@@ -66,17 +66,19 @@ func getEntClient() (*ent.Client, error) {
 
 	debug, _ := strconv.ParseBool(getEnv("DB_DEBUG", "false"))
 
-	var options = make([]ent.Option, 0, 0)
+	var options = make([]ent.Option, 0)
 
 	if debug {
 		options = append(options, ent.Debug())
 	}
 
-	return ent.Open(
+	client, err := ent.Open(
 		"mysql",
 		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, pass, host, port, db),
 		options...,
 	)
+
+	return client, errors.Wrap(err, "failed to connect to mysql database")
 }
 
 func getEnv(n, v string) string {
