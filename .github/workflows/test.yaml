@@ -1,0 +1,59 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+      - "mkdocs.yaml"
+      - ".readthedocs.yaml"
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+      - "mkdocs.yaml"
+      - ".readthedocs.yaml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Cache Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/appdata/local/go-build
+            ~/Library/Caches/go-build
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-1-${{ hashFiles('**/go.sum') }}-test
+          restore-keys: |
+            ${{ runner.os }}-go-1-${{ hashFiles('**/go.sum') }}-
+
+      - run: make install
+
+      - name: Run tests
+        run: make coverage
+        env:
+          GORACE: halt_on_error=1
+
+      - name: Codecov
+        run: bash <(curl -s https://codecov.io/bash) -F ${{ runner.os }}
+        shell: bash
