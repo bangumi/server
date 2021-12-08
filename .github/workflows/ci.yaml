@@ -22,8 +22,9 @@ jobs:
           python-version: "3.8"
 
       - uses: Trim21/setup-poetry@dist/v1
-
       - uses: Trim21/install-poetry-project@dist/v1
+
+      - run: bash $HOME/dev-env/wait_mysql_ready.sh
 
       - name: test
         run: coverage run -m pytest
