@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, TypeVar, Optional
+from typing import Any, Dict, TypeVar, Optional
 
 from pydantic import Field, BaseModel
 
@@ -28,7 +28,6 @@ class SubjectInfo(BaseModel):
 
 class Person(BaseModel):
     id: int
-    subjects: List[SubjectInfo]
     name: str
     type: int
     infobox: str

@@ -24,17 +24,15 @@ def test_person_basic(client: TestClient):
 
     data = response.json()
     assert data["img"] is None
-    assert isinstance(data["subjects"], list)
     assert not data["locked"]
 
 
 def test_person_subjects(client: TestClient):
-    response = client.get("/api/v0/person/1")
+    response = client.get("/api/v0/person/1/subjects")
     assert response.status_code == 200
 
-    data = response.json()
-    assert data["subjects"]
-    assert set(data["subjects"][0].keys()) == {
+    subjects = response.json()
+    assert set(subjects[0].keys()) == {
         "id",
         "staff",
         "name",
