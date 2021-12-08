@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, APIRouter, HTTPException
+from fastapi import Path, Depends, APIRouter, HTTPException
 from databases import Database
 from starlette.responses import RedirectResponse
 
@@ -24,7 +24,7 @@ router = APIRouter()
     },
 )
 async def get_person(
-    person_id: int,
+    person_id: int = Path(..., gt=0),
     db: Database = Depends(get_db),
 ):
     try:

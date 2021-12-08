@@ -12,6 +12,10 @@ def test_person_not_valid(client: TestClient):
     assert response.status_code == 422
     assert response.headers["content-type"] == "application/json"
 
+    response = client.get("/api/v0/person/0")
+    assert response.status_code == 422
+    assert response.headers["content-type"] == "application/json"
+
 
 def test_person_basic(client: TestClient):
     response = client.get("/api/v0/person/2")
