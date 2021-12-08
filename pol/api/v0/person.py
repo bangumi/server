@@ -16,6 +16,8 @@ from pol.curd.exceptions import NotFoundError
 
 router = APIRouter()
 
+api_base = "/api/v0/person"
+
 
 async def basic_person(
     person_id: int = Path(..., gt=0),
@@ -41,7 +43,7 @@ async def get_person(
     person: ChiiPerson = Depends(basic_person),
 ):
     if person.prsn_redirect:
-        return RedirectResponse(str(person.prsn_redirect))
+        return RedirectResponse(f"{api_base}/{person.prsn_redirect}")
 
     data = {
         "id": person.prsn_id,
@@ -91,7 +93,7 @@ async def get_person_subjects(
     person: ChiiPerson = Depends(basic_person),
 ):
     if person.prsn_redirect:
-        return RedirectResponse(f"/api/v0/person/{person.prsn_redirect}/subjects")
+        return RedirectResponse(f"{api_base}/{person.prsn_redirect}/subjects")
 
     print(router.prefix)
 
