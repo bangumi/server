@@ -55,6 +55,7 @@ async def get_person(
         summary=person.prsn_summary,
         img=imgUrl(person.prsn_img),
         subjects=result,
+        locked=person.prsn_lock,
     )
 
     try:

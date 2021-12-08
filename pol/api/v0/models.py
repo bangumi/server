@@ -21,6 +21,7 @@ class Person(BaseModel):
     role: PersonRole
     summary: str
     subjects: List[int]
+    locked: bool
 
     wiki: Optional[Dict[str, Any]] = Field(
         None,
