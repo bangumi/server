@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import Field, BaseModel
 
@@ -18,10 +18,20 @@ class Person(BaseModel):
     name: str
     type: int
     infobox: str
-    wiki: Optional[Dict[str, Any]] = Field(
-        None,
-        description="server parsed infobox, a map from key to string or tuple",
-    )
     role: PersonRole
     summary: str
-    img: Optional[str]
+    subjects: List[int]
+
+    wiki: Optional[Dict[str, Any]] = Field(
+        None,
+        description="server parsed infobox, a map from key to string or tuple\n"
+        "null if server infobox is not valid",
+    )
+
+    img: Optional[str] = None
+
+    gender: Optional[int] = Field(None, description="parsed from wiki, maybe null")
+    blood_type: Optional[int] = Field(None, description="parsed from wiki, maybe null")
+    birth_year: Optional[int] = Field(None, description="parsed from wiki, maybe null")
+    birth_mon: Optional[int] = Field(None, description="parsed from wiki, maybe null")
+    birth_day: Optional[int] = Field(None, description="parsed from wiki, maybe null")

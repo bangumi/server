@@ -4,6 +4,7 @@ from sqlalchemy import (
     Column,
     String,
     DateTime,
+    and_,
     func,
     join,
     text,
@@ -24,4 +25,5 @@ __all__ = [
     "select",
     "update",
     "insert",
+    "and_",
 ]

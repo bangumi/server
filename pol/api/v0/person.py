@@ -7,7 +7,8 @@ from pol.utils import imgUrl
 from pol.api.v0 import models
 from pol.models import ErrorDetail
 from pol.depends import get_db
-from pol.db.tables import ChiiPerson
+from pol.db.tables import ChiiPerson, ChiiPersonField, ChiiPersonCsIndex
+from pol.db_models import sa
 from pol.curd.exceptions import NotFoundError
 
 router = APIRouter()
@@ -20,7 +21,7 @@ router = APIRouter()
         404: res.response(model=ErrorDetail),
     },
 )
-async def bgm_ip_map(
+async def get_person(
     person_id: int,
     db: Database = Depends(get_db),
 ):
@@ -32,6 +33,24 @@ async def bgm_ip_map(
     if person.prsn_redirect:
         return RedirectResponse(str(person.prsn_redirect))
 
+    query = (
+        sa.select([ChiiPersonCsIndex.subject_id])
+        .where(ChiiPersonCsIndex.prsn_id == person_id)
+        .distinct(ChiiPersonCsIndex.subject_id)
+        .order_by(ChiiPersonCsIndex.subject_id)
+    )
+
+    result = []
+    for r in await db.fetch_all(query):
+        result.append(ChiiPersonCsIndex(**r).subject_id)
+
+    field = await curd.get_one_null(
+        db,
+        ChiiPersonField,
+        ChiiPersonField.prsn_id == person_id,
+        ChiiPersonField.prsn_cat == "prsn",
+    )
+
     m = models.Person(
         id=person.prsn_id,
         name=person.prsn_name,
@@ -40,11 +59,19 @@ async def bgm_ip_map(
         role=person.role(),
         summary=person.prsn_summary,
         img=imgUrl(person.prsn_img),
+        subjects=result,
     )
 
     try:
         m.wiki = wiki.parse(person.prsn_infobox).info
     except wiki.WikiSyntaxError:
         pass
+
+    if field:
+        m.gender = field.gender
+        m.blood_type = field.bloodtype
+        m.birth_year = field.birth_year
+        m.birth_mon = field.birth_mon
+        m.birth_day = field.birth_day
 
     return m
