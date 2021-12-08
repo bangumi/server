@@ -38,9 +38,11 @@ async def get_person(
     query = (
         sa.select([ChiiPersonCsIndex.subject_id])
         .where(ChiiPersonCsIndex.prsn_id == person_id)
-        .distinct(ChiiPersonCsIndex.subject_id)
+        .distinct()
         .order_by(ChiiPersonCsIndex.subject_id)
     )
+
+    print(str(query))
 
     result: List[int] = []
     for r in await db.fetch_all(query):
