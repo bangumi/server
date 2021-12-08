@@ -48,7 +48,7 @@ async def get_person(
     data = {
         "id": person.prsn_id,
         "name": person.prsn_name,
-        "type": str(PersonType(person.prsn_type)),
+        "type": PersonType.to_view(person.prsn_type),
         "infobox": person.prsn_infobox,
         "role": models.PersonRole.from_orm(person),
         "summary": person.prsn_summary,
@@ -63,10 +63,8 @@ async def get_person(
             ChiiPersonField.prsn_id == person_id,
             ChiiPersonField.prsn_cat == "prsn",
         )
-        if field.gender:
-            data["gender"] = str(Gender(field.gender))
-        if field.bloodtype:
-            data["blood_type"] = str(BloodType(field.bloodtype))
+        data["gender"] = Gender.to_view(field.gender)
+        data["blood_type"] = BloodType.to_view(field.bloodtype)
         data["birth_year"] = field.birth_year or None
         data["birth_mon"] = field.birth_mon or None
         data["birth_day"] = field.birth_day or None

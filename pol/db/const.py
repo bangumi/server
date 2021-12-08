@@ -1,4 +1,5 @@
 import enum
+from typing import Optional
 
 from pol.db._const import (
     Staff,
@@ -10,7 +11,15 @@ from pol.db._const import (
 )
 
 
-class BloodType(int, enum.Enum):
+class ViewMixin:
+    @classmethod
+    def to_view(cls, v) -> Optional[str]:
+        if not v:
+            return None
+        return str(cls(v))
+
+
+class BloodType(int, ViewMixin, enum.Enum):
     a = 1
     b = 2
     ab = 3
@@ -23,7 +32,7 @@ class BloodType(int, enum.Enum):
             raise ValueError(f"{self.value} is not valid blood type")
 
 
-class PersonType(int, enum.Enum):
+class PersonType(int, ViewMixin, enum.Enum):
     person = 1
     company = 2
     band = 3
@@ -35,7 +44,7 @@ class PersonType(int, enum.Enum):
             raise ValueError(f"{self.value} is not valid person record type")
 
 
-class Gender(int, enum.Enum):
+class Gender(int, ViewMixin, enum.Enum):
     male = 1
     female = 2
 
