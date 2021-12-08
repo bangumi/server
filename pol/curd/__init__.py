@@ -32,7 +32,7 @@ async def get_all(db: Database, t: Type[T], *where) -> List[T]:
     query = sa.select(t).where(*where).limit(1)
     result = []
     for r in await db.fetch_all(query):
-        result.append(**r)
+        result.append(t(**r))
     return result
 
 
