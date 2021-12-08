@@ -55,7 +55,7 @@ class Gender(int, ViewMixin, enum.Enum):
 
     def __str__(self):
         try:
-            return {1: "男", 2: "女"}[self.value]
+            return {1: "male", 2: "female"}[self.value]
         except KeyError:
             raise ValueError(f"{self.value} is not valid gender")
 

@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Dict, List, TypeVar, Optional
 
 from pydantic import Field, BaseModel
@@ -36,6 +37,7 @@ class Person(BaseModel):
     role: List[str]
     summary: str
     locked: bool
+    last_update: datetime.datetime
 
     wiki: Optional[List[Dict[str, Any]]] = Field(
         None,
