@@ -1,5 +1,5 @@
 import enum
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from pol.db._const import (
     Staff,
@@ -12,8 +12,13 @@ from pol.db._const import (
 
 
 class ViewMixin:
+    if TYPE_CHECKING:
+
+        def __init__(self, v):
+            pass
+
     @classmethod
-    def to_view(cls, v) -> Optional[str]:
+    def to_view(cls, v: Optional[int]) -> Optional[str]:
         if not v:
             return None
         return str(cls(v))
