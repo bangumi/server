@@ -5,7 +5,7 @@ from databases import Database
 from starlette.responses import RedirectResponse
 
 from pol import res, curd, wiki
-from pol.utils import img_url
+from pol.utils import person_img_url, subject_img_url
 from pol.api.v0 import models
 from pol.models import ErrorDetail
 from pol.depends import get_db
@@ -62,7 +62,7 @@ async def get_person(
     subjects = [dict(r) for r in await db.fetch_all(query)]
 
     for s in subjects:
-        s["subject_image"] = img_url(s["subject_image"])
+        s["subject_image"] = subject_img_url(s["subject_image"])
         rel = result[s["subject_id"]]
         s["staff"] = get_staff(StaffMap[rel.subject_type_id][rel.prsn_position])
 
@@ -73,7 +73,7 @@ async def get_person(
         "infobox": person.prsn_infobox,
         "role": models.PersonRole.from_orm(person),
         "summary": person.prsn_summary,
-        "img": img_url(person.prsn_img),
+        "img": person_img_url(person.prsn_img),
         "subjects": subjects,
         "locked": person.prsn_lock,
     }
