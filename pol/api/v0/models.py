@@ -1,4 +1,4 @@
-from typing import Any, Dict, TypeVar, Optional
+from typing import Any, Dict, List, TypeVar, Optional
 
 from pydantic import Field, BaseModel
 
@@ -37,7 +37,7 @@ class Person(BaseModel):
     summary: str
     locked: bool
 
-    wiki: Optional[Dict[str, Any]] = Field(
+    wiki: Optional[List[Dict[str, Any]]] = Field(
         None,
         description=(
             "server parsed infobox, a map from key to string or tuple\n"
