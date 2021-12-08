@@ -1,0 +1,46 @@
+name: ci
+
+on:
+  push:
+    branches-ignore:
+      - renovate/**
+      - deepsource-fix-*
+  pull_request: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: git clone https://github.com/bangumi/dev-env $HOME/dev-env
+
+      - run: cd ~/dev-env && docker-compose up -d
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: Trim21/setup-poetry@dist/v1
+
+      - uses: Trim21/install-poetry-project@dist/v1
+
+      - name: test
+        run: coverage run -m pytest
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: "3306"
+          MYSQL_USER: user
+          MYSQL_PASS: password
+          MYSQL_DB: bangumi
+          REDIS_URI: redis://127.0.0.1:6379/0
+
+      - run: coverage xml
+
+      - uses: codecov/codecov-action@v2
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker build -t bangumi/server .

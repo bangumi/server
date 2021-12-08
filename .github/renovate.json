@@ -1,17 +1,18 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "local>Trim21/renovate-config",
-    "local>Trim21/renovate-config:monthly"
-  ],
+  "extends": ["@trim21", "@trim21:monthly", "@trim21:poetry"],
+  "separateMajorMinor": false,
   "separateMinorPatch": false,
-  "separateMajorMinor": true,
-  "separateMultipleMajor": true,
+  "rangeStrategy": "widen",
   "packageRules": [
     {
-      "groupName": "deps",
-      "matchManagers": ["gomod"],
-      "matchUpdateTypes": ["patch", "minor"]
+      "groupName": "deps-docs",
+      "semanticCommitScope": "docs",
+      "packagePatterns": ["^sphinx"],
+      "rangeStrategy": "pin"
+    },
+    {
+      "depTypeList": ["dev-dependencies"],
+      "rangeStrategy": "pin"
     }
   ]
 }

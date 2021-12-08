@@ -1,0 +1,69 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 38b88246ccc552bffaaf54259d064beeee434539 # frozen: v4.0.1
+    hooks:
+      - id: check-case-conflict
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-byte-order-marker
+      - id: check-toml
+      - id: check-yaml
+      - id: check-json
+      - id: check-docstring-first
+      - id: check-merge-conflict
+      - id: check-added-large-files # check for file bigger than 500kb
+      - id: debug-statements
+      - id: trailing-whitespace
+      - id: debug-statements
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: end-of-file-fixer
+      - id: fix-encoding-pragma
+        args: [--remove]
+
+  - repo: https://github.com/Trim21/pre-commit-hooks
+    rev: e4bd622f56f4cb289b7c15f6e9f03698afbc55d2 # frozen: v0.4.1
+    hooks:
+      - id: poetry-check-lock
+      - id: find-trailing-comma
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: 9db80ebadc833c3863746007d3933f8f63aea759 # frozen: v2.29.1
+    hooks:
+      - id: pyupgrade
+        args: [--py38-plus]
+
+  - repo: https://github.com/Trim21/poetry-check-lock
+    rev: 85c22f5c571ebc5ba8c935ae5aeb20ec0a9a3add # frozen: v0.0.4
+    hooks:
+      - id: poetry-check-lock
+
+  - repo: https://github.com/timothycrosley/isort
+    rev: c5e8fa75dda5f764d20f66a215d71c21cfa198e1 # frozen: 5.10.1
+    hooks:
+      - id: isort
+        args:
+          - --length-sort
+          - --line-width=88
+          - --trailing-comma
+          - --multi-line=3
+          - --project=pol
+          - --force-grid-wrap=0
+          - --use-parentheses
+          - --sd=THIRDPARTY
+          - --no-lines-before=LOCALFOLDER
+
+  - repo: https://github.com/myint/autoflake
+    rev: 7a53fdafc82c33f446915b60fcac947c51279260 # frozen: v1.4
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-unused-variables
+          - --remove-all-unused-imports
+          - --expand-star-imports
+
+  - repo: https://github.com/psf/black
+    rev: f1d4e742c91dd5179d742b0db9293c4472b765f8 # frozen: 21.12b0
+    hooks:
+      - id: black

@@ -1,7 +1,16 @@
-*.exe
-.vscode/
-.idea/
-dist/
-.bin/
-.env
-.envrc
+# Created by .ignore support plugin (hsz.mobi)
+.idea
+.vscode
+ics
+env
+source.sh
+.scrapy
+a.html
+*.py[cod]
+.mypy_cache
+.pytest_cache
+docs/build
+docs/source/openapi.json
+*.egg-info
+.venv/
+dev-env/

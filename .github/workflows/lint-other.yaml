@@ -29,16 +29,12 @@ jobs:
     steps:
       - name: Install Node LTS
         uses: actions/setup-node@v2
-        with:
-          node-version: 14.x.x
-      - run: npm i -g prettier
 
-      - uses: actions/setup-python@v2
-      - run: pip install black isort
+      - run: npm i -g prettier
 
       - uses: reviewdog/action-setup@v1
         with:
-          reviewdog_version: latest # Optional. [latest,nightly,v.X.Y.Z]
+          reviewdog_version: latest
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -51,10 +47,7 @@ jobs:
         if: ${{ github.event_name == 'push' }}
 
       - name: prettier
-        run: |
-          prettier --write --list-different ./
-          isort ./
-          black ./
+        run: prettier --write --list-different ./
 
       - run: git diff --exit-code
 
