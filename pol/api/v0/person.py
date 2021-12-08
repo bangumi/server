@@ -95,8 +95,6 @@ async def get_person_subjects(
     if person.prsn_redirect:
         return RedirectResponse(f"{api_base}/{person.prsn_redirect}/subjects")
 
-    print(router.prefix)
-
     query = (
         sa.select(
             ChiiPersonCsIndex.subject_id,
