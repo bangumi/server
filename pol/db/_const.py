@@ -1,11 +1,11 @@
-from typing import NamedTuple
+from typing import Optional, NamedTuple
 
 
 class Staff(NamedTuple):
     cn: str
     jp: str
     en: str
-    rdf: str = None
+    rdf: Optional[str] = None
 
 
 staff_job_real = {

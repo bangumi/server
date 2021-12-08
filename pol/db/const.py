@@ -28,4 +28,5 @@ StaffMap = {
 
 
 def get_staff(o: Staff) -> str:
-    return o.cn or o.jp or o.en or o.rdf
+    v: str = o.cn or o.jp or o.en or o.rdf
+    return v
