@@ -2,7 +2,7 @@ from typing import Any, Dict, List, TypeVar, Optional
 
 from pydantic import Field, BaseModel
 
-from pol.db.const import BloodType
+from pol.db.const import BloodType, PersonType
 
 T = TypeVar("T", bound="PersonRole")
 
@@ -31,9 +31,9 @@ class SubjectInfo(BaseModel):
 class Person(BaseModel):
     id: int
     name: str
-    type: str
+    type: PersonType
     infobox: str
-    role: PersonRole
+    role: List[str]
     summary: str
     locked: bool
 

@@ -9,14 +9,14 @@ from pol.utils import person_img_url, subject_img_url
 from pol.api.v0 import models
 from pol.models import ErrorDetail
 from pol.depends import get_db
-from pol.db.const import Gender, StaffMap, BloodType, PersonType, get_staff
+from pol.db.const import Gender, StaffMap, BloodType, get_staff
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
 from pol.curd.exceptions import NotFoundError
 
 router = APIRouter()
 
-api_base = "/api/v0/person"
+api_base = "/api/v0/persons"
 
 
 async def basic_person(
@@ -36,7 +36,7 @@ async def basic_person(
 
 
 @router.get(
-    "/person/{person_id}",
+    "/persons/{person_id}",
     response_model=models.Person,
     response_model_by_alias=False,
     responses={
@@ -53,9 +53,13 @@ async def get_person(
     data = {
         "id": person.prsn_id,
         "name": person.prsn_name,
-        "type": PersonType.to_view(person.prsn_type),
+        "type": person.prsn_type,
         "infobox": person.prsn_infobox,
-        "role": models.PersonRole.from_orm(person),
+        "role": [
+            key
+            for key, value in models.PersonRole.from_orm(person).dict().items()
+            if value
+        ],
         "summary": person.prsn_summary,
         "img": person_img_url(person.prsn_img),
         "locked": person.prsn_lock,
@@ -85,7 +89,7 @@ async def get_person(
 
 
 @router.get(
-    "/person/{person_id}/subjects",
+    "/persons/{person_id}/subjects",
     response_model=List[models.SubjectInfo],
     response_model_by_alias=False,
     responses={
