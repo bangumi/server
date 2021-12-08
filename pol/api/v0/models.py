@@ -29,6 +29,11 @@ class SubjectInfo(BaseModel):
     image: Optional[str] = Field(alias="subject_image")
 
 
+class Stat(BaseModel):
+    comments: int
+    collects: int
+
+
 class Person(BaseModel):
     id: int
     name: str
@@ -56,6 +61,8 @@ class Person(BaseModel):
     birth_year: Optional[int] = Field(None, description="parsed from wiki, maybe null")
     birth_mon: Optional[int] = Field(None, description="parsed from wiki, maybe null")
     birth_day: Optional[int] = Field(None, description="parsed from wiki, maybe null")
+
+    stat: Stat
 
     # class Config:
     #     use_enum_values = True

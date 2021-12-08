@@ -64,6 +64,10 @@ async def get_person(
         "img": person_img_url(person.prsn_img),
         "locked": person.prsn_lock,
         "last_update": person.prsn_lastpost,
+        "stat": {
+            "comments": person.prsn_comment,
+            "collects": person.prsn_collects,
+        },
     }
 
     try:
