@@ -33,11 +33,6 @@ repos:
       - id: pyupgrade
         args: [--py38-plus]
 
-  - repo: https://github.com/Trim21/poetry-check-lock
-    rev: 85c22f5c571ebc5ba8c935ae5aeb20ec0a9a3add # frozen: v0.0.4
-    hooks:
-      - id: poetry-check-lock
-
   - repo: https://github.com/timothycrosley/isort
     rev: c5e8fa75dda5f764d20f66a215d71c21cfa198e1 # frozen: 5.10.1
     hooks:

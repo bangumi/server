@@ -45,12 +45,23 @@ pytest
 
 ### python
 
-formatter: black
+启用 [pre-commit](https://github.com/pre-commit/pre-commit)
 
-lint: flake8, isort
+```shell
+pre-commit insall
+```
 
-其他: [pre-commit](https://github.com/pre-commit/pre-commit)
+pre-commit 会在当前仓库安装一个 git hook，在每次 commit 前自动运行。
+
+也可以手动运行
+
+```shell
+pre-commit run #only check changed files
+pre-commit run --all-files # check all files
+```
+
+lint: flake8
 
 ### 配置文件
 
-非 python 文件(yaml,json,markdown 等)使用 [prettier](https://prettier.io/) 进行格式化。
+非 python 文件(yaml, json, markdown 等)使用 [prettier](https://prettier.io/) 进行格式化。
