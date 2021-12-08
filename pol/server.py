@@ -42,7 +42,7 @@ async def http_exception_handler(request, exc: res.HTTPException):
 
 
 @app.exception_handler(RequestValidationError)
-async def http_exception_handler(request, exc: RequestValidationError):
+async def validation_exception_handler(request, exc: RequestValidationError):
     return ORJSONResponse(
         {
             "title": "Invalid Request",
