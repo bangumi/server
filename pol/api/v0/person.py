@@ -42,7 +42,7 @@ async def get_person(
         .order_by(ChiiPersonCsIndex.subject_id)
     )
 
-    result: List[ChiiPersonCsIndex] = []
+    result: List[int] = []
     for r in await db.fetch_all(query):
         result.append(ChiiPersonCsIndex(**r).subject_id)
 
