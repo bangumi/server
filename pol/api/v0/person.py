@@ -46,13 +46,6 @@ async def get_person(
     for r in await db.fetch_all(query):
         result.append(ChiiPersonCsIndex(**r).subject_id)
 
-    field = await curd.get_one_null(
-        db,
-        ChiiPersonField,
-        ChiiPersonField.prsn_id == person_id,
-        ChiiPersonField.prsn_cat == "prsn",
-    )
-
     m = models.Person(
         id=person.prsn_id,
         name=person.prsn_name,
@@ -65,15 +58,23 @@ async def get_person(
     )
 
     try:
-        m.wiki = wiki.parse(person.prsn_infobox).info
-    except wiki.WikiSyntaxError:
-        pass
-
-    if field:
+        field = await curd.get_one(
+            db,
+            ChiiPersonField,
+            ChiiPersonField.prsn_id == person_id,
+            ChiiPersonField.prsn_cat == "prsn",
+        )
         m.gender = field.gender
         m.blood_type = field.bloodtype
         m.birth_year = field.birth_year
         m.birth_mon = field.birth_mon
         m.birth_day = field.birth_day
+    except NotFoundError:
+        pass
+
+    try:
+        m.wiki = wiki.parse(person.prsn_infobox).info
+    except wiki.WikiSyntaxError:
+        pass
 
     return m

@@ -27,6 +27,8 @@ async def get_one_null(db: Database, t: Type[T], *where) -> Optional[T]:
     if r:
         return t(**r)
 
+    return None
+
 
 async def get_all(db: Database, t: Type[T], *where) -> List[T]:
     query = sa.select(t).where(*where).limit(1)
