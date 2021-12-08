@@ -9,7 +9,7 @@ from pol.utils import person_img_url, subject_img_url
 from pol.api.v0 import models
 from pol.models import ErrorDetail
 from pol.depends import get_db
-from pol.db.const import StaffMap, get_staff
+from pol.db.const import Gender, StaffMap, BloodType, PersonType, get_staff
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
 from pol.curd.exceptions import NotFoundError
@@ -48,7 +48,7 @@ async def get_person(
     data = {
         "id": person.prsn_id,
         "name": person.prsn_name,
-        "type": person.prsn_type,
+        "type": str(PersonType(person.prsn_type)),
         "infobox": person.prsn_infobox,
         "role": models.PersonRole.from_orm(person),
         "summary": person.prsn_summary,
@@ -63,8 +63,10 @@ async def get_person(
             ChiiPersonField.prsn_id == person_id,
             ChiiPersonField.prsn_cat == "prsn",
         )
-        data["gender"] = field.gender or None
-        data["blood_type"] = field.bloodtype or None
+        if field.gender:
+            data["gender"] = str(Gender(field.gender))
+        if field.bloodtype:
+            data["blood_type"] = str(BloodType(field.bloodtype))
         data["birth_year"] = field.birth_year or None
         data["birth_mon"] = field.birth_mon or None
         data["birth_day"] = field.birth_day or None

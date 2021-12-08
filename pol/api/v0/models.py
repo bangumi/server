@@ -2,6 +2,8 @@ from typing import Any, Dict, TypeVar, Optional
 
 from pydantic import Field, BaseModel
 
+from pol.db.const import BloodType
+
 T = TypeVar("T", bound="PersonRole")
 
 
@@ -29,7 +31,7 @@ class SubjectInfo(BaseModel):
 class Person(BaseModel):
     id: int
     name: str
-    type: int
+    type: str
     infobox: str
     role: PersonRole
     summary: str
@@ -45,8 +47,13 @@ class Person(BaseModel):
 
     img: Optional[str] = None
 
-    gender: Optional[int] = Field(None, description="parsed from wiki, maybe null")
-    blood_type: Optional[int] = Field(None, description="parsed from wiki, maybe null")
+    gender: Optional[str] = Field(None, description="parsed from wiki, maybe null")
+    blood_type: Optional[BloodType] = Field(
+        None, description="parsed from wiki, maybe null"
+    )
     birth_year: Optional[int] = Field(None, description="parsed from wiki, maybe null")
     birth_mon: Optional[int] = Field(None, description="parsed from wiki, maybe null")
     birth_day: Optional[int] = Field(None, description="parsed from wiki, maybe null")
+
+    # class Config:
+    #     use_enum_values = True

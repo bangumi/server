@@ -10,6 +10,42 @@ from pol.db._const import (
 )
 
 
+class BloodType(int, enum.Enum):
+    a = 1
+    b = 2
+    ab = 3
+    o = 4
+
+    def __str__(self):
+        try:
+            return {1: "A", 2: "B", 3: "AB", 4: "O"}[self.value]
+        except KeyError:
+            raise ValueError(f"{self.value} is not valid blood type")
+
+
+class PersonType(int, enum.Enum):
+    person = 1
+    company = 2
+    band = 3
+
+    def __str__(self):
+        try:
+            return {1: "个人", 2: "公司", 3: "组合"}[self.value]
+        except KeyError:
+            raise ValueError(f"{self.value} is not valid person record type")
+
+
+class Gender(int, enum.Enum):
+    male = 1
+    female = 2
+
+    def __str__(self):
+        try:
+            return {1: "男", 2: "女"}[self.value]
+        except KeyError:
+            raise ValueError(f"{self.value} is not valid gender")
+
+
 class SubjectType(int, enum.Enum):
     book = 1
     anime = 2
