@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import Depends, APIRouter, HTTPException
 from databases import Database
 from starlette.responses import RedirectResponse
@@ -40,7 +42,7 @@ async def get_person(
         .order_by(ChiiPersonCsIndex.subject_id)
     )
 
-    result = []
+    result: List[ChiiPersonCsIndex] = []
     for r in await db.fetch_all(query):
         result.append(ChiiPersonCsIndex(**r).subject_id)
 
