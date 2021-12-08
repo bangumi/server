@@ -42,8 +42,6 @@ async def get_person(
         .order_by(ChiiPersonCsIndex.subject_id)
     )
 
-    print(str(query))
-
     result: List[int] = []
     for r in await db.fetch_all(query):
         result.append(ChiiPersonCsIndex(**r).subject_id)
@@ -67,11 +65,11 @@ async def get_person(
             ChiiPersonField.prsn_id == person_id,
             ChiiPersonField.prsn_cat == "prsn",
         )
-        m.gender = field.gender
-        m.blood_type = field.bloodtype
-        m.birth_year = field.birth_year
-        m.birth_mon = field.birth_mon
-        m.birth_day = field.birth_day
+        m.gender = field.gender or None
+        m.blood_type = field.bloodtype or None
+        m.birth_year = field.birth_year or None
+        m.birth_mon = field.birth_mon or None
+        m.birth_day = field.birth_day or None
     except NotFoundError:
         pass
 

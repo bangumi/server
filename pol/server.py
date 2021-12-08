@@ -52,7 +52,7 @@ async def doc():
 <head>
 <link type="text/css" rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css">
-<link rel="shortcut icon" href="https://blog.trim21.cn/favicon.ico">
+<link rel="shortcut icon" href="https://bgm.tv/img/favicon.ico">
 <title>Pol server - Swagger UI</title>
 <style>
     a {
