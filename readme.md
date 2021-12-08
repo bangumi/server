@@ -29,6 +29,12 @@ pre-commit install
 - `MYSQL_USER` **无默认值**
 - `MYSQL_PASS` **无默认值**
 
+启动服务器
+
+```shell
+uvicorn pol.server:app --reload --port 3000
+```
+
 ### 后端环境
 
 https://github.com/bangumi/dev-env
