@@ -32,13 +32,13 @@ def test_key_array():
     assert parse(raw).info == {
         "中文名": "Code Geass 反叛的鲁路修R2",
         "别名": [
-            "叛逆的鲁路修R2",
-            "Code Geass: Hangyaku no Lelouch R2",
-            "叛逆的勒鲁什R2",
-            "叛逆的鲁鲁修R2",
-            "コードギアス 反逆のルルーシュR2",
-            "Code Geass: Lelouch of the Rebellion R2",
-            "叛逆的勒路什R2",
+            {"v": "叛逆的鲁路修R2"},
+            {"v": "Code Geass: Hangyaku no Lelouch R2"},
+            {"v": "叛逆的勒鲁什R2"},
+            {"v": "叛逆的鲁鲁修R2"},
+            {"v": "コードギアス 反逆のルルーシュR2"},
+            {"v": "Code Geass: Lelouch of the Rebellion R2"},
+            {"v": "叛逆的勒路什R2"},
         ],
         "话数": "25",
     }
@@ -59,7 +59,29 @@ def test_new_line_array_body():
 """
     assert parse(raw).info == {
         "中文名": "足球经理2009",
-        "平台": ["PC", "Mac", "PSP"],
+        "平台": [
+            {"v": "PC"},
+            {"v": "Mac"},
+            {"v": "PSP"},
+        ],
+    }
+
+
+def test_array_with_key():
+    raw = """{{Infobox Game
+|平台={
+[1|PC]
+[2|Mac]
+[PSP]
+}
+}}
+"""
+    assert parse(raw).info == {
+        "平台": [
+            {"k": "1", "v": "PC"},
+            {"k": "2", "v": "Mac"},
+            {"v": "PSP"},
+        ],
     }
 
 
@@ -199,8 +221,20 @@ def test_multi_array():
 }}"""
     assert parse(raw).info == {
         "Illustration": "真琴",
-        "Lyrics": ["紗智", "水城さえ", "タキモトショウ", "りでる", "mintea", "Cororo"],
-        "Music": ["KA=YA", "三滝航", "塵屑れお", "Yuy", "タキモトショウ", "りでる", "sonoa", "Cororo"],
+        "Lyrics": [v(x) for x in ["紗智", "水城さえ", "タキモトショウ", "りでる", "mintea", "Cororo"]],
+        "Music": [
+            v(x)
+            for x in [
+                "KA=YA",
+                "三滝航",
+                "塵屑れお",
+                "Yuy",
+                "タキモトショウ",
+                "りでる",
+                "sonoa",
+                "Cororo",
+            ]
+        ],
         "Vocal": "紗智",
         "价格": "1000 yen",
         "发售日期": "2014-04-27 (M3-33)",
@@ -222,3 +256,7 @@ def test_error_message_missing_key():
 }}"""
     with pytest.raises(WikiSyntaxError, match="missing key or unexpected line break "):
         parse(raw)
+
+
+def v(vv: str) -> dict:
+    return {"v": vv}

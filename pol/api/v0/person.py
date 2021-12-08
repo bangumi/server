@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from fastapi import Path, Depends, APIRouter, HTTPException
+from fastapi import Path, Depends, Request, APIRouter
 from databases import Database
 from starlette.responses import RedirectResponse
 
@@ -20,13 +20,19 @@ api_base = "/api/v0/person"
 
 
 async def basic_person(
+    request: Request,
     person_id: int = Path(..., gt=0),
     db: Database = Depends(get_db),
 ) -> ChiiPerson:
     try:
         return await curd.get_one(db, ChiiPerson, ChiiPerson.prsn_id == person_id)
     except NotFoundError:
-        raise HTTPException(status_code=404, detail="person not found")
+        raise res.HTTPException(
+            status_code=404,
+            title="Not Found",
+            description="resource you resource can't be found in the database",
+            detail={"person_id": request.path_params.get("person_id")},
+        )
 
 
 @router.get(
@@ -38,7 +44,6 @@ async def basic_person(
     },
 )
 async def get_person(
-    person_id: int = Path(..., gt=0),
     db: Database = Depends(get_db),
     person: ChiiPerson = Depends(basic_person),
 ):
@@ -60,7 +65,7 @@ async def get_person(
         field = await curd.get_one(
             db,
             ChiiPersonField,
-            ChiiPersonField.prsn_id == person_id,
+            ChiiPersonField.prsn_id == person.prsn_id,
             ChiiPersonField.prsn_cat == "prsn",
         )
         data["gender"] = Gender.to_view(field.gender)
@@ -88,7 +93,6 @@ async def get_person(
     },
 )
 async def get_person_subjects(
-    person_id: int = Path(..., gt=0),
     db: Database = Depends(get_db),
     person: ChiiPerson = Depends(basic_person),
 ):
@@ -101,7 +105,7 @@ async def get_person_subjects(
             ChiiPersonCsIndex.prsn_position,
             ChiiPersonCsIndex.subject_type_id,
         )
-        .where(ChiiPersonCsIndex.prsn_id == person_id)
+        .where(ChiiPersonCsIndex.prsn_id == person.prsn_id)
         .distinct()
         .order_by(ChiiPersonCsIndex.subject_id)
     )

@@ -84,9 +84,9 @@ def parse(s: str) -> Wiki:
                 if "|" in striped_line:
                     vv = striped_line[1:-1].split("|", 1)
                     if vv[1]:
-                        value.append(vv)
+                        value.append({"k": vv[0], "v": vv[1]})
                 else:
-                    value.append(striped_line[1:-1])  # type: ignore
+                    value.append({"v": striped_line[1:-1]})  # type: ignore
             elif not in_key:
                 raise WikiSyntaxError(
                     f'missing key or unexpected line break "{line}" (line: {lino + 2})'

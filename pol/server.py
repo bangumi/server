@@ -4,9 +4,10 @@ import threading
 from loguru import logger
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi.exceptions import RequestValidationError
 from starlette.middleware import cors
 
-from pol import api, config
+from pol import api, res, config
 from pol.res import ORJSONResponse
 from pol.db.mysql import database
 from pol.middlewares.http import setup_http_middleware
@@ -25,6 +26,31 @@ app = FastAPI(
 app.add_middleware(cors.CORSMiddleware, allow_origins=["bgm.tv", "bangumi.tv"])
 setup_http_middleware(app)
 app.include_router(api.router, prefix="/api")
+
+
+@app.exception_handler(res.HTTPException)
+async def http_exception_handler(request, exc: res.HTTPException):
+    return ORJSONResponse(
+        {
+            "title": exc.title,
+            "description": exc.description,
+            "detail": exc.detail,
+        },
+        headers=exc.headers,
+        status_code=exc.status_code,
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def http_exception_handler(request, exc: RequestValidationError):
+    return ORJSONResponse(
+        {
+            "title": "Invalid Request",
+            "description": "One or more parameters to your request was invalid.",
+            "detail": exc.errors(),
+        },
+        status_code=422,
+    )
 
 
 @app.on_event("startup")
