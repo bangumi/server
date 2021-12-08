@@ -4,3 +4,4 @@ from pydantic import BaseModel
 class ErrorDetail(BaseModel):
     detail: str
     title: str
+    description: str
