@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Type, TypeVar, Optional
+from typing import Any, Dict, List, TypeVar, Optional
 
 from pydantic import Field, BaseModel
 
@@ -6,36 +6,24 @@ T = TypeVar("T", bound="PersonRole")
 
 
 class PersonRole(BaseModel):
-    producer: bool
-    mangaka: bool
-    artist: bool
-    seiyu: bool
-    writer: bool
-    illustrator: bool
-    actor: bool
+    producer: bool = Field(..., alias="prsn_producer")
+    mangaka: bool = Field(..., alias="prsn_mangaka")
+    artist: bool = Field(..., alias="prsn_artist")
+    seiyu: bool = Field(..., alias="prsn_seiyu")
+    writer: bool = Field(..., alias="prsn_writer")
+    illustrator: bool = Field(..., alias="prsn_illustrator")
+    actor: bool = Field(..., alias="prsn_actor")
 
-    @classmethod
-    def from_table(cls: Type[T], person) -> T:
-        return cls(
-            producer=person.prsn_producer,
-            mangaka=person.prsn_mangaka,
-            artist=person.prsn_artist,
-            seiyu=person.prsn_seiyu,
-            writer=person.prsn_writer,
-            illustrator=person.prsn_illustrator,
-            actor=person.prsn_actor,
-        )
+    class Config:
+        orm_mode = True
 
 
 class SubjectInfo(BaseModel):
-    subject_id: int
+    id: int = Field(..., alias="subject_id")
     staff: str
     name: str = Field(..., alias="subject_name")
     name_cn: str = Field(..., alias="subject_name_cn")
     image: Optional[str] = Field(alias="subject_image")
-
-    class Config:
-        orm_mode = True
 
 
 class Person(BaseModel):

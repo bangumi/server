@@ -34,6 +34,13 @@ def test_person_subjects(client: TestClient):
 
     data = response.json()
     assert data["subjects"]
+    assert set(data["subjects"][0].keys()) == {
+        "id",
+        "staff",
+        "name",
+        "name_cn",
+        "image",
+    }
 
 
 def test_person_redirect(client: TestClient):

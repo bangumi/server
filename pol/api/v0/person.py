@@ -20,6 +20,7 @@ router = APIRouter()
 @router.get(
     "/person/{person_id}",
     response_model=models.Person,
+    response_model_by_alias=False,
     responses={
         404: res.response(model=ErrorDetail),
     },
@@ -70,7 +71,7 @@ async def get_person(
         "name": person.prsn_name,
         "type": person.prsn_type,
         "infobox": person.prsn_infobox,
-        "role": models.PersonRole.from_table(person),
+        "role": models.PersonRole.from_orm(person),
         "summary": person.prsn_summary,
         "img": img_url(person.prsn_img),
         "subjects": subjects,
