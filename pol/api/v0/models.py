@@ -21,7 +21,7 @@ class PersonRole(BaseModel):
 class SubjectInfo(BaseModel):
     id: int = Field(..., alias="subject_id")
     staff: str
-    name: str = Field(..., alias="subject_name")
+    name: Optional[str] = Field(None, alias="subject_name")
     name_cn: str = Field(..., alias="subject_name_cn")
     image: Optional[str] = Field(alias="subject_image")
 
