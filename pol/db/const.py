@@ -1,0 +1,31 @@
+import enum
+
+from pol.db._const import (
+    Staff,
+    staff_job_book,
+    staff_job_game,
+    staff_job_real,
+    staff_job_anime,
+    staff_job_music,
+)
+
+
+class SubjectType(int, enum.Enum):
+    book = 1
+    anime = 2
+    music = 3
+    game = 4
+    real = 6
+
+
+StaffMap = {
+    SubjectType.book: staff_job_book,
+    SubjectType.anime: staff_job_anime,
+    SubjectType.music: staff_job_music,
+    SubjectType.game: staff_job_game,
+    SubjectType.real: staff_job_real,
+}
+
+
+def get_staff(o: Staff) -> str:
+    return o.cn or o.jp or o.en or o.rdf
