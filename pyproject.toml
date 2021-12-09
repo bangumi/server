@@ -42,6 +42,7 @@ mypy = "==0.910"
 requests = "^2.26.0"
 types-pytz = "^2021.3.1"
 pytest-github-actions-annotate-failures = "^0.1.6"
+pytest-env = "^0.6.2"
 
 [tool.coverage.report]
 exclude_lines = [
@@ -51,7 +52,10 @@ exclude_lines = [
 ]
 
 [tool.pytest.ini_options]
-addopts = '-ra -q'
+addopts = '-rav'
+env = [
+  'D:TESTING=true'
+]
 
 [tool.mypy]
 ignore_missing_imports = true
