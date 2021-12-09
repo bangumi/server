@@ -217,6 +217,7 @@ async def get_person(
 
 @router.get(
     "/persons/{person_id}/subjects",
+    summary="get person related subjects",
     response_model=List[models.SubjectInfo],
     response_model_by_alias=False,
     responses={
