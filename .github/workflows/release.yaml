@@ -11,28 +11,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-python@v2
-      - uses: Trim21/setup-poetry@dist/v1
-
-      - run: poetry publish --build
-        env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
 
       - name: Get Tag Name
         run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
       - name: Generate Changlog
-        run: docker build --build-arg "COMMIT_REF=$TAG" -t ghcr.io/trim21/pol:latest .
+        run: docker build --build-arg "COMMIT_REF=$TAG" -t ghcr.io/bangumi/api-server:latest .
 
-      - run: echo $DOCKER_TOKEN | docker login ghcr.io -u Trim21 --password-stdin
+      - run: echo $DOCKER_TOKEN | docker login ghcr.io -u bangumi --password-stdin
         name: docker login
         env:
           DOCKER_TOKEN: ${{ github.token }}
 
       - run: |
-          docker push ghcr.io/trim21/pol:latest
-          docker tag ghcr.io/trim21/pol:latest "ghcr.io/trim21/pol:$TAG"
-          docker push "ghcr.io/trim21/pol:$TAG"
+          docker push ghcr.io/bangumi/api-server:latest
+          docker tag ghcr.io/bangumi/api-server:latest "ghcr.io/bangumi/api-server:$TAG"
+          docker push "ghcr.io/bangumi/api-server:$TAG"
