@@ -83,8 +83,13 @@ async def get_persons(
         query = query.where(ChiiPerson.prsn_type == type)
 
     if career:
+
+        q = []
+
         for c in career:
-            query = query.where(getattr(ChiiPerson, f"prsn_{c}") == 1)
+            q.append(getattr(ChiiPerson, f"prsn_{c}") == 1)
+
+        query = query.where(sa.or_(*q))
 
     count = await db.fetch_val(query)
     if page.offset > count:
