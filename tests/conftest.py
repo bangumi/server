@@ -1,7 +1,6 @@
 import pytest
 from databases import DatabaseURL
 from sqlalchemy import create_engine
-from aioresponses import aioresponses
 from sqlalchemy.orm import sessionmaker
 
 from pol import config
@@ -13,12 +12,6 @@ def pytest_sessionstart(session):
     before performing collection and entering the run test loop.
     """
     "session start"
-
-
-@pytest.fixture()
-def mock_aiohttp():
-    with aioresponses() as m:
-        yield m
 
 
 engine = create_engine(
