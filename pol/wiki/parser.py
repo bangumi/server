@@ -1,3 +1,23 @@
+"""
+parse raw infobox to a dict like this:
+
+```python
+wiki = parse("...")
+
+assert wiki.info == [
+    {"key": "...", "value": "..."},
+    {"key": "...", "value": null},
+    {
+        "key": "...",
+        "value": [
+        {'k': '...', 'v': '...'},
+        {'v': '...'},
+      ]
+    },
+]
+```
+"""
+
 import dataclasses
 from typing import Any, Dict, List, Optional
 
