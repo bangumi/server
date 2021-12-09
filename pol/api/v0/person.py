@@ -65,14 +65,15 @@ class Order(enum.IntEnum):
 @router.get(
     "/persons",
     response_model=models.PagedPerson,
-    response_model_by_alias=False,
 )
 async def get_persons(
     db: Database = Depends(get_db),
     page: Pager = Depends(),
     name: Optional[str] = None,
-    type: Optional[PersonType] = None,
-    career: Optional[List[PersonCareer]] = Query(None),
+    type: Optional[PersonType] = Query(None, description="1为个人，2为公司，3为组合"),
+    career: Optional[List[PersonCareer]] = Query(
+        None, example="?career=mangaka&career=producer"
+    ),
     sort: Sort = Sort.id,
     order: Order = Order.desc,
 ):
