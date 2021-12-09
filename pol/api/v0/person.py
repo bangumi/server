@@ -66,9 +66,6 @@ class Order(enum.IntEnum):
     "/persons",
     response_model=models.PagedPerson,
     response_model_by_alias=False,
-    responses={
-        404: res.response(model=ErrorDetail),
-    },
 )
 async def get_persons(
     db: Database = Depends(get_db),
