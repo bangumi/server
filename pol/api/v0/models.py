@@ -1,12 +1,10 @@
 import enum
 import datetime
-from typing import Any, Dict, List, TypeVar, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import Field, BaseModel
 
 from pol.db.const import BloodType, PersonType
-
-T = TypeVar("T", bound="PersonRole")
 
 
 class PersonCareer(str, enum.Enum):
