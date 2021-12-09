@@ -143,8 +143,6 @@ async def get_persons(
     else:
         sort_field = sort_field.desc()
 
-    print(sort_field)
-
     query = query.order_by(sort_field)
 
     persons = [
