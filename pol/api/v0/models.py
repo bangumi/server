@@ -52,13 +52,12 @@ class PagedPerson(BaseModel):
 
 
 class PersonDetail(BasePerson):
-    infobox: str
     career: List[PersonCareer]
     summary: str
     locked: bool
     last_modified: datetime.datetime
 
-    wiki: Optional[List[Dict[str, Any]]] = Field(
+    infobox: Optional[List[Dict[str, Any]]] = Field(
         None,
         description=(
             "server parsed infobox, a map from key to string or tuple\n"

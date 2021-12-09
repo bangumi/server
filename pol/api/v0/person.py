@@ -153,7 +153,7 @@ async def get_persons(
             "career": get_career(r),
             "short_summary": r["prsn_summary"][:80] + "...",
             "locked": r["prsn_lock"],
-            "img": r["prsn_img"],
+            "img": person_img_url(r["prsn_img"]),
         }
         for r in await db.fetch_all(query)
     ]
@@ -180,7 +180,6 @@ async def get_person(
         "id": person.prsn_id,
         "name": person.prsn_name,
         "type": person.prsn_type,
-        "infobox": person.prsn_infobox,
         "career": get_career(person),
         "summary": person.prsn_summary,
         "img": person_img_url(person.prsn_img),
@@ -208,7 +207,7 @@ async def get_person(
         pass
 
     try:
-        data["wiki"] = wiki.parse(person.prsn_infobox).info
+        data["infobox"] = wiki.parse(person.prsn_infobox).info
     except wiki.WikiSyntaxError:
         pass
 
