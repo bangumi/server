@@ -29,9 +29,6 @@ sqlacodegen = "2.3.0"
 # tests
 coverage = { version = "==6.2", extras = ["toml"] }
 pytest = "==6.2.5"
-pytest-asyncio = "==0.16.0"
-asynctest = "0.13.0"
-pytest-rerunfailures = "==10.2"
 # linter and formatter
 pre-commit = "==2.16.0"
 flake8 = '==4.0.1'
@@ -54,9 +51,7 @@ exclude_lines = [
 ]
 
 [tool.pytest.ini_options]
-addopts = '-ra -q --reruns-delay 1'
-junit_family = 'legacy'
-
+addopts = '-ra -q'
 
 [tool.mypy]
 ignore_missing_imports = true
