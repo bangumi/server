@@ -653,6 +653,17 @@ pytest = ">=5.4.0"
 testing = ["coverage", "hypothesis (>=5.7.1)"]
 
 [[package]]
+name = "pytest-github-actions-annotate-failures"
+version = "0.1.6"
+description = "pytest plugin to annotate failed tests with a workflow command for GitHub Actions"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+pytest = ">=4.0.0"
+
+[[package]]
 name = "pytest-rerunfailures"
 version = "10.2"
 description = "pytest plugin to re-run tests to eliminate flaky failures"
@@ -962,7 +973,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.8.*"
-content-hash = "f243721db882b242bdcc210d84fdbe0f9f815df83d5d2d77280b44378fe47bda"
+content-hash = "57f33172cd3d9ab6a7e765447b4df409f2d03cf16f5af49a918e8068afa762a7"
 
 [metadata.files]
 aiohttp = [
@@ -1571,6 +1582,10 @@ pytest = [
 pytest-asyncio = [
     {file = "pytest-asyncio-0.16.0.tar.gz", hash = "sha256:7496c5977ce88c34379df64a66459fe395cd05543f0a2f837016e7144391fcfb"},
     {file = "pytest_asyncio-0.16.0-py3-none-any.whl", hash = "sha256:5f2a21273c47b331ae6aa5b36087047b4899e40f03f18397c0e65fa5cca54e9b"},
+]
+pytest-github-actions-annotate-failures = [
+    {file = "pytest-github-actions-annotate-failures-0.1.6.tar.gz", hash = "sha256:162e2fe18b8ab24716c4c3a8d88c29aa67126dc75b4e54be54b58e6fa04653c2"},
+    {file = "pytest_github_actions_annotate_failures-0.1.6-py2.py3-none-any.whl", hash = "sha256:5222dfa315c49d705912826335488ac1c75946c4b06782ab9a99379a7ee3af66"},
 ]
 pytest-rerunfailures = [
     {file = "pytest-rerunfailures-10.2.tar.gz", hash = "sha256:9e1e1bad51e07642c5bbab809fc1d4ec8eebcb7de86f90f1a26e6ef9de446697"},
