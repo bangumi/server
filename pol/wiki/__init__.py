@@ -4,12 +4,15 @@ from .parser import parse as _parse
 
 def parse(s: str):
     w = _parse(s)
-    s = []
+    if not w.info:
+        return w
+
+    result = []
     for r in w.info:
         if r["value"]:
-            s.append(r)
+            result.append(r)
 
-    w.info = s or None
+    w.info = result or None
     return w
 
 
