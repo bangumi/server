@@ -20,7 +20,7 @@ from pol.db_models import sa
 from pol.api.v0.models import PersonCareer
 from pol.curd.exceptions import NotFoundError
 
-router = APIRouter()
+router = APIRouter(tags=["人物"])
 
 api_base = "/api/v0/persons"
 
