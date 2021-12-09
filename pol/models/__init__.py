@@ -1,5 +1,9 @@
-from pydantic import BaseModel
+from typing import Any
+
+from pydantic import Field, BaseModel
 
 
 class ErrorDetail(BaseModel):
-    detail: str
+    title: str
+    description: str
+    detail: Any = Field(..., description="can be anything")

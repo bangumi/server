@@ -1,16 +1,39 @@
+"""
+parse raw infobox
+
+```python
+wiki = parse("...")
+
+assert wiki.info == [
+    {"key": "...", "value": "..."},
+    {"key": "...", "value": null},
+    {
+      "key": "...",
+      "value": [
+        {'k': '...', 'v': '...'},
+        {'v': '...'},
+      ]
+    },
+  ]
+```
+"""
 import dataclasses
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 
 @dataclasses.dataclass
 class Wiki:
     type: Optional[str]
-    info: Optional[Dict[str, Any]]
+    info: Optional[List[Dict[str, Any]]]
 
 
 class WikiSyntaxError(Exception):
     def __init__(self, message: str):
         self.message = message
+
+
+def kv(key, value=None) -> Dict[str, Any]:
+    return {"key": key, "value": value}
 
 
 # TODO: fix mysql type error
@@ -32,9 +55,9 @@ def parse(s: str) -> Wiki:
 
     lines = lines[1:-1]
 
-    data = {}
+    results: List[dict] = []
     in_key = False
-    key = None
+    key: Optional[str] = None
     value = None
     for lino, line in enumerate(lines):
         striped_line = line.strip()
@@ -68,15 +91,15 @@ def parse(s: str) -> Wiki:
                     else:
                         value = []  # type: ignore
                 else:
-                    data[key[1:]] = v or None
+                    results.append(kv(key[1:], v.strip() or None))
 
         elif striped_line == "{":
-            try:
-                del data[key[1:]]  # type: ignore
-            except TypeError:
+            if key is None:
                 raise WikiSyntaxError(f'unexpected "{{" (line: {lino + 2}')
-            key = key[1:]  # type: ignore
+            results.pop()
+            key = key[1:]
             value = []
+
         elif striped_line != "}":
             if not striped_line:
                 continue
@@ -84,9 +107,9 @@ def parse(s: str) -> Wiki:
                 if "|" in striped_line:
                     vv = striped_line[1:-1].split("|", 1)
                     if vv[1]:
-                        value.append(vv)
+                        value.append({"k": vv[0], "v": vv[1]})
                 else:
-                    value.append(striped_line[1:-1])  # type: ignore
+                    value.append({"v": striped_line[1:-1]})
             elif not in_key:
                 raise WikiSyntaxError(
                     f'missing key or unexpected line break "{line}" (line: {lino + 2})'
@@ -97,16 +120,8 @@ def parse(s: str) -> Wiki:
                 )
         elif striped_line == "}":
             in_key = False
-            if value:
-                data[key] = value  # type: ignore
-            key = value = None  # type: ignore
+            results.append(kv(key, value))
+            key = None
+            value = None  # type: ignore
 
-    d = {}
-    for key, value in data.items():  # type: ignore
-        if isinstance(value, list):
-            d[key] = value
-            continue
-        if value and (m := value.strip()):  # type: ignore
-            d[key] = m
-
-    return Wiki(subject_type, d)
+    return Wiki(subject_type, results or None)

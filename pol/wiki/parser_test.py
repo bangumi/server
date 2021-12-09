@@ -1,6 +1,6 @@
 import pytest
 
-from .parser import WikiSyntaxError, parse
+from .parser import WikiSyntaxError, kv, parse
 
 
 def test_key_value():
@@ -9,10 +9,11 @@ def test_key_value():
 |其他=
 |Copyright= （C）2006 SUNRISE inc./MBS
 }}"""
-    assert parse(raw).info == {
-        "中文名": "Code Geass 反叛的鲁路修R2",
-        "Copyright": "（C）2006 SUNRISE inc./MBS",
-    }
+    assert parse(raw).info == [
+        kv("中文名", "Code Geass 反叛的鲁路修R2"),
+        kv("其他"),
+        kv("Copyright", "（C）2006 SUNRISE inc./MBS"),
+    ]
 
 
 def test_key_array():
@@ -29,19 +30,22 @@ def test_key_array():
 }
 |话数=25
 }}"""
-    assert parse(raw).info == {
-        "中文名": "Code Geass 反叛的鲁路修R2",
-        "别名": [
-            "叛逆的鲁路修R2",
-            "Code Geass: Hangyaku no Lelouch R2",
-            "叛逆的勒鲁什R2",
-            "叛逆的鲁鲁修R2",
-            "コードギアス 反逆のルルーシュR2",
-            "Code Geass: Lelouch of the Rebellion R2",
-            "叛逆的勒路什R2",
-        ],
-        "话数": "25",
-    }
+    assert parse(raw).info == [
+        kv("中文名", "Code Geass 反叛的鲁路修R2"),
+        kv(
+            "别名",
+            [
+                v("叛逆的鲁路修R2"),
+                v("Code Geass: Hangyaku no Lelouch R2"),
+                v("叛逆的勒鲁什R2"),
+                v("叛逆的鲁鲁修R2"),
+                v("コードギアス 反逆のルルーシュR2"),
+                v("Code Geass: Lelouch of the Rebellion R2"),
+                v("叛逆的勒路什R2"),
+            ],
+        ),
+        kv("话数", "25"),
+    ]
 
 
 def test_new_line_array_body():
@@ -57,10 +61,39 @@ def test_new_line_array_body():
 }
 }}
 """
-    assert parse(raw).info == {
-        "中文名": "足球经理2009",
-        "平台": ["PC", "Mac", "PSP"],
-    }
+    assert parse(raw).info == [
+        kv("中文名", "足球经理2009"),
+        kv("别名", []),
+        kv(
+            "平台",
+            [
+                {"v": "PC"},
+                {"v": "Mac"},
+                {"v": "PSP"},
+            ],
+        ),
+    ]
+
+
+def test_array_with_key():
+    raw = """{{Infobox Game
+|平台={
+[1|PC]
+[2|Mac]
+[PSP]
+}
+}}
+"""
+    assert parse(raw).info == [
+        kv(
+            "平台",
+            [
+                {"k": "1", "v": "PC"},
+                {"k": "2", "v": "Mac"},
+                {"v": "PSP"},
+            ],
+        )
+    ]
 
 
 def test_example_2():
@@ -197,17 +230,36 @@ def test_multi_array():
 }
 |特设= http://haccadrop.chu.jp/favoritte/?spm=a1z1s.6659513.0.0.cV15ab
 }}"""
-    assert parse(raw).info == {
-        "Illustration": "真琴",
-        "Lyrics": ["紗智", "水城さえ", "タキモトショウ", "りでる", "mintea", "Cororo"],
-        "Music": ["KA=YA", "三滝航", "塵屑れお", "Yuy", "タキモトショウ", "りでる", "sonoa", "Cororo"],
-        "Vocal": "紗智",
-        "价格": "1000 yen",
-        "发售日期": "2014-04-27 (M3-33)",
-        "录音": "ハッカドロップ。",
-        "特设": "http://haccadrop.chu.jp/favoritte/?spm=a1z1s.6659513.0.0.cV15ab",
-        "碟片数量": "1",
-    }
+    assert parse(raw).info == [
+        kv("中文名"),
+        kv("别名", []),
+        kv("版本特性"),
+        kv("发售日期", "2014-04-27 (M3-33)"),
+        kv("价格", "1000 yen"),
+        kv("播放时长"),
+        kv("录音", "ハッカドロップ。"),
+        kv("碟片数量", "1"),
+        kv("Vocal", "紗智"),
+        kv("Illustration", "真琴"),
+        kv(
+            "Lyrics",
+            [v(x) for x in ["紗智", "水城さえ", "タキモトショウ", "りでる", "mintea", "Cororo"]],
+        ),
+        kv(
+            "Music",
+            [
+                v("KA=YA"),
+                v("三滝航"),
+                v("塵屑れお"),
+                v("Yuy"),
+                v("タキモトショウ"),
+                v("りでる"),
+                v("sonoa"),
+                v("Cororo"),
+            ],
+        ),
+        kv("特设", "http://haccadrop.chu.jp/favoritte/?spm=a1z1s.6659513.0.0.cV15ab"),
+    ]
 
 
 def test_error_message_missing_key():
@@ -222,3 +274,7 @@ def test_error_message_missing_key():
 }}"""
     with pytest.raises(WikiSyntaxError, match="missing key or unexpected line break "):
         parse(raw)
+
+
+def v(vv: str) -> dict:
+    return {"v": vv}
