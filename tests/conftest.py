@@ -1,7 +1,10 @@
 import pytest
+from databases import DatabaseURL
+from sqlalchemy import create_engine
 from aioresponses import aioresponses
+from sqlalchemy.orm import sessionmaker
 
-from pol.db.mysql import Session
+from pol import config
 
 
 def pytest_sessionstart(session):
@@ -16,6 +19,13 @@ def pytest_sessionstart(session):
 def mock_aiohttp():
     with aioresponses() as m:
         yield m
+
+
+engine = create_engine(
+    str(DatabaseURL(config.MYSQL_URI).replace(dialect="mysql+pymysql"))
+)
+
+Session = sessionmaker(bind=engine)
 
 
 @pytest.fixture()
