@@ -1,17 +1,23 @@
-from typing import Dict, List
+import enum
+from typing import Dict, List, Optional
 
-from fastapi import Path, Depends, Request, APIRouter
+import pydantic
+from fastapi import Path, Query, Depends, Request, APIRouter
+from pydantic import Field
 from databases import Database
+from fastapi.exceptions import RequestValidationError
 from starlette.responses import RedirectResponse
+from pydantic.error_wrappers import ErrorWrapper
 
 from pol import res, curd, wiki
 from pol.utils import person_img_url, subject_img_url
 from pol.api.v0 import models
 from pol.models import ErrorDetail
 from pol.depends import get_db
-from pol.db.const import Gender, StaffMap, BloodType, get_staff
+from pol.db.const import Gender, StaffMap, BloodType, PersonType, get_staff
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
+from pol.api.v0.models import PersonCareer
 from pol.curd.exceptions import NotFoundError
 
 router = APIRouter()
@@ -25,7 +31,12 @@ async def basic_person(
     db: Database = Depends(get_db),
 ) -> ChiiPerson:
     try:
-        return await curd.get_one(db, ChiiPerson, ChiiPerson.prsn_id == person_id)
+        return await curd.get_one(
+            db,
+            ChiiPerson,
+            ChiiPerson.prsn_id == person_id,
+            ChiiPerson.prsn_ban != 1,
+        )
     except NotFoundError:
         raise res.HTTPException(
             status_code=404,
@@ -35,9 +46,111 @@ async def basic_person(
         )
 
 
+class Pager(pydantic.BaseModel):
+    limit: int = Field(30, gt=0, le=50)
+    offset: int = Field(0, ge=0)
+
+
+class Sort(str, enum.Enum):
+    id = "id"
+    name = "name"
+    last_modified = "update"
+
+
+@router.get(
+    "/persons",
+    response_model=models.PagedPerson,
+    response_model_by_alias=False,
+    responses={
+        404: res.response(model=ErrorDetail),
+    },
+)
+async def get_persons(
+    db: Database = Depends(get_db),
+    page: Pager = Depends(),
+    name: Optional[str] = None,
+    type: Optional[PersonType] = None,
+    career: Optional[List[PersonCareer]] = Query(None),
+    sort: Optional[Sort] = None,
+):
+    query = sa.select(sa.func.count(ChiiPerson.prsn_id)).where(
+        ChiiPerson.prsn_ban == 0, ChiiPerson.prsn_redirect == 0
+    )
+    if name is not None:
+        query = query.where(ChiiPerson.prsn_name.contains(name))
+
+    if type:
+        query = query.where(ChiiPerson.prsn_type == type)
+
+    if career:
+        for c in career:
+            query = query.where(getattr(ChiiPerson, f"prsn_{c}") == 1)
+
+    count = await db.fetch_val(query)
+    if page.offset > count:
+        raise RequestValidationError(
+            [
+                ErrorWrapper(
+                    ValueError(f"offset is too big, must be less than {count}"),
+                    loc=("query", "offset"),
+                )
+            ]
+        )
+
+    query = (
+        sa.select(
+            ChiiPerson.prsn_id,
+            ChiiPerson.prsn_name,
+            ChiiPerson.prsn_type,
+            ChiiPerson.prsn_img,
+            ChiiPerson.prsn_summary,
+            ChiiPerson.prsn_producer,
+            ChiiPerson.prsn_mangaka,
+            ChiiPerson.prsn_actor,
+            ChiiPerson.prsn_lock,
+            ChiiPerson.prsn_artist,
+            ChiiPerson.prsn_seiyu,
+            ChiiPerson.prsn_writer,
+            ChiiPerson.prsn_illustrator,
+        )
+        .where(ChiiPerson.prsn_ban == 0, ChiiPerson.prsn_redirect == 0)
+        .limit(page.limit)
+        .offset(page.offset)
+    )
+
+    if name is not None:
+        query = query.where(ChiiPerson.prsn_name.contains(name))
+    if career:
+        for c in career:
+            query = query.where(getattr(ChiiPerson, f"prsn_{c}") == 1)
+
+    if sort:
+        if sort == Sort.id:
+            query = query.order_by(ChiiPerson.prsn_id)
+        if sort == Sort.name:
+            query = query.order_by(ChiiPerson.prsn_name)
+        if sort == Sort.last_modified:
+            query = query.order_by(ChiiPerson.prsn_lastpost)
+
+    persons = [
+        {
+            "id": r["prsn_id"],
+            "name": r["prsn_name"],
+            "type": r["prsn_type"],
+            "career": get_career(r),
+            "short_summary": r["prsn_summary"][:80] + "...",
+            "locked": r["prsn_lock"],
+            "img": r["prsn_img"],
+        }
+        for r in await db.fetch_all(query)
+    ]
+
+    return {"limit": page.limit, "offset": page.offset, "total": count, "data": persons}
+
+
 @router.get(
     "/persons/{person_id}",
-    response_model=models.Person,
+    response_model=models.PersonDetail,
     response_model_by_alias=False,
     responses={
         404: res.response(model=ErrorDetail),
@@ -55,15 +168,11 @@ async def get_person(
         "name": person.prsn_name,
         "type": person.prsn_type,
         "infobox": person.prsn_infobox,
-        "role": [
-            key
-            for key, value in models.PersonRole.from_orm(person).dict().items()
-            if value
-        ],
+        "career": get_career(person),
         "summary": person.prsn_summary,
         "img": person_img_url(person.prsn_img),
         "locked": person.prsn_lock,
-        "last_update": person.prsn_lastpost,
+        "last_modified": person.prsn_lastpost,
         "stat": {
             "comments": person.prsn_comment,
             "collects": person.prsn_collects,
@@ -123,6 +232,14 @@ async def get_person_subjects(
         r["subject_id"]: ChiiPersonCsIndex(**r) for r in await db.fetch_all(query)
     }
 
+    if not result:
+        res.HTTPException(
+            status_code=404,
+            title="Not Found",
+            description="person doesn't relative to any subjects",
+            detail={"person_id": person.prsn_id},
+        )
+
     query = sa.select(
         ChiiSubject.subject_id,
         ChiiSubject.subject_name,
@@ -138,3 +255,22 @@ async def get_person_subjects(
         s["staff"] = get_staff(StaffMap[rel.subject_type_id][rel.prsn_position])
 
     return subjects
+
+
+def get_career(p: ChiiPerson) -> List[str]:
+    s = []
+    if p.prsn_producer:
+        s.append("producer")
+    if p.prsn_mangaka:
+        s.append("mangaka")
+    if p.prsn_artist:
+        s.append("artist")
+    if p.prsn_seiyu:
+        s.append("seiyu")
+    if p.prsn_writer:
+        s.append("writer")
+    if p.prsn_illustrator:
+        s.append("illustrator")
+    if p.prsn_actor:
+        s.append("actor")
+    return s

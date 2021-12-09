@@ -1,3 +1,4 @@
+import enum
 import datetime
 from typing import Any, Dict, List, TypeVar, Optional
 
@@ -8,17 +9,14 @@ from pol.db.const import BloodType, PersonType
 T = TypeVar("T", bound="PersonRole")
 
 
-class PersonRole(BaseModel):
-    producer: bool = Field(..., alias="prsn_producer")
-    mangaka: bool = Field(..., alias="prsn_mangaka")
-    artist: bool = Field(..., alias="prsn_artist")
-    seiyu: bool = Field(..., alias="prsn_seiyu")
-    writer: bool = Field(..., alias="prsn_writer")
-    illustrator: bool = Field(..., alias="prsn_illustrator")
-    actor: bool = Field(..., alias="prsn_actor")
-
-    class Config:
-        orm_mode = True
+class PersonCareer(str, enum.Enum):
+    producer = "producer"
+    mangaka = "mangaka"
+    artist = "artist"
+    seiyu = "seiyu"
+    writer = "writer"
+    illustrator = "illustrator"
+    actor = "actor"
 
 
 class SubjectInfo(BaseModel):
@@ -34,15 +32,33 @@ class Stat(BaseModel):
     collects: int
 
 
-class Person(BaseModel):
+class BasePerson(BaseModel):
     id: int
     name: str
     type: PersonType
+    career: List[PersonCareer]
+    locked: bool
+
+    img: Optional[str] = None
+
+
+class Person(BasePerson):
+    short_summary: str
+
+
+class PagedPerson(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    data: List[Person]
+
+
+class PersonDetail(BasePerson):
     infobox: str
-    role: List[str]
+    career: List[PersonCareer]
     summary: str
     locked: bool
-    last_update: datetime.datetime
+    last_modified: datetime.datetime
 
     wiki: Optional[List[Dict[str, Any]]] = Field(
         None,

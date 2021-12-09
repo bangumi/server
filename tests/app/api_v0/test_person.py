@@ -27,6 +27,11 @@ def test_person_basic(client: TestClient):
     assert not data["locked"]
 
 
+def test_person_ban_404(client: TestClient):
+    response = client.get("/api/v0/persons/6")
+    assert response.status_code == 404
+
+
 def test_person_subjects(client: TestClient):
     response = client.get("/api/v0/persons/1/subjects")
     assert response.status_code == 200

@@ -132,7 +132,7 @@ class ChiiPerson(Base):
     __table_args__ = {"comment": "（现实）人物表"}
 
     prsn_id = Column(MEDIUMINT(8), primary_key=True)
-    prsn_name = Column(String(255, "utf8_unicode_ci"), nullable=False)
+    prsn_name: Column = Column(String(255, "utf8_unicode_ci"), nullable=False)
     prsn_type = Column(TINYINT(4), nullable=False, index=True, comment="个人，公司，组合")
     prsn_infobox = Column(MEDIUMTEXT, nullable=False)
     prsn_producer = Column(TINYINT(1), nullable=False, index=True)
