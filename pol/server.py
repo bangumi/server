@@ -25,7 +25,7 @@ app = FastAPI(
 
 app.add_middleware(cors.CORSMiddleware, allow_origins=["bgm.tv", "bangumi.tv"])
 setup_http_middleware(app)
-app.include_router(api.router, prefix="/api")
+app.include_router(api.router)
 
 
 @app.exception_handler(res.HTTPException)
@@ -66,12 +66,12 @@ async def shutdown() -> None:
     await app.state.db.disconnect()
 
 
-@app.get("/openapi.json", include_in_schema=False)
+@app.get("/v0/openapi.json", include_in_schema=False)
 async def openapi():
     return app.openapi()
 
 
-@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+@app.get("/v0", response_class=HTMLResponse, include_in_schema=False)
 async def doc():
     return """<!DOCTYPE html>
 <html lang=zh-cmn-Hans>
@@ -93,7 +93,7 @@ async def doc():
 </script>
 <script>
 const ui = SwaggerUIBundle({
-    url: '/openapi.json',
+    url: '/v0/openapi.json',
     dom_id: '#swagger-ui',
     presets: [
         SwaggerUIBundle.presets.apis,

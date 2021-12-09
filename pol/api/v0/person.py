@@ -22,7 +22,7 @@ from pol.curd.exceptions import NotFoundError
 
 router = APIRouter(tags=["人物"])
 
-api_base = "/api/v0/persons"
+api_base = "/v0/persons"
 
 
 async def basic_person(
