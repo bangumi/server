@@ -79,7 +79,7 @@ async def doc():
 <link type="text/css" rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css">
 <link rel="shortcut icon" href="https://bgm.tv/img/favicon.ico">
-<title>Pol server - Swagger UI</title>
+<title>Bangumi API - Swagger UI</title>
 <style>
     a {
         text-decoration: none

@@ -9,7 +9,7 @@ PROJ_ROOT = Path(os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 
 _config = Config(PROJ_ROOT / "env" / "dev")
 
-APP_NAME = "api server"
+APP_NAME = "new bangumi api server"
 
 DEBUG = _config("DEBUG", cast=bool, default=False)
 
