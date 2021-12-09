@@ -69,7 +69,7 @@ class PersonDetail(BasePerson):
 
     gender: Optional[str] = Field(None, description="parsed from wiki, maybe null")
     blood_type: Optional[BloodType] = Field(
-        None, description="parsed from wiki, maybe null"
+        description="parsed from wiki, maybe null, `1, 2, 3, 4` for `A, B, CD, O`"
     )
     birth_year: Optional[int] = Field(None, description="parsed from wiki, maybe null")
     birth_mon: Optional[int] = Field(None, description="parsed from wiki, maybe null")
