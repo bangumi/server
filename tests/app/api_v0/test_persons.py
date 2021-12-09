@@ -86,7 +86,6 @@ def test_persons_page_offset(client: TestClient, db_session: Session):
         x.prsn_id
         for x in db_session.query(ChiiPerson.prsn_id)
         .filter(ChiiPerson.prsn_ban == 0, ChiiPerson.prsn_redirect == 0)
-        .order_by(ChiiPerson.prsn_id)
         .offset(1)
         .order_by(ChiiPerson.prsn_id.desc())
     ]
