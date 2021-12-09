@@ -57,6 +57,11 @@ class Sort(str, enum.Enum):
     last_modified = "update"
 
 
+class Order(enum.IntEnum):
+    asc = 1
+    desc = -1
+
+
 @router.get(
     "/persons",
     response_model=models.PagedPerson,
@@ -71,7 +76,8 @@ async def get_persons(
     name: Optional[str] = None,
     type: Optional[PersonType] = None,
     career: Optional[List[PersonCareer]] = Query(None),
-    sort: Optional[Sort] = None,
+    sort: Sort = Sort.id,
+    order: Order = Order.desc,
 ):
     query = sa.select(sa.func.count(ChiiPerson.prsn_id)).where(
         ChiiPerson.prsn_ban == 0, ChiiPerson.prsn_redirect == 0
@@ -82,14 +88,13 @@ async def get_persons(
     if type:
         query = query.where(ChiiPerson.prsn_type == type)
 
+    career_filter = None
     if career:
-
         q = []
-
         for c in career:
             q.append(getattr(ChiiPerson, f"prsn_{c}") == 1)
-
-        query = query.where(sa.or_(*q))
+        career_filter = sa.or_(*q)
+        query = query.where(career_filter)
 
     count = await db.fetch_val(query)
     if page.offset > count:
@@ -125,17 +130,25 @@ async def get_persons(
 
     if name is not None:
         query = query.where(ChiiPerson.prsn_name.contains(name))
-    if career:
-        for c in career:
-            query = query.where(getattr(ChiiPerson, f"prsn_{c}") == 1)
 
-    if sort:
-        if sort == Sort.id:
-            query = query.order_by(ChiiPerson.prsn_id)
-        if sort == Sort.name:
-            query = query.order_by(ChiiPerson.prsn_name)
-        if sort == Sort.last_modified:
-            query = query.order_by(ChiiPerson.prsn_lastpost)
+    if career_filter is not None:
+        query = query.where(career_filter)
+
+    sort_field = ChiiPerson.prsn_id
+
+    if sort == Sort.name:
+        sort_field = ChiiPerson.prsn_name
+    if sort == Sort.last_modified:
+        sort_field = ChiiPerson.prsn_lastpost
+
+    if order > 0:
+        sort_field = sort_field.asc()
+    else:
+        sort_field = sort_field.desc()
+
+    print(sort_field)
+
+    query = query.order_by(sort_field)
 
     persons = [
         {
