@@ -2,23 +2,25 @@ import enum
 from typing import Dict, List, Optional
 
 import pydantic
-from fastapi import Path, Query, Depends, Request, APIRouter
+from fastapi import Path, Query, Depends, APIRouter
 from pydantic import Field
 from databases import Database
 from fastapi.exceptions import RequestValidationError
-from starlette.responses import RedirectResponse
+from starlette.responses import Response, RedirectResponse
 from pydantic.error_wrappers import ErrorWrapper
 
 from pol import res, curd, wiki
 from pol.utils import person_img_url, subject_img_url
 from pol.api.v0 import models
+from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
-from pol.depends import get_db
+from pol.depends import get_db, get_redis
 from pol.db.const import Gender, StaffMap, BloodType, PersonType, get_staff
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
 from pol.api.v0.models import PersonCareer
 from pol.curd.exceptions import NotFoundError
+from pol.redis.json_cache import JSONRedis
 
 router = APIRouter(tags=["人物"])
 
@@ -26,8 +28,7 @@ api_base = "/v0/persons"
 
 
 async def basic_person(
-    request: Request,
-    person_id: int = Path(..., gt=0),
+    person_id: int,
     db: Database = Depends(get_db),
 ) -> ChiiPerson:
     try:
@@ -42,7 +43,7 @@ async def basic_person(
             status_code=404,
             title="Not Found",
             description="resource you resource can't be found in the database",
-            detail={"person_id": request.path_params.get("person_id")},
+            detail={"person_id": "person_id"},
         )
 
 
@@ -167,6 +168,7 @@ async def get_persons(
 
 @router.get(
     "/persons/{person_id}",
+    description="cache with 60s",
     response_model=models.PersonDetail,
     response_model_by_alias=False,
     responses={
@@ -174,9 +176,20 @@ async def get_persons(
     },
 )
 async def get_person(
+    response: Response,
     db: Database = Depends(get_db),
-    person: ChiiPerson = Depends(basic_person),
+    person_id: int = Path(..., gt=0),
+    redis: JSONRedis = Depends(get_redis),
 ):
+    cache_key = CACHE_KEY_PREFIX + f"person:{person_id}"
+    if (value := await redis.get(cache_key)) is not None:
+        response.headers["x-cache-status"] = "hit"
+        return value
+    else:
+        response.headers["x-cache-status"] = "miss"
+
+    person: ChiiPerson = await basic_person(person_id=person_id, db=db)
+
     if person.prsn_redirect:
         return RedirectResponse(f"{api_base}/{person.prsn_redirect}")
 
@@ -215,6 +228,8 @@ async def get_person(
     except wiki.WikiSyntaxError:
         pass
 
+    await redis.set(cache_key, value=data, ex=60)
+
     return data
 
 
@@ -229,8 +244,9 @@ async def get_person(
 )
 async def get_person_subjects(
     db: Database = Depends(get_db),
-    person: ChiiPerson = Depends(basic_person),
+    person_id: int = Path(..., gt=0),
 ):
+    person: ChiiPerson = await basic_person(person_id=person_id, db=db)
     if person.prsn_redirect:
         return RedirectResponse(f"{api_base}/{person.prsn_redirect}/subjects")
 

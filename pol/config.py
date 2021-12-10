@@ -34,3 +34,5 @@ SECRET_KEY = (_config("SECRET_KEY", default=secrets.token_hex(32)))[:32]
 assert len(SECRET_KEY) == 32
 
 TESTING = _config("TESTING", cast=bool, default=False)
+
+CACHE_KEY_PREFIX = "api-cache:"

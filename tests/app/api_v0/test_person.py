@@ -1,4 +1,9 @@
+import json
+
+import redis
 from starlette.testclient import TestClient
+
+from pol.config import CACHE_KEY_PREFIX
 
 
 def test_person_not_found(client: TestClient):
@@ -30,6 +35,36 @@ def test_person_basic(client: TestClient):
 def test_person_ban_404(client: TestClient):
     response = client.get("/v0/persons/6")
     assert response.status_code == 404
+
+
+def test_person_cache(client: TestClient, redis_client: redis.Redis):
+    response = client.get("/v0/persons/1")
+    assert response.status_code == 200
+    assert response.headers["x-cache-status"] == "miss"
+
+    response = client.get("/v0/persons/1")
+    assert response.headers["x-cache-status"] == "hit"
+    assert response.status_code == 200
+
+    cache_key = CACHE_KEY_PREFIX + f"person:1"
+
+    cached_data = {
+        "id": 1,
+        "name": "n",
+        "type": 1,
+        "career": [],
+        "locked": False,
+        "last_modified": 10,
+        "summary": "s",
+        "stat": {"comments": 110, "collects": 841},
+    }
+    redis_client.set(cache_key, json.dumps(cached_data))
+    response = client.get("/v0/persons/1")
+    assert response.headers["x-cache-status"] == "hit"
+    assert response.status_code == 200
+
+    res = response.json()
+    assert res["name"] == "n"
 
 
 def test_person_subjects(client: TestClient):
