@@ -1,9 +1,6 @@
 name: release(openapi)
 
-on:
-  push:
-    tags:
-      - v*
+on: [push]
 
 jobs:
   dump-openapi:
@@ -20,14 +17,12 @@ jobs:
           python-version: 3.8
 
       - uses: Trim21/setup-poetry@dist/v1
-
       - uses: Trim21/install-poetry-project@dist/v1
 
       - uses: actions/checkout@v2
         with:
           repository: "bangumi/api"
           path: api
-          token: ${{ secrets.PAT }}
 
       - run: python -c 'from pol.server import app;print(app.openapi())' > fastapi.json
         env:
@@ -48,9 +43,10 @@ jobs:
 
       - run: npx openapi-merge-cli --config merge.config.json
 
-      - uses: actions/github-script@v5
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
         with:
-          github-token: ${{ secrets.PAT }}
-          script: |
-            const script = require('./.github/workflows/scripts/merge-openapi.js')
-            await script({github, exec})
+          token: ${{ secrets.PAT }}
+          title: Update Openapi Spec
+          push-to-fork: Trim21-bot/api
+          branch: "update-upstream"
