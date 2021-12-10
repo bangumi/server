@@ -30,7 +30,7 @@ app.include_router(api.router)
 
 
 @app.exception_handler(StarletteHTTPException)
-async def http_exception_handler(request, exc: StarletteHTTPException):
+async def global_404(request, exc: StarletteHTTPException):
     return ORJSONResponse(
         {
             "title": "Not Found",
