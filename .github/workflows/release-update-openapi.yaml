@@ -1,9 +1,6 @@
 name: release dump openapi
 
-on:
-  push:
-    tags:
-      - v*
+on: [push]
 
 jobs:
   dump-openapi:
