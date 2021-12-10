@@ -20,4 +20,4 @@ ENV COMMIT_REF=${COMMIT_REF}
 
 COPY / /app
 
-ENTRYPOINT ["gunicorn", "pol.server:app"]
+ENTRYPOINT ["uvicorn", "pol.server:app", "--host", "0.0.0.0", "--port", "3000"]

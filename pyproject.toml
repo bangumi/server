@@ -12,7 +12,6 @@ authors = ["Trim21 <i@trim21.me>"]
 python = "3.8.*"
 # dependencies
 fastapi = "==0.70.0"
-gunicorn = "20.1.0"
 pydantic = "==1.8.2"
 python-dateutil = "2.8.2"
 python-multipart = "0.0.5"
