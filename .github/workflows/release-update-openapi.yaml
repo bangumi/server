@@ -37,7 +37,7 @@ jobs:
           echo '{
             "inputs": [
               {"inputFile": "./fastapi.json"},
-              {"inputFile": "./api/openapi/api.yml"}
+              {"inputFile": "./api/open-api/api.yml"}
             ],
             "output": "./api/dist.json"
           }' > merge.config.json
