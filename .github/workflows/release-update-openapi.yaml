@@ -1,0 +1,54 @@
+name: release dump openapi
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  dump-openapi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get Tag Name
+        run: echo "COMMIT_REF=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - uses: Trim21/setup-poetry@dist/v1
+
+      - uses: Trim21/install-poetry-project@dist/v1
+
+      - uses: actions/checkout@v2
+        with:
+          repository: "bangumi/api"
+          path: api
+
+      - run: python -c 'from pol.server import app;print(app.openapi())' > fastapi.json
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: "3306"
+          MYSQL_USER: user
+          MYSQL_PASS: password
+          MYSQL_DB: bangumi
+
+      - run: |
+          echo '{
+            "inputs": [
+              {"inputFile": "./fastapi.json"},
+              {"inputFile": "./api/openapi/api.yml"}
+            ],
+            "output": "./api/dist.json"
+          }' > merge.config.json
+
+      - run: npx openapi-merge-cli --config merge.config.json
+
+      - uses: actions/github-script@v5
+        with:
+          script: |
+            const script = require('./.github/workflows/scripts/merge-openapi.js')
+            await script({github, exec})
