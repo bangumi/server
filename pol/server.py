@@ -87,6 +87,7 @@ async def openapi():
     return app.openapi()
 
 
+@app.get("/v0/", response_class=HTMLResponse, include_in_schema=False)
 @app.get("/v0", response_class=HTMLResponse, include_in_schema=False)
 async def doc():
     return """<!DOCTYPE html>
