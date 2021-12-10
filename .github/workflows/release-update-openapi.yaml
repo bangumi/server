@@ -46,6 +46,7 @@ jobs:
 
       - uses: actions/github-script@v5
         with:
+          github-token: ${{ secrets.PAT }}
           script: |
             const script = require('./.github/workflows/scripts/merge-openapi.js')
             await script({github, exec})
