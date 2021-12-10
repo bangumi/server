@@ -54,3 +54,4 @@ jobs:
           title: Update Openapi Spec
           push-to-fork: Trim21-bot/api
           branch: "update-upstream"
+          author: "Trim21-bot <trim21-bot@users.noreply.github.com>>"
