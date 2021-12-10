@@ -5,6 +5,7 @@ from loguru import logger
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware import cors
 
 from pol import api, res, config
@@ -26,6 +27,21 @@ app = FastAPI(
 app.add_middleware(cors.CORSMiddleware, allow_origins=["bgm.tv", "bangumi.tv"])
 setup_http_middleware(app)
 app.include_router(api.router)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request, exc: StarletteHTTPException):
+    return ORJSONResponse(
+        {
+            "title": "Not Found",
+            "description": "Ehe path you requested is not registered",
+            "detail": (
+                "This is default 404 response, "
+                "if you see this response, please check your request path"
+            ),
+        },
+        status_code=exc.status_code,
+    )
 
 
 @app.exception_handler(res.HTTPException)
