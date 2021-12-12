@@ -84,7 +84,7 @@ async def get_persons(
         query = query.where(ChiiPerson.prsn_name.contains(name))
 
     if type:
-        query = query.where(ChiiPerson.prsn_type == type)
+        query = query.where(ChiiPerson.prsn_type == type.value)
 
     career_filter = None
     if career:

@@ -29,6 +29,16 @@ def test_persons_filter_name(client: TestClient):
     assert res["data"][0]["name"] == name
 
 
+def test_persions_filter_type(client: TestClient):
+    type = 1
+    response = client.get("v0/persons", params={"type": type})
+    assert response.status_code == 200
+
+    res = response.json()
+    assert res["data"]
+    assert [x for x in res["data"] if type == x["type"]]
+
+
 def test_persons_filter_career_valid(client: TestClient):
     career = "artist"
     response = client.get("/v0/persons", params={"career": career})

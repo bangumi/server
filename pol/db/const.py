@@ -24,7 +24,7 @@ class ViewMixin:
         return str(cls(v))
 
 
-class BloodType(int, ViewMixin, enum.Enum):
+class BloodType(ViewMixin, enum.IntEnum):
     a = 1
     b = 2
     ab = 3
@@ -37,7 +37,7 @@ class BloodType(int, ViewMixin, enum.Enum):
             raise ValueError(f"{self.value} is not valid blood type")
 
 
-class PersonType(int, ViewMixin, enum.Enum):
+class PersonType(ViewMixin, enum.IntEnum):
     person = 1
     company = 2
     band = 3
@@ -49,7 +49,7 @@ class PersonType(int, ViewMixin, enum.Enum):
             raise ValueError(f"{self.value} is not valid person record type")
 
 
-class Gender(int, ViewMixin, enum.Enum):
+class Gender(ViewMixin, enum.IntEnum):
     male = 1
     female = 2
 
@@ -60,7 +60,7 @@ class Gender(int, ViewMixin, enum.Enum):
             raise ValueError(f"{self.value} is not valid gender")
 
 
-class SubjectType(int, enum.Enum):
+class SubjectType(enum.IntEnum):
     book = 1
     anime = 2
     music = 3
