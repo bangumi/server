@@ -12,6 +12,7 @@ from pol import api, res, config
 from pol.res import ORJSONResponse
 from pol.db.mysql import database
 from pol.middlewares.http import setup_http_middleware
+from pol.redis.json_cache import JSONRedis
 
 app = FastAPI(
     debug=config.DEBUG,
@@ -73,6 +74,7 @@ async def validation_exception_handler(request, exc: RequestValidationError):
 async def startup() -> None:
     await database.connect()
     app.state.db = database
+    app.state.redis = await JSONRedis.from_url(config.REDIS_URI)
 
     logger.info("server start at pid {}, tid {}", os.getpid(), threading.get_ident())
 
@@ -80,6 +82,7 @@ async def startup() -> None:
 @app.on_event("shutdown")
 async def shutdown() -> None:
     await app.state.db.disconnect()
+    await app.state.redis.close()
 
 
 @app.get("/v0/openapi.json", include_in_schema=False)
