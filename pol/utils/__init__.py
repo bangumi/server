@@ -14,15 +14,9 @@ def subject_images(s: Optional[str]) -> Optional[Images]:
         return None
 
     return {
-        "large": "http://lain.bgm.tv/pic/cover/l/" + s,
-        "common": "http://lain.bgm.tv/pic/cover/c/" + s,
-        "medium": "http://lain.bgm.tv/pic/cover/m/" + s,
-        "small": "http://lain.bgm.tv/pic/cover/s/" + s,
-        "grid": "http://lain.bgm.tv/pic/cover/g/" + s,
+        "large": "https://lain.bgm.tv/pic/cover/l/" + s,
+        "common": "https://lain.bgm.tv/pic/cover/c/" + s,
+        "medium": "https://lain.bgm.tv/pic/cover/m/" + s,
+        "small": "https://lain.bgm.tv/pic/cover/s/" + s,
+        "grid": "https://lain.bgm.tv/pic/cover/g/" + s,
     }
-
-
-def person_img_url(s: Optional[str]) -> Optional[str]:
-    if not s:
-        return None
-    return "https://lain.bgm.tv/pic/crt/m/" + s

@@ -10,7 +10,7 @@ from starlette.responses import Response, RedirectResponse
 from pydantic.error_wrappers import ErrorWrapper
 
 from pol import res, curd, wiki
-from pol.utils import person_img_url, subject_images
+from pol.utils import subject_images
 from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
@@ -311,8 +311,14 @@ def person_images(s: Optional[str]) -> Optional[Dict[str, str]]:
         return None
 
     return {
-        "large": "http://lain.bgm.tv/pic/crt/l/" + s,
-        "medium": "http://lain.bgm.tv/pic/crt/m/" + s,
-        "small": "http://lain.bgm.tv/pic/crt/s/" + s,
-        "grid": "http://lain.bgm.tv/pic/crt/g/" + s,
+        "large": "https://lain.bgm.tv/pic/crt/l/" + s,
+        "medium": "https://lain.bgm.tv/pic/crt/m/" + s,
+        "small": "https://lain.bgm.tv/pic/crt/s/" + s,
+        "grid": "https://lain.bgm.tv/pic/crt/g/" + s,
     }
+
+
+def person_img_url(s: Optional[str]) -> Optional[str]:
+    if not s:
+        return None
+    return "https://lain.bgm.tv/pic/crt/m/" + s
