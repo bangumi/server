@@ -84,7 +84,7 @@ async def get_persons(
         query = query.where(ChiiPerson.prsn_name.contains(name))
 
     if type:
-        query = query.where(ChiiPerson.prsn_type == type)
+        query = query.where(ChiiPerson.prsn_type == type.value)
 
     career_filter = None
     if career:
@@ -128,6 +128,9 @@ async def get_persons(
 
     if name is not None:
         query = query.where(ChiiPerson.prsn_name.contains(name))
+
+    if type:
+        query = query.where(ChiiPerson.prsn_type == type.value)
 
     if career_filter is not None:
         query = query.where(career_filter)
