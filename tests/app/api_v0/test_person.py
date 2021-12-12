@@ -46,7 +46,7 @@ def test_person_cache(client: TestClient, redis_client: redis.Redis):
     assert response.headers["x-cache-status"] == "hit"
     assert response.status_code == 200
 
-    cache_key = CACHE_KEY_PREFIX + f"person:1"
+    cache_key = CACHE_KEY_PREFIX + "person:1"
 
     cached_data = {
         "id": 1,

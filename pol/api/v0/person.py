@@ -228,7 +228,7 @@ async def get_person(
     except wiki.WikiSyntaxError:
         pass
 
-    await redis.set(cache_key, value=data, ex=60)
+    await redis.set_json(cache_key, value=data, ex=60)
 
     return data
 

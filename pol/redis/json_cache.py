@@ -15,18 +15,22 @@ class JSONRedis(Redis):
                 await self.delete(name)
         return None
 
-    async def set(
+    async def set_json(
         self,
         name: KeyT,
-        value: Union[Dict[str, Any], bytes],
+        value: Union[Dict[str, Any], int],
         ex: ExpiryT = None,
         px: ExpiryT = None,
         nx: bool = False,
         xx: bool = False,
         keepttl: bool = False,
     ):
-        if not isinstance(value, bytes):
-            value = orjson.dumps(value)
-        return await super().set(
-            name=name, value=value, ex=ex, px=px, nx=nx, xx=xx, keepttl=keepttl
+        return await self.set(
+            name=name,
+            value=orjson.dumps(value),
+            ex=ex,
+            px=px,
+            nx=nx,
+            xx=xx,
+            keepttl=keepttl,
         )
