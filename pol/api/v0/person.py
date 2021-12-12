@@ -159,6 +159,7 @@ async def get_persons(
             "short_summary": r["prsn_summary"][:80] + "...",
             "locked": r["prsn_lock"],
             "img": person_img_url(r["prsn_img"]),
+            "images": person_images(r["prsn_img"]),
         }
         for r in await db.fetch_all(query)
     ]

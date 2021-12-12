@@ -62,9 +62,9 @@ class PagedPerson(BaseModel):
 
 class PersonDetail(BasePerson):
     career: List[PersonCareer]
+    summary: str
     locked: bool
     last_modified: datetime.datetime
-    summary: str
     infobox: Optional[List[Dict[str, Any]]] = Field(
         None,
         description=(
