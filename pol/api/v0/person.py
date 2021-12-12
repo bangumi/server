@@ -71,31 +71,29 @@ async def get_persons(
     db: Database = Depends(get_db),
     page: Pager = Depends(),
     name: Optional[str] = None,
-    type: Optional[PersonType] = Query(None, description="1为个人，2为公司，3为组合"),
+    type: Optional[PersonType] = Query(None, description="`1`为个人，`2`为公司，`3`为组合"),
     career: Optional[List[PersonCareer]] = Query(
         None, example="?career=mangaka&career=producer"
     ),
     sort: Sort = Sort.id,
     order: Order = Order.desc,
 ):
-    query = sa.select(sa.func.count(ChiiPerson.prsn_id)).where(
-        ChiiPerson.prsn_ban == 0, ChiiPerson.prsn_redirect == 0
-    )
+    filters = [ChiiPerson.prsn_ban == 0, ChiiPerson.prsn_redirect == 0]
     if name is not None:
-        query = query.where(ChiiPerson.prsn_name.contains(name))
+        filters.append(ChiiPerson.prsn_name.contains(name))
+    if type is not None:
+        filters.append(ChiiPerson.prsn_type == type.value)
 
-    if type:
-        query = query.where(ChiiPerson.prsn_type == type.value)
-
-    career_filter = None
     if career:
         q = []
         for c in career:
             q.append(getattr(ChiiPerson, f"prsn_{c}") == 1)
         career_filter = sa.or_(*q)
-        query = query.where(career_filter)
+        filters.append(career_filter)
 
-    count = await db.fetch_val(query)
+    count = await db.fetch_val(
+        sa.select(sa.func.count(ChiiPerson.prsn_id)).where(*filters)
+    )
     if page.offset > count:
         raise RequestValidationError(
             [
@@ -122,19 +120,10 @@ async def get_persons(
             ChiiPerson.prsn_writer,
             ChiiPerson.prsn_illustrator,
         )
-        .where(ChiiPerson.prsn_ban == 0, ChiiPerson.prsn_redirect == 0)
+        .where(*filters)
         .limit(page.limit)
         .offset(page.offset)
     )
-
-    if name is not None:
-        query = query.where(ChiiPerson.prsn_name.contains(name))
-
-    if type:
-        query = query.where(ChiiPerson.prsn_type == type.value)
-
-    if career_filter is not None:
-        query = query.where(career_filter)
 
     sort_field = ChiiPerson.prsn_id
 
