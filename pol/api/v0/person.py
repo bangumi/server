@@ -15,7 +15,7 @@ from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import Gender, StaffMap, BloodType, PersonType, get_staff
+from pol.db.const import Gender, StaffMap, PersonType, get_staff
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
 from pol.api.v0.models import PersonCareer
@@ -207,7 +207,7 @@ async def get_person(
             ChiiPersonField.prsn_cat == "prsn",
         )
         data["gender"] = Gender.to_view(field.gender)
-        data["blood_type"] = BloodType.to_view(field.bloodtype)
+        data["blood_type"] = field.bloodtype or None
         data["birth_year"] = field.birth_year or None
         data["birth_mon"] = field.birth_mon or None
         data["birth_day"] = field.birth_day or None
