@@ -10,7 +10,7 @@ from starlette.responses import Response, RedirectResponse
 from pydantic.error_wrappers import ErrorWrapper
 
 from pol import res, curd, wiki
-from pol.utils import person_img_url, subject_img_url
+from pol.utils import person_img_url, subject_images
 from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
@@ -18,7 +18,7 @@ from pol.depends import get_db, get_redis
 from pol.db.const import Gender, StaffMap, BloodType, PersonType, get_staff
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
-from pol.api.v0.models import PersonCareer
+from pol.api.v0.models import PersonCareer, PersonImages
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -200,6 +200,7 @@ async def get_person(
         "career": get_career(person),
         "summary": person.prsn_summary,
         "img": person_img_url(person.prsn_img),
+        "images": person_images(person.prsn_img),
         "locked": person.prsn_lock,
         "last_modified": person.prsn_lastpost,
         "stat": {
@@ -265,14 +266,6 @@ async def get_person_subjects(
         r["subject_id"]: ChiiPersonCsIndex(**r) for r in await db.fetch_all(query)
     }
 
-    if not result:
-        res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description="person doesn't relative to any subjects",
-            detail={"person_id": person.prsn_id},
-        )
-
     query = sa.select(
         ChiiSubject.subject_id,
         ChiiSubject.subject_name,
@@ -283,7 +276,10 @@ async def get_person_subjects(
     subjects = [dict(r) for r in await db.fetch_all(query)]
 
     for s in subjects:
-        s["subject_image"] = subject_img_url(s["subject_image"])
+        if v := subject_images(s["subject_image"]):
+            s["subject_image"] = v["grid"]
+        else:
+            s["subject_image"] = None
         rel = result[s["subject_id"]]
         s["staff"] = get_staff(StaffMap[rel.subject_type_id][rel.prsn_position])
 
@@ -307,3 +303,15 @@ def get_career(p: ChiiPerson) -> List[str]:
     if p.prsn_actor:
         s.append("actor")
     return s
+
+
+def person_images(s: Optional[str]) -> Optional[PersonImages]:
+    if not s:
+        return None
+
+    return PersonImages(
+        large="http://lain.bgm.tv/pic/crt/l/" + s,
+        medium="http://lain.bgm.tv/pic/crt/m/" + s,
+        small="http://lain.bgm.tv/pic/crt/s/" + s,
+        grid="http://lain.bgm.tv/pic/crt/g/" + s,
+    )
