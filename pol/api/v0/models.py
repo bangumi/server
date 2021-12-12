@@ -65,6 +65,7 @@ class PersonDetail(BasePerson):
     summary: str
     locked: bool
     last_modified: datetime.datetime
+
     infobox: Optional[List[Dict[str, Any]]] = Field(
         None,
         description=(
