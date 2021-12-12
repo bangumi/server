@@ -18,7 +18,7 @@ from pol.depends import get_db, get_redis
 from pol.db.const import Gender, StaffMap, BloodType, PersonType, get_staff
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
-from pol.api.v0.models import PersonCareer, PersonImages
+from pol.api.v0.models import PersonCareer
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -305,13 +305,13 @@ def get_career(p: ChiiPerson) -> List[str]:
     return s
 
 
-def person_images(s: Optional[str]) -> Optional[PersonImages]:
+def person_images(s: Optional[str]) -> Optional[Dict[str, str]]:
     if not s:
         return None
 
-    return PersonImages(
-        large="http://lain.bgm.tv/pic/crt/l/" + s,
-        medium="http://lain.bgm.tv/pic/crt/m/" + s,
-        small="http://lain.bgm.tv/pic/crt/s/" + s,
-        grid="http://lain.bgm.tv/pic/crt/g/" + s,
-    )
+    return {
+        "large": "http://lain.bgm.tv/pic/crt/l/" + s,
+        "medium": "http://lain.bgm.tv/pic/crt/m/" + s,
+        "small": "http://lain.bgm.tv/pic/crt/s/" + s,
+        "grid": "http://lain.bgm.tv/pic/crt/g/" + s,
+    }

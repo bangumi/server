@@ -1,23 +1,17 @@
 import enum
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
-from pydantic import Field, BaseModel, dataclasses
+from pydantic import Field, BaseModel
 
 from pol.db.const import BloodType, PersonType
 
 
-@dataclasses.dataclass
-class PersonImages:
+class PersonImages(BaseModel):
     large: str
     medium: str
     small: str
     grid: str
-    if TYPE_CHECKING:
-        # remove this fixup after pydantic is upgrade and
-        # enable it's mypy plugin in config
-        def __init__(self, large: str, medium: str, small: str, grid: str):
-            pass
 
 
 class PersonCareer(str, enum.Enum):
