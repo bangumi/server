@@ -1,18 +1,23 @@
 {
-  "extends": ["@trim21", "@trim21:monthly", "@trim21:poetry"],
-  "separateMajorMinor": false,
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>Trim21/renovate-config",
+    "local>Trim21/renovate-config:monthly",
+    "local>Trim21/renovate-config:poetry"
+  ],
+  "separateMajorMinor": true,
   "separateMinorPatch": false,
-  "rangeStrategy": "widen",
+  "rangeStrategy": "pin",
   "packageRules": [
     {
-      "groupName": "deps-docs",
-      "semanticCommitScope": "docs",
-      "packagePatterns": ["^sphinx"],
-      "rangeStrategy": "pin"
-    },
-    {
-      "depTypeList": ["dev-dependencies"],
-      "rangeStrategy": "pin"
+      "matchManagers": ["dockerfile"],
+      "rangeStrategy": "pin",
+      "minor": {
+        "enabled": false
+      },
+      "major": {
+        "enabled": false
+      }
     }
   ]
 }
