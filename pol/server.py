@@ -6,7 +6,6 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.middleware import cors
 
 from pol import api, res, config
 from pol.res import ORJSONResponse
@@ -25,7 +24,6 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
-app.add_middleware(cors.CORSMiddleware, allow_origins=["bgm.tv", "bangumi.tv"])
 setup_http_middleware(app)
 app.include_router(api.router)
 
