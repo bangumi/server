@@ -928,7 +928,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.8.*"
-content-hash = "318de76ead22d86a468747c0dda3b4ea4f4585a9296b3eea5bab34b81860931e"
+content-hash = "fe6fb05f7aa8eeaa8558b05938d229ab9b3fa4b3f1cf830c325365fb41fd1ea9"
 
 [metadata.files]
 aiomysql = [
