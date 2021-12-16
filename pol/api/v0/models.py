@@ -68,7 +68,10 @@ class PersonDetail(BasePerson):
     career: List[PersonCareer]
     summary: str
     locked: bool
-    last_modified: datetime.datetime
+    last_modified: datetime.datetime = Field(
+        ...,
+        description="currently it's latest user comment time, will be last wiki/image update date in the future",
+    )
 
     infobox: Optional[List[Dict[str, Any]]] = Field(
         None,
@@ -95,7 +98,7 @@ class PersonDetail(BasePerson):
 class BaseCharacter(BaseModel):
     id: int
     name: str
-    type: PersonType = Field(description="`1`, `2`, `3` 表示 `个人`, `公司`, `组合`")
+    type: PersonType = Field(description="角色，机体，组织...")
     images: Optional[PersonImages] = Field(
         description="object with some size of images, this object maybe `null`"
     )
@@ -104,7 +107,6 @@ class BaseCharacter(BaseModel):
 
 class Character(BaseCharacter):
     short_summary: str
-    img: Optional[str] = Field(None, description="use `images` instead")
 
 
 class PagedCharacter(Paged):
@@ -114,7 +116,6 @@ class PagedCharacter(Paged):
 class CharacterDetail(BaseCharacter):
     summary: str
     locked: bool
-    last_modified: datetime.datetime
 
     infobox: Optional[List[Dict[str, Any]]] = Field(
         None,
@@ -135,4 +136,3 @@ class CharacterDetail(BaseCharacter):
     birth_day: Optional[int] = Field(None, description="parsed from wiki, maybe `null`")
 
     stat: Stat
-    img: Optional[str] = Field(None, description="use `images` instead")

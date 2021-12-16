@@ -2,7 +2,7 @@ import enum
 from typing import Dict, List, Optional
 
 import pydantic
-from fastapi import Path, Query, Depends, APIRouter
+from fastapi import Path, Depends, APIRouter
 from pydantic import Field
 from databases import Database
 from fastapi.exceptions import RequestValidationError
@@ -15,7 +15,7 @@ from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import Gender, PersonType, get_character_rel
+from pol.db.const import Gender, get_character_rel
 from pol.db.tables import (
     ChiiSubject,
     ChiiCharacter,
@@ -24,7 +24,6 @@ from pol.db.tables import (
 )
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
-from pol.api.v0.models import PersonCareer
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -60,7 +59,6 @@ class Pager(pydantic.BaseModel):
 class Sort(str, enum.Enum):
     id = "id"
     name = "name"
-    last_modified = "update"
 
 
 class Order(enum.IntEnum):
@@ -76,25 +74,12 @@ async def get_characters(
     db: Database = Depends(get_db),
     page: Pager = Depends(),
     name: Optional[str] = None,
-    type: Optional[PersonType] = Query(None, description="`1`为个人，`2`为公司，`3`为组合"),
-    career: Optional[List[PersonCareer]] = Query(
-        None, example="?career=mangaka&career=producer"
-    ),
     sort: Sort = Sort.id,
     order: Order = Order.desc,
 ):
     filters = [ChiiCharacter.crt_ban == 0, ChiiCharacter.crt_redirect == 0]
     if name is not None:
         filters.append(ChiiCharacter.crt_name.contains(name))
-    if type is not None:
-        filters.append(ChiiCharacter.crt_role == type.value)
-
-    if career:
-        q = []
-        for c in career:
-            q.append(getattr(ChiiCharacter, f"crt_{c}") == 1)
-        career_filter = sa.or_(*q)
-        filters.append(career_filter)
 
     count = await db.fetch_val(
         sa.select(sa.func.count(ChiiCharacter.crt_id)).where(*filters)
@@ -116,14 +101,7 @@ async def get_characters(
             ChiiCharacter.crt_role,
             ChiiCharacter.crt_img,
             ChiiCharacter.crt_summary,
-            ChiiCharacter.crt_producer,
-            ChiiCharacter.crt_mangaka,
-            ChiiCharacter.crt_actor,
             ChiiCharacter.crt_lock,
-            ChiiCharacter.crt_artist,
-            ChiiCharacter.crt_seiyu,
-            ChiiCharacter.crt_writer,
-            ChiiCharacter.crt_illustrator,
         )
         .where(*filters)
         .limit(page.limit)
@@ -134,8 +112,6 @@ async def get_characters(
 
     if sort == Sort.name:
         sort_field = ChiiCharacter.crt_name
-    if sort == Sort.last_modified:
-        sort_field = ChiiCharacter.crt_lastpost
 
     if order > 0:
         sort_field = sort_field.asc()
@@ -151,7 +127,6 @@ async def get_characters(
             "type": r["crt_role"],
             "short_summary": r["crt_summary"][:80] + "...",
             "locked": r["crt_lock"],
-            "img": person_img_url(r["crt_img"]),
             "images": person_images(r["crt_img"]),
         }
         for r in await db.fetch_all(query)
@@ -199,10 +174,8 @@ async def get_person(
         "name": character.crt_name,
         "type": character.crt_role,
         "summary": character.crt_summary,
-        "img": person_img_url(character.crt_img),
         "images": person_images(character.crt_img),
         "locked": character.crt_lock,
-        "last_modified": character.crt_lastpost,
         "stat": {
             "comments": character.crt_comment,
             "collects": character.crt_collects,
