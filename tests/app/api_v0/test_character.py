@@ -80,6 +80,7 @@ def test_character_subjects(client: TestClient):
     assert response.status_code == 200
 
     subjects = response.json()
+    assert subjects[0]["id"] == 8
     assert set(subjects[0].keys()) == {
         "id",
         "staff",
