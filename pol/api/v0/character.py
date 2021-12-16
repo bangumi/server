@@ -149,7 +149,7 @@ async def get_characters(
         404: res.response(model=ErrorDetail),
     },
 )
-async def get_person(
+async def get_character_detail(
     response: Response,
     db: Database = Depends(get_db),
     character_id: int = Path(..., gt=0),

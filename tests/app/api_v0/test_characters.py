@@ -76,6 +76,11 @@ def test_characters_page_sort_invalid(client: TestClient, db_session: Session):
     assert response.status_code == 422, response.text
 
 
+def test_characters_page_offset_too_bid(client: TestClient, db_session: Session):
+    response = client.get(path, params={"offset": 100000000})
+    assert response.status_code == 422, response.text
+
+
 def test_characters_page_offset(client: TestClient, db_session: Session):
     response = client.get(path, params={"offset": 1})
     assert response.status_code == 200, response.text
