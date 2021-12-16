@@ -15,9 +15,15 @@ from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import Gender, StaffMap, PersonType, get_character_rel
-from pol.db.tables import ChiiSubject, ChiiCharacter, ChiiPersonField, ChiiPersonCsIndex
+from pol.db.const import Gender, PersonType, get_character_rel
+from pol.db.tables import (
+    ChiiSubject,
+    ChiiCharacter,
+    ChiiPersonField,
+    ChiiCrtSubjectIndex,
+)
 from pol.db_models import sa
+from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.models import PersonCareer
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
@@ -35,14 +41,13 @@ async def basic_character(
         return await curd.get_one(
             db,
             ChiiCharacter,
-            ChiiCharacter.prsn_id == character_id,
-            ChiiCharacter.prsn_ban != 1,
+            ChiiCharacter.crt_id == character_id,
         )
     except NotFoundError:
         raise res.HTTPException(
             status_code=404,
             title="Not Found",
-            description="resource you resource can't be found in the database",
+            description=NotFoundDescription,
             detail={"character_id": "character_id"},
         )
 
@@ -65,9 +70,9 @@ class Order(enum.IntEnum):
 
 @router.get(
     "/characters",
-    response_model=models.PagedPerson,
+    response_model=models.PagedCharacter,
 )
-async def get_persons(
+async def get_characters(
     db: Database = Depends(get_db),
     page: Pager = Depends(),
     name: Optional[str] = None,
@@ -78,21 +83,21 @@ async def get_persons(
     sort: Sort = Sort.id,
     order: Order = Order.desc,
 ):
-    filters = [ChiiCharacter.prsn_ban == 0, ChiiCharacter.prsn_redirect == 0]
+    filters = [ChiiCharacter.crt_ban == 0, ChiiCharacter.crt_redirect == 0]
     if name is not None:
-        filters.append(ChiiCharacter.prsn_name.contains(name))
+        filters.append(ChiiCharacter.crt_name.contains(name))
     if type is not None:
-        filters.append(ChiiCharacter.prsn_type == type.value)
+        filters.append(ChiiCharacter.crt_role == type.value)
 
     if career:
         q = []
         for c in career:
-            q.append(getattr(ChiiCharacter, f"prsn_{c}") == 1)
+            q.append(getattr(ChiiCharacter, f"crt_{c}") == 1)
         career_filter = sa.or_(*q)
         filters.append(career_filter)
 
     count = await db.fetch_val(
-        sa.select(sa.func.count(ChiiCharacter.prsn_id)).where(*filters)
+        sa.select(sa.func.count(ChiiCharacter.crt_id)).where(*filters)
     )
     if page.offset > count:
         raise RequestValidationError(
@@ -106,31 +111,31 @@ async def get_persons(
 
     query = (
         sa.select(
-            ChiiCharacter.prsn_id,
-            ChiiCharacter.prsn_name,
-            ChiiCharacter.prsn_type,
-            ChiiCharacter.prsn_img,
-            ChiiCharacter.prsn_summary,
-            ChiiCharacter.prsn_producer,
-            ChiiCharacter.prsn_mangaka,
-            ChiiCharacter.prsn_actor,
-            ChiiCharacter.prsn_lock,
-            ChiiCharacter.prsn_artist,
-            ChiiCharacter.prsn_seiyu,
-            ChiiCharacter.prsn_writer,
-            ChiiCharacter.prsn_illustrator,
+            ChiiCharacter.crt_id,
+            ChiiCharacter.crt_name,
+            ChiiCharacter.crt_role,
+            ChiiCharacter.crt_img,
+            ChiiCharacter.crt_summary,
+            ChiiCharacter.crt_producer,
+            ChiiCharacter.crt_mangaka,
+            ChiiCharacter.crt_actor,
+            ChiiCharacter.crt_lock,
+            ChiiCharacter.crt_artist,
+            ChiiCharacter.crt_seiyu,
+            ChiiCharacter.crt_writer,
+            ChiiCharacter.crt_illustrator,
         )
         .where(*filters)
         .limit(page.limit)
         .offset(page.offset)
     )
 
-    sort_field = ChiiCharacter.prsn_id
+    sort_field = ChiiCharacter.crt_id
 
     if sort == Sort.name:
-        sort_field = ChiiCharacter.prsn_name
+        sort_field = ChiiCharacter.crt_name
     if sort == Sort.last_modified:
-        sort_field = ChiiCharacter.prsn_lastpost
+        sort_field = ChiiCharacter.crt_lastpost
 
     if order > 0:
         sort_field = sort_field.asc()
@@ -141,14 +146,13 @@ async def get_persons(
 
     characters = [
         {
-            "id": r["prsn_id"],
-            "name": r["prsn_name"],
-            "type": r["prsn_type"],
-            "career": get_career(r),
-            "short_summary": r["prsn_summary"][:80] + "...",
-            "locked": r["prsn_lock"],
-            "img": person_img_url(r["prsn_img"]),
-            "images": person_images(r["prsn_img"]),
+            "id": r["crt_id"],
+            "name": r["crt_name"],
+            "type": r["crt_role"],
+            "short_summary": r["crt_summary"][:80] + "...",
+            "locked": r["crt_lock"],
+            "img": person_img_url(r["crt_img"]),
+            "images": person_images(r["crt_img"]),
         }
         for r in await db.fetch_all(query)
     ]
@@ -164,7 +168,7 @@ async def get_persons(
 @router.get(
     "/characters/{character_id}",
     description="cache with 60s",
-    response_model=models.PersonDetail,
+    response_model=models.CharacterDetail,
     response_model_by_alias=False,
     responses={
         404: res.response(model=ErrorDetail),
@@ -185,22 +189,23 @@ async def get_person(
 
     character: ChiiCharacter = await basic_character(character_id=character_id, db=db)
 
-    if character.prsn_redirect:
-        return RedirectResponse(f"{api_base}/{character.prsn_redirect}")
+    if character.crt_redirect:
+        return RedirectResponse(f"{api_base}/{character.crt_redirect}")
+
+    raise_ban(character)
 
     data = {
-        "id": character.prsn_id,
-        "name": character.prsn_name,
-        "type": character.prsn_type,
-        "career": get_career(character),
-        "summary": character.prsn_summary,
-        "img": person_img_url(character.prsn_img),
-        "images": person_images(character.prsn_img),
-        "locked": character.prsn_lock,
-        "last_modified": character.prsn_lastpost,
+        "id": character.crt_id,
+        "name": character.crt_name,
+        "type": character.crt_role,
+        "summary": character.crt_summary,
+        "img": person_img_url(character.crt_img),
+        "images": person_images(character.crt_img),
+        "locked": character.crt_lock,
+        "last_modified": character.crt_lastpost,
         "stat": {
-            "comments": character.prsn_comment,
-            "collects": character.prsn_collects,
+            "comments": character.crt_comment,
+            "collects": character.crt_collects,
         },
     }
 
@@ -208,8 +213,8 @@ async def get_person(
         field = await curd.get_one(
             db,
             ChiiPersonField,
-            ChiiPersonField.prsn_id == character.prsn_id,
-            ChiiPersonField.prsn_cat == "prsn",
+            ChiiPersonField.prsn_id == character.crt_id,
+            ChiiPersonField.prsn_cat == "crt",
         )
         data["gender"] = Gender.to_view(field.gender)
         data["blood_type"] = field.bloodtype or None
@@ -220,7 +225,7 @@ async def get_person(
         pass
 
     try:
-        data["infobox"] = wiki.parse(character.prsn_infobox).info
+        data["infobox"] = wiki.parse(character.crt_infobox).info
     except wiki.WikiSyntaxError:
         pass
 
@@ -243,22 +248,23 @@ async def get_person_subjects(
     character_id: int = Path(..., gt=0),
 ):
     character: ChiiCharacter = await basic_character(character_id=character_id, db=db)
-    if character.prsn_redirect:
-        return RedirectResponse(f"{api_base}/{character.prsn_redirect}/subjects")
+    if character.crt_redirect:
+        return RedirectResponse(f"{api_base}/{character.crt_redirect}/subjects")
+
+    raise_ban(character)
 
     query = (
         sa.select(
-            ChiiPersonCsIndex.subject_id,
-            ChiiPersonCsIndex.prsn_position,
-            ChiiPersonCsIndex.subject_type_id,
+            ChiiCrtSubjectIndex.subject_id,
+            ChiiCrtSubjectIndex.crt_type,
         )
-        .where(ChiiPersonCsIndex.prsn_id == character.prsn_id)
+        .where(ChiiCrtSubjectIndex.crt_id == character.crt_id)
         .distinct()
-        .order_by(ChiiPersonCsIndex.subject_id)
+        .order_by(ChiiCrtSubjectIndex.subject_id)
     )
 
-    result: Dict[int, ChiiPersonCsIndex] = {
-        r["subject_id"]: ChiiPersonCsIndex(**r) for r in await db.fetch_all(query)
+    result: Dict[int, ChiiCrtSubjectIndex] = {
+        r["subject_id"]: ChiiCrtSubjectIndex(**r) for r in await db.fetch_all(query)
     }
 
     query = sa.select(
@@ -276,28 +282,19 @@ async def get_person_subjects(
         else:
             s["subject_image"] = None
         rel = result[s["subject_id"]]
-        s["staff"] = get_character_rel(StaffMap[rel.subject_type_id][rel.prsn_position])
+        s["staff"] = get_character_rel(rel.crt_type)
 
     return subjects
 
 
-def get_career(p: ChiiCharacter) -> List[str]:
-    s = []
-    if p.prsn_producer:
-        s.append("producer")
-    if p.prsn_mangaka:
-        s.append("mangaka")
-    if p.prsn_artist:
-        s.append("artist")
-    if p.prsn_seiyu:
-        s.append("seiyu")
-    if p.prsn_writer:
-        s.append("writer")
-    if p.prsn_illustrator:
-        s.append("illustrator")
-    if p.prsn_actor:
-        s.append("actor")
-    return s
+def raise_ban(c: ChiiCharacter):
+    if c.crt_ban:
+        raise res.HTTPException(
+            status_code=404,
+            title="Not Found",
+            description=NotFoundDescription,
+            detail={"character_id": "character_id"},
+        )
 
 
 def person_images(s: Optional[str]) -> Optional[Dict[str, str]]:
