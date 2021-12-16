@@ -70,7 +70,10 @@ class PersonDetail(BasePerson):
     locked: bool
     last_modified: datetime.datetime = Field(
         ...,
-        description="currently it's latest user comment time, will be last wiki/image update date in the future",
+        description=(
+            "currently it's latest user comment time,"
+            " it will be replaced by wiki modified date in the future"
+        ),
     )
 
     infobox: Optional[List[Dict[str, Any]]] = Field(
