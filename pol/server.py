@@ -28,21 +28,6 @@ setup_http_middleware(app)
 app.include_router(api.router)
 
 
-@app.exception_handler(StarletteHTTPException)
-async def global_404(request, exc: StarletteHTTPException):
-    return ORJSONResponse(
-        {
-            "title": "Not Found",
-            "description": "Ehe path you requested is not registered",
-            "detail": (
-                "This is default 404 response, "
-                "if you see this response, please check your request path"
-            ),
-        },
-        status_code=exc.status_code,
-    )
-
-
 @app.exception_handler(res.HTTPException)
 async def http_exception_handler(request, exc: res.HTTPException):
     return ORJSONResponse(
@@ -54,6 +39,24 @@ async def http_exception_handler(request, exc: res.HTTPException):
         headers=exc.headers,
         status_code=exc.status_code,
     )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def global_404(request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return ORJSONResponse(
+            {
+                "title": "Not Found",
+                "description": "Ehe path you requested is not registered",
+                "detail": (
+                    "This is default 404 response, "
+                    "if you see this response, please check your request path"
+                ),
+            },
+            status_code=exc.status_code,
+        )
+
+    return ORJSONResponse({"detail": exc.detail}, status_code=exc.status_code)
 
 
 @app.exception_handler(RequestValidationError)

@@ -77,6 +77,14 @@ StaffMap = {
 }
 
 
+def get_character_rel(o: int) -> str:
+    return {
+        1: "主角",
+        2: "配角",
+        3: "客串",
+    }[o]
+
+
 def get_staff(o: Staff) -> str:
     v: str = o.cn or o.jp or o.en or o.rdf
     return v

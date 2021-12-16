@@ -18,6 +18,8 @@ from pol.depends import get_db, get_redis
 from pol.db.const import Gender, StaffMap, PersonType, get_staff
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
+from pol.api.v0.const import NotFoundDescription
+from pol.api.v0.utils import person_images
 from pol.api.v0.models import PersonCareer
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
@@ -42,7 +44,7 @@ async def basic_person(
         raise res.HTTPException(
             status_code=404,
             title="Not Found",
-            description="resource you resource can't be found in the database",
+            description=NotFoundDescription,
             detail={"person_id": "person_id"},
         )
 
@@ -293,18 +295,6 @@ def get_career(p: ChiiPerson) -> List[str]:
     if p.prsn_actor:
         s.append("actor")
     return s
-
-
-def person_images(s: Optional[str]) -> Optional[Dict[str, str]]:
-    if not s:
-        return None
-
-    return {
-        "large": "https://lain.bgm.tv/pic/crt/l/" + s,
-        "medium": "https://lain.bgm.tv/pic/crt/m/" + s,
-        "small": "https://lain.bgm.tv/pic/crt/s/" + s,
-        "grid": "https://lain.bgm.tv/pic/crt/g/" + s,
-    }
 
 
 def person_img_url(s: Optional[str]) -> Optional[str]:
