@@ -24,6 +24,7 @@ from pol.db.tables import (
 )
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
+from pol.api.v0.utils import person_images
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -268,21 +269,3 @@ def raise_ban(c: ChiiCharacter):
             description=NotFoundDescription,
             detail={"character_id": "character_id"},
         )
-
-
-def person_images(s: Optional[str]) -> Optional[Dict[str, str]]:
-    if not s:
-        return None
-
-    return {
-        "large": "https://lain.bgm.tv/pic/crt/l/" + s,
-        "medium": "https://lain.bgm.tv/pic/crt/m/" + s,
-        "small": "https://lain.bgm.tv/pic/crt/s/" + s,
-        "grid": "https://lain.bgm.tv/pic/crt/g/" + s,
-    }
-
-
-def person_img_url(s: Optional[str]) -> Optional[str]:
-    if not s:
-        return None
-    return "https://lain.bgm.tv/pic/crt/m/" + s
