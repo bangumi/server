@@ -3,7 +3,7 @@ from typing import Type, TypeVar
 from databases import Database
 from sqlalchemy.orm import DeclarativeMeta
 
-from . import subject
+from . import ep, subject
 from ..db_models import sa
 from .exceptions import NotFoundError
 
@@ -20,4 +20,4 @@ async def get_one(db: Database, t: Type[T], *where) -> T:
     raise NotFoundError()
 
 
-__all__ = ["get_one", "subject"]
+__all__ = ["get_one", "subject", "ep"]

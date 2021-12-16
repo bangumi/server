@@ -1,0 +1,46 @@
+import datetime
+from typing import List
+
+from pydantic import Field, BaseModel
+from databases import Database
+
+from pol.db.tables import ChiiEpisode
+from pol.db_models import sa
+from pol.curd.exceptions import NotFoundError
+
+
+class Ep(BaseModel):
+    id: int = Field(alias="ep_id")
+    subject_id: int = Field(alias="ep_subject_id")
+    sort: float = Field(alias="ep_sort")
+    type: int = Field(alias="ep_type")
+    disc: int = Field(alias="ep_disc")
+    name: str = Field(alias="ep_name")
+    name_cn: str = Field(alias="ep_name_cn")
+    duration: str = Field(alias="ep_duration")
+    airdate: str = Field(alias="ep_airdate")
+    online: str = Field(alias="ep_online")
+    comment: int = Field(alias="ep_comment")
+    # resources: int = Field(alias="ep_resources")
+    desc: str = Field(alias="ep_desc")
+    dateline: datetime.datetime = Field(alias="ep_dateline")
+    lastpost: datetime.datetime = Field(alias="ep_lastpost")
+    lock: bool = Field(alias="ep_lock")
+    ban: bool = Field(alias="ep_ban")
+
+
+async def get_one(db: Database, *where) -> Ep:
+    query = sa.select(ChiiEpisode).where(*where).limit(1)
+    r = await db.fetch_one(query)
+
+    if r:
+        return Ep.parse_obj(r)
+
+    raise NotFoundError()
+
+
+async def get_many(db: Database, *where) -> List[Ep]:
+    query = sa.select(ChiiEpisode).where(*where).order_by(ChiiEpisode.ep_sort)
+    results = await db.fetch_all(query)
+
+    return [Ep.parse_obj(r) for r in results]
