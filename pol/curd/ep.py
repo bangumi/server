@@ -39,8 +39,18 @@ async def get_one(db: Database, *where) -> Ep:
     raise NotFoundError()
 
 
-async def get_many(db: Database, *where) -> List[Ep]:
-    query = sa.select(ChiiEpisode).where(*where).order_by(ChiiEpisode.ep_sort)
+async def get_many(db: Database, *where, limit=None, offset=None) -> List[Ep]:
+    query = (
+        sa.select(ChiiEpisode)
+        .where(*where)
+        .order_by(ChiiEpisode.ep_type, ChiiEpisode.ep_sort)
+    )
+
+    if limit is not None:
+        query = query.limit(limit)
+    if offset is not None:
+        query = query.offset(offset)
+
     results = await db.fetch_all(query)
 
     return [Ep.parse_obj(r) for r in results]

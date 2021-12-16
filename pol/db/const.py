@@ -60,6 +60,13 @@ class Gender(ViewMixin, enum.IntEnum):
             raise ValueError(f"{self.value} is not valid gender")
 
 
+class EpType(enum.IntEnum):
+    normal = 0
+    sp = 1
+    op = 2
+    ed = 3
+
+
 class SubjectType(enum.IntEnum):
     book = 1
     anime = 2

@@ -1,9 +1,7 @@
 import enum
 from typing import Dict, List, Optional
 
-import pydantic
 from fastapi import Path, Query, Depends, APIRouter
-from pydantic import Field
 from databases import Database
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, RedirectResponse
@@ -20,7 +18,7 @@ from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCs
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
-from pol.api.v0.models import PersonCareer
+from pol.api.v0.models import Pager, PersonCareer
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -47,11 +45,6 @@ async def basic_person(
             description=NotFoundDescription,
             detail={"person_id": "person_id"},
         )
-
-
-class Pager(pydantic.BaseModel):
-    limit: int = Field(30, gt=0, le=50)
-    offset: int = Field(0, ge=0)
 
 
 class Sort(str, enum.Enum):

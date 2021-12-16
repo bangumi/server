@@ -2,6 +2,7 @@ import enum
 import datetime
 from typing import Any, Dict, List, Optional
 
+import pydantic
 from pydantic import Field, BaseModel
 
 from pol.db.const import BloodType, PersonType
@@ -139,3 +140,8 @@ class CharacterDetail(BaseCharacter):
     birth_day: Optional[int] = Field(None, description="parsed from wiki, maybe `null`")
 
     stat: Stat
+
+
+class Pager(pydantic.BaseModel):
+    limit: int = Field(30, gt=0, le=50)
+    offset: int = Field(0, ge=0)

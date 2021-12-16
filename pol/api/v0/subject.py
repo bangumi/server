@@ -1,6 +1,7 @@
 from typing import List
 
-from fastapi import Path, Depends, APIRouter
+from fastapi import Path, Query, Depends, APIRouter
+from pydantic import Field, BaseModel
 from databases import Database
 from starlette.responses import Response, RedirectResponse
 
@@ -8,6 +9,7 @@ from pol import res, curd, wiki
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
+from pol.db.const import EpType
 from pol.db.tables import (
     ChiiPerson,
     ChiiEpisode,
@@ -37,7 +39,7 @@ async def basic_subject(db: Database, subject_id: int) -> curd.subject.Subject:
             status_code=404,
             title="Not Found",
             description=NotFoundDescription,
-            detail={"character_id": "character_id"},
+            detail={"subject_id": subject_id},
         )
 
 
@@ -73,15 +75,25 @@ async def get_subject(
     data["images"] = subject.images
     data["collection"] = subject.collection
     data["rating"] = subject.rating()
+    data["total_episodes"] = await db.fetch_val(
+        sa.select(sa.func.count(ChiiEpisode.ep_id)).where(
+            ChiiEpisode.ep_subject_id == subject_id
+        )
+    )
 
     try:
         data["infobox"] = wiki.parse(subject.infobox).info
     except wiki.WikiSyntaxError:
         pass
 
-    await redis.set_json(cache_key, value=data, ex=300)
+    # await redis.set_json(cache_key, value=data, ex=300)
 
     return data
+
+
+class Pager(BaseModel):
+    limit: int = Field(100, gt=0, le=200, description="最大值`200`")
+    offset: int = Field(0, ge=0)
 
 
 @router.get(
@@ -95,10 +107,24 @@ async def get_subject(
 async def get_subject_eps(
     db: Database = Depends(get_db),
     subject_id: int = Path(..., gt=0),
+    type: EpType = Query(None, description="`0`,`1`,`2`,`3`代表`本篇`，`sp`，`op`，`ed`"),
+    page: Pager = Depends(),
 ):
+    where = [
+        ChiiEpisode.ep_subject_id == subject_id,
+    ]
+
+    if type is not None:
+        where.append(ChiiEpisode.ep_type == type.value)
+
     return [
         x.dict()
-        for x in await curd.ep.get_many(db, ChiiEpisode.ep_subject_id == subject_id)
+        for x in await curd.ep.get_many(
+            db,
+            *where,
+            limit=page.limit,
+            offset=page.offset,
+        )
     ]
 
 

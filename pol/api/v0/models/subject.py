@@ -1,23 +1,21 @@
 import datetime
 from typing import Dict
 
-from pydantic import BaseModel
+from pydantic import Field, BaseModel
 
 from pol.api.v0.models.wiki import Wiki
 
 
 class SubjectEp(BaseModel):
     id: int
-    # url: str
-    type: int
-    sort: int
+    type: int = Field(description="`0` 本篇，`1` SP，`2` OP，`3` ED")
+    sort: float
     name: str
     name_cn: str
     duration: str
     airdate: str
     comment: int
     desc: str
-    # status: str
 
 
 class Rating(BaseModel):
@@ -54,6 +52,11 @@ class Subject(BaseModel):
     platform: int
     images: Images
     infobox: Wiki
+
+    volumes: int = Field(description="书籍条目，由旧服务端从wiki中解析，`册数`")
+    eps: int = Field(description="由旧服务端从wiki中解析，对于书籍条目为`话数`")
+
+    total_episodes: int = Field(description="数据库中的章节数量")
 
     rating: Rating
 

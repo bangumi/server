@@ -26,6 +26,9 @@ class Subject(BaseModel):
     summary: str = Field(alias="field_summary")
     infobox: str = Field(alias="field_infobox")
 
+    volumes: int = Field(alias="field_volumes")
+    eps: int = Field(alias="field_eps")
+
     rank: int = Field(alias="field_rank")
 
     dropped: int = Field(alias="subject_dropped")
