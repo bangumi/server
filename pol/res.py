@@ -1,12 +1,7 @@
 from typing import Any, Dict, Type, Optional
 
 import orjson
-from fastapi import HTTPException as _HTTPException
-from starlette.responses import Response, JSONResponse
-
-
-class CalendarResponse(Response):
-    media_type = "text/calendar"
+from starlette.responses import JSONResponse
 
 
 class ORJSONResponse(JSONResponse):
@@ -16,7 +11,7 @@ class ORJSONResponse(JSONResponse):
         return orjson.dumps(content)
 
 
-class HTTPException(_HTTPException):
+class HTTPException(Exception):
     def __init__(
         self,
         status_code: int,
@@ -25,7 +20,8 @@ class HTTPException(_HTTPException):
         detail: Any = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> None:
-        super().__init__(status_code=status_code, detail=detail)
+        self.status_code = status_code
+        self.detail = detail
         self.headers = headers
         self.title = title
         self.description = description
