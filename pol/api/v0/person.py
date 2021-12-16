@@ -18,6 +18,7 @@ from pol.depends import get_db, get_redis
 from pol.db.const import Gender, StaffMap, PersonType, get_staff
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
+from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import person_images
 from pol.api.v0.models import PersonCareer
 from pol.curd.exceptions import NotFoundError
@@ -43,7 +44,7 @@ async def basic_person(
         raise res.HTTPException(
             status_code=404,
             title="Not Found",
-            description="resource you resource can't be found in the database",
+            description=NotFoundDescription,
             detail={"person_id": "person_id"},
         )
 
