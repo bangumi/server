@@ -1,4 +1,4 @@
-from sqlalchemy import Date, Enum, Index, Table, Column, String, text
+from sqlalchemy import Date, Enum, Float, Index, Table, Column, String, text
 from sqlalchemy.dialects.mysql import (
     ENUM,
     YEAR,
@@ -61,6 +61,36 @@ class ChiiCrtSubjectIndex(Base):
     crt_type = Column(TINYINT(4), nullable=False, index=True, comment="主角，配角")
     ctr_appear_eps = Column(MEDIUMTEXT, nullable=False, comment="可选，角色出场的的章节")
     crt_order = Column(TINYINT(3), nullable=False)
+
+
+class ChiiEpisode(Base):
+    __tablename__ = "chii_episodes"
+    __table_args__ = (Index("ep_subject_id_2", "ep_subject_id", "ep_ban", "ep_sort"),)
+
+    ep_id = Column(MEDIUMINT(8), primary_key=True)
+    ep_subject_id = Column(MEDIUMINT(8), nullable=False, index=True)
+    ep_sort = Column(Float, nullable=False, index=True, server_default=text("'0'"))
+    ep_type = Column(TINYINT(1), nullable=False)
+    ep_disc = Column(
+        TINYINT(3),
+        nullable=False,
+        index=True,
+        server_default=text("'0'"),
+        comment="碟片数",
+    )
+    ep_name = Column(String(80), nullable=False)
+    ep_name_cn = Column(String(80), nullable=False)
+    ep_rate = Column(TINYINT(3), nullable=False)
+    ep_duration = Column(String(80), nullable=False)
+    ep_airdate = Column(String(80), nullable=False)
+    ep_online = Column(MEDIUMTEXT, nullable=False)
+    ep_comment = Column(MEDIUMINT(8), nullable=False)
+    ep_resources = Column(MEDIUMINT(8), nullable=False)
+    ep_desc = Column(MEDIUMTEXT, nullable=False)
+    ep_dateline = Column(INTEGER(10), nullable=False)
+    ep_lastpost = Column(INTEGER(10), nullable=False, index=True)
+    ep_lock = Column(TINYINT(3), nullable=False, server_default=text("'0'"))
+    ep_ban = Column(TINYINT(3), nullable=False, index=True, server_default=text("'0'"))
 
 
 t_chii_person_alias = Table(
