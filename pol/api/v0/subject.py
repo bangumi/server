@@ -8,8 +8,18 @@ from pol import res, curd, wiki
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.tables import ChiiEpisode, ChiiSubject
+from pol.db.tables import (
+    ChiiPerson,
+    ChiiEpisode,
+    ChiiSubject,
+    ChiiCharacter,
+    ChiiPersonCsIndex,
+    ChiiCrtSubjectIndex,
+)
+from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
+from pol.api.v0.utils import get_career, person_images, short_description
+from pol.api.v0.models import Person, Character
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 from pol.api.v0.models.subject import Subject, SubjectEp
@@ -49,7 +59,7 @@ async def get_subject(
     cache_key = CACHE_KEY_PREFIX + f"subject:{subject_id}"
     if (value := await redis.get(cache_key)) is not None:
         response.headers["x-cache-status"] = "hit"
-        # return value
+        return value
     else:
         response.headers["x-cache-status"] = "miss"
 
@@ -90,3 +100,93 @@ async def get_subject_eps(
         x.dict()
         for x in await curd.ep.get_many(db, ChiiEpisode.ep_subject_id == subject_id)
     ]
+
+
+@router.get(
+    "/subjects/{subject_id}/persons",
+    response_model_by_alias=False,
+    response_model=List[Person],
+    responses={
+        404: res.response(model=ErrorDetail),
+    },
+)
+async def get_subject_persons(
+    db: Database = Depends(get_db),
+    subject_id: int = Path(..., gt=0),
+):
+    query = (
+        sa.select(
+            ChiiPersonCsIndex.prsn_id,
+            ChiiPerson.prsn_name,
+            ChiiPerson.prsn_type,
+            ChiiPerson.prsn_img,
+            ChiiPerson.prsn_summary,
+            ChiiPerson.prsn_producer,
+            ChiiPerson.prsn_mangaka,
+            ChiiPerson.prsn_actor,
+            ChiiPerson.prsn_lock,
+            ChiiPerson.prsn_artist,
+            ChiiPerson.prsn_seiyu,
+            ChiiPerson.prsn_writer,
+            ChiiPerson.prsn_illustrator,
+        )
+        .distinct()
+        .join(ChiiPerson, ChiiPerson.prsn_id == ChiiPersonCsIndex.prsn_id)
+        .where(ChiiPersonCsIndex.subject_id == subject_id)
+    )
+
+    persons = [
+        {
+            "id": r["prsn_id"],
+            "name": r["prsn_name"],
+            "type": r["prsn_type"],
+            "career": get_career(r),
+            "short_summary": short_description(r["prsn_summary"]),
+            "locked": r["prsn_lock"],
+            "images": person_images(r["prsn_img"]),
+        }
+        for r in await db.fetch_all(query)
+    ]
+
+    return persons
+
+
+@router.get(
+    "/subjects/{subject_id}/characters",
+    response_model_by_alias=False,
+    response_model=List[Character],
+    responses={
+        404: res.response(model=ErrorDetail),
+    },
+)
+async def get_subject_characters(
+    db: Database = Depends(get_db),
+    subject_id: int = Path(..., gt=0),
+):
+    query = (
+        sa.select(
+            ChiiCrtSubjectIndex.crt_id,
+            ChiiCharacter.crt_name,
+            ChiiCharacter.crt_role,
+            ChiiCharacter.crt_img,
+            ChiiCharacter.crt_summary,
+            ChiiCharacter.crt_lock,
+        )
+        .distinct()
+        .join(ChiiCharacter, ChiiCharacter.crt_id == ChiiCrtSubjectIndex.crt_id)
+        .where(ChiiCrtSubjectIndex.subject_id == subject_id)
+    )
+
+    characters = [
+        {
+            "id": r["crt_id"],
+            "name": r["crt_name"],
+            "type": r["crt_role"],
+            "short_summary": short_description(r["crt_summary"]),
+            "locked": r["crt_lock"],
+            "images": person_images(r["crt_img"]),
+        }
+        for r in await db.fetch_all(query)
+    ]
+
+    return characters

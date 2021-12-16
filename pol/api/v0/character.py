@@ -24,7 +24,7 @@ from pol.db.tables import (
 )
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
-from pol.api.v0.utils import person_images
+from pol.api.v0.utils import person_images, short_description
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -126,7 +126,7 @@ async def get_characters(
             "id": r["crt_id"],
             "name": r["crt_name"],
             "type": r["crt_role"],
-            "short_summary": r["crt_summary"][:80] + "...",
+            "short_summary": short_description(r["crt_summary"]),
             "locked": r["crt_lock"],
             "images": person_images(r["crt_img"]),
         }
