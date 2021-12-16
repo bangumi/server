@@ -81,6 +81,3 @@ class Ep(BaseModel):
     airdate: str
     comment: int
     desc: str
-    comment: int
-
-    # status: str
