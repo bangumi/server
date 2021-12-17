@@ -60,3 +60,11 @@ def test_subject_ep_query_redirect(client: TestClient):
     new_data = client.get("/v0/subjects/8/eps", params={"limit": 4, "offset": 1}).json()
 
     assert ids[1:] == [x["id"] for x in new_data]
+
+
+def test_subject_ep_type(client: TestClient):
+    response = client.get("/v0/subjects/253/eps", params={"type": 3})
+    assert response.status_code == 200
+
+    data = response.json()
+    assert [x["id"] for x in data] == [103233, 103234, 103235]
