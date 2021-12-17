@@ -72,6 +72,7 @@ async def get_subject(
 
     data = subject.dict(exclude={"dateline", "image", "dropped", "wish"})
 
+    data["locked"] = subject.locked
     data["images"] = subject.images
     data["collection"] = subject.collection
     data["rating"] = subject.rating()
@@ -84,7 +85,7 @@ async def get_subject(
     try:
         data["infobox"] = wiki.parse(subject.infobox).info
     except wiki.WikiSyntaxError:
-        pass
+        data["infobox"] = None
 
     # await redis.set_json(cache_key, value=data, ex=300)
 

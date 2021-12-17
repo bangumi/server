@@ -1,6 +1,7 @@
 import datetime
+from typing import Optional
 
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, validator
 from databases import Database
 
 from pol.utils import subject_images
@@ -16,9 +17,9 @@ class Subject(BaseModel):
     name_cn: str = Field(alias="subject_name_cn")
 
     type: int = Field(alias="subject_type_id")
-    ban: bool = Field(alias="subject_ban")
+    ban: int = Field(alias="subject_ban", description="1 为重定向 2 为锁定")
     redirect: int = Field(alias="field_redirect")
-    date: datetime.date = Field(alias="field_date")
+    date: Optional[datetime.date] = Field(alias="field_date")
     dateline: int = Field(alias="subject_dateline")
     nsfw: bool = Field(alias="subject_nsfw")
     platform: int = Field(alias="subject_platform")
@@ -48,6 +49,16 @@ class Subject(BaseModel):
     rate_8: int = Field(alias="field_rate_8")
     rate_9: int = Field(alias="field_rate_9")
     rate_10: int = Field(alias="field_rate_10")
+
+    @validator("date", pre=True)
+    def handle_mysql_zero_value(cls, v):
+        if v == "0000-00-00":
+            return None
+        return v
+
+    @property
+    def locked(self):
+        return self.ban == 2
 
     @property
     def images(self):

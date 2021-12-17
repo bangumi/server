@@ -14,7 +14,7 @@ class Ep(BaseModel):
     subject_id: int = Field(alias="ep_subject_id")
     sort: float = Field(alias="ep_sort")
     type: int = Field(alias="ep_type")
-    disc: int = Field(alias="ep_disc")
+    disc: int = Field(0, alias="ep_disc")
     name: str = Field(alias="ep_name")
     name_cn: str = Field(alias="ep_name_cn")
     duration: str = Field(alias="ep_duration")
@@ -43,7 +43,7 @@ async def get_many(db: Database, *where, limit=None, offset=None) -> List[Ep]:
     query = (
         sa.select(ChiiEpisode)
         .where(*where)
-        .order_by(ChiiEpisode.ep_type, ChiiEpisode.ep_sort)
+        .order_by(ChiiEpisode.ep_disc, ChiiEpisode.ep_type, ChiiEpisode.ep_sort)
     )
 
     if limit is not None:

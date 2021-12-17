@@ -1,4 +1,4 @@
-from typing import List, Union, Optional
+from typing import List, Union
 
 from pydantic import BaseModel
 
@@ -17,4 +17,4 @@ class Item(BaseModel):
     value: Union[str, List[Union[KV, V]]]
 
 
-Wiki = Optional[List[Item]]
+Wiki = List[Item]

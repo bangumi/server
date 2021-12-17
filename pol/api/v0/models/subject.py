@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict
+from typing import Dict, Optional
 
 from pydantic import Field, BaseModel
 
@@ -16,6 +16,7 @@ class SubjectEp(BaseModel):
     airdate: str
     comment: int
     desc: str
+    disc: int = Field(description="用于音乐条目")
 
 
 class Rating(BaseModel):
@@ -48,12 +49,13 @@ class Subject(BaseModel):
     name_cn: str
     summary: str
     nsfw: bool
-    date: datetime.date
+    locked: bool
+    date: Optional[datetime.date]
     platform: int
     images: Images
-    infobox: Wiki
+    infobox: Optional[Wiki]
 
-    volumes: int = Field(description="书籍条目，由旧服务端从wiki中解析，`册数`")
+    volumes: int = Field(description="书籍条目的册数，由旧服务端从wiki中解析")
     eps: int = Field(description="由旧服务端从wiki中解析，对于书籍条目为`话数`")
 
     total_episodes: int = Field(description="数据库中的章节数量")
@@ -61,16 +63,6 @@ class Subject(BaseModel):
     rating: Rating
 
     collection: Collection
-
-    # air_date: str
-    # air_weekday: int
-    # rating: Rating
-    # rank: int
-    # collection: Collection
-    # crt: List[CrtItem]
-    # staff: List[StaffItem]
-    # topic: List[TopicItem]
-    # blog: List[BlogItem]
 
 
 class Ep(BaseModel):
