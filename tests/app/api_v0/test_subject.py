@@ -68,3 +68,22 @@ def test_subject_ep_type(client: TestClient):
 
     data = response.json()
     assert [x["id"] for x in data] == [103233, 103234, 103235]
+
+
+def test_subject_characters(client: TestClient):
+    response = client.get("/v0/subjects/8/characters")
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert data
+
+
+def test_subject_persons(client: TestClient):
+    response = client.get("/v0/subjects/4/persons")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert isinstance(data, list)
+    assert data
