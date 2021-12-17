@@ -36,18 +36,13 @@ def test_subject_locked(client: TestClient):
     assert data["locked"]
 
 
-def test_subject_ban_404(client: TestClient):
-    response = client.get("/v0/subjects/600000")
-    assert response.status_code == 404
-
-
 def test_subject_redirect(client: TestClient):
     response = client.get("/v0/subjects/18", allow_redirects=False)
     assert response.status_code == 307
     assert response.headers["location"] == "/v0/subjects/19"
 
 
-def test_subject_ep_query_redirect(client: TestClient):
+def test_subject_ep_query_limit(client: TestClient):
     response = client.get("/v0/subjects/8/eps", params={"limit": 5})
     assert response.status_code == 200
 
