@@ -45,3 +45,18 @@ def test_subject_redirect(client: TestClient):
     response = client.get("/v0/subjects/18", allow_redirects=False)
     assert response.status_code == 307
     assert response.headers["location"] == "/v0/subjects/19"
+
+
+def test_subject_ep_query_redirect(client: TestClient):
+    response = client.get("/v0/subjects/8/eps", params={"limit": 5})
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 5
+
+    ids = [x["id"] for x in data]
+
+    new_data = client.get("/v0/subjects/8/eps", params={"limit": 4, "offset": 1}).json()
+
+    assert ids[1:] == [x["id"] for x in new_data]

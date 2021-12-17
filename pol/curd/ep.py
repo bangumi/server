@@ -6,7 +6,6 @@ from databases import Database
 
 from pol.db.tables import ChiiEpisode
 from pol.db_models import sa
-from pol.curd.exceptions import NotFoundError
 
 
 class Ep(BaseModel):
@@ -27,16 +26,6 @@ class Ep(BaseModel):
     lastpost: datetime.datetime = Field(alias="ep_lastpost")
     lock: bool = Field(alias="ep_lock")
     ban: bool = Field(alias="ep_ban")
-
-
-async def get_one(db: Database, *where) -> Ep:
-    query = sa.select(ChiiEpisode).where(*where).limit(1)
-    r = await db.fetch_one(query)
-
-    if r:
-        return Ep.parse_obj(r)
-
-    raise NotFoundError()
 
 
 async def get_many(db: Database, *where, limit=None, offset=None) -> List[Ep]:
