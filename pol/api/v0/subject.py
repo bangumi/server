@@ -87,7 +87,7 @@ async def get_subject(
     except wiki.WikiSyntaxError:
         data["infobox"] = None
 
-    # await redis.set_json(cache_key, value=data, ex=300)
+    await redis.set_json(cache_key, value=data, ex=300)
 
     return data
 
