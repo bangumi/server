@@ -35,7 +35,9 @@ api_base = "/v0/subjects"
 async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.Subject:
     try:
         return await curd.subject.get_one(
-            db, ChiiSubject.subject_id == subject_id, *where
+            db,
+            ChiiSubject.subject_id == subject_id,
+            *where,
         )
     except NotFoundError:
         raise res.HTTPException(
