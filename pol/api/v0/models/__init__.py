@@ -147,3 +147,8 @@ class CharacterDetail(BaseCharacter):
 class Pager(pydantic.BaseModel):
     limit: int = Field(30, gt=0, le=50)
     offset: int = Field(0, ge=0)
+
+
+class Order(enum.IntEnum):
+    asc = 1
+    desc = -1

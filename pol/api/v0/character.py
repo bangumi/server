@@ -23,7 +23,7 @@ from pol.db.tables import (
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import person_images, short_description
-from pol.api.v0.models import Pager
+from pol.api.v0.models import Order, Pager
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -54,11 +54,6 @@ async def basic_character(
 class Sort(str, enum.Enum):
     id = "id"
     name = "name"
-
-
-class Order(enum.IntEnum):
-    asc = 1
-    desc = -1
 
 
 @router.get(

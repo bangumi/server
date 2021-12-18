@@ -18,7 +18,7 @@ from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCs
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
-from pol.api.v0.models import Pager, PersonCareer
+from pol.api.v0.models import Order, Pager, PersonCareer
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -51,11 +51,6 @@ class Sort(str, enum.Enum):
     id = "id"
     name = "name"
     last_modified = "update"
-
-
-class Order(enum.IntEnum):
-    asc = 1
-    desc = -1
 
 
 @router.get(
