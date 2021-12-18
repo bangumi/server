@@ -8,7 +8,7 @@ class Staff(NamedTuple):
     rdf: Optional[str] = None
 
     def get(self) -> str:
-        return self.cn or self.jp or self.en or self.rdf
+        return self.cn or self.jp or self.en or self.rdf or ""
 
 
 staff_job_real = {

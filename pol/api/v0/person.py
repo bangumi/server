@@ -13,7 +13,7 @@ from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import Gender, StaffMap, PersonType, get_staff
+from pol.db.const import Gender, StaffMap, PersonType
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
@@ -266,7 +266,7 @@ async def get_person_subjects(
         else:
             s["subject_image"] = None
         rel = result[s["subject_id"]]
-        s["staff"] = get_staff(StaffMap[rel.subject_type_id][rel.prsn_position])
+        s["staff"] = StaffMap[rel.subject_type_id][rel.prsn_position].get()
 
     return subjects
 

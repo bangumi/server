@@ -9,7 +9,7 @@ from pol import res, curd, wiki
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import EpType, StaffMap, get_character_rel
+from pol.db.const import RELATION_MAP, EpType, StaffMap, get_character_rel
 from pol.db.tables import (
     ChiiPerson,
     ChiiEpisode,
@@ -17,6 +17,7 @@ from pol.db.tables import (
     ChiiCharacter,
     ChiiPersonCsIndex,
     ChiiCrtSubjectIndex,
+    ChiiSubjectRelations,
 )
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
@@ -24,7 +25,7 @@ from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelPerson, RelCharacter
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
-from pol.api.v0.models.subject import Subject, SubjectEp
+from pol.api.v0.models.subject import Subject, SubjectEp, RelSubject
 
 router = APIRouter(tags=["条目"])
 
@@ -222,3 +223,47 @@ async def get_subject_characters(
     ]
 
     return characters
+
+
+@router.get(
+    "/subjects/{subject_id}/subjects",
+    response_model_by_alias=False,
+    response_model=List[RelSubject],
+    responses={
+        404: res.response(model=ErrorDetail),
+    },
+)
+async def get_subject_relations(
+    db: Database = Depends(get_db),
+    subject_id: int = Path(..., gt=0),
+):
+    subject = await basic_subject(db, subject_id)
+
+    query = (
+        sa.select(
+            ChiiSubjectRelations, ChiiSubject.subject_name, ChiiSubject.subject_name_cn
+        )
+        .join(
+            ChiiSubject, ChiiSubject.subject_id == ChiiSubjectRelations.rlt_subject_id
+        )
+        .where(ChiiSubjectRelations.rlt_subject_id == subject_id)
+        .order_by(
+            ChiiSubjectRelations.rlt_order, ChiiSubjectRelations.rlt_related_subject_id
+        )
+    )
+
+    response = [
+        {
+            "id": r["rlt_related_subject_id"],
+            "relation": RELATION_MAP[r["rlt_subject_type_id"]][
+                r["rlt_relation_type"]
+            ].get(),
+            "name": r["subject_name"],
+            "type": repr(r["rlt_related_subject_type_id"]),
+            "name_cn": r["rlt_relation_type"],
+            "images": subject.images,
+        }
+        for r in await db.fetch_all(query)
+    ]
+
+    return response

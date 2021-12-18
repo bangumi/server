@@ -2,7 +2,6 @@ import enum
 from typing import TYPE_CHECKING, Dict, Optional, NamedTuple
 
 from pol.db._const import (
-    Staff,
     staff_job_book,
     staff_job_game,
     staff_job_real,
@@ -90,11 +89,6 @@ def get_character_rel(o: int) -> str:
         2: "配角",
         3: "客串",
     }[o]
-
-
-def get_staff(o: Staff) -> str:
-    v: str = o.cn or o.jp or o.en or o.rdf
-    return v
 
 
 class Relation(NamedTuple):
@@ -200,11 +194,11 @@ RELATION_REVERSE_MAP = {
 }
 
 RELATION_MAP: Dict[SubjectType, Dict[int, Relation]] = {
-    SubjectType.anime: RELATION_SERIES,
-    SubjectType.real: RELATION_SERIES,
     SubjectType.book: RELATION_BOOK,
-    SubjectType.game: RELATION_GAME,
+    SubjectType.anime: RELATION_SERIES,
     SubjectType.music: RELATION_MUSIC,
+    SubjectType.game: RELATION_GAME,
+    SubjectType.real: RELATION_SERIES,
 }
 
 PLATFORM_MAP = {

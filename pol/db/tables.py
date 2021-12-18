@@ -248,32 +248,51 @@ class ChiiSubjectField(Base):
     field_redirect = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
 
 
-t_chii_subject_relations = Table(
-    "chii_subject_relations",
-    metadata,
-    Column("rlt_subject_id", MEDIUMINT(8), nullable=False, comment="关联主 ID"),
-    Column("rlt_subject_type_id", TINYINT(3), nullable=False, index=True),
-    Column("rlt_relation_type", SMALLINT(5), nullable=False, comment="关联类型"),
-    Column("rlt_related_subject_id", MEDIUMINT(8), nullable=False, comment="关联目标 ID"),
-    Column("rlt_related_subject_type_id", TINYINT(3), nullable=False, comment="关联目标类型"),
-    Column("rlt_vice_versa", TINYINT(1), nullable=False),
-    Column("rlt_order", TINYINT(3), nullable=False, comment="关联排序"),
-    Index(
-        "rlt_relation_type",
-        "rlt_relation_type",
-        "rlt_subject_id",
-        "rlt_related_subject_id",
-    ),
-    Index(
-        "rlt_subject_id",
-        "rlt_subject_id",
-        "rlt_related_subject_id",
-        "rlt_vice_versa",
-        unique=True,
-    ),
-    Index("rlt_related_subject_type_id", "rlt_related_subject_type_id", "rlt_order"),
-    comment="条目关联表",
-)
+class ChiiSubjectRelations(Base):
+    """
+    这个表带有 comment，也没有主键，所以生成器用的是 `Table` 而不是现在的class。
+    """
+
+    __tablename__ = "chii_subject_relations"
+    __table_args__ = (
+        Index(
+            "rlt_relation_type",
+            "rlt_relation_type",
+            "rlt_subject_id",
+            "rlt_related_subject_id",
+        ),
+        Index(
+            "rlt_subject_id",
+            "rlt_subject_id",
+            "rlt_related_subject_id",
+            "rlt_vice_versa",
+            unique=True,
+        ),
+        Index(
+            "rlt_related_subject_type_id", "rlt_related_subject_type_id", "rlt_order"
+        ),
+    )
+    rlt_subject_id = Column(
+        "rlt_subject_id", MEDIUMINT(8), nullable=False, comment="关联主 ID"
+    )
+    rlt_subject_type_id = Column(
+        "rlt_subject_type_id", TINYINT(3), nullable=False, index=True
+    )
+    rlt_relation_type = Column(
+        "rlt_relation_type", SMALLINT(5), nullable=False, comment="关联类型"
+    )
+    rlt_related_subject_id = Column(
+        "rlt_related_subject_id", MEDIUMINT(8), nullable=False, comment="关联目标 ID"
+    )
+    rlt_related_subject_type_id = Column(
+        "rlt_related_subject_type_id", TINYINT(3), nullable=False, comment="关联目标类型"
+    )
+    rlt_vice_versa = Column("rlt_vice_versa", TINYINT(1), nullable=False)
+    rlt_order = Column("rlt_order", TINYINT(3), nullable=False, comment="关联排序")
+
+    __mapper_args__ = {
+        "primary_key": [rlt_subject_id, rlt_related_subject_id, rlt_vice_versa]
+    }
 
 
 class ChiiSubject(Base):

@@ -52,7 +52,7 @@ class Subject(BaseModel):
     locked: bool
     date: Optional[datetime.date]
     platform: int
-    images: Images
+    images: Optional[Images]
     infobox: Optional[Wiki]
 
     volumes: int = Field(description="书籍条目的册数，由旧服务端从wiki中解析")
@@ -63,6 +63,15 @@ class Subject(BaseModel):
     rating: Rating
 
     collection: Collection
+
+
+class RelSubject(BaseModel):
+    id: int
+    type: int
+    name: str
+    name_cn: str
+    images: Optional[Images]
+    relation: str
 
 
 class Ep(BaseModel):
