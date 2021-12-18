@@ -81,7 +81,9 @@ async def get_subject(
     data["images"] = subject.images
     data["collection"] = subject.collection
     data["rating"] = subject.rating()
-    data["platform"] = PLATFORM_MAP[subject.type][subject.platform]["type_cn"]
+    data["platform"] = PLATFORM_MAP[subject.type].get(
+        subject.platform, {"type_cn": ""}
+    )["type_cn"]
     data["total_episodes"] = await db.fetch_val(
         sa.select(sa.func.count(ChiiEpisode.ep_id)).where(
             ChiiEpisode.ep_subject_id == subject_id

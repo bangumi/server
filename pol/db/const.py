@@ -212,6 +212,7 @@ class Platform(NamedTuple):
 
 
 PLATFORM_MAP = {
+    SubjectType.music: {},
     SubjectType.book: {
         0: {
             "id": 0,
