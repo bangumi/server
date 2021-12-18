@@ -181,32 +181,22 @@ async def get_persons(
 
     query = query.order_by(sort_field)
 
-    if subject_id is None:
-        mapper = lambda r: {
+    persons = [
+        {
             "id": r["prsn_id"],
             "name": r["prsn_name"],
             "type": r["prsn_type"],
             "career": get_career(r),
             "short_summary": short_description(r["prsn_summary"]),
             "locked": r["prsn_lock"],
-            "relation": None,
+            "relation": StaffMap[r["subject_type_id"]][r["prsn_position"]].get()
+            if "subject_type_id" in r
+            else None,
             "img": person_img_url(r["prsn_img"]),
             "images": person_images(r["prsn_img"]),
         }
-    else:
-        mapper = lambda r: {
-            "id": r["prsn_id"],
-            "name": r["prsn_name"],
-            "type": r["prsn_type"],
-            "career": get_career(r),
-            "short_summary": short_description(r["prsn_summary"]),
-            "locked": r["prsn_lock"],
-            "relation": StaffMap[r["subject_type_id"]][r["prsn_position"]].get(),
-            "img": person_img_url(r["prsn_img"]),
-            "images": person_images(r["prsn_img"]),
-        }
-
-    persons = [mapper(r) for r in await db.fetch_all(query)]
+        for r in await db.fetch_all(query)
+    ]
 
     return {"limit": page.limit, "offset": page.offset, "total": count, "data": persons}
 
