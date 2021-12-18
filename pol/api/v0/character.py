@@ -78,11 +78,11 @@ async def get_characters(
         raise RequestValidationError(
             [
                 ErrorWrapper(
-                    ValueError("can't use `subject_id` with `name`"),
+                    ValueError(f"can't use `subject_id` with `name`"),
                     loc=("query", "subject_id"),
                 ),
                 ErrorWrapper(
-                    ValueError("can't use `subject_id` with `name`"),
+                    ValueError(f"can't use `subject_id` with `name`"),
                     loc=("query", "name"),
                 ),
             ]
