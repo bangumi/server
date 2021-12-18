@@ -51,7 +51,7 @@ class Subject(BaseModel):
     nsfw: bool
     locked: bool
     date: Optional[datetime.date]
-    platform: int
+    platform: str = Field(description="TV, Web, 欧美剧, PS4...")
     images: Optional[Images]
     infobox: Optional[Wiki]
 

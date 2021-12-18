@@ -201,6 +201,16 @@ RELATION_MAP: Dict[SubjectType, Dict[int, Relation]] = {
     SubjectType.real: RELATION_SERIES,
 }
 
+
+class Platform(NamedTuple):
+    id: int
+    type: str
+    type_cn: str
+    alias: str
+    wiki_tpl: str
+    enable_header: bool = False
+
+
 PLATFORM_MAP = {
     SubjectType.book: {
         0: {

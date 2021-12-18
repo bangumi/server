@@ -9,7 +9,7 @@ from pol import res, curd, wiki
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import RELATION_MAP, EpType, StaffMap, get_character_rel
+from pol.db.const import PLATFORM_MAP, RELATION_MAP, EpType, StaffMap, get_character_rel
 from pol.db.tables import (
     ChiiPerson,
     ChiiEpisode,
@@ -81,6 +81,7 @@ async def get_subject(
     data["images"] = subject.images
     data["collection"] = subject.collection
     data["rating"] = subject.rating()
+    data["platform"] = PLATFORM_MAP[subject.type][subject.platform]["type_cn"]
     data["total_episodes"] = await db.fetch_val(
         sa.select(sa.func.count(ChiiEpisode.ep_id)).where(
             ChiiEpisode.ep_subject_id == subject_id
