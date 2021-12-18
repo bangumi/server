@@ -9,20 +9,10 @@ from pol import res, curd, wiki
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import PLATFORM_MAP, RELATION_MAP, EpType, StaffMap, get_character_rel
-from pol.db.tables import (
-    ChiiPerson,
-    ChiiEpisode,
-    ChiiSubject,
-    ChiiCharacter,
-    ChiiPersonCsIndex,
-    ChiiCrtSubjectIndex,
-    ChiiSubjectRelations,
-)
+from pol.db.const import PLATFORM_MAP, RELATION_MAP, EpType
+from pol.db.tables import ChiiEpisode, ChiiSubject, ChiiSubjectRelations
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
-from pol.api.v0.utils import get_career, person_images, short_description
-from pol.api.v0.models import RelPerson, RelCharacter
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 from pol.api.v0.models.subject import Subject, RelSubject, PagedEpisode
@@ -142,105 +132,6 @@ async def get_episodes(
             )
         ],
     }
-
-
-@router.get(
-    "/subjects/{subject_id}/persons",
-    response_model_by_alias=False,
-    response_model=List[RelPerson],
-    responses={
-        404: res.response(model=ErrorDetail),
-    },
-)
-async def get_subject_persons(
-    db: Database = Depends(get_db),
-    subject_id: int = Path(..., gt=0),
-):
-    await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
-
-    query = (
-        sa.select(
-            ChiiPersonCsIndex.prsn_id,
-            ChiiPersonCsIndex.prsn_position,
-            ChiiPersonCsIndex.subject_type_id,
-            ChiiPerson.prsn_name,
-            ChiiPerson.prsn_type,
-            ChiiPerson.prsn_img,
-            ChiiPerson.prsn_summary,
-            ChiiPerson.prsn_producer,
-            ChiiPerson.prsn_mangaka,
-            ChiiPerson.prsn_actor,
-            ChiiPerson.prsn_artist,
-            ChiiPerson.prsn_seiyu,
-            ChiiPerson.prsn_writer,
-            ChiiPerson.prsn_illustrator,
-        )
-        .join(ChiiPerson, ChiiPerson.prsn_id == ChiiPersonCsIndex.prsn_id)
-        .where(
-            ChiiPersonCsIndex.subject_id == subject_id, ChiiPerson.prsn_redirect == 0
-        )
-    )
-
-    persons = [
-        {
-            "id": r["prsn_id"],
-            "name": r["prsn_name"],
-            "type": r["prsn_type"],
-            "relation": StaffMap[r["subject_type_id"]][r["prsn_position"]].get(),
-            "career": get_career(r),
-            "short_summary": short_description(r["prsn_summary"]),
-            "images": person_images(r["prsn_img"]),
-        }
-        for r in await db.fetch_all(query)
-    ]
-
-    return persons
-
-
-@router.get(
-    "/subjects/{subject_id}/characters",
-    response_model_by_alias=False,
-    response_model=List[RelCharacter],
-    responses={
-        404: res.response(model=ErrorDetail),
-    },
-)
-async def get_subject_characters(
-    db: Database = Depends(get_db),
-    subject_id: int = Path(..., gt=0),
-):
-    await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
-
-    query = (
-        sa.select(
-            ChiiCrtSubjectIndex.crt_id,
-            ChiiCrtSubjectIndex.crt_type,
-            ChiiCharacter.crt_name,
-            ChiiCharacter.crt_role,
-            ChiiCharacter.crt_img,
-            ChiiCharacter.crt_summary,
-        )
-        .distinct()
-        .join(ChiiCharacter, ChiiCharacter.crt_id == ChiiCrtSubjectIndex.crt_id)
-        .where(
-            ChiiCrtSubjectIndex.subject_id == subject_id,
-            ChiiCharacter.crt_redirect == 0,
-        )
-    )
-
-    characters = [
-        {
-            "id": r["crt_id"],
-            "name": r["crt_name"],
-            "relation": get_character_rel(r["crt_type"]),
-            "type": r["crt_role"],
-            "short_summary": short_description(r["crt_summary"]),
-            "images": person_images(r["crt_img"]),
-        }
-        for r in await db.fetch_all(query)
-    ]
-
-    return characters
 
 
 @router.get(

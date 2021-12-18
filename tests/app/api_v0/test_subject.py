@@ -68,20 +68,19 @@ def test_subject_ep_type(client: TestClient):
 
 
 def test_subject_characters(client: TestClient):
-    response = client.get("/v0/subjects/8/characters")
+    response = client.get("/v0/characters", params={"subject_id": 8})
     assert response.status_code == 200
 
-    data = response.json()
+    data = response.json()["data"]
     assert isinstance(data, list)
     assert data
 
 
 def test_subject_persons(client: TestClient):
-    response = client.get("/v0/subjects/4/persons")
+    response = client.get("/v0/persons", params={"subject_id": 4})
     assert response.status_code == 200
 
-    data = response.json()
-
+    data = response.json()["data"]
     assert isinstance(data, list)
     assert data
 

@@ -1,7 +1,7 @@
 import enum
 from typing import Dict, List, Optional
 
-from fastapi import Path, Depends, APIRouter
+from fastapi import Path, Query, Depends, APIRouter
 from databases import Database
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, RedirectResponse
@@ -24,6 +24,7 @@ from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import person_images, short_description
 from pol.api.v0.models import Pager
+from pol.api.v0.db_utils import basic_subject
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -68,17 +69,43 @@ class Order(enum.IntEnum):
 async def get_characters(
     db: Database = Depends(get_db),
     page: Pager = Depends(),
+    subject_id: Optional[int] = Query(None, description="获取条目相关联的角色，不能跟name共用", gt=0),
     name: Optional[str] = None,
     sort: Sort = Sort.id,
     order: Order = Order.desc,
 ):
+    if subject_id and name:
+        raise RequestValidationError(
+            [
+                ErrorWrapper(
+                    ValueError(f"can't use `subject_id` with `name`"),
+                    loc=("query", "subject_id"),
+                ),
+                ErrorWrapper(
+                    ValueError(f"can't use `subject_id` with `name`"),
+                    loc=("query", "name"),
+                ),
+            ]
+        )
+
     filters = [ChiiCharacter.crt_ban == 0, ChiiCharacter.crt_redirect == 0]
+
+    query = sa.select(sa.func.count(ChiiCharacter.crt_id))
+
+    if subject_id is not None:
+        await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
+        filters.append(ChiiCrtSubjectIndex.subject_id == subject_id)
+        query = query.join(
+            ChiiCrtSubjectIndex,
+            ChiiCrtSubjectIndex.crt_id == ChiiCharacter.crt_id,
+        )
+
     if name is not None:
         filters.append(ChiiCharacter.crt_name.contains(name))
 
-    count = await db.fetch_val(
-        sa.select(sa.func.count(ChiiCharacter.crt_id)).where(*filters)
-    )
+    query = query.where(*filters)
+    count = await db.fetch_val(query)
+
     if page.offset > count:
         raise RequestValidationError(
             [
@@ -89,8 +116,13 @@ async def get_characters(
             ]
         )
 
-    query = (
-        sa.select(
+    if subject_id is not None:
+        query = sa.select(ChiiCharacter, ChiiCrtSubjectIndex).join(
+            ChiiCrtSubjectIndex,
+            ChiiCrtSubjectIndex.crt_id == ChiiCharacter.crt_id,
+        )
+    else:
+        query = sa.select(
             ChiiCharacter.crt_id,
             ChiiCharacter.crt_name,
             ChiiCharacter.crt_role,
@@ -98,10 +130,8 @@ async def get_characters(
             ChiiCharacter.crt_summary,
             ChiiCharacter.crt_lock,
         )
-        .where(*filters)
-        .limit(page.limit)
-        .offset(page.offset)
-    )
+
+    query = query.where(*filters).limit(page.limit).offset(page.offset)
 
     sort_field = ChiiCharacter.crt_id
 
@@ -121,6 +151,7 @@ async def get_characters(
             "name": r["crt_name"],
             "type": r["crt_role"],
             "short_summary": short_description(r["crt_summary"]),
+            "relation": get_character_rel(r["crt_type"]) if "crt_type" in r else None,
             "locked": r["crt_lock"],
             "images": person_images(r["crt_img"]),
         }

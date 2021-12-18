@@ -53,6 +53,9 @@ class Person(BasePerson):
     short_summary: str
     img: Optional[str] = Field(None, description="use `images` instead")
     locked: bool
+    relation: Optional[str] = Field(
+        description="`null` is `subject_id` is not in query"
+    )
 
 
 class RelPerson(BasePerson):
@@ -109,10 +112,9 @@ class BaseCharacter(BaseModel):
 class Character(BaseCharacter):
     short_summary: str
     locked: bool
-
-
-class RelCharacter(BaseCharacter):
-    relation: str
+    relation: Optional[str] = Field(
+        description="`null` is `subject_id` is not in query"
+    )
 
 
 class PagedCharacter(Paged):
