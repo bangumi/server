@@ -32,9 +32,11 @@ router = APIRouter(tags=["条目"])
 api_base = "/v0/subjects"
 
 
-async def basic_subject(db: Database, subject_id: int) -> curd.subject.Subject:
+async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.Subject:
     try:
-        return await curd.subject.get_one(db, ChiiSubject.subject_id == subject_id)
+        return await curd.subject.get_one(
+            db, ChiiSubject.subject_id == subject_id, *where
+        )
     except NotFoundError:
         raise res.HTTPException(
             status_code=404,
@@ -142,6 +144,8 @@ async def get_subject_persons(
     db: Database = Depends(get_db),
     subject_id: int = Path(..., gt=0),
 ):
+    await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
+
     query = (
         sa.select(
             ChiiPersonCsIndex.prsn_id,
@@ -193,6 +197,8 @@ async def get_subject_characters(
     db: Database = Depends(get_db),
     subject_id: int = Path(..., gt=0),
 ):
+    await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
+
     query = (
         sa.select(
             ChiiCrtSubjectIndex.crt_id,
@@ -237,7 +243,7 @@ async def get_subject_relations(
     db: Database = Depends(get_db),
     subject_id: int = Path(..., gt=0),
 ):
-    subject = await basic_subject(db, subject_id)
+    await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
 
     query = (
         sa.select(
