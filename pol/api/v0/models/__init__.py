@@ -53,12 +53,16 @@ class BasePerson(BaseModel):
     images: Optional[PersonImages] = Field(
         description="object with some size of images, this object maybe `null`"
     )
-    locked: bool
 
 
 class Person(BasePerson):
     short_summary: str
     img: Optional[str] = Field(None, description="use `images` instead")
+    locked: bool
+
+
+class RelPerson(BasePerson):
+    relation: str
 
 
 class PagedPerson(Paged):
@@ -106,11 +110,15 @@ class BaseCharacter(BaseModel):
     images: Optional[PersonImages] = Field(
         description="object with some size of images, this object maybe `null`"
     )
-    locked: bool
 
 
 class Character(BaseCharacter):
     short_summary: str
+    locked: bool
+
+
+class RelCharacter(BaseCharacter):
+    relation: str
 
 
 class PagedCharacter(Paged):

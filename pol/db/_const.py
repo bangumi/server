@@ -7,6 +7,9 @@ class Staff(NamedTuple):
     en: str
     rdf: Optional[str] = None
 
+    def get(self) -> str:
+        return self.cn or self.jp or self.en or self.rdf
+
 
 staff_job_real = {
     4001: Staff(cn="原作", jp="", en="creator"),
