@@ -25,7 +25,7 @@ from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelPerson, RelCharacter
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
-from pol.api.v0.models.subject import Subject, SubjectEp, RelSubject
+from pol.api.v0.models.subject import Subject, RelSubject, PagedEpisode
 
 router = APIRouter(tags=["条目"])
 
@@ -106,16 +106,16 @@ class Pager(BaseModel):
 
 
 @router.get(
-    "/subjects/{subject_id}/eps",
+    "/episodes",
     response_model_by_alias=False,
-    response_model=List[SubjectEp],
+    response_model=PagedEpisode,
     responses={
         404: res.response(model=ErrorDetail),
     },
 )
-async def get_subject_eps(
+async def get_episodes(
     db: Database = Depends(get_db),
-    subject_id: int = Path(..., gt=0),
+    subject_id: int = Query(..., gt=0),
     type: EpType = Query(None, description="`0`,`1`,`2`,`3`代表`本篇`，`sp`，`op`，`ed`"),
     page: Pager = Depends(),
 ):
@@ -126,15 +126,22 @@ async def get_subject_eps(
     if type is not None:
         where.append(ChiiEpisode.ep_type == type.value)
 
-    return [
-        x.dict()
-        for x in await curd.ep.get_many(
-            db,
-            *where,
-            limit=page.limit,
-            offset=page.offset,
-        )
-    ]
+    total = await db.fetch_val(sa.select(sa.count(ChiiEpisode.ep_id)).where(*where))
+
+    return {
+        "total": total,
+        "limit": page.limit,
+        "offset": page.offset,
+        "data": [
+            x.dict()
+            for x in await curd.ep.get_many(
+                db,
+                *where,
+                limit=page.limit,
+                offset=page.offset,
+            )
+        ],
+    }
 
 
 @router.get(

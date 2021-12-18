@@ -1,8 +1,9 @@
 import datetime
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from pydantic import Field, BaseModel
 
+from pol.api.v0.models import Paged
 from pol.api.v0.models.wiki import Wiki
 
 
@@ -74,7 +75,7 @@ class RelSubject(BaseModel):
     relation: str
 
 
-class Ep(BaseModel):
+class Episode(BaseModel):
     id: int
     # url: str
     type: int
@@ -85,3 +86,7 @@ class Ep(BaseModel):
     airdate: str
     comment: int
     desc: str
+
+
+class PagedEpisode(Paged):
+    data: List[Episode]

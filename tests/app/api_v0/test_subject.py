@@ -42,26 +42,28 @@ def test_subject_redirect(client: TestClient):
     assert response.headers["location"] == "/v0/subjects/19"
 
 
-def test_subject_ep_query_limit(client: TestClient):
-    response = client.get("/v0/subjects/8/eps", params={"limit": 5})
+def test_subject_ep_query_limit_offset(client: TestClient):
+    response = client.get("/v0/episodes", params={"subject_id": 8, "limit": 5})
     assert response.status_code == 200
 
-    data = response.json()
+    data = response.json()["data"]
     assert isinstance(data, list)
     assert len(data) == 5
 
     ids = [x["id"] for x in data]
 
-    new_data = client.get("/v0/subjects/8/eps", params={"limit": 4, "offset": 1}).json()
+    new_data = client.get(
+        "/v0/episodes", params={"subject_id": 8, "limit": 4, "offset": 1}
+    ).json()["data"]
 
     assert ids[1:] == [x["id"] for x in new_data]
 
 
 def test_subject_ep_type(client: TestClient):
-    response = client.get("/v0/subjects/253/eps", params={"type": 3})
+    response = client.get("/v0/episodes", params={"type": 3, "subject_id": 253})
     assert response.status_code == 200
 
-    data = response.json()
+    data = response.json()["data"]
     assert [x["id"] for x in data] == [103233, 103234, 103235]
 
 

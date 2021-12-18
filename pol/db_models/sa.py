@@ -14,6 +14,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.mysql import insert
 
+count = func.count
+
 __all__ = [
     "CHAR",
     "Text",
@@ -28,5 +30,6 @@ __all__ = [
     "insert",
     "and_",
     "func",
+    "count",
     "or_",
 ]

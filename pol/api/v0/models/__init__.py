@@ -6,6 +6,7 @@ import pydantic
 from pydantic import Field, BaseModel
 
 from pol.db.const import BloodType, PersonType
+from pol.api.v0.models.base import Paged
 
 
 class PersonImages(BaseModel):
@@ -36,13 +37,6 @@ class SubjectInfo(BaseModel):
 class Stat(BaseModel):
     comments: int
     collects: int
-
-
-class Paged(BaseModel):
-    total: int
-    limit: int
-    offset: int
-    data: Any
 
 
 class BasePerson(BaseModel):
