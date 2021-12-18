@@ -82,3 +82,17 @@ def test_subject_persons(client: TestClient):
 
     assert isinstance(data, list)
     assert data
+
+
+def test_subject_subjects_ban(client: TestClient):
+    response = client.get("/v0/subjects/5/subjects")
+    assert response.status_code == 404
+
+
+def test_subject_subjects(client: TestClient):
+    response = client.get("/v0/subjects/11/subjects")
+    assert response.status_code == 200
+    data = response.json()
+
+    assert isinstance(data, list)
+    assert data
