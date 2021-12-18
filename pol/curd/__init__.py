@@ -20,4 +20,4 @@ async def get_one(db: Database, t: Type[T], *where) -> T:
     raise NotFoundError()
 
 
-__all__ = ["get_one", "subject", "ep", "NotFoundError"]
+__all__ = ["get_one", "subject", "ep"]
