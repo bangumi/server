@@ -243,7 +243,7 @@ async def get_subject_relations(
     db: Database = Depends(get_db),
     subject_id: int = Path(..., gt=0),
 ):
-    await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
+    subject = await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
 
     query = (
         sa.select(
