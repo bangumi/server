@@ -6,6 +6,7 @@ from databases import Database
 
 from pol.db.tables import ChiiEpisode
 from pol.db_models import sa
+from .exceptions import NotFoundError
 
 
 class Ep(BaseModel):
@@ -43,3 +44,13 @@ async def get_many(db: Database, *where, limit=None, offset=None) -> List[Ep]:
     results = await db.fetch_all(query)
 
     return [Ep.parse_obj(r) for r in results]
+
+
+async def get_one(db: Database, episode_id: int, *where) -> Ep:
+    query = sa.select(ChiiEpisode).where(ChiiEpisode.ep_id == episode_id, *where)
+
+    results = await db.fetch_one(query)
+    if results:
+        return Ep.parse_obj(results)
+
+    raise NotFoundError()

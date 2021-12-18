@@ -88,5 +88,9 @@ class Episode(BaseModel):
     desc: str
 
 
+class EpisodeDetail(Episode):
+    subject_id: int
+
+
 class PagedEpisode(Paged):
     data: List[Episode]

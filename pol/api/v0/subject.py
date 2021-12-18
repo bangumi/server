@@ -1,7 +1,6 @@
 from typing import List
 
-from fastapi import Path, Query, Depends, APIRouter
-from pydantic import Field, BaseModel
+from fastapi import Path, Depends, APIRouter
 from databases import Database
 from starlette.responses import Response, RedirectResponse
 
@@ -9,7 +8,7 @@ from pol import res, curd, wiki
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import PLATFORM_MAP, RELATION_MAP, EpType, StaffMap, get_character_rel
+from pol.db.const import PLATFORM_MAP, RELATION_MAP, StaffMap, get_character_rel
 from pol.db.tables import (
     ChiiPerson,
     ChiiEpisode,
@@ -25,7 +24,7 @@ from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelPerson, RelCharacter
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
-from pol.api.v0.models.subject import Subject, RelSubject, PagedEpisode
+from pol.api.v0.models.subject import Subject, RelSubject
 
 router = APIRouter(tags=["条目"])
 
@@ -98,50 +97,6 @@ async def get_subject(
     await redis.set_json(cache_key, value=data, ex=300)
 
     return data
-
-
-class Pager(BaseModel):
-    limit: int = Field(100, gt=0, le=200, description="最大值`200`")
-    offset: int = Field(0, ge=0)
-
-
-@router.get(
-    "/episodes",
-    response_model_by_alias=False,
-    response_model=PagedEpisode,
-    responses={
-        404: res.response(model=ErrorDetail),
-    },
-)
-async def get_episodes(
-    db: Database = Depends(get_db),
-    subject_id: int = Query(..., gt=0),
-    type: EpType = Query(None, description="`0`,`1`,`2`,`3`代表`本篇`，`sp`，`op`，`ed`"),
-    page: Pager = Depends(),
-):
-    where = [
-        ChiiEpisode.ep_subject_id == subject_id,
-    ]
-
-    if type is not None:
-        where.append(ChiiEpisode.ep_type == type.value)
-
-    total = await db.fetch_val(sa.select(sa.count(ChiiEpisode.ep_id)).where(*where))
-
-    return {
-        "total": total,
-        "limit": page.limit,
-        "offset": page.offset,
-        "data": [
-            x.dict()
-            for x in await curd.ep.get_many(
-                db,
-                *where,
-                limit=page.limit,
-                offset=page.offset,
-            )
-        ],
-    }
 
 
 @router.get(
