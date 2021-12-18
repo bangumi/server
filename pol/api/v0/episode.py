@@ -69,7 +69,7 @@ async def get_episodes(
     },
     tags=["章节"],
 )
-async def get_episodes(
+async def get_episode(
     episode_id: int,
     db: Database = Depends(get_db),
 ):
