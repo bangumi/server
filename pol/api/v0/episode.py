@@ -4,6 +4,7 @@ from databases import Database
 
 from pol import res, curd
 from pol.models import ErrorDetail
+from pol.curd.ep import Ep
 from pol.depends import get_db
 from pol.db.const import EpType
 from pol.db.tables import ChiiEpisode
@@ -43,13 +44,24 @@ async def get_episodes(
         where.append(ChiiEpisode.ep_type == type.value)
 
     total = await db.fetch_val(sa.select(sa.count(ChiiEpisode.ep_id)).where(*where))
+    if total == 0:
+        raise res.HTTPException(
+            status_code=404,
+            title="Not Found",
+            description=NotFoundDescription,
+            detail={"subject_id": subject_id, "type": type},
+        )
+
+    first_episode = (
+        await curd.ep.get_many(db, ChiiEpisode.ep_subject_id == subject_id, limit=1)
+    )[0]
 
     return {
         "total": total,
         "limit": page.limit,
         "offset": page.offset,
         "data": [
-            x.dict()
+            add_episode(x, first_episode.sort)
             for x in await curd.ep.get_many(
                 db,
                 *where,
@@ -58,6 +70,15 @@ async def get_episodes(
             )
         ],
     }
+
+
+def add_episode(e: Ep, start: float) -> dict:
+    data = e.dict()
+    if e.type == 0:
+        data["ep"] = e.sort - start + 1
+    else:
+        data["ep"] = None
+    return data
 
 
 @router.get(
@@ -74,8 +95,12 @@ async def get_episode(
     db: Database = Depends(get_db),
 ):
     try:
-        return (await curd.ep.get_one(db, episode_id, ChiiEpisode.ep_ban == 0)).dict()
-    except NotFoundError:
+        ep = await curd.ep.get_one(db, episode_id, ChiiEpisode.ep_ban == 0)
+        first_episode = await curd.ep.get_many(
+            db, ChiiEpisode.ep_subject_id == ep.subject_id, limit=1
+        )
+        return add_episode(ep, first_episode[0].sort)
+    except (NotFoundError, IndexError):
         raise res.HTTPException(
             status_code=404,
             title="Not Found",

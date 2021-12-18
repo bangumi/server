@@ -81,6 +81,7 @@ class Episode(BaseModel):
     type: int
     sort: int
     name: str
+    ep: Optional[int] = Field(None, description="条目内的集数, 从`1`开始")
     name_cn: str
     duration: str
     airdate: str
