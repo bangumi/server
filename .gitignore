@@ -14,3 +14,4 @@ docs/source/openapi.json
 *.egg-info
 .venv/
 dev-env/
+.coverage

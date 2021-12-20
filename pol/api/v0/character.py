@@ -1,9 +1,7 @@
 import enum
 from typing import Dict, List, Optional
 
-import pydantic
 from fastapi import Path, Depends, APIRouter
-from pydantic import Field
 from databases import Database
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, RedirectResponse
@@ -24,7 +22,8 @@ from pol.db.tables import (
 )
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
-from pol.api.v0.utils import person_images
+from pol.api.v0.utils import person_images, short_description
+from pol.api.v0.models import Order, Pager
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -48,23 +47,13 @@ async def basic_character(
             status_code=404,
             title="Not Found",
             description=NotFoundDescription,
-            detail={"character_id": "character_id"},
+            detail={"character_id": character_id},
         )
-
-
-class Pager(pydantic.BaseModel):
-    limit: int = Field(30, gt=0, le=50)
-    offset: int = Field(0, ge=0)
 
 
 class Sort(str, enum.Enum):
     id = "id"
     name = "name"
-
-
-class Order(enum.IntEnum):
-    asc = 1
-    desc = -1
 
 
 @router.get(
@@ -126,7 +115,7 @@ async def get_characters(
             "id": r["crt_id"],
             "name": r["crt_name"],
             "type": r["crt_role"],
-            "short_summary": r["crt_summary"][:80] + "...",
+            "short_summary": short_description(r["crt_summary"]),
             "locked": r["crt_lock"],
             "images": person_images(r["crt_img"]),
         }

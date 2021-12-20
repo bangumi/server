@@ -1,9 +1,7 @@
 import enum
 from typing import Dict, List, Optional
 
-import pydantic
 from fastapi import Path, Query, Depends, APIRouter
-from pydantic import Field
 from databases import Database
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, RedirectResponse
@@ -15,12 +13,12 @@ from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import Gender, StaffMap, PersonType, get_staff
+from pol.db.const import Gender, StaffMap, PersonType
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
 from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
-from pol.api.v0.utils import person_images
-from pol.api.v0.models import PersonCareer
+from pol.api.v0.utils import get_career, person_images, short_description
+from pol.api.v0.models import Order, Pager, PersonCareer
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -49,20 +47,10 @@ async def basic_person(
         )
 
 
-class Pager(pydantic.BaseModel):
-    limit: int = Field(30, gt=0, le=50)
-    offset: int = Field(0, ge=0)
-
-
 class Sort(str, enum.Enum):
     id = "id"
     name = "name"
     last_modified = "update"
-
-
-class Order(enum.IntEnum):
-    asc = 1
-    desc = -1
 
 
 @router.get(
@@ -147,7 +135,7 @@ async def get_persons(
             "name": r["prsn_name"],
             "type": r["prsn_type"],
             "career": get_career(r),
-            "short_summary": r["prsn_summary"][:80] + "...",
+            "short_summary": short_description(r["prsn_summary"]),
             "locked": r["prsn_lock"],
             "img": person_img_url(r["prsn_img"]),
             "images": person_images(r["prsn_img"]),
@@ -273,28 +261,9 @@ async def get_person_subjects(
         else:
             s["subject_image"] = None
         rel = result[s["subject_id"]]
-        s["staff"] = get_staff(StaffMap[rel.subject_type_id][rel.prsn_position])
+        s["staff"] = StaffMap[rel.subject_type_id][rel.prsn_position].get()
 
     return subjects
-
-
-def get_career(p: ChiiPerson) -> List[str]:
-    s = []
-    if p.prsn_producer:
-        s.append("producer")
-    if p.prsn_mangaka:
-        s.append("mangaka")
-    if p.prsn_artist:
-        s.append("artist")
-    if p.prsn_seiyu:
-        s.append("seiyu")
-    if p.prsn_writer:
-        s.append("writer")
-    if p.prsn_illustrator:
-        s.append("illustrator")
-    if p.prsn_actor:
-        s.append("actor")
-    return s
 
 
 def person_img_url(s: Optional[str]) -> Optional[str]:

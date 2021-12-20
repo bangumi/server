@@ -2,9 +2,11 @@ import enum
 import datetime
 from typing import Any, Dict, List, Optional
 
+import pydantic
 from pydantic import Field, BaseModel
 
 from pol.db.const import BloodType, PersonType
+from pol.api.v0.models.base import Paged
 
 
 class PersonImages(BaseModel):
@@ -37,13 +39,6 @@ class Stat(BaseModel):
     collects: int
 
 
-class Paged(BaseModel):
-    total: int
-    limit: int
-    offset: int
-    data: Any
-
-
 class BasePerson(BaseModel):
     id: int
     name: str
@@ -52,12 +47,16 @@ class BasePerson(BaseModel):
     images: Optional[PersonImages] = Field(
         description="object with some size of images, this object maybe `null`"
     )
-    locked: bool
 
 
 class Person(BasePerson):
     short_summary: str
     img: Optional[str] = Field(None, description="use `images` instead")
+    locked: bool
+
+
+class RelPerson(BasePerson):
+    relation: str
 
 
 class PagedPerson(Paged):
@@ -105,11 +104,15 @@ class BaseCharacter(BaseModel):
     images: Optional[PersonImages] = Field(
         description="object with some size of images, this object maybe `null`"
     )
-    locked: bool
 
 
 class Character(BaseCharacter):
     short_summary: str
+    locked: bool
+
+
+class RelCharacter(BaseCharacter):
+    relation: str
 
 
 class PagedCharacter(Paged):
@@ -139,3 +142,13 @@ class CharacterDetail(BaseCharacter):
     birth_day: Optional[int] = Field(None, description="parsed from wiki, maybe `null`")
 
     stat: Stat
+
+
+class Pager(pydantic.BaseModel):
+    limit: int = Field(30, gt=0, le=50)
+    offset: int = Field(0, ge=0)
+
+
+class Order(enum.IntEnum):
+    asc = 1
+    desc = -1
