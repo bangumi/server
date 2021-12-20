@@ -1,12 +1,15 @@
-from sqlalchemy import Date, Enum, Float, Index, Table, Column, String, text
+from sqlalchemy import TIMESTAMP, Date, Enum, Float, Index, Table, Column, String, text
 from sqlalchemy.dialects.mysql import (
+    CHAR,
     ENUM,
+    TEXT,
     YEAR,
     INTEGER,
     TINYINT,
     VARCHAR,
     SMALLINT,
     MEDIUMINT,
+    MEDIUMBLOB,
     MEDIUMTEXT,
 )
 from sqlalchemy.ext.declarative import declarative_base
@@ -63,6 +66,20 @@ class ChiiCrtSubjectIndex(Base):
     crt_order = Column(TINYINT(3), nullable=False)
 
 
+class ChiiEpRevision(Base):
+    __tablename__ = "chii_ep_revisions"
+    __table_args__ = (Index("rev_sid", "rev_sid", "rev_creator"),)
+
+    ep_rev_id = Column(MEDIUMINT(8), primary_key=True)
+    rev_sid = Column(MEDIUMINT(8), nullable=False)
+    rev_eids = Column(String(255), nullable=False)
+    rev_ep_infobox = Column(MEDIUMTEXT, nullable=False)
+    rev_creator = Column(MEDIUMINT(8), nullable=False)
+    rev_version = Column(TINYINT(1), nullable=False, server_default=text("'0'"))
+    rev_dateline = Column(INTEGER(10), nullable=False)
+    rev_edit_summary = Column(String(200), nullable=False)
+
+
 class ChiiEpisode(Base):
     __tablename__ = "chii_episodes"
     __table_args__ = (Index("ep_subject_id_2", "ep_subject_id", "ep_ban", "ep_sort"),)
@@ -91,6 +108,53 @@ class ChiiEpisode(Base):
     ep_lastpost = Column(INTEGER(10), nullable=False, index=True)
     ep_lock = Column(TINYINT(3), nullable=False, server_default=text("'0'"))
     ep_ban = Column(TINYINT(3), nullable=False, index=True, server_default=text("'0'"))
+
+
+class ChiiMemberfield(Base):
+    __tablename__ = "chii_memberfields"
+
+    uid = Column(MEDIUMINT(8), primary_key=True, server_default=text("'0'"))
+    site = Column(VARCHAR(75), nullable=False, server_default=text("''"))
+    location = Column(VARCHAR(30), nullable=False, server_default=text("''"))
+    bio = Column(TEXT, nullable=False)
+    privacy = Column(MEDIUMTEXT, nullable=False)
+    blocklist = Column(MEDIUMTEXT, nullable=False)
+
+
+class ChiiMember(Base):
+    __tablename__ = "chii_members"
+
+    uid = Column(MEDIUMINT(8), primary_key=True)
+    username = Column(CHAR(15), nullable=False, unique=True, server_default=text("''"))
+    nickname = Column(String(30), nullable=False)
+    avatar = Column(VARCHAR(255), nullable=False)
+    groupid = Column(SMALLINT(6), nullable=False, server_default=text("'0'"))
+    regdate = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
+    lastvisit = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
+    lastactivity = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
+    lastpost = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
+    dateformat = Column(CHAR(10), nullable=False, server_default=text("''"))
+    timeformat = Column(TINYINT(1), nullable=False, server_default=text("'0'"))
+    timeoffset = Column(CHAR(4), nullable=False, server_default=text("''"))
+    newpm = Column(TINYINT(1), nullable=False, server_default=text("'0'"))
+    new_notify = Column(
+        SMALLINT(6), nullable=False, server_default=text("'0'"), comment="新提醒"
+    )
+    sign = Column(VARCHAR(255), nullable=False)
+
+
+class ChiiOauthAccessToken(Base):
+    __tablename__ = "chii_oauth_access_tokens"
+
+    access_token = Column(String(40, "utf8_unicode_ci"), primary_key=True)
+    client_id = Column(String(80, "utf8_unicode_ci"), nullable=False)
+    user_id = Column(String(80, "utf8_unicode_ci"))
+    expires = Column(
+        TIMESTAMP,
+        nullable=False,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+    )
+    scope = Column(String(4000, "utf8_unicode_ci"))
 
 
 t_chii_person_alias = Table(
@@ -154,6 +218,8 @@ t_chii_person_relationship = Table(
     Column("relat_prsn_type", ENUM("prsn", "crt"), nullable=False),
     Column("relat_prsn_id", MEDIUMINT(9), nullable=False),
     Column("relat_type", SMALLINT(6), nullable=False, comment="任职于，从属,聘用,嫁给，"),
+    Index("relat_prsn_type", "relat_prsn_type", "relat_prsn_id"),
+    Index("prsn_type", "prsn_type", "prsn_id"),
 )
 
 
@@ -190,6 +256,29 @@ class ChiiPerson(Base):
     )
     prsn_redirect = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
     prsn_nsfw = Column(TINYINT(1), nullable=False)
+
+
+class ChiiRevHistory(Base):
+    __tablename__ = "chii_rev_history"
+    __table_args__ = (
+        Index("rev_crt_id", "rev_type", "rev_mid"),
+        Index("rev_id", "rev_id", "rev_type", "rev_creator"),
+    )
+
+    rev_id = Column(MEDIUMINT(8), primary_key=True)
+    rev_type = Column(TINYINT(3), nullable=False, comment="条目，角色，人物")
+    rev_mid = Column(MEDIUMINT(8), nullable=False, comment="对应条目，人物的ID")
+    rev_text_id = Column(MEDIUMINT(9), nullable=False)
+    rev_dateline = Column(INTEGER(10), nullable=False)
+    rev_creator = Column(MEDIUMINT(8), nullable=False, index=True)
+    rev_edit_summary = Column(String(200, "utf8_unicode_ci"), nullable=False)
+
+
+class ChiiRevText(Base):
+    __tablename__ = "chii_rev_text"
+
+    rev_text_id = Column(MEDIUMINT(9), primary_key=True)
+    rev_text = Column(MEDIUMBLOB, nullable=False)
 
 
 t_chii_subject_alias = Table(
@@ -293,6 +382,37 @@ class ChiiSubjectRelations(Base):
     __mapper_args__ = {
         "primary_key": [rlt_subject_id, rlt_related_subject_id, rlt_vice_versa]
     }
+
+
+class ChiiSubjectRevision(Base):
+    __tablename__ = "chii_subject_revisions"
+    __table_args__ = (
+        Index("rev_subject_id", "rev_subject_id", "rev_creator"),
+        Index("rev_creator", "rev_creator", "rev_id"),
+    )
+
+    rev_id = Column(MEDIUMINT(8), primary_key=True)
+    rev_type = Column(
+        TINYINT(3),
+        nullable=False,
+        index=True,
+        server_default=text("'1'"),
+        comment="修订类型",
+    )
+    rev_subject_id = Column(MEDIUMINT(8), nullable=False)
+    rev_type_id = Column(SMALLINT(6), nullable=False, server_default=text("'0'"))
+    rev_creator = Column(MEDIUMINT(8), nullable=False)
+    rev_dateline = Column(
+        INTEGER(10), nullable=False, index=True, server_default=text("'0'")
+    )
+    rev_name = Column(String(80), nullable=False)
+    rev_name_cn = Column(String(80), nullable=False)
+    rev_field_infobox = Column(MEDIUMTEXT, nullable=False)
+    rev_field_summary = Column(MEDIUMTEXT, nullable=False)
+    rev_vote_field = Column(MEDIUMTEXT, nullable=False)
+    rev_field_eps = Column(MEDIUMINT(8), nullable=False)
+    rev_edit_summary = Column(String(200), nullable=False)
+    rev_platform = Column(SMALLINT(6), nullable=False)
 
 
 class ChiiSubject(Base):
