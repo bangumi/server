@@ -47,7 +47,7 @@ async def global_404(request, exc: StarletteHTTPException):
         return ORJSONResponse(
             {
                 "title": "Not Found",
-                "description": "Ehe path you requested is not registered",
+                "description": "The path you requested doesn't exist",
                 "detail": (
                     "This is default 404 response, "
                     "if you see this response, please check your request path"
