@@ -85,7 +85,7 @@ pytest
 启用 [pre-commit](https://github.com/pre-commit/pre-commit)
 
 ```shell
-pre-commit insall
+pre-commit install
 ```
 
 pre-commit 会在当前仓库安装一个 git hook，在每次 commit 前自动运行。
