@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, RedirectResponse
 from pydantic.error_wrappers import ErrorWrapper
 
-from pol import res, curd, wiki
+from pol import sa, res, curd, wiki
 from pol.utils import subject_images
 from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
@@ -15,7 +15,6 @@ from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
 from pol.db.const import Gender, StaffMap, PersonType
 from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
-from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import Order, Pager, PersonCareer

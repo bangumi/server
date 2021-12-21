@@ -323,6 +323,17 @@ python-versions = ">=3.6,<4.0"
 flake8-plugin-utils = ">=1.3.2,<2.0.0"
 
 [[package]]
+name = "flake8-tidy-imports"
+version = "4.5.0"
+description = "A flake8 plugin that helps you write tidier imports."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+flake8 = ">=3.8.0,<5"
+
+[[package]]
 name = "greenlet"
 version = "1.1.2"
 description = "Lightweight in-process concurrent programming"
@@ -928,7 +939,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.8.*"
-content-hash = "ba11c68a1e8f28145d75a0215d3ca81b79e7f8c1c25256ccc153427b3f4bc324"
+content-hash = "e045d1bb9ba9025397f00b68349c46547b5877cb63308874d95fe89777da1921"
 
 [metadata.files]
 aiomysql = [
@@ -1083,6 +1094,10 @@ flake8-plugin-utils = [
 flake8-pytest-style = [
     {file = "flake8-pytest-style-1.5.1.tar.gz", hash = "sha256:56af62da468a547560a9f455c7f205449ed03e8f8a42f85373180e91c1031c40"},
     {file = "flake8_pytest_style-1.5.1-py3-none-any.whl", hash = "sha256:ae62f8db8ad0ea7d90695deb6dbbacfc67d45cb83a7c360388b34a9705786114"},
+]
+flake8-tidy-imports = [
+    {file = "flake8-tidy-imports-4.5.0.tar.gz", hash = "sha256:ac637961d0f319012d099e49619f8c928e3221f74e00fe6eb89513bc64c40adb"},
+    {file = "flake8_tidy_imports-4.5.0-py3-none-any.whl", hash = "sha256:87eed94ae6a2fda6a5918d109746feadf1311e0eb8274ab7a7920f6db00a41c9"},
 ]
 greenlet = [
     {file = "greenlet-1.1.2-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:58df5c2a0e293bf665a51f8a100d3e9956febfbf1d9aaf8c0677cf70218910c6"},

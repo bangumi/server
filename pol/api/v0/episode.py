@@ -2,13 +2,12 @@ from fastapi import Query, Depends, APIRouter
 from pydantic import Field, BaseModel
 from databases import Database
 
-from pol import res, curd
+from pol import sa, res, curd
 from pol.models import ErrorDetail
 from pol.curd.ep import Ep
 from pol.depends import get_db
 from pol.db.const import EpType
 from pol.db.tables import ChiiEpisode
-from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
 from pol.curd.exceptions import NotFoundError
 from pol.api.v0.models.subject import PagedEpisode, EpisodeDetail

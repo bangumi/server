@@ -41,6 +41,19 @@ pre-commit install
 - `MYSQL_PASS` **无默认值**
 - `REDIS_URI` 默认 `redis://127.0.0.1:6379/0`
 
+你也可以把配置放在 `./env/dev` 文件中，如果在环境变量中找不到对应的值，会在这个文件中查找
+
+example:
+
+```text
+MYSQL_HOST="127.0.0.1"
+MYSQL_PORT="3306"
+MYSQL_USER="username"
+MYSQL_PASS="password"
+MYSQL_DB="bangumi"
+REDIS_URI="redis://:pass@127.0.0.1:6379/1"
+```
+
 ## 开发
 
 ### 项目结构

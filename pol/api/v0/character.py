@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, RedirectResponse
 from pydantic.error_wrappers import ErrorWrapper
 
-from pol import res, curd, wiki
+from pol import sa, res, curd, wiki
 from pol.utils import subject_images
 from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
@@ -20,7 +20,6 @@ from pol.db.tables import (
     ChiiPersonField,
     ChiiCrtSubjectIndex,
 )
-from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import person_images, short_description
 from pol.api.v0.models import Order, Pager

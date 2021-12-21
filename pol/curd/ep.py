@@ -4,8 +4,8 @@ from typing import List
 from pydantic import Field, BaseModel
 from databases import Database
 
+from pol import sa
 from pol.db.tables import ChiiEpisode
-from pol.db_models import sa
 from .exceptions import NotFoundError
 
 

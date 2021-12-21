@@ -4,7 +4,7 @@ from fastapi import Path, Depends, APIRouter
 from databases import Database
 from starlette.responses import Response, RedirectResponse
 
-from pol import res, curd, wiki
+from pol import sa, res, curd, wiki
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
@@ -18,7 +18,6 @@ from pol.db.tables import (
     ChiiCrtSubjectIndex,
     ChiiSubjectRelations,
 )
-from pol.db_models import sa
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelPerson, RelCharacter

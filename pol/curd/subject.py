@@ -4,9 +4,9 @@ from typing import Optional
 from pydantic import Field, BaseModel, validator
 from databases import Database
 
+from pol import sa
 from pol.utils import subject_images
 from pol.db.tables import ChiiSubject, ChiiSubjectField
-from pol.db_models import sa
 from pol.curd.exceptions import NotFoundError
 
 
