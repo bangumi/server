@@ -2,7 +2,7 @@ from typing import List
 
 import pydantic
 from fastapi import Path, Depends, APIRouter
-from pydantic import Extra, Field
+from pydantic import Extra, Field, ValidationError
 from databases import Database
 from starlette.responses import Response, RedirectResponse
 
@@ -53,9 +53,6 @@ async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.S
             description=NotFoundDescription,
             detail={"subject_id": subject_id},
         )
-
-
-from pydantic import ValidationError
 
 
 @router.get(

@@ -132,7 +132,7 @@ async def optional_user(
             ChiiMember.uid == int(access_row.user_id),
         )
     except NotFoundError:
-        return
+        return None
 
     user = User(
         id=member_row.uid,
