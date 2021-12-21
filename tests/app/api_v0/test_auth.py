@@ -15,3 +15,8 @@ def test_auth_403(client: TestClient):
 
     response = client.get("/v0/me", headers={"Authorization": f"t {access_token}"})
     assert response.status_code == 403, "no token"
+
+
+def test_auth_403_wrong_token(client: TestClient):
+    response = client.get("/v0/me", headers={"Authorization": "Bearer 1"})
+    assert response.status_code == 403, "no token"
