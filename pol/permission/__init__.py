@@ -11,3 +11,9 @@ class UserGroup(enum.IntEnum):
     wiki_admin = 9  # 维基条目管理猿
     normal_user = 10  # 用户
     wiki = 11  # 维基人
+
+
+class Role:
+    def allow_nsfw(self) -> bool:
+        """if this user can see nsfw contents"""
+        raise NotImplementedError()

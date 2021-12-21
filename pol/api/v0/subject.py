@@ -26,12 +26,13 @@ from pol.db.tables import (
     ChiiCrtSubjectIndex,
     ChiiSubjectRelations,
 )
+from pol.permission import Role
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelPerson, RelCharacter
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
-from pol.api.v0.depends.auth import User, optional_user
+from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelSubject
 
 router = APIRouter(tags=["条目"])
@@ -68,7 +69,7 @@ async def get_subject(
     response: Response,
     db: Database = Depends(get_db),
     subject_id: int = Path(..., gt=0),
-    user: User = Depends(optional_user),
+    user: Role = Depends(optional_user),
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"subject:{subject_id}"
@@ -76,7 +77,7 @@ async def get_subject(
         try:
             s = Subject.parse_obj(value)
             if s.nsfw:
-                if user is None or not user.allow_nsfw():
+                if not user.allow_nsfw():
                     raise res.HTTPException(
                         status_code=404,
                         title="Not Found",
@@ -116,7 +117,7 @@ async def get_subject(
         data["infobox"] = None
 
     if subject.nsfw:
-        if user is None or not user.allow_nsfw():
+        if not user.allow_nsfw():
             raise res.HTTPException(
                 status_code=404,
                 title="Not Found",
