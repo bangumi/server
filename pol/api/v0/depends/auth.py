@@ -132,9 +132,9 @@ async def optional_user(
 
 
 async def get_current_user(
-    user: Optional[User] = Depends(optional_user),
+    user: Role = Depends(optional_user),
 ) -> User:
-    if user is guest:
+    if not isinstance(user, User):
         raise res.HTTPException(
             status_code=HTTP_403_FORBIDDEN,
             title="unauthorized",
