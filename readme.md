@@ -76,11 +76,11 @@ redis 和 mysql 都在此 docker-compose 内。 https://github.com/bangumi/dev-e
 watchgod scripts.dev.main
 ```
 
-## 提交 Pull Requst
+## 提交 Pull Request
 
-如果你的 PR 是新功能，最好先发个 Issue 讨论一下要不要实现，避免 PR 提交之后新功能本身被否决的问题。
+如果你的 PR 是新功能，最好先发个 issue 讨论一下要不要实现，避免 PR 提交之后新功能本身被否决的问题。
 
-如果已经存在相关的 issue，最好先在 issue 内回复一下自己的意向，避免撞车问题。
+如果已经存在相关的 issue，最好先在 issue 内回复一下自己的意向，或者创建一个 Draft PR 关联对应的 issue，避免撞车问题。
 
 ## 测试
 
