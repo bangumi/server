@@ -66,9 +66,11 @@ ORM 类定义在 [pol/db/tables.py](./pol/db/tables.py) 文件。
 
 ### 后端环境
 
-https://github.com/bangumi/dev-env
+redis 和 mysql 都在此 docker-compose 内。 https://github.com/bangumi/dev-env
 
-启动开发服务器，默认为 `3000` 端口，在代码修改后会自动重启。
+如果你不是 docker 用户，请自行启动 mysql 和 redis 并导入`bangumi/dev-env` 仓库内的数据。
+
+启动 web 服务器，默认为 `3000` 端口，在代码修改后会自动重启。
 
 ```shell
 watchgod scripts.dev.main
