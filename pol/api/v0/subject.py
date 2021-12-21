@@ -1,6 +1,8 @@
 from typing import List
 
+import pydantic
 from fastapi import Path, Depends, APIRouter
+from pydantic import Extra, Field
 from databases import Database
 from starlette.responses import Response, RedirectResponse
 
@@ -8,7 +10,13 @@ from pol import sa, res, curd, wiki
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
-from pol.db.const import PLATFORM_MAP, RELATION_MAP, StaffMap, get_character_rel
+from pol.db.const import (
+    PLATFORM_MAP,
+    RELATION_MAP,
+    StaffMap,
+    SubjectType,
+    get_character_rel,
+)
 from pol.db.tables import (
     ChiiPerson,
     ChiiEpisode,
@@ -140,7 +148,7 @@ async def get_subject_persons(
             "id": r["prsn_id"],
             "name": r["prsn_name"],
             "type": r["prsn_type"],
-            "relation": StaffMap[r["subject_type_id"]][r["prsn_position"]].get(),
+            "relation": StaffMap[r["subject_type_id"]][r["prsn_position"]].str(),
             "career": get_career(r),
             "short_summary": short_description(r["prsn_summary"]),
             "images": person_images(r["prsn_img"]),
@@ -213,10 +221,15 @@ async def get_subject_relations(
 
     query = (
         sa.select(
-            ChiiSubjectRelations, ChiiSubject.subject_name, ChiiSubject.subject_name_cn
+            ChiiSubjectRelations.rlt_related_subject_type_id,
+            ChiiSubjectRelations.rlt_related_subject_id,
+            ChiiSubjectRelations.rlt_relation_type,
+            ChiiSubject.subject_name,
+            ChiiSubject.subject_name_cn,
         )
         .join(
-            ChiiSubject, ChiiSubject.subject_id == ChiiSubjectRelations.rlt_subject_id
+            ChiiSubject,
+            ChiiSubject.subject_id == ChiiSubjectRelations.rlt_related_subject_id,
         )
         .where(ChiiSubjectRelations.rlt_subject_id == subject_id)
         .order_by(
@@ -224,18 +237,39 @@ async def get_subject_relations(
         )
     )
 
-    response = [
-        {
-            "id": r["rlt_related_subject_id"],
-            "relation": RELATION_MAP[r["rlt_subject_type_id"]][
-                r["rlt_relation_type"]
-            ].get(),
-            "name": r["subject_name"],
-            "type": repr(r["rlt_related_subject_type_id"]),
-            "name_cn": r["rlt_relation_type"],
-            "images": subject.images,
-        }
-        for r in await db.fetch_all(query)
-    ]
+    rows = pydantic.parse_obj_as(List[JoinRow], await db.fetch_all(query))
+
+    response = []
+    for r in rows:
+        relation = RELATION_MAP[r.related_subject_type_id].get(r.relation_type)
+
+        if relation is None or r.relation_type == 1:
+            rel = r.related_subject_type_id.str()
+        else:
+            rel = relation.str()
+
+        response.append(
+            {
+                "id": r.related_subject_id,
+                "relation": rel,
+                "name": r.name,
+                "type": r.related_subject_type_id,
+                "name_cn": r.name_cn,
+                "images": subject.images,
+            }
+        )
 
     return response
+
+
+class JoinRow(pydantic.BaseModel):
+    """JOIN row result for `get_subject_relations`"""
+
+    related_subject_id: int = Field(alias="rlt_related_subject_id")
+    related_subject_type_id: SubjectType = Field(alias="rlt_related_subject_type_id")
+    relation_type: int = Field(alias="rlt_relation_type")
+    name_cn: str = Field(alias="subject_name_cn")
+    name: str = Field(alias="subject_name")
+
+    class Config:
+        extra = Extra.forbid

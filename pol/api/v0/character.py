@@ -58,6 +58,7 @@ class Sort(str, enum.Enum):
 @router.get(
     "/characters",
     response_model=models.PagedCharacter,
+    include_in_schema=False,
 )
 async def get_characters(
     db: Database = Depends(get_db),
