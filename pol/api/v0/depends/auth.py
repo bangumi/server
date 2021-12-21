@@ -4,10 +4,9 @@ from typing import Optional
 from fastapi import Depends
 from pydantic import Field, BaseModel
 from databases import Database
-from fastapi.security import HTTPBearer
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.requests import Request
-from fastapi.security.http import HTTPBase, HTTPAuthorizationCredentials
+from fastapi.security.http import SecurityBase, HTTPAuthorizationCredentials
 from fastapi.openapi.models import HTTPBearer as HTTPBearerModel
 from fastapi.security.utils import get_authorization_scheme_param
 
@@ -18,7 +17,7 @@ from pol.db.tables import ChiiMember, ChiiOauthAccessToken
 from pol.permission import UserGroup
 
 
-class HTTPBearer(HTTPBase):
+class HTTPBearer(SecurityBase):
     def __init__(
         self,
         *,
