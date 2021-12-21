@@ -27,7 +27,7 @@ def db_session():
     db_session = Session()
     try:
         yield db_session
-    except Exception:
+    except Exception:  # pragma: no cover
         db_session.rollback()
         raise
     finally:
@@ -40,7 +40,7 @@ def redis_client():
         redis_client.flushdb()
         try:
             yield redis_client
-        except Exception:
+        except Exception:  # pragma: no cover
             raise
         finally:
             redis_client.flushdb()

@@ -9,7 +9,7 @@ from pol.redis.json_cache import JSONRedis
 
 
 def async_test(f):
-    if not inspect.iscoroutinefunction(f):  # pragma: no cover'
+    if not inspect.iscoroutinefunction(f):  # pragma: no cover
         raise ValueError("not async test function")
 
     @wraps(f)
