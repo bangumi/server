@@ -31,6 +31,7 @@ from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelPerson, RelCharacter
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
+from pol.api.v0.depends.auth import User, optional_user
 from pol.api.v0.models.subject import Subject, RelSubject
 
 router = APIRouter(tags=["条目"])
@@ -54,6 +55,9 @@ async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.S
         )
 
 
+from pydantic import ValidationError
+
+
 @router.get(
     "/subjects/{subject_id}",
     description="cache with 300s",
@@ -67,12 +71,25 @@ async def get_subject(
     response: Response,
     db: Database = Depends(get_db),
     subject_id: int = Path(..., gt=0),
+    user: User = Depends(optional_user),
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"subject:{subject_id}"
-    if (value := await redis.get(cache_key)) is not None:
-        response.headers["x-cache-status"] = "hit"
-        return value
+    if value := await redis.get(cache_key):
+        try:
+            s = Subject.parse_obj(value)
+            if s.nsfw:
+                if user is None or not user.allow_nsfw():
+                    raise res.HTTPException(
+                        status_code=404,
+                        title="Not Found",
+                        description=NotFoundDescription,
+                        detail={"subject_id": subject_id},
+                    )
+            response.headers["x-cache-status"] = "hit"
+            return value
+        except ValidationError:
+            await redis.delete(cache_key)
     else:
         response.headers["x-cache-status"] = "miss"
 
@@ -100,6 +117,15 @@ async def get_subject(
         data["infobox"] = wiki.parse(subject.infobox).info
     except wiki.WikiSyntaxError:
         data["infobox"] = None
+
+    if subject.nsfw:
+        if user is None or not user.allow_nsfw():
+            raise res.HTTPException(
+                status_code=404,
+                title="Not Found",
+                description=NotFoundDescription,
+                detail={"subject_id": subject_id},
+            )
 
     await redis.set_json(cache_key, value=data, ex=300)
 

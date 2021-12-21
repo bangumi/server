@@ -36,6 +36,20 @@ def test_subject_locked(client: TestClient):
     assert data["locked"]
 
 
+def test_subject_nsfw_no_auth_404(client: TestClient):
+    """not authorized 404 nsfw subject"""
+    response = client.get("/v0/subjects/16")
+    assert response.status_code == 404
+    assert response.headers["content-type"] == "application/json"
+
+
+def test_subject_nsfw_auth_200(client: TestClient, auth_header):
+    """authorized 200 nsfw subject"""
+    response = client.get("/v0/subjects/16", headers=auth_header)
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/json"
+
+
 def test_subject_redirect(client: TestClient):
     response = client.get("/v0/subjects/18", allow_redirects=False)
     assert response.status_code == 307

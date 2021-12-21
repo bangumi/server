@@ -11,8 +11,8 @@ from pol.api.v0.depends.auth import User
 access_token = "a_development_access_token"
 
 
-def test_auth_200(client: TestClient):
-    response = client.get("/v0/me", headers={"Authorization": f"Bearer {access_token}"})
+def test_auth_200(client: TestClient, auth_header):
+    response = client.get("/v0/me", headers=auth_header)
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
 
