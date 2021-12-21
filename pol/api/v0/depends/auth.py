@@ -1,5 +1,5 @@
-import datetime
 from typing import Optional
+from datetime import datetime, timedelta
 
 from fastapi import Depends
 from pydantic import Field, BaseModel
@@ -53,7 +53,8 @@ class User(BaseModel):
     username: str
     nickname: str
     group_id: UserGroup = Field(alias="groupid")
-    # regdate: int
+    registration_date: datetime = Field(alias="regdate")
+
     # lastvisit: int
     # lastactivity: int
     # lastpost: int
@@ -63,6 +64,10 @@ class User(BaseModel):
     # newpm: int
     # new_notify: int
     # sign: str
+
+    def allow_nsfw(self) -> bool:
+        allow_date = self.registration_date + timedelta(days=60)
+        return datetime.now() > allow_date
 
 
 async def get_current_user(
@@ -74,7 +79,7 @@ async def get_current_user(
             db,
             ChiiOauthAccessToken,
             ChiiOauthAccessToken.access_token == token,
-            ChiiOauthAccessToken.expires > datetime.datetime.now(),
+            ChiiOauthAccessToken.expires > datetime.now(),
         )
 
         member_row = await curd.get_one(
@@ -95,5 +100,6 @@ async def get_current_user(
         groupid=member_row.groupid,
         username=member_row.username,
         nickname=member_row.nickname,
+        regdate=member_row.regdate,
     )
     return user
