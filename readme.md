@@ -55,10 +55,10 @@ ORM 类定义在 [pol/db/tables.py](./pol/db/tables.py) 文件。
 
 https://github.com/bangumi/dev-env
 
-启动开发服务器
+启动开发服务器，默认为 `3000` 端口，在代码修改后会自动重启。
 
 ```shell
-uvicorn pol.server:app --reload --port 3000
+watchgod scripts.dev.main
 ```
 
 ## 测试
