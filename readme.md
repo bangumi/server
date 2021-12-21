@@ -39,6 +39,7 @@ pre-commit install
 - `MYSQL_DB` 默认 `bangumi`
 - `MYSQL_USER` **无默认值**
 - `MYSQL_PASS` **无默认值**
+- `REDIS_URI` 默认 `redis://127.0.0.1:6379/0`
 
 ## 开发
 
