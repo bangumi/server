@@ -52,35 +52,6 @@ class OptionalHTTPBearer(SecurityBase):
         return credentials
 
 
-class HTTPBearer(SecurityBase):
-    def __init__(
-        self,
-        *,
-        bearerFormat: Optional[str] = None,
-        description: Optional[str] = None,
-    ):
-        self.model = HTTPBearerModel(bearerFormat=bearerFormat, description=description)
-        self.scheme_name = self.__class__.__name__
-
-    async def __call__(self, request: Request) -> str:
-        authorization: str = request.headers.get("Authorization")
-        scheme, credentials = get_authorization_scheme_param(authorization)
-        if not (authorization and scheme and credentials):
-            raise res.HTTPException(
-                title="unauthorized",
-                status_code=HTTP_403_FORBIDDEN,
-                description="Not authenticated",
-            )
-        if scheme.lower() != "bearer":
-            raise res.HTTPException(
-                status_code=HTTP_403_FORBIDDEN,
-                title="unauthorized",
-                description="Invalid authentication credentials",
-            )
-        return credentials
-
-
-API_KEY_HEADER = HTTPBearer()
 OPTIONAL_API_KEY_HEADER = OptionalHTTPBearer()
 
 
