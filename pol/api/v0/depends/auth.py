@@ -2,7 +2,7 @@ from typing import Optional
 from datetime import datetime, timedelta
 
 from fastapi import Depends
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, ValidationError
 from databases import Database
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.requests import Request
@@ -10,11 +10,12 @@ from fastapi.security.http import SecurityBase, HTTPAuthorizationCredentials
 from fastapi.openapi.models import HTTPBearer as HTTPBearerModel
 from fastapi.security.utils import get_authorization_scheme_param
 
-from pol import res, curd
+from pol import res, curd, config
 from pol.curd import NotFoundError
-from pol.depends import get_db
+from pol.depends import get_db, get_redis
 from pol.db.tables import ChiiMember, ChiiOauthAccessToken
 from pol.permission import UserGroup
+from pol.redis.json_cache import JSONRedis
 
 
 class HTTPBearer(SecurityBase):
@@ -73,7 +74,15 @@ class User(BaseModel):
 async def get_current_user(
     token: HTTPAuthorizationCredentials = Depends(API_KEY_HEADER),
     db: Database = Depends(get_db),
+    redis: JSONRedis = Depends(get_redis),
 ) -> User:
+    cache_key = config.CACHE_KEY_PREFIX + f"access:{token}"
+    if value := await redis.get(cache_key):
+        try:
+            return User.parse_obj(value)
+        except ValidationError:
+            await redis.delete(cache_key)
+
     try:
         access_row = await curd.get_one(
             db,
@@ -102,4 +111,7 @@ async def get_current_user(
         nickname=member_row.nickname,
         regdate=member_row.regdate,
     )
+
+    await redis.set_json(cache_key, user.dict(by_alias=True))
+
     return user

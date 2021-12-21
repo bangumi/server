@@ -38,5 +38,9 @@ def db_session():
 def redis_client():
     with redis.Redis.from_url(config.REDIS_URI) as redis_client:
         redis_client.flushdb()
-        yield redis_client
-        redis_client.flushdb()
+        try:
+            yield redis_client
+        except Exception:
+            raise
+        finally:
+            redis_client.flushdb()
