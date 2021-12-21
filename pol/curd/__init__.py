@@ -1,13 +1,13 @@
 from typing import Type, TypeVar
 
 from databases import Database
-from sqlalchemy.orm import DeclarativeMeta
 
 from pol import sa
 from . import ep, subject
+from ..db.tables import Base
 from .exceptions import NotFoundError
 
-T = TypeVar("T", bound=DeclarativeMeta)
+T = TypeVar("T", bound=Base)
 
 
 async def get_one(db: Database, t: Type[T], *where) -> T:
