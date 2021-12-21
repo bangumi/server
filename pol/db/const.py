@@ -73,6 +73,19 @@ class SubjectType(enum.IntEnum):
     game = 4
     real = 6
 
+    def str(self) -> str:
+        if self == self.book:
+            return "书籍"
+        elif self == self.anime:
+            return "动画"
+        elif self == self.music:
+            return "音乐"
+        elif self == self.game:
+            return "游戏"
+        elif self == self.real:
+            return "三次元"
+        raise ValueError(f"unexpected SubjectType {self}")
+
 
 StaffMap = {
     SubjectType.book: staff_job_book,
@@ -97,7 +110,7 @@ class Relation(NamedTuple):
     jp: str = ""
     desc: str = ""
 
-    def get(self) -> str:
+    def str(self) -> str:
         return self.cn or self.en or self.jp
 
 

@@ -55,6 +55,7 @@ class Sort(str, enum.Enum):
 @router.get(
     "/persons",
     response_model=models.PagedPerson,
+    include_in_schema=False,
 )
 async def get_persons(
     db: Database = Depends(get_db),
@@ -260,7 +261,7 @@ async def get_person_subjects(
         else:
             s["subject_image"] = None
         rel = result[s["subject_id"]]
-        s["staff"] = StaffMap[rel.subject_type_id][rel.prsn_position].get()
+        s["staff"] = StaffMap[rel.subject_type_id][rel.prsn_position].str()
 
     return subjects
 
