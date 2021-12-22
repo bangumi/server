@@ -71,6 +71,7 @@ class User(Role, BaseModel):
     # timeoffset: str
     # newpm: int
     # new_notify: int
+
     def allow_nsfw(self) -> bool:
         allow_date = self.registration_date + timedelta(days=60)
         return datetime.utcnow().astimezone() > allow_date
