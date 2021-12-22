@@ -40,7 +40,5 @@ def redis_client():
         redis_client.flushdb()
         try:
             yield redis_client
-        except Exception:  # pragma: no cover
-            raise
         finally:
             redis_client.flushdb()
