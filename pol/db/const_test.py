@@ -17,5 +17,5 @@ def test_valid_type():
 def test_gender():
     assert Gender(1).str() == "male"
     assert Gender(2).str() == "female"
-    with pytest.raises(ValueError, match="3 is not valid gender"):
+    with pytest.raises(ValueError, match="3 is not a valid Gender"):
         Gender(3).str()
