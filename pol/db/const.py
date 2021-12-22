@@ -28,7 +28,7 @@ class Gender(enum.IntEnum):
     female = 2
 
     def str(self):
-        if self.value == 1:
+        if self.value == self.male:
             return "male"
         elif self.value == self.female:
             return "female"
@@ -63,6 +63,8 @@ class SubjectType(enum.IntEnum):
         raise ValueError(f"unexpected SubjectType {self}")
 
     def translate(self, _escape_table):
+        """sqlalchemy method to get real value,
+        so you can use `Table.column == SubjectType.book`"""
         return self.value
 
 

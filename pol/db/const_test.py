@@ -14,6 +14,8 @@ def test_valid_type():
     assert len(keys) == len(set(keys))
 
 
-def test_basic_value():
+def test_gender():
+    assert Gender(1).str() == "male"
+    assert Gender(2).str() == "female"
     with pytest.raises(ValueError):
         Gender(3).str()
