@@ -38,10 +38,13 @@ def test_auth_cached(client: TestClient, redis_client: Redis):
         regdate=datetime.datetime(2007, 8, 10, 3, 1, 5),
         groupid=UserGroup.wiki_admin,
         nickname="ni",
+        sign="",
+        avatar="",
     )
     redis_client.set(cache_key, u.json(by_alias=True))
     response = client.get("/v0/me", headers={"Authorization": "Bearer 1"})
     assert response.status_code == 200, "user lookup should be cached"
+    assert response.json()["avatar"]["large"] == ""
 
 
 def test_auth_cache_ban_cache_fallback(client: TestClient, redis_client: Redis):
