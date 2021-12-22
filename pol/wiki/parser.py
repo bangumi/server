@@ -53,6 +53,9 @@ def parse(s: str) -> Wiki:
 
     subject_type = first_line[len("{{Infobox") :].strip() or None
 
+    if lines[-1] != "}}":
+        raise WikiSyntaxError("missing infobox closure }} at the end")
+
     lines = lines[1:-1]
 
     results: List[dict] = []
@@ -124,4 +127,6 @@ def parse(s: str) -> Wiki:
             key = None
             value = None  # type: ignore
 
+    if in_key:
+        raise WikiSyntaxError(f'missing close "}}" for array (line: {len(lines) + 1})')
     return Wiki(subject_type, results or None)

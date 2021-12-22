@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
@@ -111,3 +113,13 @@ def test_characters_sort_valid(client: TestClient, db_session: Session):
 
     res = response.json()
     assert [x["id"] for x in res["data"]] == expected
+
+
+def test_characters_page_sort_args(client: TestClient, db_session: Session):
+    response = client.get(path, params={"sort": "name", "order": 1})
+    assert response.status_code == 200, response.text
+
+    res = response.json()
+    assert [x["id"] for x in res["data"]] == [
+        x["id"] for x in sorted(res["data"], key=itemgetter("name"))
+    ]

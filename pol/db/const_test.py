@@ -1,4 +1,6 @@
-from pol.db.const import StaffMap
+import pytest
+
+from pol.db.const import Gender, StaffMap
 
 
 def test_valid_type():
@@ -10,3 +12,10 @@ def test_valid_type():
             assert value.cn or value.jp or value.en or value.rdf
 
     assert len(keys) == len(set(keys))
+
+
+def test_gender():
+    assert Gender(1).str() == "male"
+    assert Gender(2).str() == "female"
+    with pytest.raises(ValueError, match="3 is not a valid Gender"):
+        Gender(3).str()
