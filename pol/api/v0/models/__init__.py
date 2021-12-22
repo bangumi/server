@@ -14,11 +14,11 @@ __all__ = [
     "Order",
     "Pager",
     "PersonCareer",
-    "RelPerson",
-    "RelCharacter",
+    "RelatedPerson",
+    "RelatedCharacter",
     "Person",
     "PersonDetail",
-    "SubjectInfo",
+    "RelatedSubject",
 ]
 
 
@@ -39,12 +39,12 @@ class PersonCareer(str, enum.Enum):
     actor = "actor"
 
 
-class SubjectInfo(BaseModel):
-    id: int = Field(..., alias="subject_id")
+class RelatedSubject(BaseModel):
+    id: int = Field()
     staff: str
-    name: Optional[str] = Field(None, alias="subject_name")
-    name_cn: str = Field(..., alias="subject_name_cn")
-    image: Optional[str] = Field(None, alias="subject_image")
+    name: Optional[str] = Field(None)
+    name_cn: str
+    image: Optional[str] = Field(None)
 
 
 class Stat(BaseModel):
@@ -68,7 +68,7 @@ class Person(BasePerson):
     locked: bool
 
 
-class RelPerson(BasePerson):
+class RelatedPerson(BasePerson):
     relation: str
 
 
@@ -120,7 +120,7 @@ class Character(BaseCharacter):
     locked: bool
 
 
-class RelCharacter(BaseCharacter):
+class RelatedCharacter(BaseCharacter):
     relation: str
 
 

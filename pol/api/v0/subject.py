@@ -28,10 +28,10 @@ from pol.db.tables import (
 )
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
-from pol.api.v0.models import RelPerson, RelCharacter
+from pol.api.v0.models import RelatedPerson, RelatedCharacter
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
-from pol.api.v0.models.subject import Subject, RelSubject
+from pol.api.v0.models.subject import Subject, RelatedSubject
 
 router = APIRouter(tags=["条目"])
 
@@ -57,7 +57,6 @@ async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.S
 @router.get(
     "/subjects/{subject_id}",
     description="cache with 300s",
-    response_model_by_alias=False,
     response_model=Subject,
     responses={
         404: res.response(model=ErrorDetail),
@@ -108,8 +107,7 @@ async def get_subject(
 
 @router.get(
     "/subjects/{subject_id}/persons",
-    response_model_by_alias=False,
-    response_model=List[RelPerson],
+    response_model=List[RelatedPerson],
     responses={
         404: res.response(model=ErrorDetail),
     },
@@ -161,8 +159,7 @@ async def get_subject_persons(
 
 @router.get(
     "/subjects/{subject_id}/characters",
-    response_model_by_alias=False,
-    response_model=List[RelCharacter],
+    response_model=List[RelatedCharacter],
     responses={
         404: res.response(model=ErrorDetail),
     },
@@ -207,8 +204,7 @@ async def get_subject_characters(
 
 @router.get(
     "/subjects/{subject_id}/subjects",
-    response_model_by_alias=False,
-    response_model=List[RelSubject],
+    response_model=List[RelatedSubject],
     responses={
         404: res.response(model=ErrorDetail),
     },

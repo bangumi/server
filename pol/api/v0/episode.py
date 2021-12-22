@@ -23,7 +23,6 @@ class Pager(BaseModel):
 
 @router.get(
     "/episodes",
-    response_model_by_alias=False,
     response_model=Paged[Episode],
     responses={
         404: res.response(model=ErrorDetail),
@@ -83,7 +82,6 @@ def add_episode(e: Ep, start: float) -> dict:
 
 @router.get(
     "/episodes/{episode_id}",
-    response_model_by_alias=False,
     response_model=EpisodeDetail,
     responses={
         404: res.response(model=ErrorDetail),
