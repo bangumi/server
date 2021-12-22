@@ -1,22 +1,24 @@
-import pydantic
 from fastapi import Depends, APIRouter
+from pydantic import BaseModel
 
 from pol import res
 from pol.models import ErrorDetail
+from pol.permission import UserGroup
 from .depends.auth import User, get_current_user
 
-router = APIRouter()
+router = APIRouter(tags=["用户"])
 
 
-class Me(pydantic.BaseModel):
-    pass
+class Me(BaseModel):
+    id: int
+    username: str
+    nickname: str
+    group_id: UserGroup
 
 
 @router.get(
     "/me",
-    description="cache with 300s",
-    response_model_by_alias=False,
-    response_model=User,
+    response_model=Me,
     responses={
         403: res.response(model=ErrorDetail, description="unauthorized"),
     },
