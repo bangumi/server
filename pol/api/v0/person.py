@@ -35,7 +35,7 @@ api_base = "/v0/persons"
 
 async def basic_person(
     person_id: int,
-    db: Database = Depends(get_db),
+    db: Database,
 ) -> ChiiPerson:
     try:
         return await curd.get_one(
@@ -235,9 +235,6 @@ async def get_person_subjects(
     person_id: int = Path(..., gt=0),
 ):
     person: ChiiPerson = await basic_person(person_id=person_id, db=db)
-    if person.prsn_redirect:
-        return RedirectResponse(f"{api_base}/{person.prsn_redirect}/subjects")
-
     query = (
         sa.select(
             ChiiPersonCsIndex.subject_id,

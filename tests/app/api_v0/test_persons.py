@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
@@ -62,6 +64,11 @@ def test_persons_page_limit(client: TestClient):
     assert len(res["data"]) == limit
 
 
+def test_persons_off_limit(client: TestClient):
+    response = client.get("/v0/persons", params={"offset": 30000})
+    assert response.status_code == 422
+
+
 def test_persons_page_limit_too_big(client: TestClient, db_session: Session):
     limit = 30000
     response = client.get("/v0/persons", params={"limit": limit})
@@ -118,3 +125,28 @@ def test_persons_sort_valid(client: TestClient, db_session: Session):
 
     res = response.json()
     assert [x["id"] for x in res["data"]] == expected
+
+
+def test_persons_sort_name(client: TestClient):
+    response = client.get("/v0/persons", params={"sort": "name", "order": 1})
+    assert response.status_code == 200, response.text
+
+    res = response.json()["data"]
+    assert [x["id"] for x in res] == [
+        x["id"] for x in sorted(res, key=itemgetter("name"))
+    ]
+
+
+def test_persons_sort_last_post(client: TestClient, db_session: Session):
+    response = client.get("/v0/persons", params={"sort": "update"})
+    assert response.status_code == 200, response.text
+
+    expected = [
+        x.prsn_id
+        for x in db_session.query(ChiiPerson.prsn_id)
+        .filter(ChiiPerson.prsn_ban == 0, ChiiPerson.prsn_redirect == 0)
+        .order_by(ChiiPerson.prsn_lastpost.desc())
+    ]
+
+    res = response.json()["data"]
+    assert [x["id"] for x in res] == expected
