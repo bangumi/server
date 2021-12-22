@@ -356,7 +356,7 @@ def test_missing_array_close_4():
 }}
 """
     with pytest.raises(
-        WikiSyntaxError, match=re.escape(f'missing "}}" at new line "[1]" (line: 3)')
+        WikiSyntaxError, match=re.escape('missing "}" at new line "[1]" (line: 3)')
     ):
         parse(raw)
 
