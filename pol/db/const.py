@@ -560,3 +560,31 @@ PLATFORM_MAP = {
         },
     },
 }
+
+
+class RevisionType(enum.IntEnum):
+    subject = 1  # 条目
+    subject_character_relation = 5  # 条目->角色关联
+    subject_cast_relation = 6  # 条目->声优关联
+    subject_person_relation = 10  # 条目->人物关联
+    subject_merge = 11  # 条目管理
+    subject_erase = 12
+    subject_relation = 17  # 条目关联
+    subject_lock = 103
+    subject_unlock = 104
+    character = 2  # 角色
+    character_subject_relation = 4  # 角色->条目关联
+    character_cast_relation = 7  # 角色->声优关联
+    character_merge = 13  # 角色管理
+    character_erase = 14
+    person = 3  # 人物
+    person_cast_relation = 8  # 人物->声优关联
+    person_subject_relation = 9  # 人物->条目关联
+    person_merge = 15  # 人物管理
+    person_erase = 16
+    ep = 18  # 章节
+    ep_merge = 181  # 章节管理
+    ep_move = 182
+    ep_lock = 183
+    ep_unlock = 184
+    ep_erase = 185
