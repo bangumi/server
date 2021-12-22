@@ -111,3 +111,17 @@ def test_characters_sort_valid(client: TestClient, db_session: Session):
 
     res = response.json()
     assert [x["id"] for x in res["data"]] == expected
+
+
+def test_characters_page_sort_args(client: TestClient, db_session: Session):
+    response = client.get(path, params={"sort": "name", "order": 1})
+    assert response.status_code == 200, response.text
+
+    expected = [
+        x.crt_id
+        for x in db_session.query(ChiiCharacter.crt_id)
+        .filter(ChiiCharacter.crt_ban == 0, ChiiCharacter.crt_redirect == 0)
+        .order_by(ChiiCharacter.crt_name.asc())
+    ]
+    res = response.json()
+    assert [x["id"] for x in res["data"]] == expected
