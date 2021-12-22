@@ -9,16 +9,36 @@ from .depends.auth import User, get_current_user
 router = APIRouter(tags=["用户"])
 
 
+class Avatar(BaseModel):
+    large: str
+    medium: str
+    small: str
+
+    @classmethod
+    def from_record(cls, s):
+        if not s:
+            return cls(large="", medium="", small="")
+        return cls(
+            large="https://lain.bgm.tv/pic/user/l/" + s,
+            medium="https://lain.bgm.tv/pic/user/m/" + s,
+            small="https://lain.bgm.tv/pic/user/s/" + s,
+        )
+
+
 class Me(BaseModel):
     id: int
+    url: str
     username: str
     nickname: str
-    group_id: UserGroup
+    user_group: UserGroup
+    avatar: Avatar
+    sign: str
 
 
 @router.get(
     "/me",
     response_model=Me,
+    description="返回当前 Access Token 对应的用户信息",
     responses={
         403: res.response(model=ErrorDetail, description="unauthorized"),
     },
@@ -26,4 +46,9 @@ class Me(BaseModel):
 async def get_subject(
     user: User = Depends(get_current_user),
 ):
-    return user.dict(by_alias=False)
+    d = user.dict(by_alias=False)
+    d["avatar"] = Avatar.from_record(user.avatar)
+    d["url"] = "https://bgm.tv/user/" + user.username
+    d["user_group"] = user.group_id
+
+    return d

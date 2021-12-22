@@ -61,7 +61,8 @@ class User(Role, BaseModel):
     nickname: str
     group_id: UserGroup = Field(alias="groupid")
     registration_date: datetime = Field(alias="regdate")
-
+    sign: str
+    avatar: str
     # lastvisit: int
     # lastactivity: int
     # lastpost: int
@@ -70,7 +71,6 @@ class User(Role, BaseModel):
     # timeoffset: str
     # newpm: int
     # new_notify: int
-    # sign: str
     def allow_nsfw(self) -> bool:
         allow_date = self.registration_date + timedelta(days=60)
         return datetime.utcnow().astimezone() > allow_date
@@ -124,6 +124,8 @@ async def optional_user(
         username=member_row.username,
         nickname=member_row.nickname,
         regdate=member_row.regdate,
+        sign=member_row.sign,
+        avatar=member_row.avatar,
     )
 
     await redis.set_json(cache_key, user.dict(by_alias=True))
