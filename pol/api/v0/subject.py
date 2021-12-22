@@ -32,6 +32,7 @@ from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelatedPerson, RelatedCharacter
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
+from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject
 
 router = APIRouter(tags=["条目"])

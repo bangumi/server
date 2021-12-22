@@ -26,4 +26,4 @@ class Me(BaseModel):
 async def get_subject(
     user: User = Depends(get_current_user),
 ):
-    return user.dict(by_alias=True)
+    return user.dict(by_alias=False)
