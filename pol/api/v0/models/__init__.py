@@ -16,6 +16,9 @@ __all__ = [
     "PersonCareer",
     "RelPerson",
     "RelCharacter",
+    "Person",
+    "PersonDetail",
+    "SubjectInfo",
 ]
 
 
