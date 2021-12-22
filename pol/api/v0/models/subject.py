@@ -1,9 +1,8 @@
 import datetime
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from pydantic import Field, BaseModel
 
-from pol.api.v0.models import Paged
 from pol.api.v0.models.wiki import Wiki
 
 
@@ -64,7 +63,6 @@ class RelSubject(BaseModel):
 
 class Episode(BaseModel):
     id: int
-    # url: str
     type: int = Field(description="`0` 本篇，`1` SP，`2` OP，`3` ED")
     name: str
     name_cn: str
@@ -79,7 +77,3 @@ class Episode(BaseModel):
 
 class EpisodeDetail(Episode):
     subject_id: int
-
-
-class PagedEpisode(Paged):
-    data: List[Episode]
