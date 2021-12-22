@@ -70,8 +70,9 @@ class Episode(BaseModel):
     ep: float = Field(None, description="条目内的集数, 从`1`开始。非本篇剧集的此字段无意义")
     airdate: str
     comment: int
-    desc: str
-    disc: int = Field(description="用于音乐条目")
+    duration: str
+    desc: str = Field(description="简介")
+    disc: int = Field(description="音乐曲目的碟片数")
 
 
 class EpisodeDetail(Episode):
