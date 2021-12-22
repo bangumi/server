@@ -9,6 +9,7 @@ from sqlalchemy import (
     func,
     join,
     text,
+    delete,
     select,
     update,
 )
@@ -32,4 +33,5 @@ __all__ = [
     "func",
     "count",
     "or_",
+    "delete",
 ]

@@ -71,7 +71,10 @@ class Subject(BaseModel):
         for key, value in scores.items():
             total += int(key) * value
             total_count += value
-        score = round(total / total_count, 1)
+        if total_count != 0:
+            score = round(total / total_count, 1)
+        else:
+            score = 0
 
         return {
             "rank": self.rank,

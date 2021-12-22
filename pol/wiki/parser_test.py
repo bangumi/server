@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from .parser import WikiSyntaxError, kv, parse
@@ -273,6 +275,89 @@ def test_error_message_missing_key():
 |译者=
 }}"""
     with pytest.raises(WikiSyntaxError, match="missing key or unexpected line break "):
+        parse(raw)
+
+
+def test_item_new_line():
+    raw = """{{Infobox
+|中文名=
+|别名= {[item1]
+
+}
+}}"""
+    with pytest.raises(WikiSyntaxError, match='item must at new line after "{"'):
+        parse(raw)
+
+
+def test_missing_key():
+    raw = """{{Infobox
+|中文名
+}}"""
+    with pytest.raises(WikiSyntaxError, match='missing "=": '):
+        parse(raw)
+
+
+def test_missing_close():
+    raw = """{{Infobox
+|中文名=
+"""
+    with pytest.raises(WikiSyntaxError, match="missing infobox closure }} at the end"):
+        parse(raw)
+
+
+def test_missing_close_2():
+    raw = """{{Infobox
+|中文名=1
+"""
+    with pytest.raises(WikiSyntaxError, match="missing infobox closure }} at the end"):
+        parse(raw)
+
+
+def test_missing_array_close():
+    raw = """{{Infobox
+|中文名={
+}}
+"""
+    with pytest.raises(
+        WikiSyntaxError, match=re.escape('missing close "}" for array (line: 2)')
+    ):
+        parse(raw)
+
+
+def test_missing_array_close_2():
+    raw = """{{Infobox
+|中文名={
+[1]
+}}
+"""
+    with pytest.raises(
+        WikiSyntaxError, match=re.escape('missing close "}" for array (line: 3)')
+    ):
+        parse(raw)
+
+
+def test_missing_array_close_3():
+    raw = """{{Infobox
+|中文名={
+[1]
+}}
+"""
+    with pytest.raises(
+        WikiSyntaxError, match=re.escape('missing close "}" for array (line: 3)')
+    ):
+        parse(raw)
+
+
+def test_missing_array_close_4():
+    raw = """{{Infobox
+|中文名={
+[1]
+|v=1
+}}
+"""
+    with pytest.raises(
+        WikiSyntaxError, match=re.escape(f'missing "}}" at new line "[1]" (line: 3)')
+    ):
         parse(raw)
 
 
