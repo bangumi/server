@@ -74,7 +74,7 @@ class Episode(BaseModel):
     comment: int
     duration: str
     desc: str = Field(description="简介")
-    disc: int = Field(description="用于音乐条目")
+    disc: int = Field(description="音乐曲目的碟片数")
 
 
 class EpisodeDetail(Episode):
