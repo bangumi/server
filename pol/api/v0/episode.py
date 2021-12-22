@@ -76,7 +76,7 @@ def add_episode(e: Ep, start: float) -> dict:
     if e.type == 0:
         data["ep"] = e.sort - start + 1
     else:
-        data["ep"] = None
+        data["ep"] = 0
     return data
 
 
