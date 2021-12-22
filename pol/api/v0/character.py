@@ -9,7 +9,6 @@ from pydantic.error_wrappers import ErrorWrapper
 
 from pol import sa, res, curd, wiki
 from pol.utils import subject_images
-from pol.api.v0 import models
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
@@ -22,7 +21,14 @@ from pol.db.tables import (
 )
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import person_images, short_description
-from pol.api.v0.models import Order, Pager
+from pol.api.v0.models import (
+    Order,
+    Paged,
+    Pager,
+    Character,
+    SubjectInfo,
+    CharacterDetail,
+)
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
@@ -57,7 +63,7 @@ class Sort(str, enum.Enum):
 
 @router.get(
     "/characters",
-    response_model=models.PagedCharacter,
+    response_model=Paged[Character],
     include_in_schema=False,
 )
 async def get_characters(
@@ -133,7 +139,7 @@ async def get_characters(
 @router.get(
     "/characters/{character_id}",
     description="cache with 60s",
-    response_model=models.CharacterDetail,
+    response_model=CharacterDetail,
     response_model_by_alias=False,
     responses={
         404: res.response(model=ErrorDetail),
@@ -200,7 +206,7 @@ async def get_character_detail(
 @router.get(
     "/characters/{character_id}/subjects",
     summary="get character related subjects",
-    response_model=List[models.SubjectInfo],
+    response_model=List[SubjectInfo],
     response_model_by_alias=False,
     responses={
         404: res.response(model=ErrorDetail),

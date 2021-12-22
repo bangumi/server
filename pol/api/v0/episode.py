@@ -9,8 +9,9 @@ from pol.depends import get_db
 from pol.db.const import EpType
 from pol.db.tables import ChiiEpisode
 from pol.api.v0.const import NotFoundDescription
+from pol.api.v0.models import Paged
 from pol.curd.exceptions import NotFoundError
-from pol.api.v0.models.subject import PagedEpisode, EpisodeDetail
+from pol.api.v0.models.subject import Episode, EpisodeDetail
 
 router = APIRouter(tags=["章节"])
 
@@ -23,7 +24,7 @@ class Pager(BaseModel):
 @router.get(
     "/episodes",
     response_model_by_alias=False,
-    response_model=PagedEpisode,
+    response_model=Paged[Episode],
     responses={
         404: res.response(model=ErrorDetail),
     },
