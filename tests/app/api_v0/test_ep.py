@@ -28,7 +28,7 @@ def test_episodes(client: TestClient):
 
     for ep in data:
         if ep["type"] != 0:
-            assert ep["ep"] is None
+            assert ep["ep"] == 0
 
 
 def test_episodes_404(client: TestClient):

@@ -7,19 +7,6 @@ from pol.api.v0.models import Paged
 from pol.api.v0.models.wiki import Wiki
 
 
-class SubjectEp(BaseModel):
-    id: int
-    type: int = Field(description="`0` 本篇，`1` SP，`2` OP，`3` ED")
-    sort: float
-    name: str
-    name_cn: str
-    duration: str
-    airdate: str
-    comment: int
-    desc: str
-    disc: int = Field(description="用于音乐条目")
-
-
 class Rating(BaseModel):
     rank: int
     total: int
@@ -78,15 +65,16 @@ class RelSubject(BaseModel):
 class Episode(BaseModel):
     id: int
     # url: str
-    type: int
-    sort: int
+    type: int = Field(description="`0` 本篇，`1` SP，`2` OP，`3` ED")
     name: str
-    ep: Optional[int] = Field(None, description="条目内的集数, 从`1`开始")
     name_cn: str
-    duration: str
+    sort: float = Field(description="同类条目的排序和集数")
+    ep: float = Field(None, description="条目内的集数, 从`1`开始。非本篇剧集的此字段无意义")
     airdate: str
     comment: int
-    desc: str
+    duration: str
+    desc: str = Field(description="简介")
+    disc: int = Field(description="音乐曲目的碟片数")
 
 
 class EpisodeDetail(Episode):
