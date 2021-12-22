@@ -1,5 +1,5 @@
 import enum
-from typing import TYPE_CHECKING, Dict, Optional, NamedTuple
+from typing import Dict, NamedTuple
 
 from pol.db._const import (
     staff_job_book,
@@ -10,53 +10,29 @@ from pol.db._const import (
 )
 
 
-class ViewMixin:
-    if TYPE_CHECKING:
-
-        def __init__(self, v):
-            pass
-
-    @classmethod
-    def to_view(cls, v: Optional[int]) -> Optional[str]:
-        if not v:
-            return None
-        return str(cls(v))
-
-
-class BloodType(ViewMixin, enum.IntEnum):
+class BloodType(enum.IntEnum):
     a = 1
     b = 2
     ab = 3
     o = 4
 
-    def __str__(self):
-        try:
-            return {1: "A", 2: "B", 3: "AB", 4: "O"}[self.value]
-        except KeyError:
-            raise ValueError(f"{self.value} is not valid blood type")
 
-
-class PersonType(ViewMixin, enum.IntEnum):
+class PersonType(enum.IntEnum):
     person = 1
     company = 2
     band = 3
 
-    def __str__(self):
-        try:
-            return {1: "个人", 2: "公司", 3: "组合"}[self.value]
-        except KeyError:
-            raise ValueError(f"{self.value} is not valid person record type")
 
-
-class Gender(ViewMixin, enum.IntEnum):
+class Gender(enum.IntEnum):
     male = 1
     female = 2
 
-    def __str__(self):
-        try:
-            return {1: "male", 2: "female"}[self.value]
-        except KeyError:
-            raise ValueError(f"{self.value} is not valid gender")
+    def str(self):
+        if self.value == self.male:
+            return "male"
+        elif self.value == self.female:
+            return "female"
+        raise ValueError(f"{self.value} is not valid gender")
 
 
 class EpType(enum.IntEnum):
@@ -85,6 +61,11 @@ class SubjectType(enum.IntEnum):
         elif self == self.real:
             return "三次元"
         raise ValueError(f"unexpected SubjectType {self}")
+
+    def translate(self, _escape_table):
+        """sqlalchemy method to get real value,
+        so you can use `Table.column == SubjectType.book`"""
+        return self.value
 
 
 StaffMap = {

@@ -185,17 +185,17 @@ async def get_character_detail(
             ChiiPersonField.prsn_id == character.crt_id,
             ChiiPersonField.prsn_cat == "crt",
         )
-        data["gender"] = Gender.to_view(field.gender)
+        data["gender"] = Gender(field.gender).str()
         data["blood_type"] = field.bloodtype or None
         data["birth_year"] = field.birth_year or None
         data["birth_mon"] = field.birth_mon or None
         data["birth_day"] = field.birth_day or None
-    except NotFoundError:
+    except NotFoundError:  # pragma: no cover
         pass
 
     try:
         data["infobox"] = wiki.parse(character.crt_infobox).info
-    except wiki.WikiSyntaxError:
+    except wiki.WikiSyntaxError:  # pragma: no cover
         pass
 
     await redis.set_json(cache_key, value=data, ex=60)

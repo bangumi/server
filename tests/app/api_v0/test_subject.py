@@ -42,6 +42,14 @@ def test_subject_redirect(client: TestClient):
     assert response.headers["location"] == "/v0/subjects/19"
 
 
+def test_subject_empty_image(client: TestClient, mock_subject):
+    mock_subject(200)
+    response = client.get("/v0/subjects/200")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["images"] is None
+
+
 def test_subject_ep_query_limit_offset(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 8, "limit": 5})
     assert response.status_code == 200

@@ -35,7 +35,7 @@ api_base = "/v0/persons"
 
 async def basic_person(
     person_id: int,
-    db: Database = Depends(get_db),
+    db: Database,
 ) -> ChiiPerson:
     try:
         return await curd.get_one(
@@ -203,17 +203,17 @@ async def get_person(
             ChiiPersonField.prsn_id == person.prsn_id,
             ChiiPersonField.prsn_cat == "prsn",
         )
-        data["gender"] = Gender.to_view(field.gender)
+        data["gender"] = Gender(field.gender).str()
         data["blood_type"] = field.bloodtype or None
         data["birth_year"] = field.birth_year or None
         data["birth_mon"] = field.birth_mon or None
         data["birth_day"] = field.birth_day or None
-    except NotFoundError:
+    except NotFoundError:  # pragma: no cover
         pass
 
     try:
         data["infobox"] = wiki.parse(person.prsn_infobox).info
-    except wiki.WikiSyntaxError:
+    except wiki.WikiSyntaxError:  # pragma: no cover
         pass
 
     await redis.set_json(cache_key, value=data, ex=60)
@@ -235,9 +235,6 @@ async def get_person_subjects(
     person_id: int = Path(..., gt=0),
 ):
     person: ChiiPerson = await basic_person(person_id=person_id, db=db)
-    if person.prsn_redirect:
-        return RedirectResponse(f"{api_base}/{person.prsn_redirect}/subjects")
-
     query = (
         sa.select(
             ChiiPersonCsIndex.subject_id,
