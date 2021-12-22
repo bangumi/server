@@ -1,10 +1,12 @@
-from typing import Any
+from typing import List, Generic, TypeVar
 
-from pydantic import BaseModel
+from pydantic.generics import GenericModel
+
+T = TypeVar("T")
 
 
-class Paged(BaseModel):
+class Paged(GenericModel, Generic[T]):
     total: int
     limit: int
     offset: int
-    data: Any
+    data: List[T]

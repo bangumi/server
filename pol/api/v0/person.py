@@ -54,7 +54,7 @@ class Sort(str, enum.Enum):
 
 @router.get(
     "/persons",
-    response_model=models.PagedPerson,
+    response_model=models.Paged[models.Person],
     include_in_schema=False,
 )
 async def get_persons(

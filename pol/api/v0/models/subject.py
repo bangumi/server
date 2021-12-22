@@ -1,9 +1,8 @@
 import datetime
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from pydantic import Field, BaseModel
 
-from pol.api.v0.models import Paged
 from pol.api.v0.models.wiki import Wiki
 
 
@@ -91,7 +90,3 @@ class Episode(BaseModel):
 
 class EpisodeDetail(Episode):
     subject_id: int
-
-
-class PagedEpisode(Paged):
-    data: List[Episode]

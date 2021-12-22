@@ -6,7 +6,6 @@ import pydantic
 from pydantic import Field, BaseModel
 
 from pol.db.const import BloodType, PersonType
-from pol.api.v0.models.base import Paged
 
 
 class PersonImages(BaseModel):
@@ -59,10 +58,6 @@ class RelPerson(BasePerson):
     relation: str
 
 
-class PagedPerson(Paged):
-    data: List[Person]
-
-
 class PersonDetail(BasePerson):
     career: List[PersonCareer]
     summary: str
@@ -113,10 +108,6 @@ class Character(BaseCharacter):
 
 class RelCharacter(BaseCharacter):
     relation: str
-
-
-class PagedCharacter(Paged):
-    data: List[Character]
 
 
 class CharacterDetail(BaseCharacter):

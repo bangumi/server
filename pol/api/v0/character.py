@@ -57,7 +57,7 @@ class Sort(str, enum.Enum):
 
 @router.get(
     "/characters",
-    response_model=models.PagedCharacter,
+    response_model=models.Paged[models.Character],
     include_in_schema=False,
 )
 async def get_characters(
