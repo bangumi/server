@@ -69,7 +69,7 @@ class Episode(BaseModel):
     name: str
     name_cn: str
     sort: float = Field(description="同类条目的排序和集数")
-    ep: Optional[float] = Field(None, description="条目内的集数, 从`1`开始。非本篇剧集的此字段无意义")
+    ep: float = Field(None, description="条目内的集数, 从`1`开始。非本篇剧集的此字段无意义")
     airdate: str
     comment: int
     duration: str
