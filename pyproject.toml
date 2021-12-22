@@ -50,7 +50,8 @@ flake8-tidy-imports = "^4.5.0"
 exclude_lines = [
   'pragma: no cover',
   'if TYPE_CHECKING:',
-  'if __name__ == "__main__":'
+  'if __name__ == "__main__":',
+  'raise NotImplementedError('
 ]
 
 [tool.pytest.ini_options]
