@@ -52,7 +52,7 @@ class Subject(BaseModel):
     collection: Collection
 
 
-class RelSubject(BaseModel):
+class RelatedSubject(BaseModel):
     id: int
     type: int
     name: str

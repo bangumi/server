@@ -21,9 +21,9 @@ from pol.api.v0.models import (
     Paged,
     Pager,
     Person,
-    SubjectInfo,
     PersonCareer,
     PersonDetail,
+    RelatedSubject,
 )
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
@@ -157,7 +157,6 @@ async def get_persons(
     "/persons/{person_id}",
     description="cache with 60s",
     response_model=PersonDetail,
-    response_model_by_alias=False,
     responses={
         404: res.response(model=ErrorDetail),
     },
@@ -224,8 +223,7 @@ async def get_person(
 @router.get(
     "/persons/{person_id}/subjects",
     summary="get person related subjects",
-    response_model=List[SubjectInfo],
-    response_model_by_alias=False,
+    response_model=List[RelatedSubject],
     responses={
         404: res.response(model=ErrorDetail),
     },
@@ -260,10 +258,12 @@ async def get_person_subjects(
     subjects = [dict(r) for r in await db.fetch_all(query)]
 
     for s in subjects:
+        s["id"] = s["subject_id"]
+        s["name_cn"] = s["subject_name_cn"]
         if v := subject_images(s["subject_image"]):
-            s["subject_image"] = v["grid"]
+            s["image"] = v["grid"]
         else:
-            s["subject_image"] = None
+            s["image"] = None
         rel = result[s["subject_id"]]
         s["staff"] = StaffMap[rel.subject_type_id][rel.prsn_position].str()
 
