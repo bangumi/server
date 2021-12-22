@@ -51,7 +51,7 @@ exclude_lines = [
   'pragma: no cover',
   'if TYPE_CHECKING:',
   'if __name__ == "__main__":',
-  'raise NotImplementedError('
+  'raise NotImplementedError'
 ]
 
 [tool.pytest.ini_options]
