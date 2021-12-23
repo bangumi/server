@@ -1,10 +1,13 @@
 import datetime
+from datetime import timedelta
 
 import orjson
 from aioredis import Redis
+from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
-from pol import config
+from pol import sa, config
+from pol.db.tables import ChiiMember
 from pol.permission import UserGroup
 from pol.api.v0.depends.auth import User
 
@@ -35,8 +38,8 @@ def test_auth_cached(client: TestClient, redis_client: Redis):
     u = User(
         id=10,
         username="ua",
-        regdate=datetime.datetime(2007, 8, 10, 3, 1, 5),
-        groupid=UserGroup.wiki_admin,
+        registration_date=datetime.datetime(2007, 8, 10, 3, 1, 5),
+        group_id=UserGroup.wiki_admin,
         nickname="ni",
         sign="",
         avatar="",
@@ -61,3 +64,25 @@ def test_auth_cache_ban_cache_fallback(client: TestClient, redis_client: Redis):
     )
     response = client.get("/v0/me", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200, "error cache should callback to db lookup"
+
+
+def test_auth_expired_token(client: TestClient, mock_access_token):
+    mock_access_token(
+        access_token="ttt",
+        user_id=200,
+        expires=datetime.datetime.now() - timedelta(days=3),
+    )
+    response = client.get("/v0/me", headers={"Authorization": "Bearer ttt"})
+    assert response.status_code == 403, "expired should not working"
+
+
+def test_auth_missing_user(client: TestClient, mock_access_token, db_session: Session):
+    mock_access_token(
+        access_token="ttt",
+        user_id=200,
+        expires=datetime.datetime.now() + timedelta(days=3),
+    )
+    db_session.execute(sa.delete(ChiiMember).where(ChiiMember.uid == 200))
+    db_session.commit()
+    response = client.get("/v0/me", headers={"Authorization": "Bearer ttt"})
+    assert response.status_code == 403, "access token without user"

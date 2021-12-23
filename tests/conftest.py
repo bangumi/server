@@ -1,4 +1,5 @@
 from datetime import datetime
+from collections import defaultdict
 
 import redis
 import pytest
@@ -8,7 +9,12 @@ from sqlalchemy.orm import sessionmaker
 
 from pol import sa, config
 from pol.db.const import SubjectType
-from pol.db.tables import ChiiSubject, ChiiSubjectField
+from pol.db.tables import (
+    ChiiMember,
+    ChiiSubject,
+    ChiiSubjectField,
+    ChiiOauthAccessToken,
+)
 
 
 def pytest_sessionstart(session):
@@ -51,6 +57,7 @@ def redis_client():
 @pytest.fixture()
 def mock_subject(db_session: Session):
     mock_subject_id = set()
+    delete_query = defaultdict(list)
 
     def mock_id(
         subject_id: int,
@@ -74,12 +81,12 @@ def mock_subject(db_session: Session):
         field_week_day=3,
         field_date=datetime.now().astimezone().date(),
     ):
-        if db_session.get(ChiiSubject, {"subject_id": subject_id}):  # pragma: no cover
-            raise ValueError(f"subject {subject_id} is in database, can't mock it")
+        delete_query[ChiiSubject].append(ChiiSubject.subject_id == subject_id)
+        delete_query[ChiiSubjectField].append(ChiiSubjectField.field_sid == subject_id)
+
+        check_exist(db_session, delete_query)
         mock_subject_id.add(subject_id)
-        db_session.execute(
-            sa.delete(ChiiSubject).where(ChiiSubject.subject_id == subject_id)
-        )
+
         db_session.add(
             ChiiSubject(
                 subject_id=200,
@@ -98,10 +105,6 @@ def mock_subject(db_session: Session):
                 subject_ban=subject_ban,
             )
         )
-
-        db_session.execute(
-            sa.delete(ChiiSubjectField).where(ChiiSubjectField.field_sid == subject_id)
-        )
         db_session.add(
             ChiiSubjectField(
                 field_sid=subject_id,
@@ -118,12 +121,62 @@ def mock_subject(db_session: Session):
     try:
         yield mock_id
     finally:
-        db_session.execute(
-            sa.delete(ChiiSubjectField).where(
-                ChiiSubjectField.field_sid.in_(mock_subject_id)
+        for table, where in delete_query.items():
+            db_session.execute(sa.delete(table).where(sa.or_(*where)))
+        db_session.commit()
+
+
+@pytest.fixture()
+def mock_access_token(db_session: Session):
+    mock_user_id = set()
+    mock_token = set()
+    delete_query = defaultdict(list)
+
+    def mock_id(
+        user_id: int,
+        access_token: str,
+        expires=datetime.now(),
+    ):
+        delete_query[ChiiOauthAccessToken].append(
+            ChiiOauthAccessToken.access_token == access_token
+        )
+        delete_query[ChiiMember].append(ChiiMember.uid == user_id)
+        check_exist(db_session, delete_query)
+
+        mock_user_id.add(user_id)
+        mock_token.add(access_token)
+
+        db_session.add(
+            ChiiOauthAccessToken(
+                access_token=access_token,
+                client_id="",
+                user_id=user_id,
+                expires=expires,
+                scope=None,
             )
         )
-        db_session.execute(
-            sa.delete(ChiiSubject).where(ChiiSubject.subject_id.in_(mock_subject_id))
+        db_session.add(
+            ChiiMember(uid=user_id, nickname="", avatar="", groupid=10, sign="")
         )
         db_session.commit()
+
+    try:
+        yield mock_id
+    finally:
+        for table, where in delete_query.items():
+            db_session.execute(sa.delete(table).where(sa.or_(*where)))
+        db_session.commit()
+
+
+def check_exist(db_session: Session, quries):
+    for Table, q in quries.items():
+        query = q[-1]
+        r = db_session.execute(sa.select(Table).where(query)).all()
+        if r:  # pragma: no cover
+            raise ValueError(
+                f"record {query.left.name} == {repr(query.right.value)}"
+                f" exists in table {Table}, can't mock it"
+            )
+
+    for Table, q in quries.items():
+        db_session.execute(sa.delete(Table).where(q[-1]))

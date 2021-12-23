@@ -1,3 +1,5 @@
+import select
+
 from sqlalchemy import (
     CHAR,
     Text,
@@ -33,5 +35,10 @@ __all__ = [
     "func",
     "count",
     "or_",
+    "get",
     "delete",
 ]
+
+
+def get(T, *where):
+    return select(T).where(*where).limit(1)
