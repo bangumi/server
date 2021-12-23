@@ -56,6 +56,8 @@ REDIS_URI="redis://:pass@127.0.0.1:6379/1"
 
 ## 开发
 
+相关项目整体说明 [bangumi/dev-docs](https://github.com/bangumi/dev-docs)
+
 ### 项目结构
 
 Web 框架 [fastapi](https://github.com/tiangolo/fastapi)
