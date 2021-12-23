@@ -22,7 +22,6 @@ def load(
     charset="utf-8",
     errors=default_errors,
     decode_strings=False,
-    object_hook=None,
     array_hook=None,
 ):
     """Read a string from the open file object `fp` and interpret it as a
@@ -119,7 +118,6 @@ def loads(
     charset="utf-8",
     errors=default_errors,
     decode_strings=True,
-    object_hook=None,
     array_hook=None,
 ):
     """Read a PHP-serialized object hierarchy from a string.  Characters in the
@@ -127,7 +125,7 @@ def loads(
     string must be a bytestring.
     """
     with BytesIO(data) as fp:
-        return load(fp, charset, errors, decode_strings, object_hook, array_hook)
+        return load(fp, charset, errors, decode_strings, array_hook)
 
 
 def dict_to_list(d):
