@@ -105,9 +105,6 @@ def load(
             return data
         if type_ == b"a":
             _expect(b":")
-            v = array_hook(_load_array())
-            print("return a array", v)
-            return v
             return array_hook(_load_array())
         if type_ == b"o":
             raise ValueError("deserialize php object is not allowed")
