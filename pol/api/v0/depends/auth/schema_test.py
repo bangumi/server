@@ -9,10 +9,15 @@ from pol.api.v0.depends.auth import API_KEY_HEADER, OPTIONAL_API_KEY_HEADER
 
 def req(s: str = None):
     if s:
-        header = {"Authorization": s}
+        return Request(
+            scope={
+                "type": "http",
+                "headers": Headers({"Authorization": s}).raw,
+            }
+        )
+
     else:
-        header = None
-    return Request(scope={"type": "http", "headers": Headers(header).raw})
+        return Request(scope={"type": "http", "headers": []})
 
 
 @async_test

@@ -10,7 +10,30 @@ from pol.permission import Role, UserGroup
 from pol.curd.exceptions import NotFoundError
 
 
-async def get_by_valid_token(db: Database, access_token: str):
+class User(Role, BaseModel):
+    id: int
+    username: str
+    nickname: str
+    group_id: UserGroup
+    registration_date: datetime
+    sign: str
+    avatar: str
+
+    # lastvisit: int
+    # lastactivity: int
+    # lastpost: int
+    # dateformat: str
+    # timeformat: int
+    # timeoffset: str
+    # newpm: int
+    # new_notify: int
+
+    def allow_nsfw(self) -> bool:
+        allow_date = self.registration_date + timedelta(days=60)
+        return datetime.utcnow().astimezone() > allow_date
+
+
+async def get_by_valid_token(db: Database, access_token: str) -> User:
     r = await db.fetch_one(
         sa.get(
             ChiiOauthAccessToken,
@@ -42,26 +65,3 @@ async def get_by_valid_token(db: Database, access_token: str):
         sign=member.sign,
         avatar=member.avatar,
     )
-
-
-class User(Role, BaseModel):
-    id: int
-    username: str
-    nickname: str
-    group_id: UserGroup
-    registration_date: datetime
-    sign: str
-    avatar: str
-
-    # lastvisit: int
-    # lastactivity: int
-    # lastpost: int
-    # dateformat: str
-    # timeformat: int
-    # timeoffset: str
-    # newpm: int
-    # new_notify: int
-
-    def allow_nsfw(self) -> bool:
-        allow_date = self.registration_date + timedelta(days=60)
-        return datetime.utcnow().astimezone() > allow_date
