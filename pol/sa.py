@@ -1,5 +1,3 @@
-import select
-
 from sqlalchemy import (
     CHAR,
     Text,
