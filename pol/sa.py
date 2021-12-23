@@ -33,5 +33,10 @@ __all__ = [
     "func",
     "count",
     "or_",
+    "get",
     "delete",
 ]
+
+
+def get(T, *where):
+    return select(T).where(*where).limit(1)

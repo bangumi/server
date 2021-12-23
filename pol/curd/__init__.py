@@ -1,23 +1,24 @@
 from typing import Type, TypeVar
 
 from databases import Database
-from sqlalchemy.orm import DeclarativeMeta
 
 from pol import sa
-from . import ep, subject
+from pol.db.tables import Base
+from . import ep, user, subject
 from .exceptions import NotFoundError
 
-T = TypeVar("T", bound=DeclarativeMeta)
+T = TypeVar("T", bound=Base)
 
 
-async def get_one(db: Database, t: Type[T], *where) -> T:
-    query = sa.select(t).where(*where).limit(1)
+async def get_one(db: Database, Table: Type[T], *where) -> T:
+    query = sa.select(Table).where(*where).limit(1)
     r = await db.fetch_one(query)
 
     if r:
-        return t(**r)
+        t: T = Table(**r)
+        return t
 
     raise NotFoundError()
 
 
-__all__ = ["get_one", "subject", "ep"]
+__all__ = ["get_one", "subject", "ep", "NotFoundError", "user"]

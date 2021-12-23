@@ -1,4 +1,8 @@
+import orjson.orjson
+from redis import Redis
 from starlette.testclient import TestClient
+
+from pol import config
 
 
 def test_subject_not_found(client: TestClient):
@@ -34,6 +38,13 @@ def test_subject_locked(client: TestClient):
 
     data = response.json()
     assert data["locked"]
+
+
+def test_subject_nsfw_auth_200(client: TestClient, auth_header):
+    """authorized 200 nsfw subject"""
+    response = client.get("/v0/subjects/16", headers=auth_header)
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/json"
 
 
 def test_subject_redirect(client: TestClient):
@@ -106,3 +117,14 @@ def test_subject_subjects(client: TestClient):
 
     assert isinstance(data, list)
     assert data
+
+
+def test_subject_cache_broken_purge(client: TestClient, redis_client: Redis):
+    cache_key = config.CACHE_KEY_PREFIX + "subject:1"
+    redis_client.set(cache_key, orjson.dumps({"id": 10, "test": "1"}))
+    response = client.get("/v0/subjects/1")
+    assert response.status_code == 200, "broken cache should be purged"
+
+    in_cache = orjson.loads(redis_client.get(cache_key))
+    assert response.json()["name"] == in_cache["name"]
+    assert "test" not in in_cache

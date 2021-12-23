@@ -2,7 +2,7 @@ from typing import List
 
 import pydantic
 from fastapi import Path, Depends, APIRouter
-from pydantic import Extra, Field
+from pydantic import Extra, Field, ValidationError
 from databases import Database
 from starlette.responses import Response, RedirectResponse
 
@@ -26,11 +26,13 @@ from pol.db.tables import (
     ChiiCrtSubjectIndex,
     ChiiSubjectRelations,
 )
+from pol.permission import Role
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelatedPerson, RelatedCharacter
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
+from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject
 
 router = APIRouter(tags=["条目"])
@@ -66,12 +68,25 @@ async def get_subject(
     response: Response,
     db: Database = Depends(get_db),
     subject_id: int = Path(..., gt=0),
+    user: Role = Depends(optional_user),
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"subject:{subject_id}"
-    if (value := await redis.get(cache_key)) is not None:
-        response.headers["x-cache-status"] = "hit"
-        return value
+    if value := await redis.get(cache_key):
+        try:
+            s = Subject.parse_obj(value)
+            if s.nsfw:
+                if not user.allow_nsfw():
+                    raise res.HTTPException(
+                        status_code=404,
+                        title="Not Found",
+                        description=NotFoundDescription,
+                        detail={"subject_id": subject_id},
+                    )
+            response.headers["x-cache-status"] = "hit"
+            return value
+        except ValidationError:
+            await redis.delete(cache_key)
     else:
         response.headers["x-cache-status"] = "miss"
 
@@ -99,6 +114,15 @@ async def get_subject(
         data["infobox"] = wiki.parse(subject.infobox).info
     except wiki.WikiSyntaxError:
         data["infobox"] = None
+
+    if subject.nsfw:
+        if not user.allow_nsfw():
+            raise res.HTTPException(
+                status_code=404,
+                title="Not Found",
+                description=NotFoundDescription,
+                detail={"subject_id": subject_id},
+            )
 
     await redis.set_json(cache_key, value=data, ex=300)
 
