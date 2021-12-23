@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from pol.compat.phpseralize import loads, dict_to_list
 
 fixtures_path = Path(__file__).parent.joinpath("fixtures")
@@ -49,3 +51,19 @@ def test_loads_2():
         {"result": "37", "tag_name": "中二"},
         {"result": "34", "tag_name": "樱井孝宏"},
     ]
+
+
+def test_loads_null():
+    assert loads(fixtures_path.joinpath("with_null.txt").read_bytes().strip()) == {
+        1: None,
+        2: {0: 1, 1: 4.5, 2: 3},
+    }
+
+
+def test_loads_disallow_object():
+    with pytest.raises(ValueError, match="php object"):
+        loads(fixtures_path.joinpath("disallow_object.txt").read_bytes().strip())
+
+
+def test_loads_bool():
+    assert loads(fixtures_path.joinpath("bool.txt").read_bytes().strip()) == {1: True}

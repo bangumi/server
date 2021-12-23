@@ -51,7 +51,7 @@ def load(
 
     def _expect(e):
         v = fp.read(len(e))
-        if v != e:
+        if v != e:  # pragma: no cover
             raise ValueError(f"failed expectation, expected {e!r} got {v!r}")
 
     def _read_until(delim):
@@ -60,7 +60,7 @@ def load(
             char = fp.read(1)
             if char == delim:
                 break
-            elif not char:
+            elif not char:  # pragma: no cover
                 raise ValueError("unexpected end of stream")
             buf.append(char)
         return b"".join(buf)
@@ -105,10 +105,13 @@ def load(
             return data
         if type_ == b"a":
             _expect(b":")
+            v = array_hook(_load_array())
+            print("return a array", v)
+            return v
             return array_hook(_load_array())
         if type_ == b"o":
             raise ValueError("deserialize php object is not allowed")
-        raise ValueError("unexpected opcode")
+        raise ValueError("unexpected opcode")  # pragma: no cover
 
     return _unserialize()
 
@@ -135,5 +138,5 @@ def dict_to_list(d):
     d = dict(d)
     try:
         return [d[x] for x in range(len(d))]
-    except KeyError:
+    except KeyError:  # pragma: no cover
         raise ValueError("dict is not a sequence")
