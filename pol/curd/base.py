@@ -10,13 +10,16 @@ T = TypeVar("T", bound=Base)
 
 async def count(db: Database, column, *where) -> int:
     query = sa.select(sa.func.count(column)).where(*where)
-    print(str(query))
-
-    return await db.fetch_val(query)
+    return int(await db.fetch_val(query))
 
 
 async def get_many(
-    db: Database, Table: Type[T], *where, order=None, limit=None, offset=None
+    db: Database,
+    Table: Type[T],
+    *where,
+    order=None,
+    limit=None,
+    offset=None,
 ) -> List[T]:
     query = sa.select(Table)
 
