@@ -128,3 +128,19 @@ def test_subject_cache_broken_purge(client: TestClient, redis_client: Redis):
     in_cache = orjson.loads(redis_client.get(cache_key))
     assert response.json()["name"] == in_cache["name"]
     assert "test" not in in_cache
+
+
+def test_subject_tags(client: TestClient):
+    response = client.get("/v0/subjects/3/subjects")
+    assert response.json()["tags"] == [
+        {"tag_name": "陈绮贞", "result": 9},
+        {"tag_name": "中配", "result": 1},
+        {"tag_name": "银魂中配", "result": 1},
+        {"tag_name": "神还原", "result": 1},
+        {"tag_name": "冷泉夜月", "result": 1},
+        {"tag_name": "银他妈", "result": 1},
+        {"tag_name": "陈老师", "result": 1},
+        {"tag_name": "银魂", "result": 1},
+        {"tag_name": "治愈系", "result": 1},
+        {"tag_name": "恶搞", "result": 1},
+    ]
