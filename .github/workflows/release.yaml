@@ -27,3 +27,9 @@ jobs:
           docker push ghcr.io/bangumi/api-server:latest
           docker tag ghcr.io/bangumi/api-server:latest "ghcr.io/bangumi/api-server:$TAG"
           docker push "ghcr.io/bangumi/api-server:$TAG"
+
+      - name: Upload Github Release
+        run: gh release create "$TAG $(date date --rfc-3339=date)"
+        env:
+          TZ: "Asia/Shanghai"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
