@@ -151,11 +151,9 @@ async def get_character_detail(
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"character:{character_id}"
-    if (value := await redis.get(cache_key)) is not None:
+    if value := await redis.get_with_model(cache_key, CharacterDetail):
         response.headers["x-cache-status"] = "hit"
         return value
-    else:
-        response.headers["x-cache-status"] = "miss"
 
     character: ChiiCharacter = await basic_character(character_id=character_id, db=db)
 
@@ -197,6 +195,7 @@ async def get_character_detail(
     except wiki.WikiSyntaxError:  # pragma: no cover
         pass
 
+    response.headers["x-cache-status"] = "miss"
     await redis.set_json(cache_key, value=data, ex=60)
 
     return data
