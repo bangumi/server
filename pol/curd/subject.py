@@ -8,6 +8,7 @@ from pol import sa
 from pol.utils import subject_images
 from pol.db.tables import ChiiSubject, ChiiSubjectField
 from pol.curd.exceptions import NotFoundError
+from pol.compat.phpseralize import loads, dict_to_list
 
 
 class Subject(BaseModel):
@@ -49,6 +50,9 @@ class Subject(BaseModel):
     rate_8: int = Field(alias="field_rate_8")
     rate_9: int = Field(alias="field_rate_9")
     rate_10: int = Field(alias="field_rate_10")
+
+    # 序列化标签
+    field_tags: str = Field(alias="field_tags")
 
     @validator("date", pre=True)
     def handle_mysql_zero_value(cls, v):
@@ -107,6 +111,11 @@ class Subject(BaseModel):
             "on_hold": self.on_hold,
             "dropped": self.dropped,
         }
+
+    def tags(self):
+        return (
+            [] if not self.field_tags else dict_to_list(loads(self.field_tags.encode()))
+        )  # defaults to utf-8
 
 
 async def get_one(db: Database, *where) -> Subject:

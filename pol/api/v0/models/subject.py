@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from pydantic import Field, BaseModel
 
@@ -29,6 +29,11 @@ class Collection(BaseModel):
     dropped: int
 
 
+class Tags(BaseModel):
+    tag_name: str
+    result: int
+
+
 class Subject(BaseModel):
     id: int
     type: int
@@ -50,6 +55,8 @@ class Subject(BaseModel):
     rating: Rating
 
     collection: Collection
+
+    tags: List[Tags]
 
 
 class RelatedSubject(BaseModel):
