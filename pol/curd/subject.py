@@ -52,7 +52,7 @@ class Subject(BaseModel):
     rate_10: int = Field(alias="field_rate_10")
 
     # 序列化标签
-    field_tags: str = Field(alias="field_tags")
+    tags_serialized: str = Field(alias="field_tags")
 
     @validator("date", pre=True)
     def handle_mysql_zero_value(cls, v):
@@ -113,9 +113,18 @@ class Subject(BaseModel):
         }
 
     def tags(self):
-        return (
-            [] if not self.field_tags else dict_to_list(loads(self.field_tags.encode()))
-        )  # defaults to utf-8
+        if not self.tags_serialized:
+            return []
+
+        # defaults to utf-8
+        tags_deserialized = dict_to_list(loads(self.tags_serialized.encode()))
+
+        return list(
+            map(
+                lambda tag: {"name": tag["tag_name"], "count": tag["result"]},
+                tags_deserialized,
+            )
+        )
 
 
 async def get_one(db: Database, *where) -> Subject:

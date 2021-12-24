@@ -29,9 +29,9 @@ class Collection(BaseModel):
     dropped: int
 
 
-class Tags(BaseModel):
-    tag_name: str
-    result: int
+class Tag(BaseModel):
+    name: str
+    count: int
 
 
 class Subject(BaseModel):
@@ -56,7 +56,7 @@ class Subject(BaseModel):
 
     collection: Collection
 
-    tags: List[Tags]
+    tags: List[Tag]
 
 
 class RelatedSubject(BaseModel):

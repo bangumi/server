@@ -1,12 +1,8 @@
-from datetime import datetime
-
 import orjson.orjson
 from redis import Redis
-from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from pol import config
-from pol.db.tables import ChiiSubject, ChiiSubjectField
 
 
 def test_subject_not_found(client: TestClient):
@@ -137,60 +133,21 @@ def test_subject_cache_broken_purge(client: TestClient, redis_client: Redis):
 def test_subject_tags(client: TestClient):
     response = client.get("/v0/subjects/2")
     assert response.json()["tags"] == [
-        {"tag_name": "陈绮贞", "result": 9},
-        {"tag_name": "中配", "result": 1},
-        {"tag_name": "银魂中配", "result": 1},
-        {"tag_name": "神还原", "result": 1},
-        {"tag_name": "冷泉夜月", "result": 1},
-        {"tag_name": "银他妈", "result": 1},
-        {"tag_name": "陈老师", "result": 1},
-        {"tag_name": "银魂", "result": 1},
-        {"tag_name": "治愈系", "result": 1},
-        {"tag_name": "恶搞", "result": 1},
+        {"name": "陈绮贞", "count": 9},
+        {"name": "中配", "count": 1},
+        {"name": "银魂中配", "count": 1},
+        {"name": "神还原", "count": 1},
+        {"name": "冷泉夜月", "count": 1},
+        {"name": "银他妈", "count": 1},
+        {"name": "陈老师", "count": 1},
+        {"name": "银魂", "count": 1},
+        {"name": "治愈系", "count": 1},
+        {"name": "恶搞", "count": 1},
     ]
 
 
-def test_subject_tags_empty(client: TestClient, db_session: Session):
-    # create a dummy subject with empty tag field
-    # todo: replace with DataModel.create()?
+def test_subject_tags_empty(client: TestClient, mock_subject):
     sid = 15234523
-    subject_already_exists = (
-        db_session.query(ChiiSubject).filter(ChiiSubject.subject_id == sid).count()
-    )
-
-    if not subject_already_exists:
-        db_session.add(
-            ChiiSubject(
-                subject_id=sid,
-                subject_type_id=1,
-                subject_name="",
-                subject_name_cn="",
-                subject_uid="",
-                subject_creator=1,
-                subject_dateline=1,
-                subject_image="",
-                subject_platform=1,
-                field_infobox="",
-                field_summary="",
-                field_5="",
-                subject_idx_cn="",
-                subject_airtime=1,
-                subject_nsfw=0,
-                subject_ban=0,
-            )
-        )
-        db_session.add(
-            ChiiSubjectField(
-                field_sid=sid,
-                field_tags="",
-                field_airtime=1,
-                field_year=2000,
-                field_mon=1,
-                field_week_day=1,
-                field_date=datetime.now(),
-            )
-        )
-        db_session.commit()
-
+    mock_subject(sid)
     response = client.get(f"/v0/subjects/{sid}")
     assert response.json()["tags"] == []
