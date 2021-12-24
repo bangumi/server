@@ -1,8 +1,8 @@
 from typing import List
 
 import pydantic
-from fastapi import Path, Depends, APIRouter
-from pydantic import Extra, Field, ValidationError
+from fastapi import Path, Depends, Request, APIRouter
+from pydantic import Extra, Field
 from databases import Database
 from starlette.responses import Response, RedirectResponse
 
@@ -40,6 +40,17 @@ router = APIRouter(tags=["条目"])
 api_base = "/v0/subjects"
 
 
+async def exception_404(request: Request):
+    detail = dict(request.query_params)
+    detail.update(request.path_params)
+    return res.HTTPException(
+        status_code=404,
+        title="Not Found",
+        description=NotFoundDescription,
+        detail=detail,
+    )
+
+
 async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.Subject:
     try:
         return await curd.subject.get_one(
@@ -67,30 +78,24 @@ async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.S
 async def get_subject(
     response: Response,
     db: Database = Depends(get_db),
+    exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
     user: Role = Depends(optional_user),
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"subject:{subject_id}"
-    if value := await redis.get(cache_key):
-        try:
-            s = Subject.parse_obj(value)
-            if s.nsfw:
-                if not user.allow_nsfw():
-                    raise res.HTTPException(
-                        status_code=404,
-                        title="Not Found",
-                        description=NotFoundDescription,
-                        detail={"subject_id": subject_id},
-                    )
-            response.headers["x-cache-status"] = "hit"
-            return value
-        except ValidationError:
-            await redis.delete(cache_key)
+    if s := await redis.get_with_model(cache_key, Subject):
+        if s.nsfw and not user.allow_nsfw():
+            raise exc_404
+        response.headers["x-cache-status"] = "hit"
+        return s
     else:
         response.headers["x-cache-status"] = "miss"
 
-    subject = await basic_subject(db, subject_id)
+    try:
+        subject = await curd.subject.get_one(db, ChiiSubject.subject_id == subject_id)
+    except NotFoundError:
+        raise exc_404
 
     if subject.redirect:
         return RedirectResponse(f"{api_base}/{subject.redirect}")
@@ -104,10 +109,8 @@ async def get_subject(
     data["platform"] = PLATFORM_MAP[subject.type].get(
         subject.platform, {"type_cn": ""}
     )["type_cn"]
-    data["total_episodes"] = await db.fetch_val(
-        sa.select(sa.func.count(ChiiEpisode.ep_id)).where(
-            ChiiEpisode.ep_subject_id == subject_id
-        )
+    data["total_episodes"] = await curd.count(
+        db, ChiiEpisode.ep_id, ChiiEpisode.ep_subject_id == subject_id
     )
     data["tags"] = subject.tags()
 
@@ -116,14 +119,8 @@ async def get_subject(
     except wiki.WikiSyntaxError:
         data["infobox"] = None
 
-    if subject.nsfw:
-        if not user.allow_nsfw():
-            raise res.HTTPException(
-                status_code=404,
-                title="Not Found",
-                description=NotFoundDescription,
-                detail={"subject_id": subject_id},
-            )
+    if subject.nsfw and not user.allow_nsfw():
+        raise exc_404
 
     await redis.set_json(cache_key, value=data, ex=300)
 

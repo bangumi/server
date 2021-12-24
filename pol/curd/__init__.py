@@ -5,6 +5,7 @@ from databases import Database
 from pol import sa
 from pol.db.tables import Base
 from . import ep, user, subject
+from .base import count, get_many
 from .exceptions import NotFoundError
 
 T = TypeVar("T", bound=Base)
@@ -21,4 +22,4 @@ async def get_one(db: Database, Table: Type[T], *where) -> T:
     raise NotFoundError()
 
 
-__all__ = ["get_one", "subject", "ep", "NotFoundError", "user"]
+__all__ = ["get_one", "subject", "ep", "NotFoundError", "user", "count", "get_many"]

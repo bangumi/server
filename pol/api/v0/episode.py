@@ -2,7 +2,7 @@ from fastapi import Query, Depends, APIRouter
 from pydantic import Field, BaseModel
 from databases import Database
 
-from pol import sa, res, curd
+from pol import res, curd
 from pol.models import ErrorDetail
 from pol.curd.ep import Ep
 from pol.depends import get_db
@@ -42,7 +42,7 @@ async def get_episodes(
     if type is not None:
         where.append(ChiiEpisode.ep_type == type.value)
 
-    total = await db.fetch_val(sa.select(sa.count(ChiiEpisode.ep_id)).where(*where))
+    total = await curd.count(db, ChiiEpisode.ep_id, *where)
     if total == 0:
         raise res.HTTPException(
             status_code=404,
