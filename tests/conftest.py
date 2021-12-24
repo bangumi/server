@@ -89,7 +89,7 @@ def mock_subject(db_session: Session):
 
         db_session.add(
             ChiiSubject(
-                subject_id=200,
+                subject_id=subject_id,
                 subject_name=subject_name,
                 subject_name_cn=subject_name_cn,
                 subject_uid=subject_uid,

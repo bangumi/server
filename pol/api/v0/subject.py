@@ -109,6 +109,7 @@ async def get_subject(
             ChiiEpisode.ep_subject_id == subject_id
         )
     )
+    data["tags"] = subject.tags()
 
     try:
         data["infobox"] = wiki.parse(subject.infobox).info
