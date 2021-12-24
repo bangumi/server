@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 from pydantic import BaseModel
 
@@ -11,10 +10,3 @@ class Revision(BaseModel):
     creator: Creator
     timestamp: datetime.datetime
     summary: str
-
-
-class PagedRevision(BaseModel):
-    total: int
-    limit: int
-    offset: int
-    data: List[Revision]
