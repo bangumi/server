@@ -35,3 +35,11 @@ async def test_curd_get_many_args(db_session: Session):
         ]
 
         assert [x.subject_id for x in results] == expected
+
+
+@async_test
+async def test_curd_get_many_args(db_session: Session):
+    async with database:
+        results = await get_many(database, ChiiSubject, ChiiSubject.subject_id != 8)
+        for s in results:
+            assert s.subject_id != 8
