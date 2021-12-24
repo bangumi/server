@@ -168,11 +168,9 @@ async def get_person(
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"person:{person_id}"
-    if (value := await redis.get(cache_key)) is not None:
+    if value := await redis.get_with_model(cache_key, PersonDetail):
         response.headers["x-cache-status"] = "hit"
-        return value
-    else:
-        response.headers["x-cache-status"] = "miss"
+        return value.dict()
 
     person: ChiiPerson = await basic_person(person_id=person_id, db=db)
 
@@ -215,6 +213,7 @@ async def get_person(
     except wiki.WikiSyntaxError:  # pragma: no cover
         pass
 
+    response.headers["x-cache-status"] = "miss"
     await redis.set_json(cache_key, value=data, ex=60)
 
     return data
