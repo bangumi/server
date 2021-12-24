@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pol"
-version = "0.2.3"
+version = "0.3.0"
 description = ""
 authors = ["Trim21 <i@trim21.me>"]
 
