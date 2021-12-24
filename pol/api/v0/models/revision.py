@@ -3,7 +3,6 @@ from typing import List
 
 from pydantic import BaseModel
 
-from pol.api.v0.models import Paged
 from pol.api.v0.models.creator import Creator
 
 
@@ -14,5 +13,8 @@ class Revision(BaseModel):
     summary: str
 
 
-class PagedRevision(Paged):
+class PagedRevision(BaseModel):
+    total: int
+    limit: int
+    offset: int
     data: List[Revision]

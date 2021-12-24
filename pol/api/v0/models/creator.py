@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -7,4 +7,4 @@ class Creator(BaseModel):
     id: int
     username: str
     nickname: str
-    avatar: Union[str, None]
+    avatar: Optional[str]
