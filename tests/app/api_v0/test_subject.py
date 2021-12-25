@@ -1,8 +1,14 @@
+from pathlib import Path
+
 import orjson.orjson
 from redis import Redis
+from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
-from pol import config
+from pol import sa, config
+from pol.db.tables import ChiiSubjectField
+
+fixtures_path = Path(__file__).parent.joinpath("fixtures")
 
 
 def test_subject_not_found(client: TestClient):
@@ -151,3 +157,53 @@ def test_subject_tags_empty(client: TestClient, mock_subject):
     mock_subject(sid)
     response = client.get(f"/v0/subjects/{sid}")
     assert response.json()["tags"] == []
+
+
+def test_subject_tags_none(client: TestClient, mock_subject, db_session: Session):
+    """
+    should exclude a tag if name is None.
+    todo: can count be None too?
+    """
+    sid = 15234524
+    mock_subject(sid)
+    field_tags_with_none_val = (
+        fixtures_path.joinpath("subject_2585_tags.txt").read_bytes().strip()
+    )
+    db_session.execute(
+        sa.update(ChiiSubjectField)
+        .where(ChiiSubjectField.field_sid == sid)
+        .values(field_tags=field_tags_with_none_val)
+    )
+    db_session.commit()
+    response = client.get(f"/v0/subjects/{sid}")
+    assert response.json()["tags"] == [
+        {"name": "炮姐", "count": 1956},
+        {"name": "超电磁炮", "count": 1756},
+        {"name": "J.C.STAFF", "count": 1746},
+        {"name": "御坂美琴", "count": 1367},
+        {"name": "百合", "count": 1240},
+        {"name": "2009年10月", "count": 917},
+        {"name": "bilibili", "count": 795},
+        {"name": "TV", "count": 709},
+        {"name": "黑子", "count": 702},
+        {"name": "科学超电磁炮", "count": 621},
+        {"name": "魔法禁书目录", "count": 518},
+        {"name": "2009", "count": 409},
+        {"name": "漫画改", "count": 288},
+        {"name": "傲娇娘", "count": 280},
+        {"name": "校园", "count": 156},
+        {"name": "战斗", "count": 144},
+        {"name": "长井龙雪", "count": 123},
+        {"name": "漫改", "count": 110},
+        {"name": "姐控", "count": 107},
+        {"name": "轻小说改", "count": 93},
+        {"name": "科幻", "count": 82},
+        {"name": "超能力", "count": 73},
+        {"name": "日常", "count": 58},
+        {"name": "奇幻", "count": 54},
+        {"name": "豊崎愛生", "count": 53},
+        {"name": "長井龍雪", "count": 47},
+        {"name": "某科学的超电磁炮", "count": 47},
+        {"name": "佐藤利奈", "count": 38},
+        {"name": "新井里美", "count": 34},
+    ]
