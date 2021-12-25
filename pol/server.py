@@ -75,8 +75,8 @@ async def validation_exception_handler(request, exc: RequestValidationError):
     )
 
 
-@app.exception_handler(sqlalchemy.exc.OperationalError)
-@app.exception_handler(pymysql.err.ProgrammingError)
+@app.exception_handler(sqlalchemy.exc.SQLAlchemyError)
+@app.exception_handler(pymysql.err.MySQLError)
 async def global_pymysql_error(
     request: Request, exc: pymysql.err.ProgrammingError
 ):  # pragma: no cover
