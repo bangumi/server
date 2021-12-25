@@ -1,10 +1,14 @@
 import os
+import datetime
 import threading
 
+import pymysql.err  # type: ignore
+import sqlalchemy.exc
 from loguru import logger
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.exceptions import RequestValidationError
+from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from pol import api, res, config
@@ -68,6 +72,31 @@ async def validation_exception_handler(request, exc: RequestValidationError):
             "detail": exc.errors(),
         },
         status_code=422,
+    )
+
+
+@app.exception_handler(sqlalchemy.exc.OperationalError)
+@app.exception_handler(pymysql.err.ProgrammingError)
+async def global_pymysql_error(
+    request: Request, exc: pymysql.err.ProgrammingError
+):  # pragma: no cover
+    ray = request.headers.get("cf_ray")
+    logger.exception(str(exc), message="sqlalchemy exception", cf_ray=ray)
+    return ORJSONResponse(
+        {
+            "title": "Internal Server Error",
+            "description": (
+                "something unexpected happened with mysql,"
+                " please report to maintainer"
+            ),
+            "detail": {
+                "cf-ray": ray,
+                "url": str(request.url),
+                "time": datetime.datetime.now().astimezone().isoformat(),
+                "report-to": "https://github.com/bangumi/server/issues",
+            },
+        },
+        status_code=500,
     )
 
 
