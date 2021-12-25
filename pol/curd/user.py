@@ -47,7 +47,12 @@ async def get_by_valid_token(db: Database, access_token: str) -> User:
 
     access = ChiiOauthAccessToken(**r)
 
-    r = await db.fetch_one(sa.get(ChiiMember, ChiiMember.uid == access.user_id))
+    r = await db.fetch_one(
+        sa.get(
+            ChiiMember.all_column(),
+            ChiiMember.uid == access.user_id,
+        )
+    )
 
     if not r:
         # 有access token又没有对应的user不太可能发生，如果发生的话打个 log 当作验证失败

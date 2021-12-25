@@ -142,6 +142,14 @@ class ChiiMember(Base):
     )
     sign = Column(VARCHAR(255), nullable=False)
 
+    @classmethod
+    def all_column(cls):
+        """
+        This table contains only column with read permission,
+        don't `select *` on this table.
+        """
+        return cls.__table__.columns
+
 
 class ChiiOauthAccessToken(Base):
     __tablename__ = "chii_oauth_access_tokens"
