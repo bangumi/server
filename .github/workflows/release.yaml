@@ -15,7 +15,7 @@ jobs:
       - name: Get Tag Name
         run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - name: Generate Changlog
+      - name: Build Docker Image
         run: docker build --build-arg "COMMIT_REF=$TAG" -t ghcr.io/bangumi/api-server:latest .
 
       - run: echo $DOCKER_TOKEN | docker login ghcr.io -u bangumi --password-stdin
@@ -27,9 +27,10 @@ jobs:
           docker push ghcr.io/bangumi/api-server:latest
           docker tag ghcr.io/bangumi/api-server:latest "ghcr.io/bangumi/api-server:$TAG"
           docker push "ghcr.io/bangumi/api-server:$TAG"
+        name: Docker Push
 
       - name: Upload Github Release
-        run: gh release create "$TAG" --title "$TAG ($(date --rfc-3339=date))"  --generate-notes
+        run: gh release create "$TAG" --title "$TAG ($(date --rfc-3339=date))"
         env:
           TZ: "Asia/Shanghai"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
