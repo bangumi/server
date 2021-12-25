@@ -2,6 +2,7 @@ import os
 import datetime
 import threading
 
+import pydantic
 import pymysql.err  # type: ignore
 import sqlalchemy.exc
 from loguru import logger
@@ -88,6 +89,30 @@ async def global_pymysql_error(
             "description": (
                 "something unexpected happened with mysql,"
                 " please report to maintainer"
+            ),
+            "detail": {
+                "cf-ray": ray,
+                "url": str(request.url),
+                "time": datetime.datetime.now().astimezone().isoformat(),
+                "report-to": "https://github.com/bangumi/server/issues",
+            },
+        },
+        status_code=500,
+    )
+
+
+@app.exception_handler(pydantic.ValidationError)
+async def internal_response_validation_error(
+    request, exc: pydantic.ValidationError
+):  # pragma: no cover
+    """this is intend to cache un-expected pydantic validation error"""
+    ray = request.headers.get("cf_ray")
+    logger.exception(str(exc), message="internal validation error", cf_ray=ray)
+    return ORJSONResponse(
+        {
+            "title": "Internal Server Error",
+            "description": (
+                "something unexpected happened, please report to maintainer"
             ),
             "detail": {
                 "cf-ray": ray,
