@@ -118,17 +118,12 @@ class Subject(BaseModel):
 
         # defaults to utf-8
         tags_deserialized = dict_to_list(loads(self.tags_serialized.encode()))
-        # remove tags like { "tag_name": None }
-        tags_filtered = filter(
-            lambda tag: tag["tag_name"] is not None, tags_deserialized
-        )
 
-        return list(
-            map(
-                lambda tag: {"name": tag["tag_name"], "count": tag["result"]},
-                tags_filtered,
-            )
-        )
+        return [
+            {"name": tag["tag_name"], "count": tag["result"]}
+            for tag in tags_deserialized
+            if tag["tag_name"] is not None  # remove tags like { "tag_name": None }
+        ]
 
 
 async def get_one(db: Database, *where) -> Subject:
