@@ -1,4 +1,5 @@
-from typing import List
+import zlib
+from typing import Any, Dict, List, Tuple, Union
 
 from sqlalchemy import (
     TIMESTAMP,
@@ -28,6 +29,7 @@ from sqlalchemy.dialects.mysql import (
     MEDIUMTEXT,
 )
 
+from pol import wiki
 from pol.compat import phpseralize
 from pol.compat.phpseralize import dict_to_list
 
@@ -372,11 +374,61 @@ class ChiiRevHistory(Base):
     rev_edit_summary = Column(String(200, "utf8_unicode_ci"), nullable=False)
 
 
+class GzipPHPSerializedBlob(MEDIUMBLOB):
+    def bind_processor(self, dialect):
+        raise NotImplementedError("write to db is not supported now")
+
+    @staticmethod
+    def load_array(d: List[Tuple[Union[int, str], Any]]):
+        for (i, (k, v)) in enumerate(d):
+            if type(k) == int:
+                d[i] = (str(k), v)
+        return dict(d)
+
+    @staticmethod
+    def loads(b: bytes):
+        return phpseralize.loads(
+            zlib.decompress(b, -zlib.MAX_WBITS),
+            array_hook=GzipPHPSerializedBlob.load_array,
+        )
+
+    def result_processor(self, dialect, coltype):
+        loads = self.loads
+
+        def process(value):
+            if value is None:
+                return None
+            return loads(value)
+
+        return process
+
+    def compare_values(self, x, y):
+        if self.comparator:
+            return self.comparator(x, y)
+        else:
+            return x == y
+
+
+class RevTextBlob(GzipPHPSerializedBlob):
+    def result_processor(self, dialect, coltype):
+        super_process = super().result_processor(dialect, coltype)
+
+        def process(value: bytes):
+            ret: Dict[str, Dict[str, Any]] = super_process(value)
+            for item in ret.values():
+                for (k, v) in item.items():
+                    if k in ["crt_infobox", "prsn_infobox"]:
+                        item[k] = wiki.parse(v)
+            return ret
+
+        return process
+
+
 class ChiiRevText(Base):
     __tablename__ = "chii_rev_text"
 
     rev_text_id = Column(MEDIUMINT(9), primary_key=True)
-    rev_text = Column(MEDIUMBLOB, nullable=False)
+    rev_text = Column(RevTextBlob, nullable=False)
 
 
 t_chii_subject_alias = Table(

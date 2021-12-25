@@ -5,6 +5,5 @@ from pydantic import BaseModel
 
 class Creator(BaseModel):
     id: int
-    username: str
-    nickname: str
+    nickname: Optional[str]
     avatar: Optional[str]

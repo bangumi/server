@@ -1,5 +1,8 @@
 from typing import Dict, List, Optional
 
+from fastapi.exceptions import RequestValidationError
+from pydantic.error_wrappers import ErrorWrapper
+
 from pol.db.tables import ChiiPerson
 
 
@@ -36,3 +39,14 @@ def get_career(p: ChiiPerson) -> List[str]:
 
 def short_description(s: str):
     return s[:80]
+
+
+def raise_offset_over_total(total: int):
+    raise RequestValidationError(
+        [
+            ErrorWrapper(
+                ValueError(f"offset is too big, must be less than {total}"),
+                loc=("query", "offset"),
+            )
+        ]
+    )

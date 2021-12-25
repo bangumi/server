@@ -1,12 +1,18 @@
 import datetime
+from typing import Any, Optional
 
-from pydantic import BaseModel
+from pydantic import Field, BaseModel
 
-from pol.api.v0.models.creator import Creator
+from .creator import Creator
 
 
 class Revision(BaseModel):
     id: int
+    type: int
     creator: Creator
-    timestamp: datetime.datetime
     summary: str
+    timestamp: datetime.datetime
+
+
+class DetailedRevision(Revision):
+    data: Optional[Any] = Field(None, description="编辑修改内容")
