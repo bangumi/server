@@ -1,9 +1,11 @@
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi.exceptions import RequestValidationError
 from pydantic.error_wrappers import ErrorWrapper
 
+from pol.res import HTTPException
 from pol.db.tables import ChiiPerson
+from .const import NotFoundDescription
 
 
 def person_images(s: Optional[str]) -> Optional[Dict[str, str]]:
@@ -49,4 +51,13 @@ def raise_offset_over_total(total: int):
                 loc=("query", "offset"),
             )
         ]
+    )
+
+
+def raise_not_found(details: Any):
+    raise HTTPException(
+        status_code=404,
+        title="Not Found",
+        description=NotFoundDescription,
+        detail=details,
     )

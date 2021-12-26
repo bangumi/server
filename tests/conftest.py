@@ -236,6 +236,8 @@ def mock_access_token(db_session: Session):
             len(access_token) == 0 or access_token in mock_token
         ):
             return
+        mock_user_id.add(user_id)
+        mock_token.add(access_token)
         if len(access_token) != 0:
             delete_query[ChiiOauthAccessToken].append(
                 ChiiOauthAccessToken.access_token == access_token
@@ -245,9 +247,9 @@ def mock_access_token(db_session: Session):
             check_exist(db_session, delete_query)
         except ValueError as e:
             print(e)
+            return
 
         if len(access_token) != 0:
-            mock_token.add(access_token)
             db_session.add(
                 ChiiOauthAccessToken(
                     access_token=access_token,
@@ -258,7 +260,6 @@ def mock_access_token(db_session: Session):
                 )
             )
 
-        mock_user_id.add(user_id)
         db_session.add(
             ChiiMember(
                 uid=user_id,
