@@ -20,9 +20,9 @@ uvicorn = { version = "==0.16.0", extras = ["standard"] }
 databases = { version = "0.5.3", extras = ["mysql"] }
 aiomysql = '0.0.22'
 orjson = "==3.6.5"
-loguru = "^0.5.3"
-SQLAlchemy = { extras = ["mypy"], version = "^1.4.27" }
-aioredis = {extras = ["hiredis"], version = "^2.0.0"}
+loguru = "0.5.3"
+SQLAlchemy = { extras = ["mypy"], version = "1.4.29" }
+aioredis = { extras = ["hiredis"], version = "2.0.0" }
 
 [tool.poetry.dev-dependencies]
 sqlacodegen = "2.3.0"
@@ -37,14 +37,14 @@ flake8-bugbear = "==21.11.29"
 flake8-commas = "==2.1.0"
 flake8-mutable = "1.2.0"
 flake8-broken-line = "==0.4.0"
-flake8-pytest-style = "==1.5.1"
-mypy = "==0.910"
+flake8-pytest-style = "==1.6.0"
+mypy = "==0.930"
 requests = "2.26.0"
-types-pytz = "2021.3.2"
+types-pytz = "==2021.3.3"
 pytest-github-actions-annotate-failures = "0.1.6"
 pytest-env = "0.6.2"
-redis = {extras = ["hiredis"], version = "4.0.2"}
-flake8-tidy-imports = "^4.5.0"
+redis = { extras = ["hiredis"], version = "==4.1.0" }
+flake8-tidy-imports = "4.5.0"
 
 [tool.coverage.report]
 exclude_lines = [
@@ -56,9 +56,7 @@ exclude_lines = [
 
 [tool.pytest.ini_options]
 addopts = '-rav'
-env = [
-  'D:TESTING=true'
-]
+env = ['D:TESTING=true']
 
 [tool.mypy]
 ignore_missing_imports = true
