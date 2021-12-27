@@ -2,7 +2,6 @@ import os
 import datetime
 import threading
 
-import yarl
 import pydantic
 import pymysql.err  # type: ignore
 import sqlalchemy.exc
@@ -131,7 +130,13 @@ async def internal_response_validation_error(
 async def startup() -> None:
     app.state.redis = await JSONRedis.from_url(config.REDIS_URI)
     app.state.engine = engine = create_async_engine(
-        str(yarl.URL(config.MYSQL_URI).with_scheme("mysql+asyncmy")),
+        "mysql+asyncmy://{}:{}@{}:{}/{}".format(
+            config.MYSQL_USER,
+            config.MYSQL_PASS,
+            config.MYSQL_HOST,
+            config.MYSQL_PORT,
+            config.MYSQL_DB,
+        )
     )
     app.state.Session = sessionmaker(
         engine, expire_on_commit=False, class_=AsyncSession

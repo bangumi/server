@@ -1,7 +1,6 @@
 from datetime import datetime
 from collections import defaultdict
 
-import yarl
 import redis
 import pytest
 from sqlalchemy import create_engine
@@ -16,16 +15,15 @@ from pol.db.tables import (
     ChiiOauthAccessToken,
 )
 
-
-def pytest_sessionstart(session):
-    """
-    Called after the Session object has been created and
-    before performing collection and entering the run test loop.
-    """
-    "session start"
-
-
-engine = create_engine(str(yarl.URL(config.MYSQL_URI).with_scheme("mysql+pymysql")))
+engine = create_engine(
+    "mysql+pymysql://{}:{}@{}:{}/{}".format(
+        config.MYSQL_USER,
+        config.MYSQL_PASS,
+        config.MYSQL_HOST,
+        config.MYSQL_PORT,
+        config.MYSQL_DB,
+    )
+)
 
 Session = sessionmaker(bind=engine)
 

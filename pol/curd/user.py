@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import datetime, timedelta
 
 from loguru import logger
@@ -34,7 +35,7 @@ class User(Role, BaseModel):
 
 
 async def get_by_valid_token(db: AsyncSession, access_token: str) -> User:
-    r = await db.scalar(
+    access: Optional[ChiiOauthAccessToken] = await db.scalar(
         sa.get(
             ChiiOauthAccessToken,
             ChiiOauthAccessToken.access_token == access_token,
@@ -42,24 +43,15 @@ async def get_by_valid_token(db: AsyncSession, access_token: str) -> User:
         )
     )
 
-    if not r:
+    if not access:
         raise NotFoundError()
 
-    access = ChiiOauthAccessToken(**r)
+    member: ChiiMember = await db.get(ChiiMember, int(access.user_id))
 
-    r = await db.scalar(
-        sa.get(
-            ChiiMember.all_column(),
-            ChiiMember.uid == access.user_id,
-        )
-    )
-
-    if not r:
+    if not member:
         # 有access token又没有对应的user不太可能发生，如果发生的话打个 log 当作验证失败
         logger.error("can't find user {} for access token", access.user_id)
         raise NotFoundError()
-
-    member = ChiiMember(**r)
 
     return User(
         id=member.uid,
