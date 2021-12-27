@@ -1,7 +1,6 @@
 from typing import List, Optional
 
 from fastapi import Path, Depends, Request, APIRouter
-from databases import Database
 from starlette.responses import Response, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,7 +27,6 @@ from pol.permission import Role
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelatedPerson, RelatedCharacter
-from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject
@@ -47,22 +45,6 @@ async def exception_404(request: Request):
         description=NotFoundDescription,
         detail=detail,
     )
-
-
-async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.Subject:
-    try:
-        return await curd.subject.get_one(
-            db,
-            ChiiSubject.subject_id == subject_id,
-            *where,
-        )
-    except NotFoundError:
-        raise res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description=NotFoundDescription,
-            detail={"subject_id": subject_id},
-        )
 
 
 @router.get(
@@ -98,6 +80,9 @@ async def get_subject(
 
     if subject.fields.field_redirect:
         return RedirectResponse(f"{api_base}/{subject.fields.field_redirect}")
+
+    if subject.ban:
+        raise exc_404
 
     data = {
         "id": subject.subject_id,
@@ -172,7 +157,7 @@ async def get_subject_persons(
                 "id": p.prsn_id,
                 "name": p.prsn_name,
                 "type": p.prsn_type,
-                "relation": StaffMap[p.subject_type_id][p.prsn_position].str(),
+                "relation": StaffMap[rel.subject_type_id][rel.prsn_position].str(),
                 "career": get_career(p),
                 "short_summary": short_description(p.prsn_summary),
                 "images": person_images(p.prsn_img),
@@ -211,12 +196,12 @@ async def get_subject_characters(
         r = rel.character
         characters.append(
             {
-                "id": r["crt_id"],
-                "name": r["crt_name"],
-                "relation": get_character_rel(r["crt_type"]),
-                "type": r["crt_role"],
-                "short_summary": short_description(r["crt_summary"]),
-                "images": person_images(r["crt_img"]),
+                "id": r.crt_id,
+                "name": r.crt_name,
+                "relation": get_character_rel(rel.crt_type),
+                "type": r.crt_role,
+                "short_summary": short_description(r.crt_summary),
+                "images": person_images(r.crt_img),
             }
         )
     return characters
@@ -234,10 +219,19 @@ async def get_subject_relations(
     subject_id: int = Path(..., gt=0),
     db_session: AsyncSession = Depends(get_session),
 ):
+    if not await db_session.scalar(
+        sa.select(ChiiSubject.subject_id).where(
+            ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0
+        )
+    ):
+        raise exc_404
+
     relations: List[ChiiSubjectRelations] = await db_session.scalars(
         sa.select(ChiiSubjectRelations)
         .options(sa.selectinload(ChiiSubjectRelations.dst_subject))
-        .where(ChiiSubjectRelations.rlt_subject_id == subject_id)
+        .where(
+            ChiiSubjectRelations.rlt_subject_id == subject_id,
+        )
         .order_by(
             ChiiSubjectRelations.rlt_order, ChiiSubjectRelations.rlt_related_subject_id
         )

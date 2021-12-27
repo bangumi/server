@@ -679,3 +679,7 @@ class ChiiSubject(Base):
     @property
     def locked(self) -> bool:
         return self.subject_ban == 2
+
+    @property
+    def ban(self) -> bool:
+        return self.subject_ban == 1

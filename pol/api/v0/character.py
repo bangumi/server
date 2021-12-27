@@ -2,29 +2,19 @@ import enum
 from typing import List, Optional
 
 from fastapi import Path, Depends, APIRouter
-from databases import Database
-from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic.error_wrappers import ErrorWrapper
 
 from pol import sa, res, wiki
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
-from pol.depends import get_db, get_redis, get_session
+from pol.depends import get_redis, get_session
 from pol.db.const import Gender, get_character_rel
 from pol.db.tables import ChiiCharacter, ChiiPersonField, ChiiCrtSubjectIndex
 from pol.api.v0.const import NotFoundDescription
-from pol.api.v0.utils import person_images, short_description
-from pol.api.v0.models import (
-    Order,
-    Paged,
-    Pager,
-    Character,
-    RelatedSubject,
-    CharacterDetail,
-)
+from pol.api.v0.utils import person_images
+from pol.api.v0.models import RelatedSubject, CharacterDetail
 from pol.redis.json_cache import JSONRedis
 
 router = APIRouter(tags=["角色"])
@@ -44,81 +34,6 @@ async def exc_404(character_id: int):
 class Sort(str, enum.Enum):
     id = "id"
     name = "name"
-
-
-@router.get(
-    "/characters",
-    response_model=Paged[Character],
-    include_in_schema=False,
-)
-async def get_characters(
-    db: Database = Depends(get_db),
-    page: Pager = Depends(),
-    name: Optional[str] = None,
-    sort: Sort = Sort.id,
-    order: Order = Order.desc,
-):
-    filters = [ChiiCharacter.crt_ban == 0, ChiiCharacter.crt_redirect == 0]
-    if name is not None:
-        filters.append(ChiiCharacter.crt_name.contains(name))
-
-    count = await db.fetch_val(
-        sa.select(sa.func.count(ChiiCharacter.crt_id)).where(*filters)
-    )
-    if page.offset > count:
-        raise RequestValidationError(
-            [
-                ErrorWrapper(
-                    ValueError(f"offset is too big, must be less than {count}"),
-                    loc=("query", "offset"),
-                )
-            ]
-        )
-
-    query = (
-        sa.select(
-            ChiiCharacter.crt_id,
-            ChiiCharacter.crt_name,
-            ChiiCharacter.crt_role,
-            ChiiCharacter.crt_img,
-            ChiiCharacter.crt_summary,
-            ChiiCharacter.crt_lock,
-        )
-        .where(*filters)
-        .limit(page.limit)
-        .offset(page.offset)
-    )
-
-    sort_field = ChiiCharacter.crt_id
-
-    if sort == Sort.name:
-        sort_field = ChiiCharacter.crt_name
-
-    if order > 0:
-        sort_field = sort_field.asc()
-    else:
-        sort_field = sort_field.desc()
-
-    query = query.order_by(sort_field)
-
-    characters = [
-        {
-            "id": r["crt_id"],
-            "name": r["crt_name"],
-            "type": r["crt_role"],
-            "short_summary": short_description(r["crt_summary"]),
-            "locked": r["crt_lock"],
-            "images": person_images(r["crt_img"]),
-        }
-        for r in await db.fetch_all(query)
-    ]
-
-    return {
-        "limit": page.limit,
-        "offset": page.offset,
-        "total": count,
-        "data": characters,
-    }
 
 
 @router.get(
