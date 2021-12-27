@@ -1,9 +1,9 @@
 from datetime import datetime
 from collections import defaultdict
 
+import yarl
 import redis
 import pytest
-from databases import DatabaseURL
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -25,9 +25,7 @@ def pytest_sessionstart(session):
     "session start"
 
 
-engine = create_engine(
-    str(DatabaseURL(config.MYSQL_URI).replace(dialect="mysql+pymysql"))
-)
+engine = create_engine(str(yarl.URL(config.MYSQL_URI).with_scheme("mysql+pymysql")))
 
 Session = sessionmaker(bind=engine)
 

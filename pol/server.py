@@ -2,12 +2,12 @@ import os
 import datetime
 import threading
 
+import yarl as yarl
 import pydantic
 import pymysql.err  # type: ignore
 import sqlalchemy.exc
 from loguru import logger
 from fastapi import FastAPI
-from databases import DatabaseURL
 from sqlalchemy.orm import sessionmaker
 from fastapi.responses import HTMLResponse
 from fastapi.exceptions import RequestValidationError
@@ -17,7 +17,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from pol import api, res, config
 from pol.res import ORJSONResponse
-from pol.db.mysql import database
 from pol.middlewares.http import setup_http_middleware
 from pol.redis.json_cache import JSONRedis
 
@@ -130,13 +129,10 @@ async def internal_response_validation_error(
 
 @app.on_event("startup")
 async def startup() -> None:
-    await database.connect()
-    app.state.db = database
     app.state.redis = await JSONRedis.from_url(config.REDIS_URI)
     app.state.engine = engine = create_async_engine(
-        str(DatabaseURL(config.MYSQL_URI).replace(dialect="mysql+asyncmy")),
+        str(yarl.URL(config.MYSQL_URI).with_scheme("mysql+asyncmy")),
     )
-
     app.state.Session = sessionmaker(
         engine, expire_on_commit=False, class_=AsyncSession
     )
@@ -146,7 +142,6 @@ async def startup() -> None:
 
 @app.on_event("shutdown")
 async def shutdown() -> None:
-    await app.state.db.disconnect()
     await app.state.redis.close()
     await app.state.engine.dispose()
 
