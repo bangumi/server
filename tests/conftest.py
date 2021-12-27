@@ -3,7 +3,6 @@ from collections import defaultdict
 
 import redis
 import pytest
-from databases import DatabaseURL
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -16,17 +15,14 @@ from pol.db.tables import (
     ChiiOauthAccessToken,
 )
 
-
-def pytest_sessionstart(session):
-    """
-    Called after the Session object has been created and
-    before performing collection and entering the run test loop.
-    """
-    "session start"
-
-
 engine = create_engine(
-    str(DatabaseURL(config.MYSQL_URI).replace(dialect="mysql+pymysql"))
+    "mysql+pymysql://{}:{}@{}:{}/{}".format(
+        config.MYSQL_USER,
+        config.MYSQL_PASS,
+        config.MYSQL_HOST,
+        config.MYSQL_PORT,
+        config.MYSQL_DB,
+    )
 )
 
 Session = sessionmaker(bind=engine)
@@ -44,7 +40,7 @@ def db_session():
         db_session.close()
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def redis_client():
     with redis.Redis.from_url(config.REDIS_URI) as redis_client:
         redis_client.flushdb()

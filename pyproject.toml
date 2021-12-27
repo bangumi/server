@@ -17,12 +17,12 @@ python-dateutil = "2.8.2"
 python-multipart = "0.0.5"
 pytz = "2021.3"
 uvicorn = { version = "==0.16.0", extras = ["standard"] }
-databases = { version = "0.5.3", extras = ["mysql"] }
 aiomysql = '0.0.22'
 orjson = "==3.6.5"
 loguru = "0.5.3"
-SQLAlchemy = { extras = ["mypy"], version = "1.4.29" }
+SQLAlchemy = { extras = ["asyncmy", "mypy", "asyncio"], version = "^1.4.29" }
 aioredis = { extras = ["hiredis"], version = "2.0.0" }
+yarl = "^1.7.2"
 
 [tool.poetry.dev-dependencies]
 sqlacodegen = "2.3.0"
@@ -44,6 +44,9 @@ pytest-env = "0.6.2"
 redis = { extras = ["hiredis"], version = "==4.1.0" }
 flake8-tidy-imports = "4.5.0"
 
+[tool.coverage.run]
+concurrency = ['thread', 'greenlet']
+
 [tool.coverage.report]
 exclude_lines = [
   'pragma: no cover',
@@ -54,7 +57,10 @@ exclude_lines = [
 
 [tool.pytest.ini_options]
 addopts = '-rav'
-env = ['D:TESTING=true']
+env = [
+  'D:TESTING=true',
+  'SQLALCHEMY_WARN_20=true',
+]
 
 [tool.mypy]
 ignore_missing_imports = true

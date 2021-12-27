@@ -19,6 +19,8 @@ __all__ = [
     "Person",
     "PersonDetail",
     "RelatedSubject",
+    "Character",
+    "CharacterDetail",
 ]
 
 

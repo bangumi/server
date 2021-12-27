@@ -1,12 +1,11 @@
-from typing import List
+from typing import List, Iterator, Optional
 
-import pydantic
 from fastapi import Path, Depends, Request, APIRouter
-from pydantic import Extra, Field
-from databases import Database
 from starlette.responses import Response, RedirectResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, curd, wiki
+from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.depends import get_db, get_redis
@@ -18,10 +17,8 @@ from pol.db.const import (
     get_character_rel,
 )
 from pol.db.tables import (
-    ChiiPerson,
     ChiiEpisode,
     ChiiSubject,
-    ChiiCharacter,
     ChiiPersonCsIndex,
     ChiiCrtSubjectIndex,
     ChiiSubjectRelations,
@@ -30,7 +27,6 @@ from pol.permission import Role
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelatedPerson, RelatedCharacter
-from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject
@@ -51,22 +47,6 @@ async def exception_404(request: Request):
     )
 
 
-async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.Subject:
-    try:
-        return await curd.subject.get_one(
-            db,
-            ChiiSubject.subject_id == subject_id,
-            *where,
-        )
-    except NotFoundError:
-        raise res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description=NotFoundDescription,
-            detail={"subject_id": subject_id},
-        )
-
-
 @router.get(
     "/subjects/{subject_id}",
     description="cache with 300s",
@@ -77,10 +57,10 @@ async def basic_subject(db: Database, subject_id: int, *where) -> curd.subject.S
 )
 async def get_subject(
     response: Response,
-    db: Database = Depends(get_db),
     exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
     user: Role = Depends(optional_user),
+    db: AsyncSession = Depends(get_db),
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"subject:{subject_id}"
@@ -92,37 +72,53 @@ async def get_subject(
     else:
         response.headers["x-cache-status"] = "miss"
 
-    try:
-        subject = await curd.subject.get_one(db, ChiiSubject.subject_id == subject_id)
-    except NotFoundError:
+    subject: Optional[ChiiSubject] = await db.get(
+        ChiiSubject, subject_id, options=[sa.joinedload(ChiiSubject.fields)]
+    )
+    if subject is None:
         raise exc_404
 
-    if subject.redirect:
-        return RedirectResponse(f"{api_base}/{subject.redirect}")
+    if subject.fields.field_redirect:
+        return RedirectResponse(f"{api_base}/{subject.fields.field_redirect}")
 
-    data = subject.dict(exclude={"dateline", "image", "dropped", "wish"})
+    if subject.ban:
+        raise exc_404
 
-    data["locked"] = subject.locked
-    data["images"] = subject.images
-    data["collection"] = subject.collection
-    data["rating"] = subject.rating()
-    data["platform"] = PLATFORM_MAP[subject.type].get(
-        subject.platform, {"type_cn": ""}
-    )["type_cn"]
-    data["total_episodes"] = await curd.count(
-        db, ChiiEpisode.ep_id, ChiiEpisode.ep_subject_id == subject_id
-    )
-    data["tags"] = subject.tags()
+    data = {
+        "id": subject.subject_id,
+        "name": subject.subject_name,
+        "name_cn": subject.subject_name_cn,
+        "type": subject.subject_type_id,
+        "summary": subject.field_summary,
+        "eps": subject.field_eps,
+        "volumes": subject.field_volumes,
+        "locked": subject.locked,
+        "images": subject_images(subject.subject_image),
+        "nsfw": subject.subject_nsfw,
+        "collection": {
+            "wish": subject.subject_wish,
+            "collect": subject.subject_collect,
+            "doing": subject.subject_doing,
+            "on_hold": subject.subject_on_hold,
+            "dropped": subject.subject_dropped,
+        },
+        "rating": subject.fields.rating(),
+        "platform": PLATFORM_MAP[subject.subject_type_id].get(
+            subject.subject_platform, {"type_cn": ""}
+        )["type_cn"],
+        "total_episodes": await curd.count(db, ChiiEpisode.ep_subject_id == subject_id),
+        "tags": subject.fields.tags(),
+    }
 
     try:
-        data["infobox"] = wiki.parse(subject.infobox).info
+        data["infobox"] = wiki.parse(subject.field_infobox).info
     except wiki.WikiSyntaxError:
         data["infobox"] = None
 
-    if subject.nsfw and not user.allow_nsfw():
-        raise exc_404
-
     await redis.set_json(cache_key, value=data, ex=300)
+
+    if subject.subject_nsfw and not user.allow_nsfw():
+        raise exc_404
 
     return data
 
@@ -135,47 +131,36 @@ async def get_subject(
     },
 )
 async def get_subject_persons(
-    db: Database = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
+    exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
 ):
-    await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
-
-    query = (
-        sa.select(
-            ChiiPersonCsIndex.prsn_id,
-            ChiiPersonCsIndex.prsn_position,
-            ChiiPersonCsIndex.subject_type_id,
-            ChiiPerson.prsn_name,
-            ChiiPerson.prsn_type,
-            ChiiPerson.prsn_img,
-            ChiiPerson.prsn_summary,
-            ChiiPerson.prsn_producer,
-            ChiiPerson.prsn_mangaka,
-            ChiiPerson.prsn_actor,
-            ChiiPerson.prsn_artist,
-            ChiiPerson.prsn_seiyu,
-            ChiiPerson.prsn_writer,
-            ChiiPerson.prsn_illustrator,
+    subject: ChiiSubject = await db.scalar(
+        sa.select(ChiiSubject)
+        .options(
+            sa.selectinload(ChiiSubject.persons).joinedload(ChiiPersonCsIndex.person)
         )
-        .join(ChiiPerson, ChiiPerson.prsn_id == ChiiPersonCsIndex.prsn_id)
-        .where(
-            ChiiPersonCsIndex.subject_id == subject_id, ChiiPerson.prsn_redirect == 0
-        )
+        .where(ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0)
     )
 
-    persons = [
-        {
-            "id": r["prsn_id"],
-            "name": r["prsn_name"],
-            "type": r["prsn_type"],
-            "relation": StaffMap[r["subject_type_id"]][r["prsn_position"]].str(),
-            "career": get_career(r),
-            "short_summary": short_description(r["prsn_summary"]),
-            "images": person_images(r["prsn_img"]),
-        }
-        for r in await db.fetch_all(query)
-    ]
+    if not subject:
+        raise exc_404
 
+    persons = []
+
+    for rel in subject.persons:
+        p = rel.person
+        persons.append(
+            {
+                "id": p.prsn_id,
+                "name": p.prsn_name,
+                "type": p.prsn_type,
+                "relation": StaffMap[rel.subject_type_id][rel.prsn_position].str(),
+                "career": get_career(p),
+                "short_summary": short_description(p.prsn_summary),
+                "images": person_images(p.prsn_img),
+            }
+        )
     return persons
 
 
@@ -187,40 +172,36 @@ async def get_subject_persons(
     },
 )
 async def get_subject_characters(
-    db: Database = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
+    exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
 ):
-    await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
-
-    query = (
-        sa.select(
-            ChiiCrtSubjectIndex.crt_id,
-            ChiiCrtSubjectIndex.crt_type,
-            ChiiCharacter.crt_name,
-            ChiiCharacter.crt_role,
-            ChiiCharacter.crt_img,
-            ChiiCharacter.crt_summary,
+    subject: ChiiSubject = await db.scalar(
+        sa.select(ChiiSubject)
+        .options(
+            sa.selectinload(ChiiSubject.characters).joinedload(
+                ChiiCrtSubjectIndex.character
+            )
         )
-        .distinct()
-        .join(ChiiCharacter, ChiiCharacter.crt_id == ChiiCrtSubjectIndex.crt_id)
-        .where(
-            ChiiCrtSubjectIndex.subject_id == subject_id,
-            ChiiCharacter.crt_redirect == 0,
-        )
+        .where(ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0)
     )
 
-    characters = [
-        {
-            "id": r["crt_id"],
-            "name": r["crt_name"],
-            "relation": get_character_rel(r["crt_type"]),
-            "type": r["crt_role"],
-            "short_summary": short_description(r["crt_summary"]),
-            "images": person_images(r["crt_img"]),
-        }
-        for r in await db.fetch_all(query)
-    ]
+    if not subject:
+        raise exc_404
 
+    characters = []
+    for rel in subject.characters:
+        r = rel.character
+        characters.append(
+            {
+                "id": r.crt_id,
+                "name": r.crt_name,
+                "relation": get_character_rel(rel.crt_type),
+                "type": r.crt_role,
+                "short_summary": short_description(r.crt_summary),
+                "images": person_images(r.crt_img),
+            }
+        )
     return characters
 
 
@@ -232,62 +213,48 @@ async def get_subject_characters(
     },
 )
 async def get_subject_relations(
-    db: Database = Depends(get_db),
+    exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
+    db: AsyncSession = Depends(get_db),
 ):
-    subject = await basic_subject(db, subject_id, ChiiSubject.subject_ban == 0)
+    if not await db.scalar(
+        sa.select(ChiiSubject.subject_id).where(
+            ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0
+        )
+    ):
+        raise exc_404
 
-    query = (
-        sa.select(
-            ChiiSubjectRelations.rlt_related_subject_type_id,
-            ChiiSubjectRelations.rlt_related_subject_id,
-            ChiiSubjectRelations.rlt_relation_type,
-            ChiiSubject.subject_name,
-            ChiiSubject.subject_name_cn,
+    relations: Iterator[ChiiSubjectRelations] = await db.scalars(
+        sa.select(ChiiSubjectRelations)
+        .options(sa.selectinload(ChiiSubjectRelations.dst_subject))
+        .where(
+            ChiiSubjectRelations.rlt_subject_id == subject_id,
         )
-        .join(
-            ChiiSubject,
-            ChiiSubject.subject_id == ChiiSubjectRelations.rlt_related_subject_id,
-        )
-        .where(ChiiSubjectRelations.rlt_subject_id == subject_id)
         .order_by(
             ChiiSubjectRelations.rlt_order, ChiiSubjectRelations.rlt_related_subject_id
         )
     )
 
-    rows = pydantic.parse_obj_as(List[JoinRow], await db.fetch_all(query))
-
     response = []
-    for r in rows:
-        relation = RELATION_MAP[r.related_subject_type_id].get(r.relation_type)
 
-        if relation is None or r.relation_type == 1:
-            rel = r.related_subject_type_id.str()
+    for r in relations:
+        s = r.dst_subject
+        relation = RELATION_MAP[r.rlt_related_subject_type_id].get(r.rlt_relation_type)
+
+        if relation is None or r.rlt_related_subject_type_id == 1:
+            rel = SubjectType(r.rlt_related_subject_type_id).str()
         else:
             rel = relation.str()
 
         response.append(
             {
-                "id": r.related_subject_id,
+                "id": r.rlt_related_subject_id,
                 "relation": rel,
-                "name": r.name,
-                "type": r.related_subject_type_id,
-                "name_cn": r.name_cn,
-                "images": subject.images,
+                "name": s.subject_name,
+                "type": r.rlt_related_subject_type_id,
+                "name_cn": s.subject_name_cn,
+                "images": subject_images(s.subject_image),
             }
         )
 
     return response
-
-
-class JoinRow(pydantic.BaseModel):
-    """JOIN row result for `get_subject_relations`"""
-
-    related_subject_id: int = Field(alias="rlt_related_subject_id")
-    related_subject_type_id: SubjectType = Field(alias="rlt_related_subject_type_id")
-    relation_type: int = Field(alias="rlt_relation_type")
-    name_cn: str = Field(alias="subject_name_cn")
-    name: str = Field(alias="subject_name")
-
-    class Config:
-        extra = Extra.forbid

@@ -1,7 +1,7 @@
 from fastapi import Depends
 from pydantic import ValidationError
-from databases import Database
 from starlette.status import HTTP_403_FORBIDDEN
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import res, curd, config
 from pol.curd import NotFoundError
@@ -28,7 +28,7 @@ guest = Guest()
 
 async def optional_user(
     token: str = Depends(OPTIONAL_API_KEY_HEADER),
-    db: Database = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     redis: JSONRedis = Depends(get_redis),
 ) -> Role:
     """
@@ -43,7 +43,7 @@ async def optional_user(
 
 async def get_current_user(
     token: str = Depends(API_KEY_HEADER),
-    db: Database = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     redis: JSONRedis = Depends(get_redis),
 ) -> User:
     cache_key = config.CACHE_KEY_PREFIX + f"access:{token}"

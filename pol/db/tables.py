@@ -1,4 +1,19 @@
-from sqlalchemy import TIMESTAMP, Date, Enum, Float, Index, Table, Column, String, text
+from typing import List
+
+from sqlalchemy import (
+    TIMESTAMP,
+    Date,
+    Enum,
+    Float,
+    Index,
+    Table,
+    Column,
+    String,
+    ForeignKey,
+    and_,
+    text,
+)
+from sqlalchemy.orm import remote, foreign, relationship, declarative_base
 from sqlalchemy.dialects.mysql import (
     CHAR,
     ENUM,
@@ -12,7 +27,9 @@ from sqlalchemy.dialects.mysql import (
     MEDIUMBLOB,
     MEDIUMTEXT,
 )
-from sqlalchemy.ext.declarative import declarative_base
+
+from pol.compat import phpseralize
+from pol.compat.phpseralize import dict_to_list
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -40,6 +57,13 @@ class ChiiCharacter(Base):
     crt_redirect = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
     crt_nsfw = Column(TINYINT(1), nullable=False)
 
+    subjects: List["ChiiCrtSubjectIndex"] = relationship(
+        "ChiiCrtSubjectIndex",
+        lazy="raise_on_sql",
+        # secondary=ChiiPersonCsIndex,
+        back_populates="character",
+    )
+
 
 class ChiiCrtCastIndex(Base):
     __tablename__ = "chii_crt_cast_index"
@@ -58,12 +82,32 @@ class ChiiCrtCastIndex(Base):
 class ChiiCrtSubjectIndex(Base):
     __tablename__ = "chii_crt_subject_index"
 
-    crt_id = Column(MEDIUMINT(9), primary_key=True, nullable=False)
-    subject_id = Column(MEDIUMINT(9), primary_key=True, nullable=False, index=True)
+    crt_id = Column(
+        MEDIUMINT(9),
+        ForeignKey("chii_characters.crt_id"),
+        primary_key=True,
+        nullable=False,
+    )
+    subject_id = Column(
+        MEDIUMINT(9),
+        ForeignKey("chii_subjects.subject_id"),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    )
     subject_type_id = Column(TINYINT(4), nullable=False, index=True)
     crt_type = Column(TINYINT(4), nullable=False, index=True, comment="主角，配角")
     ctr_appear_eps = Column(MEDIUMTEXT, nullable=False, comment="可选，角色出场的的章节")
     crt_order = Column(TINYINT(3), nullable=False)
+
+    character: "ChiiCharacter" = relationship(
+        "ChiiCharacter",
+        lazy="raise",
+        innerjoin=True,
+    )  # type: ignore
+    subject: "ChiiSubject" = relationship(
+        "ChiiSubject", lazy="raise", innerjoin=True
+    )  # type: ignore
 
 
 class ChiiEpRevision(Base):
@@ -85,7 +129,9 @@ class ChiiEpisode(Base):
     __table_args__ = (Index("ep_subject_id_2", "ep_subject_id", "ep_ban", "ep_sort"),)
 
     ep_id = Column(MEDIUMINT(8), primary_key=True)
-    ep_subject_id = Column(MEDIUMINT(8), nullable=False, index=True)
+    ep_subject_id = Column(
+        MEDIUMINT(8), ForeignKey("chii_subjects.subject_id"), nullable=False, index=True
+    )
     ep_sort = Column(Float, nullable=False, index=True, server_default=text("'0'"))
     ep_type = Column(TINYINT(1), nullable=False)
     ep_disc = Column(
@@ -108,6 +154,12 @@ class ChiiEpisode(Base):
     ep_lastpost = Column(INTEGER(10), nullable=False, index=True)
     ep_lock = Column(TINYINT(3), nullable=False, server_default=text("'0'"))
     ep_ban = Column(TINYINT(3), nullable=False, index=True, server_default=text("'0'"))
+
+    subject: List["ChiiSubject"] = relationship(
+        "ChiiSubject",
+        lazy="raise",
+        back_populates="episodes",
+    )
 
 
 class ChiiMemberfield(Base):
@@ -196,26 +248,57 @@ class ChiiPersonCsIndex(Base):
     __table_args__ = {"comment": "subjects' credits/creator & staff (c&s)index"}
 
     prsn_type = Column(ENUM("prsn", "crt"), primary_key=True, nullable=False)
-    prsn_id = Column(MEDIUMINT(9), primary_key=True, nullable=False, index=True)
+    prsn_id = Column(
+        MEDIUMINT(9),
+        ForeignKey("chii_persons.prsn_id"),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    )
     prsn_position = Column(
         SMALLINT(5), primary_key=True, nullable=False, index=True, comment="监督，原案，脚本,.."
     )
-    subject_id = Column(MEDIUMINT(9), primary_key=True, nullable=False, index=True)
+    subject_id = Column(
+        MEDIUMINT(9),
+        ForeignKey("chii_subjects.subject_id"),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    )
     subject_type_id = Column(TINYINT(4), nullable=False, index=True)
     summary = Column(MEDIUMTEXT, nullable=False)
     prsn_appear_eps = Column(MEDIUMTEXT, nullable=False, comment="可选，人物参与的章节")
 
+    person: "ChiiPerson" = relationship(
+        "ChiiPerson",
+        primaryjoin=lambda: and_(
+            ChiiPerson.prsn_ban == 0,
+            ChiiPersonCsIndex.prsn_id == ChiiPerson.prsn_id,
+        ),
+        lazy="raise",
+        innerjoin=True,
+    )  # type: ignore
+    subject: "ChiiSubject" = relationship(
+        "ChiiSubject", lazy="raise", innerjoin=True
+    )  # type: ignore
+
 
 class ChiiPersonField(Base):
     __tablename__ = "chii_person_fields"
+    __table_args__ = {"extend_existing": True}
 
-    prsn_cat = Column(ENUM("prsn", "crt"), primary_key=True, nullable=False)
     prsn_id = Column(INTEGER(8), primary_key=True, nullable=False, index=True)
+    prsn_cat = Column(ENUM("prsn", "crt"), nullable=False)
     gender = Column(TINYINT(4), nullable=False)
     bloodtype = Column(TINYINT(4), nullable=False)
     birth_year = Column(YEAR(4), nullable=False)
     birth_mon = Column(TINYINT(2), nullable=False)
     birth_day = Column(TINYINT(2), nullable=False)
+    __mapper_args__ = {"polymorphic_on": prsn_cat, "polymorphic_identity": "prsn"}
+
+
+class ChiiCharacterField(ChiiPersonField):
+    __mapper_args__ = {"polymorphic_identity": "crt"}
 
 
 t_chii_person_relationship = Table(
@@ -264,6 +347,13 @@ class ChiiPerson(Base):
     )
     prsn_redirect = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
     prsn_nsfw = Column(TINYINT(1), nullable=False)
+
+    subjects: List["ChiiPersonCsIndex"] = relationship(
+        "ChiiPersonCsIndex",
+        lazy="raise_on_sql",
+        # secondary=ChiiPersonCsIndex,
+        back_populates="person",
+    )
 
 
 class ChiiRevHistory(Base):
@@ -344,6 +434,61 @@ class ChiiSubjectField(Base):
     field_date = Column(Date, nullable=False, index=True, comment="放送日期")
     field_redirect = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
 
+    subject: "ChiiSubject" = relationship(
+        "ChiiSubject",
+        primaryjoin=lambda: ChiiSubject.subject_id == ChiiSubjectField.field_sid,
+        remote_side="ChiiSubjectField.field_sid",
+        foreign_keys="ChiiSubject.subject_id",
+        innerjoin=True,
+        uselist=False,
+    )  # type: ignore
+
+    def rating(self):
+        scores = self.scores()
+        total = 0
+        total_count = 0
+        for key, value in scores.items():
+            total += int(key) * value
+            total_count += value
+        if total_count != 0:
+            score = round(total / total_count, 1)
+        else:
+            score = 0
+
+        return {
+            "rank": self.field_rank,
+            "score": score,
+            "count": scores,
+            "total": total,
+        }
+
+    def scores(self):
+        return {
+            "1": self.field_rate_1,
+            "2": self.field_rate_2,
+            "3": self.field_rate_3,
+            "4": self.field_rate_4,
+            "5": self.field_rate_5,
+            "6": self.field_rate_6,
+            "7": self.field_rate_7,
+            "8": self.field_rate_8,
+            "9": self.field_rate_9,
+            "10": self.field_rate_10,
+        }
+
+    def tags(self):
+        if not self.field_tags:
+            return []
+
+        # defaults to utf-8
+        tags_deserialized = dict_to_list(phpseralize.loads(self.field_tags.encode()))
+
+        return [
+            {"name": tag["tag_name"], "count": tag["result"]}
+            for tag in tags_deserialized
+            if tag["tag_name"] is not None  # remove tags like { "tag_name": None }
+        ]
+
 
 class ChiiSubjectRelations(Base):
     """
@@ -370,7 +515,10 @@ class ChiiSubjectRelations(Base):
         ),
     )
     rlt_subject_id = Column(
-        "rlt_subject_id", MEDIUMINT(8), nullable=False, comment="关联主 ID"
+        "rlt_subject_id",
+        MEDIUMINT(8),
+        nullable=False,
+        comment="关联主 ID",
     )
     rlt_subject_type_id = Column(
         "rlt_subject_type_id", TINYINT(3), nullable=False, index=True
@@ -379,7 +527,11 @@ class ChiiSubjectRelations(Base):
         "rlt_relation_type", SMALLINT(5), nullable=False, comment="关联类型"
     )
     rlt_related_subject_id = Column(
-        "rlt_related_subject_id", MEDIUMINT(8), nullable=False, comment="关联目标 ID"
+        "rlt_related_subject_id",
+        MEDIUMINT(8),
+        ForeignKey("chii_subjects.subject_id"),
+        nullable=False,
+        comment="关联目标 ID",
     )
     rlt_related_subject_type_id = Column(
         "rlt_related_subject_type_id", TINYINT(3), nullable=False, comment="关联目标类型"
@@ -390,6 +542,19 @@ class ChiiSubjectRelations(Base):
     __mapper_args__ = {
         "primary_key": [rlt_subject_id, rlt_related_subject_id, rlt_vice_versa]
     }
+
+    dst_subject: "ChiiSubject" = relationship(
+        "ChiiSubject",
+        primaryjoin=lambda: (
+            remote(ChiiSubject.subject_id)
+            == foreign(ChiiSubjectRelations.rlt_related_subject_id)
+        ),
+        lazy="raise",
+        remote_side=rlt_related_subject_id,
+        foreign_keys="ChiiSubject.subject_id",
+        innerjoin=True,
+        uselist=False,
+    )  # type: ignore
 
 
 class ChiiSubjectRevision(Base):
@@ -485,3 +650,40 @@ class ChiiSubject(Base):
     subject_ban = Column(
         TINYINT(1), nullable=False, index=True, server_default=text("'0'")
     )
+
+    persons: List[ChiiPersonCsIndex] = relationship(
+        "ChiiPersonCsIndex",
+        lazy="raise",
+        back_populates="subject",
+    )  # type: ignore
+
+    characters: List[ChiiCrtSubjectIndex] = relationship(
+        "ChiiCrtSubjectIndex",
+        lazy="raise",
+        back_populates="subject",
+    )  # type: ignore
+
+    episodes: List[ChiiEpisode] = relationship(
+        "ChiiEpisode",
+        lazy="raise",
+        order_by=(ChiiEpisode.ep_disc, ChiiEpisode.ep_type, ChiiEpisode.ep_sort),
+        back_populates="subject",
+    )  # type: ignore
+
+    fields: ChiiSubjectField = relationship(
+        "ChiiSubjectField",
+        lazy="raise",
+        primaryjoin=lambda: ChiiSubjectField.field_sid == ChiiSubject.subject_id,
+        remote_side=ChiiSubjectField.field_sid,
+        foreign_keys=subject_id,
+        back_populates="subject",
+        uselist=False,
+    )  # type: ignore
+
+    @property
+    def locked(self) -> bool:
+        return self.subject_ban == 2
+
+    @property
+    def ban(self) -> bool:
+        return self.subject_ban == 1
