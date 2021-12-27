@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from loguru import logger
 from pydantic import BaseModel
-from databases import Database
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa
 from pol.db.tables import ChiiMember, ChiiOauthAccessToken
@@ -33,8 +33,8 @@ class User(Role, BaseModel):
         return datetime.utcnow().astimezone() > allow_date
 
 
-async def get_by_valid_token(db: Database, access_token: str) -> User:
-    r = await db.fetch_one(
+async def get_by_valid_token(db: AsyncSession, access_token: str) -> User:
+    r = await db.scalar(
         sa.get(
             ChiiOauthAccessToken,
             ChiiOauthAccessToken.access_token == access_token,
@@ -47,7 +47,7 @@ async def get_by_valid_token(db: Database, access_token: str) -> User:
 
     access = ChiiOauthAccessToken(**r)
 
-    r = await db.fetch_one(
+    r = await db.scalar(
         sa.get(
             ChiiMember.all_column(),
             ChiiMember.uid == access.user_id,
