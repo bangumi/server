@@ -10,9 +10,10 @@ from sqlalchemy import (
     Column,
     String,
     ForeignKey,
+    and_,
     text,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import remote, foreign, relationship
 from sqlalchemy.dialects.mysql import (
     CHAR,
     ENUM,
@@ -27,6 +28,9 @@ from sqlalchemy.dialects.mysql import (
     MEDIUMTEXT,
 )
 from sqlalchemy.ext.declarative import declarative_base
+
+from pol.compat import phpseralize
+from pol.compat.phpseralize import dict_to_list
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -266,6 +270,10 @@ class ChiiPersonCsIndex(Base):
 
     person: "ChiiPerson" = relationship(
         "ChiiPerson",
+        primaryjoin=lambda: and_(
+            ChiiPerson.prsn_ban == 0,
+            ChiiPersonCsIndex.prsn_id == ChiiPerson.prsn_id,
+        ),
         lazy="raise",
         innerjoin=True,
     )
@@ -423,6 +431,61 @@ class ChiiSubjectField(Base):
     field_date = Column(Date, nullable=False, index=True, comment="放送日期")
     field_redirect = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
 
+    subject: "ChiiSubject" = relationship(
+        "ChiiSubject",
+        primaryjoin=lambda: ChiiSubject.subject_id == ChiiSubjectField.field_sid,
+        remote_side="ChiiSubjectField.field_sid",
+        foreign_keys="ChiiSubject.subject_id",
+        innerjoin=True,
+        uselist=False,
+    )
+
+    def rating(self):
+        scores = self.scores()
+        total = 0
+        total_count = 0
+        for key, value in scores.items():
+            total += int(key) * value
+            total_count += value
+        if total_count != 0:
+            score = round(total / total_count, 1)
+        else:
+            score = 0
+
+        return {
+            "rank": self.field_rank,
+            "score": score,
+            "count": scores,
+            "total": total,
+        }
+
+    def scores(self):
+        return {
+            "1": self.field_rate_1,
+            "2": self.field_rate_2,
+            "3": self.field_rate_3,
+            "4": self.field_rate_4,
+            "5": self.field_rate_5,
+            "6": self.field_rate_6,
+            "7": self.field_rate_7,
+            "8": self.field_rate_8,
+            "9": self.field_rate_9,
+            "10": self.field_rate_10,
+        }
+
+    def tags(self):
+        if not self.field_tags:
+            return []
+
+        # defaults to utf-8
+        tags_deserialized = dict_to_list(phpseralize.loads(self.field_tags.encode()))
+
+        return [
+            {"name": tag["tag_name"], "count": tag["result"]}
+            for tag in tags_deserialized
+            if tag["tag_name"] is not None  # remove tags like { "tag_name": None }
+        ]
+
 
 class ChiiSubjectRelations(Base):
     """
@@ -449,7 +512,10 @@ class ChiiSubjectRelations(Base):
         ),
     )
     rlt_subject_id = Column(
-        "rlt_subject_id", MEDIUMINT(8), nullable=False, comment="关联主 ID"
+        "rlt_subject_id",
+        MEDIUMINT(8),
+        nullable=False,
+        comment="关联主 ID",
     )
     rlt_subject_type_id = Column(
         "rlt_subject_type_id", TINYINT(3), nullable=False, index=True
@@ -458,7 +524,11 @@ class ChiiSubjectRelations(Base):
         "rlt_relation_type", SMALLINT(5), nullable=False, comment="关联类型"
     )
     rlt_related_subject_id = Column(
-        "rlt_related_subject_id", MEDIUMINT(8), nullable=False, comment="关联目标 ID"
+        "rlt_related_subject_id",
+        MEDIUMINT(8),
+        ForeignKey("chii_subjects.subject_id"),
+        nullable=False,
+        comment="关联目标 ID",
     )
     rlt_related_subject_type_id = Column(
         "rlt_related_subject_type_id", TINYINT(3), nullable=False, comment="关联目标类型"
@@ -469,6 +539,19 @@ class ChiiSubjectRelations(Base):
     __mapper_args__ = {
         "primary_key": [rlt_subject_id, rlt_related_subject_id, rlt_vice_versa]
     }
+
+    dst_subject: "ChiiSubject" = relationship(
+        "ChiiSubject",
+        primaryjoin=lambda: (
+            remote(ChiiSubject.subject_id)
+            == foreign(ChiiSubjectRelations.rlt_related_subject_id)
+        ),
+        lazy="raise",
+        remote_side=rlt_related_subject_id,
+        foreign_keys="ChiiSubject.subject_id",
+        innerjoin=True,
+        uselist=False,
+    )
 
 
 class ChiiSubjectRevision(Base):
@@ -582,3 +665,17 @@ class ChiiSubject(Base):
         order_by=(ChiiEpisode.ep_disc, ChiiEpisode.ep_type, ChiiEpisode.ep_sort),
         back_populates="subject",
     )
+
+    fields: ChiiSubjectField = relationship(
+        "ChiiSubjectField",
+        lazy="raise",
+        primaryjoin=lambda: ChiiSubjectField.field_sid == ChiiSubject.subject_id,
+        remote_side=ChiiSubjectField.field_sid,
+        foreign_keys=subject_id,
+        back_populates="subject",
+        uselist=False,
+    )
+
+    @property
+    def locked(self) -> bool:
+        return self.subject_ban == 2

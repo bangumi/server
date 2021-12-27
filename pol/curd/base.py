@@ -1,6 +1,7 @@
 from typing import List, Type, TypeVar
 
 from databases import Database
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa
 from pol.db.tables import Base
@@ -8,9 +9,9 @@ from pol.db.tables import Base
 T = TypeVar("T", bound=Base)
 
 
-async def count(db: Database, column, *where) -> int:
-    query = sa.select(sa.func.count(column)).where(*where)
-    return int(await db.fetch_val(query))
+async def count(db: AsyncSession, *where) -> int:
+    query = sa.select(sa.func.count(1)).where(*where)
+    return int(await db.scalar(query))
 
 
 async def get_many(

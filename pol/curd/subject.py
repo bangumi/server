@@ -54,6 +54,9 @@ class Subject(BaseModel):
     # 序列化标签
     tags_serialized: str = Field(alias="field_tags")
 
+    class Config:
+        orm_mode = True
+
     @validator("date", pre=True)
     def handle_mysql_zero_value(cls, v):
         if v == "0000-00-00":
@@ -100,16 +103,6 @@ class Subject(BaseModel):
             "8": self.rate_8,
             "9": self.rate_9,
             "10": self.rate_10,
-        }
-
-    @property
-    def collection(self):
-        return {
-            "wish": self.wish,
-            "collect": self.collect,
-            "doing": self.doing,
-            "on_hold": self.on_hold,
-            "dropped": self.dropped,
         }
 
     def tags(self):
