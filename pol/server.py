@@ -2,7 +2,7 @@ import os
 import datetime
 import threading
 
-import yarl as yarl
+import yarl
 import pydantic
 import pymysql.err  # type: ignore
 import sqlalchemy.exc
