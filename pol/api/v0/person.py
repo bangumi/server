@@ -1,4 +1,3 @@
-import enum
 from typing import List, Optional
 
 from fastapi import Path, Depends, APIRouter
@@ -29,12 +28,6 @@ async def exc_404(person_id: int):
         description=NotFoundDescription,
         detail={"person_id": person_id},
     )
-
-
-class Sort(str, enum.Enum):
-    id = "id"
-    name = "name"
-    last_modified = "update"
 
 
 @router.get(
