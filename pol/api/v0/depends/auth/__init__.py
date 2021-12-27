@@ -43,7 +43,7 @@ async def optional_user(
 
 async def get_current_user(
     token: str = Depends(API_KEY_HEADER),
-    dv: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     redis: JSONRedis = Depends(get_redis),
 ) -> User:
     cache_key = config.CACHE_KEY_PREFIX + f"access:{token}"
@@ -54,7 +54,7 @@ async def get_current_user(
             await redis.delete(cache_key)
 
     try:
-        user = await curd.user.get_by_valid_token(dv, token)
+        user = await curd.user.get_by_valid_token(db, token)
     except NotFoundError:
         raise res.HTTPException(
             status_code=HTTP_403_FORBIDDEN,
