@@ -21,7 +21,7 @@ databases = { version = "0.5.3", extras = ["mysql"] }
 aiomysql = '0.0.22'
 orjson = "==3.6.5"
 loguru = "0.5.3"
-SQLAlchemy = { extras = ["mypy"], version = "1.4.29" }
+SQLAlchemy = { extras = ["asyncmy", "mypy", "asyncio"], version = "^1.4.29" }
 aioredis = { extras = ["hiredis"], version = "2.0.0" }
 
 [tool.poetry.dev-dependencies]
@@ -54,7 +54,10 @@ exclude_lines = [
 
 [tool.pytest.ini_options]
 addopts = '-rav'
-env = ['D:TESTING=true']
+env = [
+  'D:TESTING=true',
+#  'SQLALCHEMY_WARN_20=true',
+]
 
 [tool.mypy]
 ignore_missing_imports = true

@@ -7,10 +7,13 @@ import pymysql.err  # type: ignore
 import sqlalchemy.exc
 from loguru import logger
 from fastapi import FastAPI
+from databases import DatabaseURL
+from sqlalchemy.orm import sessionmaker
 from fastapi.responses import HTMLResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from pol import api, res, config
 from pol.res import ORJSONResponse
@@ -82,7 +85,7 @@ async def global_pymysql_error(
     request: Request, exc: pymysql.err.ProgrammingError
 ):  # pragma: no cover
     ray = request.headers.get("cf_ray")
-    logger.exception(str(exc), message="sqlalchemy exception", cf_ray=ray)
+    logger.exception("exception in sqlalchemy", cf_ray=ray)
     return ORJSONResponse(
         {
             "title": "Internal Server Error",
@@ -130,6 +133,14 @@ async def startup() -> None:
     await database.connect()
     app.state.db = database
     app.state.redis = await JSONRedis.from_url(config.REDIS_URI)
+    app.state.engine = engine = create_async_engine(
+        str(DatabaseURL(config.MYSQL_URI).replace(dialect="mysql+asyncmy")),
+        echo=True,
+    )
+
+    app.state.Session = sessionmaker(
+        engine, expire_on_commit=False, class_=AsyncSession
+    )
 
     logger.info("server start at pid {}, tid {}", os.getpid(), threading.get_ident())
 
@@ -138,6 +149,7 @@ async def startup() -> None:
 async def shutdown() -> None:
     await app.state.db.disconnect()
     await app.state.redis.close()
+    await app.state.engine.dispose()
 
 
 @app.get("/v0/openapi.json", include_in_schema=False)

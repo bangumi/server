@@ -1,19 +1,20 @@
 import enum
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from fastapi import Path, Query, Depends, APIRouter
 from databases import Database
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, RedirectResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic.error_wrappers import ErrorWrapper
 
 from pol import sa, res, curd, wiki
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
-from pol.depends import get_db, get_redis
+from pol.depends import get_db, get_redis, get_session
 from pol.db.const import Gender, StaffMap, PersonType
-from pol.db.tables import ChiiPerson, ChiiSubject, ChiiPersonField, ChiiPersonCsIndex
+from pol.db.tables import ChiiPerson, ChiiPersonCsIndex, ChiiCharacterField
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import (
@@ -31,6 +32,15 @@ from pol.redis.json_cache import JSONRedis
 router = APIRouter(tags=["人物"])
 
 api_base = "/v0/persons"
+
+
+async def exc_404(person_id: int):
+    return res.HTTPException(
+        status_code=404,
+        title="Not Found",
+        description=NotFoundDescription,
+        detail={"person_id": person_id},
+    )
 
 
 async def basic_person(
@@ -163,8 +173,9 @@ async def get_persons(
 )
 async def get_person(
     response: Response,
-    db: Database = Depends(get_db),
+    db_session: AsyncSession = Depends(get_session),
     person_id: int = Path(..., gt=0),
+    not_found: Exception = Depends(exc_404),
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"person:{person_id}"
@@ -172,10 +183,18 @@ async def get_person(
         response.headers["x-cache-status"] = "hit"
         return value.dict()
 
-    person: ChiiPerson = await basic_person(person_id=person_id, db=db)
+    person: Optional[ChiiPerson] = await db_session.scalar(
+        sa.select(ChiiPerson).where(ChiiPerson.prsn_id == person_id).limit(1)
+    )
+
+    if person is None:
+        raise not_found
 
     if person.prsn_redirect:
         return RedirectResponse(f"{api_base}/{person.prsn_redirect}")
+
+    if person.prsn_ban:
+        raise not_found
 
     data = {
         "id": person.prsn_id,
@@ -193,20 +212,13 @@ async def get_person(
         },
     }
 
-    try:
-        field = await curd.get_one(
-            db,
-            ChiiPersonField,
-            ChiiPersonField.prsn_id == person.prsn_id,
-            ChiiPersonField.prsn_cat == "prsn",
-        )
+    field = await db_session.get(ChiiCharacterField, person_id)
+    if field is not None:
         data["gender"] = Gender(field.gender).str()
         data["blood_type"] = field.bloodtype or None
         data["birth_year"] = field.birth_year or None
         data["birth_mon"] = field.birth_mon or None
         data["birth_day"] = field.birth_day or None
-    except NotFoundError:  # pragma: no cover
-        pass
 
     try:
         data["infobox"] = wiki.parse(person.prsn_infobox).info
@@ -228,43 +240,41 @@ async def get_person(
     },
 )
 async def get_person_subjects(
-    db: Database = Depends(get_db),
+    db_session: AsyncSession = Depends(get_session),
+    not_found: Exception = Depends(exc_404),
     person_id: int = Path(..., gt=0),
 ):
-    person: ChiiPerson = await basic_person(person_id=person_id, db=db)
-    query = (
-        sa.select(
-            ChiiPersonCsIndex.subject_id,
-            ChiiPersonCsIndex.prsn_position,
-            ChiiPersonCsIndex.subject_type_id,
+    person: ChiiPerson = await db_session.scalar(
+        sa.select(ChiiPerson)
+        .options(
+            sa.selectinload(ChiiPerson.subjects).joinedload(ChiiPersonCsIndex.subject)
         )
-        .where(ChiiPersonCsIndex.prsn_id == person.prsn_id)
-        .distinct()
-        .order_by(ChiiPersonCsIndex.subject_id)
+        .where(ChiiPerson.prsn_id == person_id)
+        .limit(1)
     )
+    if person is None:
+        raise not_found
 
-    result: Dict[int, ChiiPersonCsIndex] = {
-        r["subject_id"]: ChiiPersonCsIndex(**r) for r in await db.fetch_all(query)
-    }
+    if person.prsn_redirect:
+        return RedirectResponse(f"{api_base}/{person.prsn_redirect}/subjects")
 
-    query = sa.select(
-        ChiiSubject.subject_id,
-        ChiiSubject.subject_name,
-        ChiiSubject.subject_name_cn,
-        ChiiSubject.subject_image,
-    ).where(ChiiSubject.subject_id.in_(result.keys()))
+    subjects = []
 
-    subjects = [dict(r) for r in await db.fetch_all(query)]
-
-    for s in subjects:
-        s["id"] = s["subject_id"]
-        s["name_cn"] = s["subject_name_cn"]
-        if v := subject_images(s["subject_image"]):
-            s["image"] = v["grid"]
+    for s in person.subjects:
+        if v := subject_images(s.subject.subject_image):
+            image = v["grid"]
         else:
-            s["image"] = None
-        rel = result[s["subject_id"]]
-        s["staff"] = StaffMap[rel.subject_type_id][rel.prsn_position].str()
+            image = None
+
+        subjects.append(
+            {
+                "id": s.subject_id,
+                "name": s.subject.subject_name,
+                "name_cn": s.subject.subject_name_cn,
+                "staff": StaffMap[s.subject_type_id][s.prsn_position].str(),
+                "image": image,
+            }
+        )
 
     return subjects
 

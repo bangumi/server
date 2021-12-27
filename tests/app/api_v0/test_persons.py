@@ -31,7 +31,7 @@ def test_persons_filter_name(client: TestClient):
     assert res["data"][0]["name"] == name
 
 
-def test_persions_filter_type(client: TestClient):
+def test_persons_filter_type(client: TestClient):
     type = 1
     response = client.get("v0/persons", params={"type": type})
     assert response.status_code == 200

@@ -65,6 +65,14 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "asyncmy"
+version = "0.2.3"
+description = "A fast asyncio MySQL driver"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[[package]]
 name = "atomicwrites"
 version = "1.4.0"
 description = "Atomic file writes."
@@ -728,6 +736,7 @@ optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
 
 [package.dependencies]
+asyncmy = {version = ">=0.2.3", optional = true, markers = "python_version >= \"3\" and extra == \"asyncmy\""}
 greenlet = {version = "!=0.4.17", markers = "python_version >= \"3\" and (platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\")"}
 mypy = {version = ">=0.910", optional = true, markers = "python_version >= \"3\" and extra == \"mypy\""}
 sqlalchemy2-stubs = {version = "*", optional = true, markers = "extra == \"mypy\""}
@@ -916,7 +925,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.8.*"
-content-hash = "188b29c7945be2b4756c350a3075e9a379b7a8468da1c4e4f7a16c2fe86f2745"
+content-hash = "d10b7a9fe755d30bb3d918c76db8a84597257c2276a1ea8ada18eb930f00e49b"
 
 [metadata.files]
 aiomysql = [
@@ -938,6 +947,21 @@ asgiref = [
 async-timeout = [
     {file = "async-timeout-4.0.2.tar.gz", hash = "sha256:2163e1640ddb52b7a8c80d0a67a08587e5d245cc9c553a74a847056bc2976b15"},
     {file = "async_timeout-4.0.2-py3-none-any.whl", hash = "sha256:8ca1e4fcf50d07413d66d1a5e416e42cfdf5851c981d679a09851a6853383b3c"},
+]
+asyncmy = [
+    {file = "asyncmy-0.2.3-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:c9dc38b56e3091d75ccda1ed598f90dac0489f4e6700bb3aae89b9a8b4635ad3"},
+    {file = "asyncmy-0.2.3-cp310-cp310-manylinux_2_31_x86_64.whl", hash = "sha256:38d6c2e658d13213ced685b5e41e35df1122174423b38f2bc27a6a4535de05b2"},
+    {file = "asyncmy-0.2.3-cp310-cp310-win_amd64.whl", hash = "sha256:2b6dbfe7f4f7ffbcaa190f477f79361cbbc79248eeb05ee8c338b295b18a0119"},
+    {file = "asyncmy-0.2.3-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:28a534ceab5fbc2e20a29b2167c05c94f2cc1e2735a96fcc24b684890bb1109a"},
+    {file = "asyncmy-0.2.3-cp37-cp37m-manylinux_2_31_x86_64.whl", hash = "sha256:0c7db0d0b7c0f47fcb656c1db41f5845b3a5e7e83013264c83e943e53c4abb60"},
+    {file = "asyncmy-0.2.3-cp37-cp37m-win_amd64.whl", hash = "sha256:22ab5de34356a7331443d0076c47c78aedd3b1c41e1b6baf4017b2f207fd39d4"},
+    {file = "asyncmy-0.2.3-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:2b14ebd0c1e050a6ee0a314111527327fdb53fe490169af6ed9361a921fba2fa"},
+    {file = "asyncmy-0.2.3-cp38-cp38-manylinux_2_31_x86_64.whl", hash = "sha256:ef785957e480902d9b1a34f23e29157de84606bf758ddbfbabc1afe93f91ece3"},
+    {file = "asyncmy-0.2.3-cp38-cp38-win_amd64.whl", hash = "sha256:804fda2c96e16de5b4a7740a49cf21207fe6b856875608f28a75a486e4903b3d"},
+    {file = "asyncmy-0.2.3-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:4be0f01f79974adf7c064c3c23bd30cd24627c081a39a03461bd4fea0a59562b"},
+    {file = "asyncmy-0.2.3-cp39-cp39-manylinux_2_31_x86_64.whl", hash = "sha256:3167337d2e778b560fc109ec9d388562b4e9b0241e6d31ca2de15bf7437c781d"},
+    {file = "asyncmy-0.2.3-cp39-cp39-win_amd64.whl", hash = "sha256:5577b695c38e01377e7ef4f5bd3877aada11d1174f80b6354be55a5447f9d1f8"},
+    {file = "asyncmy-0.2.3.tar.gz", hash = "sha256:769f749d8b03b28a31b185b77c54e8f8f363ee8a3c3719bad8a71e4e9a0ce8a6"},
 ]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
