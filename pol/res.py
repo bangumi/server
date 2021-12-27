@@ -27,14 +27,10 @@ class HTTPException(Exception):
         self.description = description
 
 
-def response(
-    model: Type = None, description: str = None, headers=None
-) -> Dict[str, Any]:
+def response(model: Type = None, description: str = None) -> Dict[str, Any]:
     d: Dict[str, Any] = {}
     if model is not None:
         d["model"] = model
     if description:
         d["description"] = description
-    if headers is not None:
-        d["headers"] = headers
     return d

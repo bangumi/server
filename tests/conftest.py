@@ -44,7 +44,7 @@ def db_session():
         db_session.close()
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def redis_client():
     with redis.Redis.from_url(config.REDIS_URI) as redis_client:
         redis_client.flushdb()

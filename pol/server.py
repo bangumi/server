@@ -134,7 +134,7 @@ async def startup() -> None:
     app.state.db = database
     app.state.redis = await JSONRedis.from_url(config.REDIS_URI)
     app.state.engine = engine = create_async_engine(
-        str(DatabaseURL(config.MYSQL_URI).replace(dialect="mysql+asyncmy")),
+        str(DatabaseURL(config.MYSQL_URI).replace(dialect="mysql+aiomysql")),
         echo=True,
     )
 

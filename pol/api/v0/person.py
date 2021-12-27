@@ -8,7 +8,7 @@ from starlette.responses import Response, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic.error_wrappers import ErrorWrapper
 
-from pol import sa, res, curd, wiki
+from pol import sa, res, wiki
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
@@ -26,7 +26,6 @@ from pol.api.v0.models import (
     PersonDetail,
     RelatedSubject,
 )
-from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
 
 router = APIRouter(tags=["人物"])
@@ -41,26 +40,6 @@ async def exc_404(person_id: int):
         description=NotFoundDescription,
         detail={"person_id": person_id},
     )
-
-
-async def basic_person(
-    person_id: int,
-    db: Database,
-) -> ChiiPerson:
-    try:
-        return await curd.get_one(
-            db,
-            ChiiPerson,
-            ChiiPerson.prsn_id == person_id,
-            ChiiPerson.prsn_ban != 1,
-        )
-    except NotFoundError:
-        raise res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description=NotFoundDescription,
-            detail={"person_id": "person_id"},
-        )
 
 
 class Sort(str, enum.Enum):
