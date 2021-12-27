@@ -1,5 +1,5 @@
 import zlib
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, List, Tuple, Union
 
 from sqlalchemy import (
     TIMESTAMP,
@@ -29,7 +29,6 @@ from sqlalchemy.dialects.mysql import (
     MEDIUMTEXT,
 )
 
-from pol import wiki
 from pol.compat import phpseralize
 from pol.compat.phpseralize import dict_to_list
 
@@ -409,26 +408,11 @@ class GzipPHPSerializedBlob(MEDIUMBLOB):
             return x == y
 
 
-class RevTextBlob(GzipPHPSerializedBlob):
-    def result_processor(self, dialect, coltype):
-        super_process = super().result_processor(dialect, coltype)
-
-        def process(value: bytes):
-            ret: Dict[str, Dict[str, Any]] = super_process(value)
-            for item in ret.values():
-                for (k, v) in item.items():
-                    if k in ["crt_infobox", "prsn_infobox"]:
-                        item[k] = wiki.parse(v)
-            return ret
-
-        return process
-
-
 class ChiiRevText(Base):
     __tablename__ = "chii_rev_text"
 
     rev_text_id = Column(MEDIUMINT(9), primary_key=True)
-    rev_text = Column(RevTextBlob, nullable=False)
+    rev_text = Column(GzipPHPSerializedBlob, nullable=False)
 
 
 t_chii_subject_alias = Table(
