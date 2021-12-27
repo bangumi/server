@@ -7,6 +7,6 @@ async def get_redis(request: Request) -> aioredis.Redis:
     return request.app.state.redis  # type: ignore
 
 
-async def get_session(request: Request):
+async def get_db(request: Request):
     async with request.app.state.Session() as session:
         yield session

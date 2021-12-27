@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pol import sa, res
 from pol.models import ErrorDetail
 from pol.curd.ep import Ep
-from pol.depends import get_session
+from pol.depends import get_db
 from pol.db.const import EpType
 from pol.db.tables import ChiiEpisode
 from pol.api.v0.const import NotFoundDescription
@@ -31,7 +31,7 @@ class Pager(BaseModel):
     tags=["章节"],
 )
 async def get_episodes(
-    db_session: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_db),
     subject_id: int = Query(..., gt=0),
     type: EpType = Query(None, description="`0`,`1`,`2`,`3`代表`本篇`，`sp`，`op`，`ed`"),
     page: Pager = Depends(),
@@ -43,7 +43,7 @@ async def get_episodes(
     if type is not None:
         where.append(ChiiEpisode.ep_type == type.value)
 
-    total = await db_session.scalar(sa.select(sa.count(1)).where(*where))
+    total = await db.scalar(sa.select(sa.count(1)).where(*where))
 
     if total == 0:
         raise res.HTTPException(
@@ -53,7 +53,7 @@ async def get_episodes(
             detail={"subject_id": subject_id, "type": type},
         )
 
-    first_episode: ChiiEpisode = await db_session.scalar(
+    first_episode: ChiiEpisode = await db.scalar(
         sa.select(ChiiEpisode).where(*where).limit(1)
     )
 
@@ -63,7 +63,7 @@ async def get_episodes(
         "offset": page.offset,
         "data": [
             add_episode(Ep.from_orm(x), first_episode.ep_sort)
-            for x in await db_session.scalars(
+            for x in await db.scalars(
                 sa.select(ChiiEpisode)
                 .where(*where)
                 .limit(page.limit)
@@ -92,9 +92,9 @@ def add_episode(e: Ep, start: float) -> dict:
 )
 async def get_episode(
     episode_id: int,
-    db_session: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_db),
 ):
-    ep: Optional[ChiiEpisode] = await db_session.get(ChiiEpisode, episode_id)
+    ep: Optional[ChiiEpisode] = await db.get(ChiiEpisode, episode_id)
     if ep is None:
         raise res.HTTPException(
             status_code=404,
@@ -105,7 +105,7 @@ async def get_episode(
 
     where = [ChiiEpisode.ep_subject_id == ep.ep_subject_id]
 
-    first_episode: ChiiEpisode = await db_session.scalar(
+    first_episode: ChiiEpisode = await db.scalar(
         sa.select(ChiiEpisode).where(*where).limit(1)
     )
 

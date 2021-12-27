@@ -9,7 +9,7 @@ from pol import sa, res, wiki
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
-from pol.depends import get_redis, get_session
+from pol.depends import get_db, get_redis
 from pol.db.const import Gender, StaffMap
 from pol.db.tables import ChiiPerson, ChiiPersonCsIndex, ChiiCharacterField
 from pol.api.v0.const import NotFoundDescription
@@ -47,7 +47,7 @@ class Sort(str, enum.Enum):
 )
 async def get_person(
     response: Response,
-    db_session: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_db),
     person_id: int = Path(..., gt=0),
     not_found: Exception = Depends(exc_404),
     redis: JSONRedis = Depends(get_redis),
@@ -57,7 +57,7 @@ async def get_person(
         response.headers["x-cache-status"] = "hit"
         return value.dict()
 
-    person: Optional[ChiiPerson] = await db_session.scalar(
+    person: Optional[ChiiPerson] = await db.scalar(
         sa.select(ChiiPerson).where(ChiiPerson.prsn_id == person_id).limit(1)
     )
 
@@ -86,7 +86,7 @@ async def get_person(
         },
     }
 
-    field = await db_session.get(ChiiCharacterField, person_id)
+    field = await db.get(ChiiCharacterField, person_id)
     if field is not None:
         data["gender"] = Gender(field.gender).str()
         data["blood_type"] = field.bloodtype or None
@@ -114,11 +114,11 @@ async def get_person(
     },
 )
 async def get_person_subjects(
-    db_session: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_db),
     not_found: Exception = Depends(exc_404),
     person_id: int = Path(..., gt=0),
 ):
-    person: ChiiPerson = await db_session.scalar(
+    person: ChiiPerson = await db.scalar(
         sa.select(ChiiPerson)
         .options(
             sa.selectinload(ChiiPerson.subjects).joinedload(ChiiPersonCsIndex.subject)

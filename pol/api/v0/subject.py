@@ -8,7 +8,7 @@ from pol import sa, res, curd, wiki
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
-from pol.depends import get_redis, get_session
+from pol.depends import get_db, get_redis
 from pol.db.const import (
     PLATFORM_MAP,
     RELATION_MAP,
@@ -60,7 +60,7 @@ async def get_subject(
     exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
     user: Role = Depends(optional_user),
-    db_session: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_db),
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"subject:{subject_id}"
@@ -72,7 +72,7 @@ async def get_subject(
     else:
         response.headers["x-cache-status"] = "miss"
 
-    subject: Optional[ChiiSubject] = await db_session.get(
+    subject: Optional[ChiiSubject] = await db.get(
         ChiiSubject, subject_id, options=[sa.joinedload(ChiiSubject.fields)]
     )
     if subject is None:
@@ -106,9 +106,7 @@ async def get_subject(
         "platform": PLATFORM_MAP[subject.subject_type_id].get(
             subject.subject_platform, {"type_cn": ""}
         )["type_cn"],
-        "total_episodes": await curd.count(
-            db_session, ChiiEpisode.ep_subject_id == subject_id
-        ),
+        "total_episodes": await curd.count(db, ChiiEpisode.ep_subject_id == subject_id),
         "tags": subject.fields.tags(),
     }
 
@@ -133,11 +131,11 @@ async def get_subject(
     },
 )
 async def get_subject_persons(
-    db_session: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_db),
     exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
 ):
-    subject: ChiiSubject = await db_session.scalar(
+    subject: ChiiSubject = await db.scalar(
         sa.select(ChiiSubject)
         .options(
             sa.selectinload(ChiiSubject.persons).joinedload(ChiiPersonCsIndex.person)
@@ -174,11 +172,11 @@ async def get_subject_persons(
     },
 )
 async def get_subject_characters(
-    db_session: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_db),
     exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
 ):
-    subject: ChiiSubject = await db_session.scalar(
+    subject: ChiiSubject = await db.scalar(
         sa.select(ChiiSubject)
         .options(
             sa.selectinload(ChiiSubject.characters).joinedload(
@@ -217,16 +215,16 @@ async def get_subject_characters(
 async def get_subject_relations(
     exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
-    db_session: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_db),
 ):
-    if not await db_session.scalar(
+    if not await db.scalar(
         sa.select(ChiiSubject.subject_id).where(
             ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0
         )
     ):
         raise exc_404
 
-    relations: Iterator[ChiiSubjectRelations] = await db_session.scalars(
+    relations: Iterator[ChiiSubjectRelations] = await db.scalars(
         sa.select(ChiiSubjectRelations)
         .options(sa.selectinload(ChiiSubjectRelations.dst_subject))
         .where(
