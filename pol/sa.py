@@ -13,7 +13,7 @@ from sqlalchemy import (
     select,
     update,
 )
-from sqlalchemy.orm import eagerload, joinedload, selectinload
+from sqlalchemy.orm import eagerload, joinedload, selectinload, subqueryload
 from sqlalchemy.dialects.mysql import insert
 
 count = func.count
@@ -24,6 +24,7 @@ __all__ = [
     "joinedload",
     "Text",
     "Column",
+    "subqueryload",
     "String",
     "DateTime",
     "func",

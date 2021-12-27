@@ -124,7 +124,9 @@ class ChiiEpisode(Base):
     __table_args__ = (Index("ep_subject_id_2", "ep_subject_id", "ep_ban", "ep_sort"),)
 
     ep_id = Column(MEDIUMINT(8), primary_key=True)
-    ep_subject_id = Column(MEDIUMINT(8), nullable=False, index=True)
+    ep_subject_id = Column(
+        MEDIUMINT(8), ForeignKey("chii_subjects.subject_id"), nullable=False, index=True
+    )
     ep_sort = Column(Float, nullable=False, index=True, server_default=text("'0'"))
     ep_type = Column(TINYINT(1), nullable=False)
     ep_disc = Column(
@@ -147,6 +149,12 @@ class ChiiEpisode(Base):
     ep_lastpost = Column(INTEGER(10), nullable=False, index=True)
     ep_lock = Column(TINYINT(3), nullable=False, server_default=text("'0'"))
     ep_ban = Column(TINYINT(3), nullable=False, index=True, server_default=text("'0'"))
+
+    subject: List["ChiiSubject"] = relationship(
+        "ChiiSubject",
+        lazy="raise",
+        back_populates="episodes",
+    )
 
 
 class ChiiMemberfield(Base):
@@ -560,12 +568,17 @@ class ChiiSubject(Base):
     persons: List[ChiiPersonCsIndex] = relationship(
         "ChiiPersonCsIndex",
         lazy="raise",
-        # secondary=ChiiPersonCsIndex,
         back_populates="subject",
     )
     characters: List[ChiiCrtSubjectIndex] = relationship(
         "ChiiCrtSubjectIndex",
         lazy="raise",
-        # secondary=ChiiPersonCsIndex,
+        back_populates="subject",
+    )
+
+    episodes: List[ChiiEpisode] = relationship(
+        "ChiiEpisode",
+        lazy="raise",
+        order_by=(ChiiEpisode.ep_disc, ChiiEpisode.ep_type, ChiiEpisode.ep_sort),
         back_populates="subject",
     )
