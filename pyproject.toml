@@ -44,6 +44,9 @@ pytest-env = "0.6.2"
 redis = { extras = ["hiredis"], version = "==4.1.0" }
 flake8-tidy-imports = "4.5.0"
 
+[tool.coverage.run]
+concurrency = ['thread', 'greenlet']
+
 [tool.coverage.report]
 exclude_lines = [
   'pragma: no cover',
