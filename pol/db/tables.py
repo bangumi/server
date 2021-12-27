@@ -105,8 +105,10 @@ class ChiiCrtSubjectIndex(Base):
         "ChiiCharacter",
         lazy="raise",
         innerjoin=True,
-    )
-    subject: "ChiiSubject" = relationship("ChiiSubject", lazy="raise", innerjoin=True)
+    )  # type: ignore
+    subject: "ChiiSubject" = relationship(
+        "ChiiSubject", lazy="raise", innerjoin=True
+    )  # type: ignore
 
 
 class ChiiEpRevision(Base):
@@ -276,8 +278,10 @@ class ChiiPersonCsIndex(Base):
         ),
         lazy="raise",
         innerjoin=True,
-    )
-    subject: "ChiiSubject" = relationship("ChiiSubject", lazy="raise", innerjoin=True)
+    )  # type: ignore
+    subject: "ChiiSubject" = relationship(
+        "ChiiSubject", lazy="raise", innerjoin=True
+    )  # type: ignore
 
 
 class ChiiPersonField(Base):
@@ -438,7 +442,7 @@ class ChiiSubjectField(Base):
         foreign_keys="ChiiSubject.subject_id",
         innerjoin=True,
         uselist=False,
-    )
+    )  # type: ignore
 
     def rating(self):
         scores = self.scores()
@@ -551,7 +555,7 @@ class ChiiSubjectRelations(Base):
         foreign_keys="ChiiSubject.subject_id",
         innerjoin=True,
         uselist=False,
-    )
+    )  # type: ignore
 
 
 class ChiiSubjectRevision(Base):
@@ -652,19 +656,20 @@ class ChiiSubject(Base):
         "ChiiPersonCsIndex",
         lazy="raise",
         back_populates="subject",
-    )
+    )  # type: ignore
+
     characters: List[ChiiCrtSubjectIndex] = relationship(
         "ChiiCrtSubjectIndex",
         lazy="raise",
         back_populates="subject",
-    )
+    )  # type: ignore
 
     episodes: List[ChiiEpisode] = relationship(
         "ChiiEpisode",
         lazy="raise",
         order_by=(ChiiEpisode.ep_disc, ChiiEpisode.ep_type, ChiiEpisode.ep_sort),
         back_populates="subject",
-    )
+    )  # type: ignore
 
     fields: ChiiSubjectField = relationship(
         "ChiiSubjectField",
@@ -674,7 +679,7 @@ class ChiiSubject(Base):
         foreign_keys=subject_id,
         back_populates="subject",
         uselist=False,
-    )
+    )  # type: ignore
 
     @property
     def locked(self) -> bool:

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Iterator, Optional
 
 from fastapi import Path, Depends, Request, APIRouter
 from starlette.responses import Response, RedirectResponse
@@ -226,7 +226,7 @@ async def get_subject_relations(
     ):
         raise exc_404
 
-    relations: List[ChiiSubjectRelations] = await db_session.scalars(
+    relations: Iterator[ChiiSubjectRelations] = await db_session.scalars(
         sa.select(ChiiSubjectRelations)
         .options(sa.selectinload(ChiiSubjectRelations.dst_subject))
         .where(
@@ -236,9 +236,6 @@ async def get_subject_relations(
             ChiiSubjectRelations.rlt_order, ChiiSubjectRelations.rlt_related_subject_id
         )
     )
-
-    if not relations:
-        raise exc_404
 
     response = []
 
