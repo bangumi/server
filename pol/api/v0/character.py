@@ -121,17 +121,11 @@ async def get_person_subjects(
                 ChiiCrtSubjectIndex.subject
             )
         )
-        .where(ChiiCharacter.crt_id == character_id)
+        .where(ChiiCharacter.crt_id == character_id, ChiiCharacter.crt_ban == 0)
         .limit(1)
     )
 
     if character is None:
-        raise not_found
-
-    if character.crt_redirect:
-        return RedirectResponse(f"{api_base}/{character.crt_redirect}/subjects")
-
-    if character.crt_ban:
         raise not_found
 
     subjects = []

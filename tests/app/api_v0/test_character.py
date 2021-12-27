@@ -90,10 +90,9 @@ def test_character_subjects(client: TestClient):
     }
 
 
-def test_character_subjects_redirect(client: TestClient):
+def test_character_subjects_ban(client: TestClient):
     response = client.get("/v0/characters/55/subjects", allow_redirects=False)
-    assert response.status_code == 307
-    assert response.headers["location"] == "/v0/characters/52/subjects"
+    assert response.status_code == 404
 
 
 def test_character_redirect(client: TestClient):
