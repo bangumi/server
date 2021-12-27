@@ -130,7 +130,7 @@ async def internal_response_validation_error(
 async def startup() -> None:
     app.state.redis = await JSONRedis.from_url(config.REDIS_URI)
     app.state.engine = engine = create_async_engine(
-        "mysql+asyncmy://{}:{}@{}:{}/{}".format(
+        "mysql+aiomysql://{}:{}@{}:{}/{}".format(
             config.MYSQL_USER,
             config.MYSQL_PASS,
             config.MYSQL_HOST,

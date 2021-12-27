@@ -13,7 +13,7 @@ from sqlalchemy import (
     and_,
     text,
 )
-from sqlalchemy.orm import remote, foreign, relationship
+from sqlalchemy.orm import remote, foreign, relationship, declarative_base
 from sqlalchemy.dialects.mysql import (
     CHAR,
     ENUM,
@@ -27,7 +27,6 @@ from sqlalchemy.dialects.mysql import (
     MEDIUMBLOB,
     MEDIUMTEXT,
 )
-from sqlalchemy.ext.declarative import declarative_base
 
 from pol.compat import phpseralize
 from pol.compat.phpseralize import dict_to_list

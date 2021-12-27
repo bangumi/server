@@ -153,13 +153,3 @@ async def get_person_subjects(
         )
 
     return subjects
-
-
-def raise_ban(c: ChiiCharacter):
-    if c.crt_ban:
-        raise res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description=NotFoundDescription,
-            detail={"character_id": "character_id"},
-        )
