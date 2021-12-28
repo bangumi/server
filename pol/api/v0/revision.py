@@ -3,8 +3,8 @@ from asyncio import gather
 from functools import reduce
 
 from fastapi import Path, Depends, APIRouter
-from databases import Database
 from starlette.responses import Response
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, curd
 from pol.models import ErrorDetail
@@ -46,7 +46,7 @@ character_rev_type_filters = ChiiRevHistory.rev_type.in_(character_rev_types)
 
 
 async def get_revisions(
-    db: Database,
+    db: AsyncSession,
     filters: List[Any],
     columns: List[Any],
     join_args: List[Tuple[Any, Any]],
@@ -105,7 +105,7 @@ async def get_revisions(
                 ),
             },
         }
-        for r in await db.fetch_all(query)
+        for r in (await db.execute(query)).mappings().fetchall()
     ]
     return {
         "limit": page.limit,
@@ -116,7 +116,7 @@ async def get_revisions(
 
 
 async def get_revision(
-    db: Database,
+    db: AsyncSession,
     filters: List[Any],
     details: Optional[Any] = None,
 ):
@@ -162,7 +162,7 @@ async def get_revision(
 )
 async def get_person_revisions(
     person_id: int = 0,
-    db: Database = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     page: Pager = Depends(),
     uid: int = 0,
     order: Order = Order.desc,
@@ -192,7 +192,7 @@ async def get_person_revisions(
 @cache(lambda revision_id, **_: f"persons:revision:{revision_id}")
 async def get_person_revision(
     response: Response,
-    db: Database = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
     redis: JSONRedis = Depends(get_redis),
 ):
@@ -221,7 +221,7 @@ async def get_person_revision(
 )
 async def get_character_revisions(
     character_id: int = 0,
-    db: Database = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     page: Pager = Depends(),
     uid: int = 0,
     order: Order = Order.desc,
@@ -251,7 +251,7 @@ async def get_character_revisions(
 @cache(lambda revision_id, **_: f"characters:revision:{revision_id}")
 async def get_character_revision(
     response: Response,
-    db: Database = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
     redis: JSONRedis = Depends(get_redis),
 ):

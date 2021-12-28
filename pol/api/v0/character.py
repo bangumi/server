@@ -10,12 +10,11 @@ from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
-from pol.db.const import Gender, RevisionType, get_character_rel
+from pol.db.const import Gender, get_character_rel
 from pol.db.tables import (
     ChiiPerson,
     ChiiSubject,
     ChiiCharacter,
-    ChiiRevHistory,
     ChiiPersonField,
     ChiiCrtCastIndex,
     ChiiCrtSubjectIndex,
@@ -28,18 +27,6 @@ from pol.redis.json_cache import JSONRedis
 router = APIRouter(tags=["角色"], route_class=ErrorCatchRoute)
 
 api_base = "/v0/characters"
-
-rev_types = [
-    t.value
-    for t in [
-        RevisionType.character,
-        RevisionType.character_subject_relation,
-        RevisionType.character_cast_relation,
-        RevisionType.character_erase,
-        RevisionType.character_merge,
-    ]
-]
-rev_type_filters = ChiiRevHistory.rev_type.in_(rev_types)
 
 
 async def exc_404(character_id: int):
