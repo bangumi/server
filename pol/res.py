@@ -49,3 +49,7 @@ def response(model: Type = None, description: str = None) -> Dict[str, Any]:
     if description:
         d["description"] = description
     return d
+
+
+def public_cache(second: int):
+    return {"cache-control": f"public, max-age={second}"}

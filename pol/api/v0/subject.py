@@ -77,6 +77,8 @@ async def get_subject(
         # now fetch real data
         response.headers["x-cache-status"] = "miss"
         data = await _get_subject(exc_404=exc_404, subject_id=subject_id, db=db)
+        if isinstance(data, Response):
+            return data
         await redis.set_json(cache_key, value=data, ex=300)
         nsfw = data["nsfw"]
 
@@ -106,7 +108,9 @@ async def _get_subject(
         raise exc_404
 
     if subject.fields.field_redirect:
-        raise res.HTTPRedirect(f"{api_base}/{subject.fields.field_redirect}")
+        raise res.HTTPRedirect(
+            f"{api_base}/{subject.fields.field_redirect}", headers=res.public_cache(300)
+        )
 
     if subject.ban:
         raise exc_404
