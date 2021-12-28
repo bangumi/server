@@ -15,6 +15,7 @@ def test_subject_auth_nsfw_no_auth_404(client: TestClient):
 def test_subject_auth_nsfw(client: TestClient, auth_header):
     response = client.get("/v0/subjects/16", headers=auth_header)
     assert response.status_code == 200
+    assert response.json()["nsfw"]
 
     response = client.get("/v0/subjects/16")
     assert response.status_code == 404
@@ -33,4 +34,5 @@ def test_subject_auth_cached(client: TestClient, redis_client: Redis, auth_heade
 def test_subject_nsfw_no_cache(client: TestClient, auth_header):
     response = client.get("/v0/subjects/16", headers=auth_header)
     assert response.status_code == 200
+    assert response.json()["nsfw"]
     assert response.headers["cache-control"] == "no-store"
