@@ -13,6 +13,7 @@ from pol.db.const import EpType
 from pol.db.tables import ChiiEpisode
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.models import Paged
+from pol.http_cache.depends import CacheControl
 from pol.api.v0.models.subject import Episode, EpisodeDetail
 
 router = APIRouter(tags=["章节"], route_class=ErrorCatchRoute)
@@ -36,7 +37,9 @@ async def get_episodes(
     subject_id: int = Query(..., gt=0),
     type: EpType = Query(None, description="`0`,`1`,`2`,`3`代表`本篇`，`sp`，`op`，`ed`"),
     page: Pager = Depends(),
+    cache_control: CacheControl = Depends(CacheControl),
 ):
+    cache_control(300)
     where = [
         ChiiEpisode.ep_subject_id == subject_id,
     ]
@@ -94,7 +97,9 @@ def add_episode(e: Ep, start: float) -> dict:
 async def get_episode(
     episode_id: int,
     db: AsyncSession = Depends(get_db),
+    cache_control: CacheControl = Depends(CacheControl),
 ):
+    cache_control(300)
     ep: Optional[ChiiEpisode] = await db.get(ChiiEpisode, episode_id)
     if ep is None:
         raise res.HTTPException(

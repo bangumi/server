@@ -5,6 +5,7 @@ from loguru import logger
 from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker
 from fastapi.responses import HTMLResponse
+from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
@@ -27,6 +28,17 @@ app = FastAPI(
 )
 
 app.router.route_class = ErrorCatchRoute
+
+
+@app.middleware("http")
+async def add_extra_headers(request: Request, call_next):
+    response = await call_next(request)
+    if "authorization" in request.headers:
+        response.headers["cache-control"] = "no-store"
+    elif v := getattr(request.state, "public_resource", 0):
+        response.headers["cache-control"] = f"public, max-age={v}"
+    return response
+
 
 setup_http_middleware(app)
 app.include_router(api.router)
