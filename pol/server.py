@@ -31,7 +31,7 @@ app.router.route_class = ErrorCatchRoute
 
 
 @app.middleware("http")
-async def add_extra_headers(request: Request, call_next):
+async def handle_public_cache(request: Request, call_next):
     response = await call_next(request)
     if "authorization" in request.headers:
         response.headers["cache-control"] = "no-store"

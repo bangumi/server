@@ -104,9 +104,7 @@ async def _get_subject(
         cache_control(300)
 
     if subject.fields.field_redirect:
-        raise res.HTTPRedirect(
-            f"{api_base}/{subject.fields.field_redirect}", headers=res.public_cache(300)
-        )
+        raise res.HTTPRedirect(f"{api_base}/{subject.fields.field_redirect}")
 
     if subject.ban:
         raise exc_404
