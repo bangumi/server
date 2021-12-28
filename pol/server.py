@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from pol import api, config
 from pol.res import ORJSONResponse
-from pol.router import ErrorLoggingRoute
+from pol.router import ErrorCatchRoute
 from pol.middlewares.http import setup_http_middleware
 from pol.redis.json_cache import JSONRedis
 
@@ -25,7 +25,7 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
-app.router.route_class = ErrorLoggingRoute
+app.router.route_class = ErrorCatchRoute
 
 setup_http_middleware(app)
 app.include_router(api.router)

@@ -8,7 +8,7 @@ from pol import sa, res, curd, wiki
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
-from pol.router import ErrorLoggingRoute
+from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
 from pol.db.const import (
     PLATFORM_MAP,
@@ -32,7 +32,7 @@ from pol.redis.json_cache import JSONRedis
 from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject
 
-router = APIRouter(tags=["条目"], route_class=ErrorLoggingRoute)
+router = APIRouter(tags=["条目"], route_class=ErrorCatchRoute)
 
 api_base = "/v0/subjects"
 

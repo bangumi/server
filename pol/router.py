@@ -12,7 +12,7 @@ from pol import res
 from pol.res import ORJSONResponse
 
 
-class ErrorLoggingRoute(APIRoute):
+class ErrorCatchRoute(APIRoute):
     """starlette不支持全局 catch `Exception`，只能用这种办法来捕获内部异常。"""
 
     def get_route_handler(self) -> Callable:
@@ -25,14 +25,24 @@ class ErrorLoggingRoute(APIRoute):
                 return ORJSONResponse(
                     {
                         "title": "Invalid Request",
-                        "description": "One or more parameters to your request was invalid.",
+                        "description": "One or more parameters are not valid.",
                         "detail": exc.errors(),
                     },
                     status_code=422,
                 )
-            except (pymysql.err.MySQLError, sqlalchemy.exc.SQLAlchemyError):
+            except res.HTTPException as exc:
+                return ORJSONResponse(
+                    {
+                        "title": exc.title,
+                        "description": exc.description,
+                        "detail": exc.detail,
+                    },
+                    headers=exc.headers,
+                    status_code=exc.status_code,
+                )
+            except (pymysql.err.MySQLError, sqlalchemy.exc.SQLAlchemyError) as exc:
                 ray = request.headers.get("cf-ray")
-                logger.exception("exception in sqlalchemy", cf_ray=ray)
+                logger.exception("exception in sqlalchemy {}", str(exc), cf_ray=ray)
                 return ORJSONResponse(
                     {
                         "title": "Internal Server Error",
@@ -49,20 +59,14 @@ class ErrorLoggingRoute(APIRoute):
                     },
                     status_code=500,
                 )
-
-            except res.HTTPException as exc:
-                return ORJSONResponse(
-                    {
-                        "title": exc.title,
-                        "description": exc.description,
-                        "detail": exc.detail,
-                    },
-                    headers=exc.headers,
-                    status_code=exc.status_code,
-                )
             except Exception:
                 ray = request.headers.get("cf-ray")
-                logger.exception("exception in sqlalchemy", cf_ray=ray)
+                logger.exception(
+                    "unexpected exception {} {}",
+                    type(Exception),
+                    str(Exception),
+                    cf_ray=ray,
+                )
                 return ORJSONResponse(
                     {
                         "title": "Internal Server Error",
