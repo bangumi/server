@@ -15,23 +15,3 @@ def setup_http_middleware(app: FastAPI):
         response.headers["X-Process-Time"] = str(int(process_time * 1000)) + "ms"
         response.headers["x-server-version"] = config.COMMIT_REF
         return response
-
-    @app.middleware("http")
-    async def log(request: Request, call_next):
-        try:
-            return await call_next(request)
-        except Exception as exc:
-            app.state.logger.exception(
-                "catch exception in middleware",
-                extra={
-                    "url": str(request.url),
-                    "query": dict(request.query_params),
-                    "x-request-id": request.headers.get("x-request-id", ""),
-                    "event": "http.exception",
-                    "exception": "{}.{}".format(
-                        getattr(exc, "__module__", "builtin"),
-                        exc.__class__.__name__,
-                    ),
-                },
-            )
-            raise

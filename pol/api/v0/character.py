@@ -8,6 +8,7 @@ from pol import sa, res, wiki
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
+from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
 from pol.db.const import Gender, get_character_rel
 from pol.db.tables import ChiiCharacter, ChiiPersonField, ChiiCrtSubjectIndex
@@ -16,7 +17,7 @@ from pol.api.v0.utils import person_images
 from pol.api.v0.models import RelatedSubject, CharacterDetail
 from pol.redis.json_cache import JSONRedis
 
-router = APIRouter(tags=["角色"])
+router = APIRouter(tags=["角色"], route_class=ErrorCatchRoute)
 
 api_base = "/v0/characters"
 
