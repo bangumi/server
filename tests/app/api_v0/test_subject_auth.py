@@ -28,3 +28,9 @@ def test_subject_auth_cached(client: TestClient, redis_client: Redis, auth_heade
 
     in_cache = orjson.loads(redis_client.get(cache_key))
     assert response.json()["name"] == in_cache["name"]
+
+
+def test_subject_nsfw_no_cache(client: TestClient, auth_header):
+    response = client.get("/v0/subjects/16", headers=auth_header)
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store"

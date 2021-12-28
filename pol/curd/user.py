@@ -33,6 +33,9 @@ class User(Role, BaseModel):
         allow_date = self.registration_date + timedelta(days=60)
         return datetime.utcnow().astimezone() > allow_date
 
+    def is_guest(self) -> bool:
+        return False
+
 
 async def get_by_valid_token(db: AsyncSession, access_token: str) -> User:
     access: Optional[ChiiOauthAccessToken] = await db.scalar(
