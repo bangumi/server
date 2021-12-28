@@ -7,10 +7,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from pol import sa, config
-from pol.db.const import SubjectType
+from pol.db.const import Gender, BloodType, PersonType, SubjectType
 from pol.db.tables import (
     ChiiMember,
+    ChiiPerson,
     ChiiSubject,
+    ChiiPersonField,
     ChiiSubjectField,
     ChiiOauthAccessToken,
 )
@@ -110,6 +112,95 @@ def mock_subject(db_session: Session):
                 field_mon=field_mon,
                 field_week_day=field_week_day,
                 field_date=field_date,
+            )
+        )
+        db_session.commit()
+
+    try:
+        yield mock_id
+    finally:
+        for table, where in delete_query.items():
+            db_session.execute(sa.delete(table).where(sa.or_(*where)))
+        db_session.commit()
+
+
+@pytest.fixture()
+def mock_person(db_session: Session):
+    mock_person_id = set()
+    delete_query = defaultdict(list)
+
+    def mock_id(
+        prsn_id: int,
+        prsn_name="",
+        prsn_type=PersonType.person,
+        prsn_infobox="",
+        prsn_producer=0,
+        prsn_mangaka=0,
+        prsn_artist=1,
+        prsn_seiyu=0,
+        prsn_writer=0,
+        prsn_illustrator=0,
+        prsn_actor=0,
+        prsn_summary="",
+        prsn_img="",
+        prsn_img_anidb="",
+        prsn_comment=0,
+        prsn_collects=0,
+        prsn_dateline=0,
+        prsn_lastpost=0,
+        prsn_lock=0,
+        prsn_anidb_id=0,
+        prsn_ban=0,
+        prsn_redirect=0,
+        prsn_nsfw=0,
+        gender=Gender.male,
+        bloodtype=BloodType.o,
+        birth_year=2000,
+        birth_mon=1,
+        birth_day=1,
+    ):
+        delete_query[ChiiPerson].append(ChiiPerson.prsn_id == prsn_id)
+        delete_query[ChiiPersonField].append(ChiiPersonField.prsn_id == prsn_id)
+
+        check_exist(db_session, delete_query)
+        mock_person_id.add(prsn_id)
+
+        db_session.add(
+            ChiiPerson(
+                prsn_id=prsn_id,
+                prsn_name=prsn_name,
+                prsn_type=prsn_type,
+                prsn_infobox=prsn_infobox,
+                prsn_producer=prsn_producer,
+                prsn_mangaka=prsn_mangaka,
+                prsn_artist=prsn_artist,
+                prsn_seiyu=prsn_seiyu,
+                prsn_writer=prsn_writer,
+                prsn_illustrator=prsn_illustrator,
+                prsn_actor=prsn_actor,
+                prsn_summary=prsn_summary,
+                prsn_img=prsn_img,
+                prsn_img_anidb=prsn_img_anidb,
+                prsn_comment=prsn_comment,
+                prsn_collects=prsn_collects,
+                prsn_dateline=prsn_dateline,
+                prsn_lastpost=prsn_lastpost,
+                prsn_lock=prsn_lock,
+                prsn_anidb_id=prsn_anidb_id,
+                prsn_ban=prsn_ban,
+                prsn_redirect=prsn_redirect,
+                prsn_nsfw=prsn_nsfw,
+            )
+        )
+        db_session.add(
+            ChiiPersonField(
+                prsn_cat="prsn",
+                prsn_id=prsn_id,
+                gender=gender,
+                bloodtype=bloodtype,
+                birth_year=birth_year,
+                birth_mon=birth_mon,
+                birth_day=birth_day,
             )
         )
         db_session.commit()

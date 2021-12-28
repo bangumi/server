@@ -21,6 +21,8 @@ __all__ = [
     "RelatedSubject",
     "Character",
     "CharacterDetail",
+    "CharacterPerson",
+    "PersonCharacter",
 ]
 
 
@@ -149,6 +151,18 @@ class CharacterDetail(BaseCharacter):
     birth_day: Optional[int] = Field(None, description="parsed from wiki, maybe `null`")
 
     stat: Stat
+
+
+class PersonCharacter(BaseCharacter):
+    subject_id: int
+    subject_name: str
+    subject_name_cn: str
+
+
+class CharacterPerson(BaseCharacter):
+    subject_id: int
+    subject_name: str
+    subject_name_cn: str
 
 
 class Pager(pydantic.BaseModel):
