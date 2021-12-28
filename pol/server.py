@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker
 from fastapi.responses import HTMLResponse
 from starlette.requests import Request
+from starlette.responses import Response
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
@@ -32,7 +33,9 @@ app.router.route_class = ErrorCatchRoute
 
 @app.middleware("http")
 async def handle_public_cache(request: Request, call_next):
-    response = await call_next(request)
+    response: Response = await call_next(request)
+    if response.status_code >= 400:
+        return response
     if "authorization" in request.headers:
         response.headers["cache-control"] = "no-store"
     elif v := getattr(request.state, "public_resource", 0):
