@@ -176,8 +176,6 @@ async def get_person_characters(
     if person is None:
         raise not_found
 
-    if person.prsn_redirect:
-        return RedirectResponse(f"{api_base}/{person.prsn_redirect}/characters")
     query = (
         sa.select(
             ChiiCrtCastIndex.crt_id,
