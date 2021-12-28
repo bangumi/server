@@ -108,3 +108,22 @@ def test_character_lock(client: TestClient):
 
     res = response.json()
     assert res["locked"]
+
+
+def test_character_persons(client: TestClient, mock_person):
+    mock_person(3818, "福山潤")
+    response = client.get("/v0/characters/1/persons")
+    assert response.status_code == 200
+
+    persons = response.json()
+    assert persons[0]["id"] == 3818
+    assert persons[0]["subject_id"] == 8
+    assert set(persons[0].keys()) == {
+        "id",
+        "name",
+        "type",
+        "images",
+        "subject_id",
+        "subject_name",
+        "subject_name_cn",
+    }

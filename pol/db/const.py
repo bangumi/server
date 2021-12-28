@@ -16,11 +16,17 @@ class BloodType(enum.IntEnum):
     ab = 3
     o = 4
 
+    def translate(self, _escape_table):
+        return self.value
+
 
 class PersonType(enum.IntEnum):
     person = 1
     company = 2
     band = 3
+
+    def translate(self, _escape_table):
+        return self.value
 
 
 class Gender(enum.IntEnum):
@@ -33,6 +39,9 @@ class Gender(enum.IntEnum):
         elif self.value == self.female:
             return "female"
         raise ValueError(f"{self.value} is not valid gender")
+
+    def translate(self, _escape_table):
+        return self.value
 
 
 class EpType(enum.IntEnum):

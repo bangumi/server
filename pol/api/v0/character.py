@@ -11,10 +11,17 @@ from pol.models import ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
 from pol.db.const import Gender, get_character_rel
-from pol.db.tables import ChiiCharacter, ChiiPersonField, ChiiCrtSubjectIndex
+from pol.db.tables import (
+    ChiiPerson,
+    ChiiSubject,
+    ChiiCharacter,
+    ChiiPersonField,
+    ChiiCrtCastIndex,
+    ChiiCrtSubjectIndex,
+)
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import person_images
-from pol.api.v0.models import RelatedSubject, CharacterDetail
+from pol.api.v0.models import RelatedSubject, CharacterDetail, CharacterPerson
 from pol.redis.json_cache import JSONRedis
 
 router = APIRouter(tags=["角色"], route_class=ErrorCatchRoute)
@@ -143,3 +150,64 @@ async def get_person_subjects(
         )
 
     return subjects
+
+
+@router.get(
+    "/characters/{character_id}/persons",
+    summary="get character related persons",
+    response_model=List[CharacterPerson],
+    responses={
+        404: res.response(model=ErrorDetail),
+    },
+)
+async def get_character_persons(
+    db: AsyncSession = Depends(get_db),
+    not_found: Exception = Depends(exc_404),
+    character_id: int = Path(..., gt=0),
+):
+    character: Optional[ChiiCharacter] = await db.scalar(
+        sa.select(ChiiCharacter)
+        .where(ChiiCharacter.crt_id == character_id, ChiiCharacter.crt_ban == 0)
+        .limit(1)
+    )
+
+    if character is None:
+        raise not_found
+
+    if character.crt_redirect:
+        return RedirectResponse(f"{api_base}/{character.crt_redirect}/persons")
+
+    query = (
+        sa.select(
+            ChiiCrtCastIndex.crt_id,
+            ChiiCrtCastIndex.prsn_id,
+            ChiiPerson.prsn_name,
+            ChiiPerson.prsn_type,
+            ChiiPerson.prsn_img,
+            ChiiSubject.subject_id,
+            ChiiSubject.subject_name,
+            ChiiSubject.subject_name_cn,
+        )
+        .distinct()
+        .join(ChiiPerson, ChiiPerson.prsn_id == ChiiCrtCastIndex.prsn_id)
+        .join(ChiiSubject, ChiiSubject.subject_id == ChiiCrtCastIndex.subject_id)
+        .where(
+            ChiiCrtCastIndex.crt_id == character.crt_id,
+            ChiiPerson.prsn_ban == 0,
+        )
+    )
+
+    persons = [
+        {
+            "id": r["prsn_id"],
+            "name": r["prsn_name"],
+            "type": r["prsn_type"],
+            "images": person_images(r["prsn_img"]),
+            "subject_id": r["subject_id"],
+            "subject_name": r["subject_name"],
+            "subject_name_cn": r["subject_name_cn"],
+        }
+        for r in (await db.execute(query)).mappings().fetchall()
+    ]
+
+    return persons
