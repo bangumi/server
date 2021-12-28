@@ -20,6 +20,7 @@ app = FastAPI(
     version=config.COMMIT_REF,
     docs_url=None,
     redoc_url=None,
+    description="你可以在 <https://api.bgm.tv/v0/oauth/> 生成一个 Access Token",
     swagger_ui_oauth2_redirect_url=None,
     openapi_url=None,
     default_response_class=ORJSONResponse,
