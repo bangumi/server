@@ -40,7 +40,10 @@ class ErrorCatchRoute(APIRoute):
                     headers=exc.headers,
                     status_code=exc.status_code,
                 )
-            except (pymysql.err.MySQLError, sqlalchemy.exc.SQLAlchemyError) as exc:
+            except (
+                pymysql.err.MySQLError,
+                sqlalchemy.exc.SQLAlchemyError,
+            ) as exc:  # pragma: no cover
                 ray = request.headers.get("cf-ray")
                 logger.exception("exception in sqlalchemy {}", str(exc), cf_ray=ray)
                 return ORJSONResponse(
@@ -59,7 +62,7 @@ class ErrorCatchRoute(APIRoute):
                     },
                     status_code=500,
                 )
-            except Exception:
+            except Exception:  # pragma: no cover
                 ray = request.headers.get("cf-ray")
                 logger.exception(
                     "unexpected exception {} {}",
