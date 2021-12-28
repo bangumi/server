@@ -1,21 +1,16 @@
 import os
-import datetime
 import threading
 
-import pydantic
-import pymysql.err  # type: ignore
-import sqlalchemy.exc
 from loguru import logger
 from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker
 from fastapi.responses import HTMLResponse
-from fastapi.exceptions import RequestValidationError
-from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-from pol import api, res, config
+from pol import api, config
 from pol.res import ORJSONResponse
+from pol.router import ErrorLoggingRoute
 from pol.middlewares.http import setup_http_middleware
 from pol.redis.json_cache import JSONRedis
 
@@ -30,30 +25,21 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
+app.router.route_class = ErrorLoggingRoute
+
 setup_http_middleware(app)
 app.include_router(api.router)
 
 
-@app.exception_handler(res.HTTPException)
-async def http_exception_handler(request, exc: res.HTTPException):
-    return ORJSONResponse(
-        {
-            "title": exc.title,
-            "description": exc.description,
-            "detail": exc.detail,
-        },
-        headers=exc.headers,
-        status_code=exc.status_code,
-    )
-
-
 @app.exception_handler(StarletteHTTPException)
 async def global_404(request, exc: StarletteHTTPException):
+    """global 404 handler"""
     if exc.status_code == 404:
         return ORJSONResponse(
             {
                 "title": "Not Found",
                 "description": "The path you requested doesn't exist",
+                "url": "https://api.bgm.tv/v0/",
                 "detail": (
                     "This is default 404 response, "
                     "if you see this response, please check your request path"
@@ -63,67 +49,6 @@ async def global_404(request, exc: StarletteHTTPException):
         )
 
     return ORJSONResponse({"detail": exc.detail}, status_code=exc.status_code)
-
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc: RequestValidationError):
-    return ORJSONResponse(
-        {
-            "title": "Invalid Request",
-            "description": "One or more parameters to your request was invalid.",
-            "detail": exc.errors(),
-        },
-        status_code=422,
-    )
-
-
-@app.exception_handler(sqlalchemy.exc.SQLAlchemyError)
-@app.exception_handler(pymysql.err.MySQLError)
-async def global_pymysql_error(
-    request: Request, exc: pymysql.err.ProgrammingError
-):  # pragma: no cover
-    ray = request.headers.get("cf_ray")
-    logger.exception("exception in sqlalchemy", cf_ray=ray)
-    return ORJSONResponse(
-        {
-            "title": "Internal Server Error",
-            "description": (
-                "something unexpected happened with mysql,"
-                " please report to maintainer"
-            ),
-            "detail": {
-                "cf-ray": ray,
-                "url": str(request.url),
-                "time": datetime.datetime.now().astimezone().isoformat(),
-                "report-to": "https://github.com/bangumi/server/issues",
-            },
-        },
-        status_code=500,
-    )
-
-
-@app.exception_handler(pydantic.ValidationError)
-async def internal_response_validation_error(
-    request, exc: pydantic.ValidationError
-):  # pragma: no cover
-    """this is intend to cache un-expected pydantic validation error"""
-    ray = request.headers.get("cf_ray")
-    logger.exception(str(exc), message="internal validation error", cf_ray=ray)
-    return ORJSONResponse(
-        {
-            "title": "Internal Server Error",
-            "description": (
-                "something unexpected happened, please report to maintainer"
-            ),
-            "detail": {
-                "cf-ray": ray,
-                "url": str(request.url),
-                "time": datetime.datetime.now().astimezone().isoformat(),
-                "report-to": "https://github.com/bangumi/server/issues",
-            },
-        },
-        status_code=500,
-    )
 
 
 @app.on_event("startup")

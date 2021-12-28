@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res
 from pol.models import ErrorDetail
+from pol.router import ErrorLoggingRoute
 from pol.curd.ep import Ep
 from pol.depends import get_db
 from pol.db.const import EpType
@@ -14,7 +15,7 @@ from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.models import Paged
 from pol.api.v0.models.subject import Episode, EpisodeDetail
 
-router = APIRouter(tags=["章节"])
+router = APIRouter(tags=["章节"], route_class=ErrorLoggingRoute)
 
 
 class Pager(BaseModel):

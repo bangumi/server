@@ -28,6 +28,7 @@ def test_default_404(client: TestClient):
     assert res == {
         "title": "Not Found",
         "description": "The path you requested doesn't exist",
+        "url": "https://api.bgm.tv/v0/",
         "detail": (
             "This is default 404 response, "
             "if you see this response, please check your request path"

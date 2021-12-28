@@ -1,9 +1,12 @@
 import time
+import datetime
 
+from loguru import logger
 from fastapi import FastAPI
 from starlette.requests import Request
 
 from pol import config
+from pol.res import ORJSONResponse
 
 
 def setup_http_middleware(app: FastAPI):
@@ -21,12 +24,13 @@ def setup_http_middleware(app: FastAPI):
         try:
             return await call_next(request)
         except Exception as exc:
-            app.state.logger.exception(
+            ray = request.headers.get("cf-ray")
+            logger.exception(
                 "catch exception in middleware",
                 extra={
                     "url": str(request.url),
                     "query": dict(request.query_params),
-                    "x-request-id": request.headers.get("x-request-id", ""),
+                    "x-request-id": request.headers.get("xf-ray", ""),
                     "event": "http.exception",
                     "exception": "{}.{}".format(
                         getattr(exc, "__module__", "builtin"),
@@ -34,4 +38,19 @@ def setup_http_middleware(app: FastAPI):
                     ),
                 },
             )
-            raise
+            return ORJSONResponse(
+                {
+                    "title": "Internal Server Error",
+                    "description": (
+                        "something unexpected happened with mysql,"
+                        " please report to maintainer"
+                    ),
+                    "detail": {
+                        "cf-ray": ray,
+                        "url": str(request.url),
+                        "time": datetime.datetime.now().astimezone().isoformat(),
+                        "report-to": "https://github.com/bangumi/server/issues",
+                    },
+                },
+                status_code=500,
+            )

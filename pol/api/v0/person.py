@@ -8,6 +8,7 @@ from pol import sa, res, wiki
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.models import ErrorDetail
+from pol.router import ErrorLoggingRoute
 from pol.depends import get_db, get_redis
 from pol.db.const import Gender, StaffMap
 from pol.db.tables import ChiiPerson, ChiiPersonCsIndex, ChiiCharacterField
@@ -16,7 +17,7 @@ from pol.api.v0.utils import get_career, person_images
 from pol.api.v0.models import PersonDetail, RelatedSubject
 from pol.redis.json_cache import JSONRedis
 
-router = APIRouter(tags=["人物"])
+router = APIRouter(tags=["人物"], route_class=ErrorLoggingRoute)
 
 api_base = "/v0/persons"
 
