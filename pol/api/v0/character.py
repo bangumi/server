@@ -78,7 +78,8 @@ async def get_character_detail(
 
     field = await db.get(ChiiPersonField, character_id)
     if field is not None:
-        data["gender"] = Gender(field.gender).str()
+        if field.gender:
+            data["gender"] = Gender(field.gender).str()
         data["blood_type"] = field.bloodtype or None
         data["birth_year"] = field.birth_year or None
         data["birth_mon"] = field.birth_mon or None
