@@ -1,7 +1,7 @@
 from typing import List, Iterator, Optional
 
 from fastapi import Path, Depends, Request, APIRouter
-from starlette.responses import Response, RedirectResponse
+from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, curd, wiki
@@ -29,6 +29,7 @@ from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelatedPerson, RelatedCharacter
 from pol.redis.json_cache import JSONRedis
+from pol.http_cache.depends import CacheControl
 from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject
 
@@ -63,24 +64,47 @@ async def get_subject(
     user: Role = Depends(optional_user),
     db: AsyncSession = Depends(get_db),
     redis: JSONRedis = Depends(get_redis),
+    cache_control: CacheControl = Depends(CacheControl),
 ):
+    """cache and permission wrapper"""
     cache_key = CACHE_KEY_PREFIX + f"subject:{subject_id}"
-    if s := await redis.get_with_model(cache_key, Subject):
-        if s.nsfw and not user.allow_nsfw():
-            raise exc_404
+    s = await redis.get_with_model(cache_key, Subject)
+    if s:
         response.headers["x-cache-status"] = "hit"
-        return s
+        nsfw = s.nsfw
+        data = s.dict()
     else:
+        # now fetch real data
         response.headers["x-cache-status"] = "miss"
+        data = await _get_subject(
+            cache_control, exc_404=exc_404, subject_id=subject_id, db=db
+        )
+        await redis.set_json(cache_key, value=data, ex=300)
+        nsfw = data["nsfw"]
 
+    if nsfw and not user.allow_nsfw():
+        raise exc_404
+
+    return data
+
+
+async def _get_subject(
+    cache_control: CacheControl,
+    exc_404: res.HTTPException = Depends(exception_404),
+    subject_id: int = Path(..., gt=0),
+    db: AsyncSession = Depends(get_db),
+):
     subject: Optional[ChiiSubject] = await db.get(
         ChiiSubject, subject_id, options=[sa.joinedload(ChiiSubject.fields)]
     )
     if subject is None:
         raise exc_404
 
+    if not subject.subject_nsfw:
+        cache_control(300)
+
     if subject.fields.field_redirect:
-        return RedirectResponse(f"{api_base}/{subject.fields.field_redirect}")
+        raise res.HTTPRedirect(f"{api_base}/{subject.fields.field_redirect}")
 
     if subject.ban:
         raise exc_404
@@ -115,11 +139,6 @@ async def get_subject(
         data["infobox"] = wiki.parse(subject.field_infobox).info
     except wiki.WikiSyntaxError:
         data["infobox"] = None
-
-    await redis.set_json(cache_key, value=data, ex=300)
-
-    if subject.subject_nsfw and not user.allow_nsfw():
-        raise exc_404
 
     return data
 

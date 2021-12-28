@@ -1,7 +1,9 @@
-from typing import Any, Dict, Type, Optional
+from typing import Any, Dict, Type, Union, Optional
+from urllib.parse import quote
 
 import orjson
 from starlette.responses import JSONResponse
+from starlette.datastructures import URL
 
 
 class ORJSONResponse(JSONResponse):
@@ -22,9 +24,22 @@ class HTTPException(Exception):
     ) -> None:
         self.status_code = status_code
         self.detail = detail
-        self.headers = headers
+        self.headers = headers or {}
         self.title = title
         self.description = description
+
+
+class HTTPRedirect(HTTPException):
+    def __init__(
+        self,
+        url: Union[str, URL],
+        status_code: int = 307,
+        headers: dict = None,
+    ) -> None:
+        super().__init__(
+            status_code=status_code, headers=headers, title="", description=""
+        )
+        self.headers["location"] = quote(str(url), safe=":/%#?=@[]!$&'()*+,;")
 
 
 def response(model: Type = None, description: str = None) -> Dict[str, Any]:
