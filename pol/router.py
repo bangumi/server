@@ -1,7 +1,8 @@
 from typing import Callable
 from datetime import datetime
 
-import pymysql.err
+import pymysql.err  # type: ignore
+import asyncmy.errors
 import sqlalchemy.exc
 from loguru import logger
 from fastapi import Request, Response
@@ -43,6 +44,7 @@ class ErrorCatchRoute(APIRoute):
             except (
                 pymysql.err.MySQLError,
                 sqlalchemy.exc.SQLAlchemyError,
+                asyncmy.errors.MySQLError,
             ) as exc:  # pragma: no cover
                 ray = request.headers.get("cf-ray")
                 logger.exception("exception in sqlalchemy {}", str(exc), cf_ray=ray)
