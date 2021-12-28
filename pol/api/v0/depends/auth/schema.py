@@ -14,10 +14,7 @@ class OptionalHTTPBearer(SecurityBase):
         self,
         *,
         bearerFormat: Optional[str] = None,
-        description: Optional[str] = (
-            "You don't need a access token to access this API "
-            "but you may not access some private or sensitive resource."
-        ),
+        description: Optional[str] = "不强制要求用户认证，但是可能看不到某些敏感内容内容（如 NSFW 或者“仅自己可见”）",
         scheme_name: Optional[str] = None,
     ):
         self.model = HTTPBearerModel(bearerFormat=bearerFormat, description=description)
@@ -48,10 +45,7 @@ class HTTPBearer(SecurityBase):
         self,
         *,
         bearerFormat: Optional[str] = None,
-        description: Optional[str] = (
-            "You can create a personal access token at "
-            "[https://bgm.tv/dev/app](https://bgm.tv/dev/app)"
-        ),
+        description: str = "需要使用 access token 进行认证",
         scheme_name: Optional[str] = None,
     ):
         self.model = HTTPBearerModel(bearerFormat=bearerFormat, description=description)
