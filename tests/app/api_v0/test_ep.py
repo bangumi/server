@@ -13,6 +13,7 @@ def test_episode(client: TestClient):
     response = client.get("/v0/episodes/103234")
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
+    assert response.headers["cache-control"] == "public, max-age=300"
 
     data = response.json()
 
