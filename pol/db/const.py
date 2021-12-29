@@ -22,9 +22,9 @@ class BloodType(enum.IntEnum):
 
 class CharacterType(enum.IntEnum):
     person = 1
-    company = 2
-    band = 3
-    group = 4
+    airframe = 2
+    ship = 3
+    organization = 4
 
     def translate(self, _escape_table):
         return self.value
