@@ -11,9 +11,11 @@ from pol.curd.ep import Ep
 from pol.depends import get_db
 from pol.db.const import EpType
 from pol.db.tables import ChiiEpisode, ChiiSubject
+from pol.permission import Role
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.models import Paged
 from pol.http_cache.depends import CacheControl
+from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Episode, EpisodeDetail
 
 router = APIRouter(tags=["章节"], route_class=ErrorCatchRoute)
@@ -38,17 +40,23 @@ async def get_episodes(
     type: EpType = Query(None, description="`0`,`1`,`2`,`3`代表`本篇`，`sp`，`op`，`ed`"),
     page: Pager = Depends(),
     cache_control: CacheControl = Depends(CacheControl),
+    user: Role = Depends(optional_user),
 ):
-    cache_control(300)
-
+    not_found = res.HTTPException(
+        status_code=404,
+        title="Not Found",
+        description=NotFoundDescription,
+        detail={"subject_id": subject_id, "type": type},
+    )
     subject = await db.get(ChiiSubject, subject_id)
     if not subject:
-        raise res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description=NotFoundDescription,
-            detail={"subject_id": subject_id, "type": type},
-        )
+        raise not_found
+
+    if not subject.subject_nsfw:
+        cache_control(300)
+    else:
+        if not user.allow_nsfw():
+            raise not_found
 
     where = [
         ChiiEpisode.ep_subject_id == subject_id,
