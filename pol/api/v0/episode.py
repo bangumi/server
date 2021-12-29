@@ -68,7 +68,7 @@ async def get_episodes(
     total = await db.scalar(sa.select(sa.count(1)).where(*where))
 
     if total == 0:
-        return {"total": total, "limit": page.limit, "offset": page.offset, "data": []}
+        return page.dict()
 
     first_episode: ChiiEpisode = await db.scalar(
         sa.select(ChiiEpisode)

@@ -34,6 +34,18 @@ def test_episodes(client: TestClient):
             assert ep["ep"] == 0
 
 
+def test_episodes_empty(client: TestClient):
+    response = client.get("/v0/episodes", params={"subject_id": 1})
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/json"
+    assert response.headers["cache-control"] == "public, max-age=300"
+
+    data = response.json()
+    assert data["total"] == 0
+    assert isinstance(data["data"], list)
+    assert not data["data"]
+
+
 def test_episodes_404(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 1000000})
     assert response.status_code == 404
