@@ -6,7 +6,7 @@ T = TypeVar("T")
 
 
 class Paged(GenericModel, Generic[T]):
-    total: int
-    limit: int
-    offset: int
-    data: List[T]
+    total: int = 0
+    limit: int = 0
+    offset: int = 0
+    data: List[T] = []
