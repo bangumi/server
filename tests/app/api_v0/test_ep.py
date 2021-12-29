@@ -34,6 +34,13 @@ def test_episodes(client: TestClient):
             assert ep["ep"] == 0
 
 
+def test_episodes_offset_too_big(client: TestClient):
+    """subject 8 has only 25 episode, offset must less than than total"""
+    response = client.get("/v0/episodes", params={"subject_id": 8, "offset": 25})
+    assert response.status_code == 422
+    assert response.headers["content-type"] == "application/json"
+
+
 def test_episodes_empty(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 1})
     assert response.status_code == 200

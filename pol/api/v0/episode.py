@@ -2,7 +2,9 @@ from typing import Optional
 
 from fastapi import Query, Depends, APIRouter
 from pydantic import Field, BaseModel
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic.error_wrappers import ErrorWrapper
 
 from pol import sa, res
 from pol.models import ErrorDetail
@@ -24,6 +26,17 @@ router = APIRouter(tags=["章节"], route_class=ErrorCatchRoute)
 class Pager(BaseModel):
     limit: int = Field(100, gt=0, le=200, description="最大值`200`")
     offset: int = Field(0, ge=0)
+
+    def check(self, total: int):
+        if self.offset >= total:
+            raise RequestValidationError(
+                [
+                    ErrorWrapper(
+                        ValueError(f"offset is too bigger for record count {total}"),
+                        loc=("query", "offset"),
+                    )
+                ]
+            )
 
 
 @router.get(
@@ -69,6 +82,8 @@ async def get_episodes(
 
     if total == 0:
         return page.dict()
+
+    page.check(total)
 
     first_episode: ChiiEpisode = await db.scalar(
         sa.select(ChiiEpisode)
