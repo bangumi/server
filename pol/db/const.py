@@ -581,14 +581,28 @@ class RevisionType(enum.IntEnum):
 
 
 class TopicStateType(enum.IntEnum):
+    """
+    topic和post共用同一套state定义
+    column: {tbl}_tpc_state
+    """
     none = 0
     closed = 1
     reopen = 2
     pin = 3
     merge = 4
     silent = 5
-    delete = 6
-    private = 7
+    delete = 6      # used by post
+    private = 7     # used by post
+
+
+class TopicDisplayStatusType(enum.IntEnum):
+    """
+    column: {tbl}_tpc_display
+    """
+    all = -1        # not related to permissions?
+    ban = 0
+    normal = 1
+    review = 2
 
 
 class TopicMeta(NamedTuple):
@@ -605,7 +619,6 @@ TOPIC_STATE_MAP: Dict[enum.IntEnum, TopicMeta] = {
     TopicStateType.merge: TopicMeta(type="merge", name="合并"),
     TopicStateType.silent: TopicMeta(type="Silent", name="下沉", desc="下沉了主题"),
     TopicStateType.delete: TopicMeta(type="delete", name="删除", desc="自行删除"),
-    TopicStateType.private: TopicMeta(
-        type="private", name="系统删除", desc="内容因违反社区指导原则已被删除"
-    ),
+    TopicStateType.private: TopicMeta(type="private", name="系统删除",
+                                      desc="内容因违反社区指导原则已被删除"),
 }
