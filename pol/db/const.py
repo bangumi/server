@@ -60,6 +60,9 @@ class EpType(enum.IntEnum):
     op = 2
     ed = 3
 
+    def translate(self, _escape_table):
+        return self.value
+
 
 class SubjectType(enum.IntEnum):
     book = 1

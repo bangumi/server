@@ -10,7 +10,7 @@ from pol.router import ErrorCatchRoute
 from pol.curd.ep import Ep
 from pol.depends import get_db
 from pol.db.const import EpType
-from pol.db.tables import ChiiEpisode
+from pol.db.tables import ChiiEpisode, ChiiSubject
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.models import Paged
 from pol.http_cache.depends import CacheControl
@@ -40,6 +40,16 @@ async def get_episodes(
     cache_control: CacheControl = Depends(CacheControl),
 ):
     cache_control(300)
+
+    subject = await db.get(ChiiSubject, subject_id)
+    if not subject:
+        raise res.HTTPException(
+            status_code=404,
+            title="Not Found",
+            description=NotFoundDescription,
+            detail={"subject_id": subject_id, "type": type},
+        )
+
     where = [
         ChiiEpisode.ep_subject_id == subject_id,
     ]
@@ -50,15 +60,15 @@ async def get_episodes(
     total = await db.scalar(sa.select(sa.count(1)).where(*where))
 
     if total == 0:
-        raise res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description=NotFoundDescription,
-            detail={"subject_id": subject_id, "type": type},
-        )
+        return {"total": total, "limit": page.limit, "offset": page.offset, "data": []}
 
     first_episode: ChiiEpisode = await db.scalar(
-        sa.select(ChiiEpisode).where(*where).limit(1)
+        sa.select(ChiiEpisode)
+        .where(
+            ChiiEpisode.ep_subject_id == subject_id,
+            ChiiEpisode.ep_type == EpType.normal,
+        )
+        .limit(1)
     )
 
     return {
