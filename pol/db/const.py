@@ -20,11 +20,20 @@ class BloodType(enum.IntEnum):
         return self.value
 
 
-class PersonType(enum.IntEnum):
+class CharacterType(enum.IntEnum):
     person = 1
     company = 2
     band = 3
     group = 4
+
+    def translate(self, _escape_table):
+        return self.value
+
+
+class PersonType(enum.IntEnum):
+    person = 1
+    company = 2
+    band = 3
 
     def translate(self, _escape_table):
         return self.value
