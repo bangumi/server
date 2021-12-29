@@ -55,21 +55,16 @@ async def get_episodes(
     cache_control: CacheControl = Depends(CacheControl),
     user: Role = Depends(optional_user),
 ):
-    not_found = res.HTTPException(
-        status_code=404,
-        title="Not Found",
-        description=NotFoundDescription,
-        detail={"subject_id": subject_id, "type": type},
-    )
     subject = await db.get(ChiiSubject, subject_id)
     if not subject:
-        raise not_found
+        cache_control(300)
+        return page.dict()
 
     if not subject.subject_nsfw:
         cache_control(300)
     else:
         if not user.allow_nsfw():
-            raise not_found
+            return page.dict()
 
     where = [
         ChiiEpisode.ep_subject_id == subject_id,

@@ -55,14 +55,18 @@ def test_episodes_empty(client: TestClient):
 
 def test_episodes_404(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 1000000})
-    assert response.status_code == 404
+    assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
+
+    assert response.json()["total"] == 0
 
 
 def test_episodes_nsfw_non_auth(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 16})
-    assert response.status_code == 404
+    assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
+
+    assert response.json()["total"] == 0
 
 
 def test_episodes_nsfw_auth(client: TestClient, auth_header):
