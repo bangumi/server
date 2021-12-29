@@ -578,3 +578,34 @@ class RevisionType(enum.IntEnum):
     ep_lock = 183
     ep_unlock = 184
     ep_erase = 185
+
+
+class TopicStateType(enum.IntEnum):
+    none = 0
+    closed = 1
+    reopen = 2
+    pin = 3
+    merge = 4
+    silent = 5
+    delete = 6
+    private = 7
+
+
+class TopicMeta(NamedTuple):
+    type: str
+    name: str
+    desc: str = ""
+
+
+TOPIC_STATE_MAP: Dict[enum.IntEnum, TopicMeta] = {
+    TopicStateType.none: TopicMeta(type="none", name="正常"),
+    TopicStateType.closed: TopicMeta(type="Closed", name="关闭", desc="关闭了主题"),
+    TopicStateType.reopen: TopicMeta(type="Reopen", name="重开", desc="重新开启了主题"),
+    TopicStateType.pin: TopicMeta(type="pin", name="置顶"),
+    TopicStateType.merge: TopicMeta(type="merge", name="合并"),
+    TopicStateType.silent: TopicMeta(type="Silent", name="下沉", desc="下沉了主题"),
+    TopicStateType.delete: TopicMeta(type="delete", name="删除", desc="自行删除"),
+    TopicStateType.private: TopicMeta(
+        type="private", name="系统删除", desc="内容因违反社区指导原则已被删除"
+    ),
+}
