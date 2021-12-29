@@ -22,6 +22,20 @@ def test_episode(client: TestClient):
     assert "name" in data
 
 
+def test_episode_nsfw_subject_404(client: TestClient):
+    response = client.get("/v0/episodes/12")
+    assert response.status_code == 404
+    assert response.headers["content-type"] == "application/json"
+    assert "cache-control" not in response.headers
+
+
+def test_episode_nsfw_subject(client: TestClient, auth_header):
+    response = client.get("/v0/episodes/12", headers=auth_header)
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/json"
+    assert response.headers["cache-control"] == "no-store"
+
+
 def test_episodes(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 253})
     assert response.status_code == 200

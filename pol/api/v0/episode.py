@@ -60,11 +60,11 @@ async def get_episodes(
         cache_control(300)
         return page.dict()
 
-    if not subject.subject_nsfw:
-        cache_control(300)
-    else:
+    if subject.subject_nsfw:
         if not user.allow_nsfw():
             return page.dict()
+    else:
+        cache_control(300)
 
     where = [
         ChiiEpisode.ep_subject_id == subject_id,
@@ -126,21 +126,38 @@ async def get_episode(
     episode_id: int,
     db: AsyncSession = Depends(get_db),
     cache_control: CacheControl = Depends(CacheControl),
+    user: Role = Depends(optional_user),
 ):
-    cache_control(300)
+    not_found = res.HTTPException(
+        status_code=404,
+        title="Not Found",
+        description=NotFoundDescription,
+        detail={"episode_id": episode_id},
+    )
+
     ep: Optional[ChiiEpisode] = await db.get(ChiiEpisode, episode_id)
     if ep is None:
-        raise res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description=NotFoundDescription,
-            detail={"episode_id": episode_id},
-        )
+        cache_control(300)
+        raise not_found
 
-    where = [ChiiEpisode.ep_subject_id == ep.ep_subject_id]
+    subject = await db.get(ChiiSubject, ep.ep_subject_id)
+    if not subject:
+        cache_control(300)
+        raise not_found
+
+    if subject.subject_nsfw:
+        if not user.allow_nsfw():
+            raise not_found
+    else:
+        cache_control(300)
 
     first_episode: ChiiEpisode = await db.scalar(
-        sa.select(ChiiEpisode).where(*where).limit(1)
+        sa.select(ChiiEpisode)
+        .where(
+            ChiiEpisode.ep_subject_id == ep.ep_subject_id,
+            ChiiEpisode.ep_type == EpType.normal,
+        )
+        .limit(1)
     )
 
     return add_episode(Ep.from_orm(ep), first_episode.ep_sort)
