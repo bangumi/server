@@ -1,5 +1,6 @@
 from typing import Optional
 
+from loguru import logger
 from fastapi import Query, Depends, APIRouter
 from pydantic import Field, BaseModel
 from fastapi.exceptions import RequestValidationError
@@ -141,7 +142,10 @@ async def get_episode(
         raise not_found
 
     subject = await db.get(ChiiSubject, ep.ep_subject_id)
-    if not subject:
+    if not subject:  # pragma: no cover
+        logger.error(
+            "detached episode {}, missing subject {}", ep.ep_id, ep.ep_subject_id
+        )
         cache_control(300)
         raise not_found
 
