@@ -112,7 +112,7 @@ def test_character_lock(client: TestClient):
 
 def test_character_persons(client: TestClient, mock_person):
     mock_person(3818, "福山潤")
-    response = client.get("/v0/characters/1/people")
+    response = client.get("/v0/characters/1/persons")
     assert response.status_code == 200
 
     persons = response.json()

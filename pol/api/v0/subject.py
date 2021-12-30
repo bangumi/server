@@ -144,7 +144,7 @@ async def _get_subject(
 
 
 @router.get(
-    "/subjects/{subject_id}/people",
+    "/subjects/{subject_id}/persons",
     response_model=List[RelatedPerson],
     responses={
         404: res.response(model=ErrorDetail),
@@ -158,7 +158,7 @@ async def get_subject_persons(
     subject: ChiiSubject = await db.scalar(
         sa.select(ChiiSubject)
         .options(
-            sa.selectinload(ChiiSubject.people).joinedload(ChiiPersonCsIndex.person)
+            sa.selectinload(ChiiSubject.persons).joinedload(ChiiPersonCsIndex.person)
         )
         .where(ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0)
     )
@@ -168,7 +168,7 @@ async def get_subject_persons(
 
     persons = []
 
-    for rel in subject.people:
+    for rel in subject.persons:
         p = rel.person
         persons.append(
             {

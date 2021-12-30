@@ -7,23 +7,23 @@ from pol.config import CACHE_KEY_PREFIX
 
 
 def test_person_not_found(client: TestClient):
-    response = client.get("/v0/people/2000000")
+    response = client.get("/v0/persons/2000000")
     assert response.status_code == 404
     assert response.headers["content-type"] == "application/json"
 
 
 def test_person_not_valid(client: TestClient):
-    response = client.get("/v0/people/hello")
+    response = client.get("/v0/persons/hello")
     assert response.status_code == 422
     assert response.headers["content-type"] == "application/json"
 
-    response = client.get("/v0/people/0")
+    response = client.get("/v0/persons/0")
     assert response.status_code == 422
     assert response.headers["content-type"] == "application/json"
 
 
 def test_person_basic(client: TestClient):
-    response = client.get("/v0/people/2")
+    response = client.get("/v0/persons/2")
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
 
@@ -33,16 +33,16 @@ def test_person_basic(client: TestClient):
 
 
 def test_person_ban_404(client: TestClient):
-    response = client.get("/v0/people/6")
+    response = client.get("/v0/persons/6")
     assert response.status_code == 404
 
 
 def test_person_cache(client: TestClient, redis_client: redis.Redis):
-    response = client.get("/v0/people/1")
+    response = client.get("/v0/persons/1")
     assert response.status_code == 200
     assert response.headers["x-cache-status"] == "miss"
 
-    response = client.get("/v0/people/1")
+    response = client.get("/v0/persons/1")
     assert response.headers["x-cache-status"] == "hit"
     assert response.status_code == 200
 
@@ -59,7 +59,7 @@ def test_person_cache(client: TestClient, redis_client: redis.Redis):
         "stat": {"comments": 110, "collects": 841},
     }
     redis_client.set(cache_key, json.dumps(cached_data))
-    response = client.get("/v0/people/1")
+    response = client.get("/v0/persons/1")
     assert response.headers["x-cache-status"] == "hit"
     assert response.status_code == 200
 
@@ -68,7 +68,7 @@ def test_person_cache(client: TestClient, redis_client: redis.Redis):
 
 
 def test_person_subjects(client: TestClient):
-    response = client.get("/v0/people/1/subjects")
+    response = client.get("/v0/persons/1/subjects")
     assert response.status_code == 200
 
     subjects = response.json()
@@ -82,12 +82,12 @@ def test_person_subjects(client: TestClient):
 
 
 def test_person_redirect(client: TestClient):
-    response = client.get("/v0/people/10", allow_redirects=False)
+    response = client.get("/v0/persons/10", allow_redirects=False)
     assert response.status_code == 307
 
 
 def test_person_lock(client: TestClient):
-    response = client.get("/v0/people/9")
+    response = client.get("/v0/persons/9")
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
 
@@ -97,7 +97,7 @@ def test_person_lock(client: TestClient):
 
 def test_person_characters(client: TestClient, mock_person):
     mock_person(3818, "福山潤")
-    response = client.get("/v0/people/3818/characters")
+    response = client.get("/v0/persons/3818/characters")
     assert response.status_code == 200
 
     characters = response.json()

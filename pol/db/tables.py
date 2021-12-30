@@ -291,7 +291,7 @@ class ChiiPersonCsIndex(Base):
         lazy="raise",
         innerjoin=True,
         uselist=False,
-        back_populates="people",
+        back_populates="persons",
     )  # type: ignore
 
 
@@ -676,7 +676,7 @@ class ChiiSubject(Base):
         TINYINT(1), nullable=False, index=True, server_default=text("'0'")
     )
 
-    people: List[ChiiPersonCsIndex] = relationship(
+    persons: List[ChiiPersonCsIndex] = relationship(
         "ChiiPersonCsIndex",
         primaryjoin=(
             lambda: foreign(ChiiPersonCsIndex.subject_id) == ChiiSubject.subject_id

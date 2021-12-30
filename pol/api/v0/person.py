@@ -26,7 +26,7 @@ from pol.redis.json_cache import JSONRedis
 
 router = APIRouter(tags=["人物"], route_class=ErrorCatchRoute)
 
-api_base = "/v0/people"
+api_base = "/v0/persons"
 
 
 async def exc_404(person_id: int):
@@ -39,7 +39,7 @@ async def exc_404(person_id: int):
 
 
 @router.get(
-    "/people/{person_id}",
+    "/persons/{person_id}",
     description="cache with 60s",
     response_model=PersonDetail,
     responses={
@@ -108,7 +108,7 @@ async def get_person(
 
 
 @router.get(
-    "/people/{person_id}/subjects",
+    "/persons/{person_id}/subjects",
     summary="get person related subjects",
     response_model=List[RelatedSubject],
     responses={
@@ -156,7 +156,7 @@ async def get_person_subjects(
 
 
 @router.get(
-    "/people/{person_id}/characters",
+    "/persons/{person_id}/characters",
     summary="get person related characters",
     response_model=List[PersonCharacter],
     responses={

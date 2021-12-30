@@ -104,7 +104,7 @@ def test_subject_characters(client: TestClient):
 
 
 def test_subject_persons(client: TestClient):
-    response = client.get("/v0/subjects/4/people")
+    response = client.get("/v0/subjects/4/persons")
     assert response.status_code == 200
 
     data = response.json()
