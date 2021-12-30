@@ -62,6 +62,6 @@ async def get_current_user(
             description="Invalid authentication credentials",
         )
 
-    await redis.set_json(cache_key, user.dict(by_alias=True))
+    await redis.set_json(cache_key, user.dict(by_alias=True), ex=60)
 
     return user

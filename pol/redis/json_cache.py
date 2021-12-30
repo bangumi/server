@@ -34,7 +34,7 @@ class JSONRedis(Redis):
         self,
         name: KeyT,
         value: Union[Dict[str, Any], int],
-        ex: ExpiryT = None,
+        ex: ExpiryT,
         px: ExpiryT = None,
         nx: bool = False,
         xx: bool = False,
