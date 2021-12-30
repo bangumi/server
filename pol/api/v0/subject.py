@@ -237,7 +237,7 @@ async def get_subject_relations(
     subject_id: int = Path(..., gt=0),
     db: AsyncSession = Depends(get_db),
 ):
-    subject: ChiiSubject = await db.scalar(
+    subject: Optional[ChiiSubject] = await db.scalar(
         sa.select(ChiiSubject)
         .where(ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0)
         .options(

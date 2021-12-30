@@ -715,7 +715,7 @@ class ChiiSubject(Base):
         uselist=False,
     )  # type: ignore
 
-    relations: ChiiSubjectRelations = relationship(
+    relations: List[ChiiSubjectRelations] = relationship(
         "ChiiSubjectRelations",
         primaryjoin=lambda: (
             ChiiSubject.subject_id == foreign(ChiiSubjectRelations.rlt_subject_id)
@@ -723,7 +723,7 @@ class ChiiSubject(Base):
         back_populates="src_subject",
     )
 
-    related: ChiiSubjectRelations = relationship(
+    related: List[ChiiSubjectRelations] = relationship(
         "ChiiSubjectRelations",
         primaryjoin=lambda: (
             ChiiSubject.subject_id
