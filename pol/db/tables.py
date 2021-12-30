@@ -9,7 +9,6 @@ from sqlalchemy import (
     Table,
     Column,
     String,
-    ForeignKey,
     and_,
     text,
 )
@@ -546,7 +545,6 @@ class ChiiSubjectRelations(Base):
     rlt_related_subject_id = Column(
         "rlt_related_subject_id",
         MEDIUMINT(8),
-        ForeignKey("chii_subjects.subject_id"),
         nullable=False,
         comment="关联目标 ID",
     )
@@ -560,6 +558,17 @@ class ChiiSubjectRelations(Base):
         "primary_key": [rlt_subject_id, rlt_related_subject_id, rlt_vice_versa]
     }
 
+    src_subject: "ChiiSubject" = relationship(
+        "ChiiSubject",
+        primaryjoin=lambda: (
+            ChiiSubject.subject_id == foreign(ChiiSubjectRelations.rlt_subject_id)
+        ),
+        lazy="raise",
+        innerjoin=True,
+        uselist=False,
+        back_populates="relations",
+    )  # type: ignore
+
     dst_subject: "ChiiSubject" = relationship(
         "ChiiSubject",
         primaryjoin=lambda: (
@@ -567,10 +576,9 @@ class ChiiSubjectRelations(Base):
             == foreign(ChiiSubjectRelations.rlt_related_subject_id)
         ),
         lazy="raise",
-        remote_side=rlt_related_subject_id,
-        foreign_keys="ChiiSubject.subject_id",
         innerjoin=True,
         uselist=False,
+        back_populates="related",
     )  # type: ignore
 
 
@@ -706,6 +714,23 @@ class ChiiSubject(Base):
         back_populates="subject",
         uselist=False,
     )  # type: ignore
+
+    relations: ChiiSubjectRelations = relationship(
+        "ChiiSubjectRelations",
+        primaryjoin=lambda: (
+            ChiiSubject.subject_id == foreign(ChiiSubjectRelations.rlt_subject_id)
+        ),
+        back_populates="src_subject",
+    )
+
+    related: ChiiSubjectRelations = relationship(
+        "ChiiSubjectRelations",
+        primaryjoin=lambda: (
+            ChiiSubject.subject_id
+            == foreign(ChiiSubjectRelations.rlt_related_subject_id)
+        ),
+        back_populates="dst_subject",
+    )
 
     @property
     def locked(self) -> bool:
