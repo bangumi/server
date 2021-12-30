@@ -153,8 +153,8 @@ async def get_person_subjects(
 
 
 @router.get(
-    "/characters/{character_id}/persons",
-    summary="get character related persons",
+    "/characters/{character_id}/people",
+    summary="get character related people",
     response_model=List[CharacterPerson],
     responses={
         404: res.response(model=ErrorDetail),

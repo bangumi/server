@@ -13,7 +13,7 @@ from sqlalchemy import (
     and_,
     text,
 )
-from sqlalchemy.orm import remote, foreign, relationship, declarative_base
+from sqlalchemy.orm import foreign, relationship, declarative_base
 from sqlalchemy.dialects.mysql import (
     CHAR,
     ENUM,
@@ -59,8 +59,10 @@ class ChiiCharacter(Base):
 
     subjects: List["ChiiCrtSubjectIndex"] = relationship(
         "ChiiCrtSubjectIndex",
+        primaryjoin=(
+            lambda: ChiiCharacter.crt_id == foreign(ChiiCrtSubjectIndex.crt_id)
+        ),
         lazy="raise_on_sql",
-        # secondary=ChiiPersonCsIndex,
         back_populates="character",
     )
 
@@ -82,19 +84,8 @@ class ChiiCrtCastIndex(Base):
 class ChiiCrtSubjectIndex(Base):
     __tablename__ = "chii_crt_subject_index"
 
-    crt_id = Column(
-        MEDIUMINT(9),
-        ForeignKey("chii_characters.crt_id"),
-        primary_key=True,
-        nullable=False,
-    )
-    subject_id = Column(
-        MEDIUMINT(9),
-        ForeignKey("chii_subjects.subject_id"),
-        primary_key=True,
-        nullable=False,
-        index=True,
-    )
+    crt_id = Column(MEDIUMINT(9), primary_key=True, nullable=False)
+    subject_id = Column(MEDIUMINT(9), primary_key=True, nullable=False, index=True)
     subject_type_id = Column(TINYINT(4), nullable=False, index=True)
     crt_type = Column(TINYINT(4), nullable=False, index=True, comment="主角，配角")
     ctr_appear_eps = Column(MEDIUMTEXT, nullable=False, comment="可选，角色出场的的章节")
@@ -103,10 +94,22 @@ class ChiiCrtSubjectIndex(Base):
     character: "ChiiCharacter" = relationship(
         "ChiiCharacter",
         lazy="raise",
+        primaryjoin=(
+            lambda: ChiiCharacter.crt_id == foreign(ChiiCrtSubjectIndex.crt_id)
+        ),
         innerjoin=True,
+        uselist=False,
+        back_populates="subjects",
     )  # type: ignore
     subject: "ChiiSubject" = relationship(
-        "ChiiSubject", lazy="raise", innerjoin=True
+        "ChiiSubject",
+        primaryjoin=(
+            lambda: ChiiSubject.subject_id == foreign(ChiiCrtSubjectIndex.subject_id)
+        ),
+        lazy="raise",
+        innerjoin=True,
+        uselist=False,
+        back_populates="characters",
     )  # type: ignore
 
 
@@ -129,9 +132,7 @@ class ChiiEpisode(Base):
     __table_args__ = (Index("ep_subject_id_2", "ep_subject_id", "ep_ban", "ep_sort"),)
 
     ep_id = Column(MEDIUMINT(8), primary_key=True)
-    ep_subject_id = Column(
-        MEDIUMINT(8), ForeignKey("chii_subjects.subject_id"), nullable=False, index=True
-    )
+    ep_subject_id = Column(MEDIUMINT(8), nullable=False, index=True)
     ep_sort = Column(Float, nullable=False, index=True, server_default=text("'0'"))
     ep_type = Column(TINYINT(1), nullable=False)
     ep_disc = Column(
@@ -155,10 +156,16 @@ class ChiiEpisode(Base):
     ep_lock = Column(TINYINT(3), nullable=False, server_default=text("'0'"))
     ep_ban = Column(TINYINT(3), nullable=False, index=True, server_default=text("'0'"))
 
-    subject: List["ChiiSubject"] = relationship(
+    subject: "ChiiSubject" = relationship(
         "ChiiSubject",
+        primaryjoin=(
+            lambda: ChiiSubject.subject_id == foreign(ChiiEpisode.ep_subject_id)
+        ),
+        foreign_keys=[ep_subject_id],
+        innerjoin=True,
         lazy="raise",
         back_populates="episodes",
+        uselist=False,
     )
 
 
@@ -250,7 +257,6 @@ class ChiiPersonCsIndex(Base):
     prsn_type = Column(ENUM("prsn", "crt"), primary_key=True, nullable=False)
     prsn_id = Column(
         MEDIUMINT(9),
-        ForeignKey("chii_persons.prsn_id"),
         primary_key=True,
         nullable=False,
         index=True,
@@ -260,7 +266,6 @@ class ChiiPersonCsIndex(Base):
     )
     subject_id = Column(
         MEDIUMINT(9),
-        ForeignKey("chii_subjects.subject_id"),
         primary_key=True,
         nullable=False,
         index=True,
@@ -273,13 +278,21 @@ class ChiiPersonCsIndex(Base):
         "ChiiPerson",
         primaryjoin=lambda: and_(
             ChiiPerson.prsn_ban == 0,
-            ChiiPersonCsIndex.prsn_id == ChiiPerson.prsn_id,
+            foreign(ChiiPersonCsIndex.prsn_id) == ChiiPerson.prsn_id,
         ),
         lazy="raise",
         innerjoin=True,
+        uselist=False,
     )  # type: ignore
     subject: "ChiiSubject" = relationship(
-        "ChiiSubject", lazy="raise", innerjoin=True
+        "ChiiSubject",
+        primaryjoin=(
+            lambda: foreign(ChiiPersonCsIndex.subject_id) == ChiiSubject.subject_id
+        ),
+        lazy="raise",
+        innerjoin=True,
+        uselist=False,
+        back_populates="people",
     )  # type: ignore
 
 
@@ -350,8 +363,11 @@ class ChiiPerson(Base):
 
     subjects: List["ChiiPersonCsIndex"] = relationship(
         "ChiiPersonCsIndex",
+        primaryjoin=lambda: and_(
+            ChiiPerson.prsn_ban == 0,
+            foreign(ChiiPersonCsIndex.prsn_id) == ChiiPerson.prsn_id,
+        ),
         lazy="raise_on_sql",
-        # secondary=ChiiPersonCsIndex,
         back_populates="person",
     )
 
@@ -436,11 +452,12 @@ class ChiiSubjectField(Base):
 
     subject: "ChiiSubject" = relationship(
         "ChiiSubject",
-        primaryjoin=lambda: ChiiSubject.subject_id == ChiiSubjectField.field_sid,
-        remote_side="ChiiSubjectField.field_sid",
-        foreign_keys="ChiiSubject.subject_id",
+        primaryjoin=(
+            lambda: ChiiSubject.subject_id == foreign(ChiiSubjectField.field_sid)
+        ),
         innerjoin=True,
         uselist=False,
+        back_populates="fields",
     )  # type: ignore
 
     def rating(self):
@@ -546,7 +563,7 @@ class ChiiSubjectRelations(Base):
     dst_subject: "ChiiSubject" = relationship(
         "ChiiSubject",
         primaryjoin=lambda: (
-            remote(ChiiSubject.subject_id)
+            ChiiSubject.subject_id
             == foreign(ChiiSubjectRelations.rlt_related_subject_id)
         ),
         lazy="raise",
@@ -651,20 +668,30 @@ class ChiiSubject(Base):
         TINYINT(1), nullable=False, index=True, server_default=text("'0'")
     )
 
-    persons: List[ChiiPersonCsIndex] = relationship(
+    people: List[ChiiPersonCsIndex] = relationship(
         "ChiiPersonCsIndex",
+        primaryjoin=(
+            lambda: foreign(ChiiPersonCsIndex.subject_id) == ChiiSubject.subject_id
+        ),
         lazy="raise",
         back_populates="subject",
     )  # type: ignore
 
     characters: List[ChiiCrtSubjectIndex] = relationship(
         "ChiiCrtSubjectIndex",
+        primaryjoin=(
+            lambda: ChiiSubject.subject_id == foreign(ChiiCrtSubjectIndex.subject_id)
+        ),
+        order_by=ChiiCrtSubjectIndex.crt_order,
         lazy="raise",
         back_populates="subject",
     )  # type: ignore
 
     episodes: List[ChiiEpisode] = relationship(
         "ChiiEpisode",
+        primaryjoin=(
+            lambda: ChiiSubject.subject_id == foreign(ChiiEpisode.ep_subject_id)
+        ),
         lazy="raise",
         order_by=(ChiiEpisode.ep_disc, ChiiEpisode.ep_type, ChiiEpisode.ep_sort),
         back_populates="subject",
@@ -673,9 +700,9 @@ class ChiiSubject(Base):
     fields: ChiiSubjectField = relationship(
         "ChiiSubjectField",
         lazy="raise",
-        primaryjoin=lambda: ChiiSubjectField.field_sid == ChiiSubject.subject_id,
-        remote_side=ChiiSubjectField.field_sid,
-        foreign_keys=subject_id,
+        primaryjoin=(
+            lambda: foreign(ChiiSubjectField.field_sid) == ChiiSubject.subject_id
+        ),
         back_populates="subject",
         uselist=False,
     )  # type: ignore
@@ -687,3 +714,6 @@ class ChiiSubject(Base):
     @property
     def ban(self) -> bool:
         return self.subject_ban == 1
+
+    def nsfw(self) -> bool:
+        return self.subject_nsfw

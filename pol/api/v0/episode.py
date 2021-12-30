@@ -149,7 +149,7 @@ async def get_episode(
         cache_control(300)
         raise not_found
 
-    if subject.subject_nsfw:
+    if subject.nsfw():
         if not user.allow_nsfw():
             raise not_found
     else:
