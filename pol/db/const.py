@@ -20,6 +20,16 @@ class BloodType(enum.IntEnum):
         return self.value
 
 
+class CharacterType(enum.IntEnum):
+    person = 1
+    airframe = 2
+    ship = 3
+    organization = 4
+
+    def translate(self, _escape_table):
+        return self.value
+
+
 class PersonType(enum.IntEnum):
     person = 1
     company = 2
@@ -49,6 +59,9 @@ class EpType(enum.IntEnum):
     sp = 1
     op = 2
     ed = 3
+
+    def translate(self, _escape_table):
+        return self.value
 
 
 class SubjectType(enum.IntEnum):

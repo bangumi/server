@@ -53,7 +53,7 @@ class JSONRedis(Redis):
         self,
         name: KeyT,
         value: DataType,
-        ex: ExpiryT = None,
+        ex: ExpiryT,
         px: ExpiryT = None,
         nx: bool = False,
         xx: bool = False,

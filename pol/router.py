@@ -76,8 +76,7 @@ class ErrorCatchRoute(APIRoute):
                     {
                         "title": "Internal Server Error",
                         "description": (
-                            "something unexpected happened with mysql,"
-                            " please report to maintainer"
+                            "something unexpected happened, please report to maintainer"
                         ),
                         "detail": {
                             "cf-ray": ray,

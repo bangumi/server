@@ -35,6 +35,7 @@ def test_subject_basic(client: TestClient):
     data = response.json()
     assert data["id"] == 2
     assert data["name"] == "坟场"
+    assert not response.json()["nsfw"]
 
 
 def test_subject_locked(client: TestClient):
@@ -57,6 +58,7 @@ def test_subject_redirect(client: TestClient):
     response = client.get("/v0/subjects/18", allow_redirects=False)
     assert response.status_code == 307
     assert response.headers["location"] == "/v0/subjects/19"
+    assert response.headers["cache-control"] == "public, max-age=300"
 
 
 def test_subject_empty_image(client: TestClient, mock_subject):
@@ -207,3 +209,11 @@ def test_subject_tags_none(client: TestClient, mock_subject, db_session: Session
         {"name": "佐藤利奈", "count": 38},
         {"name": "新井里美", "count": 34},
     ]
+
+
+def test_subject_cache_header_public(client: TestClient, redis_client: Redis):
+    response = client.get("/v0/subjects/1")
+    assert response.status_code == 200, "broken cache should be purged"
+
+    assert response.headers["cache-control"] == "public, max-age=300"
+    assert not response.json()["nsfw"]

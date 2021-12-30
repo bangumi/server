@@ -1,8 +1,11 @@
 from typing import Optional
 
+from loguru import logger
 from fastapi import Query, Depends, APIRouter
 from pydantic import Field, BaseModel
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic.error_wrappers import ErrorWrapper
 
 from pol import sa, res
 from pol.models import ErrorDetail
@@ -10,9 +13,12 @@ from pol.router import ErrorCatchRoute
 from pol.curd.ep import Ep
 from pol.depends import get_db
 from pol.db.const import EpType
-from pol.db.tables import ChiiEpisode
+from pol.db.tables import ChiiEpisode, ChiiSubject
+from pol.permission import Role
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.models import Paged
+from pol.http_cache.depends import CacheControl
+from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Episode, EpisodeDetail
 
 router = APIRouter(tags=["章节"], route_class=ErrorCatchRoute)
@@ -21,6 +27,17 @@ router = APIRouter(tags=["章节"], route_class=ErrorCatchRoute)
 class Pager(BaseModel):
     limit: int = Field(100, gt=0, le=200, description="最大值`200`")
     offset: int = Field(0, ge=0)
+
+    def check(self, total: int):
+        if self.offset >= total:
+            raise RequestValidationError(
+                [
+                    ErrorWrapper(
+                        ValueError(f"offset is too bigger for record count {total}"),
+                        loc=("query", "offset"),
+                    )
+                ]
+            )
 
 
 @router.get(
@@ -36,7 +53,20 @@ async def get_episodes(
     subject_id: int = Query(..., gt=0),
     type: EpType = Query(None, description="`0`,`1`,`2`,`3`代表`本篇`，`sp`，`op`，`ed`"),
     page: Pager = Depends(),
+    cache_control: CacheControl = Depends(CacheControl),
+    user: Role = Depends(optional_user),
 ):
+    subject = await db.get(ChiiSubject, subject_id)
+    if not subject:
+        cache_control(300)
+        return page.dict()
+
+    if subject.subject_nsfw:
+        if not user.allow_nsfw():
+            return page.dict()
+    else:
+        cache_control(300)
+
     where = [
         ChiiEpisode.ep_subject_id == subject_id,
     ]
@@ -47,15 +77,17 @@ async def get_episodes(
     total = await db.scalar(sa.select(sa.count(1)).where(*where))
 
     if total == 0:
-        raise res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description=NotFoundDescription,
-            detail={"subject_id": subject_id, "type": type},
-        )
+        return page.dict()
+
+    page.check(total)
 
     first_episode: ChiiEpisode = await db.scalar(
-        sa.select(ChiiEpisode).where(*where).limit(1)
+        sa.select(ChiiEpisode)
+        .where(
+            ChiiEpisode.ep_subject_id == subject_id,
+            ChiiEpisode.ep_type == EpType.normal,
+        )
+        .limit(1)
     )
 
     return {
@@ -94,20 +126,42 @@ def add_episode(e: Ep, start: float) -> dict:
 async def get_episode(
     episode_id: int,
     db: AsyncSession = Depends(get_db),
+    cache_control: CacheControl = Depends(CacheControl),
+    user: Role = Depends(optional_user),
 ):
+    not_found = res.HTTPException(
+        status_code=404,
+        title="Not Found",
+        description=NotFoundDescription,
+        detail={"episode_id": episode_id},
+    )
+
     ep: Optional[ChiiEpisode] = await db.get(ChiiEpisode, episode_id)
     if ep is None:
-        raise res.HTTPException(
-            status_code=404,
-            title="Not Found",
-            description=NotFoundDescription,
-            detail={"episode_id": episode_id},
-        )
+        cache_control(300)
+        raise not_found
 
-    where = [ChiiEpisode.ep_subject_id == ep.ep_subject_id]
+    subject = await db.get(ChiiSubject, ep.ep_subject_id)
+    if not subject:  # pragma: no cover
+        logger.error(
+            "detached episode {}, missing subject {}", ep.ep_id, ep.ep_subject_id
+        )
+        cache_control(300)
+        raise not_found
+
+    if subject.subject_nsfw:
+        if not user.allow_nsfw():
+            raise not_found
+    else:
+        cache_control(300)
 
     first_episode: ChiiEpisode = await db.scalar(
-        sa.select(ChiiEpisode).where(*where).limit(1)
+        sa.select(ChiiEpisode)
+        .where(
+            ChiiEpisode.ep_subject_id == ep.ep_subject_id,
+            ChiiEpisode.ep_type == EpType.normal,
+        )
+        .limit(1)
     )
 
     return add_episode(Ep.from_orm(ep), first_episode.ep_sort)
