@@ -92,7 +92,7 @@ class ChiiCrtSubjectIndex(Base):
 
     character: "ChiiCharacter" = relationship(
         "ChiiCharacter",
-        lazy="raise",
+        lazy="raise_on_sql",
         primaryjoin=(
             lambda: ChiiCharacter.crt_id == foreign(ChiiCrtSubjectIndex.crt_id)
         ),
@@ -105,7 +105,7 @@ class ChiiCrtSubjectIndex(Base):
         primaryjoin=(
             lambda: ChiiSubject.subject_id == foreign(ChiiCrtSubjectIndex.subject_id)
         ),
-        lazy="raise",
+        lazy="raise_on_sql",
         innerjoin=True,
         uselist=False,
         back_populates="characters",
@@ -162,7 +162,7 @@ class ChiiEpisode(Base):
         ),
         foreign_keys=[ep_subject_id],
         innerjoin=True,
-        lazy="raise",
+        lazy="raise_on_sql",
         back_populates="episodes",
         uselist=False,
     )  # type: ignore
@@ -279,7 +279,7 @@ class ChiiPersonCsIndex(Base):
             ChiiPerson.prsn_ban == 0,
             foreign(ChiiPersonCsIndex.prsn_id) == ChiiPerson.prsn_id,
         ),
-        lazy="raise",
+        lazy="raise_on_sql",
         innerjoin=True,
         uselist=False,
     )  # type: ignore
@@ -288,7 +288,7 @@ class ChiiPersonCsIndex(Base):
         primaryjoin=(
             lambda: foreign(ChiiPersonCsIndex.subject_id) == ChiiSubject.subject_id
         ),
-        lazy="raise",
+        lazy="raise_on_sql",
         innerjoin=True,
         uselist=False,
         back_populates="persons",
@@ -454,6 +454,7 @@ class ChiiSubjectField(Base):
         primaryjoin=(
             lambda: ChiiSubject.subject_id == foreign(ChiiSubjectField.field_sid)
         ),
+        lazy="raise_on_sql",
         innerjoin=True,
         uselist=False,
         back_populates="fields",
@@ -563,7 +564,7 @@ class ChiiSubjectRelations(Base):
         primaryjoin=lambda: (
             ChiiSubject.subject_id == foreign(ChiiSubjectRelations.rlt_subject_id)
         ),
-        lazy="raise",
+        lazy="raise_on_sql",
         innerjoin=True,
         uselist=False,
         back_populates="relations",
@@ -575,7 +576,7 @@ class ChiiSubjectRelations(Base):
             ChiiSubject.subject_id
             == foreign(ChiiSubjectRelations.rlt_related_subject_id)
         ),
-        lazy="raise",
+        lazy="raise_on_sql",
         innerjoin=True,
         uselist=False,
         back_populates="related",
@@ -681,7 +682,7 @@ class ChiiSubject(Base):
         primaryjoin=(
             lambda: foreign(ChiiPersonCsIndex.subject_id) == ChiiSubject.subject_id
         ),
-        lazy="raise",
+        lazy="raise_on_sql",
         back_populates="subject",
     )  # type: ignore
 
@@ -691,7 +692,7 @@ class ChiiSubject(Base):
             lambda: ChiiSubject.subject_id == foreign(ChiiCrtSubjectIndex.subject_id)
         ),
         order_by=ChiiCrtSubjectIndex.crt_order,
-        lazy="raise",
+        lazy="raise_on_sql",
         back_populates="subject",
     )  # type: ignore
 
@@ -700,14 +701,14 @@ class ChiiSubject(Base):
         primaryjoin=(
             lambda: ChiiSubject.subject_id == foreign(ChiiEpisode.ep_subject_id)
         ),
-        lazy="raise",
+        lazy="raise_on_sql",
         order_by=(ChiiEpisode.ep_disc, ChiiEpisode.ep_type, ChiiEpisode.ep_sort),
         back_populates="subject",
     )  # type: ignore
 
     fields: ChiiSubjectField = relationship(
         "ChiiSubjectField",
-        lazy="raise",
+        lazy="raise_on_sql",
         primaryjoin=(
             lambda: foreign(ChiiSubjectField.field_sid) == ChiiSubject.subject_id
         ),
@@ -720,6 +721,7 @@ class ChiiSubject(Base):
         primaryjoin=lambda: (
             ChiiSubject.subject_id == foreign(ChiiSubjectRelations.rlt_subject_id)
         ),
+        lazy="raise_on_sql",
         back_populates="src_subject",
     )
 
@@ -729,6 +731,7 @@ class ChiiSubject(Base):
             ChiiSubject.subject_id
             == foreign(ChiiSubjectRelations.rlt_related_subject_id)
         ),
+        lazy="raise_on_sql",
         back_populates="dst_subject",
     )
 
