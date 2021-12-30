@@ -1,4 +1,4 @@
-from typing import List, Iterator, Optional
+from typing import List, Optional
 
 from fastapi import Path, Depends, Request, APIRouter
 from starlette.responses import Response
@@ -237,27 +237,22 @@ async def get_subject_relations(
     subject_id: int = Path(..., gt=0),
     db: AsyncSession = Depends(get_db),
 ):
-    if not await db.scalar(
-        sa.select(ChiiSubject.subject_id).where(
-            ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0
-        )
-    ):
-        raise exc_404
-
-    relations: Iterator[ChiiSubjectRelations] = await db.scalars(
-        sa.select(ChiiSubjectRelations)
-        .options(sa.selectinload(ChiiSubjectRelations.dst_subject))
-        .where(
-            ChiiSubjectRelations.rlt_subject_id == subject_id,
-        )
-        .order_by(
-            ChiiSubjectRelations.rlt_order, ChiiSubjectRelations.rlt_related_subject_id
+    subject: Optional[ChiiSubject] = await db.scalar(
+        sa.select(ChiiSubject)
+        .where(ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0)
+        .options(
+            sa.selectinload(ChiiSubject.relations).selectinload(
+                ChiiSubjectRelations.dst_subject
+            )
         )
     )
 
+    if not subject:
+        raise exc_404
+
     response = []
 
-    for r in relations:
+    for r in subject.relations:
         s = r.dst_subject
         relation = RELATION_MAP[r.rlt_related_subject_type_id].get(r.rlt_relation_type)
 
