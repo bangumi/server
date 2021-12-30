@@ -5,7 +5,7 @@ from pol.db.const import TopicStateType, TopicDisplayStatusType
 
 class ContentPermState:
     nsfw: bool
-    displayOverride: bool  # $topic['tpc_display'] != PostCore::TOPIC_STATUS_NORMAL)
+    displayOverride: bool  # not in [TOPIC_STATUS_ALL, TOPIC_STATUS_BAN])
     state: TopicStateType
 
 
@@ -27,5 +27,8 @@ class ContentRelation:
 
 class DenialReasonType(enum.IntEnum):
     granted = 0
-    deletedByUser = 1
-    guidelineViolation = 2
+    fallback = 1  # when no authz rule matches
+    deletedByUser = 2
+    guidelineViolation = 3
+    nsfw = 4
+    accountAgeUnqualified = 5
