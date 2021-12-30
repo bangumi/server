@@ -63,7 +63,7 @@ class ChiiCharacter(Base):
         ),
         lazy="raise_on_sql",
         back_populates="character",
-    )
+    )  # type: ignore
 
 
 class ChiiCrtCastIndex(Base):
@@ -165,7 +165,7 @@ class ChiiEpisode(Base):
         lazy="raise",
         back_populates="episodes",
         uselist=False,
-    )
+    )  # type: ignore
 
 
 class ChiiMemberfield(Base):
@@ -739,6 +739,3 @@ class ChiiSubject(Base):
     @property
     def ban(self) -> bool:
         return self.subject_ban == 1
-
-    def nsfw(self) -> bool:
-        return self.subject_nsfw
