@@ -721,6 +721,7 @@ class ChiiSubject(Base):
         primaryjoin=lambda: (
             ChiiSubject.subject_id == foreign(ChiiSubjectRelations.rlt_subject_id)
         ),
+        order_by=ChiiSubjectRelations.rlt_order,
         lazy="raise_on_sql",
         back_populates="src_subject",
     )
