@@ -1,4 +1,4 @@
-from pol.api.v0.access_control.types import UserPermState, \
+from pol.permission.types import UserPermState, \
     DenialReasonType, ContentRelation, TopicPermState
 from pol.db.const import TopicStateType, TopicDisplayStatusType
 

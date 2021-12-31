@@ -1,17 +1,18 @@
-from typing import Optional
 from datetime import datetime, timedelta
+from typing import Optional
 
 from loguru import logger
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa
-from pol.db.tables import ChiiMember, ChiiOauthAccessToken
-from pol.permission import Role, UserGroup
-from pol.curd.exceptions import NotFoundError
+from pol.curd import NotFoundError
+from pol.db.tables import ChiiOauthAccessToken, ChiiMember
+from pol.permission.roles import Role
+from pol.permission.types import UserGroup, UserPermState
 
 
-class User(Role, BaseModel):
+class User(BaseModel):
     id: int
     username: str
     nickname: str
@@ -29,9 +30,24 @@ class User(Role, BaseModel):
     # newpm: int
     # new_notify: int
 
-    def allow_nsfw(self) -> bool:
-        allow_date = self.registration_date + timedelta(days=60)
-        return datetime.utcnow().astimezone() > allow_date
+    def days_since_registration(self) -> int:
+        return (datetime.now() - self.registration_date).days
+
+    def to_role(self) -> Role:
+        days_since_reg = self.days_since_registration()
+        can_view_nsfw = days_since_reg > 60
+        can_view_closed_post = days_since_reg > 180
+        can_view_silent_post = days_since_reg > 365
+
+        perm_state = UserPermState(exists=True,
+                                   canViewNsfw=can_view_nsfw,
+                                   canViewClosedPost=can_view_closed_post,
+                                   canViewSilentPost=can_view_silent_post,
+                                   # isBannedFromPost=False,  # todo: load from db
+                                   # canManageTopic=False,  # todo: load from role table (chii_usergroup)
+                                   )
+
+        return Role(perm_state)
 
 
 async def get_by_valid_token(db: AsyncSession, access_token: str) -> User:

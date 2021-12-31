@@ -4,8 +4,9 @@ from pydantic import BaseModel
 from pol import res
 from pol.models import ErrorDetail
 from pol.router import ErrorCatchRoute
-from pol.permission import UserGroup
-from .depends.auth import User, get_current_user
+from ...permission.types import UserGroup
+from .depends.auth import get_current_user
+from ...curd.user import User
 
 router = APIRouter(tags=["用户"], route_class=ErrorCatchRoute)
 

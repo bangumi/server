@@ -8,8 +8,8 @@ from starlette.testclient import TestClient
 
 from pol import sa, config
 from pol.db.tables import ChiiMember
-from pol.permission import UserGroup
-from pol.api.v0.depends.auth import User
+from pol.permission.types import UserGroup
+from pol.curd.user import User
 
 access_token = "a_development_access_token"
 

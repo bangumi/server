@@ -3,27 +3,19 @@ from pydantic import ValidationError
 from starlette.status import HTTP_403_FORBIDDEN
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import res, curd, config
+import pol.curd.user
+import pol.permission.roles
+from pol import res, config
 from pol.curd import NotFoundError
 from pol.depends import get_db, get_redis
+from pol.permission.roles import Role, GuestRole
 from pol.curd.user import User
-from pol.permission import Role
 from pol.redis.json_cache import JSONRedis
 from pol.api.v0.depends.auth.schema import HTTPBearer, OptionalHTTPBearer
 
 OPTIONAL_API_KEY_HEADER = OptionalHTTPBearer()
 
 API_KEY_HEADER = HTTPBearer()
-
-
-class Guest(Role):
-    """this is a guest with only basic permission"""
-
-    def allow_nsfw(self) -> bool:
-        return False
-
-
-guest = Guest()
 
 
 async def optional_user(
@@ -33,12 +25,13 @@ async def optional_user(
 ) -> Role:
     """
     if no auth header in request, return a guest object with only basic permission,
-    otherwise, return a authorized user.
+    otherwise, return an authorized user.
     """
     if not token:
-        return guest
+        return GuestRole()
 
-    return await get_current_user(token, db, redis)
+    user = await get_current_user(token, db, redis)
+    return user.to_role()
 
 
 async def get_current_user(
@@ -54,7 +47,7 @@ async def get_current_user(
             await redis.delete(cache_key)
 
     try:
-        user = await curd.user.get_by_valid_token(db, token)
+        user = await pol.curd.user.get_by_valid_token(db, token)
     except NotFoundError:
         raise res.HTTPException(
             status_code=HTTP_403_FORBIDDEN,

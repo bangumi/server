@@ -1,19 +1,18 @@
+from typing import Optional
+
 from fastapi import Depends, Path
 from mypy.typeshed.stdlib.typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import res
+from pol import res, sa
 from pol.api.v0.depends.auth import optional_user
-from pol.api.v0.models.base import ListResponse, CursorPaged
+from pol.api.v0.models.base import ResponseCursorPaged
 from pol.api.v0.models.topic import Topic
-from pol.depends import get_db, get_redis
-from pol.http_cache.depends import CacheControl
+from pol.db.tables import ChiiSubject
+from pol.depends import get_db
 from pol.models import ErrorDetail
-from pol.permission import Role
-from pol.redis.json_cache import JSONRedis
+from pol.permission.roles import Role
 from subject import router, exception_404
-
-
 
 @router.get(
     "/subjects/{subject_id}/topics",
@@ -21,16 +20,26 @@ from subject import router, exception_404
     responses={
         404: res.response(model=ErrorDetail),
     },
-    summary="all get topics related to a subject",
-    description="returns the first 100 topics",
+    summary="get a list of topics related to a subject; result is paginated",
     tags=["章节"],
 )
 async def get_subject_topics(
-    response: ListResponse[CursorPaged[Topic]],
+    response: ResponseCursorPaged[Topic, int],
     exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
-    user: Role = Depends(optional_user),
+    role: Role = Depends(optional_user),
     db: AsyncSession = Depends(get_db),
-    redis: JSONRedis = Depends(get_redis),
-    cache_control: CacheControl = Depends(CacheControl),
-)
+):
+    # todo: cache metadata of each topic (reply count, last reply timestamp)
+
+    subject: Optional[ChiiSubject] = await db.get(
+        ChiiSubject, subject_id, options=[sa.joinedload(ChiiSubject.fields)]
+    )
+    if subject is None:
+        raise exc_404
+
+    # check access permissions
+    if subject.subject_nsfw and not role.allow_nsfw():
+        raise exc_404
+
+    # todo: load topic, check perm of each topic, then return the list
