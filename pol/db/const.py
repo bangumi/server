@@ -603,6 +603,7 @@ class TopicStateType(enum.IntEnum):
     topic和post共用同一套state定义
     column: {tbl}_tpc_state
     """
+
     none = 0
     closed = 1
     reopen = 2
@@ -617,6 +618,7 @@ class TopicDisplayStatusType(enum.IntEnum):
     """
     column: {tbl}_tpc_display
     """
+
     all = -1  # not related to permissions?
     ban = 0
     normal = 1
@@ -637,6 +639,7 @@ TOPIC_STATE_MAP: Dict[enum.IntEnum, TopicMeta] = {
     TopicStateType.merge: TopicMeta(type="merge", name="合并"),
     TopicStateType.silent: TopicMeta(type="Silent", name="下沉", desc="下沉了主题"),
     TopicStateType.delete: TopicMeta(type="delete", name="删除", desc="自行删除"),
-    TopicStateType.private: TopicMeta(type="private", name="系统删除",
-                                      desc="内容因违反社区指导原则已被删除"),
+    TopicStateType.private: TopicMeta(
+        type="private", name="系统删除", desc="内容因违反社区指导原则已被删除"
+    ),
 }

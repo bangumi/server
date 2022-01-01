@@ -24,11 +24,11 @@ from pol.db.tables import (
     ChiiCrtSubjectIndex,
     ChiiSubjectRelations,
 )
-from pol.permission.roles import Role
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
-from pol.api.v0.models.misc import RelatedPerson, RelatedCharacter
+from pol.permission.roles import Role
 from pol.redis.json_cache import JSONRedis
+from pol.api.v0.models.misc import RelatedPerson, RelatedCharacter
 from pol.http_cache.depends import CacheControl
 from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject

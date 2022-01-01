@@ -123,6 +123,10 @@ pre-commit run --all-files # check all files
 
 lint: flake8
 
+```shell
+bash scripts/lint.sh
+```
+
 ### 配置文件
 
 非 python 文件(yaml, json, markdown 等)使用 [prettier](https://prettier.io/) 进行格式化。

@@ -12,12 +12,7 @@ from starlette.testclient import TestClient
 fixtures_path = Path(__file__).parent.joinpath("fixtures")
 
 
-subject_ids = {
-    "public": 1,
-    "nsfw": 16,
-    "banned": 5,
-    "locked": 2
-}
+subject_ids = {"public": 1, "nsfw": 16, "banned": 5, "locked": 2}
 
 
 @pytest.mark.skip(reason="wip")

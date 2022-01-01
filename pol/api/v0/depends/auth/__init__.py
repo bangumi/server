@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import pol.curd.user
 import pol.permission.roles
 from pol import res, config
-from pol.curd.exceptions import NotFoundError
 from pol.depends import get_db, get_redis
-from pol.permission.roles import Role, GuestRole
 from pol.curd.user import User
+from pol.curd.exceptions import NotFoundError
+from pol.permission.roles import Role, GuestRole
 from pol.redis.json_cache import JSONRedis
 from pol.api.v0.depends.auth.schema import HTTPBearer, OptionalHTTPBearer
 

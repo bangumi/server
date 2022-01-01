@@ -1,11 +1,11 @@
-import datetime
 import enum
-from typing import Optional, List, Dict, Any
+import datetime
+from typing import Any, Dict, List, Optional
 
 import pydantic
-from pydantic import BaseModel, Field
+from pydantic import Field, BaseModel
 
-from pol.db.const import PersonType, BloodType
+from pol.db.const import BloodType, PersonType
 
 
 class PersonImages(BaseModel):

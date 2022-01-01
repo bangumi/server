@@ -1,18 +1,18 @@
 from typing import Optional
 
-from fastapi import Depends, Path
-from mypy.typeshed.stdlib.typing import List
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from pol import res, sa
-from pol.api.v0.depends.auth import optional_user
-from pol.api.v0.models.base import ResponseCursorPaged
-from pol.api.v0.models.topic import Topic
-from pol.db.tables import ChiiSubject
-from pol.depends import get_db
-from pol.models import ErrorDetail
-from pol.permission.roles import Role
+from fastapi import Path, Depends
 from subject import router, exception_404
+from sqlalchemy.ext.asyncio import AsyncSession
+from mypy.typeshed.stdlib.typing import List
+
+from pol import sa, res
+from pol.models import ErrorDetail
+from pol.depends import get_db
+from pol.db.tables import ChiiSubject
+from pol.permission.roles import Role
+from pol.api.v0.models.base import ResponseCursorPaged
+from pol.api.v0.depends.auth import optional_user
+from pol.api.v0.models.topic import Topic
 
 
 @router.get(

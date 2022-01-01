@@ -1,13 +1,13 @@
-from datetime import datetime, timezone
 from typing import Optional
+from datetime import datetime, timezone
 
 from loguru import logger
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa
+from pol.db.tables import ChiiMember, ChiiOauthAccessToken
 from pol.curd.exceptions import NotFoundError
-from pol.db.tables import ChiiOauthAccessToken, ChiiMember
 from pol.permission.roles import Role
 from pol.permission.types import UserGroup, UserPermState
 
@@ -39,15 +39,16 @@ class User(BaseModel):
         can_view_closed_post = days_since_reg > 180
         can_view_silent_post = days_since_reg > 365
 
-        perm_state = UserPermState(exists=True,
-                                   canViewNsfw=can_view_nsfw,
-                                   canViewClosedPost=can_view_closed_post,
-                                   canViewSilentPost=can_view_silent_post,
-                                   # isBannedFromPost=False,
-                                   # todo: load from db
-                                   # canManageTopic=False,
-                                   # todo: load from role table (chii_usergroup)
-                                   )
+        perm_state = UserPermState(
+            exists=True,
+            canViewNsfw=can_view_nsfw,
+            canViewClosedPost=can_view_closed_post,
+            canViewSilentPost=can_view_silent_post,
+            # isBannedFromPost=False,
+            # todo: load from db
+            # canManageTopic=False,
+            # todo: load from role table (chii_usergroup)
+        )
 
         return Role(perm_state)
 

@@ -1,11 +1,11 @@
-from datetime import date
 from typing import List, Optional
+from datetime import date
 
-from pydantic import BaseModel, Field
+from pydantic import Field, BaseModel
 
+from pol.db.const import TopicStateType
 from pol.api.v0.models.creator import Creator
 from pol.api.v0.models.cursorPage import CursorPage
-from pol.db.const import TopicStateType
 
 
 class Post(BaseModel):

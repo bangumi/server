@@ -1,6 +1,10 @@
-from pol.permission.types import UserPermState, TopicPermState, ContentRelation
-from pol.permission.types import DenialReasonType
 from pol.db.const import TopicStateType, TopicDisplayStatusType
+from pol.permission.types import (
+    UserPermState,
+    TopicPermState,
+    ContentRelation,
+    DenialReasonType,
+)
 
 
 def can_view_post(state: TopicStateType) -> (bool, DenialReasonType):
@@ -12,18 +16,18 @@ def can_view_post(state: TopicStateType) -> (bool, DenialReasonType):
     return True, DenialReasonType.granted
 
 
-def can_view_topic(topic_perms: TopicPermState,
-                   user_perms: UserPermState,
-                   relations: ContentRelation) -> (bool, DenialReasonType):
+def can_view_topic(
+    topic_perms: TopicPermState, user_perms: UserPermState, relations: ContentRelation
+) -> (bool, DenialReasonType):
     # moderator
     if user_perms.canManageTopic:
         return True, DenialReasonType.granted
 
     # own content
-    if (relations.isContentOwner
-        and topic_perms.displayStatus in [
-            TopicDisplayStatusType.normal,
-            TopicDisplayStatusType.review]):
+    if relations.isContentOwner and topic_perms.displayStatus in [
+        TopicDisplayStatusType.normal,
+        TopicDisplayStatusType.review,
+    ]:
         return True, DenialReasonType.granted
 
     # nsfw

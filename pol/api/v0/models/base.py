@@ -19,5 +19,6 @@ class Paged(GenericModel, Generic[T]):
 
 class ResponseCursorPaged(GenericModel, Generic[T, PageKeyT]):
     pagination: Optional[CursorPage[PageKeyT]] = Field(
-        description="None if all replies fit in one page")
+        description="None if all replies fit in one page"
+    )
     data: List[T]

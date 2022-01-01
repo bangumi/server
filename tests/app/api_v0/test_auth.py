@@ -7,9 +7,9 @@ from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from pol import sa, config
+from pol.curd.user import User
 from pol.db.tables import ChiiMember
 from pol.permission.types import UserGroup
-from pol.curd.user import User
 
 access_token = "a_development_access_token"
 

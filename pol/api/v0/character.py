@@ -21,8 +21,8 @@ from pol.db.tables import (
 )
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import person_images
-from pol.api.v0.models.misc import RelatedSubject, CharacterDetail, CharacterPerson
 from pol.redis.json_cache import JSONRedis
+from pol.api.v0.models.misc import RelatedSubject, CharacterDetail, CharacterPerson
 
 router = APIRouter(tags=["角色"], route_class=ErrorCatchRoute)
 
