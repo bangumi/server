@@ -29,6 +29,7 @@ from sqlalchemy.dialects.mysql import (
 
 from pol.compat import phpseralize
 from pol.compat.phpseralize import dict_to_list
+from pol.db.const import SubjectBanType
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -614,6 +615,35 @@ class ChiiSubjectRevision(Base):
     rev_platform = Column(SMALLINT(6), nullable=False)
 
 
+class ChiiSubjectTopic(Base):
+    __tablename__ = 'chii_subject_topics'
+    __table_args__ = (
+        Index('sbj_tpc_lastpost', 'sbj_tpc_lastpost', 'sbj_tpc_subject_id',
+              'sbj_tpc_display'),
+    )
+
+    sbj_tpc_id = Column(MEDIUMINT(8), primary_key=True)
+    sbj_tpc_subject_id = Column(MEDIUMINT(8), nullable=False, index=True)
+    sbj_tpc_uid = Column(MEDIUMINT(8), nullable=False, index=True)
+    sbj_tpc_title = Column(VARCHAR(80), nullable=False)
+    sbj_tpc_dateline = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
+    sbj_tpc_lastpost = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
+    sbj_tpc_replies = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
+    sbj_tpc_state = Column(TINYINT(1), nullable=False)
+    sbj_tpc_display = Column(TINYINT(1), nullable=False, index=True,
+                             server_default=text("'1'"))
+
+    subject: "ChiiSubject" = relationship(
+        "ChiiSubject",
+        primaryjoin=lambda: (
+            ChiiSubject.subject_id == ChiiSubjectTopic.sbj_tpc_subject_id),
+        remote_side="ChiiSubjectTopic.sbj_tpc_subject_id",
+        foreign_keys="ChiiSubject.subject_id",
+        innerjoin=True,
+        uselist=False,
+    )  # type: ignore
+
+
 class ChiiSubject(Base):
     __tablename__ = "chii_subjects"
     __table_args__ = (
@@ -738,8 +768,8 @@ class ChiiSubject(Base):
 
     @property
     def locked(self) -> bool:
-        return self.subject_ban == 2
+        return self.subject_ban == SubjectBanType.locked
 
     @property
     def ban(self) -> bool:
-        return self.subject_ban == 1
+        return self.subject_ban == SubjectBanType.ban

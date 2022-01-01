@@ -90,6 +90,11 @@ class SubjectType(enum.IntEnum):
         return self.value
 
 
+class SubjectBanType(enum.IntEnum):
+    ban = 1
+    locked = 2
+
+
 StaffMap = {
     SubjectType.book: staff_job_book,
     SubjectType.anime: staff_job_anime,
@@ -604,15 +609,15 @@ class TopicStateType(enum.IntEnum):
     pin = 3
     merge = 4
     silent = 5
-    delete = 6      # used by post
-    private = 7     # used by post
+    delete = 6  # used by post
+    private = 7  # used by post
 
 
 class TopicDisplayStatusType(enum.IntEnum):
     """
     column: {tbl}_tpc_display
     """
-    all = -1        # not related to permissions?
+    all = -1  # not related to permissions?
     ban = 0
     normal = 1
     review = 2

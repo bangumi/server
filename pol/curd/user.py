@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from typing import Optional
 
 from loguru import logger
@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa
-from pol.curd import NotFoundError
+from pol.curd.exceptions import NotFoundError
 from pol.db.tables import ChiiOauthAccessToken, ChiiMember
 from pol.permission.roles import Role
 from pol.permission.types import UserGroup, UserPermState
@@ -31,7 +31,7 @@ class User(BaseModel):
     # new_notify: int
 
     def days_since_registration(self) -> int:
-        return (datetime.now() - self.registration_date).days
+        return (datetime.now(timezone.utc) - self.registration_date).days
 
     def to_role(self) -> Role:
         days_since_reg = self.days_since_registration()
@@ -43,8 +43,10 @@ class User(BaseModel):
                                    canViewNsfw=can_view_nsfw,
                                    canViewClosedPost=can_view_closed_post,
                                    canViewSilentPost=can_view_silent_post,
-                                   # isBannedFromPost=False,  # todo: load from db
-                                   # canManageTopic=False,  # todo: load from role table (chii_usergroup)
+                                   # isBannedFromPost=False,
+                                   # todo: load from db
+                                   # canManageTopic=False,
+                                   # todo: load from role table (chii_usergroup)
                                    )
 
         return Role(perm_state)

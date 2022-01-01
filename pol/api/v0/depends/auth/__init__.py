@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import pol.curd.user
 import pol.permission.roles
 from pol import res, config
-from pol.curd import NotFoundError
+from pol.curd.exceptions import NotFoundError
 from pol.depends import get_db, get_redis
 from pol.permission.roles import Role, GuestRole
 from pol.curd.user import User

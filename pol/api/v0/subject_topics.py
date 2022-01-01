@@ -14,6 +14,7 @@ from pol.models import ErrorDetail
 from pol.permission.roles import Role
 from subject import router, exception_404
 
+
 @router.get(
     "/subjects/{subject_id}/topics",
     response_model=List[Topic],

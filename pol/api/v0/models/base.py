@@ -4,7 +4,6 @@ from pydantic import Field
 from pydantic.generics import GenericModel
 
 from pol.api.v0.models.cursorPage import CursorPage
-from pol.api.v0.models.topic import Topic
 
 T = TypeVar("T")
 PageKeyT = TypeVar("PageKeyT")

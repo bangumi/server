@@ -27,7 +27,7 @@ from pol.db.tables import (
 from pol.permission.roles import Role
 from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
-from pol.api.v0.models import RelatedPerson, RelatedCharacter
+from pol.api.v0.models.misc import RelatedPerson, RelatedCharacter
 from pol.redis.json_cache import JSONRedis
 from pol.http_cache.depends import CacheControl
 from pol.api.v0.depends.auth import optional_user
