@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 import pydantic
 from pydantic import Field, BaseModel
 
-from pol.db.const import BloodType, PersonType
+from pol.db.const import BloodType, PersonType, CharacterType
 from .base import Paged
 
 __all__ = [
@@ -113,7 +113,7 @@ class PersonDetail(BasePerson):
 class BaseCharacter(BaseModel):
     id: int
     name: str
-    type: PersonType = Field(description="角色，机体，组织...")
+    type: CharacterType = Field(description="角色，机体，舰船，组织...")
     images: Optional[PersonImages] = Field(
         description="object with some size of images, this object maybe `null`"
     )
