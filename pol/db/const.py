@@ -603,7 +603,6 @@ class TopicStateType(enum.IntEnum):
     topic和post共用同一套state定义
     column: {tbl}_tpc_state
     """
-
     none = 0
     closed = 1
     reopen = 2
@@ -618,7 +617,6 @@ class TopicDisplayStatusType(enum.IntEnum):
     """
     column: {tbl}_tpc_display
     """
-
     all = -1  # not related to permissions?
     ban = 0
     normal = 1

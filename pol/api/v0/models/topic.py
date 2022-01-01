@@ -16,7 +16,7 @@ class Post(BaseModel):
 
 
 class Reply(Post):
-    replyTo: Post.id
+    replyTo: int
 
 
 class Comment(Post):

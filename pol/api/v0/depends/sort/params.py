@@ -1,4 +1,4 @@
-from typing import TypeVar, Optional
+from typing import TypeVar, Optional, Generic
 
 from pydantic.generics import GenericModel
 
@@ -8,7 +8,7 @@ from pol.api.v0.models.cursorPage import CursorPage
 T = TypeVar("T")
 
 
-class SortParams(GenericModel, T):
+class SortParams(GenericModel, Generic[T]):
     sortBy: str
     pageKey: T
 

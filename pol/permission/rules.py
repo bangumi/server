@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from pol.db.const import TopicStateType, TopicDisplayStatusType
 from pol.permission.types import (
     UserPermState,
@@ -7,7 +9,7 @@ from pol.permission.types import (
 )
 
 
-def can_view_post(state: TopicStateType) -> (bool, DenialReasonType):
+def can_view_post(state: TopicStateType) -> Tuple[bool, DenialReasonType]:
     if state == TopicStateType.delete:
         return False, DenialReasonType.deletedByUser
     if state == TopicStateType.private:
@@ -18,7 +20,7 @@ def can_view_post(state: TopicStateType) -> (bool, DenialReasonType):
 
 def can_view_topic(
     topic_perms: TopicPermState, user_perms: UserPermState, relations: ContentRelation
-) -> (bool, DenialReasonType):
+) -> Tuple[bool, DenialReasonType]:
     # moderator
     if user_perms.canManageTopic:
         return True, DenialReasonType.granted
