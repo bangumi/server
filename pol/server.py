@@ -77,7 +77,10 @@ async def startup() -> None:
             config.MYSQL_HOST,
             config.MYSQL_PORT,
             config.MYSQL_DB,
-        )
+        ),
+        pool_recycle=14400,
+        pool_size=10,
+        max_overflow=20,
     )
     app.state.Session = sessionmaker(
         engine, expire_on_commit=False, class_=AsyncSession
