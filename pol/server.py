@@ -79,7 +79,6 @@ async def startup() -> None:
             config.MYSQL_DB,
         ),
         pool_recycle=14400,
-        pool_use_lifo=True,
         pool_size=10,
         max_overflow=20,
     )
