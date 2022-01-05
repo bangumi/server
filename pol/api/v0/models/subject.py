@@ -1,7 +1,7 @@
 import datetime
 from typing import Dict, List, Optional
 
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, validator
 
 from pol.api.v0.models.wiki import Wiki
 
@@ -42,7 +42,7 @@ class Subject(BaseModel):
     summary: str
     nsfw: bool
     locked: bool
-    date: Optional[datetime.date]
+    date: Optional[str] = Field(description="air date in `YYYY-MM-DD` format")
     platform: str = Field(description="TV, Web, 欧美剧, PS4...")
     images: Optional[Images]
     infobox: Optional[Wiki]
@@ -57,6 +57,12 @@ class Subject(BaseModel):
     collection: Collection
 
     tags: List[Tag]
+
+    @validator("date", pre=True)
+    def convert_date(cls, v):
+        if isinstance(v, datetime.datetime):
+            return f"{v.year:04d}-{v.month:02d}-{v.day:02d}"
+        return v
 
 
 class RelatedSubject(BaseModel):

@@ -113,6 +113,7 @@ async def _get_subject(
         "id": subject.subject_id,
         "name": subject.subject_name,
         "name_cn": subject.subject_name_cn,
+        "date": subject.fields.field_date,
         "type": subject.subject_type_id,
         "summary": subject.field_summary,
         "eps": subject.field_eps,
