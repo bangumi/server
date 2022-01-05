@@ -1,4 +1,3 @@
-import datetime
 from typing import Dict, List, Optional
 
 from pydantic import Field, BaseModel
@@ -42,7 +41,7 @@ class Subject(BaseModel):
     summary: str
     nsfw: bool
     locked: bool
-    date: Optional[datetime.date]
+    date: Optional[str] = Field(description="air date in `YYYY-MM-DD` format")
     platform: str = Field(description="TV, Web, 欧美剧, PS4...")
     images: Optional[Images]
     infobox: Optional[Wiki]

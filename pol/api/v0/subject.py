@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Optional
 
 from fastapi import Path, Depends, Request, APIRouter
@@ -109,10 +110,16 @@ async def _get_subject(
     if subject.ban:
         raise exc_404
 
+    date = None
+    v = subject.fields.field_date
+    if isinstance(v, datetime.date):
+        date = f"{v.year:04d}-{v.month:02d}-{v.day:02d}"
+
     data = {
         "id": subject.subject_id,
         "name": subject.subject_name,
         "name_cn": subject.subject_name_cn,
+        "date": date,
         "type": subject.subject_type_id,
         "summary": subject.field_summary,
         "eps": subject.field_eps,
