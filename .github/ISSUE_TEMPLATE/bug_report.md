@@ -3,8 +3,7 @@ name: Bug report
 about: 问题反馈
 title: "[BUG]: "
 labels: bug
-assignees: ''
-
+assignees: ""
 ---
 
 **描述**
