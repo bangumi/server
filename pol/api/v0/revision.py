@@ -15,7 +15,8 @@ from pol.db.tables import ChiiMember, ChiiRevText, ChiiRevHistory
 from pol.api.v0.utils import raise_not_found, raise_offset_over_total
 from pol.api.v0.models import Paged, Pager
 from pol.curd.exceptions import NotFoundError
-from pol.redis.json_cache import JSONRedis, cache
+from pol.redis.json_cache import JSONRedis
+from pol.http_cache.depends import CacheControl
 from pol.api.v0.models.revision import Revision, DetailedRevision
 
 router = APIRouter(prefix="/revisions", tags=["编辑历史"], route_class=ErrorCatchRoute)
@@ -125,7 +126,9 @@ async def get_person_revisions(
     person_id: int = 0,
     db: AsyncSession = Depends(get_db),
     page: Pager = Depends(),
+    cache_control: CacheControl = Depends(CacheControl),
 ):
+    cache_control(300)
     filters = [person_rev_type_filters]
     if person_id > 0:
         filters.append(ChiiRevHistory.rev_mid == person_id)
@@ -144,28 +147,33 @@ async def get_person_revisions(
         404: res.response(model=ErrorDetail),
     },
 )
-@cache(lambda revision_id, **_: f"persons:revision:{revision_id}")
 async def get_person_revision(
     response: Response,
     db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
     redis: JSONRedis = Depends(get_redis),
+    cache_control: CacheControl = Depends(CacheControl),
 ):
-
-    try:
-        data = await get_revision(
-            db,
-            [
-                ChiiRevHistory.rev_id == revision_id,
-                person_rev_type_filters,
-            ],
-            details={
-                "rev_id": revision_id,
-            },
-        )
-        return data
-    except NotFoundError as e:
-        raise_not_found(e.details)
+    cache_control(300)
+    cache_key = f"persons:revision:{revision_id}"
+    data = await redis.get(cache_key)
+    response.headers["x-cache-status"] = "miss" if data is None else "hit"
+    if data is None:
+        try:
+            data = await get_revision(
+                db,
+                [
+                    ChiiRevHistory.rev_id == revision_id,
+                    person_rev_type_filters,
+                ],
+                details={
+                    "rev_id": revision_id,
+                },
+            )
+            await redis.set_json(cache_key, data, ex=60)
+        except NotFoundError as e:
+            raise_not_found(e.details)
+    return data
 
 
 @router.get(
@@ -177,7 +185,9 @@ async def get_character_revisions(
     character_id: int = 0,
     db: AsyncSession = Depends(get_db),
     page: Pager = Depends(),
+    cache_control: CacheControl = Depends(CacheControl),
 ):
+    cache_control(300)
     filters = [character_rev_type_filters]
     if character_id > 0:
         filters.append(ChiiRevHistory.rev_mid == character_id)
@@ -196,24 +206,30 @@ async def get_character_revisions(
         404: res.response(model=ErrorDetail),
     },
 )
-@cache(lambda revision_id, **_: f"characters:revision:{revision_id}")
 async def get_character_revision(
     response: Response,
     db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
     redis: JSONRedis = Depends(get_redis),
+    cache_control: CacheControl = Depends(CacheControl),
 ):
-    try:
-        data = await get_revision(
-            db,
-            [
-                ChiiRevHistory.rev_id == revision_id,
-                character_rev_type_filters,
-            ],
-            details={
-                "rev_id": revision_id,
-            },
-        )
-        return data
-    except NotFoundError as e:
-        raise_not_found(e.details)
+    cache_control(300)
+    cache_key = f"characters:revision:{revision_id}"
+    data = await redis.get(cache_key)
+    response.headers["x-cache-status"] = "miss" if data is None else "hit"
+    if data is None:
+        try:
+            data = await get_revision(
+                db,
+                [
+                    ChiiRevHistory.rev_id == revision_id,
+                    character_rev_type_filters,
+                ],
+                details={
+                    "rev_id": revision_id,
+                },
+            )
+            await redis.set_json(cache_key, data, ex=60)
+        except NotFoundError as e:
+            raise_not_found(e.details)
+    return data
