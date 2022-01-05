@@ -232,13 +232,11 @@ def mock_access_token(db_session: Session):
     def mock_id(
         user_id: int, access_token: str = "", expires=datetime.now(), raise_error=True
     ):
-        if user_id in mock_user_id and (
-            len(access_token) == 0 or access_token in mock_token
-        ):
+        if user_id in mock_user_id and (not access_token or access_token in mock_token):
             return
         mock_user_id.add(user_id)
         mock_token.add(access_token)
-        if len(access_token) != 0:
+        if access_token:
             delete_query[ChiiOauthAccessToken].append(
                 ChiiOauthAccessToken.access_token == access_token
             )
@@ -249,7 +247,7 @@ def mock_access_token(db_session: Session):
             print(e)
             return
 
-        if len(access_token) != 0:
+        if access_token:
             db_session.add(
                 ChiiOauthAccessToken(
                     access_token=access_token,

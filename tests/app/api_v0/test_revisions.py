@@ -30,32 +30,6 @@ def test_person_revisions_basic(
         assert "nickname" in item["creator"]
 
 
-def test_person_revisions_filter_uid(
-    client: TestClient,
-    db_session: Session,
-    mock_access_token: MockAccessToken,
-):
-    uid = 104510
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_mid == 9, person_rev_type_filters
-    ):
-        mock_access_token(r["rev_creator"])
-    response = client.get(
-        person_revisions_api_prefix, params={"uid": uid, "person_id": 9}
-    )
-    assert response.status_code == 200
-    assert response.headers["content-type"] == "application/json"
-
-    res = response.json()
-    assert res["total"]
-    assert res["data"]
-    assert res["offset"] == 0
-    assert "limit" in res
-    for item in res["data"]:
-        assert item["creator"]["id"] == uid
-        assert "nickname" not in item["creator"]
-
-
 def test_person_revisions_offset(
     client: TestClient,
     db_session: Session,
@@ -121,32 +95,6 @@ def test_character_revisions_basic(
     assert "limit" in res
     for item in res["data"]:
         assert "nickname" in item["creator"]
-
-
-def test_character_revisions_filter_uid(
-    client: TestClient,
-    db_session: Session,
-    mock_access_token: MockAccessToken,
-):
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_mid == 1, character_rev_type_filters
-    ):
-        mock_access_token(r["rev_creator"])
-    uid = 1
-    response = client.get(
-        character_revisions_api_prefix, params={"charater_id": 1, "uid": uid}
-    )
-    assert response.status_code == 200
-    assert response.headers["content-type"] == "application/json"
-
-    res = response.json()
-    assert res["total"]
-    assert res["data"]
-    assert res["offset"] == 0
-    assert "limit" in res
-    for item in res["data"]:
-        assert item["creator"]["id"] == uid
-        assert "nickname" not in item["creator"]
 
 
 def test_character_revisions_offset(

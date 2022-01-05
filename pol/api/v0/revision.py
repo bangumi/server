@@ -8,55 +8,31 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, curd
 from pol.models import ErrorDetail
+from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
 from pol.db.const import RevisionType
 from pol.db.tables import ChiiMember, ChiiRevText, ChiiRevHistory
 from pol.api.v0.utils import raise_not_found, raise_offset_over_total
-from pol.api.v0.models import Order, Paged, Pager
+from pol.api.v0.models import Paged, Pager
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis, cache
 from pol.api.v0.models.revision import Revision, DetailedRevision
 
-router = APIRouter(prefix="/revisions", tags=["编辑历史"])
+router = APIRouter(prefix="/revisions", tags=["编辑历史"], route_class=ErrorCatchRoute)
 
-person_rev_types = [
-    t.value
-    for t in [
-        RevisionType.person,
-        RevisionType.person_cast_relation,
-        RevisionType.person_subject_relation,
-        RevisionType.person_erase,
-        RevisionType.person_merge,
-    ]
-]
 
-person_rev_type_filters = ChiiRevHistory.rev_type.in_(person_rev_types)
+person_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.person_rev_types())
 
-character_rev_types = [
-    t.value
-    for t in [
-        RevisionType.character,
-        RevisionType.character_subject_relation,
-        RevisionType.character_cast_relation,
-        RevisionType.character_erase,
-        RevisionType.character_merge,
-    ]
-]
-character_rev_type_filters = ChiiRevHistory.rev_type.in_(character_rev_types)
+character_rev_type_filters = ChiiRevHistory.rev_type.in_(
+    RevisionType.character_rev_types()
+)
 
 
 async def get_revisions(
     db: AsyncSession,
     filters: List[Any],
-    columns: List[Any],
-    join_args: List[Tuple[Any, Any]],
     page: Pager,
-    uid: int = 0,
-    order: Order = Order.desc,
 ):
-    filters = [*filters]
-    if uid > 0:
-        filters.append(ChiiRevHistory.rev_creator == uid)
     total = await curd.count(db, ChiiRevHistory.rev_id, *filters)
     if total <= page.offset:
         raise_offset_over_total(total)
@@ -66,23 +42,15 @@ async def get_revisions(
         ChiiRevHistory.rev_creator,
         ChiiRevHistory.rev_dateline,
         ChiiRevHistory.rev_edit_summary,
-        *columns,
+        ChiiMember.nickname,
     ]
-    join_args = [*join_args]
-    if uid <= 0:
-        columns.extend([ChiiMember.nickname, ChiiMember.avatar])
-        join_args.append((ChiiMember, ChiiRevHistory.rev_creator == ChiiMember.uid))
-    sort_field = ChiiRevHistory.rev_id
-    if order == Order.desc:
-        sort_field.desc()
-    else:
-        sort_field.asc()
+    join_args = [(ChiiMember, ChiiRevHistory.rev_creator == ChiiMember.uid)]
     query = (
         sa.select(
             *columns,
         )
         .where(*filters)
-        .order_by(sort_field)
+        .order_by(ChiiRevHistory.rev_id.desc())
         .limit(page.limit)
         .offset(page.offset)
     )
@@ -95,14 +63,7 @@ async def get_revisions(
             "summary": r["rev_edit_summary"],
             "creator": {
                 "id": r["rev_creator"],
-                **(
-                    {
-                        "nickname": r["nickname"],
-                        "avatar": r["avatar"],
-                    }
-                    if uid <= 0
-                    else {}
-                ),
+                "nickname": r["nickname"],
             },
         }
         for r in (await db.execute(query)).mappings().fetchall()
@@ -164,8 +125,6 @@ async def get_person_revisions(
     person_id: int = 0,
     db: AsyncSession = Depends(get_db),
     page: Pager = Depends(),
-    uid: int = 0,
-    order: Order = Order.desc,
 ):
     filters = [person_rev_type_filters]
     if person_id > 0:
@@ -173,11 +132,7 @@ async def get_person_revisions(
     return await get_revisions(
         db,
         filters,
-        [],
-        [],
         page,
-        uid=uid,
-        order=order,
     )
 
 
@@ -206,7 +161,6 @@ async def get_person_revision(
             ],
             details={
                 "rev_id": revision_id,
-                "rev_type": f"({','.join([str(t) for t in person_rev_types])})",
             },
         )
         return data
@@ -223,8 +177,6 @@ async def get_character_revisions(
     character_id: int = 0,
     db: AsyncSession = Depends(get_db),
     page: Pager = Depends(),
-    uid: int = 0,
-    order: Order = Order.desc,
 ):
     filters = [character_rev_type_filters]
     if character_id > 0:
@@ -232,11 +184,7 @@ async def get_character_revisions(
     return await get_revisions(
         db,
         filters,
-        [],
-        [],
         page,
-        uid=uid,
-        order=order,
     )
 
 
@@ -264,7 +212,6 @@ async def get_character_revision(
             ],
             details={
                 "rev_id": revision_id,
-                "rev_type": f"({','.join([str(t) for t in character_rev_types])})",
             },
         )
         return data
