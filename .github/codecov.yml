@@ -1,0 +1,13 @@
+coverage:
+  precision: 1
+  round: down
+  range: 90...95 # custom range of coverage colors from red -> yellow -> green
+  status:
+    project:
+      default:
+        # basic
+        target: 99%
+        threshold: 1%
+
+codecov:
+  require_ci_to_pass: true

@@ -51,7 +51,7 @@ MYSQL_PORT="3306"
 MYSQL_USER="user"
 MYSQL_PASS="password"
 MYSQL_DB="bangumi"
-REDIS_URI="redis://:pass@127.0.0.1:6379/1"
+REDIS_URI="redis://:redis-pass@127.0.0.1:6379/1"
 ```
 
 ## 开发
