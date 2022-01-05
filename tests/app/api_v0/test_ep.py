@@ -132,3 +132,27 @@ def test_episodes_start_non_offset(client: TestClient):
     assert [x["sort"] for x in res["data"] if x["type"] == EpType.normal] == [
         26.0 + i for i in range(19)
     ]
+
+
+def test_episode_offset(client: TestClient):
+    response = client.get("/v0/episodes/744210")
+    assert response.status_code == 200
+    res = response.json()
+
+    assert res["sort"] == 27
+    assert res["ep"] == 5
+
+
+def test_episodes_ban(client: TestClient):
+    """ep_id `1075445` is soft removed"""
+    response = client.get("/v0/episodes", params={"subject_id": "363612"})
+    assert response.status_code == 200
+    res = response.json()
+
+    assert not [x for x in res["data"] if x["id"] == 1275445]
+
+
+def test_episode_ban(client: TestClient):
+    """ep_id `1075445` is soft removed"""
+    response = client.get("/v0/episodes/1275445")
+    assert response.status_code == 404
