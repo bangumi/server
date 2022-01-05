@@ -69,6 +69,7 @@ async def get_episodes(
 
     where = [
         ChiiEpisode.ep_subject_id == subject_id,
+        ChiiEpisode.ep_ban == 0,
     ]
 
     if type is not None:
@@ -86,6 +87,7 @@ async def get_episodes(
         .where(
             ChiiEpisode.ep_subject_id == subject_id,
             ChiiEpisode.ep_type == EpType.normal,
+            ChiiEpisode.ep_ban == 0,
         )
         .limit(1)
     )
@@ -141,7 +143,9 @@ async def get_episode(
         cache_control(300)
         raise not_found
 
-    subject = await db.get(ChiiSubject, ep.ep_subject_id)
+    subject = await db.scalar(
+        sa.get(ChiiSubject, ChiiSubject.subject_id == ep.ep_subject_id)
+    )
     if not subject:  # pragma: no cover
         logger.error(
             "detached episode {}, missing subject {}", ep.ep_id, ep.ep_subject_id
@@ -156,12 +160,18 @@ async def get_episode(
         cache_control(300)
 
     first_episode: ChiiEpisode = await db.scalar(
-        sa.select(ChiiEpisode)
+        sa.get(ChiiEpisode)
         .where(
             ChiiEpisode.ep_subject_id == ep.ep_subject_id,
             ChiiEpisode.ep_type == EpType.normal,
+            ChiiEpisode.ep_ban == 0,
         )
         .limit(1)
     )
 
-    return add_episode(Ep.from_orm(ep), first_episode.ep_sort)
+    if first_episode:
+        first = first_episode.ep_sort
+    else:
+        first = 1
+
+    return add_episode(Ep.from_orm(ep), first)
