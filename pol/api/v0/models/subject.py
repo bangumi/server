@@ -1,7 +1,6 @@
-import datetime
 from typing import Dict, List, Optional
 
-from pydantic import Field, BaseModel, validator
+from pydantic import Field, BaseModel
 
 from pol.api.v0.models.wiki import Wiki
 
@@ -57,12 +56,6 @@ class Subject(BaseModel):
     collection: Collection
 
     tags: List[Tag]
-
-    @validator("date", pre=True)
-    def convert_date(cls, v):
-        if isinstance(v, datetime.datetime):
-            return f"{v.year:04d}-{v.month:02d}-{v.day:02d}"
-        return v
 
 
 class RelatedSubject(BaseModel):

@@ -446,6 +446,8 @@ class ChiiSubjectField(Base):
     field_year = Column(YEAR(4), nullable=False, index=True, comment="放送年份")
     field_mon = Column(TINYINT(2), nullable=False, comment="放送月份")
     field_week_day = Column(TINYINT(1), nullable=False, comment="放送日(星期X)")
+    # 对于默认的零值 '0000-00-00' 会被解析成字符串。
+    # 非零值会被处理成 `datetime.date`
     field_date = Column(Date, nullable=False, index=True, comment="放送日期")
     field_redirect = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
 
