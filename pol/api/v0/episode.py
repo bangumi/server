@@ -160,13 +160,12 @@ async def get_episode(
         cache_control(300)
 
     first_episode: ChiiEpisode = await db.scalar(
-        sa.get(ChiiEpisode)
-        .where(
+        sa.get(
+            ChiiEpisode,
             ChiiEpisode.ep_subject_id == ep.ep_subject_id,
             ChiiEpisode.ep_type == EpType.normal,
             ChiiEpisode.ep_ban == 0,
         )
-        .limit(1)
     )
 
     if first_episode:
