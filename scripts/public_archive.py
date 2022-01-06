@@ -31,7 +31,7 @@ def main():
     args = parser.parse_args()
     logger.info("dump database to {}", os.path.abspath(args.out))
 
-    SessionMaker = sa.create_sync_session()
+    SessionMaker = sa.sync_session_maker()
     with zipfile.ZipFile(
         args.out, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=7
     ) as zip_file:

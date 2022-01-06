@@ -52,7 +52,7 @@ __all__ = [
     "or_",
     "get",
     "delete",
-    "create_sync_session",
+    "sync_session_maker",
 ]
 
 
@@ -60,7 +60,7 @@ def get(T, *where):
     return select(T).where(*where).limit(1)
 
 
-def create_sync_session() -> Callable[[], sqlalchemy.orm.Session]:
+def sync_session_maker() -> Callable[[], sqlalchemy.orm.Session]:
     engine = create_engine(
         "mysql+pymysql://{}:{}@{}:{}/{}".format(
             config.MYSQL_USER,
