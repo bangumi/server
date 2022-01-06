@@ -13,3 +13,4 @@ docs
 .gitignore
 dev-env/
 .venv/
+tests/
