@@ -235,6 +235,7 @@ def export_episodes(f: IO[bytes], session: Session):
                         "id": episode.ep_id,
                         "name": episode.ep_name,
                         "name_cn": episode.ep_name_cn,
+                        "sort": episode.ep_sort,
                         "subject_id": episode.ep_subject_id,
                         "description": episode.ep_desc,
                         "type": episode.ep_type,
