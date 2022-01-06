@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from pol import sa
 from pol.db.tables import (
     ChiiPerson,
+    ChiiEpisode,
     ChiiSubject,
     ChiiCharacter,
     ChiiCrtCastIndex,
@@ -70,6 +71,10 @@ def main():
             "person-characters.jsonlines", "w"
         ) as f, SessionMaker() as session:
             export_person_characters(f, session)
+
+        logger.info("dumping episodes")
+        with zip_file.open("episodes.jsonlines", "w") as f, SessionMaker() as session:
+            export_episodes(f, session)
 
 
 def export_person_characters(f: IO[bytes], session: Session):
@@ -201,6 +206,39 @@ def export_subjects(f: IO[bytes], session: Session):
                         "platform": subject.subject_platform,
                         "summary": subject.field_summary,
                         "nsfw": subject.subject_nsfw,
+                    }
+                )
+            )
+            f.write(b"\n")
+
+
+def export_episodes(f: IO[bytes], session: Session):
+    chunk = 50
+    max_subject_id = session.scalar(
+        sa.select(ChiiSubject.subject_id)
+        .order_by(ChiiSubject.subject_id.desc())
+        .limit(1)
+    )
+
+    for id in range(1, max_subject_id + chunk, chunk):
+        for episode in session.scalars(
+            sa.select(ChiiEpisode).where(
+                ChiiEpisode.ep_subject_id >= id,
+                ChiiEpisode.ep_subject_id < id + chunk,
+                ChiiEpisode.ep_ban == 0,
+            )
+        ):
+            episode: ChiiEpisode
+            f.write(
+                orjson.dumps(
+                    {
+                        "id": episode.ep_id,
+                        "name": episode.ep_name,
+                        "name_cn": episode.ep_name_cn,
+                        "description": episode.ep_desc,
+                        "type": episode.ep_type,
+                        "airdate": episode.ep_airdate,
+                        "disc": episode.ep_disc,
                     }
                 )
             )
