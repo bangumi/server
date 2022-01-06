@@ -1,5 +1,10 @@
+"""
+create a public archive at `--out`
+"""
+import os
 import zipfile
 from typing import IO
+from argparse import ArgumentParser
 
 import orjson
 from loguru import logger
@@ -20,9 +25,15 @@ from pol.api.v0.utils import get_career
 
 @logger.catch()
 def main():
+    parser = ArgumentParser()
+    parser.add_argument("--out", default="./data/export.zip")
+
+    args = parser.parse_args()
+    logger.info("dump database to {}", os.path.abspath(args.out))
+
     SessionMaker = sa.create_sync_session()
     with zipfile.ZipFile(
-        "./data/export.zip", "w", compression=zipfile.ZIP_DEFLATED, compresslevel=7
+        args.out, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=7
     ) as zip_file:
         logger.info("dumping subjects")
         with zip_file.open("subject.jsonlines", "w") as f, SessionMaker() as session:
