@@ -1,6 +1,5 @@
 from typing import Any, List, Tuple, Optional
 from asyncio import gather
-from functools import reduce
 
 from fastapi import Path, Depends, APIRouter
 from starlette.responses import Response
@@ -45,17 +44,18 @@ async def get_revisions(
         ChiiRevHistory.rev_edit_summary,
         ChiiMember.nickname,
     ]
-    join_args = [(ChiiMember, ChiiRevHistory.rev_creator == ChiiMember.uid)]
+
     query = (
         sa.select(
             *columns,
         )
+        .join(ChiiMember, ChiiRevHistory.rev_creator == ChiiMember.uid)
         .where(*filters)
         .order_by(ChiiRevHistory.rev_id.desc())
         .limit(page.limit)
         .offset(page.offset)
     )
-    query = reduce(lambda acc, item: acc.join(item[0], item[1]), join_args, query)
+
     revisions = [
         {
             "id": r["rev_id"],
