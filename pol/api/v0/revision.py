@@ -60,7 +60,7 @@ async def get_revisions(
         {
             "id": r["rev_id"],
             "type": r["rev_type"],
-            "timestamp": r["rev_dateline"],
+            "created_at": r["rev_dateline"],
             "summary": r["rev_edit_summary"],
             "creator": {
                 "id": r["rev_creator"],
@@ -106,7 +106,7 @@ async def get_revision(
     return {
         "id": r.rev_id,
         "type": r.rev_type,
-        "timestamp": r.rev_dateline,
+        "created_at": r.rev_dateline,
         "summary": r.rev_edit_summary,
         "data": text_item.rev_text,
         "creator": {

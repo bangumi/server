@@ -11,7 +11,7 @@ class Revision(BaseModel):
     type: int
     creator: Creator
     summary: str
-    timestamp: datetime.datetime
+    created_at: datetime.datetime
 
 
 class DetailedRevision(Revision):

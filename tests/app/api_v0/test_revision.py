@@ -27,7 +27,7 @@ def test_person_revision_basic(
     assert set(res.keys()) == {
         "id",
         "type",
-        "timestamp",
+        "created_at",
         "summary",
         "data",
         "creator",
@@ -81,7 +81,7 @@ def test_character_revision_basic(
     assert set(res.keys()) == {
         "id",
         "type",
-        "timestamp",
+        "created_at",
         "summary",
         "data",
         "creator",
