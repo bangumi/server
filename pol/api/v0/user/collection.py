@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Iterator
 
 from fastapi import Depends, APIRouter
 from pydantic import BaseModel
@@ -61,7 +61,7 @@ async def get_subject(
         sa.select(sa.count(1)).where(ChiiSubjectInterest.uid == username, *where)
     )
 
-    collections: List[ChiiSubjectInterest] = await db.scalars(
+    collections: Iterator[ChiiSubjectInterest] = await db.scalars(
         sa.select(ChiiSubjectInterest)
         .where(ChiiSubjectInterest.uid == username, *where)
         .limit(page.limit)
