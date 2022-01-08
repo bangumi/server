@@ -24,8 +24,3 @@ class Role:
 
     def get_user_id(self) -> Optional[int]:
         raise NotImplementedError()
-
-
-def is_user_id(s: str) -> int:
-    if s.isdecimal() and not s.startswith("0"):
-        return int(s)

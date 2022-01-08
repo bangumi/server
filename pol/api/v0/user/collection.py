@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from starlette.requests import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import sa, res, permission
+from pol import sa, res
 from pol.models import ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db
@@ -38,13 +38,10 @@ async def get_user(
     username: str,
     db: AsyncSession = Depends(get_db),
 ) -> Optional[ChiiMember]:
-    """lookup user by path info username.
-    username can be raw user_id or username set by user.
-    """
-    if user_id := permission.is_user_id(username):  # raw user id like `1`
-        u = await db.scalar(sa.get(ChiiMember, ChiiMember.uid == user_id))
-    else:
-        u = await db.scalar(sa.get(ChiiMember, ChiiMember.username == username))
+    """get the user for `username` like `/user/{username}/collections`"""
+    u: Optional[ChiiMember] = await db.scalar(
+        sa.get(ChiiMember, ChiiMember.username == username)
+    )
 
     if not u:
         raise res.not_found(request)
@@ -54,7 +51,7 @@ async def get_user(
 @router.get(
     "/user/{username}/collections",
     summary="获取用户收藏",
-    description="获取对应用户的收藏，查看私有收藏需要access token。",
+    description="获取对应用户的收藏，查看私有收藏需要access token。\n设置了username的用户无法通过数字ID查询",
     response_model=Paged[Model],
     responses={
         404: res.response(model=ErrorDetail, description="用户不存在"),
