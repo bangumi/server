@@ -42,6 +42,7 @@ async def get_revisions(
         ChiiRevHistory.rev_creator,
         ChiiRevHistory.rev_dateline,
         ChiiRevHistory.rev_edit_summary,
+        ChiiMember.username,
         ChiiMember.nickname,
     ]
 
@@ -63,7 +64,7 @@ async def get_revisions(
             "created_at": r["rev_dateline"],
             "summary": r["rev_edit_summary"],
             "creator": {
-                "id": r["rev_creator"],
+                "username": r["username"],
                 "nickname": r["nickname"],
             },
         }
@@ -110,9 +111,8 @@ async def get_revision(
         "summary": r.rev_edit_summary,
         "data": text_item.rev_text,
         "creator": {
-            "id": r.rev_creator,
+            "username": user.username,
             "nickname": user.nickname,
-            "avatar": user.avatar,
         },
     }
 
