@@ -1,10 +1,11 @@
-from typing import TypeVar
-
-from pol.db.tables import Base
 from . import ep, user
-from .base import count
+from .base import count, get_one
 from .exceptions import NotFoundError
 
-T = TypeVar("T", bound=Base)
-
-__all__ = ["ep", "NotFoundError", "user", "count"]
+__all__ = [
+    "get_one",
+    "count",
+    "ep",
+    "NotFoundError",
+    "user",
+]

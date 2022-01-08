@@ -1,8 +1,11 @@
+from abc import abstractmethod
+from typing import Protocol
 from datetime import datetime
 from collections import defaultdict
 
 import redis
 import pytest
+from sqlalchemy.orm import Session
 
 from pol import sa, config
 from pol.db.const import Gender, BloodType, PersonType, SubjectType
@@ -15,12 +18,12 @@ from pol.db.tables import (
     ChiiOauthAccessToken,
 )
 
-Session = sa.sync_session_maker()
+DBSession = sa.sync_session_maker()
 
 
 @pytest.fixture()
 def db_session():
-    db_session = Session()
+    db_session = DBSession()
     try:
         yield db_session
     except Exception:  # pragma: no cover
@@ -110,6 +113,14 @@ def mock_subject(db_session: Session):
         for table, where in delete_query.items():
             db_session.execute(sa.delete(table).where(sa.or_(*where)))
         db_session.commit()
+
+
+class MockAccessToken(Protocol):
+    @abstractmethod
+    def __call__(
+        self, user_id: int, access_token: str, expires: datetime = datetime.now()
+    ) -> None:
+        pass
 
 
 @pytest.fixture()
@@ -208,30 +219,43 @@ def mock_access_token(db_session: Session):
     delete_query = defaultdict(list)
 
     def mock_id(
-        user_id: int,
-        access_token: str,
-        expires=datetime.now(),
+        user_id: int, access_token: str = "", expires=datetime.now(), raise_error=True
     ):
-        delete_query[ChiiOauthAccessToken].append(
-            ChiiOauthAccessToken.access_token == access_token
-        )
-        delete_query[ChiiMember].append(ChiiMember.uid == user_id)
-        check_exist(db_session, delete_query)
-
+        if user_id in mock_user_id and (not access_token or access_token in mock_token):
+            return
         mock_user_id.add(user_id)
         mock_token.add(access_token)
+        if access_token:
+            delete_query[ChiiOauthAccessToken].append(
+                ChiiOauthAccessToken.access_token == access_token
+            )
+        delete_query[ChiiMember].append(ChiiMember.uid == user_id)
+        try:
+            check_exist(db_session, delete_query)
+        except ValueError as e:
+            print(e)
+            return
+
+        if access_token:
+            db_session.add(
+                ChiiOauthAccessToken(
+                    access_token=access_token,
+                    client_id="",
+                    user_id=user_id,
+                    expires=expires,
+                    scope=None,
+                )
+            )
 
         db_session.add(
-            ChiiOauthAccessToken(
-                access_token=access_token,
-                client_id="",
-                user_id=user_id,
-                expires=expires,
-                scope=None,
+            ChiiMember(
+                uid=user_id,
+                username=f"mock_{user_id}",
+                nickname="",
+                avatar="",
+                groupid=10,
+                sign="",
             )
-        )
-        db_session.add(
-            ChiiMember(uid=user_id, nickname="", avatar="", groupid=10, sign="")
         )
         db_session.commit()
 

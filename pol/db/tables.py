@@ -1,4 +1,5 @@
-from typing import List
+import zlib
+from typing import Any, List, Tuple, Union
 
 from sqlalchemy import (
     TIMESTAMP,
@@ -387,11 +388,46 @@ class ChiiRevHistory(Base):
     rev_edit_summary = Column(String(200, "utf8_unicode_ci"), nullable=False)
 
 
+class GzipPHPSerializedBlob(MEDIUMBLOB):
+    def bind_processor(self, dialect):
+        raise NotImplementedError("write to db is not supported now")
+
+    @staticmethod
+    def load_array(d: List[Tuple[Union[int, str], Any]]):
+        for (i, (k, v)) in enumerate(d):
+            if type(k) == int:
+                d[i] = (str(k), v)
+        return dict(d)
+
+    @staticmethod
+    def loads(b: bytes):
+        return phpseralize.loads(
+            zlib.decompress(b, -zlib.MAX_WBITS),
+            array_hook=GzipPHPSerializedBlob.load_array,
+        )
+
+    def result_processor(self, dialect, coltype):
+        loads = self.loads
+
+        def process(value):
+            if value is None:
+                return None
+            return loads(value)
+
+        return process
+
+    def compare_values(self, x, y):
+        if self.comparator:
+            return self.comparator(x, y)
+        else:
+            return x == y
+
+
 class ChiiRevText(Base):
     __tablename__ = "chii_rev_text"
 
     rev_text_id = Column(MEDIUMINT(9), primary_key=True)
-    rev_text = Column(MEDIUMBLOB, nullable=False)
+    rev_text = Column(GzipPHPSerializedBlob, nullable=False)
 
 
 t_chii_subject_alias = Table(

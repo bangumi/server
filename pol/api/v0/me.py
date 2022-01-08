@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter
-from pydantic import BaseModel
+from pydantic import Field, BaseModel
 
 from pol import res
 from pol.models import ErrorDetail
@@ -29,7 +29,7 @@ class Avatar(BaseModel):
 class Me(BaseModel):
     id: int
     url: str
-    username: str
+    username: str = Field(..., description="唯一用户名，初始与uid相同，可修改")
     nickname: str
     user_group: UserGroup
     avatar: Avatar
