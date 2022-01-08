@@ -5,8 +5,7 @@ from collections import defaultdict
 
 import redis
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session
 
 from pol import sa, config
 from pol.db.const import Gender, BloodType, PersonType, SubjectType
@@ -19,17 +18,7 @@ from pol.db.tables import (
     ChiiOauthAccessToken,
 )
 
-engine = create_engine(
-    "mysql+pymysql://{}:{}@{}:{}/{}".format(
-        config.MYSQL_USER,
-        config.MYSQL_PASS,
-        config.MYSQL_HOST,
-        config.MYSQL_PORT,
-        config.MYSQL_DB,
-    )
-)
-
-DBSession = sessionmaker(bind=engine)
+DBSession = sa.sync_session_maker()
 
 
 @pytest.fixture()

@@ -16,3 +16,4 @@ docs/source/openapi.json
 dev-env/
 .coverage
 *.pyc.*
+/data/
