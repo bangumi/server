@@ -23,3 +23,15 @@ def test_collection_private(client: TestClient, auth_header, mock_user_collectio
     assert response.headers["content-type"] == "application/json"
 
     assert len(response.json()["data"]) == 6
+
+
+def test_collection_username(
+    client: TestClient, auth_header, mock_user_collection, mock_access_token
+):
+    mock_access_token(access_token="token", user_id=6, username="ua")
+    mock_user_collection(id=1, uid=6, subject_id=1, private=False)
+    response = client.get("/v0/user/ua/collections", headers=auth_header)
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/json"
+
+    assert len(response.json()["data"]) == 1

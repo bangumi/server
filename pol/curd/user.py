@@ -36,6 +36,9 @@ class User(Role, BaseModel):
     def get_username(self) -> str:
         return self.username
 
+    def get_user_id(self) -> int:
+        return self.id
+
 
 async def get_by_valid_token(db: AsyncSession, access_token: str) -> User:
     access: Optional[ChiiOauthAccessToken] = await db.scalar(

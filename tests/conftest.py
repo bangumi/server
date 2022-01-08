@@ -211,6 +211,7 @@ def mock_access_token(db_session: Session):
     def mock_id(
         user_id: int,
         access_token: str,
+        username: str = "",
         expires=datetime.now(),
     ):
         delete_query[ChiiOauthAccessToken].append(
@@ -232,7 +233,14 @@ def mock_access_token(db_session: Session):
             )
         )
         db_session.add(
-            ChiiMember(uid=user_id, nickname="", avatar="", groupid=10, sign="")
+            ChiiMember(
+                uid=user_id,
+                username=username,
+                nickname="",
+                avatar="",
+                groupid=10,
+                sign="",
+            )
         )
         db_session.commit()
 

@@ -1,12 +1,12 @@
 import datetime
-from typing import List, Iterator
+from typing import List, Iterator, Optional
 
 from fastapi import Depends, APIRouter
 from pydantic import BaseModel
 from starlette.requests import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import sa, res
+from pol import sa, res, permission
 from pol.models import ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db
@@ -33,10 +33,17 @@ class Model(BaseModel):
     private: int
 
 
+async def get_user(db: AsyncSession, username: str) -> Optional[ChiiMember]:
+    if user_id := permission.is_user_id(username):  # raw user id like `1`
+        return await db.scalar(sa.get(ChiiMember, ChiiMember.uid == user_id))
+    else:
+        return await db.scalar(sa.get(ChiiMember, ChiiMember.username == username))
+
+
 @router.get(
     "/user/{username}/collections",
     summary="获取用户收藏",
-    description="获取对应用户的收藏，查看私有收藏需要access token。",
+    description="获取对应用户的收藏，查看私有收藏需要access token。\n设置了用户名的用户无法使用数字ID进行查询",
     response_model=Paged[Model],
     responses={
         404: res.response(model=ErrorDetail, description="用户不存在"),
@@ -50,20 +57,24 @@ async def get_subject(
     db: AsyncSession = Depends(get_db),
 ):
     where = [ChiiSubjectInterest.private == 0]
-    if username == user.get_username():
-        where = []
-    else:
-        user = await db.scalar(sa.get(ChiiMember, ChiiMember.username == username))
-        if not user:
-            raise res.not_found(request)
 
-    total = await db.scalar(
-        sa.select(sa.count(1)).where(ChiiSubjectInterest.uid == username, *where)
-    )
+    if user_id := permission.is_user_id(username):  # raw user id like `1`
+        if user_id == user.get_user_id():
+            where = []
+    else:
+        if username == user.get_username():
+            where = []
+
+    u = await get_user(db, username)
+    if not u:
+        raise res.not_found(request)
+
+    where.append(ChiiSubjectInterest.uid == u.uid)
+    total = await db.scalar(sa.select(sa.count(1)).where(*where))
 
     collections: Iterator[ChiiSubjectInterest] = await db.scalars(
         sa.select(ChiiSubjectInterest)
-        .where(ChiiSubjectInterest.uid == username, *where)
+        .where(*where)
         .limit(page.limit)
         .offset(page.offset)
         .order_by(ChiiSubjectInterest.last_touch)

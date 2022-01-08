@@ -27,6 +27,9 @@ class Guest(Role):
     def get_username(self) -> Optional[str]:
         return None
 
+    def get_user_id(self) -> int:
+        return 0
+
 
 guest = Guest()
 
