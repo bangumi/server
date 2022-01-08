@@ -33,11 +33,22 @@ class Model(BaseModel):
     private: int
 
 
-async def get_user(db: AsyncSession, username: str) -> Optional[ChiiMember]:
+async def get_user(
+    request: Request,
+    username: str,
+    db: AsyncSession = Depends(get_db),
+) -> Optional[ChiiMember]:
+    """lookup user by path info username.
+    username can be raw user_id or username set by user.
+    """
     if user_id := permission.is_user_id(username):  # raw user id like `1`
-        return await db.scalar(sa.get(ChiiMember, ChiiMember.uid == user_id))
+        u = await db.scalar(sa.get(ChiiMember, ChiiMember.uid == user_id))
     else:
-        return await db.scalar(sa.get(ChiiMember, ChiiMember.username == username))
+        u = await db.scalar(sa.get(ChiiMember, ChiiMember.username == username))
+
+    if not u:
+        raise res.not_found(request)
+    return u
 
 
 @router.get(
@@ -50,24 +61,15 @@ async def get_user(db: AsyncSession, username: str) -> Optional[ChiiMember]:
     },
 )
 async def get_subject(
-    username: str,
-    request: Request,
     user: Role = Depends(optional_user),
     page: Pager = Depends(),
+    u: Optional[ChiiMember] = Depends(get_user),
     db: AsyncSession = Depends(get_db),
 ):
     where = [ChiiSubjectInterest.private == 0]
 
-    if user_id := permission.is_user_id(username):  # raw user id like `1`
-        if user_id == user.get_user_id():
-            where = []
-    else:
-        if username == user.get_username():
-            where = []
-
-    u = await get_user(db, username)
-    if not u:
-        raise res.not_found(request)
+    if u.uid == user.get_user_id():
+        where = []
 
     where.append(ChiiSubjectInterest.uid == u.uid)
     total = await db.scalar(sa.select(sa.count(1)).where(*where))
