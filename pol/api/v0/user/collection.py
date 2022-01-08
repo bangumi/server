@@ -43,7 +43,7 @@ async def get_user(db: AsyncSession, username: str) -> Optional[ChiiMember]:
 @router.get(
     "/user/{username}/collections",
     summary="获取用户收藏",
-    description="获取对应用户的收藏，查看私有收藏需要access token。\n设置了用户名的用户无法使用数字ID进行查询",
+    description="获取对应用户的收藏，查看私有收藏需要access token。",
     response_model=Paged[Model],
     responses={
         404: res.response(model=ErrorDetail, description="用户不存在"),
