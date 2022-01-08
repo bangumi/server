@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import Depends
 from pydantic import ValidationError
 from starlette.status import HTTP_403_FORBIDDEN
@@ -21,6 +23,9 @@ class Guest(Role):
 
     def allow_nsfw(self) -> bool:
         return False
+
+    def get_username(self) -> Optional[str]:
+        return None
 
 
 guest = Guest()

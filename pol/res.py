@@ -2,6 +2,7 @@ from typing import Any, Dict, Type, Union, Optional
 from urllib.parse import quote
 
 import orjson
+from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.datastructures import URL
 
@@ -49,3 +50,15 @@ def response(model: Type = None, description: str = None) -> Dict[str, Any]:
     if description:
         d["description"] = description
     return d
+
+
+def not_found(request: Request):
+    return HTTPException(
+        status_code=404,
+        title="Not Found",
+        description="resource can't be found in the database or has been removed",
+        detail={
+            "path_info": dict(request.path_params),
+            "query_info": dict(request.query_params),
+        },
+    )

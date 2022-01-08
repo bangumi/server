@@ -745,3 +745,113 @@ class ChiiSubject(Base):
     @property
     def ban(self) -> bool:
         return self.subject_ban == 1
+
+
+class ChiiSubjectInterest(Base):
+    __tablename__ = "chii_subject_interests"
+    __table_args__ = (
+        Index("user_collects", "interest_subject_type", "interest_uid"),
+        Index(
+            "tag_subject_id", "interest_subject_type", "interest_type", "interest_uid"
+        ),
+        Index(
+            "subject_lasttouch",
+            "interest_subject_id",
+            "interest_private",
+            "interest_lasttouch",
+        ),
+        Index(
+            "user_collect_type",
+            "interest_subject_type",
+            "interest_type",
+            "interest_uid",
+            "interest_private",
+            "interest_collect_dateline",
+        ),
+        Index(
+            "subject_collect",
+            "interest_subject_id",
+            "interest_type",
+            "interest_private",
+            "interest_collect_dateline",
+        ),
+        Index(
+            "subject_comment",
+            "interest_subject_id",
+            "interest_has_comment",
+            "interest_private",
+            "interest_lasttouch",
+        ),
+        Index("interest_id", "interest_uid", "interest_private"),
+        Index(
+            "user_collect_latest",
+            "interest_subject_type",
+            "interest_type",
+            "interest_uid",
+            "interest_private",
+        ),
+        Index(
+            "top_subject",
+            "interest_subject_id",
+            "interest_subject_type",
+            "interest_doing_dateline",
+        ),
+        Index(
+            "subject_rate", "interest_subject_id", "interest_rate", "interest_private"
+        ),
+        Index("interest_type_2", "interest_type", "interest_uid"),
+        Index(
+            "interest_uid_2", "interest_uid", "interest_private", "interest_lasttouch"
+        ),
+        Index("user_interest", "interest_uid", "interest_subject_id", unique=True),
+        Index("interest_subject_id", "interest_subject_id", "interest_type"),
+    )
+
+    id = Column("interest_id", INTEGER(10), primary_key=True)
+    uid = Column("interest_uid", MEDIUMINT(8), nullable=False, index=True)
+    subject_id = Column("interest_subject_id", MEDIUMINT(8), nullable=False, index=True)
+    subject_type = Column(
+        "interest_subject_type",
+        SMALLINT(6),
+        nullable=False,
+        index=True,
+        server_default=text("'0'"),
+    )
+    rate = Column(
+        "interest_rate",
+        TINYINT(3),
+        nullable=False,
+        index=True,
+        server_default=text("'0'"),
+    )
+    type = Column(
+        "interest_type",
+        TINYINT(1),
+        nullable=False,
+        index=True,
+        server_default=text("'0'"),
+    )
+    has_comment = Column("interest_has_comment", TINYINT(1), nullable=False)
+    comment = Column("interest_comment", MEDIUMTEXT, nullable=False)
+    tag: str = Column("interest_tag", MEDIUMTEXT, nullable=False)
+    ep_status = Column(
+        "interest_ep_status", MEDIUMINT(8), nullable=False, server_default=text("'0'")
+    )
+    vol_status = Column(
+        "interest_vol_status", MEDIUMINT(8), nullable=False, comment="卷数"
+    )
+    wish_dateline = Column("interest_wish_dateline", INTEGER(10), nullable=False)
+    doing_dateline = Column("interest_doing_dateline", INTEGER(10), nullable=False)
+    collect_dateline = Column(
+        "interest_collect_dateline", INTEGER(10), nullable=False, index=True
+    )
+    on_hold_dateline = Column("interest_on_hold_dateline", INTEGER(10), nullable=False)
+    dropped_dateline = Column("interest_dropped_dateline", INTEGER(10), nullable=False)
+    last_touch = Column(
+        "interest_lasttouch",
+        INTEGER(10),
+        nullable=False,
+        index=True,
+        server_default=text("'0'"),
+    )
+    private = Column("interest_private", TINYINT(1), nullable=False, index=True)

@@ -20,6 +20,14 @@ class BloodType(enum.IntEnum):
         return self.value
 
 
+class CollectionType(enum.IntEnum):
+    wish = 1  # 想看
+    doing = 2  # 看过
+    collect = 3  # 在看
+    on_hold = 4  # 搁置
+    dropped = 5  # 抛弃
+
+
 class CharacterType(enum.IntEnum):
     person = 1
     airframe = 2

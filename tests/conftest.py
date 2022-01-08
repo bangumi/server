@@ -12,6 +12,7 @@ from pol.db.tables import (
     ChiiSubject,
     ChiiPersonField,
     ChiiSubjectField,
+    ChiiSubjectInterest,
     ChiiOauthAccessToken,
 )
 
@@ -237,6 +238,68 @@ def mock_access_token(db_session: Session):
 
     try:
         yield mock_id
+    finally:
+        for table, where in delete_query.items():
+            db_session.execute(sa.delete(table).where(sa.or_(*where)))
+        db_session.commit()
+
+
+@pytest.fixture()
+def mock_user_collection(db_session: Session):
+    mock_ids = set()
+    delete_query = defaultdict(list)
+
+    def mock_collection(
+        id: int,
+        uid: int,
+        subject_id: int,
+        tag: str = "",
+        private=False,
+        rate: int = 0,
+        comment: str = "",
+        last_touch=datetime.now(),
+        ep_status=0,
+        vol_status=0,
+        wish_dateline=0,
+        doing_dateline=0,
+        collect_dateline=0,
+        on_hold_dateline=0,
+        dropped_dateline=0,
+    ):
+        delete_query[ChiiSubjectInterest].append(
+            ChiiSubjectInterest.id == id,
+        )
+        check_exist(db_session, delete_query)
+
+        mock_ids.add(id)
+
+        db_session.add(
+            ChiiSubjectInterest(
+                id=id,
+                uid=uid,
+                subject_id=subject_id,
+                subject_type=1,
+                rate=rate,
+                type=1,
+                has_comment=bool(comment),
+                comment=comment,
+                tag=tag,
+                ep_status=ep_status,
+                vol_status=vol_status,
+                wish_dateline=wish_dateline,
+                doing_dateline=doing_dateline,
+                collect_dateline=collect_dateline,
+                on_hold_dateline=on_hold_dateline,
+                dropped_dateline=dropped_dateline,
+                last_touch=last_touch.timestamp(),
+                private=private,
+            )
+        )
+
+        db_session.commit()
+
+    try:
+        yield mock_collection
     finally:
         for table, where in delete_query.items():
             db_session.execute(sa.delete(table).where(sa.or_(*where)))

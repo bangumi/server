@@ -23,6 +23,7 @@ __all__ = [
     "CharacterDetail",
     "CharacterPerson",
     "PersonCharacter",
+    "PagerSinceInt",
 ]
 
 
@@ -168,6 +169,14 @@ class CharacterPerson(BaseCharacter):
 class Pager(pydantic.BaseModel):
     limit: int = Field(30, gt=0, le=50)
     offset: int = Field(0, ge=0)
+
+
+# we should use a genetic type for field `since`,
+# but there's a pydantic bug prevent this
+# https://github.com/samuelcolvin/pydantic/issues/3358
+class PagerSinceInt(pydantic.BaseModel):
+    limit: int = Field(default=30, gt=0, le=50)
+    since: Optional[int] = Field(description="A sort key fields")
 
 
 class Order(enum.IntEnum):

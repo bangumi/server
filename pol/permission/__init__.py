@@ -1,4 +1,5 @@
 import enum
+from typing import Optional
 
 
 class UserGroup(enum.IntEnum):
@@ -16,4 +17,7 @@ class UserGroup(enum.IntEnum):
 class Role:
     def allow_nsfw(self) -> bool:
         """if this user can see nsfw contents"""
+        raise NotImplementedError()
+
+    def get_username(self) -> Optional[str]:
         raise NotImplementedError()
