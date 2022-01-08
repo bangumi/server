@@ -37,7 +37,7 @@ async def get_user(
     request: Request,
     username: str,
     db: AsyncSession = Depends(get_db),
-) -> Optional[ChiiMember]:
+) -> ChiiMember:
     """get the user for `username` like `/user/{username}/collections`"""
     u: Optional[ChiiMember] = await db.scalar(
         sa.get(ChiiMember, ChiiMember.username == username)
@@ -60,7 +60,7 @@ async def get_user(
 async def get_subject(
     user: Role = Depends(optional_user),
     page: Pager = Depends(),
-    u: Optional[ChiiMember] = Depends(get_user),
+    u: ChiiMember = Depends(get_user),
     db: AsyncSession = Depends(get_db),
 ):
     where = [ChiiSubjectInterest.private == 0]
