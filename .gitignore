@@ -17,3 +17,4 @@ dev-env/
 .coverage
 *.pyc.*
 /data/
+tmp/

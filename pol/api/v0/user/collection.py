@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Iterator
+from typing import List, Iterator, Optional
 
 from fastapi import Depends, APIRouter
 from pydantic import BaseModel
@@ -28,8 +28,7 @@ class UserCollection(BaseModel):
     subject_type: SubjectType
     rate: int
     type: CollectionType
-    has_comment: bool
-    comment: str
+    comment: Optional[str]
     tag: List[str]
     ep_status: int
     vol_status: int
@@ -77,8 +76,7 @@ async def get_subject(
                 "subject_type": x.subject_type,
                 "rate": x.rate,
                 "type": x.type,
-                "has_comment": x.has_comment,
-                "comment": x.comment,
+                "comment": x.comment if x.has_comment else None,
                 "tag": tags(x.tag),
                 "ep_status": x.ep_status,
                 "vol_status": x.vol_status,
