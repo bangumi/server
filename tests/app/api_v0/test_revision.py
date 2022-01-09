@@ -16,7 +16,7 @@ def test_person_revision_basic(
     for r in db_session.query(ChiiRevHistory.rev_creator).where(
         ChiiRevHistory.rev_id == 348475
     ):
-        mock_access_token(r["rev_creator"])
+        mock_access_token(r.rev_creator)
     response = client.get(
         f"{person_revisions_api_prefix}/348475",
     )
@@ -44,7 +44,7 @@ def test_person_revision_cache(
     for r in db_session.query(ChiiRevHistory.rev_creator).where(
         ChiiRevHistory.rev_id == 348475
     ):
-        mock_access_token(r["rev_creator"])
+        mock_access_token(r.rev_creator)
     url = f"{person_revisions_api_prefix}/348475"
     response = client.get(
         url,
@@ -70,7 +70,7 @@ def test_character_revision_basic(
     for r in db_session.query(ChiiRevHistory.rev_creator).where(
         ChiiRevHistory.rev_id == 190704
     ):
-        mock_access_token(r["rev_creator"])
+        mock_access_token(r.rev_creator)
     response = client.get(
         f"{character_revisions_api_prefix}/190704",
     )
@@ -98,7 +98,7 @@ def test_character_revision_cache(
     for r in db_session.query(ChiiRevHistory.rev_creator).where(
         ChiiRevHistory.rev_id == 190704
     ):
-        mock_access_token(r["rev_creator"])
+        mock_access_token(r.rev_creator)
     url = f"{character_revisions_api_prefix}/190704"
     response = client.get(
         url,

@@ -118,7 +118,7 @@ def mock_subject(db_session: Session):
 class MockAccessToken(Protocol):
     @abstractmethod
     def __call__(
-        self, user_id: int, access_token: str, expires: datetime = datetime.now()
+        self, user_id: int, access_token: str = "", expires: datetime = datetime.now()
     ) -> None:
         pass
 
