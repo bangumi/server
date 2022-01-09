@@ -62,3 +62,19 @@ def test_character_revision_basic(
         "creator",
     }
     assert res["data"]["1"]["crt_name"] == "ルルーシュ・ランペルージ"
+
+
+def test_person_revision_not_found(client: TestClient):
+    response = client.get(
+        f"{person_revisions_api_prefix}/888888",
+    )
+    assert response.status_code == 404
+    assert response.headers["content-type"] == "application/json"
+
+
+def test_character_revision_not_found(client: TestClient):
+    response = client.get(
+        f"{character_revisions_api_prefix}/888888",
+    )
+    assert response.status_code == 404
+    assert response.headers["content-type"] == "application/json"
