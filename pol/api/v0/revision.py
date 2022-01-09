@@ -9,7 +9,13 @@ from pol.res import ErrorDetail, not_found_exception
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db
 from pol.db.const import RevisionType
-from pol.db.tables import ChiiMember, ChiiRevText, ChiiRevHistory, ChiiSubjectRevision
+from pol.db.tables import (
+    ChiiMember,
+    ChiiRevText,
+    ChiiEpRevision,
+    ChiiRevHistory,
+    ChiiSubjectRevision,
+)
 from pol.api.v0.models import Paged, Pager
 from pol.curd.exceptions import NotFoundError
 from pol.http_cache.depends import CacheControl
@@ -318,4 +324,65 @@ async def get_subject_revision_alt(
             "username": user.username,
             "nickname": user.nickname,
         },
+    }
+
+
+@router.get(
+    "/episodes",
+    response_model=Paged[Revision],
+    response_model_exclude_unset=True,
+)
+async def get_episode_revisions(
+    episode_id: int = 0,
+    db: AsyncSession = Depends(get_db),
+    page: Pager = Depends(),
+    cache_control: CacheControl = Depends(CacheControl),
+):
+    cache_control(300)
+
+    filters = []
+    if episode_id > 0:
+        filters.append(ChiiEpRevision.rev_eids.regexp_match(rf"(^|,){episode_id}($|,)"))
+    total = await curd.count(db, ChiiEpRevision.ep_rev_id, *filters)
+    page.check(total)
+
+    query = (
+        sa.select(
+            ChiiEpRevision.ep_rev_id.label("rev_id"),
+            ChiiEpRevision.rev_eids,
+            ChiiEpRevision.rev_creator,
+            ChiiEpRevision.rev_dateline,
+            ChiiEpRevision.rev_edit_summary,
+            ChiiMember.username,
+            ChiiMember.nickname,
+            ChiiMember.avatar,
+        )
+        .join(
+            ChiiMember,
+            ChiiEpRevision.rev_creator == ChiiMember.uid,
+        )
+        .where(*filters)
+        .order_by(ChiiEpRevision.rev_dateline.desc())
+        .limit(page.limit)
+        .offset(page.offset)
+    )
+
+    revisions = [
+        {
+            "id": r["rev_id"],
+            "type": RevisionType.ep,
+            "created_at": r["rev_dateline"],
+            "summary": r["rev_edit_summary"],
+            "creator": {
+                "username": r["username"],
+                "nickname": r["nickname"],
+            },
+        }
+        for r in (await db.execute(query)).mappings().fetchall()
+    ]
+    return {
+        "limit": page.limit,
+        "offset": page.offset,
+        "data": revisions,
+        "total": total,
     }
