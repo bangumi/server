@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from pol import sa, config
-from pol.db.const import Gender, BloodType, PersonType, SubjectType
+from pol.db.const import Gender, BloodType, PersonType, SubjectType, CollectionType
 from pol.db.tables import (
     ChiiMember,
     ChiiPerson,
@@ -282,24 +282,13 @@ def mock_user_collection(db_session: Session):
 
     def mock_collection(
         id: int,
-        uid: int,
+        user_id: int,
         subject_id: int,
-        tag: str = "",
+        subject_type=SubjectType.anime,
+        type=CollectionType.doing,
         private=False,
-        rate: int = 0,
-        comment: str = "",
-        last_touch=datetime.now(),
-        ep_status=0,
-        vol_status=0,
-        wish_dateline=0,
-        doing_dateline=0,
-        collect_dateline=0,
-        on_hold_dateline=0,
-        dropped_dateline=0,
     ):
-        delete_query[ChiiSubjectInterest].append(
-            ChiiSubjectInterest.id == id,
-        )
+        delete_query[ChiiSubjectInterest].append(ChiiSubjectInterest.id == id)
         check_exist(db_session, delete_query)
 
         mock_ids.add(id)
@@ -307,22 +296,10 @@ def mock_user_collection(db_session: Session):
         db_session.add(
             ChiiSubjectInterest(
                 id=id,
-                uid=uid,
+                user_id=user_id,
                 subject_id=subject_id,
-                subject_type=1,
-                rate=rate,
-                type=1,
-                has_comment=bool(comment),
-                comment=comment,
-                tag=tag,
-                ep_status=ep_status,
-                vol_status=vol_status,
-                wish_dateline=wish_dateline,
-                doing_dateline=doing_dateline,
-                collect_dateline=collect_dateline,
-                on_hold_dateline=on_hold_dateline,
-                dropped_dateline=dropped_dateline,
-                last_touch=last_touch.timestamp(),
+                subject_type=subject_type,
+                type=type,
                 private=private,
             )
         )

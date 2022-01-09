@@ -57,7 +57,7 @@ async def get_subject(
     if u.id == user.get_user_id():
         where = []
 
-    where.append(ChiiSubjectInterest.uid == u.id)
+    where.append(ChiiSubjectInterest.user_id == u.id)
     total = await db.scalar(sa.select(sa.count(1)).where(*where))
 
     collections: Iterator[ChiiSubjectInterest] = await db.scalars(

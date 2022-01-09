@@ -836,7 +836,7 @@ class ChiiSubjectInterest(Base):
     )
 
     id = Column("interest_id", INTEGER(10), primary_key=True)
-    uid = Column("interest_uid", MEDIUMINT(8), nullable=False, index=True)
+    user_id = Column("interest_uid", MEDIUMINT(8), nullable=False, index=True)
     subject_id = Column("interest_subject_id", MEDIUMINT(8), nullable=False, index=True)
     subject_type = Column(
         "interest_subject_type",
@@ -859,22 +859,37 @@ class ChiiSubjectInterest(Base):
         index=True,
         server_default=text("'0'"),
     )
-    has_comment = Column("interest_has_comment", TINYINT(1), nullable=False)
-    comment = Column("interest_comment", MEDIUMTEXT, nullable=False)
-    tag: str = Column("interest_tag", MEDIUMTEXT, nullable=False)
+    has_comment = Column("interest_has_comment", TINYINT(1), nullable=False, default=0)
+    comment = Column("interest_comment", MEDIUMTEXT, nullable=False, default="")
+    tag: str = Column("interest_tag", MEDIUMTEXT, nullable=False, default="")
     ep_status = Column(
-        "interest_ep_status", MEDIUMINT(8), nullable=False, server_default=text("'0'")
+        "interest_ep_status",
+        MEDIUMINT(8),
+        nullable=False,
+        server_default=text("'0'"),
     )
     vol_status = Column(
-        "interest_vol_status", MEDIUMINT(8), nullable=False, comment="卷数"
+        "interest_vol_status",
+        MEDIUMINT(8),
+        nullable=False,
+        comment="卷数",
+        default=0,
     )
-    wish_dateline = Column("interest_wish_dateline", INTEGER(10), nullable=False)
-    doing_dateline = Column("interest_doing_dateline", INTEGER(10), nullable=False)
+    wish_dateline = Column(
+        "interest_wish_dateline", INTEGER(10), nullable=False, default=0
+    )
+    doing_dateline = Column(
+        "interest_doing_dateline", INTEGER(10), nullable=False, default=0
+    )
     collect_dateline = Column(
-        "interest_collect_dateline", INTEGER(10), nullable=False, index=True
+        "interest_collect_dateline", INTEGER(10), nullable=False, index=True, default=0
     )
-    on_hold_dateline = Column("interest_on_hold_dateline", INTEGER(10), nullable=False)
-    dropped_dateline = Column("interest_dropped_dateline", INTEGER(10), nullable=False)
+    on_hold_dateline = Column(
+        "interest_on_hold_dateline", INTEGER(10), nullable=False, default=0
+    )
+    dropped_dateline = Column(
+        "interest_dropped_dateline", INTEGER(10), nullable=False, default=0
+    )
     last_touch = Column(
         "interest_lasttouch",
         INTEGER(10),
@@ -882,4 +897,6 @@ class ChiiSubjectInterest(Base):
         index=True,
         server_default=text("'0'"),
     )
-    private = Column("interest_private", TINYINT(1), nullable=False, index=True)
+    private = Column(
+        "interest_private", TINYINT(1), nullable=False, index=True, default=0
+    )
