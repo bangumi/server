@@ -28,6 +28,14 @@ class BloodType(IntEnum):
 
 
 class CollectionType(IntEnum):
+    """
+    - `1`: 想看
+    - `2`: 看过
+    - `3`: 在看
+    - `4`: 搁置
+    - `5`: 抛弃
+    """
+
     wish = 1  # 想看
     doing = 2  # 看过
     collect = 3  # 在看
@@ -68,6 +76,16 @@ class EpType(IntEnum):
 
 
 class SubjectType(IntEnum):
+    """条目类型
+    - `1` 为 书籍
+    - `2` 为 动画
+    - `3` 为 音乐
+    - `4` 为 游戏
+    - `6` 为 三次元
+
+    没有 `5`
+    """
+
     book = 1
     anime = 2
     music = 3
