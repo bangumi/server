@@ -11,12 +11,3 @@ class Paged(GenericModel, Generic[T]):
     limit: int = 0
     offset: int = 0
     data: List[T] = []
-
-
-class PageInfo(GenericModel, Generic[T]):
-    next: T
-
-
-class Pagination(GenericModel, Generic[S, T]):
-    pagination: PageInfo[S]
-    data: List[T] = []

@@ -11,7 +11,10 @@ async def get_public_user(
     username: str,
     user_service: UserService = Depends(UserService.new),
 ) -> PublicUser:
-    """get the user for `username` like `/user/{username}/collections`"""
+    """
+    get the user for `username` like `/user/{username}/collections`.
+    UID is not working.
+    """
     try:
         return await user_service.get_by_name(username)
     except UserService.not_found:
