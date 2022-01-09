@@ -14,5 +14,5 @@ async def get_public_user(
     """get the user for `username` like `/user/{username}/collections`"""
     try:
         return await user_service.get_by_name(username)
-    except user_service.not_found:
+    except UserService.not_found:
         raise res.not_found(request)

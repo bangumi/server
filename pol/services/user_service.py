@@ -16,7 +16,6 @@ class EntityNotFound(Exception):
 
 
 class UserService:
-    __slots__ = ("_db",)
     _db: AsyncSession
     not_found = EntityNotFound
 
