@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Protocol
+from typing import Protocol, Generator
 from datetime import datetime
 from collections import defaultdict
 
@@ -115,7 +115,7 @@ def mock_subject(db_session: Session):
         db_session.commit()
 
 
-class MockAccessToken(Protocol):
+class MockUser(Protocol):
     @abstractmethod
     def __call__(
         self, user_id: int, access_token: str = "", expires: datetime = datetime.now()
@@ -213,14 +213,12 @@ def mock_person(db_session: Session):
 
 
 @pytest.fixture()
-def mock_access_token(db_session: Session):
+def mock_user(db_session: Session) -> Generator[MockUser, None, None]:
     mock_user_id = set()
     mock_token = set()
     delete_query = defaultdict(list)
 
-    def mock_id(
-        user_id: int, access_token: str = "", expires=datetime.now(), raise_error=True
-    ):
+    def mock_id(user_id: int, access_token: str = "", expires=datetime.now()):
         if user_id in mock_user_id and (not access_token or access_token in mock_token):
             return
         mock_user_id.add(user_id)

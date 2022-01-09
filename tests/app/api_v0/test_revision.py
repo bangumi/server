@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from pol.db.tables import ChiiRevHistory
-from tests.conftest import MockAccessToken
+from tests.conftest import MockUser
 
 person_revisions_api_prefix = "/v0/revisions/persons"
 
@@ -11,12 +11,12 @@ person_revisions_api_prefix = "/v0/revisions/persons"
 def test_person_revision_basic(
     client: TestClient,
     db_session: Session,
-    mock_access_token: MockAccessToken,
+    mock_user: MockUser,
 ):
     for r in db_session.query(ChiiRevHistory.rev_creator).where(
         ChiiRevHistory.rev_id == 348475
     ):
-        mock_access_token(r.rev_creator)
+        mock_user(r.rev_creator)
     response = client.get(
         f"{person_revisions_api_prefix}/348475",
     )
@@ -39,12 +39,12 @@ def test_person_revision_cache(
     client: TestClient,
     redis_client: redis.Redis,
     db_session: Session,
-    mock_access_token: MockAccessToken,
+    mock_user: MockUser,
 ):
     for r in db_session.query(ChiiRevHistory.rev_creator).where(
         ChiiRevHistory.rev_id == 348475
     ):
-        mock_access_token(r.rev_creator)
+        mock_user(r.rev_creator)
     url = f"{person_revisions_api_prefix}/348475"
     response = client.get(
         url,
@@ -65,12 +65,12 @@ character_revisions_api_prefix = "/v0/revisions/characters"
 def test_character_revision_basic(
     client: TestClient,
     db_session: Session,
-    mock_access_token: MockAccessToken,
+    mock_user: MockUser,
 ):
     for r in db_session.query(ChiiRevHistory.rev_creator).where(
         ChiiRevHistory.rev_id == 190704
     ):
-        mock_access_token(r.rev_creator)
+        mock_user(r.rev_creator)
     response = client.get(
         f"{character_revisions_api_prefix}/190704",
     )
@@ -93,12 +93,12 @@ def test_character_revision_cache(
     client: TestClient,
     redis_client: redis.Redis,
     db_session: Session,
-    mock_access_token: MockAccessToken,
+    mock_user: MockUser,
 ):
     for r in db_session.query(ChiiRevHistory.rev_creator).where(
         ChiiRevHistory.rev_id == 190704
     ):
-        mock_access_token(r.rev_creator)
+        mock_user(r.rev_creator)
     url = f"{character_revisions_api_prefix}/190704"
     response = client.get(
         url,

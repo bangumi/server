@@ -9,6 +9,7 @@ from starlette.testclient import TestClient
 from pol import sa, config
 from pol.db.tables import ChiiMember
 from pol.permission import UserGroup
+from tests.conftest import MockUser
 from pol.api.v0.depends.auth import User
 
 access_token = "a_development_access_token"
@@ -66,8 +67,11 @@ def test_auth_cache_ban_cache_fallback(client: TestClient, redis_client: Redis):
     assert response.status_code == 200, "error cache should callback to db lookup"
 
 
-def test_auth_expired_token(client: TestClient, mock_access_token):
-    mock_access_token(
+def test_auth_expired_token(
+    client: TestClient,
+    mock_user: MockUser,
+):
+    mock_user(
         access_token="ttt",
         user_id=200,
         expires=datetime.datetime.now() - timedelta(days=3),
@@ -76,8 +80,12 @@ def test_auth_expired_token(client: TestClient, mock_access_token):
     assert response.status_code == 403, "expired should not working"
 
 
-def test_auth_missing_user(client: TestClient, mock_access_token, db_session: Session):
-    mock_access_token(
+def test_auth_missing_user(
+    client: TestClient,
+    mock_user: MockUser,
+    db_session: Session,
+):
+    mock_user(
         access_token="ttt",
         user_id=200,
         expires=datetime.datetime.now() + timedelta(days=3),
