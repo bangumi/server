@@ -33,6 +33,16 @@ repos:
       - id: pyupgrade
         args: [--py38-plus]
 
+  - repo: https://github.com/myint/autoflake
+    rev: 7a53fdafc82c33f446915b60fcac947c51279260 # frozen: v1.4
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-unused-variables
+          - --remove-all-unused-imports
+          - --expand-star-imports
+
   - repo: https://github.com/timothycrosley/isort
     rev: c5e8fa75dda5f764d20f66a215d71c21cfa198e1 # frozen: 5.10.1
     hooks:
@@ -47,16 +57,6 @@ repos:
           - --use-parentheses
           - --sd=THIRDPARTY
           - --no-lines-before=LOCALFOLDER
-
-  - repo: https://github.com/myint/autoflake
-    rev: 7a53fdafc82c33f446915b60fcac947c51279260 # frozen: v1.4
-    hooks:
-      - id: autoflake
-        args:
-          - --in-place
-          - --remove-unused-variables
-          - --remove-all-unused-imports
-          - --expand-star-imports
 
   - repo: https://github.com/psf/black
     rev: f1d4e742c91dd5179d742b0db9293c4472b765f8 # frozen: 21.12b0

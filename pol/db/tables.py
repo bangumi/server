@@ -201,13 +201,13 @@ class ChiiMember(Base):
     )
     sign = Column(VARCHAR(255), nullable=False)
 
-    @classmethod
-    def all_column(cls):
-        """
-        This table contains only column with read permission,
-        don't `select *` on this table.
-        """
-        return cls.__table__.columns
+    subjects: List["ChiiSubjectInterest"] = relationship(
+        "ChiiSubjectInterest",
+        lazy="raise_on_sql",
+        primaryjoin=lambda: ChiiMember.uid == foreign(ChiiSubjectInterest.user_id),
+        uselist=True,
+        back_populates="user",
+    )  # type: ignore
 
 
 class ChiiOauthAccessToken(Base):
@@ -774,6 +774,17 @@ class ChiiSubject(Base):
         back_populates="dst_subject",
     )
 
+    users: List["ChiiSubjectInterest"] = relationship(
+        "ChiiSubjectInterest",
+        primaryjoin=(
+            lambda: ChiiSubject.subject_id == foreign(ChiiSubjectInterest.subject_id)
+        ),
+        lazy="raise_on_sql",
+        innerjoin=True,
+        uselist=True,
+        back_populates="subject",
+    )  # type: ignore
+
     @property
     def locked(self) -> bool:
         return self.subject_ban == 2
@@ -781,3 +792,148 @@ class ChiiSubject(Base):
     @property
     def ban(self) -> bool:
         return self.subject_ban == 1
+
+
+class ChiiSubjectInterest(Base):
+    __tablename__ = "chii_subject_interests"
+    __table_args__ = (
+        Index("user_collects", "interest_subject_type", "interest_uid"),
+        Index(
+            "tag_subject_id", "interest_subject_type", "interest_type", "interest_uid"
+        ),
+        Index(
+            "subject_lasttouch",
+            "interest_subject_id",
+            "interest_private",
+            "interest_lasttouch",
+        ),
+        Index(
+            "user_collect_type",
+            "interest_subject_type",
+            "interest_type",
+            "interest_uid",
+            "interest_private",
+            "interest_collect_dateline",
+        ),
+        Index(
+            "subject_collect",
+            "interest_subject_id",
+            "interest_type",
+            "interest_private",
+            "interest_collect_dateline",
+        ),
+        Index(
+            "subject_comment",
+            "interest_subject_id",
+            "interest_has_comment",
+            "interest_private",
+            "interest_lasttouch",
+        ),
+        Index("interest_id", "interest_uid", "interest_private"),
+        Index(
+            "user_collect_latest",
+            "interest_subject_type",
+            "interest_type",
+            "interest_uid",
+            "interest_private",
+        ),
+        Index(
+            "top_subject",
+            "interest_subject_id",
+            "interest_subject_type",
+            "interest_doing_dateline",
+        ),
+        Index(
+            "subject_rate", "interest_subject_id", "interest_rate", "interest_private"
+        ),
+        Index("interest_type_2", "interest_type", "interest_uid"),
+        Index(
+            "interest_uid_2", "interest_uid", "interest_private", "interest_lasttouch"
+        ),
+        Index("user_interest", "interest_uid", "interest_subject_id", unique=True),
+        Index("interest_subject_id", "interest_subject_id", "interest_type"),
+    )
+
+    id = Column("interest_id", INTEGER(10), primary_key=True)
+    user_id = Column("interest_uid", MEDIUMINT(8), nullable=False, index=True)
+    subject_id = Column("interest_subject_id", MEDIUMINT(8), nullable=False, index=True)
+    subject_type = Column(
+        "interest_subject_type",
+        SMALLINT(6),
+        nullable=False,
+        index=True,
+        server_default=text("'0'"),
+    )
+    rate = Column(
+        "interest_rate",
+        TINYINT(3),
+        nullable=False,
+        index=True,
+        server_default=text("'0'"),
+    )
+    type = Column(
+        "interest_type",
+        TINYINT(1),
+        nullable=False,
+        index=True,
+        server_default=text("'0'"),
+    )
+    has_comment = Column("interest_has_comment", TINYINT(1), nullable=False, default=0)
+    comment = Column("interest_comment", MEDIUMTEXT, nullable=False, default="")
+    tag: str = Column("interest_tag", MEDIUMTEXT, nullable=False, default="")
+    ep_status = Column(
+        "interest_ep_status",
+        MEDIUMINT(8),
+        nullable=False,
+        server_default=text("'0'"),
+    )
+    vol_status = Column(
+        "interest_vol_status",
+        MEDIUMINT(8),
+        nullable=False,
+        comment="卷数",
+        default=0,
+    )
+    wish_dateline = Column(
+        "interest_wish_dateline", INTEGER(10), nullable=False, default=0
+    )
+    doing_dateline = Column(
+        "interest_doing_dateline", INTEGER(10), nullable=False, default=0
+    )
+    collect_dateline = Column(
+        "interest_collect_dateline", INTEGER(10), nullable=False, index=True, default=0
+    )
+    on_hold_dateline = Column(
+        "interest_on_hold_dateline", INTEGER(10), nullable=False, default=0
+    )
+    dropped_dateline = Column(
+        "interest_dropped_dateline", INTEGER(10), nullable=False, default=0
+    )
+    last_touch = Column(
+        "interest_lasttouch",
+        INTEGER(10),
+        nullable=False,
+        index=True,
+        server_default=text("'0'"),
+    )
+    private = Column(
+        "interest_private", TINYINT(1), nullable=False, index=True, default=0
+    )
+
+    user: "ChiiMember" = relationship(
+        "ChiiMember",
+        lazy="raise_on_sql",
+        primaryjoin=lambda: ChiiMember.uid == foreign(ChiiSubjectInterest.user_id),
+        uselist=False,
+        back_populates="subjects",
+    )  # type: ignore
+
+    subject: "ChiiSubject" = relationship(
+        "ChiiSubject",
+        primaryjoin=(
+            lambda: ChiiSubject.subject_id == foreign(ChiiSubjectInterest.subject_id)
+        ),
+        lazy="raise_on_sql",
+        uselist=False,
+        back_populates="users",
+    )  # type: ignore

@@ -8,13 +8,14 @@ import pytest
 from sqlalchemy.orm import Session
 
 from pol import sa, config
-from pol.db.const import Gender, BloodType, PersonType, SubjectType
+from pol.db.const import Gender, BloodType, PersonType, SubjectType, CollectionType
 from pol.db.tables import (
     ChiiMember,
     ChiiPerson,
     ChiiSubject,
     ChiiPersonField,
     ChiiSubjectField,
+    ChiiSubjectInterest,
     ChiiOauthAccessToken,
 )
 
@@ -118,7 +119,11 @@ def mock_subject(db_session: Session):
 class MockUser(Protocol):
     @abstractmethod
     def __call__(
-        self, user_id: int, access_token: str = "", expires: datetime = datetime.now()
+        self,
+        user_id: int,
+        access_token: str = "",
+        username: str = "",
+        expires: datetime = datetime.now(),
     ) -> None:
         pass
 
@@ -218,7 +223,12 @@ def mock_user(db_session: Session) -> Generator[MockUser, None, None]:
     mock_token = set()
     delete_query = defaultdict(list)
 
-    def mock_id(user_id: int, access_token: str = "", expires=datetime.now()):
+    def mock_id(
+        user_id: int,
+        access_token: str = "",
+        username: str = "",
+        expires=datetime.now(),
+    ):
         if user_id in mock_user_id and (not access_token or access_token in mock_token):
             return
         mock_user_id.add(user_id)
@@ -248,7 +258,7 @@ def mock_user(db_session: Session) -> Generator[MockUser, None, None]:
         db_session.add(
             ChiiMember(
                 uid=user_id,
-                username=f"mock_{user_id}",
+                username=username or f"mock_{user_id}",
                 nickname="",
                 avatar="",
                 groupid=10,
@@ -259,6 +269,45 @@ def mock_user(db_session: Session) -> Generator[MockUser, None, None]:
 
     try:
         yield mock_id
+    finally:
+        for table, where in delete_query.items():
+            db_session.execute(sa.delete(table).where(sa.or_(*where)))
+        db_session.commit()
+
+
+@pytest.fixture()
+def mock_user_collection(db_session: Session):
+    mock_ids = set()
+    delete_query = defaultdict(list)
+
+    def mock_collection(
+        id: int,
+        user_id: int,
+        subject_id: int,
+        subject_type=SubjectType.anime,
+        type=CollectionType.doing,
+        private=False,
+    ):
+        delete_query[ChiiSubjectInterest].append(ChiiSubjectInterest.id == id)
+        check_exist(db_session, delete_query)
+
+        mock_ids.add(id)
+
+        db_session.add(
+            ChiiSubjectInterest(
+                id=id,
+                user_id=user_id,
+                subject_id=subject_id,
+                subject_type=subject_type,
+                type=type,
+                private=private,
+            )
+        )
+
+        db_session.commit()
+
+    try:
+        yield mock_collection
     finally:
         for table, where in delete_query.items():
             db_session.execute(sa.delete(table).where(sa.or_(*where)))

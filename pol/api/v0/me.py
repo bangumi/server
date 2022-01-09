@@ -44,7 +44,7 @@ class Me(BaseModel):
         403: res.response(model=ErrorDetail, description="unauthorized"),
     },
 )
-async def get_subject(
+async def get_user(
     user: User = Depends(get_current_user),
 ):
     d = user.dict(by_alias=False)

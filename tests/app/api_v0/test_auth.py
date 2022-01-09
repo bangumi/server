@@ -7,10 +7,10 @@ from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from pol import sa, config
+from pol.models import User
 from pol.db.tables import ChiiMember
 from pol.permission import UserGroup
 from tests.conftest import MockUser
-from pol.api.v0.depends.auth import User
 
 access_token = "a_development_access_token"
 
