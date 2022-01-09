@@ -201,6 +201,14 @@ class ChiiMember(Base):
     )
     sign = Column(VARCHAR(255), nullable=False)
 
+    subjects: List["ChiiSubjectInterest"] = relationship(
+        "ChiiSubjectInterest",
+        lazy="raise_on_sql",
+        primaryjoin=lambda: ChiiMember.uid == foreign(ChiiSubjectInterest.user_id),
+        uselist=True,
+        back_populates="user",
+    )  # type: ignore
+
 
 class ChiiOauthAccessToken(Base):
     __tablename__ = "chii_oauth_access_tokens"
@@ -766,6 +774,17 @@ class ChiiSubject(Base):
         back_populates="dst_subject",
     )
 
+    users: List["ChiiSubjectInterest"] = relationship(
+        "ChiiSubjectInterest",
+        primaryjoin=(
+            lambda: ChiiSubject.subject_id == foreign(ChiiSubjectInterest.subject_id)
+        ),
+        lazy="raise_on_sql",
+        innerjoin=True,
+        uselist=True,
+        back_populates="subject",
+    )  # type: ignore
+
     @property
     def locked(self) -> bool:
         return self.subject_ban == 2
@@ -900,3 +919,21 @@ class ChiiSubjectInterest(Base):
     private = Column(
         "interest_private", TINYINT(1), nullable=False, index=True, default=0
     )
+
+    user: "ChiiMember" = relationship(
+        "ChiiMember",
+        lazy="raise_on_sql",
+        primaryjoin=lambda: ChiiMember.uid == foreign(ChiiSubjectInterest.user_id),
+        uselist=False,
+        back_populates="subjects",
+    )  # type: ignore
+
+    subject: "ChiiSubject" = relationship(
+        "ChiiSubject",
+        primaryjoin=(
+            lambda: ChiiSubject.subject_id == foreign(ChiiSubjectInterest.subject_id)
+        ),
+        lazy="raise_on_sql",
+        uselist=False,
+        back_populates="users",
+    )  # type: ignore
