@@ -27,8 +27,5 @@ class User(Role, BaseModel):
         allow_date = self.registration_date + timedelta(days=60)
         return datetime.utcnow().astimezone() > allow_date
 
-    def get_username(self) -> str:
-        return self.username
-
     def get_user_id(self) -> int:
         return self.id

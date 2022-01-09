@@ -19,8 +19,5 @@ class Role:
         """if this user can see nsfw contents"""
         raise NotImplementedError()
 
-    def get_username(self) -> Optional[str]:
-        raise NotImplementedError()
-
     def get_user_id(self) -> Optional[int]:
         raise NotImplementedError()
