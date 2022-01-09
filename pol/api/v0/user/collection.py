@@ -16,7 +16,11 @@ from pol.permission import Role
 from pol.api.v0.models import Paged, Pager
 from pol.api.v0.depends.auth import optional_user
 
-router = APIRouter(tags=["用户"], route_class=ErrorCatchRoute)
+router = APIRouter(
+    tags=["用户", "社区"],
+    route_class=ErrorCatchRoute,
+    redirect_slashes=False,
+)
 
 
 class Model(BaseModel):
@@ -51,7 +55,7 @@ async def get_user(
 @router.get(
     "/user/{username}/collections",
     summary="获取用户收藏",
-    description="获取对应用户的收藏，查看私有收藏需要access token。\n设置了username的用户无法通过数字ID查询",
+    description="获取对应用户的收藏，查看私有收藏需要access token。\n设置了 username 的用户无法通过数字ID查询",
     response_model=Paged[Model],
     responses={
         404: res.response(model=ErrorDetail, description="用户不存在"),
