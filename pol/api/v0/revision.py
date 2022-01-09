@@ -2,18 +2,16 @@ from typing import Any, List, Tuple
 from asyncio import gather
 
 from fastapi import Path, Depends, APIRouter
-from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, curd
 from pol.res import ErrorDetail, not_found_exception
 from pol.router import ErrorCatchRoute
-from pol.depends import get_db, get_redis
+from pol.depends import get_db
 from pol.db.const import RevisionType
 from pol.db.tables import ChiiMember, ChiiRevText, ChiiRevHistory
 from pol.api.v0.models import Paged, Pager
 from pol.curd.exceptions import NotFoundError
-from pol.redis.json_cache import JSONRedis
 from pol.http_cache.depends import CacheControl
 from pol.api.v0.models.revision import Revision, DetailedRevision
 
@@ -143,27 +141,19 @@ async def get_person_revisions(
     },
 )
 async def get_person_revision(
-    response: Response,
     db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
-    redis: JSONRedis = Depends(get_redis),
     cache_control: CacheControl = Depends(CacheControl),
     not_found: res.HTTPException = Depends(not_found_exception),
 ):
     cache_control(300)
-    cache_key = f"persons:revision:{revision_id}"
-    data = await redis.get(cache_key)
-    response.headers["x-cache-status"] = "miss" if data is None else "hit"
-    if data is None:
-        try:
-            data = await get_revision(
-                db,
-                [ChiiRevHistory.rev_id == revision_id, person_rev_type_filters],
-            )
-            await redis.set_json(cache_key, data, ex=60)
-        except NotFoundError:
-            raise not_found
-    return data
+    try:
+        return await get_revision(
+            db,
+            [ChiiRevHistory.rev_id == revision_id, person_rev_type_filters],
+        )
+    except NotFoundError:
+        raise not_found
 
 
 @router.get(
@@ -197,23 +187,15 @@ async def get_character_revisions(
     },
 )
 async def get_character_revision(
-    response: Response,
     db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
-    redis: JSONRedis = Depends(get_redis),
     cache_control: CacheControl = Depends(CacheControl),
     not_found: res.HTTPException = Depends(not_found_exception),
 ):
     cache_control(300)
-    cache_key = f"characters:revision:{revision_id}"
-    data = await redis.get(cache_key)
-    response.headers["x-cache-status"] = "miss" if data is None else "hit"
-    if data is None:
-        try:
-            data = await get_revision(
-                db, [ChiiRevHistory.rev_id == revision_id, character_rev_type_filters]
-            )
-            await redis.set_json(cache_key, data, ex=60)
-        except NotFoundError:
-            raise not_found
-    return data
+    try:
+        return await get_revision(
+            db, [ChiiRevHistory.rev_id == revision_id, character_rev_type_filters]
+        )
+    except NotFoundError:
+        raise not_found
