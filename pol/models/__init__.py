@@ -2,10 +2,9 @@ from datetime import datetime, timedelta
 
 from pydantic import BaseModel
 
-from pol.res import ErrorDetail
 from pol.permission import Role, UserGroup
 
-__all__ = ["ErrorDetail", "PublicUser", "User"]
+__all__ = ["PublicUser", "User"]
 
 
 class PublicUser(BaseModel):

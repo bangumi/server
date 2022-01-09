@@ -45,8 +45,8 @@ async def optional_user(
 
 async def get_current_user(
     token: str = Depends(API_KEY_HEADER),
-    redis: JSONRedis = Depends(get_redis),
     service: UserService = Depends(UserService.new),
+    redis: JSONRedis = Depends(get_redis),
 ) -> User:
     cache_key = config.CACHE_KEY_PREFIX + f"access:{token}"
     if value := await redis.get(cache_key):

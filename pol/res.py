@@ -8,12 +8,6 @@ from starlette.responses import JSONResponse
 from starlette.datastructures import URL
 
 
-class ErrorDetail(BaseModel):
-    title: str
-    description: str
-    detail: Any = Field(..., description="can be anything")
-
-
 class ORJSONResponse(JSONResponse):
     media_type = "application/json"
 
@@ -57,6 +51,12 @@ def response(model: Type = None, description: str = None) -> Dict[str, Any]:
     if description:
         d["description"] = description
     return d
+
+
+class ErrorDetail(BaseModel):
+    title: str
+    description: str
+    detail: Any = Field(..., description="can be anything")
 
 
 async def not_found_exception(request: Request):
