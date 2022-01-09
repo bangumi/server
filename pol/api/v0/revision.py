@@ -9,7 +9,7 @@ from pol.res import ErrorDetail, not_found_exception
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db
 from pol.db.const import RevisionType
-from pol.db.tables import ChiiMember, ChiiRevText, ChiiRevHistory
+from pol.db.tables import ChiiMember, ChiiRevText, ChiiRevHistory, ChiiSubjectRevision
 from pol.api.v0.models import Paged, Pager
 from pol.curd.exceptions import NotFoundError
 from pol.http_cache.depends import CacheControl
@@ -22,6 +22,10 @@ person_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.person_rev_ty
 character_rev_type_filters = ChiiRevHistory.rev_type.in_(
     RevisionType.character_rev_types()
 )
+
+subject_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.subject_rev_types())
+
+episode_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.episode_rev_types())
 
 
 async def get_revisions(
@@ -199,3 +203,63 @@ async def get_character_revision(
         )
     except NotFoundError:
         raise not_found
+
+
+@router.get(
+    "/subjects",
+    response_model=Paged[Revision],
+    response_model_exclude_unset=True,
+)
+async def get_subject_revisions(
+    subject_id: int = 0,
+    db: AsyncSession = Depends(get_db),
+    page: Pager = Depends(),
+    cache_control: CacheControl = Depends(CacheControl),
+):
+    cache_control(300)
+
+    filters = []
+    if subject_id > 0:
+        filters.append(ChiiSubjectRevision.rev_subject_id == subject_id)
+    total = await curd.count(db, ChiiSubjectRevision.rev_subject_id, *filters)
+    page.check(total)
+
+    query = (
+        sa.select(
+            ChiiSubjectRevision.rev_id.label("rev_id"),
+            ChiiSubjectRevision.rev_type,
+            ChiiSubjectRevision.rev_creator,
+            ChiiSubjectRevision.rev_dateline,
+            ChiiSubjectRevision.rev_edit_summary,
+            ChiiMember.username,
+            ChiiMember.nickname,
+        )
+        .join(
+            ChiiMember,
+            ChiiSubjectRevision.rev_creator == ChiiMember.uid,
+        )
+        .where(*filters)
+        .order_by(ChiiSubjectRevision.rev_dateline.desc())
+        .limit(page.limit)
+        .offset(page.offset)
+    )
+
+    revisions = [
+        {
+            "id": r["rev_id"],
+            "type": r["rev_type"],
+            "created_at": r["rev_dateline"],
+            "summary": r["rev_edit_summary"],
+            "creator": {
+                "username": r["username"],
+                "nickname": r["nickname"],
+            },
+        }
+        for r in (await db.execute(query)).mappings().fetchall()
+    ]
+    return {
+        "limit": page.limit,
+        "offset": page.offset,
+        "data": revisions,
+        "total": total,
+    }
