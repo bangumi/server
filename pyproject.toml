@@ -56,7 +56,7 @@ exclude_lines = [
 ]
 
 [tool.pytest.ini_options]
-addopts = '-rav'
+addopts = '-rav -W error::sqlalchemy.exc.RemovedIn20Warning'
 env = [
   'D:TESTING=true',
   'SQLALCHEMY_WARN_20=true',
