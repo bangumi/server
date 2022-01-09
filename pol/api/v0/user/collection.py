@@ -6,7 +6,8 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res
-from pol.models import PublicUser, ErrorDetail
+from pol.res import ErrorDetail
+from pol.models import PublicUser
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db
 from pol.db.const import SubjectType, CollectionType
