@@ -5,9 +5,9 @@ from starlette.responses import Response, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, wiki
+from pol.res import ErrorDetail, not_found_exception
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
-from pol.models import ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
 from pol.db.const import Gender, StaffMap
@@ -19,7 +19,6 @@ from pol.db.tables import (
     ChiiPersonCsIndex,
     ChiiCharacterField,
 )
-from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images
 from pol.api.v0.models import PersonDetail, RelatedSubject, PersonCharacter
 from pol.redis.json_cache import JSONRedis
@@ -27,15 +26,6 @@ from pol.redis.json_cache import JSONRedis
 router = APIRouter(tags=["人物"], route_class=ErrorCatchRoute)
 
 api_base = "/v0/persons"
-
-
-async def exc_404(person_id: int):
-    return res.HTTPException(
-        status_code=404,
-        title="Not Found",
-        description=NotFoundDescription,
-        detail={"person_id": person_id},
-    )
 
 
 @router.get(
@@ -50,7 +40,7 @@ async def get_person(
     response: Response,
     db: AsyncSession = Depends(get_db),
     person_id: int = Path(..., gt=0),
-    not_found: Exception = Depends(exc_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     redis: JSONRedis = Depends(get_redis),
 ):
     cache_key = CACHE_KEY_PREFIX + f"person:{person_id}"
@@ -117,7 +107,7 @@ async def get_person(
 )
 async def get_person_subjects(
     db: AsyncSession = Depends(get_db),
-    not_found: Exception = Depends(exc_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     person_id: int = Path(..., gt=0),
 ):
     person: ChiiPerson = await db.scalar(
@@ -165,7 +155,7 @@ async def get_person_subjects(
 )
 async def get_person_characters(
     db: AsyncSession = Depends(get_db),
-    not_found: Exception = Depends(exc_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     person_id: int = Path(..., gt=0),
 ):
     person: Optional[ChiiPerson] = await db.scalar(

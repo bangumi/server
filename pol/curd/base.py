@@ -1,4 +1,4 @@
-from typing import Any, Type, TypeVar, Optional
+from typing import Type, TypeVar, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,11 +18,10 @@ async def get_one(
     db: AsyncSession,
     Table: Type[T],
     *where,
-    details: Optional[Any] = None,
 ) -> T:
     query = sa.select(Table).where(*where).limit(1)
     r: Optional[T] = await db.scalar(query)
 
     if r is not None:
         return r
-    raise NotFoundError(details)
+    raise NotFoundError

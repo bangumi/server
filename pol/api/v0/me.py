@@ -2,10 +2,10 @@ from fastapi import Depends, APIRouter
 from pydantic import Field, BaseModel
 
 from pol import res
-from pol.models import ErrorDetail
+from pol.res import ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.permission import UserGroup
-from .depends.auth import User, get_current_user
+from pol.api.v0.depends.auth import User, get_current_user
 
 router = APIRouter(tags=["用户"], route_class=ErrorCatchRoute)
 

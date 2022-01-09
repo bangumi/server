@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Optional
+from typing import Any, List, Tuple
 from asyncio import gather
 
 from fastapi import Path, Depends, APIRouter
@@ -6,12 +6,11 @@ from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, curd
-from pol.models import ErrorDetail
+from pol.res import ErrorDetail, not_found_exception
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
 from pol.db.const import RevisionType
 from pol.db.tables import ChiiMember, ChiiRevText, ChiiRevHistory
-from pol.api.v0.utils import raise_not_found, raise_offset_over_total
 from pol.api.v0.models import Paged, Pager
 from pol.curd.exceptions import NotFoundError
 from pol.redis.json_cache import JSONRedis
@@ -19,7 +18,6 @@ from pol.http_cache.depends import CacheControl
 from pol.api.v0.models.revision import Revision, DetailedRevision
 
 router = APIRouter(prefix="/revisions", tags=["编辑历史"], route_class=ErrorCatchRoute)
-
 
 person_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.person_rev_types())
 
@@ -34,8 +32,9 @@ async def get_revisions(
     page: Pager,
 ):
     total = await curd.count(db, ChiiRevHistory.rev_id, *filters)
-    if total <= page.offset:
-        raise_offset_over_total(total)
+
+    page.check(total)
+
     columns = [
         ChiiRevHistory.rev_id,
         ChiiRevHistory.rev_type,
@@ -81,26 +80,22 @@ async def get_revisions(
 async def get_revision(
     db: AsyncSession,
     filters: List[Any],
-    details: Optional[Any] = None,
 ):
     r = await curd.get_one(
         db,
         ChiiRevHistory,
         *filters,
-        details=details,
     )
     results: Tuple[ChiiMember, ChiiRevText] = await gather(
         curd.get_one(
             db,
             ChiiMember,
             ChiiMember.uid == r.rev_creator,
-            details={"rev_creator": r.rev_creator},
         ),
         curd.get_one(
             db,
             ChiiRevText,
             ChiiRevText.rev_text_id == r.rev_text_id,
-            details={"rev_text_id": r.rev_text_id},
         ),
     )
     user, text_item = results
@@ -153,6 +148,7 @@ async def get_person_revision(
     revision_id: int = Path(..., gt=0),
     redis: JSONRedis = Depends(get_redis),
     cache_control: CacheControl = Depends(CacheControl),
+    not_found: res.HTTPException = Depends(not_found_exception),
 ):
     cache_control(300)
     cache_key = f"persons:revision:{revision_id}"
@@ -162,17 +158,11 @@ async def get_person_revision(
         try:
             data = await get_revision(
                 db,
-                [
-                    ChiiRevHistory.rev_id == revision_id,
-                    person_rev_type_filters,
-                ],
-                details={
-                    "rev_id": revision_id,
-                },
+                [ChiiRevHistory.rev_id == revision_id, person_rev_type_filters],
             )
             await redis.set_json(cache_key, data, ex=60)
-        except NotFoundError as e:
-            raise_not_found(e.details)
+        except NotFoundError:
+            raise not_found
     return data
 
 
@@ -212,6 +202,7 @@ async def get_character_revision(
     revision_id: int = Path(..., gt=0),
     redis: JSONRedis = Depends(get_redis),
     cache_control: CacheControl = Depends(CacheControl),
+    not_found: res.HTTPException = Depends(not_found_exception),
 ):
     cache_control(300)
     cache_key = f"characters:revision:{revision_id}"
@@ -220,16 +211,9 @@ async def get_character_revision(
     if data is None:
         try:
             data = await get_revision(
-                db,
-                [
-                    ChiiRevHistory.rev_id == revision_id,
-                    character_rev_type_filters,
-                ],
-                details={
-                    "rev_id": revision_id,
-                },
+                db, [ChiiRevHistory.rev_id == revision_id, character_rev_type_filters]
             )
             await redis.set_json(cache_key, data, ex=60)
-        except NotFoundError as e:
-            raise_not_found(e.details)
+        except NotFoundError:
+            raise not_found
     return data

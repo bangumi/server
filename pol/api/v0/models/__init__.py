@@ -4,6 +4,8 @@ from typing import Any, Dict, List, Optional
 
 import pydantic
 from pydantic import Field, BaseModel
+from fastapi.exceptions import RequestValidationError
+from pydantic.error_wrappers import ErrorWrapper
 
 from pol.db.const import BloodType, PersonType, CharacterType
 from .base import Paged
@@ -168,6 +170,17 @@ class CharacterPerson(BaseCharacter):
 class Pager(pydantic.BaseModel):
     limit: int = Field(30, gt=0, le=50)
     offset: int = Field(0, ge=0)
+
+    def check(self, total: int):
+        if self.offset >= total:
+            raise RequestValidationError(
+                [
+                    ErrorWrapper(
+                        ValueError(f"offset is too bigger for record count {total}"),
+                        loc=("query", "offset"),
+                    )
+                ]
+            )
 
 
 class Order(enum.IntEnum):
