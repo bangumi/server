@@ -2,6 +2,8 @@ from typing import Any, Dict, Type, Union, Optional
 from urllib.parse import quote
 
 import orjson
+from pydantic import Field, BaseModel
+from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.datastructures import URL
 
@@ -49,3 +51,26 @@ def response(model: Type = None, description: str = None) -> Dict[str, Any]:
     if description:
         d["description"] = description
     return d
+
+
+class ErrorDetail(BaseModel):
+    title: str
+    description: str
+    detail: Any = Field(..., description="can be anything")
+
+
+async def not_found_exception(request: Request):
+    return HTTPException(
+        status_code=404,
+        title="Not Found",
+        description=NotFoundDescription,
+        detail={
+            "path": dict(request.path_params),
+            "query": dict(request.query_params),
+        },
+    )
+
+
+NotFoundDescription = (
+    "resource you resource can't be found in the database or has been removed"
+)

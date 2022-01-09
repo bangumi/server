@@ -5,9 +5,9 @@ from starlette.responses import Response, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, wiki
+from pol.res import ErrorDetail, not_found_exception
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
-from pol.models import ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
 from pol.db.const import Gender, get_character_rel
@@ -19,7 +19,6 @@ from pol.db.tables import (
     ChiiCrtCastIndex,
     ChiiCrtSubjectIndex,
 )
-from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import person_images
 from pol.api.v0.models import RelatedSubject, CharacterDetail, CharacterPerson
 from pol.redis.json_cache import JSONRedis
@@ -27,15 +26,6 @@ from pol.redis.json_cache import JSONRedis
 router = APIRouter(tags=["角色"], route_class=ErrorCatchRoute)
 
 api_base = "/v0/characters"
-
-
-async def exc_404(character_id: int):
-    return res.HTTPException(
-        status_code=404,
-        title="Not Found",
-        description=NotFoundDescription,
-        detail={"character_id": character_id},
-    )
 
 
 @router.get(
@@ -49,7 +39,7 @@ async def exc_404(character_id: int):
 async def get_character_detail(
     response: Response,
     db: AsyncSession = Depends(get_db),
-    not_found: Exception = Depends(exc_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     character_id: int = Path(..., gt=0),
     redis: JSONRedis = Depends(get_redis),
 ):
@@ -114,7 +104,7 @@ async def get_character_detail(
 )
 async def get_person_subjects(
     db: AsyncSession = Depends(get_db),
-    not_found: Exception = Depends(exc_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     character_id: int = Path(..., gt=0),
 ):
     character: Optional[ChiiCharacter] = await db.scalar(
@@ -162,7 +152,7 @@ async def get_person_subjects(
 )
 async def get_character_persons(
     db: AsyncSession = Depends(get_db),
-    not_found: Exception = Depends(exc_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     character_id: int = Path(..., gt=0),
 ):
     character: Optional[ChiiCharacter] = await db.scalar(
