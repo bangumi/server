@@ -69,3 +69,6 @@ warn_unused_configs = true
 show_error_codes = true
 pretty = true
 plugins = ['sqlalchemy.ext.mypy.plugin']
+
+[tool.black]
+target_version = ['py38']
