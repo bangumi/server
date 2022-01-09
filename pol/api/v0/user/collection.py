@@ -34,7 +34,7 @@ class UserCollection(BaseModel):
     ep_status: int
     vol_status: int
     updated_at: datetime.datetime
-    private: int
+    private: bool
 
 
 @router.get(
