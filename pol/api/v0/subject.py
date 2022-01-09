@@ -1,14 +1,14 @@
 import datetime
 from typing import List, Optional
 
-from fastapi import Path, Depends, Request, APIRouter
+from fastapi import Path, Depends, APIRouter
 from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, curd, wiki
+from pol.res import ErrorDetail, not_found_exception
 from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
-from pol.models import ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
 from pol.db.const import (
@@ -26,7 +26,6 @@ from pol.db.tables import (
     ChiiSubjectRelations,
 )
 from pol.permission import Role
-from pol.api.v0.const import NotFoundDescription
 from pol.api.v0.utils import get_career, person_images, short_description
 from pol.api.v0.models import RelatedPerson, RelatedCharacter
 from pol.redis.json_cache import JSONRedis
@@ -39,17 +38,6 @@ router = APIRouter(tags=["条目"], route_class=ErrorCatchRoute)
 api_base = "/v0/subjects"
 
 
-async def exception_404(request: Request):
-    detail = dict(request.query_params)
-    detail.update(request.path_params)
-    return res.HTTPException(
-        status_code=404,
-        title="Not Found",
-        description=NotFoundDescription,
-        detail=detail,
-    )
-
-
 @router.get(
     "/subjects/{subject_id}",
     description="cache with 300s",
@@ -60,7 +48,7 @@ async def exception_404(request: Request):
 )
 async def get_subject(
     response: Response,
-    exc_404: res.HTTPException = Depends(exception_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     subject_id: int = Path(..., gt=0),
     user: Role = Depends(optional_user),
     db: AsyncSession = Depends(get_db),
@@ -78,20 +66,20 @@ async def get_subject(
         # now fetch real data
         response.headers["x-cache-status"] = "miss"
         data = await _get_subject(
-            cache_control, exc_404=exc_404, subject_id=subject_id, db=db
+            cache_control, not_found=not_found, subject_id=subject_id, db=db
         )
         await redis.set_json(cache_key, value=data, ex=300)
         nsfw = data["nsfw"]
 
     if nsfw and not user.allow_nsfw():
-        raise exc_404
+        raise not_found
 
     return data
 
 
 async def _get_subject(
     cache_control: CacheControl,
-    exc_404: res.HTTPException = Depends(exception_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     subject_id: int = Path(..., gt=0),
     db: AsyncSession = Depends(get_db),
 ):
@@ -99,7 +87,7 @@ async def _get_subject(
         ChiiSubject, subject_id, options=[sa.joinedload(ChiiSubject.fields)]
     )
     if subject is None:
-        raise exc_404
+        raise not_found
 
     if not subject.subject_nsfw:
         cache_control(300)
@@ -108,7 +96,7 @@ async def _get_subject(
         raise res.HTTPRedirect(f"{api_base}/{subject.fields.field_redirect}")
 
     if subject.ban:
-        raise exc_404
+        raise not_found
 
     date = None
     v = subject.fields.field_date
@@ -159,7 +147,7 @@ async def _get_subject(
 )
 async def get_subject_persons(
     db: AsyncSession = Depends(get_db),
-    exc_404: res.HTTPException = Depends(exception_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     subject_id: int = Path(..., gt=0),
 ):
     subject: ChiiSubject = await db.scalar(
@@ -171,7 +159,7 @@ async def get_subject_persons(
     )
 
     if not subject:
-        raise exc_404
+        raise not_found
 
     persons = []
 
@@ -200,7 +188,7 @@ async def get_subject_persons(
 )
 async def get_subject_characters(
     db: AsyncSession = Depends(get_db),
-    exc_404: res.HTTPException = Depends(exception_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     subject_id: int = Path(..., gt=0),
 ):
     subject: ChiiSubject = await db.scalar(
@@ -214,7 +202,7 @@ async def get_subject_characters(
     )
 
     if not subject:
-        raise exc_404
+        raise not_found
 
     characters = []
     for rel in subject.characters:
@@ -240,7 +228,7 @@ async def get_subject_characters(
     },
 )
 async def get_subject_relations(
-    exc_404: res.HTTPException = Depends(exception_404),
+    not_found: res.HTTPException = Depends(not_found_exception),
     subject_id: int = Path(..., gt=0),
     db: AsyncSession = Depends(get_db),
 ):
@@ -255,7 +243,7 @@ async def get_subject_relations(
     )
 
     if not subject:
-        raise exc_404
+        raise not_found
 
     response = []
 

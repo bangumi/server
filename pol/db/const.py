@@ -10,17 +10,24 @@ from pol.db._const import (
 )
 
 
-class BloodType(enum.IntEnum):
+class IntEnum(enum.IntEnum):
+    def translate(self, _escape_table):
+        """sqlalchemy method called inside pymysql or aiomysql to get real value,
+        so you can use `Table.column == SubjectType.book`
+
+        _escape_table: character code => escaped value
+        """
+        return self.value
+
+
+class BloodType(IntEnum):
     a = 1
     b = 2
     ab = 3
     o = 4
 
-    def translate(self, _escape_table):
-        return self.value
 
-
-class CollectionType(enum.IntEnum):
+class CollectionType(IntEnum):
     wish = 1  # 想看
     doing = 2  # 看过
     collect = 3  # 在看
@@ -28,26 +35,20 @@ class CollectionType(enum.IntEnum):
     dropped = 5  # 抛弃
 
 
-class CharacterType(enum.IntEnum):
+class CharacterType(IntEnum):
     person = 1
     airframe = 2
     ship = 3
     organization = 4
 
-    def translate(self, _escape_table):
-        return self.value
 
-
-class PersonType(enum.IntEnum):
+class PersonType(IntEnum):
     person = 1
     company = 2
     band = 3
 
-    def translate(self, _escape_table):
-        return self.value
 
-
-class Gender(enum.IntEnum):
+class Gender(IntEnum):
     male = 1
     female = 2
 
@@ -58,21 +59,15 @@ class Gender(enum.IntEnum):
             return "female"
         raise ValueError(f"{self.value} is not valid gender")
 
-    def translate(self, _escape_table):
-        return self.value
 
-
-class EpType(enum.IntEnum):
+class EpType(IntEnum):
     normal = 0
     sp = 1
     op = 2
     ed = 3
 
-    def translate(self, _escape_table):
-        return self.value
 
-
-class SubjectType(enum.IntEnum):
+class SubjectType(IntEnum):
     book = 1
     anime = 2
     music = 3
@@ -91,11 +86,6 @@ class SubjectType(enum.IntEnum):
         elif self == self.real:
             return "三次元"
         raise ValueError(f"unexpected SubjectType {self}")
-
-    def translate(self, _escape_table):
-        """sqlalchemy method to get real value,
-        so you can use `Table.column == SubjectType.book`"""
-        return self.value
 
 
 StaffMap = {
@@ -573,7 +563,7 @@ PLATFORM_MAP = {
 }
 
 
-class RevisionType(enum.IntEnum):
+class RevisionType(IntEnum):
     subject = 1  # 条目
     subject_character_relation = 5  # 条目->角色关联
     subject_cast_relation = 6  # 条目->声优关联
@@ -599,3 +589,23 @@ class RevisionType(enum.IntEnum):
     ep_lock = 183
     ep_unlock = 184
     ep_erase = 185
+
+    @classmethod
+    def person_rev_types(cls):
+        return [
+            cls.person,
+            cls.person_cast_relation,
+            cls.person_subject_relation,
+            cls.person_erase,
+            cls.person_merge,
+        ]
+
+    @classmethod
+    def character_rev_types(cls):
+        return [
+            cls.character,
+            cls.character_subject_relation,
+            cls.character_cast_relation,
+            cls.character_erase,
+            cls.character_merge,
+        ]

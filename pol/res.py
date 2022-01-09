@@ -59,13 +59,24 @@ def response(model: Type = None, description: str = None) -> Dict[str, Any]:
     return d
 
 
-def not_found(request: Request):
+class ErrorDetail(BaseModel):
+    title: str
+    description: str
+    detail: Any = Field(..., description="can be anything")
+
+
+async def not_found_exception(request: Request):
     return HTTPException(
         status_code=404,
         title="Not Found",
-        description="resource can't be found in the database or has been removed",
+        description=NotFoundDescription,
         detail={
-            "path_info": dict(request.path_params),
-            "query_info": dict(request.query_params),
+            "path": dict(request.path_params),
+            "query": dict(request.query_params),
         },
     )
+
+
+NotFoundDescription = (
+    "resource you resource can't be found in the database or has been removed"
+)
