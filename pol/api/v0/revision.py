@@ -263,3 +263,59 @@ async def get_subject_revisions(
         "data": revisions,
         "total": total,
     }
+
+
+@router.get(
+    "/subjects/{revision_id}",
+    response_model=DetailedRevision,
+    response_model_exclude_unset=True,
+    responses={
+        404: res.response(model=ErrorDetail),
+    },
+)
+async def get_subject_revision_alt(
+    db: AsyncSession = Depends(get_db),
+    revision_id: int = Path(..., gt=0),
+    cache_control: CacheControl = Depends(CacheControl),
+    not_found: res.HTTPException = Depends(not_found_exception),
+):
+
+    cache_control(300)
+
+    try:
+        r = await curd.get_one(
+            db,
+            ChiiSubjectRevision,
+            ChiiSubjectRevision.rev_id == revision_id,
+        )
+    except NotFoundError:
+        raise not_found
+
+    try:
+        user = await curd.get_one(db, ChiiMember, ChiiMember.uid == r.rev_creator)
+    except NotFoundError:
+        raise not_found
+
+    return {
+        "id": r.rev_id,
+        "type": r.rev_type,
+        "created_at": r.rev_dateline,
+        "summary": r.rev_edit_summary,
+        "data": {
+            "subject_id": r.rev_subject_id,
+            "name": r.rev_name,
+            "name_cn": r.rev_name_cn,
+            "vote_field": r.rev_vote_field,
+            "edit_summary": r.rev_edit_summary,
+            "type": r.rev_type,
+            "type_id": r.rev_type_id,
+            "field_infobox": r.rev_field_infobox,
+            "field_summary": r.rev_field_summary,
+            "field_eps": r.rev_field_eps,
+            "platform": r.rev_platform,
+        },
+        "creator": {
+            "username": user.username,
+            "nickname": user.nickname,
+        },
+    }
