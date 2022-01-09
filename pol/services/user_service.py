@@ -9,15 +9,16 @@ from pol import sa
 from pol.models import User, PublicUser
 from pol.depends import get_db
 from pol.db.tables import ChiiMember, ChiiOauthAccessToken
+from pol.curd.exceptions import NotFoundError
 
 
-class EntityNotFound(Exception):
+class UserNotFound(NotFoundError):
     pass
 
 
 class UserService:
     _db: AsyncSession
-    not_found = EntityNotFound
+    NotFoundError = UserNotFound
 
     @classmethod
     async def new(cls, session: AsyncSession = Depends(get_db)):
@@ -33,7 +34,7 @@ class UserService:
         )
 
         if not u:
-            raise self.not_found
+            raise self.NotFoundError
 
         return PublicUser(
             id=u.uid,
@@ -52,7 +53,7 @@ class UserService:
         )
 
         if not access:
-            raise self.not_found
+            raise self.NotFoundError
 
         member: ChiiMember = await self._db.get(ChiiMember, int(access.user_id))
 
@@ -61,7 +62,7 @@ class UserService:
             logger.error(
                 "can't find user {user_id} for access token", user_id=access.user_id
             )
-            raise EntityNotFound
+            raise self.NotFoundError
 
         return User(
             id=member.uid,

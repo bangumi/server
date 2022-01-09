@@ -18,5 +18,5 @@ async def get_public_user(
     """
     try:
         return await user_service.get_by_name(username)
-    except UserService.not_found:
+    except UserService.NotFoundError:
         raise not_found

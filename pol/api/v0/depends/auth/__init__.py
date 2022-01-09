@@ -57,7 +57,7 @@ async def get_current_user(
 
     try:
         user = await service.get_by_access_token(token)
-    except UserService.not_found:
+    except UserService.NotFoundError:
         raise res.HTTPException(
             status_code=HTTP_403_FORBIDDEN,
             title="unauthorized",

@@ -30,7 +30,7 @@ class UserCollection(BaseModel):
     rate: int
     type: CollectionType
     comment: Optional[str]
-    tag: List[str]
+    tags: List[str]
     ep_status: int
     vol_status: int
     updated_at: datetime.datetime
@@ -78,7 +78,7 @@ async def get_subject(
                 "rate": x.rate,
                 "type": x.type,
                 "comment": x.comment if x.has_comment else None,
-                "tag": tags(x.tag),
+                "tags": tags(x.tag),
                 "ep_status": x.ep_status,
                 "vol_status": x.vol_status,
                 "updated_at": x.last_touch,
