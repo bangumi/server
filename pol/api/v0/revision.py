@@ -279,7 +279,7 @@ async def get_subject_revisions(
         404: res.response(model=ErrorDetail),
     },
 )
-async def get_subject_revision_alt(
+async def get_subject_revision(
     db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
     cache_control: CacheControl = Depends(CacheControl),
@@ -312,7 +312,6 @@ async def get_subject_revision_alt(
             "name": r.rev_name,
             "name_cn": r.rev_name_cn,
             "vote_field": r.rev_vote_field,
-            "edit_summary": r.rev_edit_summary,
             "type": r.rev_type,
             "type_id": r.rev_type_id,
             "field_infobox": r.rev_field_infobox,
@@ -385,4 +384,53 @@ async def get_episode_revisions(
         "offset": page.offset,
         "data": revisions,
         "total": total,
+    }
+
+
+@router.get(
+    "/episodes/{revision_id}",
+    response_model=DetailedRevision,
+    response_model_exclude_unset=True,
+    responses={
+        404: res.response(model=ErrorDetail),
+    },
+)
+async def get_episode_revision(
+    db: AsyncSession = Depends(get_db),
+    revision_id: int = Path(..., gt=0),
+    cache_control: CacheControl = Depends(CacheControl),
+    not_found: res.HTTPException = Depends(not_found_exception),
+):
+
+    cache_control(300)
+
+    try:
+        r = await curd.get_one(
+            db,
+            ChiiEpRevision,
+            ChiiEpRevision.ep_rev_id == revision_id,
+        )
+    except NotFoundError:
+        raise not_found
+
+    try:
+        user = await curd.get_one(db, ChiiMember, ChiiMember.uid == r.rev_creator)
+    except NotFoundError:
+        raise not_found
+
+    return {
+        "id": r.ep_rev_id,
+        "type": RevisionType.ep,
+        "created_at": r.rev_dateline,
+        "summary": r.rev_edit_summary,
+        "data": {
+            "eids": r.rev_eids,
+            "ep_infobox": r.rev_ep_infobox,
+            "sid": r.rev_sid,
+            "version": r.rev_version,
+        },
+        "creator": {
+            "username": user.username,
+            "nickname": user.nickname,
+        },
     }
