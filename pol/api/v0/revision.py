@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Optional
+from typing import Any, List, Tuple
 from asyncio import gather
 
 from fastapi import Path, Depends, APIRouter
@@ -80,26 +80,22 @@ async def get_revisions(
 async def get_revision(
     db: AsyncSession,
     filters: List[Any],
-    details: Optional[Any] = None,
 ):
     r = await curd.get_one(
         db,
         ChiiRevHistory,
         *filters,
-        details=details,
     )
     results: Tuple[ChiiMember, ChiiRevText] = await gather(
         curd.get_one(
             db,
             ChiiMember,
             ChiiMember.uid == r.rev_creator,
-            details={"rev_creator": r.rev_creator},
         ),
         curd.get_one(
             db,
             ChiiRevText,
             ChiiRevText.rev_text_id == r.rev_text_id,
-            details={"rev_text_id": r.rev_text_id},
         ),
     )
     user, text_item = results
@@ -162,13 +158,7 @@ async def get_person_revision(
         try:
             data = await get_revision(
                 db,
-                [
-                    ChiiRevHistory.rev_id == revision_id,
-                    person_rev_type_filters,
-                ],
-                details={
-                    "rev_id": revision_id,
-                },
+                [ChiiRevHistory.rev_id == revision_id, person_rev_type_filters],
             )
             await redis.set_json(cache_key, data, ex=60)
         except NotFoundError:
@@ -221,14 +211,7 @@ async def get_character_revision(
     if data is None:
         try:
             data = await get_revision(
-                db,
-                [
-                    ChiiRevHistory.rev_id == revision_id,
-                    character_rev_type_filters,
-                ],
-                details={
-                    "rev_id": revision_id,
-                },
+                db, [ChiiRevHistory.rev_id == revision_id, character_rev_type_filters]
             )
             await redis.set_json(cache_key, data, ex=60)
         except NotFoundError:
