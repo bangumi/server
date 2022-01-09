@@ -627,3 +627,28 @@ class RevisionType(IntEnum):
             cls.character_erase,
             cls.character_merge,
         ]
+
+    @classmethod
+    def subject_rev_types(cls):
+        return [
+            cls.subject,
+            cls.subject_character_relation,
+            cls.subject_cast_relation,
+            cls.subject_person_relation,
+            cls.subject_merge,
+            cls.subject_erase,
+            cls.subject_relation,
+            cls.subject_lock,
+            cls.subject_unlock,
+        ]
+
+    @classmethod
+    def episode_rev_types(cls):
+        return [
+            cls.ep,
+            cls.ep_merge,
+            cls.ep_move,
+            cls.ep_lock,
+            cls.ep_unlock,
+            cls.ep_erase,
+        ]
