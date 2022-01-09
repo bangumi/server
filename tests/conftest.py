@@ -119,7 +119,11 @@ def mock_subject(db_session: Session):
 class MockUser(Protocol):
     @abstractmethod
     def __call__(
-        self, user_id: int, access_token: str = "", expires: datetime = datetime.now()
+        self,
+        user_id: int,
+        access_token: str = "",
+        username: str = "",
+        expires: datetime = datetime.now(),
     ) -> None:
         pass
 
@@ -219,7 +223,12 @@ def mock_user(db_session: Session) -> Generator[MockUser, None, None]:
     mock_token = set()
     delete_query = defaultdict(list)
 
-    def mock_id(user_id: int, access_token: str = "", expires=datetime.now()):
+    def mock_id(
+        user_id: int,
+        access_token: str = "",
+        username: str = "",
+        expires=datetime.now(),
+    ):
         if user_id in mock_user_id and (not access_token or access_token in mock_token):
             return
         mock_user_id.add(user_id)
@@ -249,7 +258,7 @@ def mock_user(db_session: Session) -> Generator[MockUser, None, None]:
         db_session.add(
             ChiiMember(
                 uid=user_id,
-                username=f"mock_{user_id}",
+                username=username or f"mock_{user_id}",
                 nickname="",
                 avatar="",
                 groupid=10,

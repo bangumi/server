@@ -59,12 +59,6 @@ def response(model: Type = None, description: str = None) -> Dict[str, Any]:
     return d
 
 
-class ErrorDetail(BaseModel):
-    title: str
-    description: str
-    detail: Any = Field(..., description="can be anything")
-
-
 async def not_found_exception(request: Request):
     return HTTPException(
         status_code=404,

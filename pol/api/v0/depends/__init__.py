@@ -10,6 +10,7 @@ async def get_public_user(
     request: Request,
     username: str,
     user_service: UserService = Depends(UserService.new),
+    not_found: res.HTTPException = Depends(res.not_found_exception),
 ) -> PublicUser:
     """
     get the user for `username` like `/user/{username}/collections`.
@@ -18,4 +19,4 @@ async def get_public_user(
     try:
         return await user_service.get_by_name(username)
     except UserService.not_found:
-        raise res.not_found(request)
+        raise not_found
