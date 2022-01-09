@@ -1,19 +1,19 @@
 import datetime
-from typing import List, Iterator, Optional
+from typing import List, Iterator
 
 from fastapi import Depends, APIRouter
 from pydantic import BaseModel
-from starlette.requests import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res
-from pol.models import ErrorDetail
+from pol.models import PublicUser, ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db
 from pol.db.const import SubjectType, CollectionType
-from pol.db.tables import ChiiMember, ChiiSubjectInterest
+from pol.db.tables import ChiiSubjectInterest
 from pol.permission import Role
 from pol.api.v0.models import Paged, Pager
+from pol.api.v0.depends import get_public_user
 from pol.api.v0.depends.auth import optional_user
 
 router = APIRouter(
@@ -23,7 +23,7 @@ router = APIRouter(
 )
 
 
-class Model(BaseModel):
+class UserCollection(BaseModel):
     subject_id: int
     subject_type: SubjectType
     rate: int
@@ -37,26 +37,11 @@ class Model(BaseModel):
     private: int
 
 
-async def get_user(
-    request: Request,
-    username: str,
-    db: AsyncSession = Depends(get_db),
-) -> ChiiMember:
-    """get the user for `username` like `/user/{username}/collections`"""
-    u: Optional[ChiiMember] = await db.scalar(
-        sa.get(ChiiMember, ChiiMember.username == username)
-    )
-
-    if not u:
-        raise res.not_found(request)
-    return u
-
-
 @router.get(
     "/user/{username}/collections",
     summary="获取用户收藏",
     description="获取对应用户的收藏，查看私有收藏需要access token。\n设置了 username 的用户无法通过数字ID查询",
-    response_model=Paged[Model],
+    response_model=Paged[UserCollection],
     responses={
         404: res.response(model=ErrorDetail, description="用户不存在"),
     },
@@ -64,15 +49,15 @@ async def get_user(
 async def get_subject(
     user: Role = Depends(optional_user),
     page: Pager = Depends(),
-    u: ChiiMember = Depends(get_user),
+    u: PublicUser = Depends(get_public_user),
     db: AsyncSession = Depends(get_db),
 ):
     where = [ChiiSubjectInterest.private == 0]
 
-    if u.uid == user.get_user_id():
+    if u.id == user.get_user_id():
         where = []
 
-    where.append(ChiiSubjectInterest.uid == u.uid)
+    where.append(ChiiSubjectInterest.uid == u.id)
     total = await db.scalar(sa.select(sa.count(1)).where(*where))
 
     collections: Iterator[ChiiSubjectInterest] = await db.scalars(

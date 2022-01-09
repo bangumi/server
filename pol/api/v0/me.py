@@ -2,10 +2,10 @@ from fastapi import Depends, APIRouter
 from pydantic import BaseModel
 
 from pol import res
-from pol.models import ErrorDetail
+from pol.models import User, ErrorDetail
 from pol.router import ErrorCatchRoute
 from pol.permission import UserGroup
-from .depends.auth import User, get_current_user
+from .depends.auth import get_current_user
 
 router = APIRouter(tags=["用户"], route_class=ErrorCatchRoute)
 
@@ -44,7 +44,7 @@ class Me(BaseModel):
         403: res.response(model=ErrorDetail, description="unauthorized"),
     },
 )
-async def get_subject(
+async def get_user(
     user: User = Depends(get_current_user),
 ):
     d = user.dict(by_alias=False)

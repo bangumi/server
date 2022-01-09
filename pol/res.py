@@ -2,9 +2,16 @@ from typing import Any, Dict, Type, Union, Optional
 from urllib.parse import quote
 
 import orjson
+from pydantic import Field, BaseModel
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.datastructures import URL
+
+
+class ErrorDetail(BaseModel):
+    title: str
+    description: str
+    detail: Any = Field(..., description="can be anything")
 
 
 class ORJSONResponse(JSONResponse):
