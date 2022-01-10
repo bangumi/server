@@ -38,15 +38,20 @@ class UserCollection(BaseModel):
 
 
 @router.get(
-    "/user/{username}/collections",
+    "/users/{username}/collections",
     summary="获取用户收藏",
-    description="获取对应用户的收藏，查看私有收藏需要access token。\n设置了 username 的用户无法通过数字ID查询",
+    description="获取对应用户的收藏，查看私有收藏需要access token。",
     response_model=Paged[UserCollection],
     responses={
         404: res.response(model=ErrorDetail, description="用户不存在"),
     },
 )
-async def get_subject(
+@router.get(
+    "/user/{username}/collections",
+    include_in_schema=False,
+    response_model=Paged[UserCollection],
+)
+async def get_user_collection(
     user: Role = Depends(optional_user),
     page: Pager = Depends(),
     u: PublicUser = Depends(get_public_user),

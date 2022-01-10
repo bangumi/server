@@ -1,5 +1,4 @@
-from fastapi import Depends
-from starlette.requests import Request
+from fastapi import Path, Depends
 
 from pol import res
 from pol.models import PublicUser
@@ -7,8 +6,7 @@ from pol.services.user_service import UserService
 
 
 async def get_public_user(
-    request: Request,
-    username: str,
+    username: str = Path(..., description="设置了 username 后无法使用UID"),
     user_service: UserService = Depends(UserService.new),
     not_found: res.HTTPException = Depends(res.not_found_exception),
 ) -> PublicUser:
