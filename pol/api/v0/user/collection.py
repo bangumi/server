@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Iterator, Optional
 
-from fastapi import Depends, APIRouter
+from fastapi import Query, Depends, APIRouter
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,7 +18,7 @@ from pol.api.v0.depends import get_public_user
 from pol.api.v0.depends.auth import optional_user
 
 router = APIRouter(
-    tags=["用户", "社区"],
+    tags=["用户"],
     route_class=ErrorCatchRoute,
     redirect_slashes=False,
 )
@@ -56,11 +56,23 @@ async def get_user_collection(
     page: Pager = Depends(),
     u: PublicUser = Depends(get_public_user),
     db: AsyncSession = Depends(get_db),
+    subject_type: SubjectType = Query(
+        None, description="条目类型，默认为全部\n\n具体含义见 [SubjectType](#model-SubjectType)"
+    ),
+    type: CollectionType = Query(
+        None, description="收藏类型，默认为全部\n\n具体含义见 [CollectionType](#model-CollectionType)"
+    ),
 ):
     where = [ChiiSubjectInterest.private == 0]
 
     if u.id == user.get_user_id():
         where = []
+
+    if subject_type is not None:
+        where.append(ChiiSubjectInterest.subject_type == subject_type)
+
+    if type is not None:
+        where.append(ChiiSubjectInterest.type == type)
 
     where.append(ChiiSubjectInterest.user_id == u.id)
     total = await db.scalar(sa.select(sa.count(1)).where(*where))
