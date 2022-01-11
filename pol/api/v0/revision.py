@@ -426,7 +426,7 @@ async def get_episode_revision(
         "data": {
             "eids": r.rev_eids,
             "ep_infobox": r.rev_ep_infobox,
-            "sid": r.rev_sid,
+            "subject_id": r.rev_sid,
             "version": r.rev_version,
         },
         "creator": {
