@@ -48,7 +48,9 @@ def test_auth_cached(client: TestClient, redis_client: Redis):
     redis_client.set(cache_key, u.json(by_alias=True))
     response = client.get("/v0/me", headers={"Authorization": "Bearer 1"})
     assert response.status_code == 200, "user lookup should be cached"
-    assert response.json()["avatar"]["large"] == ""
+    assert (
+        response.json()["avatar"]["large"] == "https://lain.bgm.tv/pic/user/l/icon.jpg"
+    )
 
 
 def test_auth_cache_ban_cache_fallback(client: TestClient, redis_client: Redis):

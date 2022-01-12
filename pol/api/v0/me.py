@@ -16,9 +16,9 @@ class Avatar(BaseModel):
     small: str
 
     @classmethod
-    def from_record(cls, s):
+    def from_record(cls, s: str):
         if not s:
-            return cls(large="", medium="", small="")
+            s = "icon.jpg"
         return cls(
             large="https://lain.bgm.tv/pic/user/l/" + s,
             medium="https://lain.bgm.tv/pic/user/m/" + s,
