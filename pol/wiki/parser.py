@@ -36,7 +36,7 @@ def kv(key, value=None) -> Dict[str, Any]:
     return {"key": key, "value": value}
 
 
-# TODO: fix mysql type error
+# TODO: fix mppy type error
 def parse(s: str) -> Wiki:
     s = s.strip()
     if not s:
