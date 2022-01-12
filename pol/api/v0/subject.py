@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa, res, curd, wiki
 from pol.res import ErrorDetail, not_found_exception
-from pol.utils import subject_images
 from pol.config import CACHE_KEY_PREFIX
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
@@ -26,7 +25,12 @@ from pol.db.tables import (
     ChiiSubjectRelations,
 )
 from pol.permission import Role
-from pol.api.v0.utils import get_career, person_images, short_description
+from pol.api.v0.utils import (
+    get_career,
+    person_images,
+    subject_images,
+    short_description,
+)
 from pol.api.v0.models import RelatedPerson, RelatedCharacter
 from pol.redis.json_cache import JSONRedis
 from pol.http_cache.depends import CacheControl
