@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, Iterator, Optional
 from datetime import datetime
 
 from loguru import logger
@@ -32,7 +32,7 @@ class UserService:
 
     async def get_users_by_id(self, *id: int) -> Dict[int, PublicUser]:
         """return a public readable user with limited information"""
-        results: List[ChiiMember] = await self._db.scalars(
+        results: Iterator[ChiiMember] = await self._db.scalars(
             sa.select(ChiiMember).where(ChiiMember.uid.in_(id))
         )
 

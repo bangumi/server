@@ -531,7 +531,7 @@ class ChiiSubjectField(Base):
             "10": self.field_rate_10,
         }
 
-    def tags(self):
+    def tags(self) -> List[dict]:
         if not self.field_tags:
             return []
 

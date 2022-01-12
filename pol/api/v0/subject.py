@@ -1,11 +1,10 @@
-import datetime
-from typing import List, Optional
+from typing import List
 
 from fastapi import Path, Depends, APIRouter
 from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import sa, res, curd, wiki
+from pol import sa, res, curd, wiki, models
 from pol.res import ErrorDetail, not_found_exception
 from pol.config import CACHE_KEY_PREFIX
 from pol.router import ErrorCatchRoute
@@ -32,10 +31,12 @@ from pol.api.v0.utils import (
     short_description,
 )
 from pol.api.v0.models import RelatedPerson, RelatedCharacter
+from pol.api.v0.depends import get_subject
 from pol.redis.json_cache import JSONRedis
 from pol.http_cache.depends import CacheControl
 from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject
+from pol.services.subject_service import SubjectService
 
 router = APIRouter(tags=["条目"], route_class=ErrorCatchRoute)
 
@@ -45,17 +46,19 @@ api_base = "/v0/subjects"
 @router.get(
     "/subjects/{subject_id}",
     description="cache with 300s",
+    summary="获取条目",
     response_model=Subject,
     responses={
         404: res.response(model=ErrorDetail),
     },
 )
-async def get_subject(
+async def get_subject_by_id(
     response: Response,
     not_found: res.HTTPException = Depends(not_found_exception),
     subject_id: int = Path(..., gt=0),
     user: Role = Depends(optional_user),
     db: AsyncSession = Depends(get_db),
+    subject_service: SubjectService = Depends(SubjectService.new),
     redis: JSONRedis = Depends(get_redis),
     cache_control: CacheControl = Depends(CacheControl),
 ):
@@ -70,7 +73,11 @@ async def get_subject(
         # now fetch real data
         response.headers["x-cache-status"] = "miss"
         data = await _get_subject(
-            cache_control, not_found=not_found, subject_id=subject_id, db=db
+            cache_control,
+            not_found=not_found,
+            subject_id=subject_id,
+            subject_service=subject_service,
+            db=db,
         )
         await redis.set_json(cache_key, value=data, ex=300)
         nsfw = data["nsfw"]
@@ -83,42 +90,44 @@ async def get_subject(
 
 async def _get_subject(
     cache_control: CacheControl,
+    subject_service: SubjectService,
     not_found: res.HTTPException = Depends(not_found_exception),
     subject_id: int = Path(..., gt=0),
     db: AsyncSession = Depends(get_db),
 ):
-    subject: Optional[ChiiSubject] = await db.get(
+    try:
+        s = await subject_service.get_by_id(
+            subject_id, include_nsfw=True, include_redirect=True
+        )
+    except SubjectService.NotFoundError:
+        cache_control(300)
+        raise not_found
+
+    if s.redirect:
+        cache_control(300)
+        raise res.HTTPRedirect(f"{api_base}/{s.redirect}")
+
+    # TODO: split these part to another service handler community function
+    subject: ChiiSubject = await db.get(
         ChiiSubject, subject_id, options=[sa.joinedload(ChiiSubject.fields)]
     )
-    if subject is None:
-        raise not_found
 
     if not subject.subject_nsfw:
         cache_control(300)
 
-    if subject.fields.field_redirect:
-        raise res.HTTPRedirect(f"{api_base}/{subject.fields.field_redirect}")
-
-    if subject.ban:
-        raise not_found
-
-    date = None
-    v = subject.fields.field_date
-    if isinstance(v, datetime.date):
-        date = f"{v.year:04d}-{v.month:02d}-{v.day:02d}"
-
     data = {
-        "id": subject.subject_id,
-        "name": subject.subject_name,
-        "name_cn": subject.subject_name_cn,
-        "date": date,
-        "type": subject.subject_type_id,
-        "summary": subject.field_summary,
+        "id": s.id,
+        "name": s.name,
+        "name_cn": s.name_cn,
+        "date": s.date,
+        "type": s.type,
+        "summary": s.summary,
+        "locked": s.locked,
+        "nsfw": s.nsfw,
+        "images": subject_images(s.image),
+        "platform": PLATFORM_MAP[s.type].get(s.platform, {}).get("type_cn", ""),
         "eps": subject.field_eps,
         "volumes": subject.field_volumes,
-        "locked": subject.locked,
-        "images": subject_images(subject.subject_image),
-        "nsfw": subject.subject_nsfw,
         "collection": {
             "wish": subject.subject_wish,
             "collect": subject.subject_collect,
@@ -127,15 +136,12 @@ async def _get_subject(
             "dropped": subject.subject_dropped,
         },
         "rating": subject.fields.rating(),
-        "platform": PLATFORM_MAP[subject.subject_type_id].get(
-            subject.subject_platform, {"type_cn": ""}
-        )["type_cn"],
         "total_episodes": await curd.count(db, ChiiEpisode.ep_subject_id == subject_id),
         "tags": subject.fields.tags(),
     }
 
     try:
-        data["infobox"] = wiki.parse(subject.field_infobox).info
+        data["infobox"] = wiki.parse(s.infobox).info
     except wiki.WikiSyntaxError:
         data["infobox"] = None
 
@@ -151,19 +157,15 @@ async def _get_subject(
 )
 async def get_subject_persons(
     db: AsyncSession = Depends(get_db),
-    not_found: res.HTTPException = Depends(not_found_exception),
-    subject_id: int = Path(..., gt=0),
+    s: models.Subject = Depends(get_subject),
 ):
     subject: ChiiSubject = await db.scalar(
         sa.select(ChiiSubject)
         .options(
             sa.selectinload(ChiiSubject.persons).joinedload(ChiiPersonCsIndex.person)
         )
-        .where(ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0)
+        .where(ChiiSubject.subject_id == s.id, ChiiSubject.subject_ban == 0)
     )
-
-    if not subject:
-        raise not_found
 
     persons = []
 
@@ -192,24 +194,20 @@ async def get_subject_persons(
 )
 async def get_subject_characters(
     db: AsyncSession = Depends(get_db),
-    not_found: res.HTTPException = Depends(not_found_exception),
-    subject_id: int = Path(..., gt=0),
+    subject: models.Subject = Depends(get_subject),
 ):
-    subject: ChiiSubject = await db.scalar(
+    s: ChiiSubject = await db.scalar(
         sa.select(ChiiSubject)
         .options(
             sa.selectinload(ChiiSubject.characters).joinedload(
                 ChiiCrtSubjectIndex.character
             )
         )
-        .where(ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0)
+        .where(ChiiSubject.subject_id == subject.id, ChiiSubject.subject_ban == 0)
     )
 
-    if not subject:
-        raise not_found
-
     characters = []
-    for rel in subject.characters:
+    for rel in s.characters:
         r = rel.character
         characters.append(
             {
@@ -232,13 +230,12 @@ async def get_subject_characters(
     },
 )
 async def get_subject_relations(
-    not_found: res.HTTPException = Depends(not_found_exception),
-    subject_id: int = Path(..., gt=0),
     db: AsyncSession = Depends(get_db),
+    subject: models.Subject = Depends(get_subject),
 ):
-    subject: Optional[ChiiSubject] = await db.scalar(
+    s: ChiiSubject = await db.scalar(
         sa.select(ChiiSubject)
-        .where(ChiiSubject.subject_id == subject_id, ChiiSubject.subject_ban == 0)
+        .where(ChiiSubject.subject_id == subject.id, ChiiSubject.subject_ban == 0)
         .options(
             sa.selectinload(ChiiSubject.relations).selectinload(
                 ChiiSubjectRelations.dst_subject
@@ -246,12 +243,9 @@ async def get_subject_relations(
         )
     )
 
-    if not subject:
-        raise not_found
-
     response = []
 
-    for r in subject.relations:
+    for r in s.relations:
         s = r.dst_subject
         relation = RELATION_MAP[r.rlt_related_subject_type_id].get(r.rlt_relation_type)
 
