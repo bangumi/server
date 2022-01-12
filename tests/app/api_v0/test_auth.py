@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from pol import sa, config
-from pol.models import User
+from pol.models import User, Avatar
 from pol.db.tables import ChiiMember
 from pol.permission import UserGroup
 from tests.conftest import MockUser
@@ -43,7 +43,7 @@ def test_auth_cached(client: TestClient, redis_client: Redis):
         group_id=UserGroup.wiki_admin,
         nickname="ni",
         sign="",
-        avatar="",
+        avatar=Avatar.from_db_record(""),
     )
     redis_client.set(cache_key, u.json(by_alias=True))
     response = client.get("/v0/me", headers={"Authorization": "Bearer 1"})

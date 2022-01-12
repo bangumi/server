@@ -3,27 +3,12 @@ from pydantic import Field, BaseModel
 
 from pol import res
 from pol.res import ErrorDetail
+from pol.models import Avatar
 from pol.router import ErrorCatchRoute
 from pol.permission import UserGroup
 from pol.api.v0.depends.auth import User, get_current_user
 
 router = APIRouter(tags=["用户"], route_class=ErrorCatchRoute)
-
-
-class Avatar(BaseModel):
-    large: str
-    medium: str
-    small: str
-
-    @classmethod
-    def from_record(cls, s: str):
-        if not s:
-            s = "icon.jpg"
-        return cls(
-            large="https://lain.bgm.tv/pic/user/l/" + s,
-            medium="https://lain.bgm.tv/pic/user/m/" + s,
-            small="https://lain.bgm.tv/pic/user/s/" + s,
-        )
 
 
 class Me(BaseModel):
@@ -44,11 +29,9 @@ class Me(BaseModel):
         403: res.response(model=ErrorDetail, description="unauthorized"),
     },
 )
-async def get_user(
-    user: User = Depends(get_current_user),
-):
+async def get_user(user: User = Depends(get_current_user)):
     d = user.dict(by_alias=False)
-    d["avatar"] = Avatar.from_record(user.avatar)
+    d["avatar"] = user.avatar
     d["url"] = "https://bgm.tv/user/" + user.username
     d["user_group"] = user.group_id
 
