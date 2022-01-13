@@ -9,7 +9,7 @@ from .creator import Creator
 class Revision(BaseModel):
     id: int
     type: int
-    creator: Creator
+    creator: Optional[Creator]
     summary: str
     created_at: datetime.datetime
 
