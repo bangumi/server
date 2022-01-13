@@ -146,16 +146,21 @@ subject_revisions_api_prefix = "/v0/revisions/subjects"
 def test_subject_revisions_basic(
     client: TestClient,
 ):
-    response = client.get(subject_revisions_api_prefix, params={"subject_id": 1})
+    response = client.get(subject_revisions_api_prefix, params={"subject_id": 26})
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
 
     res = response.json()
-    assert res["total"]
-    assert res["offset"] == 0
+    assert "total" in res
     assert "limit" in res
+    assert res["offset"] == 0
+    if res["total"] <= res["limit"]:
+        assert res["total"] == len(res["data"])
+    else:
+        assert res["limit"] == len(res["data"])
     for item in res["data"]:
-        assert "nickname" in item["creator"]
+        if item["creator"]:
+            assert "nickname" in item["creator"]
 
 
 def test_subject_revisions_offset(
@@ -200,9 +205,13 @@ def test_episode_revisions_basic(
     assert response.headers["content-type"] == "application/json"
 
     res = response.json()
-    assert res["total"]
-    assert res["offset"] == 0
+    assert "total" in res
     assert "limit" in res
+    assert res["offset"] == 0
+    if res["total"] <= res["limit"]:
+        assert res["total"] == len(res["data"])
+    else:
+        assert res["limit"] == len(res["data"])
     for item in res["data"]:
         assert "nickname" in item["creator"]
 

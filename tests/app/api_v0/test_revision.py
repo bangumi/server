@@ -112,6 +112,25 @@ def test_subject_revision_not_found(client: TestClient):
     assert response.headers["content-type"] == "application/json"
 
 
+def test_subject_revision_amazon(client: TestClient):
+    response = client.get(
+        f"{subject_revisions_api_prefix}/194043",
+    )
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/json"
+
+    res: dict = response.json()
+    assert set(res.keys()) == {
+        "id",
+        "type",
+        "created_at",
+        "summary",
+        "data",
+        "creator",
+    }
+    assert res["creator"] == None
+
+
 episode_revisions_api_prefix = "/v0/revisions/episodes"
 
 
