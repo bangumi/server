@@ -27,6 +27,21 @@ class UserService:
     def __init__(self, db: AsyncSession):
         self._db = db
 
+    async def get_by_uid(self, uid: str) -> PublicUser:
+        """return a public readable user with limited information"""
+        u: Optional[ChiiMember] = await self._db.scalar(
+            sa.get(ChiiMember, ChiiMember.uid == uid)
+        )
+
+        if not u:
+            raise self.NotFoundError
+
+        return PublicUser(
+            id=u.uid,
+            username=u.username,
+            nickname=u.nickname,
+        )
+
     async def get_by_name(self, username: str) -> PublicUser:
         """return a public readable user with limited information"""
         u: Optional[ChiiMember] = await self._db.scalar(
