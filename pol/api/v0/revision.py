@@ -1,6 +1,7 @@
 from typing import Any, List, Tuple
 from asyncio import gather
 
+from loguru import logger
 from fastapi import Path, Depends, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,10 +10,17 @@ from pol.res import ErrorDetail, not_found_exception
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db
 from pol.db.const import RevisionType
-from pol.db.tables import ChiiMember, ChiiRevText, ChiiRevHistory
+from pol.db.tables import (
+    ChiiMember,
+    ChiiRevText,
+    ChiiEpRevision,
+    ChiiRevHistory,
+    ChiiSubjectRevision,
+)
 from pol.api.v0.models import Paged, Pager
 from pol.curd.exceptions import NotFoundError
 from pol.http_cache.depends import CacheControl
+from pol.services.user_service import UserService
 from pol.api.v0.models.revision import Revision, DetailedRevision
 
 router = APIRouter(prefix="/revisions", tags=["编辑历史"], route_class=ErrorCatchRoute)
@@ -22,6 +30,10 @@ person_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.person_rev_ty
 character_rev_type_filters = ChiiRevHistory.rev_type.in_(
     RevisionType.character_rev_types()
 )
+
+subject_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.subject_rev_types())
+
+episode_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.episode_rev_types())
 
 
 async def get_revisions(
@@ -199,3 +211,242 @@ async def get_character_revision(
         )
     except NotFoundError:
         raise not_found
+
+
+@router.get(
+    "/subjects",
+    response_model=Paged[Revision],
+    response_model_exclude_unset=True,
+)
+async def get_subject_revisions(
+    subject_id: int = 0,
+    db: AsyncSession = Depends(get_db),
+    page: Pager = Depends(),
+    cache_control: CacheControl = Depends(CacheControl),
+):
+    cache_control(300)
+
+    filters = []
+    if subject_id > 0:
+        filters.append(ChiiSubjectRevision.rev_subject_id == subject_id)
+    total = await curd.count(db, ChiiSubjectRevision.rev_subject_id, *filters)
+    page.check(total)
+
+    query = (
+        sa.select(
+            ChiiSubjectRevision.rev_id.label("rev_id"),
+            ChiiSubjectRevision.rev_type,
+            ChiiSubjectRevision.rev_creator,
+            ChiiSubjectRevision.rev_dateline,
+            ChiiSubjectRevision.rev_edit_summary,
+            ChiiMember.username,
+            ChiiMember.nickname,
+        )
+        .outerjoin(
+            ChiiMember,
+            ChiiSubjectRevision.rev_creator == ChiiMember.uid,
+        )
+        .where(*filters)
+        .order_by(ChiiSubjectRevision.rev_dateline.desc())
+        .limit(page.limit)
+        .offset(page.offset)
+    )
+
+    revisions = [
+        {
+            "id": r["rev_id"],
+            "type": r["rev_type"],
+            "created_at": r["rev_dateline"],
+            "summary": r["rev_edit_summary"],
+            "creator": {
+                "username": r["username"],
+                "nickname": r["nickname"],
+            }
+            if r["username"]
+            else None,
+        }
+        for r in (await db.execute(query)).mappings().fetchall()
+    ]
+    return {
+        "limit": page.limit,
+        "offset": page.offset,
+        "data": revisions,
+        "total": total,
+    }
+
+
+@router.get(
+    "/subjects/{revision_id}",
+    response_model=DetailedRevision,
+    response_model_exclude_unset=True,
+    responses={
+        404: res.response(model=ErrorDetail),
+    },
+)
+async def get_subject_revision(
+    db: AsyncSession = Depends(get_db),
+    revision_id: int = Path(..., gt=0),
+    user_service: UserService = Depends(UserService.new),
+    cache_control: CacheControl = Depends(CacheControl),
+    not_found: res.HTTPException = Depends(not_found_exception),
+):
+
+    cache_control(300)
+
+    try:
+        r = await curd.get_one(
+            db,
+            ChiiSubjectRevision,
+            ChiiSubjectRevision.rev_id == revision_id,
+        )
+    except NotFoundError:
+        raise not_found
+
+    if r.rev_creator == 0:
+        creator = None
+    else:
+        try:
+            user = await user_service.get_by_uid(r.rev_creator)
+        except NotFoundError:
+            logger.error(
+                f"subject revision {r.rev_id} creator {r.rev_creator} does not exist"
+            )
+            raise not_found
+        creator = {
+            "username": user.username,
+            "nickname": user.nickname,
+        }
+
+    return {
+        "id": r.rev_id,
+        "type": r.rev_type,
+        "created_at": r.rev_dateline,
+        "summary": r.rev_edit_summary,
+        "data": {
+            "subject_id": r.rev_subject_id,
+            "name": r.rev_name,
+            "name_cn": r.rev_name_cn,
+            "vote_field": r.rev_vote_field,
+            "type": r.rev_type,
+            "type_id": r.rev_type_id,
+            "field_infobox": r.rev_field_infobox,
+            "field_summary": r.rev_field_summary,
+            "field_eps": r.rev_field_eps,
+            "platform": r.rev_platform,
+        },
+        "creator": creator,
+    }
+
+
+@router.get(
+    "/episodes",
+    response_model=Paged[Revision],
+    response_model_exclude_unset=True,
+)
+async def get_episode_revisions(
+    episode_id: int = 0,
+    db: AsyncSession = Depends(get_db),
+    page: Pager = Depends(),
+    cache_control: CacheControl = Depends(CacheControl),
+):
+    cache_control(300)
+
+    filters = []
+    if episode_id > 0:
+        filters.append(ChiiEpRevision.rev_eids.regexp_match(rf"(^|,){episode_id}($|,)"))
+    total = await curd.count(db, ChiiEpRevision.ep_rev_id, *filters)
+    page.check(total)
+
+    query = (
+        sa.select(
+            ChiiEpRevision.ep_rev_id.label("rev_id"),
+            ChiiEpRevision.rev_eids,
+            ChiiEpRevision.rev_creator,
+            ChiiEpRevision.rev_dateline,
+            ChiiEpRevision.rev_edit_summary,
+            ChiiMember.username,
+            ChiiMember.nickname,
+            ChiiMember.avatar,
+        )
+        .join(
+            ChiiMember,
+            ChiiEpRevision.rev_creator == ChiiMember.uid,
+        )
+        .where(*filters)
+        .order_by(ChiiEpRevision.rev_dateline.desc())
+        .limit(page.limit)
+        .offset(page.offset)
+    )
+
+    revisions = [
+        {
+            "id": r["rev_id"],
+            "type": RevisionType.ep,
+            "created_at": r["rev_dateline"],
+            "summary": r["rev_edit_summary"],
+            "creator": {
+                "username": r["username"],
+                "nickname": r["nickname"],
+            },
+        }
+        for r in (await db.execute(query)).mappings().fetchall()
+    ]
+    return {
+        "limit": page.limit,
+        "offset": page.offset,
+        "data": revisions,
+        "total": total,
+    }
+
+
+@router.get(
+    "/episodes/{revision_id}",
+    response_model=DetailedRevision,
+    response_model_exclude_unset=True,
+    responses={
+        404: res.response(model=ErrorDetail),
+    },
+)
+async def get_episode_revision(
+    db: AsyncSession = Depends(get_db),
+    revision_id: int = Path(..., gt=0),
+    user_service: UserService = Depends(UserService.new),
+    cache_control: CacheControl = Depends(CacheControl),
+    not_found: res.HTTPException = Depends(not_found_exception),
+):
+
+    cache_control(300)
+
+    try:
+        r = await curd.get_one(
+            db,
+            ChiiEpRevision,
+            ChiiEpRevision.ep_rev_id == revision_id,
+        )
+    except NotFoundError:
+        raise not_found
+
+    try:
+        user = await user_service.get_by_uid(r.rev_creator)
+    except NotFoundError:
+        logger.error(
+            f"episode revision {r.ep_rev_id} creator {r.rev_creator} does not exist"
+        )
+        raise not_found
+
+    return {
+        "id": r.ep_rev_id,
+        "type": RevisionType.ep,
+        "created_at": r.rev_dateline,
+        "summary": r.rev_edit_summary,
+        "data": {
+            "eids": r.rev_eids,
+            "ep_infobox": r.rev_ep_infobox,
+            "subject_id": r.rev_sid,
+            "version": r.rev_version,
+        },
+        "creator": {
+            "username": user.username,
+            "nickname": user.nickname,
+        },
+    }
