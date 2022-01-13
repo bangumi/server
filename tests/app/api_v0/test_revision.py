@@ -128,7 +128,7 @@ def test_subject_revision_amazon(client: TestClient):
         "data",
         "creator",
     }
-    assert res["creator"] == None
+    assert res["creator"] is None
 
 
 episode_revisions_api_prefix = "/v0/revisions/episodes"
