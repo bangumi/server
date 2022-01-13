@@ -242,7 +242,7 @@ async def get_subject_revisions(
             ChiiMember.username,
             ChiiMember.nickname,
         )
-        .join(
+        .outerjoin(
             ChiiMember,
             ChiiSubjectRevision.rev_creator == ChiiMember.uid,
         )
@@ -261,7 +261,9 @@ async def get_subject_revisions(
             "creator": {
                 "username": r["username"],
                 "nickname": r["nickname"],
-            },
+            }
+            if r["username"]
+            else None,
         }
         for r in (await db.execute(query)).mappings().fetchall()
     ]
