@@ -30,7 +30,7 @@ class UserService:
     def __init__(self, db: AsyncSession):
         self._db = db
 
-    async def get_by_uid(self, uid: str) -> PublicUser:
+    async def get_by_uid(self, uid: int) -> PublicUser:
         """return a public readable user with limited information"""
         u: Optional[ChiiMember] = await self._db.scalar(
             sa.get(ChiiMember, ChiiMember.uid == uid)
@@ -43,6 +43,7 @@ class UserService:
             id=u.uid,
             username=u.username,
             nickname=u.nickname,
+            avatar=Avatar.from_db_record(u.avatar),
         )
 
     async def get_users_by_id(self, *id: int) -> Dict[int, PublicUser]:
