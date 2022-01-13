@@ -1,6 +1,7 @@
 from typing import Any, List, Tuple
 from asyncio import gather
 
+from loguru import logger
 from fastapi import Path, Depends, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,6 +20,7 @@ from pol.db.tables import (
 from pol.api.v0.models import Paged, Pager
 from pol.curd.exceptions import NotFoundError
 from pol.http_cache.depends import CacheControl
+from pol.services.user_service import UserService
 from pol.api.v0.models.revision import Revision, DetailedRevision
 
 router = APIRouter(prefix="/revisions", tags=["编辑历史"], route_class=ErrorCatchRoute)
@@ -282,6 +284,7 @@ async def get_subject_revisions(
 async def get_subject_revision(
     db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
+    user_service: UserService = Depends(UserService.new),
     cache_control: CacheControl = Depends(CacheControl),
     not_found: res.HTTPException = Depends(not_found_exception),
 ):
@@ -297,10 +300,20 @@ async def get_subject_revision(
     except NotFoundError:
         raise not_found
 
-    try:
-        user = await curd.get_one(db, ChiiMember, ChiiMember.uid == r.rev_creator)
-    except NotFoundError:
-        raise not_found
+    if r.rev_creator == 0:
+        creator = None
+    else:
+        try:
+            user = await user_service.get_by_uid(r.rev_creator)
+        except NotFoundError:
+            logger.error(
+                f"subject revision {r.rev_id} creator {r.rev_creator} does not exist"
+            )
+            raise not_found
+        creator = {
+            "username": user.username,
+            "nickname": user.nickname,
+        }
 
     return {
         "id": r.rev_id,
@@ -319,10 +332,7 @@ async def get_subject_revision(
             "field_eps": r.rev_field_eps,
             "platform": r.rev_platform,
         },
-        "creator": {
-            "username": user.username,
-            "nickname": user.nickname,
-        },
+        "creator": creator,
     }
 
 
@@ -398,6 +408,7 @@ async def get_episode_revisions(
 async def get_episode_revision(
     db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
+    user_service: UserService = Depends(UserService.new),
     cache_control: CacheControl = Depends(CacheControl),
     not_found: res.HTTPException = Depends(not_found_exception),
 ):
@@ -414,8 +425,11 @@ async def get_episode_revision(
         raise not_found
 
     try:
-        user = await curd.get_one(db, ChiiMember, ChiiMember.uid == r.rev_creator)
+        user = await user_service.get_by_uid(r.rev_creator)
     except NotFoundError:
+        logger.error(
+            f"episode revision {r.ep_rev_id} creator {r.rev_creator} does not exist"
+        )
         raise not_found
 
     return {
