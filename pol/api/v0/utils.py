@@ -15,6 +15,19 @@ def person_images(s: Optional[str]) -> Optional[Dict[str, str]]:
     }
 
 
+def subject_images(s: Optional[str]) -> Optional[Dict[str, str]]:
+    if not s:
+        return None
+
+    return {
+        "large": "https://lain.bgm.tv/pic/cover/l/" + s,
+        "common": "https://lain.bgm.tv/pic/cover/c/" + s,
+        "medium": "https://lain.bgm.tv/pic/cover/m/" + s,
+        "small": "https://lain.bgm.tv/pic/cover/s/" + s,
+        "grid": "https://lain.bgm.tv/pic/cover/g/" + s,
+    }
+
+
 def get_career(p: ChiiPerson) -> List[str]:
     s = []
     if p.prsn_producer:
@@ -35,4 +48,6 @@ def get_career(p: ChiiPerson) -> List[str]:
 
 
 def short_description(s: str):
-    return s[:80]
+    if len(s) >= 80:
+        return s[:77] + "..."
+    return s
