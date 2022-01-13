@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Iterator, Optional
 from datetime import datetime
 
 from loguru import logger
@@ -6,7 +6,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import sa
-from pol.models import User, PublicUser
+from pol.models import User, Avatar, PublicUser
 from pol.depends import get_db
 from pol.db.tables import ChiiMember, ChiiOauthAccessToken
 from pol.curd.exceptions import NotFoundError
@@ -17,6 +17,9 @@ class UserNotFound(NotFoundError):
 
 
 class UserService:
+    """user service to get user from database"""
+
+    __slots__ = ("_db",)
     _db: AsyncSession
     NotFoundError = UserNotFound
 
@@ -42,6 +45,22 @@ class UserService:
             nickname=u.nickname,
         )
 
+    async def get_users_by_id(self, *id: int) -> Dict[int, PublicUser]:
+        """return a public readable user with limited information"""
+        results: Iterator[ChiiMember] = await self._db.scalars(
+            sa.select(ChiiMember).where(ChiiMember.uid.in_(id))
+        )
+
+        return {
+            u.uid: PublicUser(
+                id=u.uid,
+                username=u.username,
+                nickname=u.nickname,
+                avatar=Avatar.from_db_record(u.avatar),
+            )
+            for u in results
+        }
+
     async def get_by_name(self, username: str) -> PublicUser:
         """return a public readable user with limited information"""
         u: Optional[ChiiMember] = await self._db.scalar(
@@ -55,6 +74,7 @@ class UserService:
             id=u.uid,
             username=u.username,
             nickname=u.nickname,
+            avatar=Avatar.from_db_record(u.avatar),
         )
 
     async def get_by_access_token(self, access_token: str) -> User:
@@ -86,5 +106,5 @@ class UserService:
             nickname=member.nickname,
             registration_date=member.regdate,
             sign=member.sign,
-            avatar=member.avatar,
+            avatar=Avatar.from_db_record(member.avatar),
         )
