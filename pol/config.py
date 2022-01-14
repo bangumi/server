@@ -19,11 +19,9 @@ TIMEZONE = pytz.timezone("Etc/GMT-8")
 
 MYSQL_HOST = _config("MYSQL_HOST", default="127.0.0.1")
 MYSQL_PORT = _config("MYSQL_PORT", default=3306, cast=int)
-MYSQL_USER = _config("MYSQL_USER")
-MYSQL_PASS = _config("MYSQL_PASS")
+MYSQL_USER = _config("MYSQL_USER", default="user")
+MYSQL_PASS = _config("MYSQL_PASS", default="password")
 MYSQL_DB = _config("MYSQL_DB", default="bangumi")
-
-MYSQL_URI = f"mysql://{MYSQL_USER}:{MYSQL_PASS}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
 
 REDIS_URI = _config("REDIS_URI", default="redis://127.0.0.1:6379/0")
 

@@ -37,8 +37,8 @@ pre-commit install
 - `MYSQL_HOST` 默认 `127.0.0.1`
 - `MYSQL_PORT` 默认 `3306`
 - `MYSQL_DB` 默认 `bangumi`
-- `MYSQL_USER` **无默认值**
-- `MYSQL_PASS` **无默认值**
+- `MYSQL_USER` 默认 `user`
+- `MYSQL_PASS` 默认 `password`
 - `REDIS_URI` 默认 `redis://127.0.0.1:6379/0`
 
 你也可以把配置放在 `./env/dev` 文件中，如果在环境变量中找不到对应的值，会在这个文件中查找

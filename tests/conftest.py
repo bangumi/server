@@ -109,7 +109,7 @@ def AsyncSessionMaker():
     return get
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def redis_client():
     with redis.Redis.from_url(config.REDIS_URI) as redis_client:
         redis_client.flushdb()
