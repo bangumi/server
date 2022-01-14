@@ -13,7 +13,7 @@ from pol.db.tables import ChiiSubjectField
 fixtures_path = Path(__file__).parent.joinpath("fixtures")
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_not_found(client: TestClient):
     response = client.get("/v0/subjects/2000000")
     assert response.status_code == 404
@@ -30,7 +30,7 @@ def test_subject_not_valid(client: TestClient):
     assert response.headers["content-type"] == "application/json"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_basic(client: TestClient):
     response = client.get("/v0/subjects/2")
     assert response.status_code == 200
@@ -42,7 +42,7 @@ def test_subject_basic(client: TestClient):
     assert not response.json()["nsfw"]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_locked(client: TestClient):
     response = client.get("/v0/subjects/2")
     assert response.status_code == 200
@@ -52,7 +52,7 @@ def test_subject_locked(client: TestClient):
     assert data["locked"]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_nsfw_auth_200(client: TestClient, auth_header):
     """authorized 200 nsfw subject"""
     response = client.get("/v0/subjects/16", headers=auth_header)
@@ -60,7 +60,7 @@ def test_subject_nsfw_auth_200(client: TestClient, auth_header):
     assert response.headers["content-type"] == "application/json"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_redirect(client: TestClient):
     response = client.get("/v0/subjects/18", allow_redirects=False)
     assert response.status_code == 307
@@ -68,7 +68,7 @@ def test_subject_redirect(client: TestClient):
     assert response.headers["cache-control"] == "public, max-age=300"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_empty_image(client: TestClient, mock_subject):
     mock_subject(200)
     response = client.get("/v0/subjects/200")
@@ -77,7 +77,7 @@ def test_subject_empty_image(client: TestClient, mock_subject):
     assert data["images"] is None
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_ep_query_limit_offset(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 8, "limit": 5})
     assert response.status_code == 200
@@ -95,7 +95,7 @@ def test_subject_ep_query_limit_offset(client: TestClient):
     assert ids[1:] == [x["id"] for x in new_data]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_ep_type(client: TestClient):
     response = client.get("/v0/episodes", params={"type": 3, "subject_id": 253})
     assert response.status_code == 200
@@ -104,7 +104,7 @@ def test_subject_ep_type(client: TestClient):
     assert [x["id"] for x in data] == [103233, 103234, 103235]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_characters(client: TestClient):
     response = client.get("/v0/subjects/8/characters")
     assert response.status_code == 200
@@ -114,7 +114,7 @@ def test_subject_characters(client: TestClient):
     assert data
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_persons(client: TestClient):
     response = client.get("/v0/subjects/4/persons")
     assert response.status_code == 200
@@ -125,13 +125,13 @@ def test_subject_persons(client: TestClient):
     assert data
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_subjects_ban(client: TestClient):
     response = client.get("/v0/subjects/5/subjects")
     assert response.status_code == 404
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_subjects(client: TestClient):
     response = client.get("/v0/subjects/11/subjects")
     assert response.status_code == 200
@@ -141,7 +141,7 @@ def test_subject_subjects(client: TestClient):
     assert data
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_cache_broken_purge(client: TestClient, redis_client: Redis):
     cache_key = config.CACHE_KEY_PREFIX + "subject:1"
     redis_client.set(cache_key, orjson.dumps({"id": 10, "test": "1"}))
@@ -153,7 +153,7 @@ def test_subject_cache_broken_purge(client: TestClient, redis_client: Redis):
     assert "test" not in in_cache
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_tags(client: TestClient):
     response = client.get("/v0/subjects/2")
     assert response.json()["tags"] == [
@@ -170,7 +170,7 @@ def test_subject_tags(client: TestClient):
     ]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_tags_empty(client: TestClient, mock_subject):
     sid = 15234523
     mock_subject(sid)
@@ -178,7 +178,7 @@ def test_subject_tags_empty(client: TestClient, mock_subject):
     assert response.json()["tags"] == []
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_tags_none(client: TestClient, mock_subject, db_session: Session):
     """
     should exclude a tag if name is None.
@@ -229,7 +229,7 @@ def test_subject_tags_none(client: TestClient, mock_subject, db_session: Session
     ]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_subject_cache_header_public(client: TestClient, redis_client: Redis):
     response = client.get("/v0/subjects/1")
     assert response.status_code == 200, "broken cache should be purged"

@@ -91,15 +91,16 @@ watchgod scripts.dev.main
 ### 运行测试(需要数据库)
 
 ```shell
-pytest --e2e --database
+pytest --e2e --database --redis
 ```
 
-默认不运行 E2E 和需要数据库的测试，使用 `--e2e` 允许 e2e 测试。
-使用 `--database` 允许需要数据库的测试。
+默认不运行 E2E 和需要数据库的测试，使用 `--e2e` 允许 e2e 测试。 使用 `--database` 允许需要数据库的测试。 使用 `--redis` 允许需要
+redis 的测试。
 
 ### 编写测试
 
-参照 [tests/app/test_base_router.py](./tests/app/test_base_router.py) 文件。在测试函数中添加`client`参数获取对应的 HTTP 测试客户端。`client` 是一个 `requests.Session` 的实例，可以使用 `requests` 的各种函数参数。
+参照 [tests/app/test_base_router.py](./tests/app/test_base_router.py) 文件。在测试函数中添加`client`
+参数获取对应的 HTTP 测试客户端。`client` 是一个 `requests.Session` 的实例，可以使用 `requests` 的各种函数参数。
 
 [详细文档](https://www.starlette.io/testclient/)
 
