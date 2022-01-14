@@ -16,7 +16,7 @@ from pol.services.rev_service.character_rev import character_rev_type_filters
 person_revisions_api_prefix = "/v0/revisions/persons"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_person_revisions_basic(
     client: TestClient,
     db_session: Session,
@@ -39,7 +39,7 @@ def test_person_revisions_basic(
         assert "nickname" in item["creator"]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_person_revisions_offset(
     client: TestClient,
     db_session: Session,
@@ -67,7 +67,7 @@ def test_person_revisions_offset(
     assert res["offset"] == offset
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_person_revisions_offset_limit(
     client: TestClient,
     db_session: Session,
@@ -87,7 +87,7 @@ def test_person_revisions_offset_limit(
 character_revisions_api_prefix = "/v0/revisions/characters"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_character_revisions_basic(
     client: TestClient,
     db_session: Session,
@@ -108,7 +108,7 @@ def test_character_revisions_basic(
     assert res["data"]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_character_revisions_offset(
     client: TestClient,
     db_session: Session,
@@ -136,7 +136,7 @@ def test_character_revisions_offset(
     assert res["offset"] == offset
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_character_revisions_page_limit(
     client: TestClient,
     db_session: Session,
@@ -182,7 +182,7 @@ class MockUserService:
         )
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_subject_revisions_basic(client: TestClient):
     pol.server.app.dependency_overrides[UserService.new] = MockUserService
     response = client.get(subject_revisions_api_prefix, params={"subject_id": 26})
@@ -202,7 +202,7 @@ def test_subject_revisions_basic(client: TestClient):
             assert "nickname" in item["creator"]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_subject_revisions_offset(client: TestClient):
     offset = 1
     common_params = {"subject_id": 1}
@@ -222,7 +222,7 @@ def test_subject_revisions_offset(client: TestClient):
     assert res["offset"] == offset
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_subject_revisions_page_limit(
     client: TestClient,
 ):
@@ -236,7 +236,7 @@ def test_subject_revisions_page_limit(
 episode_revisions_api_prefix = "/v0/revisions/episodes"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_episode_revisions_basic(
     client: TestClient,
 ):
@@ -256,7 +256,7 @@ def test_episode_revisions_basic(
         assert "nickname" in item["creator"]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_episode_revisions_offset(
     client: TestClient,
 ):
@@ -278,7 +278,7 @@ def test_episode_revisions_offset(
     assert res["offset"] == offset
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_episode_revisions_page_limit(
     client: TestClient,
 ):

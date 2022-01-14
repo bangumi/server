@@ -9,7 +9,7 @@ from tests.conftest import MockUser
 person_revisions_api_prefix = "/v0/revisions/persons"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_person_revision_basic(
     client: TestClient,
     db_session: Session,
@@ -37,7 +37,7 @@ def test_person_revision_basic(
     assert res["data"]["348475"]["prsn_name"] == "森岡浩之"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_person_revision_not_found(client: TestClient):
     response = client.get(
         f"{person_revisions_api_prefix}/888888",
@@ -49,7 +49,7 @@ def test_person_revision_not_found(client: TestClient):
 character_revisions_api_prefix = "/v0/revisions/characters"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_character_revision_basic(
     client: TestClient,
     db_session: Session,
@@ -77,7 +77,7 @@ def test_character_revision_basic(
     assert res["data"]["1"]["crt_name"] == "ルルーシュ・ランペルージ"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_character_revision_not_found(client: TestClient):
     response = client.get(
         f"{character_revisions_api_prefix}/888888",
@@ -89,7 +89,7 @@ def test_character_revision_not_found(client: TestClient):
 subject_revisions_api_prefix = "/v0/revisions/subjects"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_subject_revision_basic(
     client: TestClient,
 ):
@@ -111,7 +111,7 @@ def test_subject_revision_basic(
     assert res["data"]["name"] == "第一次的親密接觸"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_subject_revision_not_found(client: TestClient):
     response = client.get(
         f"{subject_revisions_api_prefix}/888888",
@@ -120,7 +120,7 @@ def test_subject_revision_not_found(client: TestClient):
     assert response.headers["content-type"] == "application/json"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_subject_revision_amazon(client: TestClient):
     response = client.get(
         f"{subject_revisions_api_prefix}/194043",
@@ -143,7 +143,7 @@ def test_subject_revision_amazon(client: TestClient):
 episode_revisions_api_prefix = "/v0/revisions/episodes"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_episode_revision_basic(
     client: TestClient,
 ):
@@ -168,7 +168,7 @@ def test_episode_revision_basic(
     )
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database")
 def test_episode_revision_not_found(client: TestClient):
     response = client.get(
         f"{episode_revisions_api_prefix}/888888",

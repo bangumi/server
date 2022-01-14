@@ -1,6 +1,7 @@
 import os
 import threading
 
+import aioredis
 from loguru import logger
 from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker
@@ -69,7 +70,9 @@ async def global_404(request, exc: StarletteHTTPException):
 
 @app.on_event("startup")
 async def startup() -> None:
-    app.state.redis = await JSONRedis.from_url(config.REDIS_URI)
+    app.state.redis_pool = aioredis.ConnectionPool.from_url(config.REDIS_URI)
+
+    app.state.redis = JSONRedis(connection_pool=app.state.redis_pool)
     app.state.engine = engine = create_async_engine(
         "mysql+aiomysql://{}:{}@{}:{}/{}".format(
             config.MYSQL_USER,
@@ -91,7 +94,10 @@ async def startup() -> None:
 
 @app.on_event("shutdown")
 async def shutdown() -> None:
-    await app.state.redis.close()
+    r: JSONRedis = app.state.redis
+    pool: aioredis.ConnectionPool = app.state.redis_pool
+    await r.close()
+    await pool.disconnect()
     await app.state.engine.dispose()
 
 

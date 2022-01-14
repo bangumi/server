@@ -37,8 +37,8 @@ pre-commit install
 - `MYSQL_HOST` 默认 `127.0.0.1`
 - `MYSQL_PORT` 默认 `3306`
 - `MYSQL_DB` 默认 `bangumi`
-- `MYSQL_USER` **无默认值**
-- `MYSQL_PASS` **无默认值**
+- `MYSQL_USER` 默认 `user`
+- `MYSQL_PASS` 默认 `password`
 - `REDIS_URI` 默认 `redis://127.0.0.1:6379/0`
 
 你也可以把配置放在 `./env/dev` 文件中，如果在环境变量中找不到对应的值，会在这个文件中查找
@@ -91,14 +91,21 @@ watchgod scripts.dev.main
 ### 运行测试(需要数据库)
 
 ```shell
-pytest --e2e
+pytest --e2e --database --redis
 ```
 
-默认不运行 E2E 测试，使用 `--e2e` 参数运行 e2e 测试。
+默认的 `pytest` 命令仅会运行一些简单地单元测试，其他 flag 包括:
+
+- `--e2e` 允许 e2e 测试。
+- `--database` 允许需要 mysql 的测试。
+- `--redis` 允许需要 redis 的测试。
+
+如果一个测试同时需要 mysql 和 redis，需要同时提供 `--darabase` 和 `--redis` 选项参数才会运行。
 
 ### 编写测试
 
-参照 [tests/app/test_base_router.py](./tests/app/test_base_router.py) 文件。在测试函数中添加`client`参数获取对应的 HTTP 测试客户端。`client` 是一个 `requests.Session` 的实例，可以使用 `requests` 的各种函数参数。
+参照 [tests/app/test_base_router.py](./tests/app/test_base_router.py) 文件。在测试函数中添加`client`
+参数获取对应的 HTTP 测试客户端。`client` 是一个 `requests.Session` 的实例，可以使用 `requests` 的各种函数参数。
 
 [详细文档](https://www.starlette.io/testclient/)
 

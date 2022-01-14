@@ -4,14 +4,14 @@ from starlette.testclient import TestClient
 from pol.db.const import EpType
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episode_404(client: TestClient):
     response = client.get("/v0/episodes/10000000")
     assert response.status_code == 404
     assert response.headers["content-type"] == "application/json"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episode(client: TestClient):
     response = client.get("/v0/episodes/103234")
     assert response.status_code == 200
@@ -25,7 +25,7 @@ def test_episode(client: TestClient):
     assert "name" in data
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episode_nsfw_subject_404(client: TestClient):
     response = client.get("/v0/episodes/12")
     assert response.status_code == 404
@@ -33,7 +33,7 @@ def test_episode_nsfw_subject_404(client: TestClient):
     assert "cache-control" not in response.headers
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episode_nsfw_subject(client: TestClient, auth_header):
     response = client.get("/v0/episodes/12", headers=auth_header)
     assert response.status_code == 200
@@ -41,7 +41,7 @@ def test_episode_nsfw_subject(client: TestClient, auth_header):
     assert response.headers["cache-control"] == "no-store"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 253})
     assert response.status_code == 200
@@ -54,7 +54,7 @@ def test_episodes(client: TestClient):
             assert ep["ep"] == 0
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_offset_too_big(client: TestClient):
     """subject 8 has only 25 episode, offset must less than than total"""
     response = client.get("/v0/episodes", params={"subject_id": 8, "offset": 25})
@@ -62,7 +62,7 @@ def test_episodes_offset_too_big(client: TestClient):
     assert response.headers["content-type"] == "application/json"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_empty(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 1})
     assert response.status_code == 200
@@ -75,7 +75,7 @@ def test_episodes_empty(client: TestClient):
     assert not data["data"]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_404(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 1000000})
     assert response.status_code == 200
@@ -84,7 +84,7 @@ def test_episodes_404(client: TestClient):
     assert response.json()["total"] == 0
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_nsfw_non_auth(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 16})
     assert response.status_code == 200
@@ -93,7 +93,7 @@ def test_episodes_nsfw_non_auth(client: TestClient):
     assert response.json()["total"] == 0
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_nsfw_auth(client: TestClient, auth_header):
     response = client.get(
         "/v0/episodes",
@@ -104,7 +104,7 @@ def test_episodes_nsfw_auth(client: TestClient, auth_header):
     assert response.headers["content-type"] == "application/json"
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_offset(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 8, "offset": 3})
     assert response.status_code == 200
@@ -113,7 +113,7 @@ def test_episodes_offset(client: TestClient):
         assert ep["sort"] == ep["ep"]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_non_normal_offset(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": 253})
     assert response.status_code == 200
@@ -123,7 +123,7 @@ def test_episodes_non_normal_offset(client: TestClient):
             assert ep["ep"] == 0
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_start_non_1(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": "211567"})
     assert response.status_code == 200
@@ -133,7 +133,7 @@ def test_episodes_start_non_1(client: TestClient):
     assert [x["ep"] for x in res["data"]] == list(range(1, 1 + res["total"]))
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_start_non_offset(client: TestClient):
     response = client.get("/v0/episodes", params={"subject_id": "211567", "offset": 3})
     assert response.status_code == 200
@@ -149,7 +149,7 @@ def test_episodes_start_non_offset(client: TestClient):
     ]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episode_offset(client: TestClient):
     response = client.get("/v0/episodes/744210")
     assert response.status_code == 200
@@ -159,7 +159,7 @@ def test_episode_offset(client: TestClient):
     assert res["ep"] == 5
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episodes_ban(client: TestClient):
     """ep_id `1075445` is soft removed"""
     response = client.get("/v0/episodes", params={"subject_id": "363612"})
@@ -169,7 +169,7 @@ def test_episodes_ban(client: TestClient):
     assert not [x for x in res["data"] if x["id"] == 1275445]
 
 
-@pytest.mark.env("e2e")
+@pytest.mark.env("e2e", "database", "redis")
 def test_episode_ban(client: TestClient):
     """ep_id `1075445` is soft removed"""
     response = client.get("/v0/episodes/1275445")
