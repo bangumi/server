@@ -32,6 +32,7 @@ def pytest_addoption(parser):
     parser.addoption(
         "--database", action="store_true", help="Enable tests require database"
     )
+    parser.addoption("--redis", action="store_true", help="Enable tests require redis")
 
 
 def pytest_configure(config):

@@ -4,13 +4,14 @@ import pytest
 from sqlalchemy.orm import Session
 
 from pol.db import sa
+from tests.base import async_test
 from pol.db.tables import ChiiMember
 from tests.conftest import MockUser
 from pol.services.user_service import UserService
 
 
 @pytest.mark.env("database")
-@pytest.mark.asyncio()
+@async_test
 async def test_auth_expired_token(mock_user: MockUser, AsyncSessionMaker):
     mock_user(
         access_token="ttt",
@@ -24,7 +25,7 @@ async def test_auth_expired_token(mock_user: MockUser, AsyncSessionMaker):
 
 
 @pytest.mark.env("database")
-@pytest.mark.asyncio()
+@async_test
 async def test_auth_missing_user(
     mock_user: MockUser,
     db_session: Session,
