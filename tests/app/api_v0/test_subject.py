@@ -5,7 +5,8 @@ from redis import Redis
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
-from pol import sa, config
+from pol import config
+from pol.db import sa
 from pol.db.tables import ChiiSubjectField
 
 fixtures_path = Path(__file__).parent.joinpath("fixtures")

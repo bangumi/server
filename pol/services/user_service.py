@@ -5,7 +5,7 @@ from loguru import logger
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import sa
+from pol.db import sa
 from pol.models import User, Avatar, PublicUser
 from pol.depends import get_db
 from pol.db.tables import ChiiMember, ChiiOauthAccessToken
@@ -46,10 +46,10 @@ class UserService:
             avatar=Avatar.from_db_record(u.avatar),
         )
 
-    async def get_users_by_id(self, *id: int) -> Dict[int, PublicUser]:
+    async def get_users_by_id(self, ids: Iterator[int]) -> Dict[int, PublicUser]:
         """return a public readable user with limited information"""
         results: Iterator[ChiiMember] = await self._db.scalars(
-            sa.select(ChiiMember).where(ChiiMember.uid.in_(id))
+            sa.select(ChiiMember).where(ChiiMember.uid.in_(ids))
         )
 
         return {

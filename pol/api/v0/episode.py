@@ -5,7 +5,8 @@ from fastapi import Query, Depends, APIRouter
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import sa, res
+from pol import res
+from pol.db import sa
 from pol.res import ErrorDetail, not_found_exception
 from pol.router import ErrorCatchRoute
 from pol.curd.ep import Ep

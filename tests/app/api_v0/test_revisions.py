@@ -93,8 +93,7 @@ def test_character_revisions_basic(
     assert res["total"]
     assert res["offset"] == 0
     assert "limit" in res
-    for item in res["data"]:
-        assert "nickname" in item["creator"]
+    assert res["data"]
 
 
 def test_character_revisions_offset(

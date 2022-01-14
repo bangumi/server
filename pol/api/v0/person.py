@@ -4,7 +4,8 @@ from fastapi import Path, Depends, APIRouter
 from starlette.responses import Response, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import sa, res, wiki
+from pol import res, wiki
+from pol.db import sa
 from pol.res import ErrorDetail, not_found_exception
 from pol.config import CACHE_KEY_PREFIX
 from pol.router import ErrorCatchRoute
