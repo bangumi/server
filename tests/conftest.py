@@ -9,6 +9,7 @@ import redis
 import pytest
 from _pytest.nodes import Node
 from sqlalchemy.orm import Session, sessionmaker
+from starlette.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 import pol.server
