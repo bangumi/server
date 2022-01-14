@@ -33,7 +33,7 @@ jobs:
       - run: bash $HOME/dev-env/wait_mysql_ready.sh
 
       - name: test
-        run: coverage run -m pytest -vv --e2e
+        run: coverage run -m pytest -vv --e2e --database
         env:
           MYSQL_HOST: 127.0.0.1
           MYSQL_PORT: "3306"
