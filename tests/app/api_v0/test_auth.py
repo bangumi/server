@@ -6,7 +6,8 @@ from aioredis import Redis
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
-from pol import sa, config
+from pol import config
+from pol.db import sa
 from pol.models import User, Avatar
 from pol.db.tables import ChiiMember
 from pol.permission import UserGroup

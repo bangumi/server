@@ -4,7 +4,7 @@ from typing import Dict, Iterator, Optional
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import sa
+from pol.db import sa
 from pol.depends import get_db
 from pol.db.tables import ChiiSubject
 from pol.models.subject import Subject

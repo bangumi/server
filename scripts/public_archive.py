@@ -11,7 +11,7 @@ import orjson
 from loguru import logger
 from sqlalchemy.orm import Session
 
-from pol import sa
+from pol.db import sa
 from pol.db.tables import (
     ChiiPerson,
     ChiiEpisode,

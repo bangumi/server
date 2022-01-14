@@ -2,7 +2,7 @@ from typing import Type, TypeVar, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import sa
+from pol.db import sa
 from pol.db.tables import Base
 from .exceptions import NotFoundError
 

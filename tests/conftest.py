@@ -7,7 +7,8 @@ import redis
 import pytest
 from sqlalchemy.orm import Session
 
-from pol import sa, config
+from pol import config
+from pol.db import sa
 from pol.db.const import Gender, BloodType, PersonType, SubjectType, CollectionType
 from pol.db.tables import (
     ChiiMember,

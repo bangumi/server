@@ -2,6 +2,7 @@ import enum
 from typing import Dict, NamedTuple
 
 from pol.db._const import (
+    Staff,
     staff_job_book,
     staff_job_game,
     staff_job_real,
@@ -106,7 +107,7 @@ class SubjectType(IntEnum):
         raise ValueError(f"unexpected SubjectType {self}")
 
 
-StaffMap = {
+StaffMap: Dict[int, Dict[int, Staff]] = {
     SubjectType.book: staff_job_book,
     SubjectType.anime: staff_job_anime,
     SubjectType.music: staff_job_music,
@@ -225,7 +226,7 @@ RELATION_REVERSE_MAP = {
     },
 }
 
-RELATION_MAP: Dict[SubjectType, Dict[int, Relation]] = {
+RELATION_MAP: Dict[int, Dict[int, Relation]] = {
     SubjectType.book: RELATION_BOOK,
     SubjectType.anime: RELATION_SERIES,
     SubjectType.music: RELATION_MUSIC,
@@ -243,7 +244,7 @@ class Platform(NamedTuple):
     enable_header: bool = False
 
 
-PLATFORM_MAP = {
+PLATFORM_MAP: Dict[int, Dict[int, dict]] = {
     SubjectType.music: {},
     SubjectType.book: {
         0: {
