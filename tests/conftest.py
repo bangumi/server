@@ -123,10 +123,10 @@ access_token = "a_development_access_token"
 
 
 @pytest.fixture()
-def client():
-    with TestClient(pol.server.app) as test_client:
+def client(app):
+    with TestClient(app) as test_client:
         yield test_client
-    pol.server.app.dependency_overrides = {}
+    app.dependency_overrides = {}
 
 
 @pytest.fixture()
