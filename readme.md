@@ -96,7 +96,6 @@ pytest --e2e
 
 默认不运行 E2E 测试，使用 `--e2e` 参数运行 e2e 测试。
 
-
 ### 编写测试
 
 参照 [tests/app/test_base_router.py](./tests/app/test_base_router.py) 文件。在测试函数中添加`client`参数获取对应的 HTTP 测试客户端。`client` 是一个 `requests.Session` 的实例，可以使用 `requests` 的各种函数参数。
