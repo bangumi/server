@@ -1,6 +1,7 @@
 # TODO: split E2E test to unit test
 from typing import Dict, Iterator
 
+import pytest
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
@@ -15,6 +16,7 @@ from pol.services.rev_service.character_rev import character_rev_type_filters
 person_revisions_api_prefix = "/v0/revisions/persons"
 
 
+@pytest.mark.env("e2e")
 def test_person_revisions_basic(
     client: TestClient,
     db_session: Session,
@@ -37,6 +39,7 @@ def test_person_revisions_basic(
         assert "nickname" in item["creator"]
 
 
+@pytest.mark.env("e2e")
 def test_person_revisions_offset(
     client: TestClient,
     db_session: Session,
@@ -64,6 +67,7 @@ def test_person_revisions_offset(
     assert res["offset"] == offset
 
 
+@pytest.mark.env("e2e")
 def test_person_revisions_offset_limit(
     client: TestClient,
     db_session: Session,
@@ -83,6 +87,7 @@ def test_person_revisions_offset_limit(
 character_revisions_api_prefix = "/v0/revisions/characters"
 
 
+@pytest.mark.env("e2e")
 def test_character_revisions_basic(
     client: TestClient,
     db_session: Session,
@@ -103,6 +108,7 @@ def test_character_revisions_basic(
     assert res["data"]
 
 
+@pytest.mark.env("e2e")
 def test_character_revisions_offset(
     client: TestClient,
     db_session: Session,
@@ -130,6 +136,7 @@ def test_character_revisions_offset(
     assert res["offset"] == offset
 
 
+@pytest.mark.env("e2e")
 def test_character_revisions_page_limit(
     client: TestClient,
     db_session: Session,
@@ -141,7 +148,7 @@ def test_character_revisions_page_limit(
         mock_user(r.rev_creator)
     offset = 30000
     response = client.get(
-        character_revisions_api_prefix, params={"charater_id": 1, "offset": offset}
+        character_revisions_api_prefix, params={"character_id": 1, "offset": offset}
     )
     assert response.status_code == 422, response.text
 
@@ -175,6 +182,7 @@ class MockUserService:
         )
 
 
+@pytest.mark.env("e2e")
 def test_subject_revisions_basic(client: TestClient):
     pol.server.app.dependency_overrides[UserService.new] = MockUserService
     response = client.get(subject_revisions_api_prefix, params={"subject_id": 26})
@@ -194,6 +202,7 @@ def test_subject_revisions_basic(client: TestClient):
             assert "nickname" in item["creator"]
 
 
+@pytest.mark.env("e2e")
 def test_subject_revisions_offset(client: TestClient):
     offset = 1
     common_params = {"subject_id": 1}
@@ -213,6 +222,7 @@ def test_subject_revisions_offset(client: TestClient):
     assert res["offset"] == offset
 
 
+@pytest.mark.env("e2e")
 def test_subject_revisions_page_limit(
     client: TestClient,
 ):
@@ -226,6 +236,7 @@ def test_subject_revisions_page_limit(
 episode_revisions_api_prefix = "/v0/revisions/episodes"
 
 
+@pytest.mark.env("e2e")
 def test_episode_revisions_basic(
     client: TestClient,
 ):
@@ -245,6 +256,7 @@ def test_episode_revisions_basic(
         assert "nickname" in item["creator"]
 
 
+@pytest.mark.env("e2e")
 def test_episode_revisions_offset(
     client: TestClient,
 ):
@@ -266,6 +278,7 @@ def test_episode_revisions_offset(
     assert res["offset"] == offset
 
 
+@pytest.mark.env("e2e")
 def test_episode_revisions_page_limit(
     client: TestClient,
 ):
