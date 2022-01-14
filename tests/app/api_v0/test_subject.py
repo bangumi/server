@@ -20,7 +20,6 @@ def test_subject_not_found(client: TestClient):
     assert response.headers["content-type"] == "application/json"
 
 
-@pytest.mark.env("e2e")
 def test_subject_not_valid(client: TestClient):
     response = client.get("/v0/subjects/hello")
     assert response.status_code == 422

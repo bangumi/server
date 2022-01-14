@@ -148,7 +148,7 @@ def test_character_revisions_page_limit(
         mock_user(r.rev_creator)
     offset = 30000
     response = client.get(
-        character_revisions_api_prefix, params={"charater_id": 1, "offset": offset}
+        character_revisions_api_prefix, params={"character_id": 1, "offset": offset}
     )
     assert response.status_code == 422, response.text
 
