@@ -1,7 +1,7 @@
 from pathlib import Path
 
+import orjson
 import pytest
-import orjson.orjson
 from redis import Redis
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient

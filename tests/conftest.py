@@ -1,13 +1,17 @@
 from abc import abstractmethod
 from typing import Protocol, Generator
 from datetime import datetime
+from unittest import mock
+from contextlib import asynccontextmanager
 from collections import defaultdict
 
 import redis
 import pytest
 from _pytest.nodes import Node
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
+import pol.server
 from pol import config
 from pol.db import sa
 from pol.db.const import Gender, BloodType, PersonType, SubjectType, CollectionType
@@ -24,13 +28,16 @@ from pol.db.tables import (
 
 def pytest_addoption(parser):
     parser.addoption("--e2e", action="store_true", help="Run E2E tests")
+    parser.addoption(
+        "--database", action="store_true", help="Enable tests require database"
+    )
 
 
 def pytest_configure(config):
     # register an additional marker
     config.addinivalue_line(
         "markers",
-        "env(name): mark test to run only on named environment",
+        "env(name1, ...name2): mark test to run only on named environment",
     )
 
 
@@ -47,6 +54,19 @@ DBSession = sa.sync_session_maker()
 
 
 @pytest.fixture()
+def app():
+    return pol.server.app
+
+
+@pytest.fixture()
+def mock_redis():
+    r = mock.Mock()
+    r.set_json = mock.AsyncMock()
+    r.get = mock.AsyncMock(return_value=None)
+    return r
+
+
+@pytest.fixture()
 def db_session():
     db_session = DBSession()
     try:
@@ -58,6 +78,35 @@ def db_session():
         db_session.close()
 
 
+@pytest.fixture()
+def AsyncSessionMaker():
+    @asynccontextmanager
+    async def get():
+        engine = create_async_engine(
+            "mysql+aiomysql://{}:{}@{}:{}/{}".format(
+                config.MYSQL_USER,
+                config.MYSQL_PASS,
+                config.MYSQL_HOST,
+                config.MYSQL_PORT,
+                config.MYSQL_DB,
+            ),
+            pool_recycle=14400,
+            pool_size=10,
+            max_overflow=20,
+        )
+
+        SS = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+
+        async with SS() as s:
+            yield s
+
+        # ensure to dispose the engine after usage.
+        # otherwise asyncio will raise a RuntimeError
+        await engine.dispose()
+
+    return get
+
+
 @pytest.fixture(autouse=True)
 def redis_client():
     with redis.Redis.from_url(config.REDIS_URI) as redis_client:
@@ -66,6 +115,21 @@ def redis_client():
             yield redis_client
         finally:
             redis_client.flushdb()
+
+
+access_token = "a_development_access_token"
+
+
+@pytest.fixture()
+def client():
+    with TestClient(pol.server.app) as test_client:
+        yield test_client
+    pol.server.app.dependency_overrides = {}
+
+
+@pytest.fixture()
+def auth_header():
+    return {"Authorization": f"Bearer {access_token}"}
 
 
 @pytest.fixture()

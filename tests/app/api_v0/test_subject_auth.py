@@ -1,5 +1,5 @@
+import orjson
 import pytest
-import orjson.orjson
 from redis import Redis
 from starlette.testclient import TestClient
 
