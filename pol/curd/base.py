@@ -2,8 +2,8 @@ from typing import Type, TypeVar, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from pol.db import sa
 from pol.db.tables import Base
-from ..db import sa
 from .exceptions import NotFoundError
 
 T = TypeVar("T", bound=Base)

@@ -91,7 +91,9 @@ class UserService:
         if not access:
             raise self.NotFoundError
 
-        member: ChiiMember = await self._db.get(ChiiMember, int(access.user_id))
+        member: Optional[ChiiMember] = await self._db.get(
+            ChiiMember, int(access.user_id)
+        )
 
         if not member:
             # 有access token又没有对应的user不太可能发生，如果发生的话打个 log 当作验证失败

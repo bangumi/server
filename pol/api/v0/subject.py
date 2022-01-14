@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import Path, Depends, APIRouter
 from starlette.responses import Response
@@ -109,9 +109,13 @@ async def _get_subject(
         raise res.HTTPRedirect(f"{api_base}/{s.redirect}")
 
     # TODO: split these part to another service handler community function
-    subject: ChiiSubject = await db.get(
+    subject: Optional[ChiiSubject] = await db.get(
         ChiiSubject, subject_id, options=[sa.joinedload(ChiiSubject.fields)]
     )
+
+    if not subject:
+        cache_control(300)
+        raise not_found
 
     if not subject.subject_nsfw:
         cache_control(300)

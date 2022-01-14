@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Type, Optional
+from typing import Any, List, Type, Iterator, Optional
 
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -77,7 +77,7 @@ class _PersonRevisionService:
             .offset(offset)
         )
 
-        results: List[ChiiRevHistory] = await self._db.scalars(query)
+        results: Iterator[ChiiRevHistory] = await self._db.scalars(query)
 
         return [
             PersonHistory(
