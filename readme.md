@@ -91,8 +91,11 @@ watchgod scripts.dev.main
 ### 运行测试(需要数据库)
 
 ```shell
-pytest
+pytest --e2e
 ```
+
+默认不运行 E2E 测试，使用 `--e2e` 参数运行 e2e 测试。
+
 
 ### 编写测试
 

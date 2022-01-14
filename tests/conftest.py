@@ -5,6 +5,7 @@ from collections import defaultdict
 
 import redis
 import pytest
+from _pytest.nodes import Node
 from sqlalchemy.orm import Session
 
 from pol import config
@@ -19,6 +20,28 @@ from pol.db.tables import (
     ChiiSubjectInterest,
     ChiiOauthAccessToken,
 )
+
+
+def pytest_addoption(parser):
+    parser.addoption("--e2e", action="store_true", help="Run E2E tests")
+
+
+def pytest_configure(config):
+    # register an additional marker
+    config.addinivalue_line(
+        "markers",
+        "env(name): mark test to run only on named environment",
+    )
+
+
+def pytest_runtest_setup(item: Node):
+    mark = item.get_closest_marker(name="env")
+    if not mark:
+        return
+    for name in mark.args:
+        if not item.config.getoption(name):
+            pytest.skip(f"test skipped without flag --{name}")
+
 
 DBSession = sa.sync_session_maker()
 

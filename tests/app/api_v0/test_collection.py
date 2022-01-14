@@ -1,15 +1,18 @@
+import pytest
 from starlette.testclient import TestClient
 
 from pol.db.const import SubjectType, CollectionType
 from tests.conftest import MockUser
 
 
+@pytest.mark.env("e2e")
 def test_collection_not_found(client: TestClient):
     response = client.get("/v0/users/2000000/collections")
     assert response.status_code == 404
     assert response.headers["content-type"] == "application/json"
 
 
+@pytest.mark.env("e2e")
 def test_collection_public(client: TestClient, mock_user_collection):
     mock_user_collection(id=1, user_id=382951, subject_id=1, private=True)
     response = client.get("/v0/users/382951/collections")
@@ -19,6 +22,7 @@ def test_collection_public(client: TestClient, mock_user_collection):
     assert len(response.json()["data"]) == 5
 
 
+@pytest.mark.env("e2e")
 def test_collection_private(client: TestClient, auth_header, mock_user_collection):
     mock_user_collection(id=1, user_id=382951, subject_id=1, private=False)
     response = client.get("/v0/users/382951/collections", headers=auth_header)
@@ -28,6 +32,7 @@ def test_collection_private(client: TestClient, auth_header, mock_user_collectio
     assert len(response.json()["data"]) == 6
 
 
+@pytest.mark.env("e2e")
 def test_collection_username(
     client: TestClient,
     auth_header,
@@ -43,6 +48,7 @@ def test_collection_username(
     assert len(response.json()["data"]) == 1
 
 
+@pytest.mark.env("e2e")
 def test_collection_filter_subject(
     client: TestClient, auth_header, mock_user_collection
 ):
@@ -65,6 +71,7 @@ def test_collection_filter_subject(
     assert not [x for x in response.json()["data"] if x["subject_type"] != 2]
 
 
+@pytest.mark.env("e2e")
 def test_collection_filter_type(client: TestClient, auth_header, mock_user_collection):
     mock_user_collection(
         id=1,

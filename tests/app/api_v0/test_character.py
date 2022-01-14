@@ -1,17 +1,20 @@
 import json
 
 import redis
+import pytest
 from starlette.testclient import TestClient
 
 from pol.config import CACHE_KEY_PREFIX
 
 
+@pytest.mark.env("e2e")
 def test_character_not_found(client: TestClient):
     response = client.get("/v0/characters/2000000")
     assert response.status_code == 404
     assert response.headers["content-type"] == "application/json"
 
 
+@pytest.mark.env("e2e")
 def test_character_not_valid(client: TestClient):
     response = client.get("/v0/characters/hello")
     assert response.status_code == 422
@@ -22,6 +25,7 @@ def test_character_not_valid(client: TestClient):
     assert response.headers["content-type"] == "application/json"
 
 
+@pytest.mark.env("e2e")
 def test_character_basic(client: TestClient):
     response = client.get("/v0/characters/2")
     assert response.status_code == 200
@@ -31,6 +35,7 @@ def test_character_basic(client: TestClient):
     assert not data["locked"]
 
 
+@pytest.mark.env("e2e")
 def test_character_locked(client: TestClient):
     response = client.get("/v0/characters/9")
     assert response.status_code == 200
@@ -40,11 +45,13 @@ def test_character_locked(client: TestClient):
     assert data["locked"]
 
 
+@pytest.mark.env("e2e")
 def test_character_ban_404(client: TestClient):
     response = client.get("/v0/characters/6")
     assert response.status_code == 404
 
 
+@pytest.mark.env("e2e")
 def test_character_cache(client: TestClient, redis_client: redis.Redis):
     response = client.get("/v0/characters/1")
     assert response.status_code == 200
@@ -75,6 +82,7 @@ def test_character_cache(client: TestClient, redis_client: redis.Redis):
     assert res["name"] == "n"
 
 
+@pytest.mark.env("e2e")
 def test_character_subjects(client: TestClient):
     response = client.get("/v0/characters/1/subjects")
     assert response.status_code == 200
@@ -90,17 +98,20 @@ def test_character_subjects(client: TestClient):
     }
 
 
+@pytest.mark.env("e2e")
 def test_character_subjects_ban(client: TestClient):
     response = client.get("/v0/characters/55/subjects", allow_redirects=False)
     assert response.status_code == 404
 
 
+@pytest.mark.env("e2e")
 def test_character_redirect(client: TestClient):
     response = client.get("/v0/characters/55", allow_redirects=False)
     assert response.status_code == 307
     assert response.headers["location"] == "/v0/characters/52"
 
 
+@pytest.mark.env("e2e")
 def test_character_lock(client: TestClient):
     response = client.get("/v0/characters/9")
     assert response.status_code == 200
@@ -110,6 +121,7 @@ def test_character_lock(client: TestClient):
     assert res["locked"]
 
 
+@pytest.mark.env("e2e")
 def test_character_persons(client: TestClient, mock_person):
     mock_person(3818, "福山潤")
     response = client.get("/v0/characters/1/persons")

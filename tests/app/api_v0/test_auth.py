@@ -2,6 +2,7 @@ import datetime
 from datetime import timedelta
 
 import orjson
+import pytest
 from aioredis import Redis
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
@@ -16,12 +17,14 @@ from tests.conftest import MockUser
 access_token = "a_development_access_token"
 
 
+@pytest.mark.env("e2e")
 def test_auth_200(client: TestClient, auth_header):
     response = client.get("/v0/me", headers=auth_header)
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
 
 
+@pytest.mark.env("e2e")
 def test_auth_403(client: TestClient):
     response = client.get("/v0/me", headers={"Authorization": "Bearer "})
     assert response.status_code == 403, "no token"
@@ -30,11 +33,13 @@ def test_auth_403(client: TestClient):
     assert response.status_code == 403, "no token"
 
 
+@pytest.mark.env("e2e")
 def test_auth_403_wrong_token(client: TestClient):
     response = client.get("/v0/me", headers={"Authorization": "Bearer 1"})
     assert response.status_code == 403, "no token"
 
 
+@pytest.mark.env("e2e")
 def test_auth_cached(client: TestClient, redis_client: Redis):
     cache_key = config.CACHE_KEY_PREFIX + "access:1"
     u = User(
@@ -54,6 +59,7 @@ def test_auth_cached(client: TestClient, redis_client: Redis):
     )
 
 
+@pytest.mark.env("e2e")
 def test_auth_cache_ban_cache_fallback(client: TestClient, redis_client: Redis):
     cache_key = config.CACHE_KEY_PREFIX + f"access:{access_token}"
     redis_client.set(
@@ -70,6 +76,7 @@ def test_auth_cache_ban_cache_fallback(client: TestClient, redis_client: Redis):
     assert response.status_code == 200, "error cache should callback to db lookup"
 
 
+@pytest.mark.env("e2e")
 def test_auth_expired_token(
     client: TestClient,
     mock_user: MockUser,
@@ -83,6 +90,7 @@ def test_auth_expired_token(
     assert response.status_code == 403, "expired should not working"
 
 
+@pytest.mark.env("e2e")
 def test_auth_missing_user(
     client: TestClient,
     mock_user: MockUser,
