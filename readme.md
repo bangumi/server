@@ -94,8 +94,13 @@ watchgod scripts.dev.main
 pytest --e2e --database --redis
 ```
 
-默认不运行 E2E 和需要数据库的测试，使用 `--e2e` 允许 e2e 测试。 使用 `--database` 允许需要数据库的测试。 使用 `--redis` 允许需要
-redis 的测试。
+默认的 `pytest` 命令仅会运行一些简单地单元测试，其他 flag 包括:
+
+- `--e2e` 允许 e2e 测试。
+- `--database` 允许需要 mysql 的测试。
+- `--redis` 允许需要 redis 的测试。
+
+如果一个测试同时需要 mysql 和 redis，需要同时提供 `--darabase` 和 `--redis` 选项参数才会运行。
 
 ### 编写测试
 
