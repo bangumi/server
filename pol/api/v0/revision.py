@@ -1,16 +1,10 @@
-from typing import Any, List
-
 from loguru import logger
 from fastapi import Path, Query, Depends, APIRouter
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import res, curd
-from pol.db import sa
+from pol import res
 from pol.res import ErrorDetail, not_found_exception
 from pol.router import ErrorCatchRoute
-from pol.depends import get_db
 from pol.db.const import RevisionType
-from pol.db.tables import ChiiMember, ChiiRevText, ChiiRevHistory, ChiiSubjectRevision
 from pol.api.v0.models import Paged, Pager
 from pol.curd.exceptions import NotFoundError
 from pol.http_cache.depends import CacheControl
@@ -20,80 +14,6 @@ from pol.api.v0.models.revision import Revision, DetailedRevision
 
 router = APIRouter(prefix="/revisions", tags=["编辑历史"], route_class=ErrorCatchRoute)
 
-person_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.person_rev_types())
-
-character_rev_type_filters = ChiiRevHistory.rev_type.in_(
-    RevisionType.character_rev_types()
-)
-
-subject_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.subject_rev_types())
-
-episode_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.episode_rev_types())
-
-
-async def get_revisions(
-    db: AsyncSession,
-    user_service: UserService,
-    filters: List[Any],
-    page: Pager,
-):
-    total = await curd.count(db, ChiiRevHistory.rev_id, *filters)
-
-    page.check(total)
-
-    query = (
-        sa.select(ChiiRevHistory)
-        .where(*filters)
-        .order_by(ChiiRevHistory.rev_id.desc())
-        .limit(page.limit)
-        .offset(page.offset)
-    )
-
-    results: List[ChiiRevHistory] = list(await db.scalars(query))
-
-    users = await user_service.get_users_by_id(x.rev_creator for x in results)
-
-    revisions = [
-        {
-            "id": r.rev_id,
-            "type": r.rev_type,
-            "created_at": r.rev_dateline,
-            "summary": r.rev_edit_summary,
-            "creator": users.get(r.rev_creator),
-        }
-        for r in results
-    ]
-    return {
-        "limit": page.limit,
-        "offset": page.offset,
-        "data": revisions,
-        "total": total,
-    }
-
-
-async def get_revision(
-    db: AsyncSession,
-    user_service: UserService,
-    filters: List[Any],
-):
-    r = await db.scalar(sa.get(ChiiRevHistory, *filters))
-    if not r:
-        raise NotFoundError
-
-    text_item = await db.get(ChiiRevText, r.rev_text_id)
-    if not text_item:
-        raise NotFoundError
-    user = await user_service.get_by_uid(r.rev_creator)
-
-    return {
-        "id": r.rev_id,
-        "type": r.rev_type,
-        "created_at": r.rev_dateline,
-        "summary": r.rev_edit_summary,
-        "data": text_item.rev_text,
-        "creator": user,
-    }
-
 
 @router.get(
     "/persons",
@@ -101,22 +21,39 @@ async def get_revision(
     response_model_exclude_unset=True,
 )
 async def get_person_revisions(
-    person_id: int = 0,
-    db: AsyncSession = Depends(get_db),
+    person_id: int = Query(..., gt=0),
+    rev_service: RevisionService = Depends(RevisionService.new),
     user_service: UserService = Depends(UserService.new),
     page: Pager = Depends(),
     cache_control: CacheControl = Depends(CacheControl),
 ):
     cache_control(300)
-    filters = [person_rev_type_filters]
-    if person_id > 0:
-        filters.append(ChiiRevHistory.rev_mid == person_id)
-    return await get_revisions(
-        db,
-        user_service,
-        filters,
-        page,
+    total = await rev_service.count_person_history(person_id)
+    page.check(total)
+
+    results = await rev_service.list_person_history(
+        person_id, limit=page.limit, offset=page.offset
     )
+
+    users = await user_service.get_users_by_id(x.creator_id for x in results)
+
+    revisions = [
+        {
+            "id": r.id,
+            "type": r.type,
+            "created_at": r.created_at,
+            "summary": r.summary,
+            "creator": users[r.creator_id],
+        }
+        for r in results
+    ]
+
+    return {
+        "limit": page.limit,
+        "offset": page.offset,
+        "data": revisions,
+        "total": total,
+    }
 
 
 @router.get(
@@ -128,21 +65,34 @@ async def get_person_revisions(
     },
 )
 async def get_person_revision(
-    db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
+    rev_service: RevisionService = Depends(RevisionService.new),
     user_service: UserService = Depends(UserService.new),
     cache_control: CacheControl = Depends(CacheControl),
     not_found: res.HTTPException = Depends(not_found_exception),
 ):
     cache_control(300)
     try:
-        return await get_revision(
-            db,
-            user_service,
-            [ChiiRevHistory.rev_id == revision_id, person_rev_type_filters],
-        )
-    except NotFoundError:
+        rev = await rev_service.get_person_history(revision_id)
+    except RevisionService.NotFoundError:
         raise not_found
+    try:
+        user = await user_service.get_by_uid(rev.creator_id)
+    except UserService.NotFoundError:
+        logger.error(
+            "can't find user {uid} for revision {rev_id}",
+            uid=rev.creator_id,
+            rev_id=revision_id,
+        )
+        raise ValueError("can't find user")
+    return {
+        "id": revision_id,
+        "type": rev.type,
+        "creator": user,
+        "summary": rev.summary,
+        "created_at": rev.created_at,
+        "data": rev.data,
+    }
 
 
 @router.get(
@@ -151,22 +101,39 @@ async def get_person_revision(
     response_model_exclude_unset=True,
 )
 async def get_character_revisions(
-    character_id: int = 0,
-    db: AsyncSession = Depends(get_db),
+    character_id: int = Query(..., gt=0),
+    rev_service: RevisionService = Depends(RevisionService.new),
     user_service: UserService = Depends(UserService.new),
     page: Pager = Depends(),
     cache_control: CacheControl = Depends(CacheControl),
 ):
     cache_control(300)
-    filters = [character_rev_type_filters]
-    if character_id > 0:
-        filters.append(ChiiRevHistory.rev_mid == character_id)
-    return await get_revisions(
-        db,
-        user_service,
-        filters,
-        page,
+    total = await rev_service.count_character_history(character_id)
+    page.check(total)
+
+    results = await rev_service.list_character_history(
+        character_id, limit=page.limit, offset=page.offset
     )
+
+    users = await user_service.get_users_by_id(x.creator_id for x in results)
+
+    revisions = [
+        {
+            "id": r.id,
+            "type": r.type,
+            "created_at": r.created_at,
+            "summary": r.summary,
+            "creator": users[r.creator_id],
+        }
+        for r in results
+    ]
+
+    return {
+        "limit": page.limit,
+        "offset": page.offset,
+        "data": revisions,
+        "total": total,
+    }
 
 
 @router.get(
@@ -178,21 +145,34 @@ async def get_character_revisions(
     },
 )
 async def get_character_revision(
-    db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
+    rev_service: RevisionService = Depends(RevisionService.new),
     user_service: UserService = Depends(UserService.new),
     cache_control: CacheControl = Depends(CacheControl),
     not_found: res.HTTPException = Depends(not_found_exception),
 ):
     cache_control(300)
     try:
-        return await get_revision(
-            db,
-            user_service,
-            [ChiiRevHistory.rev_id == revision_id, character_rev_type_filters],
-        )
-    except NotFoundError:
+        rev = await rev_service.get_character_history(revision_id)
+    except RevisionService.NotFoundError:
         raise not_found
+    try:
+        user = await user_service.get_by_uid(rev.creator_id)
+    except UserService.NotFoundError:
+        logger.error(
+            "can't find user {uid} for revision {rev_id}",
+            uid=rev.creator_id,
+            rev_id=revision_id,
+        )
+        raise ValueError("can't find user")
+    return {
+        "id": revision_id,
+        "type": rev.type,
+        "creator": user,
+        "summary": rev.summary,
+        "created_at": rev.created_at,
+        "data": rev.data,
+    }
 
 
 @router.get(
@@ -201,54 +181,37 @@ async def get_character_revision(
     response_model_exclude_unset=True,
 )
 async def get_subject_revisions(
-    subject_id: int = 0,
-    db: AsyncSession = Depends(get_db),
+    subject_id: int = Query(..., gt=0),
+    rev_service: RevisionService = Depends(RevisionService.new),
+    user_service: UserService = Depends(UserService.new),
     page: Pager = Depends(),
     cache_control: CacheControl = Depends(CacheControl),
 ):
     cache_control(300)
 
-    filters = []
-    if subject_id > 0:
-        filters.append(ChiiSubjectRevision.rev_subject_id == subject_id)
-    total = await curd.count(db, ChiiSubjectRevision.rev_subject_id, *filters)
+    total = await rev_service.count_subject_history(subject_id)
+
     page.check(total)
 
-    query = (
-        sa.select(
-            ChiiSubjectRevision.rev_id.label("rev_id"),
-            ChiiSubjectRevision.rev_type,
-            ChiiSubjectRevision.rev_creator,
-            ChiiSubjectRevision.rev_dateline,
-            ChiiSubjectRevision.rev_edit_summary,
-            ChiiMember.username,
-            ChiiMember.nickname,
-        )
-        .outerjoin(
-            ChiiMember,
-            ChiiSubjectRevision.rev_creator == ChiiMember.uid,
-        )
-        .where(*filters)
-        .order_by(ChiiSubjectRevision.rev_dateline.desc())
-        .limit(page.limit)
-        .offset(page.offset)
+    results = await rev_service.list_subject_history(
+        subject_id, offset=page.offset, limit=page.limit
+    )
+
+    users = await user_service.get_users_by_id(
+        x.creator_id for x in results if x.creator_id > 0
     )
 
     revisions = [
         {
-            "id": r["rev_id"],
-            "type": r["rev_type"],
-            "created_at": r["rev_dateline"],
-            "summary": r["rev_edit_summary"],
-            "creator": {
-                "username": r["username"],
-                "nickname": r["nickname"],
-            }
-            if r["username"]
-            else None,
+            "id": r.id,
+            "type": r.type,
+            "created_at": r.created_at,
+            "summary": r.summary,
+            "creator": users[r.creator_id] if r.creator_id else None,
         }
-        for r in (await db.execute(query)).mappings().fetchall()
+        for r in results
     ]
+
     return {
         "limit": page.limit,
         "offset": page.offset,
@@ -266,46 +229,38 @@ async def get_subject_revisions(
     },
 )
 async def get_subject_revision(
-    db: AsyncSession = Depends(get_db),
     revision_id: int = Path(..., gt=0),
+    rev_service: RevisionService = Depends(RevisionService.new),
     user_service: UserService = Depends(UserService.new),
     cache_control: CacheControl = Depends(CacheControl),
     not_found: res.HTTPException = Depends(not_found_exception),
 ):
     cache_control(300)
 
-    r = await db.get(ChiiSubjectRevision, revision_id)
-    if not r:
+    try:
+        r = await rev_service.get_subject_history(revision_id)
+    except RevisionService.NotFoundError:
         raise not_found
 
-    if r.rev_creator == 0:
+    if r.creator_id == 0:
         creator = None
     else:
         try:
-            creator = await user_service.get_by_uid(r.rev_creator)
+            creator = await user_service.get_by_uid(r.creator_id)
         except NotFoundError:
             logger.error(
-                f"subject revision {r.rev_id} creator {r.rev_creator} does not exist"
+                "subject revision {rev_id} creator {user_id} does not exist",
+                rev_id=revision_id,
+                user_id=r.creator_id,
             )
             raise not_found
 
     return {
-        "id": r.rev_id,
-        "type": r.rev_type,
-        "created_at": r.rev_dateline,
-        "summary": r.rev_edit_summary,
-        "data": {
-            "subject_id": r.rev_subject_id,
-            "name": r.rev_name,
-            "name_cn": r.rev_name_cn,
-            "vote_field": r.rev_vote_field,
-            "type": r.rev_type,
-            "type_id": r.rev_type_id,
-            "field_infobox": r.rev_field_infobox,
-            "field_summary": r.rev_field_summary,
-            "field_eps": r.rev_field_eps,
-            "platform": r.rev_platform,
-        },
+        "id": r.id,
+        "type": r.type,
+        "created_at": r.created_at,
+        "summary": r.summary,
+        "data": r.data,
         "creator": creator,
     }
 
@@ -378,7 +333,7 @@ async def get_episode_revision(
         user = await user_service.get_by_uid(rev.creator_id)
     except NotFoundError:
         logger.error(
-            f"episode revision {id} creator {uid} does not exist",
+            "episode revision {id} creator {uid} does not exist",
             id=rev.id,
             uid=rev.creator_id,
         )

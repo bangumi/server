@@ -1,9 +1,15 @@
+from typing import Dict, Iterator
+
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
+import pol.server
+from pol.models import Avatar, PublicUser
 from pol.db.tables import ChiiRevHistory
 from tests.conftest import MockUser
-from pol.api.v0.revision import person_rev_type_filters, character_rev_type_filters
+from pol.services.user_service import UserService
+from pol.services.rev_service.person_rev import person_rev_type_filters
+from pol.services.rev_service.character_rev import character_rev_type_filters
 
 person_revisions_api_prefix = "/v0/revisions/persons"
 
@@ -85,8 +91,8 @@ def test_character_revisions_basic(
         ChiiRevHistory.rev_mid == 1, character_rev_type_filters
     ):
         mock_user(r.rev_creator)
-    response = client.get(character_revisions_api_prefix, params={"charater_id": 1})
-    assert response.status_code == 200
+    response = client.get(character_revisions_api_prefix, params={"character_id": 1})
+    assert response.status_code == 200, response.json()
     assert response.headers["content-type"] == "application/json"
 
     res = response.json()
@@ -106,7 +112,7 @@ def test_character_revisions_offset(
     ):
         mock_user(r.rev_creator)
     offset = 1
-    common_params = {"charater_id": 1}
+    common_params = {"character_id": 1}
     response1 = client.get(
         character_revisions_api_prefix, params={"offset": offset, **common_params}
     )
@@ -142,9 +148,34 @@ def test_character_revisions_page_limit(
 subject_revisions_api_prefix = "/v0/revisions/subjects"
 
 
-def test_subject_revisions_basic(
-    client: TestClient,
-):
+class MockUserService:
+    async def get_users_by_id(self, ids: Iterator[int]) -> Dict[int, PublicUser]:
+        ids = list(ids)
+        for uid in ids:
+            assert uid > 0
+
+        return {
+            uid: PublicUser(
+                id=uid,
+                username=f"username {uid}",
+                nickname=f"nickname {uid}",
+                avatar=Avatar.from_db_record(""),
+            )
+            for uid in ids
+        }
+
+    async def get_by_uid(self, uid: int) -> PublicUser:
+        assert uid > 0
+        return PublicUser(
+            id=uid,
+            username=f"username {uid}",
+            nickname=f"nickname {uid}",
+            avatar=Avatar.from_db_record(""),
+        )
+
+
+def test_subject_revisions_basic(client: TestClient):
+    pol.server.app.dependency_overrides[UserService.new] = MockUserService
     response = client.get(subject_revisions_api_prefix, params={"subject_id": 26})
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
@@ -162,9 +193,7 @@ def test_subject_revisions_basic(
             assert "nickname" in item["creator"]
 
 
-def test_subject_revisions_offset(
-    client: TestClient,
-):
+def test_subject_revisions_offset(client: TestClient):
     offset = 1
     common_params = {"subject_id": 1}
     response1 = client.get(

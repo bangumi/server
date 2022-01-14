@@ -1,20 +1,16 @@
 import datetime
-from typing import List, Iterator
+from typing import List, Type, Iterator
 
-from fastapi import Depends
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol import curd
 from pol.db import sa
-from pol.depends import get_db
 from pol.db.const import RevisionType
-from pol.db.tables import ChiiEpRevision
-from pol.curd.exceptions import NotFoundError
+from pol.db.tables import ChiiEpRevision, ChiiRevHistory
+from pol.services.rev_service.exception import RevisionNotFound
 
-
-class RevisionNotFound(NotFoundError):
-    pass
+episode_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.episode_rev_types())
 
 
 class EpisodeHistory(BaseModel):
@@ -32,19 +28,9 @@ class EpisodeHistoryDetail(EpisodeHistory):
     subject_id: int
 
 
-class RevisionService:
-    """user service to get user from database"""
-
-    __slots__ = ("_db",)
+class _EpisodeRevsionService:
     _db: AsyncSession
-    NotFoundError = RevisionNotFound
-
-    @classmethod
-    async def new(cls, session: AsyncSession = Depends(get_db)):
-        return cls(session)
-
-    def __init__(self, db: AsyncSession):
-        self._db = db
+    NotFoundError: Type[RevisionNotFound]
 
     async def get_ep_history(self, revision_id) -> EpisodeHistoryDetail:
         r = await self._db.get(ChiiEpRevision, revision_id)
@@ -60,7 +46,7 @@ class RevisionService:
             infobox=r.rev_ep_infobox,
             subject_id=r.rev_sid,
             version=r.rev_version,
-            creator_id=ChiiEpRevision.rev_creator,
+            creator_id=r.rev_creator,
         )
 
     async def count_ep_history(self, ep_id: int) -> int:
