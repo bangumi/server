@@ -9,13 +9,13 @@ from pol import res
 from pol.db import sa
 from pol.res import ErrorDetail, not_found_exception
 from pol.router import ErrorCatchRoute
-from pol.curd.ep import Ep
 from pol.depends import get_db
 from pol.db.const import EpType
 from pol.db.tables import ChiiEpisode, ChiiSubject
 from pol.permission import Role
 from pol.api.v0.models import Paged
 from pol.api.v0.models import Pager as _Pager
+from pol.models.subject import Ep
 from pol.http_cache.depends import CacheControl
 from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Episode, EpisodeDetail

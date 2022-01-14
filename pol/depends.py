@@ -1,8 +1,9 @@
-import aioredis
 from starlette.requests import Request
 
+from pol.redis.json_cache import JSONRedis
 
-async def get_redis(request: Request) -> aioredis.Redis:
+
+async def get_redis(request: Request) -> JSONRedis:
     """defined at app.startup"""
     return request.app.state.redis  # type: ignore
 
