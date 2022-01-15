@@ -7,7 +7,7 @@ from pol.db import sa
 from pol.models import Permission
 from tests.base import async_test
 from pol.db.tables import ChiiMember, ChiiUserGroup
-from tests.conftest import MockDB, MockUser
+from tests.conftest import MockUser, MockAsyncSession
 from pol.services.user_service import UserService
 
 
@@ -44,7 +44,7 @@ async def test_user_service__missing_user(
 
 
 @async_test
-async def test_user_service_read_permission(mock_db: MockDB):
+async def test_user_service_read_permission(mock_db: MockAsyncSession):
     mock_db.get.return_value = ChiiUserGroup(usr_grp_perm={"subject_cover_lock": 1})
     v = await UserService(mock_db).get_permission(180)
     assert v.subject_cover_lock == 1
@@ -52,6 +52,6 @@ async def test_user_service_read_permission(mock_db: MockDB):
 
 
 @async_test
-async def test_user_service_permission_fallback(mock_db: MockDB):
+async def test_user_service_permission_fallback(mock_db: MockAsyncSession):
     mock_db.get.return_value = None
     assert Permission() == await UserService(mock_db).get_permission(181)
