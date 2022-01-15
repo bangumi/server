@@ -79,7 +79,8 @@ class SubjectService:
         return _convert_from_orm(s)
 
 
-def _convert_from_orm(s) -> Subject:
+def _convert_from_orm(s: ChiiSubject) -> Subject:
+    """convert ORM model to app model"""
     date = None
     v = s.fields.field_date
     if isinstance(v, datetime.date):

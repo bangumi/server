@@ -12,3 +12,10 @@ def async_test(f):
         return asyncio.get_event_loop().run_until_complete(f(*args, **kwargs))
 
     return test_a
+
+
+def async_lambda(value):
+    async def f():
+        return value
+
+    return f

@@ -26,7 +26,7 @@ def test_subject_auth_nsfw(client: TestClient, auth_header):
 
 @pytest.mark.env("e2e", "database", "redis")
 def test_subject_auth_cached(client: TestClient, redis_client: Redis, auth_header):
-    cache_key = config.CACHE_KEY_PREFIX + "subject:1"
+    cache_key = config.CACHE_KEY_PREFIX + "res:subject:1"
     redis_client.set(cache_key, orjson.dumps({"id": 10}))
     response = client.get("/v0/subjects/1")
     assert response.status_code == 200, "broken cache should be purged"

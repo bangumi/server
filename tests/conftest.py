@@ -15,6 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 import pol.server
 from pol import config
 from pol.db import sa
+from tests.base import async_lambda
+from pol.depends import get_db, get_redis
 from pol.db.const import Gender, BloodType, PersonType, SubjectType, CollectionType
 from pol.db.tables import (
     ChiiMember,
@@ -60,11 +62,37 @@ def app():
     return pol.server.app
 
 
+class MockAsyncSession(Protocol):
+    get: mock.AsyncMock
+    scalar: mock.AsyncMock
+    scalars: mock.AsyncMock
+
+
 @pytest.fixture()
-def mock_redis():
+def mock_db(app) -> MockAsyncSession:
+    """mock mock AsyncSession, also override dependency `get_db` for all router"""
+    db = mock.Mock()
+    db.get = mock.AsyncMock(return_value=None)
+    db.scalar = mock.AsyncMock(return_value=None)
+    db.scalars = mock.AsyncMock(return_value=None)
+    app.dependency_overrides[get_db] = async_lambda(db)
+    return db
+
+
+class MockRedis(Protocol):
+    get: mock.AsyncMock
+    set_json: mock.AsyncMock
+    get_with_model: mock.AsyncMock
+
+
+@pytest.fixture()
+def mock_redis(app) -> MockRedis:
+    """mock redis client, also override dependency `get_redis` for all router"""
     r = mock.Mock()
     r.set_json = mock.AsyncMock()
     r.get = mock.AsyncMock(return_value=None)
+    r.get_with_model = mock.AsyncMock(return_value=None)
+    app.dependency_overrides[get_redis] = async_lambda(r)
     return r
 
 

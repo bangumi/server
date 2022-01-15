@@ -1,20 +1,35 @@
 from pathlib import Path
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import orjson
 import pytest
 from redis import Redis
+from fastapi import FastAPI
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from pol import config
 from pol.db import sa
+from pol.models import Subject
+from tests.base import async_lambda
 from pol.db.tables import ChiiSubjectField
+from tests.conftest import MockRedis
+from pol.api.v0.depends import optional_user
+from pol.api.v0.depends.auth import Guest
+from pol.services.subject_service import SubjectService
 
 fixtures_path = Path(__file__).parent.joinpath("fixtures")
 
 
-@pytest.mark.env("e2e", "database", "redis")
-def test_subject_not_found(client: TestClient):
+def test_subject_not_found(
+    client: TestClient, app: FastAPI, mock_redis: MockRedis, mock_db
+):
+    app.dependency_overrides[SubjectService.new] = async_lambda(
+        mock.Mock(get_by_id=AsyncMock(side_effect=SubjectService.NotFoundError))
+    )
+    app.dependency_overrides[optional_user] = async_lambda(Guest())
+
     response = client.get("/v0/subjects/2000000")
     assert response.status_code == 404
     assert response.headers["content-type"] == "application/json"
@@ -40,15 +55,6 @@ def test_subject_basic(client: TestClient):
     assert data["id"] == 2
     assert data["name"] == "坟场"
     assert not response.json()["nsfw"]
-
-
-@pytest.mark.env("e2e", "database", "redis")
-def test_subject_locked(client: TestClient):
-    response = client.get("/v0/subjects/2")
-    assert response.status_code == 200
-    assert response.headers["content-type"] == "application/json"
-
-    data = response.json()
     assert data["locked"]
 
 
@@ -60,8 +66,30 @@ def test_subject_nsfw_auth_200(client: TestClient, auth_header):
     assert response.headers["content-type"] == "application/json"
 
 
-@pytest.mark.env("e2e", "database", "redis")
-def test_subject_redirect(client: TestClient):
+def test_subject_redirect(
+    client: TestClient, app: FastAPI, mock_redis: MockRedis, mock_db
+):
+    app.dependency_overrides[SubjectService.new] = async_lambda(
+        mock.Mock(
+            get_by_id=AsyncMock(
+                return_value=Subject(
+                    id=18,
+                    type=2,
+                    name="",
+                    name_cn="",
+                    summary="",
+                    nsfw=False,
+                    platform=1,
+                    image="",
+                    infobox="",
+                    redirect=19,
+                    ban=0,
+                )
+            )
+        )
+    )
+    app.dependency_overrides[optional_user] = async_lambda(Guest())
+
     response = client.get("/v0/subjects/18", allow_redirects=False)
     assert response.status_code == 307
     assert response.headers["location"] == "/v0/subjects/19"
@@ -143,7 +171,7 @@ def test_subject_subjects(client: TestClient):
 
 @pytest.mark.env("e2e", "database", "redis")
 def test_subject_cache_broken_purge(client: TestClient, redis_client: Redis):
-    cache_key = config.CACHE_KEY_PREFIX + "subject:1"
+    cache_key = config.CACHE_KEY_PREFIX + "res:subject:1"
     redis_client.set(cache_key, orjson.dumps({"id": 10, "test": "1"}))
     response = client.get("/v0/subjects/1")
     assert response.status_code == 200, "broken cache should be purged"
