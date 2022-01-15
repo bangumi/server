@@ -51,13 +51,11 @@ class SubjectService:
     async def get_by_id(
         self,
         subject_id: int,
-        include_nsfw: bool = False,
         include_redirect: bool = False,
     ) -> Subject:
         """
 
         :param subject_id:
-        :param include_nsfw: if nsfw subject should be included
         :param include_redirect: if merged subject included.
         if `include_redirect=false` subject with redirect will raise a ``NotFoundError``
         """
@@ -68,9 +66,6 @@ class SubjectService:
         )
 
         if not s:
-            raise self.NotFoundError
-
-        if not include_nsfw and s.subject_nsfw:
             raise self.NotFoundError
 
         if not include_redirect and s.fields.field_redirect:

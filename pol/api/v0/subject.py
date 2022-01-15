@@ -97,9 +97,7 @@ async def _get_subject(
     db: AsyncSession = Depends(get_db),
 ):
     try:
-        s = await subject_service.get_by_id(
-            subject_id, include_nsfw=True, include_redirect=True
-        )
+        s = await subject_service.get_by_id(subject_id, include_redirect=True)
     except SubjectService.NotFoundError:
         cache_control(300)
         raise not_found

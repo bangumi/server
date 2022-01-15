@@ -37,9 +37,7 @@ async def _get_subject(
     subject = await redis.get_with_model(cache_key, Subject)
     if not subject:
         try:
-            subject = await service.get_by_id(
-                subject_id, include_nsfw=True, include_redirect=False
-            )
+            subject = await service.get_by_id(subject_id, include_redirect=False)
         except SubjectService.NotFoundError:
             raise not_found
         await redis.set_json(cache_key, value=subject.dict(), ex=300)
