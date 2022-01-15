@@ -143,7 +143,7 @@ def test_subject_subjects(client: TestClient):
 
 @pytest.mark.env("e2e", "database", "redis")
 def test_subject_cache_broken_purge(client: TestClient, redis_client: Redis):
-    cache_key = config.CACHE_KEY_PREFIX + "subject:1"
+    cache_key = config.CACHE_KEY_PREFIX + "res:subject:1"
     redis_client.set(cache_key, orjson.dumps({"id": 10, "test": "1"}))
     response = client.get("/v0/subjects/1")
     assert response.status_code == 200, "broken cache should be purged"
