@@ -3,12 +3,13 @@ from datetime import datetime
 
 from loguru import logger
 from fastapi import Depends
+from power_cache import TTLCache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol.db import sa
-from pol.models import User, Avatar, PublicUser
+from pol.models import User, Avatar, Permission, PublicUser
 from pol.depends import get_db
-from pol.db.tables import ChiiMember, ChiiOauthAccessToken
+from pol.db.tables import ChiiMember, ChiiUserGroup, ChiiOauthAccessToken
 from pol.curd.exceptions import NotFoundError
 
 
@@ -21,6 +22,7 @@ class UserService:
 
     __slots__ = ("_db",)
     _db: AsyncSession
+    cache: TTLCache[int, Permission] = TTLCache(capacity=15, ttl=60)
     NotFoundError = UserNotFound
 
     @classmethod
@@ -29,6 +31,22 @@ class UserService:
 
     def __init__(self, db: AsyncSession):
         self._db = db
+
+    async def get_permission(self, group_id: int) -> Permission:
+        """从数据库读取当前的权限规则，在进程中缓存60s"""
+        v = self.cache.get(group_id)
+        if v:
+            return v
+        p: Optional[ChiiUserGroup] = await self._db.get(ChiiUserGroup, group_id)
+        if not p:
+            logger.error(
+                "can't read permission {group_id} from database, fallback to non",
+                group_id=group_id,
+            )
+            return Permission()
+        permission = Permission.parse_obj(p.usr_grp_perm)
+        self.cache.set(group_id, permission)
+        return permission
 
     async def get_by_uid(self, uid: int) -> PublicUser:
         """return a public readable user with limited information"""
@@ -110,4 +128,5 @@ class UserService:
             registration_date=member.regdate,
             sign=member.sign,
             avatar=Avatar.from_db_record(member.avatar),
+            permission=await self.get_permission(member.groupid),
         )

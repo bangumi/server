@@ -60,8 +60,28 @@ def app():
     return pol.server.app
 
 
+class MockDB(Protocol):
+    get: mock.AsyncMock
+    scalar: mock.AsyncMock
+    scalars: mock.AsyncMock
+
+
+@pytest.fixture()
+def mock_db():
+    """return a mocked `JSONRedis` client"""
+
+    r = mock.Mock()
+    r.get = mock.AsyncMock()
+    r.scalars = mock.AsyncMock()
+    r.scalar = mock.AsyncMock()
+
+    return r
+
+
 @pytest.fixture()
 def mock_redis():
+    """return a mocked `JSONRedis` client"""
+
     r = mock.Mock()
     r.set_json = mock.AsyncMock()
     r.get = mock.AsyncMock(return_value=None)

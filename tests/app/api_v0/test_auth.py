@@ -6,8 +6,7 @@ from aioredis import Redis
 from starlette.testclient import TestClient
 
 from pol import config
-from pol.models import User, Avatar
-from pol.permission import UserGroup
+from pol.models import User, Avatar, UserGroup, Permission
 
 access_token = "a_development_access_token"
 
@@ -45,6 +44,7 @@ def test_auth_cached(client: TestClient, redis_client: Redis):
         nickname="ni",
         sign="",
         avatar=Avatar.from_db_record(""),
+        permission=Permission(),
     )
     redis_client.set(cache_key, u.json(by_alias=True))
     response = client.get("/v0/me", headers={"Authorization": "Bearer 1"})

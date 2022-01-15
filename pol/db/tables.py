@@ -189,7 +189,7 @@ class ChiiMember(Base):
     username = Column(CHAR(15), nullable=False, unique=True, server_default=text("''"))
     nickname = Column(String(30), nullable=False)
     avatar: str = Column(VARCHAR(255), nullable=False)
-    groupid = Column(SMALLINT(6), nullable=False, server_default=text("'0'"))
+    groupid: int = Column(SMALLINT(6), nullable=False, server_default=text("'0'"))
     regdate = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
     lastvisit = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
     lastactivity = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
@@ -943,3 +943,34 @@ class ChiiSubjectInterest(Base):
         uselist=False,
         back_populates="users",
     )  # type: ignore
+
+
+class PHPSerializedStr(MEDIUMBLOB):
+    @staticmethod
+    def loads(b: bytes):
+        return phpseralize.loads(b)
+
+    def result_processor(self, dialect, coltype):
+        loads = self.loads
+
+        def process(value: str):
+            if value is None:
+                return None
+            return loads(value.encode("utf-8"))
+
+        return process
+
+    def compare_values(self, x, y):
+        if self.comparator:
+            return self.comparator(x, y)
+        else:
+            return x == y
+
+
+class ChiiUserGroup(Base):
+    __tablename__ = "chii_usergroup"
+
+    usr_grp_id = Column(MEDIUMINT(8), primary_key=True)
+    usr_grp_name = Column(VARCHAR(255), nullable=False)
+    usr_grp_perm = Column(PHPSerializedStr, nullable=False)
+    usr_grp_dateline = Column(INTEGER(10), nullable=False)

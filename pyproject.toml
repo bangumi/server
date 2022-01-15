@@ -22,6 +22,7 @@ orjson = "3.6.5"
 loguru = "0.5.3"
 SQLAlchemy = { extras = ["mypy", "asyncio"], version = "1.4.29" }
 aioredis = { extras = ["hiredis"], version = "2.0.1" }
+power-cache = "0.1.1"
 
 [tool.poetry.dev-dependencies]
 sqlacodegen = "2.3.0"

@@ -455,6 +455,14 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "power-cache"
+version = "0.1.1"
+description = "Simple (but powerful) Caching Tools"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[[package]]
 name = "pre-commit"
 version = "2.16.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
@@ -885,7 +893,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.8.*"
-content-hash = "baa636e1f3c0777b13a05546ffcbd9cb6f930e790db8e1e153f63117c5e16d04"
+content-hash = "21d18569ba4ddcb3381c4bd068f7eb10977f7cbd3d51181cd72cfd4ae0d5d890"
 
 [metadata.files]
 aiomysql = [
@@ -1245,6 +1253,10 @@ platformdirs = [
 pluggy = [
     {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
     {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
+]
+power-cache = [
+    {file = "power_cache-0.1.1-py3-none-any.whl", hash = "sha256:d58818f40ac27ac427d302fd85c70b0e1f3e4a8f330afdadbcb998f8d57b58aa"},
+    {file = "power_cache-0.1.1.tar.gz", hash = "sha256:68f8ad3b96f908c4cda0378cc95f4cf0d9356d33cb8db98702534482991bc246"},
 ]
 pre-commit = [
     {file = "pre_commit-2.16.0-py2.py3-none-any.whl", hash = "sha256:758d1dc9b62c2ed8881585c254976d66eae0889919ab9b859064fc2fe3c7743e"},

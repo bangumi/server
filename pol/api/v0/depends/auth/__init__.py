@@ -3,7 +3,7 @@ from pydantic import ValidationError
 from starlette.status import HTTP_403_FORBIDDEN
 
 from pol import res, config
-from pol.models import User
+from pol.models import User, Permission
 from pol.depends import get_redis
 from pol.permission import Role
 from pol.redis.json_cache import JSONRedis
@@ -17,6 +17,9 @@ API_KEY_HEADER = HTTPBearer()
 
 class Guest(Role):
     """this is a guest with only basic permission"""
+
+    def __init__(self):
+        self.permission = Permission()
 
     def allow_nsfw(self) -> bool:
         return False
