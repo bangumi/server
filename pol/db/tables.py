@@ -945,6 +945,47 @@ class ChiiSubjectInterest(Base):
     )  # type: ignore
 
 
+class ChiiSubjectTopic(Base):
+    __tablename__ = "chii_subject_topics"
+    __table_args__ = (
+        Index(
+            "sbj_tpc_lastpost",
+            "sbj_tpc_lastpost",
+            "sbj_tpc_subject_id",
+            "sbj_tpc_display",
+        ),
+    )
+
+    sbj_tpc_id = Column(MEDIUMINT(8), primary_key=True)
+    sbj_tpc_subject_id = Column(MEDIUMINT(8), nullable=False, index=True)
+    sbj_tpc_uid = Column(MEDIUMINT(8), nullable=False, index=True)
+    sbj_tpc_title = Column(VARCHAR(80), nullable=False)
+    # 发帖时间
+    sbj_tpc_dateline = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
+    # 最后回复时间
+    sbj_tpc_lastpost = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
+    # 数据库里实际上有 sbj_tpc_replies+1 条回复，第一条回复是帖子的内容，不是回复
+    sbj_tpc_replies = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
+    sbj_tpc_state = Column(TINYINT(1), nullable=False)
+    sbj_tpc_display = Column(
+        TINYINT(1), nullable=False, index=True, server_default=text("'1'")
+    )
+
+
+class ChiiSubjectPost(Base):
+    __tablename__ = "chii_subject_posts"
+
+    sbj_pst_id = Column(MEDIUMINT(8), primary_key=True)
+    sbj_pst_mid = Column(MEDIUMINT(8), nullable=False, index=True)
+    sbj_pst_uid = Column(MEDIUMINT(8), nullable=False, index=True)
+    sbj_pst_related = Column(
+        MEDIUMINT(8), nullable=False, index=True, server_default=text("'0'")
+    )
+    sbj_pst_content = Column(MEDIUMTEXT, nullable=False)
+    sbj_pst_state = Column(TINYINT(1), nullable=False)
+    sbj_pst_dateline = Column(INTEGER(10), nullable=False, server_default=text("'0'"))
+
+
 class PHPSerializedStr(MEDIUMBLOB):
     @staticmethod
     def loads(b: bytes):
