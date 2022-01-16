@@ -15,3 +15,4 @@ sqlacodegen --tables $table_name \
 ```
 
 2. 添加 relationship（注意双向）
+   * relationship 后面可以加上 `# type: ignore` (mypy check)

@@ -11,8 +11,8 @@ T = TypeVar("T")
 class CursorPage(GenericModel, Generic[T]):
     """pagination with cursor"""
 
-    page: int
-    size: int  # number of items in this page
+    page: int = Field(le=10000)
+    size: int = Field(le=100)  # number of items in this page
     total: int  # total number of items
     order: Order
     key: str = Field(description="key to sort by, e.g. id, createdAt")

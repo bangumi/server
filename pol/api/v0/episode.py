@@ -13,9 +13,9 @@ from pol.router import ErrorCatchRoute
 from pol.curd.ep import Ep
 from pol.depends import get_db
 from pol.db.const import EpType
+from pol.curd.user import User
 from pol.db.tables import ChiiEpisode, ChiiSubject
 from pol.api.v0.const import NotFoundDescription
-from pol.permission.roles import Role
 from pol.api.v0.models.base import Paged
 from pol.http_cache.depends import CacheControl
 from pol.api.v0.depends.auth import optional_user
@@ -54,7 +54,7 @@ async def get_episodes(
     type: EpType = Query(None, description="`0`,`1`,`2`,`3`代表`本篇`，`sp`，`op`，`ed`"),
     page: Pager = Depends(),
     cache_control: CacheControl = Depends(CacheControl),
-    user: Role = Depends(optional_user),
+    user: User = Depends(optional_user),
 ):
     subject = await db.get(ChiiSubject, subject_id)
     if not subject:
@@ -62,7 +62,7 @@ async def get_episodes(
         return page.dict()
 
     if subject.subject_nsfw:
-        if not user.allow_nsfw():
+        if not user.to_role().allow_nsfw():
             return page.dict()
     else:
         cache_control(300)
@@ -127,7 +127,7 @@ async def get_episode(
     episode_id: int,
     db: AsyncSession = Depends(get_db),
     cache_control: CacheControl = Depends(CacheControl),
-    user: Role = Depends(optional_user),
+    user: User = Depends(optional_user),
 ):
     not_found = res.HTTPException(
         status_code=404,
@@ -150,7 +150,7 @@ async def get_episode(
         raise not_found
 
     if subject.subject_nsfw:
-        if not user.allow_nsfw():
+        if not user.to_role().allow_nsfw():
             raise not_found
     else:
         cache_control(300)

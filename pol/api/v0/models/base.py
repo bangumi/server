@@ -1,9 +1,7 @@
-from typing import List, Generic, TypeVar, Optional
+from typing import List, Generic, TypeVar
 
-from pydantic import Field
+from pydantic.main import BaseModel
 from pydantic.generics import GenericModel
-
-from pol.api.v0.models.cursorPage import CursorPage
 
 T = TypeVar("T")
 PageKeyT = TypeVar("PageKeyT")
@@ -17,8 +15,12 @@ class Paged(GenericModel, Generic[T]):
     data: List[T] = []
 
 
-class ResponseCursorPaged(GenericModel, Generic[T, PageKeyT]):
-    pagination: Optional[CursorPage[PageKeyT]] = Field(
-        description="None if all replies fit in one page"
-    )
+class OffsetPage(BaseModel):
+    total: int = 0
+    page: int = 0
+    size: int = 0
+
+
+class OffsetPagedResponse(GenericModel, Generic[T]):
+    page: OffsetPage
     data: List[T]

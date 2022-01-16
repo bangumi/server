@@ -11,7 +11,3 @@ class Role:
 
     def allow_nsfw(self) -> bool:
         return self.user_perm_state.canViewNsfw
-
-
-class GuestRole(Role):
-    """this is a guest with only basic permission"""

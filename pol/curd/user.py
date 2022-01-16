@@ -1,4 +1,5 @@
-from typing import Optional
+from __future__ import annotations
+
 from datetime import datetime, timezone
 
 from loguru import logger
@@ -52,9 +53,13 @@ class User(BaseModel):
 
         return Role(perm_state)
 
+    @classmethod
+    def default_user(cls) -> User:
+        return User(id=0)
+
 
 async def get_by_valid_token(db: AsyncSession, access_token: str) -> User:
-    access: Optional[ChiiOauthAccessToken] = await db.scalar(
+    access: ChiiOauthAccessToken | None = await db.scalar(
         sa.get(
             ChiiOauthAccessToken,
             ChiiOauthAccessToken.access_token == access_token,

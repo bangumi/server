@@ -17,6 +17,7 @@ from pol.db.const import (
     SubjectType,
     get_character_rel,
 )
+from pol.curd.user import User
 from pol.db.tables import (
     ChiiEpisode,
     ChiiSubject,
@@ -24,9 +25,8 @@ from pol.db.tables import (
     ChiiCrtSubjectIndex,
     ChiiSubjectRelations,
 )
-from pol.api.v0.const import NotFoundDescription
+from pol.api.v0.const import NotFoundDescription, InvalidRequestDescription
 from pol.api.v0.utils import get_career, person_images, short_description
-from pol.permission.roles import Role
 from pol.redis.json_cache import JSONRedis
 from pol.api.v0.models.misc import RelatedPerson, RelatedCharacter
 from pol.http_cache.depends import CacheControl
@@ -38,13 +38,24 @@ router = APIRouter(tags=["条目"], route_class=ErrorCatchRoute)
 api_base = "/v0/subjects"
 
 
-async def exception_404(request: Request):
+async def exception_400(request: Request):
     detail = dict(request.query_params)
     detail.update(request.path_params)
     return res.HTTPException(
         status_code=404,
         title="Not Found",
         description=NotFoundDescription,
+        detail=detail,
+    )
+
+
+async def exception_404(request: Request):
+    detail = dict(request.query_params)
+    detail.update(request.path_params)
+    return res.HTTPException(
+        status_code=404,
+        title="Bad Request",
+        description=InvalidRequestDescription,
         detail=detail,
     )
 
@@ -61,7 +72,7 @@ async def get_subject(
     response: Response,
     exc_404: res.HTTPException = Depends(exception_404),
     subject_id: int = Path(..., gt=0),
-    user: Role = Depends(optional_user),
+    user: User = Depends(optional_user),
     db: AsyncSession = Depends(get_db),
     redis: JSONRedis = Depends(get_redis),
     cache_control: CacheControl = Depends(CacheControl),
@@ -82,7 +93,7 @@ async def get_subject(
         await redis.set_json(cache_key, value=data, ex=300)
         nsfw = data["nsfw"]
 
-    if nsfw and not user.allow_nsfw():
+    if nsfw and not user.to_role().allow_nsfw():
         raise exc_404
 
     return data
