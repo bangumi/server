@@ -6,7 +6,15 @@ build-backend = "poetry.core.masonry.api"
 name = "pol"
 version = "0.6.0"
 description = ""
-authors = ["Trim21 <i@trim21.me>"]
+# sort by PR date
+authors = [
+  'Trim21 <trim21.me@gmail.com>',
+  'Sociosarbis <136657577@qq.com>',
+  'MoguCloud <mogucloud@gmail.com>',
+  'MTC <MichaelMai2000@users.noreply.github.com>',
+  'JarvieK <3547456+Jarvie8176@users.noreply.github.com>',
+  'AspectLeft <aspectleft@gmail.com>',
+]
 
 [tool.poetry.dependencies]
 python = "3.8.*"
@@ -54,10 +62,7 @@ exclude_lines = [
 
 [tool.pytest.ini_options]
 addopts = '-rav -W error::sqlalchemy.exc.RemovedIn20Warning'
-env = [
-  'D:TESTING=true',
-  'SQLALCHEMY_WARN_20=true',
-]
+env = ['D:TESTING=true', 'SQLALCHEMY_WARN_20=true']
 
 [tool.mypy]
 ignore_missing_imports = true
