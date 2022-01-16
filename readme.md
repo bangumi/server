@@ -84,30 +84,7 @@ watchgod scripts.dev.main
 
 如果已经存在相关的 issue，最好先在 issue 内回复一下自己的意向，或者创建一个 Draft PR 关联对应的 issue，避免撞车问题。
 
-## 测试
-
-测试基于 pytest
-
-### 运行测试(需要数据库)
-
-```shell
-pytest --e2e --database --redis
-```
-
-默认的 `pytest` 命令仅会运行一些简单地单元测试，其他 flag 包括:
-
-- `--e2e` 允许 e2e 测试。
-- `--database` 允许需要 mysql 的测试。
-- `--redis` 允许需要 redis 的测试。
-
-如果一个测试同时需要 mysql 和 redis，需要同时提供 `--darabase` 和 `--redis` 选项参数才会运行。
-
-### 编写测试
-
-参照 [tests/app/test_base_router.py](./tests/app/test_base_router.py) 文件。在测试函数中添加`client`
-参数获取对应的 HTTP 测试客户端。`client` 是一个 `requests.Session` 的实例，可以使用 `requests` 的各种函数参数。
-
-[详细文档](https://www.starlette.io/testclient/)
+## [测试](./tests/readme.md)
 
 ## 代码风格
 
