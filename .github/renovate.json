@@ -8,7 +8,16 @@
   "separateMajorMinor": true,
   "separateMinorPatch": false,
   "rangeStrategy": "pin",
+  "pre-commit": {
+    "enabled": true
+  },
   "packageRules": [
+    {
+      "matchManagers": ["pre-commit"],
+      "semanticCommitType": "chore",
+      "groupName": "deps-dev",
+      "semanticCommitScope": "dev"
+    },
     {
       "matchManagers": ["dockerfile"],
       "rangeStrategy": "pin",
