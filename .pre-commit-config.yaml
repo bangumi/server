@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 38b88246ccc552bffaaf54259d064beeee434539 # frozen: v4.0.1
+    rev: v4.0.1
     hooks:
       - id: check-case-conflict
       - id: check-ast
@@ -22,19 +22,19 @@ repos:
         args: [--remove]
 
   - repo: https://github.com/Trim21/pre-commit-hooks
-    rev: e4bd622f56f4cb289b7c15f6e9f03698afbc55d2 # frozen: v0.4.1
+    rev: v0.4.1
     hooks:
       - id: poetry-check-lock
       - id: find-trailing-comma
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: 9db80ebadc833c3863746007d3933f8f63aea759 # frozen: v2.29.1
+    rev: v2.31.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
 
   - repo: https://github.com/myint/autoflake
-    rev: 7a53fdafc82c33f446915b60fcac947c51279260 # frozen: v1.4
+    rev: v1.4
     hooks:
       - id: autoflake
         args:
@@ -44,7 +44,7 @@ repos:
           - --expand-star-imports
 
   - repo: https://github.com/timothycrosley/isort
-    rev: c5e8fa75dda5f764d20f66a215d71c21cfa198e1 # frozen: 5.10.1
+    rev: 5.10.1
     hooks:
       - id: isort
         args:
@@ -59,6 +59,6 @@ repos:
           - --no-lines-before=LOCALFOLDER
 
   - repo: https://github.com/psf/black
-    rev: f1d4e742c91dd5179d742b0db9293c4472b765f8 # frozen: 21.12b0
+    rev: 21.12b0
     hooks:
       - id: black
