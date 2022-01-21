@@ -5,6 +5,7 @@ from starlette.testclient import TestClient
 
 import pol.server
 
+# mockers
 pytest_plugins = [
     "tests.fixtures.mock_redis",
     "tests.fixtures.mock_db",

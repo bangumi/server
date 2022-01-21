@@ -10,7 +10,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from pol import config
-from tests.base import async_lambda
 from pol.depends import get_db
 
 
@@ -27,7 +26,11 @@ def mock_db(app) -> MockAsyncSession:
     db.get = mock.AsyncMock(return_value=None)
     db.scalar = mock.AsyncMock(return_value=None)
     db.scalars = mock.AsyncMock(return_value=None)
-    app.dependency_overrides[get_db] = async_lambda(db)
+
+    async def mocker():
+        return db
+
+    app.dependency_overrides[get_db] = mocker
     yield db
     app.dependency_overrides.pop(get_db, None)
 

@@ -6,7 +6,6 @@ import redis
 import pytest
 
 from pol import config
-from tests.base import async_lambda
 from pol.depends import get_redis
 
 
@@ -23,7 +22,11 @@ def mock_redis(app) -> MockRedis:
     r.set_json = mock.AsyncMock()
     r.get = mock.AsyncMock(return_value=None)
     r.get_with_model = mock.AsyncMock(return_value=None)
-    app.dependency_overrides[get_redis] = async_lambda(r)
+
+    async def mocker():
+        return r
+
+    app.dependency_overrides[get_redis] = mocker
     yield r
     app.dependency_overrides.pop(get_redis, None)
 

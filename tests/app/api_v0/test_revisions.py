@@ -1,12 +1,10 @@
 # TODO: split E2E test to unit test
-from typing import Dict, Iterator
 
 import pytest
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 import pol.server
-from pol.models import Avatar, PublicUser
 from pol.db.tables import ChiiRevHistory
 from pol.services.user_service import UserService
 from tests.fixtures.mock_db_record import MockUser
@@ -156,35 +154,9 @@ def test_character_revisions_page_limit(
 subject_revisions_api_prefix = "/v0/revisions/subjects"
 
 
-class MockUserService:
-    async def get_users_by_id(self, ids: Iterator[int]) -> Dict[int, PublicUser]:
-        ids = list(ids)
-        for uid in ids:
-            assert uid > 0
-
-        return {
-            uid: PublicUser(
-                id=uid,
-                username=f"username {uid}",
-                nickname=f"nickname {uid}",
-                avatar=Avatar.from_db_record(""),
-            )
-            for uid in ids
-        }
-
-    async def get_by_uid(self, uid: int) -> PublicUser:
-        assert uid > 0
-        return PublicUser(
-            id=uid,
-            username=f"username {uid}",
-            nickname=f"nickname {uid}",
-            avatar=Avatar.from_db_record(""),
-        )
-
-
 @pytest.mark.env("e2e", "database")
-def test_subject_revisions_basic(client: TestClient):
-    pol.server.app.dependency_overrides[UserService.new] = MockUserService
+def test_subject_revisions_basic(client: TestClient, mock_user_service):
+    pol.server.app.dependency_overrides[UserService.new] = mock_user_service
     response = client.get(subject_revisions_api_prefix, params={"subject_id": 26})
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
