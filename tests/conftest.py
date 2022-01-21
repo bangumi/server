@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Protocol, Generator
+from typing import Iterator, Protocol, Generator
 from datetime import datetime
 from unittest import mock
 from contextlib import asynccontextmanager
@@ -7,6 +7,7 @@ from collections import defaultdict
 
 import redis
 import pytest
+from fastapi import FastAPI
 from _pytest.nodes import Node
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.testclient import TestClient
@@ -15,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 import pol.server
 from pol import config
 from pol.db import sa
+from pol.models import Avatar, PublicUser
 from tests.base import async_lambda
 from pol.depends import get_db, get_redis
 from pol.db.const import Gender, BloodType, PersonType, SubjectType, CollectionType
@@ -27,6 +29,7 @@ from pol.db.tables import (
     ChiiSubjectInterest,
     ChiiOauthAccessToken,
 )
+from pol.services.user_service import UserService
 
 
 def pytest_addoption(parser):
@@ -60,6 +63,40 @@ DBSession = sa.sync_session_maker()
 @pytest.fixture()
 def app():
     return pol.server.app
+
+
+class MockUserService:
+    async def get_users_by_id(self, ids: Iterator[int]):
+        id_list = list(ids)
+        for uid in id_list:
+            assert uid > 0
+
+        return {
+            uid: PublicUser(
+                id=uid,
+                username=f"username {uid}",
+                nickname=f"nickname {uid}",
+                avatar=Avatar.from_db_record(""),
+            )
+            for uid in id_list
+        }
+
+    async def get_by_uid(self, uid: int):
+        assert uid > 0
+        return PublicUser(
+            id=uid,
+            username=f"username {uid}",
+            nickname=f"nickname {uid}",
+            avatar=Avatar.from_db_record(""),
+        )
+
+
+@pytest.fixture()
+def mock_user_service(app: FastAPI):
+    service = mock.Mock(wraps=MockUserService())
+    app.dependency_overrides[UserService.new] = lambda: service
+    yield service
+    app.dependency_overrides.pop(UserService.new, None)
 
 
 class MockAsyncSession(Protocol):
