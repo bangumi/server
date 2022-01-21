@@ -1,13 +1,9 @@
 # TODO: split E2E test to unit test
 
 import pytest
-from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
-from pol.db.tables import ChiiRevHistory
-from tests.fixtures.mock_db_record import MockUser
-from pol.services.rev_service.person_rev import person_rev_type_filters
-from pol.services.rev_service.character_rev import character_rev_type_filters
+from tests.fixtures.mock_service import MockUserService
 
 person_revisions_api_prefix = "/v0/revisions/persons"
 
@@ -15,13 +11,8 @@ person_revisions_api_prefix = "/v0/revisions/persons"
 @pytest.mark.env("e2e", "database")
 def test_person_revisions_basic(
     client: TestClient,
-    db_session: Session,
-    mock_user: MockUser,
+    mock_user_service,
 ):
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_mid == 9, person_rev_type_filters
-    ):
-        mock_user(r.rev_creator)
     response = client.get(person_revisions_api_prefix, params={"person_id": 9})
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
@@ -38,13 +29,8 @@ def test_person_revisions_basic(
 @pytest.mark.env("e2e", "database")
 def test_person_revisions_offset(
     client: TestClient,
-    db_session: Session,
-    mock_user: MockUser,
+    mock_user_service: MockUserService,
 ):
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_mid == 9, person_rev_type_filters
-    ):
-        mock_user(r.rev_creator)
     offset = 1
     common_params = {"person_id": 9}
     response1 = client.get(
@@ -66,13 +52,8 @@ def test_person_revisions_offset(
 @pytest.mark.env("e2e", "database")
 def test_person_revisions_offset_limit(
     client: TestClient,
-    db_session: Session,
-    mock_user: MockUser,
+    mock_user_service: MockUserService,
 ):
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_mid == 9, person_rev_type_filters
-    ):
-        mock_user(r.rev_creator)
     offset = 30000
     response = client.get(
         person_revisions_api_prefix, params={"offset": offset, "person_id": 9}
@@ -86,13 +67,8 @@ character_revisions_api_prefix = "/v0/revisions/characters"
 @pytest.mark.env("e2e", "database")
 def test_character_revisions_basic(
     client: TestClient,
-    db_session: Session,
-    mock_user: MockUser,
+    mock_user_service: MockUserService,
 ):
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_mid == 1, character_rev_type_filters
-    ):
-        mock_user(r.rev_creator)
     response = client.get(character_revisions_api_prefix, params={"character_id": 1})
     assert response.status_code == 200, response.json()
     assert response.headers["content-type"] == "application/json"
@@ -107,13 +83,8 @@ def test_character_revisions_basic(
 @pytest.mark.env("e2e", "database")
 def test_character_revisions_offset(
     client: TestClient,
-    db_session: Session,
-    mock_user: MockUser,
+    mock_user_service: MockUserService,
 ):
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_mid == 1, character_rev_type_filters
-    ):
-        mock_user(r.rev_creator)
     offset = 1
     common_params = {"character_id": 1}
     response1 = client.get(
@@ -135,13 +106,8 @@ def test_character_revisions_offset(
 @pytest.mark.env("e2e", "database")
 def test_character_revisions_page_limit(
     client: TestClient,
-    db_session: Session,
-    mock_user: MockUser,
+    mock_user_service: MockUserService,
 ):
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_mid == 1, character_rev_type_filters
-    ):
-        mock_user(r.rev_creator)
     offset = 30000
     response = client.get(
         character_revisions_api_prefix, params={"character_id": 1, "offset": offset}
