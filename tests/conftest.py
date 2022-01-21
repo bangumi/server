@@ -76,7 +76,8 @@ def mock_db(app) -> MockAsyncSession:
     db.scalar = mock.AsyncMock(return_value=None)
     db.scalars = mock.AsyncMock(return_value=None)
     app.dependency_overrides[get_db] = async_lambda(db)
-    return db
+    yield db
+    app.dependency_overrides.pop(get_db, None)
 
 
 class MockRedis(Protocol):
@@ -93,7 +94,8 @@ def mock_redis(app) -> MockRedis:
     r.get = mock.AsyncMock(return_value=None)
     r.get_with_model = mock.AsyncMock(return_value=None)
     app.dependency_overrides[get_redis] = async_lambda(r)
-    return r
+    yield r
+    app.dependency_overrides.pop(get_redis, None)
 
 
 @pytest.fixture()
