@@ -8,8 +8,8 @@ from starlette.testclient import TestClient
 import pol.server
 from pol.models import Avatar, PublicUser
 from pol.db.tables import ChiiRevHistory
-from tests.conftest import MockUser
 from pol.services.user_service import UserService
+from tests.fixtures.mock_db_record import MockUser
 from pol.services.rev_service.person_rev import person_rev_type_filters
 from pol.services.rev_service.character_rev import character_rev_type_filters
 

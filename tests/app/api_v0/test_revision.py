@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from pol.db.tables import ChiiRevHistory
-from tests.conftest import MockUser
+from tests.fixtures.mock_db_record import MockUser
 
 person_revisions_api_prefix = "/v0/revisions/persons"
 

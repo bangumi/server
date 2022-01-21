@@ -14,9 +14,9 @@ from pol.db import sa
 from pol.models import Subject
 from tests.base import async_lambda
 from pol.db.tables import ChiiSubjectField
-from tests.conftest import MockRedis
 from pol.api.v0.depends import optional_user
 from pol.api.v0.depends.auth import Guest
+from tests.fixtures.mock_redis import MockRedis
 from pol.services.subject_service import SubjectService
 
 fixtures_path = Path(__file__).parent.joinpath("fixtures")
