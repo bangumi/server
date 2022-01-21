@@ -2,7 +2,7 @@ import pytest
 from starlette.testclient import TestClient
 
 from pol.db.const import SubjectType, CollectionType
-from tests.conftest import MockUser
+from tests.fixtures.mock_db_record import MockUser
 
 
 @pytest.mark.env("e2e", "database", "redis")

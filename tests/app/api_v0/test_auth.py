@@ -9,8 +9,6 @@ from pol import config
 from pol.models import User, Avatar
 from pol.permission import UserGroup
 
-access_token = "a_development_access_token"
-
 
 @pytest.mark.env("e2e", "database", "redis")
 def test_auth_200(client: TestClient, auth_header):
@@ -20,7 +18,7 @@ def test_auth_200(client: TestClient, auth_header):
 
 
 @pytest.mark.env("e2e", "database", "redis")
-def test_auth_403(client: TestClient):
+def test_auth_403(client: TestClient, access_token: str):
     response = client.get("/v0/me", headers={"Authorization": "Bearer "})
     assert response.status_code == 403, "no token"
 
@@ -55,7 +53,9 @@ def test_auth_cached(client: TestClient, redis_client: Redis):
 
 
 @pytest.mark.env("e2e", "database", "redis")
-def test_auth_cache_ban_cache_fallback(client: TestClient, redis_client: Redis):
+def test_auth_cache_ban_cache_fallback(
+    client: TestClient, redis_client: Redis, access_token: str
+):
     cache_key = config.CACHE_KEY_PREFIX + f"access:{access_token}"
     redis_client.set(
         cache_key,

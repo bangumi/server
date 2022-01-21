@@ -3,7 +3,7 @@
 import pytest
 from starlette.testclient import TestClient
 
-from tests.conftest import MockUserService
+from tests.fixtures.mock_service import MockUserService
 
 person_revisions_api_prefix = "/v0/revisions/persons"
 

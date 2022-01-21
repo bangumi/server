@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from pol.db import sa
 from tests.base import async_test
 from pol.db.tables import ChiiMember
-from tests.conftest import MockUser
 from pol.services.user_service import UserService
+from tests.fixtures.mock_db_record import MockUser
 
 
 @pytest.mark.env("database")
