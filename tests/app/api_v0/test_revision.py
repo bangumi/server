@@ -1,24 +1,15 @@
 # TODO: split E2E test to unit test
+
 import pytest
-from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
-from pol.db.tables import ChiiRevHistory
-from tests.conftest import MockUser
+from tests.conftest import MockUserService
 
 person_revisions_api_prefix = "/v0/revisions/persons"
 
 
 @pytest.mark.env("e2e", "database")
-def test_person_revision_basic(
-    client: TestClient,
-    db_session: Session,
-    mock_user: MockUser,
-):
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_id == 348475
-    ):
-        mock_user(r.rev_creator)
+def test_person_revision_basic(client: TestClient, mock_user_service: MockUserService):
     response = client.get(
         f"{person_revisions_api_prefix}/348475",
     )
@@ -51,14 +42,8 @@ character_revisions_api_prefix = "/v0/revisions/characters"
 
 @pytest.mark.env("e2e", "database")
 def test_character_revision_basic(
-    client: TestClient,
-    db_session: Session,
-    mock_user: MockUser,
+    client: TestClient, mock_user_service: MockUserService
 ):
-    for r in db_session.query(ChiiRevHistory.rev_creator).where(
-        ChiiRevHistory.rev_id == 190704
-    ):
-        mock_user(r.rev_creator)
     response = client.get(
         f"{character_revisions_api_prefix}/190704",
     )
