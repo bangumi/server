@@ -4,9 +4,7 @@ import pytest
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
-import pol.server
 from pol.db.tables import ChiiRevHistory
-from pol.services.user_service import UserService
 from tests.fixtures.mock_db_record import MockUser
 from pol.services.rev_service.person_rev import person_rev_type_filters
 from pol.services.rev_service.character_rev import character_rev_type_filters
@@ -156,7 +154,6 @@ subject_revisions_api_prefix = "/v0/revisions/subjects"
 
 @pytest.mark.env("e2e", "database")
 def test_subject_revisions_basic(client: TestClient, mock_user_service):
-    pol.server.app.dependency_overrides[UserService.new] = mock_user_service
     response = client.get(subject_revisions_api_prefix, params={"subject_id": 26})
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
