@@ -95,7 +95,8 @@ class MockUserService:
 def mock_user_service(app: FastAPI):
     service = mock.Mock(wraps=MockUserService())
     app.dependency_overrides[UserService.new] = lambda: service
-    return service
+    yield service
+    app.dependency_overrides.pop(UserService.new, None)
 
 
 class MockAsyncSession(Protocol):
