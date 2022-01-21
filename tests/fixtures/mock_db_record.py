@@ -232,11 +232,7 @@ def mock_user(db_session: Session) -> Generator[MockUser, None, None]:
                 ChiiOauthAccessToken.access_token == access_token
             )
         delete_query[ChiiMember].append(ChiiMember.uid == user_id)
-        try:
-            check_exist(db_session, delete_query)
-        except ValueError as e:
-            print(e)
-            return
+        check_exist(db_session, delete_query)
 
         if access_token:
             db_session.add(
