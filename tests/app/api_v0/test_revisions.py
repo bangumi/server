@@ -11,7 +11,7 @@ person_revisions_api_prefix = "/v0/revisions/persons"
 @pytest.mark.env("e2e", "database")
 def test_person_revisions_basic(
     client: TestClient,
-    mock_user_service,
+    mock_user_service: MockUserService,
 ):
     response = client.get(person_revisions_api_prefix, params={"person_id": 9})
     assert response.status_code == 200
@@ -119,7 +119,9 @@ subject_revisions_api_prefix = "/v0/revisions/subjects"
 
 
 @pytest.mark.env("e2e", "database")
-def test_subject_revisions_basic(client: TestClient, mock_user_service):
+def test_subject_revisions_basic(
+    client: TestClient, mock_user_service: MockUserService
+):
     response = client.get(subject_revisions_api_prefix, params={"subject_id": 26})
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
