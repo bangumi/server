@@ -89,60 +89,6 @@ def test_index_nsfw_200(
 
 
 @pytest.mark.env("e2e", "database")
-def test_index_comments(
-    client: TestClient,
-    mock_user_service: MockUserService,
-):
-    id = 15045
-    response = client.get(
-        f"{index_api_prefix}/{id}/comments",
-    )
-    assert response.status_code == 200
-    assert response.headers["content-type"] == "application/json"
-
-    res = response.json()
-    assert res["total"]
-    assert res["data"]
-    assert res["total"] == len(res["data"])
-    assert res["offset"] == 0
-    assert "limit" in res
-
-    for item in res["data"]:
-        assert "text" in item
-
-
-@pytest.mark.env("e2e", "database", "redis")
-def test_index_comments_nsfw_404(
-    client: TestClient,
-    mock_user_service: MockUserService,
-    db_session: Session,
-    mock_subject: MockSubject,
-):
-    id = 15465
-    mock_subjects(db_session, mock_subject, id)
-    response = client.get(
-        f"{index_api_prefix}/{id}/comments",
-    )
-    assert response.status_code == 404
-    assert response.headers["content-type"] == "application/json"
-
-
-@pytest.mark.env("e2e", "database", "redis")
-def test_index_comments_nsfw_200(
-    client: TestClient,
-    mock_user_service: MockUserService,
-    auth_header: Dict[str, str],
-    db_session: Session,
-    mock_subject: MockSubject,
-):
-    id = 15465
-    mock_subjects(db_session, mock_subject, id)
-    response = client.get(f"{index_api_prefix}/{id}/comments", headers=auth_header)
-    assert response.status_code == 200
-    assert response.headers["content-type"] == "application/json"
-
-
-@pytest.mark.env("e2e", "database")
 def test_index_subjects(
     client: TestClient,
     db_session: Session,

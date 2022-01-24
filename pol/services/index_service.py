@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Iterator, Optional, cast
+from typing import Iterator, Optional, cast
 
 from fastapi import Depends
 from pydantic import BaseModel
@@ -9,7 +9,7 @@ from pol import curd
 from pol.db import sa
 from pol.depends import get_db
 from pol.db.const import SubjectType
-from pol.db.tables import ChiiIndex, ChiiSubject, ChiiIndexRelated, ChiiIndexComments
+from pol.db.tables import ChiiIndex, ChiiSubject, ChiiIndexRelated
 from pol.api.v0.models import Stat
 from pol.curd.exceptions import NotFoundError
 
@@ -28,14 +28,6 @@ class Index(BaseModel):
     updated_at: datetime.datetime
     creator_id: int
     ban: bool
-
-
-class IndexComment(BaseModel):
-    id: int
-    creator_id: int
-    created_at: datetime.datetime
-    text: str
-    replies: Optional[List["IndexComment"]]
 
 
 class IndexSubject(BaseModel):
@@ -125,54 +117,6 @@ class IndexService:
                 type=r.idx_rlt_type,
                 comment=r.idx_rlt_comment,
                 added_at=r.idx_rlt_dateline,
-            )
-            for r in results
-        ]
-
-    async def count_index_comments(self, index_id: int):
-        return await curd.count(
-            self._db,
-            ChiiIndexComments.idx_pst_mid == index_id,
-            ChiiIndexComments.idx_pst_related == 0,
-        )
-
-    async def list_index_comments(
-        self,
-        index_id: int,
-        limit: int,
-        offset: int,
-    ):
-        query = (
-            sa.select(ChiiIndexComments)
-            .options(sa.selectinload(ChiiIndexComments.replies))
-            .where(
-                ChiiIndexComments.idx_pst_mid == index_id,
-                ChiiIndexComments.idx_pst_related == 0,
-            )
-            .order_by(ChiiIndexComments.idx_pst_dateline.asc())
-            .limit(limit)
-            .offset(offset)
-        )
-        results = cast(
-            Iterator[ChiiIndexComments],
-            await self._db.scalars(query),
-        )
-
-        return [
-            IndexComment(
-                id=r.idx_pst_id,
-                creator_id=r.idx_pst_uid,
-                created_at=r.idx_pst_dateline,
-                text=r.idx_pst_content,
-                replies=[
-                    IndexComment(
-                        id=reply.idx_pst_id,
-                        creator_id=reply.idx_pst_uid,
-                        created_at=reply.idx_pst_dateline,
-                        text=reply.idx_pst_content,
-                    )
-                    for reply in r.replies
-                ],
             )
             for r in results
         ]

@@ -1,4 +1,4 @@
-from typing import Set, Optional
+from typing import Optional
 
 from fastapi import Path, Depends, APIRouter
 
@@ -13,7 +13,7 @@ from pol.api.v0.depends.auth import optional_user
 from pol.services.user_service import UserService
 from pol.services.index_service import IndexService
 from pol.services.subject_service import SubjectService
-from .models.index import Index, IndexComment, IndexSubject, IndexCommentReply
+from .models.index import Index, IndexSubject
 
 router = APIRouter(prefix="/indices", tags=["目录"], route_class=ErrorCatchRoute)
 
@@ -102,65 +102,6 @@ async def get_index_subjects(
                 added_at=r.added_at,
             )
             for r, s in ((r, subjects[r.id]) for r in results)
-        ],
-        "total": total,
-    }
-
-
-@router.get(
-    "/{index_id}/comments",
-    response_model=Paged[IndexComment],
-    responses={
-        404: res.response(model=ErrorDetail),
-    },
-)
-async def get_index_comments(
-    index_id: int = Path(0, gt=0),
-    index_service: IndexService = Depends(IndexService.new),
-    user_service: UserService = Depends(UserService.new),
-    page: Pager = Depends(),
-    cache_control: CacheControl = Depends(CacheControl),
-    not_found: res.HTTPException = Depends(not_found_exception),
-    user: Role = Depends(optional_user),
-):
-    cache_control(300)
-    if not user.allow_nsfw() and await index_service.get_index_nsfw_by_id(index_id):
-        raise not_found
-    try:
-        await index_service.get_index_by_id(index_id)
-    except IndexService.NotFoundError:
-        raise not_found
-    total = await index_service.count_index_comments(index_id)
-    page.check(total)
-    results = await index_service.list_index_comments(index_id, page.limit, page.offset)
-    creator_ids: Set[int] = set()
-    for x in results:
-        creator_ids.add(x.creator_id)
-        if x.replies:
-            for r in x.replies:
-                creator_ids.add(r.creator_id)
-    users = await user_service.get_users_by_id(id for id in creator_ids)
-
-    return {
-        "limit": page.limit,
-        "offset": page.offset,
-        "data": [
-            IndexComment(
-                id=r.id,
-                text=r.text,
-                creator=users[r.creator_id],
-                created_at=r.created_at,
-                replies=[
-                    IndexCommentReply(
-                        id=reply.id,
-                        text=reply.text,
-                        creator=users[reply.creator_id],
-                        created_at=reply.created_at,
-                    )
-                    for reply in r.replies
-                ],
-            )
-            for r in results
         ],
         "total": total,
     }

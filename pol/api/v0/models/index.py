@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field, BaseModel
 
@@ -49,14 +49,3 @@ class IndexSubject(BaseModel):
             images = subject_images(images)
 
         super().__init__(**data, infobox=infobox, images=images)
-
-
-class IndexCommentReply(BaseModel):
-    id: int
-    text: str
-    creator: Creator
-    created_at: datetime.datetime
-
-
-class IndexComment(IndexCommentReply):
-    replies: List[IndexCommentReply]
