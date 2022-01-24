@@ -2,8 +2,8 @@ name: lint
 
 on:
   push:
-    branches:
-      - master
+    branches-ignore:
+      - renovate/**
     paths-ignore:
       - "**.md"
   pull_request:

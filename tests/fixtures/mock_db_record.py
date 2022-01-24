@@ -5,7 +5,7 @@ Database records added by fixtures should be removed after tests.
 """
 from abc import abstractmethod
 from typing import Protocol, Generator
-from datetime import datetime
+from datetime import date, datetime
 from collections import defaultdict
 
 import pytest
@@ -38,6 +38,34 @@ def db_session():
         db_session.close()
 
 
+class MockSubject(Protocol):
+    @abstractmethod
+    def __call__(
+        self,
+        subject_id: int,
+        subject_name: str = "",
+        subject_type: SubjectType = SubjectType.anime,
+        subject_name_cn: str = "",
+        subject_uid: int = 1,
+        subject_creator: int = 1,
+        subject_image: str = "",
+        field_infobox: str = "",
+        field_summary: str = "",
+        field_5: str = "",
+        subject_idx_cn: str = "",
+        subject_airtime: int = 1,
+        subject_nsfw: int = 0,
+        subject_ban: int = 0,
+        field_tags: str = "",
+        field_airtime: int = 1,
+        field_year: int = 2007,
+        field_mon: int = 1,
+        field_week_day: int = 3,
+        field_date: date = datetime.now().astimezone().date(),
+    ) -> None:
+        pass
+
+
 @pytest.fixture()
 def mock_subject(db_session: Session):
     mock_subject_id = set()
@@ -65,6 +93,8 @@ def mock_subject(db_session: Session):
         field_week_day=3,
         field_date=datetime.now().astimezone().date(),
     ):
+        if subject_id in mock_subject_id:
+            return
         delete_query[ChiiSubject].append(ChiiSubject.subject_id == subject_id)
         delete_query[ChiiSubjectField].append(ChiiSubjectField.field_sid == subject_id)
 

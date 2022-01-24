@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from . import me, user, person, episode, subject, revision, character
+from . import me, user, index, person, episode, subject, revision, character
 
 router = APIRouter()
 router.include_router(subject.router)
@@ -10,3 +10,4 @@ router.include_router(person.router)
 router.include_router(me.router)
 router.include_router(user.router)
 router.include_router(revision.router)
+router.include_router(index.router)
