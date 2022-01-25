@@ -5,6 +5,8 @@ from pydantic import Field, BaseModel
 
 from .creator import Creator
 
+__all__ = ["Revision", "DetailedRevision"]
+
 
 class Revision(BaseModel):
     id: int

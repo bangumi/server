@@ -5,6 +5,14 @@ from starlette.testclient import TestClient
 
 import pol.server
 
+__all__ = ["pytest_addoption",
+           "pytest_configure",
+           "pytest_runtest_setup",
+           "app",
+           "client",
+           "access_token",
+           "auth_header"]
+
 # mockers
 pytest_plugins = [
     "tests.fixtures.mock_redis",

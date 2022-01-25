@@ -20,6 +20,8 @@ assert wiki.info == [
 import dataclasses
 from typing import Any, Dict, List, Optional
 
+__all__ = ["Wiki", "WikiSyntaxError", "kv", "parse"]
+
 
 @dataclasses.dataclass
 class Wiki:

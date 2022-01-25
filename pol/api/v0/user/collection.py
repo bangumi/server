@@ -18,6 +18,8 @@ from pol.api.v0.models import Paged, Pager
 from pol.api.v0.depends import get_public_user
 from pol.api.v0.depends.auth import optional_user
 
+__all__ = ["UserCollection", "get_user_collection", "tags"]
+
 router = APIRouter(
     tags=["用户"],
     route_class=ErrorCatchRoute,

@@ -8,6 +8,8 @@ import pytest
 from pol import config
 from pol.depends import get_redis
 
+__all__ = ["MockRedis", "mock_redis", "redis_client"]
+
 
 class MockRedis(Protocol):
     get: mock.AsyncMock

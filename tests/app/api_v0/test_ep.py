@@ -3,6 +3,24 @@ from starlette.testclient import TestClient
 
 from pol.db.const import EpType
 
+__all__ = ["test_episode_404",
+           "test_episode",
+           "test_episode_nsfw_subject_404",
+           "test_episode_nsfw_subject",
+           "test_episodes",
+           "test_episodes_offset_too_big",
+           "test_episodes_empty",
+           "test_episodes_404",
+           "test_episodes_nsfw_non_auth",
+           "test_episodes_nsfw_auth",
+           "test_episodes_offset",
+           "test_episodes_non_normal_offset",
+           "test_episodes_start_non_1",
+           "test_episodes_start_non_offset",
+           "test_episode_offset",
+           "test_episodes_ban",
+           "test_episode_ban"]
+
 
 @pytest.mark.env("e2e", "database", "redis")
 def test_episode_404(client: TestClient):

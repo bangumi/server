@@ -19,6 +19,24 @@ from pol.api.v0.depends.auth import Guest
 from tests.fixtures.mock_redis import MockRedis
 from pol.services.subject_service import SubjectService
 
+__all__ = ["test_subject_not_found",
+           "test_subject_not_valid",
+           "test_subject_basic",
+           "test_subject_nsfw_auth_200",
+           "test_subject_redirect",
+           "test_subject_empty_image",
+           "test_subject_ep_query_limit_offset",
+           "test_subject_ep_type",
+           "test_subject_characters",
+           "test_subject_persons",
+           "test_subject_subjects_ban",
+           "test_subject_subjects",
+           "test_subject_cache_broken_purge",
+           "test_subject_tags",
+           "test_subject_tags_empty",
+           "test_subject_tags_none",
+           "test_subject_cache_header_public"]
+
 fixtures_path = Path(__file__).parent.joinpath("fixtures")
 
 

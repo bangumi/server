@@ -9,6 +9,8 @@ from pol.db.tables import ChiiMember
 from pol.services.user_service import UserService
 from tests.fixtures.mock_db_record import MockUser
 
+__all__ = ["test_auth_expired_token", "test_auth_missing_user"]
+
 
 @pytest.mark.env("database")
 @async_test

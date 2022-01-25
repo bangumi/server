@@ -4,6 +4,8 @@ from pydantic import BaseModel
 
 from pol.permission import Role, UserGroup
 
+__all__ = ["Avatar", "PublicUser", "User"]
+
 
 class Avatar(BaseModel):
     large: str

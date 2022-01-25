@@ -1,5 +1,7 @@
 from starlette.testclient import TestClient
 
+__all__ = ["test_doc_html", "test_doc_html_2", "test_openapi_json", "test_default_404"]
+
 
 def test_doc_html(client: TestClient):
     response = client.get("/v0", allow_redirects=False)

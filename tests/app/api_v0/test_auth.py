@@ -9,6 +9,12 @@ from pol import config
 from pol.models import User, Avatar
 from pol.permission import UserGroup
 
+__all__ = ["test_auth_200",
+           "test_auth_403",
+           "test_auth_403_wrong_token",
+           "test_auth_cached",
+           "test_auth_cache_ban_cache_fallback"]
+
 
 @pytest.mark.env("e2e", "database", "redis")
 def test_auth_200(client: TestClient, auth_header):

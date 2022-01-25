@@ -5,6 +5,16 @@ from starlette.testclient import TestClient
 
 from tests.fixtures.mock_service import MockUserService
 
+__all__ = ["test_person_revision_basic",
+           "test_person_revision_not_found",
+           "test_character_revision_basic",
+           "test_character_revision_not_found",
+           "test_subject_revision_basic",
+           "test_subject_revision_not_found",
+           "test_subject_revision_amazon",
+           "test_episode_revision_basic",
+           "test_episode_revision_not_found"]
+
 person_revisions_api_prefix = "/v0/revisions/persons"
 
 

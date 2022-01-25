@@ -8,6 +8,8 @@ from pol.router import ErrorCatchRoute
 from pol.permission import UserGroup
 from pol.api.v0.depends.auth import User, get_current_user
 
+__all__ = ["Me", "get_user"]
+
 router = APIRouter(tags=["用户"], route_class=ErrorCatchRoute)
 
 

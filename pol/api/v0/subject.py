@@ -39,6 +39,11 @@ from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject
 from pol.services.subject_service import SubjectService
 
+__all__ = ["get_subject_by_id",
+           "get_subject_persons",
+           "get_subject_characters",
+           "get_subject_relations"]
+
 router = APIRouter(tags=["条目"], route_class=ErrorCatchRoute)
 
 api_base = "/v0/subjects"

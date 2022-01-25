@@ -5,6 +5,8 @@ from pol import config
 from tests.base import async_test
 from pol.redis.json_cache import JSONRedis
 
+__all__ = ["test_redis_util"]
+
 
 @pytest.mark.env("redis")
 @async_test

@@ -7,6 +7,8 @@ from tests.base import async_test
 from pol.api.v0.depends.auth import get_current_user
 from pol.services.user_service import UserService
 
+__all__ = ["test_depends_get_current_user"]
+
 
 @async_test
 async def test_depends_get_current_user(mock_redis):

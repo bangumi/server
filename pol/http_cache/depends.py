@@ -1,5 +1,7 @@
 from starlette.requests import Request
 
+__all__ = ["CacheControl"]
+
 
 class CacheControl:
     """用于控制响应的 `Cache-Control`"""

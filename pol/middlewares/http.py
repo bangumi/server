@@ -5,6 +5,8 @@ from starlette.requests import Request
 
 from pol import config
 
+__all__ = ["setup_http_middleware"]
+
 
 def setup_http_middleware(app: FastAPI):
     @app.middleware("http")

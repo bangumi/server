@@ -10,6 +10,8 @@ from pol.db.tables import ChiiSubject
 from pol.models.subject import Subject
 from pol.curd.exceptions import NotFoundError
 
+__all__ = ["SubjectNotFound", "SubjectService"]
+
 
 class SubjectNotFound(NotFoundError):
     pass

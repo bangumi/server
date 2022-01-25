@@ -23,6 +23,14 @@ from pol.db.tables import (
     ChiiOauthAccessToken,
 )
 
+__all__ = ["db_session",
+           "mock_subject",
+           "mock_person",
+           "MockUser",
+           "mock_user",
+           "mock_user_collection",
+           "check_exist"]
+
 DBSession = sa.sync_session_maker()
 
 

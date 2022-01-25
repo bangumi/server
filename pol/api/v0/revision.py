@@ -12,6 +12,15 @@ from pol.services.rev_service import RevisionService
 from pol.services.user_service import UserService
 from pol.api.v0.models.revision import Revision, DetailedRevision
 
+__all__ = ["get_person_revisions",
+           "get_person_revision",
+           "get_character_revisions",
+           "get_character_revision",
+           "get_subject_revisions",
+           "get_subject_revision",
+           "get_episode_revisions",
+           "get_episode_revision"]
+
 router = APIRouter(prefix="/revisions", tags=["编辑历史"], route_class=ErrorCatchRoute)
 
 

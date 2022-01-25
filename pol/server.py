@@ -17,6 +17,8 @@ from pol.router import ErrorCatchRoute
 from pol.middlewares.http import setup_http_middleware
 from pol.redis.json_cache import JSONRedis
 
+__all__ = ["handle_public_cache", "global_404", "startup", "shutdown", "openapi", "doc"]
+
 app = FastAPI(
     debug=config.DEBUG,
     title=config.APP_NAME,

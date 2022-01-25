@@ -24,6 +24,20 @@ from pol.db.tables import (
 )
 from pol.api.v0.utils import get_career
 
+__all__ = ["main",
+           "export_person_characters",
+           "export_subject_persons",
+           "export_subject_characters",
+           "export_persons",
+           "export_characters",
+           "export_subject_self_relation",
+           "export_subjects",
+           "export_episodes",
+           "chunk_ids",
+           "get_max_character_id",
+           "get_max_person_id",
+           "get_max_subject_id"]
+
 
 @logger.catch()
 def main():

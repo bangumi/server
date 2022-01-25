@@ -5,6 +5,11 @@ from starlette.testclient import TestClient
 
 from pol import config
 
+__all__ = ["test_subject_auth_nsfw_no_auth_404",
+           "test_subject_auth_nsfw",
+           "test_subject_auth_cached",
+           "test_subject_nsfw_no_cache"]
+
 
 @pytest.mark.env("e2e", "database", "redis")
 def test_subject_auth_nsfw_no_auth_404(client: TestClient):

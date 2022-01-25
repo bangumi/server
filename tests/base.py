@@ -2,6 +2,8 @@ import asyncio
 import inspect
 from functools import wraps
 
+__all__ = ["async_test", "async_lambda"]
+
 
 def async_test(f):
     if not inspect.iscoroutinefunction(f):  # pragma: no cover

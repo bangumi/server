@@ -6,6 +6,16 @@ from starlette.testclient import TestClient
 
 from pol.config import CACHE_KEY_PREFIX
 
+__all__ = ["test_person_not_found",
+           "test_person_not_valid",
+           "test_person_basic",
+           "test_person_ban_404",
+           "test_person_cache",
+           "test_person_subjects",
+           "test_person_redirect",
+           "test_person_lock",
+           "test_person_characters"]
+
 
 @pytest.mark.env("e2e", "database", "redis")
 def test_person_not_found(client: TestClient):

@@ -10,6 +10,8 @@ from pol.db.const import RevisionType
 from pol.db.tables import ChiiEpRevision, ChiiRevHistory
 from pol.services.rev_service.exception import RevisionNotFound
 
+__all__ = ["EpisodeHistory", "EpisodeHistoryDetail"]
+
 episode_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.episode_rev_types())
 
 

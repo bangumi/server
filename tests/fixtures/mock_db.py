@@ -12,6 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from pol import config
 from pol.depends import get_db
 
+__all__ = ["MockAsyncSession", "mock_db", "AsyncSessionMaker"]
+
 
 class MockAsyncSession(Protocol):
     get: mock.AsyncMock

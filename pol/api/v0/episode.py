@@ -20,6 +20,8 @@ from pol.http_cache.depends import CacheControl
 from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Episode, EpisodeDetail
 
+__all__ = ["Pager", "get_episodes", "add_episode", "get_episode"]
+
 router = APIRouter(tags=["章节"], route_class=ErrorCatchRoute)
 
 

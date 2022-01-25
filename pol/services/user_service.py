@@ -11,6 +11,8 @@ from pol.depends import get_db
 from pol.db.tables import ChiiMember, ChiiOauthAccessToken
 from pol.curd.exceptions import NotFoundError
 
+__all__ = ["UserNotFound", "UserService"]
+
 
 class UserNotFound(NotFoundError):
     pass

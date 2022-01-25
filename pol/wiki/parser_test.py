@@ -5,6 +5,7 @@ import pytest
 from .parser import WikiSyntaxError, kv, parse
 
 
+
 def test_key_value():
     raw = """{{Infobox animanga/TVAnime
 |中文名= Code Geass 反叛的鲁路修R2

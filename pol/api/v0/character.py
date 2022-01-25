@@ -23,6 +23,8 @@ from pol.api.v0.utils import person_images, subject_images
 from pol.api.v0.models import RelatedSubject, CharacterDetail, CharacterPerson
 from pol.redis.json_cache import JSONRedis
 
+__all__ = ["get_character_detail", "get_person_subjects", "get_character_persons"]
+
 router = APIRouter(tags=["角色"], route_class=ErrorCatchRoute)
 
 api_base = "/v0/characters"

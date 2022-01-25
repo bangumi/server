@@ -4,6 +4,13 @@ from starlette.testclient import TestClient
 from pol.db.const import SubjectType, CollectionType
 from tests.fixtures.mock_db_record import MockUser
 
+__all__ = ["test_collection_not_found",
+           "test_collection_public",
+           "test_collection_private",
+           "test_collection_username",
+           "test_collection_filter_subject",
+           "test_collection_filter_type"]
+
 
 @pytest.mark.env("e2e", "database", "redis")
 def test_collection_not_found(client: TestClient):

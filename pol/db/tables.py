@@ -31,6 +31,28 @@ from sqlalchemy.dialects.mysql import (
 from pol.compat import phpseralize
 from pol.compat.phpseralize import dict_to_list
 
+__all__ = ["ChiiCharacter",
+           "ChiiCrtCastIndex",
+           "ChiiCrtSubjectIndex",
+           "ChiiEpRevision",
+           "ChiiEpisode",
+           "ChiiMemberfield",
+           "ChiiMember",
+           "ChiiOauthAccessToken",
+           "ChiiPersonCollect",
+           "ChiiPersonCsIndex",
+           "ChiiPersonField",
+           "ChiiCharacterField",
+           "ChiiPerson",
+           "ChiiRevHistory",
+           "GzipPHPSerializedBlob",
+           "ChiiRevText",
+           "ChiiSubjectField",
+           "ChiiSubjectRelations",
+           "ChiiSubjectRevision",
+           "ChiiSubject",
+           "ChiiSubjectInterest"]
+
 Base = declarative_base()
 metadata = Base.metadata
 

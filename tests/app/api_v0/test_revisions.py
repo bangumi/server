@@ -5,6 +5,19 @@ from starlette.testclient import TestClient
 
 from tests.fixtures.mock_service import MockUserService
 
+__all__ = ["test_person_revisions_basic",
+           "test_person_revisions_offset",
+           "test_person_revisions_offset_limit",
+           "test_character_revisions_basic",
+           "test_character_revisions_offset",
+           "test_character_revisions_page_limit",
+           "test_subject_revisions_basic",
+           "test_subject_revisions_offset",
+           "test_subject_revisions_page_limit",
+           "test_episode_revisions_basic",
+           "test_episode_revisions_offset",
+           "test_episode_revisions_page_limit"]
+
 person_revisions_api_prefix = "/v0/revisions/persons"
 
 

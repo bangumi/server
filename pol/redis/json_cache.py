@@ -5,6 +5,8 @@ from aioredis import Redis
 from pydantic import BaseModel, ValidationError
 from aioredis.client import KeyT, ExpiryT
 
+__all__ = ["JSONRedis"]
+
 T = TypeVar("T", bound=BaseModel)
 
 

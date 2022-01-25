@@ -11,6 +11,8 @@ from fastapi.exceptions import RequestValidationError
 from pol import res
 from pol.res import ORJSONResponse
 
+__all__ = ["ErrorCatchRoute"]
+
 
 class ErrorCatchRoute(APIRoute):
     """starlette不支持全局 catch `Exception`，只能用这种办法来捕获内部异常。"""

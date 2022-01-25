@@ -5,6 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pol.db import sa
 from pol.db.tables import Base
 
+__all__ = ["count"]
+
 T = TypeVar("T", bound=Base)
 
 

@@ -7,6 +7,8 @@ from fastapi import FastAPI
 from pol.models import Avatar, PublicUser
 from pol.services.user_service import UserService
 
+__all__ = ["MockUserService", "mock_user_service"]
+
 
 class MockUserService:
     async def get_users_by_id(self, ids: Iterator[int]) -> Dict[int, PublicUser]:

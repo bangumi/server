@@ -5,6 +5,8 @@ from tests.base import async_test
 from pol.db.tables import ChiiSubject, ChiiSubjectField
 from pol.services.subject_service import SubjectService
 
+__all__ = ["test_get_by_id", "test_get_basic"]
+
 
 @pytest.mark.env("database")
 @async_test

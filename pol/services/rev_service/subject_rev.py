@@ -10,6 +10,8 @@ from pol.db.const import RevisionType
 from pol.db.tables import ChiiRevHistory, ChiiSubjectRevision
 from pol.services.rev_service.exception import RevisionNotFound
 
+__all__ = ["SubjectHistory", "SubjectHistoryDetail"]
+
 subject_rev_type_filters = ChiiRevHistory.rev_type.in_(RevisionType.subject_rev_types())
 
 
