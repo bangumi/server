@@ -119,6 +119,4 @@ CI 中还会运行 flake8 和 mypy
 
 ## License
 
-BSD 3-Clause License
-
-[LICENSE](https://github.com/bangumi/server/blob/master/LICENSE.md)
+Source is licensed under the GNU AGPLv3 license that can be found in the [LICENSE.txt](https://github.com/bangumi/server/blob/master/LICENSE.txt) file.
