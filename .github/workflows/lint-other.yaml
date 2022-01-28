@@ -30,7 +30,7 @@ jobs:
       - name: Install Node LTS
         uses: actions/setup-node@v2
 
-      - run: npm i -g prettier
+      - run: npm i -g prettier prettier-plugin-toml
 
       - uses: reviewdog/action-setup@v1
         with:
