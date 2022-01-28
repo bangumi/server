@@ -12,7 +12,7 @@ on:
       - "**.html"
       - "**.json"
   pull_request_target:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, ready_for_review, reopened]
     branches:
       - master
     paths:
@@ -58,12 +58,6 @@ jobs:
           git diff >"${TMPFILE}"
           git reset --hard HEAD
 
-          TMPEVENT=$(mktemp)
-          jq '.+{"action_name": "pull_request_target"}' $GITHUB_EVENT_PATH > $TMPEVENT
-          export GITHUB_EVENT_PATH=$TMPEVENT
-
-          reviewdog -f=diff -f.diff.strip=1 -reporter=github-pr-review -tee < "${TMPFILE}"
-
-          exit 1
+          reviewdog -f=diff -f.diff.strip=1 -reporter=github-pr-review < "${TMPFILE}"
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
