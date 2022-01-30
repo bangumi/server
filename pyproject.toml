@@ -19,14 +19,14 @@ authors = [
 [tool.poetry.dependencies]
 python = "3.8.*"
 # dependencies
-fastapi = "0.71.0"
+fastapi = "==0.73.0"
 pydantic = "1.9.0"
 pytz = "2021.3"
-uvicorn = { version = "0.17.0", extras = ["standard"] }
+uvicorn = { version = "==0.17.1", extras = ["standard"] }
 aiomysql = '0.0.22'
-orjson = "3.6.5"
-loguru = "0.5.3"
-SQLAlchemy = { extras = ["mypy", "asyncio"], version = "1.4.29" }
+orjson = "==3.6.6"
+loguru = "==0.6.0"
+SQLAlchemy = { extras = ["mypy", "asyncio"], version = "==1.4.31" }
 aioredis = { extras = ["hiredis"], version = "2.0.1" }
 
 [tool.poetry.dev-dependencies]
