@@ -5,7 +5,7 @@ repos:
       - id: check-case-conflict
       - id: check-ast
       - id: check-builtin-literals
-      - id: check-byte-order-marker
+      - id: fix-byte-order-marker
       - id: check-toml
       - id: check-yaml
       - id: check-json
@@ -59,6 +59,6 @@ repos:
           - --no-lines-before=LOCALFOLDER
 
   - repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.1.0
     hooks:
       - id: black
