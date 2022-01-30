@@ -32,10 +32,10 @@ aioredis = { extras = ["hiredis"], version = "2.0.1" }
 [tool.poetry.dev-dependencies]
 sqlacodegen = "2.3.0"
 # tests
-coverage = { version = "6.2", extras = ["toml"] }
+coverage = { version = "==6.3", extras = ["toml"] }
 pytest = "6.2.5"
 # linter and formatter
-pre-commit = "2.16.0"
+pre-commit = "==2.17.0"
 flake8 = '4.0.1'
 flake8-comprehensions = "3.8.0"
 flake8-bugbear = "22.1.11"
@@ -46,7 +46,7 @@ requests = "2.27.1"
 types-pytz = "2021.3.4"
 pytest-github-actions-annotate-failures = "0.1.6"
 pytest-env = "0.6.2"
-redis = { extras = ["hiredis"], version = "4.1.0" }
+redis = { extras = ["hiredis"], version = "==4.1.2" }
 flake8-tidy-imports = "4.6.0"
 
 [tool.coverage.run]
