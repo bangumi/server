@@ -3,6 +3,8 @@
 .vscode
 ics
 env
+.env
+.envrc
 source.sh
 .scrapy
 a.html
