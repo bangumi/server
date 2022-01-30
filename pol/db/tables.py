@@ -516,7 +516,7 @@ class ChiiSubjectField(Base):
             "rank": self.field_rank,
             "score": score,
             "count": scores,
-            "total": total,
+            "total": total_count,
         }
 
     def scores(self):
