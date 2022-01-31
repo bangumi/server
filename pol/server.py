@@ -36,11 +36,7 @@ app.router.route_class = ErrorCatchRoute
 async def handle_public_cache(request: Request, call_next):
     """add cache control header, use `pol.http_cache.depends.CacheControl` in handler"""
     response: Response = await call_next(request)
-    if response.status_code >= 400:
-        return response
-    if "authorization" in request.headers:
-        response.headers["cache-control"] = "no-store"
-    elif v := getattr(request.state, "public_resource", 0):
+    if v := getattr(request.state, "public_resource", 0):
         response.headers["cache-control"] = f"public, max-age={v}"
     return response
 

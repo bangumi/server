@@ -37,8 +37,8 @@ class User(Role, BaseModel):
     nickname: str
     group_id: UserGroup
     registration_date: datetime
-    sign: str
-    avatar: Avatar
+    sign: str = ""
+    avatar: Avatar = Avatar.from_db_record("")
 
     def allow_nsfw(self) -> bool:
         allow_date = self.registration_date + timedelta(days=60)

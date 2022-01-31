@@ -799,6 +799,74 @@ class ChiiSubject(Base):
     def ban(self) -> bool:
         return self.subject_ban == 1
 
+    @classmethod
+    def with_default_value(
+        cls,
+        subject_id=1,
+        subject_type_id=1,
+        subject_platform=0,
+        subject_image="",
+        field_infobox="",
+        field_summary="",
+        subject_name="name",
+        subject_name_cn="name_cn",
+        subject_ban=0,
+        subject_nsfw=0,
+        field_volumes=0,
+        field_eps=0,
+        subject_wish=0,
+        subject_collect=0,
+        subject_doing=0,
+        subject_on_hold=0,
+        subject_dropped=0,
+        field_redirect=0,
+        field_rate_1=0,
+        field_rate_2=0,
+        field_rate_3=0,
+        field_rate_4=0,
+        field_rate_5=0,
+        field_rate_6=0,
+        field_rate_7=0,
+        field_rate_8=0,
+        field_rate_9=0,
+        field_rate_10=0,
+        field_rank=0,
+    ):
+        """a method to get a instance with all field has a default value"""
+        return ChiiSubject(
+            subject_id=subject_id,
+            subject_type_id=subject_type_id,
+            subject_platform=subject_platform,
+            subject_image=subject_image,
+            field_infobox=field_infobox,
+            field_summary=field_summary,
+            subject_name=subject_name,
+            subject_name_cn=subject_name_cn,
+            subject_ban=subject_ban,
+            subject_nsfw=subject_nsfw,
+            field_volumes=field_volumes,
+            field_eps=field_eps,
+            subject_wish=subject_wish,
+            subject_collect=subject_collect,
+            subject_doing=subject_doing,
+            subject_on_hold=subject_on_hold,
+            subject_dropped=subject_dropped,
+            fields=ChiiSubjectField(
+                field_redirect=field_redirect,
+                field_rate_1=field_rate_1,
+                field_rate_2=field_rate_2,
+                field_rate_3=field_rate_3,
+                field_rate_4=field_rate_4,
+                field_rate_5=field_rate_5,
+                field_rate_6=field_rate_6,
+                field_rate_7=field_rate_7,
+                field_rate_8=field_rate_8,
+                field_rate_9=field_rate_9,
+                field_rate_10=field_rate_10,
+                field_rank=field_rank,
+            ),
+        )
+
 
 class ChiiSubjectInterest(Base):
     __tablename__ = "chii_subject_interests"

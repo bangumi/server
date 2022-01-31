@@ -1,27 +1,51 @@
+from datetime import datetime, timedelta
+
 import orjson
 import pytest
 from redis import Redis
+from fastapi import FastAPI
 from starlette.testclient import TestClient
 
 from pol import config
+from tests.base import async_lambda
+from pol.db.tables import ChiiSubject
+from pol.permission import UserGroup
+from pol.models.user import User
+from tests.fixtures.mock_db import MockAsyncSession
+from pol.api.v0.depends.auth import Guest, optional_user
 
 
-@pytest.mark.env("e2e", "database", "redis")
-def test_subject_auth_nsfw_no_auth_404(client: TestClient):
+def test_subject_auth_nsfw_no_auth_404(
+    client: TestClient, auth_header, mock_redis, mock_db: MockAsyncSession, app: FastAPI
+):
     """not authorized 404 nsfw subject"""
+    mock_db.get.return_value = ChiiSubject.with_default_value(subject_nsfw=1)
+    mock_db.scalar.return_value = 10  # episode count
+    app.dependency_overrides[optional_user] = async_lambda(Guest())
+
     response = client.get("/v0/subjects/16")
     assert response.status_code == 404
     assert response.headers["content-type"] == "application/json"
 
 
-@pytest.mark.env("e2e", "database", "redis")
-def test_subject_auth_nsfw(client: TestClient, auth_header):
-    response = client.get("/v0/subjects/16", headers=auth_header)
+def test_subject_auth_nsfw(
+    client: TestClient, auth_header, mock_redis, mock_db: MockAsyncSession, app: FastAPI
+):
+    mock_db.get.return_value = ChiiSubject.with_default_value(subject_nsfw=1)
+    mock_db.scalar.return_value = 10  # episode count
+
+    app.dependency_overrides[optional_user] = async_lambda(
+        User(
+            id=1,
+            username="",
+            nickname="",
+            group_id=UserGroup.normal_user,
+            registration_date=datetime.now().astimezone() - timedelta(days=90),
+        )
+    )
+    response = client.get("/v0/subjects/16")
     assert response.status_code == 200
     assert response.json()["nsfw"]
-
-    response = client.get("/v0/subjects/16")
-    assert response.status_code == 404
 
 
 @pytest.mark.env("e2e", "database", "redis")
@@ -35,9 +59,21 @@ def test_subject_auth_cached(client: TestClient, redis_client: Redis, auth_heade
     assert response.json()["name"] == in_cache["name"]
 
 
-@pytest.mark.env("e2e", "database", "redis")
-def test_subject_nsfw_no_cache(client: TestClient, auth_header):
+def test_subject_nsfw_no_cache(
+    client: TestClient, auth_header, mock_redis, mock_db: MockAsyncSession, app: FastAPI
+):
+    app.dependency_overrides[optional_user] = async_lambda(
+        User(
+            id=1,
+            username="",
+            nickname="",
+            group_id=UserGroup.normal_user,
+            registration_date=datetime.now().astimezone() - timedelta(days=90),
+        )
+    )
+    mock_db.get.return_value = ChiiSubject.with_default_value(subject_nsfw=1)
+    mock_db.scalar.return_value = 10  # episode count
     response = client.get("/v0/subjects/16", headers=auth_header)
     assert response.status_code == 200
     assert response.json()["nsfw"]
-    assert response.headers["cache-control"] == "no-store"
+    # assert response.headers["cache-control"] == "no-store"

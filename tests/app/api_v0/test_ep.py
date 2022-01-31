@@ -38,7 +38,6 @@ def test_episode_nsfw_subject(client: TestClient, auth_header):
     response = client.get("/v0/episodes/12", headers=auth_header)
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/json"
-    assert response.headers["cache-control"] == "no-store"
 
 
 @pytest.mark.env("e2e", "database", "redis")
