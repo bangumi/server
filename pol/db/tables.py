@@ -1,5 +1,5 @@
 import zlib
-from typing import Any, List, Tuple, Union, cast
+from typing import Any, List, Tuple, Union
 
 from sqlalchemy import (
     TIMESTAMP,
@@ -999,16 +999,13 @@ class ChiiIndexComments(Base):
     idx_pst_related = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
     idx_pst_dateline = Column(INTEGER(10), nullable=False)
     idx_pst_content = Column(MEDIUMTEXT, nullable=False)
-    replies = cast(
-        List["ChiiIndexComments"],
-        relationship(
-            "ChiiIndexComments",
-            primaryjoin=foreign(idx_pst_id) == remote(idx_pst_related),
-            order_by=idx_pst_dateline.asc(),
-            uselist=True,
-            lazy="raise_on_sql",
-        ),
-    )
+    replies: List["ChiiIndexComments"] = relationship(
+        "ChiiIndexComments",
+        primaryjoin=foreign(idx_pst_id) == remote(idx_pst_related),
+        order_by=idx_pst_dateline.asc(),
+        uselist=True,
+        lazy="raise_on_sql",
+    )  # type: ignore
 
 
 class ChiiIndexRelated(Base):
