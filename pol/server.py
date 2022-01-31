@@ -34,6 +34,7 @@ app.router.route_class = ErrorCatchRoute
 
 @app.middleware("http")
 async def handle_public_cache(request: Request, call_next):
+    """add cache control header, use `pol.http_cache.depends.CacheControl` in handler"""
     response: Response = await call_next(request)
     if response.status_code >= 400:
         return response

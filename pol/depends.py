@@ -9,5 +9,6 @@ async def get_redis(request: Request) -> JSONRedis:
 
 
 async def get_db(request: Request):
+    """return a app scoped sqlalchemy `AsyncSession`"""
     async with request.app.state.Session() as session:
         yield session
