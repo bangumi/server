@@ -1,15 +1,17 @@
-r"""
-:original source: https://github.com/mitsuhiko/phpserialize
-:copyright: 2007-2012 by Armin Ronacher.
-:license: BSD
+"""
+This file is copied and modified from https://github.com/mitsuhiko/phpserialize
+
+Licensed under bsd 3-clause license
+<https://github.com/mitsuhiko/phpserialize/blob/master/LICENSE>
+
+Copyright 2021-2022 by Trim21 <trim21.me@gmail.com>
+Copyright 2007-2016 by Armin Ronacher.
 """
 
 from io import BytesIO
 
 default_errors = "strict"
 
-__author__ = "Armin Ronacher <armin.ronacher@active-4.com>"
-__version__ = "1.3"
 __all__ = (
     "dict_to_list",
     "load",
