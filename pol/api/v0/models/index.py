@@ -40,12 +40,12 @@ class IndexSubject(BaseModel):
         images: Any = None,
         **data: Any,
     ) -> None:
-        if infobox is not None and type(infobox) == str:
+        if type(infobox) == str:
             try:
                 infobox = wiki.parse(infobox).info
             except wiki.WikiSyntaxError:
                 infobox = None
-        if images is not None and type(images) == str:
+        if type(images) == str:
             images = subject_images(images)
 
         super().__init__(**data, infobox=infobox, images=images)
