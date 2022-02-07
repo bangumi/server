@@ -100,6 +100,7 @@ class IndexService:
         where = [ChiiIndexRelated.idx_rlt_rid == index_id]
         if subject_type:
             where.append(ChiiIndexRelated.idx_rlt_type == subject_type)
+        # vscode 的类型推导在此处有 Bug，所以使用 cast 而不用 type hint
         results = cast(
             Iterator[ChiiIndexRelated],
             await self._db.scalars(
