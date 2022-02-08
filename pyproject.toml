@@ -32,7 +32,7 @@ aioredis = { extras = ["hiredis"], version = "2.0.1" }
 [tool.poetry.dev-dependencies]
 sqlacodegen = "2.3.0"
 # tests
-coverage = { version = "==6.3", extras = ["toml"] }
+coverage = { version = "==6.3.1", extras = ["toml"] }
 pytest = "6.2.5"
 pytest-dotenv = "0.5.2"
 # linter and formatter
@@ -49,7 +49,7 @@ requests = "2.27.1"
 types-pytz = "2021.3.4"
 pytest-github-actions-annotate-failures = "0.1.6"
 pytest-env = "0.6.2"
-redis = { extras = ["hiredis"], version = "==4.1.2" }
+redis = { extras = ["hiredis"], version = "==4.1.3" }
 
 [tool.coverage.run]
 concurrency = ['thread', 'greenlet']
