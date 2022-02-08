@@ -19,4 +19,4 @@ ENV COMMIT_REF=${COMMIT_REF}
 
 COPY / /app
 
-ENTRYPOINT ["uvicorn", "pol.server:app"]
+ENTRYPOINT ["python", "-OO", "-m", "uvicorn", "pol.server:app"]
