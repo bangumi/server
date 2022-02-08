@@ -33,7 +33,7 @@ aioredis = { extras = ["hiredis"], version = "2.0.1" }
 sqlacodegen = "2.3.0"
 # tests
 coverage = { version = "==6.3.1", extras = ["toml"] }
-pytest = "6.2.5"
+pytest = "==7.0.0"
 pytest-dotenv = "0.5.2"
 # linter and formatter
 pre-commit = "==2.17.0"
