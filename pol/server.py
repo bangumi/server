@@ -5,14 +5,13 @@ import aioredis
 from loguru import logger
 from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, ORJSONResponse
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from pol import api, config
-from pol.res import ORJSONResponse
 from pol.router import ErrorCatchRoute
 from pol.middlewares.http import setup_http_middleware
 from pol.redis.json_cache import JSONRedis

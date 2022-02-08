@@ -1,18 +1,9 @@
 from typing import Any, Dict, Type, Union, Optional
 from urllib.parse import quote
 
-import orjson
 from pydantic import Field, BaseModel
 from starlette.requests import Request
-from starlette.responses import JSONResponse
 from starlette.datastructures import URL
-
-
-class ORJSONResponse(JSONResponse):
-    media_type = "application/json"
-
-    def render(self, content: Any) -> bytes:
-        return orjson.dumps(content)
 
 
 class HTTPException(Exception):
