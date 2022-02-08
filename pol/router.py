@@ -6,10 +6,10 @@ import sqlalchemy.exc
 from loguru import logger
 from fastapi import Request, Response
 from fastapi.routing import APIRoute
+from fastapi.responses import ORJSONResponse
 from fastapi.exceptions import RequestValidationError
 
 from pol import res
-from pol.res import ORJSONResponse
 
 
 class ErrorCatchRoute(APIRoute):
