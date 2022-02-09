@@ -53,18 +53,22 @@ class SubjectService:
         subject_id: int,
         include_nsfw: bool = False,
         include_redirect: bool = False,
+        include_banned: bool = False,
     ) -> Subject:
         """
 
         :param subject_id:
         :param include_nsfw: if nsfw subject should be included
         :param include_redirect: if merged subject included.
-        if `include_redirect=false` subject with redirect will raise a ``NotFoundError``
+        if `include_redirect=True` subject with redirect will raise a `NotFoundError`
+        :param include_banned: if `subject_ban` equal to 0.
         """
-        s: Optional[ChiiSubject] = await self._db.get(
-            ChiiSubject,
-            subject_id,
-            options=[sa.joinedload(ChiiSubject.fields)],
+        where = [ChiiSubject.subject_id == subject_id]
+        if not include_banned:
+            where.append(ChiiSubject.subject_ban == 0)
+
+        s: Optional[ChiiSubject] = await self._db.scalar(
+            sa.get(ChiiSubject, *where).options(sa.joinedload(ChiiSubject.fields)),
         )
 
         if not s:

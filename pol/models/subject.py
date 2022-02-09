@@ -7,14 +7,14 @@ from pydantic import Field, BaseModel
 class Subject(BaseModel):
     id: int
     type: int
-    name: str
-    name_cn: str
-    summary: str
+    name: str = ""
+    name_cn: str = ""
+    summary: str = ""
     nsfw: bool
     date: Optional[str]  # air date in `YYYY-MM-DD` format"
     platform: int  # TV, Web, 欧美剧, PS4...
-    image: str
-    infobox: str
+    image: str = ""
+    infobox: str = ""
 
     redirect: int
 
