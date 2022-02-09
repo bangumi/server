@@ -54,7 +54,9 @@ class MockSubjectService(Protocol):
 
 @pytest.fixture()
 def mock_subject_service(app) -> MockSubjectService:
-    """mock SubjectService, also override dependency `SubjectService.new` for all router"""
+    """
+    mock SubjectService, also override dependency `SubjectService.new` for all router
+    """
     m: MockSubjectService = mock.Mock()
     m.get_by_id = mock.AsyncMock(return_value=None)
     m.get_by_ids = mock.AsyncMock(return_value=None)
