@@ -23,13 +23,13 @@ def test_subject_auth_nsfw_no_auth_404(
     mock_redis,
     mock_db: MockAsyncSession,
     app: FastAPI,
-    mock_subject,
+    mock_subject_service: MockSubjectService,
 ):
     """not authorized 404 nsfw subject"""
-    mock_db.scalar.side_effect = [
-        ChiiSubject.with_default_value(subject_nsfw=1),
-        10,  # episode count
-    ]
+    mock_subject_service.get_by_id.return_value = models.Subject(
+        id=16, type=SubjectType.anime, nsfw=True, platform=1, redirect=0, ban=0
+    )
+    mock_db.scalar.return_value = 10  # episode count
     app.dependency_overrides[optional_user] = async_lambda(Guest())
 
     response = client.get("/v0/subjects/16")
