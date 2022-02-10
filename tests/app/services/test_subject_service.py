@@ -16,7 +16,7 @@ async def test_get_by_id(client: TestClient, AsyncSessionMaker):
 
 @async_test
 async def test_get_basic(client: TestClient, AsyncSessionMaker, mock_db):
-    mock_db.get.return_value = ChiiSubject(
+    mock_db.scalar.return_value = ChiiSubject(
         subject_id=1,
         subject_type_id=2,
         subject_platform=1,

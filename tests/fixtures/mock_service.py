@@ -1,4 +1,4 @@
-from typing import Dict, Iterator
+from typing import Dict, Iterator, Protocol
 from unittest import mock
 
 import pytest
@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from pol.models import User, Avatar, PublicUser
 from pol.api.v0.depends.auth import Guest
 from pol.services.user_service import UserService
+from pol.services.subject_service import SubjectService
 
 
 class MockUserService:
@@ -64,3 +65,25 @@ def mock_user_service(app: FastAPI, access_token: str):
     app.dependency_overrides[UserService.new] = mocker
     yield service
     app.dependency_overrides.pop(UserService.new, None)
+
+
+class MockSubjectService(Protocol):
+    get_by_id: mock.AsyncMock
+    get_by_ids: mock.AsyncMock
+
+
+@pytest.fixture()
+def mock_subject_service(app) -> MockSubjectService:
+    """
+    mock SubjectService, also override dependency `SubjectService.new` for all router
+    """
+    m: MockSubjectService = mock.Mock()
+    m.get_by_id = mock.AsyncMock(return_value=None)
+    m.get_by_ids = mock.AsyncMock(return_value=None)
+
+    async def mocker():
+        return m
+
+    app.dependency_overrides[SubjectService.new] = mocker
+    yield m
+    app.dependency_overrides.pop(SubjectService.new, None)

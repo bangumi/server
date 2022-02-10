@@ -38,7 +38,10 @@ async def get_subject(
     """
     try:
         return await subject_service.get_by_id(
-            subject_id, user.allow_nsfw(), include_redirect=False
+            subject_id,
+            user.allow_nsfw(),
+            include_redirect=False,
+            include_banned=False,
         )
     except SubjectService.NotFoundError:
         raise not_found

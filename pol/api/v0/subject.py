@@ -98,7 +98,10 @@ async def _get_subject(
 ):
     try:
         s = await subject_service.get_by_id(
-            subject_id, include_nsfw=True, include_redirect=True
+            subject_id,
+            include_nsfw=True,
+            include_redirect=True,
+            include_banned=True,
         )
     except SubjectService.NotFoundError:
         cache_control(300)
