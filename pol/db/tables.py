@@ -13,7 +13,7 @@ from sqlalchemy import (
     and_,
     text,
 )
-from sqlalchemy.orm import foreign, relationship, declarative_base
+from sqlalchemy.orm import remote, foreign, relationship, declarative_base
 from sqlalchemy.dialects.mysql import (
     CHAR,
     ENUM,
@@ -1011,3 +1011,88 @@ class ChiiSubjectInterest(Base):
         uselist=False,
         back_populates="users",
     )  # type: ignore
+
+
+class ChiiIndex(Base):
+    __tablename__ = "chii_index"
+    __table_args__ = (
+        Index("mid", "idx_id"),
+        Index("idx_ban", "idx_ban"),
+        Index("idx_type", "idx_type"),
+        Index("idx_uid", "idx_uid"),
+        Index("idx_collects", "idx_collects"),
+    )
+    idx_id = Column(MEDIUMINT(8), comment="自动id", primary_key=True, autoincrement=True)
+    idx_type = Column(TINYINT(3), nullable=False, server_default=text("'0'"))
+    idx_title = Column(VARCHAR(80), nullable=False, comment="标题")
+    idx_desc = Column(MEDIUMTEXT, nullable=False, comment="简介")
+    idx_replies = Column(
+        MEDIUMINT(8), nullable=False, server_default="'0'", comment="回复数"
+    )
+    idx_subject_total = Column(
+        MEDIUMINT(8), nullable=False, server_default="'0'", comment="内含条目总数"
+    )
+    idx_collects = Column(
+        MEDIUMINT(8), nullable=False, server_default="'0'", comment="收藏数"
+    )
+    idx_stats = Column(MEDIUMTEXT, nullable=False)
+    idx_dateline = Column(INTEGER(10), nullable=False, comment="创建时间")
+    idx_lasttouch = Column(INTEGER(10), nullable=False)
+    idx_uid = Column(MEDIUMINT(8), nullable=False, comment="创建人UID")
+    idx_ban = Column(TINYINT(1), nullable=False, server_default="'0'")
+
+
+class ChiiIndexCollects(Base):
+    __tablename__ = "chii_index_collects"
+    __table_args__ = (
+        Index("idx_clt_mid", "idx_clt_mid", "idx_clt_uid"),
+        {"comment": "目录收藏"},
+    )
+    idx_clt_id = Column(MEDIUMINT(8), primary_key=True, autoincrement=True)
+    idx_clt_mid = Column(MEDIUMINT(8), nullable=False, comment="目录ID")
+    idx_clt_uid = Column(MEDIUMINT(8), nullable=False, comment="用户UID")
+    idx_clt_dateline = Column(INTEGER(10), nullable=False)
+
+
+class ChiiIndexComments(Base):
+    __tablename__ = "chii_index_comments"
+    __table_args__ = (
+        Index("idx_pst_mid", "idx_pst_mid"),
+        Index("idx_pst_related", "idx_pst_related"),
+        Index("idx_pst_uid", "idx_pst_uid"),
+    )
+    idx_pst_id = Column(MEDIUMINT(8), primary_key=True, autoincrement=True)
+    idx_pst_mid = Column(MEDIUMINT(8), nullable=False)
+    idx_pst_uid = Column(MEDIUMINT(8), nullable=False)
+    idx_pst_related = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
+    idx_pst_dateline = Column(INTEGER(10), nullable=False)
+    idx_pst_content = Column(MEDIUMTEXT, nullable=False)
+    replies: List["ChiiIndexComments"] = relationship(
+        "ChiiIndexComments",
+        primaryjoin=foreign(idx_pst_id) == remote(idx_pst_related),
+        order_by=idx_pst_dateline.asc(),
+        uselist=True,
+        lazy="raise_on_sql",
+    )  # type: ignore
+
+
+class ChiiIndexRelated(Base):
+    __tablename__ = "chii_index_related"
+    __table_args__ = (
+        Index("idx_rlt_rid", "idx_rlt_rid", "idx_rlt_type"),
+        Index("idx_rlt_sid", "idx_rlt_rid", "idx_rlt_sid"),
+        Index("idx_rlt_sid_2", "idx_rlt_sid"),
+        Index("index_rlt_cat", "idx_rlt_cat"),
+        Index(
+            "idx_order", "idx_rlt_rid", "idx_rlt_cat", "idx_rlt_order", "idx_rlt_sid"
+        ),
+        {"comment": "目录关联表"},
+    )
+    idx_rlt_id = Column(MEDIUMINT(8), primary_key=True, autoincrement=True)
+    idx_rlt_cat = Column(TINYINT(3), nullable=False)
+    idx_rlt_rid = Column(MEDIUMINT(8), nullable=False, comment="关联目录")
+    idx_rlt_type = Column(SMALLINT(6), nullable=False, comment="关联条目类型")
+    idx_rlt_sid = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
+    idx_rlt_order = Column(MEDIUMINT(8), nullable=False, server_default=text("'0'"))
+    idx_rlt_comment = Column(MEDIUMTEXT, nullable=False)
+    idx_rlt_dateline = Column(INTEGER(10), nullable=False)
