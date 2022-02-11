@@ -33,7 +33,7 @@ def main():
 
     run(f'git commit -m "bump: {version}"')
 
-    run(f"git tag v{version}")
+    run(f"git tag v{version} -m v{version}")
 
 
 if __name__ == "__main__":
