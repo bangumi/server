@@ -29,7 +29,7 @@ def main():
 
     version = read_target_version()
 
-    run(f"git add pyproject.toml")
+    run("git add pyproject.toml")
 
     run(f'git commit -m "bump: {version}"')
 
