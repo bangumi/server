@@ -35,7 +35,7 @@ def pytest_runtest_setup(item: Node):
     mark = item.get_closest_marker(name="env")
     if not mark:
         return
-    for name in mark.args:
+    for name in sorted(mark.args):
         if not item.config.getoption(name):
             pytest.skip(f"test skipped without flag --{name}")
 
