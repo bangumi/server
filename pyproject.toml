@@ -24,7 +24,7 @@ pydantic = "1.9.0"
 pytz = "2021.3"
 uvicorn = { version = "==0.17.4", extras = ["standard"] }
 aiomysql = '0.0.22'
-orjson = "==3.6.6"
+orjson = "==3.6.7"
 loguru = "==0.6.0"
 SQLAlchemy = { extras = ["mypy", "asyncio"], version = "==1.4.31" }
 aioredis = { extras = ["hiredis"], version = "2.0.1" }
