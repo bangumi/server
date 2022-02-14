@@ -22,7 +22,7 @@ repos:
         args: [--remove]
 
   - repo: https://github.com/Trim21/pre-commit-hooks
-    rev: v0.4.1
+    rev: v0.5.1
     hooks:
       - id: poetry-check-lock
       - id: find-trailing-comma
