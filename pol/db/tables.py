@@ -66,11 +66,18 @@ class ChiiCharacter(Base):
         back_populates="character",
     )  # type: ignore
 
+    field: "ChiiPersonField" = relationship(
+        "ChiiPersonField",
+        lazy="raise_on_sql",
+        primaryjoin=(lambda: foreign(ChiiPersonField.prsn_id) == ChiiCharacter.crt_id),
+        uselist=False,
+    )  # type: ignore
+
 
 class ChiiCrtCastIndex(Base):
     __tablename__ = "chii_crt_cast_index"
 
-    crt_id: int = Column(MEDIUMINT(9), primary_key=True, nullable=False)
+    crt_id = Column(MEDIUMINT(9), primary_key=True, nullable=False)
     prsn_id: int = Column(MEDIUMINT(9), primary_key=True, nullable=False, index=True)
     subject_id: int = Column(MEDIUMINT(9), primary_key=True, nullable=False, index=True)
     subject_type_id: int = Column(
@@ -675,7 +682,7 @@ class ChiiSubject(Base):
         Index("subject_idx_cn", "subject_idx_cn", "subject_type_id"),
     )
 
-    subject_id: int = Column(MEDIUMINT(8), primary_key=True)
+    subject_id = Column(MEDIUMINT(8), primary_key=True)
     subject_type_id = Column(
         SMALLINT(6), nullable=False, index=True, server_default=text("'0'")
     )

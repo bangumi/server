@@ -1,4 +1,5 @@
 from typing import List, Optional
+from asyncio import gather
 
 from fastapi import Path, Depends, APIRouter
 from starlette.responses import Response
@@ -10,18 +11,11 @@ from pol.res import ErrorDetail, not_found_exception
 from pol.config import CACHE_KEY_PREFIX
 from pol.router import ErrorCatchRoute
 from pol.depends import get_db, get_redis
-from pol.db.const import (
-    PLATFORM_MAP,
-    RELATION_MAP,
-    StaffMap,
-    SubjectType,
-    get_character_rel,
-)
+from pol.db.const import PLATFORM_MAP, RELATION_MAP, StaffMap, SubjectType
 from pol.db.tables import (
     ChiiEpisode,
     ChiiSubject,
     ChiiPersonCsIndex,
-    ChiiCrtSubjectIndex,
     ChiiSubjectRelations,
 )
 from pol.permission import Role
@@ -37,7 +31,9 @@ from pol.redis.json_cache import JSONRedis
 from pol.http_cache.depends import CacheControl
 from pol.api.v0.depends.auth import optional_user
 from pol.api.v0.models.subject import Subject, RelatedSubject
+from pol.services.person_service import PersonService
 from pol.services.subject_service import SubjectService
+from pol.services.character_service import CharacterService
 
 router = APIRouter(tags=["条目"], route_class=ErrorCatchRoute)
 
@@ -201,33 +197,38 @@ async def get_subject_persons(
     },
 )
 async def get_subject_characters(
-    db: AsyncSession = Depends(get_db),
     subject: models.Subject = Depends(get_subject),
+    subject_service: SubjectService = Depends(SubjectService.new),
+    character_service: CharacterService = Depends(CharacterService.new),
+    person_service: PersonService = Depends(PersonService.new),
 ):
-    s: ChiiSubject = await db.scalar(
-        sa.select(ChiiSubject)
-        .options(
-            sa.selectinload(ChiiSubject.characters).joinedload(
-                ChiiCrtSubjectIndex.character
-            )
-        )
-        .where(ChiiSubject.subject_id == subject.id, ChiiSubject.subject_ban == 0)
+    subject_characters = await subject_service.list_characters(subject.id)
+    character_ids = [character.id for character in subject_characters]
+    characters, persons_map = await gather(
+        character_service.get_by_ids(id for id in character_ids),
+        character_service.get_persons_by_ids((id for id in character_ids), subject.id),
     )
 
-    characters = []
-    for rel in s.characters:
-        r = rel.character
-        characters.append(
-            {
-                "id": r.crt_id,
-                "name": r.crt_name,
-                "relation": get_character_rel(rel.crt_type),
-                "type": r.crt_role,
-                "short_summary": short_description(r.crt_summary),
-                "images": person_images(r.crt_img),
-            }
-        )
-    return characters
+    actors = await person_service.get_by_ids(
+        person.id for persons in persons_map.values() for person in persons
+    )
+
+    return [
+        {
+            "id": c.id,
+            "name": cc.name,
+            "relation": c.relation,
+            "type": cc.type,
+            "short_summary": cc.summary,
+            "actors": [
+                actors[person.id] for person in persons_map[c.id] if person.id in actors
+            ]
+            if c.id in persons_map
+            else [],
+            "images": cc.images,
+        }
+        for c, cc in ((c, characters[c.id]) for c in subject_characters)
+    ]
 
 
 @router.get(

@@ -133,12 +133,16 @@ def test_subject_ep_type(client: TestClient):
 
 
 @pytest.mark.env("e2e", "database", "redis")
-def test_subject_characters(client: TestClient):
+def test_subject_characters(client: TestClient, mock_person_service):
     response = client.get("/v0/subjects/8/characters")
     assert response.status_code == 200
 
     data = response.json()
     assert isinstance(data, list)
+    assert len(data)
+    assert data[0]["actors"]
+    assert len(data[0]["actors"])
+    assert data[0]["actors"][0]["name"]
     assert data
 
 

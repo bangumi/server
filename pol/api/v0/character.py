@@ -1,27 +1,20 @@
-from typing import List, Optional
+from typing import List
+from asyncio import gather
 
 from fastapi import Path, Depends, APIRouter
 from starlette.responses import Response, RedirectResponse
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from pol import res, wiki
-from pol.db import sa
+from pol import res
 from pol.res import ErrorDetail, not_found_exception
 from pol.config import CACHE_KEY_PREFIX
 from pol.router import ErrorCatchRoute
-from pol.depends import get_db, get_redis
-from pol.db.const import Gender, get_character_rel
-from pol.db.tables import (
-    ChiiPerson,
-    ChiiSubject,
-    ChiiCharacter,
-    ChiiPersonField,
-    ChiiCrtCastIndex,
-    ChiiCrtSubjectIndex,
-)
-from pol.api.v0.utils import person_images, subject_images
+from pol.depends import get_redis
+from pol.api.v0.utils import subject_images
 from pol.api.v0.models import RelatedSubject, CharacterDetail, CharacterPerson
 from pol.redis.json_cache import JSONRedis
+from pol.services.person_service import PersonService
+from pol.services.subject_service import SubjectService
+from pol.services.character_service import CharacterService
 
 router = APIRouter(tags=["角色"], route_class=ErrorCatchRoute)
 
@@ -38,8 +31,8 @@ api_base = "/v0/characters"
 )
 async def get_character_detail(
     response: Response,
-    db: AsyncSession = Depends(get_db),
     not_found: res.HTTPException = Depends(not_found_exception),
+    character_service: CharacterService = Depends(CharacterService.new),
     character_id: int = Path(..., gt=0),
     redis: JSONRedis = Depends(get_redis),
 ):
@@ -48,46 +41,15 @@ async def get_character_detail(
         response.headers["x-cache-status"] = "hit"
         return value
 
-    character: Optional[ChiiCharacter] = await db.scalar(
-        sa.select(ChiiCharacter).where(ChiiCharacter.crt_id == character_id).limit(1)
-    )
-
-    if character is None:
-        raise not_found
-
-    if character.crt_redirect:
-        return RedirectResponse(f"{api_base}/{character.crt_redirect}")
-
-    if character.crt_ban:
-        raise not_found
-
-    data = {
-        "id": character.crt_id,
-        "name": character.crt_name,
-        "type": character.crt_role,
-        "summary": character.crt_summary,
-        "images": person_images(character.crt_img),
-        "locked": character.crt_lock,
-        "stat": {
-            "comments": character.crt_comment,
-            "collects": character.crt_collects,
-        },
-    }
-
-    field = await db.get(ChiiPersonField, character_id)
-    if field is not None:
-        if field.gender:
-            data["gender"] = Gender(field.gender).str()
-        data["blood_type"] = field.bloodtype or None
-        data["birth_year"] = field.birth_year or None
-        data["birth_mon"] = field.birth_mon or None
-        data["birth_day"] = field.birth_day or None
-
     try:
-        data["infobox"] = wiki.parse(character.crt_infobox).info
-    except wiki.WikiSyntaxError:  # pragma: no cover
-        pass
+        character = await character_service.get_by_id(character_id)
+    except CharacterService.NotFoundError:
+        raise not_found
 
+    if character.redirect:
+        return RedirectResponse(f"{api_base}/{character.redirect}")
+
+    data = character.dict()
     response.headers["x-cache-status"] = "miss"
     await redis.set_json(cache_key, value=data, ex=60)
 
@@ -103,43 +65,34 @@ async def get_character_detail(
     },
 )
 async def get_person_subjects(
-    db: AsyncSession = Depends(get_db),
     not_found: res.HTTPException = Depends(not_found_exception),
+    character_service: CharacterService = Depends(CharacterService.new),
+    subject_service: SubjectService = Depends(SubjectService.new),
     character_id: int = Path(..., gt=0),
 ):
-    character: Optional[ChiiCharacter] = await db.scalar(
-        sa.select(ChiiCharacter)
-        .options(
-            sa.selectinload(ChiiCharacter.subjects).joinedload(
-                ChiiCrtSubjectIndex.subject
-            )
-        )
-        .where(ChiiCharacter.crt_id == character_id, ChiiCharacter.crt_ban == 0)
-        .limit(1)
-    )
-
-    if character is None:
+    try:
+        character_subjects = await character_service.list_subjects_by_id(character_id)
+    except CharacterService.NotFoundError:
         raise not_found
 
-    subjects = []
+    subjects = await subject_service.get_by_ids(
+        *[s.id for s in character_subjects], include_nsfw=True
+    )
 
-    for s in character.subjects:
-        if v := subject_images(s.subject.subject_image):
-            image = v["grid"]
-        else:
-            image = None
-
-        subjects.append(
-            {
-                "id": s.subject_id,
-                "name": s.subject.subject_name,
-                "name_cn": s.subject.subject_name_cn,
-                "staff": get_character_rel(s.crt_type),
-                "image": image,
-            }
+    return [
+        {
+            "id": s.id,
+            "name": ss.name,
+            "name_cn": ss.name_cn,
+            "staff": s.staff,
+            "image": images["grid"] if images else None,
+        }
+        for s, ss, images in (
+            (s, subjects[s.id], subject_images(subjects[s.id].image))
+            for s in character_subjects
+            if s.id in subjects
         )
-
-    return subjects
+    ]
 
 
 @router.get(
@@ -151,50 +104,45 @@ async def get_person_subjects(
     },
 )
 async def get_character_persons(
-    db: AsyncSession = Depends(get_db),
-    not_found: res.HTTPException = Depends(not_found_exception),
+    character_service: CharacterService = Depends(CharacterService.new),
+    person_serivce: PersonService = Depends(PersonService.new),
+    subject_service: SubjectService = Depends(SubjectService.new),
     character_id: int = Path(..., gt=0),
 ):
-    character: Optional[ChiiCharacter] = await db.scalar(
-        sa.select(ChiiCharacter)
-        .where(ChiiCharacter.crt_id == character_id, ChiiCharacter.crt_ban == 0)
-        .limit(1)
+    await character_service.get_by_id(character_id)
+
+    person_map = await character_service.get_persons_by_ids(
+        id for id in (character_id,)
     )
 
-    if character is None:
-        raise not_found
+    person_to_subject = [
+        (person.id, person.subject_id)
+        for person_list in person_map.values()
+        for person in person_list
+    ]
 
-    query = (
-        sa.select(
-            ChiiCrtCastIndex.crt_id,
-            ChiiCrtCastIndex.prsn_id,
-            ChiiPerson.prsn_name,
-            ChiiPerson.prsn_type,
-            ChiiPerson.prsn_img,
-            ChiiSubject.subject_id,
-            ChiiSubject.subject_name,
-            ChiiSubject.subject_name_cn,
-        )
-        .distinct()
-        .join(ChiiPerson, ChiiPerson.prsn_id == ChiiCrtCastIndex.prsn_id)
-        .join(ChiiSubject, ChiiSubject.subject_id == ChiiCrtCastIndex.subject_id)
-        .where(
-            ChiiCrtCastIndex.crt_id == character.crt_id,
-            ChiiPerson.prsn_ban == 0,
-        )
+    subjects, persons = await gather(
+        subject_service.get_by_ids(
+            *(id for _, id in person_to_subject), include_nsfw=True
+        ),
+        person_serivce.get_by_ids(id for id, _ in person_to_subject),
     )
 
     persons = [
         {
-            "id": r["prsn_id"],
-            "name": r["prsn_name"],
-            "type": r["prsn_type"],
-            "images": person_images(r["prsn_img"]),
-            "subject_id": r["subject_id"],
-            "subject_name": r["subject_name"],
-            "subject_name_cn": r["subject_name_cn"],
+            "id": r.id,
+            "name": r.name,
+            "type": r.type,
+            "images": r.images,
+            "subject_id": subject.id,
+            "subject_name": subject.name,
+            "subject_name_cn": subject.name_cn,
         }
-        for r in (await db.execute(query)).mappings().fetchall()
+        for r, subject in (
+            (persons[person_id], subjects[subject_id])
+            for person_id, subject_id in person_to_subject
+            if person_id in persons and subject_id in subjects
+        )
     ]
 
     return persons

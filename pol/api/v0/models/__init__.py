@@ -128,6 +128,7 @@ class Character(BaseCharacter):
 
 class RelatedCharacter(BaseCharacter):
     relation: str
+    actors: List[Person] = Field([], description="演员列表")
 
 
 class CharacterDetail(BaseCharacter):
