@@ -68,18 +68,18 @@ type Rating struct {
 }
 
 type Platform struct {
-	Alias        string
-	Type         string
-	TypeCn       string
-	WikiTpl      string
-	SearchString string
-	ID           int
-	EnableHeader bool
+	Alias        string `json:"alias"`
+	Type         string `json:"type"`
+	TypeCN       string `json:"type_cn"`
+	WikiTpl      string `json:"wiki_tpl"`
+	SearchString string `json:"search_string"`
+	ID           int    `json:"id"`
+	EnableHeader bool   `json:"enable_header"`
 }
 
 func (p Platform) String() string {
-	if p.TypeCn != "" {
-		return p.TypeCn
+	if p.TypeCN != "" {
+		return p.TypeCN
 	}
 
 	return p.Type
