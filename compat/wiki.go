@@ -21,7 +21,7 @@ import (
 )
 
 func V0Wiki(s wiki.Wiki) []interface{} {
-	r := make([]interface{}, 0, len(s.Fields))
+	r := make([]interface{}, len(s.Fields))
 
 	var valuesCount int
 	for _, field := range s.Fields {
@@ -34,23 +34,20 @@ func V0Wiki(s wiki.Wiki) []interface{} {
 	var lastCut, currentCut int
 
 	for i, field := range s.Fields {
-		if field.Array {
-			for j, value := range field.Values {
-				kvContainer[j] = kv{
-					K: value.Key,
-					V: value.Value,
-				}
-			}
-
-			currentCut += len(field.Values)
-			r[i] = wikiValues{
-				Key:   field.Key,
-				Value: kvContainer[lastCut:currentCut],
-			}
-			lastCut = currentCut
-		} else {
+		if !field.Array {
 			r[i] = wikiValue{Key: field.Key, Value: field.Value}
+
+			continue
 		}
+		// non array item
+
+		for _, value := range field.Values {
+			kvContainer = append(kvContainer, kv{Key: value.Key, Value: value.Value})
+		}
+
+		currentCut += len(field.Values)
+		r[i] = wikiValues{Key: field.Key, Value: kvContainer[lastCut:currentCut]}
+		lastCut = currentCut
 	}
 
 	return r
@@ -67,6 +64,6 @@ type wikiValues struct {
 }
 
 type kv struct {
-	K string `json:"k"`
-	V string `json:"v"`
+	Key   string `json:"k,omitempty"`
+	Value string `json:"v"`
 }
