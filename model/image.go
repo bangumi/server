@@ -22,6 +22,8 @@ type PersonImages struct {
 }
 
 type SubjectImages struct {
+	Small  string `json:"small"`
+	Grid   string `json:"grid"`
 	Large  string `json:"large"`
 	Medium string `json:"medium"`
 	Common string `json:"common"`
@@ -33,6 +35,8 @@ func SubjectImage(s string) SubjectImages {
 	}
 
 	return SubjectImages{
+		Grid:   "https://lain.bgm.tv/pic/cover/g/" + s,
+		Small:  "https://lain.bgm.tv/pic/cover/s/" + s,
 		Common: "https://lain.bgm.tv/pic/cover/c/" + s,
 		Large:  "https://lain.bgm.tv/pic/cover/l/" + s,
 		Medium: "https://lain.bgm.tv/pic/cover/m/" + s,

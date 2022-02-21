@@ -107,32 +107,37 @@ func (h Handler) getSubjectWithCache(ctx context.Context, id uint32) (res.Subjec
 	return r, true, nil
 }
 
-func convertModelSubject(s model.Subject) res.SubjectV0 {
-	var platformText *string = nil
+func platformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
 	if !ok {
 		logger.Warn("unknown platform",
 			zap.Uint8("type", s.TypeID), zap.Uint16("platform", s.PlatformID))
-	} else {
-		v := platform.String()
-		platformText = &v
+
+		return nil
 	}
 
+	v := platform.String()
+
+	return &v
+}
+
+func convertModelSubject(s model.Subject) res.SubjectV0 {
 	tags, err := compat.ParseTags(s.CompatRawTags)
 	if err != nil {
 		logger.Warn("failed to parse tags", zap.Uint32("subject_id", s.ID))
 	}
 
-	var date *string = nil
+	var date *string
 	if s.Date != "" {
 		date = &s.Date
 	}
 
 	return res.SubjectV0{
+		ID:       s.ID,
 		Image:    model.SubjectImage(s.Image),
 		Summary:  s.Summary,
 		Name:     s.Name,
-		Platform: platformText,
+		Platform: platformString(s),
 		NameCN:   s.NameCN,
 		Date:     date,
 		Infobox:  compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
@@ -147,7 +152,6 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 			Collect: s.Collect,
 			Doing:   s.Doing,
 		},
-		ID:     s.ID,
 		TypeID: s.TypeID,
 		Locked: s.Locked(),
 		NSFW:   s.NSFW,
