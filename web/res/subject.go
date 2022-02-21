@@ -31,7 +31,7 @@ type SubjectV0 struct {
 	NSFW          bool                `json:"nsfw"`
 	Locked        bool                `json:"locked"`
 	Date          *string             `json:"date"`
-	Platform      string              `json:"platform"`
+	Platform      *string             `json:"platform"`
 	Image         model.SubjectImages `json:"images"`
 	Infobox       []interface{}       `json:"infobox"`
 	Volumes       uint32              `json:"volumes"`

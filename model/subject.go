@@ -22,6 +22,7 @@ type Subject struct {
 	Image         string
 	Summary       string
 	Name          string
+	Date          string // first release date
 	NameCN        string
 	Infobox       string
 	CompatRawTags []byte // compat field for old tags

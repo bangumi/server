@@ -52,8 +52,14 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Subject, error) {
 		return model.Subject{}, errgo.Wrap(err, "dal")
 	}
 
+	var date string
+	if !s.Fields.Date.IsZero() {
+		date = s.Fields.Date.Format("2006-01-02")
+	}
+
 	return model.Subject{
 		Redirect:      s.Fields.Redirect,
+		Date:          date,
 		ID:            s.ID,
 		Name:          s.Name,
 		NameCN:        s.NameCN,

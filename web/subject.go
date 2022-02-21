@@ -32,6 +32,7 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/res"
 )
@@ -107,16 +108,33 @@ func (h Handler) getSubjectWithCache(ctx context.Context, id uint32) (res.Subjec
 }
 
 func convertModelSubject(s model.Subject) res.SubjectV0 {
+	var platformText *string = nil
+	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
+	if !ok {
+		logger.Warn("unknown platform",
+			zap.Uint8("type", s.TypeID), zap.Uint16("platform", s.PlatformID))
+	} else {
+		v := platform.String()
+		platformText = &v
+	}
+
 	tags, err := compat.ParseTags(s.CompatRawTags)
 	if err != nil {
 		logger.Warn("failed to parse tags", zap.Uint32("subject_id", s.ID))
+	}
+
+	var date *string = nil
+	if s.Date != "" {
+		date = &s.Date
 	}
 
 	return res.SubjectV0{
 		Image:    model.SubjectImage(s.Image),
 		Summary:  s.Summary,
 		Name:     s.Name,
+		Platform: platformText,
 		NameCN:   s.NameCN,
+		Date:     date,
 		Infobox:  compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
 		Volumes:  s.Volumes,
 		Redirect: s.Redirect,
