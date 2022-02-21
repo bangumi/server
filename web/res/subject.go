@@ -22,6 +22,27 @@ import (
 	"github.com/bangumi/server/pkg/wiki"
 )
 
+type SubjectV0 struct {
+	ID            uint32              `json:"id"`
+	TypeID        model.SubjectType   `json:"type"`
+	Name          string              `json:"name"`
+	NameCN        string              `json:"name_cn"`
+	Summary       string              `json:"summary"`
+	NSFW          bool                `json:"nsfw"`
+	Locked        bool                `json:"locked"`
+	Date          *string             `json:"date"`
+	Platform      string              `json:"platform"`
+	Image         model.SubjectImages `json:"images"`
+	Infobox       []interface{}       `json:"infobox"`
+	Volumes       uint32              `json:"volumes"`
+	Eps           uint32              `json:"eps"`
+	TotalEpisodes uint32              `json:"total_episodes"`
+	Rating        Rating              `json:"rating"`
+	Collection    Collection          `json:"collection"`
+	Tags          []compat.Tag        `json:"tags"`
+	Redirect      uint32              `json:"-"` // http 302 response
+}
+
 type Subject struct {
 	ID           uint32              `json:"id"`
 	Name         string              `json:"name"`

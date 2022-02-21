@@ -33,7 +33,7 @@ func ResistRouter(app *fiber.App, h Handler, scope tally.Scope) {
 		Tagged(map[string]string{"handler": utils.FunctionName(h.getSubject)}).
 		Counter("request_count")
 
-	app.Get("/v1/subjects/:id", func(c *fiber.Ctx) error {
+	app.Get("/v0/subjects/:id", func(c *fiber.Ctx) error {
 		reqCounter.Inc(1)
 
 		return c.Next()

@@ -48,7 +48,7 @@ func TestHappyPath(t *testing.T) {
 		test.MockEmptyCache(),
 	)
 
-	req := httptest.NewRequest(http.MethodGet, "/v1/subjects/7", http.NoBody)
+	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
 	req.Header.Set("authorization", "bearer token")
 
 	resp, err := app.Test(req)
@@ -70,7 +70,7 @@ func TestNSFW_200(t *testing.T) {
 		test.MockEmptyCache(),
 	)
 
-	req := httptest.NewRequest(http.MethodGet, "/v1/subjects/7", http.NoBody)
+	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
 	req.Header.Set("authorization", "bearer token")
 
 	resp, err := app.Test(req)
@@ -92,7 +92,7 @@ func TestNSFW_404(t *testing.T) {
 		test.MockEmptyCache(),
 	)
 
-	req := httptest.NewRequest(http.MethodGet, "/v1/subjects/7", http.NoBody)
+	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
 	req.Header.Set("authorization", "bearer token")
 
 	resp, err := app.Test(req)
@@ -102,7 +102,7 @@ func TestNSFW_404(t *testing.T) {
 	require.Equal(t, http.StatusNotFound, resp.StatusCode, "404 for unauthorized user")
 }
 
-func TestRedirect(t *testing.T) {
+func Test_web_subject_Redirect(t *testing.T) {
 	t.Parallel()
 	m := &domain.MockSubjectRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(8)).Return(model.Subject{Redirect: 2}, nil)
@@ -113,7 +113,7 @@ func TestRedirect(t *testing.T) {
 		test.MockEmptyCache(),
 	)
 
-	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/v1/subjects/8", http.NoBody))
+	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/v0/subjects/8", http.NoBody))
 	require.NoError(t, err)
 	defer resp.Body.Close()
 

@@ -31,7 +31,7 @@ type MemCacheTestItem struct {
 	V int
 }
 
-func TestHappyPath(t *testing.T) {
+func Test_MemCache_HappyPath(t *testing.T) {
 	t.Parallel()
 	const key = "K"
 	var value = MemCacheTestItem{V: 1}
@@ -50,7 +50,7 @@ func TestHappyPath(t *testing.T) {
 	require.Equal(t, value.V, result.V)
 }
 
-func TestWrongType(t *testing.T) {
+func Test_MemCache_WrongType(t *testing.T) {
 	t.Parallel()
 	const key = "K"
 	m := cache.NewMemoryCache()
@@ -65,7 +65,7 @@ func TestWrongType(t *testing.T) {
 	require.False(t, ok)
 }
 
-func TestExpired(t *testing.T) {
+func Test_MemCache_Expired(t *testing.T) {
 	t.Parallel()
 	const key = "K"
 	m := cache.NewMemoryCache()

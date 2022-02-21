@@ -32,13 +32,12 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/model"
-	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/res"
 )
 
 func subjectCacheKey(id uint32) string {
-	return "chii:res:repository:" + strconv.FormatUint(uint64(id), 10)
+	return "chii:res:0:repository:" + strconv.FormatUint(uint64(id), 10)
 }
 
 func (h Handler) getSubject(c *fiber.Ctx) error {
@@ -76,11 +75,11 @@ func (h Handler) getSubject(c *fiber.Ctx) error {
 	return c.JSON(r)
 }
 
-func (h Handler) getSubjectWithCache(ctx context.Context, id uint32) (res.Subject, bool, error) {
+func (h Handler) getSubjectWithCache(ctx context.Context, id uint32) (res.SubjectV0, bool, error) {
 	var key = subjectCacheKey(id)
 
 	// try to read from cache
-	var r res.Subject
+	var r res.SubjectV0
 	ok, err := h.cache.Get(ctx, key, &r)
 	if err != nil {
 		return r, ok, errgo.Wrap(err, "cache.Get")
@@ -93,7 +92,7 @@ func (h Handler) getSubjectWithCache(ctx context.Context, id uint32) (res.Subjec
 	s, err := h.s.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.Subject{}, false, nil
+			return res.SubjectV0{}, false, nil
 		}
 
 		return r, ok, errgo.Wrap(err, "repo.Set")
@@ -107,30 +106,22 @@ func (h Handler) getSubjectWithCache(ctx context.Context, id uint32) (res.Subjec
 	return r, true, nil
 }
 
-func convertModelSubject(s model.Subject) res.Subject {
-	platformText, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
-	if !ok {
-		logger.Warn("unknown platform",
-			zap.Uint8("type", s.TypeID), zap.Uint16("platform", s.PlatformID))
-	}
-
+func convertModelSubject(s model.Subject) res.SubjectV0 {
 	tags, err := compat.ParseTags(s.CompatRawTags)
 	if err != nil {
-		logger.Info("failed to parse tags", zap.Uint32("subject_id", s.ID))
+		logger.Warn("failed to parse tags", zap.Uint32("subject_id", s.ID))
 	}
 
-	return res.Subject{
-		Image:        model.SubjectImage(s.Image),
-		Summary:      s.Summary,
-		Name:         s.Name,
-		NameCN:       s.NameCN,
-		Wiki:         wiki.ParseOmitError(s.Infobox).NonZero(),
-		PlatformText: platformText.String(),
-		Infobox:      s.Infobox,
-		Volumes:      s.Volumes,
-		Redirect:     s.Redirect,
-		Eps:          s.Eps,
-		Tags:         tags,
+	return res.SubjectV0{
+		Image:    model.SubjectImage(s.Image),
+		Summary:  s.Summary,
+		Name:     s.Name,
+		NameCN:   s.NameCN,
+		Infobox:  compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
+		Volumes:  s.Volumes,
+		Redirect: s.Redirect,
+		Eps:      s.Eps,
+		Tags:     tags,
 		Collection: res.Collection{
 			OnHold:  s.OnHold,
 			Wish:    s.Wish,
@@ -138,13 +129,10 @@ func convertModelSubject(s model.Subject) res.Subject {
 			Collect: s.Collect,
 			Doing:   s.Doing,
 		},
-		ID:       s.ID,
-		Platform: s.PlatformID,
-		Airtime:  s.Airtime,
-		TypeID:   s.TypeID,
-		TypeText: model.TypeString(s.TypeID),
-		Locked:   s.Locked(),
-		NSFW:     s.NSFW,
+		ID:     s.ID,
+		TypeID: s.TypeID,
+		Locked: s.Locked(),
+		NSFW:   s.NSFW,
 		Rating: res.Rating{
 			Rank:  s.Rating.Rank,
 			Total: s.Rating.Total,
