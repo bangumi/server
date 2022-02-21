@@ -14,20 +14,33 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package episode
 
 import (
 	"context"
 
-	"github.com/bangumi/server/model"
+	"go.uber.org/zap"
+
+	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/errgo"
 )
 
-type SubjectRepo interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
+type mysqlRepo struct {
+	q   *query.Query
+	log *zap.Logger
 }
 
-type SubjectService interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.EpisodeRepo, error) {
+	return mysqlRepo{q: q, log: log.Named("repository.mysqlRepo")}, nil
+}
+
+func (r mysqlRepo) Count(ctx context.Context, subjectID uint32) (int, error) {
+	c, err := r.q.Episode.WithContext(ctx).
+		Where(r.q.Episode.SubjectID.Eq(subjectID)).Count()
+	if err != nil {
+		return 0, errgo.Wrap(err, "dal")
+	}
+
+	return int(c), nil
 }

@@ -31,11 +31,13 @@ func TestGetWebApp(t *testing.T) {
 		test.MockUserRepo(&domain.MockAuthRepo{}),
 		test.MockSubjectRepo(&domain.MockSubjectRepo{}),
 		test.MockCache(&cache.MockGeneric{}),
+		test.MockEpisodeRepo(&domain.MockEpisodeRepo{}),
 	)
 
 	test.GetWebApp(t,
 		test.MockUserRepo(&domain.MockAuthRepo{}),
 		test.MockSubjectRepo(&domain.MockSubjectRepo{}),
 		test.MockEmptyCache(),
+		test.MockEpisodeRepo(nil),
 	)
 }

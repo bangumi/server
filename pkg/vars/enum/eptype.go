@@ -14,20 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package enum
 
-import (
-	"context"
+type EpType = uint8
 
-	"github.com/bangumi/server/model"
+const (
+	EpTypeNormal  EpType = 0
+	EpTypeSpecial EpType = 1
+	EpTypeOpening EpType = 2
+	EpTypeEnding  EpType = 3
 )
-
-type SubjectRepo interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
-}
-
-type SubjectService interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
-}

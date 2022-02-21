@@ -96,10 +96,15 @@ func (h Handler) getSubjectWithCache(ctx context.Context, id uint32) (res.Subjec
 			return res.SubjectV0{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "repo.Set")
+		return r, ok, errgo.Wrap(err, "repo.subject.Set")
 	}
 
 	r = convertModelSubject(s)
+	r.TotalEpisodes, err = h.e.Count(ctx, id)
+	if err != nil {
+		return r, false, errgo.Wrap(err, "repo.episode.Count")
+	}
+
 	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
 		logger.Error("can't set response to cache", zap.Error(e))
 	}

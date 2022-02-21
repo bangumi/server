@@ -69,6 +69,17 @@ func GetWebApp(t *testing.T, options ...fx.Option) (f *fiber.App) {
 	return
 }
 
+func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
+	if m == nil {
+		mocker := &domain.MockEpisodeRepo{}
+		mocker.EXPECT().Count(mock.Anything, mock.Anything).Return(0, nil)
+
+		m = mocker
+	}
+
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.EpisodeRepo))))
+}
+
 func MockUserRepo(mock domain.AuthRepo) fx.Option {
 	return fx.Supply(fx.Annotate(mock, fx.As(new(domain.AuthRepo))))
 }

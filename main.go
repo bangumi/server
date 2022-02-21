@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/auth"
 	"github.com/bangumi/server/cache"
 	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/episode"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
@@ -63,9 +64,16 @@ func start() error {
 
 		fx.Provide(
 			query.Use,
+			cache.NewRedisCache,
+		),
+
+		fx.Provide(
 			subject.NewMysqlRepo,
 			auth.NewMysqlRepo,
-			cache.NewRedisCache,
+			episode.NewMysqlRepo,
+		),
+
+		fx.Provide(
 			web.New,
 			web.NewHandle,
 		),

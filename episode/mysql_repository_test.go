@@ -14,20 +14,38 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package episode_test
 
 import (
 	"context"
+	"testing"
 
-	"github.com/bangumi/server/model"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+
+	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/episode"
+	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/test"
 )
 
-type SubjectRepo interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
+func getRepo(t *testing.T) domain.EpisodeRepo {
+	t.Helper()
+	repo, err := episode.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
+	require.NoError(t, err)
+
+	return repo
 }
 
-type SubjectService interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
+func TestCount(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	s, err := repo.Count(context.Background(), 253)
+	require.NoError(t, err)
+
+	assert.Equal(t, 31, s)
 }

@@ -52,13 +52,16 @@ func ResistRouter(app *fiber.App, h Handler, scope tally.Scope) {
 	})
 }
 
-func NewHandle(repo domain.SubjectRepo, auth domain.AuthRepo, cache cache.Generic) Handler {
-	return Handler{s: repo, a: auth, cache: cache}
+func NewHandle(
+	repo domain.SubjectRepo, auth domain.AuthRepo, e domain.EpisodeRepo, cache cache.Generic,
+) Handler {
+	return Handler{s: repo, a: auth, cache: cache, e: e}
 }
 
 type Handler struct {
 	// replace it with service, when it's too complex. Just use a repository currently.
 	s     domain.SubjectRepo
 	a     domain.AuthRepo
+	e     domain.EpisodeRepo
 	cache cache.Generic
 }

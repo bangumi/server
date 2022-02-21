@@ -18,16 +18,9 @@ package domain
 
 import (
 	"context"
-
-	"github.com/bangumi/server/model"
 )
 
-type SubjectRepo interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
-}
-
-type SubjectService interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
+type EpisodeRepo interface {
+	// Count all episode for a subject.
+	Count(ctx context.Context, subjectID uint32) (int, error)
 }
