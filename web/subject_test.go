@@ -118,5 +118,5 @@ func Test_web_subject_Redirect(t *testing.T) {
 	defer resp.Body.Close()
 
 	require.Equal(t, http.StatusFound, resp.StatusCode, "302 for redirect repository")
-	require.Equal(t, "/v1/subjects/2", resp.Header.Get("location"))
+	require.Equal(t, "/v0/subjects/2", resp.Header.Get("location"))
 }

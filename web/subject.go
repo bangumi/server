@@ -65,7 +65,7 @@ func (h Handler) getSubject(c *fiber.Ctx) error {
 	}
 
 	if r.Redirect != 0 {
-		return c.Redirect("/v1/subjects/" + strconv.FormatUint(uint64(r.Redirect), 10))
+		return c.Redirect("/v0/subjects/" + strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
 	if r.NSFW && !u.AllowNSFW() {
