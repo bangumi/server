@@ -48,8 +48,8 @@ func (h Handler) getSubject(c *fiber.Ctx) error {
 	}
 
 	id, err := strparse.Uint32(c.Params("id"))
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("bad id " + err.Error())
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)

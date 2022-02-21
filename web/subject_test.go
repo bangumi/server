@@ -120,3 +120,26 @@ func Test_web_subject_Redirect(t *testing.T) {
 	require.Equal(t, http.StatusFound, resp.StatusCode, "302 for redirect repository")
 	require.Equal(t, "/v0/subjects/2", resp.Header.Get("location"))
 }
+
+func Test_web_subject_bad_id(t *testing.T) {
+	t.Parallel()
+	m := &domain.MockSubjectRepo{}
+
+	app := test.GetWebApp(t,
+		test.MockUserRepo(mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}}),
+		test.MockSubjectRepo(m),
+		test.MockEmptyCache(),
+	)
+
+	for _, path := range []string{"/v0/subjects/0", "/v0/subjects/-1", "/v0/subjects/a"} {
+		path := path
+		t.Run(path, func(t *testing.T) {
+			t.Parallel()
+			resp, err := app.Test(httptest.NewRequest(http.MethodGet, path, http.NoBody))
+			require.NoError(t, err)
+			defer resp.Body.Close()
+
+			require.Equal(t, http.StatusBadRequest, resp.StatusCode, "400 for redirect subject id")
+		})
+	}
+}
