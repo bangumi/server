@@ -2,5 +2,5 @@ ignore:
   - "**/mock_*.go"
   - "**/*_test.go"
   - "**/*.gen.go"
-  - "dal/query/gen.go"
-  - "cmd/gen/gorm.go"
+  - "internal/dal/query/gen.go"
+  - "internal/cmd/gen/"

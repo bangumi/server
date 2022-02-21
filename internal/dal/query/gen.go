@@ -11,38 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	Q                 = new(Query)
-	Character         *character
-	CharacterSubjects *characterSubjects
-	Episode           *episode
-	Member            *member
-	OAuthAccessToken  *oAuthAccessToken
-	Person            *person
-	PersonField       *personField
-	PersonSubjects    *personSubjects
-	Subject           *subject
-	SubjectField      *subjectField
-	SubjectRelation   *subjectRelation
-	SubjectRevision   *subjectRevision
-)
-
-func SetDefault(db *gorm.DB) {
-	*Q = *Use(db)
-	Character = &Q.Character
-	CharacterSubjects = &Q.CharacterSubjects
-	Episode = &Q.Episode
-	Member = &Q.Member
-	OAuthAccessToken = &Q.OAuthAccessToken
-	Person = &Q.Person
-	PersonField = &Q.PersonField
-	PersonSubjects = &Q.PersonSubjects
-	Subject = &Q.Subject
-	SubjectField = &Q.SubjectField
-	SubjectRelation = &Q.SubjectRelation
-	SubjectRevision = &Q.SubjectRevision
-}
-
 func Use(db *gorm.DB) *Query {
 	return &Query{
 		db:                db,

@@ -49,7 +49,6 @@ func main() {
 		OutFile:       dalBase + "/query/gen.go",
 		ModelPkgPath:  dalBase + "/dao",
 		FieldNullable: false,
-		Mode:          gen.WithDefaultQuery,
 		// if you want the nullable field generation property to be pointer type, set FieldNullable true
 		/* FieldNullable: true,*/
 		// if you want to generate index tags from database, set FieldWithIndexTag true
@@ -59,8 +58,6 @@ func main() {
 		// if you need unit tests for query code, set WithUnitTest true
 		// WithUnitTest: true,
 	})
-
-	g.FieldNullable = false
 
 	// reuse the database connection in Project or create a connection here
 	// if you want to use GenerateModel/GenerateModelAs, UseDB is necessary, otherwise it will panic
