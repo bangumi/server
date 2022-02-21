@@ -1,0 +1,325 @@
+#
+# This file contains all available configuration options
+# with their default values.
+
+# options for analysis running
+run:
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  timeout: 2m
+
+  # exit code when at least one issue was found, default is 1
+  issues-exit-code: 1
+
+  # include test files or not, default is true
+  tests: true
+
+  modules-download-mode: readonly
+
+  # Allow multiple parallel golangci-lint instances running.
+  # If false (default) - golangci-lint acquires file lock on start.
+  allow-parallel-runners: true
+
+  skip-files: []
+
+# output configuration options
+output:
+  # colored-line-number|line-number|json|tab|checkstyle|code-climate|junit-xml|github-actions
+  # default is "colored-line-number"
+  format: colored-line-number
+
+  # print lines of code with issue, default is true
+  print-issued-lines: true
+
+  # print linter name in the end of issue text, default is true
+  print-linter-name: true
+
+  # make issues output unique by line, default is true
+  uniq-by-line: false
+
+  # add a prefix to the output file references; default is no prefix
+  path-prefix: ""
+
+  # sorts results by: filepath, line and column
+  sort-results: false
+
+# all available settings of specific linters
+linters-settings:
+  goheader:
+    values:
+      regexp:
+        AUTHOR: "{{COPYRIGHT}}+\nSPDX-License-Identifier: AGPL-3.0-only"
+        COPYRIGHT: "(Copyright \\(c\\) (20\\d\\d)(-20\\d\\d)? {{ USERNAME }}\n)"
+        USERNAME: "[^\n]*"
+    # Copyright (c) 2021-2022 USER1 <email>
+    # Copyright (c) 2022 USER2
+    #
+    # SPDX-License-Identifier: AGPL-3.0-only
+    template: |-
+      {{ AUTHOR }}
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU Affero General Public License as published
+      by the Free Software Foundation, version 3.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+      See the GNU Affero General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program. If not, see <https://www.gnu.org/licenses/>
+
+  errcheck:
+    # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
+    # default is false: such cases aren't reported by default.
+    check-type-assertions: true
+
+    # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
+    # default is false: such cases aren't reported by default.
+    check-blank: false
+    exclude-functions:
+      - (*github.com/valyala/bytebufferpool.ByteBuffer).Write
+      - (*github.com/valyala/bytebufferpool.ByteBuffer).WriteByte
+      - (*github.com/valyala/bytebufferpool.ByteBuffer).WriteString
+
+  errorlint:
+    # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
+    errorf: true
+    # Check for plain type assertions and type switches
+    asserts: true
+    # Check for plain error comparisons
+    comparison: true
+
+  forbidigo:
+    # Forbid the following identifiers (identifiers are written using regexp):
+    forbid:
+      - ^print.*$
+
+  funlen:
+    lines: 60
+    statements: 40
+
+  gocyclo:
+    # minimal code complexity to report, 30 by default (but we recommend 10-20)
+    min-complexity: 10
+
+  godot:
+    # comments to be checked: `declarations`, `toplevel`, or `all`
+    scope: declarations
+    # list of regexps for excluding particular comment lines from check
+    exclude: []
+    # example: exclude comments which contain numbers
+    # - '[0-9]+'
+    # check that each sentence starts with a capital letter
+    capital: false
+
+  gci:
+    sections:
+      - standard # Captures all standard packages if they do not match another section.
+      - default # Contains all imports that could not be matched to another section type.
+      - prefix(github.com/bangumi/server) # Groups all imports with the specified Prefix.
+    sectionSeparators:
+      - newLine
+
+  depguard:
+    list-type: denylist
+    # Check the list against standard lib.
+    # Default: false
+    include-go-root: true
+    # A list of packages for the list type specified.
+    # Default: []
+    packages:
+      - "encoding/json"
+      - "github.com/sirupsen/logrus"
+      - "github.com/golang/mock/gomock"
+    # A list of packages for the list type specified.
+    # Specify an error message to output when a denied package is used.
+    # Default: []
+    packages-with-error-message:
+      - "encoding/json": 'use "github.com/goccy/go-json"'
+      - "github.com/sirupsen/logrus": 'use "app/pkg/logger"'
+      - "github.com/golang/mock": 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
+    # Create additional guards that follow the same configuration pattern.
+    # Results from all guards are aggregated together.
+    additional-guards:
+      - list-type: denylist
+        include-go-root: false
+        packages:
+          - github.com/stretchr/testify
+        # Specify rules by which the linter ignores certain files for consideration.
+        ignore-file-rules:
+          - "!**/*_test.go"
+          - "!/mocks/**/*.go"
+
+  gosec:
+    excludes:
+      - G401
+      - G505
+      - G501 # md5
+
+  gomnd:
+    settings:
+      mnd:
+        # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
+        checks:
+          - argument
+          - case
+          - operation
+          - return
+          - assign
+        ignored-functions: strconv\..*,time\..*,make,math\..*,strings\..*
+        ignored-numbers: 1,2,3,10,100,1000,10000
+
+  gosimple:
+    # Select the Go version to target. The default is '1.13'.
+    go: "1.17"
+    # https://staticcheck.io/docs/options#checks
+    checks: ["all"]
+
+  importas:
+    no-unaliased: false
+    no-extra-aliases: true
+    alias:
+      - pkg: "log"
+        alias: stdLog
+      - pkg: "github.com/uber-go/tally/v4/prometheus"
+        alias: promreporter
+      - pkg: "gorm.io/gorm/logger"
+        alias: gormLogger
+
+  lll:
+    # max line length, lines longer will be reported. Default is 120.
+    # '\t' is counted as 1 character by default, and can be changed with the tab-width option
+    line-length: 100
+    # tab width in spaces. Default to 1.
+    tab-width: 2
+
+  misspell:
+    # Correct spellings using locale preferences for US or UK.
+    # Default is to use a neutral variety of English.
+    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
+    locale: US
+
+  staticcheck:
+    # Select the Go version to target. The default is '1.13'.
+    go: "1.17"
+    # https://staticcheck.io/docs/options#checks
+    checks: ["all"]
+
+  stylecheck:
+    # Select the Go version to target. The default is '1.13'.
+    go: "1.17"
+
+  testpackage:
+    # regexp pattern to skip files
+    skip-regexp: (export|internal)_test\.go
+
+  unused:
+    # Select the Go version to target. The default is '1.13'.
+    go: "1.17"
+
+  whitespace:
+    multi-if: false # Enforces newlines (or comments) after every multi-line if statement
+    multi-func: false # Enforces newlines (or comments) after every multi-line function signature
+
+  exhaustive:
+    # check switch statements in generated files also
+    check-generated: false
+    # indicates that switch statements are to be considered exhaustive if a
+    # 'default' case is present, even if all enum members aren't listed in the
+    # switch
+    default-signifies-exhaustive: true
+  govet:
+    enable-all: true
+  #    disable:
+  #      - shadow
+  wrapcheck:
+    # An array of strings that specify substrings of signatures to ignore.
+    # If this set, it will override the default set of ignored signatures.
+    # See https://github.com/tomarrell/wrapcheck#configuration for more information.
+    ignoreSigs:
+      - fmt.Errorf(
+      - errors.New(
+      - errors.Unwrap(
+      - .Wrapf(
+      - "errgo.Msg(err error, msg string) error"
+      - "errgo.Wrap(err error, msg string) error"
+      - "func (*github.com/gofiber/fiber/v2.Ctx).Send"
+      - "func (*github.com/gofiber/fiber/v2.Ctx).Render("
+      - "func (*github.com/gofiber/fiber/v2.Ctx).Redirect("
+      - "func (*github.com/gofiber/fiber/v2.Ctx).JSON("
+      - "func os.Open(name string)"
+      - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
+
+  ifshort:
+    # Maximum length of vars declaration measured in number of lines, after which linter won't suggest using short syntax.
+    # Has higher priority than max-decl-chars.
+    max-decl-lines: 1
+    # Maximum length of vars declaration measured in number of characters, after which linter won't suggest using short syntax.
+    max-decl-chars: 30
+  wsl:
+    allow-cuddle-declarations: true
+    allow-assign-and-call: true
+    force-err-cuddling: false
+
+  tagliatelle:
+    # Check the struck tag name case.
+    case:
+      # Use the struct field name to check the name of the struct tag.
+      # Default: false
+      use-field-name: false
+      rules:
+        # Any struct tag type can be used.
+        # Support string case: `camel`, `pascal`, `kebab`, `snake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`
+        json: snake
+
+linters:
+  enable-all: true
+  disable:
+    - ireturn
+    - wsl # noisy
+    - varnamelen # noisy
+    - exhaustivestruct # too noisy, default zero value is a good thing.
+    - gofumpt # break import grouping
+    - prealloc # perf
+    - scopelint # archived
+    - golint # archived
+    - maligned # replaced by go vert
+    - interfacer # archived
+    - dupl
+    - cyclop # we have gocyclo
+    - goimports # we have gci already
+  fast: false
+
+issues:
+  new: false
+  fix: false
+  exclude-use-default: true
+  exclude-rules:
+    # Disable linters that are annoying in tests.
+    - path: 'cmd[/\\].*'
+      linters: [gochecknoglobals, gochecknoinits, goerr113, wrapcheck]
+
+    - path: '.*_test\.go'
+      linters: [gocritic, nlreturn, gochecknoglobals]
+
+    - source: "var log"
+      linters: [gochecknoglobals]
+
+    # ignore response struct align to preserve json field order.
+    - path: 'web[/\\]res[/\\].*\.go'
+      linters:
+        - govet
+      text: "fieldalignment: struct of size \\d+ could be \\d+"
+
+    - linters: [goerr113, errorlint]
+      source: "if err == redis.Nil {"
+
+    # https://github.com/kunwardeep/paralleltest/issues/8
+    - linters:
+        - paralleltest
+      text: "Range statement for test \\S+ does not use range value in test Run"
+
+    - linters:
+        - nilerr
+      source: "return false, nil"

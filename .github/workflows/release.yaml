@@ -3,7 +3,10 @@ name: release
 on:
   push:
     tags:
-      - v*
+      - "v*.*.*"
+env:
+  USER: "bangumi"
+  IMAGE: "chii"
 
 jobs:
   release:
@@ -11,26 +14,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: ./.github/actions/base
 
       - name: Get Tag Name
         run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - name: Build Docker Image
-        run: docker build --build-arg "COMMIT_REF=$TAG" -t ghcr.io/bangumi/api-server:latest .
+      - run: make build
 
-      - run: echo $DOCKER_TOKEN | docker login ghcr.io -u bangumi --password-stdin
-        name: docker login
+      - name: docker build
+        run: docker build -t ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest .
+
+      - name: docker login
+        run: echo $DOCKER_TOKEN | docker login ghcr.io -u ${{ env.USER }} --password-stdin
         env:
           DOCKER_TOKEN: ${{ github.token }}
 
-      - run: |
-          docker push ghcr.io/bangumi/api-server:latest
-          docker tag ghcr.io/bangumi/api-server:latest "ghcr.io/bangumi/api-server:$TAG"
-          docker push "ghcr.io/bangumi/api-server:$TAG"
-        name: Docker Push
-
-      - name: Upload Github Release
-        run: gh release create "$TAG" --title "$TAG ($(date --rfc-3339=date))"
-        env:
-          TZ: "Asia/Shanghai"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: docker push
+        run: |
+          docker push ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest
+          docker tag ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
+          docker push "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"

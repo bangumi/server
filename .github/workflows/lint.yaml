@@ -1,75 +1,43 @@
-name: lint
+name: Lint
 
 on:
   push:
-    branches-ignore:
-      - renovate/**
+    branches:
+      - master
+      - go
     paths-ignore:
       - "**.md"
+      - "**.txt"
   pull_request:
     branches:
       - master
+      - go
     paths-ignore:
       - "**.md"
+      - "**.txt"
 
 jobs:
-  mypy:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v2
+      - uses: ./.github/actions/base
+
+      - name: Go Build Cache (lint)
+        uses: actions/cache@v2
         with:
-          python-version: 3.8
+          path: |
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-build-1-${{ hashFiles('**/go.sum') }}-lint
+          restore-keys: |
+            ${{ runner.os }}-go-build-1-${{ hashFiles('**/go.sum') }}-
+            ${{ runner.os }}-go-build-1-
 
-      - uses: Trim21/setup-poetry@dist/v1
-
-      - uses: Trim21/install-poetry-project@dist/v1
-
-      - uses: liskin/gh-problem-matcher-wrap@v1
+      - name: Run linters
+        uses: golangci/golangci-lint-action@v2
         with:
-          action: add
-          linters: mypy
-
-      - name: mypy
-        run: mypy --show-column-numbers pol
-
-  flake8:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - uses: Trim21/setup-poetry@dist/v1
-
-      - uses: Trim21/install-poetry-project@dist/v1
-
-      - run: echo "::add-matcher::.github/workflows/matcher/flake8.json"
-
-      - name: flake8
-        run: flake8
-
-  pre-commit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - uses: Trim21/setup-poetry@dist/v1
-
-      - uses: Trim21/install-poetry-project@dist/v1
-
-      - uses: actions/cache@v2
-        with:
-          path: ~/.cache/pre-commit
-          key: precommit-2-${{ env.PY }}-${{ hashFiles('.pre-commit-config.yaml') }}
-          restore-keys: precommit-2-${{ env.PY }}-
-
-      - name: pre-commit
-        run: pre-commit run --all-files --show-diff-on-failure && pre-commit gc
+          version: v1.44.1
+          skip-go-installation: true
+          skip-pkg-cache: true
+          skip-build-cache: true

@@ -1,0 +1,115 @@
+// Copyright (c) 2021-2022 Trim21 <trim21.me@gmail.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>
+
+//nolint:gochecknoglobals
+// Package vars provide some pre-defined variable from old codebase.
+package vars
+
+import (
+	_ "embed"
+	"log"
+
+	"github.com/goccy/go-json"
+
+	"github.com/bangumi/server/model"
+)
+
+//go:embed staff.json
+var staffRaw []byte
+
+//go:embed platform.json
+var platformRaw []byte
+
+//go:embed relation.json
+var relationRaw []byte
+
+// StaffID ...
+type StaffID = uint16
+
+// PlatformID ...
+type PlatformID = uint16
+
+// RelationID ...
+type RelationID = int32
+
+var (
+	// StaffMap ...
+	StaffMap map[model.SubjectType]map[StaffID]Staff
+	// PlatformMap ...
+	PlatformMap map[model.SubjectType]map[PlatformID]model.Platform
+	// RelationMap ...
+	RelationMap map[model.SubjectType]map[RelationID]Relation
+)
+
+//nolint:gochecknoinits
+func init() {
+	if err := json.Unmarshal(staffRaw, &StaffMap); err != nil {
+		log.Panicln("can't unmarshal raw staff json to go type", err)
+	}
+	staffRaw = nil
+
+	if err := json.Unmarshal(platformRaw, &PlatformMap); err != nil {
+		log.Panicln("can't unmarshal raw platform json to go type", err)
+	}
+	platformRaw = nil
+
+	if err := json.Unmarshal(relationRaw, &RelationMap); err != nil {
+		log.Panicln("can't unmarshal raw relation json to go type", err)
+	}
+	relationRaw = nil
+}
+
+type Staff struct {
+	CN  string
+	JP  string
+	EN  string
+	RDF string
+}
+
+func (s Staff) String() string {
+	switch {
+	case s.CN != "":
+		return s.CN
+	case s.JP != "":
+		return s.JP
+	case s.EN != "":
+		return s.EN
+	case s.RDF != "":
+		return s.RDF
+	default:
+		return "unknown"
+	}
+}
+
+type Relation struct {
+	CN          string `json:"cn"`
+	EN          string `json:"en"`
+	JP          string `json:"jp"`
+	Description string `json:"description"`
+}
+
+func (r Relation) String() string {
+	switch {
+	case r.CN != "":
+		return r.CN
+	case r.JP != "":
+		return r.JP
+	case r.EN != "":
+		return r.EN
+	default:
+		return "unknown"
+	}
+}
