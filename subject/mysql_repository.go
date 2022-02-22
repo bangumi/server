@@ -37,7 +37,7 @@ type mysqlRepo struct {
 }
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.SubjectRepo, error) {
-	return mysqlRepo{q: q, log: log.Named("repository.mysqlRepo")}, nil
+	return mysqlRepo{q: q, log: log.Named("subject.mysqlRepo")}, nil
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Subject, error) {

@@ -31,7 +31,7 @@ import (
 )
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.AuthRepo, error) {
-	return mysqlRepo{q: q, log: log.Named("user.mysqlRepo")}, nil
+	return mysqlRepo{q: q, log: log.Named("auth.mysqlRepo")}, nil
 }
 
 type mysqlRepo struct {
