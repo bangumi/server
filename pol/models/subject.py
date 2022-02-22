@@ -51,3 +51,8 @@ class Ep(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class SubjectCharacter(BaseModel):
+    id: int
+    relation: str

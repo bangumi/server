@@ -5,8 +5,10 @@ import pytest
 from fastapi import FastAPI
 
 from pol.models import User, Avatar, PublicUser
+from pol.api.v0.models import Person
 from pol.api.v0.depends.auth import Guest
 from pol.services.user_service import UserService
+from pol.services.person_service import PersonService
 from pol.services.subject_service import SubjectService
 
 
@@ -65,6 +67,34 @@ def mock_user_service(app: FastAPI, access_token: str):
     app.dependency_overrides[UserService.new] = mocker
     yield service
     app.dependency_overrides.pop(UserService.new, None)
+
+
+class MockPersonService:
+    async def get_by_ids(self, ids: Iterator[int]):
+        return {
+            id: Person(
+                id=id,
+                name=f"person {id}",
+                type=1,
+                career=[],
+                short_summary="",
+                images=None,
+                locked=0,
+            )
+            for id in ids
+        }
+
+
+@pytest.fixture()
+def mock_person_service(app: FastAPI):
+    service = mock.Mock(wraps=MockPersonService())
+
+    async def mocker():
+        return service
+
+    app.dependency_overrides[PersonService.new] = mocker
+    yield service
+    app.dependency_overrides.pop(PersonService.new, None)
 
 
 class MockSubjectService(Protocol):

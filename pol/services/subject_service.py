@@ -1,13 +1,14 @@
 import datetime
-from typing import Dict, Iterator, Optional
+from typing import Dict, List, Iterator, Optional, cast
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pol.db import sa
 from pol.depends import get_db
-from pol.db.tables import ChiiSubject
-from pol.models.subject import Subject
+from pol.db.const import get_character_rel
+from pol.db.tables import ChiiSubject, ChiiCrtSubjectIndex
+from pol.models.subject import Subject, SubjectCharacter
 from pol.curd.exceptions import NotFoundError
 
 
@@ -40,13 +41,16 @@ class SubjectService:
         if not include_nsfw:
             where.append(ChiiSubject.subject_nsfw == 0)
 
-        results: Iterator[ChiiSubject] = await self._db.scalars(
-            sa.select(ChiiSubject)
-            .where(*where)
-            .options(sa.joinedload(ChiiSubject.fields))
+        results = cast(
+            Iterator[ChiiSubject],
+            await self._db.scalars(
+                sa.select(ChiiSubject)
+                .where(*where)
+                .options(sa.joinedload(ChiiSubject.fields))
+            ),
         )
 
-        return {s.subject_id: _convert_from_orm(s) for s in results}
+        return {cast(int, s.subject_id): _convert_from_orm(s) for s in results}
 
     async def get_by_id(
         self,
@@ -81,6 +85,33 @@ class SubjectService:
             raise self.NotFoundError
 
         return _convert_from_orm(s)
+
+    async def list_characters(self, id: int):
+        s: ChiiSubject = await self._db.scalar(
+            sa.select(ChiiSubject).where(
+                ChiiSubject.subject_id == id, ChiiSubject.subject_ban == 0
+            )
+        )
+
+        if not s:
+            return []
+
+        res = cast(
+            List[ChiiCrtSubjectIndex],
+            await self._db.scalars(
+                sa.select(ChiiCrtSubjectIndex).where(
+                    ChiiCrtSubjectIndex.subject_id == id
+                )
+            ),
+        )
+
+        return [
+            SubjectCharacter(
+                id=rel.crt_id,
+                relation=get_character_rel(rel.crt_type),
+            )
+            for rel in res
+        ]
 
 
 def _convert_from_orm(s: ChiiSubject) -> Subject:
