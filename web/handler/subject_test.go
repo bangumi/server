@@ -43,10 +43,10 @@ func TestHappyPath(t *testing.T) {
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{ID: 7}, nil)
 
 	app := test.GetWebApp(t,
-		test.MockUserRepo(mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}}),
-		test.MockSubjectRepo(m),
-		test.MockEmptyCache(),
-		test.MockEpisodeRepo(nil),
+		test.Mock{
+			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
+			SubjectRepo: m,
+		},
 	)
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
@@ -66,10 +66,10 @@ func TestNSFW_200(t *testing.T) {
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
 
 	app := test.GetWebApp(t,
-		test.MockUserRepo(mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}}),
-		test.MockSubjectRepo(m),
-		test.MockEmptyCache(),
-		test.MockEpisodeRepo(nil),
+		test.Mock{
+			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
+			SubjectRepo: m,
+		},
 	)
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
@@ -89,10 +89,10 @@ func TestNSFW_404(t *testing.T) {
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
 
 	app := test.GetWebApp(t,
-		test.MockUserRepo(mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}}),
-		test.MockSubjectRepo(m),
-		test.MockEmptyCache(),
-		test.MockEpisodeRepo(nil),
+		test.Mock{
+			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
+			SubjectRepo: m,
+		},
 	)
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
@@ -111,10 +111,10 @@ func Test_web_subject_Redirect(t *testing.T) {
 	m.EXPECT().Get(mock.Anything, uint32(8)).Return(model.Subject{Redirect: 2}, nil)
 
 	app := test.GetWebApp(t,
-		test.MockUserRepo(mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}}),
-		test.MockSubjectRepo(m),
-		test.MockEmptyCache(),
-		test.MockEpisodeRepo(nil),
+		test.Mock{
+			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
+			SubjectRepo: m,
+		},
 	)
 
 	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/v0/subjects/8", http.NoBody))
@@ -130,10 +130,10 @@ func Test_web_subject_bad_id(t *testing.T) {
 	m := &domain.MockSubjectRepo{}
 
 	app := test.GetWebApp(t,
-		test.MockUserRepo(mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}}),
-		test.MockSubjectRepo(m),
-		test.MockEmptyCache(),
-		test.MockEpisodeRepo(nil),
+		test.Mock{
+			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
+			SubjectRepo: m,
+		},
 	)
 
 	for _, path := range []string{"/v0/subjects/0", "/v0/subjects/-1", "/v0/subjects/a"} {

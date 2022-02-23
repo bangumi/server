@@ -31,6 +31,7 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
+	"github.com/bangumi/server/person"
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/web"
 	"github.com/bangumi/server/web/handler"
@@ -70,6 +71,7 @@ func start() error {
 
 		fx.Provide(
 			subject.NewMysqlRepo,
+			person.NewMysqlRepo,
 			auth.NewMysqlRepo,
 			episode.NewMysqlRepo,
 		),

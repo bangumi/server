@@ -36,6 +36,8 @@ import (
 	"github.com/bangumi/server/internal/dal"
 )
 
+const personIDTypeString = "uint32"
+
 const subjectIDTypeString = "uint32"
 const subjectTypeIDTypeString = "uint8"
 
@@ -116,15 +118,27 @@ func main() {
 
 	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "OAuthAccessToken"))
 
-	g.ApplyInterface(func(method.PersonField) {}, g.GenerateModelAs("chii_person_fields", "PersonField", gen.FieldTrimPrefix("prsn_")))
+	g.ApplyInterface(func(method.PersonField) {},
+		g.GenerateModelAs("chii_person_fields", "PersonField",
+			gen.FieldTrimPrefix("prsn_"),
+			gen.FieldType("prsn_id", personIDTypeString),
+			// mysql year(4) has range 1901 to 2155, uint16 has range 0-65535.
+			gen.FieldType("birth_year", "uint16"),
+		))
 
 	g.ApplyInterface(func(method.Person) {}, g.GenerateModelAs("chii_persons", "Person",
 		gen.FieldTrimPrefix("prsn_"),
 		gen.FieldType("prsn_illustrator", "bool"),
 		gen.FieldType("prsn_writer", "bool"),
+		gen.FieldType("prsn_redirect", personIDTypeString),
 	))
 
-	g.ApplyInterface(func(method.Character) {}, g.GenerateModelAs("chii_characters", "Character", gen.FieldTrimPrefix("crt_")))
+	g.ApplyInterface(
+		func(method.Character) {},
+		g.GenerateModelAs("chii_characters", "Character",
+			gen.FieldTrimPrefix("crt_"),
+		),
+	)
 
 	g.ApplyInterface(func(method.PersonSubjects) {},
 		g.GenerateModelAs("chii_person_cs_index", "PersonSubjects",

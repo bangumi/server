@@ -14,34 +14,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+package handler
 
-import (
-	"testing"
+import "github.com/gofiber/fiber/v2/utils"
 
-	"github.com/bangumi/server/cache"
-	"github.com/bangumi/server/domain"
-	"github.com/bangumi/server/internal/test"
-)
+func nilUint8(i uint8) *uint8 {
+	if i == 0 {
+		return nil
+	}
 
-func TestGetWebApp(t *testing.T) {
-	t.Parallel()
+	return &i
+}
 
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
+func nilUint16(i uint16) *uint16 {
+	if i == 0 {
+		return nil
+	}
 
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
+	return &i
+}
+
+func nilString(s string) *string {
+	if s == "" {
+		return nil
+	}
+
+	s = utils.CopyString(s)
+
+	return &s
 }

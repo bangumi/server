@@ -29,7 +29,7 @@ type Person struct {
 	Lock        int8   `gorm:"column:prsn_lock;type:tinyint(4);not null;index:prsn_lock,priority:1" json:"prsn_lock"`
 	AnidbID     uint32 `gorm:"column:prsn_anidb_id;type:mediumint(8) unsigned;not null" json:"prsn_anidb_id"`
 	Ban         uint8  `gorm:"column:prsn_ban;type:tinyint(3) unsigned;not null;index:prsn_ban,priority:1;default:0" json:"prsn_ban"`
-	Redirect    int32  `gorm:"column:prsn_redirect;type:int(10) unsigned;not null;default:0" json:"prsn_redirect"`
+	Redirect    uint32 `gorm:"column:prsn_redirect;type:int(10) unsigned;not null;default:0" json:"prsn_redirect"`
 	Nsfw        bool   `gorm:"column:prsn_nsfw;type:tinyint(1) unsigned;not null" json:"prsn_nsfw"`
 }
 

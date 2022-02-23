@@ -26,10 +26,10 @@ func newPersonField(db *gorm.DB) personField {
 	tableName := _personField.personFieldDo.TableName()
 	_personField.ALL = field.NewField(tableName, "*")
 	_personField.Cat = field.NewString(tableName, "prsn_cat")
-	_personField.ID = field.NewInt32(tableName, "prsn_id")
+	_personField.ID = field.NewUint32(tableName, "prsn_id")
 	_personField.Gender = field.NewUint8(tableName, "gender")
 	_personField.Bloodtype = field.NewUint8(tableName, "bloodtype")
-	_personField.BirthYear = field.NewInt32(tableName, "birth_year")
+	_personField.BirthYear = field.NewUint16(tableName, "birth_year")
 	_personField.BirthMon = field.NewUint8(tableName, "birth_mon")
 	_personField.BirthDay = field.NewUint8(tableName, "birth_day")
 
@@ -43,10 +43,10 @@ type personField struct {
 
 	ALL       field.Field
 	Cat       field.String
-	ID        field.Int32
+	ID        field.Uint32
 	Gender    field.Uint8
 	Bloodtype field.Uint8
-	BirthYear field.Int32
+	BirthYear field.Uint16
 	BirthMon  field.Uint8
 	BirthDay  field.Uint8
 
@@ -66,10 +66,10 @@ func (p personField) As(alias string) *personField {
 func (p *personField) updateTableName(table string) *personField {
 	p.ALL = field.NewField(table, "*")
 	p.Cat = field.NewString(table, "prsn_cat")
-	p.ID = field.NewInt32(table, "prsn_id")
+	p.ID = field.NewUint32(table, "prsn_id")
 	p.Gender = field.NewUint8(table, "gender")
 	p.Bloodtype = field.NewUint8(table, "bloodtype")
-	p.BirthYear = field.NewInt32(table, "birth_year")
+	p.BirthYear = field.NewUint16(table, "birth_year")
 	p.BirthMon = field.NewUint8(table, "birth_mon")
 	p.BirthDay = field.NewUint8(table, "birth_day")
 

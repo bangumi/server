@@ -33,13 +33,23 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/web"
 	"github.com/bangumi/server/web/handler"
 )
 
-func GetWebApp(t *testing.T, options ...fx.Option) (f *fiber.App) {
+type Mock struct {
+	SubjectRepo domain.SubjectRepo
+	PersonRepo  domain.PersonRepo
+	AuthRepo    domain.AuthRepo
+	EpisodeRepo domain.EpisodeRepo
+	Cache       cache.Generic
+}
+
+func GetWebApp(t *testing.T, m Mock, options ...fx.Option) *fiber.App {
 	t.Helper()
+	var f *fiber.App
 
 	options = append(options,
 		// fx.NopLogger,
@@ -56,10 +66,21 @@ func GetWebApp(t *testing.T, options ...fx.Option) (f *fiber.App) {
 			handler.New,
 		),
 
+		MockPersonRepo(m.PersonRepo),
+		MockSubjectRepo(m.SubjectRepo),
+		MockEpisodeRepo(m.EpisodeRepo),
+		MockAuthRepo(m.AuthRepo),
+
 		fx.Invoke(web.ResistRouter),
 
 		fx.Populate(&f),
 	)
+
+	if m.Cache == nil {
+		options = append(options, MockEmptyCache())
+	} else {
+		options = append(options, MockCache(m.Cache))
+	}
 
 	app := fx.New(options...)
 
@@ -67,9 +88,19 @@ func GetWebApp(t *testing.T, options ...fx.Option) (f *fiber.App) {
 		t.Fatal("can't create web app", app.Err())
 	}
 
-	return
+	return f
 }
 
+func MockPersonRepo(m domain.PersonRepo) fx.Option {
+	if m == nil {
+		mocker := &domain.MockPersonRepo{}
+		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Person{}, nil)
+
+		m = mocker
+	}
+
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.PersonRepo))))
+}
 func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 	if m == nil {
 		mocker := &domain.MockEpisodeRepo{}
@@ -81,12 +112,26 @@ func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 	return fx.Supply(fx.Annotate(m, fx.As(new(domain.EpisodeRepo))))
 }
 
-func MockUserRepo(mock domain.AuthRepo) fx.Option {
-	return fx.Supply(fx.Annotate(mock, fx.As(new(domain.AuthRepo))))
+func MockAuthRepo(m domain.AuthRepo) fx.Option {
+	if m == nil {
+		mocker := &domain.MockAuthRepo{}
+		mocker.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
+
+		m = mocker
+	}
+
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.AuthRepo))))
 }
 
-func MockSubjectRepo(mock domain.SubjectRepo) fx.Option {
-	return fx.Supply(fx.Annotate(mock, fx.As(new(domain.SubjectRepo))))
+func MockSubjectRepo(m domain.SubjectRepo) fx.Option {
+	if m == nil {
+		mocker := &domain.MockSubjectRepo{}
+		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{}, nil)
+
+		m = mocker
+	}
+
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.SubjectRepo))))
 }
 
 func MockCache(mock cache.Generic) fx.Option {

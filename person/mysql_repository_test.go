@@ -14,34 +14,38 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+package person_test
 
 import (
+	"context"
 	"testing"
 
-	"github.com/bangumi/server/cache"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/subject"
 )
 
-func TestGetWebApp(t *testing.T) {
+func getRepo(t *testing.T) domain.SubjectRepo {
+	t.Helper()
+	repo, err := subject.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
+	require.NoError(t, err)
+
+	return repo
+}
+
+func TestGet(t *testing.T) {
+	test.RequireEnv(t, "mysql")
 	t.Parallel()
 
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
+	repo := getRepo(t)
 
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
+	s, err := repo.Get(context.Background(), 1)
+	require.NoError(t, err)
+
+	assert.Equal(t, uint32(1), s.ID)
 }

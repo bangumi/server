@@ -14,34 +14,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+package domain
 
 import (
-	"testing"
+	"context"
 
-	"github.com/bangumi/server/cache"
-	"github.com/bangumi/server/domain"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/model"
 )
 
-func TestGetWebApp(t *testing.T) {
-	t.Parallel()
-
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
-
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
+type PersonRepo interface {
+	Get(ctx context.Context, id uint32) (model.Person, error)
 }

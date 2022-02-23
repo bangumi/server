@@ -14,34 +14,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+package model
 
-import (
-	"testing"
-
-	"github.com/bangumi/server/cache"
-	"github.com/bangumi/server/domain"
-	"github.com/bangumi/server/internal/test"
-)
-
-func TestGetWebApp(t *testing.T) {
-	t.Parallel()
-
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
-
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
+type Person struct {
+	Name           string
+	Image          string
+	Infobox        string
+	Summary        string
+	ID             uint32
+	Redirect       uint32
+	CollectCount   uint32
+	CommentCount   uint32
+	FieldBirthYear uint16
+	Producer       bool
+	Mangaka        bool
+	Type           uint8
+	Artist         bool
+	Seiyu          bool
+	Writer         bool
+	Illustrator    bool
+	Actor          bool
+	FieldBloodType uint8
+	FieldGender    uint8
+	FieldBirthMon  uint8
+	Locked         bool
+	FieldBirthDay  uint8
 }

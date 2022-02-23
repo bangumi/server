@@ -46,7 +46,7 @@ func newPerson(db *gorm.DB) person {
 	_person.Lock = field.NewInt8(tableName, "prsn_lock")
 	_person.AnidbID = field.NewUint32(tableName, "prsn_anidb_id")
 	_person.Ban = field.NewUint8(tableName, "prsn_ban")
-	_person.Redirect = field.NewInt32(tableName, "prsn_redirect")
+	_person.Redirect = field.NewUint32(tableName, "prsn_redirect")
 	_person.Nsfw = field.NewBool(tableName, "prsn_nsfw")
 
 	_person.fillFieldMap()
@@ -79,7 +79,7 @@ type person struct {
 	Lock        field.Int8
 	AnidbID     field.Uint32
 	Ban         field.Uint8
-	Redirect    field.Int32
+	Redirect    field.Uint32
 	Nsfw        field.Bool
 
 	fieldMap map[string]field.Expr
@@ -118,7 +118,7 @@ func (p *person) updateTableName(table string) *person {
 	p.Lock = field.NewInt8(table, "prsn_lock")
 	p.AnidbID = field.NewUint32(table, "prsn_anidb_id")
 	p.Ban = field.NewUint8(table, "prsn_ban")
-	p.Redirect = field.NewInt32(table, "prsn_redirect")
+	p.Redirect = field.NewUint32(table, "prsn_redirect")
 	p.Nsfw = field.NewBool(table, "prsn_nsfw")
 
 	p.fillFieldMap()

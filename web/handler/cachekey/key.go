@@ -14,34 +14,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+package cachekey
 
 import (
-	"testing"
+	"strconv"
 
-	"github.com/bangumi/server/cache"
-	"github.com/bangumi/server/domain"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/config"
 )
 
-func TestGetWebApp(t *testing.T) {
-	t.Parallel()
+// Put version in cache key to avoid model changes.
+const globalPrefix = "chii:" + config.Version + ":res:"
 
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
+func Person(id uint32) string {
+	return globalPrefix + "person:" + strconv.FormatUint(uint64(id), 10)
+}
 
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
-		},
-	)
+func Subject(id uint32) string {
+	return globalPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
 }

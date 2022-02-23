@@ -17,6 +17,8 @@
 package model
 
 type PersonImages struct {
+	Small  string `json:"small"`
+	Grid   string `json:"grid"`
 	Large  string `json:"large"`
 	Medium string `json:"medium"`
 }
@@ -40,5 +42,18 @@ func SubjectImage(s string) SubjectImages {
 		Common: "https://lain.bgm.tv/pic/cover/c/" + s,
 		Large:  "https://lain.bgm.tv/pic/cover/l/" + s,
 		Medium: "https://lain.bgm.tv/pic/cover/m/" + s,
+	}
+}
+
+func PersonImage(s string) PersonImages {
+	if s == "" {
+		return PersonImages{}
+	}
+
+	return PersonImages{
+		Grid:   "https://lain.bgm.tv/pic/crt/g/" + s,
+		Small:  "https://lain.bgm.tv/pic/crt/s/" + s,
+		Large:  "https://lain.bgm.tv/pic/crt/l/" + s,
+		Medium: "https://lain.bgm.tv/pic/crt/m/" + s,
 	}
 }

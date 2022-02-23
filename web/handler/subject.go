@@ -34,14 +34,11 @@ import (
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
+	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/handler/ctxkey"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/util"
 )
-
-func subjectCacheKey(id uint32) string {
-	return "chii:res:0:subject:" + strconv.FormatUint(uint64(id), 10)
-}
 
 func (h Handler) GetSubject(c *fiber.Ctx) error {
 	u, ok := c.Context().UserValue(ctxkey.User).(accessor) // get visitor
@@ -79,7 +76,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 }
 
 func (h Handler) getSubjectWithCache(ctx context.Context, id uint32) (res.SubjectV0, bool, error) {
-	var key = subjectCacheKey(id)
+	var key = cachekey.Subject(id)
 
 	// try to read from cache
 	var r res.SubjectV0
