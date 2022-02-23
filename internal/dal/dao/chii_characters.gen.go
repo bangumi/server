@@ -22,7 +22,7 @@ type Character struct {
 	ImgAnidb string `gorm:"column:crt_img_anidb;type:varchar(255);not null" json:"crt_img_anidb"`
 	AnidbID  uint32 `gorm:"column:crt_anidb_id;type:mediumint(8) unsigned;not null" json:"crt_anidb_id"`
 	Ban      uint8  `gorm:"column:crt_ban;type:tinyint(3) unsigned;not null;index:crt_ban,priority:1;default:0" json:"crt_ban"`
-	Redirect int32  `gorm:"column:crt_redirect;type:int(10) unsigned;not null;default:0" json:"crt_redirect"`
+	Redirect uint32 `gorm:"column:crt_redirect;type:int(10) unsigned;not null;default:0" json:"crt_redirect"`
 	Nsfw     bool   `gorm:"column:crt_nsfw;type:tinyint(1) unsigned;not null" json:"crt_nsfw"`
 }
 

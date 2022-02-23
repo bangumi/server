@@ -23,6 +23,7 @@ import (
 
 	"github.com/bangumi/server/auth"
 	"github.com/bangumi/server/cache"
+	"github.com/bangumi/server/character"
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/episode"
 	"github.com/bangumi/server/internal/dal"
@@ -70,6 +71,7 @@ func start() error {
 		),
 
 		fx.Provide(
+			character.NewMysqlRepo,
 			subject.NewMysqlRepo,
 			person.NewMysqlRepo,
 			auth.NewMysqlRepo,

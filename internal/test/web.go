@@ -24,6 +24,7 @@ import (
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/auth"
 	"github.com/bangumi/server/cache"
@@ -32,7 +33,6 @@ import (
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/web"
@@ -40,26 +40,27 @@ import (
 )
 
 type Mock struct {
-	SubjectRepo domain.SubjectRepo
-	PersonRepo  domain.PersonRepo
-	AuthRepo    domain.AuthRepo
-	EpisodeRepo domain.EpisodeRepo
-	Cache       cache.Generic
+	SubjectRepo   domain.SubjectRepo
+	PersonRepo    domain.PersonRepo
+	CharacterRepo domain.CharacterRepo
+	AuthRepo      domain.AuthRepo
+	EpisodeRepo   domain.EpisodeRepo
+	Cache         cache.Generic
 }
 
-func GetWebApp(t *testing.T, m Mock, options ...fx.Option) *fiber.App {
+func GetWebApp(t *testing.T, m Mock) *fiber.App {
 	t.Helper()
 	var f *fiber.App
 
-	options = append(options,
-		// fx.NopLogger,
+	var options = []fx.Option{
+		fx.NopLogger,
 
 		fx.Supply(fx.Annotate(tally.NoopScope, fx.As(new(tally.Scope)))),
 		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}),
 			fx.As(new(promreporter.Reporter)))),
 
 		fx.Provide(
-			logger.Copy,
+			zap.NewNop,
 			config.NewAppConfig,
 			dal.NewDB,
 			web.New,
@@ -67,6 +68,7 @@ func GetWebApp(t *testing.T, m Mock, options ...fx.Option) *fiber.App {
 		),
 
 		MockPersonRepo(m.PersonRepo),
+		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
 		MockAuthRepo(m.AuthRepo),
@@ -74,7 +76,7 @@ func GetWebApp(t *testing.T, m Mock, options ...fx.Option) *fiber.App {
 		fx.Invoke(web.ResistRouter),
 
 		fx.Populate(&f),
-	)
+	}
 
 	if m.Cache == nil {
 		options = append(options, MockEmptyCache())
@@ -101,6 +103,18 @@ func MockPersonRepo(m domain.PersonRepo) fx.Option {
 
 	return fx.Supply(fx.Annotate(m, fx.As(new(domain.PersonRepo))))
 }
+
+func MockCharacterRepo(m domain.CharacterRepo) fx.Option {
+	if m == nil {
+		mocker := &domain.MockCharacterRepo{}
+		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Character{}, nil)
+
+		m = mocker
+	}
+
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.CharacterRepo))))
+}
+
 func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 	if m == nil {
 		mocker := &domain.MockEpisodeRepo{}

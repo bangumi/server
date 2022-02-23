@@ -14,42 +14,38 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package character_test
 
 import (
+	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/cache"
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/subject"
 )
 
-func New(
-	s domain.SubjectRepo,
-	c domain.CharacterRepo,
-	p domain.PersonRepo,
-	a domain.AuthRepo,
-	e domain.EpisodeRepo,
-	cache cache.Generic,
-	log *zap.Logger,
-) Handler {
-	return Handler{
-		cache: cache,
-		log:   log,
-		p:     p,
-		s:     s,
-		a:     a,
-		e:     e,
-		c:     c,
-	}
+func getRepo(t *testing.T) domain.SubjectRepo {
+	t.Helper()
+	repo, err := subject.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
+	require.NoError(t, err)
+
+	return repo
 }
 
-type Handler struct {
-	// replace it with service, when it's too complex. Just use a repository currently.
-	s     domain.SubjectRepo
-	p     domain.PersonRepo
-	a     domain.AuthRepo
-	e     domain.EpisodeRepo
-	c     domain.CharacterRepo
-	cache cache.Generic
-	log   *zap.Logger
+func TestGet(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	s, err := repo.Get(context.Background(), 1)
+	require.NoError(t, err)
+
+	assert.Equal(t, uint32(1), s.ID)
 }

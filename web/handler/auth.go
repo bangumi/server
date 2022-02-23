@@ -70,7 +70,7 @@ func getUser(h Handler, c *fiber.Ctx) (accessor, error) {
 
 	authorization := c.Get(fiber.HeaderAuthorization)
 	if authorization == "" {
-		logger.Info("access without token", a.LogField())
+		h.log.Info("access without token", a.LogField())
 
 		return a, nil
 	}

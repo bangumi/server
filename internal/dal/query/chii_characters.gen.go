@@ -39,7 +39,7 @@ func newCharacter(db *gorm.DB) character {
 	_character.ImgAnidb = field.NewString(tableName, "crt_img_anidb")
 	_character.AnidbID = field.NewUint32(tableName, "crt_anidb_id")
 	_character.Ban = field.NewUint8(tableName, "crt_ban")
-	_character.Redirect = field.NewInt32(tableName, "crt_redirect")
+	_character.Redirect = field.NewUint32(tableName, "crt_redirect")
 	_character.Nsfw = field.NewBool(tableName, "crt_nsfw")
 
 	_character.fillFieldMap()
@@ -65,7 +65,7 @@ type character struct {
 	ImgAnidb field.String
 	AnidbID  field.Uint32
 	Ban      field.Uint8
-	Redirect field.Int32
+	Redirect field.Uint32
 	Nsfw     field.Bool
 
 	fieldMap map[string]field.Expr
@@ -97,7 +97,7 @@ func (c *character) updateTableName(table string) *character {
 	c.ImgAnidb = field.NewString(table, "crt_img_anidb")
 	c.AnidbID = field.NewUint32(table, "crt_anidb_id")
 	c.Ban = field.NewUint8(table, "crt_ban")
-	c.Redirect = field.NewInt32(table, "crt_redirect")
+	c.Redirect = field.NewUint32(table, "crt_redirect")
 	c.Nsfw = field.NewBool(table, "crt_nsfw")
 
 	c.fillFieldMap()

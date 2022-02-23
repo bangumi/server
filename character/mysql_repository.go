@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package person
+package character
 
 import (
 	"context"
@@ -34,60 +34,54 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.PersonRepo, error) {
-	return mysqlRepo{q: q, log: log.Named("person.mysqlRepo")}, nil
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CharacterRepo, error) {
+	return mysqlRepo{q: q, log: log.Named("character.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Person, error) {
-	s, err := r.q.Person.WithContext(ctx).Where(r.q.Person.ID.Eq(id)).First()
+func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Character, error) {
+	s, err := r.q.Character.WithContext(ctx).Where(r.q.Character.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Person{}, domain.ErrNotFound
+			return model.Character{}, domain.ErrNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))
 
-		return model.Person{}, errgo.Wrap(err, "dal")
+		return model.Character{}, errgo.Wrap(err, "dal")
 	}
 
-	field, err := r.q.PersonField.WithContext(ctx).GetPerson(id)
+	field, err := r.q.PersonField.WithContext(ctx).GetCharacter(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			r.log.Error("unexpected 'gorm.ErrRecordNotFound' happened",
 				zap.Error(err), zap.Uint32("id", id))
 
-			return model.Person{}, domain.ErrNotFound
+			return model.Character{}, domain.ErrNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))
 
-		return model.Person{}, errgo.Wrap(err, "dal")
+		return model.Character{}, errgo.Wrap(err, "dal")
 	}
 
-	return model.Person{
-		Redirect:     s.Redirect,
-		Type:         s.Type,
+	return model.Character{
 		ID:           s.ID,
 		Name:         s.Name,
+		Type:         s.Role,
 		Image:        s.Img,
-		Infobox:      s.Infobox,
 		Summary:      s.Summary,
 		Locked:       s.Ban != 0,
+		Infobox:      s.Infobox,
 		CollectCount: s.Collects,
 		CommentCount: s.Comment,
-		//
-		Producer:    s.Producer,
-		Mangaka:     s.Mangaka,
-		Artist:      s.Artist,
-		Seiyu:       s.Seiyu,
-		Writer:      s.Writer,
-		Illustrator: s.Illustrator,
-		Actor:       s.Actor,
+		NSFW:         s.Nsfw,
 		//
 		FieldBloodType: field.Bloodtype,
 		FieldGender:    field.Gender,
 		FieldBirthYear: field.BirthYear,
 		FieldBirthMon:  field.BirthMon,
 		FieldBirthDay:  field.BirthDay,
+		//
+		Redirect: s.Redirect,
 	}, nil
 }

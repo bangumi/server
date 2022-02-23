@@ -23,17 +23,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/goccy/go-json"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/web/res"
 )
 
-type mockUser struct{ u domain.Auth }
+type mockAuth struct{ u domain.Auth }
 
-func (m mockUser) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
+func (m mockAuth) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
 	return m.u, nil
 }
 
@@ -44,7 +47,7 @@ func TestHappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
+			AuthRepo:    mockAuth{domain.Auth{RegTime: time.Unix(1e10, 0)}},
 			SubjectRepo: m,
 		},
 	)
@@ -57,6 +60,10 @@ func TestHappyPath(t *testing.T) {
 	defer resp.Body.Close()
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var r res.SubjectV0
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
+	require.Equal(t, uint32(7), r.ID)
 }
 
 func TestNSFW_200(t *testing.T) {
@@ -67,19 +74,19 @@ func TestNSFW_200(t *testing.T) {
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
+			AuthRepo:    mockAuth{domain.Auth{ID: 1, RegTime: time.Unix(1e9, 0)}},
 			SubjectRepo: m,
 		},
 	)
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
-	req.Header.Set("authorization", "bearer token")
+	req.Header.Set(fiber.HeaderAuthorization, "bearer token")
 
 	resp, err := app.Test(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
-	require.Equal(t, http.StatusNotFound, resp.StatusCode, "200 for authorized user")
+	require.Equal(t, http.StatusOK, resp.StatusCode, "200 for authorized user")
 }
 
 func TestNSFW_404(t *testing.T) {
@@ -90,7 +97,7 @@ func TestNSFW_404(t *testing.T) {
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
+			AuthRepo:    mockAuth{domain.Auth{}},
 			SubjectRepo: m,
 		},
 	)
@@ -112,7 +119,6 @@ func Test_web_subject_Redirect(t *testing.T) {
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
 			SubjectRepo: m,
 		},
 	)
@@ -129,12 +135,7 @@ func Test_web_subject_bad_id(t *testing.T) {
 	t.Parallel()
 	m := &domain.MockSubjectRepo{}
 
-	app := test.GetWebApp(t,
-		test.Mock{
-			AuthRepo:    mockUser{domain.Auth{RegTime: time.Unix(1e10, 0)}},
-			SubjectRepo: m,
-		},
-	)
+	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 
 	for _, path := range []string{"/v0/subjects/0", "/v0/subjects/-1", "/v0/subjects/a"} {
 		path := path

@@ -17,16 +17,13 @@
 package res
 
 import (
-	"time"
-
 	"github.com/bangumi/server/model"
 )
 
-type PersonV0 struct {
+type CharacterV0 struct {
 	ID        uint32             `json:"id"`
 	Name      string             `json:"name"`
 	Type      uint8              `json:"type"`
-	Career    []string           `json:"career"`
 	Images    model.PersonImages `json:"images"`
 	Summary   string             `json:"summary"`
 	Locked    bool               `json:"locked"`
@@ -38,7 +35,5 @@ type PersonV0 struct {
 	BirthDay  *uint8             `json:"birth_day"`
 	Stat      Stat               `json:"stat"`
 	Redirect  uint32             `json:"-"` // http 302 response
-
-	LastModified time.Time `json:"last_modified"`
-	Img          string    `json:"img"`
+	NSFW      bool               `json:"nsfw"`
 }

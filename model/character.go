@@ -14,42 +14,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package model
 
-import (
-	"go.uber.org/zap"
-
-	"github.com/bangumi/server/cache"
-	"github.com/bangumi/server/domain"
-)
-
-func New(
-	s domain.SubjectRepo,
-	c domain.CharacterRepo,
-	p domain.PersonRepo,
-	a domain.AuthRepo,
-	e domain.EpisodeRepo,
-	cache cache.Generic,
-	log *zap.Logger,
-) Handler {
-	return Handler{
-		cache: cache,
-		log:   log,
-		p:     p,
-		s:     s,
-		a:     a,
-		e:     e,
-		c:     c,
-	}
-}
-
-type Handler struct {
-	// replace it with service, when it's too complex. Just use a repository currently.
-	s     domain.SubjectRepo
-	p     domain.PersonRepo
-	a     domain.AuthRepo
-	e     domain.EpisodeRepo
-	c     domain.CharacterRepo
-	cache cache.Generic
-	log   *zap.Logger
+type Character struct {
+	Name           string
+	Image          string
+	Infobox        string
+	Summary        string
+	ID             uint32
+	Redirect       uint32
+	CollectCount   uint32
+	CommentCount   uint32
+	FieldBirthYear uint16
+	Producer       bool
+	Type           uint8
+	Artist         bool
+	Seiyu          bool
+	Writer         bool
+	Illustrator    bool
+	Actor          bool
+	FieldBloodType uint8
+	FieldGender    uint8
+	FieldBirthMon  uint8
+	Locked         bool
+	FieldBirthDay  uint8
+	NSFW           bool
 }

@@ -137,6 +137,7 @@ func main() {
 		func(method.Character) {},
 		g.GenerateModelAs("chii_characters", "Character",
 			gen.FieldTrimPrefix("crt_"),
+			gen.FieldType("crt_redirect", personIDTypeString),
 		),
 	)
 

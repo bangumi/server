@@ -25,6 +25,10 @@ import (
 // Put version in cache key to avoid model changes.
 const globalPrefix = "chii:" + config.Version + ":res:"
 
+func Character(id uint32) string {
+	return globalPrefix + "character:" + strconv.FormatUint(uint64(id), 10)
+}
+
 func Person(id uint32) string {
 	return globalPrefix + "person:" + strconv.FormatUint(uint64(id), 10)
 }
