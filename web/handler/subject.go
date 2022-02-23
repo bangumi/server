@@ -35,16 +35,12 @@ import (
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/handler/cachekey"
-	"github.com/bangumi/server/web/handler/ctxkey"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/util"
 )
 
 func (h Handler) GetSubject(c *fiber.Ctx) error {
-	u, ok := c.Context().UserValue(ctxkey.User).(accessor) // get visitor
-	if !ok {
-		panic("can't convert type")
-	}
+	u := h.getUser(c)
 
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {

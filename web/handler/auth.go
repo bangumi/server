@@ -29,6 +29,7 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/strutil"
+	"github.com/bangumi/server/web/handler/ctxkey"
 	"github.com/bangumi/server/web/util"
 )
 
@@ -40,7 +41,7 @@ const authCacheKeyPrefix = "chii:auth:1:access-token:"
 
 func (h Handler) MiddlewareAccessUser() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		a, err := h.getUser(ctx)
+		a, err := getUser(h, ctx)
 		if err != nil {
 			return err
 		}
@@ -50,8 +51,16 @@ func (h Handler) MiddlewareAccessUser() fiber.Handler {
 		return ctx.Next()
 	}
 }
+func (h Handler) getUser(c *fiber.Ctx) accessor {
+	u, ok := c.Context().UserValue(ctxkey.User).(accessor) // get visitor
+	if !ok {
+		panic("can't convert type")
+	}
 
-func (h Handler) getUser(c *fiber.Ctx) (accessor, error) {
+	return u
+}
+
+func getUser(h Handler, c *fiber.Ctx) (accessor, error) {
 	a := accessor{
 		Auth:  domain.Auth{},
 		login: false,
