@@ -50,7 +50,7 @@ func newSubject(db *gorm.DB) subject {
 	_subject.Airtime = field.NewUint8(tableName, "subject_airtime")
 	_subject.Nsfw = field.NewBool(tableName, "subject_nsfw")
 	_subject.Ban = field.NewUint8(tableName, "subject_ban")
-	_subject.Fields = subjectHasOneFields{
+	_subject.Fields = subjectBelongsToFields{
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("Fields", "dao.SubjectField"),
@@ -90,7 +90,7 @@ type subject struct {
 	Airtime     field.Uint8
 	Nsfw        field.Bool
 	Ban         field.Uint8
-	Fields      subjectHasOneFields
+	Fields      subjectBelongsToFields
 
 	fieldMap map[string]field.Expr
 }
@@ -186,13 +186,13 @@ func (s subject) clone(db *gorm.DB) subject {
 	return s
 }
 
-type subjectHasOneFields struct {
+type subjectBelongsToFields struct {
 	db *gorm.DB
 
 	field.RelationField
 }
 
-func (a subjectHasOneFields) Where(conds ...field.Expr) *subjectHasOneFields {
+func (a subjectBelongsToFields) Where(conds ...field.Expr) *subjectBelongsToFields {
 	if len(conds) == 0 {
 		return &a
 	}
@@ -205,22 +205,22 @@ func (a subjectHasOneFields) Where(conds ...field.Expr) *subjectHasOneFields {
 	return &a
 }
 
-func (a subjectHasOneFields) WithContext(ctx context.Context) *subjectHasOneFields {
+func (a subjectBelongsToFields) WithContext(ctx context.Context) *subjectBelongsToFields {
 	a.db = a.db.WithContext(ctx)
 	return &a
 }
 
-func (a subjectHasOneFields) Model(m *dao.Subject) *subjectHasOneFieldsTx {
-	return &subjectHasOneFieldsTx{a.db.Model(m).Association(a.Name())}
+func (a subjectBelongsToFields) Model(m *dao.Subject) *subjectBelongsToFieldsTx {
+	return &subjectBelongsToFieldsTx{a.db.Model(m).Association(a.Name())}
 }
 
-type subjectHasOneFieldsTx struct{ tx *gorm.Association }
+type subjectBelongsToFieldsTx struct{ tx *gorm.Association }
 
-func (a subjectHasOneFieldsTx) Find() (result *dao.SubjectField, err error) {
+func (a subjectBelongsToFieldsTx) Find() (result *dao.SubjectField, err error) {
 	return result, a.tx.Find(&result)
 }
 
-func (a subjectHasOneFieldsTx) Append(values ...*dao.SubjectField) (err error) {
+func (a subjectBelongsToFieldsTx) Append(values ...*dao.SubjectField) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -228,7 +228,7 @@ func (a subjectHasOneFieldsTx) Append(values ...*dao.SubjectField) (err error) {
 	return a.tx.Append(targetValues...)
 }
 
-func (a subjectHasOneFieldsTx) Replace(values ...*dao.SubjectField) (err error) {
+func (a subjectBelongsToFieldsTx) Replace(values ...*dao.SubjectField) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -236,7 +236,7 @@ func (a subjectHasOneFieldsTx) Replace(values ...*dao.SubjectField) (err error) 
 	return a.tx.Replace(targetValues...)
 }
 
-func (a subjectHasOneFieldsTx) Delete(values ...*dao.SubjectField) (err error) {
+func (a subjectBelongsToFieldsTx) Delete(values ...*dao.SubjectField) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -244,11 +244,11 @@ func (a subjectHasOneFieldsTx) Delete(values ...*dao.SubjectField) (err error) {
 	return a.tx.Delete(targetValues...)
 }
 
-func (a subjectHasOneFieldsTx) Clear() error {
+func (a subjectBelongsToFieldsTx) Clear() error {
 	return a.tx.Clear()
 }
 
-func (a subjectHasOneFieldsTx) Count() int64 {
+func (a subjectBelongsToFieldsTx) Count() int64 {
 	return a.tx.Count()
 }
 

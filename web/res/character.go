@@ -21,19 +21,19 @@ import (
 )
 
 type CharacterV0 struct {
-	ID        uint32             `json:"id"`
-	Name      string             `json:"name"`
-	Type      uint8              `json:"type"`
+	BirthMon  *uint8             `json:"birth_mon"`
+	Gender    *string            `json:"gender"`
+	BirthDay  *uint8             `json:"birth_day"`
+	BirthYear *uint16            `json:"birth_year"`
+	BloodType *uint8             `json:"blood_type"`
 	Images    model.PersonImages `json:"images"`
 	Summary   string             `json:"summary"`
-	Locked    bool               `json:"locked"`
+	Name      string             `json:"name"`
 	Infobox   v0wiki             `json:"infobox"`
-	Gender    *string            `json:"gender"`
-	BloodType *uint8             `json:"blood_type"`
-	BirthYear *uint16            `json:"birth_year"`
-	BirthMon  *uint8             `json:"birth_mon"`
-	BirthDay  *uint8             `json:"birth_day"`
 	Stat      Stat               `json:"stat"`
-	Redirect  uint32             `json:"-"` // http 302 response
+	ID        uint32             `json:"id"`
+	Redirect  uint32             `json:"-"`
+	Locked    bool               `json:"locked"`
+	Type      uint8              `json:"type"`
 	NSFW      bool               `json:"nsfw"`
 }

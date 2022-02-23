@@ -141,13 +141,6 @@ func main() {
 		),
 	)
 
-	g.ApplyInterface(func(method.PersonSubjects) {},
-		g.GenerateModelAs("chii_person_cs_index", "PersonSubjects",
-			gen.FieldRename("prsn_id", "person_id"),
-			gen.FieldType("subject_id", subjectIDTypeString),
-			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
-		))
-
 	g.ApplyInterface(func(method method.CharacterSubjects) {},
 		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
 			gen.FieldType("subject_id", subjectIDTypeString),
@@ -178,7 +171,7 @@ func main() {
 		gen.FieldType("subject_ban", "uint8"),
 		gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 		gen.FieldType("subject_airtime", "uint8"),
-		gen.FieldRelate(field.HasOne, "Fields", modelSubjectFields, &field.RelateConfig{
+		gen.FieldRelate(field.BelongsTo, "Fields", modelSubjectFields, &field.RelateConfig{
 			GORMTag: "foreignKey:subject_id;references:field_sid",
 		}),
 	)
@@ -213,6 +206,16 @@ func main() {
 			}),
 		))
 
+	g.ApplyInterface(func(method.PersonSubjects) {},
+		g.GenerateModelAs("chii_person_cs_index", "PersonSubjects",
+			gen.FieldRename("prsn_id", "person_id"),
+			gen.FieldType("subject_id", subjectIDTypeString),
+			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
+			gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
+				RelatePointer: true,
+				GORMTag:       "foreignKey:subject_id;references:subject_id",
+			}),
+		))
 	// execute the action of code generation
 	g.Execute()
 }

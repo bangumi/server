@@ -32,6 +32,7 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/res"
@@ -164,4 +165,45 @@ func careers(p model.Person) []string {
 	}
 
 	return s
+}
+
+func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+	}
+
+	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	if r.Redirect != 0 {
+		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
+	}
+
+	subjects, relation, err := h.s.GetPersonRelated(c.Context(), id)
+	if err != nil {
+		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
+	}
+
+	var response = make([]res.PersonRelatedSubject, len(subjects))
+	for i, subject := range subjects {
+		response[i] = res.PersonRelatedSubject{
+			SubjectID: subject.ID,
+			Staff:     vars.StaffMap[subject.TypeID][relation[i].ID].String(),
+			Name:      subject.Name,
+			NameCn:    subject.NameCN,
+			Image:     model.SubjectImage(subject.Image).Large,
+		}
+	}
+
+	return c.JSON(response)
 }

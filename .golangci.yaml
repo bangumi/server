@@ -306,12 +306,6 @@ issues:
     - source: "var log"
       linters: [gochecknoglobals]
 
-    # ignore response struct align to preserve json field order.
-    - path: 'web[/\\]res[/\\].*\.go'
-      linters:
-        - govet
-      text: "fieldalignment: struct of size \\d+ could be \\d+"
-
     - linters: [goerr113, errorlint]
       source: "if err == redis.Nil {"
 

@@ -23,22 +23,21 @@ import (
 )
 
 type PersonV0 struct {
-	ID        uint32             `json:"id"`
-	Name      string             `json:"name"`
-	Type      uint8              `json:"type"`
-	Career    []string           `json:"career"`
-	Images    model.PersonImages `json:"images"`
-	Summary   string             `json:"summary"`
-	Locked    bool               `json:"locked"`
-	Infobox   v0wiki             `json:"infobox"`
-	Gender    *string            `json:"gender"`
-	BloodType *uint8             `json:"blood_type"`
-	BirthYear *uint16            `json:"birth_year"`
-	BirthMon  *uint8             `json:"birth_mon"`
-	BirthDay  *uint8             `json:"birth_day"`
-	Stat      Stat               `json:"stat"`
-	Redirect  uint32             `json:"-"` // http 302 response
-
-	LastModified time.Time `json:"last_modified"`
-	Img          string    `json:"img"`
+	LastModified time.Time          `json:"last_modified"`
+	BloodType    *uint8             `json:"blood_type"`
+	BirthYear    *uint16            `json:"birth_year"`
+	BirthDay     *uint8             `json:"birth_day"`
+	BirthMon     *uint8             `json:"birth_mon"`
+	Gender       *string            `json:"gender"`
+	Images       model.PersonImages `json:"images"`
+	Summary      string             `json:"summary"`
+	Name         string             `json:"name"`
+	Img          string             `json:"img"`
+	Infobox      v0wiki             `json:"infobox"`
+	Career       []string           `json:"career"`
+	Stat         Stat               `json:"stat"`
+	Redirect     uint32             `json:"-"`
+	ID           uint32             `json:"id"`
+	Locked       bool               `json:"locked"`
+	Type         uint8              `json:"type"`
 }

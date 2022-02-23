@@ -32,6 +32,16 @@ func newPersonSubjects(db *gorm.DB) personSubjects {
 	_personSubjects.SubjectTypeID = field.NewUint8(tableName, "subject_type_id")
 	_personSubjects.Summary = field.NewString(tableName, "summary")
 	_personSubjects.PrsnAppearEps = field.NewString(tableName, "prsn_appear_eps")
+	_personSubjects.Subject = personSubjectsHasOneSubject{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Subject", "dao.Subject"),
+		Fields: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("Subject.Fields", "dao.SubjectField"),
+		},
+	}
 
 	_personSubjects.fillFieldMap()
 
@@ -49,6 +59,7 @@ type personSubjects struct {
 	SubjectTypeID field.Uint8
 	Summary       field.String
 	PrsnAppearEps field.String
+	Subject       personSubjectsHasOneSubject
 
 	fieldMap map[string]field.Expr
 }
@@ -94,7 +105,7 @@ func (p *personSubjects) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (p *personSubjects) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 7)
+	p.fieldMap = make(map[string]field.Expr, 8)
 	p.fieldMap["prsn_type"] = p.PrsnType
 	p.fieldMap["prsn_id"] = p.PersonID
 	p.fieldMap["prsn_position"] = p.PrsnPosition
@@ -102,11 +113,82 @@ func (p *personSubjects) fillFieldMap() {
 	p.fieldMap["subject_type_id"] = p.SubjectTypeID
 	p.fieldMap["summary"] = p.Summary
 	p.fieldMap["prsn_appear_eps"] = p.PrsnAppearEps
+
 }
 
 func (p personSubjects) clone(db *gorm.DB) personSubjects {
 	p.personSubjectsDo.ReplaceDB(db)
 	return p
+}
+
+type personSubjectsHasOneSubject struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	Fields struct {
+		field.RelationField
+	}
+}
+
+func (a personSubjectsHasOneSubject) Where(conds ...field.Expr) *personSubjectsHasOneSubject {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a personSubjectsHasOneSubject) WithContext(ctx context.Context) *personSubjectsHasOneSubject {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a personSubjectsHasOneSubject) Model(m *dao.PersonSubjects) *personSubjectsHasOneSubjectTx {
+	return &personSubjectsHasOneSubjectTx{a.db.Model(m).Association(a.Name())}
+}
+
+type personSubjectsHasOneSubjectTx struct{ tx *gorm.Association }
+
+func (a personSubjectsHasOneSubjectTx) Find() (result *dao.Subject, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a personSubjectsHasOneSubjectTx) Append(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a personSubjectsHasOneSubjectTx) Replace(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a personSubjectsHasOneSubjectTx) Delete(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a personSubjectsHasOneSubjectTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a personSubjectsHasOneSubjectTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type personSubjectsDo struct{ gen.DO }

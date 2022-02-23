@@ -18,6 +18,7 @@ package res
 
 import (
 	"github.com/bangumi/server/compat"
+	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -25,47 +26,47 @@ import (
 type v0wiki = []interface{}
 
 type SubjectV0 struct {
-	ID            uint32              `json:"id"`
-	TypeID        model.SubjectType   `json:"type"`
-	Name          string              `json:"name"`
-	NameCN        string              `json:"name_cn"`
-	Summary       string              `json:"summary"`
-	NSFW          bool                `json:"nsfw"`
-	Locked        bool                `json:"locked"`
 	Date          *string             `json:"date"`
 	Platform      *string             `json:"platform"`
 	Image         model.SubjectImages `json:"images"`
-	Infobox       v0wiki              `json:"infobox"`
-	Volumes       uint32              `json:"volumes"`
-	Eps           uint32              `json:"eps"`
-	TotalEpisodes int64               `json:"total_episodes"`
-	Rating        Rating              `json:"rating"`
-	Collection    Collection          `json:"collection"`
+	Summary       string              `json:"summary"`
+	Name          string              `json:"name"`
+	NameCN        string              `json:"name_cn"`
 	Tags          []compat.Tag        `json:"tags"`
-	Redirect      uint32              `json:"-"` // http 302 response
+	Infobox       v0wiki              `json:"infobox"`
+	Rating        Rating              `json:"rating"`
+	TotalEpisodes int64               `json:"total_episodes"`
+	Collection    Collection          `json:"collection"`
+	ID            uint32              `json:"id"`
+	Eps           uint32              `json:"eps"`
+	Volumes       uint32              `json:"volumes"`
+	Redirect      uint32              `json:"-"`
+	Locked        bool                `json:"locked"`
+	NSFW          bool                `json:"nsfw"`
+	TypeID        model.SubjectType   `json:"type"`
 }
 
 type Subject struct {
-	ID           uint32              `json:"id"`
+	Image        model.SubjectImages `json:"images"`
+	Infobox      string              `json:"infobox"`
 	Name         string              `json:"name"`
 	NameCN       string              `json:"name_cn"`
 	Summary      string              `json:"summary"`
-	Image        model.SubjectImages `json:"images"`
-	Tags         []compat.Tag        `json:"tags"`
-	TypeID       model.SubjectType   `json:"type_id"`
+	PlatformText string              `json:"platform_text"`
 	TypeText     string              `json:"type_text"`
 	Wiki         wiki.Wiki           `json:"wiki"`
-	Infobox      string              `json:"infobox"`
-	Volumes      uint32              `json:"volumes"`
+	Tags         []compat.Tag        `json:"tags"`
+	Rating       Rating              `json:"rating"`
 	Collection   Collection          `json:"collection"`
+	Volumes      uint32              `json:"volumes"`
 	Eps          uint32              `json:"eps"`
+	ID           uint32              `json:"id"`
+	Redirect     uint32              `json:"-"`
 	Platform     uint16              `json:"platform_id"`
-	PlatformText string              `json:"platform_text"`
 	Airtime      uint8               `json:"air_time"`
 	Locked       bool                `json:"locked"`
 	NSFW         bool                `json:"nsfw"`
-	Rating       Rating              `json:"rating"`
-	Redirect     uint32              `json:"-"` // http 302 response
+	TypeID       model.SubjectType   `json:"type_id"`
 }
 
 type Collection struct {
@@ -94,4 +95,12 @@ type Rating struct {
 	Total uint32  `json:"total"`
 	Count Count   `json:"count"`
 	Score float64 `json:"score"`
+}
+
+type PersonRelatedSubject struct {
+	Staff     string               `json:"staff"`
+	Name      string               `json:"name"`
+	NameCn    string               `json:"name_cn"`
+	Image     string               `json:"image"`
+	SubjectID domain.SubjectIDType `json:"id"`
 }

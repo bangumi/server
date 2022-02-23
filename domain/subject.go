@@ -25,6 +25,10 @@ import (
 type SubjectRepo interface {
 	// Get return a repository model.
 	Get(ctx context.Context, id uint32) (model.Subject, error)
+
+	GetPersonRelated(
+		ctx context.Context, personID PersonIDType,
+	) ([]model.Subject, []model.PersonSubjectRelation, error)
 }
 
 type SubjectService interface {

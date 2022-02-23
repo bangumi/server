@@ -52,6 +52,9 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Subject, error) {
 		return model.Subject{}, errgo.Wrap(err, "dal")
 	}
 
+	return convertDao(s), nil
+}
+func convertDao(s *dao.Subject) model.Subject {
 	var date string
 	if !s.Fields.Date.IsZero() {
 		date = s.Fields.Date.Format("2006-01-02")
@@ -80,7 +83,34 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Subject, error) {
 		NSFW:          s.Nsfw,
 		Ban:           s.Ban,
 		Rating:        rating(s.Fields),
-	}, nil
+	}
+}
+
+func (r mysqlRepo) GetPersonRelated(
+	ctx context.Context, personID domain.PersonIDType,
+) ([]model.Subject, []model.PersonSubjectRelation, error) {
+	relations, err := r.q.PersonSubjects.WithContext(ctx).
+		Preload(r.q.PersonSubjects.Subject.Fields).
+		Where(r.q.PersonSubjects.PersonID.Eq(personID)).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+
+		return nil, nil, errgo.Wrap(err, "dal")
+	}
+
+	var rel = make([]model.PersonSubjectRelation, 0, len(relations))
+	var subjects = make([]model.Subject, 0, len(relations))
+
+	for _, relation := range relations {
+		if relation.Subject == nil {
+			// gorm/gen doesn't support preload with join, so ignore relations without subject.
+			continue
+		}
+		rel = append(rel, model.PersonSubjectRelation{ID: relation.PrsnPosition})
+		subjects = append(subjects, convertDao(relation.Subject))
+	}
+
+	return subjects, rel, nil
 }
 
 func rating(f dao.SubjectField) model.Rating {
