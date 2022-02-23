@@ -18,7 +18,6 @@ package driver
 
 import (
 	"context"
-	"time"
 
 	"github.com/go-redis/redis/v8"
 
@@ -29,14 +28,11 @@ import (
 const defaultRedisPoolSize = 4
 
 func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
-	cli := redis.NewClient(&redis.Options{
-		Addr:         c.RedisAddr,
-		Password:     c.RedisPassword,
-		DialTimeout:  time.Second,
-		ReadTimeout:  time.Second,
-		WriteTimeout: time.Second,
-		PoolSize:     defaultRedisPoolSize,
-	})
+	if c.RedisOptions.PoolSize == 0 {
+		c.RedisOptions.PoolSize = defaultRedisPoolSize
+	}
+
+	cli := redis.NewClient(c.RedisOptions)
 
 	if err := cli.Ping(context.Background()).Err(); err != nil {
 		return nil, errgo.Wrap(err, "failed to connect to redis")

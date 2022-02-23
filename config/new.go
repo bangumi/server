@@ -17,11 +17,13 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/logger"
@@ -39,7 +41,7 @@ func NewAppConfig() AppConfig {
 		connection = 100
 	}
 
-	httpPort, err := strconv.Atoi(getEnv("HTTP_PORT", "3003"))
+	httpPort, err := strconv.Atoi(getEnv("HTTP_PORT", "3000"))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -53,9 +55,14 @@ func NewAppConfig() AppConfig {
 		}
 	}
 
+	redisURL := getEnv("REDIS_URI", "redis://127.0.0.1:6379/0")
+	redisOptions, err := redis.ParseURL(redisURL)
+	if err != nil {
+		panic(fmt.Sprintf("failed to parse redis url %s", redisURL))
+	}
+
 	return AppConfig{
-		RedisAddr:     getEnv("REDIS_ADDR", "127.0.0.1:6379"),
-		RedisPassword: getEnv("REDIS_PASSWORD", ""),
+		RedisOptions:  redisOptions,
 		MySQLHost:     host,
 		MySQLPort:     port,
 		MySQLUserName: user,
@@ -69,8 +76,7 @@ func NewAppConfig() AppConfig {
 
 type AppConfig struct {
 	Debug         map[string]bool
-	RedisAddr     string
-	RedisPassword string
+	RedisOptions  *redis.Options
 	MySQLHost     string
 	MySQLPort     string
 	MySQLUserName string
