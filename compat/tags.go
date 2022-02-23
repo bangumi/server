@@ -34,7 +34,7 @@ type Tag struct {
 
 var ErrTypeCase = errors.New("can't cast to expected type")
 
-func ParseTags(s []byte) (t []Tag, err error) {
+func ParseTags(s []byte) ([]Tag, error) {
 	if len(s) == 0 {
 		return []Tag{}, nil
 	}
@@ -44,7 +44,7 @@ func ParseTags(s []byte) (t []Tag, err error) {
 		return nil, errgo.Wrap(err, "php unmarshal")
 	}
 
-	t = make([]Tag, 0, len(in))
+	var t = make([]Tag, 0, len(in))
 
 	for _, tag := range in {
 		v, ok := tag.(map[interface{}]interface{})
