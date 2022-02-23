@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -14,26 +14,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model_test
+package enum_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/pkg/vars/enum"
 )
 
 func TestValue(t *testing.T) {
 	t.Parallel()
 
-	require.Equal(t, uint8(1), model.GroupAdmin)
-	require.Equal(t, uint8(2), model.GroupBangumiAdmin)
-	require.Equal(t, uint8(3), model.GroupWindowAdmin)
-	require.Equal(t, uint8(4), model.GroupQuite)
-	require.Equal(t, uint8(5), model.GroupBanned)
-	require.Equal(t, uint8(8), model.GroupCharacterAdmin)
-	require.Equal(t, uint8(9), model.GroupWikiAdmin)
-	require.Equal(t, uint8(10), model.GroupNormal)
-	require.Equal(t, uint8(11), model.GroupWiki)
+	require.Equal(t, uint8(1), enum.GroupAdmin)
+	require.Equal(t, uint8(2), enum.GroupBangumiAdmin)
+	require.Equal(t, uint8(3), enum.GroupWindowAdmin)
+	require.Equal(t, uint8(4), enum.GroupQuite)
+	require.Equal(t, uint8(5), enum.GroupBanned)
+	require.Equal(t, uint8(8), enum.GroupCharacterAdmin)
+	require.Equal(t, uint8(9), enum.GroupWikiAdmin)
+	require.Equal(t, uint8(10), enum.GroupNormal)
+	require.Equal(t, uint8(11), enum.GroupWiki)
 }

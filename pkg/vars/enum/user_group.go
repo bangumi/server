@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package enum
 
 const (
 	GroupAdmin          uint8 = iota + 1 // 1
