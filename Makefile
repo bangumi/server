@@ -7,9 +7,11 @@ Building Targets:
 
 Testing Targets:
 
-  test: simply run tests.
-  bench: run all benchmark
-  coverage: test with coverage report './coverage.out'.
+  test: run Tests without e2e and driver.
+  test-all: Run all tests, need database and redis.
+            You can also run `make test` with env `TEST_MYSQL=1 TEST_REDIS=1`
+  bench:    Run all benchmark
+  coverage: Test-all with coverage report './coverage.out'.
 
 Others Targets:
 
@@ -40,7 +42,7 @@ test: .bin/dotenv.exe
 	.bin/dotenv.exe go test ./...
 
 test-all: .bin/dotenv.exe
-	.bin/dotenv.exe env CGO_ENABLED=0 TEST_MYSQL=1 TEST_REDIS=1 go test ./...
+	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test ./...
 
 bench:
 	go test -bench=. -benchmem ./pkg/wiki
@@ -68,4 +70,4 @@ clean::
 	rm -rf ./out
 	rm -rf ./dist ./.bin
 
-.PHONY:: install help build test bench coverage clean gen lint mocks
+.PHONY:: install help build test test-all bench coverage clean gen lint mocks

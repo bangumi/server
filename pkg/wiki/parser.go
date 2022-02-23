@@ -18,7 +18,6 @@ package wiki
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/bangumi/server/internal/errgo"
@@ -26,11 +25,12 @@ import (
 
 var (
 	ErrWikiSyntax         = errors.New("invalid wiki syntax")
-	ErrArrayNoClose       = fmt.Errorf("array should be closed by '}': %w", ErrWikiSyntax)
-	ErrArrayItemWrapped   = fmt.Errorf("array item should be wrapped by '[]': %w", ErrWikiSyntax)
-	ErrExpectingNewField  = fmt.Errorf("expecting '|' to start a new field: %w", ErrWikiSyntax)
-	ErrExpectingSignEqual = fmt.Errorf(
-		"expecting '=' to seprate field name and value: %w", ErrWikiSyntax)
+	ErrGlobalPrefix       = errgo.Wrap(ErrWikiSyntax, "missing prefix '{{Infobox' at the start")
+	ErrGlobalSuffix       = errgo.Wrap(ErrWikiSyntax, "missing '}}' at the end")
+	ErrArrayNoClose       = errgo.Wrap(ErrWikiSyntax, "array should be closed by '}'")
+	ErrArrayItemWrapped   = errgo.Wrap(ErrWikiSyntax, "array item should be wrapped by '[]'")
+	ErrExpectingNewField  = errgo.Wrap(ErrWikiSyntax, "missing '|' to start a new field")
+	ErrExpectingSignEqual = errgo.Wrap(ErrWikiSyntax, "missing '=' to separate field name and value")
 )
 
 // ParseOmitError try to parse a string as wiki, omitting error.
@@ -52,11 +52,11 @@ func Parse(s string) (Wiki, error) {
 	}
 
 	if !strings.HasPrefix(s, prefix) {
-		return w, errgo.Wrap(ErrWikiSyntax, "missing global prefix '{{Infobox' at the beginning")
+		return w, ErrGlobalPrefix
 	}
 
 	if !strings.HasSuffix(s, suffix) {
-		return w, errgo.Wrap(ErrWikiSyntax, "missing '}}' at the end")
+		return w, ErrGlobalSuffix
 	}
 
 	eolCount := strings.Count(s, "\n")

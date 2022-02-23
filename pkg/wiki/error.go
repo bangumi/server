@@ -22,7 +22,7 @@ var _ interface {
 	Error() string
 	Unwrap() error
 	Is(error) bool
-} = parseError{}
+} = (*parseError)(nil)
 
 type parseError struct {
 	err  error
@@ -30,20 +30,20 @@ type parseError struct {
 	lino int
 }
 
-func (p parseError) Error() string {
+func (p *parseError) Error() string {
 	return p.err.Error() + "\nline: " + strconv.Itoa(p.lino) + " " + strconv.Quote(p.line)
 }
 
-func (p parseError) Unwrap() error {
+func (p *parseError) Unwrap() error {
 	return p.err
 }
 
-func (p parseError) Is(err error) bool {
-	return p.err == err //nolint: goerr113,errorlint
+func (p *parseError) Is(err error) bool {
+	return p.err == err // nolint: goerr113,errorlint
 }
 
 func wrapError(err error, lino int, line string) error {
-	return parseError{
+	return &parseError{
 		line: line,
 		lino: lino,
 		err:  err,
