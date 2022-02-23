@@ -38,7 +38,7 @@ type SubjectV0 struct {
 	Infobox       v0wiki              `json:"infobox"`
 	Volumes       uint32              `json:"volumes"`
 	Eps           uint32              `json:"eps"`
-	TotalEpisodes int                 `json:"total_episodes"`
+	TotalEpisodes int64               `json:"total_episodes"`
 	Rating        Rating              `json:"rating"`
 	Collection    Collection          `json:"collection"`
 	Tags          []compat.Tag        `json:"tags"`

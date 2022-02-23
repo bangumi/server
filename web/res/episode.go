@@ -14,38 +14,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package episode_test
+package res
 
-import (
-	"context"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-
-	"github.com/bangumi/server/domain"
-	"github.com/bangumi/server/episode"
-	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/test"
-)
-
-func getRepo(t *testing.T) domain.EpisodeRepo {
-	t.Helper()
-	repo, err := episode.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
-	require.NoError(t, err)
-
-	return repo
-}
-
-func TestCount(t *testing.T) {
-	test.RequireEnv(t, "mysql")
-	t.Parallel()
-
-	repo := getRepo(t)
-
-	s, err := repo.Count(context.Background(), 253)
-	require.NoError(t, err)
-
-	assert.Equal(t, int64(31), s)
+type Episode struct {
+	ID          uint32  `json:"id"`
+	Name        string  `json:"name"`
+	NameCN      string  `json:"name_cn"`
+	Ep          float32 `json:"ep"`
+	Sort        float32 `json:"sort"`
+	Duration    string  `json:"duration"`
+	Airdate     string  `json:"airdate"`
+	SubjectID   uint32  `json:"subject_id"`
+	Description string  `json:"desc"`
+	Comment     uint32  `json:"comment"`
+	Type        uint8   `json:"type"`
+	Disc        uint8   `json:"disc"`
 }

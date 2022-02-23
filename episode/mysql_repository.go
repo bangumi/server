@@ -18,12 +18,17 @@ package episode
 
 import (
 	"context"
+	"errors"
 
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/pkg/vars/enum"
 )
 
 type mysqlRepo struct {
@@ -32,15 +37,131 @@ type mysqlRepo struct {
 }
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.EpisodeRepo, error) {
-	return mysqlRepo{q: q, log: log.Named("repository.mysqlRepo")}, nil
+	return mysqlRepo{q: q, log: log.Named("episode.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Count(ctx context.Context, subjectID uint32) (int, error) {
+func (r mysqlRepo) Get(ctx context.Context, episodeID uint32) (model.Episode, error) {
+	episode, err := r.q.Episode.WithContext(ctx).
+		Where(r.q.Episode.ID.Eq(episodeID)).Limit(1).First()
+	if err != nil {
+		return model.Episode{}, errgo.Wrap(err, "dal")
+	}
+
+	first, err := r.firstEpisode(ctx, episode.SubjectID)
+	if err != nil {
+		return model.Episode{}, err
+	}
+
+	return convertDaoEpisode(episode, first), nil
+}
+
+func (r mysqlRepo) Count(ctx context.Context, subjectID uint32) (int64, error) {
 	c, err := r.q.Episode.WithContext(ctx).
 		Where(r.q.Episode.SubjectID.Eq(subjectID)).Count()
 	if err != nil {
 		return 0, errgo.Wrap(err, "dal")
 	}
 
-	return int(c), nil
+	return c, nil
+}
+
+func (r mysqlRepo) CountByType(ctx context.Context, subjectID uint32, epType uint8) (int64, error) {
+	c, err := r.q.Episode.WithContext(ctx).
+		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Type.Eq(epType)).Count()
+	if err != nil {
+		return 0, errgo.Wrap(err, "dal")
+	}
+
+	return c, nil
+}
+
+func (r mysqlRepo) List(
+	ctx context.Context, subjectID uint32, limit int, offset int,
+) ([]model.Episode, error) {
+	first, err := r.firstEpisode(ctx, subjectID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return []model.Episode{}, nil
+		}
+
+		return nil, err
+	}
+
+	episodes, err := r.q.Episode.WithContext(ctx).
+		Where(r.q.Episode.SubjectID.Eq(subjectID)).
+		Limit(limit).Offset(offset).Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var result = make([]model.Episode, len(episodes))
+	for i, episode := range episodes {
+		result[i] = convertDaoEpisode(episode, first)
+	}
+
+	return result, nil
+}
+
+func (r mysqlRepo) ListByType(
+	ctx context.Context, subjectID uint32, epType uint8, limit int, offset int,
+) ([]model.Episode, error) {
+	first, err := r.firstEpisode(ctx, subjectID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return []model.Episode{}, nil
+		}
+
+		return nil, err
+	}
+
+	episodes, err := r.q.Episode.WithContext(ctx).
+		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Type.Eq(epType)).
+		Limit(limit).Offset(offset).Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var result = make([]model.Episode, len(episodes))
+	for i, episode := range episodes {
+		result[i] = convertDaoEpisode(episode, first)
+	}
+
+	return result, nil
+}
+
+func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID uint32) (float32, error) {
+	episode, err := r.q.Episode.WithContext(ctx).
+		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Type.Eq(enum.EpTypeNormal)).
+		Order(r.q.Episode.Disc, r.q.Episode.Sort).Limit(1).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, domain.ErrNotFound
+		}
+
+		return 0, errgo.Wrap(err, "dal")
+	}
+
+	return episode.Sort, nil
+}
+
+func convertDaoEpisode(e *dao.Episode, firstEpisode float32) model.Episode {
+	var ep float32
+	if e.Type == enum.EpTypeNormal {
+		ep = e.Sort - firstEpisode + 1
+	}
+
+	return model.Episode{
+		Airdate:     e.Airdate,
+		Name:        e.Name,
+		NameCN:      e.NameCn,
+		SubjectID:   e.SubjectID,
+		Duration:    e.Duration,
+		Description: e.Desc,
+		Type:        e.Type,
+		Sort:        e.Sort,
+		Ep:          ep,
+		Comment:     e.Comment,
+		Disc:        e.Disc,
+		ID:          e.ID,
+	}
 }

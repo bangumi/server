@@ -18,9 +18,25 @@ package domain
 
 import (
 	"context"
+
+	"github.com/bangumi/server/model"
 )
 
 type EpisodeRepo interface {
+	Get(ctx context.Context, episodeID uint32) (model.Episode, error)
+
 	// Count all episode for a subject.
-	Count(ctx context.Context, subjectID uint32) (int, error)
+	Count(ctx context.Context, subjectID uint32) (int64, error)
+
+	// CountByType count episode for a subject and filter by type.
+	// This is because 0 means episode type normal.
+	CountByType(ctx context.Context, subjectID uint32, epType uint8) (int64, error)
+
+	// List return all episode.
+	List(ctx context.Context, subjectID uint32, limit int, offset int) ([]model.Episode, error)
+
+	// ListByType return episodes filtered by episode type.
+	ListByType(
+		ctx context.Context, subjectID uint32, epType uint8, limit int, offset int,
+	) ([]model.Episode, error)
 }

@@ -36,3 +36,7 @@ func Person(id uint32) string {
 func Subject(id uint32) string {
 	return globalPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
 }
+
+func Episode(id uint32) string {
+	return globalPrefix + "episode:" + strconv.FormatUint(uint64(id), 10)
+}
