@@ -66,3 +66,68 @@ func (_c *MockCharacterRepo_Get_Call) Return(_a0 model.Character, _a1 error) *Mo
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
+
+// GetPersonRelated provides a mock function with given fields: ctx, characterID
+func (_m *MockCharacterRepo) GetPersonRelated(ctx context.Context, characterID uint32) ([]model.Character, []model.Subject, []model.PersonCharacterRelation, error) {
+	ret := _m.Called(ctx, characterID)
+
+	var r0 []model.Character
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) []model.Character); ok {
+		r0 = rf(ctx, characterID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Character)
+		}
+	}
+
+	var r1 []model.Subject
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) []model.Subject); ok {
+		r1 = rf(ctx, characterID)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]model.Subject)
+		}
+	}
+
+	var r2 []model.PersonCharacterRelation
+	if rf, ok := ret.Get(2).(func(context.Context, uint32) []model.PersonCharacterRelation); ok {
+		r2 = rf(ctx, characterID)
+	} else {
+		if ret.Get(2) != nil {
+			r2 = ret.Get(2).([]model.PersonCharacterRelation)
+		}
+	}
+
+	var r3 error
+	if rf, ok := ret.Get(3).(func(context.Context, uint32) error); ok {
+		r3 = rf(ctx, characterID)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
+}
+
+// MockCharacterRepo_GetPersonRelated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPersonRelated'
+type MockCharacterRepo_GetPersonRelated_Call struct {
+	*mock.Call
+}
+
+// GetPersonRelated is a helper method to define mock.On call
+//  - ctx context.Context
+//  - characterID uint32
+func (_e *MockCharacterRepo_Expecter) GetPersonRelated(ctx interface{}, characterID interface{}) *MockCharacterRepo_GetPersonRelated_Call {
+	return &MockCharacterRepo_GetPersonRelated_Call{Call: _e.mock.On("GetPersonRelated", ctx, characterID)}
+}
+
+func (_c *MockCharacterRepo_GetPersonRelated_Call) Run(run func(ctx context.Context, characterID uint32)) *MockCharacterRepo_GetPersonRelated_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *MockCharacterRepo_GetPersonRelated_Call) Return(_a0 []model.Character, _a1 []model.Subject, _a2 []model.PersonCharacterRelation, _a3 error) *MockCharacterRepo_GetPersonRelated_Call {
+	_c.Call.Return(_a0, _a1, _a2, _a3)
+	return _c
+}

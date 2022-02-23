@@ -52,9 +52,10 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Subject, error) {
 		return model.Subject{}, errgo.Wrap(err, "dal")
 	}
 
-	return convertDao(s), nil
+	return ConvertDao(s), nil
 }
-func convertDao(s *dao.Subject) model.Subject {
+
+func ConvertDao(s *dao.Subject) model.Subject {
 	var date string
 	if !s.Fields.Date.IsZero() {
 		date = s.Fields.Date.Format("2006-01-02")
@@ -107,7 +108,7 @@ func (r mysqlRepo) GetPersonRelated(
 			continue
 		}
 		rel = append(rel, model.PersonSubjectRelation{ID: relation.PrsnPosition})
-		subjects = append(subjects, convertDao(relation.Subject))
+		subjects = append(subjects, ConvertDao(relation.Subject))
 	}
 
 	return subjects, rel, nil

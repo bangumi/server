@@ -24,4 +24,7 @@ import (
 
 type CharacterRepo interface {
 	Get(ctx context.Context, id uint32) (model.Character, error)
+	GetPersonRelated(
+		ctx context.Context, characterID PersonIDType,
+	) ([]model.Character, []model.Subject, []model.PersonCharacterRelation, error)
 }

@@ -24,9 +24,11 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/subject"
 )
 
 type mysqlRepo struct {
@@ -39,7 +41,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CharacterRepo, error)
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Character, error) {
-	s, err := r.q.Character.WithContext(ctx).Where(r.q.Character.ID.Eq(id)).First()
+	s, err := r.q.Character.WithContext(ctx).Where(r.q.Character.ID.Eq(id)).Limit(1).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Character{}, domain.ErrNotFound
@@ -84,4 +86,115 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Character, error) 
 		//
 		Redirect: s.Redirect,
 	}, nil
+}
+
+func (r mysqlRepo) GetPersonRelated(
+	ctx context.Context, characterID domain.PersonIDType,
+) ([]model.Character, []model.Subject, []model.PersonCharacterRelation, error) {
+	relations, err := r.q.CharacterSubjects.WithContext(ctx).
+		Preload(r.q.CharacterSubjects.Character).
+		Where(r.q.CharacterSubjects.CrtID.Eq(characterID)).
+		Order(r.q.CharacterSubjects.CrtID).
+		Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+
+		return nil, nil, nil, errgo.Wrap(err, "dal")
+	}
+
+	var characterIDs = make([]domain.CharacterIDType, 0, len(relations))
+	var subjectIDs = make([]domain.SubjectIDType, 0, len(relations))
+	for _, relation := range relations {
+		if relation.Character == nil {
+			// gorm/gen doesn't support preload with join, so ignore relations without subject.
+			continue
+		}
+		characterIDs = append(characterIDs, relation.Character.ID)
+		subjectIDs = append(subjectIDs, relation.SubjectID)
+	}
+
+	crtMap, err := getCharacters(ctx, r, characterIDs)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	subjectMap, err := getSubjects(ctx, r, subjectIDs)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	var rel = make([]model.PersonCharacterRelation, 0, len(relations))
+	var characters = make([]model.Character, 0, len(relations))
+	var subjects = make([]model.Subject, 0, len(relations))
+
+	for _, relation := range relations {
+		if relation.Character == nil || subjectMap[relation.SubjectID] == nil {
+			// gorm/gen doesn't support preload with join, so ignore relations without subject.
+			continue
+		}
+		rel = append(rel, model.PersonCharacterRelation{Type: relation.CrtType})
+		characters = append(characters, convertDao(relation.Character, crtMap[relation.Character.ID]))
+		subjects = append(subjects, subject.ConvertDao(subjectMap[relation.SubjectID]))
+	}
+
+	return characters, subjects, rel, nil
+}
+
+func getCharacters(
+	ctx context.Context, r mysqlRepo, characterIDs []domain.CharacterIDType,
+) (map[domain.CharacterIDType]*dao.PersonField, error) {
+	crtFields, err := r.q.PersonField.WithContext(ctx).
+		Where(r.q.PersonField.Cat.Eq("crt"), r.q.PersonField.ID.In(characterIDs...)).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+
+		return nil, errgo.Wrap(err, "dal")
+	}
+	var crtMap = make(map[domain.CharacterIDType]*dao.PersonField, len(crtFields))
+	for _, field := range crtFields {
+		crtMap[field.ID] = field
+	}
+
+	return crtMap, nil
+}
+
+func getSubjects(
+	ctx context.Context, r mysqlRepo, subjectIDs []domain.SubjectIDType,
+) (map[domain.CharacterIDType]*dao.Subject, error) {
+	daoSubjects, err := r.q.Subject.WithContext(ctx).Preload(r.q.Subject.Fields).
+		Where(r.q.Subject.ID.In(subjectIDs...), r.q.Subject.Ban.Eq(0)).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+
+		return nil, errgo.Wrap(err, "dal")
+	}
+	var subjectMap = make(map[domain.CharacterIDType]*dao.Subject, len(daoSubjects))
+	for _, field := range daoSubjects {
+		subjectMap[field.ID] = field
+	}
+
+	return subjectMap, nil
+}
+
+func convertDao(s *dao.Character, field *dao.PersonField) model.Character {
+	return model.Character{
+		ID:           s.ID,
+		Name:         s.Name,
+		Type:         s.Role,
+		Image:        s.Img,
+		Summary:      s.Summary,
+		Locked:       s.Ban != 0,
+		Infobox:      s.Infobox,
+		CollectCount: s.Collects,
+		CommentCount: s.Comment,
+		NSFW:         s.Nsfw,
+		//
+		FieldBloodType: field.Bloodtype,
+		FieldGender:    field.Gender,
+		FieldBirthYear: field.BirthYear,
+		FieldBirthMon:  field.BirthMon,
+		FieldBirthDay:  field.BirthDay,
+		//
+		Redirect: s.Redirect,
+	}
 }

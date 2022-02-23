@@ -167,6 +167,49 @@ func careers(p model.Person) []string {
 	return s
 }
 
+func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+	}
+
+	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	if r.Redirect != 0 {
+		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
+	}
+
+	characters, subjects, relation, err := h.c.GetPersonRelated(c.Context(), id)
+	if err != nil {
+		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
+	}
+
+	var response = make([]res.PersonRelatedCharacter, len(subjects))
+	for i, subject := range subjects {
+		response[i] = res.PersonRelatedCharacter{
+			ID:            characters[i].ID,
+			Name:          characters[i].Name,
+			Type:          relation[i].Type,
+			Images:        model.PersonImage(subject.Image),
+			SubjectID:     subject.ID,
+			SubjectName:   subject.Name,
+			SubjectNameCn: subject.NameCN,
+		}
+	}
+
+	return c.JSON(response)
+}
+
 func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {

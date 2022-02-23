@@ -133,19 +133,12 @@ func main() {
 		gen.FieldType("prsn_redirect", personIDTypeString),
 	))
 
-	g.ApplyInterface(
-		func(method.Character) {},
-		g.GenerateModelAs("chii_characters", "Character",
-			gen.FieldTrimPrefix("crt_"),
-			gen.FieldType("crt_redirect", personIDTypeString),
-		),
+	modelCharacter := g.GenerateModelAs("chii_characters", "Character",
+		gen.FieldTrimPrefix("crt_"),
+		gen.FieldType("crt_redirect", personIDTypeString),
 	)
 
-	g.ApplyInterface(func(method method.CharacterSubjects) {},
-		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
-			gen.FieldType("subject_id", subjectIDTypeString),
-			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
-		))
+	g.ApplyInterface(func(method.Character) {}, modelCharacter)
 
 	modelSubjectFields := g.GenerateModelAs("chii_subject_fields", "SubjectField",
 		// gen.FieldTrimPrefix("field_"),
@@ -203,6 +196,16 @@ func main() {
 			gen.FieldRename("rev_name_cn", "NameCN"),
 			gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 				GORMTag: "foreignKey:rev_subject_id;references:subject_id",
+			}),
+		))
+
+	g.ApplyInterface(func(method method.CharacterSubjects) {},
+		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
+			gen.FieldType("subject_id", subjectIDTypeString),
+			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
+			gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
+				RelatePointer: true,
+				GORMTag:       "foreignKey:crt_id;references:crt_id",
 			}),
 		))
 

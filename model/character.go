@@ -40,3 +40,7 @@ type Character struct {
 	FieldBirthDay  uint8
 	NSFW           bool
 }
+
+type PersonCharacterRelation struct {
+	Type uint8
+}

@@ -104,3 +104,13 @@ type PersonRelatedSubject struct {
 	Image     string               `json:"image"`
 	SubjectID domain.SubjectIDType `json:"id"`
 }
+
+type PersonRelatedCharacter struct {
+	Images        model.PersonImages `json:"images"`
+	Name          string
+	SubjectName   string                 `json:"subject_name"`
+	SubjectNameCn string                 `json:"subject_name_cn"`
+	SubjectID     domain.SubjectIDType   `json:"subject_id"`
+	ID            domain.CharacterIDType `json:"id"`
+	Type          uint8                  `json:"type"`
+}

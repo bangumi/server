@@ -31,6 +31,11 @@ func newCharacterSubjects(db *gorm.DB) characterSubjects {
 	_characterSubjects.CrtType = field.NewUint8(tableName, "crt_type")
 	_characterSubjects.CtrAppearEps = field.NewString(tableName, "ctr_appear_eps")
 	_characterSubjects.CrtOrder = field.NewUint8(tableName, "crt_order")
+	_characterSubjects.Character = characterSubjectsHasOneCharacter{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Character", "dao.Character"),
+	}
 
 	_characterSubjects.fillFieldMap()
 
@@ -47,6 +52,7 @@ type characterSubjects struct {
 	CrtType       field.Uint8
 	CtrAppearEps  field.String
 	CrtOrder      field.Uint8
+	Character     characterSubjectsHasOneCharacter
 
 	fieldMap map[string]field.Expr
 }
@@ -91,18 +97,85 @@ func (c *characterSubjects) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (c *characterSubjects) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 6)
+	c.fieldMap = make(map[string]field.Expr, 7)
 	c.fieldMap["crt_id"] = c.CrtID
 	c.fieldMap["subject_id"] = c.SubjectID
 	c.fieldMap["subject_type_id"] = c.SubjectTypeID
 	c.fieldMap["crt_type"] = c.CrtType
 	c.fieldMap["ctr_appear_eps"] = c.CtrAppearEps
 	c.fieldMap["crt_order"] = c.CrtOrder
+
 }
 
 func (c characterSubjects) clone(db *gorm.DB) characterSubjects {
 	c.characterSubjectsDo.ReplaceDB(db)
 	return c
+}
+
+type characterSubjectsHasOneCharacter struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a characterSubjectsHasOneCharacter) Where(conds ...field.Expr) *characterSubjectsHasOneCharacter {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a characterSubjectsHasOneCharacter) WithContext(ctx context.Context) *characterSubjectsHasOneCharacter {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a characterSubjectsHasOneCharacter) Model(m *dao.CharacterSubjects) *characterSubjectsHasOneCharacterTx {
+	return &characterSubjectsHasOneCharacterTx{a.db.Model(m).Association(a.Name())}
+}
+
+type characterSubjectsHasOneCharacterTx struct{ tx *gorm.Association }
+
+func (a characterSubjectsHasOneCharacterTx) Find() (result *dao.Character, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a characterSubjectsHasOneCharacterTx) Append(values ...*dao.Character) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a characterSubjectsHasOneCharacterTx) Replace(values ...*dao.Character) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a characterSubjectsHasOneCharacterTx) Delete(values ...*dao.Character) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a characterSubjectsHasOneCharacterTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a characterSubjectsHasOneCharacterTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type characterSubjectsDo struct{ gen.DO }
