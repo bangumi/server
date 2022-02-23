@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package web
+package handler
 
 import (
 	"errors"
@@ -38,7 +38,7 @@ const ctxKeyUser = "access-user"
 // should bump cache version every time we change domain.Auth.
 const authCacheKeyPrefix = "chii:auth:1:access-token:"
 
-func newAccessUserMiddleware(h Handler) fiber.Handler {
+func (h Handler) MiddlewareAccessUser() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		a, err := h.getUser(ctx)
 		if err != nil {

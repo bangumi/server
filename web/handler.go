@@ -21,23 +21,31 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/uber-go/tally/v4"
 
-	"github.com/bangumi/server/cache"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/web/handler"
 )
 
-// ResistRouter add all router and default 404 Handler to app.
-func ResistRouter(app *fiber.App, h Handler, scope tally.Scope) {
-	app.Use(newAccessUserMiddleware(h))
-
+func addHandle(
+	scope tally.Scope,
+	reg func(path string, handlers ...fiber.Handler) fiber.Router,
+	path string,
+	handler fiber.Handler,
+) {
 	reqCounter := scope.
-		Tagged(map[string]string{"handler": utils.FunctionName(h.getSubject)}).
+		Tagged(map[string]string{"handler": utils.FunctionName(handler)}).
 		Counter("request_count")
 
-	app.Get("/v0/subjects/:id", func(c *fiber.Ctx) error {
+	reg(path, func(c *fiber.Ctx) error {
 		reqCounter.Inc(1)
 
 		return c.Next()
-	}, h.getSubject)
+	}, handler)
+}
+
+// ResistRouter add all router and default 404 Handler to app.
+func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
+	app.Use(h.MiddlewareAccessUser())
+
+	addHandle(scope, app.Get, "/v0/subjects/:id", h.GetSubject)
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
@@ -47,21 +55,7 @@ func ResistRouter(app *fiber.App, h Handler, scope tally.Scope) {
 		return c.SendString(`{
   "title": "Not Found",
   "description": "The path you requested doesn't exist",
-  "detail": "This is default 404 response, if you see this response, please check your request path"
+  "Detail": "This is default 404 response, if you see this response, please check your request path"
 }`)
 	})
-}
-
-func NewHandle(
-	repo domain.SubjectRepo, auth domain.AuthRepo, e domain.EpisodeRepo, cache cache.Generic,
-) Handler {
-	return Handler{s: repo, a: auth, cache: cache, e: e}
-}
-
-type Handler struct {
-	// replace it with service, when it's too complex. Just use a repository currently.
-	s     domain.SubjectRepo
-	a     domain.AuthRepo
-	e     domain.EpisodeRepo
-	cache cache.Generic
 }

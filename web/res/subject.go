@@ -22,6 +22,8 @@ import (
 	"github.com/bangumi/server/pkg/wiki"
 )
 
+type v0wiki = []interface{}
+
 type SubjectV0 struct {
 	ID            uint32              `json:"id"`
 	TypeID        model.SubjectType   `json:"type"`
@@ -33,7 +35,7 @@ type SubjectV0 struct {
 	Date          *string             `json:"date"`
 	Platform      *string             `json:"platform"`
 	Image         model.SubjectImages `json:"images"`
-	Infobox       []interface{}       `json:"infobox"`
+	Infobox       v0wiki              `json:"infobox"`
 	Volumes       uint32              `json:"volumes"`
 	Eps           uint32              `json:"eps"`
 	TotalEpisodes int                 `json:"total_episodes"`

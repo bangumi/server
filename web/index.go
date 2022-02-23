@@ -37,6 +37,7 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/web/middleware/recovery"
 	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/util"
 )
 
 func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
@@ -127,24 +128,11 @@ func getDefaultErrorHandler() func(c *fiber.Ctx, err error) error {
 		return c.Status(code).JSON(res.Error{
 			Title:       utils.StatusMessage(code),
 			Description: description,
-			Details: detail{
+			Details: util.Detail{
 				Error:       err.Error(),
 				Path:        c.Path(),
 				QueryString: c.Request().URI().QueryArgs().String(),
 			},
 		})
 	}
-}
-
-func detailFromRequest(c *fiber.Ctx) detail {
-	return detail{
-		Path:        c.Path(),
-		QueryString: c.Request().URI().QueryArgs().String(),
-	}
-}
-
-type detail struct {
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
-	QueryString string `json:"query_string,omitempty"`
 }

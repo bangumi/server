@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package web
+package handler
 
 import (
 	"context"
@@ -34,15 +34,17 @@ import (
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
+	"github.com/bangumi/server/web/handler/ctxkey"
 	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/util"
 )
 
 func subjectCacheKey(id uint32) string {
-	return "chii:res:0:repository:" + strconv.FormatUint(uint64(id), 10)
+	return "chii:res:0:subject:" + strconv.FormatUint(uint64(id), 10)
 }
 
-func (h Handler) getSubject(c *fiber.Ctx) error {
-	u, ok := c.Context().UserValue(ctxKeyUser).(accessor) // get visitor
+func (h Handler) GetSubject(c *fiber.Ctx) error {
+	u, ok := c.Context().UserValue(ctxkey.User).(accessor) // get visitor
 	if !ok {
 		panic("can't convert type")
 	}
@@ -60,7 +62,7 @@ func (h Handler) getSubject(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: detailFromRequest(c),
+			Details: util.DetailFromRequest(c),
 		})
 	}
 

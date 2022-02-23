@@ -33,6 +33,7 @@ import (
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/web"
+	"github.com/bangumi/server/web/handler"
 )
 
 func main() {
@@ -74,13 +75,13 @@ func start() error {
 		),
 
 		fx.Provide(
+			handler.New,
 			web.New,
-			web.NewHandle,
 		),
 
 		fx.Invoke(
-			web.Listen,
 			web.ResistRouter,
+			web.Listen,
 		),
 	)
 

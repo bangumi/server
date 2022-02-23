@@ -35,6 +35,7 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/web"
+	"github.com/bangumi/server/web/handler"
 )
 
 func GetWebApp(t *testing.T, options ...fx.Option) (f *fiber.App) {
@@ -52,7 +53,7 @@ func GetWebApp(t *testing.T, options ...fx.Option) (f *fiber.App) {
 			config.NewAppConfig,
 			dal.NewDB,
 			web.New,
-			web.NewHandle,
+			handler.New,
 		),
 
 		fx.Invoke(web.ResistRouter),
