@@ -32,7 +32,7 @@ type Tag struct {
 	Count int    `json:"count"`
 }
 
-var ErrTypeCase = errors.New("can't cast to expected type")
+var ErrTypeCast = errors.New("can't cast to expected type")
 
 func ParseTags(s []byte) ([]Tag, error) {
 	if len(s) == 0 {
@@ -49,7 +49,7 @@ func ParseTags(s []byte) ([]Tag, error) {
 	for _, tag := range in {
 		v, ok := tag.(map[interface{}]interface{})
 		if !ok {
-			return nil, errgo.Msg(ErrTypeCase,
+			return nil, errgo.Msg(ErrTypeCast,
 				fmt.Sprintf("failed to cast %v to map[interface{}]interface{} ", tag))
 		}
 
@@ -61,7 +61,7 @@ func ParseTags(s []byte) ([]Tag, error) {
 
 		countRaw, ok := v["result"].(string)
 		if !ok {
-			return nil, errgo.Msg(ErrTypeCase, fmt.Sprintf("failed to cast %v to string ", v["result"]))
+			return nil, errgo.Msg(ErrTypeCast, fmt.Sprintf("failed to cast %v to string ", v["result"]))
 		}
 
 		count, err := strconv.Atoi(countRaw)
