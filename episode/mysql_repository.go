@@ -42,7 +42,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.EpisodeRepo, error) {
 
 func (r mysqlRepo) Get(ctx context.Context, episodeID uint32) (model.Episode, error) {
 	episode, err := r.q.Episode.WithContext(ctx).
-		Where(r.q.Episode.ID.Eq(episodeID)).Limit(1).First()
+		Where(r.q.Episode.ID.Eq(episodeID), r.q.Episode.Ban.Eq(0)).Limit(1).First()
 	if err != nil {
 		return model.Episode{}, errgo.Wrap(err, "dal")
 	}
@@ -57,7 +57,7 @@ func (r mysqlRepo) Get(ctx context.Context, episodeID uint32) (model.Episode, er
 
 func (r mysqlRepo) Count(ctx context.Context, subjectID uint32) (int64, error) {
 	c, err := r.q.Episode.WithContext(ctx).
-		Where(r.q.Episode.SubjectID.Eq(subjectID)).Count()
+		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Ban.Eq(0)).Count()
 	if err != nil {
 		return 0, errgo.Wrap(err, "dal")
 	}
@@ -67,7 +67,11 @@ func (r mysqlRepo) Count(ctx context.Context, subjectID uint32) (int64, error) {
 
 func (r mysqlRepo) CountByType(ctx context.Context, subjectID uint32, epType uint8) (int64, error) {
 	c, err := r.q.Episode.WithContext(ctx).
-		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Type.Eq(epType)).Count()
+		Where(
+			r.q.Episode.SubjectID.Eq(subjectID),
+			r.q.Episode.Type.Eq(epType),
+			r.q.Episode.Ban.Eq(0),
+		).Count()
 	if err != nil {
 		return 0, errgo.Wrap(err, "dal")
 	}
@@ -88,7 +92,7 @@ func (r mysqlRepo) List(
 	}
 
 	episodes, err := r.q.Episode.WithContext(ctx).
-		Where(r.q.Episode.SubjectID.Eq(subjectID)).
+		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Ban.Eq(0)).
 		Limit(limit).Offset(offset).Find()
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
@@ -115,7 +119,11 @@ func (r mysqlRepo) ListByType(
 	}
 
 	episodes, err := r.q.Episode.WithContext(ctx).
-		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Type.Eq(epType)).
+		Where(
+			r.q.Episode.SubjectID.Eq(subjectID),
+			r.q.Episode.Type.Eq(epType),
+			r.q.Episode.Ban.Eq(0),
+		).
 		Limit(limit).Offset(offset).Find()
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
@@ -131,7 +139,11 @@ func (r mysqlRepo) ListByType(
 
 func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID uint32) (float32, error) {
 	episode, err := r.q.Episode.WithContext(ctx).
-		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Type.Eq(enum.EpTypeNormal)).
+		Where(
+			r.q.Episode.SubjectID.Eq(subjectID),
+			r.q.Episode.Type.Eq(enum.EpTypeNormal),
+			r.q.Episode.Ban.Eq(0),
+		).
 		Order(r.q.Episode.Disc, r.q.Episode.Sort).Limit(1).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
