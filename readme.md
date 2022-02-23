@@ -1,4 +1,8 @@
-基于 python 的新后端服务器
+<https://bgm.tv/> 新后端服务器。
+
+## 正在使用 [Golang](https://go.dev/) 重写
+
+请查看 [go 分支](https://github.com/bangumi/server/tree/go)
 
 ## 开发环境
 
