@@ -24,6 +24,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/model"
@@ -90,4 +91,60 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Person, error) {
 		FieldBirthMon:  field.BirthMon,
 		FieldBirthDay:  field.BirthDay,
 	}, nil
+}
+
+func (r mysqlRepo) GetSubjectRelated(
+	ctx context.Context, subjectID domain.SubjectIDType,
+) ([]model.Person, []model.PersonSubjectRelation, error) {
+	relations, err := r.q.PersonSubjects.WithContext(ctx).
+		Preload(r.q.PersonSubjects.Subject.Fields).
+		Preload(r.q.PersonSubjects.Person.Fields).
+		Where(r.q.PersonSubjects.SubjectID.Eq(subjectID)).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, nil, errgo.Wrap(err, "dal")
+	}
+
+	var rel = make([]model.PersonSubjectRelation, 0, len(relations))
+	var persons = make([]model.Person, 0, len(relations))
+	for _, relation := range relations {
+		if relation.Subject.ID == 0 || relation.Person.ID == 0 {
+			// gorm/gen doesn't support preload with join, so ignore relations without subject.
+			continue
+		}
+
+		rel = append(rel, model.PersonSubjectRelation{ID: relation.PrsnPosition})
+		persons = append(persons, ConvertDao(&relation.Person))
+	}
+
+	return persons, rel, nil
+}
+
+func ConvertDao(p *dao.Person) model.Person {
+	return model.Person{
+		Redirect:     p.Redirect,
+		Type:         p.Type,
+		ID:           p.ID,
+		Name:         p.Name,
+		Image:        p.Img,
+		Infobox:      p.Infobox,
+		Summary:      p.Summary,
+		Locked:       p.Ban != 0,
+		CollectCount: p.Collects,
+		CommentCount: p.Comment,
+		//
+		Producer:    p.Producer,
+		Mangaka:     p.Mangaka,
+		Artist:      p.Artist,
+		Seiyu:       p.Seiyu,
+		Writer:      p.Writer,
+		Illustrator: p.Illustrator,
+		Actor:       p.Actor,
+		//
+		FieldBloodType: p.Fields.Bloodtype,
+		FieldGender:    p.Fields.Gender,
+		FieldBirthYear: p.Fields.BirthYear,
+		FieldBirthMon:  p.Fields.BirthMon,
+		FieldBirthDay:  p.Fields.BirthDay,
+	}
 }

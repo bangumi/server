@@ -43,6 +43,17 @@ func newPersonSubjects(db *gorm.DB) personSubjects {
 		},
 	}
 
+	_personSubjects.Person = personSubjectsHasOnePerson{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Person", "dao.Person"),
+		Fields: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("Person.Fields", "dao.PersonField"),
+		},
+	}
+
 	_personSubjects.fillFieldMap()
 
 	return _personSubjects
@@ -60,6 +71,8 @@ type personSubjects struct {
 	Summary       field.String
 	PrsnAppearEps field.String
 	Subject       personSubjectsHasOneSubject
+
+	Person personSubjectsHasOnePerson
 
 	fieldMap map[string]field.Expr
 }
@@ -105,7 +118,7 @@ func (p *personSubjects) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (p *personSubjects) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 8)
+	p.fieldMap = make(map[string]field.Expr, 9)
 	p.fieldMap["prsn_type"] = p.PrsnType
 	p.fieldMap["prsn_id"] = p.PersonID
 	p.fieldMap["prsn_position"] = p.PrsnPosition
@@ -188,6 +201,76 @@ func (a personSubjectsHasOneSubjectTx) Clear() error {
 }
 
 func (a personSubjectsHasOneSubjectTx) Count() int64 {
+	return a.tx.Count()
+}
+
+type personSubjectsHasOnePerson struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	Fields struct {
+		field.RelationField
+	}
+}
+
+func (a personSubjectsHasOnePerson) Where(conds ...field.Expr) *personSubjectsHasOnePerson {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a personSubjectsHasOnePerson) WithContext(ctx context.Context) *personSubjectsHasOnePerson {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a personSubjectsHasOnePerson) Model(m *dao.PersonSubjects) *personSubjectsHasOnePersonTx {
+	return &personSubjectsHasOnePersonTx{a.db.Model(m).Association(a.Name())}
+}
+
+type personSubjectsHasOnePersonTx struct{ tx *gorm.Association }
+
+func (a personSubjectsHasOnePersonTx) Find() (result *dao.Person, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a personSubjectsHasOnePersonTx) Append(values ...*dao.Person) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a personSubjectsHasOnePersonTx) Replace(values ...*dao.Person) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a personSubjectsHasOnePersonTx) Delete(values ...*dao.Person) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a personSubjectsHasOnePersonTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a personSubjectsHasOnePersonTx) Count() int64 {
 	return a.tx.Count()
 }
 

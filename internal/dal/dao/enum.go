@@ -14,26 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package enum_test
+package dao
 
-import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/pkg/vars/enum"
-)
-
-func TestValue(t *testing.T) {
-	t.Parallel()
-
-	require.Equal(t, uint8(1), enum.UserGroupAdmin)
-	require.Equal(t, uint8(2), enum.UserGroupBangumiAdmin)
-	require.Equal(t, uint8(3), enum.UserGroupWindowAdmin)
-	require.Equal(t, uint8(4), enum.UserGroupQuite)
-	require.Equal(t, uint8(5), enum.UserGroupBanned)
-	require.Equal(t, uint8(8), enum.UserGroupCharacterAdmin)
-	require.Equal(t, uint8(9), enum.UserGroupWikiAdmin)
-	require.Equal(t, uint8(10), enum.UserGroupNormal)
-	require.Equal(t, uint8(11), enum.UserGroupWikiEditor)
-}
+const FieldTypePerson = "prsn"
+const FieldTypeCharacter = "crt"

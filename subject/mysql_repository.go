@@ -103,12 +103,12 @@ func (r mysqlRepo) GetPersonRelated(
 	var subjects = make([]model.Subject, 0, len(relations))
 
 	for _, relation := range relations {
-		if relation.Subject == nil {
+		if relation.Subject.ID == 0 {
 			// gorm/gen doesn't support preload with join, so ignore relations without subject.
 			continue
 		}
 		rel = append(rel, model.PersonSubjectRelation{ID: relation.PrsnPosition})
-		subjects = append(subjects, ConvertDao(relation.Subject))
+		subjects = append(subjects, ConvertDao(&relation.Subject))
 	}
 
 	return subjects, rel, nil

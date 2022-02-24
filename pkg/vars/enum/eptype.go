@@ -23,4 +23,6 @@ const (
 	EpTypeSpecial EpType = 1
 	EpTypeOpening EpType = 2
 	EpTypeEnding  EpType = 3
+	EpTypeMad     EpType = 4
+	EpTypeOther   EpType = 6
 )

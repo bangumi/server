@@ -92,35 +92,12 @@ func (r mysqlRepo) GetPersonRelated(
 	ctx context.Context, characterID domain.PersonIDType,
 ) ([]model.Character, []model.Subject, []model.PersonCharacterRelation, error) {
 	relations, err := r.q.CharacterSubjects.WithContext(ctx).
-		Preload(r.q.CharacterSubjects.Character).
-		Where(r.q.CharacterSubjects.CrtID.Eq(characterID)).
-		Order(r.q.CharacterSubjects.CrtID).
+		Preload(r.q.CharacterSubjects.Character.Fields).Preload(r.q.CharacterSubjects.Subject.Fields).
+		Where(r.q.CharacterSubjects.CrtID.Eq(characterID)).Order(r.q.CharacterSubjects.CrtID).
 		Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
-
 		return nil, nil, nil, errgo.Wrap(err, "dal")
-	}
-
-	var characterIDs = make([]domain.CharacterIDType, 0, len(relations))
-	var subjectIDs = make([]domain.SubjectIDType, 0, len(relations))
-	for _, relation := range relations {
-		if relation.Character == nil {
-			// gorm/gen doesn't support preload with join, so ignore relations without subject.
-			continue
-		}
-		characterIDs = append(characterIDs, relation.Character.ID)
-		subjectIDs = append(subjectIDs, relation.SubjectID)
-	}
-
-	crtMap, err := getCharacters(ctx, r, characterIDs)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	subjectMap, err := getSubjects(ctx, r, subjectIDs)
-	if err != nil {
-		return nil, nil, nil, err
 	}
 
 	var rel = make([]model.PersonCharacterRelation, 0, len(relations))
@@ -128,55 +105,20 @@ func (r mysqlRepo) GetPersonRelated(
 	var subjects = make([]model.Subject, 0, len(relations))
 
 	for _, relation := range relations {
-		if relation.Character == nil || subjectMap[relation.SubjectID] == nil {
-			// gorm/gen doesn't support preload with join, so ignore relations without subject.
+		if relation.Subject.ID == 0 || relation.Character.ID == 0 {
+			// skip non-existing
 			continue
 		}
+
 		rel = append(rel, model.PersonCharacterRelation{Type: relation.CrtType})
-		characters = append(characters, convertDao(relation.Character, crtMap[relation.Character.ID]))
-		subjects = append(subjects, subject.ConvertDao(subjectMap[relation.SubjectID]))
+		characters = append(characters, convertDao(&relation.Character))
+		subjects = append(subjects, subject.ConvertDao(&relation.Subject))
 	}
 
 	return characters, subjects, rel, nil
 }
 
-func getCharacters(
-	ctx context.Context, r mysqlRepo, characterIDs []domain.CharacterIDType,
-) (map[domain.CharacterIDType]*dao.PersonField, error) {
-	crtFields, err := r.q.PersonField.WithContext(ctx).
-		Where(r.q.PersonField.Cat.Eq("crt"), r.q.PersonField.ID.In(characterIDs...)).Find()
-	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
-
-		return nil, errgo.Wrap(err, "dal")
-	}
-	var crtMap = make(map[domain.CharacterIDType]*dao.PersonField, len(crtFields))
-	for _, field := range crtFields {
-		crtMap[field.ID] = field
-	}
-
-	return crtMap, nil
-}
-
-func getSubjects(
-	ctx context.Context, r mysqlRepo, subjectIDs []domain.SubjectIDType,
-) (map[domain.CharacterIDType]*dao.Subject, error) {
-	daoSubjects, err := r.q.Subject.WithContext(ctx).Preload(r.q.Subject.Fields).
-		Where(r.q.Subject.ID.In(subjectIDs...), r.q.Subject.Ban.Eq(0)).Find()
-	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
-
-		return nil, errgo.Wrap(err, "dal")
-	}
-	var subjectMap = make(map[domain.CharacterIDType]*dao.Subject, len(daoSubjects))
-	for _, field := range daoSubjects {
-		subjectMap[field.ID] = field
-	}
-
-	return subjectMap, nil
-}
-
-func convertDao(s *dao.Character, field *dao.PersonField) model.Character {
+func convertDao(s *dao.Character) model.Character {
 	return model.Character{
 		ID:           s.ID,
 		Name:         s.Name,
@@ -189,11 +131,11 @@ func convertDao(s *dao.Character, field *dao.PersonField) model.Character {
 		CommentCount: s.Comment,
 		NSFW:         s.Nsfw,
 		//
-		FieldBloodType: field.Bloodtype,
-		FieldGender:    field.Gender,
-		FieldBirthYear: field.BirthYear,
-		FieldBirthMon:  field.BirthMon,
-		FieldBirthDay:  field.BirthDay,
+		FieldBloodType: s.Fields.Bloodtype,
+		FieldGender:    s.Fields.Gender,
+		FieldBirthYear: s.Fields.BirthYear,
+		FieldBirthMon:  s.Fields.BirthMon,
+		FieldBirthDay:  s.Fields.BirthDay,
 		//
 		Redirect: s.Redirect,
 	}

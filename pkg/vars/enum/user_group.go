@@ -17,15 +17,15 @@
 package enum
 
 const (
-	GroupAdmin          uint8 = iota + 1 // 1
-	GroupBangumiAdmin                    // 2
-	GroupWindowAdmin                     // 3
-	GroupQuite                           // 4
-	GroupBanned                          // 5
-	_                                    // 6
-	_                                    // 7
-	GroupCharacterAdmin                  // 8
-	GroupWikiAdmin                       // 9
-	GroupNormal                          // 10
-	GroupWiki                            // 11
+	UserGroupAdmin uint8 = iota + 1
+	UserGroupBangumiAdmin
+	UserGroupWindowAdmin
+	UserGroupQuite
+	UserGroupBanned
+	_
+	_
+	UserGroupCharacterAdmin
+	UserGroupWikiAdmin
+	UserGroupNormal
+	UserGroupWikiEditor
 )

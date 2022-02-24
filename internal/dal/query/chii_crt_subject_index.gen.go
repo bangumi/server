@@ -35,6 +35,22 @@ func newCharacterSubjects(db *gorm.DB) characterSubjects {
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("Character", "dao.Character"),
+		Fields: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("Character.Fields", "dao.PersonField"),
+		},
+	}
+
+	_characterSubjects.Subject = characterSubjectsHasOneSubject{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Subject", "dao.Subject"),
+		Fields: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("Subject.Fields", "dao.SubjectField"),
+		},
 	}
 
 	_characterSubjects.fillFieldMap()
@@ -53,6 +69,8 @@ type characterSubjects struct {
 	CtrAppearEps  field.String
 	CrtOrder      field.Uint8
 	Character     characterSubjectsHasOneCharacter
+
+	Subject characterSubjectsHasOneSubject
 
 	fieldMap map[string]field.Expr
 }
@@ -97,7 +115,7 @@ func (c *characterSubjects) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (c *characterSubjects) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 7)
+	c.fieldMap = make(map[string]field.Expr, 8)
 	c.fieldMap["crt_id"] = c.CrtID
 	c.fieldMap["subject_id"] = c.SubjectID
 	c.fieldMap["subject_type_id"] = c.SubjectTypeID
@@ -116,6 +134,10 @@ type characterSubjectsHasOneCharacter struct {
 	db *gorm.DB
 
 	field.RelationField
+
+	Fields struct {
+		field.RelationField
+	}
 }
 
 func (a characterSubjectsHasOneCharacter) Where(conds ...field.Expr) *characterSubjectsHasOneCharacter {
@@ -175,6 +197,76 @@ func (a characterSubjectsHasOneCharacterTx) Clear() error {
 }
 
 func (a characterSubjectsHasOneCharacterTx) Count() int64 {
+	return a.tx.Count()
+}
+
+type characterSubjectsHasOneSubject struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	Fields struct {
+		field.RelationField
+	}
+}
+
+func (a characterSubjectsHasOneSubject) Where(conds ...field.Expr) *characterSubjectsHasOneSubject {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a characterSubjectsHasOneSubject) WithContext(ctx context.Context) *characterSubjectsHasOneSubject {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a characterSubjectsHasOneSubject) Model(m *dao.CharacterSubjects) *characterSubjectsHasOneSubjectTx {
+	return &characterSubjectsHasOneSubjectTx{a.db.Model(m).Association(a.Name())}
+}
+
+type characterSubjectsHasOneSubjectTx struct{ tx *gorm.Association }
+
+func (a characterSubjectsHasOneSubjectTx) Find() (result *dao.Subject, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a characterSubjectsHasOneSubjectTx) Append(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a characterSubjectsHasOneSubjectTx) Replace(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a characterSubjectsHasOneSubjectTx) Delete(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a characterSubjectsHasOneSubjectTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a characterSubjectsHasOneSubjectTx) Count() int64 {
 	return a.tx.Count()
 }
 

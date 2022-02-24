@@ -41,6 +41,11 @@ func newCharacter(db *gorm.DB) character {
 	_character.Ban = field.NewUint8(tableName, "crt_ban")
 	_character.Redirect = field.NewUint32(tableName, "crt_redirect")
 	_character.Nsfw = field.NewBool(tableName, "crt_nsfw")
+	_character.Fields = characterHasOneFields{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Fields", "dao.PersonField"),
+	}
 
 	_character.fillFieldMap()
 
@@ -67,6 +72,7 @@ type character struct {
 	Ban      field.Uint8
 	Redirect field.Uint32
 	Nsfw     field.Bool
+	Fields   characterHasOneFields
 
 	fieldMap map[string]field.Expr
 }
@@ -121,7 +127,7 @@ func (c *character) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *character) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 16)
+	c.fieldMap = make(map[string]field.Expr, 17)
 	c.fieldMap["crt_id"] = c.ID
 	c.fieldMap["crt_name"] = c.Name
 	c.fieldMap["crt_role"] = c.Role
@@ -138,11 +144,78 @@ func (c *character) fillFieldMap() {
 	c.fieldMap["crt_ban"] = c.Ban
 	c.fieldMap["crt_redirect"] = c.Redirect
 	c.fieldMap["crt_nsfw"] = c.Nsfw
+
 }
 
 func (c character) clone(db *gorm.DB) character {
 	c.characterDo.ReplaceDB(db)
 	return c
+}
+
+type characterHasOneFields struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a characterHasOneFields) Where(conds ...field.Expr) *characterHasOneFields {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a characterHasOneFields) WithContext(ctx context.Context) *characterHasOneFields {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a characterHasOneFields) Model(m *dao.Character) *characterHasOneFieldsTx {
+	return &characterHasOneFieldsTx{a.db.Model(m).Association(a.Name())}
+}
+
+type characterHasOneFieldsTx struct{ tx *gorm.Association }
+
+func (a characterHasOneFieldsTx) Find() (result *dao.PersonField, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a characterHasOneFieldsTx) Append(values ...*dao.PersonField) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a characterHasOneFieldsTx) Replace(values ...*dao.PersonField) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a characterHasOneFieldsTx) Delete(values ...*dao.PersonField) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a characterHasOneFieldsTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a characterHasOneFieldsTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type characterDo struct{ gen.DO }

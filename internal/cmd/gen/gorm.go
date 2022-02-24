@@ -118,24 +118,33 @@ func main() {
 
 	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "OAuthAccessToken"))
 
-	g.ApplyInterface(func(method.PersonField) {},
-		g.GenerateModelAs("chii_person_fields", "PersonField",
-			gen.FieldTrimPrefix("prsn_"),
-			gen.FieldType("prsn_id", personIDTypeString),
-			// mysql year(4) has range 1901 to 2155, uint16 has range 0-65535.
-			gen.FieldType("birth_year", "uint16"),
-		))
+	modelPersonField := g.GenerateModelAs("chii_person_fields", "PersonField",
+		gen.FieldTrimPrefix("prsn_"),
+		gen.FieldType("prsn_id", personIDTypeString),
+		gen.FieldRename("prsn_id", "OwnerID"),
+		// mysql year(4) has range 1901 to 2155, uint16 has range 0-65535.
+		gen.FieldType("birth_year", "uint16"),
+		gen.FieldRename("prsn_cat", "OwnerType"),
+	)
+	g.ApplyInterface(func(method.PersonField) {}, modelPersonField)
 
-	g.ApplyInterface(func(method.Person) {}, g.GenerateModelAs("chii_persons", "Person",
+	modelPerson := g.GenerateModelAs("chii_persons", "Person",
 		gen.FieldTrimPrefix("prsn_"),
 		gen.FieldType("prsn_illustrator", "bool"),
 		gen.FieldType("prsn_writer", "bool"),
 		gen.FieldType("prsn_redirect", personIDTypeString),
-	))
+		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
+			GORMTag: "foreignKey:prsn_id;polymorphic:Owner;polymorphicValue:prsn",
+		}),
+	)
+	g.ApplyInterface(func(method.Person) {}, modelPerson)
 
 	modelCharacter := g.GenerateModelAs("chii_characters", "Character",
 		gen.FieldTrimPrefix("crt_"),
 		gen.FieldType("crt_redirect", personIDTypeString),
+		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
+			GORMTag: "foreignKey:crt_id;polymorphic:Owner;polymorphicValue:crt",
+		}),
 	)
 
 	g.ApplyInterface(func(method.Character) {}, modelCharacter)
@@ -164,7 +173,7 @@ func main() {
 		gen.FieldType("subject_ban", "uint8"),
 		gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 		gen.FieldType("subject_airtime", "uint8"),
-		gen.FieldRelate(field.BelongsTo, "Fields", modelSubjectFields, &field.RelateConfig{
+		gen.FieldRelate(field.HasOne, "Fields", modelSubjectFields, &field.RelateConfig{
 			GORMTag: "foreignKey:subject_id;references:field_sid",
 		}),
 	)
@@ -204,8 +213,10 @@ func main() {
 			gen.FieldType("subject_id", subjectIDTypeString),
 			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 			gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
-				RelatePointer: true,
-				GORMTag:       "foreignKey:crt_id;references:crt_id",
+				GORMTag: "foreignKey:crt_id;references:crt_id",
+			}),
+			gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
+				GORMTag: "foreignKey:subject_id;references:subject_id",
 			}),
 		))
 
@@ -215,8 +226,10 @@ func main() {
 			gen.FieldType("subject_id", subjectIDTypeString),
 			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 			gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-				RelatePointer: true,
-				GORMTag:       "foreignKey:subject_id;references:subject_id",
+				GORMTag: "foreignKey:subject_id;references:subject_id",
+			}),
+			gen.FieldRelate(field.HasOne, "Person", modelPerson, &field.RelateConfig{
+				GORMTag: "foreignKey:prsn_id;references:prsn_id",
 			}),
 		))
 	// execute the action of code generation

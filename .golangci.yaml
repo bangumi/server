@@ -251,6 +251,9 @@ linters-settings:
       - "func os.Open(name string)"
       - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
 
+  nlreturn:
+    block-size: 3
+
   ifshort:
     # Maximum length of vars declaration measured in number of lines, after which linter won't suggest using short syntax.
     # Has higher priority than max-decl-chars.

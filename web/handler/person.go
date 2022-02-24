@@ -210,7 +210,7 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
+func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
