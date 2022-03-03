@@ -70,10 +70,23 @@ class Gender(IntEnum):
 
 
 class EpType(IntEnum):
+    """
+    本篇 = 0
+    特别篇 = 1
+    OP = 2
+    ED = 3
+    预告/宣传/广告 = 4
+    MAD = 5
+    其他 = 6
+    """
+
     normal = 0
     sp = 1
     op = 2
     ed = 3
+    trailer = 4
+    mad = 5
+    other = 6
 
 
 class SubjectType(IntEnum):

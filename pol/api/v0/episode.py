@@ -38,7 +38,7 @@ class Pager(_Pager):
 async def get_episodes(
     db: AsyncSession = Depends(get_db),
     subject_id: int = Query(..., gt=0),
-    type: EpType = Query(None, description="`0`,`1`,`2`,`3`代表`本篇`，`sp`，`op`，`ed`"),
+    type: EpType = Query(None, description="参照章节的`type`"),
     page: Pager = Depends(),
     cache_control: CacheControl = Depends(CacheControl),
     user: Role = Depends(optional_user),
