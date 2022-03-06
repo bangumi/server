@@ -14,14 +14,35 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package handler
 
-// User is visible for everyone.
-type User struct {
-	UserName  string
-	UserGroup uint8
-	NickName  string
-	Avatar    string
-	ID        uint32
-	Sign      string
+import (
+	"github.com/gofiber/fiber/v2"
+
+	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/web/res"
+)
+
+func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
+	u := h.getUser(c)
+	if u.ID == 0 {
+		return fiber.ErrUnauthorized
+	}
+
+	user, err := h.u.GetByID(c.Context(), u.ID)
+	if err != nil {
+		return errgo.Wrap(err, "repo")
+	}
+
+	var me = res.Me{
+		ID:        user.ID,
+		URL:       "https://bgm.tv/user/" + user.UserName,
+		Username:  user.UserName,
+		Nickname:  user.NickName,
+		UserGroup: user.UserGroup,
+		Avatar:    res.Avatar{}.Fill(user.Avatar),
+		Sign:      user.Sign,
+	}
+
+	return c.JSON(me)
 }

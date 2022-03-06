@@ -88,9 +88,11 @@ func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...uint32) (map[uint32]mode
 
 func fromDao(m *dao.Member) model.User {
 	return model.User{
-		UserName: m.Username,
-		NickName: m.Nickname,
-		Avatar:   m.Avatar,
-		ID:       m.UID,
+		UserName:  m.Username,
+		NickName:  m.Nickname,
+		UserGroup: m.Groupid,
+		Avatar:    m.Avatar,
+		Sign:      m.Sign,
+		ID:        m.UID,
 	}
 }

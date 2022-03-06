@@ -45,6 +45,7 @@ type Mock struct {
 	CharacterRepo domain.CharacterRepo
 	AuthRepo      domain.AuthRepo
 	EpisodeRepo   domain.EpisodeRepo
+	UserRepo      domain.UserRepo
 	Cache         cache.Generic
 }
 
@@ -72,6 +73,7 @@ func GetWebApp(t *testing.T, m Mock) *fiber.App {
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
 		MockAuthRepo(m.AuthRepo),
+		MockUserRepo(m.UserRepo),
 
 		fx.Invoke(web.ResistRouter),
 
@@ -91,6 +93,17 @@ func GetWebApp(t *testing.T, m Mock) *fiber.App {
 	}
 
 	return f
+}
+
+func MockUserRepo(repo domain.UserRepo) fx.Option {
+	if repo == nil {
+		mocker := &domain.MockUserRepo{}
+		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(model.User{}, nil)
+
+		repo = mocker
+	}
+
+	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.UserRepo))))
 }
 
 func MockPersonRepo(m domain.PersonRepo) fx.Option {

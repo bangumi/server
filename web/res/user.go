@@ -14,14 +14,31 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package res
 
-// User is visible for everyone.
-type User struct {
-	UserName  string
-	UserGroup uint8
-	NickName  string
-	Avatar    string
-	ID        uint32
-	Sign      string
+type Avatar struct {
+	Large  string `json:"large"`
+	Medium string `json:"medium"`
+	Small  string `json:"small"`
+}
+
+func (a Avatar) Fill(s string) Avatar {
+	if s == "" {
+		s = "icon.jpg"
+	}
+	return Avatar{
+		Large:  "https://lain.bgm.tv/pic/user/l/" + s,
+		Medium: "https://lain.bgm.tv/pic/user/m/" + s,
+		Small:  "https://lain.bgm.tv/pic/user/s/" + s,
+	}
+}
+
+type Me struct {
+	Avatar    Avatar `json:"avatar"`
+	Sign      string `json:"sign"`
+	URL       string `json:"url"`
+	Username  string `json:"username"`
+	Nickname  string `json:"nickname"`
+	ID        uint32 `json:"id"`
+	UserGroup uint8  `json:"user_group"`
 }
