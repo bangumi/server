@@ -62,3 +62,8 @@ type Collection struct {
 	Rate        uint8                `json:"rate"`
 	Private     bool                 `json:"private"`
 }
+
+type Creator struct {
+	Username string `json:"username"`
+	Nickname string `json:"nickname"`
+}

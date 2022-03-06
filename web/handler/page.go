@@ -24,6 +24,9 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 )
 
+const defaultPageLimit = 30
+const defaultMaxPageLimit = 100
+
 type pageQuery struct {
 	Limit  int
 	Offset int

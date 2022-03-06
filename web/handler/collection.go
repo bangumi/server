@@ -28,9 +28,6 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-const defaultCollectionPageLimit = 30
-const maxCollectionPageLimit = 100
-
 func (h Handler) getCollection(c *fiber.Ctx, u model.User, page pageQuery, showPrivate bool) error {
 	count, err := h.u.CountCollections(c.Context(), u.ID, 0, 0, showPrivate)
 	if err != nil {
@@ -82,7 +79,7 @@ func (h Handler) getCollection(c *fiber.Ctx, u model.User, page pageQuery, showP
 
 func (h Handler) GetCollection(c *fiber.Ctx) error {
 	v := h.getUser(c)
-	page, err := getPageQuery(c, defaultCollectionPageLimit, maxCollectionPageLimit)
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return fiber.NewError(http.StatusBadRequest, "bad query args: "+err.Error())
 	}

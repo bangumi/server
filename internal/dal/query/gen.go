@@ -18,6 +18,8 @@ func Use(db *gorm.DB) *Query {
 		Character:         newCharacter(db),
 		CharacterSubjects: newCharacterSubjects(db),
 		Episode:           newEpisode(db),
+		Index:             newIndex(db),
+		IndexSubject:      newIndexSubject(db),
 		Member:            newMember(db),
 		OAuthAccessToken:  newOAuthAccessToken(db),
 		Person:            newPerson(db),
@@ -38,6 +40,8 @@ type Query struct {
 	Character         character
 	CharacterSubjects characterSubjects
 	Episode           episode
+	Index             index
+	IndexSubject      indexSubject
 	Member            member
 	OAuthAccessToken  oAuthAccessToken
 	Person            person
@@ -59,6 +63,8 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Character:         q.Character.clone(db),
 		CharacterSubjects: q.CharacterSubjects.clone(db),
 		Episode:           q.Episode.clone(db),
+		Index:             q.Index.clone(db),
+		IndexSubject:      q.IndexSubject.clone(db),
 		Member:            q.Member.clone(db),
 		OAuthAccessToken:  q.OAuthAccessToken.clone(db),
 		Person:            q.Person.clone(db),
@@ -77,6 +83,8 @@ type queryCtx struct {
 	Character         characterDo
 	CharacterSubjects characterSubjectsDo
 	Episode           episodeDo
+	Index             indexDo
+	IndexSubject      indexSubjectDo
 	Member            memberDo
 	OAuthAccessToken  oAuthAccessTokenDo
 	Person            personDo
@@ -95,6 +103,8 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Character:         *q.Character.WithContext(ctx),
 		CharacterSubjects: *q.CharacterSubjects.WithContext(ctx),
 		Episode:           *q.Episode.WithContext(ctx),
+		Index:             *q.Index.WithContext(ctx),
+		IndexSubject:      *q.IndexSubject.WithContext(ctx),
 		Member:            *q.Member.WithContext(ctx),
 		OAuthAccessToken:  *q.OAuthAccessToken.WithContext(ctx),
 		Person:            *q.Person.WithContext(ctx),

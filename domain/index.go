@@ -14,33 +14,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package cachekey
+package domain
 
 import (
-	"strconv"
+	"context"
 
-	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/model"
 )
 
-// Put version in cache key to avoid model changes.
-const globalPrefix = "chii:" + config.Version + ":res:"
-
-func Character(id uint32) string {
-	return globalPrefix + "character:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func Person(id uint32) string {
-	return globalPrefix + "person:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func Subject(id uint32) string {
-	return globalPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func Episode(id uint32) string {
-	return globalPrefix + "episode:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func IndexNSFW(id uint32) string {
-	return globalPrefix + "index:nsfw:" + strconv.FormatUint(uint64(id), 10)
+type IndexRepo interface {
+	Get(ctx context.Context, id uint32) (model.Index, error)
+	IsNsfw(ctx context.Context, id uint32) (bool, error)
 }

@@ -29,6 +29,7 @@ func New(
 	p domain.PersonRepo,
 	a domain.AuthRepo,
 	e domain.EpisodeRepo,
+	index domain.IndexRepo,
 	user domain.UserRepo,
 	cache cache.Generic,
 	log *zap.Logger,
@@ -42,6 +43,7 @@ func New(
 		u:     user,
 		e:     e,
 		c:     c,
+		i:     index,
 	}
 }
 
@@ -53,6 +55,7 @@ type Handler struct {
 	e     domain.EpisodeRepo
 	c     domain.CharacterRepo
 	u     domain.UserRepo
+	i     domain.IndexRepo
 	cache cache.Generic
 	log   *zap.Logger
 }

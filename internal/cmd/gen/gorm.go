@@ -123,6 +123,15 @@ func main() {
 		gen.FieldType("interest_type", "uint8"),
 		gen.FieldTrimPrefix("interest_")))
 
+	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
+		gen.FieldTrimPrefix("idx_"),
+		gen.FieldType("idx_id", "uint32"),
+		gen.FieldType("idx_uid", "uint32"),
+		gen.FieldType("idx_collects", "uint32")))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_index_related", "IndexSubject",
+		gen.FieldTrimPrefix("idx_rlt_")))
+
 	modelPersonField := g.GenerateModelAs("chii_person_fields", "PersonField",
 		gen.FieldTrimPrefix("prsn_"),
 		gen.FieldType("prsn_id", personIDTypeString),
