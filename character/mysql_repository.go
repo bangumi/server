@@ -111,14 +111,14 @@ func (r mysqlRepo) GetPersonRelated(
 		}
 
 		rel = append(rel, model.PersonCharacterRelation{Type: relation.CrtType})
-		characters = append(characters, convertDao(&relation.Character))
+		characters = append(characters, ConvertDao(&relation.Character))
 		subjects = append(subjects, subject.ConvertDao(&relation.Subject))
 	}
 
 	return characters, subjects, rel, nil
 }
 
-func convertDao(s *dao.Character) model.Character {
+func ConvertDao(s *dao.Character) model.Character {
 	return model.Character{
 		ID:           s.ID,
 		Name:         s.Name,

@@ -126,3 +126,52 @@ func convertModelCharacter(s model.Character) res.CharacterV0 {
 		Locked:   s.Locked,
 	}
 }
+
+func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
+	u := h.getUser(c)
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	}
+
+	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	if r.Redirect != 0 {
+		return c.Redirect("/v0/characters/" + strconv.FormatUint(uint64(r.Redirect), 10))
+	}
+
+	if r.NSFW && !u.AllowNSFW() {
+		// default Handler will return a 404 response
+		return c.Next()
+	}
+
+	casts, err := h.p.GetCharacterRelated(c.Context(), id)
+	if err != nil {
+		return errgo.Wrap(err, "repo.GetCharacterRelated")
+	}
+
+	var response = make([]res.CharacterRelatedPerson, len(casts))
+	for i, cast := range casts {
+		response[i] = res.CharacterRelatedPerson{
+			ID:            cast.Person.ID,
+			Name:          cast.Person.Name,
+			Type:          cast.Character.Type,
+			Images:        model.PersonImage(cast.Subject.Image),
+			SubjectID:     cast.Subject.ID,
+			SubjectName:   cast.Subject.Name,
+			SubjectNameCn: cast.Subject.NameCN,
+		}
+	}
+
+	return c.JSON(response)
+}

@@ -14,6 +14,7 @@ import (
 func Use(db *gorm.DB) *Query {
 	return &Query{
 		db:                db,
+		Cast:              newCast(db),
 		Character:         newCharacter(db),
 		CharacterSubjects: newCharacterSubjects(db),
 		Episode:           newEpisode(db),
@@ -32,6 +33,7 @@ func Use(db *gorm.DB) *Query {
 type Query struct {
 	db *gorm.DB
 
+	Cast              cast
 	Character         character
 	CharacterSubjects characterSubjects
 	Episode           episode
@@ -51,6 +53,7 @@ func (q *Query) Available() bool { return q.db != nil }
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:                db,
+		Cast:              q.Cast.clone(db),
 		Character:         q.Character.clone(db),
 		CharacterSubjects: q.CharacterSubjects.clone(db),
 		Episode:           q.Episode.clone(db),
@@ -67,6 +70,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 }
 
 type queryCtx struct {
+	Cast              castDo
 	Character         characterDo
 	CharacterSubjects characterSubjectsDo
 	Episode           episodeDo
@@ -83,6 +87,7 @@ type queryCtx struct {
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
+		Cast:              *q.Cast.WithContext(ctx),
 		Character:         *q.Character.WithContext(ctx),
 		CharacterSubjects: *q.CharacterSubjects.WithContext(ctx),
 		Episode:           *q.Episode.WithContext(ctx),

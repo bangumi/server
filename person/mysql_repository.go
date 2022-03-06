@@ -23,11 +23,13 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
+	"github.com/bangumi/server/character"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/subject"
 )
 
 type mysqlRepo struct {
@@ -118,6 +120,39 @@ func (r mysqlRepo) GetSubjectRelated(
 	}
 
 	return persons, rel, nil
+}
+
+func (r mysqlRepo) GetCharacterRelated(
+	ctx context.Context,
+	characterID domain.CharacterIDType,
+) ([]domain.CharacterCast, error) {
+	relations, err := r.q.Cast.WithContext(ctx).
+		Preload(r.q.Cast.Character.Fields).
+		Preload(r.q.Cast.Subject.Fields).
+		Preload(r.q.Cast.Person.Fields).
+		Where(r.q.Cast.CrtID.Eq(characterID)).
+		Order(r.q.Cast.PrsnID).
+		Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var results = make([]domain.CharacterCast, 0, len(relations))
+	for _, relation := range relations {
+		if relation.Subject.ID == 0 || relation.Person.ID == 0 {
+			// skip non-existing
+			continue
+		}
+
+		results = append(results, domain.CharacterCast{
+			Character: character.ConvertDao(&relation.Character),
+			Person:    model.Person{},
+			Subject:   subject.ConvertDao(&relation.Subject),
+		})
+	}
+
+	return results, nil
 }
 
 func ConvertDao(p *dao.Person) model.Person {

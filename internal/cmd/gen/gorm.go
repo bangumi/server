@@ -208,6 +208,18 @@ func main() {
 			}),
 		))
 
+	g.ApplyBasic(g.GenerateModelAs("chii_crt_cast_index", "Cast",
+		gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
+			GORMTag: "foreignKey:crt_id;references:crt_id",
+		}),
+		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
+			GORMTag: "foreignKey:subject_id;references:subject_id",
+		}),
+		gen.FieldRelate(field.HasOne, "Person", modelPerson, &field.RelateConfig{
+			GORMTag: "foreignKey:prsn_id;references:prsn_id",
+		}),
+	))
+
 	g.ApplyInterface(func(method method.CharacterSubjects) {},
 		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
 			gen.FieldType("subject_id", subjectIDTypeString),
