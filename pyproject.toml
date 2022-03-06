@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pol"
-version = "0.9.0"
+version = "0.9.1"
 description = ""
 # sort by PR date
 authors = [
