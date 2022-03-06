@@ -260,3 +260,74 @@ func readableRelation(destSubjectType model.SubjectType, relation uint16) string
 
 	return r.String()
 }
+
+func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
+	u := h.getUser(c)
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	}
+
+	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	return h.getSubjectRelatedCharacters(c, id)
+}
+
+func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID domain.SubjectIDType) error {
+	characters, relations, err := h.c.GetSubjectRelated(c.Context(), subjectID)
+	if err != nil {
+		return errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
+	}
+
+	var characterIDs = make([]domain.PersonIDType, len(characters))
+	for i, character := range characters {
+		characterIDs[i] = character.ID
+	}
+
+	actors, err := h.p.GetActors(c.Context(), subjectID, characterIDs...)
+	if err != nil {
+		return errgo.Wrap(err, "PersonRepo.GetActors")
+	}
+
+	var response = make([]res.SubjectRelatedCharacter, len(characters))
+	for i, character := range characters {
+		response[i] = res.SubjectRelatedCharacter{
+			Images:   model.PersonImage(character.Image),
+			Name:     character.Name,
+			Relation: characterStaffString(relations[i].Type),
+			Actors:   toActors(actors[character.ID]),
+			Type:     character.Type,
+			ID:       character.ID,
+		}
+	}
+
+	return c.JSON(response)
+}
+
+func toActors(persons []model.Person) []res.Actor {
+	// should pre-alloc a big slice and split it into sub slice.
+	var actors = make([]res.Actor, len(persons))
+	for j, actor := range persons {
+		actors[j] = res.Actor{
+			Images:       model.PersonImage(actor.Image),
+			Name:         actor.Name,
+			ShortSummary: actor.Summary,
+			Career:       careers(actor),
+			ID:           actor.ID,
+			Type:         actor.Type,
+			Locked:       actor.Locked,
+		}
+	}
+
+	return actors
+}

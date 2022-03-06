@@ -14,22 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
-
-import (
-	"context"
-
-	"github.com/bangumi/server/model"
-)
-
-type CharacterRepo interface {
-	Get(ctx context.Context, id uint32) (model.Character, error)
-	GetPersonRelated(
-		ctx context.Context, characterID PersonIDType,
-	) ([]model.Character, []model.Subject, []model.PersonCharacterRelation, error)
-
-	GetSubjectRelated(
-		ctx context.Context,
-		subjectID SubjectIDType,
-	) ([]model.Character, []model.CharacterSubjectRelation, error)
-}
+package character

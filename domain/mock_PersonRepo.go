@@ -67,6 +67,68 @@ func (_c *MockPersonRepo_Get_Call) Return(_a0 model.Person, _a1 error) *MockPers
 	return _c
 }
 
+// GetActors provides a mock function with given fields: ctx, subjectID, characterIDs
+func (_m *MockPersonRepo) GetActors(ctx context.Context, subjectID uint32, characterIDs ...uint32) (map[uint32][]model.Person, error) {
+	_va := make([]interface{}, len(characterIDs))
+	for _i := range characterIDs {
+		_va[_i] = characterIDs[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, subjectID)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 map[uint32][]model.Person
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, ...uint32) map[uint32][]model.Person); ok {
+		r0 = rf(ctx, subjectID, characterIDs...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[uint32][]model.Person)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, ...uint32) error); ok {
+		r1 = rf(ctx, subjectID, characterIDs...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockPersonRepo_GetActors_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActors'
+type MockPersonRepo_GetActors_Call struct {
+	*mock.Call
+}
+
+// GetActors is a helper method to define mock.On call
+//  - ctx context.Context
+//  - subjectID uint32
+//  - characterIDs ...uint32
+func (_e *MockPersonRepo_Expecter) GetActors(ctx interface{}, subjectID interface{}, characterIDs ...interface{}) *MockPersonRepo_GetActors_Call {
+	return &MockPersonRepo_GetActors_Call{Call: _e.mock.On("GetActors",
+		append([]interface{}{ctx, subjectID}, characterIDs...)...)}
+}
+
+func (_c *MockPersonRepo_GetActors_Call) Run(run func(ctx context.Context, subjectID uint32, characterIDs ...uint32)) *MockPersonRepo_GetActors_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]uint32, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(uint32)
+			}
+		}
+		run(args[0].(context.Context), args[1].(uint32), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockPersonRepo_GetActors_Call) Return(_a0 map[uint32][]model.Person, _a1 error) *MockPersonRepo_GetActors_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // GetCharacterRelated provides a mock function with given fields: ctx, subjectID
 func (_m *MockPersonRepo) GetCharacterRelated(ctx context.Context, subjectID uint32) ([]CharacterCast, error) {
 	ret := _m.Called(ctx, subjectID)

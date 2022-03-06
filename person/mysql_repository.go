@@ -37,8 +37,8 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.PersonRepo, error) {
-	return mysqlRepo{q: q, log: log.Named("person.mysqlRepo")}, nil
+func NewMysqlRepo(q *query.Query, log *zap.Logger) domain.PersonRepo {
+	return mysqlRepo{q: q, log: log.Named("person.mysqlRepo")}
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Person, error) {
@@ -150,6 +150,35 @@ func (r mysqlRepo) GetCharacterRelated(
 			Person:    model.Person{},
 			Subject:   subject.ConvertDao(&relation.Subject),
 		})
+	}
+
+	return results, nil
+}
+
+func (r mysqlRepo) GetActors(
+	ctx context.Context,
+	subjectID domain.SubjectIDType,
+	characterIDs ...domain.CharacterIDType,
+) (map[domain.CharacterIDType][]model.Person, error) {
+	relations, err := r.q.Cast.WithContext(ctx).
+		Preload(r.q.Cast.Person.Fields).
+		Where(r.q.Cast.CrtID.In(characterIDs...), r.q.Cast.SubjectID.Eq(subjectID)).
+		Order(r.q.Cast.PrsnID).
+		Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var results = make(map[domain.CharacterIDType][]model.Person, len(relations))
+	for _, relation := range relations {
+		if relation.Person.ID == 0 {
+			// skip non-existing
+			continue
+		}
+
+		// should pre-alloc a big slice and split it as results.
+		results[relation.Person.ID] = append(results[relation.Person.ID], ConvertDao(&relation.Person))
 	}
 
 	return results, nil

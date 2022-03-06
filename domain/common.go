@@ -16,6 +16,6 @@
 
 package domain
 
-type SubjectIDType = uint32
+type SubjectIDType = uint32 // in case we need future change, but I guess not...
 type CharacterIDType = uint32
 type PersonIDType = uint32

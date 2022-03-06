@@ -119,6 +119,34 @@ func (r mysqlRepo) GetPersonRelated(
 	return characters, subjects, rel, nil
 }
 
+func (r mysqlRepo) GetSubjectRelated(
+	ctx context.Context,
+	subjectID domain.SubjectIDType,
+) ([]model.Character, []model.CharacterSubjectRelation, error) {
+	relations, err := r.q.CharacterSubjects.WithContext(ctx).
+		Preload(r.q.CharacterSubjects.Character.Fields).
+		Where(r.q.CharacterSubjects.SubjectID.Eq(subjectID)).
+		Order(r.q.CharacterSubjects.CrtOrder).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, nil, errgo.Wrap(err, "dal")
+	}
+
+	var rel = make([]model.CharacterSubjectRelation, 0, len(relations))
+	var characters = make([]model.Character, 0, len(relations))
+
+	for _, relation := range relations {
+		if relation.Character.ID == 0 {
+			// gorm/gen doesn't support preload with join, so ignore relations without subject.
+			continue
+		}
+		rel = append(rel, model.CharacterSubjectRelation{Type: relation.CrtType})
+		characters = append(characters, ConvertDao(&relation.Character))
+	}
+
+	return characters, rel, nil
+}
+
 func ConvertDao(s *dao.Character) model.Character {
 	return model.Character{
 		ID:           s.ID,

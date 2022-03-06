@@ -141,3 +141,22 @@ type SubjectRelatedSubject struct {
 	Type      model.SubjectType    `json:"type"`
 	SubjectID domain.SubjectIDType `json:"id"`
 }
+
+type SubjectRelatedCharacter struct {
+	Images   model.PersonImages  `json:"images"`
+	Name     string              `json:"name"`
+	Relation string              `json:"relation"`
+	Actors   []Actor             `json:"actors"`
+	Type     uint8               `json:"type"`
+	ID       domain.PersonIDType `json:"id"`
+}
+
+type Actor struct {
+	Images       model.PersonImages  `json:"images"`
+	Name         string              `json:"name"`
+	ShortSummary string              `json:"short_summary"`
+	Career       []string            `json:"career"`
+	ID           domain.PersonIDType `json:"id"`
+	Type         uint8               `json:"type"`
+	Locked       bool                `json:"locked"`
+}

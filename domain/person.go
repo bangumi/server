@@ -30,6 +30,12 @@ type PersonRepo interface {
 		subjectID SubjectIDType,
 	) ([]model.Person, []model.PersonSubjectRelation, error)
 
+	GetActors(
+		ctx context.Context,
+		subjectID SubjectIDType,
+		characterIDs ...CharacterIDType,
+	) (map[CharacterIDType][]model.Person, error)
+
 	GetCharacterRelated(
 		ctx context.Context,
 		subjectID CharacterIDType,
