@@ -99,9 +99,9 @@ class SubjectService:
         res = cast(
             List[ChiiCrtSubjectIndex],
             await self._db.scalars(
-                sa.select(ChiiCrtSubjectIndex).where(
-                    ChiiCrtSubjectIndex.subject_id == id
-                )
+                sa.select(ChiiCrtSubjectIndex)
+                .where(ChiiCrtSubjectIndex.subject_id == id)
+                .order_by(ChiiCrtSubjectIndex.crt_order)
             ),
         )
 
