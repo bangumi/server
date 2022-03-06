@@ -26,50 +26,50 @@ import (
 type v0wiki = []interface{}
 
 type SubjectV0 struct {
-	Date          *string             `json:"date"`
-	Platform      *string             `json:"platform"`
-	Image         model.SubjectImages `json:"images"`
-	Summary       string              `json:"summary"`
-	Name          string              `json:"name"`
-	NameCN        string              `json:"name_cn"`
-	Tags          []compat.Tag        `json:"tags"`
-	Infobox       v0wiki              `json:"infobox"`
-	Rating        Rating              `json:"rating"`
-	TotalEpisodes int64               `json:"total_episodes"`
-	Collection    Collection          `json:"collection"`
-	ID            uint32              `json:"id"`
-	Eps           uint32              `json:"eps"`
-	Volumes       uint32              `json:"volumes"`
-	Redirect      uint32              `json:"-"`
-	Locked        bool                `json:"locked"`
-	NSFW          bool                `json:"nsfw"`
-	TypeID        model.SubjectType   `json:"type"`
+	Date          *string               `json:"date"`
+	Platform      *string               `json:"platform"`
+	Image         model.SubjectImages   `json:"images"`
+	Summary       string                `json:"summary"`
+	Name          string                `json:"name"`
+	NameCN        string                `json:"name_cn"`
+	Tags          []compat.Tag          `json:"tags"`
+	Infobox       v0wiki                `json:"infobox"`
+	Rating        Rating                `json:"rating"`
+	TotalEpisodes int64                 `json:"total_episodes"`
+	Collection    SubjectCollectionStat `json:"collection"`
+	ID            uint32                `json:"id"`
+	Eps           uint32                `json:"eps"`
+	Volumes       uint32                `json:"volumes"`
+	Redirect      uint32                `json:"-"`
+	Locked        bool                  `json:"locked"`
+	NSFW          bool                  `json:"nsfw"`
+	TypeID        model.SubjectType     `json:"type"`
 }
 
 type Subject struct {
-	Image        model.SubjectImages `json:"images"`
-	Infobox      string              `json:"infobox"`
-	Name         string              `json:"name"`
-	NameCN       string              `json:"name_cn"`
-	Summary      string              `json:"summary"`
-	PlatformText string              `json:"platform_text"`
-	TypeText     string              `json:"type_text"`
-	Wiki         wiki.Wiki           `json:"wiki"`
-	Tags         []compat.Tag        `json:"tags"`
-	Rating       Rating              `json:"rating"`
-	Collection   Collection          `json:"collection"`
-	Volumes      uint32              `json:"volumes"`
-	Eps          uint32              `json:"eps"`
-	ID           uint32              `json:"id"`
-	Redirect     uint32              `json:"-"`
-	Platform     uint16              `json:"platform_id"`
-	Airtime      uint8               `json:"air_time"`
-	Locked       bool                `json:"locked"`
-	NSFW         bool                `json:"nsfw"`
-	TypeID       model.SubjectType   `json:"type_id"`
+	Image        model.SubjectImages   `json:"images"`
+	Infobox      string                `json:"infobox"`
+	Name         string                `json:"name"`
+	NameCN       string                `json:"name_cn"`
+	Summary      string                `json:"summary"`
+	PlatformText string                `json:"platform_text"`
+	TypeText     string                `json:"type_text"`
+	Wiki         wiki.Wiki             `json:"wiki"`
+	Tags         []compat.Tag          `json:"tags"`
+	Rating       Rating                `json:"rating"`
+	Collection   SubjectCollectionStat `json:"collection"`
+	Volumes      uint32                `json:"volumes"`
+	Eps          uint32                `json:"eps"`
+	ID           uint32                `json:"id"`
+	Redirect     uint32                `json:"-"`
+	Platform     uint16                `json:"platform_id"`
+	Airtime      uint8                 `json:"air_time"`
+	Locked       bool                  `json:"locked"`
+	NSFW         bool                  `json:"nsfw"`
+	TypeID       model.SubjectType     `json:"type_id"`
 }
 
-type Collection struct {
+type SubjectCollectionStat struct {
 	OnHold  uint32 `json:"on_hold"`
 	Dropped uint32 `json:"dropped"`
 	Wish    uint32 `json:"wish"`

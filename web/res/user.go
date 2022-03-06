@@ -16,6 +16,12 @@
 
 package res
 
+import (
+	"time"
+
+	"github.com/bangumi/server/domain"
+)
+
 type Avatar struct {
 	Large  string `json:"large"`
 	Medium string `json:"medium"`
@@ -42,4 +48,17 @@ type Me struct {
 	Nickname  string `json:"nickname"`
 	ID        uint32 `json:"id"`
 	UserGroup uint8  `json:"user_group"`
+}
+
+type Collection struct {
+	UpdatedAt   time.Time            `json:"updated_at"`
+	Comment     *string              `json:"comment"`
+	Tags        []string             `json:"tags"`
+	SubjectID   domain.SubjectIDType `json:"subject_id"`
+	EpStatus    uint32               `json:"ep_status"`
+	VolStatus   uint32               `json:"vol_status"`
+	SubjectType uint8                `json:"subject_type"`
+	Type        uint8                `json:"type"`
+	Rate        uint8                `json:"rate"`
+	Private     bool                 `json:"private"`
 }

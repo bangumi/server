@@ -22,6 +22,54 @@ func (_m *MockUserRepo) EXPECT() *MockUserRepo_Expecter {
 	return &MockUserRepo_Expecter{mock: &_m.Mock}
 }
 
+// CountCollections provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate
+func (_m *MockUserRepo) CountCollections(ctx context.Context, userID uint32, subjectType uint8, collectionType uint8, showPrivate bool) (int64, error) {
+	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate)
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint8, uint8, bool) int64); ok {
+		r0 = rf(ctx, userID, subjectType, collectionType, showPrivate)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint8, uint8, bool) error); ok {
+		r1 = rf(ctx, userID, subjectType, collectionType, showPrivate)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockUserRepo_CountCollections_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountCollections'
+type MockUserRepo_CountCollections_Call struct {
+	*mock.Call
+}
+
+// CountCollections is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID uint32
+//  - subjectType uint8
+//  - collectionType uint8
+//  - showPrivate bool
+func (_e *MockUserRepo_Expecter) CountCollections(ctx interface{}, userID interface{}, subjectType interface{}, collectionType interface{}, showPrivate interface{}) *MockUserRepo_CountCollections_Call {
+	return &MockUserRepo_CountCollections_Call{Call: _e.mock.On("CountCollections", ctx, userID, subjectType, collectionType, showPrivate)}
+}
+
+func (_c *MockUserRepo_CountCollections_Call) Run(run func(ctx context.Context, userID uint32, subjectType uint8, collectionType uint8, showPrivate bool)) *MockUserRepo_CountCollections_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint8), args[3].(uint8), args[4].(bool))
+	})
+	return _c
+}
+
+func (_c *MockUserRepo_CountCollections_Call) Return(_a0 int64, _a1 error) *MockUserRepo_CountCollections_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // GetByID provides a mock function with given fields: ctx, userID
 func (_m *MockUserRepo) GetByID(ctx context.Context, userID uint32) (model.User, error) {
 	ret := _m.Called(ctx, userID)
@@ -169,6 +217,58 @@ func (_c *MockUserRepo_GetByName_Call) Run(run func(ctx context.Context, usernam
 }
 
 func (_c *MockUserRepo_GetByName_Call) Return(_a0 model.User, _a1 error) *MockUserRepo_GetByName_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// ListCollections provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate, limit, offset
+func (_m *MockUserRepo) ListCollections(ctx context.Context, userID uint32, subjectType uint8, collectionType uint8, showPrivate bool, limit int, offset int) ([]model.Collection, error) {
+	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
+
+	var r0 []model.Collection
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint8, uint8, bool, int, int) []model.Collection); ok {
+		r0 = rf(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Collection)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint8, uint8, bool, int, int) error); ok {
+		r1 = rf(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockUserRepo_ListCollections_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListCollections'
+type MockUserRepo_ListCollections_Call struct {
+	*mock.Call
+}
+
+// ListCollections is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID uint32
+//  - subjectType uint8
+//  - collectionType uint8
+//  - showPrivate bool
+//  - limit int
+//  - offset int
+func (_e *MockUserRepo_Expecter) ListCollections(ctx interface{}, userID interface{}, subjectType interface{}, collectionType interface{}, showPrivate interface{}, limit interface{}, offset interface{}) *MockUserRepo_ListCollections_Call {
+	return &MockUserRepo_ListCollections_Call{Call: _e.mock.On("ListCollections", ctx, userID, subjectType, collectionType, showPrivate, limit, offset)}
+}
+
+func (_c *MockUserRepo_ListCollections_Call) Run(run func(ctx context.Context, userID uint32, subjectType uint8, collectionType uint8, showPrivate bool, limit int, offset int)) *MockUserRepo_ListCollections_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint8), args[3].(uint8), args[4].(bool), args[5].(int), args[6].(int))
+	})
+	return _c
+}
+
+func (_c *MockUserRepo_ListCollections_Call) Return(_a0 []model.Collection, _a1 error) *MockUserRepo_ListCollections_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

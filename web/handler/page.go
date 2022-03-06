@@ -29,6 +29,15 @@ type pageQuery struct {
 	Offset int
 }
 
+func (q pageQuery) check(count int64) error {
+	if q.Limit > int(count) {
+		return fiber.NewError(fiber.StatusBadRequest,
+			"limit should less equal than "+strconv.FormatInt(count, 10))
+	}
+
+	return nil
+}
+
 func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, error) {
 	q := pageQuery{Limit: defaultLimit}
 	var err error

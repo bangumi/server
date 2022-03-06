@@ -16,6 +16,8 @@
 
 package model
 
+import "time"
+
 // User is visible for everyone.
 type User struct {
 	UserName  string
@@ -24,4 +26,18 @@ type User struct {
 	Sign      string
 	ID        uint32
 	UserGroup uint8
+}
+
+type Collection struct {
+	UpdatedAt   time.Time
+	Comment     string
+	Tags        []string
+	SubjectType uint8
+	HasComment  bool
+	Private     bool
+	Type        uint8
+	VolStatus   uint32
+	EpStatus    uint32
+	SubjectID   uint32
+	Rate        uint8
 }

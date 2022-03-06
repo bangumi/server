@@ -34,19 +34,19 @@ import (
 )
 
 const headerCFRay = "Cf-Ray"
-const ctxKeyUser = "access-user"
+const ctxKeyVisitor = "access-user"
 
 // should bump cache version every time we change domain.Auth.
 const authCacheKeyPrefix = "chii:auth:1:access-token:"
 
 func (h Handler) MiddlewareAccessUser() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		a, err := getUser(h, ctx)
+		a, err := getVisitor(h, ctx)
 		if err != nil {
 			return err
 		}
 
-		ctx.Context().SetUserValue(ctxKeyUser, a)
+		ctx.Context().SetUserValue(ctxKeyVisitor, a)
 
 		return ctx.Next()
 	}
@@ -60,7 +60,7 @@ func (h Handler) getUser(c *fiber.Ctx) accessor {
 	return u
 }
 
-func getUser(h Handler, c *fiber.Ctx) (accessor, error) {
+func getVisitor(h Handler, c *fiber.Ctx) (accessor, error) {
 	a := accessor{
 		Auth:  domain.Auth{},
 		login: false,

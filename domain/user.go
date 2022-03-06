@@ -29,4 +29,21 @@ type UserRepo interface {
 	GetByName(ctx context.Context, username string) (model.User, error)
 
 	GetByIDs(ctx context.Context, ids ...uint32) (map[uint32]model.User, error)
+
+	CountCollections(
+		ctx context.Context,
+		userID uint32,
+		subjectType model.SubjectType,
+		collectionType uint8,
+		showPrivate bool,
+	) (int64, error)
+
+	ListCollections(
+		ctx context.Context,
+		userID uint32,
+		subjectType model.SubjectType,
+		collectionType uint8,
+		showPrivate bool,
+		limit, offset int,
+	) ([]model.Collection, error)
 }

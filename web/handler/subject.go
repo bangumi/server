@@ -185,7 +185,7 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 		Redirect: s.Redirect,
 		Eps:      s.Eps,
 		Tags:     tags,
-		Collection: res.Collection{
+		Collection: res.SubjectCollectionStat{
 			OnHold:  s.OnHold,
 			Wish:    s.Wish,
 			Dropped: s.Dropped,

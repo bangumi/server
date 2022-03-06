@@ -19,6 +19,8 @@ package user
 import (
 	"context"
 	"errors"
+	"strings"
+	"time"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -37,6 +39,84 @@ func NewUserRepo(q *query.Query, log *zap.Logger) (domain.UserRepo, error) {
 type mysqlRepo struct {
 	q   *query.Query
 	log *zap.Logger
+}
+
+func (m mysqlRepo) CountCollections(
+	ctx context.Context,
+	userID uint32,
+	subjectType model.SubjectType,
+	collectionType uint8,
+	showPrivate bool,
+) (int64, error) {
+	q := m.q.SubjectCollection.WithContext(ctx).
+		Where(m.q.SubjectCollection.UID.Eq(userID))
+
+	if subjectType != 0 {
+		q = q.Where(m.q.SubjectCollection.SubjectType.Eq(subjectType))
+	}
+
+	if collectionType != 0 {
+		q = q.Where(m.q.SubjectCollection.Type.Eq(collectionType))
+	}
+
+	if !showPrivate {
+		q = q.Where(m.q.SubjectCollection.Private.Is(false))
+	}
+
+	c, err := q.Count()
+	if err != nil {
+		return 0, errgo.Wrap(err, "dal")
+	}
+
+	return c, nil
+}
+
+func (m mysqlRepo) ListCollections(
+	ctx context.Context,
+	userID uint32,
+	subjectType model.SubjectType,
+	collectionType uint8,
+	showPrivate bool,
+	limit, offset int,
+) ([]model.Collection, error) {
+	q := m.q.SubjectCollection.WithContext(ctx).
+		Where(m.q.SubjectCollection.UID.Eq(userID)).Limit(limit).Offset(offset)
+
+	if subjectType != 0 {
+		q = q.Where(m.q.SubjectCollection.SubjectType.Eq(subjectType))
+	}
+
+	if collectionType != 0 {
+		q = q.Where(m.q.SubjectCollection.Type.Eq(collectionType))
+	}
+
+	if !showPrivate {
+		q = q.Where(m.q.SubjectCollection.Private.Is(false))
+	}
+
+	collections, err := q.Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var results = make([]model.Collection, len(collections))
+	for i, c := range collections {
+		results[i] = model.Collection{
+			UpdatedAt:   time.Unix(int64(c.Lasttouch), 0),
+			Comment:     c.Comment,
+			Tags:        strings.Split(c.Tag, " "),
+			SubjectType: c.SubjectType,
+			Rate:        c.Rate,
+			SubjectID:   c.SubjectID,
+			EpStatus:    c.EpStatus,
+			VolStatus:   c.VolStatus,
+			Type:        c.Type,
+			HasComment:  c.HasComment,
+			Private:     c.Private,
+		}
+	}
+
+	return results, nil
 }
 
 func (m mysqlRepo) GetByID(ctx context.Context, userID uint32) (model.User, error) {
