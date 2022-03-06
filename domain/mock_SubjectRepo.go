@@ -67,6 +67,62 @@ func (_c *MockSubjectRepo_Get_Call) Return(_a0 model.Subject, _a1 error) *MockSu
 	return _c
 }
 
+// GetCharacterRelated provides a mock function with given fields: ctx, characterID
+func (_m *MockSubjectRepo) GetCharacterRelated(ctx context.Context, characterID uint32) ([]model.Subject, []model.CharacterSubjectRelation, error) {
+	ret := _m.Called(ctx, characterID)
+
+	var r0 []model.Subject
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) []model.Subject); ok {
+		r0 = rf(ctx, characterID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Subject)
+		}
+	}
+
+	var r1 []model.CharacterSubjectRelation
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) []model.CharacterSubjectRelation); ok {
+		r1 = rf(ctx, characterID)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]model.CharacterSubjectRelation)
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, uint32) error); ok {
+		r2 = rf(ctx, characterID)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// MockSubjectRepo_GetCharacterRelated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCharacterRelated'
+type MockSubjectRepo_GetCharacterRelated_Call struct {
+	*mock.Call
+}
+
+// GetCharacterRelated is a helper method to define mock.On call
+//  - ctx context.Context
+//  - characterID uint32
+func (_e *MockSubjectRepo_Expecter) GetCharacterRelated(ctx interface{}, characterID interface{}) *MockSubjectRepo_GetCharacterRelated_Call {
+	return &MockSubjectRepo_GetCharacterRelated_Call{Call: _e.mock.On("GetCharacterRelated", ctx, characterID)}
+}
+
+func (_c *MockSubjectRepo_GetCharacterRelated_Call) Run(run func(ctx context.Context, characterID uint32)) *MockSubjectRepo_GetCharacterRelated_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *MockSubjectRepo_GetCharacterRelated_Call) Return(_a0 []model.Subject, _a1 []model.CharacterSubjectRelation, _a2 error) *MockSubjectRepo_GetCharacterRelated_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
 // GetPersonRelated provides a mock function with given fields: ctx, personID
 func (_m *MockSubjectRepo) GetPersonRelated(ctx context.Context, personID uint32) ([]model.Subject, []model.PersonSubjectRelation, error) {
 	ret := _m.Called(ctx, personID)

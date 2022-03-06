@@ -222,6 +222,7 @@ func main() {
 
 	g.ApplyInterface(func(method method.CharacterSubjects) {},
 		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
+			gen.FieldRename("crt_id", "CharacterID"),
 			gen.FieldType("subject_id", subjectIDTypeString),
 			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 			gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{

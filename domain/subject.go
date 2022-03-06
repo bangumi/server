@@ -29,6 +29,10 @@ type SubjectRepo interface {
 	GetPersonRelated(
 		ctx context.Context, personID PersonIDType,
 	) ([]model.Subject, []model.PersonSubjectRelation, error)
+
+	GetCharacterRelated(
+		ctx context.Context, characterID PersonIDType,
+	) ([]model.Subject, []model.CharacterSubjectRelation, error)
 }
 
 type SubjectService interface {

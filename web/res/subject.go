@@ -124,3 +124,11 @@ type CharacterRelatedPerson struct {
 	ID            domain.CharacterIDType `json:"id"`
 	Type          uint8                  `json:"type"`
 }
+
+type CharacterRelatedSubject struct {
+	Staff  string               `json:"staff"`
+	Name   string               `json:"name"`
+	NameCn string               `json:"name_cn"`
+	Image  string               `json:"image"`
+	ID     domain.SubjectIDType `json:"id"`
+}

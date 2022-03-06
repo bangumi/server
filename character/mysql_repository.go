@@ -93,7 +93,8 @@ func (r mysqlRepo) GetPersonRelated(
 ) ([]model.Character, []model.Subject, []model.PersonCharacterRelation, error) {
 	relations, err := r.q.CharacterSubjects.WithContext(ctx).
 		Preload(r.q.CharacterSubjects.Character.Fields).Preload(r.q.CharacterSubjects.Subject.Fields).
-		Where(r.q.CharacterSubjects.CrtID.Eq(characterID)).Order(r.q.CharacterSubjects.CrtID).
+		Where(r.q.CharacterSubjects.CharacterID.Eq(characterID)).
+		Order(r.q.CharacterSubjects.CharacterID).
 		Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))

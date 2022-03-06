@@ -87,6 +87,31 @@ func ConvertDao(s *dao.Subject) model.Subject {
 	}
 }
 
+func rating(f dao.SubjectField) model.Rating {
+	var total = f.Rate1 + f.Rate2 + f.Rate3 + f.Rate4 + f.Rate5 +
+		f.Rate6 + f.Rate7 + f.Rate8 + f.Rate9 + f.Rate10
+	var score = float64(1*f.Rate1+2*f.Rate2+3*f.Rate3+4*f.Rate4+5*f.Rate5+
+		6*f.Rate6+7*f.Rate7+8*f.Rate8+9*f.Rate9+10*f.Rate10) / float64(total)
+
+	return model.Rating{
+		Rank:  f.Rank,
+		Total: total,
+		Count: model.Count{
+			Field1:  f.Rate1,
+			Field2:  f.Rate2,
+			Field3:  f.Rate3,
+			Field4:  f.Rate4,
+			Field5:  f.Rate5,
+			Field6:  f.Rate6,
+			Field7:  f.Rate7,
+			Field8:  f.Rate8,
+			Field9:  f.Rate9,
+			Field10: f.Rate10,
+		},
+		Score: math.Round(score*10) / 10,
+	}
+}
+
 func (r mysqlRepo) GetPersonRelated(
 	ctx context.Context, personID domain.PersonIDType,
 ) ([]model.Subject, []model.PersonSubjectRelation, error) {
@@ -114,27 +139,30 @@ func (r mysqlRepo) GetPersonRelated(
 	return subjects, rel, nil
 }
 
-func rating(f dao.SubjectField) model.Rating {
-	var total = f.Rate1 + f.Rate2 + f.Rate3 + f.Rate4 + f.Rate5 +
-		f.Rate6 + f.Rate7 + f.Rate8 + f.Rate9 + f.Rate10
-	var score = float64(1*f.Rate1+2*f.Rate2+3*f.Rate3+4*f.Rate4+5*f.Rate5+
-		6*f.Rate6+7*f.Rate7+8*f.Rate8+9*f.Rate9+10*f.Rate10) / float64(total)
+func (r mysqlRepo) GetCharacterRelated(
+	ctx context.Context,
+	characterID domain.PersonIDType,
+) ([]model.Subject, []model.CharacterSubjectRelation, error) {
+	relations, err := r.q.CharacterSubjects.WithContext(ctx).
+		Preload(r.q.CharacterSubjects.Subject.Fields).
+		Where(r.q.CharacterSubjects.CharacterID.Eq(characterID)).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
 
-	return model.Rating{
-		Rank:  f.Rank,
-		Total: total,
-		Count: model.Count{
-			Field1:  f.Rate1,
-			Field2:  f.Rate2,
-			Field3:  f.Rate3,
-			Field4:  f.Rate4,
-			Field5:  f.Rate5,
-			Field6:  f.Rate6,
-			Field7:  f.Rate7,
-			Field8:  f.Rate8,
-			Field9:  f.Rate9,
-			Field10: f.Rate10,
-		},
-		Score: math.Round(score*10) / 10,
+		return nil, nil, errgo.Wrap(err, "dal")
 	}
+
+	var rel = make([]model.CharacterSubjectRelation, 0, len(relations))
+	var subjects = make([]model.Subject, 0, len(relations))
+
+	for _, relation := range relations {
+		if relation.Subject.ID == 0 {
+			// gorm/gen doesn't support preload with join, so ignore relations without subject.
+			continue
+		}
+		rel = append(rel, model.CharacterSubjectRelation{Type: relation.CrtType})
+		subjects = append(subjects, ConvertDao(&relation.Subject))
+	}
+
+	return subjects, rel, nil
 }

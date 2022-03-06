@@ -175,3 +175,56 @@ func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 
 	return c.JSON(response)
 }
+
+func (h Handler) GetCharacterRelatedSubjects(c *fiber.Ctx) error {
+	u := h.getUser(c)
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	}
+
+	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	subjects, relations, err := h.s.GetCharacterRelated(c.Context(), id)
+	if err != nil {
+		return errgo.Wrap(err, "repo.GetCharacterRelated")
+	}
+
+	var response = make([]res.CharacterRelatedSubject, len(subjects))
+	for i, subject := range subjects {
+		response[i] = res.CharacterRelatedSubject{
+			ID:     subject.ID,
+			Name:   subject.Name,
+			NameCn: subject.NameCN,
+			Staff:  characterStaffString(relations[i].Type),
+			Image:  model.SubjectImage(subject.Image).Large,
+		}
+	}
+
+	return c.JSON(response)
+}
+
+func characterStaffString(i uint8) string {
+	switch i {
+	case 1:
+		return "主角"
+
+	case 2:
+		return "配角"
+
+	case 3:
+		return "客串"
+	}
+
+	return ""
+}

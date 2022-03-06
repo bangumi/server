@@ -40,7 +40,3 @@ type Person struct {
 	Locked         bool
 	FieldBirthDay  uint8
 }
-
-type PersonSubjectRelation struct {
-	ID uint16
-}

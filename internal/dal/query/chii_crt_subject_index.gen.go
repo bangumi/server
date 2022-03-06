@@ -25,7 +25,7 @@ func newCharacterSubjects(db *gorm.DB) characterSubjects {
 
 	tableName := _characterSubjects.characterSubjectsDo.TableName()
 	_characterSubjects.ALL = field.NewField(tableName, "*")
-	_characterSubjects.CrtID = field.NewUint32(tableName, "crt_id")
+	_characterSubjects.CharacterID = field.NewUint32(tableName, "crt_id")
 	_characterSubjects.SubjectID = field.NewUint32(tableName, "subject_id")
 	_characterSubjects.SubjectTypeID = field.NewUint8(tableName, "subject_type_id")
 	_characterSubjects.CrtType = field.NewUint8(tableName, "crt_type")
@@ -62,7 +62,7 @@ type characterSubjects struct {
 	characterSubjectsDo characterSubjectsDo
 
 	ALL           field.Field
-	CrtID         field.Uint32
+	CharacterID   field.Uint32
 	SubjectID     field.Uint32
 	SubjectTypeID field.Uint8
 	CrtType       field.Uint8
@@ -87,7 +87,7 @@ func (c characterSubjects) As(alias string) *characterSubjects {
 
 func (c *characterSubjects) updateTableName(table string) *characterSubjects {
 	c.ALL = field.NewField(table, "*")
-	c.CrtID = field.NewUint32(table, "crt_id")
+	c.CharacterID = field.NewUint32(table, "crt_id")
 	c.SubjectID = field.NewUint32(table, "subject_id")
 	c.SubjectTypeID = field.NewUint8(table, "subject_type_id")
 	c.CrtType = field.NewUint8(table, "crt_type")
@@ -116,7 +116,7 @@ func (c *characterSubjects) GetFieldByName(fieldName string) (field.OrderExpr, b
 
 func (c *characterSubjects) fillFieldMap() {
 	c.fieldMap = make(map[string]field.Expr, 8)
-	c.fieldMap["crt_id"] = c.CrtID
+	c.fieldMap["crt_id"] = c.CharacterID
 	c.fieldMap["subject_id"] = c.SubjectID
 	c.fieldMap["subject_type_id"] = c.SubjectTypeID
 	c.fieldMap["crt_type"] = c.CrtType
