@@ -19,9 +19,9 @@ package model
 // User is visible for everyone.
 type User struct {
 	UserName  string
-	UserGroup uint8
 	NickName  string
 	Avatar    string
-	ID        uint32
 	Sign      string
+	ID        uint32
+	UserGroup uint8
 }

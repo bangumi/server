@@ -166,3 +166,31 @@ func (r mysqlRepo) GetCharacterRelated(
 
 	return subjects, rel, nil
 }
+
+func (r mysqlRepo) GetSubjectRelated(
+	ctx context.Context,
+	subjectID domain.SubjectIDType,
+) ([]model.Subject, []model.SubjectInternalRelation, error) {
+	relations, err := r.q.SubjectRelation.WithContext(ctx).
+		Preload(r.q.SubjectRelation.Subject).Where(r.q.SubjectRelation.SubjectID.Eq(subjectID)).
+		Order(r.q.SubjectRelation.Order).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, nil, errgo.Wrap(err, "dal")
+	}
+
+	var rel = make([]model.SubjectInternalRelation, 0, len(relations))
+	var subjects = make([]model.Subject, 0, len(relations))
+
+	for _, relation := range relations {
+		if relation.Subject.ID == 0 {
+			// gorm/gen doesn't support preload with join, so ignore relations without subject.
+			continue
+		}
+
+		rel = append(rel, model.SubjectInternalRelation{Type: relation.RelationType})
+		subjects = append(subjects, ConvertDao(&relation.Subject))
+	}
+
+	return subjects, rel, nil
+}

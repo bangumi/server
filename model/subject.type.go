@@ -35,7 +35,7 @@ const (
 	textSubjectReal  = "三次元"
 )
 
-func TypeString(s uint8) string {
+func SubjectTypeString(s uint8) string {
 	switch s {
 	case SubjectBook:
 		return textSubjectBook

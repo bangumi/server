@@ -26,6 +26,7 @@ func (a Avatar) Fill(s string) Avatar {
 	if s == "" {
 		s = "icon.jpg"
 	}
+
 	return Avatar{
 		Large:  "https://lain.bgm.tv/pic/user/l/" + s,
 		Medium: "https://lain.bgm.tv/pic/user/m/" + s,

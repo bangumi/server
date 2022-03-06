@@ -210,10 +210,10 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
+func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
 	}
 
 	r, ok, err := h.getPersonWithCache(c.Context(), id)
@@ -221,11 +221,15 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok || r.Redirect != 0 {
+	if !ok {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
 		})
+	}
+
+	if r.Redirect != 0 {
+		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
 	subjects, relation, err := h.s.GetPersonRelated(c.Context(), id)

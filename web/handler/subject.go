@@ -121,10 +121,10 @@ func platformString(s model.Subject) *string {
 	return &v
 }
 
-func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
+func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
 	}
 
 	r, ok, err := h.getPersonWithCache(c.Context(), id)
@@ -132,15 +132,11 @@ func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok {
+	if !ok || r.Redirect != 0 {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
 		})
-	}
-
-	if r.Redirect != 0 {
-		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
 	subjects, relation, err := h.s.GetPersonRelated(c.Context(), id)
@@ -214,4 +210,53 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 			Score: s.Rating.Score,
 		},
 	}
+}
+
+func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
+	u := h.getUser(c)
+
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	}
+
+	r, ok, err := h.getSubjectWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	subjects, relation, err := h.s.GetSubjectRelated(c.Context(), id)
+	if err != nil {
+		return errgo.Wrap(err, "repo")
+	}
+
+	var response = make([]res.SubjectRelatedSubject, len(subjects))
+	for i, subject := range subjects {
+		response[i] = res.SubjectRelatedSubject{
+			Images:    model.SubjectImage(subject.Image),
+			Name:      subject.Name,
+			NameCn:    subject.NameCN,
+			Relation:  readableRelation(subject.TypeID, relation[i].Type),
+			Type:      subject.TypeID,
+			SubjectID: subject.ID,
+		}
+	}
+
+	return c.JSON(response)
+}
+
+func readableRelation(destSubjectType model.SubjectType, relation uint16) string {
+	var r, ok = vars.RelationMap[destSubjectType][relation]
+	if !ok || relation == 1 {
+		return model.SubjectTypeString(destSubjectType)
+	}
+
+	return r.String()
 }

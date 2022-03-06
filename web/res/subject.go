@@ -132,3 +132,12 @@ type CharacterRelatedSubject struct {
 	Image  string               `json:"image"`
 	ID     domain.SubjectIDType `json:"id"`
 }
+
+type SubjectRelatedSubject struct {
+	Images    model.SubjectImages  `json:"images"`
+	Name      string               `json:"name"`
+	NameCn    string               `json:"name_cn"`
+	Relation  string               `json:"relation"`
+	Type      model.SubjectType    `json:"type"`
+	SubjectID domain.SubjectIDType `json:"id"`
+}

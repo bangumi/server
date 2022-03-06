@@ -32,6 +32,16 @@ func newSubjectRelation(db *gorm.DB) subjectRelation {
 	_subjectRelation.RelatedSubjectTypeID = field.NewUint8(tableName, "rlt_related_subject_type_id")
 	_subjectRelation.ViceVersa = field.NewBool(tableName, "rlt_vice_versa")
 	_subjectRelation.Order = field.NewUint8(tableName, "rlt_order")
+	_subjectRelation.Subject = subjectRelationHasOneSubject{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Subject", "dao.Subject"),
+		Fields: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("Subject.Fields", "dao.SubjectField"),
+		},
+	}
 
 	_subjectRelation.fillFieldMap()
 
@@ -49,6 +59,7 @@ type subjectRelation struct {
 	RelatedSubjectTypeID field.Uint8
 	ViceVersa            field.Bool
 	Order                field.Uint8
+	Subject              subjectRelationHasOneSubject
 
 	fieldMap map[string]field.Expr
 }
@@ -94,7 +105,7 @@ func (s *subjectRelation) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (s *subjectRelation) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 7)
+	s.fieldMap = make(map[string]field.Expr, 8)
 	s.fieldMap["rlt_subject_id"] = s.SubjectID
 	s.fieldMap["rlt_subject_type_id"] = s.SubjectTypeID
 	s.fieldMap["rlt_relation_type"] = s.RelationType
@@ -102,11 +113,82 @@ func (s *subjectRelation) fillFieldMap() {
 	s.fieldMap["rlt_related_subject_type_id"] = s.RelatedSubjectTypeID
 	s.fieldMap["rlt_vice_versa"] = s.ViceVersa
 	s.fieldMap["rlt_order"] = s.Order
+
 }
 
 func (s subjectRelation) clone(db *gorm.DB) subjectRelation {
 	s.subjectRelationDo.ReplaceDB(db)
 	return s
+}
+
+type subjectRelationHasOneSubject struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	Fields struct {
+		field.RelationField
+	}
+}
+
+func (a subjectRelationHasOneSubject) Where(conds ...field.Expr) *subjectRelationHasOneSubject {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a subjectRelationHasOneSubject) WithContext(ctx context.Context) *subjectRelationHasOneSubject {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a subjectRelationHasOneSubject) Model(m *dao.SubjectRelation) *subjectRelationHasOneSubjectTx {
+	return &subjectRelationHasOneSubjectTx{a.db.Model(m).Association(a.Name())}
+}
+
+type subjectRelationHasOneSubjectTx struct{ tx *gorm.Association }
+
+func (a subjectRelationHasOneSubjectTx) Find() (result *dao.Subject, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a subjectRelationHasOneSubjectTx) Append(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a subjectRelationHasOneSubjectTx) Replace(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a subjectRelationHasOneSubjectTx) Delete(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a subjectRelationHasOneSubjectTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a subjectRelationHasOneSubjectTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type subjectRelationDo struct{ gen.DO }

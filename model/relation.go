@@ -27,3 +27,7 @@ type PersonSubjectRelation struct {
 type CharacterSubjectRelation struct {
 	Type uint8
 }
+
+type SubjectInternalRelation struct {
+	Type uint16
+}

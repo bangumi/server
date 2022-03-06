@@ -197,6 +197,9 @@ func main() {
 			gen.FieldType("rlt_subject_id", subjectIDTypeString),
 			gen.FieldType("rlt_subject_type_id", subjectTypeIDTypeString),
 			gen.FieldType("rlt_related_subject_type_id", subjectTypeIDTypeString),
+			gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
+				GORMTag: "foreignKey:rlt_related_subject_id;references:subject_id",
+			}),
 		))
 
 	g.ApplyInterface(func(method.SubjectRevision) {},

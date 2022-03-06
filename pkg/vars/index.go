@@ -43,7 +43,7 @@ type StaffID = uint16
 type PlatformID = uint16
 
 // RelationID ...
-type RelationID = int32
+type RelationID = uint16
 
 var (
 	// StaffMap ...
