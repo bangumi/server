@@ -183,7 +183,7 @@ func main() {
 		g.GenerateModelAs("chii_episodes", "Episode",
 			// gen.FieldTrimPrefix("field_"),
 			gen.FieldTrimPrefix("ep_"),
-			gen.FieldType("ep_type", "uint8"),
+			gen.FieldType("ep_type", "int8"),
 			gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 				GORMTag: "foreignKey:ep_subject_id;references:subject_id",
 			}),

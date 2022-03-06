@@ -68,18 +68,18 @@ func (_c *MockEpisodeRepo_Count_Call) Return(_a0 int64, _a1 error) *MockEpisodeR
 }
 
 // CountByType provides a mock function with given fields: ctx, subjectID, epType
-func (_m *MockEpisodeRepo) CountByType(ctx context.Context, subjectID uint32, epType uint8) (int64, error) {
+func (_m *MockEpisodeRepo) CountByType(ctx context.Context, subjectID uint32, epType int8) (int64, error) {
 	ret := _m.Called(ctx, subjectID, epType)
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint8) int64); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int8) int64); ok {
 		r0 = rf(ctx, subjectID, epType)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint8) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, int8) error); ok {
 		r1 = rf(ctx, subjectID, epType)
 	} else {
 		r1 = ret.Error(1)
@@ -96,14 +96,14 @@ type MockEpisodeRepo_CountByType_Call struct {
 // CountByType is a helper method to define mock.On call
 //  - ctx context.Context
 //  - subjectID uint32
-//  - epType uint8
+//  - epType int8
 func (_e *MockEpisodeRepo_Expecter) CountByType(ctx interface{}, subjectID interface{}, epType interface{}) *MockEpisodeRepo_CountByType_Call {
 	return &MockEpisodeRepo_CountByType_Call{Call: _e.mock.On("CountByType", ctx, subjectID, epType)}
 }
 
-func (_c *MockEpisodeRepo_CountByType_Call) Run(run func(ctx context.Context, subjectID uint32, epType uint8)) *MockEpisodeRepo_CountByType_Call {
+func (_c *MockEpisodeRepo_CountByType_Call) Run(run func(ctx context.Context, subjectID uint32, epType int8)) *MockEpisodeRepo_CountByType_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(uint8))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(int8))
 	})
 	return _c
 }
@@ -208,11 +208,11 @@ func (_c *MockEpisodeRepo_List_Call) Return(_a0 []model.Episode, _a1 error) *Moc
 }
 
 // ListByType provides a mock function with given fields: ctx, subjectID, epType, limit, offset
-func (_m *MockEpisodeRepo) ListByType(ctx context.Context, subjectID uint32, epType uint8, limit int, offset int) ([]model.Episode, error) {
+func (_m *MockEpisodeRepo) ListByType(ctx context.Context, subjectID uint32, epType int8, limit int, offset int) ([]model.Episode, error) {
 	ret := _m.Called(ctx, subjectID, epType, limit, offset)
 
 	var r0 []model.Episode
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint8, int, int) []model.Episode); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int8, int, int) []model.Episode); ok {
 		r0 = rf(ctx, subjectID, epType, limit, offset)
 	} else {
 		if ret.Get(0) != nil {
@@ -221,7 +221,7 @@ func (_m *MockEpisodeRepo) ListByType(ctx context.Context, subjectID uint32, epT
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint8, int, int) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, int8, int, int) error); ok {
 		r1 = rf(ctx, subjectID, epType, limit, offset)
 	} else {
 		r1 = ret.Error(1)
@@ -238,16 +238,16 @@ type MockEpisodeRepo_ListByType_Call struct {
 // ListByType is a helper method to define mock.On call
 //  - ctx context.Context
 //  - subjectID uint32
-//  - epType uint8
+//  - epType int8
 //  - limit int
 //  - offset int
 func (_e *MockEpisodeRepo_Expecter) ListByType(ctx interface{}, subjectID interface{}, epType interface{}, limit interface{}, offset interface{}) *MockEpisodeRepo_ListByType_Call {
 	return &MockEpisodeRepo_ListByType_Call{Call: _e.mock.On("ListByType", ctx, subjectID, epType, limit, offset)}
 }
 
-func (_c *MockEpisodeRepo_ListByType_Call) Run(run func(ctx context.Context, subjectID uint32, epType uint8, limit int, offset int)) *MockEpisodeRepo_ListByType_Call {
+func (_c *MockEpisodeRepo_ListByType_Call) Run(run func(ctx context.Context, subjectID uint32, epType int8, limit int, offset int)) *MockEpisodeRepo_ListByType_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(uint8), args[3].(int), args[4].(int))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(int8), args[3].(int), args[4].(int))
 	})
 	return _c
 }

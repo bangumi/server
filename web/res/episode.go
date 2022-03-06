@@ -16,17 +16,19 @@
 
 package res
 
+import "github.com/bangumi/server/domain"
+
 type Episode struct {
-	Airdate     string  `json:"airdate"`
-	Name        string  `json:"name"`
-	NameCN      string  `json:"name_cn"`
-	Duration    string  `json:"duration"`
-	Description string  `json:"desc"`
-	Ep          float32 `json:"ep"`
-	Sort        float32 `json:"sort"`
-	ID          uint32  `json:"id"`
-	SubjectID   uint32  `json:"subject_id"`
-	Comment     uint32  `json:"comment"`
-	Type        uint8   `json:"type"`
-	Disc        uint8   `json:"disc"`
+	Airdate     string            `json:"airdate"`
+	Name        string            `json:"name"`
+	NameCN      string            `json:"name_cn"`
+	Duration    string            `json:"duration"`
+	Description string            `json:"desc"`
+	Ep          float32           `json:"ep"`
+	Sort        float32           `json:"sort"`
+	ID          uint32            `json:"id"`
+	SubjectID   uint32            `json:"subject_id"`
+	Comment     uint32            `json:"comment"`
+	Type        domain.EpTypeType `json:"type"`
+	Disc        uint8             `json:"disc"`
 }

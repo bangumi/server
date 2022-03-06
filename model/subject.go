@@ -96,6 +96,6 @@ type Episode struct {
 	Sort        float32
 	Comment     uint32
 	ID          uint32
-	Type        uint8
+	Type        int8
 	Disc        uint8
 }

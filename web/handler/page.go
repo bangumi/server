@@ -14,29 +14,45 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package strparse
+package handler
 
 import (
 	"strconv"
 
-	"github.com/bangumi/server/domain"
+	"github.com/gofiber/fiber/v2"
+
 	"github.com/bangumi/server/internal/errgo"
 )
 
-func Uint8(s string) (uint8, error) {
-	v, err := strconv.ParseUint(s, 10, 8)
-
-	return uint8(v), errgo.Wrap(err, "strconv")
+type pageQuery struct {
+	Limit  int
+	Offset int
 }
 
-func Uint32(s string) (uint32, error) {
-	v, err := strconv.ParseUint(s, 10, 32)
+func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, error) {
+	q := pageQuery{Limit: defaultLimit}
+	var err error
 
-	return uint32(v), errgo.Wrap(err, "strconv")
-}
+	raw := c.Query("limit")
+	if raw != "" {
+		q.Limit, err = strconv.Atoi(raw)
+		if err != nil {
+			return q, errgo.Wrap(err, "ParseUint")
+		}
 
-func SubjectID(s string) (domain.SubjectIDType, error) {
-	v, err := strconv.ParseUint(s, 10, 32)
+		if q.Limit > maxLimit {
+			return q, fiber.NewError(fiber.StatusBadRequest,
+				"limit should less equal than "+strconv.Itoa(maxLimit))
+		}
+	}
 
-	return domain.SubjectIDType(v), errgo.Wrap(err, "strconv")
+	raw = c.Query("offset")
+	if raw != "" {
+		q.Offset, err = strconv.Atoi(raw)
+		if err != nil {
+			return q, errgo.Wrap(err, "ParseUint")
+		}
+	}
+
+	return q, nil
 }

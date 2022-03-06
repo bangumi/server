@@ -16,7 +16,7 @@
 
 package enum
 
-type EpType = uint8
+type EpType = int8 // same wht domain.EpType
 
 const (
 	EpTypeNormal  EpType = 0

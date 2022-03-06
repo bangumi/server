@@ -71,7 +71,10 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	return c.JSON(r)
 }
 
-func (h Handler) getSubjectWithCache(ctx context.Context, id uint32) (res.SubjectV0, bool, error) {
+func (h Handler) getSubjectWithCache(
+	ctx context.Context,
+	id domain.SubjectIDType,
+) (res.SubjectV0, bool, error) {
 	var key = cachekey.Subject(id)
 
 	// try to read from cache

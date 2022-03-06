@@ -65,7 +65,11 @@ func (r mysqlRepo) Count(ctx context.Context, subjectID uint32) (int64, error) {
 	return c, nil
 }
 
-func (r mysqlRepo) CountByType(ctx context.Context, subjectID uint32, epType uint8) (int64, error) {
+func (r mysqlRepo) CountByType(
+	ctx context.Context,
+	subjectID uint32,
+	epType domain.EpTypeType,
+) (int64, error) {
 	c, err := r.q.Episode.WithContext(ctx).
 		Where(
 			r.q.Episode.SubjectID.Eq(subjectID),
@@ -80,7 +84,7 @@ func (r mysqlRepo) CountByType(ctx context.Context, subjectID uint32, epType uin
 }
 
 func (r mysqlRepo) List(
-	ctx context.Context, subjectID uint32, limit int, offset int,
+	ctx context.Context, subjectID domain.SubjectIDType, limit int, offset int,
 ) ([]model.Episode, error) {
 	first, err := r.firstEpisode(ctx, subjectID)
 	if err != nil {
@@ -107,7 +111,7 @@ func (r mysqlRepo) List(
 }
 
 func (r mysqlRepo) ListByType(
-	ctx context.Context, subjectID uint32, epType uint8, limit int, offset int,
+	ctx context.Context, subjectID uint32, epType domain.EpTypeType, limit int, offset int,
 ) ([]model.Episode, error) {
 	first, err := r.firstEpisode(ctx, subjectID)
 	if err != nil {

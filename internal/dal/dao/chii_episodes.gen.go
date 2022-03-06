@@ -11,7 +11,7 @@ type Episode struct {
 	ID        uint32  `gorm:"column:ep_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:"ep_id"`
 	SubjectID uint32  `gorm:"column:ep_subject_id;type:mediumint(8) unsigned;not null;index:ep_subject_id,priority:1;index:ep_subject_id_2,priority:1" json:"ep_subject_id"`
 	Sort      float32 `gorm:"column:ep_sort;type:float unsigned;not null;index:ep_sort,priority:1;index:ep_subject_id_2,priority:3;default:0" json:"ep_sort"`
-	Type      uint8   `gorm:"column:ep_type;type:tinyint(1) unsigned;not null" json:"ep_type"`
+	Type      int8    `gorm:"column:ep_type;type:tinyint(1) unsigned;not null" json:"ep_type"`
 	Disc      uint8   `gorm:"column:ep_disc;type:tinyint(3) unsigned;not null;index:ep_disc,priority:1;default:0" json:"ep_disc"` // 碟片数
 	Name      string  `gorm:"column:ep_name;type:varchar(80);not null" json:"ep_name"`
 	NameCn    string  `gorm:"column:ep_name_cn;type:varchar(80);not null" json:"ep_name_cn"`

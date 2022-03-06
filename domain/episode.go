@@ -20,6 +20,7 @@ import (
 	"context"
 
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/pkg/vars/enum"
 )
 
 type EpisodeRepo interface {
@@ -30,13 +31,13 @@ type EpisodeRepo interface {
 
 	// CountByType count episode for a subject and filter by type.
 	// This is because 0 means episode type normal.
-	CountByType(ctx context.Context, subjectID uint32, epType uint8) (int64, error)
+	CountByType(ctx context.Context, subjectID uint32, epType EpTypeType) (int64, error)
 
 	// List return all episode.
 	List(ctx context.Context, subjectID uint32, limit int, offset int) ([]model.Episode, error)
 
 	// ListByType return episodes filtered by episode type.
 	ListByType(
-		ctx context.Context, subjectID uint32, epType uint8, limit int, offset int,
+		ctx context.Context, subjectID uint32, epType enum.EpType, limit int, offset int,
 	) ([]model.Episode, error)
 }
