@@ -169,8 +169,13 @@ func (h Handler) listEpisode(
 		}
 	}
 
+	if count == 0 {
+		response.Data = []int{}
+		return c.JSON(response)
+	}
+
 	if int64(page.Offset) >= count {
-		return fiber.NewError(http.StatusBadRequest, "missing query `subject_id`")
+		return fiber.NewError(http.StatusBadRequest, "offset if greater than count")
 	}
 
 	response.Total = count
