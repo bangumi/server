@@ -82,7 +82,7 @@ make lint
 
 ### 配置文件
 
-非 python 文件(yaml, json, markdown 等)使用 [prettier](https://prettier.io/) 进行格式化。
+非 golang 文件(yaml, json, markdown 等)使用 [prettier](https://prettier.io/) 进行格式化。
 
 ## Go Mod
 
