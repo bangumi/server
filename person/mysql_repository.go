@@ -178,7 +178,7 @@ func (r mysqlRepo) GetActors(
 		}
 
 		// should pre-alloc a big slice and split it as results.
-		results[relation.Person.ID] = append(results[relation.Person.ID], ConvertDao(&relation.Person))
+		results[relation.CrtID] = append(results[relation.Person.ID], ConvertDao(&relation.Person))
 	}
 
 	return results, nil
