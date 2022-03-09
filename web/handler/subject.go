@@ -130,7 +130,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
 	}
 
-	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	r, ok, err := h.getSubjectWithCache(c.Context(), id)
 	if err != nil {
 		return err
 	}
