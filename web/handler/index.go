@@ -130,7 +130,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "bad index_id")
 	}
 
-	subjectType, err := strparse.Uint8(c.Query("type"))
+	subjectType, err := parseSubjectType(c.Query("type"))
 	if err != nil {
 		return errgo.Wrap(err, "invalid query `type` for subject type")
 	}

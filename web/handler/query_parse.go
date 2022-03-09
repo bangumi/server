@@ -38,3 +38,16 @@ func parseSubjectID(s string) (domain.SubjectIDType, error) {
 
 	return subjectID, nil
 }
+
+func parseSubjectType(s string) (uint8, error) {
+	if s == "" {
+		return 0, nil
+	}
+
+	t, err := strparse.Uint8(s)
+	if err != nil {
+		return 0, fiber.NewError(http.StatusBadRequest, "bad subject type: "+strconv.Quote(s))
+	}
+
+	return t, nil
+}
