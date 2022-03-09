@@ -151,7 +151,7 @@ func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID uint32) (float32,
 		Order(r.q.Episode.Disc, r.q.Episode.Sort).Limit(1).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return 0, domain.ErrNotFound
+			return 0, nil
 		}
 
 		return 0, errgo.Wrap(err, "dal")

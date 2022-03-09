@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -211,5 +212,13 @@ func parseEpType(s string) (domain.EpTypeType, error) {
 		return -1, fiber.NewError(http.StatusBadRequest, "wrong value for query `type`")
 	}
 
-	return domain.EpTypeType(v), nil
+	e := domain.EpTypeType(v)
+	switch e {
+	case enum.EpTypeNormal, enum.EpTypeSpecial,
+		enum.EpTypeOpening, enum.EpTypeEnding,
+		enum.EpTypeMad, enum.EpTypeOther:
+		return e, nil
+	}
+
+	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+" is not valid episode type")
 }
