@@ -153,6 +153,15 @@ type SubjectRelatedCharacter struct {
 	ID       domain.PersonIDType `json:"id"`
 }
 
+type SubjectRelatedPerson struct {
+	Images   model.PersonImages  `json:"images"`
+	Name     string              `json:"name"`
+	Relation string              `json:"relation"`
+	Career   []string            `json:"career"`
+	Type     uint16              `json:"type"`
+	ID       domain.PersonIDType `json:"id"`
+}
+
 type Actor struct {
 	Images       model.PersonImages  `json:"images"`
 	Name         string              `json:"name"`

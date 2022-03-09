@@ -142,19 +142,20 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 		})
 	}
 
-	subjects, relation, err := h.s.GetPersonRelated(c.Context(), id)
+	persons, relations, err := h.p.GetSubjectRelated(c.Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	var response = make([]res.PersonRelatedSubject, len(subjects))
-	for i, subject := range subjects {
-		response[i] = res.PersonRelatedSubject{
-			SubjectID: subject.ID,
-			Staff:     vars.StaffMap[subject.TypeID][relation[i].ID].String(),
-			Name:      subject.Name,
-			NameCn:    subject.NameCN,
-			Image:     model.SubjectImage(subject.Image).Large,
+	var response = make([]res.SubjectRelatedPerson, len(persons))
+	for i, p := range persons {
+		response[i] = res.SubjectRelatedPerson{
+			Images:   model.PersonImage(p.Image),
+			Name:     p.Name,
+			Relation: vars.RelationMap[r.TypeID][relations[i].ID].String(),
+			Career:   careers(p),
+			Type:     relations[i].ID,
+			ID:       p.ID,
 		}
 	}
 
