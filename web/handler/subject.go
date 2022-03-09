@@ -152,9 +152,9 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 		response[i] = res.SubjectRelatedPerson{
 			Images:   model.PersonImage(p.Image),
 			Name:     p.Name,
-			Relation: vars.RelationMap[r.TypeID][relations[i].ID].String(),
+			Relation: vars.StaffMap[r.TypeID][relations[i].ID].String(),
 			Career:   careers(p),
-			Type:     relations[i].ID,
+			Type:     p.Type,
 			ID:       p.ID,
 		}
 	}

@@ -158,7 +158,7 @@ type SubjectRelatedPerson struct {
 	Name     string              `json:"name"`
 	Relation string              `json:"relation"`
 	Career   []string            `json:"career"`
-	Type     uint16              `json:"type"`
+	Type     uint8              `json:"type"`
 	ID       domain.PersonIDType `json:"id"`
 }
 
