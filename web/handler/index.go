@@ -189,7 +189,7 @@ func (h Handler) getIndexSubjects(
 			Name:    s.Subject.Name,
 			NameCN:  s.Subject.NameCN,
 			Comment: s.Comment,
-			Infobox: compat.V0Wiki(wiki.ParseOmitError(s.Subject.Infobox)),
+			Infobox: compat.V0Wiki(wiki.ParseOmitError(s.Subject.Infobox).NonZero()),
 			ID:      s.Subject.ID,
 			TypeID:  s.Subject.TypeID,
 		}

@@ -54,6 +54,10 @@ func (w Wiki) NonZero() Wiki {
 			continue
 		}
 
+		if len(f.Values) == 0 {
+			continue
+		}
+
 		for _, item := range f.Values {
 			if item.Value == "" {
 				continue
