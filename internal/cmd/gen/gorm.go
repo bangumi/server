@@ -129,9 +129,6 @@ func main() {
 		gen.FieldType("idx_uid", "uint32"),
 		gen.FieldType("idx_collects", "uint32")))
 
-	g.ApplyBasic(g.GenerateModelAs("chii_index_related", "IndexSubject",
-		gen.FieldTrimPrefix("idx_rlt_")))
-
 	modelPersonField := g.GenerateModelAs("chii_person_fields", "PersonField",
 		gen.FieldTrimPrefix("prsn_"),
 		gen.FieldType("prsn_id", personIDTypeString),
@@ -262,6 +259,15 @@ func main() {
 				GORMTag: "foreignKey:prsn_id;references:prsn_id",
 			}),
 		))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_index_related", "IndexSubject",
+		gen.FieldTrimPrefix("idx_rlt_"),
+		gen.FieldType("idx_rlt_type", "uint8"),
+		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
+			GORMTag: "foreignKey:idx_rlt_sid;references:subject_id",
+		}),
+	))
+
 	// execute the action of code generation
 	g.Execute()
 }

@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/subject"
 )
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.IndexRepo, error) {
@@ -72,4 +73,54 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
 		Collects:    i.Collects,
 		Ban:         i.Ban,
 	}, nil
+}
+
+func (r mysqlRepo) CountSubjects(
+	ctx context.Context, id uint32, subjectType model.SubjectType,
+) (int64, error) {
+	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.Rid.Eq(id))
+	if subjectType != 0 {
+		q = q.Where(r.q.IndexSubject.Type.Eq(subjectType))
+	}
+
+	i, err := q.Count()
+	if err != nil {
+		return 0, errgo.Wrap(err, "dal")
+	}
+
+	return i, nil
+}
+
+func (r mysqlRepo) ListSubjects(
+	ctx context.Context,
+	id uint32,
+	subjectType model.SubjectType,
+	limit, offset int,
+) ([]domain.IndexSubject, error) {
+	q := r.q.IndexSubject.WithContext(ctx).Preload(r.q.IndexSubject.Subject.Fields).
+		Where(r.q.IndexSubject.Rid.Eq(id)).
+		Order(r.q.IndexSubject.Order).Limit(limit).Offset(offset)
+	if subjectType != 0 {
+		q = q.Where(r.q.IndexSubject.Type.Eq(subjectType))
+	}
+
+	d, err := q.Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var results = make([]domain.IndexSubject, len(d))
+	for i, s := range d {
+		if s.Subject.ID == 0 {
+			continue
+		}
+
+		results[i] = domain.IndexSubject{
+			AddedAt: time.Unix(int64(s.Dateline), 0),
+			Comment: s.Comment,
+			Subject: subject.ConvertDao(&s.Subject),
+		}
+	}
+
+	return results, nil
 }

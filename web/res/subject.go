@@ -17,6 +17,8 @@
 package res
 
 import (
+	"time"
+
 	"github.com/bangumi/server/compat"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/model"
@@ -159,4 +161,16 @@ type Actor struct {
 	ID           domain.PersonIDType `json:"id"`
 	Type         uint8               `json:"type"`
 	Locked       bool                `json:"locked"`
+}
+
+type SlimSubjectV0 struct {
+	AddedAt time.Time           `json:"added_at"`
+	Date    *string             `json:"date"`
+	Image   model.SubjectImages `json:"images"`
+	Name    string              `json:"name"`
+	NameCN  string              `json:"name_cn"`
+	Comment string              `json:"comment"`
+	Infobox v0wiki              `json:"infobox"`
+	ID      uint32              `json:"id"`
+	TypeID  model.SubjectType   `json:"type"`
 }

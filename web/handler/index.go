@@ -25,9 +25,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/compat"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/strparse"
+	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/res"
 )
@@ -117,4 +120,85 @@ func (h Handler) getIndexNsfwWithCache(ctx context.Context, id uint32) (bool, er
 	}
 
 	return nsfw, nil
+}
+
+func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
+	v := h.getUser(c)
+
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad index_id")
+	}
+
+	subjectType, err := strparse.Uint8(c.Query("type"))
+	if err != nil {
+		return errgo.Wrap(err, "invalid query `type` for subject type")
+	}
+
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return err
+	}
+
+	if !v.AllowNSFW() {
+		nsfw, err := h.getIndexNsfwWithCache(c.Context(), id)
+		if err != nil {
+			return err
+		}
+
+		if nsfw {
+			return fiber.ErrNotFound
+		}
+	}
+
+	return h.getIndexSubjects(c, id, subjectType, page)
+}
+
+func (h Handler) getIndexSubjects(
+	c *fiber.Ctx, id uint32, subjectType uint8, page pageQuery,
+) error {
+	count, err := h.i.CountSubjects(c.Context(), id, subjectType)
+	if err != nil {
+		return errgo.Wrap(err, "Index.CountSubjects")
+	}
+
+	if count == 0 {
+		return c.JSON(res.Paged{
+			Data:   []int{},
+			Total:  0,
+			Limit:  page.Limit,
+			Offset: page.Offset,
+		})
+	}
+
+	if err = page.check(count); err != nil {
+		return err
+	}
+
+	subjects, err := h.i.ListSubjects(c.Context(), id, subjectType, page.Limit, page.Offset)
+	if err != nil {
+		return errgo.Wrap(err, "Index.ListSubjects")
+	}
+
+	var data = make([]res.SlimSubjectV0, len(subjects))
+	for i, s := range subjects {
+		data[i] = res.SlimSubjectV0{
+			AddedAt: s.AddedAt,
+			Date:    nilString(s.Subject.Date),
+			Image:   model.SubjectImage(s.Subject.Image),
+			Name:    s.Subject.Name,
+			NameCN:  s.Subject.NameCN,
+			Comment: s.Comment,
+			Infobox: compat.V0Wiki(wiki.ParseOmitError(s.Subject.Infobox)),
+			ID:      s.Subject.ID,
+			TypeID:  s.Subject.TypeID,
+		}
+	}
+
+	return c.JSON(res.Paged{
+		Data:   data,
+		Total:  count,
+		Limit:  page.Limit,
+		Offset: page.Offset,
+	})
 }

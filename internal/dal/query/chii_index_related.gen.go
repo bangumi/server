@@ -27,11 +27,21 @@ func newIndexSubject(db *gorm.DB) indexSubject {
 	_indexSubject.ID = field.NewUint32(tableName, "idx_rlt_id")
 	_indexSubject.Cat = field.NewInt8(tableName, "idx_rlt_cat")
 	_indexSubject.Rid = field.NewUint32(tableName, "idx_rlt_rid")
-	_indexSubject.Type = field.NewUint16(tableName, "idx_rlt_type")
+	_indexSubject.Type = field.NewUint8(tableName, "idx_rlt_type")
 	_indexSubject.Sid = field.NewUint32(tableName, "idx_rlt_sid")
 	_indexSubject.Order = field.NewUint32(tableName, "idx_rlt_order")
 	_indexSubject.Comment = field.NewString(tableName, "idx_rlt_comment")
 	_indexSubject.Dateline = field.NewInt32(tableName, "idx_rlt_dateline")
+	_indexSubject.Subject = indexSubjectBelongsToSubject{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Subject", "dao.Subject"),
+		Fields: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("Subject.Fields", "dao.SubjectField"),
+		},
+	}
 
 	_indexSubject.fillFieldMap()
 
@@ -45,11 +55,12 @@ type indexSubject struct {
 	ID       field.Uint32
 	Cat      field.Int8
 	Rid      field.Uint32
-	Type     field.Uint16
+	Type     field.Uint8
 	Sid      field.Uint32
 	Order    field.Uint32
 	Comment  field.String
 	Dateline field.Int32
+	Subject  indexSubjectBelongsToSubject
 
 	fieldMap map[string]field.Expr
 }
@@ -69,7 +80,7 @@ func (i *indexSubject) updateTableName(table string) *indexSubject {
 	i.ID = field.NewUint32(table, "idx_rlt_id")
 	i.Cat = field.NewInt8(table, "idx_rlt_cat")
 	i.Rid = field.NewUint32(table, "idx_rlt_rid")
-	i.Type = field.NewUint16(table, "idx_rlt_type")
+	i.Type = field.NewUint8(table, "idx_rlt_type")
 	i.Sid = field.NewUint32(table, "idx_rlt_sid")
 	i.Order = field.NewUint32(table, "idx_rlt_order")
 	i.Comment = field.NewString(table, "idx_rlt_comment")
@@ -96,7 +107,7 @@ func (i *indexSubject) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (i *indexSubject) fillFieldMap() {
-	i.fieldMap = make(map[string]field.Expr, 8)
+	i.fieldMap = make(map[string]field.Expr, 9)
 	i.fieldMap["idx_rlt_id"] = i.ID
 	i.fieldMap["idx_rlt_cat"] = i.Cat
 	i.fieldMap["idx_rlt_rid"] = i.Rid
@@ -105,11 +116,82 @@ func (i *indexSubject) fillFieldMap() {
 	i.fieldMap["idx_rlt_order"] = i.Order
 	i.fieldMap["idx_rlt_comment"] = i.Comment
 	i.fieldMap["idx_rlt_dateline"] = i.Dateline
+
 }
 
 func (i indexSubject) clone(db *gorm.DB) indexSubject {
 	i.indexSubjectDo.ReplaceDB(db)
 	return i
+}
+
+type indexSubjectBelongsToSubject struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	Fields struct {
+		field.RelationField
+	}
+}
+
+func (a indexSubjectBelongsToSubject) Where(conds ...field.Expr) *indexSubjectBelongsToSubject {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a indexSubjectBelongsToSubject) WithContext(ctx context.Context) *indexSubjectBelongsToSubject {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a indexSubjectBelongsToSubject) Model(m *dao.IndexSubject) *indexSubjectBelongsToSubjectTx {
+	return &indexSubjectBelongsToSubjectTx{a.db.Model(m).Association(a.Name())}
+}
+
+type indexSubjectBelongsToSubjectTx struct{ tx *gorm.Association }
+
+func (a indexSubjectBelongsToSubjectTx) Find() (result *dao.Subject, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a indexSubjectBelongsToSubjectTx) Append(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a indexSubjectBelongsToSubjectTx) Replace(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a indexSubjectBelongsToSubjectTx) Delete(values ...*dao.Subject) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a indexSubjectBelongsToSubjectTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a indexSubjectBelongsToSubjectTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type indexSubjectDo struct{ gen.DO }
