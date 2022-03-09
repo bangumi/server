@@ -134,16 +134,11 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok || subject.Redirect != 0 {
+	if !ok || subject.Redirect != 0 || (subject.NSFW && !u.AllowNSFW()) {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
 		})
-	}
-
-	if subject.NSFW && !u.AllowNSFW() {
-		// default Handler will return a 404 response
-		return c.Next()
 	}
 
 	return h.listEpisode(c, subjectID, page, epType)
