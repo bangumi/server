@@ -7,9 +7,9 @@ require (
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-redis/redismock/v8 v8.0.6
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/goccy/go-json v0.9.4
-	github.com/gofiber/adaptor/v2 v2.1.18
-	github.com/gofiber/fiber/v2 v2.27.0
+	github.com/goccy/go-json v0.9.5
+	github.com/gofiber/adaptor/v2 v2.1.20
+	github.com/gofiber/fiber/v2 v2.29.0
 	github.com/joho/godotenv v1.4.0
 	github.com/mattn/go-colorable v0.1.12
 	github.com/prometheus/client_golang v1.12.1
@@ -17,12 +17,12 @@ require (
 	github.com/uber-go/tally/v4 v4.1.1
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/vektra/mockery/v2 v2.10.0
-	go.uber.org/fx v1.16.0
+	go.uber.org/fx v1.17.0
 	go.uber.org/zap v1.21.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gorm.io/driver/mysql v1.3.2
-	gorm.io/gen v0.2.39
-	gorm.io/gorm v1.23.1
+	gorm.io/gen v0.2.43
+	gorm.io/gorm v1.23.2
 )
 
 require (
@@ -38,7 +38,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
-	github.com/klauspost/compress v1.14.1 // indirect
+	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -60,17 +60,17 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.10.1 // indirect
-	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
-	github.com/valyala/fasthttp v1.33.0 // indirect
+	github.com/valyala/fasthttp v1.34.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/dig v1.13.0 // indirect
-	go.uber.org/multierr v1.7.0 // indirect
-	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
+	go.uber.org/dig v1.14.0 // indirect
+	go.uber.org/multierr v1.8.0 // indirect
+	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
+	golang.org/x/sys v0.0.0-20220307203707-22a9840ba4d7 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.9 // indirect
@@ -79,6 +79,6 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.66.3 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/datatypes v1.0.5 // indirect
+	gorm.io/datatypes v1.0.6 // indirect
 	gorm.io/hints v1.1.0 // indirect
 )
