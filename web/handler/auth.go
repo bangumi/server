@@ -76,7 +76,7 @@ func getVisitor(h Handler, c *fiber.Ctx) (accessor, error) {
 	}
 
 	key, value := strutil.Partition(authorization, ' ')
-	if key != "bearer" {
+	if key != "Bearer" {
 		return a, fiber.NewError(fiber.StatusUnauthorized,
 			"http Authorization header has wrong scope")
 	}
