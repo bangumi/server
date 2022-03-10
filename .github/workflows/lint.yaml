@@ -33,7 +33,7 @@ jobs:
             ${{ runner.os }}-go-build-1-
 
       - name: Run linters
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
         with:
           version: v1.44.1
           skip-go-installation: true
