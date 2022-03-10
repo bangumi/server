@@ -19,7 +19,6 @@ package user
 import (
 	"context"
 	"errors"
-	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -29,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/strutil"
 	"github.com/bangumi/server/model"
 )
 
@@ -104,7 +104,7 @@ func (m mysqlRepo) ListCollections(
 		results[i] = model.Collection{
 			UpdatedAt:   time.Unix(int64(c.Lasttouch), 0),
 			Comment:     c.Comment,
-			Tags:        strings.Split(c.Tag, " "),
+			Tags:        strutil.Split(c.Tag, " "),
 			SubjectType: c.SubjectType,
 			Rate:        c.Rate,
 			SubjectID:   c.SubjectID,

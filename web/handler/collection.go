@@ -70,14 +70,14 @@ func (h Handler) getCollection(c *fiber.Ctx, u model.User, page pageQuery, showP
 	}
 
 	return c.JSON(res.Paged{
-		Data:   collections,
+		Data:   data,
 		Total:  count,
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	})
 }
 
-func (h Handler) GetCollection(c *fiber.Ctx) error {
+func (h Handler) ListCollection(c *fiber.Ctx) error {
 	v := h.getUser(c)
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {

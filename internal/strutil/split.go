@@ -30,3 +30,16 @@ func Partition(s string, c byte) (string, string) {
 
 	return s[:i], s[i+1:]
 }
+
+func Split(s string, c string) []string {
+	split := strings.Split(s, c)
+
+	result := make([]string, 0, len(split))
+	for _, s2 := range split {
+		if s2 != "" {
+			result = append(result, s2)
+		}
+	}
+
+	return result
+}

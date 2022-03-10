@@ -43,3 +43,16 @@ func TestPartition(t *testing.T) {
 	assert.Equal(t, "ab", key)
 	assert.Equal(t, "", value)
 }
+
+func TestSplit(t *testing.T) {
+	t.Parallel()
+
+	s := strutil.Split("a=b", "=")
+	assert.EqualValues(t, []string{"a", "b"}, s)
+
+	s = strutil.Split("a==b", "=")
+	assert.EqualValues(t, []string{"a", "b"}, s)
+
+	s = strutil.Split("", "=")
+	assert.EqualValues(t, []string{}, s)
+}
