@@ -23,7 +23,7 @@ jobs:
       - run: git clone https://github.com/bangumi/dev-env $HOME/dev-env
       - run: cd ~/dev-env && docker-compose up -d
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
 
