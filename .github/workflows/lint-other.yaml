@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Node LTS
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
 
       - run: npm i -g prettier
 
