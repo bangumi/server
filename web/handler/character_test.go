@@ -102,7 +102,7 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/characters/7", http.NoBody)
-	req.Header.Set(fiber.HeaderAuthorization, "bearer v")
+	req.Header.Set(fiber.HeaderAuthorization, "Bearer v")
 
 	resp, err := app.Test(req)
 	require.NoError(t, err)

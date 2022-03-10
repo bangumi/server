@@ -53,7 +53,7 @@ func TestHappyPath(t *testing.T) {
 	)
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
-	req.Header.Set("authorization", "bearer token")
+	req.Header.Set("authorization", "Bearer token")
 
 	resp, err := app.Test(req)
 	require.NoError(t, err)
@@ -80,7 +80,7 @@ func TestNSFW_200(t *testing.T) {
 	)
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
-	req.Header.Set(fiber.HeaderAuthorization, "bearer token")
+	req.Header.Set(fiber.HeaderAuthorization, "Bearer token")
 
 	resp, err := app.Test(req)
 	require.NoError(t, err)
@@ -103,7 +103,7 @@ func TestNSFW_404(t *testing.T) {
 	)
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
-	req.Header.Set("authorization", "bearer token")
+	req.Header.Set("authorization", "Bearer token")
 
 	resp, err := app.Test(req)
 	require.NoError(t, err)
