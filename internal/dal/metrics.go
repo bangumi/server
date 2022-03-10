@@ -55,7 +55,7 @@ func setupMetrics(db *gorm.DB, scope tally.Scope, register prometheus.Registerer
 
 	var DatabaseQuery = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "db_execute_total",
+			Name: "chii_db_execute_total",
 			Help: "Number of executing sql.",
 		},
 		[]string{"table"},
