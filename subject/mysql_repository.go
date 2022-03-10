@@ -90,6 +90,11 @@ func ConvertDao(s *dao.Subject) model.Subject {
 func rating(f dao.SubjectField) model.Rating {
 	var total = f.Rate1 + f.Rate2 + f.Rate3 + f.Rate4 + f.Rate5 +
 		f.Rate6 + f.Rate7 + f.Rate8 + f.Rate9 + f.Rate10
+
+	if total == 0 {
+		return model.Rating{}
+	}
+
 	var score = float64(1*f.Rate1+2*f.Rate2+3*f.Rate3+4*f.Rate4+5*f.Rate5+
 		6*f.Rate6+7*f.Rate7+8*f.Rate8+9*f.Rate9+10*f.Rate10) / float64(total)
 
