@@ -10,32 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Get Tag Name
-        run: echo "COMMIT_REF=${GITHUB_REF##*/}" >> $GITHUB_ENV
-
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - uses: Trim21/setup-poetry@dist/v1
-      - uses: Trim21/install-poetry-project@dist/v1
-
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository: "bangumi/api"
           path: api
 
-      - run: |
-          python -c 'from pol.server import app;import json;print(json.dumps(app.openapi()))' |\
-            jq 'del(.info)' > ./api/open-api/v0.json
-        env:
-          MYSQL_HOST: 127.0.0.1
-          MYSQL_PORT: "3306"
-          MYSQL_USER: user
-          MYSQL_PASS: password
-          MYSQL_DB: bangumi
+      - run: cp web/spec.yaml ./api/open-api/v0.yaml
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
