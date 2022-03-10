@@ -80,6 +80,7 @@ func (m mysqlRepo) ListCollections(
 	limit, offset int,
 ) ([]model.Collection, error) {
 	q := m.q.SubjectCollection.WithContext(ctx).
+		Order(m.q.SubjectCollection.Lasttouch.Desc()).
 		Where(m.q.SubjectCollection.UID.Eq(userID)).Limit(limit).Offset(offset)
 
 	if subjectType != 0 {

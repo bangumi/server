@@ -19,17 +19,62 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Handler) getCollection(c *fiber.Ctx, u model.User, page pageQuery, showPrivate bool) error {
-	count, err := h.u.CountCollections(c.Context(), u.ID, 0, 0, showPrivate)
+func (h Handler) ListCollection(c *fiber.Ctx) error {
+	v := h.getUser(c)
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest, "bad query args: "+err.Error())
+	}
+
+	username := c.Params("username")
+	if username == "" {
+		return fiber.NewError(http.StatusBadRequest, "missing require parameters `username`")
+	}
+
+	subjectType, err := parseSubjectType(c.Query("subject_type"))
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest, err.Error())
+	}
+
+	collectionType, err := parseCollectionType(c.Query("type"))
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest, "bad query 'type': "+err.Error())
+	}
+
+	u, err := h.u.GetByName(c.Context(), username)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return fiber.NewError(http.StatusNotFound, "user doesn't exist or has been removed")
+		}
+
+		return errgo.Wrap(err, "user.GetByName")
+	}
+
+	var showPrivate = u.ID == v.ID
+
+	return h.listCollection(c, u, subjectType, collectionType, page, showPrivate)
+}
+
+func (h Handler) listCollection(
+	c *fiber.Ctx,
+	u model.User,
+	subjectType model.SubjectType,
+	collectionType uint8,
+	page pageQuery,
+	showPrivate bool,
+) error {
+	count, err := h.u.CountCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
 		return errgo.Wrap(err, "user.CountCollections")
 	}
@@ -43,7 +88,7 @@ func (h Handler) getCollection(c *fiber.Ctx, u model.User, page pageQuery, showP
 	}
 
 	collections, err := h.u.ListCollections(c.Context(),
-		u.ID, 0, 0, showPrivate, page.Limit, page.Offset)
+		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "user.ListCollections")
 	}
@@ -77,28 +122,20 @@ func (h Handler) getCollection(c *fiber.Ctx, u model.User, page pageQuery, showP
 	})
 }
 
-func (h Handler) ListCollection(c *fiber.Ctx) error {
-	v := h.getUser(c)
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+func parseCollectionType(s string) (uint8, error) {
+	if s == "" {
+		return 0, nil
+	}
+
+	t, err := strparse.Uint8(s)
 	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, "bad query args: "+err.Error())
+		return 0, fiber.NewError(http.StatusBadRequest, "bad collection type: "+strconv.Quote(s))
 	}
 
-	username := c.Params("username")
-	if username == "" {
-		return fiber.NewError(http.StatusBadRequest, "missing require parameters `username`")
+	switch t {
+	case 1, 2, 3, 4, 5: //nolint:gomnd
+		return t, nil
 	}
 
-	u, err := h.u.GetByName(c.Context(), username)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.NewError(http.StatusNotFound, "user doesn't exist or has been removed")
-		}
-
-		return errgo.Wrap(err, "user.GetByName")
-	}
-
-	var showPrivate = u.ID == v.ID
-
-	return h.getCollection(c, u, page, showPrivate)
+	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+"is not a valid collection type")
 }

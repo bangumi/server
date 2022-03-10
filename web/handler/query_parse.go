@@ -24,6 +24,7 @@ import (
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/strparse"
+	"github.com/bangumi/server/model"
 )
 
 func parseSubjectID(s string) (domain.SubjectIDType, error) {
@@ -49,5 +50,11 @@ func parseSubjectType(s string) (uint8, error) {
 		return 0, fiber.NewError(http.StatusBadRequest, "bad subject type: "+strconv.Quote(s))
 	}
 
-	return t, nil
+	switch t {
+	case model.SubjectAnime, model.SubjectBook,
+		model.SubjectMusic, model.SubjectReal, model.SubjectGame:
+		return t, nil
+	}
+
+	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+"is not a valid subject type")
 }
