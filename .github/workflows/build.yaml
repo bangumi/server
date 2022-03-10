@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: ./.github/actions/base
+
+      - name: Go Build Cache (build)
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-build-1-${{ hashFiles('**/go.sum') }}-build
+          restore-keys: |
+            ${{ runner.os }}-go-build-1-${{ hashFiles('**/go.sum') }}-
+            ${{ runner.os }}-go-build-1-
+
+      - name: Build
+        run: make build
+
+      - run: docker build .

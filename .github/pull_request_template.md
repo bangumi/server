@@ -1,4 +1,4 @@
-如果你的 PR 添加了新的 API，请针对每一个 API 填写以下部分
+<!-- 如果你的 PR 添加了新的 API，请针对每一个 API 填写以下部分 -->
 
 <details>
 <summary> New API Name </summary>

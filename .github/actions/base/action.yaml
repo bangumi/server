@@ -1,0 +1,22 @@
+name: Base Setup
+
+description: "basic steps to setup golang tools"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: "^1.17"
+
+    - name: Go Mod Cache
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-mod-1-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-mod-1-
+
+    - run: make install
+      shell: bash

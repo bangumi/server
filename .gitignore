@@ -20,3 +20,11 @@ dev-env/
 *.pyc.*
 /data/
 tmp/
+*.exe
+dist/
+bin/
+.air.toml
+.env
+.envrc
+coverage.out
+.bin/

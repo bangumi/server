@@ -1,0 +1,57 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+      - go
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+  pull_request:
+    branches:
+      - master
+      - go
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: git clone https://github.com/bangumi/dev-env $HOME/dev-env
+      - run: cd ~/dev-env && docker-compose up -d
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/base
+
+      - name: Go Build Cache (test)
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-build-1-${{ hashFiles('**/go.sum') }}-test
+          restore-keys: |
+            ${{ runner.os }}-go-build-1-${{ hashFiles('**/go.sum') }}-
+            ${{ runner.os }}-go-build-1-
+
+      - run: bash $HOME/dev-env/wait_mysql_ready.sh
+
+      - name: Run tests
+        run: make coverage
+        env:
+          GORACE: halt_on_error=1
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: "3306"
+          MYSQL_USER: user
+          MYSQL_PASS: password
+          MYSQL_DB: bangumi
+          REDIS_URI: "redis://:redis-pass@127.0.0.1:6379/0"
+
+      - uses: codecov/codecov-action@v2
+        with:
+          files: coverage.out

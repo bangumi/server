@@ -2,31 +2,17 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>Trim21/renovate-config",
-    "local>Trim21/renovate-config:monthly",
-    "local>Trim21/renovate-config:poetry"
+    "local>Trim21/renovate-config:monthly"
   ],
-  "separateMajorMinor": true,
   "separateMinorPatch": false,
-  "rangeStrategy": "pin",
-  "pre-commit": {
-    "enabled": true
-  },
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true,
   "packageRules": [
     {
-      "matchManagers": ["pre-commit"],
-      "semanticCommitType": "chore",
-      "groupName": "deps-dev",
-      "semanticCommitScope": "dev"
-    },
-    {
-      "matchManagers": ["dockerfile"],
-      "rangeStrategy": "pin",
-      "minor": {
-        "enabled": false
-      },
-      "major": {
-        "enabled": false
-      }
+      "groupName": "deps",
+      "matchManagers": ["gomod"],
+      "semanticCommitType": "build",
+      "matchUpdateTypes": ["patch", "minor"]
     }
   ]
 }

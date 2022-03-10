@@ -1,0 +1,876 @@
+{
+  "1": {
+    "2001": {
+      "CN": "作者",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "2002": {
+      "CN": "",
+      "EN": "",
+      "JP": "作画",
+      "RDF": ""
+    },
+    "2003": {
+      "CN": "插图",
+      "EN": "",
+      "JP": "イラスト",
+      "RDF": ""
+    },
+    "2004": {
+      "CN": "",
+      "EN": "",
+      "JP": "出版社",
+      "RDF": ""
+    },
+    "2005": {
+      "CN": "连载杂志",
+      "EN": "",
+      "JP": "掲載誌",
+      "RDF": ""
+    },
+    "2006": {
+      "CN": "译者",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "2007": {
+      "CN": "原作",
+      "EN": "Original Creator/Original Work",
+      "JP": "",
+      "RDF": ""
+    },
+    "2008": {
+      "CN": "客串",
+      "EN": "guest",
+      "JP": "ゲスト",
+      "RDF": ""
+    },
+    "2009": {
+      "CN": "人物原案",
+      "EN": "Original Character Design",
+      "JP": "キャラクター原案",
+      "RDF": ""
+    }
+  },
+  "2": {
+    "1": {
+      "CN": "原作",
+      "EN": "Original Creator/Original Work",
+      "JP": "",
+      "RDF": ""
+    },
+    "2": {
+      "CN": "导演",
+      "EN": "Director/Direction",
+      "JP": "監督 シリーズ監督",
+      "RDF": "directedBy"
+    },
+    "3": {
+      "CN": "脚本",
+      "EN": "Script/Screenplay",
+      "JP": "シナリオ",
+      "RDF": ""
+    },
+    "4": {
+      "CN": "分镜",
+      "EN": "Storyboard",
+      "JP": "コンテ  ストーリーボード  画コンテ  絵コンテ",
+      "RDF": ""
+    },
+    "5": {
+      "CN": "演出",
+      "EN": "Episode Director",
+      "JP": "",
+      "RDF": ""
+    },
+    "6": {
+      "CN": "音乐",
+      "EN": "Music",
+      "JP": "楽曲  音楽",
+      "RDF": ""
+    },
+    "7": {
+      "CN": "人物原案",
+      "EN": "Original Character Design",
+      "JP": "キャラ原案",
+      "RDF": ""
+    },
+    "8": {
+      "CN": "人物设定",
+      "EN": "Character Design",
+      "JP": "キャラ設定",
+      "RDF": ""
+    },
+    "9": {
+      "CN": "分镜构图",
+      "EN": "Layout",
+      "JP": "レイアウト",
+      "RDF": ""
+    },
+    "10": {
+      "CN": "系列构成",
+      "EN": "Series Composition",
+      "JP": "シナリオディレクター  構成  シリーズ構成  脚本構成",
+      "RDF": ""
+    },
+    "11": {
+      "CN": "美术监督",
+      "EN": "Art Direction",
+      "JP": "アートディレクション 背景監督",
+      "RDF": ""
+    },
+    "13": {
+      "CN": "色彩设计",
+      "EN": "Color Design",
+      "JP": "色彩設定",
+      "RDF": ""
+    },
+    "14": {
+      "CN": "总作画监督",
+      "EN": "Chief Animation Director",
+      "JP": "チーフ作画監督",
+      "RDF": ""
+    },
+    "15": {
+      "CN": "作画监督",
+      "EN": "Animation Direction",
+      "JP": "作監 アニメーション演出",
+      "RDF": ""
+    },
+    "16": {
+      "CN": "机械设定",
+      "EN": "Mechanical Design",
+      "JP": "メカニック設定",
+      "RDF": ""
+    },
+    "17": {
+      "CN": "摄影监督",
+      "EN": "Director of Photography",
+      "JP": "撮影監督",
+      "RDF": ""
+    },
+    "18": {
+      "CN": "监修",
+      "EN": "Supervision/Supervisor",
+      "JP": "シリーズ監修 スーパーバイザー",
+      "RDF": ""
+    },
+    "19": {
+      "CN": "道具设计",
+      "EN": "Prop Design",
+      "JP": "プロップデザイン",
+      "RDF": ""
+    },
+    "20": {
+      "CN": "原画",
+      "EN": "Key Animation",
+      "JP": "作画 原画",
+      "RDF": ""
+    },
+    "21": {
+      "CN": "第二原画",
+      "EN": "2nd Key Animation",
+      "JP": "原画協力",
+      "RDF": ""
+    },
+    "22": {
+      "CN": "动画检查",
+      "EN": "Animation Check",
+      "JP": "動画チェック",
+      "RDF": ""
+    },
+    "23": {
+      "CN": "助理制片人",
+      "EN": "Assistant Producer",
+      "JP": "協力プロデューサー",
+      "RDF": ""
+    },
+    "24": {
+      "CN": "",
+      "EN": "Associate Producer",
+      "JP": "アソシエイトプロデューサー",
+      "RDF": ""
+    },
+    "25": {
+      "CN": "背景美术",
+      "EN": "Background Art",
+      "JP": "背景",
+      "RDF": ""
+    },
+    "26": {
+      "CN": "色彩指定",
+      "EN": "Color Setting",
+      "JP": "",
+      "RDF": ""
+    },
+    "27": {
+      "CN": "数码绘图",
+      "EN": "Digital Paint",
+      "JP": "",
+      "RDF": ""
+    },
+    "28": {
+      "CN": "剪辑",
+      "EN": "Editing",
+      "JP": "編集",
+      "RDF": ""
+    },
+    "29": {
+      "CN": "原案",
+      "EN": "Original Plan",
+      "JP": "",
+      "RDF": ""
+    },
+    "30": {
+      "CN": "主题歌编曲",
+      "EN": "Theme Song Arrangement",
+      "JP": "",
+      "RDF": ""
+    },
+    "31": {
+      "CN": "主题歌作曲",
+      "EN": "Theme Song Composition",
+      "JP": "",
+      "RDF": ""
+    },
+    "32": {
+      "CN": "主题歌作词",
+      "EN": "Theme Song Lyrics",
+      "JP": "",
+      "RDF": ""
+    },
+    "33": {
+      "CN": "主题歌演出",
+      "EN": "Theme Song Performance",
+      "JP": "",
+      "RDF": ""
+    },
+    "34": {
+      "CN": "插入歌演出",
+      "EN": "Inserted Song Performance",
+      "JP": "",
+      "RDF": ""
+    },
+    "35": {
+      "CN": "企画",
+      "EN": "Planning",
+      "JP": "プランニング  企画開発",
+      "RDF": ""
+    },
+    "36": {
+      "CN": "",
+      "EN": "Planning Producer",
+      "JP": "企画プロデューサー  企画営業プロデューサー",
+      "RDF": ""
+    },
+    "37": {
+      "CN": "制作管理",
+      "EN": "Production Manager",
+      "JP": "制作マネージャー 制作担当 制作班長",
+      "RDF": ""
+    },
+    "38": {
+      "CN": "宣传",
+      "EN": "Publicity",
+      "JP": "パブリシティ  宣伝  広告宣伝  番組宣伝  製作宣伝",
+      "RDF": ""
+    },
+    "39": {
+      "CN": "录音",
+      "EN": "Recording",
+      "JP": "録音",
+      "RDF": ""
+    },
+    "40": {
+      "CN": "录音助理",
+      "EN": "Recording Assistant",
+      "JP": "録音アシスタント  録音助手",
+      "RDF": ""
+    },
+    "41": {
+      "CN": "系列监督",
+      "EN": "Series Production Director",
+      "JP": "",
+      "RDF": ""
+    },
+    "42": {
+      "CN": "製作",
+      "EN": "Production",
+      "JP": "",
+      "RDF": ""
+    },
+    "43": {
+      "CN": "设定",
+      "EN": "Setting",
+      "JP": "設定",
+      "RDF": ""
+    },
+    "44": {
+      "CN": "音响监督",
+      "EN": "Sound Director",
+      "JP": "",
+      "RDF": ""
+    },
+    "45": {
+      "CN": "音响",
+      "EN": "Sound",
+      "JP": "音響",
+      "RDF": ""
+    },
+    "46": {
+      "CN": "音效",
+      "EN": "Sound Effects",
+      "JP": "音響効果",
+      "RDF": ""
+    },
+    "47": {
+      "CN": "特效",
+      "EN": "Special Effects",
+      "JP": "視覚効果",
+      "RDF": ""
+    },
+    "48": {
+      "CN": "配音监督",
+      "EN": "ADR Director",
+      "JP": "",
+      "RDF": ""
+    },
+    "49": {
+      "CN": "联合导演",
+      "EN": "Co-Director",
+      "JP": "",
+      "RDF": ""
+    },
+    "50": {
+      "CN": "背景设定",
+      "EN": "Setting",
+      "JP": "基本設定  場面設定  場面設計  設定",
+      "RDF": ""
+    },
+    "51": {
+      "CN": "补间动画",
+      "EN": "In-Between Animation",
+      "JP": "動画",
+      "RDF": ""
+    },
+    "52": {
+      "CN": "执行制片人",
+      "EN": "Executive Producer",
+      "JP": "製作総指揮",
+      "RDF": ""
+    },
+    "53": {
+      "CN": "助理制片人",
+      "EN": "Assistant Producer",
+      "JP": "協力プロデューサー",
+      "RDF": ""
+    },
+    "54": {
+      "CN": "制片人",
+      "EN": "Producer",
+      "JP": "プロデュース  プロデューサー",
+      "RDF": ""
+    },
+    "55": {
+      "CN": "助理录音师",
+      "EN": "Assistant Engineer",
+      "JP": "",
+      "RDF": ""
+    },
+    "56": {
+      "CN": "助理制片协调",
+      "EN": "Assistant Production Coordinat",
+      "JP": "",
+      "RDF": ""
+    },
+    "57": {
+      "CN": "演员监督",
+      "EN": "Casting Director",
+      "JP": "キャスティングコーディネーター監督",
+      "RDF": ""
+    },
+    "58": {
+      "CN": "总制片",
+      "EN": "Chief Producer",
+      "JP": "チーフプロデューサー  チーフ制作  総合プロデューサー",
+      "RDF": ""
+    },
+    "59": {
+      "CN": "联合制片人",
+      "EN": "Co-Producer",
+      "JP": "",
+      "RDF": ""
+    },
+    "60": {
+      "CN": "台词编辑",
+      "EN": "Dialogue Editing",
+      "JP": "台詞編集",
+      "RDF": ""
+    },
+    "61": {
+      "CN": "后期制片协调",
+      "EN": "Post-Production Assistant",
+      "JP": "ポストプロダクション協力",
+      "RDF": ""
+    },
+    "62": {
+      "CN": "制作助手",
+      "EN": "Production Assistant",
+      "JP": "制作アシスタント 制作補佐 製作補",
+      "RDF": ""
+    },
+    "63": {
+      "CN": "制作",
+      "EN": "Production",
+      "JP": "製作 製作スタジオ",
+      "RDF": ""
+    },
+    "64": {
+      "CN": "制作协调",
+      "EN": "Production Coordination",
+      "JP": "制作コーディネーター",
+      "RDF": ""
+    },
+    "65": {
+      "CN": "音乐制作",
+      "EN": "Music Work",
+      "JP": "楽曲制作 音楽制作",
+      "RDF": ""
+    },
+    "66": {
+      "CN": "友情協力",
+      "EN": "Special Thanks",
+      "JP": "特别鸣谢",
+      "RDF": ""
+    },
+    "67": {
+      "CN": "动画制作",
+      "EN": "Animation Work",
+      "JP": "アニメーション制作 アニメ制作 アニメーション",
+      "RDF": ""
+    },
+    "69": {
+      "CN": "CG 导演",
+      "EN": "CG Director",
+      "JP": "CG 監督",
+      "RDF": ""
+    },
+    "70": {
+      "CN": "机械作画监督",
+      "EN": "Mechanical Animation Direction",
+      "JP": "メカニック作監",
+      "RDF": ""
+    },
+    "71": {
+      "CN": "美术设计",
+      "EN": "Art Design",
+      "JP": "美術設定",
+      "RDF": ""
+    },
+    "72": {
+      "CN": "副导演",
+      "EN": "Assistant director",
+      "JP": "助監督",
+      "RDF": ""
+    },
+    "73": {
+      "CN": "OP・ED 分镜",
+      "EN": "OP ED",
+      "JP": "OP・ED 分鏡",
+      "RDF": ""
+    },
+    "74": {
+      "CN": "总导演",
+      "EN": "Chief Director",
+      "JP": "総監督",
+      "RDF": ""
+    },
+    "75": {
+      "CN": "3DCG",
+      "EN": "3DCG",
+      "JP": "",
+      "RDF": ""
+    },
+    "76": {
+      "CN": "制作协力",
+      "EN": "Work Assistance",
+      "JP": "制作協力 / 作品協力",
+      "RDF": ""
+    },
+    "77": {
+      "CN": "动作作画监督",
+      "EN": "Action Animation Direction",
+      "JP": "アクション作画監督",
+      "RDF": ""
+    }
+  },
+  "3": {
+    "3001": {
+      "CN": "艺术家",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "3002": {
+      "CN": "制作人",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "3003": {
+      "CN": "作曲",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "3004": {
+      "CN": "厂牌",
+      "EN": "Label",
+      "JP": "",
+      "RDF": ""
+    },
+    "3005": {
+      "CN": "原作",
+      "EN": "Original Creator/Original Work",
+      "JP": "",
+      "RDF": ""
+    },
+    "3006": {
+      "CN": "作词",
+      "EN": "Lyric",
+      "JP": "",
+      "RDF": ""
+    },
+    "3007": {
+      "CN": "录音",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "3008": {
+      "CN": "编曲",
+      "EN": "Arrange",
+      "JP": "",
+      "RDF": ""
+    },
+    "3009": {
+      "CN": "插图",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "3010": {
+      "CN": "脚本",
+      "EN": "Scenario",
+      "JP": "シナリオ",
+      "RDF": ""
+    }
+  },
+  "4": {
+    "1001": {
+      "CN": "开发",
+      "EN": "developer",
+      "JP": "開発元",
+      "RDF": ""
+    },
+    "1002": {
+      "CN": "发行",
+      "EN": "publisher",
+      "JP": "発売元",
+      "RDF": ""
+    },
+    "1003": {
+      "CN": "遊戲設計師",
+      "EN": "game designer",
+      "JP": "ゲームクリエイター",
+      "RDF": ""
+    },
+    "1004": {
+      "CN": "剧本",
+      "EN": "",
+      "JP": "腳本",
+      "RDF": ""
+    },
+    "1005": {
+      "CN": "美工",
+      "EN": "",
+      "JP": "美術",
+      "RDF": ""
+    },
+    "1006": {
+      "CN": "音乐",
+      "EN": "",
+      "JP": "音楽",
+      "RDF": ""
+    },
+    "1007": {
+      "CN": "关卡设计",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "1008": {
+      "CN": "人物设定",
+      "EN": "Character Design",
+      "JP": "キャラ設定 キャラクターデザイン",
+      "RDF": ""
+    },
+    "1009": {
+      "CN": "主题歌作曲",
+      "EN": "Theme Song Composition",
+      "JP": "",
+      "RDF": ""
+    },
+    "1010": {
+      "CN": "主题歌作词",
+      "EN": "Theme Song Lyrics",
+      "JP": "",
+      "RDF": ""
+    },
+    "1011": {
+      "CN": "主题歌演出",
+      "EN": "Theme Song Performance",
+      "JP": "",
+      "RDF": ""
+    },
+    "1012": {
+      "CN": "插入歌演出",
+      "EN": "Inserted Song Performance",
+      "JP": "",
+      "RDF": ""
+    },
+    "1013": {
+      "CN": "原画",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "1014": {
+      "CN": "动画制作",
+      "EN": "Animation Work",
+      "JP": "アニメーション制作 アニメ制作 アニメーション",
+      "RDF": ""
+    },
+    "1015": {
+      "CN": "原作",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "1016": {
+      "CN": "导演",
+      "EN": "Director/Direction",
+      "JP": "監督 演出 シリーズ監督",
+      "RDF": ""
+    },
+    "1017": {
+      "CN": "动画监督",
+      "EN": "",
+      "JP": "アニメーション監督",
+      "RDF": ""
+    },
+    "1018": {
+      "CN": "制作总指挥",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "1019": {
+      "CN": "QC",
+      "EN": "QC",
+      "JP": "",
+      "RDF": ""
+    },
+    "1020": {
+      "CN": "动画剧本",
+      "EN": "",
+      "JP": "アニメーション脚本",
+      "RDF": ""
+    },
+    "1021": {
+      "CN": "程序",
+      "EN": "Program",
+      "JP": "プログラム",
+      "RDF": ""
+    },
+    "1022": {
+      "CN": "协力",
+      "EN": "",
+      "JP": "協力",
+      "RDF": ""
+    },
+    "1023": {
+      "CN": "CG监修",
+      "EN": "",
+      "JP": "CG監修",
+      "RDF": ""
+    },
+    "1024": {
+      "CN": "SD原画",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "1025": {
+      "CN": "背景",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "1026": {
+      "CN": "监修",
+      "EN": "",
+      "JP": "監修",
+      "RDF": ""
+    },
+    "1027": {
+      "CN": "系列构成",
+      "EN": "",
+      "JP": "シリーズ構成",
+      "RDF": ""
+    },
+    "1028": {
+      "CN": "企画",
+      "EN": "",
+      "JP": "",
+      "RDF": ""
+    },
+    "1029": {
+      "CN": "机械设定",
+      "EN": "Mechanical Design",
+      "JP": "メカニック設定",
+      "RDF": ""
+    },
+    "1030": {
+      "CN": "音响监督",
+      "EN": "Sound Director",
+      "JP": "",
+      "RDF": ""
+    },
+    "1031": {
+      "CN": "作画监督",
+      "EN": "",
+      "JP": "作画監督",
+      "RDF": ""
+    },
+    "1032": {
+      "CN": "制作人",
+      "EN": "Producer",
+      "JP": "プロデューサー",
+      "RDF": ""
+    }
+  },
+  "6": {
+    "4001": {
+      "CN": "原作",
+      "EN": "creator",
+      "JP": "",
+      "RDF": ""
+    },
+    "4002": {
+      "CN": "导演",
+      "EN": "director",
+      "JP": "",
+      "RDF": ""
+    },
+    "4003": {
+      "CN": "编剧",
+      "EN": "writer",
+      "JP": "",
+      "RDF": ""
+    },
+    "4004": {
+      "CN": "音乐",
+      "EN": "composer",
+      "JP": "",
+      "RDF": ""
+    },
+    "4005": {
+      "CN": "执行制片人",
+      "EN": "executive producer",
+      "JP": "製作総指揮",
+      "RDF": ""
+    },
+    "4006": {
+      "CN": "共同执行制作",
+      "EN": "co exec ",
+      "JP": "",
+      "RDF": ""
+    },
+    "4007": {
+      "CN": "制片人/制作人",
+      "EN": "producer",
+      "JP": "プロデューサー",
+      "RDF": ""
+    },
+    "4008": {
+      "CN": "监制",
+      "EN": "supervising producer",
+      "JP": "",
+      "RDF": ""
+    },
+    "4009": {
+      "CN": "副制作人/制作顾问",
+      "EN": "consulting producer",
+      "JP": "",
+      "RDF": ""
+    },
+    "4010": {
+      "CN": "故事",
+      "EN": "story",
+      "JP": "",
+      "RDF": ""
+    },
+    "4011": {
+      "CN": "编审",
+      "EN": "story editor",
+      "JP": "",
+      "RDF": ""
+    },
+    "4012": {
+      "CN": "剪辑",
+      "EN": "editor",
+      "JP": "",
+      "RDF": ""
+    },
+    "4013": {
+      "CN": "创意总监",
+      "EN": "creative director",
+      "JP": "",
+      "RDF": ""
+    },
+    "4014": {
+      "CN": "摄影",
+      "EN": "cinematography",
+      "JP": "",
+      "RDF": ""
+    },
+    "4015": {
+      "CN": "主题歌演出",
+      "EN": "Theme Song Performance",
+      "JP": "",
+      "RDF": ""
+    },
+    "4016": {
+      "CN": "主演",
+      "EN": "Actor",
+      "JP": "",
+      "RDF": ""
+    },
+    "4017": {
+      "CN": "配角",
+      "EN": "Supporting Actor",
+      "JP": "",
+      "RDF": ""
+    },
+    "4018": {
+      "CN": "制作",
+      "EN": "Production",
+      "JP": "製作 製作スタジオ",
+      "RDF": ""
+    }
+  }
+}

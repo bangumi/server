@@ -11,9 +11,8 @@ on:
       - "**.yml"
       - "**.html"
       - "**.json"
-      - "**.toml"
   pull_request_target:
-    types: [opened, synchronize, ready_for_review, reopened]
+    types: [opened, synchronize, reopened]
     branches:
       - master
     paths:
@@ -23,7 +22,6 @@ on:
       - "**.yml"
       - "**.html"
       - "**.json"
-      - "**.toml"
 
 jobs:
   lint-other:
@@ -32,7 +30,7 @@ jobs:
       - name: Install Node LTS
         uses: actions/setup-node@v2
 
-      - run: npm i -g prettier prettier-plugin-toml
+      - run: npm i -g prettier
 
       - uses: reviewdog/action-setup@v1
         with:
@@ -60,6 +58,6 @@ jobs:
           git diff >"${TMPFILE}"
           git reset --hard HEAD
 
-          reviewdog -f=diff -f.diff.strip=1 -reporter=github-pr-review < "${TMPFILE}"
+          reviewdog -f=diff -f.diff.strip=1 -reporter=github-pr-review -tee < "${TMPFILE}"
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
