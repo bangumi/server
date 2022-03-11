@@ -19,6 +19,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -42,7 +43,7 @@ import (
 func (h Handler) GetSubject(c *fiber.Ctx) error {
 	u := h.getUser(c)
 
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
 	}
@@ -64,8 +65,10 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	}
 
 	if r.NSFW && !u.AllowNSFW() {
-		// default Handler will return a 404 response
-		return c.Next()
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
 	}
 
 	return c.JSON(r)
@@ -75,6 +78,7 @@ func (h Handler) getSubjectWithCache(
 	ctx context.Context,
 	id domain.SubjectIDType,
 ) (res.SubjectV0, bool, error) {
+	fmt.Println("try to get from cache")
 	var key = cachekey.Subject(id)
 
 	// try to read from cache
@@ -84,10 +88,11 @@ func (h Handler) getSubjectWithCache(
 		return r, ok, errgo.Wrap(err, "cache.Get")
 	}
 
-	if !ok {
+	if ok {
 		return r, ok, nil
 	}
 
+	fmt.Println("try get from repo")
 	s, err := h.s.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -112,7 +117,7 @@ func (h Handler) getSubjectWithCache(
 
 func platformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
-	if ok {
+	if !ok {
 		logger.Warn("unknown platform",
 			zap.Uint32("subject_id", s.ID),
 			zap.Uint8("type", s.TypeID),

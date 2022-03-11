@@ -19,7 +19,6 @@ package strparse
 import (
 	"strconv"
 
-	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
 )
 
@@ -33,10 +32,4 @@ func Uint32(s string) (uint32, error) {
 	v, err := strconv.ParseUint(s, 10, 32)
 
 	return uint32(v), errgo.Wrap(err, "strconv")
-}
-
-func SubjectID(s string) (domain.SubjectIDType, error) {
-	v, err := strconv.ParseUint(s, 10, 32)
-
-	return domain.SubjectIDType(v), errgo.Wrap(err, "strconv")
 }

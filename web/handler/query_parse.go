@@ -32,12 +32,12 @@ func parseSubjectID(s string) (domain.SubjectIDType, error) {
 		return 0, nil
 	}
 
-	subjectID, err := strparse.SubjectID(s)
+	subjectID, err := strconv.ParseUint(s, 10, 32)
 	if err != nil {
 		return 0, fiber.NewError(http.StatusBadRequest, "bad subject id: "+strconv.Quote(s))
 	}
 
-	return subjectID, nil
+	return domain.SubjectIDType(subjectID), nil
 }
 
 func parseSubjectType(s string) (uint8, error) {
