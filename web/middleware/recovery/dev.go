@@ -19,13 +19,14 @@
 package recovery
 
 import (
+	"bytes"
 	_ "embed"
 	"fmt"
 	"runtime"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/valyala/bytebufferpool"
 )
 
 //go:embed debug.html
@@ -47,43 +48,30 @@ func New() fiber.Handler {
 	}
 }
 
-type programCounters struct {
-	pcs []uintptr
-}
-
-func newProgramCounters(size int) *programCounters {
-	return &programCounters{make([]uintptr, size)}
-}
-
-const defaultProgramCounter = 64
-
 // this is mainly copied from uber/zap's trace reader.
 func takeStacktrace(skip int) string {
-	programCounters := newProgramCounters(defaultProgramCounter)
-	buf := bytebufferpool.Get()
-	defer bytebufferpool.Put(buf)
+	const defaultProgramCounter = 64
+
+	programCounters := make([]uintptr, defaultProgramCounter)
+	buf := bytes.NewBuffer(nil)
 
 	var numFrames int
 	for {
-		numFrames = runtime.Callers(skip+2, programCounters.pcs)
-		if numFrames < len(programCounters.pcs) {
+		numFrames = runtime.Callers(skip+2, programCounters)
+		if numFrames < len(programCounters) {
 			break
 		}
 
-		programCounters = newProgramCounters(len(programCounters.pcs) * 2)
+		programCounters = make([]uintptr, len(programCounters)*2)
 	}
 
-	i := 0
-	frames := runtime.CallersFrames(programCounters.pcs[:numFrames])
+	frames := runtime.CallersFrames(programCounters[:numFrames])
 
 	// Note: On the last iteration, frames.Next() returns false, with a valid
 	// frame, but we ignore this frame. The last frame is a a runtime frame which
 	// adds noise, since it's only either runtime.main or runtime.goexit.
 	for frame, more := frames.Next(); more; frame, more = frames.Next() {
-		if i != 0 {
-			buf.WriteByte('\n')
-		}
-		i++
+		buf.WriteByte('\n')
 		buf.WriteString(frame.Function)
 		buf.WriteByte('\n')
 		buf.WriteByte('\t')
@@ -92,5 +80,5 @@ func takeStacktrace(skip int) string {
 		buf.WriteString(strconv.Itoa(frame.Line))
 	}
 
-	return buf.String()
+	return strings.TrimSpace(buf.String())
 }

@@ -15,7 +15,6 @@ require (
 	github.com/prometheus/client_golang v1.12.1
 	github.com/stretchr/testify v1.7.0
 	github.com/uber-go/tally/v4 v4.1.1
-	github.com/valyala/bytebufferpool v1.0.0
 	github.com/vektra/mockery/v2 v2.10.0
 	go.uber.org/fx v1.17.0
 	go.uber.org/zap v1.21.0
@@ -63,6 +62,7 @@ require (
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.34.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
