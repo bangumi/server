@@ -19,7 +19,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -78,7 +77,6 @@ func (h Handler) getSubjectWithCache(
 	ctx context.Context,
 	id domain.SubjectIDType,
 ) (res.SubjectV0, bool, error) {
-	fmt.Println("try to get from cache")
 	var key = cachekey.Subject(id)
 
 	// try to read from cache
@@ -92,7 +90,6 @@ func (h Handler) getSubjectWithCache(
 		return r, ok, nil
 	}
 
-	fmt.Println("try get from repo")
 	s, err := h.s.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {

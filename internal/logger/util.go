@@ -17,20 +17,22 @@
 package logger
 
 import (
-	"runtime/debug"
+	"path/filepath"
+	"runtime"
+	"strings"
 
 	"go.uber.org/zap/zapcore"
 )
 
 func getCallerEncoder() zapcore.CallerEncoder {
-	info, ok := debug.ReadBuildInfo()
+	_, file, _, ok := runtime.Caller(0)
 	if !ok {
 		return zapcore.FullCallerEncoder
 	}
 
-	length := len(info.Path)
+	prefix := filepath.ToSlash(filepath.Join(file, "../../..")) + "/"
 
 	return func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(caller.String()[length:])
+		encoder.AppendString(strings.TrimPrefix(caller.String(), prefix))
 	}
 }
