@@ -25,7 +25,7 @@ import (
 func getCallerEncoder() zapcore.CallerEncoder {
 	info, ok := debug.ReadBuildInfo()
 	if !ok {
-		panic("can't read build info")
+		return zapcore.FullCallerEncoder
 	}
 
 	length := len(info.Path)
