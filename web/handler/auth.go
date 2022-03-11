@@ -70,8 +70,6 @@ func getVisitor(h Handler, c *fiber.Ctx) (accessor, error) {
 
 	authorization := c.Get(fiber.HeaderAuthorization)
 	if authorization == "" {
-		h.log.Info("access without token", a.LogField())
-
 		return a, nil
 	}
 
