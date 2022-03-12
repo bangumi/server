@@ -16,12 +16,15 @@
 
 package util
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
+)
 
 func DetailFromRequest(c *fiber.Ctx) Detail {
 	return Detail{
 		Path:        c.Path(),
-		QueryString: c.Request().URI().QueryArgs().String(),
+		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
 	}
 }
 

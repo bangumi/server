@@ -75,14 +75,12 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
-		c.Status(fiber.StatusNotFound).
-			Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
-
-		return c.SendString(`{
-  "title": "Not Found",
-  "description": "The path you requested doesn't exist",
-  "details": "This is default response, if you see this response, please check your request path"
-}`)
+		return c.Status(fiber.StatusNotFound).JSON(res.Error{
+			Title: "Not Found",
+			Description: "This is default response, " +
+				"if you see this response, please check your request path",
+			Details: util.DetailFromRequest(c),
+		})
 	})
 }
 
@@ -122,7 +120,7 @@ func handlerWrapper(log *zap.Logger, handler fiber.Handler) fiber.Handler {
 			Details: util.Detail{
 				Error:       err.Error(),
 				Path:        ctx.Path(),
-				QueryString: ctx.Request().URI().QueryArgs().String(),
+				QueryString: utils.UnsafeString(ctx.Request().URI().QueryString()),
 			},
 		})
 	}
