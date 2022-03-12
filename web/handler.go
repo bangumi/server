@@ -20,52 +20,58 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/uber-go/tally/v4"
+	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/web/handler"
+	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/util"
 )
-
-func addHandle(
-	scope tally.Scope,
-	reg func(path string, handlers ...fiber.Handler) fiber.Router,
-	path string,
-	handler fiber.Handler,
-) {
-	reqCounter := scope.
-		Tagged(map[string]string{"handler": utils.FunctionName(handler)}).
-		Counter("request_count")
-
-	reg(path, func(c *fiber.Ctx) error {
-		reqCounter.Inc(1)
-
-		return c.Next()
-	}, handler)
-}
 
 // ResistRouter add all router and default 404 Handler to app.
 func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Use(h.MiddlewareAccessUser())
+	var log = logger.Named("http.err")
 
-	addHandle(scope, app.Get, "/v0/subjects/:id", h.GetSubject)
-	addHandle(scope, app.Get, "/v0/subjects/:id/persons", h.GetSubjectRelatedPersons)
-	addHandle(scope, app.Get, "/v0/subjects/:id/subjects", h.GetSubjectRelatedSubjects)
-	addHandle(scope, app.Get, "/v0/subjects/:id/characters", h.GetSubjectRelatedCharacters)
+	// add logger wrapper and metrics counter
+	addHandle := func(
+		reg func(path string, handlers ...fiber.Handler) fiber.Router,
+		path string,
+		handler fiber.Handler,
+	) {
+		reqCounter := scope.
+			Tagged(map[string]string{"handler": utils.FunctionName(handler)}).
+			Counter("request_count")
 
-	addHandle(scope, app.Get, "/v0/persons/:id", h.GetPerson)
-	addHandle(scope, app.Get, "/v0/persons/:id/subjects", h.GetPersonRelatedSubjects)
-	addHandle(scope, app.Get, "/v0/persons/:id/characters", h.GetPersonRelatedCharacters)
+		middle := func(c *fiber.Ctx) error {
+			reqCounter.Inc(1)
+			return c.Next()
+		}
 
-	addHandle(scope, app.Get, "/v0/characters/:id", h.GetCharacter)
-	addHandle(scope, app.Get, "/v0/characters/:id/subjects", h.GetCharacterRelatedSubjects)
-	addHandle(scope, app.Get, "/v0/characters/:id/persons", h.GetCharacterRelatedPersons)
+		reg(path, middle, handlerWrapper(log, handler))
+	}
 
-	addHandle(scope, app.Get, "/v0/episodes/:id", h.GetEpisode)
-	addHandle(scope, app.Get, "/v0/episodes", h.ListEpisode)
+	addHandle(app.Get, "/v0/subjects/:id", h.GetSubject)
+	addHandle(app.Get, "/v0/subjects/:id/persons", h.GetSubjectRelatedPersons)
+	addHandle(app.Get, "/v0/subjects/:id/subjects", h.GetSubjectRelatedSubjects)
+	addHandle(app.Get, "/v0/subjects/:id/characters", h.GetSubjectRelatedCharacters)
 
-	addHandle(scope, app.Get, "/v0/me", h.GetCurrentUser)
-	addHandle(scope, app.Get, "/v0/users/:username/collections", h.ListCollection)
+	addHandle(app.Get, "/v0/persons/:id", h.GetPerson)
+	addHandle(app.Get, "/v0/persons/:id/subjects", h.GetPersonRelatedSubjects)
+	addHandle(app.Get, "/v0/persons/:id/characters", h.GetPersonRelatedCharacters)
 
-	addHandle(scope, app.Get, "/v0/indices/:id", h.GetIndex)
-	addHandle(scope, app.Get, "/v0/indices/:id/subjects", h.GetIndexSubjects)
+	addHandle(app.Get, "/v0/characters/:id", h.GetCharacter)
+	addHandle(app.Get, "/v0/characters/:id/subjects", h.GetCharacterRelatedSubjects)
+	addHandle(app.Get, "/v0/characters/:id/persons", h.GetCharacterRelatedPersons)
+
+	addHandle(app.Get, "/v0/episodes/:id", h.GetEpisode)
+	addHandle(app.Get, "/v0/episodes", h.ListEpisode)
+
+	addHandle(app.Get, "/v0/me", h.GetCurrentUser)
+	addHandle(app.Get, "/v0/users/:username/collections", h.ListCollection)
+
+	addHandle(app.Get, "/v0/indices/:id", h.GetIndex)
+	addHandle(app.Get, "/v0/indices/:id/subjects", h.GetIndexSubjects)
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
@@ -78,4 +84,46 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
   "Detail": "This is default 404 response, if you see this response, please check your request path"
 }`)
 	})
+}
+
+// wrap handler to make trace stack works.
+func handlerWrapper(log *zap.Logger, handler fiber.Handler) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		err := handler(ctx)
+		if err == nil {
+			return nil
+		}
+		// Default 500 status code
+		code := fiber.StatusInternalServerError
+		description := "Unexpected Internal Server Error"
+
+		// router will return an un-wrapped error, so just check it like this.
+		// DO NOT rewrite it to errors.Is.
+		if e, ok := err.(*fiber.Error); ok { //nolint:errorlint
+			code = e.Code
+			switch code {
+			case fiber.StatusInternalServerError:
+				break
+			case fiber.StatusNotFound:
+				description = "resource can't be found in the database or has been removed"
+			default:
+				description = e.Error()
+			}
+		} else {
+			log.Error("unexpected error", zap.Error(err),
+				zap.String("path", ctx.Path()), zap.String("cf-ray", ctx.Get("cf-ray")))
+		}
+
+		ctx.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
+
+		return ctx.Status(code).JSON(res.Error{
+			Title:       utils.StatusMessage(code),
+			Description: description,
+			Details: util.Detail{
+				Error:       err.Error(),
+				Path:        ctx.Path(),
+				QueryString: ctx.Request().URI().QueryArgs().String(),
+			},
+		})
+	}
 }

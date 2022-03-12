@@ -26,7 +26,6 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
@@ -99,35 +98,17 @@ func Listen(lc fx.Lifecycle, c config.AppConfig, app *fiber.App) {
 }
 
 func getDefaultErrorHandler() func(c *fiber.Ctx, err error) error {
-	var errLogger = logger.Named("http.err")
+	var log = logger.Named("http.err")
 
 	return func(c *fiber.Ctx, err error) error {
-		// Default 500 status code
-		code := fiber.StatusInternalServerError
-		description := "Unexpected Internal Server Error"
-
-		// router will return an un-wrapped error, so just check it like this.
-		// DO NOT rewrite it to errors.Is, it's not working in this case
-		if e, ok := err.(*fiber.Error); ok { //nolint:errorlint
-			code = e.Code
-			switch code {
-			case fiber.StatusInternalServerError:
-				break
-			case fiber.StatusNotFound:
-				description = "resource can't be found in the database or has been removed"
-			default:
-				description = e.Error()
-			}
-		} else {
-			errLogger.Error(err.Error(),
-				zap.String("path", c.Path()), zap.String("cf-ray", c.Get("cf-ray")))
-		}
+		log.Error("default error handler catch a error", zap.Error(err),
+			zap.String("path", c.Path()), zap.String("cf-ray", c.Get("cf-ray")))
 
 		c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
 
-		return c.Status(code).JSON(res.Error{
-			Title:       utils.StatusMessage(code),
-			Description: description,
+		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
+			Title:       "Internal Server Error",
+			Description: "Unexpected Internal Server Error",
 			Details: util.Detail{
 				Error:       err.Error(),
 				Path:        c.Path(),
