@@ -44,12 +44,18 @@ func (r mysqlRepo) Get(ctx context.Context, episodeID uint32) (model.Episode, er
 	episode, err := r.q.Episode.WithContext(ctx).
 		Where(r.q.Episode.ID.Eq(episodeID), r.q.Episode.Ban.Eq(0)).Limit(1).First()
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Episode{}, domain.ErrNotFound
+		}
+
 		return model.Episode{}, errgo.Wrap(err, "dal")
 	}
 
-	first, err := r.firstEpisode(ctx, episode.SubjectID)
-	if err != nil {
-		return model.Episode{}, err
+	var first float32
+	if episode.Type == enum.EpTypeNormal {
+		if first, err = r.firstEpisode(ctx, episode.SubjectID); err != nil {
+			return model.Episode{}, err
+		}
 	}
 
 	return convertDaoEpisode(episode, first), nil
