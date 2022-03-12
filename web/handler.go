@@ -81,7 +81,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 		return c.SendString(`{
   "title": "Not Found",
   "description": "The path you requested doesn't exist",
-  "Detail": "This is default 404 response, if you see this response, please check your request path"
+  "details": "This is default response, if you see this response, please check your request path"
 }`)
 	})
 }
