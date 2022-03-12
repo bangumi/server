@@ -34,6 +34,7 @@ import (
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/web/middleware/recovery"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/util"
@@ -45,14 +46,10 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 		StrictRouting:         true,
 		CaseSensitive:         true,
 		ErrorHandler:          getDefaultErrorHandler(),
-		JSONEncoder: func(v interface{}) ([]byte, error) {
-			//nolint:wrapcheck
-			return json.MarshalIndentWithOption(v, "", "  ",
-				json.DisableNormalizeUTF8(), json.DisableHTMLEscape())
-		},
+		JSONEncoder:           json.MarshalNoEscape,
 	})
 
-	histogram := scope.Histogram("response_time", tally.DefaultBuckets)
+	histogram := scope.Histogram("response_time", metrics.ResponseTimeBucket())
 	app.Use(func(c *fiber.Ctx) error {
 		start := time.Now()
 

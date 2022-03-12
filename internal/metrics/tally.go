@@ -28,11 +28,39 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 )
 
-// DefaultDurationBucket currently return a bucket
-// [0, .01, .025, .05, .075, .1, .2, .3, .4, .5, .6, .8, 1, 2, 5, +Inf]
-// leave it for future adjustment.
-func DefaultDurationBucket() tally.Buckets {
-	return tally.DefaultBuckets
+func SQLTimeBucket() tally.Buckets {
+	return tally.DurationBuckets{
+		time.Millisecond,
+		time.Millisecond * 2,
+		time.Millisecond * 3,
+		time.Millisecond * 4,
+		time.Millisecond * 5,
+		time.Millisecond * 10,
+		time.Millisecond * 20,
+		time.Millisecond * 30,
+		time.Millisecond * 40,
+		time.Millisecond * 50,
+		time.Millisecond * 100,
+		time.Millisecond * 200,
+		time.Millisecond * 300,
+		time.Millisecond * 500,
+		time.Second,
+	}
+}
+
+func ResponseTimeBucket() tally.Buckets {
+	return tally.DurationBuckets{
+		time.Millisecond,
+		time.Millisecond * 5,
+		time.Millisecond * 10,
+		time.Millisecond * 20,
+		time.Millisecond * 50,
+		time.Millisecond * 100,
+		time.Millisecond * 200,
+		time.Millisecond * 300,
+		time.Millisecond * 500,
+		time.Second,
+	}
 }
 
 func NewScope(lc fx.Lifecycle) (tally.Scope, promreporter.Reporter, prometheus.Registerer) {

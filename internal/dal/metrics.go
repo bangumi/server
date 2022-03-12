@@ -32,7 +32,7 @@ import (
 func newMetricsLog(log gormLogger.Interface, scope tally.Scope) gormLogger.Interface {
 	return metricsLog{
 		Interface: log,
-		h:         scope.Histogram("sql_time", metrics.DefaultDurationBucket()),
+		h:         scope.Histogram("sql_time", metrics.SQLTimeBucket()),
 	}
 }
 
