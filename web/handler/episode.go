@@ -113,7 +113,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 
 	page, err := getPageQuery(c, episodeDefaultLimit, episodeMaxLimit)
 	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, "bad query args: "+err.Error())
+		return err
 	}
 
 	epType, err := parseEpType(c.Query("type"))

@@ -34,7 +34,7 @@ func (h Handler) ListCollection(c *fiber.Ctx) error {
 	v := h.getUser(c)
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, "bad query args: "+err.Error())
+		return err
 	}
 
 	username := c.Params("username")
