@@ -49,8 +49,12 @@ type Mock struct {
 	IndexRepo     domain.IndexRepo
 	Cache         cache.Generic
 }
+type TB interface {
+	Helper()
+	Fatal(args ...interface{})
+}
 
-func GetWebApp(t *testing.T, m Mock) *fiber.App {
+func GetWebApp(t TB, m Mock) *fiber.App {
 	t.Helper()
 	var f *fiber.App
 

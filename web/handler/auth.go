@@ -19,6 +19,7 @@ package handler
 import (
 	"errors"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -29,6 +30,7 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/strutil"
+	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/handler/ctxkey"
 	"github.com/bangumi/server/web/util"
 )
@@ -36,13 +38,16 @@ import (
 const headerCFRay = "Cf-Ray"
 const ctxKeyVisitor = "access-user"
 
-// should bump cache version every time we change domain.Auth.
-const authCacheKeyPrefix = "chii:auth:1:access-token:"
-
 func (h Handler) MiddlewareAccessUser() fiber.Handler {
+	pool := sync.Pool{New: func() interface{} {
+		return &accessor{}
+	}}
+
 	return func(ctx *fiber.Ctx) error {
-		a, err := getVisitor(h, ctx)
-		if err != nil {
+		var a = pool.Get().(*accessor) //nolint:forcetypeassert
+		defer pool.Put(a)
+
+		if err := h.fill(ctx, a); err != nil {
 			return err
 		}
 
@@ -51,8 +56,8 @@ func (h Handler) MiddlewareAccessUser() fiber.Handler {
 		return ctx.Next()
 	}
 }
-func (h Handler) getUser(c *fiber.Ctx) accessor {
-	u, ok := c.Context().UserValue(ctxkey.User).(accessor) // get visitor
+func (h Handler) getUser(c *fiber.Ctx) *accessor {
+	u, ok := c.Context().UserValue(ctxkey.User).(*accessor) // get visitor
 	if !ok {
 		panic("can't convert type")
 	}
@@ -60,53 +65,47 @@ func (h Handler) getUser(c *fiber.Ctx) accessor {
 	return u
 }
 
-func getVisitor(h Handler, c *fiber.Ctx) (accessor, error) {
-	a := accessor{
-		Auth:  domain.Auth{},
-		login: false,
-		cfRay: c.Get(headerCFRay),
-		ip:    util.RequestIP(c),
-	}
+func (h Handler) fill(c *fiber.Ctx, a *accessor) error {
+	a.login = false
+	a.cfRay = c.Get(headerCFRay)
+	a.ip = util.RequestIP(c)
 
 	authorization := c.Get(fiber.HeaderAuthorization)
 	if authorization == "" {
-		return a, nil
+		return nil
 	}
 
-	key, value := strutil.Partition(authorization, ' ')
+	key, token := strutil.Partition(authorization, ' ')
 	if key != "Bearer" {
-		return a, fiber.NewError(fiber.StatusUnauthorized,
+		return fiber.NewError(fiber.StatusUnauthorized,
 			"http Authorization header has wrong scope")
 	}
 
-	var u domain.Auth
+	var cacheKey = cachekey.Auth(token)
 
-	var cacheKey = authCacheKeyPrefix + value
-
-	ok, err := h.cache.Get(c.Context(), cacheKey, &u)
+	ok, err := h.cache.Get(c.Context(), cacheKey, &a.Auth)
 	if err != nil {
-		return a, errgo.Wrap(err, "cache")
+		return errgo.Wrap(err, "cache.Get")
+	}
+	if ok {
+		a.login = true
+		return nil
 	}
 
-	if !ok {
-		u, err = h.a.GetByToken(c.Context(), value)
-		if err != nil {
-			if errors.Is(err, domain.ErrNotFound) {
-				return a, nil
-			}
-
-			return a, errgo.Wrap(err, "repo")
+	if a.Auth, err = h.a.GetByToken(c.Context(), token); err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return fiber.NewError(fiber.StatusUnauthorized,
+				"access token has been expired or doesn't exist")
 		}
 
-		if err := h.cache.Set(c.Context(), cacheKey, u, time.Minute); err != nil {
-			logger.Error("can't set cache value", zap.Error(err))
-		}
+		return errgo.Wrap(err, "auth.GetByToken")
 	}
 
-	a.Auth = u
-	a.login = true
+	if err := h.cache.Set(c.Context(), cacheKey, a.Auth, time.Hour); err != nil {
+		logger.Error("can't set cache value", zap.Error(err))
+	}
 
-	return a, nil
+	return nil
 }
 
 type accessor struct {
