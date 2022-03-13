@@ -26,10 +26,12 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/errgo"
@@ -95,21 +97,44 @@ func Listen(lc fx.Lifecycle, c config.AppConfig, app *fiber.App) {
 }
 
 func getDefaultErrorHandler() func(c *fiber.Ctx, err error) error {
-	var log = logger.Named("http.err")
+	var log = logger.Named("http.err").WithOptions(zap.AddStacktrace(zapcore.PanicLevel))
 
-	return func(c *fiber.Ctx, err error) error {
-		log.Error("default error handler catch a error", zap.Error(err),
-			zap.String("path", c.Path()), zap.String("cf-ray", c.Get("cf-ray")))
+	return func(ctx *fiber.Ctx, err error) error {
+		// Default 500 status code
+		code := fiber.StatusInternalServerError
+		title := "Internal Server Error"
+		description := "Unexpected Internal Server Error"
 
-		c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
+		// router will return an un-wrapped error, so just check it like this.
+		// DO NOT rewrite it to errors.Is.
+		if e, ok := err.(*fiber.Error); ok { //nolint:errorlint
+			code = e.Code
+			switch e.Code {
+			case fiber.StatusInternalServerError:
+				break
+			case fiber.StatusNotFound:
+				description = "resource can't be found in the database or has been removed"
+				title = utils.StatusMessage(code)
+			default:
+				description = e.Error()
+				title = utils.StatusMessage(code)
+			}
+		} else {
+			log.Error("unexpected error",
+				zap.Error(err),
+				zap.String("path", ctx.Path()),
+				zap.ByteString("query", ctx.Request().URI().QueryString()),
+				zap.String("cf-ray", ctx.Get("cf-ray")),
+			)
+		}
 
-		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
-			Title:       "Internal Server Error",
-			Description: "Unexpected Internal Server Error",
+		return ctx.Status(code).JSON(res.Error{
+			Title:       title,
+			Description: description,
 			Details: util.Detail{
 				Error:       err.Error(),
-				Path:        c.Path(),
-				QueryString: c.Request().URI().QueryArgs().String(),
+				Path:        ctx.Path(),
+				QueryString: utils.UnsafeString(ctx.Request().URI().QueryString()),
 			},
 		})
 	}
