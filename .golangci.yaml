@@ -292,6 +292,7 @@ linters:
     - dupl
     - cyclop # we have gocyclo
     - goimports # we have gci already
+    - nlreturn
   fast: false
 
 issues:
@@ -304,7 +305,7 @@ issues:
       linters: [gochecknoglobals, gochecknoinits, goerr113, wrapcheck]
 
     - path: '.*_test\.go'
-      linters: [gocritic, nlreturn, gochecknoglobals]
+      linters: [gocritic, gochecknoglobals]
 
     - source: "var log"
       linters: [gochecknoglobals]

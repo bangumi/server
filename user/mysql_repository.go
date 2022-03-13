@@ -97,6 +97,7 @@ func (m mysqlRepo) ListCollections(
 
 	collections, err := q.Find()
 	if err != nil {
+		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -128,8 +129,7 @@ func (m mysqlRepo) GetByID(ctx context.Context, userID uint32) (model.User, erro
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
-
-		return model.User{}, errgo.Wrap(err, "gorm")
+		return model.User{}, errgo.Wrap(err, "dal")
 	}
 
 	return fromDao(u), nil
@@ -143,8 +143,7 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (model.User, 
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
-
-		return model.User{}, errgo.Wrap(err, "gorm")
+		return model.User{}, errgo.Wrap(err, "dal")
 	}
 
 	return fromDao(u), nil
@@ -154,8 +153,7 @@ func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...uint32) (map[uint32]mode
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.UID.In(ids...)).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))
-
-		return nil, errgo.Wrap(err, "gorm")
+		return nil, errgo.Wrap(err, "dal")
 	}
 
 	var r = make(map[uint32]model.User, len(ids))
