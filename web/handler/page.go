@@ -69,8 +69,8 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 				"can't parse query args offset as int: "+strconv.Quote(raw))
 		}
 
-		if q.Limit <= 0 {
-			return q, fiber.NewError(fiber.StatusBadRequest, "limit should greater than 0")
+		if q.Offset <= 0 {
+			return q, fiber.NewError(fiber.StatusBadRequest, "offset should greater than 0")
 		}
 	}
 
