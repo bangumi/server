@@ -62,8 +62,10 @@ func (h Handler) GetCharacter(c *fiber.Ctx) error {
 	}
 
 	if r.NSFW && !u.AllowNSFW() {
-		// default Handler will return a 404 response
-		return c.Next()
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
 	}
 
 	return c.JSON(r)

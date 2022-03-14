@@ -178,15 +178,11 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok {
+	if !ok || r.Redirect != 0 {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
 		})
-	}
-
-	if r.Redirect != 0 {
-		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
 	relations, err := h.c.GetPersonRelated(c.Context(), id)
@@ -221,15 +217,11 @@ func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok {
+	if !ok || r.Redirect != 0 {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
 		})
-	}
-
-	if r.Redirect != 0 {
-		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
 	relations, err := h.s.GetPersonRelated(c.Context(), id)

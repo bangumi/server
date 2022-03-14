@@ -83,6 +83,7 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 	}
 
 	if !v.AllowNSFW() {
+		// TODO: merge 2 branches and check nsfw instead.
 		nsfw, err := h.getIndexNsfwWithCache(c.Context(), id)
 		if err != nil {
 			return err
@@ -141,6 +142,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 	}
 
 	if !v.AllowNSFW() {
+		// TODO: merge 2 branches and check nsfw instead.
 		nsfw, err := h.getIndexNsfwWithCache(c.Context(), id)
 		if err != nil {
 			return err

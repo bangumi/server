@@ -37,12 +37,14 @@ import (
 )
 
 func (h Handler) GetEpisode(c *fiber.Ctx) error {
+	u := h.getUser(c)
+
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
 	}
 
-	r, ok, err := h.getEpisodeWithCache(c.Context(), id)
+	e, ok, err := h.getEpisodeWithCache(c.Context(), id)
 	if err != nil {
 		return err
 	}
@@ -54,7 +56,18 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(r)
+	s, ok, err := h.getSubjectWithCache(c.Context(), e.SubjectID)
+	if err != nil {
+		return err
+	}
+	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	return c.JSON(e)
 }
 
 func (h Handler) getEpisodeWithCache(ctx context.Context, id uint32) (res.Episode, bool, error) {

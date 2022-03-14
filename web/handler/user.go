@@ -25,7 +25,7 @@ import (
 
 func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
 	u := h.getUser(c)
-	if u.ID == 0 {
+	if !u.login || u.ID == 0 {
 		return fiber.ErrUnauthorized
 	}
 
