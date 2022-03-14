@@ -32,8 +32,7 @@ type pageQuery struct {
 
 func (q pageQuery) check(count int64) error {
 	if q.Limit > int(count) {
-		return fiber.NewError(fiber.StatusBadRequest,
-			"limit should less equal than "+strconv.FormatInt(count, 10))
+		return fiber.NewError(fiber.StatusBadRequest, "limit should less equal than "+strconv.FormatInt(count, 10))
 	}
 
 	return nil
@@ -47,17 +46,14 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 	if raw != "" {
 		q.Limit, err = strconv.Atoi(raw)
 		if err != nil {
-			return q, fiber.NewError(fiber.StatusBadRequest,
-				"can't parse query args limit as int: "+strconv.Quote(raw))
+			return q, fiber.NewError(fiber.StatusBadRequest, "can't parse query args limit as int: "+strconv.Quote(raw))
 		}
 
 		if q.Limit > maxLimit {
-			return q, fiber.NewError(fiber.StatusBadRequest,
-				"limit should less equal than "+strconv.Itoa(maxLimit))
+			return q, fiber.NewError(fiber.StatusBadRequest, "limit should less equal than "+strconv.Itoa(maxLimit))
 		}
 		if q.Limit <= 0 {
-			return q, fiber.NewError(fiber.StatusBadRequest,
-				"limit should greater equal zero")
+			return q, fiber.NewError(fiber.StatusBadRequest, "limit should greater equal zero")
 		}
 	}
 
@@ -65,8 +61,7 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 	if raw != "" {
 		q.Offset, err = strconv.Atoi(raw)
 		if err != nil {
-			return q, fiber.NewError(fiber.StatusBadRequest,
-				"can't parse query args offset as int: "+strconv.Quote(raw))
+			return q, fiber.NewError(fiber.StatusBadRequest, "can't parse query args offset as int: "+strconv.Quote(raw))
 		}
 
 		if q.Offset < 0 {

@@ -39,9 +39,7 @@ const headerCFRay = "Cf-Ray"
 const ctxKeyVisitor = "access-user"
 
 func (h Handler) MiddlewareAccessUser() fiber.Handler {
-	pool := sync.Pool{New: func() interface{} {
-		return &accessor{}
-	}}
+	pool := sync.Pool{New: func() interface{} { return &accessor{} }}
 
 	return func(ctx *fiber.Ctx) error {
 		var a = pool.Get().(*accessor) //nolint:forcetypeassert
@@ -77,8 +75,7 @@ func (h Handler) fill(c *fiber.Ctx, a *accessor) error {
 
 	key, token := strutil.Partition(authorization, ' ')
 	if key != "Bearer" {
-		return fiber.NewError(fiber.StatusUnauthorized,
-			"http Authorization header has wrong scope")
+		return fiber.NewError(fiber.StatusUnauthorized, "http Authorization header has wrong scope")
 	}
 
 	var cacheKey = cachekey.Auth(token)
@@ -94,8 +91,7 @@ func (h Handler) fill(c *fiber.Ctx, a *accessor) error {
 
 	if a.Auth, err = h.a.GetByToken(c.Context(), token); err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.NewError(fiber.StatusUnauthorized,
-				"access token has been expired or doesn't exist")
+			return fiber.NewError(fiber.StatusUnauthorized, "access token has been expired or doesn't exist")
 		}
 
 		return errgo.Wrap(err, "auth.GetByToken")

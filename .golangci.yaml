@@ -34,13 +34,13 @@ output:
   print-linter-name: true
 
   # make issues output unique by line, default is true
-  uniq-by-line: false
+  uniq-by-line: true
 
   # add a prefix to the output file references; default is no prefix
   path-prefix: ""
 
   # sorts results by: filepath, line and column
-  sort-results: false
+  sort-results: true
 
 # all available settings of specific linters
 linters-settings:
@@ -72,7 +72,7 @@ linters-settings:
   errcheck:
     # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
     # default is false: such cases aren't reported by default.
-    check-type-assertions: true
+    check-type-assertions: false
 
     # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
     # default is false: such cases aren't reported by default.
@@ -151,12 +151,6 @@ linters-settings:
           - "!**/*_test.go"
           - "!/mocks/**/*.go"
 
-  gosec:
-    excludes:
-      - G401
-      - G505
-      - G501 # md5
-
   gomnd:
     settings:
       mnd:
@@ -190,7 +184,7 @@ linters-settings:
   lll:
     # max line length, lines longer will be reported. Default is 120.
     # '\t' is counted as 1 character by default, and can be changed with the tab-width option
-    line-length: 100
+    line-length: 120
     # tab width in spaces. Default to 1.
     tab-width: 2
 
@@ -217,10 +211,6 @@ linters-settings:
   unused:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17"
-
-  whitespace:
-    multi-if: false # Enforces newlines (or comments) after every multi-line if statement
-    multi-func: false # Enforces newlines (or comments) after every multi-line function signature
 
   exhaustive:
     # check switch statements in generated files also
@@ -260,10 +250,6 @@ linters-settings:
     max-decl-lines: 1
     # Maximum length of vars declaration measured in number of characters, after which linter won't suggest using short syntax.
     max-decl-chars: 30
-  wsl:
-    allow-cuddle-declarations: true
-    allow-assign-and-call: true
-    force-err-cuddling: false
 
   tagliatelle:
     # Check the struck tag name case.
@@ -293,6 +279,7 @@ linters:
     - cyclop # we have gocyclo
     - goimports # we have gci already
     - nlreturn
+    - whitespace
   fast: false
 
 issues:
