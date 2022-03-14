@@ -19,7 +19,6 @@ package character
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -114,9 +113,6 @@ func (r mysqlRepo) GetSubjectRelated(
 			TypeID:      relation.CrtType,
 		}
 	}
-
-	fmt.Println(relations)
-	fmt.Println(rel)
 
 	return rel, nil
 }

@@ -18,7 +18,6 @@ package person
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
@@ -77,14 +76,10 @@ func (s service) GetCharacterRelated(
 		personIDs[i] = relation.PersonID
 	}
 
-	fmt.Println(personIDs)
-
 	persons, err := s.repo.GetByIDs(ctx, personIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}
-
-	fmt.Println(persons)
 
 	subject, err := s.s.Get(ctx, subjectID)
 	if err != nil {

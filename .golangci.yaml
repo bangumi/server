@@ -94,6 +94,8 @@ linters-settings:
     # Forbid the following identifiers (identifiers are written using regexp):
     forbid:
       - ^print.*$
+      - ^fmt.Println$
+      - ^fmt.Print$
 
   funlen:
     lines: 60
