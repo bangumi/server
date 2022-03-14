@@ -130,6 +130,8 @@ func platformString(s model.Subject) *string {
 }
 
 func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
+	u := h.getUser(c)
+
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
@@ -140,7 +142,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok || r.Redirect != 0 {
+	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
