@@ -19,6 +19,7 @@ package character
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -105,13 +106,17 @@ func (r mysqlRepo) GetSubjectRelated(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var rel = make([]domain.SubjectCharacterRelation, 0, len(relations))
-	for _, relation := range relations {
-		rel = append(rel, domain.SubjectCharacterRelation{
+	var rel = make([]domain.SubjectCharacterRelation, len(relations))
+	for i, relation := range relations {
+		rel[i] = domain.SubjectCharacterRelation{
 			CharacterID: relation.CharacterID,
+			SubjectID:   relation.SubjectID,
 			TypeID:      relation.CrtType,
-		})
+		}
 	}
+
+	fmt.Println(relations)
+	fmt.Println(rel)
 
 	return rel, nil
 }

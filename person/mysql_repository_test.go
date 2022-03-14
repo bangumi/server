@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/subject"
 )
 
@@ -48,4 +49,22 @@ func TestGet(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, uint32(1), s.ID)
+}
+
+func TestMysqlRepo_GetByIDs(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	s, err := repo.GetByIDs(context.Background(), 1, 2)
+	require.NoError(t, err)
+
+	_, ok := s[1]
+	assert.True(t, ok)
+	assert.Equal(t, model.PersonIDType(1), s[1].ID)
+
+	_, ok = s[2]
+	assert.True(t, ok)
+	assert.Equal(t, model.PersonIDType(2), s[2].ID)
 }

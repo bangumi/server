@@ -109,8 +109,7 @@ func (r mysqlRepo) GetByIDs(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var result = make(map[uint32]model.Person, len(ids))
-
+	var result = make(map[model.PersonIDType]model.Person, len(ids))
 	for _, p := range u {
 		result[p.ID] = ConvertDao(p)
 	}

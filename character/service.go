@@ -44,17 +44,17 @@ func (s service) GetPersonRelated(
 		return nil, errgo.Wrap(err, "CharacterRepo.GetPersonRelated")
 	}
 
-	var subjectIDs = make([]model.SubjectIDType, len(relations))
-	var results = make([]model.PersonCharacterRelation, len(relations))
+	var characterIDs = make([]model.CharacterIDType, len(relations))
 	for i, relation := range relations {
-		subjectIDs[i] = relation.SubjectID
+		characterIDs[i] = relation.CharacterID
 	}
 
-	characters, err := s.repo.GetByIDs(ctx, subjectIDs...)
+	characters, err := s.repo.GetByIDs(ctx, characterIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
 	}
 
+	var results = make([]model.PersonCharacterRelation, len(relations))
 	for i, rel := range relations {
 		results[i].Character = characters[rel.CharacterID]
 	}
@@ -70,19 +70,22 @@ func (s service) GetSubjectRelated(
 		return nil, errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
 	}
 
-	var subjectIDs = make([]model.SubjectIDType, len(relations))
-	var results = make([]model.SubjectCharacterRelation, len(relations))
+	var characterIDs = make([]model.CharacterIDType, len(relations))
 	for i, relation := range relations {
-		subjectIDs[i] = relation.SubjectID
+		characterIDs[i] = relation.CharacterID
 	}
 
-	characters, err := s.repo.GetByIDs(ctx, subjectIDs...)
+	characters, err := s.repo.GetByIDs(ctx, characterIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
 	}
 
+	var results = make([]model.SubjectCharacterRelation, len(relations))
 	for i, rel := range relations {
-		results[i].Character = characters[rel.CharacterID]
+		results[i] = model.SubjectCharacterRelation{
+			Character: characters[rel.CharacterID],
+			TypeID:    rel.TypeID,
+		}
 	}
 
 	return results, nil

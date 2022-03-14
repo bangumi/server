@@ -18,18 +18,20 @@ package person
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/model"
 )
 
-func NewService(p domain.PersonRepo) domain.PersonService {
-	return service{repo: p}
+func NewService(p domain.PersonRepo, s domain.SubjectRepo) domain.PersonService {
+	return service{repo: p, s: s}
 }
 
 type service struct {
 	repo domain.PersonRepo
+	s    domain.SubjectRepo
 }
 
 func (s service) Get(ctx context.Context, id uint32) (model.Person, error) {
@@ -44,19 +46,19 @@ func (s service) GetSubjectRelated(
 		return nil, errgo.Wrap(err, "PersonRepo.GetSubjectRelated")
 	}
 
-	var subjectIDs = make([]model.SubjectIDType, len(relations))
-	var results = make([]model.SubjectPersonRelation, len(relations))
+	var personIDs = make([]model.PersonIDType, len(relations))
 	for i, relation := range relations {
-		subjectIDs[i] = relation.SubjectID
+		personIDs[i] = relation.PersonID
 	}
 
-	characters, err := s.repo.GetByIDs(ctx, subjectIDs...)
+	persons, err := s.repo.GetByIDs(ctx, personIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}
 
+	var results = make([]model.SubjectPersonRelation, len(relations))
 	for i, rel := range relations {
-		results[i].Person = characters[rel.PersonID]
+		results[i].Person = persons[rel.PersonID]
 	}
 
 	return results, nil
@@ -70,19 +72,32 @@ func (s service) GetCharacterRelated(
 		return nil, errgo.Wrap(err, "PersonRepo.GetCharacterRelated")
 	}
 
-	var subjectIDs = make([]model.SubjectIDType, len(relations))
-	var results = make([]model.PersonCharacterRelation, len(relations))
+	var personIDs = make([]model.PersonIDType, len(relations))
 	for i, relation := range relations {
-		subjectIDs[i] = relation.SubjectID
+		personIDs[i] = relation.PersonID
 	}
 
-	characters, err := s.repo.GetByIDs(ctx, subjectIDs...)
+	fmt.Println(personIDs)
+
+	persons, err := s.repo.GetByIDs(ctx, personIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}
 
+	fmt.Println(persons)
+
+	subject, err := s.s.Get(ctx, subjectID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "SubjectRepo.Get")
+	}
+
+	var results = make([]model.PersonCharacterRelation, len(relations))
 	for i, rel := range relations {
-		results[i].Person = characters[rel.PersonID]
+		results[i] = model.PersonCharacterRelation{
+			Subject: subject,
+			Person:  persons[rel.PersonID],
+			TypeID:  rel.TypeID,
+		}
 	}
 
 	return results, nil
