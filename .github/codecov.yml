@@ -3,4 +3,5 @@ ignore:
   - "**/*_test.go"
   - "**/*.gen.go"
   - "internal/dal/query/gen.go"
+  - "mocks/"
   - "internal/cmd/gen/"
