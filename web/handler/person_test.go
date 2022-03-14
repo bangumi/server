@@ -27,8 +27,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/cache"
-	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/mocks"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/res"
@@ -36,7 +36,7 @@ import (
 
 func TestHandler_GetPerson_HappyPath(t *testing.T) {
 	t.Parallel()
-	m := &domain.MockPersonRepo{}
+	m := &mocks.PersonRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Person{ID: 7}, nil)
 
 	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
@@ -52,7 +52,7 @@ func TestHandler_GetPerson_HappyPath(t *testing.T) {
 
 func TestHandler_GetPerson_Redirect(t *testing.T) {
 	t.Parallel()
-	m := &domain.MockPersonRepo{}
+	m := &mocks.PersonRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Person{ID: 7}, nil)
 
 	app := test.GetWebApp(t, test.Mock{PersonRepo: m})

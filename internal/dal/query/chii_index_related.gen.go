@@ -208,6 +208,10 @@ func (i indexSubjectDo) Clauses(conds ...clause.Expression) *indexSubjectDo {
 	return i.withDO(i.DO.Clauses(conds...))
 }
 
+func (i indexSubjectDo) Returning(value interface{}, columns ...string) *indexSubjectDo {
+	return i.withDO(i.DO.Returning(value, columns...))
+}
+
 func (i indexSubjectDo) Not(conds ...gen.Condition) *indexSubjectDo {
 	return i.withDO(i.DO.Not(conds...))
 }
@@ -371,16 +375,22 @@ func (i indexSubjectDo) FirstOrCreate() (*dao.IndexSubject, error) {
 }
 
 func (i indexSubjectDo) FindByPage(offset int, limit int) (result []*dao.IndexSubject, count int64, err error) {
-	count, err = i.Count()
-	if err != nil {
-		return
-	}
-
 	if limit <= 0 {
+		count, err = i.Count()
 		return
 	}
 
 	result, err = i.Offset(offset).Limit(limit).Find()
+	if err != nil {
+		return
+	}
+
+	if size := len(result); 0 < size && size < limit {
+		count = int64(size + offset)
+		return
+	}
+
+	count, err = i.Offset(-1).Limit(-1).Count()
 	return
 }
 

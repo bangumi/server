@@ -189,21 +189,21 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
-	characters, subjects, relation, err := h.c.GetPersonRelated(c.Context(), id)
+	relations, err := h.c.GetPersonRelated(c.Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	var response = make([]res.PersonRelatedCharacter, len(subjects))
-	for i, subject := range subjects {
+	var response = make([]res.PersonRelatedCharacter, len(relations))
+	for i, rel := range relations {
 		response[i] = res.PersonRelatedCharacter{
-			ID:            characters[i].ID,
-			Name:          characters[i].Name,
-			Type:          relation[i].Type,
-			Images:        model.PersonImage(subject.Image),
-			SubjectID:     subject.ID,
-			SubjectName:   subject.Name,
-			SubjectNameCn: subject.NameCN,
+			ID:            rel.Character.ID,
+			Name:          rel.Character.Name,
+			Type:          rel.TypeID,
+			Images:        model.PersonImage(rel.Subject.Image),
+			SubjectID:     rel.Subject.ID,
+			SubjectName:   rel.Subject.Name,
+			SubjectNameCn: rel.Subject.NameCN,
 		}
 	}
 
@@ -232,19 +232,19 @@ func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
-	subjects, relation, err := h.s.GetPersonRelated(c.Context(), id)
+	relations, err := h.s.GetPersonRelated(c.Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	var response = make([]res.PersonRelatedSubject, len(subjects))
-	for i, subject := range subjects {
+	var response = make([]res.PersonRelatedSubject, len(relations))
+	for i, relation := range relations {
 		response[i] = res.PersonRelatedSubject{
-			SubjectID: subject.ID,
-			Staff:     vars.StaffMap[subject.TypeID][relation[i].ID].String(),
-			Name:      subject.Name,
-			NameCn:    subject.NameCN,
-			Image:     model.SubjectImage(subject.Image).Large,
+			SubjectID: relation.Subject.ID,
+			Staff:     vars.StaffMap[relation.Subject.TypeID][relation.TypeID].String(),
+			Name:      relation.Subject.Name,
+			NameCn:    relation.Subject.NameCN,
+			Image:     model.SubjectImage(relation.Subject.Image).Large,
 		}
 	}
 

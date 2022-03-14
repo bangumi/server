@@ -8,8 +8,8 @@ const TableNamePersonField = "chii_person_fields"
 
 // PersonField mapped from table <chii_person_fields>
 type PersonField struct {
-	OwnerType string `gorm:"column:prsn_cat;type:enum('prsn','crt');primaryKey;autoIncrement:false" json:"prsn_cat"`
-	OwnerID   uint32 `gorm:"column:prsn_id;type:int(8) unsigned;primaryKey;autoIncrement:false;index:prsn_id,priority:1" json:"prsn_id"`
+	OwnerType string `gorm:"column:prsn_cat;type:enum('prsn','crt');primaryKey" json:"prsn_cat"`
+	OwnerID   uint32 `gorm:"column:prsn_id;type:int(8) unsigned;primaryKey;index:prsn_id,priority:1" json:"prsn_id"`
 	Gender    uint8  `gorm:"column:gender;type:tinyint(4) unsigned;not null" json:"gender"`
 	Bloodtype uint8  `gorm:"column:bloodtype;type:tinyint(4) unsigned;not null" json:"bloodtype"`
 	BirthYear uint16 `gorm:"column:birth_year;type:year(4);not null" json:"birth_year"`

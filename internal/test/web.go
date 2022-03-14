@@ -28,12 +28,15 @@ import (
 
 	"github.com/bangumi/server/auth"
 	"github.com/bangumi/server/cache"
+	"github.com/bangumi/server/character"
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
+	"github.com/bangumi/server/mocks"
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/person"
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/web"
 	"github.com/bangumi/server/web/handler"
@@ -73,6 +76,12 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 			handler.New,
 		),
 
+		fx.Provide(
+			character.NewService,
+			subject.NewService,
+			person.NewService,
+		),
+
 		MockPersonRepo(m.PersonRepo),
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
@@ -103,7 +112,7 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 
 func MockIndexRepo(repo domain.IndexRepo) fx.Option {
 	if repo == nil {
-		mocker := &domain.MockIndexRepo{}
+		mocker := &mocks.IndexRepo{}
 
 		repo = mocker
 	}
@@ -113,7 +122,7 @@ func MockIndexRepo(repo domain.IndexRepo) fx.Option {
 
 func MockUserRepo(repo domain.UserRepo) fx.Option {
 	if repo == nil {
-		mocker := &domain.MockUserRepo{}
+		mocker := &mocks.UserRepo{}
 		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(model.User{}, nil)
 
 		repo = mocker
@@ -124,7 +133,7 @@ func MockUserRepo(repo domain.UserRepo) fx.Option {
 
 func MockPersonRepo(m domain.PersonRepo) fx.Option {
 	if m == nil {
-		mocker := &domain.MockPersonRepo{}
+		mocker := &mocks.PersonRepo{}
 		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Person{}, nil)
 
 		m = mocker
@@ -135,7 +144,7 @@ func MockPersonRepo(m domain.PersonRepo) fx.Option {
 
 func MockCharacterRepo(m domain.CharacterRepo) fx.Option {
 	if m == nil {
-		mocker := &domain.MockCharacterRepo{}
+		mocker := &mocks.CharacterRepo{}
 		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Character{}, nil)
 
 		m = mocker
@@ -146,7 +155,7 @@ func MockCharacterRepo(m domain.CharacterRepo) fx.Option {
 
 func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 	if m == nil {
-		mocker := &domain.MockEpisodeRepo{}
+		mocker := &mocks.EpisodeRepo{}
 		mocker.EXPECT().Count(mock.Anything, mock.Anything).Return(0, nil)
 
 		m = mocker
@@ -157,7 +166,7 @@ func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 
 func MockAuthRepo(m domain.AuthRepo) fx.Option {
 	if m == nil {
-		mocker := &domain.MockAuthRepo{}
+		mocker := &mocks.AuthRepo{}
 		mocker.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
 
 		m = mocker
@@ -168,7 +177,7 @@ func MockAuthRepo(m domain.AuthRepo) fx.Option {
 
 func MockSubjectRepo(m domain.SubjectRepo) fx.Option {
 	if m == nil {
-		mocker := &domain.MockSubjectRepo{}
+		mocker := &mocks.SubjectRepo{}
 		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{}, nil)
 
 		m = mocker
@@ -182,7 +191,7 @@ func MockCache(mock cache.Generic) fx.Option {
 }
 
 func MockEmptyCache() fx.Option {
-	mc := &cache.MockGeneric{}
+	mc := &mocks.Generic{}
 	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
 	mc.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 

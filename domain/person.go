@@ -24,26 +24,15 @@ import (
 
 type PersonRepo interface {
 	Get(ctx context.Context, id uint32) (model.Person, error)
+	GetByIDs(ctx context.Context, ids ...model.PersonIDType) (map[model.PersonIDType]model.Person, error)
 
-	GetSubjectRelated(
-		ctx context.Context,
-		subjectID SubjectIDType,
-	) ([]model.Person, []model.PersonSubjectRelation, error)
-
-	GetActors(
-		ctx context.Context,
-		subjectID SubjectIDType,
-		characterIDs ...CharacterIDType,
-	) (map[CharacterIDType][]model.Person, error)
-
-	GetCharacterRelated(
-		ctx context.Context,
-		subjectID CharacterIDType,
-	) ([]CharacterCast, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]SubjectPersonRelation, error)
+	GetCharacterRelated(ctx context.Context, subjectID model.CharacterIDType) ([]PersonCharacterRelation, error)
 }
 
-type CharacterCast struct {
-	Character model.Character
-	Person    model.Person
-	Subject   model.Subject
+type PersonService interface {
+	Get(ctx context.Context, id uint32) (model.Person, error)
+
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]model.SubjectPersonRelation, error)
+	GetCharacterRelated(ctx context.Context, subjectID model.CharacterIDType) ([]model.PersonCharacterRelation, error)
 }

@@ -24,9 +24,9 @@ import (
 )
 
 func New(
-	s domain.SubjectRepo,
-	c domain.CharacterRepo,
-	p domain.PersonRepo,
+	s domain.SubjectService,
+	c domain.CharacterService,
+	p domain.PersonService,
 	a domain.AuthRepo,
 	e domain.EpisodeRepo,
 	index domain.IndexRepo,
@@ -49,11 +49,11 @@ func New(
 
 type Handler struct {
 	// replace it with service, when it's too complex. Just use a repository currently.
-	s     domain.SubjectRepo
-	p     domain.PersonRepo
+	s     domain.SubjectService
+	p     domain.PersonService
 	a     domain.AuthRepo
 	e     domain.EpisodeRepo
-	c     domain.CharacterRepo
+	c     domain.CharacterService
 	u     domain.UserRepo
 	i     domain.IndexRepo
 	cache cache.Generic

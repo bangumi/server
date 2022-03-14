@@ -8,12 +8,12 @@ const TableNameSubjectRelation = "chii_subject_relations"
 
 // SubjectRelation mapped from table <chii_subject_relations>
 type SubjectRelation struct {
-	SubjectID            uint32  `gorm:"column:rlt_subject_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:false;uniqueIndex:rlt_subject_id,priority:1;index:rlt_relation_type,priority:2" json:"rlt_subject_id"` // 关联主 ID
+	SubjectID            uint32  `gorm:"column:rlt_subject_id;type:mediumint(8) unsigned;primaryKey;uniqueIndex:rlt_subject_id,priority:1;index:rlt_relation_type,priority:2" json:"rlt_subject_id"` // 关联主 ID
 	SubjectTypeID        uint8   `gorm:"column:rlt_subject_type_id;type:tinyint(3) unsigned;not null;index:rlt_subject_type_id,priority:1" json:"rlt_subject_type_id"`
-	RelationType         uint16  `gorm:"column:rlt_relation_type;type:smallint(5) unsigned;not null;index:rlt_relation_type,priority:1" json:"rlt_relation_type"`                                                                        // 关联类型
-	RelatedSubjectID     uint32  `gorm:"column:rlt_related_subject_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:false;uniqueIndex:rlt_subject_id,priority:2;index:rlt_relation_type,priority:3" json:"rlt_related_subject_id"` // 关联目标 ID
-	RelatedSubjectTypeID uint8   `gorm:"column:rlt_related_subject_type_id;type:tinyint(3) unsigned;not null;index:rlt_related_subject_type_id,priority:1" json:"rlt_related_subject_type_id"`                                           // 关联目标类型
-	ViceVersa            bool    `gorm:"column:rlt_vice_versa;type:tinyint(1) unsigned;primaryKey;autoIncrement:false;uniqueIndex:rlt_subject_id,priority:3" json:"rlt_vice_versa"`
+	RelationType         uint16  `gorm:"column:rlt_relation_type;type:smallint(5) unsigned;not null;index:rlt_relation_type,priority:1" json:"rlt_relation_type"`                                                    // 关联类型
+	RelatedSubjectID     uint32  `gorm:"column:rlt_related_subject_id;type:mediumint(8) unsigned;primaryKey;uniqueIndex:rlt_subject_id,priority:2;index:rlt_relation_type,priority:3" json:"rlt_related_subject_id"` // 关联目标 ID
+	RelatedSubjectTypeID uint8   `gorm:"column:rlt_related_subject_type_id;type:tinyint(3) unsigned;not null;index:rlt_related_subject_type_id,priority:1" json:"rlt_related_subject_type_id"`                       // 关联目标类型
+	ViceVersa            bool    `gorm:"column:rlt_vice_versa;type:tinyint(1) unsigned;primaryKey;uniqueIndex:rlt_subject_id,priority:3" json:"rlt_vice_versa"`
 	Order                uint8   `gorm:"column:rlt_order;type:tinyint(3) unsigned;not null;index:rlt_related_subject_type_id,priority:2" json:"rlt_order"` // 关联排序
 	Subject              Subject `gorm:"foreignKey:rlt_related_subject_id;references:subject_id" json:"subject"`
 }

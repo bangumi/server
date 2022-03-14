@@ -22,12 +22,11 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/model"
 )
 
-func parseSubjectID(s string) (domain.SubjectIDType, error) {
+func parseSubjectID(s string) (model.SubjectIDType, error) {
 	if s == "" {
 		return 0, nil
 	}
@@ -37,7 +36,7 @@ func parseSubjectID(s string) (domain.SubjectIDType, error) {
 		return 0, fiber.NewError(http.StatusBadRequest, "bad subject id: "+strconv.Quote(s))
 	}
 
-	return domain.SubjectIDType(subjectID), nil
+	return model.SubjectIDType(subjectID), nil
 }
 
 func parseSubjectType(s string) (uint8, error) {

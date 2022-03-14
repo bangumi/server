@@ -246,6 +246,10 @@ func (m memberDo) Clauses(conds ...clause.Expression) *memberDo {
 	return m.withDO(m.DO.Clauses(conds...))
 }
 
+func (m memberDo) Returning(value interface{}, columns ...string) *memberDo {
+	return m.withDO(m.DO.Returning(value, columns...))
+}
+
 func (m memberDo) Not(conds ...gen.Condition) *memberDo {
 	return m.withDO(m.DO.Not(conds...))
 }
@@ -409,16 +413,22 @@ func (m memberDo) FirstOrCreate() (*dao.Member, error) {
 }
 
 func (m memberDo) FindByPage(offset int, limit int) (result []*dao.Member, count int64, err error) {
-	count, err = m.Count()
-	if err != nil {
-		return
-	}
-
 	if limit <= 0 {
+		count, err = m.Count()
 		return
 	}
 
 	result, err = m.Offset(offset).Limit(limit).Find()
+	if err != nil {
+		return
+	}
+
+	if size := len(result); 0 < size && size < limit {
+		count = int64(size + offset)
+		return
+	}
+
+	count, err = m.Offset(-1).Limit(-1).Count()
 	return
 }
 

@@ -232,6 +232,10 @@ func (s subjectRevisionDo) Clauses(conds ...clause.Expression) *subjectRevisionD
 	return s.withDO(s.DO.Clauses(conds...))
 }
 
+func (s subjectRevisionDo) Returning(value interface{}, columns ...string) *subjectRevisionDo {
+	return s.withDO(s.DO.Returning(value, columns...))
+}
+
 func (s subjectRevisionDo) Not(conds ...gen.Condition) *subjectRevisionDo {
 	return s.withDO(s.DO.Not(conds...))
 }
@@ -395,16 +399,22 @@ func (s subjectRevisionDo) FirstOrCreate() (*dao.SubjectRevision, error) {
 }
 
 func (s subjectRevisionDo) FindByPage(offset int, limit int) (result []*dao.SubjectRevision, count int64, err error) {
-	count, err = s.Count()
-	if err != nil {
-		return
-	}
-
 	if limit <= 0 {
+		count, err = s.Count()
 		return
 	}
 
 	result, err = s.Offset(offset).Limit(limit).Find()
+	if err != nil {
+		return
+	}
+
+	if size := len(result); 0 < size && size < limit {
+		count = int64(size + offset)
+		return
+	}
+
+	count, err = s.Offset(-1).Limit(-1).Count()
 	return
 }
 

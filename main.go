@@ -83,6 +83,12 @@ func start() error {
 		),
 
 		fx.Provide(
+			character.NewService,
+			subject.NewService,
+			person.NewService,
+		),
+
+		fx.Provide(
 			handler.New,
 			web.New,
 		),

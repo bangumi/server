@@ -139,20 +139,11 @@ func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok {
+	if !ok || r.Redirect != 0 || r.NSFW && !u.AllowNSFW() {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
 		})
-	}
-
-	if r.Redirect != 0 {
-		return c.Redirect("/v0/characters/" + strconv.FormatUint(uint64(r.Redirect), 10))
-	}
-
-	if r.NSFW && !u.AllowNSFW() {
-		// default Handler will return a 404 response
-		return c.Next()
 	}
 
 	casts, err := h.p.GetCharacterRelated(c.Context(), id)
@@ -195,18 +186,19 @@ func (h Handler) GetCharacterRelatedSubjects(c *fiber.Ctx) error {
 		})
 	}
 
-	subjects, relations, err := h.s.GetCharacterRelated(c.Context(), id)
+	relations, err := h.s.GetCharacterRelated(c.Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "repo.GetCharacterRelated")
 	}
 
-	var response = make([]res.CharacterRelatedSubject, len(subjects))
-	for i, subject := range subjects {
+	var response = make([]res.CharacterRelatedSubject, len(relations))
+	for i, relation := range relations {
+		subject := relation.Subject
 		response[i] = res.CharacterRelatedSubject{
 			ID:     subject.ID,
 			Name:   subject.Name,
 			NameCn: subject.NameCN,
-			Staff:  characterStaffString(relations[i].Type),
+			Staff:  characterStaffString(relations[i].TypeID),
 			Image:  model.SubjectImage(subject.Image).Large,
 		}
 	}

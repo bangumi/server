@@ -30,6 +30,7 @@ import (
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/mocks"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/web/res"
 )
@@ -42,7 +43,7 @@ func (m mockAuth) GetByToken(ctx context.Context, token string) (domain.Auth, er
 
 func TestHappyPath(t *testing.T) {
 	t.Parallel()
-	m := &domain.MockSubjectRepo{}
+	m := &mocks.SubjectRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{ID: 7}, nil)
 
 	app := test.GetWebApp(t,
@@ -69,7 +70,7 @@ func TestHappyPath(t *testing.T) {
 func TestNSFW_200(t *testing.T) {
 	t.Parallel()
 
-	m := &domain.MockSubjectRepo{}
+	m := &mocks.SubjectRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
 
 	app := test.GetWebApp(t,
@@ -92,7 +93,7 @@ func TestNSFW_200(t *testing.T) {
 func TestNSFW_404(t *testing.T) {
 	t.Parallel()
 
-	m := &domain.MockSubjectRepo{}
+	m := &mocks.SubjectRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
 
 	app := test.GetWebApp(t,
@@ -114,7 +115,7 @@ func TestNSFW_404(t *testing.T) {
 
 func Test_web_subject_Redirect(t *testing.T) {
 	t.Parallel()
-	m := &domain.MockSubjectRepo{}
+	m := &mocks.SubjectRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(8)).Return(model.Subject{Redirect: 2}, nil)
 
 	app := test.GetWebApp(t,
@@ -133,7 +134,7 @@ func Test_web_subject_Redirect(t *testing.T) {
 
 func Test_web_subject_bad_id(t *testing.T) {
 	t.Parallel()
-	m := &domain.MockSubjectRepo{}
+	m := &mocks.SubjectRepo{}
 
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 

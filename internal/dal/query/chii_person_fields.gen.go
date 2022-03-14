@@ -163,6 +163,10 @@ func (p personFieldDo) Clauses(conds ...clause.Expression) *personFieldDo {
 	return p.withDO(p.DO.Clauses(conds...))
 }
 
+func (p personFieldDo) Returning(value interface{}, columns ...string) *personFieldDo {
+	return p.withDO(p.DO.Returning(value, columns...))
+}
+
 func (p personFieldDo) Not(conds ...gen.Condition) *personFieldDo {
 	return p.withDO(p.DO.Not(conds...))
 }
@@ -326,16 +330,22 @@ func (p personFieldDo) FirstOrCreate() (*dao.PersonField, error) {
 }
 
 func (p personFieldDo) FindByPage(offset int, limit int) (result []*dao.PersonField, count int64, err error) {
-	count, err = p.Count()
-	if err != nil {
-		return
-	}
-
 	if limit <= 0 {
+		count, err = p.Count()
 		return
 	}
 
 	result, err = p.Offset(offset).Limit(limit).Find()
+	if err != nil {
+		return
+	}
+
+	if size := len(result); 0 < size && size < limit {
+		count = int64(size + offset)
+		return
+	}
+
+	count, err = p.Offset(-1).Limit(-1).Count()
 	return
 }
 

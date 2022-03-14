@@ -15,3 +15,75 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
 package person
+
+import (
+	"context"
+
+	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/model"
+)
+
+func NewService(p domain.PersonRepo) domain.PersonService {
+	return service{repo: p}
+}
+
+type service struct {
+	repo domain.PersonRepo
+}
+
+func (s service) Get(ctx context.Context, id uint32) (model.Person, error) {
+	return s.repo.Get(ctx, id) //nolint:wrapcheck
+}
+
+func (s service) GetSubjectRelated(
+	ctx context.Context, subjectID model.SubjectIDType,
+) ([]model.SubjectPersonRelation, error) {
+	relations, err := s.repo.GetSubjectRelated(ctx, subjectID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "PersonRepo.GetSubjectRelated")
+	}
+
+	var subjectIDs = make([]model.SubjectIDType, len(relations))
+	var results = make([]model.SubjectPersonRelation, len(relations))
+	for i, relation := range relations {
+		subjectIDs[i] = relation.SubjectID
+	}
+
+	characters, err := s.repo.GetByIDs(ctx, subjectIDs...)
+	if err != nil {
+		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
+	}
+
+	for i, rel := range relations {
+		results[i].Person = characters[rel.PersonID]
+	}
+
+	return results, nil
+}
+
+func (s service) GetCharacterRelated(
+	ctx context.Context, subjectID model.CharacterIDType,
+) ([]model.PersonCharacterRelation, error) {
+	relations, err := s.repo.GetCharacterRelated(ctx, subjectID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "PersonRepo.GetCharacterRelated")
+	}
+
+	var subjectIDs = make([]model.SubjectIDType, len(relations))
+	var results = make([]model.PersonCharacterRelation, len(relations))
+	for i, relation := range relations {
+		subjectIDs[i] = relation.SubjectID
+	}
+
+	characters, err := s.repo.GetByIDs(ctx, subjectIDs...)
+	if err != nil {
+		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
+	}
+
+	for i, rel := range relations {
+		results[i].Person = characters[rel.PersonID]
+	}
+
+	return results, nil
+}

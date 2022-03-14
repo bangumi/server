@@ -19,9 +19,8 @@ package test_test
 import (
 	"testing"
 
-	"github.com/bangumi/server/cache"
-	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/mocks"
 )
 
 func TestGetWebApp(t *testing.T) {
@@ -29,19 +28,19 @@ func TestGetWebApp(t *testing.T) {
 
 	test.GetWebApp(t,
 		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
+			SubjectRepo: &mocks.SubjectRepo{},
+			AuthRepo:    &mocks.AuthRepo{},
+			EpisodeRepo: &mocks.EpisodeRepo{},
+			Cache:       &mocks.Generic{},
 		},
 	)
 
 	test.GetWebApp(t,
 		test.Mock{
-			SubjectRepo: &domain.MockSubjectRepo{},
-			AuthRepo:    &domain.MockAuthRepo{},
-			EpisodeRepo: &domain.MockEpisodeRepo{},
-			Cache:       &cache.MockGeneric{},
+			SubjectRepo: &mocks.SubjectRepo{},
+			AuthRepo:    &mocks.AuthRepo{},
+			EpisodeRepo: &mocks.EpisodeRepo{},
+			Cache:       &mocks.Generic{},
 		},
 	)
 }

@@ -280,6 +280,7 @@ linters:
     - goimports # we have gci already
     - nlreturn
     - whitespace
+    - godox
   fast: false
 
 issues:

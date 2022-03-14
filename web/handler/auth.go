@@ -97,6 +97,8 @@ func (h Handler) fill(c *fiber.Ctx, a *accessor) error {
 		return errgo.Wrap(err, "auth.GetByToken")
 	}
 
+	a.login = true
+
 	if err := h.cache.Set(c.Context(), cacheKey, a.Auth, time.Hour); err != nil {
 		logger.Error("can't set cache value", zap.Error(err))
 	}
@@ -109,6 +111,10 @@ type accessor struct {
 	cfRay string
 	ip    net.IP
 	login bool
+}
+
+func (a *accessor) AllowNSFW() bool {
+	return a.login && a.Auth.AllowNSFW()
 }
 
 func (a accessor) LogField() zap.Field {

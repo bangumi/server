@@ -17,17 +17,26 @@
 package model
 
 type PersonCharacterRelation struct {
-	Type uint8
+	Character Character
+	Person    Person
+	Subject   Subject
+	TypeID    uint8
 }
 
-type PersonSubjectRelation struct {
-	ID uint16
+type SubjectPersonRelation struct {
+	Person  Person
+	Subject Subject
+	TypeID  uint16
 }
 
-type CharacterSubjectRelation struct {
-	Type uint8
+type SubjectCharacterRelation struct {
+	Character Character
+	Subject   Subject
+	TypeID    uint8
 }
 
 type SubjectInternalRelation struct {
-	Type uint16
+	Source      Subject
+	Destination Subject
+	TypeID      uint16
 }

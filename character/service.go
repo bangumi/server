@@ -15,3 +15,75 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
 package character
+
+import (
+	"context"
+
+	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/model"
+)
+
+func NewService(c domain.CharacterRepo) domain.CharacterService {
+	return service{repo: c}
+}
+
+type service struct {
+	repo domain.CharacterRepo
+}
+
+func (s service) Get(ctx context.Context, id uint32) (model.Character, error) {
+	return s.repo.Get(ctx, id) //nolint:wrapcheck
+}
+
+func (s service) GetPersonRelated(
+	ctx context.Context, personID model.PersonIDType,
+) ([]model.PersonCharacterRelation, error) {
+	relations, err := s.repo.GetPersonRelated(ctx, personID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "CharacterRepo.GetPersonRelated")
+	}
+
+	var subjectIDs = make([]model.SubjectIDType, len(relations))
+	var results = make([]model.PersonCharacterRelation, len(relations))
+	for i, relation := range relations {
+		subjectIDs[i] = relation.SubjectID
+	}
+
+	characters, err := s.repo.GetByIDs(ctx, subjectIDs...)
+	if err != nil {
+		return nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
+	}
+
+	for i, rel := range relations {
+		results[i].Character = characters[rel.CharacterID]
+	}
+
+	return results, nil
+}
+
+func (s service) GetSubjectRelated(
+	ctx context.Context, subjectID model.SubjectIDType,
+) ([]model.SubjectCharacterRelation, error) {
+	relations, err := s.repo.GetSubjectRelated(ctx, subjectID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
+	}
+
+	var subjectIDs = make([]model.SubjectIDType, len(relations))
+	var results = make([]model.SubjectCharacterRelation, len(relations))
+	for i, relation := range relations {
+		subjectIDs[i] = relation.SubjectID
+	}
+
+	characters, err := s.repo.GetByIDs(ctx, subjectIDs...)
+	if err != nil {
+		return nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
+	}
+
+	for i, rel := range relations {
+		results[i].Character = characters[rel.CharacterID]
+	}
+
+	return results, nil
+}

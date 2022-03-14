@@ -12,7 +12,7 @@ const TableNameOAuthAccessToken = "chii_oauth_access_tokens"
 
 // OAuthAccessToken mapped from table <chii_oauth_access_tokens>
 type OAuthAccessToken struct {
-	AccessToken string    `gorm:"column:access_token;type:varchar(40);primaryKey;autoIncrement:false" json:"access_token"`
+	AccessToken string    `gorm:"column:access_token;type:varchar(40);primaryKey" json:"access_token"`
 	ClientID    string    `gorm:"column:client_id;type:varchar(80);not null" json:"client_id"`
 	UserID      string    `gorm:"column:user_id;type:varchar(80)" json:"user_id"`
 	Expires     time.Time `gorm:"column:expires;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"expires"`

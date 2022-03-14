@@ -8,9 +8,9 @@ const TableNameCast = "chii_crt_cast_index"
 
 // Cast mapped from table <chii_crt_cast_index>
 type Cast struct {
-	CrtID         uint32    `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey;autoIncrement:false" json:"crt_id"`
-	PrsnID        uint32    `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey;autoIncrement:false;index:prsn_id,priority:1" json:"prsn_id"`
-	SubjectID     uint32    `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey;autoIncrement:false;index:subject_id,priority:1" json:"subject_id"`
+	CrtID         uint32    `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey" json:"crt_id"`
+	PrsnID        uint32    `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey;index:prsn_id,priority:1" json:"prsn_id"`
+	SubjectID     uint32    `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey;index:subject_id,priority:1" json:"subject_id"`
 	SubjectTypeID uint8     `gorm:"column:subject_type_id;type:tinyint(3) unsigned;not null;index:subject_type_id,priority:1" json:"subject_type_id"` // 根据人物归类查询角色，动画，书籍，游戏
 	Summary       string    `gorm:"column:summary;type:varchar(255);not null" json:"summary"`                                                         // 幼年，男乱马，女乱马，变身形态，少女形态。。
 	Character     Character `gorm:"foreignKey:crt_id;references:crt_id" json:"character"`

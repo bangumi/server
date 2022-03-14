@@ -114,6 +114,10 @@ func (o oAuthAccessTokenDo) Clauses(conds ...clause.Expression) *oAuthAccessToke
 	return o.withDO(o.DO.Clauses(conds...))
 }
 
+func (o oAuthAccessTokenDo) Returning(value interface{}, columns ...string) *oAuthAccessTokenDo {
+	return o.withDO(o.DO.Returning(value, columns...))
+}
+
 func (o oAuthAccessTokenDo) Not(conds ...gen.Condition) *oAuthAccessTokenDo {
 	return o.withDO(o.DO.Not(conds...))
 }
@@ -277,16 +281,22 @@ func (o oAuthAccessTokenDo) FirstOrCreate() (*dao.OAuthAccessToken, error) {
 }
 
 func (o oAuthAccessTokenDo) FindByPage(offset int, limit int) (result []*dao.OAuthAccessToken, count int64, err error) {
-	count, err = o.Count()
-	if err != nil {
-		return
-	}
-
 	if limit <= 0 {
+		count, err = o.Count()
 		return
 	}
 
 	result, err = o.Offset(offset).Limit(limit).Find()
+	if err != nil {
+		return
+	}
+
+	if size := len(result); 0 < size && size < limit {
+		count = int64(size + offset)
+		return
+	}
+
+	count, err = o.Offset(-1).Limit(-1).Count()
 	return
 }
 

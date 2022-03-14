@@ -324,6 +324,10 @@ func (c characterSubjectsDo) Clauses(conds ...clause.Expression) *characterSubje
 	return c.withDO(c.DO.Clauses(conds...))
 }
 
+func (c characterSubjectsDo) Returning(value interface{}, columns ...string) *characterSubjectsDo {
+	return c.withDO(c.DO.Returning(value, columns...))
+}
+
 func (c characterSubjectsDo) Not(conds ...gen.Condition) *characterSubjectsDo {
 	return c.withDO(c.DO.Not(conds...))
 }
@@ -487,16 +491,22 @@ func (c characterSubjectsDo) FirstOrCreate() (*dao.CharacterSubjects, error) {
 }
 
 func (c characterSubjectsDo) FindByPage(offset int, limit int) (result []*dao.CharacterSubjects, count int64, err error) {
-	count, err = c.Count()
-	if err != nil {
-		return
-	}
-
 	if limit <= 0 {
+		count, err = c.Count()
 		return
 	}
 
 	result, err = c.Offset(offset).Limit(limit).Find()
+	if err != nil {
+		return
+	}
+
+	if size := len(result); 0 < size && size < limit {
+		count = int64(size + offset)
+		return
+	}
+
+	count, err = c.Offset(-1).Limit(-1).Count()
 	return
 }
 

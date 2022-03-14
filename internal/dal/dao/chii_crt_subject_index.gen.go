@@ -8,8 +8,8 @@ const TableNameCharacterSubjects = "chii_crt_subject_index"
 
 // CharacterSubjects mapped from table <chii_crt_subject_index>
 type CharacterSubjects struct {
-	CharacterID   uint32    `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey;autoIncrement:false" json:"crt_id"`
-	SubjectID     uint32    `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey;autoIncrement:false;index:subject_id,priority:1" json:"subject_id"`
+	CharacterID   uint32    `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey" json:"crt_id"`
+	SubjectID     uint32    `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey;index:subject_id,priority:1" json:"subject_id"`
 	SubjectTypeID uint8     `gorm:"column:subject_type_id;type:tinyint(4) unsigned;not null;index:subject_type_id,priority:1" json:"subject_type_id"`
 	CrtType       uint8     `gorm:"column:crt_type;type:tinyint(4) unsigned;not null;index:crt_type,priority:1" json:"crt_type"` // 主角，配角
 	CtrAppearEps  string    `gorm:"column:ctr_appear_eps;type:mediumtext;not null" json:"ctr_appear_eps"`                        // 可选，角色出场的的章节

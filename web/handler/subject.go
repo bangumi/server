@@ -75,7 +75,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 
 func (h Handler) getSubjectWithCache(
 	ctx context.Context,
-	id domain.SubjectIDType,
+	id model.SubjectIDType,
 ) (res.SubjectV0, bool, error) {
 	var key = cachekey.Subject(id)
 
@@ -147,20 +147,20 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 		})
 	}
 
-	persons, relations, err := h.p.GetSubjectRelated(c.Context(), id)
+	relations, err := h.p.GetSubjectRelated(c.Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	var response = make([]res.SubjectRelatedPerson, len(persons))
-	for i, p := range persons {
+	var response = make([]res.SubjectRelatedPerson, len(relations))
+	for i, rel := range relations {
 		response[i] = res.SubjectRelatedPerson{
-			Images:   model.PersonImage(p.Image),
-			Name:     p.Name,
-			Relation: vars.StaffMap[r.TypeID][relations[i].ID].String(),
-			Career:   careers(p),
-			Type:     p.Type,
-			ID:       p.ID,
+			Images:   model.PersonImage(rel.Subject.Image),
+			Name:     rel.Person.Name,
+			Relation: vars.StaffMap[r.TypeID][rel.TypeID].String(),
+			Career:   careers(rel.Person),
+			Type:     rel.Person.Type,
+			ID:       rel.Subject.ID,
 		}
 	}
 
@@ -241,20 +241,20 @@ func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 		})
 	}
 
-	subjects, relation, err := h.s.GetSubjectRelated(c.Context(), id)
+	relations, err := h.s.GetSubjectRelated(c.Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "repo")
 	}
 
-	var response = make([]res.SubjectRelatedSubject, len(subjects))
-	for i, subject := range subjects {
+	var response = make([]res.SubjectRelatedSubject, len(relations))
+	for i, relation := range relations {
 		response[i] = res.SubjectRelatedSubject{
-			Images:    model.SubjectImage(subject.Image),
-			Name:      subject.Name,
-			NameCn:    subject.NameCN,
-			Relation:  readableRelation(subject.TypeID, relation[i].Type),
-			Type:      subject.TypeID,
-			SubjectID: subject.ID,
+			Images:    model.SubjectImage(relation.Destination.Image),
+			Name:      relation.Destination.Name,
+			NameCn:    relation.Destination.NameCN,
+			Relation:  readableRelation(relation.Destination.TypeID, relation.TypeID),
+			Type:      relation.Destination.TypeID,
+			SubjectID: relation.Destination.ID,
 		}
 	}
 
@@ -292,31 +292,34 @@ func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	return h.getSubjectRelatedCharacters(c, id)
 }
 
-func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID domain.SubjectIDType) error {
-	characters, relations, err := h.c.GetSubjectRelated(c.Context(), subjectID)
+func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID model.SubjectIDType) error {
+	relations, err := h.c.GetSubjectRelated(c.Context(), subjectID)
 	if err != nil {
 		return errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
 	}
 
-	var characterIDs = make([]domain.PersonIDType, len(characters))
-	for i, character := range characters {
-		characterIDs[i] = character.ID
+	var characterIDs = make([]model.PersonIDType, len(relations))
+	for i, rel := range relations {
+		characterIDs[i] = rel.Character.ID
 	}
 
-	actors, err := h.p.GetActors(c.Context(), subjectID, characterIDs...)
-	if err != nil {
-		return errgo.Wrap(err, "PersonRepo.GetActors")
+	var actors map[model.CharacterIDType][]model.Person
+	if len(characterIDs) != 0 {
+		actors, err = h.s.GetActors(c.Context(), subjectID, characterIDs...)
+		if err != nil {
+			return errgo.Wrap(err, "PersonRepo.GetActors")
+		}
 	}
 
-	var response = make([]res.SubjectRelatedCharacter, len(characters))
-	for i, character := range characters {
+	var response = make([]res.SubjectRelatedCharacter, len(relations))
+	for i, rel := range relations {
 		response[i] = res.SubjectRelatedCharacter{
-			Images:   model.PersonImage(character.Image),
-			Name:     character.Name,
-			Relation: characterStaffString(relations[i].Type),
-			Actors:   toActors(actors[character.ID]),
-			Type:     character.Type,
-			ID:       character.ID,
+			Images:   model.PersonImage(rel.Character.Image),
+			Name:     rel.Character.Name,
+			Relation: characterStaffString(rel.TypeID),
+			Actors:   toActors(actors[rel.Character.ID]),
+			Type:     rel.Character.Type,
+			ID:       rel.Character.ID,
 		}
 	}
 

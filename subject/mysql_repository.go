@@ -29,6 +29,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/person"
 )
 
 type mysqlRepo struct {
@@ -48,7 +49,6 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Subject, error) {
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))
-
 		return model.Subject{}, errgo.Wrap(err, "dal")
 	}
 
@@ -118,84 +118,123 @@ func rating(f dao.SubjectField) model.Rating {
 }
 
 func (r mysqlRepo) GetPersonRelated(
-	ctx context.Context, personID domain.PersonIDType,
-) ([]model.Subject, []model.PersonSubjectRelation, error) {
+	ctx context.Context, personID model.PersonIDType,
+) ([]domain.SubjectPersonRelation, error) {
 	relations, err := r.q.PersonSubjects.WithContext(ctx).
-		Preload(r.q.PersonSubjects.Subject.Fields).
+		Joins(r.q.PersonSubjects.Subject).
+		Joins(r.q.PersonSubjects.Person).
 		Where(r.q.PersonSubjects.PersonID.Eq(personID)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 
-		return nil, nil, errgo.Wrap(err, "dal")
+		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var rel = make([]model.PersonSubjectRelation, 0, len(relations))
-	var subjects = make([]model.Subject, 0, len(relations))
-
+	var rel = make([]domain.SubjectPersonRelation, 0, len(relations))
 	for _, relation := range relations {
-		if relation.Subject.ID == 0 {
-			// gorm/gen doesn't support preload with join, so ignore relations without subject.
-			continue
-		}
-		rel = append(rel, model.PersonSubjectRelation{ID: relation.PrsnPosition})
-		subjects = append(subjects, ConvertDao(&relation.Subject))
+		rel = append(rel, domain.SubjectPersonRelation{
+			SubjectID: relation.SubjectID,
+			PersonID:  relation.PersonID,
+			TypeID:    relation.PrsnPosition})
 	}
 
-	return subjects, rel, nil
+	return rel, nil
 }
 
 func (r mysqlRepo) GetCharacterRelated(
 	ctx context.Context,
-	characterID domain.PersonIDType,
-) ([]model.Subject, []model.CharacterSubjectRelation, error) {
+	characterID model.PersonIDType,
+) ([]domain.SubjectCharacterRelation, error) {
 	relations, err := r.q.CharacterSubjects.WithContext(ctx).
 		Preload(r.q.CharacterSubjects.Subject.Fields).
 		Where(r.q.CharacterSubjects.CharacterID.Eq(characterID)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
-
-		return nil, nil, errgo.Wrap(err, "dal")
+		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var rel = make([]model.CharacterSubjectRelation, 0, len(relations))
-	var subjects = make([]model.Subject, 0, len(relations))
-
+	var rel = make([]domain.SubjectCharacterRelation, 0, len(relations))
 	for _, relation := range relations {
 		if relation.Subject.ID == 0 {
 			// gorm/gen doesn't support preload with join, so ignore relations without subject.
 			continue
 		}
-		rel = append(rel, model.CharacterSubjectRelation{Type: relation.CrtType})
-		subjects = append(subjects, ConvertDao(&relation.Subject))
+		rel = append(rel, domain.SubjectCharacterRelation{
+			SubjectID:   relation.Subject.ID,
+			CharacterID: relation.CharacterID,
+			TypeID:      relation.CrtType,
+		})
 	}
 
-	return subjects, rel, nil
+	return rel, nil
 }
 
 func (r mysqlRepo) GetSubjectRelated(
 	ctx context.Context,
-	subjectID domain.SubjectIDType,
-) ([]model.Subject, []model.SubjectInternalRelation, error) {
+	subjectID model.SubjectIDType,
+) ([]domain.SubjectInternalRelation, error) {
 	relations, err := r.q.SubjectRelation.WithContext(ctx).
 		Preload(r.q.SubjectRelation.Subject).Where(r.q.SubjectRelation.SubjectID.Eq(subjectID)).
 		Order(r.q.SubjectRelation.Order).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
-		return nil, nil, errgo.Wrap(err, "dal")
+		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var rel = make([]model.SubjectInternalRelation, 0, len(relations))
-	var subjects = make([]model.Subject, 0, len(relations))
-
+	var rel = make([]domain.SubjectInternalRelation, 0, len(relations))
 	for _, relation := range relations {
 		if relation.Subject.ID == 0 {
 			// gorm/gen doesn't support preload with join, so ignore relations without subject.
 			continue
 		}
 
-		rel = append(rel, model.SubjectInternalRelation{Type: relation.RelationType})
-		subjects = append(subjects, ConvertDao(&relation.Subject))
+		rel = append(rel, domain.SubjectInternalRelation{
+			SourceID:      subjectID,
+			DestinationID: relation.Subject.ID,
+			TypeID:        relation.RelationType,
+		})
 	}
 
-	return subjects, rel, nil
+	return rel, nil
+}
+
+func (r mysqlRepo) GetByIDs(
+	ctx context.Context, ids ...model.SubjectIDType,
+) (map[model.SubjectIDType]model.Subject, error) {
+	records, err := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(ids...)).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var result = make(map[model.SubjectIDType]model.Subject, len(ids))
+
+	for _, s := range records {
+		result[s.ID] = ConvertDao(s)
+	}
+
+	return result, nil
+}
+func (r mysqlRepo) GetActors(
+	ctx context.Context,
+	subjectID model.SubjectIDType,
+	characterIDs ...model.CharacterIDType,
+) (map[model.CharacterIDType][]model.Person, error) {
+	relations, err := r.q.Cast.WithContext(ctx).
+		Preload(r.q.Cast.Person.Fields).
+		Where(r.q.Cast.CrtID.In(characterIDs...), r.q.Cast.SubjectID.Eq(subjectID)).
+		Order(r.q.Cast.PrsnID).
+		Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var results = make(map[model.CharacterIDType][]model.Person, len(relations))
+	for _, relation := range relations {
+		// TODO: should pre-alloc a big slice and split it as results.
+		results[relation.CrtID] = append(results[relation.CrtID], person.ConvertDao(&relation.Person))
+	}
+
+	return results, nil
 }

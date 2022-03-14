@@ -326,6 +326,10 @@ func (e episodeDo) Clauses(conds ...clause.Expression) *episodeDo {
 	return e.withDO(e.DO.Clauses(conds...))
 }
 
+func (e episodeDo) Returning(value interface{}, columns ...string) *episodeDo {
+	return e.withDO(e.DO.Returning(value, columns...))
+}
+
 func (e episodeDo) Not(conds ...gen.Condition) *episodeDo {
 	return e.withDO(e.DO.Not(conds...))
 }
@@ -489,16 +493,22 @@ func (e episodeDo) FirstOrCreate() (*dao.Episode, error) {
 }
 
 func (e episodeDo) FindByPage(offset int, limit int) (result []*dao.Episode, count int64, err error) {
-	count, err = e.Count()
-	if err != nil {
-		return
-	}
-
 	if limit <= 0 {
+		count, err = e.Count()
 		return
 	}
 
 	result, err = e.Offset(offset).Limit(limit).Find()
+	if err != nil {
+		return
+	}
+
+	if size := len(result); 0 < size && size < limit {
+		count = int64(size + offset)
+		return
+	}
+
+	count, err = e.Offset(-1).Limit(-1).Count()
 	return
 }
 

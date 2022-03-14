@@ -25,21 +25,47 @@ import (
 type SubjectRepo interface {
 	// Get return a repository model.
 	Get(ctx context.Context, id uint32) (model.Subject, error)
+	GetByIDs(ctx context.Context, ids ...model.SubjectIDType) (map[model.SubjectIDType]model.Subject, error)
 
-	GetPersonRelated(
-		ctx context.Context, personID PersonIDType,
-	) ([]model.Subject, []model.PersonSubjectRelation, error)
+	GetPersonRelated(ctx context.Context, personID model.PersonIDType) ([]SubjectPersonRelation, error)
+	GetCharacterRelated(ctx context.Context, characterID model.PersonIDType) ([]SubjectCharacterRelation, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]SubjectInternalRelation, error)
 
-	GetCharacterRelated(
-		ctx context.Context, characterID PersonIDType,
-	) ([]model.Subject, []model.CharacterSubjectRelation, error)
-
-	GetSubjectRelated(
-		ctx context.Context, subjectID SubjectIDType,
-	) ([]model.Subject, []model.SubjectInternalRelation, error)
+	GetActors(
+		ctx context.Context, subjectID model.SubjectIDType, characterIDs ...model.CharacterIDType,
+	) (map[model.CharacterIDType][]model.Person, error)
 }
 
 type SubjectService interface {
 	// Get return a repository model.
 	Get(ctx context.Context, id uint32) (model.Subject, error)
+
+	GetPersonRelated(ctx context.Context, personID model.PersonIDType) ([]model.SubjectPersonRelation, error)
+	GetCharacterRelated(ctx context.Context, characterID model.PersonIDType) ([]model.SubjectCharacterRelation, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]model.SubjectInternalRelation, error)
+
+	GetActors(
+		ctx context.Context, subjectID model.SubjectIDType, characterIDs ...model.CharacterIDType,
+	) (map[model.CharacterIDType][]model.Person, error)
+}
+
+type SubjectPersonRelation struct {
+	TypeID uint16
+
+	PersonID  model.PersonIDType
+	SubjectID model.SubjectIDType
+}
+
+type SubjectCharacterRelation struct {
+	TypeID uint8
+
+	SubjectID   model.SubjectIDType
+	CharacterID model.CharacterIDType
+}
+
+type SubjectInternalRelation struct {
+	TypeID uint16
+
+	SourceID      model.SubjectIDType
+	DestinationID model.SubjectIDType
 }

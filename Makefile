@@ -31,9 +31,8 @@ build: ./dist/chii.exe
 ./dist/chii.exe:
 	env CGO_ENABLED=0 go build -o $@
 
-mocks: .bin/mockery.exe
-	.bin/mockery.exe --all --dir domain --inpackage --with-expecter
-	.bin/mockery.exe --all --dir cache --inpackage --with-expecter
+mocks:
+	go run github.com/vektra/mockery/v2 --all --dir domain --dir cache --with-expecter
 
 gen: ./dal/query/gen.go mocks
 
@@ -56,10 +55,7 @@ coverage: .bin/dotenv.exe
 .bin/dotenv.exe: go.mod
 	go build -o $@ github.com/joho/godotenv/cmd/godotenv
 
-.bin/mockery.exe: go.mod
-	go build -o $@ github.com/vektra/mockery/v2
-
-install: .bin/mockery.exe .bin/dotenv.exe
+install: .bin/dotenv.exe
 	@mkdir -p ./.bin ./tmp
 	go get ./...
 
