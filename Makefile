@@ -10,14 +10,15 @@ Testing Targets:
   test: run Tests without e2e and driver.
   test-all: Run all tests, need database and redis.
             You can also run `make test` with env `TEST_MYSQL=1 TEST_REDIS=1`
-  bench:    Run all benchmark
+  bench:    Run all benchmark.
   coverage: Test-all with coverage report './coverage.out'.
 
 Others Targets:
 
-  gen: generated files like protobuf.
-  clean: cleanup all auxiliary files.
-  install: install required binary
+  gen: Generate files like gorm-gen and mocks.
+  mocks: Generate mocks.
+  clean: Cleanup all auxiliary files.
+  install: Install required binary
 
 endef
 export helpMessage
