@@ -71,7 +71,6 @@ func (s service) GetCharacterRelated(
 	}
 
 	var subjectIDs = make([]model.SubjectIDType, len(relations))
-	var results = make([]model.SubjectCharacterRelation, len(relations))
 	for i, relation := range relations {
 		subjectIDs[i] = relation.SubjectID
 	}
@@ -81,8 +80,12 @@ func (s service) GetCharacterRelated(
 		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}
 
+	var results = make([]model.SubjectCharacterRelation, len(relations))
 	for i, rel := range relations {
-		results[i].Subject = subjects[rel.SubjectID]
+		results[i] = model.SubjectCharacterRelation{
+			Subject: subjects[rel.SubjectID],
+			TypeID:  rel.TypeID,
+		}
 	}
 
 	return results, nil

@@ -99,7 +99,7 @@ func (r mysqlRepo) GetSubjectRelated(
 ) ([]domain.SubjectCharacterRelation, error) {
 	relations, err := r.q.CharacterSubjects.WithContext(ctx).
 		Where(r.q.CharacterSubjects.SubjectID.Eq(subjectID)).
-		Order(r.q.CharacterSubjects.CrtOrder).Find()
+		Order(r.q.CharacterSubjects.CharacterID).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")

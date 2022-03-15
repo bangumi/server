@@ -200,7 +200,7 @@ func (h Handler) GetCharacterRelatedSubjects(c *fiber.Ctx) error {
 			ID:     subject.ID,
 			Name:   subject.Name,
 			NameCn: subject.NameCN,
-			Staff:  characterStaffString(relations[i].TypeID),
+			Staff:  characterStaffString(relation.TypeID),
 			Image:  model.SubjectImage(subject.Image).Large,
 		}
 	}
@@ -212,10 +212,8 @@ func characterStaffString(i uint8) string {
 	switch i {
 	case 1:
 		return "主角"
-
 	case 2:
 		return "配角"
-
 	case 3:
 		return "客串"
 	}
