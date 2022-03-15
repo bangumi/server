@@ -87,7 +87,6 @@ func (r mysqlRepo) GetPersonRelated(
 		rel = append(rel, domain.PersonCharacterRelation{
 			CharacterID: relation.CharacterID,
 			SubjectID:   relation.SubjectID,
-			TypeID:      relation.CrtType,
 		})
 	}
 

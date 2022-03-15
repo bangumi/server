@@ -20,7 +20,6 @@ type PersonCharacterRelation struct {
 	Character Character
 	Person    Person
 	Subject   Subject
-	TypeID    uint8
 }
 
 type SubjectPersonRelation struct {

@@ -100,7 +100,6 @@ func (s service) GetCharacterRelated(
 		results[i] = model.PersonCharacterRelation{
 			Subject: subject,
 			Person:  persons[rel.PersonID],
-			TypeID:  rel.TypeID,
 		}
 	}
 

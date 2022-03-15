@@ -80,7 +80,6 @@ func (s service) GetPersonRelated(
 			Character: characters[rel.CharacterID],
 			Person:    persons[rel.PersonID],
 			Subject:   subjects[rel.SubjectID],
-			TypeID:    rel.TypeID,
 		}
 	}
 

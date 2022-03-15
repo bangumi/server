@@ -113,7 +113,7 @@ type PersonRelatedCharacter struct {
 	SubjectNameCn string                `json:"subject_name_cn"`
 	SubjectID     model.SubjectIDType   `json:"subject_id"`
 	ID            model.CharacterIDType `json:"id"`
-	Type          uint8                 `json:"type"`
+	Type          uint8                 `json:"type" doc:"character type"`
 }
 
 type CharacterRelatedPerson struct {
@@ -123,7 +123,7 @@ type CharacterRelatedPerson struct {
 	SubjectNameCn string                `json:"subject_name_cn"`
 	SubjectID     model.SubjectIDType   `json:"subject_id"`
 	ID            model.CharacterIDType `json:"id"`
-	Type          uint8                 `json:"type"`
+	Type          uint8                 `json:"type" doc:"person type"`
 }
 
 type CharacterRelatedSubject struct {

@@ -41,5 +41,4 @@ type PersonCharacterRelation struct {
 	CharacterID model.CharacterIDType
 	PersonID    model.PersonIDType
 	SubjectID   model.SubjectIDType
-	TypeID      uint8
 }

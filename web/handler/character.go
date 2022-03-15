@@ -158,7 +158,7 @@ func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 		response[i] = res.CharacterRelatedPerson{
 			ID:            cast.Person.ID,
 			Name:          cast.Person.Name,
-			Type:          cast.Character.Type,
+			Type:          cast.Person.Type,
 			Images:        model.PersonImage(cast.Subject.Image),
 			SubjectID:     cast.Subject.ID,
 			SubjectName:   cast.Subject.Name,
