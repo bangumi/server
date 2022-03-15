@@ -64,12 +64,12 @@ func (r mysqlRepo) GetSubjectRelated(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var rel = make([]domain.SubjectPersonRelation, 0, len(relations))
-	for _, relation := range relations {
-		rel = append(rel, domain.SubjectPersonRelation{
+	var rel = make([]domain.SubjectPersonRelation, len(relations))
+	for i, relation := range relations {
+		rel[i] = domain.SubjectPersonRelation{
 			PersonID: relation.PersonID,
-			TypeID:   relation.PrsnPosition},
-		)
+			TypeID:   relation.PrsnPosition,
+		}
 	}
 
 	return rel, nil

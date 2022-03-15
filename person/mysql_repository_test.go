@@ -28,15 +28,12 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/model"
-	"github.com/bangumi/server/subject"
+	"github.com/bangumi/server/person"
 )
 
-func getRepo(t *testing.T) domain.SubjectRepo {
+func getRepo(t *testing.T) domain.PersonRepo {
 	t.Helper()
-	repo, err := subject.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
-	require.NoError(t, err)
-
-	return repo
+	return person.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 }
 
 func TestGet(t *testing.T) {
@@ -67,4 +64,18 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 	_, ok = s[2]
 	assert.True(t, ok)
 	assert.Equal(t, model.PersonIDType(2), s[2].ID)
+}
+
+func TestMysqlRepo_GetSubjectRelated(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	s, err := repo.GetSubjectRelated(context.Background(), 4)
+	require.NoError(t, err)
+
+	for _, relation := range s {
+		assert.NotEmpty(t, relation.TypeID)
+	}
 }

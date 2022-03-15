@@ -55,9 +55,18 @@ func (s service) GetSubjectRelated(
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}
 
+	subject, err := s.s.Get(ctx, subjectID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "SubjectRepo.Get")
+	}
+
 	var results = make([]model.SubjectPersonRelation, len(relations))
 	for i, rel := range relations {
-		results[i].Person = persons[rel.PersonID]
+		results[i] = model.SubjectPersonRelation{
+			Person:  persons[rel.PersonID],
+			Subject: subject,
+			TypeID:  rel.TypeID,
+		}
 	}
 
 	return results, nil
