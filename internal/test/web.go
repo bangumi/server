@@ -17,6 +17,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -50,6 +51,7 @@ type Mock struct {
 	EpisodeRepo   domain.EpisodeRepo
 	UserRepo      domain.UserRepo
 	IndexRepo     domain.IndexRepo
+	RevisionRepo  domain.RevisionRepo
 	Cache         cache.Generic
 }
 type TB interface {
@@ -89,6 +91,7 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 		MockAuthRepo(m.AuthRepo),
 		MockUserRepo(m.UserRepo),
 		MockIndexRepo(m.IndexRepo),
+		MockRevisionRepo(m.RevisionRepo),
 
 		fx.Invoke(web.ResistRouter),
 
@@ -110,6 +113,13 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 	return f
 }
 
+func MockRevisionRepo(repo domain.RevisionRepo) fx.Option {
+	if repo == nil {
+		repo = &domain.MockRevisionRepo{}
+	}
+	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.RevisionRepo))))
+}
+
 func MockIndexRepo(repo domain.IndexRepo) fx.Option {
 	if repo == nil {
 		mocker := &mocks.IndexRepo{}
@@ -124,7 +134,16 @@ func MockUserRepo(repo domain.UserRepo) fx.Option {
 	if repo == nil {
 		mocker := &mocks.UserRepo{}
 		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(model.User{}, nil)
-
+		mocker.On("GetByIDs", mock.Anything, mock.Anything).
+			Return(func(ctx context.Context, ids ...uint32) map[uint32]model.User {
+				ret := map[uint32]model.User{}
+				for _, id := range ids {
+					ret[id] = model.User{}
+				}
+				return ret
+			}, func(ctx context.Context, ids ...uint32) error {
+				return nil
+			})
 		repo = mocker
 	}
 

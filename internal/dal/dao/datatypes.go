@@ -14,11 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package dao
 
-type IDType = uint32
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type EpTypeType = int8
-type RevisionTypeType = uint8
+import (
+	"github.com/bangumi/server/internal/dal/dao/datatypes"
+)
+
+type GzipPhpSerializedBlob = datatypes.GzipPhpSerializedBlob

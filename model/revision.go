@@ -16,9 +16,22 @@
 
 package model
 
-type IDType = uint32
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type EpTypeType = int8
-type RevisionTypeType = uint8
+import (
+	"time"
+
+	"github.com/bangumi/server/internal/dal/dao"
+)
+
+type Creator struct {
+	Username string
+	Nickname string
+}
+
+type Revision struct {
+	CreatedAt time.Time
+	Data      dao.GzipPhpSerializedBlob
+	Summary   string
+	ID        uint32
+	CreatorID uint32
+	Type      uint8
+}

@@ -14,11 +14,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package res
 
-type IDType = uint32
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type EpTypeType = int8
-type RevisionTypeType = uint8
+import (
+	"time"
+
+	"github.com/bangumi/server/internal/dal/dao"
+)
+
+type Revision struct {
+	CreatedAt time.Time                 `json:"created_at"`
+	Data      dao.GzipPhpSerializedBlob `json:"data"`
+	Creator   Creator                   `json:"creator"`
+	Summary   string                    `json:"summary"`
+	ID        uint32                    `json:"id"`
+	Type      uint8                     `json:"type"`
+}

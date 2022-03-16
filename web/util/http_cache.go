@@ -14,11 +14,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package util
 
-type IDType = uint32
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type EpTypeType = int8
-type RevisionTypeType = uint8
+import (
+	"fmt"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+func CacheControl(c *fiber.Ctx, seconds int) {
+	c.Set("Cache-Control", fmt.Sprintf("public, max-age=%d", seconds))
+}
