@@ -1380,6 +1380,7 @@ components:
         - created_at
         - creator
         - ban
+        - nsfw
       type: object
       properties:
         id:
@@ -1409,6 +1410,9 @@ components:
           "$ref": "#/components/schemas/Creator"
         ban:
           title: Ban
+          type: boolean
+        nsfw:
+          title: 目录是否包括 nsfw 条目
           type: boolean
     IndexSubject:
       title: IndexSubject
