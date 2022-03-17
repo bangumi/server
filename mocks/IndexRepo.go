@@ -115,51 +115,6 @@ func (_c *IndexRepo_Get_Call) Return(_a0 model.Index, _a1 error) *IndexRepo_Get_
 	return _c
 }
 
-// IsNsfw provides a mock function with given fields: ctx, id
-func (_m *IndexRepo) IsNsfw(ctx context.Context, id uint32) (bool, error) {
-	ret := _m.Called(ctx, id)
-
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(context.Context, uint32) bool); ok {
-		r0 = rf(ctx, id)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
-		r1 = rf(ctx, id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// IndexRepo_IsNsfw_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IsNsfw'
-type IndexRepo_IsNsfw_Call struct {
-	*mock.Call
-}
-
-// IsNsfw is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id uint32
-func (_e *IndexRepo_Expecter) IsNsfw(ctx interface{}, id interface{}) *IndexRepo_IsNsfw_Call {
-	return &IndexRepo_IsNsfw_Call{Call: _e.mock.On("IsNsfw", ctx, id)}
-}
-
-func (_c *IndexRepo_IsNsfw_Call) Run(run func(ctx context.Context, id uint32)) *IndexRepo_IsNsfw_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32))
-	})
-	return _c
-}
-
-func (_c *IndexRepo_IsNsfw_Call) Return(_a0 bool, _a1 error) *IndexRepo_IsNsfw_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
 // ListSubjects provides a mock function with given fields: ctx, id, subjectType, limit, offset
 func (_m *IndexRepo) ListSubjects(ctx context.Context, id uint32, subjectType uint8, limit int, offset int) ([]domain.IndexSubject, error) {
 	ret := _m.Called(ctx, id, subjectType, limit, offset)
