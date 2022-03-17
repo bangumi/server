@@ -27,4 +27,5 @@ type Index struct {
 	ID          uint32    `json:"id"`
 	Stat        Stat      `json:"stat"`
 	Ban         bool      `json:"ban"`
+	NSFW        bool      `json:"nsfw" doc:"if index contains any nsfw subjects"`
 }

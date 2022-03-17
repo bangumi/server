@@ -106,7 +106,7 @@ func (h Handler) getSubjectWithCache(
 	}
 
 	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
-		logger.Error("can't set response to cache", zap.Error(e))
+		h.log.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return r, true, nil

@@ -25,9 +25,6 @@ import (
 
 type IndexRepo interface {
 	Get(ctx context.Context, id uint32) (model.Index, error)
-	// IsNsfw return if this index contains any nsfw subjects
-	// should move this to a field of model.Index
-	IsNsfw(ctx context.Context, id uint32) (bool, error)
 
 	CountSubjects(ctx context.Context, id uint32, subjectType model.SubjectType) (int64, error)
 	ListSubjects(

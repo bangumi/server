@@ -45,6 +45,10 @@ func IndexNSFW(id uint32) string {
 	return globalPrefix + "index:nsfw:" + strconv.FormatUint(uint64(id), 10)
 }
 
+func Index(id uint32) string {
+	return globalPrefix + "index:" + strconv.FormatUint(uint64(id), 10)
+}
+
 func Auth(token string) string {
 	return "chii:" + config.Version + ":auth:access-token:" + token
 }

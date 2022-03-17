@@ -40,15 +40,16 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (r mysqlRepo) IsNsfw(ctx context.Context, id uint32) (bool, error) {
+func (r mysqlRepo) isNsfw(ctx context.Context, id uint32) (bool, error) {
 	i, err := r.q.IndexSubject.WithContext(ctx).
 		Join(r.q.Subject, r.q.IndexSubject.Sid.EqCol(r.q.Subject.ID)).
 		Where(r.q.IndexSubject.Rid.Eq(id), r.q.Subject.Nsfw.Is(true)).Count()
 	if err != nil {
+		r.log.Error("unexpected error when checking index nsfw", zap.Uint32("index_id", id))
 		return false, errgo.Wrap(err, "dal")
 	}
 
-	return i == 0, nil
+	return i != 0, nil
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
@@ -62,6 +63,11 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
 		return model.Index{}, errgo.Wrap(err, "dal")
 	}
 
+	nsfw, err := r.isNsfw(ctx, id)
+	if err != nil {
+		return model.Index{}, err
+	}
+
 	return model.Index{
 		CreatedAt:   time.Unix(int64(i.Dateline), 0),
 		Title:       i.Title,
@@ -72,6 +78,7 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
 		Comments:    i.Replies,
 		Collects:    i.Collects,
 		Ban:         i.Ban,
+		NSFW:        nsfw,
 	}, nil
 }
 

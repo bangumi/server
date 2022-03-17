@@ -33,30 +33,39 @@ import (
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/util"
 )
 
-func (h Handler) getIndex(c *fiber.Ctx, id uint32) error {
-	i, err := h.i.Get(c.Context(), id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.ErrNotFound
-		}
+func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, bool, error) {
+	var key = cachekey.Index(id)
 
-		return errgo.Wrap(err, "Index.Get")
+	var r res.Index
+	ok, err := h.cache.Get(c, key, &r)
+	if err != nil {
+		return r, ok, errgo.Wrap(err, "cache.Get")
 	}
 
-	u, err := h.u.GetByID(c.Context(), i.CreatorID)
+	i, err := h.i.Get(c, id)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.Index{}, false, nil
+		}
+
+		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
+	}
+
+	u, err := h.u.GetByID(c, i.CreatorID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			h.log.Error("index missing creator",
 				zap.Uint32("index_id", id), zap.Uint32("user_id", i.CreatorID))
-			return fiber.ErrInternalServerError
+			return res.Index{}, false, fiber.ErrInternalServerError
 		}
 
-		return errgo.Wrap(err, "Index.Get")
+		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
 	}
 
-	return c.JSON(res.Index{
+	r = res.Index{
 		CreatedAt: i.CreatedAt,
 		Creator: res.Creator{
 			Username: u.UserName,
@@ -70,61 +79,41 @@ func (h Handler) getIndex(c *fiber.Ctx, id uint32) error {
 			Comments: i.Comments,
 			Collects: i.Collects,
 		},
-		Ban: i.Ban,
-	})
+		Ban:  i.Ban,
+		NSFW: i.NSFW,
+	}
+
+	if e := h.cache.Set(c, key, r, time.Hour); e != nil {
+		h.log.Error("can't set response to cache", zap.Error(e))
+	}
+
+	return r, true, nil
 }
 
 func (h Handler) GetIndex(c *fiber.Ctx) error {
-	v := h.getUser(c)
+	user := h.getUser(c)
 
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad index_id")
 	}
 
-	if !v.AllowNSFW() {
-		// TODO: merge 2 branches and check nsfw instead.
-		nsfw, err := h.getIndexNsfwWithCache(c.Context(), id)
-		if err != nil {
-			return err
-		}
-
-		if nsfw {
-			return fiber.ErrNotFound
-		}
-	}
-
-	return h.getIndex(c, id)
-}
-
-func (h Handler) getIndexNsfwWithCache(ctx context.Context, id uint32) (bool, error) {
-	cacheKey := cachekey.IndexNSFW(id)
-	var nsfw bool
-	cached, err := h.cache.Get(ctx, cacheKey, &nsfw)
+	r, ok, err := h.getIndexWithCache(c.Context(), id)
 	if err != nil {
-		h.log.Error("can't read cache", zap.String("key", cacheKey), zap.Error(err))
-		return false, errgo.Wrap(err, "Cache.Get")
+		return err
 	}
 
-	if cached {
-		return nsfw, nil
+	if !ok || r.NSFW && !user.AllowNSFW() {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
 	}
 
-	nsfw, err = h.i.IsNsfw(ctx, id)
-	if err != nil {
-		return false, errgo.Wrap(err, "Index.IsNsfw")
-	}
-
-	if err = h.cache.Set(ctx, cacheKey, nsfw, time.Hour); err != nil {
-		h.log.Error("can't read cache", zap.String("key", cacheKey), zap.Error(err))
-		return false, errgo.Wrap(err, "Cache.Get")
-	}
-
-	return nsfw, nil
+	return c.JSON(r)
 }
-
 func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
-	v := h.getUser(c)
+	user := h.getUser(c)
 
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
@@ -141,16 +130,16 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !v.AllowNSFW() {
-		// TODO: merge 2 branches and check nsfw instead.
-		nsfw, err := h.getIndexNsfwWithCache(c.Context(), id)
-		if err != nil {
-			return err
-		}
+	r, ok, err := h.getIndexWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
 
-		if nsfw {
-			return fiber.ErrNotFound
-		}
+	if !ok || (r.NSFW && !user.AllowNSFW()) {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
 	}
 
 	return h.getIndexSubjects(c, id, subjectType, page)
