@@ -17,8 +17,6 @@
 package config
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -43,7 +41,7 @@ func NewAppConfig() AppConfig {
 
 	httpPort, err := strconv.Atoi(getEnv("HTTP_PORT", "3000"))
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal("can't parse http port", zap.Error(err))
 	}
 
 	var debug = make(map[string]bool)
@@ -58,7 +56,7 @@ func NewAppConfig() AppConfig {
 	redisURL := getEnv("REDIS_URI", "redis://127.0.0.1:6379/0")
 	redisOptions, err := redis.ParseURL(redisURL)
 	if err != nil {
-		panic(fmt.Sprintf("failed to parse redis url %s", redisURL))
+		logger.Fatal("failed to parse redis url", zap.String("url", redisURL))
 	}
 
 	return AppConfig{
