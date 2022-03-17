@@ -33,7 +33,9 @@ build: ./dist/chii.exe
 	env CGO_ENABLED=0 go build -o $@
 
 mocks:
-	go run github.com/vektra/mockery/v2 --all --dir domain --dir cache --with-expecter
+	for dir in domain cache; do \
+		go run github.com/vektra/mockery/v2 --all --dir $$dir --with-expecter; \
+	done
 
 gen: ./dal/query/gen.go mocks
 
