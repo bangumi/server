@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -19,19 +19,18 @@ package handler
 import (
 	"fmt"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/web/res"
-	"github.com/bangumi/server/web/util"
 )
 
 const CacheDuration = 300
 
 func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
-	util.CacheControl(c, CacheDuration)
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad query args: %s", err.Error()))
@@ -71,22 +70,21 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonIDType, p
 		return errgo.Wrap(err, "revision.ListPersonRelated")
 	}
 
-	data := make([]res.Revision, len(revisions))
+	data := make([]res.PersonRevision, len(revisions))
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), listUniqueCreatorID(revisions)...)
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
-	for i, r := range revisions {
-		data[i] = convertModelRevision(r, creatorMap)
+	for i := range revisions {
+		data[i] = convertModelRevision(&revisions[i], creatorMap)
 	}
 	response.Data = data
 	return c.JSON(response)
 }
 
 func (h Handler) GetPersionRevision(c *fiber.Ctx) error {
-	util.CacheControl(c, CacheDuration)
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id <= 0 {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad param id: %s", c.Params("id")))
@@ -102,11 +100,11 @@ func (h Handler) GetPersionRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "user.GetByIDS")
 	}
 
-	return c.JSON(convertModelRevision(r, creatorMap))
+	return c.JSON(convertModelRevision(&r, creatorMap))
 
 }
 
-func listUniqueCreatorID(revisions []*model.Revision) []model.IDType {
+func listUniqueCreatorID(revisions []model.Revision) []model.IDType {
 	m := map[model.IDType]bool{}
 	ret := []model.IDType{}
 	for _, r := range revisions {
@@ -118,9 +116,21 @@ func listUniqueCreatorID(revisions []*model.Revision) []model.IDType {
 	return ret
 }
 
-func convertModelRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.Revision {
+func CastPersonData(raw map[string]interface{}) map[string]res.PersonRevisionDataItem {
+	data, err := json.Marshal(raw)
+	if err == nil {
+		item := map[string]res.PersonRevisionDataItem{}
+		err = json.Unmarshal(data, &item)
+		if err == nil {
+			return item
+		}
+	}
+	return nil
+}
+
+func convertModelRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.PersonRevision {
 	creator := creatorMap[r.CreatorID]
-	return res.Revision{
+	return res.PersonRevision{
 		ID:      r.ID,
 		Type:    r.Type,
 		Summary: r.Summary,
@@ -129,6 +139,7 @@ func convertModelRevision(r *model.Revision, creatorMap map[model.IDType]model.U
 			Nickname: creator.UserName,
 		},
 		CreatedAt: r.CreatedAt,
-		Data:      r.Data,
+		Data:      CastPersonData(r.Data),
 	}
+
 }

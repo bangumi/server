@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/revision"
+	"github.com/bangumi/server/web/handler"
 )
 
 func getRepo(t *testing.T) domain.RevisionRepo {
@@ -46,6 +47,8 @@ func TestGetPersonRelatedBasic(t *testing.T) {
 	r, err := repo.GetPersonRelated(context.Background(), 348475)
 	require.NoError(t, err)
 	require.Equal(t, uint32(348475), r.ID)
+	a := handler.CastPersonData(r.Data)
+	t.Log(a)
 	if data, ok := r.Data["348475"].(map[string]interface{}); ok {
 		require.Equal(t, data["prsn_name"], "森岡浩之")
 	}

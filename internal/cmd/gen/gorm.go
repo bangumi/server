@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -270,8 +270,7 @@ func main() {
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_rev_text", "RevisionText",
-		gen.FieldTrimPrefix("rev_"),
-		gen.FieldType("rev_text", "GzipPhpSerializedBlob")),
+		gen.FieldTrimPrefix("rev_")),
 	)
 
 	g.ApplyBasic(g.GenerateModelAs("chii_rev_history", "RevisionHistory",

@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -18,8 +18,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/bangumi/server/internal/dal/dao"
 )
 
 type Creator struct {
@@ -29,7 +27,7 @@ type Creator struct {
 
 type Revision struct {
 	CreatedAt time.Time
-	Data      dao.GzipPhpSerializedBlob
+	Data      map[string]interface{}
 	Summary   string
 	ID        uint32
 	CreatorID uint32

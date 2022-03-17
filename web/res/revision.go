@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -18,15 +18,21 @@ package res
 
 import (
 	"time"
-
-	"github.com/bangumi/server/internal/dal/dao"
 )
 
-type Revision struct {
-	CreatedAt time.Time                 `json:"created_at"`
-	Data      dao.GzipPhpSerializedBlob `json:"data"`
-	Creator   Creator                   `json:"creator"`
-	Summary   string                    `json:"summary"`
-	ID        uint32                    `json:"id"`
-	Type      uint8                     `json:"type"`
+type PersonRevisionDataItem struct {
+	InfoBox    string            `json:"prsn_infobox"`
+	Summary    string            `json:"prsn_summary"`
+	Profession map[string]string `json:"profession"`
+	Extra      map[string]string `json:"extra"`
+	Name       string            `json:"prsn_name"`
+}
+
+type PersonRevision struct {
+	CreatedAt time.Time                         `json:"created_at"`
+	Data      map[string]PersonRevisionDataItem `json:"data"`
+	Creator   Creator                           `json:"creator"`
+	Summary   string                            `json:"summary"`
+	ID        uint32                            `json:"id"`
+	Type      uint8                             `json:"type"`
 }

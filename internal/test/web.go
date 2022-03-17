@@ -1,4 +1,5 @@
 // Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -115,7 +116,7 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 
 func MockRevisionRepo(repo domain.RevisionRepo) fx.Option {
 	if repo == nil {
-		repo = &domain.MockRevisionRepo{}
+		repo = &mocks.RevisionRepo{}
 	}
 	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.RevisionRepo))))
 }
@@ -136,7 +137,7 @@ func MockUserRepo(repo domain.UserRepo) fx.Option {
 		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(model.User{}, nil)
 		mocker.On("GetByIDs", mock.Anything, mock.Anything).
 			Return(func(ctx context.Context, ids ...uint32) map[uint32]model.User {
-				ret := map[uint32]model.User{}
+				var ret = make(map[uint32]model.User, len(ids))
 				for _, id := range ids {
 					ret[id] = model.User{}
 				}

@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -27,7 +27,7 @@ type RevisionRepo interface {
 
 	ListPersonRelated(
 		ctx context.Context, personID model.PersonIDType, limit int, offset int,
-	) ([]*model.Revision, error)
+	) ([]model.Revision, error)
 
-	GetPersonRelated(ctx context.Context, id model.IDType) (*model.Revision, error)
+	GetPersonRelated(ctx context.Context, id model.IDType) (model.Revision, error)
 }
