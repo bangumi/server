@@ -1,4 +1,5 @@
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
+// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -20,12 +21,26 @@ import (
 	"time"
 )
 
+type Profession struct {
+	Writer      string `json:"writer,omitempty"`
+	Producer    string `json:"producer,omitempty"`
+	Mangaka     string `json:"mangaka,omitempty"`
+	Artist      string `json:"artist,omitempty"`
+	Seiyu       string `json:"seiyu,omitempty"`
+	Illustrator string `json:"illustrator,omitempty"`
+	Actor       string `json:"actor,omitempty"`
+}
+
+type Extra struct {
+	Img string `json:"img,omitempty"`
+}
+
 type PersonRevisionDataItem struct {
-	InfoBox    string            `json:"prsn_infobox"`
-	Summary    string            `json:"prsn_summary"`
-	Profession map[string]string `json:"profession"`
-	Extra      map[string]string `json:"extra"`
-	Name       string            `json:"prsn_name"`
+	InfoBox    string     `json:"prsn_infobox"`
+	Summary    string     `json:"prsn_summary"`
+	Profession Profession `json:"profession"`
+	Extra      Extra      `json:"extra"`
+	Name       string     `json:"prsn_name"`
 }
 
 type PersonRevision struct {
