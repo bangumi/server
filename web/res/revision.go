@@ -18,7 +18,12 @@
 package res
 
 import (
+	"reflect"
 	"time"
+
+	"github.com/goccy/go-json"
+
+	"github.com/bangumi/server/internal/errgo"
 )
 
 type Profession struct {
@@ -33,6 +38,29 @@ type Profession struct {
 
 type Extra struct {
 	Img string `json:"img,omitempty"`
+}
+
+func (e *Extra) UnmarshalJSON(data []byte) error {
+	var res interface{}
+	err := json.Unmarshal(data, &res)
+	if err != nil {
+		return errgo.Wrap(err, err.Error())
+	}
+	typ := reflect.TypeOf(res).Kind()
+	switch typ {
+	case reflect.Map:
+		if m, ok := res.(map[string]interface{}); ok {
+			if img, ok := m["img"]; ok {
+				if img, ok := img.(string); ok {
+					*e = Extra{
+						Img: img,
+					}
+				}
+			}
+		}
+	default:
+	}
+	return nil
 }
 
 type PersonRevisionDataItem struct {

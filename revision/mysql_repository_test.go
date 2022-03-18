@@ -48,10 +48,9 @@ func TestGetPersonRelatedBasic(t *testing.T) {
 	r, err := repo.GetPersonRelated(context.Background(), 348475)
 	require.NoError(t, err)
 	require.Equal(t, uint32(348475), r.ID)
-	a := handler.CastPersonData(r.Data)
-	t.Log(a)
-	if data, ok := r.Data["348475"].(map[string]interface{}); ok {
-		require.Equal(t, data["prsn_name"], "森岡浩之")
+	data := handler.CastPersonData(r.Data)
+	if data, ok := data["348475"]; ok {
+		require.Equal(t, data.Name, "森岡浩之")
 	}
 }
 
@@ -73,5 +72,5 @@ func TestListPersonRelated(t *testing.T) {
 
 	r, err := repo.ListPersonRelated(context.Background(), 9, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, uint32(9), r[0].CreatorID)
+	require.Equal(t, uint32(452437), r[0].CreatorID)
 }

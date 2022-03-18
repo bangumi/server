@@ -59,6 +59,7 @@ func (r mysqlRepo) ListPersonRelated(
 ) ([]model.Revision, error) {
 	revisions, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).
+		Order(r.q.RevisionHistory.ID.Desc()).
 		Limit(limit).
 		Offset(offset).Find()
 	if err != nil {
