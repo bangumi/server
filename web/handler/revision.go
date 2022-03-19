@@ -1,5 +1,4 @@
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -19,9 +18,10 @@ package handler
 
 import (
 	"fmt"
+	"reflect"
 
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/mitchellh/mapstructure"
 
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/strparse"
@@ -85,7 +85,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonIDType, p
 	return c.JSON(response)
 }
 
-func (h Handler) GetPersionRevision(c *fiber.Ctx) error {
+func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id <= 0 {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad param id: %s", c.Params("id")))
@@ -96,7 +96,6 @@ func (h Handler) GetPersionRevision(c *fiber.Ctx) error {
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
-
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDS")
 	}
@@ -106,27 +105,40 @@ func (h Handler) GetPersionRevision(c *fiber.Ctx) error {
 }
 
 func listUniqueCreatorID(revisions []model.Revision) []model.IDType {
-	m := map[model.IDType]bool{}
-	ret := []model.IDType{}
+	m := make(map[model.IDType]bool, len(revisions))
+	ret := make([]model.IDType, len(revisions))
+	i := 0
 	for _, r := range revisions {
 		if _, ok := m[r.CreatorID]; !ok {
 			m[r.CreatorID] = true
-			ret = append(ret, r.CreatorID)
+			ret[i] = r.CreatorID
+			i++
 		}
 	}
-	return ret
+	return ret[:i]
+}
+
+func SafeDecodeExtra(k1 reflect.Type, k2 reflect.Type, input interface{}) (interface{}, error) {
+	if k2.Name() == "Extra" && k1.Kind() != reflect.Map {
+		return map[string]string{}, nil
+	}
+	return input, nil
 }
 
 func CastPersonData(raw map[string]interface{}) map[string]res.PersonRevisionDataItem {
-	data, err := json.Marshal(raw)
-	if err == nil {
-		item := map[string]res.PersonRevisionDataItem{}
-		err = json.Unmarshal(data, &item)
-		if err == nil {
-			return item
-		}
+	items := make(map[string]res.PersonRevisionDataItem, len(raw))
+	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		TagName:    "json",
+		DecodeHook: SafeDecodeExtra,
+		Result:     &items,
+	})
+	if err != nil {
+		return nil
 	}
-	return nil
+	if err := decoder.Decode(raw); err != nil {
+		return nil
+	}
+	return items
 }
 
 func convertModelRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.PersonRevision {

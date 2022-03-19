@@ -11,6 +11,7 @@ require (
 	github.com/gofiber/adaptor/v2 v2.1.20
 	github.com/gofiber/fiber/v2 v2.29.0
 	github.com/joho/godotenv v1.4.0
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/mattn/go-colorable v0.1.12
 	github.com/prometheus/client_golang v1.12.1
 	github.com/stretchr/testify v1.7.0

@@ -60,8 +60,8 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Get("/v0/indices/:id", addMetrics(h.GetIndex))
 	app.Get("/v0/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
 
-	app.Get("v0/revisions/persons/:id", addMetrics(h.GetPersionRevision))
-	app.Get("v0/revisions/persons", addMetrics(h.ListPersonRevision))
+	app.Get("/v0/revisions/persons/:id", addMetrics(h.GetPersonRevision))
+	app.Get("/v0/revisions/persons", addMetrics(h.ListPersonRevision))
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {

@@ -1,5 +1,4 @@
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -81,7 +80,7 @@ func TestHandler_ListPersionRevision_Bad_ID(t *testing.T) {
 	}
 }
 
-func TestHandler_GetPersionRevision_HappyPath(t *testing.T) {
+func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 	t.Parallel()
 	m := &mocks.RevisionRepo{}
 	m.EXPECT().GetPersonRelated(mock.Anything, uint32(348475)).Return(model.Revision{ID: 348475}, nil)

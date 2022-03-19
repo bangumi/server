@@ -49,9 +49,9 @@ func TestGetPersonRelatedBasic(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, uint32(348475), r.ID)
 	data := handler.CastPersonData(r.Data)
-	if data, ok := data["348475"]; ok {
-		require.Equal(t, data.Name, "森岡浩之")
-	}
+	d, ok := data["348475"]
+	require.True(t, ok)
+	require.Equal(t, d.Name, "森岡浩之")
 }
 
 func TestGetPersonRelatedNotFound(t *testing.T) {
