@@ -126,6 +126,9 @@ func SafeDecodeExtra(k1 reflect.Type, k2 reflect.Type, input interface{}) (inter
 }
 
 func CastPersonData(raw map[string]interface{}) map[string]res.PersonRevisionDataItem {
+	if raw == nil {
+		return nil
+	}
 	items := make(map[string]res.PersonRevisionDataItem, len(raw))
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		TagName:    "json",
