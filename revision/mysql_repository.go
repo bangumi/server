@@ -1,5 +1,4 @@
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -42,7 +41,7 @@ type mysqlRepo struct {
 }
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.RevisionRepo, error) {
-	return mysqlRepo{q, log}, nil
+	return mysqlRepo{q: q, log: log.Named("revision.mysqlRepo")}, nil
 }
 
 func (r mysqlRepo) CountPersonRelated(ctx context.Context, id model.PersonIDType) (int64, error) {

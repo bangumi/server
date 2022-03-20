@@ -34,7 +34,7 @@ const CacheDuration = 300
 func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad query args: %s", err.Error()))
+		return err
 	}
 	personID, err := strparse.Uint32(c.Query("person_id"))
 	if err != nil || personID <= 0 {
@@ -92,12 +92,12 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 	}
 	r, err := h.r.GetPersonRelated(c.Context(), id)
 	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound)
+		return fiber.ErrNotFound
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
 	if err != nil {
-		return errgo.Wrap(err, "user.GetByIDS")
+		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
 	return c.JSON(convertModelRevision(&r, creatorMap))
