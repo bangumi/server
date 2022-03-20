@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -14,11 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
-
-type IDType = uint32
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type EpTypeType = int8
-type RevisionTypeType = uint8
+package revision

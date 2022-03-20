@@ -1,3 +1,4 @@
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 // Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -58,6 +59,9 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Get("/v0/users/:username/collections", addMetrics(h.ListCollection))
 	app.Get("/v0/indices/:id", addMetrics(h.GetIndex))
 	app.Get("/v0/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
+
+	app.Get("/v0/revisions/persons/:id", addMetrics(h.GetPersonRevision))
+	app.Get("/v0/revisions/persons", addMetrics(h.ListPersonRevision))
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {

@@ -1,3 +1,4 @@
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 // Copyright (c) 2021-2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -34,6 +35,7 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/person"
+	"github.com/bangumi/server/revision"
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/user"
 	"github.com/bangumi/server/web"
@@ -80,6 +82,7 @@ func start() error {
 			index.NewMysqlRepo,
 			auth.NewMysqlRepo,
 			episode.NewMysqlRepo,
+			revision.NewMysqlRepo,
 		),
 
 		fx.Provide(

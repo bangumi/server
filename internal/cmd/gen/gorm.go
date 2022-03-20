@@ -1,3 +1,4 @@
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 // Copyright (c) 2021-2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -107,14 +108,15 @@ func main() {
 		gen.FieldType("uid", "uint32"),
 	)
 
-	g.ApplyInterface(func(method.Member) {},
-		g.GenerateModelAs("chii_members", "Member",
-			gen.FieldType("uid", "uint32"),
-			gen.FieldType("regdate", "int64"),
-			gen.FieldType("groupid", "uint8"),
-			gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
-				GORMTag: "foreignKey:UID;references:UID",
-			})))
+	modelMember := g.GenerateModelAs("chii_members", "Member",
+		gen.FieldType("uid", "uint32"),
+		gen.FieldType("regdate", "int64"),
+		gen.FieldType("groupid", "uint8"),
+		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
+			GORMTag: "foreignKey:UID;references:UID",
+		}))
+
+	g.ApplyInterface(func(method.Member) {}, modelMember)
 
 	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "OAuthAccessToken"))
 
@@ -266,6 +268,17 @@ func main() {
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:idx_rlt_sid;references:subject_id",
 		}),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_rev_text", "RevisionText",
+		gen.FieldTrimPrefix("rev_")),
+	)
+
+	g.ApplyBasic(g.GenerateModelAs("chii_rev_history", "RevisionHistory",
+		gen.FieldTrimPrefix("rev_"),
+		gen.FieldRename("rev_edit_summary", "Summary"),
+		gen.FieldRename("rev_dateline", "CreatedAt"),
+		gen.FieldRename("rev_creator", "CreatorID"),
 	))
 
 	// execute the action of code generation

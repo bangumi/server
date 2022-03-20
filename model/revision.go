@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -16,9 +16,20 @@
 
 package model
 
-type IDType = uint32
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type EpTypeType = int8
-type RevisionTypeType = uint8
+import (
+	"time"
+)
+
+type Creator struct {
+	Username string
+	Nickname string
+}
+
+type Revision struct {
+	CreatedAt time.Time
+	Data      map[string]interface{}
+	Summary   string
+	ID        uint32
+	CreatorID uint32
+	Type      uint8
+}
