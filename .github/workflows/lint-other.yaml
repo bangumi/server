@@ -2,8 +2,8 @@ name: Lint Other Language
 
 on:
   push:
-    branches:
-      - master
+    branches-ignore:
+      - renovate/**
     paths:
       - "**.md"
       - "**.py"

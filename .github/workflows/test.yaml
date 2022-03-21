@@ -2,16 +2,14 @@ name: Test
 
 on:
   push:
-    branches:
-      - master
-      - go
+    branches-ignore:
+      - renovate/**
     paths-ignore:
       - "**.md"
       - "**.txt"
   pull_request:
     branches:
       - master
-      - go
     paths-ignore:
       - "**.md"
       - "**.txt"

@@ -2,8 +2,8 @@ name: Lint
 
 on:
   push:
-    branches:
-      - master
+    branches-ignore:
+      - renovate/**
     paths-ignore:
       - "**.md"
       - "**.txt"
