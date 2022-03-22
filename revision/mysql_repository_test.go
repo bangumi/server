@@ -71,5 +71,5 @@ func TestListPersonRelated(t *testing.T) {
 
 	r, err := repo.ListPersonRelated(context.Background(), 9, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, uint32(452437), r[0].CreatorID)
+	require.Equal(t, uint32(181882), r[0].CreatorID)
 }
