@@ -46,7 +46,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.RevisionRepo, error) 
 
 func (r mysqlRepo) CountPersonRelated(ctx context.Context, id model.PersonIDType) (int64, error) {
 	c, err := r.q.RevisionHistory.WithContext(ctx).
-		Where(r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).Count()
+		Where(r.q.RevisionHistory.Mid.Eq(id), r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).Count()
 	if err != nil {
 		return 0, errgo.Wrap(err, "dal")
 	}
@@ -57,7 +57,7 @@ func (r mysqlRepo) ListPersonRelated(
 	ctx context.Context, personID model.PersonIDType, limit int, offset int,
 ) ([]model.Revision, error) {
 	revisions, err := r.q.RevisionHistory.WithContext(ctx).
-		Where(r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).
+		Where(r.q.RevisionHistory.Mid.Eq(personID), r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).
 		Order(r.q.RevisionHistory.ID.Desc()).
 		Limit(limit).
 		Offset(offset).Find()
