@@ -23,7 +23,7 @@ jobs:
       - uses: ./.github/actions/base
 
       - name: Go Build Cache (build)
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.cache/go-build
