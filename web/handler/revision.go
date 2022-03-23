@@ -79,7 +79,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonIDType, p
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 	for i := range revisions {
-		data[i] = convertModelRevision(&revisions[i], creatorMap)
+		data[i] = convertModelPersonRevision(&revisions[i], creatorMap)
 	}
 	response.Data = data
 	return c.JSON(response)
@@ -100,7 +100,80 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	return c.JSON(convertModelRevision(&r, creatorMap))
+	return c.JSON(convertModelPersonRevision(&r, creatorMap))
+
+}
+
+func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return err
+	}
+	subjectID, err := strparse.Uint32(c.Query("subject_id"))
+	if err != nil || subjectID <= 0 {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad query subject_id: %s", c.Query("subject_id")))
+	}
+
+	return h.listSubjectRevision(c, subjectID, page)
+}
+
+func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectIDType, page pageQuery) error {
+	var response = res.Paged{
+		Limit:  page.Limit,
+		Offset: page.Offset,
+	}
+	count, err := h.r.CountSubjectRelated(c.Context(), subjectID)
+	if err != nil {
+		return errgo.Wrap(err, "revision.CountSubjectRelated")
+	}
+
+	if count == 0 {
+		response.Data = []int{}
+		return c.JSON(response)
+	}
+
+	if err = page.check(count); err != nil {
+		return err
+	}
+
+	response.Total = count
+
+	revisions, err := h.r.ListSubjectRelated(c.Context(), subjectID, page.Limit, page.Offset)
+
+	if err != nil {
+		return errgo.Wrap(err, "revision.ListSubjectRelated")
+	}
+
+	data := make([]res.SubjectRevision, len(revisions))
+
+	creatorMap, err := h.u.GetByIDs(c.Context(), listUniqueCreatorID(revisions)...)
+
+	if err != nil {
+		return errgo.Wrap(err, "user.GetByIDs")
+	}
+	for i := range revisions {
+		data[i] = convertModelSubjectRevision(&revisions[i], creatorMap)
+	}
+	response.Data = data
+	return c.JSON(response)
+}
+
+func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id <= 0 {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad param id: %s", c.Params("id")))
+	}
+	r, err := h.r.GetSubjectRelated(c.Context(), id)
+	if err != nil {
+		return fiber.ErrNotFound
+	}
+
+	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
+	if err != nil {
+		return errgo.Wrap(err, "user.GetByIDs")
+	}
+
+	return c.JSON(convertModelSubjectRevision(&r, creatorMap))
 
 }
 
@@ -144,9 +217,9 @@ func CastPersonData(raw map[string]interface{}) map[string]res.PersonRevisionDat
 	return items
 }
 
-func convertModelRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.PersonRevision {
+func convertModelPersonRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.PersonRevision {
 	creator := creatorMap[r.CreatorID]
-	return res.PersonRevision{
+	ret := res.PersonRevision{
 		ID:      r.ID,
 		Type:    r.Type,
 		Summary: r.Summary,
@@ -155,7 +228,43 @@ func convertModelRevision(r *model.Revision, creatorMap map[model.IDType]model.U
 			Nickname: creator.UserName,
 		},
 		CreatedAt: r.CreatedAt,
-		Data:      CastPersonData(r.Data),
+		Data:      nil,
+	}
+	if data, ok := r.Data.(map[string]interface{}); ok {
+		ret.Data = CastPersonData(data)
+	}
+	return ret
+}
+
+func convertModelSubjectRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.SubjectRevision {
+	creator := creatorMap[r.CreatorID]
+	var data *res.SubjectRevisionData
+	if r.Data != nil {
+		if subjectData, ok := r.Data.(*model.SubjectRevisionData); ok {
+			data = &res.SubjectRevisionData{
+				Name:         subjectData.Name,
+				NameCN:       subjectData.NameCN,
+				VoteField:    subjectData.VoteField,
+				FieldInfobox: subjectData.FieldInfobox,
+				FieldSummary: subjectData.FieldSummary,
+				Platform:     subjectData.Platform,
+				TypeID:       subjectData.TypeID,
+				SubjectID:    subjectData.SubjectID,
+				FieldEps:     subjectData.FieldEps,
+				Type:         subjectData.Type,
+			}
+		}
+	}
+	return res.SubjectRevision{
+		ID:      r.ID,
+		Type:    r.Type,
+		Summary: r.Summary,
+		Creator: res.Creator{
+			Username: creator.UserName,
+			Nickname: creator.UserName,
+		},
+		CreatedAt: r.CreatedAt,
+		Data:      data,
 	}
 
 }
