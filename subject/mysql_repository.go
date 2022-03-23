@@ -123,7 +123,8 @@ func (r mysqlRepo) GetPersonRelated(
 	relations, err := r.q.PersonSubjects.WithContext(ctx).
 		Joins(r.q.PersonSubjects.Subject).
 		Joins(r.q.PersonSubjects.Person).
-		Where(r.q.PersonSubjects.PersonID.Eq(personID)).Find()
+		Where(r.q.PersonSubjects.PersonID.Eq(personID)).
+		Distinct(r.q.PersonSubjects.SubjectID).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 
@@ -135,7 +136,8 @@ func (r mysqlRepo) GetPersonRelated(
 		rel = append(rel, domain.SubjectPersonRelation{
 			SubjectID: relation.SubjectID,
 			PersonID:  relation.PersonID,
-			TypeID:    relation.PrsnPosition})
+			TypeID:    relation.PrsnPosition,
+		})
 	}
 
 	return rel, nil

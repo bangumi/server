@@ -57,6 +57,7 @@ func (s service) GetPersonRelated(
 
 	for i, rel := range relations {
 		results[i].Subject = subjects[rel.SubjectID]
+		results[i].TypeID = rel.TypeID
 	}
 
 	return results, nil
