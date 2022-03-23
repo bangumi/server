@@ -112,6 +112,7 @@ func (s service) GetSubjectRelated(
 
 	for i, rel := range relations {
 		results[i].Destination = subjects[rel.DestinationID]
+		results[i].TypeID = rel.TypeID
 	}
 
 	return results, nil
