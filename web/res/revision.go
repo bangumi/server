@@ -50,3 +50,19 @@ type PersonRevision struct {
 	ID        uint32                            `json:"id"`
 	Type      uint8                             `json:"type"`
 }
+
+type CharacterRevisionDataItem struct {
+	SubjectID string `json:"subject_id"`
+	CrtType   string `json:"crt_type"`
+	CrtID     int    `json:"crt_id"`
+	CrtOrder  int    `json:"crt_order"`
+}
+
+type CharacterRevision struct {
+	CreatedAt time.Time                                       `json:"created_at"`
+	Data      map[string]map[string]CharacterRevisionDataItem `json:"data"`
+	Creator   Creator                                         `json:"creator"`
+	Summary   string                                          `json:"summary"`
+	ID        uint32                                          `json:"id"`
+	Type      uint8                                           `json:"type"`
+}

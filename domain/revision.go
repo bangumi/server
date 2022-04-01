@@ -24,10 +24,12 @@ import (
 
 type RevisionRepo interface {
 	CountPersonRelated(ctx context.Context, personID model.PersonIDType) (int64, error)
-
-	ListPersonRelated(
-		ctx context.Context, personID model.PersonIDType, limit int, offset int,
+	ListPersonRelated(ctx context.Context, personID model.PersonIDType, limit int, offset int,
 	) ([]model.Revision, error)
-
 	GetPersonRelated(ctx context.Context, id model.IDType) (model.Revision, error)
+
+	CountCharacterRelated(ctx context.Context, personID model.PersonIDType) (int64, error)
+	ListCharacterRelated(ctx context.Context, personID model.PersonIDType, limit int, offset int,
+	) ([]model.Revision, error)
+	GetCharacterRelated(ctx context.Context, id model.IDType) (model.Revision, error)
 }

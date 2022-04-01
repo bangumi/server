@@ -44,6 +44,8 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.RevisionRepo, error) 
 	return mysqlRepo{q: q, log: log.Named("revision.mysqlRepo")}, nil
 }
 
+// -----person-----
+
 func (r mysqlRepo) CountPersonRelated(ctx context.Context, id model.PersonIDType) (int64, error) {
 	c, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.Mid.Eq(id), r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).Count()
@@ -88,6 +90,56 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.IDType) (model
 	}
 	return convertRevisionDao(revision, data), nil
 }
+
+// -----character-----
+
+func (r mysqlRepo) CountCharacterRelated(ctx context.Context, id model.PersonIDType) (int64, error) {
+	c, err := r.q.RevisionHistory.WithContext(ctx).
+		Where(r.q.RevisionHistory.Mid.Eq(id), r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...)).Count()
+	if err != nil {
+		return 0, errgo.Wrap(err, "dal")
+	}
+	return c, nil
+}
+
+func (r mysqlRepo) ListCharacterRelated(
+	ctx context.Context, characterID model.CharacterIDType, limit int, offset int,
+) ([]model.Revision, error) {
+	revisions, err := r.q.RevisionHistory.WithContext(ctx).
+		Where(r.q.RevisionHistory.Mid.Eq(characterID), r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...)).
+		Order(r.q.RevisionHistory.ID.Desc()).
+		Limit(limit).
+		Offset(offset).Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	result := make([]model.Revision, len(revisions))
+	for i, revision := range revisions {
+		// TODO 不需要data吗
+		result[i] = convertRevisionDao(revision, nil)
+	}
+	return result, nil
+}
+
+func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.IDType) (model.Revision, error) {
+	revision, err := r.q.RevisionHistory.WithContext(ctx).
+		Where(r.q.RevisionHistory.ID.Eq(id),
+			r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...)).
+		First()
+
+	if err != nil {
+		return model.Revision{}, errgo.Wrap(err, "dal")
+	}
+	data, err := r.q.RevisionText.WithContext(ctx).
+		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).First()
+	if err != nil {
+		return model.Revision{}, errgo.Wrap(err, "dal")
+	}
+	return convertRevisionDao(revision, data), nil
+}
+
+// -----common-----
 
 func toValidJSON(data interface{}) interface{} {
 	t := reflect.TypeOf(data).Kind()

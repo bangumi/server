@@ -44,6 +44,20 @@ const (
 	RevisionTypeEpErase                  = 185
 )
 
+func SubjectRevisionTypes() []uint8 {
+	return []uint8{
+		RevisionTypeSubject,
+		RevisionTypeSubjectCharacterRelation,
+		RevisionTypeSubjectCastRelation,
+		RevisionTypeSubjectPersonRelation,
+		RevisionTypeSubjectMerge,
+		RevisionTypeSubjectErase,
+		RevisionTypeSubjectRelation,
+		RevisionTypeSubjectLock,
+		RevisionTypeSubjectUnlock,
+	}
+}
+
 func PersonRevisionTypes() []uint8 {
 	return []uint8{
 		RevisionTypePerson,
@@ -51,5 +65,26 @@ func PersonRevisionTypes() []uint8 {
 		RevisionTypePersonErase,
 		RevisionTypePersonMerge,
 		RevisionTypePersonSubjectRelation,
+	}
+}
+
+func CharacterRevisionTypes() []uint8 {
+	return []uint8{
+		RevisionTypeCharacter,
+		RevisionTypeCharacterSubjectRelation,
+		RevisionTypeCharacterCastRelation,
+		RevisionTypeCharacterMerge,
+		RevisionTypeCharacterErase,
+	}
+}
+
+func EpisodeRevisionTypes() []uint8 {
+	return []uint8{
+		RevisionTypeEp,
+		RevisionTypeEpMerge,
+		RevisionTypeEpMove,
+		RevisionTypeEpLock,
+		RevisionTypeEpUnlock,
+		RevisionTypeEpErase,
 	}
 }

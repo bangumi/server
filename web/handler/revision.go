@@ -79,7 +79,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonIDType, p
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 	for i := range revisions {
-		data[i] = convertModelRevision(&revisions[i], creatorMap)
+		data[i] = convertModelPersonRevision(&revisions[i], creatorMap)
 	}
 	response.Data = data
 	return c.JSON(response)
@@ -100,7 +100,7 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	return c.JSON(convertModelRevision(&r, creatorMap))
+	return c.JSON(convertModelPersonRevision(&r, creatorMap))
 
 }
 
@@ -144,7 +144,7 @@ func CastPersonData(raw map[string]interface{}) map[string]res.PersonRevisionDat
 	return items
 }
 
-func convertModelRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.PersonRevision {
+func convertModelPersonRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.PersonRevision {
 	creator := creatorMap[r.CreatorID]
 	return res.PersonRevision{
 		ID:      r.ID,
@@ -158,4 +158,113 @@ func convertModelRevision(r *model.Revision, creatorMap map[model.IDType]model.U
 		Data:      CastPersonData(r.Data),
 	}
 
+}
+
+// ------
+
+func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return err
+	}
+	characterID, err := strparse.Uint32(c.Query("character_id"))
+	if err != nil || characterID <= 0 {
+		return fiber.NewError(fiber.StatusBadRequest,
+			fmt.Sprintf("bad query character_id: %s", c.Query("character_id")))
+	}
+
+	return h.listCharacterRevision(c, characterID, page)
+}
+
+func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.PersonIDType, page pageQuery) error {
+	var response = res.Paged{
+		Limit:  page.Limit,
+		Offset: page.Offset,
+	}
+	count, err := h.r.CountCharacterRelated(c.Context(), characterID)
+	if err != nil {
+		return errgo.Wrap(err, "revision.CountCharacterRelated")
+	}
+
+	if count == 0 {
+		response.Data = []int{}
+		return c.JSON(response)
+	}
+
+	if err = page.check(count); err != nil {
+		return err
+	}
+
+	response.Total = count
+
+	revisions, err := h.r.ListCharacterRelated(c.Context(), characterID, page.Limit, page.Offset)
+
+	if err != nil {
+		return errgo.Wrap(err, "revision.ListCharacterRelated")
+	}
+
+	data := make([]res.CharacterRevision, len(revisions))
+
+	creatorMap, err := h.u.GetByIDs(c.Context(), listUniqueCreatorID(revisions)...)
+
+	if err != nil {
+		return errgo.Wrap(err, "user.GetByIDs")
+	}
+	for i := range revisions {
+		data[i] = convertModelCharacterRevision(&revisions[i], creatorMap)
+	}
+	response.Data = data
+	return c.JSON(response)
+}
+
+func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id <= 0 {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad param id: %s", c.Params("id")))
+	}
+	r, err := h.r.GetCharacterRelated(c.Context(), id)
+	if err != nil {
+		return fiber.ErrNotFound
+	}
+
+	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
+	if err != nil {
+		return errgo.Wrap(err, "user.GetByIDs")
+	}
+
+	return c.JSON(convertModelCharacterRevision(&r, creatorMap))
+}
+
+func convertModelCharacterRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.CharacterRevision {
+	creator := creatorMap[r.CreatorID]
+	return res.CharacterRevision{
+		ID:      r.ID,
+		Type:    r.Type,
+		Summary: r.Summary,
+		Creator: res.Creator{
+			Username: creator.UserName,
+			Nickname: creator.UserName,
+		},
+		CreatedAt: r.CreatedAt,
+		Data:      CastCharacterData(r.Data),
+	}
+}
+
+func CastCharacterData(raw map[string]interface{}) map[string]map[string]res.CharacterRevisionDataItem {
+	if raw == nil {
+		return nil
+	}
+	items := make(map[string]map[string]res.CharacterRevisionDataItem, len(raw))
+	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		TagName:    "json",
+		DecodeHook: SafeDecodeExtra,
+		Result:     &items,
+	})
+	if err != nil {
+		return nil
+	}
+	if err = decoder.Decode(raw); err != nil {
+		return nil
+	}
+	return items
 }

@@ -73,3 +73,41 @@ func TestListPersonRelated(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, uint32(181882), r[0].CreatorID)
 }
+
+func TestGetCharacterRelatedBasic(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	r, err := repo.GetCharacterRelated(context.Background(), 158925)
+	require.NoError(t, err)
+	require.Equal(t, uint32(158925), r.ID)
+	data := handler.CastCharacterData(r.Data)
+	dict, ok := data["158925"]
+	require.True(t, ok)
+	d, ok := dict["0"]
+	require.True(t, ok)
+	require.Equal(t, d.SubjectID, "14")
+}
+
+func TestGetCharacterRelatedNotFound(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	_, err := repo.GetCharacterRelated(context.Background(), 888888)
+	require.Error(t, err)
+}
+
+func TestListCharacterRelated(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	r, err := repo.ListCharacterRelated(context.Background(), 9, 30, 0)
+	require.NoError(t, err)
+	require.Equal(t, uint32(227062), r[0].CreatorID)
+}

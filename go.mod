@@ -11,8 +11,8 @@ require (
 	github.com/gofiber/adaptor/v2 v2.1.20
 	github.com/gofiber/fiber/v2 v2.29.0
 	github.com/joho/godotenv v1.4.0
-	github.com/mitchellh/mapstructure v1.4.3
 	github.com/mattn/go-colorable v0.1.12
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/prometheus/client_golang v1.12.1
 	github.com/stretchr/testify v1.7.0
 	github.com/uber-go/tally/v4 v4.1.1
@@ -45,7 +45,6 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
