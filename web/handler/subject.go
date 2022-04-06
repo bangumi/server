@@ -157,12 +157,12 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	var response = make([]res.SubjectRelatedPerson, len(relations))
 	for i, rel := range relations {
 		response[i] = res.SubjectRelatedPerson{
-			Images:   model.PersonImage(rel.Subject.Image),
+			Images:   model.PersonImage(rel.Person.Image),
 			Name:     rel.Person.Name,
 			Relation: vars.StaffMap[r.TypeID][rel.TypeID].String(),
 			Career:   careers(rel.Person),
 			Type:     rel.Person.Type,
-			ID:       rel.Subject.ID,
+			ID:       rel.Person.ID,
 		}
 	}
 
