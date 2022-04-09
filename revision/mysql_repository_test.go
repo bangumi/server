@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/revision"
 	"github.com/bangumi/server/web/handler"
 )
@@ -47,10 +48,12 @@ func TestGetPersonRelatedBasic(t *testing.T) {
 	r, err := repo.GetPersonRelated(context.Background(), 348475)
 	require.NoError(t, err)
 	require.Equal(t, uint32(348475), r.ID)
-	data := handler.CastPersonData(r.Data)
-	d, ok := data["348475"]
+	data, ok := r.Data.(map[string]interface{})
 	require.True(t, ok)
-	require.Equal(t, d.Name, "森岡浩之")
+	dat := handler.CastPersonData(data)
+	d, ok := dat["348475"]
+	require.True(t, ok)
+	require.Equal(t, "森岡浩之", d.Name)
 }
 
 func TestGetPersonRelatedNotFound(t *testing.T) {
@@ -70,6 +73,41 @@ func TestListPersonRelated(t *testing.T) {
 	repo := getRepo(t)
 
 	r, err := repo.ListPersonRelated(context.Background(), 9, 30, 0)
+	require.NoError(t, err)
+	require.Equal(t, uint32(181882), r[0].CreatorID)
+}
+
+func TestGetSubjectRelatedBasic(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	r, err := repo.GetSubjectRelated(context.Background(), 718391)
+	require.NoError(t, err)
+	require.Equal(t, uint32(718391), r.ID)
+	data, ok := r.Data.(*model.SubjectRevisionData)
+	require.True(t, ok)
+	require.Equal(t, "第一次的親密接觸", data.Name)
+}
+
+func TestGetSubjectRelatedNotFound(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	_, err := repo.GetPersonRelated(context.Background(), 888888)
+	require.Error(t, err)
+}
+
+func TestListSubjectRelated(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	r, err := repo.ListSubjectRelated(context.Background(), 26, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, uint32(181882), r[0].CreatorID)
 }

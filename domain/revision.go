@@ -30,4 +30,12 @@ type RevisionRepo interface {
 	) ([]model.Revision, error)
 
 	GetPersonRelated(ctx context.Context, id model.IDType) (model.Revision, error)
+
+	CountSubjectRelated(ctx context.Context, id model.SubjectIDType) (int64, error)
+
+	ListSubjectRelated(
+		ctx context.Context, id model.SubjectIDType, limit int, offset int,
+	) ([]model.Revision, error)
+
+	GetSubjectRelated(ctx context.Context, id model.IDType) (model.Revision, error)
 }

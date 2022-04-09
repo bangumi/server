@@ -795,7 +795,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/DetailedRevision"
+                "$ref": "#/components/schemas/SubjectRevision"
         "404":
           description: Not Found
           content:
@@ -1256,6 +1256,59 @@ components:
       properties:
         img:
           title: Image
+          type: string
+    SubjectRevision:
+      title: SubjectRevision
+      allOf:
+        - "$ref": "#/components/schemas/Revision"
+        - type: object
+          properties:
+            data:
+              "$ref": "#/components/schemas/SubjectRevisionData"
+    SubjectRevisionData:
+      title: SubjectRevisionData
+      required:
+        - field_eps
+        - field_infobox
+        - field_summary
+        - name
+        - name_cn
+        - platform
+        - subject_id
+        - type
+        - type_id
+        - vote_field
+      type: object
+      properties:
+        field_eps:
+          title: Field EPs
+          type: integer
+        field_infobox:
+          title: Field Infobox
+          type: string
+        field_summary:
+          title: Field Summary
+          type: string
+        name:
+          title: Name
+          type: string
+        name_cn:
+          title: Name CN
+          type: string
+        platform:
+          title: Platform
+          type: integer
+        subject_id:
+          title: Subject ID
+          type: integer
+        type:
+          title: Type
+          type: integer
+        type_id:
+          title: Type ID
+          type: integer
+        vote_field:
+          title: Vote Field
           type: string
     EpType:
       title: EpType

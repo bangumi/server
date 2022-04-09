@@ -26,10 +26,23 @@ type Creator struct {
 }
 
 type Revision struct {
+	Data      interface{}
 	CreatedAt time.Time
-	Data      map[string]interface{}
 	Summary   string
+	Type      uint8
 	ID        uint32
 	CreatorID uint32
-	Type      uint8
+}
+
+type SubjectRevisionData struct {
+	Name         string
+	NameCN       string
+	VoteField    string
+	FieldInfobox string
+	FieldSummary string
+	Platform     uint16
+	TypeID       uint16
+	SubjectID    uint32
+	FieldEps     uint32
+	Type         uint8
 }

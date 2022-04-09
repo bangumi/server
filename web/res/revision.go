@@ -50,3 +50,25 @@ type PersonRevision struct {
 	ID        uint32                            `json:"id"`
 	Type      uint8                             `json:"type"`
 }
+
+type SubjectRevisionData struct {
+	Name         string `json:"name"`
+	NameCN       string `json:"name_cn"`
+	VoteField    string `json:"vote_field"`
+	FieldInfobox string `json:"field_infobox"`
+	FieldSummary string `json:"field_summary"`
+	Platform     uint16 `json:"platform"`
+	TypeID       uint16 `json:"type_id"`
+	SubjectID    uint32 `json:"subject_id"`
+	FieldEps     uint32 `json:"field_eps"`
+	Type         uint8  `json:"type"`
+}
+
+type SubjectRevision struct {
+	CreatedAt time.Time            `json:"created_at"`
+	Data      *SubjectRevisionData `json:"data"`
+	Creator   Creator              `json:"creator"`
+	Summary   string               `json:"summary"`
+	ID        uint32               `json:"id"`
+	Type      uint8                `json:"type"`
+}

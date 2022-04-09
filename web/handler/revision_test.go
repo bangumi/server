@@ -32,7 +32,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func TestHandler_ListPersionRevision_HappyPath(t *testing.T) {
+func TestHandler_ListPersonRevision_HappyPath(t *testing.T) {
 	t.Parallel()
 	m := &mocks.RevisionRepo{}
 	m.EXPECT().ListPersonRelated(mock.Anything, uint32(9), 30, 0).Return([]model.Revision{{ID: 348475}}, nil)
@@ -61,7 +61,7 @@ func TestHandler_ListPersionRevision_HappyPath(t *testing.T) {
 	}
 }
 
-func TestHandler_ListPersionRevision_Bad_ID(t *testing.T) {
+func TestHandler_ListPersonRevision_Bad_ID(t *testing.T) {
 	t.Parallel()
 	m := &mocks.RevisionRepo{}
 
@@ -98,4 +98,72 @@ func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 	err = json.NewDecoder(resp.Body).Decode(&r)
 	require.NoError(t, err)
 	require.Equal(t, uint32(348475), r.ID)
+}
+
+func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
+	t.Parallel()
+	m := &mocks.RevisionRepo{}
+	m.EXPECT().ListSubjectRelated(mock.Anything, uint32(26), 30, 0).Return([]model.Revision{{ID: 665556}}, nil)
+	m.EXPECT().CountSubjectRelated(mock.Anything, uint32(26)).Return(1, nil)
+
+	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
+
+	req := httptest.NewRequest(http.MethodGet, "/v0/revisions/subjects?subject_id=26", http.NoBody)
+
+	resp, err := app.Test(req, -1)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var r res.Paged
+
+	err = json.NewDecoder(resp.Body).Decode(&r)
+
+	require.NoError(t, err)
+
+	if result, ok := r.Data.([]interface{})[0].(map[string]interface{}); ok {
+		if id, ok := result["id"].(float64); ok {
+			require.Equal(t, uint32(665556), uint32(id))
+		}
+	}
+}
+
+func TestHandler_ListSubjectRevision_Bad_ID(t *testing.T) {
+	t.Parallel()
+	m := &mocks.RevisionRepo{}
+
+	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
+
+	badIDs := []string{"-1", "a", "0"}
+
+	for _, id := range badIDs {
+		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/subjects?subject_id=%s", id), http.NoBody)
+
+		resp, err := app.Test(req, -1)
+		require.NoError(t, err)
+		defer resp.Body.Close()
+
+		require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	}
+}
+
+func TestHandler_GetSubjectRevision_HappyPath(t *testing.T) {
+	t.Parallel()
+	m := &mocks.RevisionRepo{}
+	m.EXPECT().GetSubjectRelated(mock.Anything, uint32(665556)).Return(model.Revision{ID: 665556}, nil)
+
+	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
+
+	req := httptest.NewRequest(http.MethodGet, "/v0/revisions/subjects/665556", http.NoBody)
+
+	resp, err := app.Test(req, -1)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+	var r res.SubjectRevision
+	err = json.NewDecoder(resp.Body).Decode(&r)
+	require.NoError(t, err)
+	require.Equal(t, uint32(665556), r.ID)
 }
