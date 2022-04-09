@@ -1,3 +1,4 @@
+// Copyright (c) 2022 TWT <TWT2333@outlook.com>
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -51,5 +52,15 @@ func PersonRevisionTypes() []uint8 {
 		RevisionTypePersonErase,
 		RevisionTypePersonMerge,
 		RevisionTypePersonSubjectRelation,
+	}
+}
+
+func CharacterRevisionTypes() []uint8 {
+	return []uint8{
+		RevisionTypeCharacter,
+		RevisionTypeCharacterCastRelation,
+		RevisionTypeCharacterErase,
+		RevisionTypeCharacterMerge,
+		RevisionTypeCharacterSubjectRelation,
 	}
 }

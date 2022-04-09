@@ -28,5 +28,6 @@ bin/
 .envrc
 coverage.out
 .bin/
+gen/
 
 /index.html
