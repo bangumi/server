@@ -19,6 +19,7 @@ package handler
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/mitchellh/mapstructure"
@@ -160,8 +161,8 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectIDType
 
 func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
-	if err != nil || id <= 0 {
-		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad param id: %s", c.Params("id")))
+	if err != nil || id == 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "bad param id: "+strconv.Quote(c.Params("id")))
 	}
 	r, err := h.r.GetSubjectRelated(c.Context(), id)
 	if err != nil {

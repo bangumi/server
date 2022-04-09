@@ -53,7 +53,7 @@ func TestGetPersonRelatedBasic(t *testing.T) {
 	dat := handler.CastPersonData(data)
 	d, ok := dat["348475"]
 	require.True(t, ok)
-	require.Equal(t, d.Name, "森岡浩之")
+	require.Equal(t, "森岡浩之", d.Name)
 }
 
 func TestGetPersonRelatedNotFound(t *testing.T) {
@@ -88,7 +88,7 @@ func TestGetSubjectRelatedBasic(t *testing.T) {
 	require.Equal(t, uint32(718391), r.ID)
 	data, ok := r.Data.(*model.SubjectRevisionData)
 	require.True(t, ok)
-	require.Equal(t, data.Name, "第一次的親密接觸")
+	require.Equal(t, "第一次的親密接觸", data.Name)
 }
 
 func TestGetSubjectRelatedNotFound(t *testing.T) {
