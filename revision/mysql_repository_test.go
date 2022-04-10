@@ -28,7 +28,6 @@ import (
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/revision"
-	"github.com/bangumi/server/web/handler"
 )
 
 func getRepo(t *testing.T) domain.RevisionRepo {
@@ -48,10 +47,9 @@ func TestGetPersonRelatedBasic(t *testing.T) {
 	r, err := repo.GetPersonRelated(context.Background(), 348475)
 	require.NoError(t, err)
 	require.Equal(t, uint32(348475), r.ID)
-	data, ok := r.Data.(map[string]interface{})
+	data, ok := r.Data.(map[string]model.PersonRevisionDataItem)
 	require.True(t, ok)
-	dat := handler.CastPersonData(data)
-	d, ok := dat["348475"]
+	d, ok := data["348475"]
 	require.True(t, ok)
 	require.Equal(t, "森岡浩之", d.Name)
 }

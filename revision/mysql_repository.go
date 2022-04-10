@@ -20,13 +20,16 @@ import (
 	"bytes"
 	"compress/flate"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"reflect"
 	"time"
 
 	"github.com/elliotchance/phpserialize"
+	"github.com/mitchellh/mapstructure"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/dal/dao"
@@ -79,11 +82,17 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.IDType) (model
 		First()
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Revision{}, domain.ErrNotFound
+		}
 		return model.Revision{}, errgo.Wrap(err, "dal")
 	}
 	data, err := r.q.RevisionText.WithContext(ctx).
 		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).First()
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Revision{}, domain.ErrNotFound
+		}
 		return model.Revision{}, errgo.Wrap(err, "dal")
 	}
 	return convertRevisionDao(revision, data), nil
@@ -123,6 +132,9 @@ func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.IDType) (mode
 		First()
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Revision{}, domain.ErrNotFound
+		}
 		return model.Revision{}, errgo.Wrap(err, "dal")
 	}
 	return convertSubjectRevisionDao(revision, true), nil
@@ -168,10 +180,36 @@ func convertRevisionText(text []byte) map[string]interface{} {
 	return nil
 }
 
+func SafeDecodeExtra(k1 reflect.Type, k2 reflect.Type, input interface{}) (interface{}, error) {
+	if k2.Name() == "Extra" && k1.Kind() != reflect.Map {
+		return map[string]string{}, nil
+	}
+	return input, nil
+}
+
+func CastPersonData(raw map[string]interface{}) map[string]model.PersonRevisionDataItem {
+	if raw == nil {
+		return nil
+	}
+	items := make(map[string]model.PersonRevisionDataItem, len(raw))
+	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		TagName:    "json",
+		DecodeHook: SafeDecodeExtra,
+		Result:     &items,
+	})
+	if err != nil {
+		return nil
+	}
+	if err := decoder.Decode(raw); err != nil {
+		return nil
+	}
+	return items
+}
+
 func convertRevisionDao(r *dao.RevisionHistory, data *dao.RevisionText) model.Revision {
-	var text map[string]interface{}
+	var text map[string]model.PersonRevisionDataItem
 	if data != nil {
-		text = convertRevisionText(data.Text)
+		text = CastPersonData(convertRevisionText(data.Text))
 	}
 
 	return model.Revision{

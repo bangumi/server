@@ -70,13 +70,16 @@ func TestHandler_ListPersonRevision_Bad_ID(t *testing.T) {
 	badIDs := []string{"-1", "a", "0"}
 
 	for _, id := range badIDs {
-		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/persons?person_id=%s", id), http.NoBody)
+		t.Run(id, func(t *testing.T) {
+			t.Parallel()
+			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/persons?person_id=%s", id), http.NoBody)
 
-		resp, err := app.Test(req, -1)
-		require.NoError(t, err)
-		defer resp.Body.Close()
+			resp, err := app.Test(req, -1)
+			require.NoError(t, err)
+			defer resp.Body.Close()
 
-		require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+		})
 	}
 }
 
@@ -122,11 +125,11 @@ func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
 
 	require.NoError(t, err)
 
-	if result, ok := r.Data.([]interface{})[0].(map[string]interface{}); ok {
-		if id, ok := result["id"].(float64); ok {
-			require.Equal(t, uint32(665556), uint32(id))
-		}
-	}
+	result, ok := r.Data.([]interface{})[0].(map[string]interface{})
+	require.Equal(t, true, ok)
+	id, ok := result["id"].(float64)
+	require.Equal(t, true, ok)
+	require.Equal(t, uint32(665556), uint32(id))
 }
 
 func TestHandler_ListSubjectRevision_Bad_ID(t *testing.T) {
@@ -138,13 +141,16 @@ func TestHandler_ListSubjectRevision_Bad_ID(t *testing.T) {
 	badIDs := []string{"-1", "a", "0"}
 
 	for _, id := range badIDs {
-		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/subjects?subject_id=%s", id), http.NoBody)
+		t.Run(id, func(t *testing.T) {
+			t.Parallel()
+			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/subjects?subject_id=%s", id), http.NoBody)
 
-		resp, err := app.Test(req, -1)
-		require.NoError(t, err)
-		defer resp.Body.Close()
+			resp, err := app.Test(req, -1)
+			require.NoError(t, err)
+			defer resp.Body.Close()
 
-		require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+		})
 	}
 }
 
