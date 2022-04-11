@@ -93,6 +93,8 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.IDType) (model
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Revision{}, domain.ErrNotFound
 		}
+
+		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.Revision{}, errgo.Wrap(err, "dal")
 	}
 	return convertRevisionDao(revision, data), nil
@@ -135,6 +137,8 @@ func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.IDType) (mode
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Revision{}, domain.ErrNotFound
 		}
+
+		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.Revision{}, errgo.Wrap(err, "dal")
 	}
 	return convertSubjectRevisionDao(revision, true), nil
@@ -180,21 +184,21 @@ func convertRevisionText(text []byte) map[string]interface{} {
 	return nil
 }
 
-func SafeDecodeExtra(k1 reflect.Type, k2 reflect.Type, input interface{}) (interface{}, error) {
+func safeDecodeExtra(k1 reflect.Type, k2 reflect.Type, input interface{}) (interface{}, error) {
 	if k2.Name() == "Extra" && k1.Kind() != reflect.Map {
 		return map[string]string{}, nil
 	}
 	return input, nil
 }
 
-func CastPersonData(raw map[string]interface{}) map[string]model.PersonRevisionDataItem {
+func castPersonData(raw map[string]interface{}) map[string]model.PersonRevisionDataItem {
 	if raw == nil {
 		return nil
 	}
 	items := make(map[string]model.PersonRevisionDataItem, len(raw))
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		TagName:    "json",
-		DecodeHook: SafeDecodeExtra,
+		DecodeHook: safeDecodeExtra,
 		Result:     &items,
 	})
 	if err != nil {
@@ -209,7 +213,7 @@ func CastPersonData(raw map[string]interface{}) map[string]model.PersonRevisionD
 func convertRevisionDao(r *dao.RevisionHistory, data *dao.RevisionText) model.Revision {
 	var text map[string]model.PersonRevisionDataItem
 	if data != nil {
-		text = CastPersonData(convertRevisionText(data.Text))
+		text = castPersonData(convertRevisionText(data.Text))
 	}
 
 	return model.Revision{
