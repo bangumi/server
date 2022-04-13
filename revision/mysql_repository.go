@@ -83,7 +83,6 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.IDType) (model
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			r.log.Error("can't find revision", zap.String("id", fmt.Sprint(id)))
 			return model.Revision{}, domain.ErrNotFound
 		}
 		r.log.Error("unexpected error happened", zap.Error(err))
@@ -138,7 +137,6 @@ func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.IDType) (mode
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			r.log.Error("can't find subject revision", zap.String("id", fmt.Sprint(id)))
 			return model.Revision{}, domain.ErrNotFound
 		}
 
