@@ -92,7 +92,7 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.IDType) (model
 		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			r.log.Error("can't find revision text", zap.String("id", fmt.Sprint(revision.TextID)))
+			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
 			return model.Revision{}, domain.ErrNotFound
 		}
 
