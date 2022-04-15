@@ -34,6 +34,28 @@ type Revision struct {
 	CreatorID uint32
 }
 
+type Profession struct {
+	Writer      string `json:"writer,omitempty"`
+	Producer    string `json:"producer,omitempty"`
+	Mangaka     string `json:"mangaka,omitempty"`
+	Artist      string `json:"artist,omitempty"`
+	Seiyu       string `json:"seiyu,omitempty"`
+	Illustrator string `json:"illustrator,omitempty"`
+	Actor       string `json:"actor,omitempty"`
+}
+
+type Extra struct {
+	Img string `json:"img,omitempty"`
+}
+
+type PersonRevisionDataItem struct {
+	InfoBox    string     `json:"prsn_infobox"`
+	Summary    string     `json:"prsn_summary"`
+	Profession Profession `json:"profession"`
+	Extra      Extra      `json:"extra"`
+	Name       string     `json:"prsn_name"`
+}
+
 type SubjectRevisionData struct {
 	Name         string
 	NameCN       string

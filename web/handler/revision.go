@@ -17,13 +17,13 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
-	"reflect"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/mitchellh/mapstructure"
 
+	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/model"
@@ -93,7 +93,10 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 	}
 	r, err := h.r.GetPersonRelated(c.Context(), id)
 	if err != nil {
-		return fiber.ErrNotFound
+		if errors.Is(err, domain.ErrNotFound) {
+			return fiber.ErrNotFound
+		}
+		return fiber.ErrInternalServerError
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
@@ -166,7 +169,10 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	}
 	r, err := h.r.GetSubjectRelated(c.Context(), id)
 	if err != nil {
-		return fiber.ErrNotFound
+		if errors.Is(err, domain.ErrNotFound) {
+			return fiber.ErrNotFound
+		}
+		return fiber.ErrInternalServerError
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
@@ -192,32 +198,6 @@ func listUniqueCreatorID(revisions []model.Revision) []model.IDType {
 	return ret[:i]
 }
 
-func SafeDecodeExtra(k1 reflect.Type, k2 reflect.Type, input interface{}) (interface{}, error) {
-	if k2.Name() == "Extra" && k1.Kind() != reflect.Map {
-		return map[string]string{}, nil
-	}
-	return input, nil
-}
-
-func CastPersonData(raw map[string]interface{}) map[string]res.PersonRevisionDataItem {
-	if raw == nil {
-		return nil
-	}
-	items := make(map[string]res.PersonRevisionDataItem, len(raw))
-	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		TagName:    "json",
-		DecodeHook: SafeDecodeExtra,
-		Result:     &items,
-	})
-	if err != nil {
-		return nil
-	}
-	if err := decoder.Decode(raw); err != nil {
-		return nil
-	}
-	return items
-}
-
 func convertModelPersonRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.PersonRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.PersonRevision{
@@ -231,8 +211,27 @@ func convertModelPersonRevision(r *model.Revision, creatorMap map[model.IDType]m
 		CreatedAt: r.CreatedAt,
 		Data:      nil,
 	}
-	if data, ok := r.Data.(map[string]interface{}); ok {
-		ret.Data = CastPersonData(data)
+	if data, ok := r.Data.(map[string]model.PersonRevisionDataItem); ok {
+		ret.Data = make(map[string]res.PersonRevisionDataItem, len(data))
+		for id, item := range data {
+			ret.Data[id] = res.PersonRevisionDataItem{
+				InfoBox: item.InfoBox,
+				Summary: item.Summary,
+				Profession: res.Profession{
+					Writer:      item.Profession.Writer,
+					Producer:    item.Profession.Producer,
+					Mangaka:     item.Profession.Mangaka,
+					Artist:      item.Profession.Artist,
+					Seiyu:       item.Profession.Seiyu,
+					Illustrator: item.Profession.Illustrator,
+					Actor:       item.Profession.Actor,
+				},
+				Extra: res.Extra{
+					Img: item.Extra.Img,
+				},
+				Name: item.Name,
+			}
+		}
 	}
 	return ret
 }
