@@ -46,6 +46,7 @@ import (
 	"github.com/bangumi/server/web"
 	"github.com/bangumi/server/web/captcha"
 	"github.com/bangumi/server/web/handler"
+	"github.com/bangumi/server/web/rate"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -61,11 +62,14 @@ type Mock struct {
 	CaptchaManager captcha.Manager
 	SessionManager session.Manager
 	Cache          cache.Generic
+	RateLimiter    rate.Manager
 	HTTPMock       *httpmock.MockTransport
 }
 
 type TB interface {
 	Helper()
+	Errorf(format string, args ...interface{})
+	FailNow()
 	Fatal(args ...interface{})
 }
 
@@ -86,15 +90,8 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 		fx.Supply(httpClient),
 
 		fx.Provide(
-			zap.NewNop,
-			config.NewAppConfig,
-			dal.NewDB,
-			web.New,
-			handler.New,
-			character.NewService,
-			subject.NewService,
-			person.NewService,
-			auth.NewService,
+			zap.NewNop, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
+			person.NewService, auth.NewService,
 		),
 
 		MockPersonRepo(m.PersonRepo),
@@ -107,6 +104,7 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 		MockRevisionRepo(m.RevisionRepo),
 		MockCaptchaManager(m.CaptchaManager),
 		MockSessionManager(m.SessionManager),
+		MockRateLimiter(m.RateLimiter),
 
 		fx.Invoke(web.ResistRouter),
 
@@ -147,6 +145,18 @@ func MockIndexRepo(repo domain.IndexRepo) fx.Option {
 	}
 
 	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.IndexRepo))))
+}
+
+func MockRateLimiter(repo rate.Manager) fx.Option {
+	if repo == nil {
+		mocker := &mocks.RateLimiter{}
+		mocker.EXPECT().Allowed(mock.Anything, mock.Anything).Return(true, 5, nil) //nolint:gomnd
+		mocker.EXPECT().Reset(mock.Anything, mock.Anything).Return(nil)
+
+		repo = mocker
+	}
+
+	return fx.Provide(func() rate.Manager { return repo })
 }
 
 func MockSessionManager(repo session.Manager) fx.Option {

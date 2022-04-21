@@ -6,6 +6,7 @@ require (
 	github.com/elliotchance/phpserialize v1.3.2
 	github.com/go-playground/validator/v10 v10.10.1
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-redis/redis_rate/v9 v9.1.2
 	github.com/go-redis/redismock/v8 v8.0.6
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/go-sql-driver/mysql v1.6.0
@@ -16,7 +17,6 @@ require (
 	github.com/jarcoal/httpmock v1.1.0
 	github.com/joho/godotenv v1.4.0
 	github.com/mattn/go-colorable v0.1.12
-	github.com/mileusna/useragent v1.0.2
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/prometheus/client_golang v1.12.1
 	github.com/stretchr/testify v1.7.1
@@ -70,7 +70,6 @@ require (
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
-	github.com/ua-parser/uap-go v0.0.0-20211112212520-00c877edfe0f // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.34.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect

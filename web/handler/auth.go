@@ -166,8 +166,23 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		})
 	}
 
+	allowed, remain, err := h.rateLimit.Allowed(c.Context(), c.Context().RemoteIP().String())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
+			Title:   "Unexpected Error",
+			Details: util.ErrDetail(c, err),
+		})
+	}
+
+	if !allowed {
+		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
+			Title:       "Bad Request",
+			Description: "Too many requests, you are not allowed to log in for a while.",
+		})
+	}
+
 	var r req.UserLogin
-	if err := json.Unmarshal(c.Body(), &r); err != nil {
+	if err = json.Unmarshal(c.Body(), &r); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
 			Title:       "Bad Request",
 			Details:     util.ErrDetail(c, err),
@@ -175,7 +190,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := h.v.Struct(r); err != nil {
+	if err = h.v.Struct(r); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
 			Title:       "Bad Request",
 			Details:     util.ErrDetail(c, err),
@@ -196,10 +211,10 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadGateway).SendString("failed to pass captcha verify, please re-do")
 	}
 
-	return h.privateLogin(c, r)
+	return h.privateLogin(c, r, remain)
 }
 
-func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin) error {
+func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
@@ -212,6 +227,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(res.Error{
 			Title:       "Unauthorized",
 			Description: "Email or Password is not correct",
+			Details:     fiber.Map{"remain": remain},
 		})
 	}
 
@@ -221,6 +237,10 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin) error {
 			Title:       "",
 			Description: "",
 		})
+	}
+
+	if err := h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
+		h.log.Error("failed to reset login rate limit", zap.Error(err))
 	}
 
 	c.Cookie(&fiber.Cookie{

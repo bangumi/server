@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/web/captcha"
+	"github.com/bangumi/server/web/rate"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -41,40 +42,43 @@ func New(
 	cache cache.Generic,
 	captcha captcha.Manager,
 	session session.Manager,
+	rateLimit rate.Manager,
 	log *zap.Logger,
 ) Handler {
 
 	return Handler{
-		cfg:     cfg,
-		cache:   cache,
-		log:     log,
-		session: session,
-		p:       p,
-		s:       s,
-		a:       a,
-		u:       user,
-		e:       e,
-		c:       c,
-		i:       index,
-		r:       r,
-		captcha: captcha,
-		v:       validator.New(),
+		cfg:       cfg,
+		cache:     cache,
+		log:       log,
+		rateLimit: rateLimit,
+		session:   session,
+		p:         p,
+		s:         s,
+		a:         a,
+		u:         user,
+		e:         e,
+		c:         c,
+		i:         index,
+		r:         r,
+		captcha:   captcha,
+		v:         validator.New(),
 	}
 }
 
 type Handler struct {
-	s       domain.SubjectService
-	p       domain.PersonService
-	a       domain.AuthService
-	session session.Manager
-	captcha captcha.Manager
-	e       domain.EpisodeRepo
-	c       domain.CharacterService
-	u       domain.UserRepo
-	cache   cache.Generic
-	i       domain.IndexRepo
-	r       domain.RevisionRepo
-	log     *zap.Logger
-	v       *validator.Validate
-	cfg     config.AppConfig
+	rateLimit rate.Manager
+	s         domain.SubjectService
+	p         domain.PersonService
+	a         domain.AuthService
+	session   session.Manager
+	captcha   captcha.Manager
+	e         domain.EpisodeRepo
+	c         domain.CharacterService
+	u         domain.UserRepo
+	cache     cache.Generic
+	i         domain.IndexRepo
+	r         domain.RevisionRepo
+	log       *zap.Logger
+	v         *validator.Validate
+	cfg       config.AppConfig
 }

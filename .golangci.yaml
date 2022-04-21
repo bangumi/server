@@ -290,10 +290,6 @@ issues:
   fix: false
   exclude-use-default: true
   exclude-rules:
-    # Disable linters that are annoying in tests.
-    - path: 'cmd[/\\].*'
-      linters: [gochecknoglobals, gochecknoinits, goerr113, wrapcheck]
-
     - path: '.*_test\.go'
       linters: [gocritic, gochecknoglobals]
 

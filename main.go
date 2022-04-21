@@ -43,6 +43,7 @@ import (
 	"github.com/bangumi/server/web"
 	"github.com/bangumi/server/web/captcha/hcaptcha"
 	"github.com/bangumi/server/web/handler"
+	"github.com/bangumi/server/web/rate"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -84,7 +85,7 @@ func start() error {
 		),
 
 		fx.Provide(
-			hcaptcha.New, session.New, handler.New, web.New,
+			rate.New, hcaptcha.New, session.New, handler.New, web.New,
 		),
 
 		fx.Invoke(
