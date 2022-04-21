@@ -34,8 +34,8 @@ type AuthRepo interface {
 type User struct {
 	Email          string
 	Username       string
-	UID            uint32
 	HashedPassword string
+	UID            uint32
 }
 
 // Auth is the basic authorization represent a user.

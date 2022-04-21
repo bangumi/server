@@ -112,9 +112,9 @@ func (h Handler) fill(c *fiber.Ctx, a *accessor) error {
 }
 
 type accessor struct {
-	domain.Auth
 	cfRay string
 	ip    net.IP
+	domain.Auth
 	login bool
 }
 
@@ -196,6 +196,10 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadGateway).SendString("failed to pass captcha verify, please re-do")
 	}
 
+	return h.privateLogin(c, r)
+}
+
+func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{

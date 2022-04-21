@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
+//nolint:tagliatelle
 package hcaptcha
 
 import (
@@ -58,10 +59,10 @@ func (m manager) Verify(ctx context.Context, response string) (bool, error) {
 }
 
 type hCaptcha struct {
-	ErrorCodes  []string      `json:"error-codes"` //nolint:tagliatelle
-	ScoreReason []interface{} `json:"score_reason"`
 	ChallengeTS time.Time     `json:"challenge_ts"`
 	Hostname    string        `json:"hostname"`
+	ErrorCodes  []string      `json:"error-codes"`
+	ScoreReason []interface{} `json:"score_reason"`
 	Score       float64       `json:"score"`
 	Credit      bool          `json:"credit"`
 	Success     bool          `json:"success"`

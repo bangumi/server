@@ -81,8 +81,7 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 		fx.NopLogger,
 
 		fx.Supply(fx.Annotate(tally.NoopScope, fx.As(new(tally.Scope)))),
-		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}),
-			fx.As(new(promreporter.Reporter)))),
+		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}), fx.As(new(promreporter.Reporter)))),
 
 		fx.Supply(httpClient),
 
@@ -92,9 +91,6 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 			dal.NewDB,
 			web.New,
 			handler.New,
-		),
-
-		fx.Provide(
 			character.NewService,
 			subject.NewService,
 			person.NewService,

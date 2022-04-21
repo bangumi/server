@@ -59,7 +59,6 @@ func main() {
 func start() error {
 	app := fx.New(
 		logger.FxLogger(),
-
 		// driver and connector
 		fx.Provide(
 			driver.NewRedisClient, // redis
@@ -69,50 +68,27 @@ func start() error {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
 				httpClient.JSONUnmarshal = json.Unmarshal
 				httpClient.JSONMarshal = json.MarshalNoEscape
-
 				return httpClient
 			},
 		),
 
 		fx.Provide(
-			config.NewAppConfig,
-			logger.Copy,
-			metrics.NewScope,
+			config.NewAppConfig, logger.Copy, metrics.NewScope,
+
+			query.Use, cache.NewRedisCache,
+
+			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
+			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo,
+
+			auth.NewService, character.NewService, subject.NewService, person.NewService,
 		),
 
 		fx.Provide(
-			query.Use,
-			cache.NewRedisCache,
-		),
-
-		fx.Provide(
-			character.NewMysqlRepo,
-			subject.NewMysqlRepo,
-			user.NewUserRepo,
-			person.NewMysqlRepo,
-			index.NewMysqlRepo,
-			auth.NewMysqlRepo,
-			episode.NewMysqlRepo,
-			revision.NewMysqlRepo,
-		),
-
-		fx.Provide(
-			auth.NewService,
-			hcaptcha.New,
-			character.NewService,
-			subject.NewService,
-			person.NewService,
-		),
-
-		fx.Provide(
-			session.New,
-			handler.New,
-			web.New,
+			hcaptcha.New, session.New, handler.New, web.New,
 		),
 
 		fx.Invoke(
-			web.ResistRouter,
-			web.Listen,
+			web.ResistRouter, web.Listen,
 		),
 	)
 

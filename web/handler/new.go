@@ -71,10 +71,10 @@ type Handler struct {
 	e       domain.EpisodeRepo
 	c       domain.CharacterService
 	u       domain.UserRepo
-	cfg     config.AppConfig
+	cache   cache.Generic
 	i       domain.IndexRepo
 	r       domain.RevisionRepo
-	cache   cache.Generic
 	log     *zap.Logger
 	v       *validator.Validate
+	cfg     config.AppConfig
 }

@@ -21,7 +21,6 @@ import (
 	"crypto/md5" //nolint:gosec
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -53,8 +52,6 @@ func (s service) Login(ctx context.Context, email, password string) (domain.Auth
 
 		return domain.Auth{}, false, errgo.Wrap(err, "repo.GetByEmail")
 	}
-
-	fmt.Println(hashedPassword)
 
 	ok, err := s.ComparePassword(hashedPassword, password)
 

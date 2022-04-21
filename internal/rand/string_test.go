@@ -17,7 +17,6 @@
 package rand_test
 
 import (
-	"fmt"
 	"runtime"
 	"testing"
 
@@ -27,9 +26,9 @@ import (
 )
 
 func TestSecureRandomString(t *testing.T) {
+	t.Parallel()
 	s := rand.SecureRandomString(32)
 	require.Equal(t, 32, len(s))
-	fmt.Println(s)
 }
 
 func BenchmarkSecureRandomString(b *testing.B) {

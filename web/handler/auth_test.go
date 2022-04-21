@@ -18,9 +18,8 @@ package handler_test
 
 import (
 	"bytes"
-	"crypto/md5"
+	"crypto/md5" //nolint:gosec
 	"encoding/hex"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -90,13 +89,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 
 	dump.P(resp.Header)
 
-	hValue, ok := resp.Header[fiber.HeaderSetCookie]
+	_, ok := resp.Header[fiber.HeaderSetCookie]
 	require.True(t, ok, "response should set cookies")
 	require.Equal(t, http.StatusOK, resp.StatusCode, "200 for login")
-
-	header := http.Header{}
-	header["Cookie"] = hValue
-	request := http.Request{Header: header}
-
-	fmt.Println(request.Cookies()) // [cookie1=value1 cookie2=value2]
 }

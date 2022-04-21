@@ -81,9 +81,9 @@ type AppConfig struct {
 	MySQLUserName     string
 	MySQLPassword     string
 	MySQLDatabase     string
+	HCaptchaSecretKey string
 	MySQLMaxConn      int
-	HCaptchaSecretKey string // hCaptcha secret key
-	HTTPPort          int    // HTTP_PORT
+	HTTPPort          int
 }
 
 func getEnv(n, v string) string {
