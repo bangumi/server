@@ -27,9 +27,8 @@ const availableCharLength = uint8(len(availableCharBytes))
 
 func SecureRandomString(length int) string {
 	b := make([]byte, length)
-	_, err := rand.Read(b)
-	if err != nil {
-		return ""
+	if _, err := rand.Read(b); err != nil {
+		panic("unexpected error happened when reading from 'crypto/rand'")
 	}
 	for i := 0; i < length; i++ {
 		b[i] = availableCharBytes[b[i]%availableCharLength]
