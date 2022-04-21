@@ -27,7 +27,6 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gookit/goutil/dump"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
@@ -86,8 +85,6 @@ func TestHandler_PrivateLogin(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, fiber.StatusOK, resp.StatusCode, string(respBody))
-
-	dump.P(resp.Header)
 
 	_, ok := resp.Header[fiber.HeaderSetCookie]
 	require.True(t, ok, "response should set cookies")

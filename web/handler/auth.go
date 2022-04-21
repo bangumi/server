@@ -165,8 +165,9 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 			Description: "Must use 'application/json' as request content-type.",
 		})
 	}
-
+	h.log.Info("1")
 	allowed, remain, err := h.rateLimit.Allowed(c.Context(), c.Context().RemoteIP().String())
+	h.log.Info("2")
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
 			Title:   "Unexpected Error",
@@ -190,6 +191,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		})
 	}
 
+	h.log.Info("3")
 	if err = h.v.Struct(r); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
 			Title:       "Bad Request",
@@ -198,7 +200,9 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		})
 	}
 
+	h.log.Info("4")
 	ok, err := h.captcha.Verify(c.Context(), r.HCaptchaResponse)
+	h.log.Info("5")
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(res.Error{
 			Title:       "Bad Gateway",
@@ -215,6 +219,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 }
 
 func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
+	h.log.Info("6")
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
@@ -231,7 +236,9 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 		})
 	}
 
+	h.log.Info("7")
 	key, _, err := h.session.Create(c.Context(), login)
+	h.log.Info("8")
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
 			Title:   "Unexpected Session Manager Error",
@@ -239,10 +246,13 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 		})
 	}
 
+	h.log.Info("9")
 	if err := h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
+		h.log.Info("9.1")
 		h.log.Error("failed to reset login rate limit", zap.Error(err))
 	}
 
+	h.log.Info("10")
 	c.Cookie(&fiber.Cookie{
 		Name:     "sessionID",
 		Value:    key,
