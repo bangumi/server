@@ -22,7 +22,7 @@ func (_m *RateLimiter) EXPECT() *RateLimiter_Expecter {
 }
 
 // Allowed provides a mock function with given fields: ctx, ip
-func (_m *RateLimiter) Allowed(ctx context.Context, ip string) (bool, int64, error) {
+func (_m *RateLimiter) Allowed(ctx context.Context, ip string) (bool, int, error) {
 	ret := _m.Called(ctx, ip)
 
 	var r0 bool
@@ -32,11 +32,11 @@ func (_m *RateLimiter) Allowed(ctx context.Context, ip string) (bool, int64, err
 		r0 = ret.Get(0).(bool)
 	}
 
-	var r1 int64
-	if rf, ok := ret.Get(1).(func(context.Context, string) int64); ok {
+	var r1 int
+	if rf, ok := ret.Get(1).(func(context.Context, string) int); ok {
 		r1 = rf(ctx, ip)
 	} else {
-		r1 = ret.Get(1).(int64)
+		r1 = ret.Get(1).(int)
 	}
 
 	var r2 error
@@ -68,7 +68,7 @@ func (_c *RateLimiter_Allowed_Call) Run(run func(ctx context.Context, ip string)
 	return _c
 }
 
-func (_c *RateLimiter_Allowed_Call) Return(allowed bool, remain int64, err error) *RateLimiter_Allowed_Call {
+func (_c *RateLimiter_Allowed_Call) Return(allowed bool, remain int, err error) *RateLimiter_Allowed_Call {
 	_c.Call.Return(allowed, remain, err)
 	return _c
 }

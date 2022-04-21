@@ -38,7 +38,7 @@ var allowScript = redis.NewScript(allowLua) //nolint:gochecknoglobals
 
 type Manager interface {
 	// Allowed 检查是否允许登录。
-	Allowed(ctx context.Context, ip string) (allowed bool, remain int64, err error)
+	Allowed(ctx context.Context, ip string) (allowed bool, remain int, err error)
 	// Reset 登录成功时应该重置计数。
 	Reset(ctx context.Context, ip string) error
 }
@@ -56,7 +56,7 @@ type manager struct {
 	r *redis.Client
 }
 
-func (m manager) Allowed(ctx context.Context, ip string) (bool, int64, error) {
+func (m manager) Allowed(ctx context.Context, ip string) (bool, int, error) {
 	var banKey = RedisBanKeyPrefix + ip
 	result, err := m.r.Exists(ctx, banKey, "1").Result()
 	if err != nil {
@@ -130,8 +130,8 @@ func (m manager) allow(
 
 	return Result{
 		Limit:      limit,
-		Allowed:    allowed,
-		Remaining:  remaining,
+		Allowed:    int(allowed),
+		Remaining:  int(remaining),
 		RetryAfter: dur(retryAfter),
 		ResetAfter: dur(resetAfter),
 	}, nil
@@ -199,14 +199,14 @@ type Result struct {
 	Limit Limit
 
 	// Allowed is the number of events that may happen at time now.
-	Allowed int64
+	Allowed int
 
 	// Remaining is the maximum number of requests that could be
 	// permitted instantaneously for this key given the current
 	// state. For example, if a rate limiter allows 10 requests per
 	// second and has already received 6 requests for this key this
 	// second, Remaining would be 4.
-	Remaining int64
+	Remaining int
 
 	// RetryAfter is the time until the next request will be permitted.
 	// It should be -1 unless the rate limit has been exceeded.

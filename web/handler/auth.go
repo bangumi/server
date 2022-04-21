@@ -214,7 +214,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	return h.privateLogin(c, r, remain)
 }
 
-func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int64) error {
+func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
