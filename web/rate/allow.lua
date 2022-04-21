@@ -1,23 +1,38 @@
----@type st
+-- Copyright (c) 2017 Pavel Pravosud
+-- https://github.com/rwz/redis-gcra/blob/master/vendor/perform_gcra_ratelimit.lua
+---@type string
+local ban_key = KEYS[2]
+
+-- check banned keys
+local banned = redis.call('EXISTS', ban_key)
+if banned == 1 then
+    return {0, 0, 0, 0}
+end
+
+-- not check rate limit
+---@type string
 local rate_limit_key = KEYS[1]
 
----@type integer
+---@type number
 local burst = ARGV[1]
 
----@type integer
+---@type number
 local rate = ARGV[2]
 
 ---@type number
 local period = ARGV[3]
 
----@type integer
-local cost = tonumber(ARGV[4])
+---@type number
+local now_second = ARGV[4]
 
----@type integer
-local now_second = ARGV[5]
+---@type number
+local now_us = ARGV[5]
 
----@type integer
-local now_us = ARGV[6]
+---@type number
+local ban_expire = ARGV[6]
+
+---@type number
+local cost = 1
 
 local emission_interval = period / rate
 local increment = emission_interval * cost
@@ -50,11 +65,11 @@ local diff = now - allow_at
 local remaining = diff / emission_interval
 
 if remaining < 0 then
+    redis.call('SET', ban_key, "1", "EX", ban_expire) -- ban key
+
     local reset_after = tat - now
     local retry_after = diff * -1
-    return {0, -- allowed
-    0, -- remaining
-    tostring(retry_after), tostring(reset_after)}
+    return {0, 0, tostring(retry_after), tostring(reset_after)}
 end
 
 local reset_after = new_tat - now
