@@ -77,7 +77,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 	req.Header.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
 	req.Header.Set(fiber.HeaderUserAgent, "fiber test client")
 
-	resp, err := app.Test(req)
+	resp, err := app.Test(req, -1) // bcrypt 比较哈希太慢了
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
