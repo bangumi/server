@@ -68,6 +68,8 @@ func (r *revisionText) WithContext(ctx context.Context) *revisionTextDo {
 
 func (r revisionText) TableName() string { return r.revisionTextDo.TableName() }
 
+func (r revisionText) Alias() string { return r.revisionTextDo.Alias() }
+
 func (r *revisionText) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := r.fieldMap[fieldName]
 	if !ok || _f == nil {

@@ -117,6 +117,8 @@ func (c *character) WithContext(ctx context.Context) *characterDo {
 
 func (c character) TableName() string { return c.characterDo.TableName() }
 
+func (c character) Alias() string { return c.characterDo.Alias() }
+
 func (c *character) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := c.fieldMap[fieldName]
 	if !ok || _f == nil {
