@@ -23,6 +23,7 @@ import (
 	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/web/handler"
+	"github.com/bangumi/server/web/middleware/ua"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/util"
 )
@@ -64,6 +65,12 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Get("/v0/revisions/persons", addMetrics(h.ListPersonRevision))
 	app.Get("/v0/revisions/subjects/:id", addMetrics(h.GetSubjectRevision))
 	app.Get("/v0/revisions/subjects", addMetrics(h.ListSubjectRevision))
+
+	app.Get("/auth/revoke", addMetrics(h.ListSubjectRevision))
+
+	// frontend private api
+	private := app.Group("/p", ua.New())
+	private.Post("/login", addMetrics(h.PrivateLogin))
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {

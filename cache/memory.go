@@ -30,14 +30,14 @@ import (
 // NewMemoryCache return an in-memory cache.
 // This cache backend should be used to cache limited-sized entries like user group permission rule.
 func NewMemoryCache() Generic {
-	return &memCache{}
+	return &Memory{}
 }
 
 var errCacheNotSameType = errors.New("cached item have is not same type as expected result")
 
-// memCache store data in memory,
+// Memory store data in memory,
 // will be used to cache user group permission rule.
-type memCache struct {
+type Memory struct {
 	m sync.Map
 }
 
@@ -46,7 +46,7 @@ type cacheItem struct {
 	Dead  time.Time
 }
 
-func (c *memCache) Get(_ context.Context, key string, value interface{}) (bool, error) {
+func (c *Memory) Get(_ context.Context, key string, value interface{}) (bool, error) {
 	v, ok := c.m.Load(key)
 	if !ok {
 		return ok, nil
@@ -79,7 +79,7 @@ func (c *memCache) Get(_ context.Context, key string, value interface{}) (bool, 
 	return true, nil
 }
 
-func (c *memCache) Set(_ context.Context, key string, value interface{}, ttl time.Duration) error {
+func (c *Memory) Set(_ context.Context, key string, value interface{}, ttl time.Duration) error {
 	c.m.Store(key, cacheItem{
 		Value: value,
 		Dead:  time.Now().Add(ttl),

@@ -21,6 +21,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/elliotchance/phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -37,6 +38,26 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.AuthRepo, error) {
 type mysqlRepo struct {
 	q   *query.Query
 	log *zap.Logger
+}
+
+func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (domain.Auth, []byte, error) {
+	// TODO: replace it with email column
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Username.Eq(email)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.Auth{}, nil, domain.ErrNotFound
+		}
+
+		m.log.Error("unexpected error happened", zap.Error(err))
+		return domain.Auth{}, nil, errgo.Wrap(err, "gorm")
+	}
+
+	// TODO: replace it with email and password column
+	return domain.Auth{
+		RegTime: time.Unix(u.Regdate, 0),
+		ID:      u.UID,
+		GroupID: u.Groupid,
+	}, nil, nil
 }
 
 func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
@@ -74,5 +95,66 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, e
 		return domain.Auth{}, errgo.Wrap(err, "gorm")
 	}
 
-	return domain.Auth{ID: u.UID}, nil
+	return domain.Auth{
+		RegTime: time.Unix(u.Regdate, 0),
+		ID:      u.UID,
+		GroupID: u.Groupid,
+	}, nil
+}
+
+func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Permission, error) {
+	r, err := m.q.UserGroup.WithContext(ctx).Where(m.q.UserGroup.ID.Eq(groupID)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			m.log.Error("can't find permission for group", zap.Uint8("id", groupID))
+			return domain.Permission{}, nil
+		}
+
+		m.log.Error("unexpected error", zap.Error(err))
+		return domain.Permission{}, errgo.Wrap(err, "dal")
+	}
+
+	var p phpPermission
+	if err := phpserialize.Unmarshal(r.Perm, &p); err != nil {
+		m.log.Error("failed to decode php serialized content", zap.Error(err))
+		return domain.Permission{}, nil
+	}
+
+	return domain.Permission{
+		UserList:          parseBool(p.UserList),
+		ManageUserGroup:   parseBool(p.ManageUserGroup),
+		ManageUser:        parseBool(p.ManageUser),
+		DoujinSubjectLock: parseBool(p.DoujinSubjectLock),
+		SubjectEdit:       parseBool(p.SubjectEdit),
+		SubjectLock:       parseBool(p.SubjectLock),
+		SubjectRefresh:    parseBool(p.SubjectRefresh),
+		SubjectRelated:    parseBool(p.SubjectRelated),
+		MonoMerge:         parseBool(p.MonoMerge),
+		MonoErase:         parseBool(p.MonoErase),
+		EpEdit:            parseBool(p.EpEdit),
+		EpMove:            parseBool(p.EpMove),
+		Report:            parseBool(p.Report),
+		AppErase:          parseBool(p.AppErase),
+	}, nil
+}
+
+func parseBool(s string) bool {
+	return s == "1"
+}
+
+type phpPermission struct {
+	UserList          string `php:"user_list"`
+	ManageUserGroup   string `php:"manage_user_group"`
+	ManageUser        string `php:"manage_user"`
+	DoujinSubjectLock string `php:"doujin_subject_lock"`
+	SubjectEdit       string `php:"subject_edit"`
+	SubjectLock       string `php:"subject_lock"`
+	SubjectRefresh    string `php:"subject_refresh"`
+	SubjectRelated    string `php:"subject_related"`
+	MonoMerge         string `php:"mono_merge"`
+	MonoErase         string `php:"mono_erase"`
+	EpEdit            string `php:"ep_edit"`
+	EpMove            string `php:"ep_move"`
+	Report            string `php:"report"`
+	AppErase          string `php:"app_erase"`
 }

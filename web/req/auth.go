@@ -14,30 +14,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package util
+package req
 
-import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
-)
-
-func ErrDetail(c *fiber.Ctx, err error) Detail {
-	return Detail{
-		Path:        c.Path(),
-		Error:       err.Error(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
+type UserLogin struct {
+	Email            string `json:"email"`
+	Password         string `json:"password"`
+	HCaptchaResponse string `json:"h-captcha-response"` //nolint:tagliatelle
 }
 
-func DetailFromRequest(c *fiber.Ctx) Detail {
-	return Detail{
-		Path:        c.Path(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
-}
-
-type Detail struct {
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
-	QueryString string `json:"query_string,omitempty"`
+type RevokeSession struct {
+	UID uint32 `validate:"required" json:"uid"`
 }

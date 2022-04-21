@@ -14,30 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package util
+package captcha
 
-import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
-)
+import "context"
 
-func ErrDetail(c *fiber.Ctx, err error) Detail {
-	return Detail{
-		Path:        c.Path(),
-		Error:       err.Error(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
-}
-
-func DetailFromRequest(c *fiber.Ctx) Detail {
-	return Detail{
-		Path:        c.Path(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
-}
-
-type Detail struct {
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
-	QueryString string `json:"query_string,omitempty"`
+type Manager interface {
+	Verify(ctx context.Context, response string) (bool, error)
 }

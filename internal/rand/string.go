@@ -14,30 +14,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package util
+package rand
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"crypto/rand"
+
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-func ErrDetail(c *fiber.Ctx, err error) Detail {
-	return Detail{
-		Path:        c.Path(),
-		Error:       err.Error(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
-}
+const availableCharBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const availableCharLength = uint8(len(availableCharBytes))
 
-func DetailFromRequest(c *fiber.Ctx) Detail {
-	return Detail{
-		Path:        c.Path(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
+func SecureRandomString(length int) string {
+	b := make([]byte, length)
+	_, err := rand.Read(b)
+	if err != nil {
+		return ""
 	}
-}
+	for i := 0; i < length; i++ {
+		b[i] = availableCharBytes[b[i]%availableCharLength]
+	}
 
-type Detail struct {
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
-	QueryString string `json:"query_string,omitempty"`
+	return utils.UnsafeString(b)
 }

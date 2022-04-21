@@ -14,30 +14,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package util
+package ua
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+
+	"github.com/bangumi/server/web/res"
 )
 
-func ErrDetail(c *fiber.Ctx, err error) Detail {
-	return Detail{
-		Path:        c.Path(),
-		Error:       err.Error(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
-}
+func New() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		u := c.Get(fiber.HeaderUserAgent)
+		if u == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(
+				res.Error{
+					Title:       "Bad Request",
+					Description: "Please set a 'User-Agent'",
+				},
+			)
+		}
 
-func DetailFromRequest(c *fiber.Ctx) Detail {
-	return Detail{
-		Path:        c.Path(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
+		return c.Next()
 	}
-}
-
-type Detail struct {
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
-	QueryString string `json:"query_string,omitempty"`
 }

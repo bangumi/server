@@ -22,7 +22,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
+	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -32,6 +35,8 @@ import (
 	"github.com/bangumi/server/internal/strutil"
 	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/handler/ctxkey"
+	"github.com/bangumi/server/web/req"
+	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/util"
 )
 
@@ -129,4 +134,101 @@ func (a accessor) MarshalLogObject(encoder zapcore.ObjectEncoder) error {
 	encoder.AddString("id", a.cfRay)
 
 	return nil
+}
+
+func (h Handler) RevokeSession(c *fiber.Ctx) error {
+	var r req.RevokeSession
+	if err := c.BodyParser(r); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
+			Title:       "Bad Request",
+			Details:     util.ErrDetail(c, err),
+			Description: "can't decode request body",
+		})
+	}
+
+	if err := h.v.Struct(r); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
+			Title:       "Bad Request",
+			Details:     util.ErrDetail(c, err),
+			Description: "can't validate request body",
+		})
+	}
+
+	return c.JSON("session revoked")
+}
+
+func (h Handler) PrivateLogin(c *fiber.Ctx) error {
+	contentType := utils.UnsafeString(c.Request().Header.ContentType())
+	if contentType != fiber.MIMEApplicationJSON {
+		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
+			Title:       "Bad Request",
+			Description: "Must use 'application/json' as request content-type.",
+		})
+	}
+
+	var r req.UserLogin
+	if err := json.Unmarshal(c.Body(), &r); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
+			Title:       "Bad Request",
+			Details:     util.ErrDetail(c, err),
+			Description: "can't decode request body as json",
+		})
+	}
+
+	if err := h.v.Struct(r); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
+			Title:       "Bad Request",
+			Details:     util.ErrDetail(c, err),
+			Description: "can't validate request body",
+		})
+	}
+
+	ok, err := h.captcha.Verify(c.Context(), r.HCaptchaResponse)
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(res.Error{
+			Title:       "Bad Gateway",
+			Details:     util.ErrDetail(c, err),
+			Description: "Captcha verify http request error",
+		})
+	}
+
+	if !ok {
+		return c.Status(fiber.StatusBadGateway).SendString("failed to pass captcha verify, please re-do")
+	}
+
+	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
+			Title:   "Unexpected Error",
+			Details: util.ErrDetail(c, err),
+		})
+	}
+
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(res.Error{
+			Title:       "Unauthorized",
+			Description: "Email or Password is not correct",
+		})
+	}
+
+	key, _, err := h.session.Create(c.Context(), login)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(res.Error{
+			Title:       "",
+			Description: "",
+		})
+	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "sessionID",
+		Value:    key,
+		Path:     "/",
+		Domain:   "next.bgm.tv",
+		MaxAge:   timex.OneWeekSec * 2,
+		Secure:   true,
+		HTTPOnly: true,
+		SameSite: fiber.CookieSameSiteStrictMode,
+	})
+
+	return c.JSON("login")
 }

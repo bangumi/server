@@ -97,9 +97,13 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 	m := &mocks.CharacterRepo{}
 	m.EXPECT().Get(mock.Anything, model.CharacterIDType(7)).Return(model.Character{ID: 7, NSFW: true}, nil)
 
+	mockAuth := &mocks.AuthRepo{}
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.Auth{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
+
 	app := test.GetWebApp(t, test.Mock{
 		CharacterRepo: m,
-		AuthRepo:      mockAuth{domain.Auth{ID: 1, RegTime: time.Unix(1e9, 0)}},
+		AuthRepo:      mockAuth,
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/characters/7", http.NoBody)

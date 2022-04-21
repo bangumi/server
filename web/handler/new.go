@@ -18,48 +18,63 @@
 package handler
 
 import (
+	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/cache"
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/web/captcha"
+	"github.com/bangumi/server/web/session"
 )
 
 func New(
+	cfg config.AppConfig,
 	s domain.SubjectService,
 	c domain.CharacterService,
 	p domain.PersonService,
-	a domain.AuthRepo,
+	a domain.AuthService,
 	e domain.EpisodeRepo,
 	r domain.RevisionRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
 	cache cache.Generic,
+	captcha captcha.Manager,
+	session session.Manager,
 	log *zap.Logger,
 ) Handler {
+
 	return Handler{
-		cache: cache,
-		log:   log,
-		p:     p,
-		s:     s,
-		a:     a,
-		u:     user,
-		e:     e,
-		c:     c,
-		i:     index,
-		r:     r,
+		cfg:     cfg,
+		cache:   cache,
+		log:     log,
+		session: session,
+		p:       p,
+		s:       s,
+		a:       a,
+		u:       user,
+		e:       e,
+		c:       c,
+		i:       index,
+		r:       r,
+		captcha: captcha,
+		v:       validator.New(),
 	}
 }
 
 type Handler struct {
-	// replace it with service, when it's too complex. Just use a repository currently.
-	s     domain.SubjectService
-	p     domain.PersonService
-	a     domain.AuthRepo
-	e     domain.EpisodeRepo
-	c     domain.CharacterService
-	u     domain.UserRepo
-	i     domain.IndexRepo
-	r     domain.RevisionRepo
-	cache cache.Generic
-	log   *zap.Logger
+	s       domain.SubjectService
+	p       domain.PersonService
+	a       domain.AuthService
+	session session.Manager
+	captcha captcha.Manager
+	e       domain.EpisodeRepo
+	c       domain.CharacterService
+	u       domain.UserRepo
+	cfg     config.AppConfig
+	i       domain.IndexRepo
+	r       domain.RevisionRepo
+	cache   cache.Generic
+	log     *zap.Logger
+	v       *validator.Validate
 }

@@ -14,30 +14,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package util
+package session_test
 
-import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
-)
+import "testing"
 
-func ErrDetail(c *fiber.Ctx, err error) Detail {
-	return Detail{
-		Path:        c.Path(),
-		Error:       err.Error(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
+func BenchmarkRandomByte(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+
 	}
-}
-
-func DetailFromRequest(c *fiber.Ctx) Detail {
-	return Detail{
-		Path:        c.Path(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
-}
-
-type Detail struct {
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
-	QueryString string `json:"query_string,omitempty"`
 }

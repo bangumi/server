@@ -19,6 +19,7 @@
 package tools
 
 import (
+	_ "github.com/gookit/goutil/dump"
 	_ "github.com/joho/godotenv"
 	_ "github.com/vektra/mockery/v2"
 )

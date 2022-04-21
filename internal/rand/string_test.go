@@ -14,30 +14,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package util
+package rand_test
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+	"fmt"
+	"runtime"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/rand"
 )
 
-func ErrDetail(c *fiber.Ctx, err error) Detail {
-	return Detail{
-		Path:        c.Path(),
-		Error:       err.Error(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
+func TestSecureRandomString(t *testing.T) {
+	s := rand.SecureRandomString(32)
+	require.Equal(t, 32, len(s))
+	fmt.Println(s)
 }
 
-func DetailFromRequest(c *fiber.Ctx) Detail {
-	return Detail{
-		Path:        c.Path(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
+func BenchmarkSecureRandomString(b *testing.B) {
+	var s string
+	for i := 0; i < b.N; i++ {
+		s = rand.SecureRandomString(32)
 	}
-}
 
-type Detail struct {
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
-	QueryString string `json:"query_string,omitempty"`
+	runtime.KeepAlive(s)
 }

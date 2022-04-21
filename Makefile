@@ -37,6 +37,10 @@ mocks:
 		go run github.com/vektra/mockery/v2 --all --dir $$dir --with-expecter; \
 	done
 
+	go run github.com/vektra/mockery/v2 --dir  ./web/captcha --name Manager --filename CaptchaManager.go --structname CaptchaManager --with-expecter;
+	go run github.com/vektra/mockery/v2 --dir  ./web/session --name Manager --filename SessionManager.go --structname SessionManager --with-expecter;
+
+
 gen: ./dal/query/gen.go mocks
 
 # don't enable `-race` in test because it require cgo, only enable it at coverage.
@@ -47,7 +51,7 @@ test-all: .bin/dotenv.exe
 	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test ./...
 
 bench:
-	go test -bench=. -benchmem ./pkg/wiki
+	go test -bench=. -benchmem ./pkg/wiki ./internal/rand
 
 ./dal/query/gen.go: ./internal/cmd/gen/gorm.go internal/cmd/gen/method go.mod .bin/dotenv.exe
 	.bin/dotenv.exe go run ./internal/cmd/gen/gorm.go

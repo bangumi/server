@@ -14,30 +14,28 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package util
+package auth
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/domain"
 )
 
-func ErrDetail(c *fiber.Ctx, err error) Detail {
-	return Detail{
-		Path:        c.Path(),
-		Error:       err.Error(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
+func getService() domain.AuthService {
+	return NewService(nil)
 }
 
-func DetailFromRequest(c *fiber.Ctx) Detail {
-	return Detail{
-		Path:        c.Path(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
-	}
-}
+func testService_ComparePassword(t *testing.T) {
+	t.Parallel()
+	s := getService()
+	// TODO: 用树洞号的帐号密码测试
+	var hashed []byte
+	var input string
 
-type Detail struct {
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
-	QueryString string `json:"query_string,omitempty"`
+	eq, err := s.ComparePassword(hashed, input)
+	require.NoError(t, err)
+	require.True(t, eq)
 }

@@ -118,6 +118,14 @@ func main() {
 
 	g.ApplyInterface(func(method.Member) {}, modelMember)
 
+	g.ApplyBasic(g.GenerateModelAs("chii_usergroup", "UserGroup",
+		gen.FieldTrimPrefix("usr_grp_"),
+		gen.FieldType("usr_grp_id", "uint8"),
+		gen.FieldType("usr_grp_perm", "[]byte"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("open_source_web_session", "WebSession"))
+
 	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "OAuthAccessToken"))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_interests", "SubjectCollection",

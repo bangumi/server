@@ -18,7 +18,9 @@
 package main
 
 import (
+	"github.com/go-resty/resty/v2"
 	"github.com/go-sql-driver/mysql"
+	"github.com/goccy/go-json"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -39,7 +41,9 @@ import (
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/user"
 	"github.com/bangumi/server/web"
+	"github.com/bangumi/server/web/captcha/hcaptcha"
 	"github.com/bangumi/server/web/handler"
+	"github.com/bangumi/server/web/session"
 )
 
 func main() {
@@ -61,6 +65,13 @@ func start() error {
 			driver.NewRedisClient, // redis
 			dal.NewConnectionPool,
 			dal.NewDB,
+			func() *resty.Client {
+				httpClient := resty.New().SetJSONEscapeHTML(false)
+				httpClient.JSONUnmarshal = json.Unmarshal
+				httpClient.JSONMarshal = json.MarshalNoEscape
+
+				return httpClient
+			},
 		),
 
 		fx.Provide(
@@ -86,12 +97,15 @@ func start() error {
 		),
 
 		fx.Provide(
+			auth.NewService,
+			hcaptcha.New,
 			character.NewService,
 			subject.NewService,
 			person.NewService,
 		),
 
 		fx.Provide(
+			session.New,
 			handler.New,
 			web.New,
 		),
