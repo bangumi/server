@@ -17,7 +17,6 @@
 package rand_test
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -27,15 +26,32 @@ import (
 
 func TestSecureRandomString(t *testing.T) {
 	t.Parallel()
-	s := rand.SecureRandomString(32)
+	s := rand.Base62String(32)
 	require.Equal(t, 32, len(s))
 }
 
-func BenchmarkSecureRandomString(b *testing.B) {
-	var s string
-	for i := 0; i < b.N; i++ {
-		s = rand.SecureRandomString(32)
+func TestBias(t *testing.T) {
+	t.Parallel()
+	const slen = 33
+	const loop = 1000000
+
+	counts := make(map[rune]int)
+	var count int64
+
+	for i := 0; i < loop; i++ {
+		s := rand.Base62String(slen)
+		require.Equal(t, slen, len(s))
+		for _, b := range s {
+			counts[b]++
+			count++
+		}
 	}
 
-	runtime.KeepAlive(s)
+	avg := float64(count) / 62.0
+	for k, n := range counts {
+		diff := float64(n) / avg
+		if diff < 0.95 || diff > 1.05 {
+			t.Errorf("Bias on '%c': expected average %f, got %d", k, avg, n)
+		}
+	}
 }

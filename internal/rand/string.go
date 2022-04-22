@@ -22,17 +22,30 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-const availableCharBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const availableCharBytes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const availableCharLength = uint8(len(availableCharBytes))
+const maxByte = 247 // 255 - (256 % availableCharLength)
 
-func SecureRandomString(length int) string {
+// Base62String generate a cryptographically secure base62 string in given length.
+// Will panic if it can't read from 'crypto/rand'.
+func Base62String(length int) string {
 	b := make([]byte, length)
-	if _, err := rand.Read(b); err != nil {
-		panic("unexpected error happened when reading from 'crypto/rand'")
+	r := make([]byte, length+(length/4)) //nolint:gomnd    // storage for random bytes.
+	i := 0
+	for {
+		if _, err := rand.Read(r); err != nil {
+			panic("unexpected error happened when reading from 'crypto/rand'")
+		}
+		for _, rb := range r {
+			if rb > maxByte {
+				// Skip this number to avoid modulo bias.
+				continue
+			}
+			b[i] = availableCharBytes[rb%availableCharLength]
+			i++
+			if i == length {
+				return utils.UnsafeString(b)
+			}
+		}
 	}
-	for i := 0; i < length; i++ {
-		b[i] = availableCharBytes[b[i]%availableCharLength]
-	}
-
-	return utils.UnsafeString(b)
 }

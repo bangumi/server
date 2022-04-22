@@ -52,7 +52,7 @@ type manager struct {
 }
 
 func (m manager) Create(ctx context.Context, a domain.Auth) (string, Session, error) {
-	key := rand.SecureRandomString(keyLength)
+	key := rand.Base62String(keyLength)
 	s := Session{}
 
 	err := m.q.WithContext(ctx).WebSession.Create(&dao.WebSession{
