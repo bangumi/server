@@ -30,6 +30,15 @@ func TestSecureRandomString(t *testing.T) {
 	require.Equal(t, 32, len(s))
 }
 
+// func BenchmarkSecureRandomString(b *testing.B) {
+// 	var s string
+// 	for i := 0; i < b.N; i++ {
+// 		s = rand.Base62String(32)
+// 	}
+//
+// 	runtime.KeepAlive(s)
+// }
+
 func TestBias(t *testing.T) {
 	t.Parallel()
 	const slen = 33
@@ -47,7 +56,9 @@ func TestBias(t *testing.T) {
 		}
 	}
 
-	avg := float64(count) / 62.0
+	require.Equal(t, 62, len(counts))
+
+	avg := float64(count) / float64(len(counts))
 	for k, n := range counts {
 		diff := float64(n) / avg
 		if diff < 0.95 || diff > 1.05 {
