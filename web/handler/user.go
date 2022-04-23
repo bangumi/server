@@ -36,7 +36,7 @@ func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "repo")
 	}
 
-	var me = res.Me{
+	var me = res.User{
 		ID:        user.ID,
 		URL:       "https://bgm.tv/user/" + user.UserName,
 		Username:  user.UserName,
@@ -63,7 +63,7 @@ func (h Handler) GetUser(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "repo")
 	}
 
-	var r = res.Me{
+	var r = res.User{
 		ID:        user.ID,
 		URL:       "https://bgm.tv/user/" + user.UserName,
 		Username:  user.UserName,

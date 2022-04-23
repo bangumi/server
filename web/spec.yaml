@@ -445,7 +445,7 @@ paths:
       parameters:
         - required: true
           schema:
-            title: Person Id
+            title: Person ID
             minimum: 0
             type: integer
           name: person_id
@@ -479,9 +479,17 @@ paths:
     get:
       tags:
         - 用户
-      summary: Get User
-      description: 返回当前 Access Token 对应的用户信息
-      operationId: getUser
+      summary: Get User by name
+      description: 返回当Token 对应的用户信息
+      operationId: getUserByName
+      parameters:
+        - required: true
+          schema:
+            title: username
+            type: string
+            maxLength: 32
+          name: username
+          in: path
       responses:
         "200":
           description: Successful Response
@@ -503,7 +511,7 @@ paths:
         - 用户
       summary: Get User
       description: 返回当前 Access Token 对应的用户信息
-      operationId: getUser
+      operationId: getMyself
       responses:
         "200":
           description: Successful Response
