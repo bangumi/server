@@ -480,7 +480,7 @@ paths:
       tags:
         - 用户
       summary: Get User by name
-      description: username 对应的用户信息，设置了 username 之后无法使用 UID 查询。
+      description: 获取用户信息，设置了 username 之后无法使用 UID 查询。
       operationId: getUserByName
       parameters:
         - required: true
