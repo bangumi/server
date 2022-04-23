@@ -84,6 +84,8 @@ func (p *personField) WithContext(ctx context.Context) *personFieldDo {
 
 func (p personField) TableName() string { return p.personFieldDo.TableName() }
 
+func (p personField) Alias() string { return p.personFieldDo.Alias() }
+
 func (p *personField) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := p.fieldMap[fieldName]
 	if !ok || _f == nil {

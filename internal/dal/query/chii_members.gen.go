@@ -112,6 +112,8 @@ func (m *member) WithContext(ctx context.Context) *memberDo { return m.memberDo.
 
 func (m member) TableName() string { return m.memberDo.TableName() }
 
+func (m member) Alias() string { return m.memberDo.Alias() }
+
 func (m *member) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := m.fieldMap[fieldName]
 	if !ok || _f == nil {

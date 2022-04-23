@@ -9,7 +9,7 @@ const TableNameMember = "chii_members"
 // Member mapped from table <chii_members>
 type Member struct {
 	UID          uint32      `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:"uid"`
-	Username     string      `gorm:"column:username;type:char(15);not null;uniqueIndex:username,priority:1" json:"username"`
+	Username     string      `gorm:"column:username;type:char(15);not null;uniqueIndex:username,priority:1;default:''" json:"username"`
 	Nickname     string      `gorm:"column:nickname;type:varchar(30);not null" json:"nickname"`
 	Avatar       string      `gorm:"column:avatar;type:varchar(255);not null" json:"avatar"`
 	Groupid      uint8       `gorm:"column:groupid;type:smallint(6) unsigned;not null;default:0" json:"groupid"`
@@ -17,9 +17,9 @@ type Member struct {
 	Lastvisit    int32       `gorm:"column:lastvisit;type:int(10) unsigned;not null;default:0" json:"lastvisit"`
 	Lastactivity int32       `gorm:"column:lastactivity;type:int(10) unsigned;not null;default:0" json:"lastactivity"`
 	Lastpost     int32       `gorm:"column:lastpost;type:int(10) unsigned;not null;default:0" json:"lastpost"`
-	Dateformat   string      `gorm:"column:dateformat;type:char(10);not null" json:"dateformat"`
+	Dateformat   string      `gorm:"column:dateformat;type:char(10);not null;default:''" json:"dateformat"`
 	Timeformat   bool        `gorm:"column:timeformat;type:tinyint(1);not null;default:0" json:"timeformat"`
-	Timeoffset   string      `gorm:"column:timeoffset;type:char(4);not null" json:"timeoffset"`
+	Timeoffset   string      `gorm:"column:timeoffset;type:char(4);not null;default:''" json:"timeoffset"`
 	Newpm        bool        `gorm:"column:newpm;type:tinyint(1);not null;default:0" json:"newpm"`
 	NewNotify    uint16      `gorm:"column:new_notify;type:smallint(6) unsigned;not null;default:0" json:"new_notify"` // 新提醒
 	Sign         string      `gorm:"column:sign;type:varchar(255);not null" json:"sign"`

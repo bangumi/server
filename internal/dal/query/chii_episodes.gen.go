@@ -126,6 +126,8 @@ func (e *episode) WithContext(ctx context.Context) *episodeDo { return e.episode
 
 func (e episode) TableName() string { return e.episodeDo.TableName() }
 
+func (e episode) Alias() string { return e.episodeDo.Alias() }
+
 func (e *episode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := e.fieldMap[fieldName]
 	if !ok || _f == nil {

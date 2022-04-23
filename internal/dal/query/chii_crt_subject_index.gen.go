@@ -105,6 +105,8 @@ func (c *characterSubjects) WithContext(ctx context.Context) *characterSubjectsD
 
 func (c characterSubjects) TableName() string { return c.characterSubjectsDo.TableName() }
 
+func (c characterSubjects) Alias() string { return c.characterSubjectsDo.Alias() }
+
 func (c *characterSubjects) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := c.fieldMap[fieldName]
 	if !ok || _f == nil {

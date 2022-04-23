@@ -83,6 +83,8 @@ func (r *revisionHistory) WithContext(ctx context.Context) *revisionHistoryDo {
 
 func (r revisionHistory) TableName() string { return r.revisionHistoryDo.TableName() }
 
+func (r revisionHistory) Alias() string { return r.revisionHistoryDo.Alias() }
+
 func (r *revisionHistory) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := r.fieldMap[fieldName]
 	if !ok || _f == nil {

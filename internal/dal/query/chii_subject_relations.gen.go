@@ -95,6 +95,8 @@ func (s *subjectRelation) WithContext(ctx context.Context) *subjectRelationDo {
 
 func (s subjectRelation) TableName() string { return s.subjectRelationDo.TableName() }
 
+func (s subjectRelation) Alias() string { return s.subjectRelationDo.Alias() }
+
 func (s *subjectRelation) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := s.fieldMap[fieldName]
 	if !ok || _f == nil {
