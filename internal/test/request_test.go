@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Trim21 <trim21.me@gmail.com>
+// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 //
@@ -14,34 +14,37 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package recovery_test
+package test_test
 
 import (
-	"net/http/httptest"
+	"net/http"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/web/middleware/recovery"
+	"github.com/bangumi/server/internal/test"
 )
 
-func TestGetPerson(t *testing.T) {
+type res struct {
+	Q string `json:"q"`
+	I int    `json:"i"`
+}
+
+func TestClientFullExample(t *testing.T) {
 	t.Parallel()
-	var app = fiber.New()
+	app := fiber.New()
 
-	app.Use(recovery.New())
-
-	app.Get("/", func(c *fiber.Ctx) error {
-		panic("errInternal")
+	app.Get("/test", func(c *fiber.Ctx) error {
+		return c.JSON(res{I: 5, Q: c.Query("q")})
 	})
 
-	req := httptest.NewRequest("GET", "/", nil)
+	var r res
+	test.New(t).Get("/test").Query("q", "v").
+		Execute(app).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
 
-	resp, err := app.Test(req)
-
-	require.Nil(t, err, "panic should be caught")
-
-	require.Equal(t, fiber.StatusInternalServerError,
-		resp.StatusCode, "middleware should catch internal error")
+	require.Equal(t, 5, r.I)
+	require.Equal(t, "v", r.Q)
 }

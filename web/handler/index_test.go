@@ -18,7 +18,6 @@ package handler_test
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -37,11 +36,7 @@ func TestHandler_GetIndex_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/indices/7", http.NoBody)
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := test.New(t).Get("/v0/indices/7").Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -53,11 +48,7 @@ func TestHandler_GetIndex_NSFW(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/indices/7", http.NoBody)
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := test.New(t).Get("/v0/indices/7").Execute(app)
 
 	require.Equal(t, fiber.StatusNotFound, resp.StatusCode)
 }

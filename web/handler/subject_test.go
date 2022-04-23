@@ -19,11 +19,9 @@ package handler_test
 import (
 	"context"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -53,17 +51,11 @@ func TestHappyPath(t *testing.T) {
 		},
 	)
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
-	req.Header.Set("authorization", "Bearer token")
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	var r res.SubjectV0
+	resp := test.New(t).Get("/v0/subjects/7").Header(fiber.HeaderAuthorization, "Bearer token").
+		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-
-	var r res.SubjectV0
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
 	require.Equal(t, uint32(7), r.ID)
 }
 
@@ -80,12 +72,8 @@ func TestNSFW_200(t *testing.T) {
 		},
 	)
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
-	req.Header.Set(fiber.HeaderAuthorization, "Bearer token")
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := test.New(t).Get("/v0/subjects/7").Header(fiber.HeaderAuthorization, "Bearer token").
+		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, "200 for authorized user")
 }
@@ -103,12 +91,8 @@ func TestNSFW_404(t *testing.T) {
 		},
 	)
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/subjects/7", http.NoBody)
-	req.Header.Set("authorization", "Bearer token")
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := test.New(t).Get("/v0/subjects/7").Header("authorization", "Bearer token").
+		Execute(app)
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode, "404 for unauthorized user")
 }
@@ -124,9 +108,7 @@ func Test_web_subject_Redirect(t *testing.T) {
 		},
 	)
 
-	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/v0/subjects/8", http.NoBody))
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := test.New(t).Get("/v0/subjects/8").Execute(app)
 
 	require.Equal(t, http.StatusFound, resp.StatusCode, "302 for redirect repository")
 	require.Equal(t, "/v0/subjects/2", resp.Header.Get("location"))
@@ -142,10 +124,8 @@ func Test_web_subject_bad_id(t *testing.T) {
 		path := path
 		t.Run(path, func(t *testing.T) {
 			t.Parallel()
-			resp, err := app.Test(httptest.NewRequest(http.MethodGet, path, http.NoBody))
-			require.NoError(t, err)
-			defer resp.Body.Close()
 
+			resp := test.New(t).Get(path).Execute(app)
 			require.Equal(t, http.StatusBadRequest, resp.StatusCode, "400 for redirect subject id")
 		})
 	}

@@ -17,12 +17,9 @@
 package handler_test
 
 import (
-	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -51,17 +48,11 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 		},
 	)
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/me", http.NoBody)
-	req.Header.Set("authorization", "Bearer token")
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	var r res.User
+	resp := test.New(t).Get("/v0/me").Header("authorization", "Bearer token").
+		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-
-	var r res.User
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
 	require.Equal(t, uid, r.ID)
 }
 
@@ -77,16 +68,10 @@ func TestHandler_GetUser_200(t *testing.T) {
 		},
 	)
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/users/u", http.NoBody)
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	var r res.User
+	resp := test.New(t).Get("/v0/users/u").Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-
-	var r res.User
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
 	require.Equal(t, uid, r.ID)
 }
 
@@ -103,14 +88,6 @@ func TestHandler_GetUser_404(t *testing.T) {
 		},
 	)
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/users/u", http.NoBody)
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
-
-	b, err := io.ReadAll(resp.Body)
-	require.NoError(t, err)
-
-	require.Equal(t, http.StatusNotFound, resp.StatusCode, string(b))
+	resp := test.New(t).Get("/v0/users/u").Execute(app)
+	require.Equal(t, http.StatusNotFound, resp.StatusCode, resp.BodyString())
 }

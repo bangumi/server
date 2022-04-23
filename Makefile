@@ -40,8 +40,8 @@ mocks:
 gen: ./dal/query/gen.go mocks
 
 # don't enable `-race` in test because it require cgo, only enable it at coverage.
-test: .bin/dotenv.exe
-	.bin/dotenv.exe go test ./...
+test:
+	go test ./...
 
 test-all: .bin/dotenv.exe
 	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test ./...
