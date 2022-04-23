@@ -55,8 +55,11 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Get("/v0/characters/:id/persons", addMetrics(h.GetCharacterRelatedPersons))
 	app.Get("/v0/episodes/:id", addMetrics(h.GetEpisode))
 	app.Get("/v0/episodes", addMetrics(h.ListEpisode))
+
 	app.Get("/v0/me", addMetrics(h.GetCurrentUser))
 	app.Get("/v0/users/:username/collections", addMetrics(h.ListCollection))
+	app.Get("/v0/users/:username", addMetrics(h.GetUser))
+
 	app.Get("/v0/indices/:id", addMetrics(h.GetIndex))
 	app.Get("/v0/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
 
