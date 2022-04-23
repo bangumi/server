@@ -17,10 +17,14 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 
+	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/web/res"
 )
@@ -60,7 +64,12 @@ func (h Handler) GetUser(c *fiber.Ctx) error {
 
 	user, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
-		return errgo.Wrap(err, "repo")
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.HTTPError(c, http.StatusNotFound, "can't find user with username "+strconv.Quote(username))
+		}
+
+		h.log.Error("unexpected error happened", zap.Error(err))
+		return errgo.Wrap(err, "user.GetByName")
 	}
 
 	var r = res.User{

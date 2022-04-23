@@ -17,8 +17,6 @@
 package res
 
 import (
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 )
@@ -31,7 +29,7 @@ type Error struct {
 }
 
 func HTTPError(c *fiber.Ctx, code int, message string) error {
-	return c.Status(http.StatusBadRequest).JSON(Error{
+	return c.Status(code).JSON(Error{
 		Title:       utils.StatusMessage(code),
 		Description: message,
 	})

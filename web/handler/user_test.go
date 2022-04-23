@@ -17,6 +17,7 @@
 package handler_test
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -64,7 +65,7 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 	require.Equal(t, uid, r.ID)
 }
 
-func TestHandler_GetUser(t *testing.T) {
+func TestHandler_GetUser_200(t *testing.T) {
 	t.Parallel()
 	const uid model.IDType = 7
 	m := &mocks.UserRepo{}
@@ -87,4 +88,29 @@ func TestHandler_GetUser(t *testing.T) {
 	var r res.User
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
 	require.Equal(t, uid, r.ID)
+}
+
+func TestHandler_GetUser_404(t *testing.T) {
+	t.Parallel()
+
+	m := &mocks.UserRepo{}
+	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{}, domain.ErrNotFound)
+	defer m.AssertExpectations(t)
+
+	app := test.GetWebApp(t,
+		test.Mock{
+			UserRepo: m,
+		},
+	)
+
+	req := httptest.NewRequest(http.MethodGet, "/v0/users/u", http.NoBody)
+
+	resp, err := app.Test(req)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	require.Equal(t, http.StatusNotFound, resp.StatusCode, string(b))
 }
