@@ -77,6 +77,8 @@ func (o *oAuthAccessToken) WithContext(ctx context.Context) *oAuthAccessTokenDo 
 
 func (o oAuthAccessToken) TableName() string { return o.oAuthAccessTokenDo.TableName() }
 
+func (o oAuthAccessToken) Alias() string { return o.oAuthAccessTokenDo.Alias() }
+
 func (o *oAuthAccessToken) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := o.fieldMap[fieldName]
 	if !ok || _f == nil {

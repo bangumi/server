@@ -123,6 +123,8 @@ func (s *subjectField) WithContext(ctx context.Context) *subjectFieldDo {
 
 func (s subjectField) TableName() string { return s.subjectFieldDo.TableName() }
 
+func (s subjectField) Alias() string { return s.subjectFieldDo.Alias() }
+
 func (s *subjectField) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := s.fieldMap[fieldName]
 	if !ok || _f == nil {

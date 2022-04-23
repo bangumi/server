@@ -116,6 +116,8 @@ func (s *subjectCollection) WithContext(ctx context.Context) *subjectCollectionD
 
 func (s subjectCollection) TableName() string { return s.subjectCollectionDo.TableName() }
 
+func (s subjectCollection) Alias() string { return s.subjectCollectionDo.Alias() }
+
 func (s *subjectCollection) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := s.fieldMap[fieldName]
 	if !ok || _f == nil {

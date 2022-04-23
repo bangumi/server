@@ -97,6 +97,8 @@ func (i *indexSubject) WithContext(ctx context.Context) *indexSubjectDo {
 
 func (i indexSubject) TableName() string { return i.indexSubjectDo.TableName() }
 
+func (i indexSubject) Alias() string { return i.indexSubjectDo.Alias() }
+
 func (i *indexSubject) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := i.fieldMap[fieldName]
 	if !ok || _f == nil {

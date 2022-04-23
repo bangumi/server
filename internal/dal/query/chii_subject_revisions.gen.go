@@ -115,6 +115,8 @@ func (s *subjectRevision) WithContext(ctx context.Context) *subjectRevisionDo {
 
 func (s subjectRevision) TableName() string { return s.subjectRevisionDo.TableName() }
 
+func (s subjectRevision) Alias() string { return s.subjectRevisionDo.Alias() }
+
 func (s *subjectRevision) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := s.fieldMap[fieldName]
 	if !ok || _f == nil {
