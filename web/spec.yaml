@@ -1190,16 +1190,16 @@ components:
         modelAsString: false
         values:
           - Wish
-          - Watched
-          - Watching
-          - Shelved
-          - Abandoned
+          - Collect
+          - Doing
+          - OnHold
+          - Dropped
       x-enum-varnames:
         - Wish
-        - Watched
-        - Watching
-        - Shelved
-        - Abandoned
+        - Collect
+        - Doing
+        - OnHold
+        - Dropped
     Creator:
       title: Creator
       required:
