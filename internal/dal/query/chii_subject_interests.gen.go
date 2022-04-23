@@ -41,7 +41,7 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 	_subjectCollection.OnHoldDateline = field.NewInt32(tableName, "interest_on_hold_dateline")
 	_subjectCollection.DroppedDateline = field.NewInt32(tableName, "interest_dropped_dateline")
 	_subjectCollection.Lasttouch = field.NewInt32(tableName, "interest_lasttouch")
-	_subjectCollection.Private = field.NewBool(tableName, "interest_private")
+	_subjectCollection.Private = field.NewUint8(tableName, "interest_private")
 
 	_subjectCollection.fillFieldMap()
 
@@ -69,7 +69,7 @@ type subjectCollection struct {
 	OnHoldDateline  field.Int32
 	DroppedDateline field.Int32
 	Lasttouch       field.Int32
-	Private         field.Bool
+	Private         field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -103,7 +103,7 @@ func (s *subjectCollection) updateTableName(table string) *subjectCollection {
 	s.OnHoldDateline = field.NewInt32(table, "interest_on_hold_dateline")
 	s.DroppedDateline = field.NewInt32(table, "interest_dropped_dateline")
 	s.Lasttouch = field.NewInt32(table, "interest_lasttouch")
-	s.Private = field.NewBool(table, "interest_private")
+	s.Private = field.NewUint8(table, "interest_private")
 
 	s.fillFieldMap()
 

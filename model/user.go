@@ -28,6 +28,15 @@ type User struct {
 	UserGroup uint8
 }
 
+const (
+	// CollectPrivacyNone 默认公开收藏。
+	CollectPrivacyNone = 0
+	// CollectPrivacySelf 私有收藏，正常计入评分。
+	CollectPrivacySelf = 1
+	// CollectPrivacyBan Shadow Ban, 显示为私有收藏，不计入评分。
+	CollectPrivacyBan = 2
+)
+
 type Collection struct {
 	UpdatedAt   time.Time
 	Comment     string

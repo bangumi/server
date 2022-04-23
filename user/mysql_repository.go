@@ -60,7 +60,7 @@ func (m mysqlRepo) CountCollections(
 	}
 
 	if !showPrivate {
-		q = q.Where(m.q.SubjectCollection.Private.Is(false))
+		q = q.Where(m.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
 	}
 
 	c, err := q.Count()
@@ -92,7 +92,7 @@ func (m mysqlRepo) ListCollections(
 	}
 
 	if !showPrivate {
-		q = q.Where(m.q.SubjectCollection.Private.Is(false))
+		q = q.Where(m.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
 	}
 
 	collections, err := q.Find()
@@ -114,7 +114,7 @@ func (m mysqlRepo) ListCollections(
 			VolStatus:   c.VolStatus,
 			Type:        c.Type,
 			HasComment:  c.HasComment,
-			Private:     c.Private,
+			Private:     c.Private != model.CollectPrivacyNone,
 		}
 	}
 
