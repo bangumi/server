@@ -40,7 +40,7 @@ import (
 )
 
 func (h Handler) GetSubject(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
@@ -130,7 +130,7 @@ func platformString(s model.Subject) *string {
 }
 
 func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
@@ -224,7 +224,7 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 }
 
 func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
@@ -273,7 +273,7 @@ func readableRelation(destSubjectType model.SubjectType, relation uint16) string
 }
 
 func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))

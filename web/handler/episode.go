@@ -37,7 +37,7 @@ import (
 )
 
 func (h Handler) GetEpisode(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
@@ -122,7 +122,7 @@ const episodeDefaultLimit = 100
 const episodeMaxLimit = 200
 
 func (h Handler) ListEpisode(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 
 	page, err := getPageQuery(c, episodeDefaultLimit, episodeMaxLimit)
 	if err != nil {

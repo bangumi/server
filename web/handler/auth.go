@@ -54,7 +54,7 @@ func (h Handler) MiddlewareAccessUser() fiber.Handler {
 		return ctx.Next()
 	}
 }
-func (h Handler) getUser(c *fiber.Ctx) *accessor {
+func (h Handler) getHTTPAccessor(c *fiber.Ctx) *accessor {
 	u, ok := c.Context().UserValue(ctxkey.User).(*accessor) // get visitor
 	if !ok {
 		panic("can't convert type")

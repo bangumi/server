@@ -17,6 +17,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/errgo"
@@ -24,7 +26,7 @@ import (
 )
 
 func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 	if !u.login || u.ID == 0 {
 		return fiber.ErrUnauthorized
 	}
@@ -45,4 +47,31 @@ func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(me)
+}
+
+func (h Handler) GetUser(c *fiber.Ctx) error {
+	username := c.Params("username")
+	if username == "" {
+		return fiber.NewError(http.StatusBadRequest, "missing require parameters `username`")
+	}
+	if len(username) >= 32 {
+		return res.HTTPError(c, http.StatusBadRequest, "username is too long")
+	}
+
+	user, err := h.u.GetByName(c.Context(), username)
+	if err != nil {
+		return errgo.Wrap(err, "repo")
+	}
+
+	var r = res.Me{
+		ID:        user.ID,
+		URL:       "https://bgm.tv/user/" + user.UserName,
+		Username:  user.UserName,
+		Nickname:  user.NickName,
+		UserGroup: user.UserGroup,
+		Avatar:    res.Avatar{}.Fill(user.Avatar),
+		Sign:      user.Sign,
+	}
+
+	return c.JSON(r)
 }

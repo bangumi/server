@@ -39,7 +39,7 @@ import (
 )
 
 func (h Handler) GetCharacter(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
@@ -130,7 +130,7 @@ func convertModelCharacter(s model.Character) res.CharacterV0 {
 }
 
 func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
@@ -170,7 +170,7 @@ func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 }
 
 func (h Handler) GetCharacterRelatedSubjects(c *fiber.Ctx) error {
-	u := h.getUser(c)
+	u := h.getHTTPAccessor(c)
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))

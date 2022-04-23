@@ -31,7 +31,7 @@ import (
 )
 
 func (h Handler) ListCollection(c *fiber.Ctx) error {
-	v := h.getUser(c)
+	v := h.getHTTPAccessor(c)
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return err

@@ -17,8 +17,12 @@
 package util
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
+
+	"github.com/bangumi/server/web/res"
 )
 
 func DetailFromRequest(c *fiber.Ctx) Detail {
@@ -32,4 +36,11 @@ type Detail struct {
 	Error       string `json:"error,omitempty"`
 	Path        string `json:"path,omitempty"`
 	QueryString string `json:"query_string,omitempty"`
+}
+
+func Error(c *fiber.Ctx, code int, message string) error {
+	return c.Status(http.StatusBadRequest).JSON(res.Error{
+		Title:       utils.StatusMessage(code),
+		Description: message,
+	})
 }
