@@ -73,8 +73,36 @@
       "wiki_tpl": "TVAnime"
     }
   },
-  "3": {},
+  "3": {
+    "0": {
+      "id": 0,
+      "type": "",
+      "type_cn": ""
+    },
+    "1": {
+      "id": 1,
+      "type": "TV",
+      "type_cn": "TV版动画"
+    },
+    "2": {
+      "id": 2,
+      "url": "ova",
+      "type": "OVA",
+      "type_cn": "OVA"
+    },
+    "3": {
+      "id": 3,
+      "url": "movie",
+      "type": "Movie",
+      "type_cn": "剧场版动画"
+    }
+  },
   "4": {
+    "0": {
+      "id": 0,
+      "type": "",
+      "type_cn": "全部游戏"
+    },
     "4": {
       "alias": "pc",
       "id": 4,
@@ -144,6 +172,11 @@
       "search_string": "XBOX",
       "type": "XBOX",
       "type_cn": "XBOX"
+    },
+    "16": {
+      "id": 16,
+      "type": "GameCube",
+      "type_cn": "GameCube"
     },
     "17": {
       "alias": "gamecube",
