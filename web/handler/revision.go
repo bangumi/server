@@ -1,3 +1,4 @@
+// Copyright (c) 2022 TWT <TWT2333@outlook.com>
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -105,7 +106,90 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(convertModelPersonRevision(&r, creatorMap))
+}
 
+func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return err
+	}
+	characterID, err := strparse.Uint32(c.Query("character_id"))
+	if err != nil || characterID <= 0 {
+		return fiber.NewError(
+			fiber.StatusBadRequest,
+			fmt.Sprintf("bad query character_id: %s", strconv.Quote(c.Query("character_id"))),
+		)
+	}
+	return h.listCharacterRevision(c, characterID, page)
+}
+
+func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.CharacterIDType, page pageQuery) error {
+	var response = res.Paged{
+		Limit:  page.Limit,
+		Offset: page.Offset,
+	}
+	count, err := h.r.CountCharacterRelated(c.Context(), characterID)
+	if err != nil {
+		return errgo.Wrap(err, "revision.CountCharacterRelated")
+	}
+
+	if count == 0 {
+		response.Data = []int{}
+		return c.JSON(response)
+	}
+
+	if err = page.check(count); err != nil {
+		return err
+	}
+
+	response.Total = count
+
+	revisions, err := h.r.ListCharacterRelated(c.Context(), characterID, page.Limit, page.Offset)
+
+	if err != nil {
+		return errgo.Wrap(err, "revision.ListCharacterRelated")
+	}
+
+	creatorIDs := make([]uint32, 0, len(revisions))
+	for _, revision := range revisions {
+		creatorIDs = append(creatorIDs, revision.RevisionCommon.CreatorID)
+	}
+	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeCreatorID(creatorIDs)...)
+
+	if err != nil {
+		return errgo.Wrap(err, "user.GetByIDs")
+	}
+
+	data := make([]res.CharacterRevision, len(revisions))
+	for i := range revisions {
+		data[i] = convertModelCharacterRevision(&revisions[i], creatorMap)
+	}
+	response.Data = data
+	return c.JSON(response)
+}
+
+func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
+	id, err := strparse.Uint32(c.Params("id"))
+	if err != nil || id <= 0 {
+		return fiber.NewError(
+			fiber.StatusBadRequest,
+			fmt.Sprintf("bad param id: %s", strconv.Quote(c.Params("id"))),
+		)
+	}
+	r, err := h.r.GetCharacterRelated(c.Context(), id)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return fiber.ErrNotFound
+		}
+		return fiber.ErrInternalServerError
+	}
+
+	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
+	if err != nil {
+		return errgo.Wrap(err, "user.GetByIDs")
+	}
+
+	return c.JSON(convertModelCharacterRevision(&r, creatorMap))
 }
 
 func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
@@ -181,7 +265,18 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(convertModelSubjectRevision(&r, creatorMap))
+}
 
+func dedupeCreatorID(creatorIDs []uint32) []model.IDType {
+	m := make(map[model.IDType]bool, len(creatorIDs))
+	ret := make([]model.IDType, 0, len(creatorIDs))
+	for _, r := range creatorIDs {
+		if _, ok := m[r]; !ok {
+			m[r] = true
+			ret = append(ret, r)
+		}
+	}
+	return ret
 }
 
 func listUniqueCreatorID(revisions []model.Revision) []model.IDType {
@@ -266,5 +361,32 @@ func convertModelSubjectRevision(r *model.Revision, creatorMap map[model.IDType]
 		CreatedAt: r.CreatedAt,
 		Data:      data,
 	}
+}
 
+func convertModelCharacterRevision(
+	r *model.CharacterRevision, creatorMap map[model.IDType]model.User,
+) res.CharacterRevision {
+	creator := creatorMap[r.CreatorID]
+	ret := res.CharacterRevision{
+		ID:      r.ID,
+		Type:    r.Type,
+		Summary: r.Summary,
+		Creator: res.Creator{
+			Username: creator.UserName,
+			Nickname: creator.UserName,
+		},
+		CreatedAt: r.CreatedAt,
+	}
+	ret.Data = make(map[string]res.CharacterRevisionDataItem, len(r.Data.CharacterRevisionEdit))
+	for id, item := range r.Data.CharacterRevisionEdit {
+		ret.Data[id] = res.CharacterRevisionDataItem{
+			InfoBox: item.InfoBox,
+			Summary: item.Summary,
+			Extra: res.Extra{
+				Img: item.Extra.Img,
+			},
+			Name: item.Name,
+		}
+	}
+	return ret
 }

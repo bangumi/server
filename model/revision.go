@@ -68,3 +68,31 @@ type SubjectRevisionData struct {
 	FieldEps     uint32
 	Type         uint8
 }
+
+// RevisionCommon common parts in revision.
+// TODO: rename RevisionCommon to Revision and replace the latter.
+type RevisionCommon struct {
+	CreatedAt time.Time
+	Summary   string
+	ID        uint32
+	CreatorID uint32
+	Type      uint8
+}
+
+// CharacterRevision concrete revision data type.
+type CharacterRevision struct {
+	Data CharacterRevisionData
+	RevisionCommon
+}
+
+type CharacterRevisionData struct {
+	CharacterRevisionEdit
+}
+type CharacterRevisionEdit map[string]CharacterRevisionEditItem
+
+type CharacterRevisionEditItem struct {
+	Name    string `json:"name" mapstructure:"crt_name"`
+	InfoBox string `json:"infobox" mapstructure:"crt_infobox"`
+	Summary string `json:"summary"`
+	Extra   Extra  `json:"extra"`
+}

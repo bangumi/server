@@ -1,3 +1,4 @@
+// Copyright (c) 2022 TWT <TWT2333@outlook.com>
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -18,6 +19,7 @@ package revision_test
 
 import (
 	"context"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -73,6 +75,48 @@ func TestListPersonRelated(t *testing.T) {
 	r, err := repo.ListPersonRelated(context.Background(), 9, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, uint32(181882), r[0].CreatorID)
+}
+
+func TestGetCharacterRelatedBasic(t *testing.T) {
+	var rid uint32 = 1053564
+
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	r, err := repo.GetCharacterRelated(context.Background(), rid)
+	require.NoError(t, err)
+	require.Equal(t, rid, r.ID)
+	d, ok := r.Data.CharacterRevisionEdit[strconv.FormatUint(uint64(rid), 10)]
+	require.True(t, ok)
+	require.Equal(t, "C.C.", d.Name)
+}
+
+func TestGetCharacterRelatedNotFound(t *testing.T) {
+	var rid uint32 = 888888
+
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	_, err := repo.GetCharacterRelated(context.Background(), rid)
+	require.ErrorIs(t, err, domain.ErrNotFound)
+}
+
+func TestListCharacterRelated(t *testing.T) {
+	var cid uint32 = 3          // character id
+	var expRID uint32 = 1062064 // expected revision id
+
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	r, err := repo.ListCharacterRelated(context.Background(), cid, 30, 0)
+	require.NoError(t, err)
+	require.Equal(t, expRID, r[0].ID)
 }
 
 func TestGetSubjectRelatedBasic(t *testing.T) {

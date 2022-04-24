@@ -1,3 +1,4 @@
+// Copyright (c) 2022 TWT <TWT2333@outlook.com>
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -17,9 +18,12 @@
 package handler_test
 
 import (
+	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -133,4 +137,66 @@ func TestHandler_GetSubjectRevision_HappyPath(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.Equal(t, uint32(665556), r.ID)
+}
+
+func TestHandler_ListCharacterRevision_HappyPath(t *testing.T) {
+	var cid uint32 = 20         // character id
+	var mockRID uint32 = 307134 // revision id
+
+	t.Parallel()
+	m := &mocks.RevisionRepo{}
+	m.EXPECT().ListCharacterRelated(mock.Anything, cid, 30, 0).Return([]model.CharacterRevision{
+		{RevisionCommon: model.RevisionCommon{ID: mockRID}},
+	}, nil)
+	m.EXPECT().CountCharacterRelated(mock.Anything, cid).Return(1, nil)
+
+	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
+
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/characters?character_id=%d", cid), http.NoBody)
+
+	resp, err := app.Test(req, -1)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var r res.Paged
+
+	err = json.NewDecoder(resp.Body).Decode(&r)
+	require.NoError(t, err)
+
+	rdms, ok := r.Data.([]interface{}) // rdm: r.Data.Maps
+	require.True(t, ok)
+	require.GreaterOrEqual(t, len(rdms), 1)
+
+	rdm, ok := rdms[0].(map[string]interface{})
+	require.True(t, ok)
+
+	id, ok := rdm["id"].(float64)
+	require.True(t, ok)
+	require.Equal(t, mockRID, uint32(id))
+}
+
+func TestHandler_GetCharacterRevision_HappyPath(t *testing.T) {
+	var mockRID uint32 = 1269825
+
+	t.Parallel()
+	m := &mocks.RevisionRepo{}
+	m.EXPECT().GetCharacterRelated(mock.Anything, mockRID).Return(model.CharacterRevision{
+		RevisionCommon: model.RevisionCommon{ID: mockRID},
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
+
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/characters/%d", mockRID), http.NoBody)
+
+	resp, err := app.Test(req, -1)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+	var r res.CharacterRevision
+	err = json.NewDecoder(resp.Body).Decode(&r)
+	require.NoError(t, err)
+	require.Equal(t, mockRID, r.ID)
 }
