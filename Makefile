@@ -45,7 +45,6 @@ mocks:
 gen: ./dal/query/gen.go mocks
 
 # don't enable `-race` in test because it require cgo, only enable it at coverage.
-=======
 test:
 	go test ./...
 
