@@ -20,10 +20,9 @@ package handler_test
 import (
 	"fmt"
 	"net/http"
-	"net/http/httptest"
+	"strconv"
 	"testing"
 
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -152,18 +151,13 @@ func TestHandler_ListCharacterRevision_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/characters?character_id=%d", cid), http.NoBody)
-
-	resp, err := app.Test(req, -1)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	var r res.Paged
+	resp := test.New(t).Get("/v0/revisions/characters").
+		Query("character_id", strconv.FormatUint(uint64(cid), 10)).
+		Execute(app, -1).
+		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-
-	var r res.Paged
-
-	err = json.NewDecoder(resp.Body).Decode(&r)
-	require.NoError(t, err)
 
 	rdms, ok := r.Data.([]interface{}) // rdm: r.Data.Maps
 	require.True(t, ok)
@@ -188,15 +182,11 @@ func TestHandler_GetCharacterRevision_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/characters/%d", mockRID), http.NoBody)
-
-	resp, err := app.Test(req, -1)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	var r res.CharacterRevision
+	resp := test.New(t).Get(fmt.Sprintf("/v0/revisions/characters/%d", mockRID)).
+		Execute(app, -1).
+		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-	var r res.CharacterRevision
-	err = json.NewDecoder(resp.Body).Decode(&r)
-	require.NoError(t, err)
 	require.Equal(t, mockRID, r.ID)
 }
