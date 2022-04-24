@@ -1,3 +1,4 @@
+// Copyright (c) 2022 TWT <TWT2333@outlook.com>
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -71,4 +72,20 @@ type SubjectRevision struct {
 	Summary   string               `json:"summary"`
 	ID        uint32               `json:"id"`
 	Type      uint8                `json:"type"`
+}
+
+type CharacterRevision struct {
+	CreatedAt time.Time                            `json:"created_at"`
+	Data      map[string]CharacterRevisionDataItem `json:"data,omitempty"`
+	Creator   Creator                              `json:"creator"`
+	Summary   string                               `json:"summary"`
+	ID        uint32                               `json:"id"`
+	Type      uint8                                `json:"type"`
+}
+
+type CharacterRevisionDataItem struct {
+	Name    string `json:"name" mapstructure:"crt_name"`
+	InfoBox string `json:"infobox" mapstructure:"crt_infobox"`
+	Summary string `json:"summary"`
+	Extra   Extra  `json:"extra"`
 }

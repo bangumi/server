@@ -1,3 +1,4 @@
+// Copyright (c) 2022 TWT <TWT2333@outlook.com>
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -102,6 +103,66 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.IDType) (model
 	return convertRevisionDao(revision, data), nil
 }
 
+func (r mysqlRepo) CountCharacterRelated(ctx context.Context, characterID model.CharacterIDType) (int64, error) {
+	c, err := r.q.RevisionHistory.WithContext(ctx).
+		Where(
+			r.q.RevisionHistory.Mid.Eq(characterID),
+			r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...),
+		).Count()
+	return c, wrapGORMError(err)
+}
+
+func (r mysqlRepo) ListCharacterRelated(
+	ctx context.Context, characterID model.CharacterIDType, limit int, offset int,
+) ([]model.CharacterRevision, error) {
+	revisions, err := r.q.RevisionHistory.WithContext(ctx).
+		Where(
+			r.q.RevisionHistory.Mid.Eq(characterID),
+			r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...),
+		).
+		Order(r.q.RevisionHistory.ID.Desc()).
+		Limit(limit).
+		Offset(offset).Find()
+	if err != nil {
+		return nil, wrapGORMError(err)
+	}
+
+	result := make([]model.CharacterRevision, 0, len(revisions))
+	for _, revision := range revisions {
+		result = append(result, convertCharacterRevisionDao(revision, nil))
+	}
+	return result, nil
+}
+
+func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.IDType) (model.CharacterRevision, error) {
+	revision, err := r.q.RevisionHistory.WithContext(ctx).
+		Where(r.q.RevisionHistory.ID.Eq(id),
+			r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...)).
+		First()
+	if err != nil {
+		return model.CharacterRevision{}, wrapGORMError(err)
+	}
+
+	data, err := r.q.RevisionText.WithContext(ctx).
+		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
+			return model.CharacterRevision{}, domain.ErrNotFound
+		}
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return model.CharacterRevision{}, errgo.Wrap(err, "dal")
+	}
+	return convertCharacterRevisionDao(revision, data), nil
+}
+
+func wrapGORMError(err error) error {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return domain.ErrNotFound
+	}
+	return errgo.Wrap(err, "dal")
+}
+
 func (r mysqlRepo) CountSubjectRelated(ctx context.Context, id model.SubjectIDType) (int64, error) {
 	c, err := r.q.SubjectRevision.WithContext(ctx).
 		Where(r.q.SubjectRevision.SubjectID.Eq(id)).Count()
@@ -147,6 +208,9 @@ func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.IDType) (mode
 }
 
 func toValidJSON(data interface{}) interface{} {
+	if data == nil {
+		return nil
+	}
 	t := reflect.TypeOf(data).Kind()
 	switch t {
 	case reflect.Array:
@@ -173,16 +237,17 @@ func toValidJSON(data interface{}) interface{} {
 func convertRevisionText(text []byte) map[string]interface{} {
 	gr := flate.NewReader(bytes.NewBuffer(text))
 	defer gr.Close()
-	bytes, err := io.ReadAll(gr)
-	if err == nil {
-		result, err := phpserialize.UnmarshalAssociativeArray(bytes)
-		if err == nil {
-			if d, ok := toValidJSON(result).(map[string]interface{}); ok {
-				return d
-			}
-		}
+	b, err := io.ReadAll(gr)
+	if err != nil {
+		return nil
 	}
-
+	result, err := phpserialize.UnmarshalAssociativeArray(b)
+	if err != nil {
+		return nil
+	}
+	if d, ok := toValidJSON(result).(map[string]interface{}); ok {
+		return d
+	}
 	return nil
 }
 
@@ -191,6 +256,26 @@ func safeDecodeExtra(k1 reflect.Type, k2 reflect.Type, input interface{}) (inter
 		return map[string]string{}, nil
 	}
 	return input, nil
+}
+
+func castCharacterData(raw map[string]interface{}) model.CharacterRevisionData {
+	if raw == nil {
+		return model.CharacterRevisionData{}
+	}
+	result := model.CharacterRevisionData{
+		CharacterRevisionEdit: make(map[string]model.CharacterRevisionEditItem, len(raw)),
+	}
+	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		DecodeHook: safeDecodeExtra,
+		Result:     &result.CharacterRevisionEdit,
+	})
+	if err != nil {
+		return model.CharacterRevisionData{}
+	}
+	if decoder.Decode(raw) != nil {
+		return model.CharacterRevisionData{}
+	}
+	return result
 }
 
 func castPersonData(raw map[string]interface{}) map[string]model.PersonRevisionDataItem {
@@ -225,6 +310,24 @@ func convertRevisionDao(r *dao.RevisionHistory, data *dao.RevisionText) model.Re
 		CreatorID: r.CreatorID,
 		CreatedAt: time.Unix(int64(r.CreatedAt), 0),
 		Data:      text,
+	}
+}
+
+func convertCharacterRevisionDao(r *dao.RevisionHistory, text *dao.RevisionText) model.CharacterRevision {
+	var data model.CharacterRevisionData
+	if text != nil {
+		data = castCharacterData(convertRevisionText(text.Text))
+	}
+
+	return model.CharacterRevision{
+		RevisionCommon: model.RevisionCommon{
+			ID:        r.ID,
+			Type:      r.Type,
+			Summary:   r.Summary,
+			CreatorID: r.CreatorID,
+			CreatedAt: time.Unix(int64(r.CreatedAt), 0),
+		},
+		Data: data,
 	}
 }
 

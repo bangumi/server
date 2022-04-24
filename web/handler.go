@@ -1,3 +1,4 @@
+// Copyright (c) 2022 TWT <TWT2333@outlook.com>
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 // Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
 //
@@ -56,8 +57,11 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Get("/v0/characters/:id/persons", addMetrics(h.GetCharacterRelatedPersons))
 	app.Get("/v0/episodes/:id", addMetrics(h.GetEpisode))
 	app.Get("/v0/episodes", addMetrics(h.ListEpisode))
+
 	app.Get("/v0/me", addMetrics(h.GetCurrentUser))
 	app.Get("/v0/users/:username/collections", addMetrics(h.ListCollection))
+	app.Get("/v0/users/:username", addMetrics(h.GetUser))
+
 	app.Get("/v0/indices/:id", addMetrics(h.GetIndex))
 	app.Get("/v0/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
 
@@ -65,6 +69,8 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Get("/v0/revisions/persons", addMetrics(h.ListPersonRevision))
 	app.Get("/v0/revisions/subjects/:id", addMetrics(h.GetSubjectRevision))
 	app.Get("/v0/revisions/subjects", addMetrics(h.ListSubjectRevision))
+	app.Get("/v0/revisions/characters/:id", addMetrics(h.GetCharacterRevision))
+	app.Get("/v0/revisions/characters", addMetrics(h.ListCharacterRevision))
 
 	app.Get("/auth/revoke", addMetrics(h.ListSubjectRevision))
 

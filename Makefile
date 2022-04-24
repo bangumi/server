@@ -45,7 +45,8 @@ mocks:
 gen: ./dal/query/gen.go mocks
 
 # don't enable `-race` in test because it require cgo, only enable it at coverage.
-test: .bin/dotenv.exe
+=======
+test:
 	go test ./...
 
 test-all: .bin/dotenv.exe

@@ -19,11 +19,9 @@ package handler_test
 import (
 	"context"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -44,16 +42,11 @@ func TestHandler_GetCharacter_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/characters/7", http.NoBody)
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
-
-	require.Equal(t, http.StatusOK, resp.StatusCode)
-
 	var r res.CharacterV0
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
+	test.New(t).Get("/v0/characters/7").
+		Execute(app).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
 	require.Equal(t, uint32(7), r.ID)
 }
 
@@ -64,13 +57,8 @@ func TestHandler_GetCharacter_Redirect(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/characters/7", http.NoBody)
+	resp := test.New(t).Get("/v0/characters/7").Execute(app).ExpectCode(http.StatusFound)
 
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
-
-	require.Equal(t, http.StatusFound, resp.StatusCode)
 	require.Equal(t, "/v0/characters/8", resp.Header.Get("Location"))
 }
 
@@ -82,13 +70,8 @@ func TestHandler_GetCharacter_Redirect_cached(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{Cache: c})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/characters/7", http.NoBody)
+	resp := test.New(t).Get("/v0/characters/7").Execute(app).ExpectCode(http.StatusFound)
 
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
-
-	require.Equal(t, http.StatusFound, resp.StatusCode)
 	require.Equal(t, "/v0/characters/8", resp.Header.Get("Location"))
 }
 
@@ -106,17 +89,11 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 		AuthRepo:      mockAuth,
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/characters/7", http.NoBody)
-	req.Header.Set(fiber.HeaderAuthorization, "Bearer v")
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
-
-	require.Equal(t, http.StatusOK, resp.StatusCode)
-
 	var r res.CharacterV0
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
+	test.New(t).Get("/v0/characters/7").Header(fiber.HeaderAuthorization, "Bearer v").
+		Execute(app).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
 
 	require.Equal(t, model.CharacterIDType(7), r.ID)
 }

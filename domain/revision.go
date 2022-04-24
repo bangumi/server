@@ -1,3 +1,4 @@
+// Copyright (c) 2022 TWT <TWT2333@outlook.com>
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -38,4 +39,12 @@ type RevisionRepo interface {
 	) ([]model.Revision, error)
 
 	GetSubjectRelated(ctx context.Context, id model.IDType) (model.Revision, error)
+
+	CountCharacterRelated(ctx context.Context, characterID model.CharacterIDType) (int64, error)
+
+	ListCharacterRelated(
+		ctx context.Context, characterID model.CharacterIDType, limit int, offset int,
+	) ([]model.CharacterRevision, error)
+
+	GetCharacterRelated(ctx context.Context, id model.IDType) (model.CharacterRevision, error)
 }

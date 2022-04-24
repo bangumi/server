@@ -16,9 +16,21 @@
 
 package res
 
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
+)
+
 // Error default error response.
 type Error struct {
 	Title       string      `json:"title"`
-	Details     interface{} `json:"details"`
+	Details     interface{} `json:"details,omitempty"`
 	Description string      `json:"description"`
+}
+
+func HTTPError(c *fiber.Ctx, code int, message string) error {
+	return c.Status(code).JSON(Error{
+		Title:       utils.StatusMessage(code),
+		Description: message,
+	})
 }

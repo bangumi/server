@@ -1,3 +1,4 @@
+// Copyright (c) 2022 TWT <TWT2333@outlook.com>
 // Copyright (c) 2022 Sociosarbis <136657577@qq.com>
 //
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -19,10 +20,9 @@ package handler_test
 import (
 	"fmt"
 	"net/http"
-	"net/http/httptest"
+	"strconv"
 	"testing"
 
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -40,25 +40,16 @@ func TestHandler_ListPersonRevision_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/revisions/persons?person_id=9", http.NoBody)
-
-	resp, err := app.Test(req, -1)
-	require.NoError(t, err)
-	defer resp.Body.Close()
-
+	var r res.Paged
+	resp := test.New(t).Get("/v0/revisions/persons?person_id=9").Execute(app, -1).JSON(&r)
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var r res.Paged
+	result, ok := r.Data.([]interface{})[0].(map[string]interface{})
+	require.True(t, ok)
 
-	err = json.NewDecoder(resp.Body).Decode(&r)
-
-	require.NoError(t, err)
-
-	if result, ok := r.Data.([]interface{})[0].(map[string]interface{}); ok {
-		if id, ok := result["id"].(float64); ok {
-			require.Equal(t, uint32(348475), uint32(id))
-		}
-	}
+	id, ok := result["id"].(float64)
+	require.True(t, ok)
+	require.Equal(t, uint32(348475), uint32(id))
 }
 
 func TestHandler_ListPersonRevision_Bad_ID(t *testing.T) {
@@ -73,12 +64,7 @@ func TestHandler_ListPersonRevision_Bad_ID(t *testing.T) {
 		id := id
 		t.Run(id, func(t *testing.T) {
 			t.Parallel()
-			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/persons?person_id=%s", id), http.NoBody)
-
-			resp, err := app.Test(req, -1)
-			require.NoError(t, err)
-			defer resp.Body.Close()
-
+			resp := test.New(t).Get("/v0/revisions/persons").Query("person_id", id).Execute(app, -1)
 			require.Equal(t, http.StatusBadRequest, resp.StatusCode)
 		})
 	}
@@ -91,16 +77,10 @@ func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/revisions/persons/348475", http.NoBody)
-
-	resp, err := app.Test(req, -1)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	var r res.PersonRevision
+	resp := test.New(t).Get("/v0/revisions/persons/348475").Execute(app, -1).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-	var r res.PersonRevision
-	err = json.NewDecoder(resp.Body).Decode(&r)
-	require.NoError(t, err)
 	require.Equal(t, uint32(348475), r.ID)
 }
 
@@ -112,22 +92,14 @@ func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/revisions/subjects?subject_id=26", http.NoBody)
-
-	resp, err := app.Test(req, -1)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	var r res.Paged
+	resp := test.New(t).Get("/v0/revisions/subjects?subject_id=26").Execute(app, -1).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var r res.Paged
-
-	err = json.NewDecoder(resp.Body).Decode(&r)
-
-	require.NoError(t, err)
-
 	result, ok := r.Data.([]interface{})[0].(map[string]interface{})
 	require.Equal(t, true, ok)
+
 	id, ok := result["id"].(float64)
 	require.Equal(t, true, ok)
 	require.Equal(t, uint32(665556), uint32(id))
@@ -145,12 +117,8 @@ func TestHandler_ListSubjectRevision_Bad_ID(t *testing.T) {
 		id := id
 		t.Run(id, func(t *testing.T) {
 			t.Parallel()
-			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v0/revisions/subjects?subject_id=%s", id), http.NoBody)
 
-			resp, err := app.Test(req, -1)
-			require.NoError(t, err)
-			defer resp.Body.Close()
-
+			resp := test.New(t).Get("/v0/revisions/subjects").Query("subject_id", id).Execute(app, -1)
 			require.Equal(t, http.StatusBadRequest, resp.StatusCode)
 		})
 	}
@@ -163,15 +131,62 @@ func TestHandler_GetSubjectRevision_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/revisions/subjects/665556", http.NoBody)
-
-	resp, err := app.Test(req, -1)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	var r res.SubjectRevision
+	resp := test.New(t).Get("/v0/revisions/subjects/665556").Execute(app, -1).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-	var r res.SubjectRevision
-	err = json.NewDecoder(resp.Body).Decode(&r)
-	require.NoError(t, err)
 	require.Equal(t, uint32(665556), r.ID)
+}
+
+func TestHandler_ListCharacterRevision_HappyPath(t *testing.T) {
+	var cid uint32 = 20         // character id
+	var mockRID uint32 = 307134 // revision id
+
+	t.Parallel()
+	m := &mocks.RevisionRepo{}
+	m.EXPECT().ListCharacterRelated(mock.Anything, cid, 30, 0).Return([]model.CharacterRevision{
+		{RevisionCommon: model.RevisionCommon{ID: mockRID}},
+	}, nil)
+	m.EXPECT().CountCharacterRelated(mock.Anything, cid).Return(1, nil)
+
+	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
+
+	var r res.Paged
+	resp := test.New(t).Get("/v0/revisions/characters").
+		Query("character_id", strconv.FormatUint(uint64(cid), 10)).
+		Execute(app, -1).
+		JSON(&r)
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	rdms, ok := r.Data.([]interface{}) // rdm: r.Data.Maps
+	require.True(t, ok)
+	require.GreaterOrEqual(t, len(rdms), 1)
+
+	rdm, ok := rdms[0].(map[string]interface{})
+	require.True(t, ok)
+
+	id, ok := rdm["id"].(float64)
+	require.True(t, ok)
+	require.Equal(t, mockRID, uint32(id))
+}
+
+func TestHandler_GetCharacterRevision_HappyPath(t *testing.T) {
+	var mockRID uint32 = 1269825
+
+	t.Parallel()
+	m := &mocks.RevisionRepo{}
+	m.EXPECT().GetCharacterRelated(mock.Anything, mockRID).Return(model.CharacterRevision{
+		RevisionCommon: model.RevisionCommon{ID: mockRID},
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
+
+	var r res.CharacterRevision
+	resp := test.New(t).Get(fmt.Sprintf("/v0/revisions/characters/%d", mockRID)).
+		Execute(app, -1).
+		JSON(&r)
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+	require.Equal(t, mockRID, r.ID)
 }

@@ -19,7 +19,6 @@ package handler_test
 import (
 	"context"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -41,11 +40,7 @@ func TestHandler_GetPerson_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/persons/7", http.NoBody)
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := test.New(t).Get("/v0/persons/7").Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -57,11 +52,7 @@ func TestHandler_GetPerson_Redirect(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
 
-	req := httptest.NewRequest(http.MethodGet, "/v0/persons/7", http.NoBody)
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := test.New(t).Get("/v0/persons/7").Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -73,12 +64,7 @@ func TestHandler_GetPerson_Redirect_cached(t *testing.T) {
 		c.Set(context.Background(), cachekey.Person(7), res.PersonV0{Redirect: 8}, time.Hour))
 
 	app := test.GetWebApp(t, test.Mock{Cache: c})
-
-	req := httptest.NewRequest(http.MethodGet, "/v0/persons/7", http.NoBody)
-
-	resp, err := app.Test(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := test.New(t).Get("/v0/persons/7").Execute(app)
 
 	require.Equal(t, http.StatusFound, resp.StatusCode)
 	require.Equal(t, "/v0/persons/8", resp.Header.Get("Location"))

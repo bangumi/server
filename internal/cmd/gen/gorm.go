@@ -131,6 +131,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_interests", "SubjectCollection",
 		gen.FieldType("interest_subject_type", subjectTypeIDTypeString),
 		gen.FieldType("interest_type", "uint8"),
+		gen.FieldType("interest_private", "uint8"),
 		gen.FieldTrimPrefix("interest_")))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",

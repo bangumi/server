@@ -40,7 +40,7 @@ func (a Avatar) Fill(s string) Avatar {
 	}
 }
 
-type Me struct {
+type User struct {
 	Avatar    Avatar `json:"avatar"`
 	Sign      string `json:"sign"`
 	URL       string `json:"url"`
