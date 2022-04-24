@@ -41,8 +41,7 @@ type mysqlRepo struct {
 }
 
 func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (domain.Auth, []byte, error) {
-	// TODO: replace it with email column
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Username.Eq(email)).First()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Email.Eq(email)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return domain.Auth{}, nil, domain.ErrNotFound
@@ -52,12 +51,11 @@ func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (domain.Auth, [
 		return domain.Auth{}, nil, errgo.Wrap(err, "gorm")
 	}
 
-	// TODO: replace it with email and password column
 	return domain.Auth{
 		RegTime: time.Unix(u.Regdate, 0),
 		ID:      u.UID,
 		GroupID: u.Groupid,
-	}, nil, nil
+	}, u.PasswordCrypt, nil
 }
 
 func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, error) {

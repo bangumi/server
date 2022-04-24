@@ -40,6 +40,8 @@ func newMember(db *gorm.DB) member {
 	_member.Newpm = field.NewBool(tableName, "newpm")
 	_member.NewNotify = field.NewUint16(tableName, "new_notify")
 	_member.Sign = field.NewString(tableName, "sign")
+	_member.PasswordCrypt = field.NewField(tableName, "password_crypt")
+	_member.Email = field.NewString(tableName, "email")
 	_member.Fields = memberHasOneFields{
 		db: db.Session(&gorm.Session{}),
 
@@ -54,23 +56,25 @@ func newMember(db *gorm.DB) member {
 type member struct {
 	memberDo memberDo
 
-	ALL          field.Field
-	UID          field.Uint32
-	Username     field.String
-	Nickname     field.String
-	Avatar       field.String
-	Groupid      field.Uint8
-	Regdate      field.Int64
-	Lastvisit    field.Int32
-	Lastactivity field.Int32
-	Lastpost     field.Int32
-	Dateformat   field.String
-	Timeformat   field.Bool
-	Timeoffset   field.String
-	Newpm        field.Bool
-	NewNotify    field.Uint16
-	Sign         field.String
-	Fields       memberHasOneFields
+	ALL           field.Field
+	UID           field.Uint32
+	Username      field.String
+	Nickname      field.String
+	Avatar        field.String
+	Groupid       field.Uint8
+	Regdate       field.Int64
+	Lastvisit     field.Int32
+	Lastactivity  field.Int32
+	Lastpost      field.Int32
+	Dateformat    field.String
+	Timeformat    field.Bool
+	Timeoffset    field.String
+	Newpm         field.Bool
+	NewNotify     field.Uint16
+	Sign          field.String
+	PasswordCrypt field.Field
+	Email         field.String
+	Fields        memberHasOneFields
 
 	fieldMap map[string]field.Expr
 }
@@ -102,6 +106,8 @@ func (m *member) updateTableName(table string) *member {
 	m.Newpm = field.NewBool(table, "newpm")
 	m.NewNotify = field.NewUint16(table, "new_notify")
 	m.Sign = field.NewString(table, "sign")
+	m.PasswordCrypt = field.NewField(table, "password_crypt")
+	m.Email = field.NewString(table, "email")
 
 	m.fillFieldMap()
 
@@ -124,7 +130,7 @@ func (m *member) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (m *member) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 16)
+	m.fieldMap = make(map[string]field.Expr, 18)
 	m.fieldMap["uid"] = m.UID
 	m.fieldMap["username"] = m.Username
 	m.fieldMap["nickname"] = m.Nickname
@@ -140,6 +146,8 @@ func (m *member) fillFieldMap() {
 	m.fieldMap["newpm"] = m.Newpm
 	m.fieldMap["new_notify"] = m.NewNotify
 	m.fieldMap["sign"] = m.Sign
+	m.fieldMap["password_crypt"] = m.PasswordCrypt
+	m.fieldMap["email"] = m.Email
 
 }
 
