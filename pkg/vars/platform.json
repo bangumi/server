@@ -227,6 +227,11 @@
       "type": "GB",
       "type_cn": "GB"
     },
+    "24": {
+      "id": 24,
+      "type": "GBC",
+      "type_cn": "GBC"
+    },
     "25": {
       "alias": "vb",
       "id": 25,
