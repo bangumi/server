@@ -151,7 +151,7 @@ func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.IDType) (mo
 			return model.CharacterRevision{}, domain.ErrNotFound
 		}
 		r.log.Error("unexpected error happened", zap.Error(err))
-		return model.CharacterRevision{}, wrapGORMError(err)
+		return model.CharacterRevision{}, errgo.Wrap(err, "dal")
 	}
 	return convertCharacterRevisionDao(revision, data), nil
 }
