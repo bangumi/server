@@ -30,15 +30,6 @@ func TestSecureRandomString(t *testing.T) {
 	require.Equal(t, 32, len(s))
 }
 
-// func BenchmarkSecureRandomString(b *testing.B) {
-// 	var s string
-// 	for i := 0; i < b.N; i++ {
-// 		s = rand.Base62String(32)
-// 	}
-//
-// 	runtime.KeepAlive(s)
-// }
-
 func TestBias(t *testing.T) {
 	t.Parallel()
 	const slen = 33
