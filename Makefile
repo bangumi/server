@@ -53,7 +53,7 @@ test-all: .bin/dotenv.exe
 	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test ./...
 
 bench:
-	go test -bench=. -benchmem ./pkg/wiki ./internal/rand
+	go test -bench=. -benchmem ./pkg/wiki
 
 ./dal/query/gen.go: ./internal/cmd/gen/gorm.go internal/cmd/gen/method go.mod .bin/dotenv.exe
 	.bin/dotenv.exe go run ./internal/cmd/gen/gorm.go
