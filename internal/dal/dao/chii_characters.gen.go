@@ -16,8 +16,8 @@ type Character struct {
 	Img      string      `gorm:"column:crt_img;type:varchar(255);not null" json:"crt_img"`
 	Comment  uint32      `gorm:"column:crt_comment;type:mediumint(9) unsigned;not null;default:0" json:"crt_comment"`
 	Collects uint32      `gorm:"column:crt_collects;type:mediumint(8) unsigned;not null" json:"crt_collects"`
-	Dateline int32       `gorm:"column:crt_dateline;type:int(10) unsigned;not null" json:"crt_dateline"`
-	Lastpost int32       `gorm:"column:crt_lastpost;type:int(11) unsigned;not null" json:"crt_lastpost"`
+	Dateline uint32      `gorm:"column:crt_dateline;type:int(10) unsigned;not null" json:"crt_dateline"`
+	Lastpost uint32      `gorm:"column:crt_lastpost;type:int(11) unsigned;not null" json:"crt_lastpost"`
 	Lock     int8        `gorm:"column:crt_lock;type:tinyint(4);not null;index:crt_lock,priority:1;default:0" json:"crt_lock"`
 	ImgAnidb string      `gorm:"column:crt_img_anidb;type:varchar(255);not null" json:"crt_img_anidb"`
 	AnidbID  uint32      `gorm:"column:crt_anidb_id;type:mediumint(8) unsigned;not null" json:"crt_anidb_id"`

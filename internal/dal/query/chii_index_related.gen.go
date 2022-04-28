@@ -31,7 +31,7 @@ func newIndexSubject(db *gorm.DB) indexSubject {
 	_indexSubject.Sid = field.NewUint32(tableName, "idx_rlt_sid")
 	_indexSubject.Order = field.NewUint32(tableName, "idx_rlt_order")
 	_indexSubject.Comment = field.NewString(tableName, "idx_rlt_comment")
-	_indexSubject.Dateline = field.NewInt32(tableName, "idx_rlt_dateline")
+	_indexSubject.Dateline = field.NewUint32(tableName, "idx_rlt_dateline")
 	_indexSubject.Subject = indexSubjectBelongsToSubject{
 		db: db.Session(&gorm.Session{}),
 
@@ -59,7 +59,7 @@ type indexSubject struct {
 	Sid      field.Uint32
 	Order    field.Uint32
 	Comment  field.String
-	Dateline field.Int32
+	Dateline field.Uint32
 	Subject  indexSubjectBelongsToSubject
 
 	fieldMap map[string]field.Expr
@@ -84,7 +84,7 @@ func (i *indexSubject) updateTableName(table string) *indexSubject {
 	i.Sid = field.NewUint32(table, "idx_rlt_sid")
 	i.Order = field.NewUint32(table, "idx_rlt_order")
 	i.Comment = field.NewString(table, "idx_rlt_comment")
-	i.Dateline = field.NewInt32(table, "idx_rlt_dateline")
+	i.Dateline = field.NewUint32(table, "idx_rlt_dateline")
 
 	i.fillFieldMap()
 

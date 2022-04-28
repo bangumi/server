@@ -39,8 +39,8 @@ func newEpisode(db *gorm.DB) episode {
 	_episode.Comment = field.NewUint32(tableName, "ep_comment")
 	_episode.Resources = field.NewUint32(tableName, "ep_resources")
 	_episode.Desc = field.NewString(tableName, "ep_desc")
-	_episode.Dateline = field.NewInt32(tableName, "ep_dateline")
-	_episode.Lastpost = field.NewInt32(tableName, "ep_lastpost")
+	_episode.Dateline = field.NewUint32(tableName, "ep_dateline")
+	_episode.Lastpost = field.NewUint32(tableName, "ep_lastpost")
 	_episode.Lock = field.NewUint8(tableName, "ep_lock")
 	_episode.Ban = field.NewUint8(tableName, "ep_ban")
 	_episode.Subject = episodeBelongsToSubject{
@@ -77,8 +77,8 @@ type episode struct {
 	Comment   field.Uint32
 	Resources field.Uint32
 	Desc      field.String
-	Dateline  field.Int32
-	Lastpost  field.Int32
+	Dateline  field.Uint32
+	Lastpost  field.Uint32
 	Lock      field.Uint8
 	Ban       field.Uint8
 	Subject   episodeBelongsToSubject
@@ -112,8 +112,8 @@ func (e *episode) updateTableName(table string) *episode {
 	e.Comment = field.NewUint32(table, "ep_comment")
 	e.Resources = field.NewUint32(table, "ep_resources")
 	e.Desc = field.NewString(table, "ep_desc")
-	e.Dateline = field.NewInt32(table, "ep_dateline")
-	e.Lastpost = field.NewInt32(table, "ep_lastpost")
+	e.Dateline = field.NewUint32(table, "ep_dateline")
+	e.Lastpost = field.NewUint32(table, "ep_lastpost")
 	e.Lock = field.NewUint8(table, "ep_lock")
 	e.Ban = field.NewUint8(table, "ep_ban")
 

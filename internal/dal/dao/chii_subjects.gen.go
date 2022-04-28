@@ -14,7 +14,7 @@ type Subject struct {
 	NameCN      string       `gorm:"column:subject_name_cn;type:varchar(80);not null;index:subject_name_cn,priority:1" json:"subject_name_cn"`
 	UID         string       `gorm:"column:subject_uid;type:varchar(20);not null" json:"subject_uid"` // isbn / imdb
 	Creator     uint32       `gorm:"column:subject_creator;type:mediumint(8) unsigned;not null;index:subject_creator,priority:1" json:"subject_creator"`
-	Dateline    int32        `gorm:"column:subject_dateline;type:int(10) unsigned;not null;default:0" json:"subject_dateline"`
+	Dateline    uint32       `gorm:"column:subject_dateline;type:int(10) unsigned;not null;default:0" json:"subject_dateline"`
 	Image       string       `gorm:"column:subject_image;type:varchar(255);not null" json:"subject_image"`
 	Platform    uint16       `gorm:"column:subject_platform;type:smallint(6) unsigned;not null;index:subject_platform,priority:1;index:order_by_name,priority:4;index:browser,priority:4;default:0" json:"subject_platform"`
 	Infobox     string       `gorm:"column:field_infobox;type:mediumtext;not null" json:"field_infobox"`

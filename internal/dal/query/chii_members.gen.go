@@ -31,15 +31,17 @@ func newMember(db *gorm.DB) member {
 	_member.Avatar = field.NewString(tableName, "avatar")
 	_member.Groupid = field.NewUint8(tableName, "groupid")
 	_member.Regdate = field.NewInt64(tableName, "regdate")
-	_member.Lastvisit = field.NewInt32(tableName, "lastvisit")
-	_member.Lastactivity = field.NewInt32(tableName, "lastactivity")
-	_member.Lastpost = field.NewInt32(tableName, "lastpost")
+	_member.Lastvisit = field.NewUint32(tableName, "lastvisit")
+	_member.Lastactivity = field.NewUint32(tableName, "lastactivity")
+	_member.Lastpost = field.NewUint32(tableName, "lastpost")
 	_member.Dateformat = field.NewString(tableName, "dateformat")
 	_member.Timeformat = field.NewBool(tableName, "timeformat")
 	_member.Timeoffset = field.NewString(tableName, "timeoffset")
 	_member.Newpm = field.NewBool(tableName, "newpm")
 	_member.NewNotify = field.NewUint16(tableName, "new_notify")
 	_member.Sign = field.NewString(tableName, "sign")
+	_member.PasswordCrypt = field.NewString(tableName, "password_crypt")
+	_member.Email = field.NewString(tableName, "email")
 	_member.Fields = memberHasOneFields{
 		db: db.Session(&gorm.Session{}),
 
@@ -54,23 +56,25 @@ func newMember(db *gorm.DB) member {
 type member struct {
 	memberDo memberDo
 
-	ALL          field.Field
-	UID          field.Uint32
-	Username     field.String
-	Nickname     field.String
-	Avatar       field.String
-	Groupid      field.Uint8
-	Regdate      field.Int64
-	Lastvisit    field.Int32
-	Lastactivity field.Int32
-	Lastpost     field.Int32
-	Dateformat   field.String
-	Timeformat   field.Bool
-	Timeoffset   field.String
-	Newpm        field.Bool
-	NewNotify    field.Uint16
-	Sign         field.String
-	Fields       memberHasOneFields
+	ALL           field.Field
+	UID           field.Uint32
+	Username      field.String
+	Nickname      field.String
+	Avatar        field.String
+	Groupid       field.Uint8
+	Regdate       field.Int64
+	Lastvisit     field.Uint32
+	Lastactivity  field.Uint32
+	Lastpost      field.Uint32
+	Dateformat    field.String
+	Timeformat    field.Bool
+	Timeoffset    field.String
+	Newpm         field.Bool
+	NewNotify     field.Uint16
+	Sign          field.String
+	PasswordCrypt field.String
+	Email         field.String
+	Fields        memberHasOneFields
 
 	fieldMap map[string]field.Expr
 }
@@ -93,15 +97,17 @@ func (m *member) updateTableName(table string) *member {
 	m.Avatar = field.NewString(table, "avatar")
 	m.Groupid = field.NewUint8(table, "groupid")
 	m.Regdate = field.NewInt64(table, "regdate")
-	m.Lastvisit = field.NewInt32(table, "lastvisit")
-	m.Lastactivity = field.NewInt32(table, "lastactivity")
-	m.Lastpost = field.NewInt32(table, "lastpost")
+	m.Lastvisit = field.NewUint32(table, "lastvisit")
+	m.Lastactivity = field.NewUint32(table, "lastactivity")
+	m.Lastpost = field.NewUint32(table, "lastpost")
 	m.Dateformat = field.NewString(table, "dateformat")
 	m.Timeformat = field.NewBool(table, "timeformat")
 	m.Timeoffset = field.NewString(table, "timeoffset")
 	m.Newpm = field.NewBool(table, "newpm")
 	m.NewNotify = field.NewUint16(table, "new_notify")
 	m.Sign = field.NewString(table, "sign")
+	m.PasswordCrypt = field.NewString(table, "password_crypt")
+	m.Email = field.NewString(table, "email")
 
 	m.fillFieldMap()
 
@@ -124,7 +130,7 @@ func (m *member) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (m *member) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 16)
+	m.fieldMap = make(map[string]field.Expr, 18)
 	m.fieldMap["uid"] = m.UID
 	m.fieldMap["username"] = m.Username
 	m.fieldMap["nickname"] = m.Nickname
@@ -140,6 +146,8 @@ func (m *member) fillFieldMap() {
 	m.fieldMap["newpm"] = m.Newpm
 	m.fieldMap["new_notify"] = m.NewNotify
 	m.fieldMap["sign"] = m.Sign
+	m.fieldMap["password_crypt"] = m.PasswordCrypt
+	m.fieldMap["email"] = m.Email
 
 }
 

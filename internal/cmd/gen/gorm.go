@@ -101,6 +101,13 @@ func main() {
 			}
 			return "int32"
 		},
+
+		"int": func(detailType string) (dataType string) {
+			if strings.HasSuffix(detailType, "unsigned") {
+				return "uint32"
+			}
+			return "int32"
+		},
 	}
 	g.WithDataTypeMap(dataMap)
 

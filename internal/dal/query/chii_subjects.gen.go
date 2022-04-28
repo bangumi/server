@@ -31,7 +31,7 @@ func newSubject(db *gorm.DB) subject {
 	_subject.NameCN = field.NewString(tableName, "subject_name_cn")
 	_subject.UID = field.NewString(tableName, "subject_uid")
 	_subject.Creator = field.NewUint32(tableName, "subject_creator")
-	_subject.Dateline = field.NewInt32(tableName, "subject_dateline")
+	_subject.Dateline = field.NewUint32(tableName, "subject_dateline")
 	_subject.Image = field.NewString(tableName, "subject_image")
 	_subject.Platform = field.NewUint16(tableName, "subject_platform")
 	_subject.Infobox = field.NewString(tableName, "field_infobox")
@@ -71,7 +71,7 @@ type subject struct {
 	NameCN      field.String
 	UID         field.String
 	Creator     field.Uint32
-	Dateline    field.Int32
+	Dateline    field.Uint32
 	Image       field.String
 	Platform    field.Uint16
 	Infobox     field.String
@@ -113,7 +113,7 @@ func (s *subject) updateTableName(table string) *subject {
 	s.NameCN = field.NewString(table, "subject_name_cn")
 	s.UID = field.NewString(table, "subject_uid")
 	s.Creator = field.NewUint32(table, "subject_creator")
-	s.Dateline = field.NewInt32(table, "subject_dateline")
+	s.Dateline = field.NewUint32(table, "subject_dateline")
 	s.Image = field.NewString(table, "subject_image")
 	s.Platform = field.NewUint16(table, "subject_platform")
 	s.Infobox = field.NewString(table, "field_infobox")

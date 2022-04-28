@@ -22,8 +22,8 @@ type Episode struct {
 	Comment   uint32  `gorm:"column:ep_comment;type:mediumint(8) unsigned;not null" json:"ep_comment"`
 	Resources uint32  `gorm:"column:ep_resources;type:mediumint(8) unsigned;not null" json:"ep_resources"`
 	Desc      string  `gorm:"column:ep_desc;type:mediumtext;not null" json:"ep_desc"`
-	Dateline  int32   `gorm:"column:ep_dateline;type:int(10) unsigned;not null" json:"ep_dateline"`
-	Lastpost  int32   `gorm:"column:ep_lastpost;type:int(10) unsigned;not null;index:ep_lastpost,priority:1" json:"ep_lastpost"`
+	Dateline  uint32  `gorm:"column:ep_dateline;type:int(10) unsigned;not null" json:"ep_dateline"`
+	Lastpost  uint32  `gorm:"column:ep_lastpost;type:int(10) unsigned;not null;index:ep_lastpost,priority:1" json:"ep_lastpost"`
 	Lock      uint8   `gorm:"column:ep_lock;type:tinyint(3) unsigned;not null;default:0" json:"ep_lock"`
 	Ban       uint8   `gorm:"column:ep_ban;type:tinyint(3) unsigned;not null;index:ep_ban,priority:1;index:ep_subject_id_2,priority:2;default:0" json:"ep_ban"`
 	Subject   Subject `gorm:"foreignKey:ep_subject_id;references:subject_id" json:"subject"`

@@ -33,8 +33,8 @@ func newCharacter(db *gorm.DB) character {
 	_character.Img = field.NewString(tableName, "crt_img")
 	_character.Comment = field.NewUint32(tableName, "crt_comment")
 	_character.Collects = field.NewUint32(tableName, "crt_collects")
-	_character.Dateline = field.NewInt32(tableName, "crt_dateline")
-	_character.Lastpost = field.NewInt32(tableName, "crt_lastpost")
+	_character.Dateline = field.NewUint32(tableName, "crt_dateline")
+	_character.Lastpost = field.NewUint32(tableName, "crt_lastpost")
 	_character.Lock = field.NewInt8(tableName, "crt_lock")
 	_character.ImgAnidb = field.NewString(tableName, "crt_img_anidb")
 	_character.AnidbID = field.NewUint32(tableName, "crt_anidb_id")
@@ -64,8 +64,8 @@ type character struct {
 	Img      field.String
 	Comment  field.Uint32
 	Collects field.Uint32
-	Dateline field.Int32
-	Lastpost field.Int32
+	Dateline field.Uint32
+	Lastpost field.Uint32
 	Lock     field.Int8
 	ImgAnidb field.String
 	AnidbID  field.Uint32
@@ -97,8 +97,8 @@ func (c *character) updateTableName(table string) *character {
 	c.Img = field.NewString(table, "crt_img")
 	c.Comment = field.NewUint32(table, "crt_comment")
 	c.Collects = field.NewUint32(table, "crt_collects")
-	c.Dateline = field.NewInt32(table, "crt_dateline")
-	c.Lastpost = field.NewInt32(table, "crt_lastpost")
+	c.Dateline = field.NewUint32(table, "crt_dateline")
+	c.Lastpost = field.NewUint32(table, "crt_lastpost")
 	c.Lock = field.NewInt8(table, "crt_lock")
 	c.ImgAnidb = field.NewString(table, "crt_img_anidb")
 	c.AnidbID = field.NewUint32(table, "crt_anidb_id")
