@@ -26,7 +26,7 @@ type SubjectField struct {
 	Rate9    uint32    `gorm:"column:field_rate_9;type:mediumint(8) unsigned;not null;default:0" json:"field_rate_9"`
 	Rate10   uint32    `gorm:"column:field_rate_10;type:mediumint(8) unsigned;not null;default:0" json:"field_rate_10"`
 	Airtime  int8      `gorm:"column:field_airtime;type:tinyint(1) unsigned;not null;index:subject_airtime,priority:1" json:"field_airtime"`
-	Rank     int32     `gorm:"column:field_rank;type:int(10) unsigned;not null;index:field_rank,priority:1;default:0" json:"field_rank"`
+	Rank     uint32    `gorm:"column:field_rank;type:int(10) unsigned;not null;index:field_rank,priority:1;default:0" json:"field_rank"`
 	Year     int32     `gorm:"column:field_year;type:year(4);not null;index:field_year_mon,priority:1;index:field_year,priority:1" json:"field_year"` // 放送年份
 	Mon      int8      `gorm:"column:field_mon;type:tinyint(2);not null;index:field_year_mon,priority:2" json:"field_mon"`                            // 放送月份
 	WeekDay  int8      `gorm:"column:field_week_day;type:tinyint(1);not null" json:"field_week_day"`                                                  // 放送日(星期X)

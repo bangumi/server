@@ -17,11 +17,10 @@
 package test
 
 import (
-	"testing"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
 	"github.com/uber-go/tally/v4"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/config"
@@ -29,21 +28,23 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 )
 
-func GetGorm(t *testing.T) *gorm.DB {
+func GetGorm(t TB) *gorm.DB {
 	t.Helper()
-	db, err := newGorm(config.NewAppConfig())
+	db, err := newGorm(t, config.NewAppConfig())
 	require.NoError(t, err)
 
 	return db
 }
 
-func newGorm(c config.AppConfig) (*gorm.DB, error) {
+func newGorm(t TB, c config.AppConfig) (*gorm.DB, error) {
 	conn, err := dal.NewConnectionPool(c)
 	if err != nil {
 		return nil, errgo.Wrap(err, "sql.Open")
 	}
 
-	db, err := dal.NewDB(conn, c, tally.NoopScope, prometheus.NewRegistry())
+	db, err := gorm.Open(mysql.New(mysql.Config{Conn: conn, DisableDatetimePrecision: true}))
+	require.NoError(t, err)
+	db, err = dal.NewDB(conn, c, tally.NoopScope, prometheus.NewRegistry())
 
 	return db, errgo.Wrap(err, "gorm.Open")
 }

@@ -92,7 +92,7 @@ type Count struct {
 }
 
 type Rating struct {
-	Rank  int32   `json:"rank"`
+	Rank  uint32  `json:"rank"`
 	Total uint32  `json:"total"`
 	Count Count   `json:"count"`
 	Score float64 `json:"score"`

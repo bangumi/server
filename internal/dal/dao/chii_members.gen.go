@@ -14,9 +14,9 @@ type Member struct {
 	Avatar        string      `gorm:"column:avatar;type:varchar(255);not null" json:"avatar"`
 	Groupid       uint8       `gorm:"column:groupid;type:smallint(6) unsigned;not null;default:0" json:"groupid"`
 	Regdate       int64       `gorm:"column:regdate;type:int(10) unsigned;not null;default:0" json:"regdate"`
-	Lastvisit     int32       `gorm:"column:lastvisit;type:int(10) unsigned;not null;default:0" json:"lastvisit"`
-	Lastactivity  int32       `gorm:"column:lastactivity;type:int(10) unsigned;not null;default:0" json:"lastactivity"`
-	Lastpost      int32       `gorm:"column:lastpost;type:int(10) unsigned;not null;default:0" json:"lastpost"`
+	Lastvisit     uint32      `gorm:"column:lastvisit;type:int(10) unsigned;not null;default:0" json:"lastvisit"`
+	Lastactivity  uint32      `gorm:"column:lastactivity;type:int(10) unsigned;not null;default:0" json:"lastactivity"`
+	Lastpost      uint32      `gorm:"column:lastpost;type:int(10) unsigned;not null;default:0" json:"lastpost"`
 	Dateformat    string      `gorm:"column:dateformat;type:char(10);not null;default:''" json:"dateformat"`
 	Timeformat    bool        `gorm:"column:timeformat;type:tinyint(1);not null;default:0" json:"timeformat"`
 	Timeoffset    string      `gorm:"column:timeoffset;type:char(4);not null;default:''" json:"timeoffset"`

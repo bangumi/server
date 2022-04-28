@@ -24,8 +24,8 @@ type Person struct {
 	ImgAnidb    string      `gorm:"column:prsn_img_anidb;type:varchar(255);not null" json:"prsn_img_anidb"`
 	Comment     uint32      `gorm:"column:prsn_comment;type:mediumint(9) unsigned;not null" json:"prsn_comment"`
 	Collects    uint32      `gorm:"column:prsn_collects;type:mediumint(8) unsigned;not null" json:"prsn_collects"`
-	Dateline    int32       `gorm:"column:prsn_dateline;type:int(10) unsigned;not null" json:"prsn_dateline"`
-	Lastpost    int32       `gorm:"column:prsn_lastpost;type:int(11) unsigned;not null" json:"prsn_lastpost"`
+	Dateline    uint32      `gorm:"column:prsn_dateline;type:int(10) unsigned;not null" json:"prsn_dateline"`
+	Lastpost    uint32      `gorm:"column:prsn_lastpost;type:int(11) unsigned;not null" json:"prsn_lastpost"`
 	Lock        int8        `gorm:"column:prsn_lock;type:tinyint(4);not null;index:prsn_lock,priority:1" json:"prsn_lock"`
 	AnidbID     uint32      `gorm:"column:prsn_anidb_id;type:mediumint(8) unsigned;not null" json:"prsn_anidb_id"`
 	Ban         uint8       `gorm:"column:prsn_ban;type:tinyint(3) unsigned;not null;index:prsn_ban,priority:1;default:0" json:"prsn_ban"`

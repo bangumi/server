@@ -67,6 +67,7 @@ type Mock struct {
 }
 
 type TB interface {
+	SkipNow()
 	Helper()
 	Errorf(format string, args ...interface{})
 	FailNow()
@@ -275,12 +276,16 @@ func MockCache(mock cache.Generic) fx.Option {
 	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.Generic))))
 }
 
-func MockEmptyCache() fx.Option {
+func NopCache() cache.Generic {
 	mc := &mocks.Generic{}
 	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
 	mc.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-	return fx.Supply(fx.Annotate(mc, fx.As(new(cache.Generic))))
+	return mc
+}
+
+func MockEmptyCache() fx.Option {
+	return fx.Provide(NopCache)
 }
 
 func FxE2E(t *testing.T) fx.Option {

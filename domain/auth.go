@@ -41,7 +41,7 @@ type User struct {
 // Auth is the basic authorization represent a user.
 type Auth struct {
 	RegTime    time.Time
-	ID         uint32
+	ID         uint32 // user id
 	GroupID    uint8
 	Permission Permission
 }

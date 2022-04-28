@@ -31,9 +31,9 @@ func newMember(db *gorm.DB) member {
 	_member.Avatar = field.NewString(tableName, "avatar")
 	_member.Groupid = field.NewUint8(tableName, "groupid")
 	_member.Regdate = field.NewInt64(tableName, "regdate")
-	_member.Lastvisit = field.NewInt32(tableName, "lastvisit")
-	_member.Lastactivity = field.NewInt32(tableName, "lastactivity")
-	_member.Lastpost = field.NewInt32(tableName, "lastpost")
+	_member.Lastvisit = field.NewUint32(tableName, "lastvisit")
+	_member.Lastactivity = field.NewUint32(tableName, "lastactivity")
+	_member.Lastpost = field.NewUint32(tableName, "lastpost")
 	_member.Dateformat = field.NewString(tableName, "dateformat")
 	_member.Timeformat = field.NewBool(tableName, "timeformat")
 	_member.Timeoffset = field.NewString(tableName, "timeoffset")
@@ -63,9 +63,9 @@ type member struct {
 	Avatar        field.String
 	Groupid       field.Uint8
 	Regdate       field.Int64
-	Lastvisit     field.Int32
-	Lastactivity  field.Int32
-	Lastpost      field.Int32
+	Lastvisit     field.Uint32
+	Lastactivity  field.Uint32
+	Lastpost      field.Uint32
 	Dateformat    field.String
 	Timeformat    field.Bool
 	Timeoffset    field.String
@@ -97,9 +97,9 @@ func (m *member) updateTableName(table string) *member {
 	m.Avatar = field.NewString(table, "avatar")
 	m.Groupid = field.NewUint8(table, "groupid")
 	m.Regdate = field.NewInt64(table, "regdate")
-	m.Lastvisit = field.NewInt32(table, "lastvisit")
-	m.Lastactivity = field.NewInt32(table, "lastactivity")
-	m.Lastpost = field.NewInt32(table, "lastpost")
+	m.Lastvisit = field.NewUint32(table, "lastvisit")
+	m.Lastactivity = field.NewUint32(table, "lastactivity")
+	m.Lastpost = field.NewUint32(table, "lastpost")
 	m.Dateformat = field.NewString(table, "dateformat")
 	m.Timeformat = field.NewBool(table, "timeformat")
 	m.Timeoffset = field.NewString(table, "timeoffset")

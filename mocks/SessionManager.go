@@ -120,3 +120,41 @@ func (_c *SessionManager_Get_Call) Return(_a0 session.Session, _a1 error) *Sessi
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
+
+// Revoke provides a mock function with given fields: ctx, key
+func (_m *SessionManager) Revoke(ctx context.Context, key string) error {
+	ret := _m.Called(ctx, key)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, key)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// SessionManager_Revoke_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Revoke'
+type SessionManager_Revoke_Call struct {
+	*mock.Call
+}
+
+// Revoke is a helper method to define mock.On call
+//  - ctx context.Context
+//  - key string
+func (_e *SessionManager_Expecter) Revoke(ctx interface{}, key interface{}) *SessionManager_Revoke_Call {
+	return &SessionManager_Revoke_Call{Call: _e.mock.On("Revoke", ctx, key)}
+}
+
+func (_c *SessionManager_Revoke_Call) Run(run func(ctx context.Context, key string)) *SessionManager_Revoke_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *SessionManager_Revoke_Call) Return(_a0 error) *SessionManager_Revoke_Call {
+	_c.Call.Return(_a0)
+	return _c
+}

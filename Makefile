@@ -39,6 +39,7 @@ mocks:
 
 	go run github.com/vektra/mockery/v2 --dir  ./web/captcha --name Manager --filename CaptchaManager.go --structname CaptchaManager --with-expecter;
 	go run github.com/vektra/mockery/v2 --dir  ./web/session --name Manager --filename SessionManager.go --structname SessionManager --with-expecter;
+	go run github.com/vektra/mockery/v2 --dir  ./web/session --name Repo --filename SessionRepo.go --structname SessionRepo --with-expecter;
 	go run github.com/vektra/mockery/v2 --dir  ./web/rate --name Manager --filename RateLimiter.go --structname RateLimiter --with-expecter;
 
 

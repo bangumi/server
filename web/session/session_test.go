@@ -16,10 +16,35 @@
 
 package session_test
 
-import "testing"
+import (
+	"context"
+	"testing"
 
-func BenchmarkRandomByte(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
-	}
+	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/mocks"
+	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/web/session"
+)
+
+func TestManager_Create(t *testing.T) {
+	t.Parallel()
+	const uid model.IDType = 1
+
+	m := &mocks.SessionRepo{}
+	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
+		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
+			require.Equal(t, uid, s.UID)
+		}).Return(nil)
+	defer m.AssertExpectations(t)
+
+	manager := session.New(test.NopCache(), m, logger.Copy())
+
+	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
+	require.NoError(t, err)
+	require.Equal(t, uid, s.UID)
 }

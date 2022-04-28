@@ -27,7 +27,7 @@ func newUserGroup(db *gorm.DB) userGroup {
 	_userGroup.ID = field.NewUint8(tableName, "usr_grp_id")
 	_userGroup.Name = field.NewString(tableName, "usr_grp_name")
 	_userGroup.Perm = field.NewField(tableName, "usr_grp_perm")
-	_userGroup.Dateline = field.NewInt32(tableName, "usr_grp_dateline")
+	_userGroup.Dateline = field.NewUint32(tableName, "usr_grp_dateline")
 
 	_userGroup.fillFieldMap()
 
@@ -41,7 +41,7 @@ type userGroup struct {
 	ID       field.Uint8
 	Name     field.String
 	Perm     field.Field
-	Dateline field.Int32
+	Dateline field.Uint32
 
 	fieldMap map[string]field.Expr
 }
@@ -61,7 +61,7 @@ func (u *userGroup) updateTableName(table string) *userGroup {
 	u.ID = field.NewUint8(table, "usr_grp_id")
 	u.Name = field.NewString(table, "usr_grp_name")
 	u.Perm = field.NewField(table, "usr_grp_perm")
-	u.Dateline = field.NewInt32(table, "usr_grp_dateline")
+	u.Dateline = field.NewUint32(table, "usr_grp_dateline")
 
 	u.fillFieldMap()
 

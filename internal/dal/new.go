@@ -68,7 +68,6 @@ func NewDB(
 		DisableDatetimePrecision: true,
 	}), &gorm.Config{
 		Logger:      gLog,
-		QueryFields: true,
 		PrepareStmt: true,
 	})
 	if err != nil {

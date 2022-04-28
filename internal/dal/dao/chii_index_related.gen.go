@@ -15,7 +15,7 @@ type IndexSubject struct {
 	Sid      uint32  `gorm:"column:idx_rlt_sid;type:mediumint(8) unsigned;not null;index:idx_rlt_sid,priority:2;index:idx_rlt_sid_2,priority:1;index:idx_order,priority:4" json:"idx_rlt_sid"` // 关联条目ID
 	Order    uint32  `gorm:"column:idx_rlt_order;type:mediumint(8) unsigned;not null;index:idx_order,priority:3;default:0" json:"idx_rlt_order"`
 	Comment  string  `gorm:"column:idx_rlt_comment;type:mediumtext;not null" json:"idx_rlt_comment"`
-	Dateline int32   `gorm:"column:idx_rlt_dateline;type:int(10) unsigned;not null" json:"idx_rlt_dateline"`
+	Dateline uint32  `gorm:"column:idx_rlt_dateline;type:int(10) unsigned;not null" json:"idx_rlt_dateline"`
 	Subject  Subject `gorm:"foreignKey:idx_rlt_sid;references:subject_id" json:"subject"`
 }
 

@@ -18,16 +18,15 @@ package session
 
 import (
 	"context"
+	"errors"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/goccy/go-json"
 	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/cache"
 	"github.com/bangumi/server/domain"
-	"github.com/bangumi/server/internal/dal/dao"
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/rand"
 	"github.com/bangumi/server/model"
@@ -36,55 +35,82 @@ import (
 const keyLength = 32
 const keyPrefix = "chii:web:session:"
 
+type Session struct {
+	RegTime   time.Time    `json:"reg_time"`
+	UID       model.IDType `json:"uid"`
+	GroupID   uint8        `json:"group_id"`
+	ExpiredAt int64        `json:"expired_at"`
+}
+
 type Manager interface {
 	Create(ctx context.Context, a domain.Auth) (string, Session, error)
 	Get(ctx context.Context, key string) (Session, error)
+	Revoke(ctx context.Context, key string) error
 }
 
-func New(r *redis.Client, q *query.Query, log *zap.Logger) Manager {
-	return manager{r: r, q: q, log: log.Named("web.Session.Manager")}
+func New(r cache.Generic, repo Repo, log *zap.Logger) Manager {
+	return manager{cache: r, repo: repo, log: log.Named("web.Session.Manager")}
 }
 
 type manager struct {
-	r   *redis.Client
-	q   *query.Query
-	log *zap.Logger
+	repo  Repo
+	cache cache.Generic
+	log   *zap.Logger
 }
 
 func (m manager) Create(ctx context.Context, a domain.Auth) (string, Session, error) {
-	key := rand.Base62String(keyLength)
-	s := Session{}
+	var key string
+	var err error
+	s := Session{UID: a.ID}
 
-	err := m.q.WithContext(ctx).WebSession.Create(&dao.WebSession{
-		Key:      key,
-		CreateAt: time.Now().Unix(),
-		Value:    "",
-	})
-	if err != nil {
-		return "", Session{}, errgo.Wrap(err, "dal")
+	for i := 0; i < 5; i++ {
+		key = rand.Base62String(keyLength)
+		err = m.repo.Create(ctx, key, a.ID, s)
+		if err != nil {
+			if !errors.Is(err, ErrKeyConflict) {
+				return "", Session{}, errgo.Wrap(err, "un-expected error when creating session")
+			}
+			// key conflict, re-generate new key and retry
+			key = rand.Base62String(keyLength)
+		}
 	}
 
-	if err = m.r.Set(ctx, keyPrefix+keyPrefix, s, timex.OneWeek).Err(); err != nil {
+	if err := m.cache.Set(ctx, keyPrefix+key, s, timex.OneWeek); err != nil {
 		return "", Session{}, errgo.Wrap(err, "redis.Set")
 	}
 
-	return key, Session{}, nil
+	return key, s, nil
 }
 
 func (m manager) Get(ctx context.Context, key string) (Session, error) {
-	result, err := m.r.Get(ctx, keyPrefix+keyPrefix).Bytes()
+	var s Session
+
+	ok, err := m.cache.Get(ctx, keyPrefix+key, &s)
 	if err != nil {
 		return Session{}, errgo.Wrap(err, "redis.Set")
 	}
-
-	var s Session
-	if err := json.Unmarshal(result, &s); err != nil {
-		m.log.Warn("can't decode session from redis")
+	if ok {
+		return s, nil
 	}
 
-	return Session{}, nil
+	ws, err := m.repo.Get(ctx, key)
+	if err != nil {
+		return Session{}, errgo.Wrap(err, "mysqlRepo.Get")
+	}
+
+	s = Session{}
+	if err := json.Unmarshal(ws.Value, &s); err != nil {
+		return Session{}, errgo.Wrap(err, "json.Unmarshal")
+	}
+
+	if err := m.cache.Set(ctx, keyPrefix+key, s, timex.OneDay*3); err != nil {
+		m.log.Panic("failed to set cache")
+	}
+
+	return s, nil
 }
 
-type Session struct {
-	UID model.IDType
+func (m manager) Revoke(ctx context.Context, key string) error {
+	// TODO implement me
+	panic("implement me")
 }

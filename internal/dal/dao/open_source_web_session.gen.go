@@ -8,10 +8,11 @@ const TableNameWebSession = "open_source_web_session"
 
 // WebSession mapped from table <open_source_web_session>
 type WebSession struct {
-	Key       string `gorm:"column:key;type:char(64);primaryKey" json:"key"`
-	CreateAt  int64  `gorm:"column:create_at;type:bigint(20)" json:"create_at"`
-	LastTouch int64  `gorm:"column:last_touch;type:bigint(20)" json:"last_touch"`
-	Value     string `gorm:"column:value;type:mediumtext" json:"value"`
+	Key       string `gorm:"column:key;type:char(64);primaryKey" json:"key"`               // session key
+	UserID    uint32 `gorm:"column:user_id;type:int(10) unsigned;not null" json:"user_id"` // uint32 user id
+	Value     []byte `gorm:"column:value;type:mediumblob;not null" json:"value"`           // json encoded session data
+	CreateAt  int64  `gorm:"column:create_at;type:bigint(20);not null" json:"create_at"`   // int64 unix timestamp, when session is created
+	ExpiredAt int64  `gorm:"column:expired_at;type:bigint(20);not null" json:"expired_at"` // int64 unix timestamp, when session is expired
 }
 
 // TableName WebSession's table name

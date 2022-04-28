@@ -41,8 +41,8 @@ func newPerson(db *gorm.DB) person {
 	_person.ImgAnidb = field.NewString(tableName, "prsn_img_anidb")
 	_person.Comment = field.NewUint32(tableName, "prsn_comment")
 	_person.Collects = field.NewUint32(tableName, "prsn_collects")
-	_person.Dateline = field.NewInt32(tableName, "prsn_dateline")
-	_person.Lastpost = field.NewInt32(tableName, "prsn_lastpost")
+	_person.Dateline = field.NewUint32(tableName, "prsn_dateline")
+	_person.Lastpost = field.NewUint32(tableName, "prsn_lastpost")
 	_person.Lock = field.NewInt8(tableName, "prsn_lock")
 	_person.AnidbID = field.NewUint32(tableName, "prsn_anidb_id")
 	_person.Ban = field.NewUint8(tableName, "prsn_ban")
@@ -79,8 +79,8 @@ type person struct {
 	ImgAnidb    field.String
 	Comment     field.Uint32
 	Collects    field.Uint32
-	Dateline    field.Int32
-	Lastpost    field.Int32
+	Dateline    field.Uint32
+	Lastpost    field.Uint32
 	Lock        field.Int8
 	AnidbID     field.Uint32
 	Ban         field.Uint8
@@ -119,8 +119,8 @@ func (p *person) updateTableName(table string) *person {
 	p.ImgAnidb = field.NewString(table, "prsn_img_anidb")
 	p.Comment = field.NewUint32(table, "prsn_comment")
 	p.Collects = field.NewUint32(table, "prsn_collects")
-	p.Dateline = field.NewInt32(table, "prsn_dateline")
-	p.Lastpost = field.NewInt32(table, "prsn_lastpost")
+	p.Dateline = field.NewUint32(table, "prsn_dateline")
+	p.Lastpost = field.NewUint32(table, "prsn_lastpost")
 	p.Lock = field.NewInt8(table, "prsn_lock")
 	p.AnidbID = field.NewUint32(table, "prsn_anidb_id")
 	p.Ban = field.NewUint8(table, "prsn_ban")

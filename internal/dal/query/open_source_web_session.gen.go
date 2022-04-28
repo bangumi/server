@@ -25,9 +25,10 @@ func newWebSession(db *gorm.DB) webSession {
 	tableName := _webSession.webSessionDo.TableName()
 	_webSession.ALL = field.NewField(tableName, "*")
 	_webSession.Key = field.NewString(tableName, "key")
+	_webSession.UserID = field.NewUint32(tableName, "user_id")
+	_webSession.Value = field.NewField(tableName, "value")
 	_webSession.CreateAt = field.NewInt64(tableName, "create_at")
-	_webSession.LastTouch = field.NewInt64(tableName, "last_touch")
-	_webSession.Value = field.NewString(tableName, "value")
+	_webSession.ExpiredAt = field.NewInt64(tableName, "expired_at")
 
 	_webSession.fillFieldMap()
 
@@ -39,9 +40,10 @@ type webSession struct {
 
 	ALL       field.Field
 	Key       field.String
+	UserID    field.Uint32
+	Value     field.Field
 	CreateAt  field.Int64
-	LastTouch field.Int64
-	Value     field.String
+	ExpiredAt field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -59,9 +61,10 @@ func (w webSession) As(alias string) *webSession {
 func (w *webSession) updateTableName(table string) *webSession {
 	w.ALL = field.NewField(table, "*")
 	w.Key = field.NewString(table, "key")
+	w.UserID = field.NewUint32(table, "user_id")
+	w.Value = field.NewField(table, "value")
 	w.CreateAt = field.NewInt64(table, "create_at")
-	w.LastTouch = field.NewInt64(table, "last_touch")
-	w.Value = field.NewString(table, "value")
+	w.ExpiredAt = field.NewInt64(table, "expired_at")
 
 	w.fillFieldMap()
 
@@ -86,11 +89,12 @@ func (w *webSession) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (w *webSession) fillFieldMap() {
-	w.fieldMap = make(map[string]field.Expr, 4)
+	w.fieldMap = make(map[string]field.Expr, 5)
 	w.fieldMap["key"] = w.Key
-	w.fieldMap["create_at"] = w.CreateAt
-	w.fieldMap["last_touch"] = w.LastTouch
+	w.fieldMap["user_id"] = w.UserID
 	w.fieldMap["value"] = w.Value
+	w.fieldMap["create_at"] = w.CreateAt
+	w.fieldMap["expired_at"] = w.ExpiredAt
 }
 
 func (w webSession) clone(db *gorm.DB) webSession {

@@ -61,7 +61,7 @@ type Count struct {
 }
 
 type Rating struct {
-	Rank  int32
+	Rank  uint32
 	Total uint32
 	Count Count
 	Score float64
