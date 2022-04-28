@@ -20,17 +20,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: ./.github/actions/base
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "~1.17.8"
 
       - name: Go Build Cache (build)
         uses: actions/cache@v3
         with:
           path: |
             ~/.cache/go-build
-          key: ${{ runner.os }}-go-build-1-${{ hashFiles('**/go.sum') }}-build
+            ~/go/pkg
+          key: go-cache-1-${{ hashFiles('**/go.sum') }}-build
           restore-keys: |
-            ${{ runner.os }}-go-build-1-${{ hashFiles('**/go.sum') }}-
-            ${{ runner.os }}-go-build-1-
+            go-cache-1-${{ hashFiles('**/go.sum') }}-
+            go-cache-1-
+
+      - run: go get ./...
 
       - name: Build
         run: make build
