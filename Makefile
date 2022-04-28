@@ -66,7 +66,6 @@ coverage: .bin/dotenv.exe
 
 install: .bin/dotenv.exe
 	@mkdir -p ./.bin ./tmp
-	go get ./...
 
 lint:
 	golangci-lint run --fix
