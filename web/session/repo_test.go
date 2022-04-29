@@ -74,7 +74,7 @@ func TestMysqlRepo_Create_conflict(t *testing.T) {
 		Key:       key,
 		UserID:    1,
 		Value:     []byte(`content`),
-		CreateAt:  2,
+		CreatedAt: 2,
 		ExpiredAt: 1,
 	})
 	require.NoError(t, err)
@@ -105,7 +105,7 @@ func TestMysqlRepo_Get_ok(t *testing.T) {
 		Key:       key,
 		UserID:    uid,
 		Value:     []byte(`content`),
-		CreateAt:  2,
+		CreatedAt: 2,
 		ExpiredAt: 1,
 	})
 	require.NoError(t, err)

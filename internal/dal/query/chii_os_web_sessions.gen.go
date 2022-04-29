@@ -27,7 +27,7 @@ func newWebSession(db *gorm.DB) webSession {
 	_webSession.Key = field.NewString(tableName, "key")
 	_webSession.UserID = field.NewUint32(tableName, "user_id")
 	_webSession.Value = field.NewField(tableName, "value")
-	_webSession.CreateAt = field.NewInt64(tableName, "create_at")
+	_webSession.CreatedAt = field.NewInt64(tableName, "created_at")
 	_webSession.ExpiredAt = field.NewInt64(tableName, "expired_at")
 
 	_webSession.fillFieldMap()
@@ -42,7 +42,7 @@ type webSession struct {
 	Key       field.String
 	UserID    field.Uint32
 	Value     field.Field
-	CreateAt  field.Int64
+	CreatedAt field.Int64
 	ExpiredAt field.Int64
 
 	fieldMap map[string]field.Expr
@@ -63,7 +63,7 @@ func (w *webSession) updateTableName(table string) *webSession {
 	w.Key = field.NewString(table, "key")
 	w.UserID = field.NewUint32(table, "user_id")
 	w.Value = field.NewField(table, "value")
-	w.CreateAt = field.NewInt64(table, "create_at")
+	w.CreatedAt = field.NewInt64(table, "created_at")
 	w.ExpiredAt = field.NewInt64(table, "expired_at")
 
 	w.fillFieldMap()
@@ -93,7 +93,7 @@ func (w *webSession) fillFieldMap() {
 	w.fieldMap["key"] = w.Key
 	w.fieldMap["user_id"] = w.UserID
 	w.fieldMap["value"] = w.Value
-	w.fieldMap["create_at"] = w.CreateAt
+	w.fieldMap["created_at"] = w.CreatedAt
 	w.fieldMap["expired_at"] = w.ExpiredAt
 }
 

@@ -32,9 +32,17 @@ import (
 	"github.com/bangumi/server/model"
 )
 
+type PersistSession struct {
+	CreatedAt time.Time
+	ExpiredAt time.Time
+	Key       string
+	Value     Session
+	UserID    model.IDType
+}
+
 type Repo interface {
 	Create(ctx context.Context, key string, userID model.IDType, s Session) error
-	Get(ctx context.Context, key string) (dao.WebSession, error)
+	Get(ctx context.Context, key string) (PersistSession, error)
 }
 
 func NewMysqlRepo(q *query.Query) Repo {
@@ -59,7 +67,7 @@ func (r mysqlRepo) Create(ctx context.Context, key string, userID model.IDType, 
 		return errgo.Wrap(err, "orm.Tx.Where.First")
 	}
 
-	createAt := time.Now().Unix()
+	createdAt := time.Now().Unix()
 
 	encodedJSON, err := json.Marshal(s)
 	if err != nil {
@@ -70,8 +78,8 @@ func (r mysqlRepo) Create(ctx context.Context, key string, userID model.IDType, 
 		Key:       key,
 		UserID:    userID,
 		Value:     encodedJSON,
-		CreateAt:  createAt,
-		ExpiredAt: createAt + timex.OneWeekSec,
+		CreatedAt: createdAt,
+		ExpiredAt: createdAt + timex.OneWeekSec,
 	}
 
 	err = tx.WebSession.WithContext(ctx).Create(&webSession)
@@ -87,15 +95,26 @@ func (r mysqlRepo) Create(ctx context.Context, key string, userID model.IDType, 
 	return nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, key string) (dao.WebSession, error) {
+func (r mysqlRepo) Get(ctx context.Context, key string) (PersistSession, error) {
 	s, err := r.q.WithContext(ctx).WebSession.Where(r.q.WebSession.Key.Eq(key)).First()
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return dao.WebSession{}, errgo.Wrap(err, "orm.Tx.Where.First")
+			return PersistSession{}, errgo.Wrap(err, "orm.Tx.Where.First")
 		}
 
-		return dao.WebSession{}, domain.ErrNotFound
+		return PersistSession{}, domain.ErrNotFound
 	}
 
-	return *s, nil
+	var v Session
+	if err = json.Unmarshal(s.Value, &v); err != nil {
+		return PersistSession{}, errgo.Wrap(err, "json.Unmarshal")
+	}
+
+	return PersistSession{
+		Key:       s.Key,
+		Value:     v,
+		CreatedAt: time.Unix(s.CreatedAt, 0),
+		ExpiredAt: time.Unix(s.ExpiredAt, 0),
+		UserID:    s.UserID,
+	}, nil
 }

@@ -126,7 +126,7 @@ func main() {
 
 	g.ApplyInterface(func(method.Member) {}, modelMember)
 
-	g.ApplyBasic(g.GenerateModelAs("open_source_web_session", "WebSession"))
+	g.ApplyBasic(g.GenerateModelAs("chii_os_web_sessions", "WebSession"))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_usergroup", "UserGroup",
 		gen.FieldTrimPrefix("usr_grp_"),
