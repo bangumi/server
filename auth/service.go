@@ -24,6 +24,7 @@ import (
 	"strconv"
 	"time"
 
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/bangumi/server/cache"
@@ -31,16 +32,18 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 )
 
-func NewService(repo domain.AuthRepo) domain.AuthService {
+func NewService(repo domain.AuthRepo, logger *zap.Logger) domain.AuthService {
 	return service{
 		c:    cache.NewMemoryCache(),
 		repo: repo,
+		log:  logger.Named("auth.Service"),
 	}
 }
 
 type service struct {
 	c    cache.Generic
 	repo domain.AuthRepo
+	log  *zap.Logger
 }
 
 func (s service) Login(ctx context.Context, email, password string) (domain.Auth, bool, error) {
@@ -55,6 +58,7 @@ func (s service) Login(ctx context.Context, email, password string) (domain.Auth
 
 	ok, err := s.ComparePassword(hashedPassword, password)
 	if err != nil {
+		s.log.Error("unexpected error when comparing password with bcrypt", zap.Error(err))
 		return domain.Auth{}, false, err
 	}
 	if !ok {
