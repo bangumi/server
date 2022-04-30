@@ -19,16 +19,13 @@ package handler
 import (
 	"errors"
 	"net"
-	"net/http"
 	"sync"
 	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
@@ -123,24 +120,7 @@ func (a *accessor) AllowNSFW() bool {
 	return a.login && a.Auth.AllowNSFW()
 }
 
-func (a accessor) LogField() zap.Field {
-	return zap.Object("request", a)
-}
-
-func (a accessor) MarshalLogObject(encoder zapcore.ObjectEncoder) error {
-	if a.ID != 0 {
-		encoder.AddUint32("user_id", a.ID)
-	}
-	encoder.AddString("ip", a.ip.String())
-	encoder.AddString("id", a.cfRay)
-
-	return nil
-}
-
 func (h Handler) RevokeSession(c *fiber.Ctx) error {
-	if c.Get(fiber.HeaderContentType) != fiber.MIMEApplicationJSON {
-		return res.HTTPError(c, http.StatusBadRequest, "need content-type to be 'application/json'")
-	}
 	var r req.RevokeSession
 	if err := json.Unmarshal(c.Body(), r); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
@@ -162,14 +142,6 @@ func (h Handler) RevokeSession(c *fiber.Ctx) error {
 }
 
 func (h Handler) PrivateLogin(c *fiber.Ctx) error {
-	contentType := utils.UnsafeString(c.Request().Header.ContentType())
-	if contentType != fiber.MIMEApplicationJSON {
-		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
-			Title:       "Bad Request",
-			Description: "Must use 'application/json' as request content-type.",
-		})
-	}
-
 	allowed, remain, err := h.rateLimit.Allowed(c.Context(), c.Context().RemoteIP().String())
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{

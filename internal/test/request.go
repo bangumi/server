@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -115,6 +116,7 @@ func (r *Request) StdRequest() *http.Request {
 	r.t.Helper()
 	var body io.ReadCloser = http.NoBody
 	if r.HTTPBody != nil {
+		r.headers.Set(fiber.HeaderContentLength, strconv.Itoa(len(r.HTTPBody)))
 		body = io.NopCloser(bytes.NewBuffer(r.HTTPBody))
 	}
 

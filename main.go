@@ -85,7 +85,7 @@ func start() error {
 		),
 
 		fx.Provide(
-			rate.New, hcaptcha.New, session.New, handler.New, web.New,
+			session.NewMysqlRepo, rate.New, hcaptcha.New, session.New, handler.New, web.New,
 		),
 
 		fx.Invoke(

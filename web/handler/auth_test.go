@@ -17,15 +17,11 @@
 package handler_test
 
 import (
-	"bytes"
 	"crypto/md5" //nolint:gosec
 	"encoding/hex"
-	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -66,25 +62,14 @@ func TestHandler_PrivateLogin(t *testing.T) {
 		},
 	)
 
-	body, err := json.Marshal(fiber.Map{
+	resp := test.New(t).Post("/p/login").JSON(fiber.Map{
 		"email":              "user email",
 		"password":           "p",
 		"h-captcha-response": "req",
-	})
-	require.NoError(t, err)
+	}).Header(fiber.HeaderUserAgent, "fiber test client").
+		Execute(app, -1)
 
-	req := httptest.NewRequest(http.MethodPost, "/p/login", bytes.NewBuffer(body))
-	req.Header.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
-	req.Header.Set(fiber.HeaderUserAgent, "fiber test client")
-
-	resp, err := app.Test(req, -1) // bcrypt 比较哈希太慢了
-	require.NoError(t, err)
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	require.NoError(t, err)
-
-	require.Equal(t, fiber.StatusOK, resp.StatusCode, string(respBody))
+	require.Equal(t, fiber.StatusOK, resp.StatusCode, resp.BodyString())
 
 	_, ok := resp.Header[fiber.HeaderSetCookie]
 	require.True(t, ok, "response should set cookies")

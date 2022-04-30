@@ -25,6 +25,7 @@ import (
 
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/middleware/ua"
+	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/util"
 )
@@ -73,9 +74,9 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Get("/v0/revisions/characters", addMetrics(h.ListCharacterRevision))
 
 	// frontend private api
-	app.Post("/p/revoke", addMetrics(h.RevokeSession))
+	app.Post("/p/revoke", req.JSON, addMetrics(h.RevokeSession))
 	private := app.Group("/p", ua.New())
-	private.Post("/login", addMetrics(h.PrivateLogin))
+	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
