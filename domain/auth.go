@@ -31,13 +31,6 @@ type AuthRepo interface {
 	GetByEmail(ctx context.Context, email string) (Auth, []byte, error)
 }
 
-type User struct {
-	Email          string
-	Username       string
-	HashedPassword string
-	UID            uint32
-}
-
 // Auth is the basic authorization represent a user.
 type Auth struct {
 	RegTime    time.Time
