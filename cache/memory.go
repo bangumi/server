@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 )
 
-// NewMemoryCache return an in-memCache cache.
+// NewMemoryCache return an in-memory cache.
 // This cache backend should be used to cache limited-sized entries like user group permission rule.
 func NewMemoryCache() Generic {
 	return &memCache{}
@@ -35,7 +35,7 @@ func NewMemoryCache() Generic {
 
 var errCacheNotSameType = errors.New("cached item have is not same type as expected result")
 
-// memCache store data in memCache,
+// memCache store data in memory,
 // will be used to cache user group permission rule.
 type memCache struct {
 	m sync.Map
