@@ -19,6 +19,7 @@ package handler
 import (
 	"errors"
 	"net"
+	"net/http"
 	"sync"
 	"time"
 
@@ -137,8 +138,11 @@ func (a accessor) MarshalLogObject(encoder zapcore.ObjectEncoder) error {
 }
 
 func (h Handler) RevokeSession(c *fiber.Ctx) error {
+	if c.Get(fiber.HeaderContentType) != fiber.MIMEApplicationJSON {
+		return res.HTTPError(c, http.StatusBadRequest, "need content-type to be 'application/json'")
+	}
 	var r req.RevokeSession
-	if err := c.BodyParser(r); err != nil {
+	if err := json.Unmarshal(c.Body(), r); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
 			Title:       "Bad Request",
 			Details:     util.ErrDetail(c, err),
