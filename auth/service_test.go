@@ -32,7 +32,6 @@ func getService() domain.AuthService {
 func TestService_ComparePassword(t *testing.T) {
 	t.Parallel()
 	s := getService()
-	// TODO: 用树洞号的帐号密码测试
 	var hashed = []byte("$2a$12$GA5Pr9GhsyLJcSPoTpYBY.JqTzYZb2nfgSeZ1EK38bfgk/Rykkvuq")
 	var input = "lovemeplease"
 
