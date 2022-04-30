@@ -2,7 +2,6 @@ title: ErrorDetail
 required:
   - title
   - description
-  - detail
 type: object
 properties:
   title:
@@ -13,11 +12,13 @@ properties:
     type: string
   detail:
     title: Detail
-    type: object
-    properties:
-      "error":
-        type: string
-        description: error message
-      "path":
-        type: string
-        description: request path
+    oneOf:
+      - type: string
+      - type: object
+        properties:
+          "error":
+            type: string
+            description: error message
+          "path":
+            type: string
+            description: request path
