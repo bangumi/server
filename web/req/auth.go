@@ -17,9 +17,9 @@
 package req
 
 type UserLogin struct {
-	Email            string `json:"email"`
-	Password         string `json:"password"`
-	HCaptchaResponse string `json:"h-captcha-response"` //nolint:tagliatelle
+	Email            string `json:"email" validate:"required"`
+	Password         string `json:"password" validate:"required"`
+	HCaptchaResponse string `json:"h-captcha-response" validate:"required"` //nolint:tagliatelle
 }
 
 type RevokeSession struct {
