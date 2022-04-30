@@ -34,7 +34,7 @@ import (
 const keyLength = 32
 const keyPrefix = "chii:web:session:"
 
-var ErrSessionExpired = errors.New("your session has been expired")
+var ErrExpired = errors.New("your session has been expired")
 
 type Manager interface {
 	Create(ctx context.Context, a domain.Auth) (string, Session, error)
@@ -95,7 +95,7 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 
 	now := time.Now()
 	if now.After(ws.ExpiredAt) {
-		return Session{}, ErrSessionExpired
+		return Session{}, ErrExpired
 	}
 
 	s = ws.Value
