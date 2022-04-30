@@ -259,7 +259,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 	return c.JSON("login")
 }
 
-// OldServerRevoke 旧服务器会发一个 HTTP 请求，revoke 掉某个用户所有的 token
+// OldServerRevoke 旧服务器会发一个 HTTP 请求，revoke 掉某个用户所有的 token.
 func (h Handler) OldServerRevoke(c *fiber.Ctx) error {
 	userIDRaw := c.Params("user_id")
 	userID, err := strparse.UserID(userIDRaw)
