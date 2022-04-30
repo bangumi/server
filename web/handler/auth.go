@@ -230,14 +230,18 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 		SameSite: fiber.CookieSameSiteStrictMode,
 	})
 
-	u, err := h.u.GetByID(c.Context(), s.UserID)
+	user, err := h.u.GetByID(c.Context(), s.UserID)
 	if err != nil {
 		return res.InternalError(c, "failed to get user", err)
 	}
 
-	return c.JSON(res.Login{
-		UserID:   s.UserID,
-		UserName: u.UserName,
-		NickName: u.NickName,
+	return c.JSON(res.User{
+		ID:        user.ID,
+		URL:       "https://bgm.tv/user/" + user.UserName,
+		Username:  user.UserName,
+		Nickname:  user.NickName,
+		UserGroup: user.UserGroup,
+		Avatar:    res.Avatar{}.Fill(user.Avatar),
+		Sign:      user.Sign,
 	})
 }
