@@ -276,6 +276,10 @@ func MockCache(mock cache.Generic) fx.Option {
 	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.Generic))))
 }
 
+func MockEmptyCache() fx.Option {
+	return fx.Provide(NopCache)
+}
+
 func NopCache() cache.Generic {
 	mc := &mocks.Generic{}
 	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
@@ -283,10 +287,6 @@ func NopCache() cache.Generic {
 	mc.EXPECT().Del(mock.Anything, mock.Anything).Return(nil)
 
 	return mc
-}
-
-func MockEmptyCache() fx.Option {
-	return fx.Provide(NopCache)
 }
 
 func FxE2E(t *testing.T) fx.Option {
