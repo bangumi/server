@@ -74,8 +74,8 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Get("/v0/revisions/characters", addMetrics(h.ListCharacterRevision))
 
 	// frontend private api
-	app.Post("/p/revoke", req.JSON, addMetrics(h.RevokeSession))
 	private := app.Group("/p", ua.New())
+	private.Post("/revoke", req.JSON, addMetrics(h.RevokeSession))
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 
 	// default 404 Handler, all router should be added before this router
