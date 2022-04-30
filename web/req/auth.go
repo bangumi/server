@@ -23,5 +23,5 @@ type UserLogin struct {
 }
 
 type RevokeSession struct {
-	UID uint32 `validate:"required" json:"uid"`
+	UID uint32 `validate:"required,gt=0" json:"uid"`
 }
