@@ -60,16 +60,17 @@ func NewAppConfig() AppConfig {
 	}
 
 	return AppConfig{
-		RedisOptions:      redisOptions,
-		MySQLHost:         host,
-		MySQLPort:         port,
-		MySQLUserName:     user,
-		MySQLPassword:     pass,
-		MySQLDatabase:     db,
+		RedisOptions:  redisOptions,
+		MySQLHost:     host,
+		MySQLPort:     port,
+		MySQLUserName: user,
+		MySQLPassword: pass,
+		MySQLDatabase: db,
+		MySQLMaxConn:  connection,
+		Debug:         debug,
+		HTTPPort:      httpPort,
+
 		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", ""),
-		MySQLMaxConn:      connection,
-		Debug:             debug,
-		HTTPPort:          httpPort,
 	}
 }
 
