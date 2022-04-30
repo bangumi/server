@@ -14,20 +14,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package rand_test
+package random_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/rand"
+	"github.com/bangumi/server/internal/random"
 )
 
 func TestSecureRandomString(t *testing.T) {
 	t.Parallel()
-	s := rand.Base62String(32)
-	require.Equal(t, 32, len(s))
+	for i := 0; i < 300; i++ {
+		s := random.Base62String(32)
+		require.Equal(t, 32, len(s))
+	}
 }
 
 func TestBias(t *testing.T) {
@@ -39,7 +41,7 @@ func TestBias(t *testing.T) {
 	var count int64
 
 	for i := 0; i < loop; i++ {
-		s := rand.Base62String(slen)
+		s := random.Base62String(slen)
 		require.Equal(t, slen, len(s))
 		for _, b := range s {
 			counts[b]++

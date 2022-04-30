@@ -27,7 +27,6 @@ import (
 	"github.com/bangumi/server/cache"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/rand"
 	"github.com/bangumi/server/model"
 )
 
@@ -59,14 +58,14 @@ func (m manager) Create(ctx context.Context, a domain.Auth) (string, Session, er
 	s := Session{UID: a.ID}
 
 	for i := 0; i < 5; i++ {
-		key = rand.Base62String(keyLength)
+		key = random.Base62String(keyLength)
 		err = m.repo.Create(ctx, key, a.ID, s)
 		if err != nil {
 			if !errors.Is(err, ErrKeyConflict) {
 				return "", Session{}, errgo.Wrap(err, "un-expected error when creating session")
 			}
 			// key conflict, re-generate new key and retry
-			key = rand.Base62String(keyLength)
+			key = random.Base62String(keyLength)
 		}
 	}
 
