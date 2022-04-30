@@ -19,6 +19,8 @@ package auth_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/bangumi/server/auth"
 	"github.com/bangumi/server/domain"
 )
@@ -29,12 +31,12 @@ func getService() domain.AuthService {
 
 func TestService_ComparePassword(t *testing.T) {
 	t.Parallel()
-	_ = getService()
+	s := getService()
 	// TODO: 用树洞号的帐号密码测试
-	// var hashed []byte
-	// var input string
+	var hashed = []byte("$2a$12$GA5Pr9GhsyLJcSPoTpYBY.JqTzYZb2nfgSeZ1EK38bfgk/Rykkvuq")
+	var input = "lovemeplease"
 
-	// eq, err := s.ComparePassword(hashed, input)
-	// require.NoError(t, err)
-	// require.True(t, eq)
+	eq, err := s.ComparePassword(hashed, input)
+	require.NoError(t, err)
+	require.True(t, eq)
 }
