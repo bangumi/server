@@ -37,6 +37,7 @@ type Request struct {
 	Response    interface{}
 	urlParams   url.Values
 	HTTPVerb    string
+	formData    url.Values
 	ContentType string
 	Endpoint    string
 	HTTPBody    []byte
@@ -49,6 +50,7 @@ func New(t *testing.T) *Request {
 	return &Request{
 		t:         t,
 		urlParams: url.Values{},
+		formData:  url.Values{},
 		headers:   http.Header{},
 	}
 }
@@ -95,6 +97,24 @@ func (r *Request) Query(key, value string) *Request {
 func (r *Request) Header(key, value string) *Request {
 	r.t.Helper()
 	r.headers.Set(key, value)
+
+	return r
+}
+
+func (r *Request) Form(key, value string) *Request {
+	r.t.Helper()
+	if r.ContentType == "" {
+		r.ContentType = fiber.MIMEApplicationForm
+	}
+
+	if r.ContentType != fiber.MIMEApplicationForm {
+		r.t.Error("content-type should be empty or 'application/x-www-form-urlencoded'," +
+			" can't mix .Form(...) with .JSON(...)")
+		r.t.FailNow()
+	}
+
+	r.formData.Set(key, value)
+	r.HTTPBody = []byte(r.formData.Encode())
 
 	return r
 }

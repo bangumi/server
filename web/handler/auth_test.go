@@ -47,12 +47,13 @@ func TestHandler_PrivateLogin(t *testing.T) {
 	require.NoError(t, err)
 
 	mockAuth := &mocks.AuthRepo{}
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
-	mockAuth.EXPECT().GetByEmail(mock.Anything, "user email").Return(domain.Auth{}, passwordInDB, nil)
+	mockAuth.EXPECT().GetByEmail(mock.Anything, "user email").Return(domain.Auth{GroupID: 1}, passwordInDB, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, uint8(1)).Return(domain.Permission{}, nil)
+	defer mockAuth.AssertExpectations(t)
 
 	mockCaptcha := &mocks.CaptchaManager{}
 	mockCaptcha.EXPECT().Verify(mock.Anything, "req").Return(true, nil)
-	// defer mockCaptcha.AssertExpectations(t)
+	defer mockCaptcha.AssertExpectations(t)
 
 	app := test.GetWebApp(t,
 		test.Mock{
@@ -74,4 +75,16 @@ func TestHandler_PrivateLogin(t *testing.T) {
 	_, ok := resp.Header[fiber.HeaderSetCookie]
 	require.True(t, ok, "response should set cookies")
 	require.Equal(t, http.StatusOK, resp.StatusCode, "200 for login")
+}
+
+func TestHandler_PrivateLogin_content_type(t *testing.T) {
+	t.Parallel()
+
+	app := test.GetWebApp(t, test.Mock{})
+
+	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").
+		Header(fiber.HeaderUserAgent, "fiber test client").
+		Execute(app, -1)
+
+	require.Equal(t, fiber.StatusBadRequest, resp.StatusCode, resp.BodyString())
 }
