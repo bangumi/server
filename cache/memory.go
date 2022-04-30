@@ -27,17 +27,17 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 )
 
-// NewMemoryCache return an in-memory cache.
+// NewMemoryCache return an in-memCache cache.
 // This cache backend should be used to cache limited-sized entries like user group permission rule.
 func NewMemoryCache() Generic {
-	return &Memory{}
+	return &memCache{}
 }
 
 var errCacheNotSameType = errors.New("cached item have is not same type as expected result")
 
-// Memory store data in memory,
+// memCache store data in memCache,
 // will be used to cache user group permission rule.
-type Memory struct {
+type memCache struct {
 	m sync.Map
 }
 
@@ -46,7 +46,7 @@ type cacheItem struct {
 	Dead  time.Time
 }
 
-func (c *Memory) Get(_ context.Context, key string, value interface{}) (bool, error) {
+func (c *memCache) Get(_ context.Context, key string, value interface{}) (bool, error) {
 	v, ok := c.m.Load(key)
 	if !ok {
 		return ok, nil
@@ -79,7 +79,7 @@ func (c *Memory) Get(_ context.Context, key string, value interface{}) (bool, er
 	return true, nil
 }
 
-func (c *Memory) Set(_ context.Context, key string, value interface{}, ttl time.Duration) error {
+func (c *memCache) Set(_ context.Context, key string, value interface{}, ttl time.Duration) error {
 	c.m.Store(key, cacheItem{
 		Value: value,
 		Dead:  time.Now().Add(ttl),
@@ -88,7 +88,7 @@ func (c *Memory) Set(_ context.Context, key string, value interface{}, ttl time.
 	return nil
 }
 
-func (c *Memory) Del(ctx context.Context, keys ...string) error {
+func (c *memCache) Del(ctx context.Context, keys ...string) error {
 	for _, key := range keys {
 		c.m.Delete(key)
 	}
