@@ -207,7 +207,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 		})
 	}
 
-	key, _, err := h.session.Create(c.Context(), login)
+	key, s, err := h.session.Create(c.Context(), login)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
 			Title:   "Unexpected Session Manager Error",
@@ -215,7 +215,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 		})
 	}
 
-	if err := h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
+	if err = h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
 		h.log.Error("failed to reset login rate limit", zap.Error(err))
 	}
 
@@ -230,5 +230,14 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 		SameSite: fiber.CookieSameSiteStrictMode,
 	})
 
-	return c.JSON("login")
+	u, err := h.u.GetByID(c.Context(), s.UserID)
+	if err != nil {
+		return res.InternalError(c, "failed to get user", err)
+	}
+
+	return c.JSON(res.Login{
+		UserID:   s.UserID,
+		UserName: u.UserName,
+		NickName: u.NickName,
+	})
 }

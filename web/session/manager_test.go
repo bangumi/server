@@ -38,7 +38,7 @@ func TestManager_Create(t *testing.T) {
 	m := &mocks.SessionRepo{}
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
 		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
-			require.Equal(t, uid, s.UID)
+			require.Equal(t, uid, s.UserID)
 		}).Return(nil)
 	defer m.AssertExpectations(t)
 
@@ -46,7 +46,7 @@ func TestManager_Create(t *testing.T) {
 
 	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
 	require.NoError(t, err)
-	require.Equal(t, uid, s.UID)
+	require.Equal(t, uid, s.UserID)
 }
 
 func TestManager_Get(t *testing.T) {
@@ -55,7 +55,7 @@ func TestManager_Get(t *testing.T) {
 	m := &mocks.SessionRepo{}
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
 		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
-			require.Equal(t, uid, s.UID)
+			require.Equal(t, uid, s.UserID)
 		}).Return(nil)
 	defer m.AssertExpectations(t)
 
@@ -63,7 +63,7 @@ func TestManager_Get(t *testing.T) {
 
 	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
 	require.NoError(t, err)
-	require.Equal(t, uid, s.UID)
+	require.Equal(t, uid, s.UserID)
 
 }
 
@@ -74,7 +74,7 @@ func TestManager_Revoke(t *testing.T) {
 	m := &mocks.SessionRepo{}
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
 		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
-			require.Equal(t, uid, s.UID)
+			require.Equal(t, uid, s.UserID)
 		}).Return(nil)
 	defer m.AssertExpectations(t)
 
@@ -82,5 +82,5 @@ func TestManager_Revoke(t *testing.T) {
 
 	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
 	require.NoError(t, err)
-	require.Equal(t, uid, s.UID)
+	require.Equal(t, uid, s.UserID)
 }

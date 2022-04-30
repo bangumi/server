@@ -17,6 +17,8 @@
 package res
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 )
@@ -32,5 +34,13 @@ func HTTPError(c *fiber.Ctx, code int, message string) error {
 	return c.Status(code).JSON(Error{
 		Title:       utils.StatusMessage(code),
 		Description: message,
+	})
+}
+
+func InternalError(c *fiber.Ctx, message string, err error) error {
+	return c.Status(http.StatusInternalServerError).JSON(Error{
+		Title:       "Internal Server Error",
+		Description: message,
+		Details:     err.Error(),
 	})
 }

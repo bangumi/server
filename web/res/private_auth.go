@@ -14,17 +14,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package session
+package res
 
-import (
-	"time"
+import "github.com/bangumi/server/model"
 
-	"github.com/bangumi/server/model"
-)
-
-type Session struct {
-	RegTime   time.Time    `json:"reg_time"`
-	UserID    model.IDType `json:"user_id"`
-	GroupID   uint8        `json:"group_id"`
-	ExpiredAt int64        `json:"expired_at"`
+type Login struct {
+	UserName string       `json:"user_name"`
+	NickName string       `json:"nick_name"`
+	UserID   model.IDType `json:"user_id"`
 }

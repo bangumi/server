@@ -56,7 +56,7 @@ type manager struct {
 func (m manager) Create(ctx context.Context, a domain.Auth) (string, Session, error) {
 	var key string
 	var err error
-	s := Session{UID: a.ID}
+	s := Session{UserID: a.ID}
 
 	for i := 0; i < 5; i++ {
 		key = random.Base62String(keyLength)
