@@ -20,13 +20,14 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/auth"
 	"github.com/bangumi/server/domain"
 )
 
 func getService() domain.AuthService {
-	return auth.NewService(nil)
+	return auth.NewService(nil, zap.NewNop())
 }
 
 func TestService_ComparePassword(t *testing.T) {
