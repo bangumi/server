@@ -106,3 +106,88 @@ func (_c *SessionRepo_Get_Call) Return(_a0 session.PersistSession, _a1 error) *S
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
+
+// Revoke provides a mock function with given fields: ctx, key
+func (_m *SessionRepo) Revoke(ctx context.Context, key string) error {
+	ret := _m.Called(ctx, key)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, key)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// SessionRepo_Revoke_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Revoke'
+type SessionRepo_Revoke_Call struct {
+	*mock.Call
+}
+
+// Revoke is a helper method to define mock.On call
+//  - ctx context.Context
+//  - key string
+func (_e *SessionRepo_Expecter) Revoke(ctx interface{}, key interface{}) *SessionRepo_Revoke_Call {
+	return &SessionRepo_Revoke_Call{Call: _e.mock.On("Revoke", ctx, key)}
+}
+
+func (_c *SessionRepo_Revoke_Call) Run(run func(ctx context.Context, key string)) *SessionRepo_Revoke_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *SessionRepo_Revoke_Call) Return(_a0 error) *SessionRepo_Revoke_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+// RevokeUser provides a mock function with given fields: ctx, userID
+func (_m *SessionRepo) RevokeUser(ctx context.Context, userID uint32) ([]string, error) {
+	ret := _m.Called(ctx, userID)
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) []string); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SessionRepo_RevokeUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RevokeUser'
+type SessionRepo_RevokeUser_Call struct {
+	*mock.Call
+}
+
+// RevokeUser is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID uint32
+func (_e *SessionRepo_Expecter) RevokeUser(ctx interface{}, userID interface{}) *SessionRepo_RevokeUser_Call {
+	return &SessionRepo_RevokeUser_Call{Call: _e.mock.On("RevokeUser", ctx, userID)}
+}
+
+func (_c *SessionRepo_RevokeUser_Call) Run(run func(ctx context.Context, userID uint32)) *SessionRepo_RevokeUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *SessionRepo_RevokeUser_Call) Return(keys []string, err error) *SessionRepo_RevokeUser_Call {
+	_c.Call.Return(keys, err)
+	return _c
+}

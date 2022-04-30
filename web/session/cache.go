@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package cache
+package session
 
 import (
 	"context"
@@ -25,20 +25,14 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger"
 )
 
-// NewRedisCache create a redis backed cache.
-func NewRedisCache(cli *redis.Client) Generic {
-	return redisCache{r: cli}
-}
-
 type redisCache struct {
-	r *redis.Client
+	r   *redis.Client
+	log *zap.Logger
 }
 
-func (c redisCache) Get(
-	ctx context.Context, key string, value interface{}) (bool, error) {
+func (c redisCache) Get(ctx context.Context, key string, value interface{}) (bool, error) {
 	raw, err := c.r.Get(ctx, key).Bytes()
 	if err != nil {
 		if err == redis.Nil {
@@ -50,7 +44,7 @@ func (c redisCache) Get(
 
 	err = json.Unmarshal(raw, value)
 	if err != nil {
-		logger.Warn("can't unmarshal redis cached data as json", zap.String("key", key))
+		c.log.Warn("can't unmarshal redis cached data as json", zap.String("key", key))
 		c.r.Del(ctx, key)
 
 		return false, nil
@@ -59,15 +53,14 @@ func (c redisCache) Get(
 	return true, nil
 }
 
-func (c redisCache) Set(
-	ctx context.Context, key string, value interface{}, ttl time.Duration) error {
+func (c redisCache) Set(ctx context.Context, key string, value interface{}, ttl time.Duration) error {
 	b, err := json.Marshal(value)
 	if err != nil {
 		return errgo.Wrap(err, "json")
 	}
 
 	if err := c.r.Set(ctx, key, b, ttl).Err(); err != nil {
-		return errgo.Wrap(err, "redis set")
+		return errgo.Wrap(err, "redis.set")
 	}
 
 	return nil

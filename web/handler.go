@@ -72,7 +72,8 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Get("/v0/revisions/characters/:id", addMetrics(h.GetCharacterRevision))
 	app.Get("/v0/revisions/characters", addMetrics(h.ListCharacterRevision))
 
-	app.Get("/auth/revoke", addMetrics(h.ListSubjectRevision))
+	app.Get("/auth/revoke", addMetrics(h.OldServerRevoke))
+	app.Get("/login", addMetrics(h.OldServerRevoke))
 
 	// frontend private api
 	private := app.Group("/p", ua.New())

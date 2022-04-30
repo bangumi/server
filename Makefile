@@ -40,7 +40,7 @@ mocks: mocks/SessionRepo.go mocks/SessionManager.go mocks/CaptchaManager.go mock
 mocks/SessionRepo.go: web/session/repo.go
 	go run github.com/vektra/mockery/v2 --dir ./web/session --name Repo --filename SessionRepo.go --structname SessionRepo --with-expecter;
 
-mocks/SessionManager.go: web/session/session.go
+mocks/SessionManager.go: web/session/manager.go
 	go run github.com/vektra/mockery/v2 --dir ./web/session --name Manager --filename SessionManager.go --structname SessionManager --with-expecter;
 
 mocks/CaptchaManager.go: web/captcha/manager.go

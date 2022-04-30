@@ -23,6 +23,7 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gookit/goutil/timex"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/domain"
@@ -43,16 +44,19 @@ type PersistSession struct {
 type Repo interface {
 	Create(ctx context.Context, key string, userID model.IDType, s Session) error
 	Get(ctx context.Context, key string) (PersistSession, error)
+	RevokeUser(ctx context.Context, userID model.IDType) (keys []string, err error)
+	Revoke(ctx context.Context, key string) error
 }
 
-func NewMysqlRepo(q *query.Query) Repo {
-	return mysqlRepo{q}
+func NewMysqlRepo(q *query.Query, logger *zap.Logger) Repo {
+	return mysqlRepo{q: q, log: logger.Named("session.mysqlRepo")}
 }
 
 var ErrKeyConflict = errors.New("conflict key in database")
 
 type mysqlRepo struct {
-	q *query.Query
+	q   *query.Query
+	log *zap.Logger
 }
 
 func (r mysqlRepo) Create(ctx context.Context, key string, userID model.IDType, s Session) error {
@@ -96,7 +100,8 @@ func (r mysqlRepo) Create(ctx context.Context, key string, userID model.IDType, 
 }
 
 func (r mysqlRepo) Get(ctx context.Context, key string) (PersistSession, error) {
-	s, err := r.q.WithContext(ctx).WebSession.Where(r.q.WebSession.Key.Eq(key)).First()
+	s, err := r.q.WithContext(ctx).WebSession.
+		Where(r.q.WebSession.Key.Eq(key), r.q.WebSession.ExpiredAt.Gte(time.Now().Unix())).First()
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return PersistSession{}, errgo.Wrap(err, "orm.Tx.Where.First")
@@ -117,4 +122,35 @@ func (r mysqlRepo) Get(ctx context.Context, key string) (PersistSession, error) 
 		ExpiredAt: time.Unix(s.ExpiredAt, 0),
 		UserID:    s.UserID,
 	}, nil
+}
+
+func (r mysqlRepo) Revoke(ctx context.Context, key string) error {
+	_, err := r.q.WithContext(ctx).WebSession.Where(r.q.WebSession.Key.Eq(key)).
+		UpdateSimple(r.q.WebSession.ExpiredAt.Value(time.Now().Unix()))
+	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
+		return errgo.Wrap(err, "gorm.UpdateSimple")
+	}
+
+	return nil
+}
+
+func (r mysqlRepo) RevokeUser(ctx context.Context, userID model.IDType) ([]string, error) {
+	s, err := r.q.WithContext(ctx).WebSession.Where(r.q.WebSession.UserID.Eq(userID)).Find()
+	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
+		return nil, errgo.Wrap(err, "gorm.Find")
+	}
+
+	_, err = r.q.WithContext(ctx).WebSession.Where(r.q.WebSession.UserID.Eq(userID)).
+		UpdateSimple(r.q.WebSession.ExpiredAt.Value(time.Now().Unix()))
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal.UpdateSimple")
+	}
+
+	var keys = make([]string, len(s))
+	for i, session := range s {
+		keys[i] = session.Key
+	}
+	return keys, nil
 }

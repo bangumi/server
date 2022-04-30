@@ -22,6 +22,9 @@ import (
 	"strings"
 )
 
+const EnvMysql = "mysql"
+const EnvRedis = "redis"
+
 // RequireEnv
 //  func TestGet(t *testing.T) {
 //    RequireEnv(t, "mysql", "redis")
@@ -37,6 +40,3 @@ func RequireEnv(t TB, envs ...string) {
 		}
 	}
 }
-
-const EnvMysql = "mysql"
-const EnvRedis = "redis"

@@ -48,3 +48,39 @@ func TestManager_Create(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, uid, s.UID)
 }
+
+func TestManager_Get(t *testing.T) {
+	t.Parallel()
+	const uid model.IDType = 1
+	m := &mocks.SessionRepo{}
+	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
+		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
+			require.Equal(t, uid, s.UID)
+		}).Return(nil)
+	defer m.AssertExpectations(t)
+
+	manager := session.New(test.NopCache(), m, logger.Copy())
+
+	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
+	require.NoError(t, err)
+	require.Equal(t, uid, s.UID)
+
+}
+
+func TestManager_Revoke(t *testing.T) {
+	t.Parallel()
+
+	const uid model.IDType = 1
+	m := &mocks.SessionRepo{}
+	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
+		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
+			require.Equal(t, uid, s.UID)
+		}).Return(nil)
+	defer m.AssertExpectations(t)
+
+	manager := session.New(test.NopCache(), m, logger.Copy())
+
+	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
+	require.NoError(t, err)
+	require.Equal(t, uid, s.UID)
+}

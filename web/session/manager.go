@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/rand"
+	"github.com/bangumi/server/model"
 )
 
 const keyLength = 32
@@ -39,10 +40,11 @@ type Manager interface {
 	Create(ctx context.Context, a domain.Auth) (string, Session, error)
 	Get(ctx context.Context, key string) (Session, error)
 	Revoke(ctx context.Context, key string) error
+	RevokeUser(ctx context.Context, id model.IDType) error
 }
 
-func New(r cache.Generic, repo Repo, log *zap.Logger) Manager {
-	return manager{cache: r, repo: repo, log: log.Named("web.Session.Manager")}
+func New(c cache.Generic, repo Repo, log *zap.Logger) Manager {
+	return manager{cache: c, repo: repo, log: log.Named("web.Session.Manager")}
 }
 
 type manager struct {
@@ -91,13 +93,17 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 		return Session{}, errgo.Wrap(err, "mysqlRepo.Get")
 	}
 
-	if time.Now().After(ws.ExpiredAt) {
+	now := time.Now()
+	if now.After(ws.ExpiredAt) {
 		return Session{}, ErrSessionExpired
 	}
 
 	s = ws.Value
 
-	if err := m.cache.Set(ctx, keyPrefix+key, s, timex.OneDay*3); err != nil {
+	// 缓存3天或缓存者到token失效
+	ttl := minDur(timex.OneDay*3, ws.ExpiredAt.Sub(now))
+
+	if err := m.cache.Set(ctx, keyPrefix+key, s, ttl); err != nil {
 		m.log.Panic("failed to set cache")
 	}
 
@@ -105,6 +111,31 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 }
 
 func (m manager) Revoke(ctx context.Context, key string) error {
-	// TODO implement me
-	panic("implement me")
+	if err := m.repo.Revoke(ctx, key); err != nil {
+		return errgo.Wrap(err, "repo.Revoke")
+	}
+
+	err := m.cache.Del(ctx, keyPrefix+key)
+	return errgo.Wrap(err, "redisCache.Del")
+}
+
+func (m manager) RevokeUser(ctx context.Context, id model.IDType) error {
+	keys, err := m.repo.RevokeUser(ctx, id)
+	if err != nil {
+		return errgo.Wrap(err, "repo.Revoke")
+	}
+
+	for i, key := range keys {
+		keys[i] = keyPrefix + key
+	}
+
+	err = m.cache.Del(ctx, keys...)
+	return errgo.Wrap(err, "redisCache.Del")
+}
+
+func minDur(a, b time.Duration) time.Duration {
+	if a < b {
+		return a
+	}
+	return b
 }

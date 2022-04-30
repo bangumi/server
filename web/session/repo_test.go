@@ -19,23 +19,27 @@ package session_test
 import (
 	"context"
 	"testing"
+	"time"
 
+	"github.com/gookit/goutil/timex"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/web/session"
 )
 
-func getRepo(t test.TB) session.Repo {
+func getRepo(t test.TB) (session.Repo, *query.Query) {
 	t.Helper()
 	test.RequireEnv(t, test.EnvMysql)
-	repo := session.NewMysqlRepo(query.Use(test.GetGorm(t)))
+	q := query.Use(test.GetGorm(t))
+	repo := session.NewMysqlRepo(q, logger.Copy())
 
-	return repo
+	return repo, q
 }
 
 func TestMysqlRepo_Create(t *testing.T) {
@@ -43,8 +47,7 @@ func TestMysqlRepo_Create(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	q := query.Use(test.GetGorm(t))
-	r := getRepo(t)
+	r, q := getRepo(t)
 	var key = "a random key " + t.Name()
 
 	_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
@@ -63,8 +66,7 @@ func TestMysqlRepo_Create_conflict(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	q := query.Use(test.GetGorm(t))
-	r := getRepo(t)
+	r, q := getRepo(t)
 	var key = "a random key " + t.Name()
 
 	_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
@@ -73,7 +75,7 @@ func TestMysqlRepo_Create_conflict(t *testing.T) {
 	err = q.WithContext(ctx).WebSession.Create(&dao.WebSession{
 		Key:       key,
 		UserID:    1,
-		Value:     []byte(`content`),
+		Value:     []byte(`{}`),
 		CreatedAt: 2,
 		ExpiredAt: 1,
 	})
@@ -94,8 +96,7 @@ func TestMysqlRepo_Get_ok(t *testing.T) {
 
 	const uid model.IDType = 1
 	ctx := context.Background()
-	q := query.Use(test.GetGorm(t))
-	r := getRepo(t)
+	r, q := getRepo(t)
 	var key = "a random key " + t.Name()
 
 	_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
@@ -104,9 +105,9 @@ func TestMysqlRepo_Get_ok(t *testing.T) {
 	err = q.WithContext(ctx).WebSession.Create(&dao.WebSession{
 		Key:       key,
 		UserID:    uid,
-		Value:     []byte(`content`),
+		Value:     []byte(`{}`),
 		CreatedAt: 2,
-		ExpiredAt: 1,
+		ExpiredAt: time.Now().Unix() + timex.OneWeekSec,
 	})
 	require.NoError(t, err)
 
@@ -127,8 +128,35 @@ func TestManager_Get_notfound(t *testing.T) {
 	t.Parallel()
 
 	var key = "a random key " + t.Name()
-	r := getRepo(t)
+	r, _ := getRepo(t)
 
 	_, err := r.Get(context.Background(), key)
 	require.ErrorIs(t, err, domain.ErrNotFound)
+}
+
+func TestMysqlRepo_Revoke(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	ctx := context.Background()
+	r, q := getRepo(t)
+	var key = "a random key " + t.Name()
+
+	err := q.WithContext(ctx).WebSession.Create(&dao.WebSession{Key: key, Value: []byte(`{}`)})
+	require.NoError(t, err)
+
+	defer func() {
+		_, err = q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
+		require.NoError(t, err)
+	}()
+
+	start := time.Now()
+	err = r.Revoke(ctx, key)
+	require.NoError(t, err)
+	end := time.Now()
+
+	s, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).First()
+	require.NoError(t, err)
+	require.LessOrEqual(t, start.Unix(), s.ExpiredAt)
+	require.LessOrEqual(t, s.ExpiredAt, end.Unix())
 }

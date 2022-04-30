@@ -20,6 +20,7 @@ import (
 	"strconv"
 
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/model"
 )
 
 func Uint8(s string) (uint8, error) {
@@ -29,6 +30,12 @@ func Uint8(s string) (uint8, error) {
 }
 
 func Uint32(s string) (uint32, error) {
+	v, err := strconv.ParseUint(s, 10, 32)
+
+	return uint32(v), errgo.Wrap(err, "strconv")
+}
+
+func UserID(s string) (model.IDType, error) {
 	v, err := strconv.ParseUint(s, 10, 32)
 
 	return uint32(v), errgo.Wrap(err, "strconv")

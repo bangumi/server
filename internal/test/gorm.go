@@ -17,9 +17,7 @@
 package test
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
-	"github.com/uber-go/tally/v4"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -44,7 +42,6 @@ func newGorm(t TB, c config.AppConfig) (*gorm.DB, error) {
 
 	db, err := gorm.Open(mysql.New(mysql.Config{Conn: conn, DisableDatetimePrecision: true}))
 	require.NoError(t, err)
-	db, err = dal.NewDB(conn, c, tally.NoopScope, prometheus.NewRegistry())
 
 	return db, errgo.Wrap(err, "gorm.Open")
 }

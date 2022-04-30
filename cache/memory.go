@@ -87,3 +87,11 @@ func (c *Memory) Set(_ context.Context, key string, value interface{}, ttl time.
 
 	return nil
 }
+
+func (c *Memory) Del(ctx context.Context, keys ...string) error {
+	for _, key := range keys {
+		c.m.Delete(key)
+	}
+
+	return nil
+}
