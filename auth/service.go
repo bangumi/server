@@ -54,9 +54,11 @@ func (s service) Login(ctx context.Context, email, password string) (domain.Auth
 	}
 
 	ok, err := s.ComparePassword(hashedPassword, password)
-
-	if !ok || err != nil {
-		return domain.Auth{}, false, errgo.Wrap(err, "ComparePassword")
+	if err != nil {
+		return domain.Auth{}, false, err
+	}
+	if !ok {
+		return domain.Auth{}, false, nil
 	}
 
 	p, err := s.GetPermission(ctx, a.GroupID)
@@ -88,8 +90,7 @@ func (s service) GetByToken(ctx context.Context, token string) (domain.Auth, err
 func (s service) ComparePassword(hashed []byte, password string) (bool, error) {
 	p := preProcessPassword(password)
 
-	err := bcrypt.CompareHashAndPassword(hashed, p[:])
-	if err != nil {
+	if err := bcrypt.CompareHashAndPassword(hashed, p[:]); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return false, nil
 		}
