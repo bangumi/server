@@ -25,10 +25,10 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-var jsonType = []byte(fiber.MIMEApplicationJSON) //nolint:gochecknoglobals
+var jsonType = []byte("application/json") //nolint:gochecknoglobals
 
 func JSON(c *fiber.Ctx) error {
-	if bytes.Equal(c.Request().Header.ContentType(), jsonType) {
+	if bytes.HasPrefix(c.Request().Header.ContentType(), jsonType) {
 		return res.HTTPError(c, http.StatusBadRequest, "need content-type to be 'application/json'")
 	}
 
