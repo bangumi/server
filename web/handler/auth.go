@@ -19,7 +19,6 @@ package handler
 import (
 	"errors"
 	"net"
-	"net/http"
 	"sync"
 	"time"
 
@@ -33,7 +32,6 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
-	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/strutil"
 	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/handler/ctxkey"
@@ -257,17 +255,4 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 	})
 
 	return c.JSON("login")
-}
-
-// OldServerRevoke 旧服务器会发一个 HTTP 请求，revoke 掉某个用户所有的 token.
-func (h Handler) OldServerRevoke(c *fiber.Ctx) error {
-	userIDRaw := c.Params("user_id")
-	userID, err := strparse.UserID(userIDRaw)
-	if err != nil {
-		return res.HTTPError(c, http.StatusBadRequest, err.Error())
-	}
-
-	err = h.session.RevokeUser(c.Context(), userID)
-
-	return errgo.Wrap(err, "session.RevokeUser")
 }
