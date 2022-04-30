@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/cache"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/random"
 	"github.com/bangumi/server/model"
 )
 
