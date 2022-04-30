@@ -1,0 +1,46 @@
+title: UserGroup
+enum:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 8
+  - 9
+  - 10
+  - 11
+type: integer
+description: >-
+  用户组
+  - 1 = 管理员
+  - 2 = Bangumi 管理猿
+  - 3 = 天窗管理猿
+  - 4 = 禁言用户
+  - 5 = 禁止访问用户
+  - 8 = 人物管理猿
+  - 9 = 维基条目管理猿
+  - 10 = 用户
+  - 11 = 维基人
+x-ms-enum:
+  name: UserGroup
+  modelAsString: false
+  values:
+    - Admin
+    - BangumiAdmin
+    - DoujinAdmin
+    - MutedUser
+    - BlockedUser
+    - PersonAdmin
+    - WikiAdmin
+    - User
+    - WikiUser
+x-enum-varnames:
+  - Admin
+  - BangumiAdmin
+  - DoujinAdmin
+  - MutedUser
+  - BlockedUser
+  - PersonAdmin
+  - WikiAdmin
+  - User
+  - WikiUser

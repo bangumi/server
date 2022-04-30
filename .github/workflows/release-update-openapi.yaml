@@ -12,12 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - run: yarn
+
       - uses: actions/checkout@v3
         with:
           repository: "bangumi/api"
           path: api
 
-      - run: cp web/spec.yaml ./api/open-api/v0.yaml
+      - run: node ./.github/scripts/resolve-ref.js ./openapi/v0.yaml ./api/open-api/v0.yaml
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4

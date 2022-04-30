@@ -1,0 +1,19 @@
+title: Avatar
+required:
+  - large
+  - medium
+  - small
+type: object
+properties:
+  large:
+    title: Large
+    type: string
+    format: url
+  medium:
+    title: Medium
+    type: string
+    format: url
+  small:
+    title: Small
+    type: string
+    format: url

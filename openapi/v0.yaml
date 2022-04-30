@@ -1021,23 +1021,12 @@ paths:
         - OptionalHTTPBearer: []
 components:
   schemas:
+    User:
+      $ref: "./components/user.yaml"
     Avatar:
-      title: Avatar
-      required:
-        - large
-        - medium
-        - small
-      type: object
-      properties:
-        large:
-          title: Large
-          type: string
-        medium:
-          title: Medium
-          type: string
-        small:
-          title: Small
-          type: string
+      $ref: "./components/avatar.yaml"
+    UserGroup:
+      $ref: "./components/user_group.yaml"
     BloodType:
       title: BloodType
       enum:
@@ -1576,31 +1565,10 @@ components:
           type: integer
           description: 音乐曲目的碟片数
         subject_id:
-          title: Subject Id
+          title: Subject ID
           type: integer
     ErrorDetail:
-      title: ErrorDetail
-      required:
-        - title
-        - description
-      type: object
-      properties:
-        title:
-          title: Title
-          type: string
-        description:
-          title: Description
-          type: string
-        detail:
-          title: Detail
-          type: object
-          properties:
-            "error":
-              type: string
-              description: error message
-            "path":
-              type: string
-              description: request path
+      $ref: "./components/error_detail.yaml"
     Images:
       title: Images
       required:
@@ -1742,54 +1710,6 @@ components:
           title: V
           type: string
 
-    User:
-      example:
-        {
-          "avatar":
-            {
-              "large": "https://lain.bgm.tv/pic/user/l/000/00/00/1.jpg?r=1391790456",
-              "medium": "https://lain.bgm.tv/pic/user/m/000/00/00/1.jpg?r=1391790456",
-              "small": "https://lain.bgm.tv/pic/user/s/000/00/00/1.jpg?r=1391790456",
-            },
-          "sign": "Awesome!",
-          "url": "https://bgm.tv/user/sai",
-          "username": "sai",
-          "nickname": "Sai🖖",
-          "id": 1,
-          "user_group": 1,
-        }
-      title: User
-      required:
-        - id
-        - url
-        - username
-        - nickname
-        - user_group
-        - avatar
-        - sign
-      type: object
-      properties:
-        id:
-          title: ID
-          type: integer
-        url:
-          title: URL
-          type: string
-        username:
-          title: Username
-          type: string
-          description: 唯一用户名，初始与 UID 相同，可修改一次
-        nickname:
-          title: Nickname
-          type: string
-        user_group:
-          "$ref": "#/components/schemas/UserGroup"
-        avatar:
-          "$ref": "#/components/schemas/Avatar"
-        sign:
-          title: Sign
-          description: 个人签名
-          type: string
     Paged_Episode_:
       title: Paged[Episode]
       type: object
@@ -2400,53 +2320,6 @@ components:
         private:
           title: Private
           type: boolean
-    UserGroup:
-      title: UserGroup
-      enum:
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
-        - 8
-        - 9
-        - 10
-        - 11
-      type: integer
-      description: >-
-        用户组
-        - 1 = 管理员
-        - 2 = Bangumi 管理猿
-        - 3 = 天窗管理猿
-        - 4 = 禁言用户
-        - 5 = 禁止访问用户
-        - 8 = 人物管理猿
-        - 9 = 维基条目管理猿
-        - 10 = 用户
-        - 11 = 维基人
-      x-ms-enum:
-        name: UserGroup
-        modelAsString: false
-        values:
-          - Admin
-          - BangumiAdmin
-          - DoujinAdmin
-          - MutedUser
-          - BlockedUser
-          - PersonAdmin
-          - WikiAdmin
-          - User
-          - WikiUser
-      x-enum-varnames:
-        - Admin
-        - BangumiAdmin
-        - DoujinAdmin
-        - MutedUser
-        - BlockedUser
-        - PersonAdmin
-        - WikiAdmin
-        - User
-        - WikiUser
     V:
       title: V
       required:
