@@ -72,7 +72,7 @@ paths:
                         description: 剩余可用登录次数。
 
         "422":
-          description: `content-type` 只能为 `application/json`.
+          description: "`content-type` 只能为 `application/json`."
 
       security:
         - CookiesSession: []
