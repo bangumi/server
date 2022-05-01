@@ -29,7 +29,7 @@ var jsonType = []byte(fiber.MIMEApplicationJSON) //nolint:gochecknoglobals
 
 func JSON(c *fiber.Ctx) error {
 	if bytes.Equal(c.Request().Header.ContentType(), jsonType) {
-		return res.HTTPError(c, http.StatusBadRequest, "need content-type to be 'application/json'")
+		return res.HTTPError(c, http.StatusUnprocessableEntity, "need content-type to be 'application/json'")
 	}
 
 	return c.Next()

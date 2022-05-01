@@ -50,7 +50,29 @@ paths:
                 title: 账号错误
                 description:
               schema:
-                "$ref": "#/components/schemas/ErrorDetail"
+                title: ErrorDetail
+                required:
+                  - title
+                  - description
+                  - detail
+                type: object
+                properties:
+                  title:
+                    title: Title
+                    type: string
+                  description:
+                    title: Description
+                    type: string
+                  detail:
+                    title: Detail
+                    type: object
+                    properties:
+                      "remain":
+                        type: integer
+                        description: 剩余可用登录次数。
+
+        "422":
+          description: `content-type` 只能为 `application/json`.
 
       security:
         - CookiesSession: []
@@ -62,30 +84,7 @@ components:
     Avatar:
       $ref: "./components/avatar.yaml"
     ErrorDetail:
-      title: ErrorDetail
-      required:
-        - title
-        - description
-        - detail
-      type: object
-      properties:
-        title:
-          title: Title
-          type: string
-        description:
-          title: Description
-          type: string
-        detail:
-          title: Detail
-          type: object
-          properties:
-            "error":
-              type: string
-              description: error message
-            "path":
-              type: string
-              description: request path
-
+      $ref: "./components/error_detail.yaml"
   securitySchemes:
     CookiesSession:
       name: sessionID
