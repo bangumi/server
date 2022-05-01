@@ -1,5 +1,6 @@
-const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const fs = require("fs/promises");
+
+const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const yaml = require("js-yaml");
 
 async function main() {
