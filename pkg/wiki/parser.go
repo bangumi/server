@@ -52,11 +52,11 @@ func Parse(s string) (Wiki, error) {
 	}
 
 	if !strings.HasPrefix(s, prefix) {
-		return w, ErrGlobalPrefix
+		return Wiki{}, ErrGlobalPrefix
 	}
 
 	if !strings.HasSuffix(s, suffix) {
-		return w, ErrGlobalSuffix
+		return Wiki{}, ErrGlobalSuffix
 	}
 
 	eolCount := strings.Count(s, "\n")
@@ -97,7 +97,7 @@ func Parse(s string) (Wiki, error) {
 			// can't find next line
 			if inArray {
 				// array should be close have read all contents
-				return w, wrapError(ErrArrayNoClose, lino+1, s[secondLastEOL:lastEOL])
+				return Wiki{}, wrapError(ErrArrayNoClose, lino+1, s[secondLastEOL:lastEOL])
 			}
 
 			break
@@ -113,12 +113,12 @@ func Parse(s string) (Wiki, error) {
 			// new field
 			currentField = Field{}
 			if inArray {
-				return w, wrapError(ErrArrayNoClose, lino, line)
+				return Wiki{}, wrapError(ErrArrayNoClose, lino, line)
 			}
 
 			key, value, err := readStartLine(trimLeftSpace(line[1:])) // read "key = value"
 			if err != nil {
-				return w, wrapError(err, lino, line)
+				return Wiki{}, wrapError(err, lino, line)
 			}
 
 			switch value {
@@ -152,7 +152,7 @@ func Parse(s string) (Wiki, error) {
 			// array item
 			key, value, err := readArrayItem(line)
 			if err != nil {
-				return w, wrapError(err, lino, line)
+				return Wiki{}, wrapError(err, lino, line)
 			}
 			itemContainer = append(itemContainer, Item{
 				Key:   key,
@@ -162,7 +162,7 @@ func Parse(s string) (Wiki, error) {
 		}
 
 		if !inArray {
-			return w, wrapError(ErrExpectingNewField, lino, line)
+			return Wiki{}, wrapError(ErrExpectingNewField, lino, line)
 		}
 	}
 

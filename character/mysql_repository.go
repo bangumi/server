@@ -71,11 +71,11 @@ func (r mysqlRepo) GetByIDs(
 }
 
 func (r mysqlRepo) GetPersonRelated(
-	ctx context.Context, characterID model.PersonIDType,
+	ctx context.Context, personID model.PersonIDType,
 ) ([]domain.PersonCharacterRelation, error) {
-	relations, err := r.q.CharacterSubjects.WithContext(ctx).
-		Where(r.q.CharacterSubjects.CharacterID.Eq(characterID)).
-		Order(r.q.CharacterSubjects.CharacterID).
+	relations, err := r.q.Cast.WithContext(ctx).
+		Where(r.q.Cast.PersonID.Eq(personID)).
+		Order(r.q.Cast.SubjectID).
 		Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
@@ -87,6 +87,7 @@ func (r mysqlRepo) GetPersonRelated(
 		rel = append(rel, domain.PersonCharacterRelation{
 			CharacterID: relation.CharacterID,
 			SubjectID:   relation.SubjectID,
+			PersonID:    personID,
 		})
 	}
 

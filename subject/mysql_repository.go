@@ -223,8 +223,8 @@ func (r mysqlRepo) GetActors(
 ) (map[model.CharacterIDType][]model.Person, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
 		Preload(r.q.Cast.Person.Fields).
-		Where(r.q.Cast.CrtID.In(characterIDs...), r.q.Cast.SubjectID.Eq(subjectID)).
-		Order(r.q.Cast.PrsnID).
+		Where(r.q.Cast.CharacterID.In(characterIDs...), r.q.Cast.SubjectID.Eq(subjectID)).
+		Order(r.q.Cast.PersonID).
 		Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
@@ -234,7 +234,7 @@ func (r mysqlRepo) GetActors(
 	var results = make(map[model.CharacterIDType][]model.Person, len(relations))
 	for _, relation := range relations {
 		// TODO: should pre-alloc a big slice and split it as results.
-		results[relation.CrtID] = append(results[relation.CrtID], person.ConvertDao(&relation.Person))
+		results[relation.CharacterID] = append(results[relation.CharacterID], person.ConvertDao(&relation.Person))
 	}
 
 	return results, nil

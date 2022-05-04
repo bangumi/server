@@ -242,6 +242,8 @@ func main() {
 		))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_crt_cast_index", "Cast",
+		gen.FieldRename("prsn_id", "PersonID"),
+		gen.FieldRename("crt_id", "CharacterID"),
 		gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
 			GORMTag: "foreignKey:crt_id;references:crt_id",
 		}),

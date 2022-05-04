@@ -73,16 +73,18 @@ func (s service) GetSubjectRelated(
 }
 
 func (s service) GetCharacterRelated(
-	ctx context.Context, subjectID model.CharacterIDType,
+	ctx context.Context, characterID model.CharacterIDType,
 ) ([]model.PersonCharacterRelation, error) {
-	relations, err := s.repo.GetCharacterRelated(ctx, subjectID)
+	relations, err := s.repo.GetCharacterRelated(ctx, characterID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetCharacterRelated")
 	}
 
 	var personIDs = make([]model.PersonIDType, len(relations))
+	var subjectIDs = make([]model.SubjectIDType, len(relations))
 	for i, relation := range relations {
 		personIDs[i] = relation.PersonID
+		subjectIDs[i] = relation.SubjectID
 	}
 
 	persons, err := s.repo.GetByIDs(ctx, personIDs...)
@@ -90,7 +92,7 @@ func (s service) GetCharacterRelated(
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}
 
-	subject, err := s.s.Get(ctx, subjectID)
+	subjects, err := s.s.GetByIDs(ctx, subjectIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.Get")
 	}
@@ -98,7 +100,7 @@ func (s service) GetCharacterRelated(
 	var results = make([]model.PersonCharacterRelation, len(relations))
 	for i, rel := range relations {
 		results[i] = model.PersonCharacterRelation{
-			Subject: subject,
+			Subject: subjects[rel.SubjectID],
 			Person:  persons[rel.PersonID],
 		}
 	}

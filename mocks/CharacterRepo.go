@@ -130,13 +130,13 @@ func (_c *CharacterRepo_GetByIDs_Call) Return(_a0 map[uint32]model.Character, _a
 	return _c
 }
 
-// GetPersonRelated provides a mock function with given fields: ctx, characterID
-func (_m *CharacterRepo) GetPersonRelated(ctx context.Context, characterID uint32) ([]domain.PersonCharacterRelation, error) {
-	ret := _m.Called(ctx, characterID)
+// GetPersonRelated provides a mock function with given fields: ctx, personID
+func (_m *CharacterRepo) GetPersonRelated(ctx context.Context, personID uint32) ([]domain.PersonCharacterRelation, error) {
+	ret := _m.Called(ctx, personID)
 
 	var r0 []domain.PersonCharacterRelation
 	if rf, ok := ret.Get(0).(func(context.Context, uint32) []domain.PersonCharacterRelation); ok {
-		r0 = rf(ctx, characterID)
+		r0 = rf(ctx, personID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]domain.PersonCharacterRelation)
@@ -145,7 +145,7 @@ func (_m *CharacterRepo) GetPersonRelated(ctx context.Context, characterID uint3
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
-		r1 = rf(ctx, characterID)
+		r1 = rf(ctx, personID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -160,12 +160,12 @@ type CharacterRepo_GetPersonRelated_Call struct {
 
 // GetPersonRelated is a helper method to define mock.On call
 //  - ctx context.Context
-//  - characterID uint32
-func (_e *CharacterRepo_Expecter) GetPersonRelated(ctx interface{}, characterID interface{}) *CharacterRepo_GetPersonRelated_Call {
-	return &CharacterRepo_GetPersonRelated_Call{Call: _e.mock.On("GetPersonRelated", ctx, characterID)}
+//  - personID uint32
+func (_e *CharacterRepo_Expecter) GetPersonRelated(ctx interface{}, personID interface{}) *CharacterRepo_GetPersonRelated_Call {
+	return &CharacterRepo_GetPersonRelated_Call{Call: _e.mock.On("GetPersonRelated", ctx, personID)}
 }
 
-func (_c *CharacterRepo_GetPersonRelated_Call) Run(run func(ctx context.Context, characterID uint32)) *CharacterRepo_GetPersonRelated_Call {
+func (_c *CharacterRepo_GetPersonRelated_Call) Run(run func(ctx context.Context, personID uint32)) *CharacterRepo_GetPersonRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uint32))
 	})
