@@ -80,8 +80,8 @@ func (r mysqlRepo) GetCharacterRelated(
 	characterID model.CharacterIDType,
 ) ([]domain.PersonCharacterRelation, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
-		Where(r.q.Cast.CrtID.Eq(characterID)).
-		Order(r.q.Cast.PrsnID).
+		Where(r.q.Cast.CharacterID.Eq(characterID)).
+		Order(r.q.Cast.PersonID).
 		Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
@@ -91,8 +91,8 @@ func (r mysqlRepo) GetCharacterRelated(
 	var results = make([]domain.PersonCharacterRelation, 0, len(relations))
 	for _, relation := range relations {
 		results = append(results, domain.PersonCharacterRelation{
-			CharacterID: relation.CrtID,
-			PersonID:    relation.PrsnID,
+			CharacterID: relation.CharacterID,
+			PersonID:    relation.PersonID,
 			SubjectID:   relation.SubjectID,
 		})
 	}

@@ -26,7 +26,7 @@ type CharacterRepo interface {
 	Get(ctx context.Context, id model.CharacterIDType) (model.Character, error)
 	GetByIDs(ctx context.Context, ids ...model.CharacterIDType) (map[model.CharacterIDType]model.Character, error)
 
-	GetPersonRelated(ctx context.Context, characterID model.PersonIDType) ([]PersonCharacterRelation, error)
+	GetPersonRelated(ctx context.Context, personID model.PersonIDType) ([]PersonCharacterRelation, error)
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]SubjectCharacterRelation, error)
 }
 
