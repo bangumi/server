@@ -38,7 +38,13 @@ jobs:
           docker tag ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
           docker push "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
 
+      - name: Generate Changlog
+        run: |
+          docker pull quay.io/git-chglog/git-chglog:latest
+          docker run -v "$PWD":/workdir quay.io/git-chglog/git-chglog "$TAG" | \
+          python -c 'import sys;print("".join(sys.stdin.readlines()[3:]).strip())' > changelog.md
+
       - name: Upload GitHub Release
-        run: gh release create "$TAG" --title "$TAG"
+        run: gh release create "$TAG" --title "$TAG" -F changelog.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
