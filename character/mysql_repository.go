@@ -85,7 +85,7 @@ func (r mysqlRepo) GetPersonRelated(
 	var rel = make([]domain.PersonCharacterRelation, 0, len(relations))
 	for _, relation := range relations {
 		rel = append(rel, domain.PersonCharacterRelation{
-			CharacterID: relation.PersonID,
+			CharacterID: relation.CharacterID,
 			SubjectID:   relation.SubjectID,
 			PersonID:    personID,
 		})
