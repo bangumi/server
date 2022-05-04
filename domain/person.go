@@ -34,5 +34,5 @@ type PersonService interface {
 	Get(ctx context.Context, id uint32) (model.Person, error)
 
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]model.SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, subjectID model.CharacterIDType) ([]model.PersonCharacterRelation, error)
+	GetCharacterRelated(ctx context.Context, characterID model.CharacterIDType) ([]model.PersonCharacterRelation, error)
 }
