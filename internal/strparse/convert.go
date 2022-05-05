@@ -36,7 +36,5 @@ func Uint32(s string) (uint32, error) {
 }
 
 func UserID(s string) (model.IDType, error) {
-	v, err := strconv.ParseUint(s, 10, 32)
-
-	return uint32(v), errgo.Wrap(err, "strconv")
+	return Uint32(s)
 }

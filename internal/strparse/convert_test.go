@@ -58,4 +58,10 @@ func TestUserID_err(t *testing.T) {
 
 	_, err := strparse.UserID("a")
 	require.Error(t, err)
+
+	_, err = strparse.UserID("-1")
+	require.Error(t, err)
+
+	_, err = strparse.UserID("0")
+	require.Error(t, err)
 }
