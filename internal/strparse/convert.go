@@ -17,6 +17,7 @@
 package strparse
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/bangumi/server/internal/errgo"
@@ -36,5 +37,16 @@ func Uint32(s string) (uint32, error) {
 }
 
 func UserID(s string) (model.IDType, error) {
-	return Uint32(s)
+	v, err := strconv.ParseUint(s, 10, 32)
+	if err != nil {
+		return 0, errgo.Wrap(err, "strconv")
+	}
+
+	if v == 0 {
+		return 0, errZeroValue
+	}
+
+	return uint32(v), nil
 }
+
+var errZeroValue = errors.New("can't use 0 as UserID")
