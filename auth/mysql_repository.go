@@ -72,7 +72,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, e
 		return domain.Auth{}, errgo.Wrap(err, "gorm")
 	}
 
-	id, err := strparse.Uint32(access.UserID)
+	id, err := strparse.UserID(access.UserID)
 	if err != nil {
 		m.log.Error("wrong UserID in OAuth Access table", zap.String("UserID", access.UserID))
 
