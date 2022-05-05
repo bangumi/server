@@ -141,3 +141,22 @@ func TestRedisCache_Real(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, data, result)
 }
+
+func TestRedisCache_Del(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvRedis)
+
+	var key = "redis_test " + t.Name()
+
+	db, err := driver.NewRedisClient(config.NewAppConfig())
+	require.NoError(t, err)
+	require.NoError(t, db.Set(context.Background(), key, "", 0).Err())
+
+	c := cache.NewRedisCache(db)
+
+	require.NoError(t, c.Del(context.Background(), key))
+
+	v, err := db.Exists(context.Background(), key).Result()
+	require.NoError(t, err)
+	require.True(t, v == 0)
+}

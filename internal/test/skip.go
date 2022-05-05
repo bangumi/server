@@ -27,7 +27,7 @@ const EnvRedis = "redis"
 
 // RequireEnv
 //  func TestGet(t *testing.T) {
-//    RequireEnv(t, "mysql", "redis")
+//    RequireEnv(t, test.EnvRedis, test.EnvMysql)
 //    ...
 //  }
 func RequireEnv(t TB, envs ...string) {
