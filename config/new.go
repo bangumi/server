@@ -69,19 +69,22 @@ func NewAppConfig() AppConfig {
 		MySQLMaxConn:  connection,
 		Debug:         debug,
 		HTTPPort:      httpPort,
+
+		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", ""),
 	}
 }
 
 type AppConfig struct {
-	Debug         map[string]bool
-	RedisOptions  *redis.Options
-	MySQLHost     string
-	MySQLPort     string
-	MySQLUserName string
-	MySQLPassword string
-	MySQLDatabase string
-	MySQLMaxConn  int
-	HTTPPort      int // HTTP_PORT
+	Debug             map[string]bool
+	RedisOptions      *redis.Options
+	MySQLHost         string
+	MySQLPort         string
+	MySQLUserName     string
+	MySQLPassword     string
+	MySQLDatabase     string
+	HCaptchaSecretKey string
+	MySQLMaxConn      int
+	HTTPPort          int
 }
 
 func getEnv(n, v string) string {

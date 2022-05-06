@@ -1,0 +1,92 @@
+openapi: 3.0.2
+info:
+  title: "Bangumi Private API"
+  version: ""
+paths:
+  "/p/login":
+    post:
+      tags:
+        - Auth
+      summary: 登录
+      operationId: login
+      description: |
+        `h-captcha-response` 是 [hCaptcha 的验证码](https://docs.hcaptcha.com/#add-the-hcaptcha-widget-to-your-webpage)
+
+        site key 是 `4874acee-9c6e-4e47-99ad-e2ea1606961f`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - username
+                - password
+                - h-captcha-response
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                h-captcha-response:
+                  type: string
+      responses:
+        "200":
+          description: "账号密码正确，设置 Cookies"
+          headers:
+            Set-Cookie:
+              description: 设置 cookies session
+              schema:
+                type: string
+                example: sessionID=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+
+        "401":
+          description: 账号或密码错误
+          content:
+            application/json:
+              example:
+                title: 账号错误
+                description:
+              schema:
+                title: ErrorDetail
+                required:
+                  - title
+                  - description
+                  - detail
+                type: object
+                properties:
+                  title:
+                    title: Title
+                    type: string
+                  description:
+                    title: Description
+                    type: string
+                  detail:
+                    title: Detail
+                    type: object
+                    properties:
+                      "remain":
+                        type: integer
+                        description: 剩余可用登录次数。
+
+        "422":
+          description: "`content-type` 只能为 `application/json`."
+
+      security:
+        - CookiesSession: []
+
+components:
+  schemas:
+    User:
+      $ref: "./components/user.yaml"
+    Avatar:
+      $ref: "./components/avatar.yaml"
+    ErrorDetail:
+      $ref: "./components/error_detail.yaml"
+  securitySchemes:
+    CookiesSession:
+      name: sessionID
+      type: apiKey
+      in: cookie

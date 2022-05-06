@@ -32,10 +32,22 @@ build: ./dist/chii.exe
 ./dist/chii.exe:
 	env CGO_ENABLED=0 go build -o $@
 
-mocks:
+mocks: mocks/SessionRepo.go mocks/SessionManager.go mocks/CaptchaManager.go mocks/RateLimiter.go
 	for dir in domain cache; do \
 		go run github.com/vektra/mockery/v2 --all --dir $$dir --with-expecter; \
 	done
+
+mocks/SessionRepo.go: web/session/repo.go
+	go run github.com/vektra/mockery/v2 --dir ./web/session --name Repo --filename SessionRepo.go --structname SessionRepo --with-expecter;
+
+mocks/SessionManager.go: web/session/manager.go
+	go run github.com/vektra/mockery/v2 --dir ./web/session --name Manager --filename SessionManager.go --structname SessionManager --with-expecter;
+
+mocks/CaptchaManager.go: web/captcha/manager.go
+	go run github.com/vektra/mockery/v2 --dir ./web/captcha --name Manager --filename CaptchaManager.go --structname CaptchaManager --with-expecter;
+
+mocks/RateLimiter.go: web/rate/new.go
+	go run github.com/vektra/mockery/v2 --dir ./web/rate --name Manager --filename RateLimiter.go --structname RateLimiter --with-expecter;
 
 gen: ./dal/query/gen.go mocks
 

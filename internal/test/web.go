@@ -21,7 +21,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/go-resty/resty/v2"
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/mock"
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
@@ -41,22 +44,33 @@ import (
 	"github.com/bangumi/server/person"
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/web"
+	"github.com/bangumi/server/web/captcha"
 	"github.com/bangumi/server/web/handler"
+	"github.com/bangumi/server/web/rate"
+	"github.com/bangumi/server/web/session"
 )
 
 type Mock struct {
-	SubjectRepo   domain.SubjectRepo
-	PersonRepo    domain.PersonRepo
-	CharacterRepo domain.CharacterRepo
-	AuthRepo      domain.AuthRepo
-	EpisodeRepo   domain.EpisodeRepo
-	UserRepo      domain.UserRepo
-	IndexRepo     domain.IndexRepo
-	RevisionRepo  domain.RevisionRepo
-	Cache         cache.Generic
+	SubjectRepo    domain.SubjectRepo
+	PersonRepo     domain.PersonRepo
+	CharacterRepo  domain.CharacterRepo
+	AuthRepo       domain.AuthRepo
+	EpisodeRepo    domain.EpisodeRepo
+	UserRepo       domain.UserRepo
+	IndexRepo      domain.IndexRepo
+	RevisionRepo   domain.RevisionRepo
+	CaptchaManager captcha.Manager
+	SessionManager session.Manager
+	Cache          cache.Generic
+	RateLimiter    rate.Manager
+	HTTPMock       *httpmock.MockTransport
 }
+
 type TB interface {
+	SkipNow()
 	Helper()
+	Errorf(format string, args ...interface{})
+	FailNow()
 	Fatal(args ...interface{})
 }
 
@@ -64,25 +78,21 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 	t.Helper()
 	var f *fiber.App
 
+	httpClient := resty.New().SetJSONEscapeHTML(false)
+	httpClient.JSONUnmarshal = json.Unmarshal
+	httpClient.JSONMarshal = json.MarshalNoEscape
+
 	var options = []fx.Option{
 		fx.NopLogger,
 
 		fx.Supply(fx.Annotate(tally.NoopScope, fx.As(new(tally.Scope)))),
-		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}),
-			fx.As(new(promreporter.Reporter)))),
+		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}), fx.As(new(promreporter.Reporter)))),
+
+		fx.Supply(httpClient),
 
 		fx.Provide(
-			zap.NewNop,
-			config.NewAppConfig,
-			dal.NewDB,
-			web.New,
-			handler.New,
-		),
-
-		fx.Provide(
-			character.NewService,
-			subject.NewService,
-			person.NewService,
+			zap.NewNop, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
+			person.NewService, auth.NewService,
 		),
 
 		MockPersonRepo(m.PersonRepo),
@@ -93,6 +103,9 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 		MockUserRepo(m.UserRepo),
 		MockIndexRepo(m.IndexRepo),
 		MockRevisionRepo(m.RevisionRepo),
+		MockCaptchaManager(m.CaptchaManager),
+		MockSessionManager(m.SessionManager),
+		MockRateLimiter(m.RateLimiter),
 
 		fx.Invoke(web.ResistRouter),
 
@@ -109,6 +122,10 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 
 	if app.Err() != nil {
 		t.Fatal("can't create web app", app.Err())
+	}
+
+	if m.HTTPMock != nil {
+		httpClient.GetClient().Transport = m.HTTPMock
 	}
 
 	return f
@@ -129,6 +146,41 @@ func MockIndexRepo(repo domain.IndexRepo) fx.Option {
 	}
 
 	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.IndexRepo))))
+}
+
+func MockRateLimiter(repo rate.Manager) fx.Option {
+	if repo == nil {
+		mocker := &mocks.RateLimiter{}
+		mocker.EXPECT().Allowed(mock.Anything, mock.Anything).Return(true, 5, nil) //nolint:gomnd
+		mocker.EXPECT().Reset(mock.Anything, mock.Anything).Return(nil)
+
+		repo = mocker
+	}
+
+	return fx.Provide(func() rate.Manager { return repo })
+}
+
+func MockSessionManager(repo session.Manager) fx.Option {
+	if repo == nil {
+		mocker := &mocks.SessionManager{}
+		mocker.EXPECT().Create(mock.Anything, mock.Anything).Return("mocked random string", session.Session{}, nil)
+		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(session.Session{}, nil)
+
+		repo = mocker
+	}
+
+	return fx.Provide(func() session.Manager { return repo })
+}
+
+func MockCaptchaManager(repo captcha.Manager) fx.Option {
+	if repo == nil {
+		mocker := &mocks.CaptchaManager{}
+		mocker.EXPECT().Verify(mock.Anything, mock.Anything).Return(true, nil)
+
+		repo = mocker
+	}
+
+	return fx.Provide(func() captcha.Manager { return repo })
 }
 
 func MockUserRepo(repo domain.UserRepo) fx.Option {
@@ -188,8 +240,22 @@ func MockAuthRepo(m domain.AuthRepo) fx.Option {
 	if m == nil {
 		mocker := &mocks.AuthRepo{}
 		mocker.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
+		mocker.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(domain.Permission{}, nil)
 
 		m = mocker
+	}
+
+	mocker, ok := m.(*mocks.AuthRepo)
+	if ok {
+		find := false
+		for _, call := range mocker.ExpectedCalls {
+			if call.Method == "GetPermission" {
+				find = true
+			}
+		}
+		if !find {
+			mocker.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(domain.Permission{}, nil)
+		}
 	}
 
 	return fx.Supply(fx.Annotate(m, fx.As(new(domain.AuthRepo))))
@@ -211,11 +277,16 @@ func MockCache(mock cache.Generic) fx.Option {
 }
 
 func MockEmptyCache() fx.Option {
+	return fx.Provide(NopCache)
+}
+
+func NopCache() cache.Generic {
 	mc := &mocks.Generic{}
 	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
 	mc.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	mc.EXPECT().Del(mock.Anything, mock.Anything).Return(nil)
 
-	return fx.Supply(fx.Annotate(mc, fx.As(new(cache.Generic))))
+	return mc
 }
 
 func FxE2E(t *testing.T) fx.Option {

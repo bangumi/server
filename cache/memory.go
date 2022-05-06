@@ -87,3 +87,11 @@ func (c *memCache) Set(_ context.Context, key string, value interface{}, ttl tim
 
 	return nil
 }
+
+func (c *memCache) Del(ctx context.Context, keys ...string) error {
+	for _, key := range keys {
+		c.m.Delete(key)
+	}
+
+	return nil
+}

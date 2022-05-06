@@ -24,4 +24,5 @@ import (
 type Generic interface {
 	Get(ctx context.Context, key string, value interface{}) (bool, error)
 	Set(ctx context.Context, key string, value interface{}, ttl time.Duration) error
+	Del(ctx context.Context, keys ...string) error
 }

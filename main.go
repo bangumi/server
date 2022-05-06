@@ -18,7 +18,9 @@
 package main
 
 import (
+	"github.com/go-resty/resty/v2"
 	"github.com/go-sql-driver/mysql"
+	"github.com/goccy/go-json"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -39,7 +41,10 @@ import (
 	"github.com/bangumi/server/subject"
 	"github.com/bangumi/server/user"
 	"github.com/bangumi/server/web"
+	"github.com/bangumi/server/web/captcha/hcaptcha"
 	"github.com/bangumi/server/web/handler"
+	"github.com/bangumi/server/web/rate"
+	"github.com/bangumi/server/web/session"
 )
 
 func main() {
@@ -55,50 +60,36 @@ func main() {
 func start() error {
 	app := fx.New(
 		logger.FxLogger(),
-
 		// driver and connector
 		fx.Provide(
 			driver.NewRedisClient, // redis
 			dal.NewConnectionPool,
 			dal.NewDB,
+			func() *resty.Client {
+				httpClient := resty.New().SetJSONEscapeHTML(false)
+				httpClient.JSONUnmarshal = json.Unmarshal
+				httpClient.JSONMarshal = json.MarshalNoEscape
+				return httpClient
+			},
 		),
 
 		fx.Provide(
-			config.NewAppConfig,
-			logger.Copy,
-			metrics.NewScope,
+			config.NewAppConfig, logger.Copy, metrics.NewScope,
+
+			query.Use, cache.NewRedisCache,
+
+			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
+			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo,
+
+			auth.NewService, character.NewService, subject.NewService, person.NewService,
 		),
 
 		fx.Provide(
-			query.Use,
-			cache.NewRedisCache,
-		),
-
-		fx.Provide(
-			character.NewMysqlRepo,
-			subject.NewMysqlRepo,
-			user.NewUserRepo,
-			person.NewMysqlRepo,
-			index.NewMysqlRepo,
-			auth.NewMysqlRepo,
-			episode.NewMysqlRepo,
-			revision.NewMysqlRepo,
-		),
-
-		fx.Provide(
-			character.NewService,
-			subject.NewService,
-			person.NewService,
-		),
-
-		fx.Provide(
-			handler.New,
-			web.New,
+			session.NewMysqlRepo, rate.New, hcaptcha.New, session.New, handler.New, web.New,
 		),
 
 		fx.Invoke(
-			web.ResistRouter,
-			web.Listen,
+			web.ResistRouter, web.Listen,
 		),
 	)
 

@@ -25,12 +25,18 @@ import (
 type AuthRepo interface {
 	// GetByToken return an authorized user by a valid access token.
 	GetByToken(ctx context.Context, token string) (Auth, error)
+	GetPermission(ctx context.Context, groupID uint8) (Permission, error)
+
+	// GetByEmail return (Auth, HashedPassword, error)
+	GetByEmail(ctx context.Context, email string) (Auth, []byte, error)
 }
 
 // Auth is the basic authorization represent a user.
 type Auth struct {
-	RegTime time.Time
-	ID      uint32
+	RegTime    time.Time
+	ID         uint32 // user id
+	GroupID    uint8
+	Permission Permission
 }
 
 const nsfwThreshold = -time.Hour * 24 * 60
@@ -42,4 +48,27 @@ func (u Auth) AllowNSFW() bool {
 	}
 
 	return u.RegTime.Add(nsfwThreshold).Before(time.Now())
+}
+
+type AuthService interface {
+	GetByToken(ctx context.Context, token string) (Auth, error)
+	ComparePassword(hashed []byte, password string) (bool, error)
+	Login(ctx context.Context, email, password string) (Auth, bool, error)
+}
+
+type Permission struct {
+	UserList          bool
+	ManageUserGroup   bool
+	ManageUser        bool
+	DoujinSubjectLock bool
+	SubjectEdit       bool
+	SubjectLock       bool
+	SubjectRefresh    bool
+	SubjectRelated    bool
+	MonoMerge         bool
+	MonoErase         bool
+	EpEdit            bool
+	EpMove            bool
+	Report            bool
+	AppErase          bool
 }

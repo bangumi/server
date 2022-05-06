@@ -17,7 +17,6 @@
 package handler_test
 
 import (
-	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -33,20 +32,18 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-type mockAuth struct{ u domain.Auth }
-
-func (m mockAuth) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
-	return m.u, nil
-}
-
 func TestHappyPath(t *testing.T) {
 	t.Parallel()
 	m := &mocks.SubjectRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{ID: 7}, nil)
 
+	mockAuth := &mocks.AuthRepo{}
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.Auth{RegTime: time.Unix(1e10, 0)}, nil)
+
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo:    mockAuth{domain.Auth{RegTime: time.Unix(1e10, 0)}},
+			AuthRepo:    mockAuth,
 			SubjectRepo: m,
 		},
 	)
@@ -65,9 +62,13 @@ func TestNSFW_200(t *testing.T) {
 	m := &mocks.SubjectRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
 
+	mockAuth := &mocks.AuthRepo{}
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.Auth{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
+
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo:    mockAuth{domain.Auth{ID: 1, RegTime: time.Unix(1e9, 0)}},
+			AuthRepo:    mockAuth,
 			SubjectRepo: m,
 		},
 	)
@@ -84,9 +85,12 @@ func TestNSFW_404(t *testing.T) {
 	m := &mocks.SubjectRepo{}
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
 
+	mockAuth := &mocks.AuthRepo{}
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
+
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo:    mockAuth{domain.Auth{}},
+			AuthRepo:    mockAuth,
 			SubjectRepo: m,
 		},
 	)

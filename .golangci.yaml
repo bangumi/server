@@ -242,7 +242,8 @@ linters-settings:
       - "func (*github.com/gofiber/fiber/v2.Ctx).JSON("
       - "func os.Open(name string)"
       - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
-      - "func github.com/bangumi/server/web/res.HTTPError(c *github.com/gofiber/fiber/v2.Ctx, code int, message string) error"
+      - "func github.com/bangumi/server/web/res.HTTPError("
+      - "func github.com/bangumi/server/web/res.InternalError("
 
   nlreturn:
     block-size: 3
@@ -291,10 +292,6 @@ issues:
   fix: false
   exclude-use-default: true
   exclude-rules:
-    # Disable linters that are annoying in tests.
-    - path: 'cmd[/\\].*'
-      linters: [gochecknoglobals, gochecknoinits, goerr113, wrapcheck]
-
     - path: '.*_test\.go'
       linters: [gocritic, gochecknoglobals]
 

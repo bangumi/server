@@ -22,6 +22,58 @@ func (_m *Generic) EXPECT() *Generic_Expecter {
 	return &Generic_Expecter{mock: &_m.Mock}
 }
 
+// Del provides a mock function with given fields: ctx, keys
+func (_m *Generic) Del(ctx context.Context, keys ...string) error {
+	_va := make([]interface{}, len(keys))
+	for _i := range keys {
+		_va[_i] = keys[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, ...string) error); ok {
+		r0 = rf(ctx, keys...)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Generic_Del_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Del'
+type Generic_Del_Call struct {
+	*mock.Call
+}
+
+// Del is a helper method to define mock.On call
+//  - ctx context.Context
+//  - keys ...string
+func (_e *Generic_Expecter) Del(ctx interface{}, keys ...interface{}) *Generic_Del_Call {
+	return &Generic_Del_Call{Call: _e.mock.On("Del",
+		append([]interface{}{ctx}, keys...)...)}
+}
+
+func (_c *Generic_Del_Call) Run(run func(ctx context.Context, keys ...string)) *Generic_Del_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]string, len(args)-1)
+		for i, a := range args[1:] {
+			if a != nil {
+				variadicArgs[i] = a.(string)
+			}
+		}
+		run(args[0].(context.Context), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *Generic_Del_Call) Return(_a0 error) *Generic_Del_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, key, value
 func (_m *Generic) Get(ctx context.Context, key string, value interface{}) (bool, error) {
 	ret := _m.Called(ctx, key, value)

@@ -20,15 +20,17 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"testing"
 )
+
+const EnvMysql = "mysql"
+const EnvRedis = "redis"
 
 // RequireEnv
 //  func TestGet(t *testing.T) {
-//    RequireEnv(t, "mysql", "redis")
+//    RequireEnv(t, test.EnvRedis, test.EnvMysql)
 //    ...
 //  }
-func RequireEnv(t *testing.T, envs ...string) {
+func RequireEnv(t TB, envs ...string) {
 	t.Helper()
 	for _, env := range envs {
 		if v, ok := os.LookupEnv(strings.ToUpper("test_" + env)); !ok {

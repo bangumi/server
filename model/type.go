@@ -16,7 +16,7 @@
 
 package model
 
-type IDType = uint32
+type IDType = uint32        // UserID
 type SubjectIDType = uint32 // in case we need future change, but I guess not...
 type CharacterIDType = uint32
 type PersonIDType = uint32

@@ -72,3 +72,8 @@ func (c redisCache) Set(
 
 	return nil
 }
+
+func (c redisCache) Del(ctx context.Context, keys ...string) error {
+	err := c.r.Del(ctx, keys...).Err()
+	return errgo.Wrap(err, "redis.Del")
+}

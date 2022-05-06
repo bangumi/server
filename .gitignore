@@ -31,3 +31,4 @@ coverage.out
 gen/
 
 /index.html
+node_modules/

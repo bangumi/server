@@ -1,0 +1,24 @@
+title: ErrorDetail
+required:
+  - title
+  - description
+type: object
+properties:
+  title:
+    title: Title
+    type: string
+  description:
+    title: Description
+    type: string
+  detail:
+    title: Detail
+    oneOf:
+      - type: string
+      - type: object
+        properties:
+          "error":
+            type: string
+            description: error message
+          "path":
+            type: string
+            description: request path

@@ -118,12 +118,21 @@ func main() {
 	modelMember := g.GenerateModelAs("chii_members", "Member",
 		gen.FieldType("uid", "uint32"),
 		gen.FieldType("regdate", "int64"),
+		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
 			GORMTag: "foreignKey:UID;references:UID",
 		}))
 
 	g.ApplyInterface(func(method.Member) {}, modelMember)
+
+	g.ApplyBasic(g.GenerateModelAs("chii_os_web_sessions", "WebSession"))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_usergroup", "UserGroup",
+		gen.FieldTrimPrefix("usr_grp_"),
+		gen.FieldType("usr_grp_id", "uint8"),
+		gen.FieldType("usr_grp_perm", "[]byte"),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "OAuthAccessToken"))
 

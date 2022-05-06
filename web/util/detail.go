@@ -21,6 +21,14 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
+func ErrDetail(c *fiber.Ctx, err error) Detail {
+	return Detail{
+		Path:        c.Path(),
+		Error:       err.Error(),
+		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
+	}
+}
+
 func DetailFromRequest(c *fiber.Ctx) Detail {
 	return Detail{
 		Path:        c.Path(),
