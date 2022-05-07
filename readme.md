@@ -21,7 +21,7 @@ make install
 可设置的环境变量
 
 - `MYSQL_HOST` 默认 `127.0.0.1`
-- `MYSQL_PORT` 默认 `3000`
+- `MYSQL_PORT` 默认 `3306`
 - `MYSQL_DB` 默认 `bangumi`
 - `MYSQL_USER` 默认 `user`
 - `MYSQL_PASS` 默认 `password`
