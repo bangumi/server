@@ -28,7 +28,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          path: api
+          path: dev-docs
           token: ${{ secrets.PAT }}
           title: Update Openapi Spec
           push-to-fork: Trim21-bot/dev-docs
