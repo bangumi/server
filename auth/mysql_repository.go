@@ -113,9 +113,11 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Per
 	}
 
 	var p phpPermission
-	if err := phpserialize.Unmarshal(r.Perm, &p); err != nil {
-		m.log.Error("failed to decode php serialized content", zap.Error(err))
-		return domain.Permission{}, nil
+	if len(r.Perm) > 0 {
+		if err := phpserialize.Unmarshal(r.Perm, &p); err != nil {
+			m.log.Error("failed to decode php serialized content", zap.Error(err))
+			return domain.Permission{}, nil
+		}
 	}
 
 	return domain.Permission{
