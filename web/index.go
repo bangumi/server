@@ -51,7 +51,7 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 		JSONEncoder:           json.MarshalNoEscape,
 	})
 
-	count := scope.Counter("request_count")
+	count := scope.Counter("request_count_total")
 	histogram := scope.Histogram("response_time", metrics.ResponseTimeBucket())
 	app.Use(func(c *fiber.Ctx) error {
 		count.Inc(1)
