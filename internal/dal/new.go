@@ -46,7 +46,6 @@ func NewDB(
 		gLog = gormLogger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags),
 			gormLogger.Config{
-				SlowThreshold:             slowQueryTimeout,
 				LogLevel:                  gormLogger.Info,
 				IgnoreRecordNotFoundError: true,
 				Colorful:                  true,
@@ -68,6 +67,7 @@ func NewDB(
 		DisableDatetimePrecision: true,
 	}), &gorm.Config{
 		Logger:      gLog,
+		QueryFields: true,
 		PrepareStmt: true,
 	})
 	if err != nil {
@@ -76,6 +76,10 @@ func NewDB(
 
 	if err = setupMetrics(db, scope, register); err != nil {
 		return nil, errgo.Wrap(err, "setup metrics")
+	}
+
+	if c.Debug["gorm"] {
+		return db.Debug(), errgo.Wrap(err, "init gorm")
 	}
 
 	return db, errgo.Wrap(err, "init gorm")
