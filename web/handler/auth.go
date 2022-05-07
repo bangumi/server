@@ -124,7 +124,7 @@ func (a *accessor) AllowNSFW() bool {
 func (h Handler) RevokeSession(c *fiber.Ctx) error {
 	var r req.RevokeSession
 	if err := json.UnmarshalNoEscape(c.Body(), r); err != nil {
-		return res.WithError(c, err, code.BadRequest, "can't validate request body")
+		return res.WithError(c, err, code.UnprocessableEntity, "can't parse request body as JSON")
 	}
 
 	if err := h.v.Struct(r); err != nil {
