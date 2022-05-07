@@ -57,18 +57,36 @@ type AuthService interface {
 }
 
 type Permission struct {
-	UserList          bool
-	ManageUserGroup   bool
-	ManageUser        bool
-	DoujinSubjectLock bool
-	SubjectEdit       bool
-	SubjectLock       bool
-	SubjectRefresh    bool
-	SubjectRelated    bool
-	MonoMerge         bool
-	MonoErase         bool
-	EpEdit            bool
-	EpMove            bool
-	Report            bool
-	AppErase          bool
+	UserList           bool
+	ManageUserGroup    bool
+	ManageUserPhoto    bool
+	ManageTopicState   bool
+	ManageReport       bool
+	UserBan            bool
+	ManageUser         bool
+	UserGroup          bool
+	UserWikiApply      bool `doc:"申请 wiki 人"`
+	UserWikiApprove    bool
+	DoujinSubjectErase bool
+	DoujinSubjectLock  bool
+	SubjectEdit        bool
+	SubjectLock        bool
+	SubjectRefresh     bool
+	SubjectRelated     bool
+	SubjectMerge       bool
+	SubjectErase       bool
+	SubjectCoverLock   bool
+	SubjectCoverErase  bool
+	MonoEdit           bool
+	MonoLock           bool
+	MonoMerge          bool
+	MonoErase          bool
+	EpEdit             bool
+	EpMove             bool
+	EpMerge            bool
+	EpLock             bool
+	EpErase            bool
+	Report             bool
+	ManageApp          bool
+	AppErase           bool
 }

@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elliotchance/phpserialize"
+	"github.com/mitchellh/mapstructure"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -114,27 +115,51 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Per
 
 	var p phpPermission
 	if len(r.Perm) > 0 {
-		if err := phpserialize.Unmarshal(r.Perm, &p); err != nil {
+		d, err := phpserialize.UnmarshalAssociativeArray(r.Perm)
+		if err != nil {
 			m.log.Error("failed to decode php serialized content", zap.Error(err), zap.Uint8("group_id", groupID))
+			return domain.Permission{}, nil
+		}
+		if err = mapstructure.Decode(d, &p); err != nil {
+			m.log.Error("failed to convert from map to struct when decoding permission",
+				zap.Error(err), zap.Uint8("group_id", groupID))
 			return domain.Permission{}, nil
 		}
 	}
 
 	return domain.Permission{
-		UserList:          parseBool(p.UserList),
-		ManageUserGroup:   parseBool(p.ManageUserGroup),
-		ManageUser:        parseBool(p.ManageUser),
-		DoujinSubjectLock: parseBool(p.DoujinSubjectLock),
-		SubjectEdit:       parseBool(p.SubjectEdit),
-		SubjectLock:       parseBool(p.SubjectLock),
-		SubjectRefresh:    parseBool(p.SubjectRefresh),
-		SubjectRelated:    parseBool(p.SubjectRelated),
-		MonoMerge:         parseBool(p.MonoMerge),
-		MonoErase:         parseBool(p.MonoErase),
-		EpEdit:            parseBool(p.EpEdit),
-		EpMove:            parseBool(p.EpMove),
-		Report:            parseBool(p.Report),
-		AppErase:          parseBool(p.AppErase),
+		UserList:           parseBool(p.UserList),
+		ManageUserGroup:    parseBool(p.ManageUserGroup),
+		ManageUserPhoto:    parseBool(p.ManageUserPhoto),
+		ManageTopicState:   parseBool(p.ManageTopicState),
+		ManageReport:       parseBool(p.ManageReport),
+		UserBan:            parseBool(p.UserBan),
+		ManageUser:         parseBool(p.ManageUser),
+		UserGroup:          parseBool(p.UserGroup),
+		UserWikiApprove:    parseBool(p.UserWikiApprove),
+		UserWikiApply:      parseBool(p.UserWikiApply),
+		DoujinSubjectErase: parseBool(p.DoujinSubjectErase),
+		DoujinSubjectLock:  parseBool(p.DoujinSubjectLock),
+		SubjectEdit:        parseBool(p.SubjectEdit),
+		SubjectLock:        parseBool(p.SubjectLock),
+		SubjectRefresh:     parseBool(p.SubjectRefresh),
+		SubjectRelated:     parseBool(p.SubjectRelated),
+		SubjectMerge:       parseBool(p.SubjectMerge),
+		SubjectErase:       parseBool(p.SubjectErase),
+		SubjectCoverLock:   parseBool(p.SubjectCoverLock),
+		SubjectCoverErase:  parseBool(p.SubjectCoverErase),
+		MonoEdit:           parseBool(p.MonoEdit),
+		MonoLock:           parseBool(p.MonoLock),
+		MonoMerge:          parseBool(p.MonoMerge),
+		MonoErase:          parseBool(p.MonoErase),
+		EpEdit:             parseBool(p.EpEdit),
+		EpMove:             parseBool(p.EpMove),
+		EpMerge:            parseBool(p.EpMerge),
+		EpLock:             parseBool(p.EpLock),
+		EpErase:            parseBool(p.EpErase),
+		Report:             parseBool(p.Report),
+		ManageApp:          parseBool(p.ManageApp),
+		AppErase:           parseBool(p.AppErase),
 	}, nil
 }
 
@@ -143,18 +168,36 @@ func parseBool(s string) bool {
 }
 
 type phpPermission struct {
-	UserList          string `php:"user_list"`
-	ManageUserGroup   string `php:"manage_user_group"`
-	ManageUser        string `php:"manage_user"`
-	DoujinSubjectLock string `php:"doujin_subject_lock"`
-	SubjectEdit       string `php:"subject_edit"`
-	SubjectLock       string `php:"subject_lock"`
-	SubjectRefresh    string `php:"subject_refresh"`
-	SubjectRelated    string `php:"subject_related"`
-	MonoMerge         string `php:"mono_merge"`
-	MonoErase         string `php:"mono_erase"`
-	EpEdit            string `php:"ep_edit"`
-	EpMove            string `php:"ep_move"`
-	Report            string `php:"report"`
-	AppErase          string `php:"app_erase"`
+	UserList           string `mapstruct:"user_list"`
+	ManageUserGroup    string `mapstruct:"manage_user_group"`
+	ManageUserPhoto    string `mapstruct:"manage_user_photo"`
+	ManageTopicState   string `mapstruct:"manage_topic_state"`
+	ManageReport       string `mapstruct:"manage_report"`
+	UserBan            string `mapstruct:"user_ban"`
+	ManageUser         string `mapstruct:"manage_user"`
+	UserGroup          string `mapstruct:"user_group"`
+	UserWikiApprove    string `mapstruct:"user_wiki_approve"`
+	DoujinSubjectErase string `mapstruct:"doujin_subject_erase"`
+	UserWikiApply      string `mapstruct:"user_wiki_apply"`
+	DoujinSubjectLock  string `mapstruct:"doujin_subject_lock"`
+	SubjectEdit        string `mapstruct:"subject_edit"`
+	SubjectLock        string `mapstruct:"subject_lock"`
+	SubjectRefresh     string `mapstruct:"subject_refresh"`
+	SubjectRelated     string `mapstruct:"subject_related"`
+	SubjectMerge       string `mapstruct:"subject_merge"`
+	SubjectErase       string `mapstruct:"subject_erase"`
+	SubjectCoverLock   string `mapstruct:"subject_cover_lock"`
+	SubjectCoverErase  string `mapstruct:"subject_cover_erase"`
+	MonoEdit           string `mapstruct:"mono_edit"`
+	MonoLock           string `mapstruct:"mono_lock"`
+	MonoMerge          string `mapstruct:"mono_merge"`
+	MonoErase          string `mapstruct:"mono_erase"`
+	EpEdit             string `mapstruct:"ep_edit"`
+	EpMove             string `mapstruct:"ep_move"`
+	EpMerge            string `mapstruct:"ep_merge"`
+	EpLock             string `mapstruct:"ep_lock"`
+	EpErase            string `mapstruct:"ep_erase"`
+	Report             string `mapstruct:"report"`
+	ManageApp          string `mapstruct:"manage_app"`
+	AppErase           string `mapstruct:"app_erase"`
 }
