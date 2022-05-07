@@ -33,7 +33,7 @@ type Error struct {
 }
 
 func WithError(c *fiber.Ctx, err error, code int, message string) error {
-	return JSON(c.Status(http.StatusContinue), Error{
+	return JSON(c.Status(code), Error{
 		Title:       http.StatusText(code),
 		Description: message,
 		Details:     util.ErrDetail(c, err),

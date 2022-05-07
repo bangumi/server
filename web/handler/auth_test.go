@@ -67,8 +67,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 		"email":              "user email",
 		"password":           "p",
 		"h-captcha-response": "req",
-	}).Header(fiber.HeaderUserAgent, "fiber test client").
-		Execute(app, -1)
+	}).Execute(app, -1)
 
 	require.Equal(t, fiber.StatusOK, resp.StatusCode, resp.BodyString())
 
@@ -82,9 +81,7 @@ func TestHandler_PrivateLogin_content_type(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{})
 
-	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").
-		Header(fiber.HeaderUserAgent, "fiber test client").
-		Execute(app, -1)
+	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").Execute(app, -1)
 
 	require.Equal(t, fiber.StatusBadRequest, resp.StatusCode, resp.BodyString())
 }

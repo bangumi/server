@@ -124,7 +124,7 @@ func (a *accessor) AllowNSFW() bool {
 func (h Handler) RevokeSession(c *fiber.Ctx) error {
 	var r req.RevokeSession
 	if err := json.UnmarshalNoEscape(c.Body(), r); err != nil {
-		return res.WithError(c, err, code.UnprocessableEntity, "can't validate request body")
+		return res.WithError(c, err, code.BadRequest, "can't validate request body")
 	}
 
 	if err := h.v.Struct(r); err != nil {
@@ -141,7 +141,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	}
 
 	if !allowed {
-		return res.HTTPError(c, code.BadRequest, "Too many requests, you are not allowed to log in for a while.")
+		return res.HTTPError(c, code.TooManyRequests, "Too many requests, you are not allowed to log in for a while.")
 	}
 
 	var r req.UserLogin

@@ -32,7 +32,7 @@ import (
 
 // ResistRouter add all router and default 404 Handler to app.
 func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
-	app.Use(h.MiddlewareAccessUser())
+	app.Use(ua.DisableDefaultHTTPLibrary, h.MiddlewareAccessUser())
 
 	// add logger wrapper and metrics counter
 	addMetrics := func(handler fiber.Handler) fiber.Handler {
@@ -75,7 +75,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	app.Post("/pp/revoke", req.JSON, addMetrics(h.RevokeSession))
 	// frontend private api
-	private := app.Group("/p", ua.New())
+	private := app.Group("/p")
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 
 	// default 404 Handler, all router should be added before this router

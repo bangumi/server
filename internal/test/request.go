@@ -38,7 +38,7 @@ type Request struct {
 	urlParams   url.Values
 	HTTPVerb    string
 	formData    url.Values
-	ContentType string
+	contentType string
 	Endpoint    string
 	HTTPBody    []byte
 	Cookies     []*http.Cookie
@@ -51,7 +51,7 @@ func New(t *testing.T) *Request {
 		t:         t,
 		urlParams: url.Values{},
 		formData:  url.Values{},
-		headers:   http.Header{},
+		headers:   http.Header{fiber.HeaderUserAgent: {"chii-test-client"}},
 	}
 }
 
@@ -103,11 +103,11 @@ func (r *Request) Header(key, value string) *Request {
 
 func (r *Request) Form(key, value string) *Request {
 	r.t.Helper()
-	if r.ContentType == "" {
-		r.ContentType = fiber.MIMEApplicationForm
+	if r.contentType == "" {
+		r.contentType = fiber.MIMEApplicationForm
 	}
 
-	if r.ContentType != fiber.MIMEApplicationForm {
+	if r.contentType != fiber.MIMEApplicationForm {
 		r.t.Error("content-type should be empty or 'application/x-www-form-urlencoded'," +
 			" can't mix .Form(...) with .JSON(...)")
 		r.t.FailNow()
@@ -121,13 +121,13 @@ func (r *Request) Form(key, value string) *Request {
 
 func (r *Request) JSON(v interface{}) *Request {
 	r.t.Helper()
-	require.Empty(r.t, r.ContentType, "content-type should not be empty")
+	require.Empty(r.t, r.contentType, "content-type should not be empty")
 
 	var err error
 	r.HTTPBody, err = json.Marshal(v)
 	require.NoError(r.t, err)
 
-	r.ContentType = fiber.MIMEApplicationJSON
+	r.contentType = fiber.MIMEApplicationJSON
 
 	return r
 }
@@ -137,6 +137,10 @@ func (r *Request) StdRequest() *http.Request {
 	var body io.ReadCloser = http.NoBody
 	if r.HTTPBody != nil {
 		r.headers.Set(fiber.HeaderContentLength, strconv.Itoa(len(r.HTTPBody)))
+		if r.headers.Get(fiber.HeaderContentType) == "" {
+			r.headers.Set(fiber.HeaderContentType, r.contentType)
+		}
+
 		body = io.NopCloser(bytes.NewBuffer(r.HTTPBody))
 	}
 

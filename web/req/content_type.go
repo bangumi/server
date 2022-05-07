@@ -18,18 +18,18 @@ package req
 
 import (
 	"bytes"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/res/code"
 )
 
 var jsonType = []byte(fiber.MIMEApplicationJSON) //nolint:gochecknoglobals
 
 func JSON(c *fiber.Ctx) error {
-	if bytes.Equal(c.Request().Header.ContentType(), jsonType) {
-		return res.HTTPError(c, http.StatusUnprocessableEntity, "need content-type to be 'application/json'")
+	if !bytes.Equal(c.Request().Header.ContentType(), jsonType) {
+		return res.HTTPError(c, code.BadRequest, "need content-type to be 'application/json'")
 	}
 
 	return c.Next()

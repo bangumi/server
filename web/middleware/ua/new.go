@@ -17,23 +17,31 @@
 package ua
 
 import (
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/res/code"
 )
 
-func New() fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		u := c.Get(fiber.HeaderUserAgent)
-		if u == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(
-				res.Error{
-					Title:       "Bad Request",
-					Description: "Please set a 'User-Agent'",
-				},
-			)
-		}
+var _ fiber.Handler = DisableDefaultHTTPLibrary
 
-		return c.Next()
+const forbiddenMessage = "default HTTP request library User-Agent is forbidden, " +
+	"please use your app name (maybe and version) as User-Agent"
+
+func DisableDefaultHTTPLibrary(c *fiber.Ctx) error {
+	u := c.Get(fiber.HeaderUserAgent)
+	if u == "" {
+		return res.HTTPError(c, code.Forbidden, "Please set a 'User-Agent'")
 	}
+
+	if strings.HasPrefix(u, "python-requests/") ||
+		strings.HasPrefix(u, "okhttp/") ||
+		strings.HasPrefix(u, "Faraday v") ||
+		u == "node-fetch" {
+		return res.HTTPError(c, code.Forbidden, forbiddenMessage)
+	}
+
+	return c.Next()
 }
