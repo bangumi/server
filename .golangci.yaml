@@ -243,7 +243,9 @@ linters-settings:
       - "func os.Open(name string)"
       - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
       - "func github.com/bangumi/server/web/res.HTTPError("
+      - "func github.com/bangumi/server/web/res.WithError("
       - "func github.com/bangumi/server/web/res.InternalError("
+      - "func github.com/bangumi/server/web/res.JSON("
 
   nlreturn:
     block-size: 3

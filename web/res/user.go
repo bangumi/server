@@ -67,3 +67,7 @@ type Creator struct {
 	Username string `json:"username"`
 	Nickname string `json:"nickname"`
 }
+
+type LoginRemain struct {
+	Remain int `json:"remain"`
+}

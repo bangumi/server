@@ -35,6 +35,7 @@ import (
 	"github.com/bangumi/server/web/handler/ctxkey"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/res/code"
 	"github.com/bangumi/server/web/util"
 )
 
@@ -122,20 +123,12 @@ func (a *accessor) AllowNSFW() bool {
 
 func (h Handler) RevokeSession(c *fiber.Ctx) error {
 	var r req.RevokeSession
-	if err := json.Unmarshal(c.Body(), r); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
-			Title:       "Bad Request",
-			Details:     util.ErrDetail(c, err),
-			Description: "can't decode request body",
-		})
+	if err := json.UnmarshalNoEscape(c.Body(), r); err != nil {
+		return res.WithError(c, err, code.UnprocessableEntity, "can't validate request body")
 	}
 
 	if err := h.v.Struct(r); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
-			Title:       "Bad Request",
-			Details:     util.ErrDetail(c, err),
-			Description: "can't validate request body",
-		})
+		return res.WithError(c, err, code.BadRequest, "can't validate request body")
 	}
 
 	return c.JSON("session revoked")
@@ -144,47 +137,29 @@ func (h Handler) RevokeSession(c *fiber.Ctx) error {
 func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	allowed, remain, err := h.rateLimit.Allowed(c.Context(), c.Context().RemoteIP().String())
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
-			Title:   "Unexpected Error",
-			Details: util.ErrDetail(c, err),
-		})
+		return res.InternalError(c, err, "failed to apply rate limit")
 	}
 
 	if !allowed {
-		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
-			Title:       "Bad Request",
-			Description: "Too many requests, you are not allowed to log in for a while.",
-		})
+		return res.HTTPError(c, code.BadRequest, "Too many requests, you are not allowed to log in for a while.")
 	}
 
 	var r req.UserLogin
-	if err = json.Unmarshal(c.Body(), &r); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
-			Title:       "Bad Request",
-			Details:     util.ErrDetail(c, err),
-			Description: "can't decode request body as json",
-		})
+	if err = json.UnmarshalNoEscape(c.Body(), &r); err != nil {
+		return res.WithError(c, err, code.UnprocessableEntity, "can't decode request body as json")
 	}
 
 	if err = h.v.Struct(r); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(res.Error{
-			Title:       "Bad Request",
-			Details:     util.ErrDetail(c, err),
-			Description: "can't validate request body",
-		})
+		return res.WithError(c, err, code.BadRequest, "can't validate request body")
 	}
 
 	ok, err := h.captcha.Verify(c.Context(), r.HCaptchaResponse)
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(res.Error{
-			Title:       "Bad Gateway",
-			Details:     util.ErrDetail(c, err),
-			Description: "Captcha verify http request error",
-		})
+		return res.WithError(c, err, code.BadRequest, "Captcha verify http request error")
 	}
 
 	if !ok {
-		return c.Status(fiber.StatusBadGateway).SendString("failed to pass captcha verify, please re-do")
+		return res.HTTPError(c, code.BadGateway, "failed to pass captcha verify, please re-do")
 	}
 
 	return h.privateLogin(c, r, remain)
@@ -193,26 +168,20 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
-			Title:   "Unexpected Error",
-			Details: util.ErrDetail(c, err),
-		})
+		return res.WithError(c, err, code.InternalServerError, "Unexpected error happened when trying to log in")
 	}
 
 	if !ok {
-		return c.Status(fiber.StatusUnauthorized).JSON(res.Error{
+		return res.JSON(c.Status(fiber.StatusUnauthorized), res.Error{
 			Title:       "Unauthorized",
 			Description: "Email or Password is not correct",
-			Details:     fiber.Map{"remain": remain},
+			Details:     res.LoginRemain{Remain: remain},
 		})
 	}
 
 	key, s, err := h.session.Create(c.Context(), login)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(res.Error{
-			Title:   "Unexpected Session Manager Error",
-			Details: util.ErrDetail(c, err),
-		})
+		return res.InternalError(c, err, "Unexpected Session Manager Error")
 	}
 
 	if err = h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
@@ -232,10 +201,10 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 
 	user, err := h.u.GetByID(c.Context(), s.UserID)
 	if err != nil {
-		return res.InternalError(c, "failed to get user", err)
+		return res.InternalError(c, err, "failed to get user")
 	}
 
-	return c.JSON(res.User{
+	return res.JSON(c, res.User{
 		ID:        user.ID,
 		URL:       "https://bgm.tv/user/" + user.UserName,
 		Username:  user.UserName,

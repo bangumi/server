@@ -20,7 +20,9 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+
+	"github.com/bangumi/server/web/res/code"
+	"github.com/bangumi/server/web/util"
 )
 
 // Error default error response.
@@ -30,15 +32,23 @@ type Error struct {
 	Description string      `json:"description"`
 }
 
+func WithError(c *fiber.Ctx, err error, code int, message string) error {
+	return JSON(c.Status(http.StatusContinue), Error{
+		Title:       http.StatusText(code),
+		Description: message,
+		Details:     util.ErrDetail(c, err),
+	})
+}
+
 func HTTPError(c *fiber.Ctx, code int, message string) error {
-	return c.Status(code).JSON(Error{
-		Title:       utils.StatusMessage(code),
+	return JSON(c.Status(code), Error{
+		Title:       http.StatusText(code),
 		Description: message,
 	})
 }
 
-func InternalError(c *fiber.Ctx, message string, err error) error {
-	return c.Status(http.StatusInternalServerError).JSON(Error{
+func InternalError(c *fiber.Ctx, err error, message string) error {
+	return JSON(c.Status(code.InternalServerError), Error{
 		Title:       "Internal Server Error",
 		Description: message,
 		Details:     err.Error(),
