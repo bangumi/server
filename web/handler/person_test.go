@@ -26,10 +26,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/cache"
+	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/mocks"
 	"github.com/bangumi/server/model"
-	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/res"
 )
 

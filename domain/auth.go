@@ -57,6 +57,7 @@ func (u Auth) AllowNSFW() bool {
 type AuthService interface {
 	GetByToken(ctx context.Context, token string) (Auth, error)
 	ComparePassword(hashed []byte, password string) (bool, error)
+	GetByTokenWithCache(ctx context.Context, token string) (Auth, error)
 	Login(ctx context.Context, email, password string) (Auth, bool, error)
 	GetPermission(ctx context.Context, id GroupID) (Permission, error)
 }

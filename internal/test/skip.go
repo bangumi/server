@@ -25,6 +25,8 @@ import (
 const EnvMysql = "mysql"
 const EnvRedis = "redis"
 
+const TreeHoleAccessToken = "a_development_access_token"
+
 // RequireEnv
 //  func TestGet(t *testing.T) {
 //    RequireEnv(t, test.EnvRedis, test.EnvMysql)

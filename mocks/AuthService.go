@@ -112,6 +112,51 @@ func (_c *AuthService_GetByToken_Call) Return(_a0 domain.Auth, _a1 error) *AuthS
 	return _c
 }
 
+// GetByTokenWithCache provides a mock function with given fields: ctx, token
+func (_m *AuthService) GetByTokenWithCache(ctx context.Context, token string) (domain.Auth, error) {
+	ret := _m.Called(ctx, token)
+
+	var r0 domain.Auth
+	if rf, ok := ret.Get(0).(func(context.Context, string) domain.Auth); ok {
+		r0 = rf(ctx, token)
+	} else {
+		r0 = ret.Get(0).(domain.Auth)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, token)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// AuthService_GetByTokenWithCache_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByTokenWithCache'
+type AuthService_GetByTokenWithCache_Call struct {
+	*mock.Call
+}
+
+// GetByTokenWithCache is a helper method to define mock.On call
+//  - ctx context.Context
+//  - token string
+func (_e *AuthService_Expecter) GetByTokenWithCache(ctx interface{}, token interface{}) *AuthService_GetByTokenWithCache_Call {
+	return &AuthService_GetByTokenWithCache_Call{Call: _e.mock.On("GetByTokenWithCache", ctx, token)}
+}
+
+func (_c *AuthService_GetByTokenWithCache_Call) Run(run func(ctx context.Context, token string)) *AuthService_GetByTokenWithCache_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *AuthService_GetByTokenWithCache_Call) Return(_a0 domain.Auth, _a1 error) *AuthService_GetByTokenWithCache_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // GetPermission provides a mock function with given fields: ctx, id
 func (_m *AuthService) GetPermission(ctx context.Context, id uint8) (domain.Permission, error) {
 	ret := _m.Called(ctx, id)

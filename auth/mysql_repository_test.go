@@ -31,8 +31,7 @@ import (
 
 func getRepo(t *testing.T) domain.AuthRepo {
 	t.Helper()
-	repo, err := auth.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
-	require.NoError(t, err)
+	repo := auth.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 
 	return repo
 }

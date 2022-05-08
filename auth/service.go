@@ -29,21 +29,24 @@ import (
 
 	"github.com/bangumi/server/cache"
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/errgo"
 )
 
-func NewService(repo domain.AuthRepo, logger *zap.Logger) domain.AuthService {
+func NewService(repo domain.AuthRepo, logger *zap.Logger, c cache.Generic) domain.AuthService {
 	return service{
-		c:    cache.NewMemoryCache(),
-		repo: repo,
-		log:  logger.Named("auth.Service"),
+		localCache: cache.NewMemoryCache(),
+		cache:      c,
+		repo:       repo,
+		log:        logger.Named("auth.Service"),
 	}
 }
 
 type service struct {
-	c    cache.Generic
-	repo domain.AuthRepo
-	log  *zap.Logger
+	localCache cache.Generic
+	cache      cache.Generic
+	repo       domain.AuthRepo
+	log        *zap.Logger
 }
 
 func (s service) Login(ctx context.Context, email, password string) (domain.Auth, bool, error) {
@@ -73,6 +76,34 @@ func (s service) Login(ctx context.Context, email, password string) (domain.Auth
 
 	return a, true, nil
 
+}
+
+// GetByTokenWithCache not sure should we cache it in service or let caller cache this.
+func (s service) GetByTokenWithCache(ctx context.Context, token string) (domain.Auth, error) {
+	var a domain.Auth
+
+	var cacheKey = cachekey.Auth(token)
+
+	ok, err := s.cache.Get(ctx, cacheKey, &a)
+	if err != nil {
+		return domain.Auth{}, errgo.Wrap(err, "cache.Get")
+	}
+	if ok {
+		if a.Permission, err = s.GetPermission(ctx, a.GroupID); err != nil {
+			return domain.Auth{}, err
+		}
+
+		return a, nil
+	}
+
+	a, err = s.GetByToken(ctx, token)
+	if err != nil {
+		return domain.Auth{}, err
+	}
+
+	_ = s.cache.Set(ctx, cacheKey, a, time.Hour)
+
+	return a, nil
 }
 
 func (s service) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
@@ -118,7 +149,7 @@ func preProcessPassword(s string) [32]byte {
 func (s service) GetPermission(ctx context.Context, id domain.GroupID) (domain.Permission, error) {
 	var p domain.Permission
 	key := strconv.FormatUint(uint64(id), 10)
-	ok, err := s.c.Get(ctx, key, &p)
+	ok, err := s.localCache.Get(ctx, key, &p)
 	if err != nil {
 		return domain.Permission{}, errgo.Wrap(err, "read cache")
 	}
@@ -132,7 +163,7 @@ func (s service) GetPermission(ctx context.Context, id domain.GroupID) (domain.P
 		return domain.Permission{}, errgo.Wrap(err, "AuthRepo.GetPermission")
 	}
 
-	_ = s.c.Set(ctx, key, p, time.Minute)
+	_ = s.localCache.Set(ctx, key, p, time.Minute)
 
 	return p, nil
 }

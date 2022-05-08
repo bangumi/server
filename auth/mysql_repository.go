@@ -32,8 +32,8 @@ import (
 	"github.com/bangumi/server/internal/strparse"
 )
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.AuthRepo, error) {
-	return mysqlRepo{q: q, log: log.Named("auth.mysqlRepo")}, nil
+func NewMysqlRepo(q *query.Query, log *zap.Logger) domain.AuthRepo {
+	return mysqlRepo{q: q, log: log.Named("auth.mysqlRepo")}
 }
 
 type mysqlRepo struct {

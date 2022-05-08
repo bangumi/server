@@ -27,11 +27,11 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/pkg/vars/enum"
-	"github.com/bangumi/server/web/handler/cachekey"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/util"
 )
