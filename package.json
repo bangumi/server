@@ -1,6 +1,10 @@
 {
+  "version": "0.12.8",
   "description": "tools to bundle openapi spec, not used in our server",
   "private": true,
+  "scripts": {
+    "version": "node scripts/bump.js"
+  },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "js-yaml": "^4.1.0"
