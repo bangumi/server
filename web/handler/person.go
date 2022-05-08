@@ -97,7 +97,7 @@ func (h Handler) getPersonWithCache(ctx context.Context, id uint32) (res.PersonV
 }
 
 func convertModelPerson(s model.Person) res.PersonV0 {
-	img := model.PersonImage(s.Image)
+	img := res.PersonImage(s.Image)
 
 	return res.PersonV0{
 		ID:           s.ID,
@@ -196,7 +196,7 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 			ID:            rel.Character.ID,
 			Name:          rel.Character.Name,
 			Type:          rel.Character.Type,
-			Images:        model.PersonImage(rel.Subject.Image),
+			Images:        res.PersonImage(rel.Subject.Image),
 			SubjectID:     rel.Subject.ID,
 			SubjectName:   rel.Subject.Name,
 			SubjectNameCn: rel.Subject.NameCN,
@@ -236,7 +236,7 @@ func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 			Staff:     vars.StaffMap[relation.Subject.TypeID][relation.TypeID].String(),
 			Name:      relation.Subject.Name,
 			NameCn:    relation.Subject.NameCN,
-			Image:     model.SubjectImage(relation.Subject.Image).Large,
+			Image:     res.SubjectImage(relation.Subject.Image).Large,
 		}
 	}
 

@@ -157,7 +157,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	var response = make([]res.SubjectRelatedPerson, len(relations))
 	for i, rel := range relations {
 		response[i] = res.SubjectRelatedPerson{
-			Images:   model.PersonImage(rel.Person.Image),
+			Images:   res.PersonImage(rel.Person.Image),
 			Name:     rel.Person.Name,
 			Relation: vars.StaffMap[r.TypeID][rel.TypeID].String(),
 			Career:   careers(rel.Person),
@@ -182,7 +182,7 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 
 	return res.SubjectV0{
 		ID:       s.ID,
-		Image:    model.SubjectImage(s.Image),
+		Image:    res.SubjectImage(s.Image),
 		Summary:  s.Summary,
 		Name:     s.Name,
 		Platform: platformString(s),
@@ -251,7 +251,7 @@ func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 	var response = make([]res.SubjectRelatedSubject, len(relations))
 	for i, relation := range relations {
 		response[i] = res.SubjectRelatedSubject{
-			Images:    model.SubjectImage(relation.Destination.Image),
+			Images:    res.SubjectImage(relation.Destination.Image),
 			Name:      relation.Destination.Name,
 			NameCn:    relation.Destination.NameCN,
 			Relation:  readableRelation(relation.Destination.TypeID, relation.TypeID),
@@ -316,7 +316,7 @@ func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID model.Subje
 	var response = make([]res.SubjectRelatedCharacter, len(relations))
 	for i, rel := range relations {
 		response[i] = res.SubjectRelatedCharacter{
-			Images:   model.PersonImage(rel.Character.Image),
+			Images:   res.PersonImage(rel.Character.Image),
 			Name:     rel.Character.Name,
 			Relation: characterStaffString(rel.TypeID),
 			Actors:   toActors(actors[rel.Character.ID]),
@@ -333,7 +333,7 @@ func toActors(persons []model.Person) []res.Actor {
 	var actors = make([]res.Actor, len(persons))
 	for j, actor := range persons {
 		actors[j] = res.Actor{
-			Images:       model.PersonImage(actor.Image),
+			Images:       res.PersonImage(actor.Image),
 			Name:         actor.Name,
 			ShortSummary: actor.Summary,
 			Career:       careers(actor),

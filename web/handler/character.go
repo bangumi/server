@@ -105,7 +105,7 @@ func (h Handler) getCharacterWithCache(
 }
 
 func convertModelCharacter(s model.Character) res.CharacterV0 {
-	img := model.PersonImage(s.Image)
+	img := res.PersonImage(s.Image)
 
 	return res.CharacterV0{
 		ID:        s.ID,
@@ -159,7 +159,7 @@ func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 			ID:            cast.Person.ID,
 			Name:          cast.Person.Name,
 			Type:          cast.Person.Type,
-			Images:        model.PersonImage(cast.Subject.Image),
+			Images:        res.PersonImage(cast.Subject.Image),
 			SubjectID:     cast.Subject.ID,
 			SubjectName:   cast.Subject.Name,
 			SubjectNameCn: cast.Subject.NameCN,
@@ -201,7 +201,7 @@ func (h Handler) GetCharacterRelatedSubjects(c *fiber.Ctx) error {
 			Name:   subject.Name,
 			NameCn: subject.NameCN,
 			Staff:  characterStaffString(relation.TypeID),
-			Image:  model.SubjectImage(subject.Image).Large,
+			Image:  res.SubjectImage(subject.Image).Large,
 		}
 	}
 

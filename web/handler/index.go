@@ -30,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/strparse"
-	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/util"
@@ -176,7 +175,7 @@ func (h Handler) getIndexSubjects(
 		data[i] = res.SlimSubjectV0{
 			AddedAt: s.AddedAt,
 			Date:    nilString(s.Subject.Date),
-			Image:   model.SubjectImage(s.Subject.Image),
+			Image:   res.SubjectImage(s.Subject.Image),
 			Name:    s.Subject.Name,
 			NameCN:  s.Subject.NameCN,
 			Comment: s.Comment,

@@ -29,7 +29,7 @@ type v0wiki = []interface{}
 type SubjectV0 struct {
 	Date          *string               `json:"date"`
 	Platform      *string               `json:"platform"`
-	Image         model.SubjectImages   `json:"images"`
+	Image         SubjectImages         `json:"images"`
 	Summary       string                `json:"summary"`
 	Name          string                `json:"name"`
 	NameCN        string                `json:"name_cn"`
@@ -48,7 +48,7 @@ type SubjectV0 struct {
 }
 
 type Subject struct {
-	Image        model.SubjectImages   `json:"images"`
+	Image        SubjectImages         `json:"images"`
 	Infobox      string                `json:"infobox"`
 	Name         string                `json:"name"`
 	NameCN       string                `json:"name_cn"`
@@ -107,7 +107,7 @@ type PersonRelatedSubject struct {
 }
 
 type PersonRelatedCharacter struct {
-	Images        model.PersonImages    `json:"images"`
+	Images        PersonImages          `json:"images"`
 	Name          string                `json:"name"`
 	SubjectName   string                `json:"subject_name"`
 	SubjectNameCn string                `json:"subject_name_cn"`
@@ -117,7 +117,7 @@ type PersonRelatedCharacter struct {
 }
 
 type CharacterRelatedPerson struct {
-	Images        model.PersonImages `json:"images"`
+	Images        PersonImages `json:"images"`
 	Name          string
 	SubjectName   string                `json:"subject_name"`
 	SubjectNameCn string                `json:"subject_name_cn"`
@@ -135,7 +135,7 @@ type CharacterRelatedSubject struct {
 }
 
 type SubjectRelatedSubject struct {
-	Images    model.SubjectImages `json:"images"`
+	Images    SubjectImages       `json:"images"`
 	Name      string              `json:"name"`
 	NameCn    string              `json:"name_cn"`
 	Relation  string              `json:"relation"`
@@ -144,7 +144,7 @@ type SubjectRelatedSubject struct {
 }
 
 type SubjectRelatedCharacter struct {
-	Images   model.PersonImages `json:"images"`
+	Images   PersonImages       `json:"images"`
 	Name     string             `json:"name"`
 	Relation string             `json:"relation"`
 	Actors   []Actor            `json:"actors"`
@@ -153,7 +153,7 @@ type SubjectRelatedCharacter struct {
 }
 
 type SubjectRelatedPerson struct {
-	Images   model.PersonImages `json:"images"`
+	Images   PersonImages       `json:"images"`
 	Name     string             `json:"name" doc:"person name"`
 	Relation string             `json:"relation"`
 	Career   []string           `json:"career"`
@@ -162,7 +162,7 @@ type SubjectRelatedPerson struct {
 }
 
 type Actor struct {
-	Images       model.PersonImages `json:"images"`
+	Images       PersonImages       `json:"images"`
 	Name         string             `json:"name"`
 	ShortSummary string             `json:"short_summary"`
 	Career       []string           `json:"career"`
@@ -172,13 +172,13 @@ type Actor struct {
 }
 
 type SlimSubjectV0 struct {
-	AddedAt time.Time           `json:"added_at"`
-	Date    *string             `json:"date"`
-	Image   model.SubjectImages `json:"images"`
-	Name    string              `json:"name"`
-	NameCN  string              `json:"name_cn"`
-	Comment string              `json:"comment"`
-	Infobox v0wiki              `json:"infobox"`
-	ID      uint32              `json:"id"`
-	TypeID  model.SubjectType   `json:"type"`
+	AddedAt time.Time         `json:"added_at"`
+	Date    *string           `json:"date"`
+	Image   SubjectImages     `json:"images"`
+	Name    string            `json:"name"`
+	NameCN  string            `json:"name_cn"`
+	Comment string            `json:"comment"`
+	Infobox v0wiki            `json:"infobox"`
+	ID      uint32            `json:"id"`
+	TypeID  model.SubjectType `json:"type"`
 }
