@@ -38,13 +38,13 @@ type PersistSession struct {
 	ExpiredAt time.Time
 	Key       string
 	Value     Session
-	UserID    model.IDType
+	UserID    model.UIDType
 }
 
 type Repo interface {
-	Create(ctx context.Context, key string, userID model.IDType, s Session) error
+	Create(ctx context.Context, key string, userID model.UIDType, s Session) error
 	Get(ctx context.Context, key string) (PersistSession, error)
-	RevokeUser(ctx context.Context, userID model.IDType) (keys []string, err error)
+	RevokeUser(ctx context.Context, userID model.UIDType) (keys []string, err error)
 	Revoke(ctx context.Context, key string) error
 }
 
@@ -59,7 +59,7 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (r mysqlRepo) Create(ctx context.Context, key string, userID model.IDType, s Session) error {
+func (r mysqlRepo) Create(ctx context.Context, key string, userID model.UIDType, s Session) error {
 	tx := r.q.Begin()
 
 	_, err := tx.WithContext(ctx).WebSession.Where(tx.WebSession.Key.Eq(key)).First()
@@ -135,7 +135,7 @@ func (r mysqlRepo) Revoke(ctx context.Context, key string) error {
 	return nil
 }
 
-func (r mysqlRepo) RevokeUser(ctx context.Context, userID model.IDType) ([]string, error) {
+func (r mysqlRepo) RevokeUser(ctx context.Context, userID model.UIDType) ([]string, error) {
 	s, err := r.q.WithContext(ctx).WebSession.Where(r.q.WebSession.UserID.Eq(userID)).Find()
 	if err != nil {
 		r.log.Error("unexpected error", zap.Error(err))

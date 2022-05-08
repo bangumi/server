@@ -19,6 +19,8 @@ package domain
 import (
 	"context"
 	"time"
+
+	"github.com/bangumi/server/model"
 )
 
 // AuthRepo presents an authorization.
@@ -31,12 +33,14 @@ type AuthRepo interface {
 	GetByEmail(ctx context.Context, email string) (Auth, []byte, error)
 }
 
+type GroupID = uint8
+
 // Auth is the basic authorization represent a user.
 type Auth struct {
 	RegTime    time.Time
-	ID         uint32 // user id
-	GroupID    uint8
-	Permission Permission
+	ID         model.UIDType // user id
+	GroupID    GroupID
+	Permission Permission `json:"-"` // disable cache for this field.
 }
 
 const nsfwThreshold = -time.Hour * 24 * 60
@@ -54,6 +58,7 @@ type AuthService interface {
 	GetByToken(ctx context.Context, token string) (Auth, error)
 	ComparePassword(hashed []byte, password string) (bool, error)
 	Login(ctx context.Context, email, password string) (Auth, bool, error)
+	GetPermission(ctx context.Context, id GroupID) (Permission, error)
 }
 
 type Permission struct {

@@ -115,7 +115,7 @@ func preProcessPassword(s string) [32]byte {
 	return md5Password
 }
 
-func (s service) GetPermission(ctx context.Context, id uint8) (domain.Permission, error) {
+func (s service) GetPermission(ctx context.Context, id domain.GroupID) (domain.Permission, error) {
 	var p domain.Permission
 	key := strconv.FormatUint(uint64(id), 10)
 	ok, err := s.c.Get(ctx, key, &p)

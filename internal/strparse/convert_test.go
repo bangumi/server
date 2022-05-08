@@ -29,7 +29,7 @@ func TestUserID(t *testing.T) {
 	t.Parallel()
 	var testCase = []struct {
 		Input    string
-		Expected model.IDType
+		Expected model.UIDType
 	}{
 		{
 			Input:    "18",

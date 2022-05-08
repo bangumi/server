@@ -40,7 +40,7 @@ type Manager interface {
 	Create(ctx context.Context, a domain.Auth) (string, Session, error)
 	Get(ctx context.Context, key string) (Session, error)
 	Revoke(ctx context.Context, key string) error
-	RevokeUser(ctx context.Context, id model.IDType) error
+	RevokeUser(ctx context.Context, id model.UIDType) error
 }
 
 func New(c cache.Generic, repo Repo, log *zap.Logger) Manager {
@@ -119,7 +119,7 @@ func (m manager) Revoke(ctx context.Context, key string) error {
 	return errgo.Wrap(err, "redisCache.Del")
 }
 
-func (m manager) RevokeUser(ctx context.Context, id model.IDType) error {
+func (m manager) RevokeUser(ctx context.Context, id model.UIDType) error {
 	keys, err := m.repo.RevokeUser(ctx, id)
 	if err != nil {
 		return errgo.Wrap(err, "repo.Revoke")

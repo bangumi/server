@@ -33,7 +33,7 @@ import (
 
 func TestManager_Create(t *testing.T) {
 	t.Parallel()
-	const uid model.IDType = 1
+	const uid model.UIDType = 1
 
 	m := &mocks.SessionRepo{}
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
@@ -51,7 +51,7 @@ func TestManager_Create(t *testing.T) {
 
 func TestManager_Get(t *testing.T) {
 	t.Parallel()
-	const uid model.IDType = 1
+	const uid model.UIDType = 1
 	m := &mocks.SessionRepo{}
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
 		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
@@ -70,7 +70,7 @@ func TestManager_Get(t *testing.T) {
 func TestManager_Revoke(t *testing.T) {
 	t.Parallel()
 
-	const uid model.IDType = 1
+	const uid model.UIDType = 1
 	m := &mocks.SessionRepo{}
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
 		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {

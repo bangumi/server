@@ -94,7 +94,7 @@ func TestMysqlRepo_Get_ok(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
-	const uid model.IDType = 1
+	const uid model.UIDType = 1
 	ctx := context.Background()
 	r, q := getRepo(t)
 	var key = "a random key " + t.Name()

@@ -267,9 +267,9 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	return c.JSON(convertModelSubjectRevision(&r, creatorMap))
 }
 
-func dedupeCreatorID(creatorIDs []uint32) []model.IDType {
-	m := make(map[model.IDType]bool, len(creatorIDs))
-	ret := make([]model.IDType, 0, len(creatorIDs))
+func dedupeCreatorID(creatorIDs []uint32) []model.UIDType {
+	m := make(map[model.UIDType]bool, len(creatorIDs))
+	ret := make([]model.UIDType, 0, len(creatorIDs))
 	for _, r := range creatorIDs {
 		if _, ok := m[r]; !ok {
 			m[r] = true
@@ -279,9 +279,9 @@ func dedupeCreatorID(creatorIDs []uint32) []model.IDType {
 	return ret
 }
 
-func listUniqueCreatorID(revisions []model.Revision) []model.IDType {
-	m := make(map[model.IDType]bool, len(revisions))
-	ret := make([]model.IDType, len(revisions))
+func listUniqueCreatorID(revisions []model.Revision) []model.UIDType {
+	m := make(map[model.UIDType]bool, len(revisions))
+	ret := make([]model.UIDType, len(revisions))
 	i := 0
 	for _, r := range revisions {
 		if _, ok := m[r.CreatorID]; !ok {
@@ -293,7 +293,7 @@ func listUniqueCreatorID(revisions []model.Revision) []model.IDType {
 	return ret[:i]
 }
 
-func convertModelPersonRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.PersonRevision {
+func convertModelPersonRevision(r *model.Revision, creatorMap map[model.UIDType]model.User) res.PersonRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.PersonRevision{
 		ID:      r.ID,
@@ -331,7 +331,7 @@ func convertModelPersonRevision(r *model.Revision, creatorMap map[model.IDType]m
 	return ret
 }
 
-func convertModelSubjectRevision(r *model.Revision, creatorMap map[model.IDType]model.User) res.SubjectRevision {
+func convertModelSubjectRevision(r *model.Revision, creatorMap map[model.UIDType]model.User) res.SubjectRevision {
 	creator := creatorMap[r.CreatorID]
 	var data *res.SubjectRevisionData
 	if r.Data != nil {
@@ -364,7 +364,7 @@ func convertModelSubjectRevision(r *model.Revision, creatorMap map[model.IDType]
 }
 
 func convertModelCharacterRevision(
-	r *model.CharacterRevision, creatorMap map[model.IDType]model.User,
+	r *model.CharacterRevision, creatorMap map[model.UIDType]model.User,
 ) res.CharacterRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.CharacterRevision{

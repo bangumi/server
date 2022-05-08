@@ -76,7 +76,7 @@ func (r mysqlRepo) ListPersonRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.IDType) (model.Revision, error) {
+func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.UIDType) (model.Revision, error) {
 	revision, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.ID.Eq(id),
 			r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).
@@ -134,7 +134,7 @@ func (r mysqlRepo) ListCharacterRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.IDType) (model.CharacterRevision, error) {
+func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.UIDType) (model.CharacterRevision, error) {
 	revision, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.ID.Eq(id),
 			r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...)).
@@ -191,7 +191,7 @@ func (r mysqlRepo) ListSubjectRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.IDType) (model.Revision, error) {
+func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.UIDType) (model.Revision, error) {
 	revision, err := r.q.SubjectRevision.WithContext(ctx).
 		Where(r.q.SubjectRevision.ID.Eq(id)).
 		First()

@@ -32,7 +32,7 @@ import (
 
 func TestHandler_GetCurrentUser(t *testing.T) {
 	t.Parallel()
-	const uid model.IDType = 7
+	const uid model.UIDType = 7
 	u := mocks.UserRepo{}
 	u.EXPECT().GetByID(mock.Anything, uid).Return(model.User{ID: uid}, nil)
 	defer u.AssertExpectations(t)
@@ -58,7 +58,7 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 
 func TestHandler_GetUser_200(t *testing.T) {
 	t.Parallel()
-	const uid model.IDType = 7
+	const uid model.UIDType = 7
 	m := &mocks.UserRepo{}
 	m.EXPECT().GetByName(mock.Anything, "u").Return(model.User{ID: uid}, nil)
 

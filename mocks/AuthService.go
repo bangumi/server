@@ -112,6 +112,51 @@ func (_c *AuthService_GetByToken_Call) Return(_a0 domain.Auth, _a1 error) *AuthS
 	return _c
 }
 
+// GetPermission provides a mock function with given fields: ctx, id
+func (_m *AuthService) GetPermission(ctx context.Context, id uint8) (domain.Permission, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 domain.Permission
+	if rf, ok := ret.Get(0).(func(context.Context, uint8) domain.Permission); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(domain.Permission)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint8) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// AuthService_GetPermission_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPermission'
+type AuthService_GetPermission_Call struct {
+	*mock.Call
+}
+
+// GetPermission is a helper method to define mock.On call
+//  - ctx context.Context
+//  - id uint8
+func (_e *AuthService_Expecter) GetPermission(ctx interface{}, id interface{}) *AuthService_GetPermission_Call {
+	return &AuthService_GetPermission_Call{Call: _e.mock.On("GetPermission", ctx, id)}
+}
+
+func (_c *AuthService_GetPermission_Call) Run(run func(ctx context.Context, id uint8)) *AuthService_GetPermission_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint8))
+	})
+	return _c
+}
+
+func (_c *AuthService_GetPermission_Call) Return(_a0 domain.Permission, _a1 error) *AuthService_GetPermission_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // Login provides a mock function with given fields: ctx, email, password
 func (_m *AuthService) Login(ctx context.Context, email string, password string) (domain.Auth, bool, error) {
 	ret := _m.Called(ctx, email, password)

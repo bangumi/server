@@ -90,6 +90,13 @@ func (h Handler) fill(c *fiber.Ctx, a *accessor) error {
 	}
 	if ok {
 		a.login = true
+
+		// read permission
+		// TODO: we should put this all in `GetByToken`, don't let caller get permission.
+		if a.Permission, err = h.a.GetPermission(c.Context(), a.GroupID); err != nil {
+			return errgo.Wrap(err, "auth.GetPermission")
+		}
+
 		return nil
 	}
 
@@ -103,7 +110,7 @@ func (h Handler) fill(c *fiber.Ctx, a *accessor) error {
 
 	a.login = true
 
-	if err := h.cache.Set(c.Context(), cacheKey, a.Auth, time.Hour); err != nil {
+	if err = h.cache.Set(c.Context(), cacheKey, a.Auth, time.Hour); err != nil {
 		logger.Error("can't set cache value", zap.Error(err))
 	}
 
