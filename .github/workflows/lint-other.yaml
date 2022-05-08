@@ -30,8 +30,6 @@ jobs:
       - name: Install Node LTS
         uses: actions/setup-node@v3
 
-      - run: npm i -g prettier
-
       - uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
@@ -46,18 +44,13 @@ jobs:
         uses: actions/checkout@v3
         if: ${{ github.event_name == 'push' }}
 
+      - run: npm ci
+
       - name: prettier
-        run: prettier --write --list-different ./
+        run: npx prettier --write --list-different ./
 
       - run: git diff --exit-code
 
-      - name: create review
-        if: ${{ failure() && github.event_name != 'push' }}
-        run: |
-          TMPFILE=$(mktemp)
-          git diff >"${TMPFILE}"
-          git reset --hard HEAD
-
-          reviewdog -f=diff -f.diff.strip=1 -reporter=github-pr-review -tee < "${TMPFILE}"
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: reviewdog/action-suggester@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
