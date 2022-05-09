@@ -25,15 +25,14 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/goccy/go-json"
+	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/cache"
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/model"
@@ -46,7 +45,12 @@ func main() {
 		logger.Panic("can't replace mysql driver's errLog", zap.Error(err))
 	}
 
-	start()
+	out := pflag.String("out", "archive.zip", "zip file output location")
+	if out == nil {
+		*out = "archive.zip"
+	}
+
+	start(*out)
 }
 
 var ctx = context.Background() //nolint:gochecknoglobals
@@ -55,16 +59,16 @@ var maxSubjectID model.SubjectIDType     //nolint:gochecknoglobals
 var maxCharacterID model.CharacterIDType //nolint:gochecknoglobals
 var maxPersonID model.PersonIDType       //nolint:gochecknoglobals
 
-func start() {
+func start(out string) {
 	var q *query.Query
 	err := fx.New(
 		logger.FxLogger(),
 		fx.Provide(
-			driver.NewRedisClient, dal.NewConnectionPool, dal.NewDB,
+			dal.NewConnectionPool, dal.NewDB,
 
 			config.NewAppConfig, logger.Copy, metrics.NewScope,
 
-			query.Use, cache.NewRedisCache,
+			query.Use,
 		),
 
 		fx.Populate(&q),
@@ -76,7 +80,7 @@ func start() {
 
 	getMaxID(q)
 
-	f, err := os.Create("archive.zip")
+	f, err := os.Create(out)
 	if err != nil {
 		panic(err)
 	}
