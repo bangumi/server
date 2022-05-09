@@ -40,3 +40,41 @@ type Person struct {
 	Locked         bool
 	FieldBirthDay  uint8
 }
+
+func (p Person) Careers() []string {
+	s := make([]string, 0, 7)
+
+	if p.Writer {
+		s = append(s, "writer")
+	}
+
+	if p.Producer {
+		s = append(s, "producer")
+	}
+
+	if p.Mangaka {
+		s = append(s, "mangaka")
+	}
+
+	if p.Artist {
+		s = append(s, "artist")
+	}
+
+	if p.Seiyu {
+		s = append(s, "seiyu")
+	}
+
+	if p.Writer {
+		s = append(s, "writer")
+	}
+
+	if p.Illustrator {
+		s = append(s, "illustrator")
+	}
+
+	if p.Actor {
+		s = append(s, "actor")
+	}
+
+	return s
+}

@@ -160,7 +160,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 			Images:   res.PersonImage(rel.Person.Image),
 			Name:     rel.Person.Name,
 			Relation: vars.StaffMap[r.TypeID][rel.TypeID].String(),
-			Career:   careers(rel.Person),
+			Career:   rel.Person.Careers(),
 			Type:     rel.Person.Type,
 			ID:       rel.Person.ID,
 		}
@@ -336,7 +336,7 @@ func toActors(persons []model.Person) []res.Actor {
 			Images:       res.PersonImage(actor.Image),
 			Name:         actor.Name,
 			ShortSummary: actor.Summary,
-			Career:       careers(actor),
+			Career:       actor.Careers(),
 			ID:           actor.ID,
 			Type:         actor.Type,
 			Locked:       actor.Locked,
