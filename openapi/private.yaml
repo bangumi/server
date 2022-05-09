@@ -2,6 +2,7 @@ openapi: 3.0.2
 info:
   title: "Bangumi Private API"
   version: ""
+  description: "`next.bgm.tv` 域名不支持跨域，"
 servers:
   - url: https://next.bgm.tv
     description: Production server
@@ -76,9 +77,6 @@ paths:
 
         "422":
           description: "`content-type` 只能为 `application/json`."
-
-      security:
-        - CookiesSession: []
 
 components:
   schemas:
