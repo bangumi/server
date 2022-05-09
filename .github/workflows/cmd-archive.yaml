@@ -25,7 +25,7 @@ jobs:
 
       - run: go build -o dist/archive.exe ./internal/cmd/archive/
         env:
-          CGO_ENABLED: '0'
+          CGO_ENABLED: "0"
 
       - name: docker build
         run: docker build -f etc/archive.Dockerfile -t ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest .
