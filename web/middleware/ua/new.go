@@ -38,6 +38,7 @@ func DisableDefaultHTTPLibrary(c *fiber.Ctx) error {
 
 	if strings.HasPrefix(u, "python-requests/") ||
 		strings.HasPrefix(u, "okhttp/") ||
+		strings.HasPrefix(u, "axios/") ||
 		strings.HasPrefix(u, "Faraday v") ||
 		u == "node-fetch" {
 		return res.HTTPError(c, code.Forbidden, forbiddenMessage)

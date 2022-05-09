@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/web/middleware/ua"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/res/code"
 	"github.com/bangumi/server/web/util"
 )
 
@@ -84,11 +85,10 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
-		return c.Status(fiber.StatusNotFound).JSON(res.Error{
-			Title: "Not Found",
-			Description: "This is default response, " +
-				"if you see this response, please check your request path",
-			Details: util.DetailFromRequest(c),
+		return res.JSON(c.Status(code.NotFound), res.Error{
+			Title:       "Not Found",
+			Description: "This is default response, if you see this response, please check your request path",
+			Details:     util.DetailFromRequest(c),
 		})
 	})
 }
