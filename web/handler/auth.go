@@ -22,9 +22,11 @@ import (
 	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/res/code"
+	"github.com/bangumi/server/web/session"
 )
 
 func (h Handler) RevokeSession(c *fiber.Ctx) error {
@@ -41,8 +43,10 @@ func (h Handler) RevokeSession(c *fiber.Ctx) error {
 }
 
 func (h Handler) PrivateLogin(c *fiber.Ctx) error {
+	a := h.getHTTPAccessor(c)
 	allowed, remain, err := h.rateLimit.Allowed(c.Context(), c.Context().RemoteIP().String())
 	if err != nil {
+		h.log.Error("failed to apply rate limit", zap.Error(err), a.LogRequestID())
 		return res.InternalError(c, err, "failed to apply rate limit")
 	}
 
@@ -68,10 +72,10 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return res.HTTPError(c, code.BadGateway, "failed to pass captcha verify, please re-do")
 	}
 
-	return h.privateLogin(c, r, remain)
+	return h.privateLogin(c, a, r, remain)
 }
 
-func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
+func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
 		return res.WithError(c, err, code.InternalServerError, "Unexpected error happened when trying to log in")
@@ -87,15 +91,16 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 
 	key, s, err := h.session.Create(c.Context(), login)
 	if err != nil {
+		h.log.Error("failed to create session", zap.Error(err), a.LogRequestID())
 		return res.InternalError(c, err, "Unexpected Session Manager Error")
 	}
 
 	if err = h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
-		h.log.Error("failed to reset login rate limit", zap.Error(err))
+		h.log.Error("failed to reset login rate limit", zap.Error(err), a.LogRequestID())
 	}
 
 	c.Cookie(&fiber.Cookie{
-		Name:     "sessionID",
+		Name:     session.Key,
 		Value:    key,
 		Path:     "/",
 		Domain:   "next.bgm.tv",
@@ -107,8 +112,11 @@ func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 
 	user, err := h.u.GetByID(c.Context(), s.UserID)
 	if err != nil {
+		h.log.Error("failed to get user by user id", zap.Error(err), a.LogRequestID())
 		return res.InternalError(c, err, "failed to get user")
 	}
+
+	h.log.Info("user login", log.UserID(user.ID))
 
 	return res.JSON(c, res.User{
 		ID:        user.ID,

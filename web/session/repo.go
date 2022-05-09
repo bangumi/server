@@ -33,6 +33,8 @@ import (
 	"github.com/bangumi/server/model"
 )
 
+const Key = "sessionID"
+
 type PersistSession struct {
 	CreatedAt time.Time
 	ExpiredAt time.Time

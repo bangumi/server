@@ -32,7 +32,7 @@ import (
 
 // ResistRouter add all router and default 404 Handler to app.
 func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
-	app.Use(ua.DisableDefaultHTTPLibrary, h.MiddlewareAccessUser())
+	app.Use(ua.DisableDefaultHTTPLibrary)
 
 	// add logger wrapper and metrics counter
 	addMetrics := func(handler fiber.Handler) fiber.Handler {
@@ -46,36 +46,40 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 		}
 	}
 
-	app.Get("/v0/subjects/:id", addMetrics(h.GetSubject))
-	app.Get("/v0/subjects/:id/persons", addMetrics(h.GetSubjectRelatedPersons))
-	app.Get("/v0/subjects/:id/subjects", addMetrics(h.GetSubjectRelatedSubjects))
-	app.Get("/v0/subjects/:id/characters", addMetrics(h.GetSubjectRelatedCharacters))
-	app.Get("/v0/persons/:id", addMetrics(h.GetPerson))
-	app.Get("/v0/persons/:id/subjects", addMetrics(h.GetPersonRelatedSubjects))
-	app.Get("/v0/persons/:id/characters", addMetrics(h.GetPersonRelatedCharacters))
-	app.Get("/v0/characters/:id", addMetrics(h.GetCharacter))
-	app.Get("/v0/characters/:id/subjects", addMetrics(h.GetCharacterRelatedSubjects))
-	app.Get("/v0/characters/:id/persons", addMetrics(h.GetCharacterRelatedPersons))
-	app.Get("/v0/episodes/:id", addMetrics(h.GetEpisode))
-	app.Get("/v0/episodes", addMetrics(h.ListEpisode))
+	v0 := app.Group("/v0", h.AccessTokenAuthMiddleware)
 
-	app.Get("/v0/me", addMetrics(h.GetCurrentUser))
-	app.Get("/v0/users/:username/collections", addMetrics(h.ListCollection))
-	app.Get("/v0/users/:username", addMetrics(h.GetUser))
+	v0.Get("/subjects/:id", addMetrics(h.GetSubject))
+	v0.Get("/subjects/:id/persons", addMetrics(h.GetSubjectRelatedPersons))
+	v0.Get("/subjects/:id/subjects", addMetrics(h.GetSubjectRelatedSubjects))
+	v0.Get("/subjects/:id/characters", addMetrics(h.GetSubjectRelatedCharacters))
+	v0.Get("/persons/:id", addMetrics(h.GetPerson))
+	v0.Get("/persons/:id/subjects", addMetrics(h.GetPersonRelatedSubjects))
+	v0.Get("/persons/:id/characters", addMetrics(h.GetPersonRelatedCharacters))
+	v0.Get("/characters/:id", addMetrics(h.GetCharacter))
+	v0.Get("/characters/:id/subjects", addMetrics(h.GetCharacterRelatedSubjects))
+	v0.Get("/characters/:id/persons", addMetrics(h.GetCharacterRelatedPersons))
+	v0.Get("/episodes/:id", addMetrics(h.GetEpisode))
+	v0.Get("/episodes", addMetrics(h.ListEpisode))
 
-	app.Get("/v0/indices/:id", addMetrics(h.GetIndex))
-	app.Get("/v0/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
+	v0.Get("/me", addMetrics(h.GetCurrentUser))
+	v0.Get("/users/:username/collections", addMetrics(h.ListCollection))
+	v0.Get("/users/:username", addMetrics(h.GetUser))
 
-	app.Get("/v0/revisions/persons/:id", addMetrics(h.GetPersonRevision))
-	app.Get("/v0/revisions/persons", addMetrics(h.ListPersonRevision))
-	app.Get("/v0/revisions/subjects/:id", addMetrics(h.GetSubjectRevision))
-	app.Get("/v0/revisions/subjects", addMetrics(h.ListSubjectRevision))
-	app.Get("/v0/revisions/characters/:id", addMetrics(h.GetCharacterRevision))
-	app.Get("/v0/revisions/characters", addMetrics(h.ListCharacterRevision))
+	v0.Get("/indices/:id", addMetrics(h.GetIndex))
+	v0.Get("/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
+
+	v0.Get("/revisions/persons/:id", addMetrics(h.GetPersonRevision))
+	v0.Get("/revisions/persons", addMetrics(h.ListPersonRevision))
+	v0.Get("/revisions/subjects/:id", addMetrics(h.GetSubjectRevision))
+	v0.Get("/revisions/subjects", addMetrics(h.ListSubjectRevision))
+	v0.Get("/revisions/characters/:id", addMetrics(h.GetCharacterRevision))
+	v0.Get("/revisions/characters", addMetrics(h.ListCharacterRevision))
 
 	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
+
 	// frontend private api
-	private := app.Group("/p")
+	private := app.Group("/p", h.SessionAuthMiddleware)
+
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 
 	// default 404 Handler, all router should be added before this router

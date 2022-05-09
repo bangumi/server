@@ -29,6 +29,7 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/res"
@@ -56,8 +57,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 	u, err := h.u.GetByID(c, i.CreatorID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			h.log.Error("index missing creator",
-				zap.Uint32("index_id", id), zap.Uint32("user_id", i.CreatorID))
+			h.log.Error("index missing creator", zap.Uint32("index_id", id), log.UserID(i.CreatorID))
 			return res.Index{}, false, fiber.ErrInternalServerError
 		}
 

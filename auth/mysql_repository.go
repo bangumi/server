@@ -29,6 +29,7 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/strparse"
 )
 
@@ -75,8 +76,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, e
 
 	id, err := strparse.UserID(access.UserID)
 	if err != nil {
-		m.log.Error("wrong UserID in OAuth Access table", zap.String("UserID", access.UserID))
-
+		m.log.Error("wrong UserID in OAuth Access table", zap.String("user_id", access.UserID))
 		return domain.Auth{}, errgo.Wrap(err, "parsing user id")
 	}
 
@@ -105,7 +105,7 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Per
 	r, err := m.q.UserGroup.WithContext(ctx).Where(m.q.UserGroup.ID.Eq(groupID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			m.log.Error("can't find permission for group", zap.Uint8("id", groupID))
+			m.log.Error("can't find permission for group", log.GroupID(groupID))
 			return domain.Permission{}, nil
 		}
 
@@ -117,7 +117,7 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Per
 	if len(r.Perm) > 0 {
 		d, err := phpserialize.UnmarshalAssociativeArray(r.Perm)
 		if err != nil {
-			m.log.Error("failed to decode php serialized content", zap.Error(err), zap.Uint8("group_id", groupID))
+			m.log.Error("failed to decode php serialized content", zap.Error(err), log.GroupID(groupID))
 			return domain.Permission{}, nil
 		}
 		if err = mapstructure.Decode(d, &p); err != nil {
