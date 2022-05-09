@@ -23,7 +23,7 @@ jobs:
       - name: Get Tag Name
         run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - run: go build ./internal/cmd/archive -o dist/archive.exe
+      - run: go build -o dist/archive.exe ./internal/cmd/archive/
 
       - name: docker build
         run: docker build -f etc/archive.Dockerfile -t ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest .
