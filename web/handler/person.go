@@ -103,7 +103,7 @@ func convertModelPerson(s model.Person) res.PersonV0 {
 		ID:           s.ID,
 		Type:         s.Type,
 		Name:         s.Name,
-		Career:       careers(s),
+		Career:       s.Careers(),
 		Images:       img,
 		Summary:      s.Summary,
 		LastModified: time.Time{},
@@ -127,44 +127,6 @@ func convertModelPerson(s model.Person) res.PersonV0 {
 var genderMap = map[uint8]string{
 	1: "male",
 	2: "female",
-}
-
-func careers(p model.Person) []string {
-	s := make([]string, 0, 7)
-
-	if p.Writer {
-		s = append(s, "writer")
-	}
-
-	if p.Producer {
-		s = append(s, "producer")
-	}
-
-	if p.Mangaka {
-		s = append(s, "mangaka")
-	}
-
-	if p.Artist {
-		s = append(s, "artist")
-	}
-
-	if p.Seiyu {
-		s = append(s, "seiyu")
-	}
-
-	if p.Writer {
-		s = append(s, "writer")
-	}
-
-	if p.Illustrator {
-		s = append(s, "illustrator")
-	}
-
-	if p.Actor {
-		s = append(s, "actor")
-	}
-
-	return s
 }
 
 func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
