@@ -2,6 +2,9 @@ openapi: 3.0.2
 info:
   title: "Bangumi Private API"
   version: ""
+servers:
+  - url: https://next.bgm.tv
+    description: Production server
 paths:
   "/p/login":
     post:
