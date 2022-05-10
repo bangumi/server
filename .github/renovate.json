@@ -11,8 +11,7 @@
     {
       "groupName": "deps",
       "matchManagers": ["gomod"],
-      "semanticCommitType": "build",
-      "matchUpdateTypes": ["patch", "minor"]
+      "semanticCommitType": "build"
     }
   ]
 }
