@@ -11,9 +11,10 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
+
+	"github.com/bangumi/server/internal/dal/dao"
 )
 
 func newUserGroup(db *gorm.DB) userGroup {
@@ -254,12 +255,18 @@ func (u userGroupDo) Assign(attrs ...field.AssignExpr) *userGroupDo {
 	return u.withDO(u.DO.Assign(attrs...))
 }
 
-func (u userGroupDo) Joins(field field.RelationField) *userGroupDo {
-	return u.withDO(u.DO.Joins(field))
+func (u userGroupDo) Joins(fields ...field.RelationField) *userGroupDo {
+	for _, _f := range fields {
+		u = *u.withDO(u.DO.Joins(_f))
+	}
+	return &u
 }
 
-func (u userGroupDo) Preload(field field.RelationField) *userGroupDo {
-	return u.withDO(u.DO.Preload(field))
+func (u userGroupDo) Preload(fields ...field.RelationField) *userGroupDo {
+	for _, _f := range fields {
+		u = *u.withDO(u.DO.Preload(_f))
+	}
+	return &u
 }
 
 func (u userGroupDo) FirstOrInit() (*dao.UserGroup, error) {
@@ -279,17 +286,12 @@ func (u userGroupDo) FirstOrCreate() (*dao.UserGroup, error) {
 }
 
 func (u userGroupDo) FindByPage(offset int, limit int) (result []*dao.UserGroup, count int64, err error) {
-	if limit <= 0 {
-		count, err = u.Count()
-		return
-	}
-
 	result, err = u.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
 	}
 
-	if size := len(result); 0 < size && size < limit {
+	if size := len(result); 0 < limit && 0 < size && size < limit {
 		count = int64(size + offset)
 		return
 	}

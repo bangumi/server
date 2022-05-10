@@ -11,9 +11,10 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
+
+	"github.com/bangumi/server/internal/dal/dao"
 )
 
 func newRevisionHistory(db *gorm.DB) revisionHistory {
@@ -266,12 +267,18 @@ func (r revisionHistoryDo) Assign(attrs ...field.AssignExpr) *revisionHistoryDo 
 	return r.withDO(r.DO.Assign(attrs...))
 }
 
-func (r revisionHistoryDo) Joins(field field.RelationField) *revisionHistoryDo {
-	return r.withDO(r.DO.Joins(field))
+func (r revisionHistoryDo) Joins(fields ...field.RelationField) *revisionHistoryDo {
+	for _, _f := range fields {
+		r = *r.withDO(r.DO.Joins(_f))
+	}
+	return &r
 }
 
-func (r revisionHistoryDo) Preload(field field.RelationField) *revisionHistoryDo {
-	return r.withDO(r.DO.Preload(field))
+func (r revisionHistoryDo) Preload(fields ...field.RelationField) *revisionHistoryDo {
+	for _, _f := range fields {
+		r = *r.withDO(r.DO.Preload(_f))
+	}
+	return &r
 }
 
 func (r revisionHistoryDo) FirstOrInit() (*dao.RevisionHistory, error) {
@@ -291,17 +298,12 @@ func (r revisionHistoryDo) FirstOrCreate() (*dao.RevisionHistory, error) {
 }
 
 func (r revisionHistoryDo) FindByPage(offset int, limit int) (result []*dao.RevisionHistory, count int64, err error) {
-	if limit <= 0 {
-		count, err = r.Count()
-		return
-	}
-
 	result, err = r.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
 	}
 
-	if size := len(result); 0 < size && size < limit {
+	if size := len(result); 0 < limit && 0 < size && size < limit {
 		count = int64(size + offset)
 		return
 	}

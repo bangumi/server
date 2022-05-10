@@ -12,9 +12,10 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
+
+	"github.com/bangumi/server/internal/dal/dao"
 )
 
 func newEpisode(db *gorm.DB) episode {
@@ -470,12 +471,18 @@ func (e episodeDo) Assign(attrs ...field.AssignExpr) *episodeDo {
 	return e.withDO(e.DO.Assign(attrs...))
 }
 
-func (e episodeDo) Joins(field field.RelationField) *episodeDo {
-	return e.withDO(e.DO.Joins(field))
+func (e episodeDo) Joins(fields ...field.RelationField) *episodeDo {
+	for _, _f := range fields {
+		e = *e.withDO(e.DO.Joins(_f))
+	}
+	return &e
 }
 
-func (e episodeDo) Preload(field field.RelationField) *episodeDo {
-	return e.withDO(e.DO.Preload(field))
+func (e episodeDo) Preload(fields ...field.RelationField) *episodeDo {
+	for _, _f := range fields {
+		e = *e.withDO(e.DO.Preload(_f))
+	}
+	return &e
 }
 
 func (e episodeDo) FirstOrInit() (*dao.Episode, error) {
@@ -495,17 +502,12 @@ func (e episodeDo) FirstOrCreate() (*dao.Episode, error) {
 }
 
 func (e episodeDo) FindByPage(offset int, limit int) (result []*dao.Episode, count int64, err error) {
-	if limit <= 0 {
-		count, err = e.Count()
-		return
-	}
-
 	result, err = e.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
 	}
 
-	if size := len(result); 0 < size && size < limit {
+	if size := len(result); 0 < limit && 0 < size && size < limit {
 		count = int64(size + offset)
 		return
 	}
