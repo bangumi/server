@@ -113,7 +113,6 @@ func (m mysqlRepo) ListCollections(
 			EpStatus:    c.EpStatus,
 			VolStatus:   c.VolStatus,
 			Type:        c.Type,
-			HasComment:  c.HasComment,
 			Private:     c.Private != model.CollectPrivacyNone,
 		}
 	}

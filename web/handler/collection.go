@@ -105,10 +105,7 @@ func (h Handler) listCollection(
 			VolStatus:   collection.VolStatus,
 			UpdatedAt:   collection.UpdatedAt,
 			Private:     collection.Private,
-		}
-
-		if collection.HasComment {
-			c.Comment = &collection.Comment
+			Comment:     nilString(collection.Comment),
 		}
 
 		data[i] = c

@@ -41,12 +41,11 @@ type Collection struct {
 	UpdatedAt   time.Time
 	Comment     string
 	Tags        []string
-	SubjectType uint8
-	HasComment  bool
-	Private     bool
-	Type        uint8
 	VolStatus   uint32
 	EpStatus    uint32
 	SubjectID   uint32
+	SubjectType uint8
 	Rate        uint8
+	Type        uint8
+	Private     bool
 }
