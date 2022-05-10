@@ -11,9 +11,10 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
+
+	"github.com/bangumi/server/internal/dal/dao"
 )
 
 func newCast(db *gorm.DB) cast {
@@ -504,12 +505,18 @@ func (c castDo) Assign(attrs ...field.AssignExpr) *castDo {
 	return c.withDO(c.DO.Assign(attrs...))
 }
 
-func (c castDo) Joins(field field.RelationField) *castDo {
-	return c.withDO(c.DO.Joins(field))
+func (c castDo) Joins(fields ...field.RelationField) *castDo {
+	for _, _f := range fields {
+		c = *c.withDO(c.DO.Joins(_f))
+	}
+	return &c
 }
 
-func (c castDo) Preload(field field.RelationField) *castDo {
-	return c.withDO(c.DO.Preload(field))
+func (c castDo) Preload(fields ...field.RelationField) *castDo {
+	for _, _f := range fields {
+		c = *c.withDO(c.DO.Preload(_f))
+	}
+	return &c
 }
 
 func (c castDo) FirstOrInit() (*dao.Cast, error) {
@@ -529,17 +536,12 @@ func (c castDo) FirstOrCreate() (*dao.Cast, error) {
 }
 
 func (c castDo) FindByPage(offset int, limit int) (result []*dao.Cast, count int64, err error) {
-	if limit <= 0 {
-		count, err = c.Count()
-		return
-	}
-
 	result, err = c.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
 	}
 
-	if size := len(result); 0 < size && size < limit {
+	if size := len(result); 0 < limit && 0 < size && size < limit {
 		count = int64(size + offset)
 		return
 	}

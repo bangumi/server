@@ -11,9 +11,10 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
+
+	"github.com/bangumi/server/internal/dal/dao"
 )
 
 func newOAuthAccessToken(db *gorm.DB) oAuthAccessToken {
@@ -258,12 +259,18 @@ func (o oAuthAccessTokenDo) Assign(attrs ...field.AssignExpr) *oAuthAccessTokenD
 	return o.withDO(o.DO.Assign(attrs...))
 }
 
-func (o oAuthAccessTokenDo) Joins(field field.RelationField) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Joins(field))
+func (o oAuthAccessTokenDo) Joins(fields ...field.RelationField) *oAuthAccessTokenDo {
+	for _, _f := range fields {
+		o = *o.withDO(o.DO.Joins(_f))
+	}
+	return &o
 }
 
-func (o oAuthAccessTokenDo) Preload(field field.RelationField) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Preload(field))
+func (o oAuthAccessTokenDo) Preload(fields ...field.RelationField) *oAuthAccessTokenDo {
+	for _, _f := range fields {
+		o = *o.withDO(o.DO.Preload(_f))
+	}
+	return &o
 }
 
 func (o oAuthAccessTokenDo) FirstOrInit() (*dao.OAuthAccessToken, error) {
@@ -283,17 +290,12 @@ func (o oAuthAccessTokenDo) FirstOrCreate() (*dao.OAuthAccessToken, error) {
 }
 
 func (o oAuthAccessTokenDo) FindByPage(offset int, limit int) (result []*dao.OAuthAccessToken, count int64, err error) {
-	if limit <= 0 {
-		count, err = o.Count()
-		return
-	}
-
 	result, err = o.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
 	}
 
-	if size := len(result); 0 < size && size < limit {
+	if size := len(result); 0 < limit && 0 < size && size < limit {
 		count = int64(size + offset)
 		return
 	}

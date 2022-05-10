@@ -12,9 +12,10 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
+
+	"github.com/bangumi/server/internal/dal/dao"
 )
 
 func newCharacter(db *gorm.DB) character {
@@ -396,12 +397,18 @@ func (c characterDo) Assign(attrs ...field.AssignExpr) *characterDo {
 	return c.withDO(c.DO.Assign(attrs...))
 }
 
-func (c characterDo) Joins(field field.RelationField) *characterDo {
-	return c.withDO(c.DO.Joins(field))
+func (c characterDo) Joins(fields ...field.RelationField) *characterDo {
+	for _, _f := range fields {
+		c = *c.withDO(c.DO.Joins(_f))
+	}
+	return &c
 }
 
-func (c characterDo) Preload(field field.RelationField) *characterDo {
-	return c.withDO(c.DO.Preload(field))
+func (c characterDo) Preload(fields ...field.RelationField) *characterDo {
+	for _, _f := range fields {
+		c = *c.withDO(c.DO.Preload(_f))
+	}
+	return &c
 }
 
 func (c characterDo) FirstOrInit() (*dao.Character, error) {
@@ -421,17 +428,12 @@ func (c characterDo) FirstOrCreate() (*dao.Character, error) {
 }
 
 func (c characterDo) FindByPage(offset int, limit int) (result []*dao.Character, count int64, err error) {
-	if limit <= 0 {
-		count, err = c.Count()
-		return
-	}
-
 	result, err = c.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
 	}
 
-	if size := len(result); 0 < size && size < limit {
+	if size := len(result); 0 < limit && 0 < size && size < limit {
 		count = int64(size + offset)
 		return
 	}
