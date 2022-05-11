@@ -32,16 +32,16 @@ import (
 )
 
 type Request struct {
+	Response    interface{}
 	t           *testing.T
 	headers     http.Header
-	Response    interface{}
 	urlParams   url.Values
-	HTTPVerb    string
 	formData    url.Values
+	cookies     map[string]string
+	HTTPVerb    string
 	contentType string
 	Endpoint    string
 	HTTPBody    []byte
-	Cookies     []*http.Cookie
 }
 
 func New(t *testing.T) *Request {
@@ -90,7 +90,8 @@ func (r *Request) Delete(path string) *Request {
 
 func (r *Request) Cookie(key, value string) *Request {
 	r.t.Helper()
-	r.Cookies = append(r.Cookies, &http.Cookie{Name: key, Value: value})
+
+	r.cookies[key] = value
 
 	return r
 }
@@ -163,8 +164,8 @@ func (r *Request) StdRequest() *http.Request {
 
 	req := httptest.NewRequest(r.HTTPVerb, path, body)
 	req.Header = r.headers
-	for _, c := range r.Cookies {
-		req.AddCookie(c)
+	for name, value := range r.cookies {
+		req.AddCookie(&http.Cookie{Name: name, Value: value})
 	}
 
 	return req
