@@ -79,7 +79,8 @@ func (w Wiki) NonZero() Wiki {
 	return wiki
 }
 
-func (w Wiki) countFieldsAndItems() (itemsCount, fieldsCount int) {
+func (w Wiki) countFieldsAndItems() (int, int) {
+	var itemsCount, fieldsCount int
 	for _, field := range w.Fields {
 		if field.Null {
 			continue
@@ -97,5 +98,5 @@ func (w Wiki) countFieldsAndItems() (itemsCount, fieldsCount int) {
 		}
 	}
 
-	return
+	return itemsCount, fieldsCount
 }

@@ -275,6 +275,7 @@ linters:
     - wsl # noisy
     - varnamelen # noisy
     - exhaustivestruct # too noisy, default zero value is a good thing.
+    - exhaustruct # too noisy
     - gofumpt # break import grouping
     - prealloc # perf
     - scopelint # archived
@@ -287,6 +288,7 @@ linters:
     - nlreturn
     - whitespace
     - godox
+    - execinquery
   fast: false
 
 issues:
