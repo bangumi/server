@@ -46,13 +46,41 @@ paths:
               schema:
                 "$ref": "#/components/schemas/User"
 
+        "400":
+          description: 请求错误或者验证码错误
+          content:
+            application/json:
+              example:
+                "title": "Bad Request"
+                "details":
+                  - "Email为必填字段"
+                  - "Password为必填字段"
+                  - "HCaptchaResponse为必填字段"
+                "description": "can't validate request body"
+              schema:
+                title: ErrorDetail
+                required:
+                  - title
+                  - description
+                  - detail
+                type: object
+                properties:
+                  title:
+                    title: Title
+                    type: string
+                  description:
+                    title: Description
+                    type: string
+                  detail:
+                    title: Detail
+                    type: array
+                    items:
+                      type: string
+
         "401":
           description: 账号或密码错误
           content:
             application/json:
-              example:
-                title: 账号错误
-                description:
               schema:
                 title: ErrorDetail
                 required:
@@ -77,6 +105,9 @@ paths:
 
         "422":
           description: "无法以 JSON 格式解析请求"
+
+        "502":
+          description: hCaptcha HTTP 请求失败
 
   "/p/logout":
     post:

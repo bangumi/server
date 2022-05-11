@@ -17,6 +17,10 @@
 package handler
 
 import (
+	"errors"
+	"net/http"
+
+	"github.com/go-playground/validator/v10"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
@@ -45,6 +49,30 @@ func (h Handler) RevokeSession(c *fiber.Ctx) error {
 
 func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	a := h.getHTTPAccessor(c)
+	var r req.UserLogin
+	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
+		return res.WithError(c, err, code.UnprocessableEntity, "can't decode request body as json")
+	}
+
+	if err := h.v.Struct(r); err != nil {
+		var validationErrors validator.ValidationErrors
+		if ok := errors.As(err, &validationErrors); ok {
+			var details = make([]string, len(validationErrors))
+			for i, e := range validationErrors {
+				// can translate each error one at a time.
+				details[i] = e.Translate(h.validatorTranslation)
+			}
+
+			return res.JSON(c.Status(code.BadRequest), res.Error{
+				Title:       http.StatusText(code.BadRequest),
+				Description: "can't validate request body",
+				Details:     details,
+			})
+		}
+
+		return res.WithError(c, err, code.BadRequest, "can't validate request body")
+	}
+
 	allowed, remain, err := h.rateLimit.Allowed(c.Context(), c.Context().RemoteIP().String())
 	if err != nil {
 		h.log.Error("failed to apply rate limit", zap.Error(err), a.LogRequestID())
@@ -55,22 +83,17 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return res.HTTPError(c, code.TooManyRequests, "Too many requests, you are not allowed to log in for a while.")
 	}
 
-	var r req.UserLogin
-	if err = json.UnmarshalNoEscape(c.Body(), &r); err != nil {
-		return res.WithError(c, err, code.UnprocessableEntity, "can't decode request body as json")
-	}
-
-	if err = h.v.Struct(r); err != nil {
-		return res.WithError(c, err, code.BadRequest, "can't validate request body")
-	}
-
 	ok, err := h.captcha.Verify(c.Context(), r.HCaptchaResponse)
 	if err != nil {
-		return res.WithError(c, err, code.BadRequest, "Captcha verify http request error")
+		return res.WithError(c, err, code.BadGateway, "Captcha verify http request error")
 	}
 
 	if !ok {
-		return res.HTTPError(c, code.BadGateway, "failed to pass captcha verify, please re-do")
+		return res.JSON(c.Status(code.BadRequest), res.Error{
+			Title:       http.StatusText(code.BadRequest),
+			Description: "can't validate request body",
+			Details:     []string{"未通过hCaptcha验证"},
+		})
 	}
 
 	return h.privateLogin(c, a, r, remain)
