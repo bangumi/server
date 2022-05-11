@@ -21,16 +21,20 @@ import (
 	"encoding/hex"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gookit/goutil/timex"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/mocks"
 	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/web/session"
 )
 
 func TestHandler_PrivateLogin(t *testing.T) {
@@ -63,7 +67,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Post("/p/login").JSON(fiber.Map{
+	resp := test.New(t).Post("/p/login").Header(fiber.HeaderOrigin, config.FrontendOrigin).JSON(fiber.Map{
 		"email":              "user email",
 		"password":           "p",
 		"h-captcha-response": "req",
@@ -84,4 +88,33 @@ func TestHandler_PrivateLogin_content_type(t *testing.T) {
 	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").Execute(app, -1)
 
 	require.Equal(t, fiber.StatusBadRequest, resp.StatusCode, resp.BodyString())
+}
+
+func TestHandler_PrivateLogout(t *testing.T) {
+	t.Parallel()
+
+	mockCaptcha := &mocks.SessionManager{}
+	mockCaptcha.EXPECT().Get(mock.Anything, "req").Return(session.Session{
+		RegTime:   time.Now().Add(-timex.OneWeek),
+		UserID:    1,
+		GroupID:   1,
+		ExpiredAt: time.Now().Unix() + timex.OneWeekSec,
+	}, nil)
+	mockCaptcha.EXPECT().Revoke(mock.Anything, "req").Return(nil)
+
+	app := test.GetWebApp(t, test.Mock{SessionManager: mockCaptcha})
+
+	resp := test.New(t).Post("/p/logout").Cookie(session.Key, "req").
+		Header(fiber.HeaderOrigin, config.FrontendOrigin).Execute(app, -1)
+
+	require.Equal(t, fiber.StatusNoContent, resp.StatusCode, resp.BodyString())
+
+	var found bool
+	for _, cookie := range resp.Cookies() {
+		if cookie.Name == session.Key {
+			found = true
+			require.Equal(t, "", cookie.Value)
+		}
+	}
+	require.True(t, found)
 }

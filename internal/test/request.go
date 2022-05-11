@@ -32,16 +32,16 @@ import (
 )
 
 type Request struct {
+	Response    interface{}
 	t           *testing.T
 	headers     http.Header
-	Response    interface{}
 	urlParams   url.Values
-	HTTPVerb    string
 	formData    url.Values
+	cookies     map[string]string
+	HTTPVerb    string
 	contentType string
 	Endpoint    string
 	HTTPBody    []byte
-	Cookies     []*http.Cookie
 }
 
 func New(t *testing.T) *Request {
@@ -50,6 +50,7 @@ func New(t *testing.T) *Request {
 	return &Request{
 		t:         t,
 		urlParams: url.Values{},
+		cookies:   make(map[string]string),
 		formData:  url.Values{},
 		headers:   http.Header{fiber.HeaderUserAgent: {"chii-test-client"}},
 	}
@@ -86,6 +87,14 @@ func (r *Request) Patch(path string) *Request {
 func (r *Request) Delete(path string) *Request {
 	r.t.Helper()
 	return r.newRequest(http.MethodDelete, path)
+}
+
+func (r *Request) Cookie(key, value string) *Request {
+	r.t.Helper()
+
+	r.cookies[key] = value
+
+	return r
 }
 
 func (r *Request) Query(key, value string) *Request {
@@ -156,6 +165,9 @@ func (r *Request) StdRequest() *http.Request {
 
 	req := httptest.NewRequest(r.HTTPVerb, path, body)
 	req.Header = r.headers
+	for name, value := range r.cookies {
+		req.AddCookie(&http.Cookie{Name: name, Value: value})
+	}
 
 	return req
 }
@@ -175,6 +187,7 @@ func (r *Request) Execute(app *fiber.App, msTimeout ...int) *Response {
 		StatusCode: resp.StatusCode,
 		Header:     resp.Header,
 		Body:       body,
+		cookies:    resp.Cookies(),
 	}
 }
 
@@ -182,7 +195,8 @@ type Response struct {
 	t          *testing.T
 	Header     http.Header
 	Body       []byte
-	StatusCode int // e.g. 200
+	cookies    []*http.Cookie
+	StatusCode int
 }
 
 func (r *Response) JSON(v interface{}) *Response {
@@ -205,4 +219,10 @@ func (r *Response) ExpectCode(t int) *Response {
 	require.Equalf(r.t, t, r.StatusCode, "expecting http response status code %d", t)
 
 	return r
+}
+
+func (r *Response) Cookies() []*http.Cookie {
+	r.t.Helper()
+
+	return r.cookies
 }

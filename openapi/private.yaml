@@ -76,7 +76,22 @@ paths:
                         description: 剩余可用登录次数。
 
         "422":
-          description: "`content-type` 只能为 `application/json`."
+          description: "无法以 JSON 格式解析请求"
+
+  "/p/logout":
+    post:
+      tags:
+        - Auth
+      summary: 登出
+      operationId: logout
+      security:
+        - CookiesSession: []
+      responses:
+        "204":
+          description: "正常登出"
+
+        "401":
+          description: 用户未登录或者 session 已失效
 
 components:
   schemas:
