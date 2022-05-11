@@ -88,6 +88,13 @@ func (r *Request) Delete(path string) *Request {
 	return r.newRequest(http.MethodDelete, path)
 }
 
+func (r *Request) Cookie(key, value string) *Request {
+	r.t.Helper()
+	r.Cookies = append(r.Cookies, &http.Cookie{Name: key, Value: value})
+
+	return r
+}
+
 func (r *Request) Query(key, value string) *Request {
 	r.t.Helper()
 	r.urlParams.Set(key, value)
@@ -156,6 +163,9 @@ func (r *Request) StdRequest() *http.Request {
 
 	req := httptest.NewRequest(r.HTTPVerb, path, body)
 	req.Header = r.headers
+	for _, c := range r.Cookies {
+		req.AddCookie(c)
+	}
 
 	return req
 }
@@ -175,6 +185,7 @@ func (r *Request) Execute(app *fiber.App, msTimeout ...int) *Response {
 		StatusCode: resp.StatusCode,
 		Header:     resp.Header,
 		Body:       body,
+		cookies:    resp.Cookies(),
 	}
 }
 
@@ -183,6 +194,7 @@ type Response struct {
 	Header     http.Header
 	Body       []byte
 	StatusCode int // e.g. 200
+	cookies    []*http.Cookie
 }
 
 func (r *Response) JSON(v interface{}) *Response {
@@ -205,4 +217,10 @@ func (r *Response) ExpectCode(t int) *Response {
 	require.Equalf(r.t, t, r.StatusCode, "expecting http response status code %d", t)
 
 	return r
+}
+
+func (r *Response) Cookies() []*http.Cookie {
+	r.t.Helper()
+
+	return r.cookies
 }
