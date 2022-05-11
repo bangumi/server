@@ -39,7 +39,7 @@ func newSubjectField(db *gorm.DB) subjectField {
 	_subjectField.Rate8 = field.NewUint32(tableName, "field_rate_8")
 	_subjectField.Rate9 = field.NewUint32(tableName, "field_rate_9")
 	_subjectField.Rate10 = field.NewUint32(tableName, "field_rate_10")
-	_subjectField.Airtime = field.NewInt8(tableName, "field_airtime")
+	_subjectField.Airtime = field.NewUint8(tableName, "field_airtime")
 	_subjectField.Rank = field.NewUint32(tableName, "field_rank")
 	_subjectField.Year = field.NewInt32(tableName, "field_year")
 	_subjectField.Mon = field.NewInt8(tableName, "field_mon")
@@ -69,7 +69,7 @@ type subjectField struct {
 	Rate8    field.Uint32
 	Rate9    field.Uint32
 	Rate10   field.Uint32
-	Airtime  field.Int8
+	Airtime  field.Uint8
 	Rank     field.Uint32
 	Year     field.Int32
 	Mon      field.Int8
@@ -105,7 +105,7 @@ func (s *subjectField) updateTableName(table string) *subjectField {
 	s.Rate8 = field.NewUint32(table, "field_rate_8")
 	s.Rate9 = field.NewUint32(table, "field_rate_9")
 	s.Rate10 = field.NewUint32(table, "field_rate_10")
-	s.Airtime = field.NewInt8(table, "field_airtime")
+	s.Airtime = field.NewUint8(table, "field_airtime")
 	s.Rank = field.NewUint32(table, "field_rank")
 	s.Year = field.NewInt32(table, "field_year")
 	s.Mon = field.NewInt8(table, "field_mon")

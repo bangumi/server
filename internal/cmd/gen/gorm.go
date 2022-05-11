@@ -182,7 +182,7 @@ func main() {
 	modelSubjectFields := g.GenerateModelAs("chii_subject_fields", "SubjectField",
 		// gen.FieldTrimPrefix("field_"),
 		gen.FieldTrimPrefix("field_"),
-		gen.FieldType("field_airtime", "int8"),
+		gen.FieldType("field_airtime", "uint8"),
 		gen.FieldType("field_week_day", "int8"),
 		gen.FieldType("field_redirect", subjectIDTypeString),
 		gen.FieldType("field_tags", "[]byte"),
