@@ -193,8 +193,8 @@ type Response struct {
 	t          *testing.T
 	Header     http.Header
 	Body       []byte
-	StatusCode int // e.g. 200
 	cookies    []*http.Cookie
+	StatusCode int
 }
 
 func (r *Response) JSON(v interface{}) *Response {
