@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -274,46 +273,6 @@ func (a characterSubjectsHasOneSubjectTx) Count() int64 {
 }
 
 type characterSubjectsDo struct{ gen.DO }
-
-//GetBySubject ...
-//
-//where(subject_id=@id)
-func (c characterSubjectsDo) GetBySubject(id uint32) (result []*dao.CharacterSubjects, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("subject_id=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = c.UnderlyingDB().Where(generateSQL.String(), params).Find(&result)
-	} else {
-		executeSQL = c.UnderlyingDB().Where(generateSQL.String()).Find(&result)
-	}
-	err = executeSQL.Error
-	return
-}
-
-//GetByCharacter ...
-//
-//where(crt_id=@id)
-func (c characterSubjectsDo) GetByCharacter(id uint32) (result []*dao.CharacterSubjects, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("crt_id=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = c.UnderlyingDB().Where(generateSQL.String(), params).Find(&result)
-	} else {
-		executeSQL = c.UnderlyingDB().Where(generateSQL.String()).Find(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (c characterSubjectsDo) Debug() *characterSubjectsDo {
 	return c.withDO(c.DO.Debug())

@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -224,26 +223,6 @@ func (a memberHasOneFieldsTx) Count() int64 {
 }
 
 type memberDo struct{ gen.DO }
-
-//GetByID get a user should not be used as authorization.
-//
-//where(uid=@id)
-func (m memberDo) GetByID(id uint32) (result *dao.Member, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("uid=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = m.UnderlyingDB().Where(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = m.UnderlyingDB().Where(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (m memberDo) Debug() *memberDo {
 	return m.withDO(m.DO.Debug())

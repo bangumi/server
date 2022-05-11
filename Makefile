@@ -32,6 +32,7 @@ build: ./dist/chii.exe
 ./dist/chii.exe:
 	env CGO_ENABLED=0 go build -o $@
 
+# we should use gomock once https://github.com/golang/mock/issues/622 is resolved.
 mocks: mocks/SessionRepo.go mocks/SessionManager.go mocks/CaptchaManager.go mocks/RateLimiter.go
 	for dir in domain cache; do \
 		go run github.com/vektra/mockery/v2 --all --dir $$dir --with-expecter; \
@@ -61,7 +62,7 @@ test-all: .bin/dotenv.exe .bin/gotestfmt.exe
 bench:
 	go test -bench=. -benchmem ./pkg/wiki
 
-./dal/query/gen.go: ./internal/cmd/gen/gorm.go internal/cmd/gen/method go.mod .bin/dotenv.exe
+./dal/query/gen.go: ./internal/cmd/gen/gorm.go go.mod .bin/dotenv.exe
 	.bin/dotenv.exe go run ./internal/cmd/gen/gorm.go
 
 coverage: .bin/dotenv.exe .bin/gotestfmt.exe

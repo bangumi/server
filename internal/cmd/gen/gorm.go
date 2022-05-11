@@ -33,7 +33,6 @@ import (
 	"gorm.io/gen/field"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/internal/cmd/gen/method"
 	"github.com/bangumi/server/internal/dal"
 )
 
@@ -124,7 +123,7 @@ func main() {
 			GORMTag: "foreignKey:UID;references:UID",
 		}))
 
-	g.ApplyInterface(func(method.Member) {}, modelMember)
+	g.ApplyBasic(modelMember)
 
 	g.ApplyBasic(g.GenerateModelAs("chii_os_web_sessions", "WebSession"))
 
@@ -156,7 +155,8 @@ func main() {
 		gen.FieldType("birth_year", "uint16"),
 		gen.FieldRename("prsn_cat", "OwnerType"),
 	)
-	g.ApplyInterface(func(method.PersonField) {}, modelPersonField)
+
+	g.ApplyBasic(modelPersonField)
 
 	modelPerson := g.GenerateModelAs("chii_persons", "Person",
 		gen.FieldTrimPrefix("prsn_"),
@@ -167,7 +167,7 @@ func main() {
 			GORMTag: "foreignKey:prsn_id;polymorphic:Owner;polymorphicValue:prsn",
 		}),
 	)
-	g.ApplyInterface(func(method.Person) {}, modelPerson)
+	g.ApplyBasic(modelPerson)
 
 	modelCharacter := g.GenerateModelAs("chii_characters", "Character",
 		gen.FieldTrimPrefix("crt_"),
@@ -177,7 +177,7 @@ func main() {
 		}),
 	)
 
-	g.ApplyInterface(func(method.Character) {}, modelCharacter)
+	g.ApplyBasic(modelCharacter)
 
 	modelSubjectFields := g.GenerateModelAs("chii_subject_fields", "SubjectField",
 		// gen.FieldTrimPrefix("field_"),
@@ -189,7 +189,7 @@ func main() {
 		// gen.FieldType("field_date","string"),
 	)
 
-	g.ApplyInterface(func(method.SubjectField) {}, modelSubjectFields)
+	g.ApplyBasic(modelSubjectFields)
 
 	modelSubject := g.GenerateModelAs("chii_subjects", "Subject",
 		// gen.FieldTrimPrefix("field_"),
@@ -207,39 +207,36 @@ func main() {
 			GORMTag: "foreignKey:subject_id;references:field_sid",
 		}),
 	)
-	g.ApplyInterface(func(method.Subject) {}, modelSubject)
+	g.ApplyBasic(modelSubject)
 
-	g.ApplyInterface(func(method method.Episode) {},
-		g.GenerateModelAs("chii_episodes", "Episode",
-			// gen.FieldTrimPrefix("field_"),
-			gen.FieldTrimPrefix("ep_"),
-			gen.FieldType("ep_type", "int8"),
-			gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
-				GORMTag: "foreignKey:ep_subject_id;references:subject_id",
-			}),
-		))
+	g.ApplyBasic(g.GenerateModelAs("chii_episodes", "Episode",
+		// gen.FieldTrimPrefix("field_"),
+		gen.FieldTrimPrefix("ep_"),
+		gen.FieldType("ep_type", "int8"),
+		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
+			GORMTag: "foreignKey:ep_subject_id;references:subject_id",
+		}),
+	))
 
-	g.ApplyInterface(func(method.SubjectRelation) {},
-		g.GenerateModelAs("chii_subject_relations", "SubjectRelation",
-			// gen.FieldTrimPrefix("field_"),
-			gen.FieldTrimPrefix("rlt_"),
-			gen.FieldType("rlt_related_subject_id", subjectIDTypeString),
-			gen.FieldType("rlt_subject_id", subjectIDTypeString),
-			gen.FieldType("rlt_subject_type_id", subjectTypeIDTypeString),
-			gen.FieldType("rlt_related_subject_type_id", subjectTypeIDTypeString),
-			gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-				GORMTag: "foreignKey:rlt_related_subject_id;references:subject_id",
-			}),
-		))
+	g.ApplyBasic(g.GenerateModelAs("chii_subject_relations", "SubjectRelation",
+		// gen.FieldTrimPrefix("field_"),
+		gen.FieldTrimPrefix("rlt_"),
+		gen.FieldType("rlt_related_subject_id", subjectIDTypeString),
+		gen.FieldType("rlt_subject_id", subjectIDTypeString),
+		gen.FieldType("rlt_subject_type_id", subjectTypeIDTypeString),
+		gen.FieldType("rlt_related_subject_type_id", subjectTypeIDTypeString),
+		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
+			GORMTag: "foreignKey:rlt_related_subject_id;references:subject_id",
+		}),
+	))
 
-	g.ApplyInterface(func(method.SubjectRevision) {},
-		g.GenerateModelAs("chii_subject_revisions", "SubjectRevision",
-			gen.FieldTrimPrefix("rev_"),
-			gen.FieldRename("rev_name_cn", "NameCN"),
-			gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
-				GORMTag: "foreignKey:rev_subject_id;references:subject_id",
-			}),
-		))
+	g.ApplyBasic(g.GenerateModelAs("chii_subject_revisions", "SubjectRevision",
+		gen.FieldTrimPrefix("rev_"),
+		gen.FieldRename("rev_name_cn", "NameCN"),
+		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
+			GORMTag: "foreignKey:rev_subject_id;references:subject_id",
+		}),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_crt_cast_index", "Cast",
 		gen.FieldRename("prsn_id", "PersonID"),
@@ -255,7 +252,7 @@ func main() {
 		}),
 	))
 
-	g.ApplyInterface(func(method method.CharacterSubjects) {},
+	g.ApplyBasic(
 		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
 			gen.FieldRename("crt_id", "CharacterID"),
 			gen.FieldType("subject_id", subjectIDTypeString),
@@ -266,20 +263,21 @@ func main() {
 			gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
 				GORMTag: "foreignKey:subject_id;references:subject_id",
 			}),
-		))
+		),
+	)
 
-	g.ApplyInterface(func(method.PersonSubjects) {},
-		g.GenerateModelAs("chii_person_cs_index", "PersonSubjects",
-			gen.FieldRename("prsn_id", "person_id"),
-			gen.FieldType("subject_id", subjectIDTypeString),
-			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
-			gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-				GORMTag: "foreignKey:subject_id;references:subject_id",
-			}),
-			gen.FieldRelate(field.HasOne, "Person", modelPerson, &field.RelateConfig{
-				GORMTag: "foreignKey:prsn_id;references:prsn_id",
-			}),
-		))
+	g.ApplyBasic(g.GenerateModelAs("chii_person_cs_index", "PersonSubjects",
+		gen.FieldRename("prsn_id", "person_id"),
+		gen.FieldType("subject_id", subjectIDTypeString),
+		gen.FieldType("subject_type_id", subjectTypeIDTypeString),
+		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
+			GORMTag: "foreignKey:subject_id;references:subject_id",
+		}),
+		gen.FieldRelate(field.HasOne, "Person", modelPerson, &field.RelateConfig{
+			GORMTag: "foreignKey:prsn_id;references:prsn_id",
+		}),
+	),
+	)
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index_related", "IndexSubject",
 		gen.FieldTrimPrefix("idx_rlt_"),

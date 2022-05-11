@@ -42,7 +42,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.SubjectRepo, error) {
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Subject, error) {
-	s, err := r.q.Subject.WithContext(ctx).Preload(r.q.Subject.Fields).GetByID(id)
+	s, err := r.q.Subject.WithContext(ctx).Preload(r.q.Subject.Fields).Where(r.q.Subject.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Subject{}, domain.ErrNotFound

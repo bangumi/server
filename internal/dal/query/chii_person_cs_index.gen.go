@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -278,46 +277,6 @@ func (a personSubjectsHasOnePersonTx) Count() int64 {
 }
 
 type personSubjectsDo struct{ gen.DO }
-
-//GetBySubject ...
-//
-//where(subject_id=@id)
-func (p personSubjectsDo) GetBySubject(id uint32) (result []*dao.PersonSubjects, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("subject_id=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String(), params).Find(&result)
-	} else {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String()).Find(&result)
-	}
-	err = executeSQL.Error
-	return
-}
-
-//GetByPerson
-//
-//where(prsn_id=@id)
-func (p personSubjectsDo) GetByPerson(id uint32) (result []*dao.PersonSubjects, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("prsn_id=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String(), params).Find(&result)
-	} else {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String()).Find(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (p personSubjectsDo) Debug() *personSubjectsDo {
 	return p.withDO(p.DO.Debug())

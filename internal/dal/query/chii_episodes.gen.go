@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -237,85 +236,6 @@ func (a episodeBelongsToSubjectTx) Count() int64 {
 }
 
 type episodeDo struct{ gen.DO }
-
-//GetByID ...
-//
-//where(ep_ep_id=@id)
-func (e episodeDo) GetByID(id uint32) (result *dao.Episode, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("ep_ep_id=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = e.UnderlyingDB().Where(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = e.UnderlyingDB().Where(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
-
-//GetBySubjectID ...
-//
-//where(ep_subject_id=@id ORDER BY `ep_disc`,`ep_type`,`ep_sort`)
-func (e episodeDo) GetBySubjectID(id uint32) (result []*dao.Episode, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("ep_subject_id=@id ORDER BY `ep_disc`,`ep_type`,`ep_sort` ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = e.UnderlyingDB().Where(generateSQL.String(), params).Find(&result)
-	} else {
-		executeSQL = e.UnderlyingDB().Where(generateSQL.String()).Find(&result)
-	}
-	err = executeSQL.Error
-	return
-}
-
-//GetFirst get first episode of a repository.
-//where(ep_subject_id=@subjectID ORDER BY `ep_disc`,`ep_type`,`ep_sort` LIMIT 1)
-func (e episodeDo) GetFirst(subjectID uint32) (result *dao.Episode, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["subjectID"] = subjectID
-	generateSQL.WriteString("get first episode of a repository. where(ep_subject_id=@subjectID ORDER BY `ep_disc`,`ep_type`,`ep_sort` LIMIT 1) ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = e.UnderlyingDB().Raw(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = e.UnderlyingDB().Raw(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
-
-//CountBySubjectID ...
-//
-//sql(select count(ep_id) from chii_episodes where ep_subject_id=@id)
-func (e episodeDo) CountBySubjectID(id uint32) (result int64, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("select count(ep_id) from chii_episodes where ep_subject_id=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = e.UnderlyingDB().Raw(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = e.UnderlyingDB().Raw(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (e episodeDo) Debug() *episodeDo {
 	return e.withDO(e.DO.Debug())

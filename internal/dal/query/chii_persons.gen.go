@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -248,26 +247,6 @@ func (a personHasOneFieldsTx) Count() int64 {
 }
 
 type personDo struct{ gen.DO }
-
-//Get a person from database.
-//
-//where(prsn_id=@id)
-func (p personDo) Get(id uint32) (result *dao.Person, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("prsn_id=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (p personDo) Debug() *personDo {
 	return p.withDO(p.DO.Debug())

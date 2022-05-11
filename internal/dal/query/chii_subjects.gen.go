@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -256,46 +255,6 @@ func (a subjectHasOneFieldsTx) Count() int64 {
 }
 
 type subjectDo struct{ gen.DO }
-
-//GetByID ...
-//
-//where(subject_id=@id)
-func (s subjectDo) GetByID(id uint32) (result *dao.Subject, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("subject_id=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = s.UnderlyingDB().Where(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = s.UnderlyingDB().Where(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
-
-//GetByIDs ...
-//
-//where(subject_id IN @ids)
-func (s subjectDo) GetByIDs(ids []uint32) (result []*dao.Subject, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["ids"] = ids
-	generateSQL.WriteString("subject_id IN @ids ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = s.UnderlyingDB().Where(generateSQL.String(), params).Find(&result)
-	} else {
-		executeSQL = s.UnderlyingDB().Where(generateSQL.String()).Find(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (s subjectDo) Debug() *subjectDo {
 	return s.withDO(s.DO.Debug())

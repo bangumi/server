@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -113,46 +112,6 @@ func (p personField) clone(db *gorm.DB) personField {
 }
 
 type personFieldDo struct{ gen.DO }
-
-//GetPerson get person's extra field.
-//
-//where(prsn_id=@id AND prsn_cat="prsn")
-func (p personFieldDo) GetPerson(id uint32) (result *dao.PersonField, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("prsn_id=@id AND prsn_cat=\"prsn\" ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
-
-//GetCharacter get character's extra field.
-//
-//where(prsn_id=@id AND prsn_cat="crt")
-func (p personFieldDo) GetCharacter(id uint32) (result *dao.PersonField, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("prsn_id=@id AND prsn_cat=\"crt\" ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = p.UnderlyingDB().Where(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (p personFieldDo) Debug() *personFieldDo {
 	return p.withDO(p.DO.Debug())

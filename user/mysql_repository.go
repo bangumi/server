@@ -121,7 +121,7 @@ func (m mysqlRepo) ListCollections(
 }
 
 func (m mysqlRepo) GetByID(ctx context.Context, userID uint32) (model.User, error) {
-	u, err := m.q.Member.WithContext(ctx).GetByID(userID)
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.UID.Eq(userID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.User{}, domain.ErrNotFound

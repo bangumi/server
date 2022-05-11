@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -165,26 +164,6 @@ func (s subjectField) clone(db *gorm.DB) subjectField {
 }
 
 type subjectFieldDo struct{ gen.DO }
-
-//GetByID ...
-//
-//where(field_sid=@id)
-func (s subjectFieldDo) GetByID(id uint32) (result *dao.SubjectField, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("field_sid=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = s.UnderlyingDB().Where(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = s.UnderlyingDB().Where(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (s subjectFieldDo) Debug() *subjectFieldDo {
 	return s.withDO(s.DO.Debug())

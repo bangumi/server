@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -222,26 +221,6 @@ func (a characterHasOneFieldsTx) Count() int64 {
 }
 
 type characterDo struct{ gen.DO }
-
-//Get a Character from database.
-//
-//where(crt_id=@id)
-func (c characterDo) Get(id uint32) (result *dao.Character, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("crt_id=@id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = c.UnderlyingDB().Where(generateSQL.String(), params).Take(&result)
-	} else {
-		executeSQL = c.UnderlyingDB().Where(generateSQL.String()).Take(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (c characterDo) Debug() *characterDo {
 	return c.withDO(c.DO.Debug())

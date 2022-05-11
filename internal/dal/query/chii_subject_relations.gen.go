@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -195,26 +194,6 @@ func (a subjectRelationHasOneSubjectTx) Count() int64 {
 }
 
 type subjectRelationDo struct{ gen.DO }
-
-//GetBySubjectID find all relation of a repository.
-//
-//where(rlt_subject_id = @id)
-func (s subjectRelationDo) GetBySubjectID(id uint32) (result []*dao.SubjectRelation, err error) {
-	params := make(map[string]interface{}, 0)
-
-	var generateSQL strings.Builder
-	params["id"] = id
-	generateSQL.WriteString("rlt_subject_id = @id ")
-
-	var executeSQL *gorm.DB
-	if len(params) > 0 {
-		executeSQL = s.UnderlyingDB().Where(generateSQL.String(), params).Find(&result)
-	} else {
-		executeSQL = s.UnderlyingDB().Where(generateSQL.String()).Find(&result)
-	}
-	err = executeSQL.Error
-	return
-}
 
 func (s subjectRelationDo) Debug() *subjectRelationDo {
 	return s.withDO(s.DO.Debug())
