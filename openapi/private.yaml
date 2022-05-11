@@ -22,11 +22,11 @@ paths:
           application/json:
             schema:
               required:
-                - username
+                - email
                 - password
                 - h-captcha-response
               properties:
-                username:
+                email:
                   type: string
                 password:
                   type: string
