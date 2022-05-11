@@ -131,8 +131,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain
 }
 
 func (h Handler) PrivateLogout(c *fiber.Ctx) error {
-	a := h.getHTTPAccessor(c)
-	if !a.login {
+	if a := h.getHTTPAccessor(c); !a.login {
 		return res.HTTPError(c, code.Unauthorized, "you are not logged-in")
 	}
 

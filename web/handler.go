@@ -23,6 +23,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/uber-go/tally/v4"
 
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/middleware/origin"
 	"github.com/bangumi/server/web/middleware/ua"
@@ -80,7 +81,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
 
 	// frontend private api
-	private := app.Group("/p", origin.New("https://next.bgm.tv"), h.SessionAuthMiddleware)
+	private := app.Group("/p", origin.New(config.FrontendOrigin), h.SessionAuthMiddleware)
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))

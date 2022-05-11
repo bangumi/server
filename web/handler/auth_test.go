@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/mocks"
@@ -63,7 +64,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Post("/p/login").JSON(fiber.Map{
+	resp := test.New(t).Post("/p/login").Header(fiber.HeaderOrigin, config.FrontendOrigin).JSON(fiber.Map{
 		"email":              "user email",
 		"password":           "p",
 		"h-captcha-response": "req",
