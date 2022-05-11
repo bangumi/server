@@ -50,6 +50,7 @@ func New(t *testing.T) *Request {
 	return &Request{
 		t:         t,
 		urlParams: url.Values{},
+		cookies:   make(map[string]string),
 		formData:  url.Values{},
 		headers:   http.Header{fiber.HeaderUserAgent: {"chii-test-client"}},
 	}
