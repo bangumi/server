@@ -19,6 +19,7 @@ package handler
 import (
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 
@@ -127,4 +128,21 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain
 		Avatar:    res.Avatar{}.Fill(user.Avatar),
 		Sign:      user.Sign,
 	})
+}
+
+func (h Handler) PrivateLogout(c *fiber.Ctx) error {
+	a := h.getHTTPAccessor(c)
+	if !a.login {
+		return res.HTTPError(c, code.Unauthorized, "you are not logged-in")
+	}
+
+	sessionID := utils.UnsafeString(c.Context().Request.Header.Cookie(session.Key))
+	if err := h.session.Revoke(c.Context(), sessionID); err != nil {
+		h.log.Error("failed to revoke session", zap.Error(err), zap.String("session_id", sessionID))
+		return res.InternalError(c, err, "failed to revoke session")
+	}
+
+	c.Status(code.NoContent).ClearCookie(session.Key)
+
+	return nil
 }

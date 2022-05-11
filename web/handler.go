@@ -24,6 +24,7 @@ import (
 	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/web/handler"
+	"github.com/bangumi/server/web/middleware/origin"
 	"github.com/bangumi/server/web/middleware/ua"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -79,9 +80,10 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
 
 	// frontend private api
-	private := app.Group("/p", h.SessionAuthMiddleware)
+	private := app.Group("/p", origin.New("https://next.bgm.tv"), h.SessionAuthMiddleware)
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
+	private.Post("/logout", addMetrics(h.PrivateLogout))
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
