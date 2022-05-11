@@ -147,7 +147,7 @@ func (r mysqlRepo) GetCharacterRelated(
 	characterID model.PersonIDType,
 ) ([]domain.SubjectCharacterRelation, error) {
 	relations, err := r.q.CharacterSubjects.WithContext(ctx).
-		Preload(r.q.CharacterSubjects.Subject.Fields).
+		Joins(r.q.CharacterSubjects.Subject.Fields).
 		Where(r.q.CharacterSubjects.CharacterID.Eq(characterID)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
@@ -156,10 +156,6 @@ func (r mysqlRepo) GetCharacterRelated(
 
 	var rel = make([]domain.SubjectCharacterRelation, 0, len(relations))
 	for _, relation := range relations {
-		if relation.Subject.ID == 0 {
-			// gorm/gen doesn't support preload with join, so ignore relations without subject.
-			continue
-		}
 		rel = append(rel, domain.SubjectCharacterRelation{
 			SubjectID:   relation.Subject.ID,
 			CharacterID: relation.CharacterID,
@@ -175,7 +171,7 @@ func (r mysqlRepo) GetSubjectRelated(
 	subjectID model.SubjectIDType,
 ) ([]domain.SubjectInternalRelation, error) {
 	relations, err := r.q.SubjectRelation.WithContext(ctx).
-		Preload(r.q.SubjectRelation.Subject).Where(r.q.SubjectRelation.SubjectID.Eq(subjectID)).
+		Joins(r.q.SubjectRelation.Subject).Where(r.q.SubjectRelation.SubjectID.Eq(subjectID)).
 		Order(r.q.SubjectRelation.Order).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
@@ -184,11 +180,6 @@ func (r mysqlRepo) GetSubjectRelated(
 
 	var rel = make([]domain.SubjectInternalRelation, 0, len(relations))
 	for _, relation := range relations {
-		if relation.Subject.ID == 0 {
-			// gorm/gen doesn't support preload with join, so ignore relations without subject.
-			continue
-		}
-
 		rel = append(rel, domain.SubjectInternalRelation{
 			SourceID:      subjectID,
 			DestinationID: relation.Subject.ID,

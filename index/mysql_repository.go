@@ -104,7 +104,7 @@ func (r mysqlRepo) ListSubjects(
 	subjectType model.SubjectType,
 	limit, offset int,
 ) ([]domain.IndexSubject, error) {
-	q := r.q.IndexSubject.WithContext(ctx).Preload(r.q.IndexSubject.Subject.Fields).
+	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject.Fields).
 		Where(r.q.IndexSubject.Rid.Eq(id)).
 		Order(r.q.IndexSubject.Order).Limit(limit).Offset(offset)
 	if subjectType != 0 {
@@ -118,10 +118,6 @@ func (r mysqlRepo) ListSubjects(
 
 	var results = make([]domain.IndexSubject, len(d))
 	for i, s := range d {
-		if s.Subject.ID == 0 {
-			continue
-		}
-
 		results[i] = domain.IndexSubject{
 			AddedAt: time.Unix(int64(s.Dateline), 0),
 			Comment: s.Comment,
