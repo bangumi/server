@@ -51,7 +51,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 	require.NoError(t, err)
 
 	mockAuth := &mocks.AuthRepo{}
-	mockAuth.EXPECT().GetByEmail(mock.Anything, "user email").Return(domain.Auth{GroupID: 1}, passwordInDB, nil)
+	mockAuth.EXPECT().GetByEmail(mock.Anything, "a@example.com").Return(domain.Auth{GroupID: 1}, passwordInDB, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, uint8(1)).Return(domain.Permission{}, nil)
 	defer mockAuth.AssertExpectations(t)
 
@@ -68,7 +68,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 	)
 
 	resp := test.New(t).Post("/p/login").Header(fiber.HeaderOrigin, config.FrontendOrigin).JSON(fiber.Map{
-		"email":              "user email",
+		"email":              "a@example.com",
 		"password":           "p",
 		"h-captcha-response": "req",
 	}).Execute(app, -1)
