@@ -8,6 +8,11 @@
 - [Go 1.17+](https://go.dev/)
 - [GNU make](https://www.gnu.org/software/make/)
 
+## Optional Requirements:
+
+- nodejs and npm: 用于生成 openapi 文件。
+- [mockery](https://github.com/vektra/mockery#installation): 用于生成测试用的 mock 文件。
+
 ## Init
 
 ```bash
