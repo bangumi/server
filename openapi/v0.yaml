@@ -485,9 +485,7 @@ paths:
       parameters:
         - required: true
           schema:
-            title: username
-            type: string
-            maxLength: 32
+            $ref: "#/components/schemas/UserName"
           name: username
           in: path
       responses:
@@ -546,9 +544,7 @@ paths:
         - description: 设置了 username 后无法使用UID
           required: true
           schema:
-            title: Username
-            type: string
-            description: 设置了 username 后无法使用UID
+            $ref: "#/components/schemas/UserName"
           name: username
           in: path
         - description: |-
@@ -631,9 +627,7 @@ paths:
         - description: 设置了 username 后无法使用UID
           required: true
           schema:
-            title: Username
-            type: string
-            description: 设置了 username 后无法使用UID
+            $ref: "#/components/schemas/UserName"
           name: username
           in: path
         - required: true
@@ -1072,6 +1066,9 @@ components:
       $ref: "./components/avatar.yaml"
     UserGroup:
       $ref: "./components/user_group.yaml"
+    UserName:
+      type: string
+      description: 获取用户信息，设置了 username 之后无法使用数字 UID。
     BloodType:
       title: BloodType
       enum:
