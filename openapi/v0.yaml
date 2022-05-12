@@ -619,6 +619,51 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+
+  "/v0/users/{username}/collections/{subject_id}":
+    get:
+      tags:
+        - 收藏
+      summary: 获取用户单个收藏
+      description: 获取对应用户的收藏，查看私有收藏需要access token。
+      operationId: getUserCollection
+      parameters:
+        - description: 设置了 username 后无法使用UID
+          required: true
+          schema:
+            title: Username
+            type: string
+            description: 设置了 username 后无法使用UID
+          name: username
+          in: path
+        - required: true
+          schema:
+            title: subject ID
+            type: integer
+          name: subject_id
+          in: path
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserCollection"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 用户不存在或者条目未收藏，或者条目为私有收藏
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+
   "/v0/revisions/persons":
     get:
       tags:
