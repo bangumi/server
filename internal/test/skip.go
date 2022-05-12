@@ -20,6 +20,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"testing"
 )
 
 const EnvMysql = "mysql"
@@ -32,13 +33,13 @@ const TreeHoleAccessToken = "a_development_access_token"
 //    RequireEnv(t, test.EnvRedis, test.EnvMysql)
 //    ...
 //  }
-func RequireEnv(t TB, envs ...string) {
-	t.Helper()
+func RequireEnv(tb testing.TB, envs ...string) {
+	tb.Helper()
 	for _, env := range envs {
 		if v, ok := os.LookupEnv(strings.ToUpper("test_" + env)); !ok {
-			t.SkipNow()
+			tb.SkipNow()
 		} else if ok, _ = strconv.ParseBool(v); !ok {
-			t.SkipNow()
+			tb.SkipNow()
 		}
 	}
 }

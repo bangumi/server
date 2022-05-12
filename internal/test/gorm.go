@@ -17,6 +17,8 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -26,22 +28,23 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 )
 
-func GetGorm(t TB) *gorm.DB {
-	t.Helper()
-	db, err := newGorm(t, config.NewAppConfig())
-	require.NoError(t, err)
+func GetGorm(tb testing.TB) *gorm.DB {
+	tb.Helper()
+	db, err := newGorm(tb, config.NewAppConfig())
+	require.NoError(tb, err)
 
 	return db
 }
 
-func newGorm(t TB, c config.AppConfig) (*gorm.DB, error) {
+func newGorm(tb testing.TB, c config.AppConfig) (*gorm.DB, error) {
+	tb.Helper()
 	conn, err := dal.NewConnectionPool(c)
 	if err != nil {
 		return nil, errgo.Wrap(err, "sql.Open")
 	}
 
 	db, err := gorm.Open(mysql.New(mysql.Config{Conn: conn, DisableDatetimePrecision: true}))
-	require.NoError(t, err)
+	require.NoError(tb, err)
 
 	return db, errgo.Wrap(err, "gorm.Open")
 }

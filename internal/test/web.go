@@ -67,16 +67,8 @@ type Mock struct {
 	HTTPMock       *httpmock.MockTransport
 }
 
-type TB interface {
-	SkipNow()
-	Helper()
-	Errorf(format string, args ...interface{})
-	FailNow()
-	Fatal(args ...interface{})
-}
-
-func GetWebApp(t TB, m Mock) *fiber.App {
-	t.Helper()
+func GetWebApp(tb testing.TB, m Mock) *fiber.App {
+	tb.Helper()
 	var f *fiber.App
 
 	httpClient := resty.New().SetJSONEscapeHTML(false)
@@ -123,7 +115,7 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 	app := fx.New(options...)
 
 	if app.Err() != nil {
-		t.Fatal("can't create web app", app.Err())
+		tb.Fatal("can't create web app", app.Err())
 	}
 
 	if m.HTTPMock != nil {

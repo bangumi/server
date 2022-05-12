@@ -33,10 +33,10 @@ import (
 	"github.com/bangumi/server/web/session"
 )
 
-func getRepo(t test.TB) (session.Repo, *query.Query) {
-	t.Helper()
-	test.RequireEnv(t, test.EnvMysql)
-	q := query.Use(test.GetGorm(t))
+func getRepo(tb testing.TB) (session.Repo, *query.Query) {
+	tb.Helper()
+	test.RequireEnv(tb, test.EnvMysql)
+	q := query.Use(test.GetGorm(tb))
 	repo := session.NewMysqlRepo(q, logger.Copy())
 
 	return repo, q
