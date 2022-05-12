@@ -34,7 +34,7 @@ import (
 
 func TestHandler_ListPersonRevision_HappyPath(t *testing.T) {
 	t.Parallel()
-	m := &mocks.RevisionRepo{}
+	m := mocks.NewRevisionRepo(t)
 	m.EXPECT().ListPersonRelated(mock.Anything, uint32(9), 30, 0).Return([]model.Revision{{ID: 348475}}, nil)
 	m.EXPECT().CountPersonRelated(mock.Anything, uint32(9)).Return(1, nil)
 
@@ -54,7 +54,7 @@ func TestHandler_ListPersonRevision_HappyPath(t *testing.T) {
 
 func TestHandler_ListPersonRevision_Bad_ID(t *testing.T) {
 	t.Parallel()
-	m := &mocks.RevisionRepo{}
+	m := mocks.NewRevisionRepo(t)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
@@ -72,7 +72,7 @@ func TestHandler_ListPersonRevision_Bad_ID(t *testing.T) {
 
 func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 	t.Parallel()
-	m := &mocks.RevisionRepo{}
+	m := mocks.NewRevisionRepo(t)
 	m.EXPECT().GetPersonRelated(mock.Anything, uint32(348475)).Return(model.Revision{ID: 348475}, nil)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
@@ -86,7 +86,7 @@ func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 
 func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
 	t.Parallel()
-	m := &mocks.RevisionRepo{}
+	m := mocks.NewRevisionRepo(t)
 	m.EXPECT().ListSubjectRelated(mock.Anything, uint32(26), 30, 0).Return([]model.Revision{{ID: 665556}}, nil)
 	m.EXPECT().CountSubjectRelated(mock.Anything, uint32(26)).Return(1, nil)
 
@@ -107,7 +107,7 @@ func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
 
 func TestHandler_ListSubjectRevision_Bad_ID(t *testing.T) {
 	t.Parallel()
-	m := &mocks.RevisionRepo{}
+	m := mocks.NewRevisionRepo(t)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
@@ -126,7 +126,7 @@ func TestHandler_ListSubjectRevision_Bad_ID(t *testing.T) {
 
 func TestHandler_GetSubjectRevision_HappyPath(t *testing.T) {
 	t.Parallel()
-	m := &mocks.RevisionRepo{}
+	m := mocks.NewRevisionRepo(t)
 	m.EXPECT().GetSubjectRelated(mock.Anything, uint32(665556)).Return(model.Revision{ID: 665556}, nil)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
@@ -143,7 +143,7 @@ func TestHandler_ListCharacterRevision_HappyPath(t *testing.T) {
 	var mockRID uint32 = 307134 // revision id
 
 	t.Parallel()
-	m := &mocks.RevisionRepo{}
+	m := mocks.NewRevisionRepo(t)
 	m.EXPECT().ListCharacterRelated(mock.Anything, cid, 30, 0).Return([]model.CharacterRevision{
 		{RevisionCommon: model.RevisionCommon{ID: mockRID}},
 	}, nil)
@@ -175,7 +175,7 @@ func TestHandler_GetCharacterRevision_HappyPath(t *testing.T) {
 	var mockRID uint32 = 1269825
 
 	t.Parallel()
-	m := &mocks.RevisionRepo{}
+	m := mocks.NewRevisionRepo(t)
 	m.EXPECT().GetCharacterRelated(mock.Anything, mockRID).Return(model.CharacterRevision{
 		RevisionCommon: model.RevisionCommon{ID: mockRID},
 	}, nil)

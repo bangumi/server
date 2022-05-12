@@ -37,7 +37,7 @@ func TestManager_Allowed(t *testing.T) { //nolint:paralleltest
 	const ip = "0.0.0.-0"
 
 	require.NoError(t, db.FlushDB(context.Background()).Err())
-	defer db.FlushDB(context.Background())
+	t.Cleanup(func() { db.FlushDB(context.Background()) })
 
 	a, err := db.Exists(context.TODO(), rate.RedisRateKeyPrefix+ip).Result()
 	require.NoError(t, err)

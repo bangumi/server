@@ -33,15 +33,11 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/mocks"
-	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/web/session"
 )
 
 func TestHandler_PrivateLogin(t *testing.T) {
 	t.Parallel()
-
-	m := &mocks.SubjectRepo{}
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
 
 	// 原本的代码库就是这么储存密码的...
 	p := md5.Sum([]byte("p")) //nolint:gosec
@@ -50,19 +46,16 @@ func TestHandler_PrivateLogin(t *testing.T) {
 	passwordInDB, err := bcrypt.GenerateFromPassword(h, bcrypt.DefaultCost)
 	require.NoError(t, err)
 
-	mockAuth := &mocks.AuthRepo{}
+	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByEmail(mock.Anything, "a@example.com").Return(domain.Auth{GroupID: 1}, passwordInDB, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, uint8(1)).Return(domain.Permission{}, nil)
-	defer mockAuth.AssertExpectations(t)
 
-	mockCaptcha := &mocks.CaptchaManager{}
+	mockCaptcha := mocks.NewCaptchaManager(t)
 	mockCaptcha.EXPECT().Verify(mock.Anything, "req").Return(true, nil)
-	defer mockCaptcha.AssertExpectations(t)
 
 	app := test.GetWebApp(t,
 		test.Mock{
 			AuthRepo:       mockAuth,
-			SubjectRepo:    m,
 			CaptchaManager: mockCaptcha,
 		},
 	)
@@ -93,7 +86,7 @@ func TestHandler_PrivateLogin_content_type(t *testing.T) {
 func TestHandler_PrivateLogout(t *testing.T) {
 	t.Parallel()
 
-	mockCaptcha := &mocks.SessionManager{}
+	mockCaptcha := mocks.NewSessionManager(t)
 	mockCaptcha.EXPECT().Get(mock.Anything, "req").Return(session.Session{
 		RegTime:   time.Now().Add(-timex.OneWeek),
 		UserID:    1,

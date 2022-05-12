@@ -37,7 +37,7 @@ import (
 
 func TestHandler_GetCharacter_HappyPath(t *testing.T) {
 	t.Parallel()
-	m := &mocks.CharacterRepo{}
+	m := mocks.NewCharacterRepo(t)
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
@@ -52,7 +52,7 @@ func TestHandler_GetCharacter_HappyPath(t *testing.T) {
 
 func TestHandler_GetCharacter_Redirect(t *testing.T) {
 	t.Parallel()
-	m := &mocks.CharacterRepo{}
+	m := mocks.NewCharacterRepo(t)
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7, Redirect: 8}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
@@ -77,12 +77,14 @@ func TestHandler_GetCharacter_Redirect_cached(t *testing.T) {
 
 func TestHandler_GetCharacter_NSFW(t *testing.T) {
 	t.Parallel()
-	m := &mocks.CharacterRepo{}
+	m := mocks.NewCharacterRepo(t)
 	m.EXPECT().Get(mock.Anything, model.CharacterIDType(7)).Return(model.Character{ID: 7, NSFW: true}, nil)
 
-	mockAuth := &mocks.AuthRepo{}
+	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
 		Return(domain.Auth{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
 
 	app := test.GetWebApp(t, test.Mock{
 		CharacterRepo: m,
@@ -90,10 +92,10 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 	})
 
 	var r res.CharacterV0
-	test.New(t).Get("/v0/characters/7").Header(fiber.HeaderAuthorization, "Bearer v").
+	resp := test.New(t).Get("/v0/characters/7").Header(fiber.HeaderAuthorization, "Bearer v").
 		Execute(app).
-		JSON(&r).
-		ExpectCode(http.StatusOK)
+		JSON(&r)
 
+	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
 	require.Equal(t, model.CharacterIDType(7), r.ID)
 }

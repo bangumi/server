@@ -52,10 +52,10 @@ func TestMysqlRepo_Create(t *testing.T) {
 
 	_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
 	require.NoError(t, err)
-	defer func() {
+	t.Cleanup(func() {
 		_, err = q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
 		require.NoError(t, err)
-	}()
+	})
 
 	err = r.Create(ctx, key, 1, session.Session{})
 	require.NoError(t, err, session.ErrKeyConflict)
@@ -81,10 +81,10 @@ func TestMysqlRepo_Create_conflict(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	defer func() {
+	t.Cleanup(func() {
 		_, err = q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
 		require.NoError(t, err)
-	}()
+	})
 
 	err = r.Create(ctx, key, 1, session.Session{})
 	require.ErrorIs(t, err, session.ErrKeyConflict)
@@ -111,10 +111,10 @@ func TestMysqlRepo_Get_ok(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	defer func() {
+	t.Cleanup(func() {
 		_, err = q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
 		require.NoError(t, err)
-	}()
+	})
 
 	ws, err := r.Get(ctx, key)
 	require.NoError(t, err)
@@ -145,10 +145,10 @@ func TestMysqlRepo_Revoke(t *testing.T) {
 	err := q.WithContext(ctx).WebSession.Create(&dao.WebSession{Key: key, Value: []byte(`{}`)})
 	require.NoError(t, err)
 
-	defer func() {
+	t.Cleanup(func() {
 		_, err = q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
 		require.NoError(t, err)
-	}()
+	})
 
 	start := time.Now()
 	err = r.Revoke(ctx, key)

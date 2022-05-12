@@ -50,8 +50,7 @@ func TestService_ComparePassword(t *testing.T) {
 func TestService_GetByTokenWithCache(t *testing.T) {
 	t.Parallel()
 
-	var m = &mocks.AuthRepo{}
-	defer m.AssertExpectations(t)
+	var m = mocks.NewAuthRepo(t)
 	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(domain.Auth{GroupID: 2}, nil)
 	m.EXPECT().GetPermission(mock.Anything, domain.GroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
 
@@ -67,16 +66,14 @@ func TestService_GetByTokenWithCache(t *testing.T) {
 func TestService_GetByTokenWithCache_cached(t *testing.T) {
 	t.Parallel()
 
-	var c = new(mocks.Generic)
-	defer c.AssertExpectations(t)
+	var c = mocks.NewGeneric(t)
 	c.EXPECT().Get(mock.Anything, cachekey.Auth(test.TreeHoleAccessToken), mock.Anything).
 		Run(func(ctx context.Context, key string, value interface{}) {
 			vOut := reflect.ValueOf(value).Elem()
 			vOut.Set(reflect.ValueOf(domain.Auth{GroupID: 2}))
 		}).Return(true, nil)
 
-	var m = new(mocks.AuthRepo)
-	defer m.AssertExpectations(t)
+	var m = mocks.NewAuthRepo(t)
 	m.EXPECT().GetPermission(mock.Anything, domain.GroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
 
 	s := auth.NewService(m, zap.NewNop(), c)

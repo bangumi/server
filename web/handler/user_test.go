@@ -33,18 +33,18 @@ import (
 func TestHandler_GetCurrentUser(t *testing.T) {
 	t.Parallel()
 	const uid model.UIDType = 7
-	u := mocks.UserRepo{}
-	u.EXPECT().GetByID(mock.Anything, uid).Return(model.User{ID: uid}, nil)
-	defer u.AssertExpectations(t)
 
-	a := mocks.AuthRepo{}
+	u := mocks.NewUserRepo(t)
+	u.EXPECT().GetByID(mock.Anything, uid).Return(model.User{ID: uid}, nil)
+
+	a := mocks.NewAuthRepo(t)
 	a.EXPECT().GetByToken(mock.Anything, "token").Return(domain.Auth{ID: uid}, nil)
-	defer a.AssertExpectations(t)
+	a.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(domain.Permission{}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo: &a,
-			UserRepo: &u,
+			AuthRepo: a,
+			UserRepo: u,
 		},
 	)
 
@@ -53,13 +53,13 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-	require.Equal(t, uid, r.ID)
+	require.Equal(t, uid, r.ID, resp.BodyString())
 }
 
 func TestHandler_GetUser_200(t *testing.T) {
 	t.Parallel()
 	const uid model.UIDType = 7
-	m := &mocks.UserRepo{}
+	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, "u").Return(model.User{ID: uid}, nil)
 
 	app := test.GetWebApp(t,
@@ -78,9 +78,8 @@ func TestHandler_GetUser_200(t *testing.T) {
 func TestHandler_GetUser_404(t *testing.T) {
 	t.Parallel()
 
-	m := &mocks.UserRepo{}
+	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{}, domain.ErrNotFound)
-	defer m.AssertExpectations(t)
 
 	app := test.GetWebApp(t,
 		test.Mock{

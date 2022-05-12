@@ -31,7 +31,7 @@ import (
 
 func TestHandler_GetIndex_HappyPath(t *testing.T) {
 	t.Parallel()
-	m := &mocks.IndexRepo{}
+	m := mocks.NewIndexRepo(t)
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{ID: 7}, nil)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: m})
@@ -43,7 +43,7 @@ func TestHandler_GetIndex_HappyPath(t *testing.T) {
 
 func TestHandler_GetIndex_NSFW(t *testing.T) {
 	t.Parallel()
-	m := &mocks.IndexRepo{}
+	m := mocks.NewIndexRepo(t)
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{ID: 7, NSFW: true}, nil)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: m})

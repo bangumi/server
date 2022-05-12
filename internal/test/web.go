@@ -55,6 +55,7 @@ type Mock struct {
 	PersonRepo     domain.PersonRepo
 	CharacterRepo  domain.CharacterRepo
 	AuthRepo       domain.AuthRepo
+	AuthService    domain.AuthService
 	EpisodeRepo    domain.EpisodeRepo
 	UserRepo       domain.UserRepo
 	IndexRepo      domain.IndexRepo
@@ -92,7 +93,7 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 
 		fx.Provide(
 			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
-			person.NewService, auth.NewService,
+			person.NewService,
 		),
 
 		MockPersonRepo(m.PersonRepo),
@@ -100,6 +101,7 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
 		MockAuthRepo(m.AuthRepo),
+		MockAuthService(m.AuthService),
 		MockUserRepo(m.UserRepo),
 		MockIndexRepo(m.IndexRepo),
 		MockRevisionRepo(m.RevisionRepo),
@@ -245,20 +247,15 @@ func MockAuthRepo(m domain.AuthRepo) fx.Option {
 		m = mocker
 	}
 
-	mocker, ok := m.(*mocks.AuthRepo)
-	if ok {
-		find := false
-		for _, call := range mocker.ExpectedCalls {
-			if call.Method == "GetPermission" {
-				find = true
-			}
-		}
-		if !find {
-			mocker.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(domain.Permission{}, nil)
-		}
+	return fx.Provide(func() domain.AuthRepo { return m })
+}
+
+func MockAuthService(m domain.AuthService) fx.Option {
+	if m == nil {
+		return fx.Provide(auth.NewService)
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.AuthRepo))))
+	return fx.Provide(func() domain.AuthService { return m })
 }
 
 func MockSubjectRepo(m domain.SubjectRepo) fx.Option {

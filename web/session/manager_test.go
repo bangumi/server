@@ -35,12 +35,11 @@ func TestManager_Create(t *testing.T) {
 	t.Parallel()
 	const uid model.UIDType = 1
 
-	m := &mocks.SessionRepo{}
+	m := mocks.NewSessionRepo(t)
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
 		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
 			require.Equal(t, uid, s.UserID)
 		}).Return(nil)
-	defer m.AssertExpectations(t)
 
 	manager := session.New(test.NopCache(), m, logger.Copy())
 
@@ -52,12 +51,11 @@ func TestManager_Create(t *testing.T) {
 func TestManager_Get(t *testing.T) {
 	t.Parallel()
 	const uid model.UIDType = 1
-	m := &mocks.SessionRepo{}
+	m := mocks.NewSessionRepo(t)
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
 		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
 			require.Equal(t, uid, s.UserID)
 		}).Return(nil)
-	defer m.AssertExpectations(t)
 
 	manager := session.New(test.NopCache(), m, logger.Copy())
 
@@ -71,12 +69,11 @@ func TestManager_Revoke(t *testing.T) {
 	t.Parallel()
 
 	const uid model.UIDType = 1
-	m := &mocks.SessionRepo{}
+	m := mocks.NewSessionRepo(t)
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
 		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
 			require.Equal(t, uid, s.UserID)
 		}).Return(nil)
-	defer m.AssertExpectations(t)
 
 	manager := session.New(test.NopCache(), m, logger.Copy())
 

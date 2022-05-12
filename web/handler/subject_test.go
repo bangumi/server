@@ -34,12 +34,14 @@ import (
 
 func TestHappyPath(t *testing.T) {
 	t.Parallel()
-	m := &mocks.SubjectRepo{}
+	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{ID: 7}, nil)
 
-	mockAuth := &mocks.AuthRepo{}
+	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
 		Return(domain.Auth{RegTime: time.Unix(1e10, 0)}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{
@@ -59,12 +61,14 @@ func TestHappyPath(t *testing.T) {
 func TestNSFW_200(t *testing.T) {
 	t.Parallel()
 
-	m := &mocks.SubjectRepo{}
+	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
 
-	mockAuth := &mocks.AuthRepo{}
+	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
 		Return(domain.Auth{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{
@@ -82,11 +86,13 @@ func TestNSFW_200(t *testing.T) {
 func TestNSFW_404(t *testing.T) {
 	t.Parallel()
 
-	m := &mocks.SubjectRepo{}
+	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
 
-	mockAuth := &mocks.AuthRepo{}
+	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{
@@ -103,7 +109,7 @@ func TestNSFW_404(t *testing.T) {
 
 func Test_web_subject_Redirect(t *testing.T) {
 	t.Parallel()
-	m := &mocks.SubjectRepo{}
+	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, uint32(8)).Return(model.Subject{Redirect: 2}, nil)
 
 	app := test.GetWebApp(t,
@@ -120,7 +126,7 @@ func Test_web_subject_Redirect(t *testing.T) {
 
 func Test_web_subject_bad_id(t *testing.T) {
 	t.Parallel()
-	m := &mocks.SubjectRepo{}
+	m := mocks.NewSubjectRepo(t)
 
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 
