@@ -30,3 +30,7 @@ func UserID(id model.UIDType) zap.Field {
 func GroupID(id domain.GroupID) zap.Field {
 	return zap.Uint8("user_id", id)
 }
+
+func SubjectID(id model.SubjectIDType) zap.Field {
+	return zap.Uint32("subject_id", id)
+}

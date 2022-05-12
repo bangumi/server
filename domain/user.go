@@ -46,4 +46,6 @@ type UserRepo interface {
 		showPrivate bool,
 		limit, offset int,
 	) ([]model.Collection, error)
+
+	GetCollection(ctx context.Context, userID uint32, subjectID model.SubjectIDType) (model.Collection, error)
 }

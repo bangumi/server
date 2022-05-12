@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/strutil"
 	"github.com/bangumi/server/model"
 )
@@ -118,6 +119,34 @@ func (m mysqlRepo) ListCollections(
 	}
 
 	return results, nil
+}
+
+func (m mysqlRepo) GetCollection(
+	ctx context.Context, userID uint32, subjectID model.SubjectIDType,
+) (model.Collection, error) {
+	c, err := m.q.SubjectCollection.WithContext(ctx).
+		Where(m.q.SubjectCollection.UID.Eq(userID), m.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Collection{}, domain.ErrNotFound
+		}
+
+		m.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return model.Collection{}, errgo.Wrap(err, "dal")
+	}
+
+	return model.Collection{
+		UpdatedAt:   time.Unix(int64(c.Lasttouch), 0),
+		Comment:     c.Comment,
+		Tags:        strutil.Split(c.Tag, " "),
+		SubjectType: c.SubjectType,
+		Rate:        c.Rate,
+		SubjectID:   c.SubjectID,
+		EpStatus:    c.EpStatus,
+		VolStatus:   c.VolStatus,
+		Type:        c.Type,
+		Private:     c.Private != model.CollectPrivacyNone,
+	}, nil
 }
 
 func (m mysqlRepo) GetByID(ctx context.Context, userID uint32) (model.User, error) {

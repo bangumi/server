@@ -1,0 +1,32 @@
+title: SubjectType
+enum:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 6
+type: integer
+description: |-
+  条目类型
+  - `1` 为 书籍
+  - `2` 为 动画
+  - `3` 为 音乐
+  - `4` 为 游戏
+  - `6` 为 三次元
+
+  没有 `5`
+x-ms-enum:
+  name: SubjectType
+  modelAsString: false
+  values:
+    - Book
+    - Anime
+    - Music
+    - Game
+    - Real
+x-enum-varnames:
+  - Book
+  - Anime
+  - Music
+  - Game
+  - Real

@@ -54,10 +54,10 @@ gen: ./dal/query/gen.go mocks
 
 # don't enable `-race` in test because it require cgo, only enable it at coverage.
 test: .bin/gotestfmt.exe
-	go test -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages
+	go test -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
 
 test-all: .bin/dotenv.exe .bin/gotestfmt.exe
-	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages
+	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
 
 bench:
 	go test -bench=. -benchmem ./pkg/wiki

@@ -5,12 +5,14 @@ on:
     branches-ignore:
       - renovate/**
     paths-ignore:
+      - "openapi/"
       - "**.md"
       - "**.txt"
   pull_request:
     branches:
       - master
     paths-ignore:
+      - "openapi/"
       - "**.md"
       - "**.txt"
 

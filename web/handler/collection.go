@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/res/code"
 )
 
 func (h Handler) ListCollection(c *fiber.Ctx) error {
@@ -135,4 +136,60 @@ func parseCollectionType(s string) (uint8, error) {
 	}
 
 	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+"is not a valid collection type")
+}
+
+func (h Handler) GetCollection(c *fiber.Ctx) error {
+	username := c.Params("username")
+	if username == "" {
+		return res.HTTPError(c, code.BadRequest, "missing require parameters `username`")
+	}
+
+	subjectID, err := parseSubjectID(c.Params("subject_id"))
+	if err != nil {
+		return err
+	}
+
+	return h.getCollection(c, username, subjectID)
+}
+
+func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.SubjectIDType) error {
+	const notFoundMessage = "subject is not collected by user"
+	v := h.getHTTPAccessor(c)
+
+	u, err := h.u.GetByName(c.Context(), username)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return fiber.NewError(code.NotFound, "user doesn't exist or has been removed")
+		}
+
+		return errgo.Wrap(err, "user.GetByName")
+	}
+
+	var showPrivate = u.ID == v.ID
+
+	collection, err := h.u.GetCollection(c.Context(), u.ID, subjectID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.HTTPError(c, code.NotFound, notFoundMessage)
+		}
+
+		return errgo.Wrap(err, "user.GetCollection")
+	}
+
+	if !showPrivate && collection.Private {
+		return res.HTTPError(c, code.NotFound, notFoundMessage)
+	}
+
+	return res.JSON(c, res.Collection{
+		SubjectID:   collection.SubjectID,
+		SubjectType: collection.SubjectType,
+		Rate:        collection.Rate,
+		Type:        collection.Type,
+		Tags:        collection.Tags,
+		EpStatus:    collection.EpStatus,
+		VolStatus:   collection.VolStatus,
+		UpdatedAt:   collection.UpdatedAt,
+		Private:     collection.Private,
+		Comment:     nilString(collection.Comment),
+	})
 }
