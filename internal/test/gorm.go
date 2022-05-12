@@ -17,11 +17,14 @@
 package test
 
 import (
+	"log"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	gormLogger "gorm.io/gorm/logger"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/dal"
@@ -52,7 +55,18 @@ func newGorm(tb testing.TB, c config.AppConfig) (*gorm.DB, error) {
 		return nil, errgo.Wrap(err, "sql.Open")
 	}
 
-	db, err := gorm.Open(mysql.New(mysql.Config{Conn: conn, DisableDatetimePrecision: true}))
+	db, err := gorm.Open(mysql.New(mysql.Config{Conn: conn, DisableDatetimePrecision: true}), &gorm.Config{
+		Logger: gormLogger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			gormLogger.Config{
+				LogLevel:                  gormLogger.Info,
+				IgnoreRecordNotFoundError: true,
+				Colorful:                  true,
+			},
+		),
+		QueryFields: true,
+		PrepareStmt: true,
+	})
 	require.NoError(tb, err)
 
 	return db, errgo.Wrap(err, "gorm.Open")
