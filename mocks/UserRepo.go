@@ -224,6 +224,52 @@ func (_c *UserRepo_GetByName_Call) Return(_a0 model.User, _a1 error) *UserRepo_G
 	return _c
 }
 
+// GetCollection provides a mock function with given fields: ctx, userID, subjectID
+func (_m *UserRepo) GetCollection(ctx context.Context, userID uint32, subjectID uint32) (model.Collection, error) {
+	ret := _m.Called(ctx, userID, subjectID)
+
+	var r0 model.Collection
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) model.Collection); ok {
+		r0 = rf(ctx, userID, subjectID)
+	} else {
+		r0 = ret.Get(0).(model.Collection)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint32) error); ok {
+		r1 = rf(ctx, userID, subjectID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UserRepo_GetCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCollection'
+type UserRepo_GetCollection_Call struct {
+	*mock.Call
+}
+
+// GetCollection is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID uint32
+//  - subjectID uint32
+func (_e *UserRepo_Expecter) GetCollection(ctx interface{}, userID interface{}, subjectID interface{}) *UserRepo_GetCollection_Call {
+	return &UserRepo_GetCollection_Call{Call: _e.mock.On("GetCollection", ctx, userID, subjectID)}
+}
+
+func (_c *UserRepo_GetCollection_Call) Run(run func(ctx context.Context, userID uint32, subjectID uint32)) *UserRepo_GetCollection_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32))
+	})
+	return _c
+}
+
+func (_c *UserRepo_GetCollection_Call) Return(_a0 model.Collection, _a1 error) *UserRepo_GetCollection_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // ListCollections provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate, limit, offset
 func (_m *UserRepo) ListCollections(ctx context.Context, userID uint32, subjectType uint8, collectionType uint8, showPrivate bool, limit int, offset int) ([]model.Collection, error) {
 	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)

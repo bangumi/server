@@ -6,7 +6,7 @@ on:
       - renovate/**
     paths:
       - "**.md"
-      - "**.py"
+      - "**.js"
       - "**.yaml"
       - "**.yml"
       - "**.html"
@@ -17,7 +17,7 @@ on:
       - master
     paths:
       - "**.md"
-      - "**.py"
+      - "**.js"
       - "**.yaml"
       - "**.yml"
       - "**.html"

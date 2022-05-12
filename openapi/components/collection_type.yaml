@@ -1,0 +1,29 @@
+title: CollectionType
+enum:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+type: integer
+description: |-
+  - `1`: 想看
+  - `2`: 看过
+  - `3`: 在看
+  - `4`: 搁置
+  - `5`: 抛弃
+x-ms-enum:
+  name: CollectionType
+  modelAsString: false
+  values:
+    - Wish
+    - Collect
+    - Doing
+    - OnHold
+    - Dropped
+x-enum-varnames:
+  - Wish
+  - Collect
+  - Doing
+  - OnHold
+  - Dropped

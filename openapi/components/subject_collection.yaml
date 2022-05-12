@@ -1,0 +1,44 @@
+title: UserCollection
+required:
+  - subject_id
+  - subject_type
+  - rate
+  - type
+  - tags
+  - ep_status
+  - vol_status
+  - updated_at
+  - private
+type: object
+properties:
+  subject_id:
+    title: Subject ID
+    type: integer
+  subject_type:
+    "$ref": "./subject_type.yaml"
+  rate:
+    title: Rate
+    type: integer
+  type:
+    $ref: "./collection_type.yaml"
+  comment:
+    title: Comment
+    type: string
+  tags:
+    title: Tags
+    type: array
+    items:
+      type: string
+  ep_status:
+    title: Ep Status
+    type: integer
+  vol_status:
+    title: Vol Status
+    type: integer
+  updated_at:
+    title: Updated At
+    type: string
+    format: date-time
+  private:
+    title: Private
+    type: boolean
