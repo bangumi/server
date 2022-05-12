@@ -19,6 +19,8 @@
 package web
 
 import (
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/uber-go/tally/v4"
@@ -40,7 +42,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	// add logger wrapper and metrics counter
 	addMetrics := func(handler fiber.Handler) fiber.Handler {
 		reqCounter := scope.
-			Tagged(map[string]string{"handler": utils.FunctionName(handler)}).
+			Tagged(map[string]string{"handler": trimFuncName(utils.FunctionName(handler))}).
 			Counter("request_count")
 
 		return func(ctx *fiber.Ctx) error {
@@ -95,4 +97,8 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 			Details:     util.DetailFromRequest(c),
 		})
 	})
+}
+
+func trimFuncName(s string) string {
+	return strings.TrimSuffix(strings.TrimPrefix(s, "github.com/bangumi/server/web/handler.Handler."), "-fm")
 }
