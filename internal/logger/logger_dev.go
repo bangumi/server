@@ -19,7 +19,6 @@
 package logger
 
 import (
-	"github.com/mattn/go-colorable"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -27,29 +26,7 @@ import (
 
 // development log config.
 func getLogger(level zapcore.Level) *zap.Logger {
-	consoleEncoding := zapcore.NewConsoleEncoder(zapcore.EncoderConfig{
-		TimeKey:        timeKey,
-		NameKey:        nameKey,
-		MessageKey:     messageKey,
-		CallerKey:      callerKey,
-		LevelKey:       levelKey,
-		StacktraceKey:  traceKey,
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseColorLevelEncoder,
-		EncodeTime:     zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05"),
-		EncodeDuration: zapcore.MillisDurationEncoder,
-		EncodeCaller:   getCallerEncoder(),
-	})
-
-	return zap.New(
-		zapcore.NewCore(
-			consoleEncoding, zapcore.AddSync(colorable.NewColorableStdout()), level,
-		),
-		zap.AddCaller(),
-		zap.AddCallerSkip(1),
-		zap.AddStacktrace(zapcore.WarnLevel),
-		zap.Development(),
-	)
+	return textLogger(level)
 }
 
 func FxLogger() fx.Option {

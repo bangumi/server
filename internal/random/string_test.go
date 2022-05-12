@@ -35,7 +35,7 @@ func TestSecureRandomString(t *testing.T) {
 func TestBias(t *testing.T) {
 	t.Parallel()
 	const slen = 33
-	const loop = 1000000
+	const loop = 100000
 
 	counts := make(map[rune]int)
 	var count int64

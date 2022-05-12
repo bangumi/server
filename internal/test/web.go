@@ -29,7 +29,6 @@ import (
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/auth"
 	"github.com/bangumi/server/cache"
@@ -39,6 +38,7 @@ import (
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
+	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/mocks"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/person"
@@ -91,7 +91,7 @@ func GetWebApp(t TB, m Mock) *fiber.App {
 		fx.Supply(httpClient),
 
 		fx.Provide(
-			zap.NewNop, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
+			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
 			person.NewService, auth.NewService,
 		),
 

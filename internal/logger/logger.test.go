@@ -14,12 +14,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build tools
+//go:build test
 
-package tools
+package logger
 
 import (
-	_ "github.com/gookit/goutil/dump"
-	_ "github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt"
-	_ "github.com/joho/godotenv"
+	"go.uber.org/fx"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
+
+// test log config.
+func getLogger(_ zapcore.Level) *zap.Logger {
+	return textLogger(zapcore.ErrorLevel)
+}
+
+func FxLogger() fx.Option {
+	return fx.Provide() // as nil fx.Option
+}

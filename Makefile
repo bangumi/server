@@ -52,11 +52,11 @@ mocks/RateLimiter.go: web/rate/new.go
 gen: ./dal/query/gen.go mocks
 
 # don't enable `-race` in test because it require cgo, only enable it at coverage.
-test:
-	go test --tags dev ./...
+test: .bin/gotestfmt.exe
+	go test -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages
 
-test-all: .bin/dotenv.exe
-	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test --tags dev ./...
+test-all: .bin/dotenv.exe .bin/gotestfmt.exe
+	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages
 
 bench:
 	go test -bench=. -benchmem ./pkg/wiki
@@ -64,13 +64,16 @@ bench:
 ./dal/query/gen.go: ./internal/cmd/gen/gorm.go internal/cmd/gen/method go.mod .bin/dotenv.exe
 	.bin/dotenv.exe go run ./internal/cmd/gen/gorm.go
 
-coverage: .bin/dotenv.exe
-	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./...
+coverage: .bin/dotenv.exe .bin/gotestfmt.exe
+	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -json -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages
+
+.bin/gotestfmt.exe: go.mod
+	go build -o $@ github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt
 
 .bin/dotenv.exe: go.mod
 	go build -o $@ github.com/joho/godotenv/cmd/godotenv
 
-install: .bin/dotenv.exe
+install: .bin/dotenv.exe .bin/gotestfmt.exe
 	@mkdir -p ./.bin ./tmp
 
 lint:

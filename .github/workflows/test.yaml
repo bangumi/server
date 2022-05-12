@@ -43,6 +43,8 @@ jobs:
 
       - run: go get -t ./...
 
+      - run: make install
+
       - run: bash $HOME/dev-env/wait_mysql_ready.sh
 
       - name: Run tests

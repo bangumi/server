@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/web/middleware/recovery"
 )
 
-func TestGetPerson(t *testing.T) {
+func TestPanicMiddleware(t *testing.T) {
 	t.Parallel()
 	var app = fiber.New()
 

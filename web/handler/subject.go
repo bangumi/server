@@ -114,7 +114,7 @@ func (h Handler) getSubjectWithCache(
 
 func platformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
-	if !ok {
+	if !ok && s.TypeID != 0 {
 		logger.Warn("unknown platform",
 			zap.Uint32("subject_id", s.ID),
 			zap.Uint8("type", s.TypeID),
