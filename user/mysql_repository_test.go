@@ -24,8 +24,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/user"
 )
 
@@ -65,4 +67,32 @@ func TestGetByName(t *testing.T) {
 
 	require.Equal(t, id, u.ID)
 	require.Equal(t, "000/38/29/382951.jpg?r=1571167246", u.Avatar)
+}
+
+func TestMysqlRepo_GetCollection(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	const id model.UIDType = 382951
+	const subjectID model.SubjectIDType = 888998
+
+	q := test.GetQuery(t)
+	err := q.WithContext(context.Background()).SubjectCollection.Create(&dao.SubjectCollection{
+		UID:       id,
+		SubjectID: subjectID,
+		Rate:      2,
+	})
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_, err = q.WithContext(context.Background()).SubjectCollection.
+			Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UID.Eq(id)).Delete()
+		require.NoError(t, err)
+	})
+
+	c, err := repo.GetCollection(context.Background(), id, subjectID)
+	require.NoError(t, err)
+
+	require.Equal(t, uint8(2), c.Rate)
 }

@@ -25,8 +25,17 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/dal"
+	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/errgo"
 )
+
+func GetQuery(tb testing.TB) *query.Query {
+	tb.Helper()
+	db, err := newGorm(tb, config.NewAppConfig())
+	require.NoError(tb, err)
+
+	return query.Use(db)
+}
 
 func GetGorm(tb testing.TB) *gorm.DB {
 	tb.Helper()
