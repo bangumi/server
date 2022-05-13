@@ -5,7 +5,7 @@ on:
     branches-ignore:
       - renovate/**
     paths:
-      - "openapi/"
+      - "openapi/**"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/test-openapi.yaml"
@@ -13,7 +13,7 @@ on:
     branches:
       - master
     paths:
-      - "openapi/"
+      - "openapi/**"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/test-openapi.yaml"
