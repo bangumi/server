@@ -4,15 +4,23 @@ on:
   push:
     branches-ignore:
       - renovate/**
-    paths-ignore:
-      - "**.md"
-      - "**.txt"
+    paths:
+      - ".github/workflows/build.yaml"
+      - "go.mod"
+      - "Makefile"
+      - "**.go"
+      - "**.go.json"
+      - "Dockerfile"
   pull_request:
     branches:
       - master
-    paths-ignore:
-      - "**.md"
-      - "**.txt"
+    paths:
+      - ".github/workflows/build.yaml"
+      - "go.mod"
+      - "Makefile"
+      - "**.go"
+      - "**.go.json"
+      - "Dockerfile"
 
 jobs:
   build:

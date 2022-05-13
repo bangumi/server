@@ -4,17 +4,21 @@ on:
   push:
     branches-ignore:
       - renovate/**
-    paths-ignore:
-      - "openapi/"
-      - "**.md"
-      - "**.txt"
+    paths:
+      - ".github/workflows/test.yaml"
+      - "go.mod"
+      - "Makefile"
+      - "**.go"
+      - "**.go.json"
   pull_request:
     branches:
       - master
-    paths-ignore:
-      - "openapi/"
-      - "**.md"
-      - "**.txt"
+    paths:
+      - ".github/workflows/test.yaml"
+      - "go.mod"
+      - "Makefile"
+      - "**.go"
+      - "**.go.json"
 
 jobs:
   test:

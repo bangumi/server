@@ -4,13 +4,13 @@ on:
   push:
     tags:
       - "v*.*.*"
-env:
-  USER: "bangumi"
-  IMAGE: "chii"
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      USER: "bangumi"
+      IMAGE: "chii"
 
     steps:
       - uses: actions/checkout@v3
@@ -51,3 +51,95 @@ jobs:
         run: gh release create "$TAG" --title "$TAG" -F changelog.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-cmd-arvhice:
+    runs-on: ubuntu-latest
+
+    env:
+      USER: "bangumi"
+      IMAGE: "chii-cmd-archive"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "~1.17.8"
+
+      - name: Get Tag Name
+        run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - run: go build -o dist/archive.exe ./internal/cmd/archive/
+        env:
+          CGO_ENABLED: "0"
+
+      - name: docker build
+        run: docker build -f etc/archive.Dockerfile -t ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest .
+
+      - name: docker login
+        run: echo $DOCKER_TOKEN | docker login ghcr.io -u ${{ env.USER }} --password-stdin
+        env:
+          DOCKER_TOKEN: ${{ github.token }}
+
+      - name: docker push
+        run: |
+          docker push ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest
+          docker tag ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
+          docker push "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
+
+  v0-api-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+
+      - run: npm ci
+
+      - uses: actions/checkout@v3
+        with:
+          repository: "bangumi/api"
+          path: api
+
+      - run: node ./openapi/bundle.js ./openapi/v0.yaml ./api/open-api/v0.yaml
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          path: api
+          token: ${{ secrets.PAT }}
+          title: Update Openapi Specification for v0
+          push-to-fork: Trim21-bot/api
+          branch: "update-upstream"
+          author: "Trim21-bot <trim21-bot@users.noreply.github.com>"
+
+  private-api-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+
+      - run: npm ci
+
+      - uses: actions/checkout@v3
+        with:
+          repository: "bangumi/dev-docs"
+          path: dev-docs
+
+      - run: node ./openapi/bundle.js ./openapi/private.yaml ./dev-docs/api.yaml
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          path: dev-docs
+          token: ${{ secrets.PAT }}
+          title: Update Openapi Specification for private api
+          push-to-fork: Trim21-bot/dev-docs
+          branch: "update-upstream"
+          author: "Trim21-bot <trim21-bot@users.noreply.github.com>"

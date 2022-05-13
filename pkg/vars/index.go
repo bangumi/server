@@ -27,13 +27,13 @@ import (
 	"github.com/bangumi/server/model"
 )
 
-//go:embed staff.json
+//go:embed staff.go.json
 var staffRaw []byte
 
-//go:embed platform.json
+//go:embed platform.go.json
 var platformRaw []byte
 
-//go:embed relation.json
+//go:embed relation.go.json
 var relationRaw []byte
 
 // StaffID ...

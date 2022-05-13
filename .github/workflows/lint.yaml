@@ -4,15 +4,21 @@ on:
   push:
     branches-ignore:
       - renovate/**
-    paths-ignore:
-      - "**.md"
-      - "**.txt"
+    paths:
+      - "**.go"
+      - "**.go.json"
+      - go.mod
+      - ".golangci.yaml"
+      - ".github/workflows/lint.yaml"
   pull_request:
     branches:
       - master
-    paths-ignore:
-      - "**.md"
-      - "**.txt"
+    paths:
+      - "**.go"
+      - "**.go.json"
+      - go.mod
+      - ".golangci.yaml"
+      - ".github/workflows/lint.yaml"
 
 jobs:
   lint:
