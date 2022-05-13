@@ -144,7 +144,7 @@ paths:
                   Get
                 type: array
                 items:
-                  "$ref": "#/components/schemas/pol__api__v0__models__subject__RelatedSubject"
+                  "$ref": "#/components/schemas/v0_subject_relation"
         "404":
           description: Not Found
           content:
@@ -205,7 +205,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Paged_Episode_"
+                "$ref": "#/components/schemas/Paged_Episode"
         "404":
           description: Not Found
           content:
@@ -308,12 +308,9 @@ paths:
           content:
             application/json:
               schema:
-                title:
-                  Response Get Person Subjects V0 Characters  Character Id  Subjects
-                  Get
                 type: array
                 items:
-                  "$ref": "#/components/schemas/pol__api__v0__models__RelatedSubject"
+                  "$ref": "#/components/schemas/v0_RelatedSubject"
         "404":
           description: Not Found
           content:
@@ -423,7 +420,7 @@ paths:
                   Get
                 type: array
                 items:
-                  "$ref": "#/components/schemas/pol__api__v0__models__RelatedSubject"
+                  "$ref": "#/components/schemas/v0_RelatedSubject"
         "404":
           description: Not Found
           content:
@@ -600,7 +597,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Paged_UserCollection_"
+                "$ref": "#/components/schemas/Paged_UserCollection"
         "404":
           description: 用户不存在
           content:
@@ -695,7 +692,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Paged_Revision_"
+                "$ref": "#/components/schemas/Paged_Revision"
         "400":
           description: Validation Error
           content:
@@ -772,7 +769,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Paged_Revision_"
+                "$ref": "#/components/schemas/Paged_Revision"
         "400":
           description: Validation Error
           content:
@@ -849,7 +846,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Paged_Revision_"
+                "$ref": "#/components/schemas/Paged_Revision"
         "400":
           description: Validation Error
           content:
@@ -926,7 +923,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Paged_Revision_"
+                "$ref": "#/components/schemas/Paged_Revision"
         "400":
           description: Validation Error
           content:
@@ -1043,7 +1040,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Paged_IndexSubject_"
+                "$ref": "#/components/schemas/Paged_IndexSubject"
         "404":
           description: Not Found
           content:
@@ -1724,7 +1721,7 @@ components:
           title: V
           type: string
 
-    Paged_Episode_:
+    Paged_Episode:
       title: Paged[Episode]
       type: object
       properties:
@@ -1746,7 +1743,7 @@ components:
           items:
             "$ref": "#/components/schemas/Episode"
           default: []
-    Paged_IndexSubject_:
+    Paged_IndexSubject:
       title: Paged[IndexSubject]
       type: object
       properties:
@@ -1768,7 +1765,7 @@ components:
           items:
             "$ref": "#/components/schemas/IndexSubject"
           default: []
-    Paged_Revision_:
+    Paged_Revision:
       title: Paged[Revision]
       type: object
       properties:
@@ -1790,7 +1787,7 @@ components:
           items:
             "$ref": "#/components/schemas/Revision"
           default: []
-    Paged_UserCollection_:
+    Paged_UserCollection:
       title: Paged[UserCollection]
       type: object
       properties:
@@ -2269,7 +2266,7 @@ components:
         v:
           title: V
           type: string
-    pol__api__v0__models__RelatedSubject:
+    v0_RelatedSubject:
       title: RelatedSubject
       required:
         - id
@@ -2292,8 +2289,8 @@ components:
         image:
           title: Image
           type: string
-    pol__api__v0__models__subject__RelatedSubject:
-      title: RelatedSubject
+    v0_subject_relation:
+      title: SubjectRelation
       required:
         - id
         - type
