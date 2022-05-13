@@ -1,4 +1,3 @@
-#
 # This file contains all available configuration options
 # with their default values.
 
@@ -47,15 +46,13 @@ linters-settings:
   goheader:
     values:
       regexp:
-        AUTHOR: "{{COPYRIGHT}}+\nSPDX-License-Identifier: AGPL-3.0-only"
-        COPYRIGHT: "(Copyright \\(c\\) (20\\d\\d)(-20\\d\\d)? {{ USERNAME }}\n)"
-        USERNAME: "[^\n]*"
+        COPYRIGHT: "(.*)?SPDX-License-Identifier: AGPL-3.0-only"
     # Copyright (c) 2021-2022 USER1 <email>
     # Copyright (c) 2022 USER2
     #
     # SPDX-License-Identifier: AGPL-3.0-only
     template: |-
-      {{ AUTHOR }}
+      {{ COPYRIGHT }}
 
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU Affero General Public License as published
