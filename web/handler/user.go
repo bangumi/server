@@ -50,7 +50,7 @@ func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
 		Sign:      user.Sign,
 	}
 
-	return c.JSON(me)
+	return res.JSON(c, me)
 }
 
 func (h Handler) GetUser(c *fiber.Ctx) error {

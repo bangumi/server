@@ -36,6 +36,7 @@ import (
 )
 
 // ResistRouter add all router and default 404 Handler to app.
+//nolint:funlen
 func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Use(ua.DisableDefaultHTTPLibrary)
 
@@ -88,6 +89,8 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
+
+	private.Get("/me", addMetrics(h.GetCurrentUser))
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
