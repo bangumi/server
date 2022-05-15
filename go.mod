@@ -15,7 +15,7 @@ require (
 	github.com/gofiber/adaptor/v2 v2.1.23
 	github.com/gofiber/fiber/v2 v2.33.0
 	github.com/gookit/goutil v0.5.2
-	github.com/haveyoudebuggedit/gotestfmt/v2 v2.3.1
+	github.com/haveyoudebuggedit/gotestfmt/v2 v2.3.2
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/joho/godotenv v1.4.0
 	github.com/mattn/go-colorable v0.1.12
