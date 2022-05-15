@@ -17,6 +17,8 @@
 package origin
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/web/res"
@@ -25,6 +27,10 @@ import (
 
 func New(allowed string) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		if ctx.Method() == http.MethodGet {
+			return ctx.Next()
+		}
+
 		origin := ctx.Get(fiber.HeaderOrigin)
 		if origin == "" {
 			return res.HTTPError(ctx, code.BadRequest, "empty origin is not allowed")

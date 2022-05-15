@@ -85,7 +85,8 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
 
 	// frontend private api
-	private := app.Group("/p", origin.New(config.FrontendOrigin), h.SessionAuthMiddleware)
+	private := app.Group("/p",
+		origin.New(config.FrontendOrigin), checkReferer(config.FrontendOrigin+"/"), h.SessionAuthMiddleware)
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
@@ -104,4 +105,15 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 func trimFuncName(s string) string {
 	return strings.TrimSuffix(strings.TrimPrefix(s, "github.com/bangumi/server/web/handler.Handler."), "-fm")
+}
+
+func checkReferer(referer string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ref := c.Get(fiber.HeaderReferer)
+		if ref == "" || strings.HasPrefix(ref, referer) {
+			return c.Next()
+		}
+
+		return res.HTTPError(c, code.BadRequest, "bad referer, cross-site api request is not allowed")
+	}
 }

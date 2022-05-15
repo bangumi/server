@@ -18,11 +18,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/mocks"
 	"github.com/bangumi/server/model"
@@ -50,7 +48,6 @@ func TestHandler_GetCurrentUser_private(t *testing.T) {
 
 	var r res.User
 	resp := test.New(t).Get("/p/me").Cookie(session.Key, sessionID).
-		Header(fiber.HeaderOrigin, config.FrontendOrigin).
 		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
