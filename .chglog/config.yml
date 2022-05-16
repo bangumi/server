@@ -11,19 +11,19 @@ options:
         - feat
         - fix
         - perf
-        - refactor
+  #        - refactor
   commit_groups:
     sort_by: Custom
     title_order:
       - feat
       - fix
       - perf
-      - refactor
+    #      - refactor
     title_maps:
       feat: Features
       fix: Bug Fixes
       perf: Performance Improvements
-      refactor: Code Refactoring
+  #      refactor: Code Refactoring
   header:
     pattern: ^(\w*)(?:\(([\w\$\.\-\*\s]*)\))?\:\s(.*)$
     pattern_maps:
