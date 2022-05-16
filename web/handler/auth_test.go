@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -90,7 +88,6 @@ func TestHandler_PrivateLogout(t *testing.T) {
 	mockCaptcha.EXPECT().Get(mock.Anything, "req").Return(session.Session{
 		RegTime:   time.Now().Add(-timex.OneWeek),
 		UserID:    1,
-		GroupID:   1,
 		ExpiredAt: time.Now().Unix() + timex.OneWeekSec,
 	}, nil)
 	mockCaptcha.EXPECT().Revoke(mock.Anything, "req").Return(nil)

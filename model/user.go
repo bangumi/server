@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -16,16 +14,19 @@
 
 package model
 
-import "time"
+import (
+	"time"
+)
 
 // User is visible for everyone.
 type User struct {
-	UserName  string
-	NickName  string
-	Avatar    string
-	Sign      string
-	ID        uint32
-	UserGroup uint8
+	RegistrationTime time.Time
+	NickName         string
+	Avatar           string
+	Sign             string
+	UserName         string
+	ID               uint32
+	UserGroup        GroupID
 }
 
 const (

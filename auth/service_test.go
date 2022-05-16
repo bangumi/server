@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -30,10 +28,11 @@ import (
 	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/mocks"
+	"github.com/bangumi/server/model"
 )
 
 func getService() domain.AuthService {
-	return auth.NewService(nil, zap.NewNop(), test.NopCache())
+	return auth.NewService(nil, nil, zap.NewNop(), test.NopCache())
 }
 
 func TestService_ComparePassword(t *testing.T) {
@@ -52,15 +51,17 @@ func TestService_GetByTokenWithCache(t *testing.T) {
 
 	var m = mocks.NewAuthRepo(t)
 	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(domain.Auth{GroupID: 2}, nil)
-	m.EXPECT().GetPermission(mock.Anything, domain.GroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
+	m.EXPECT().GetPermission(mock.Anything, model.GroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
 
-	s := auth.NewService(m, zap.NewNop(), test.NopCache())
+	var u = mocks.NewUserRepo(t)
 
-	u, err := s.GetByTokenWithCache(context.Background(), test.TreeHoleAccessToken)
+	s := auth.NewService(m, u, zap.NewNop(), test.NopCache())
+
+	a, err := s.GetByTokenWithCache(context.Background(), test.TreeHoleAccessToken)
 	require.NoError(t, err)
 
-	require.Equal(t, domain.GroupID(2), u.GroupID)
-	require.True(t, u.Permission.EpEdit)
+	require.Equal(t, model.GroupID(2), a.GroupID)
+	require.True(t, a.Permission.EpEdit)
 }
 
 func TestService_GetByTokenWithCache_cached(t *testing.T) {
@@ -74,13 +75,14 @@ func TestService_GetByTokenWithCache_cached(t *testing.T) {
 		}).Return(true, nil)
 
 	var m = mocks.NewAuthRepo(t)
-	m.EXPECT().GetPermission(mock.Anything, domain.GroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
+	m.EXPECT().GetPermission(mock.Anything, model.GroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
+	var u = mocks.NewUserRepo(t)
 
-	s := auth.NewService(m, zap.NewNop(), c)
+	s := auth.NewService(m, u, zap.NewNop(), c)
 
-	u, err := s.GetByTokenWithCache(context.Background(), test.TreeHoleAccessToken)
+	a, err := s.GetByTokenWithCache(context.Background(), test.TreeHoleAccessToken)
 	require.NoError(t, err)
 
-	require.Equal(t, domain.GroupID(2), u.GroupID)
-	require.True(t, u.Permission.EpEdit)
+	require.Equal(t, model.GroupID(2), a.GroupID)
+	require.True(t, a.Permission.EpEdit)
 }

@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -16,7 +14,9 @@
 
 package model
 
-type UIDType = uint32       // UserID
+type UIDType = uint32 // UserID
+type GroupID = uint8
+
 type SubjectIDType = uint32 // in case we need future change, but I guess not...
 type CharacterIDType = uint32
 type PersonIDType = uint32

@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -55,18 +53,21 @@ type manager struct {
 
 func (m manager) Create(ctx context.Context, a domain.Auth) (string, Session, error) {
 	var key string
+	var s Session
 	var err error
-	s := Session{UserID: a.ID}
 
 	for i := 0; i < 5; i++ {
 		key = random.Base62String(keyLength)
-		err = m.repo.Create(ctx, key, a.ID, s)
+		s, err = m.repo.Create(ctx, key, a.ID, a.RegTime)
 		if err != nil {
-			if !errors.Is(err, ErrKeyConflict) {
-				return "", Session{}, errgo.Wrap(err, "un-expected error when creating session")
+			if errors.Is(err, ErrKeyConflict) {
+				// key conflict, re-generate new key and retry
+				key = random.Base62String(keyLength)
+				continue
 			}
-			// key conflict, re-generate new key and retry
-			key = random.Base62String(keyLength)
+
+			m.log.Error("un-expected error when creating session", zap.Error(err))
+			return "", Session{}, errgo.Wrap(err, "un-expected error when creating session")
 		}
 	}
 
@@ -99,6 +100,7 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 	}
 
 	s = ws.Value
+	s.ExpiredAt = ws.ExpiredAt.Unix()
 
 	// 缓存3天或缓存者到token失效
 	ttl := minDur(timex.OneDay*3, ws.ExpiredAt.Sub(now))

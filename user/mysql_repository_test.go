@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -52,6 +50,7 @@ func TestGetByID(t *testing.T) {
 
 	require.Equal(t, id, u.ID)
 	require.Equal(t, "000/38/29/382951.jpg?r=1571167246", u.Avatar)
+	require.False(t, u.RegistrationTime.IsZero())
 }
 
 func TestGetByName(t *testing.T) {

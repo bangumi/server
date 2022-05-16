@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -35,7 +33,7 @@ import (
 
 const Key = "sessionID"
 
-type PersistSession struct {
+type persistSession struct {
 	CreatedAt time.Time
 	ExpiredAt time.Time
 	Key       string
@@ -44,8 +42,8 @@ type PersistSession struct {
 }
 
 type Repo interface {
-	Create(ctx context.Context, key string, userID model.UIDType, s Session) error
-	Get(ctx context.Context, key string) (PersistSession, error)
+	Create(ctx context.Context, key string, userID model.UIDType, regTime time.Time) (Session, error)
+	Get(ctx context.Context, key string) (persistSession, error)
 	RevokeUser(ctx context.Context, userID model.UIDType) (keys []string, err error)
 	Revoke(ctx context.Context, key string) error
 }
@@ -61,23 +59,25 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (r mysqlRepo) Create(ctx context.Context, key string, userID model.UIDType, s Session) error {
+func (r mysqlRepo) Create(ctx context.Context, key string, userID model.UIDType, regTime time.Time) (Session, error) {
 	tx := r.q.Begin()
 
 	_, err := tx.WithContext(ctx).WebSession.Where(tx.WebSession.Key.Eq(key)).First()
 	if err == nil {
-		return ErrKeyConflict
+		return Session{}, ErrKeyConflict
 	}
 
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return errgo.Wrap(err, "orm.Tx.Where.First")
+		return Session{}, errgo.Wrap(err, "orm.Tx.Where.First")
 	}
 
 	createdAt := time.Now().Unix()
+	expiredAt := createdAt + timex.OneWeekSec
+	s := Session{RegTime: regTime, UserID: userID, ExpiredAt: expiredAt}
 
 	encodedJSON, err := json.Marshal(s)
 	if err != nil {
-		return errgo.Wrap(err, "json.Marshal")
+		return Session{}, errgo.Wrap(err, "json.Marshal")
 	}
 
 	webSession := dao.WebSession{
@@ -85,39 +85,39 @@ func (r mysqlRepo) Create(ctx context.Context, key string, userID model.UIDType,
 		UserID:    userID,
 		Value:     encodedJSON,
 		CreatedAt: createdAt,
-		ExpiredAt: createdAt + timex.OneWeekSec,
+		ExpiredAt: expiredAt,
 	}
 
 	err = tx.WebSession.WithContext(ctx).Create(&webSession)
 	if err != nil {
-		return errgo.Wrap(err, "orm.Tx.Create")
+		return Session{}, errgo.Wrap(err, "orm.Tx.Create")
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return errgo.Wrap(err, "tx.Commit")
+		return Session{}, errgo.Wrap(err, "tx.Commit")
 	}
 
-	return nil
+	return s, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, key string) (PersistSession, error) {
+func (r mysqlRepo) Get(ctx context.Context, key string) (persistSession, error) {
 	s, err := r.q.WithContext(ctx).WebSession.
 		Where(r.q.WebSession.Key.Eq(key), r.q.WebSession.ExpiredAt.Gte(time.Now().Unix())).First()
 	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return PersistSession{}, errgo.Wrap(err, "orm.Tx.Where.First")
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return persistSession{}, domain.ErrNotFound
 		}
 
-		return PersistSession{}, domain.ErrNotFound
+		return persistSession{}, errgo.Wrap(err, "orm.Tx.Where.First")
 	}
 
 	var v Session
 	if err = json.Unmarshal(s.Value, &v); err != nil {
-		return PersistSession{}, errgo.Wrap(err, "json.Unmarshal")
+		return persistSession{}, errgo.Wrap(err, "json.Unmarshal")
 	}
 
-	return PersistSession{
+	return persistSession{
 		Key:       s.Key,
 		Value:     v,
 		CreatedAt: time.Unix(s.CreatedAt, 0),

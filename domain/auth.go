@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -33,13 +31,11 @@ type AuthRepo interface {
 	GetByEmail(ctx context.Context, email string) (Auth, []byte, error)
 }
 
-type GroupID = uint8
-
 // Auth is the basic authorization represent a user.
 type Auth struct {
 	RegTime    time.Time
 	ID         model.UIDType // user id
-	GroupID    GroupID
+	GroupID    model.GroupID
 	Permission Permission `json:"-"` // disable cache for this field.
 }
 
@@ -55,11 +51,17 @@ func (u Auth) AllowNSFW() bool {
 }
 
 type AuthService interface {
+	GetByID(ctx context.Context, userID model.UIDType) (Auth, error)
 	GetByToken(ctx context.Context, token string) (Auth, error)
-	ComparePassword(hashed []byte, password string) (bool, error)
+
 	GetByTokenWithCache(ctx context.Context, token string) (Auth, error)
+	GetByIDWithCache(ctx context.Context, userID model.UIDType) (Auth, error)
+
+	ComparePassword(hashed []byte, password string) (bool, error)
+
 	Login(ctx context.Context, email, password string) (Auth, bool, error)
-	GetPermission(ctx context.Context, id GroupID) (Permission, error)
+
+	GetPermission(ctx context.Context, id model.GroupID) (Permission, error)
 }
 
 type Permission struct {

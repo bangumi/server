@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -19,7 +17,6 @@ package log
 import (
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/model"
 )
 
@@ -27,8 +24,8 @@ func UserID(id model.UIDType) zap.Field {
 	return zap.Uint32("user_id", id)
 }
 
-func GroupID(id domain.GroupID) zap.Field {
-	return zap.Uint8("user_id", id)
+func GroupID(id model.GroupID) zap.Field {
+	return zap.Uint8("group_id", id)
 }
 
 func SubjectID(id model.SubjectIDType) zap.Field {

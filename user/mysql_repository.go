@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -195,11 +193,12 @@ func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...uint32) (map[uint32]mode
 
 func fromDao(m *dao.Member) model.User {
 	return model.User{
-		UserName:  m.Username,
-		NickName:  m.Nickname,
-		UserGroup: m.Groupid,
-		Avatar:    m.Avatar,
-		Sign:      m.Sign,
-		ID:        m.UID,
+		UserName:         m.Username,
+		NickName:         m.Nickname,
+		UserGroup:        m.Groupid,
+		Avatar:           m.Avatar,
+		Sign:             m.Sign,
+		ID:               m.UID,
+		RegistrationTime: time.Unix(m.Regdate, 0),
 	}
 }

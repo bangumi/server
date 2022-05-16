@@ -69,6 +69,96 @@ func (_c *AuthService_ComparePassword_Call) Return(_a0 bool, _a1 error) *AuthSer
 	return _c
 }
 
+// GetByID provides a mock function with given fields: ctx, userID
+func (_m *AuthService) GetByID(ctx context.Context, userID uint32) (domain.Auth, error) {
+	ret := _m.Called(ctx, userID)
+
+	var r0 domain.Auth
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) domain.Auth); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		r0 = ret.Get(0).(domain.Auth)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// AuthService_GetByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+type AuthService_GetByID_Call struct {
+	*mock.Call
+}
+
+// GetByID is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID uint32
+func (_e *AuthService_Expecter) GetByID(ctx interface{}, userID interface{}) *AuthService_GetByID_Call {
+	return &AuthService_GetByID_Call{Call: _e.mock.On("GetByID", ctx, userID)}
+}
+
+func (_c *AuthService_GetByID_Call) Run(run func(ctx context.Context, userID uint32)) *AuthService_GetByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *AuthService_GetByID_Call) Return(_a0 domain.Auth, _a1 error) *AuthService_GetByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// GetByIDWithCache provides a mock function with given fields: ctx, userID
+func (_m *AuthService) GetByIDWithCache(ctx context.Context, userID uint32) (domain.Auth, error) {
+	ret := _m.Called(ctx, userID)
+
+	var r0 domain.Auth
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) domain.Auth); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		r0 = ret.Get(0).(domain.Auth)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// AuthService_GetByIDWithCache_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByIDWithCache'
+type AuthService_GetByIDWithCache_Call struct {
+	*mock.Call
+}
+
+// GetByIDWithCache is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID uint32
+func (_e *AuthService_Expecter) GetByIDWithCache(ctx interface{}, userID interface{}) *AuthService_GetByIDWithCache_Call {
+	return &AuthService_GetByIDWithCache_Call{Call: _e.mock.On("GetByIDWithCache", ctx, userID)}
+}
+
+func (_c *AuthService_GetByIDWithCache_Call) Run(run func(ctx context.Context, userID uint32)) *AuthService_GetByIDWithCache_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *AuthService_GetByIDWithCache_Call) Return(_a0 domain.Auth, _a1 error) *AuthService_GetByIDWithCache_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // GetByToken provides a mock function with given fields: ctx, token
 func (_m *AuthService) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
 	ret := _m.Called(ctx, token)

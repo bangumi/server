@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -32,6 +30,7 @@ import (
 	"github.com/bangumi/server/internal/strutil"
 	"github.com/bangumi/server/web/handler/ctxkey"
 	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/web/res/code"
 	"github.com/bangumi/server/web/session"
 	"github.com/bangumi/server/web/util"
 )
@@ -49,22 +48,21 @@ func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 	if value != "" {
 		s, err := h.getSession(c.Context(), value)
 		if err != nil {
-			h.log.Error("get permission", zap.Error(err), a.LogRequestID())
+			if errors.Is(err, session.ErrExpired) {
+				return res.HTTPError(c, code.Unauthorized, "token expired")
+			}
+
+			h.log.Error("get session", zap.Error(err), a.LogRequestID())
 			return res.InternalError(c, err, "failed to read session")
 		}
 
-		permission, err := h.a.GetPermission(c.Context(), s.GroupID)
+		auth, err := h.a.GetByIDWithCache(c.Context(), s.UserID)
 		if err != nil {
-			h.log.Error("failed to get permission", zap.Error(err), a.LogRequestID(), log.GroupID(s.GroupID))
+			h.log.Error("failed to get permission", zap.Error(err), a.LogRequestID(), log.UserID(s.UserID))
 			return res.InternalError(c, err, "failed to get permission of user group")
 		}
 
-		a.fillAuth(domain.Auth{
-			RegTime:    s.RegTime,
-			ID:         s.UserID,
-			GroupID:    s.GroupID,
-			Permission: permission,
-		})
+		a.fillAuth(auth)
 	}
 
 	c.Context().SetUserValue(ctxkey.User, a)

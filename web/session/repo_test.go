@@ -57,7 +57,7 @@ func TestMysqlRepo_Create(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	err = r.Create(ctx, key, 1, session.Session{})
+	_, err = r.Create(ctx, key, 1, time.Now())
 	require.NoError(t, err, session.ErrKeyConflict)
 }
 
@@ -86,7 +86,7 @@ func TestMysqlRepo_Create_conflict(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	err = r.Create(ctx, key, 1, session.Session{})
+	_, err = r.Create(ctx, key, 1, time.Now())
 	require.ErrorIs(t, err, session.ErrKeyConflict)
 }
 

@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -19,6 +17,7 @@ package session_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -26,7 +25,6 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/test"
-	"github.com/bangumi/server/mocks"
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/web/session"
 )
@@ -35,11 +33,11 @@ func TestManager_Create(t *testing.T) {
 	t.Parallel()
 	const uid model.UIDType = 1
 
-	m := mocks.NewSessionRepo(t)
-	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
-		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
-			require.Equal(t, uid, s.UserID)
-		}).Return(nil)
+	m := session.NewMockRepo(t)
+	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.Anything).
+		Run(func(ctx context.Context, key string, userID model.UIDType, regTime time.Time) {
+			require.Equal(t, uid, userID)
+		}).Return(session.Session{UserID: uid}, nil)
 
 	manager := session.New(test.NopCache(), m, logger.Copy())
 
@@ -51,11 +49,11 @@ func TestManager_Create(t *testing.T) {
 func TestManager_Get(t *testing.T) {
 	t.Parallel()
 	const uid model.UIDType = 1
-	m := mocks.NewSessionRepo(t)
-	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
-		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
-			require.Equal(t, uid, s.UserID)
-		}).Return(nil)
+	m := session.NewMockRepo(t)
+	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.Anything).
+		Run(func(ctx context.Context, key string, userID model.UIDType, regTime time.Time) {
+			require.Equal(t, uid, userID)
+		}).Return(session.Session{UserID: uid}, nil)
 
 	manager := session.New(test.NopCache(), m, logger.Copy())
 
@@ -69,11 +67,11 @@ func TestManager_Revoke(t *testing.T) {
 	t.Parallel()
 
 	const uid model.UIDType = 1
-	m := mocks.NewSessionRepo(t)
-	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.AnythingOfType("session.Session")).
-		Run(func(ctx context.Context, key string, userID uint32, s session.Session) {
-			require.Equal(t, uid, s.UserID)
-		}).Return(nil)
+	m := session.NewMockRepo(t)
+	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.Anything).
+		Run(func(ctx context.Context, key string, userID model.UIDType, regTime time.Time) {
+			require.Equal(t, uid, userID)
+		}).Return(session.Session{UserID: uid}, nil)
 
 	manager := session.New(test.NopCache(), m, logger.Copy())
 

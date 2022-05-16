@@ -33,13 +33,13 @@ build: ./dist/chii.exe
 	env CGO_ENABLED=0 go build -o $@
 
 # we should use gomock once https://github.com/golang/mock/issues/622 is resolved.
-mocks: mocks/SessionRepo.go mocks/SessionManager.go mocks/CaptchaManager.go mocks/RateLimiter.go
+mocks: web/session/repo_mock_test.go mocks/SessionManager.go mocks/CaptchaManager.go mocks/RateLimiter.go
 	for dir in domain cache; do \
 		mockery --all --dir $$dir --with-expecter; \
 	done
 
-mocks/SessionRepo.go: web/session/repo.go
-	mockery --dir ./web/session --name Repo --filename SessionRepo.go --structname SessionRepo --with-expecter;
+web/session/repo_mock_test.go: web/session/repo.go
+	mockery --inpackage --dir ./web/session --testonly --name Repo --filename repo_mock_test.go --structname MockRepo --with-expecter;
 
 mocks/SessionManager.go: web/session/manager.go
 	mockery --dir ./web/session --name Manager --filename SessionManager.go --structname SessionManager --with-expecter;

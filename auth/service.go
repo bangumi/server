@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -31,14 +29,16 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/model"
 )
 
-func NewService(repo domain.AuthRepo, logger *zap.Logger, c cache.Generic) domain.AuthService {
+func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.Generic) domain.AuthService {
 	return service{
 		localCache: cache.NewMemoryCache(),
 		cache:      c,
 		repo:       repo,
 		log:        logger.Named("auth.Service"),
+		user:       user,
 	}
 }
 
@@ -46,7 +46,54 @@ type service struct {
 	localCache cache.Generic
 	cache      cache.Generic
 	repo       domain.AuthRepo
+	user       domain.UserRepo
 	log        *zap.Logger
+}
+
+func (s service) GetByID(ctx context.Context, userID model.UIDType) (domain.Auth, error) {
+	u, err := s.user.GetByID(ctx, userID)
+	if err != nil {
+		return domain.Auth{}, errgo.Wrap(err, "AuthRepo.GetByToken")
+	}
+
+	p, err := s.GetPermission(ctx, u.UserGroup)
+	if err != nil {
+		return domain.Auth{}, err
+	}
+
+	return domain.Auth{
+		RegTime:    u.RegistrationTime,
+		ID:         u.ID,
+		GroupID:    u.UserGroup,
+		Permission: p,
+	}, nil
+}
+
+func (s service) GetByIDWithCache(ctx context.Context, userID model.UIDType) (domain.Auth, error) {
+	var a domain.Auth
+
+	var cacheKey = cachekey.User(userID)
+
+	ok, err := s.cache.Get(ctx, cacheKey, &a)
+	if err != nil {
+		return domain.Auth{}, errgo.Wrap(err, "cache.Get")
+	}
+	if ok {
+		if a.Permission, err = s.GetPermission(ctx, a.GroupID); err != nil {
+			return domain.Auth{}, err
+		}
+
+		return a, nil
+	}
+
+	a, err = s.GetByID(ctx, userID)
+	if err != nil {
+		return domain.Auth{}, err
+	}
+
+	_ = s.cache.Set(ctx, cacheKey, a, time.Hour)
+
+	return a, nil
 }
 
 func (s service) Login(ctx context.Context, email, password string) (domain.Auth, bool, error) {
@@ -146,7 +193,7 @@ func preProcessPassword(s string) [32]byte {
 	return md5Password
 }
 
-func (s service) GetPermission(ctx context.Context, id domain.GroupID) (domain.Permission, error) {
+func (s service) GetPermission(ctx context.Context, id model.GroupID) (domain.Permission, error) {
 	var p domain.Permission
 	key := strconv.FormatUint(uint64(id), 10)
 	ok, err := s.localCache.Get(ctx, key, &p)
