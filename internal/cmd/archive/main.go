@@ -84,10 +84,8 @@ func start(out string) {
 	if err != nil {
 		panic(err)
 	}
-	defer f.Close()
 
 	z := zip.NewWriter(f)
-	defer z.Close()
 
 	for _, s := range []struct {
 		FileName string
@@ -108,6 +106,14 @@ func start(out string) {
 		}
 
 		s.Fn(q, w)
+	}
+
+	if err = z.Close(); err != nil {
+		panic(err)
+	}
+
+	if err = f.Close(); err != nil {
+		panic(err)
 	}
 }
 
@@ -150,7 +156,7 @@ func exportSubjects(q *query.Query, w io.Writer) {
 		}
 
 		for _, subject := range subjects {
-			if err := json.NewEncoder(w).Encode(Subject{
+			encode(w, Subject{
 				ID:       subject.ID,
 				Type:     subject.TypeID,
 				Name:     subject.Name,
@@ -159,9 +165,7 @@ func exportSubjects(q *query.Query, w io.Writer) {
 				Platform: subject.Platform,
 				Summary:  subject.Summary,
 				Nsfw:     subject.Nsfw,
-			}); err != nil {
-				panic(err)
-			}
+			})
 		}
 	}
 }
@@ -184,16 +188,14 @@ func exportPersons(q *query.Query, w io.Writer) {
 		}
 
 		for _, p := range persons {
-			if err := json.NewEncoder(w).Encode(Person{
+			encode(w, Person{
 				ID:      p.ID,
 				Name:    p.Name,
 				Type:    p.Type,
 				Career:  careers(p),
 				Infobox: p.Infobox,
 				Summary: p.Summary,
-			}); err != nil {
-				panic(err)
-			}
+			})
 		}
 	}
 }
@@ -252,14 +254,12 @@ func exportCharacters(q *query.Query, w io.Writer) {
 		}
 
 		for _, c := range characters {
-			if err := json.NewEncoder(w).Encode(Character{
+			encode(w, Character{
 				ID:      c.ID,
 				Role:    c.Role,
 				Infobox: c.Infobox,
 				Summary: c.Summary,
-			}); err != nil {
-				panic(err)
-			}
+			})
 		}
 	}
 }
@@ -289,7 +289,7 @@ func exportEpisodes(q *query.Query, w io.Writer) {
 		}
 
 		for _, e := range episodes {
-			if err := json.NewEncoder(w).Encode(Episode{
+			encode(w, Episode{
 				ID:          e.ID,
 				Name:        e.Name,
 				NameCn:      e.NameCn,
@@ -299,9 +299,7 @@ func exportEpisodes(q *query.Query, w io.Writer) {
 				Type:        e.Type,
 				AirDate:     e.Airdate,
 				Disc:        e.Disc,
-			}); err != nil {
-				panic(err)
-			}
+			})
 		}
 	}
 }
@@ -323,14 +321,12 @@ func exportSubjectRelations(q *query.Query, w io.Writer) {
 		}
 
 		for _, rel := range relations {
-			if err := json.NewEncoder(w).Encode(SubjectRelation{
+			encode(w, SubjectRelation{
 				SubjectID:        rel.SubjectID,
 				RelationType:     rel.RelationType,
 				RelatedSubjectID: rel.RelatedSubjectID,
 				Order:            rel.Order,
-			}); err != nil {
-				panic(err)
-			}
+			})
 		}
 	}
 }
@@ -351,13 +347,11 @@ func exportSubjectPersonRelations(q *query.Query, w io.Writer) {
 		}
 
 		for _, rel := range relations {
-			if err := json.NewEncoder(w).Encode(SubjectPerson{
+			encode(w, SubjectPerson{
 				PersonID:  rel.PersonID,
 				SubjectID: rel.SubjectID,
 				Position:  rel.PrsnPosition,
-			}); err != nil {
-				panic(err)
-			}
+			})
 		}
 	}
 }
@@ -379,14 +373,12 @@ func exportSubjectCharacterRelations(q *query.Query, w io.Writer) {
 		}
 
 		for _, rel := range relations {
-			if err := json.NewEncoder(w).Encode(SubjectCharacter{
+			encode(w, SubjectCharacter{
 				CharacterID: rel.CharacterID,
 				SubjectID:   rel.SubjectID,
 				Type:        rel.CrtType,
 				Order:       rel.CrtOrder,
-			}); err != nil {
-				panic(err)
-			}
+			})
 		}
 	}
 }
@@ -408,14 +400,18 @@ func exportPersonCharacterRelations(q *query.Query, w io.Writer) {
 		}
 
 		for _, rel := range relations {
-			if err := json.NewEncoder(w).Encode(PersonCharacter{
+			encode(w, PersonCharacter{
 				PersonID:    rel.PersonID,
 				SubjectID:   rel.SubjectID,
 				CharacterID: rel.CharacterID,
 				Summary:     rel.Summary,
-			}); err != nil {
-				panic(err)
-			}
+			})
 		}
+	}
+}
+
+func encode(w io.Writer, object interface{}) {
+	if err := json.NewEncoder(w).Encode(object); err != nil {
+		panic(err)
 	}
 }
