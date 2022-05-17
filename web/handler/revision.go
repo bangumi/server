@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/goccy/go-reflect"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/domain"
@@ -30,8 +31,6 @@ import (
 	"github.com/bangumi/server/model"
 	"github.com/bangumi/server/web/res"
 )
-
-const CacheDuration = 300
 
 func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
@@ -334,7 +333,11 @@ func convertModelPersonRevision(r *model.Revision, creatorMap map[model.UIDType]
 func convertModelSubjectRevision(r *model.Revision, creatorMap map[model.UIDType]model.User) res.SubjectRevision {
 	creator := creatorMap[r.CreatorID]
 	var data *res.SubjectRevisionData
-	if r.Data != nil {
+	v := reflect.ValueNoEscapeOf(r.Data)
+	if v.IsValid() && (!v.IsZero()) && (!v.IsNil()) {
+		// can't compare r.Data != nil
+		// see https://yourbasic.org/golang/gotcha-why-nil-error-not-equal-nil/ for this detail.
+		// replace it with generic type after we upgrade to go 1.18
 		if subjectData, ok := r.Data.(*model.SubjectRevisionData); ok {
 			data = &res.SubjectRevisionData{
 				Name:         subjectData.Name,

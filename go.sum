@@ -114,6 +114,8 @@ github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/me
 github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0/go.mod h1:fyg7847qk6SyHyPtNmDHnmrv/HOrqktSC+C9fM+CJOE=
 github.com/goccy/go-json v0.9.7 h1:IcB+Aqpx/iMHu5Yooh7jEzJk1JZ7Pjtmys2ukPr7EeM=
 github.com/goccy/go-json v0.9.7/go.mod h1:6MelG93GURQebXPDq3khkgXZkazVtN9CRI+MGFi0w8I=
+github.com/goccy/go-reflect v1.1.0 h1:kiT3+exv9ULtdpawlMzCGT1y5bWOmuY3jgS86GB9t1s=
+github.com/goccy/go-reflect v1.1.0/go.mod h1:n0oYZn8VcV2CkWTxi8B9QjkCoq6GTtCEdfmR66YhFtE=
 github.com/gofiber/adaptor/v2 v2.1.23 h1:VG0yAPnB2EJZjxy4Ul+Ra9e92PnqwXE97SUVuPGuoAA=
 github.com/gofiber/adaptor/v2 v2.1.23/go.mod h1:hnYEQBPF2x1JaBHygutJJF5d0+J2eYnKKsUMCSsfxKk=
 github.com/gofiber/fiber/v2 v2.32.0/go.mod h1:CMy5ZLiXkn6qwthrl03YMyW1NLfj0rhxz2LKl4t7ZTY=
