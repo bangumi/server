@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -40,7 +38,7 @@ func getRepo(t *testing.T) domain.SubjectRepo {
 }
 
 func TestGet(t *testing.T) {
-	test.RequireEnv(t, "mysql")
+	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
@@ -52,7 +50,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestMysqlRepo_GetByIDs(t *testing.T) {
-	test.RequireEnv(t, "mysql")
+	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
@@ -67,4 +65,23 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 	_, ok = s[2]
 	assert.True(t, ok)
 	assert.Equal(t, model.SubjectIDType(2), s[2].ID)
+}
+
+func TestMysqlRepo_GetCharacterRelated(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	s, err := repo.GetCharacterRelated(context.Background(), 1)
+	require.NoError(t, err)
+
+	var found bool
+	for _, relation := range s {
+		if relation.SubjectID == 8 {
+			found = true
+		}
+	}
+
+	require.True(t, found, "character 1 should be related to subject 8")
 }

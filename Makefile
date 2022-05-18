@@ -57,7 +57,7 @@ test: .bin/gotestfmt.exe
 	go test -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
 
 test-all: .bin/dotenv.exe .bin/gotestfmt.exe
-	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./...
 
 bench:
 	go test -bench=. -benchmem ./pkg/wiki

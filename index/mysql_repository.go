@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -104,7 +102,7 @@ func (r mysqlRepo) ListSubjects(
 	subjectType model.SubjectType,
 	limit, offset int,
 ) ([]domain.IndexSubject, error) {
-	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject.Fields).
+	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).Preload(r.q.IndexSubject.Subject.Fields).
 		Where(r.q.IndexSubject.Rid.Eq(id)).
 		Order(r.q.IndexSubject.Order).Limit(limit).Offset(offset)
 	if subjectType != 0 {

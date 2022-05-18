@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -147,7 +145,7 @@ func (r mysqlRepo) GetCharacterRelated(
 	characterID model.PersonIDType,
 ) ([]domain.SubjectCharacterRelation, error) {
 	relations, err := r.q.CharacterSubjects.WithContext(ctx).
-		Joins(r.q.CharacterSubjects.Subject.Fields).
+		Joins(r.q.CharacterSubjects.Subject).
 		Where(r.q.CharacterSubjects.CharacterID.Eq(characterID)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
@@ -157,7 +155,7 @@ func (r mysqlRepo) GetCharacterRelated(
 	var rel = make([]domain.SubjectCharacterRelation, 0, len(relations))
 	for _, relation := range relations {
 		rel = append(rel, domain.SubjectCharacterRelation{
-			SubjectID:   relation.Subject.ID,
+			SubjectID:   relation.SubjectID,
 			CharacterID: relation.CharacterID,
 			TypeID:      relation.CrtType,
 		})
