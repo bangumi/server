@@ -150,7 +150,8 @@ type Subject struct {
 
 func exportSubjects(q *query.Query, w io.Writer) {
 	for i := model.SubjectIDType(0); i < maxSubjectID; i += defaultStep {
-		subjects, err := q.WithContext(ctx).Subject.Where(q.Subject.ID.Gt(i), q.Subject.ID.Lte(i+defaultStep)).Find()
+		subjects, err := q.WithContext(ctx).Subject.
+			Where(q.Subject.ID.Gt(i), q.Subject.ID.Lte(i+defaultStep), q.Subject.Ban.Eq(0)).Find()
 		if err != nil {
 			panic(err)
 		}
@@ -283,7 +284,7 @@ func exportEpisodes(q *query.Query, w io.Writer) {
 	}
 	for i := model.EpisodeIDType(0); i < lastEpisode.ID; i += defaultStep {
 		episodes, err := q.WithContext(context.Background()).Episode.
-			Where(q.Episode.ID.Gt(i), q.Episode.ID.Lte(i+defaultStep)).Find()
+			Where(q.Episode.ID.Gt(i), q.Episode.ID.Lte(i+defaultStep), q.Episode.Ban.Eq(0)).Find()
 		if err != nil {
 			panic(err)
 		}
