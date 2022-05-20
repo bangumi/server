@@ -30,34 +30,33 @@ import (
 )
 
 type Request struct {
-	Response    interface{}
 	t           *testing.T
 	headers     http.Header
-	urlParams   url.Values
+	urlQuery    url.Values
 	formData    url.Values
 	cookies     map[string]string
-	HTTPVerb    string
+	httpVerb    string
 	contentType string
-	Endpoint    string
-	HTTPBody    []byte
+	endpoint    string
+	httpBody    []byte
 }
 
 func New(t *testing.T) *Request {
 	t.Helper()
 
 	return &Request{
-		t:         t,
-		urlParams: url.Values{},
-		cookies:   make(map[string]string),
-		formData:  url.Values{},
-		headers:   http.Header{fiber.HeaderUserAgent: {"chii-test-client"}},
+		t:        t,
+		urlQuery: url.Values{},
+		cookies:  make(map[string]string),
+		formData: url.Values{},
+		headers:  http.Header{fiber.HeaderUserAgent: {"chii-test-client"}},
 	}
 }
 
 func (r *Request) newRequest(httpVerb string, endpoint string) *Request {
 	r.t.Helper()
-	r.HTTPVerb = httpVerb
-	r.Endpoint = endpoint
+	r.httpVerb = httpVerb
+	r.endpoint = endpoint
 
 	return r
 }
@@ -97,7 +96,7 @@ func (r *Request) Cookie(key, value string) *Request {
 
 func (r *Request) Query(key, value string) *Request {
 	r.t.Helper()
-	r.urlParams.Set(key, value)
+	r.urlQuery.Set(key, value)
 	return r
 }
 
@@ -121,7 +120,7 @@ func (r *Request) Form(key, value string) *Request {
 	}
 
 	r.formData.Set(key, value)
-	r.HTTPBody = []byte(r.formData.Encode())
+	r.httpBody = []byte(r.formData.Encode())
 
 	return r
 }
@@ -131,7 +130,7 @@ func (r *Request) JSON(v interface{}) *Request {
 	require.Empty(r.t, r.contentType, "content-type should not be empty")
 
 	var err error
-	r.HTTPBody, err = json.Marshal(v)
+	r.httpBody, err = json.Marshal(v)
 	require.NoError(r.t, err)
 
 	r.contentType = fiber.MIMEApplicationJSON
@@ -142,26 +141,26 @@ func (r *Request) JSON(v interface{}) *Request {
 func (r *Request) StdRequest() *http.Request {
 	r.t.Helper()
 	var body io.ReadCloser = http.NoBody
-	if r.HTTPBody != nil {
-		r.headers.Set(fiber.HeaderContentLength, strconv.Itoa(len(r.HTTPBody)))
+	if r.httpBody != nil {
+		r.headers.Set(fiber.HeaderContentLength, strconv.Itoa(len(r.httpBody)))
 		if r.headers.Get(fiber.HeaderContentType) == "" {
 			r.headers.Set(fiber.HeaderContentType, r.contentType)
 		}
 
-		body = io.NopCloser(bytes.NewBuffer(r.HTTPBody))
+		body = io.NopCloser(bytes.NewBuffer(r.httpBody))
 	}
 
-	path := r.Endpoint
-	if len(r.urlParams) > 0 {
+	path := r.endpoint
+	if len(r.urlQuery) > 0 {
 		var sep = "?"
-		if strings.Contains(r.Endpoint, "?") {
+		if strings.Contains(r.endpoint, "?") {
 			sep = "&"
 		}
 
-		path = r.Endpoint + sep + r.urlParams.Encode()
+		path = r.endpoint + sep + r.urlQuery.Encode()
 	}
 
-	req := httptest.NewRequest(r.HTTPVerb, path, body)
+	req := httptest.NewRequest(r.httpVerb, path, body)
 	req.Header = r.headers
 	for name, value := range r.cookies {
 		req.AddCookie(&http.Cookie{Name: name, Value: value})
