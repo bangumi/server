@@ -10,7 +10,7 @@
 
 ## Optional Requirements:
 
-- nodejs and npm: 用于生成 openapi 文件。
+- nodejs: 用于生成 openapi 文件。
 - [mockery](https://github.com/vektra/mockery#installation): 用于生成测试用的 mock 文件。
 
 ## Init
@@ -67,7 +67,7 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 ## 测试
 
-运行部分测试。
+使用 mock 进行部分测试。
 
 ```
 make test
@@ -87,13 +87,24 @@ make lint
 
 ### 配置文件
 
-非 golang 文件(yaml, json, markdown 等)使用 [prettier](https://prettier.io/) 进行格式化。
+非 golang 文件 (yaml, json, markdown 等) 使用 [prettier](https://prettier.io/) 进行格式化。
+如果你没有 nodejs 环境，也可以直接提交 PR。GitHub Actions 会对文件进行检查并提出修改建议。
 
 ## Go Mod
 
 你不应当导入 `github.com/bangumi/server/pkg` 以外的任何路径。
 
 具体可用的包见 [pkg/readme.md](./pkg)
+
+## Contributing
+
+项目整体分为 web，service 和 repository 三层。
+
+web 相关的框架和 handler 在[web/](./web) 文件夹中。
+
+service 和 repository 在[domain/](./domain)定义为 interface，在各个子文件夹(如[subject/](./subject)) 中实现。
+
+使用 [`uber/fx`](https://github.com/uber-go/fx) 进行依赖注入。
 
 ## License
 
