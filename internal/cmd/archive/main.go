@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -29,13 +27,13 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
-	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/internal/model"
 )
 
 const defaultStep = 50

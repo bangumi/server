@@ -8,7 +8,7 @@ if (!VERSION) {
   process.exit(1);
 }
 
-const goFile = path.join(__dirname, "..", "config/version.go");
+const goFile = path.join(__dirname, "..", "internal/config/version.go");
 
 fs.writeFileSync(
   goFile,

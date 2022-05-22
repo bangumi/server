@@ -1,5 +1,3 @@
-// Copyright (c) 2022 Trim21 <trim21.me@gmail.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -21,7 +19,7 @@ import (
 	"strconv"
 
 	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/internal/model"
 )
 
 func Uint8(s string) (uint8, error) {

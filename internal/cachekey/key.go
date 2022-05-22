@@ -17,8 +17,8 @@ package cachekey
 import (
 	"strconv"
 
-	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/model"
 )
 
 // Put version in cache key to avoid model changes.

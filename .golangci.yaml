@@ -179,6 +179,8 @@ linters-settings:
         alias: promreporter
       - pkg: "gorm.io/gorm/logger"
         alias: gormLogger
+      - pkg: "github.com/go-playground/universal-translator"
+        alias: ut
 
   lll:
     # max line length, lines longer will be reported. Default is 120.
@@ -239,10 +241,10 @@ linters-settings:
       - "func (*github.com/gofiber/fiber/v2.Ctx).JSON("
       - "func os.Open(name string)"
       - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
-      - "func github.com/bangumi/server/web/res.HTTPError("
-      - "func github.com/bangumi/server/web/res.WithError("
-      - "func github.com/bangumi/server/web/res.InternalError("
-      - "func github.com/bangumi/server/web/res.JSON("
+      - "func github.com/bangumi/server/internal/web/res.HTTPError("
+      - "func github.com/bangumi/server/internal/web/res.WithError("
+      - "func github.com/bangumi/server/internal/web/res.InternalError("
+      - "func github.com/bangumi/server/internal/web/res.JSON("
 
   nlreturn:
     block-size: 3

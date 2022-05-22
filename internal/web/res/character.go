@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>
+
+package res
+
+type CharacterV0 struct {
+	BirthMon  *uint8       `json:"birth_mon"`
+	Gender    *string      `json:"gender"`
+	BirthDay  *uint8       `json:"birth_day"`
+	BirthYear *uint16      `json:"birth_year"`
+	BloodType *uint8       `json:"blood_type"`
+	Images    PersonImages `json:"images"`
+	Summary   string       `json:"summary"`
+	Name      string       `json:"name"`
+	Infobox   v0wiki       `json:"infobox"`
+	Stat      Stat         `json:"stat"`
+	ID        uint32       `json:"id"`
+	Redirect  uint32       `json:"-"`
+	Locked    bool         `json:"locked"`
+	Type      uint8        `json:"type"`
+	NSFW      bool         `json:"nsfw"`
+}

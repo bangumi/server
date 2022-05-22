@@ -17,7 +17,7 @@ package log
 import (
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/model"
+	"github.com/bangumi/server/internal/model"
 )
 
 func UserID(id model.UIDType) zap.Field {

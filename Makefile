@@ -23,6 +23,8 @@ Others Targets:
 endef
 export helpMessage
 
+MOCKERY_ARGS=--output ./internal/mocks --with-expecter
+
 help:
 	@echo "$$helpMessage"
 
@@ -33,22 +35,22 @@ build: ./dist/chii.exe
 	env CGO_ENABLED=0 go build -o $@
 
 # we should use gomock once https://github.com/golang/mock/issues/622 is resolved.
-mocks: web/session/repo_mock_test.go mocks/SessionManager.go mocks/CaptchaManager.go mocks/RateLimiter.go
-	for dir in domain cache; do \
-		mockery --all --dir $$dir --with-expecter; \
-	done
+mocks: internal/web/session/repo_mock_test.go internal/mocks/SessionManager.go \
+		internal/mocks/CaptchaManager.go internal/mocks/RateLimiter.go
+	mockery --all --dir ./internal/domain $(MOCKERY_ARGS)
+	mockery --all --dir ./internal/cache $(MOCKERY_ARGS)
 
-web/session/repo_mock_test.go: web/session/repo.go
-	mockery --inpackage --dir ./web/session --testonly --name Repo --filename repo_mock_test.go --structname MockRepo --with-expecter;
+internal/web/session/repo_mock_test.go: internal/web/session/repo.go
+	mockery --inpackage --dir ./internal/web/session --testonly --name Repo --filename repo_mock_test.go --structname MockRepo --with-expecter;
 
-mocks/SessionManager.go: web/session/manager.go
-	mockery --dir ./web/session --name Manager --filename SessionManager.go --structname SessionManager --with-expecter;
+internal/mocks/SessionManager.go: internal/web/session/manager.go
+	mockery --dir ./internal/web/session --name Manager --filename SessionManager.go --structname SessionManager $(MOCKERY_ARGS)
 
-mocks/CaptchaManager.go: web/captcha/manager.go
-	mockery --dir ./web/captcha --name Manager --filename CaptchaManager.go --structname CaptchaManager --with-expecter;
+internal/mocks/CaptchaManager.go: internal/web/captcha/manager.go
+	mockery --dir ./internal/web/captcha --name Manager --filename CaptchaManager.go --structname CaptchaManager $(MOCKERY_ARGS)
 
-mocks/RateLimiter.go: web/rate/new.go
-	mockery --dir ./web/rate --name Manager --filename RateLimiter.go --structname RateLimiter --with-expecter;
+internal/mocks/RateLimiter.go: internal/web/rate/new.go
+	mockery --dir ./internal/web/rate --name Manager --filename RateLimiter.go --structname RateLimiter $(MOCKERY_ARGS)
 
 gen: ./dal/query/gen.go mocks
 

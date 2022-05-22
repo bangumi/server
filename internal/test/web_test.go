@@ -17,8 +17,8 @@ package test_test
 import (
 	"testing"
 
+	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/test"
-	"github.com/bangumi/server/mocks"
 )
 
 func TestGetWebApp(t *testing.T) {

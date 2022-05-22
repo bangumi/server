@@ -100,9 +100,9 @@ make lint
 
 项目整体分为 web，service 和 repository 三层。
 
-web 相关的框架和 handler 在[web/](./web) 文件夹中。
+web 相关的框架和 handler 在[internal/web/](internal/web) 文件夹中。
 
-service 和 repository 在[domain/](./domain)定义为 interface，在各个子文件夹(如[subject/](./subject)) 中实现。
+service 和 repository 在[internal/domain/](internal/domain)定义为 interface，在各个子文件夹(如[internal/subject/](internal/subject)) 中实现。
 
 使用 [`uber/fx`](https://github.com/uber-go/fx) 进行依赖注入。
 
