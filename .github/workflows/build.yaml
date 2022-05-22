@@ -11,7 +11,7 @@ on:
       - "Makefile"
       - "**.go"
       - "**.go.json"
-      - "Dockerfile"
+      - "etc/Dockerfile"
   pull_request:
     branches:
       - master
@@ -22,7 +22,7 @@ on:
       - "Makefile"
       - "**.go"
       - "**.go.json"
-      - "Dockerfile"
+      - "etc/Dockerfile"
 
 jobs:
   build:
@@ -51,4 +51,4 @@ jobs:
       - name: Build
         run: make build
 
-      - run: docker build .
+      - run: docker build -f etc/Dockerfile .

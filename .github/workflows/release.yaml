@@ -28,7 +28,7 @@ jobs:
       - run: make build
 
       - name: docker build
-        run: docker build -t ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest .
+        run: docker build -f etc/Dockerfile -t ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest .
 
       - name: docker login
         run: echo $DOCKER_TOKEN | docker login ghcr.io -u ${{ env.USER }} --password-stdin
