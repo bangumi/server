@@ -11,7 +11,7 @@
 ## Optional Requirements:
 
 - nodejs: 用于生成 openapi 文件。
-- [mockery](https://github.com/vektra/mockery#installation): 用于生成测试用的 mock 文件。
+- [mockery](https://github.com/vektra/mockery#installation): 用于生成测试用的 [mock](./internal/mocks/) 文件。
 
 ## Init
 
@@ -67,7 +67,7 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 ## 测试
 
-使用 mock 进行部分测试。
+使用 [mock](./internal/mocks/) 进行部分测试。
 
 ```
 make test
