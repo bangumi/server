@@ -44,15 +44,8 @@ output:
 # all available settings of specific linters
 linters-settings:
   goheader:
-    values:
-      regexp:
-        COPYRIGHT: "(.*)?SPDX-License-Identifier: AGPL-3.0-only"
-    # Copyright (c) 2021-2022 USER1 <email>
-    # Copyright (c) 2022 USER2
-    #
-    # SPDX-License-Identifier: AGPL-3.0-only
     template: |-
-      {{ COPYRIGHT }}
+      SPDX-License-Identifier: AGPL-3.0-only
 
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU Affero General Public License as published
