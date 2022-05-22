@@ -41,10 +41,10 @@ jobs:
           docker tag ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
           docker push "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
 
-      - name: Generate Changlog
+      - name: Generate Changelog
         run: |
           docker pull quay.io/git-chglog/git-chglog:latest
-          docker run -v "$PWD":/workdir quay.io/git-chglog/git-chglog "$TAG" | \
+          docker run -v "$PWD":/workdir quay.io/git-chglog/git-chglog "$TAG" --config /workdir/.github/.chglog/config.yml | \
           python -c 'import sys;print("".join(sys.stdin.readlines()[3:]).strip())' > changelog.md
 
       - name: Upload GitHub Release
