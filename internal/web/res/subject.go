@@ -36,7 +36,7 @@ type SubjectV0 struct {
 	Rating        Rating                `json:"rating"`
 	TotalEpisodes int64                 `json:"total_episodes"`
 	Collection    SubjectCollectionStat `json:"collection"`
-	ID            uint32                `json:"id"`
+	ID            model.SubjectIDType   `json:"id"`
 	Eps           uint32                `json:"eps"`
 	Volumes       uint32                `json:"volumes"`
 	Redirect      uint32                `json:"-"`
@@ -59,7 +59,7 @@ type Subject struct {
 	Collection   SubjectCollectionStat `json:"collection"`
 	Volumes      uint32                `json:"volumes"`
 	Eps          uint32                `json:"eps"`
-	ID           uint32                `json:"id"`
+	ID           model.SubjectIDType   `json:"id"`
 	Redirect     uint32                `json:"-"`
 	Platform     uint16                `json:"platform_id"`
 	Airtime      uint8                 `json:"air_time"`

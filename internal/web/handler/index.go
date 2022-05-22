@@ -90,7 +90,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 func (h Handler) GetIndex(c *fiber.Ctx) error {
 	user := h.getHTTPAccessor(c)
 
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := strparse.IndexID(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad index_id")
 	}
@@ -109,10 +109,11 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 
 	return c.JSON(r)
 }
+
 func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 	user := h.getHTTPAccessor(c)
 
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := strparse.IndexID(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad index_id")
 	}

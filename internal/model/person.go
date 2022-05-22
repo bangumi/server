@@ -19,8 +19,8 @@ type Person struct {
 	Image          string
 	Infobox        string
 	Summary        string
-	ID             uint32
-	Redirect       uint32
+	ID             PersonIDType
+	Redirect       PersonIDType
 	CollectCount   uint32
 	CommentCount   uint32
 	FieldBirthYear uint16

@@ -42,7 +42,7 @@ type mysqlRepo struct {
 
 func (m mysqlRepo) CountCollections(
 	ctx context.Context,
-	userID uint32,
+	userID model.UIDType,
 	subjectType model.SubjectType,
 	collectionType uint8,
 	showPrivate bool,
@@ -72,7 +72,7 @@ func (m mysqlRepo) CountCollections(
 
 func (m mysqlRepo) ListCollections(
 	ctx context.Context,
-	userID uint32,
+	userID model.UIDType,
 	subjectType model.SubjectType,
 	collectionType uint8,
 	showPrivate bool,
@@ -120,7 +120,7 @@ func (m mysqlRepo) ListCollections(
 }
 
 func (m mysqlRepo) GetCollection(
-	ctx context.Context, userID uint32, subjectID model.SubjectIDType,
+	ctx context.Context, userID model.UIDType, subjectID model.SubjectIDType,
 ) (model.Collection, error) {
 	c, err := m.q.SubjectCollection.WithContext(ctx).
 		Where(m.q.SubjectCollection.UID.Eq(userID), m.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
@@ -147,7 +147,7 @@ func (m mysqlRepo) GetCollection(
 	}, nil
 }
 
-func (m mysqlRepo) GetByID(ctx context.Context, userID uint32) (model.User, error) {
+func (m mysqlRepo) GetByID(ctx context.Context, userID model.UIDType) (model.User, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.UID.Eq(userID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -175,14 +175,14 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (model.User, 
 	return fromDao(u), nil
 }
 
-func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...uint32) (map[uint32]model.User, error) {
+func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...model.UIDType) (map[model.UIDType]model.User, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.UID.In(ids...)).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var r = make(map[uint32]model.User, len(ids))
+	var r = make(map[model.UIDType]model.User, len(ids))
 
 	for _, member := range u {
 		r[member.UID] = fromDao(member)

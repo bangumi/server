@@ -38,7 +38,7 @@ import (
 )
 
 func (h Handler) GetPerson(c *fiber.Ctx) error {
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := strparse.PersonID(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
 	}
@@ -62,7 +62,7 @@ func (h Handler) GetPerson(c *fiber.Ctx) error {
 	return c.JSON(r)
 }
 
-func (h Handler) getPersonWithCache(ctx context.Context, id uint32) (res.PersonV0, bool, error) {
+func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonIDType) (res.PersonV0, bool, error) {
 	var key = cachekey.Person(id)
 
 	// try to read from cache
@@ -128,7 +128,7 @@ var genderMap = map[uint8]string{
 }
 
 func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := strparse.PersonID(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
 	}
@@ -167,7 +167,7 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 }
 
 func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := strparse.PersonID(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
 	}

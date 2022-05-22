@@ -28,7 +28,7 @@ bin/
 .envrc
 coverage.out
 .bin/
-gen/
+/gen/
 
 /index.html
 node_modules/

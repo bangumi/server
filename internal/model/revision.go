@@ -62,7 +62,7 @@ type SubjectRevisionData struct {
 	FieldSummary string
 	Platform     uint16
 	TypeID       uint16
-	SubjectID    uint32
+	SubjectID    SubjectIDType
 	FieldEps     uint32
 	Type         uint8
 }

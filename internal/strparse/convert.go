@@ -34,8 +34,8 @@ func Uint32(s string) (uint32, error) {
 	return uint32(v), errgo.Wrap(err, "strconv")
 }
 
-func UserID(s string) (model.UIDType, error) {
-	v, err := strconv.ParseUint(s, 10, 32)
+func uint32NonZero(s string) (uint32, error) {
+	v, err := Uint32(s)
 	if err != nil {
 		return 0, errgo.Wrap(err, "strconv")
 	}
@@ -44,7 +44,31 @@ func UserID(s string) (model.UIDType, error) {
 		return 0, errZeroValue
 	}
 
-	return uint32(v), nil
+	return v, nil
 }
 
-var errZeroValue = errors.New("can't use 0 as UserID")
+func UserID(s string) (model.UIDType, error) {
+	return uint32NonZero(s)
+}
+
+func SubjectID(s string) (model.PersonIDType, error) {
+	return uint32NonZero(s)
+}
+
+func PersonID(s string) (model.PersonIDType, error) {
+	return uint32NonZero(s)
+}
+
+func CharacterID(s string) (model.PersonIDType, error) {
+	return uint32NonZero(s)
+}
+
+func EpisodeID(s string) (model.PersonIDType, error) {
+	return uint32NonZero(s)
+}
+
+func IndexID(s string) (model.PersonIDType, error) {
+	return uint32NonZero(s)
+}
+
+var errZeroValue = errors.New("can't use 0 as ID")

@@ -90,10 +90,10 @@ type Episode struct {
 	Duration    string
 	Description string
 	Ep          float32
-	SubjectID   uint32
+	SubjectID   SubjectIDType
 	Sort        float32
 	Comment     uint32
-	ID          uint32
+	ID          EpisodeIDType
 	Type        int8
 	Disc        uint8
 }

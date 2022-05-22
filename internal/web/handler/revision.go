@@ -34,7 +34,7 @@ func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	personID, err := strparse.Uint32(c.Query("person_id"))
+	personID, err := strparse.PersonID(c.Query("person_id"))
 	if err != nil || personID <= 0 {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad query person_id: %s", c.Query("person_id")))
 	}
@@ -109,7 +109,7 @@ func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	characterID, err := strparse.Uint32(c.Query("character_id"))
+	characterID, err := strparse.CharacterID(c.Query("character_id"))
 	if err != nil || characterID <= 0 {
 		return fiber.NewError(
 			fiber.StatusBadRequest,
@@ -193,7 +193,7 @@ func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	subjectID, err := strparse.Uint32(c.Query("subject_id"))
+	subjectID, err := strparse.SubjectID(c.Query("subject_id"))
 	if err != nil || subjectID <= 0 {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad query subject_id: %s", c.Query("subject_id")))
 	}

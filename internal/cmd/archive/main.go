@@ -264,15 +264,15 @@ func exportCharacters(q *query.Query, w io.Writer) {
 }
 
 type Episode struct {
-	ID          uint32  `json:"id"`
-	Name        string  `json:"name"`
-	NameCn      string  `json:"name_cn"`
-	Description string  `json:"description"`
-	AirDate     string  `json:"airdate"`
-	Disc        uint8   `json:"disc"`
-	SubjectID   uint32  `json:"subject_id"`
-	Sort        float32 `json:"sort"`
-	Type        int8    `json:"type"`
+	ID          model.EpisodeIDType `json:"id"`
+	Name        string              `json:"name"`
+	NameCn      string              `json:"name_cn"`
+	Description string              `json:"description"`
+	AirDate     string              `json:"airdate"`
+	Disc        uint8               `json:"disc"`
+	SubjectID   model.SubjectIDType `json:"subject_id"`
+	Sort        float32             `json:"sort"`
+	Type        int8                `json:"type"`
 }
 
 func exportEpisodes(q *query.Query, w io.Writer) {

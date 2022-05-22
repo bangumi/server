@@ -22,6 +22,7 @@ package main
 // disable lint in this package as it's only a generator
 
 import (
+	"reflect"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -31,12 +32,14 @@ import (
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
+	"github.com/bangumi/server/internal/model"
 )
 
-const personIDTypeString = "uint32"
-
-const subjectIDTypeString = "uint32"
-const subjectTypeIDTypeString = "uint8"
+var personIDTypeString = reflect.TypeOf(new(model.PersonIDType)).Elem().Name()
+var characterIDTypeString = reflect.TypeOf(new(model.CharacterIDType)).Elem().Name()
+var episodeIDTypeString = reflect.TypeOf(new(model.EpisodeIDType)).Elem().Name()
+var subjectIDTypeString = reflect.TypeOf(new(model.SubjectIDType)).Elem().Name()
+var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 
 // generate code.
 func main() {
@@ -168,6 +171,7 @@ func main() {
 
 	modelCharacter := g.GenerateModelAs("chii_characters", "Character",
 		gen.FieldTrimPrefix("crt_"),
+		gen.FieldType("crt_id", characterIDTypeString),
 		gen.FieldType("crt_redirect", personIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
 			GORMTag: "foreignKey:crt_id;polymorphic:Owner;polymorphicValue:crt",
@@ -209,6 +213,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_episodes", "Episode",
 		// gen.FieldTrimPrefix("field_"),
 		gen.FieldTrimPrefix("ep_"),
+		gen.FieldType("ep_id", episodeIDTypeString),
 		gen.FieldType("ep_type", "int8"),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:ep_subject_id;references:subject_id",

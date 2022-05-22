@@ -37,7 +37,7 @@ import (
 func (h Handler) GetEpisode(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := strparse.EpisodeID(c.Params("id"))
 	if err != nil || id == 0 {
 		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
 	}

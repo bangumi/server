@@ -43,7 +43,7 @@ func TestGetByID(t *testing.T) {
 
 	repo := getRepo(t)
 
-	const id uint32 = 382951
+	const id model.UIDType = 382951
 
 	u, err := repo.GetByID(context.Background(), id)
 	require.NoError(t, err)
@@ -59,7 +59,7 @@ func TestGetByName(t *testing.T) {
 
 	repo := getRepo(t)
 
-	const id uint32 = 382951
+	const id model.UIDType = 382951
 
 	u, err := repo.GetByName(context.Background(), "382951")
 	require.NoError(t, err)
