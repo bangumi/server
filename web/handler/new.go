@@ -65,7 +65,7 @@ func New(
 	return Handler{
 		cfg:                  cfg,
 		cache:                cache,
-		log:                  log,
+		log:                  log.Named("web.handler"),
 		rateLimit:            rateLimit,
 		session:              session,
 		p:                    p,
