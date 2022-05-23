@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	"github.com/goccy/go-json"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/compat"
@@ -40,7 +39,7 @@ func TestParseTags_WithNil(t *testing.T) {
 	tags, err := compat.ParseTags(bytes.TrimSpace(raw))
 	require.NoError(t, err)
 
-	assert.EqualValues(t, []compat.Tag{
+	require.EqualValues(t, []compat.Tag{
 		{Count: 1645, Name: "叛逆的鲁鲁修"},
 		{Count: 1229, Name: "SUNRISE"},
 		{Count: 936, Name: "反逆のルルーシュ"},

@@ -18,7 +18,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
@@ -45,5 +44,5 @@ func TestCount(t *testing.T) {
 	s, err := repo.Count(context.Background(), 253)
 	require.NoError(t, err)
 
-	assert.Equal(t, int64(31), s)
+	require.Equal(t, int64(31), s)
 }

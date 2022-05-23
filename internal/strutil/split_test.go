@@ -17,7 +17,7 @@ package strutil_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/strutil"
 )
@@ -26,31 +26,31 @@ func TestPartition(t *testing.T) {
 	t.Parallel()
 
 	key, value := strutil.Partition("a=b", '=')
-	assert.Equal(t, "a", key)
-	assert.Equal(t, "b", value)
+	require.Equal(t, "a", key)
+	require.Equal(t, "b", value)
 
 	key, value = strutil.Partition("a=", '=')
-	assert.Equal(t, "a", key)
-	assert.Equal(t, "", value)
+	require.Equal(t, "a", key)
+	require.Equal(t, "", value)
 
 	key, value = strutil.Partition("=", '=')
-	assert.Equal(t, "", key)
-	assert.Equal(t, "", value)
+	require.Equal(t, "", key)
+	require.Equal(t, "", value)
 
 	key, value = strutil.Partition("ab", '=')
-	assert.Equal(t, "ab", key)
-	assert.Equal(t, "", value)
+	require.Equal(t, "ab", key)
+	require.Equal(t, "", value)
 }
 
 func TestSplit(t *testing.T) {
 	t.Parallel()
 
 	s := strutil.Split("a=b", "=")
-	assert.EqualValues(t, []string{"a", "b"}, s)
+	require.EqualValues(t, []string{"a", "b"}, s)
 
 	s = strutil.Split("a==b", "=")
-	assert.EqualValues(t, []string{"a", "b"}, s)
+	require.EqualValues(t, []string{"a", "b"}, s)
 
 	s = strutil.Split("", "=")
-	assert.EqualValues(t, []string{}, s)
+	require.EqualValues(t, []string{}, s)
 }

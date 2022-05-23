@@ -18,7 +18,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
@@ -46,7 +45,7 @@ func TestGet(t *testing.T) {
 	s, err := repo.Get(context.Background(), 1)
 	require.NoError(t, err)
 
-	assert.Equal(t, uint32(1), s.ID)
+	require.Equal(t, uint32(1), s.ID)
 }
 
 func TestMysqlRepo_GetByIDs(t *testing.T) {
@@ -59,10 +58,10 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 	require.NoError(t, err)
 
 	_, ok := s[1]
-	assert.True(t, ok)
-	assert.Equal(t, model.CharacterIDType(1), s[1].ID)
+	require.True(t, ok)
+	require.Equal(t, model.CharacterIDType(1), s[1].ID)
 
 	_, ok = s[2]
-	assert.True(t, ok)
-	assert.Equal(t, model.CharacterIDType(2), s[2].ID)
+	require.True(t, ok)
+	require.Equal(t, model.CharacterIDType(2), s[2].ID)
 }

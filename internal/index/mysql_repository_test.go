@@ -18,7 +18,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
@@ -45,7 +44,7 @@ func TestMysqlRepo_Get(t *testing.T) {
 	i, err := repo.Get(context.Background(), 15045)
 	require.NoError(t, err)
 
-	assert.Equal(t, uint32(15045), i.ID)
-	assert.Equal(t, uint32(14127), i.CreatorID)
-	assert.False(t, i.NSFW)
+	require.Equal(t, uint32(15045), i.ID)
+	require.Equal(t, uint32(14127), i.CreatorID)
+	require.False(t, i.NSFW)
 }

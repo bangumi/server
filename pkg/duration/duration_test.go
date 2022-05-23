@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/pkg/duration"
@@ -79,7 +78,7 @@ func TestParse(t *testing.T) {
 
 			require.NoError(t, err)
 
-			assert.Equal(t, tc.Expected, actual, "parse result should be same as expected")
+			require.Equal(t, tc.Expected, actual, "parse result should be same as expected")
 		})
 	}
 }
