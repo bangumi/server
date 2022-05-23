@@ -14,7 +14,9 @@
 
 package enum
 
-type EpType = int8 // same wht domain.EpType
+import "github.com/bangumi/server/internal/model"
+
+type EpType = model.EpTypeType
 
 const (
 	EpTypeNormal  EpType = 0

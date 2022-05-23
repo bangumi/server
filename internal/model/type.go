@@ -21,5 +21,5 @@ type SubjectIDType = uint32 // in case we need future change, but I guess not...
 type CharacterIDType = uint32
 type PersonIDType = uint32
 type EpisodeIDType = uint32
-type EpTypeType = int8
+type EpTypeType = int16
 type RevisionTypeType = uint8

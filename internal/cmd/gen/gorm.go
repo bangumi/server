@@ -40,6 +40,7 @@ var characterIDTypeString = reflect.TypeOf(new(model.CharacterIDType)).Elem().Na
 var episodeIDTypeString = reflect.TypeOf(new(model.EpisodeIDType)).Elem().Name()
 var subjectIDTypeString = reflect.TypeOf(new(model.SubjectIDType)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
+var episodeTypeTypeString = reflect.TypeOf(new(model.EpTypeType)).Elem().Name()
 
 // generate code.
 func main() {
@@ -214,7 +215,7 @@ func main() {
 		// gen.FieldTrimPrefix("field_"),
 		gen.FieldTrimPrefix("ep_"),
 		gen.FieldType("ep_id", episodeIDTypeString),
-		gen.FieldType("ep_type", "int8"),
+		gen.FieldType("ep_type", episodeTypeTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:ep_subject_id;references:subject_id",
 		}),

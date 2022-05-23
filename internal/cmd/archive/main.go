@@ -272,7 +272,7 @@ type Episode struct {
 	Disc        uint8               `json:"disc"`
 	SubjectID   model.SubjectIDType `json:"subject_id"`
 	Sort        float32             `json:"sort"`
-	Type        int8                `json:"type"`
+	Type        model.EpTypeType    `json:"type"`
 }
 
 func exportEpisodes(q *query.Query, w io.Writer) {
