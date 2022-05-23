@@ -1,0 +1,4 @@
+# merge this into package.json after https://github.com/prettier/prettier/pull/12672 is released
+/pkg/wiki/testdata/wiki-syntax-spec/
+.vscode/
+.idea/
