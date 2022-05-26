@@ -6,58 +6,34 @@ on:
       - "v*.*.*"
 
 jobs:
-  release:
+  github:
     runs-on: ubuntu-latest
-    env:
-      USER: "bangumi"
-      IMAGE: "chii"
-
     steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: "^1.17"
+
+      - name: Install git-chglog
+        run: go install github.com/git-chglog/git-chglog/cmd/git-chglog@latest
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: "~1.17.8"
-
-      - name: Get Tag Name
-        run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
-
-      - run: make build
-
-      - name: docker build
-        run: docker build -f etc/Dockerfile -t ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest .
-
-      - name: docker login
-        run: echo $DOCKER_TOKEN | docker login ghcr.io -u ${{ env.USER }} --password-stdin
-        env:
-          DOCKER_TOKEN: ${{ github.token }}
-
-      - name: docker push
-        run: |
-          docker push ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest
-          docker tag ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
-          docker push "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
+      - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
       - name: Generate Changelog
-        run: |
-          docker pull quay.io/git-chglog/git-chglog:latest
-          docker run -v "$PWD":/workdir quay.io/git-chglog/git-chglog --config /workdir/.github/.chglog/config.yml "$TAG" | \
-          python -c 'import sys;print("".join(sys.stdin.readlines()[3:]).strip())' > changelog.md
+        run: git-chglog --config ./.github/.chglog/config.yml --output changelog.md "$TAG"
 
       - name: Upload GitHub Release
         run: gh release create "$TAG" --title "$TAG" -F changelog.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  release-cmd-arvhice:
+  docker-chii:
     runs-on: ubuntu-latest
-
     env:
-      USER: "bangumi"
-      IMAGE: "chii-cmd-archive"
+      IMAGE: "bangumi/chii"
 
     steps:
       - uses: actions/checkout@v3
@@ -67,28 +43,63 @@ jobs:
         with:
           go-version: "~1.17.8"
 
-      - name: Get Tag Name
-        run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
+      - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - run: make build
+
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          file: etc/Dockerfile
+          tags: ghcr.io/${{ env.IMAGE }}:latest,"ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
+
+  docker-cmd-archive:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE: "bangumi/chii-cmd-archive"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "~1.17.8"
+
+      - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
       - run: go build -o dist/archive.exe ./internal/cmd/archive/
         env:
           CGO_ENABLED: "0"
 
-      - name: docker build
-        run: docker build -f etc/archive.Dockerfile -t ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest .
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
-      - name: docker login
-        run: echo $DOCKER_TOKEN | docker login ghcr.io -u ${{ env.USER }} --password-stdin
-        env:
-          DOCKER_TOKEN: ${{ github.token }}
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
-      - name: docker push
-        run: |
-          docker push ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest
-          docker tag ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:latest "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
-          docker push "ghcr.io/${{ env.USER }}/${{ env.IMAGE }}:$TAG"
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          file: etc/archive.Dockerfile
+          tags: ghcr.io/${{ env.IMAGE }}:latest,"ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
 
-  v0-api-spec:
+  openapi-v0:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -116,7 +127,7 @@ jobs:
           branch: "update-upstream"
           author: "Trim21-bot <trim21-bot@users.noreply.github.com>"
 
-  private-api-spec:
+  openapi-private:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
