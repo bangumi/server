@@ -13,8 +13,8 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goccy/go-json v0.9.7
 	github.com/goccy/go-reflect v1.1.0
-	github.com/gofiber/adaptor/v2 v2.1.23
-	github.com/gofiber/fiber/v2 v2.33.0
+	github.com/gofiber/adaptor/v2 v2.1.24
+	github.com/gofiber/fiber/v2 v2.34.0
 	github.com/gookit/goutil v0.5.2
 	github.com/haveyoudebuggedit/gotestfmt/v2 v2.3.2
 	github.com/jarcoal/httpmock v1.2.0
@@ -27,8 +27,8 @@ require (
 	github.com/uber-go/tally/v4 v4.1.1
 	go.uber.org/fx v1.17.1
 	go.uber.org/zap v1.21.0
-	golang.org/x/crypto v0.0.0-20220513210258-46612604a0f9
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
+	gopkg.in/yaml.v3 v3.0.0
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/gen v0.3.4
 	gorm.io/gorm v1.23.5
@@ -60,7 +60,7 @@ require (
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.35.0 // indirect
+	github.com/valyala/fasthttp v1.37.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
