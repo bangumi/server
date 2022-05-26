@@ -7,9 +7,7 @@
   "separateMinorPatch": false,
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
-  "postUpdateOptions": [
-    "gomodTidy1.17",
-  ],
+  "postUpdateOptions": ["gomodTidy1.17"],
   "packageRules": [
     {
       "groupName": "deps",
