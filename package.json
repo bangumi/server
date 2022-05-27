@@ -8,8 +8,12 @@
     "version": "node scripts/bump.js"
   },
   "dependencies": {
+    "conventional-changelog": "^3.1.25",
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "js-yaml": "^4.1.0",
     "prettier": "^2.6.2"
+  },
+  "devDependencies": {
+    "@types/conventional-changelog": "^3.1.1"
   }
 }
