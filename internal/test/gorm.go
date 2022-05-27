@@ -67,5 +67,9 @@ func newGorm(tb testing.TB, c config.AppConfig) (*gorm.DB, error) {
 	})
 	require.NoError(tb, err)
 
+	tb.Cleanup(func() {
+		conn.Close()
+	})
+
 	return db, errgo.Wrap(err, "gorm.Open")
 }

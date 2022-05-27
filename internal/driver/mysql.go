@@ -17,6 +17,7 @@ package driver
 import (
 	"database/sql"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -27,12 +28,16 @@ import (
 	"github.com/bangumi/server/internal/logger"
 )
 
+var setLoggerMutex = sync.Mutex{} //nolint:gochecknoglobals
+
 func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
 	const maxIdleTime = time.Hour * 6
 
+	setLoggerMutex.Lock()
 	if err := mysql.SetLogger(logger.Std()); err != nil {
 		logger.Panic("can't replace mysql driver's errLog", zap.Error(err))
 	}
+	setLoggerMutex.Unlock()
 
 	logger.Infoln("creating sql connection pool with size", c.MySQLMaxConn)
 
