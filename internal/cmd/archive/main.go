@@ -31,6 +31,7 @@ import (
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/model"
@@ -62,7 +63,7 @@ func start(out string) {
 	err := fx.New(
 		logger.FxLogger(),
 		fx.Provide(
-			dal.NewConnectionPool, dal.NewDB,
+			driver.NewMysqlConnectionPool, dal.NewDB,
 
 			config.NewAppConfig, logger.Copy, metrics.NewScope,
 

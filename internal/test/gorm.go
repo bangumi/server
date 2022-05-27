@@ -25,8 +25,8 @@ import (
 	gormLogger "gorm.io/gorm/logger"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/errgo"
 )
 
@@ -48,7 +48,7 @@ func GetGorm(tb testing.TB) *gorm.DB {
 
 func newGorm(tb testing.TB, c config.AppConfig) (*gorm.DB, error) {
 	tb.Helper()
-	conn, err := dal.NewConnectionPool(c)
+	conn, err := driver.NewMysqlConnectionPool(c)
 	if err != nil {
 		return nil, errgo.Wrap(err, "sql.Open")
 	}

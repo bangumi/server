@@ -16,7 +16,6 @@ package dal
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -32,7 +31,6 @@ import (
 	"github.com/bangumi/server/internal/logger"
 )
 
-const maxIdleTime = time.Hour * 6
 const slowQueryTimeout = time.Millisecond * 200
 
 func NewDB(
@@ -81,19 +79,4 @@ func NewDB(
 	}
 
 	return db, errgo.Wrap(err, "init gorm")
-}
-
-func NewConnectionPool(c config.AppConfig) (*sql.DB, error) {
-	logger.Infoln("creating sql connection pool with size", c.MySQLMaxConn)
-	db, err := sql.Open("mysql",
-		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=UTC",
-			c.MySQLUserName, c.MySQLPassword, c.MySQLHost, c.MySQLPort, c.MySQLDatabase))
-	if err != nil {
-		return nil, errgo.Wrap(err, "failed to create sql connection pool")
-	}
-	db.SetMaxOpenConns(c.MySQLMaxConn)
-	// default mysql has 7 hour timeout
-	db.SetConnMaxIdleTime(maxIdleTime)
-
-	return db, nil
 }

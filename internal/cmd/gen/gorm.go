@@ -32,6 +32,7 @@ import (
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
+	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -65,7 +66,7 @@ func main() {
 	// reuse the database connection in Project or create a connection here
 	// if you want to use GenerateModel/GenerateModelAs, UseDB is necessary, otherwise it will panic
 	c := config.NewAppConfig()
-	conn, err := dal.NewConnectionPool(c)
+	conn, err := driver.NewMysqlConnectionPool(c)
 	if err != nil {
 		panic(err)
 	}

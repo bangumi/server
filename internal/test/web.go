@@ -283,6 +283,6 @@ func FxE2E(t *testing.T) fx.Option {
 		driver.NewRedisClient,
 		auth.NewMysqlRepo,
 		subject.NewMysqlRepo,
-		dal.NewConnectionPool,
+		driver.NewMysqlConnectionPool,
 	)
 }

@@ -16,7 +16,6 @@ package main
 
 import (
 	"github.com/go-resty/resty/v2"
-	"github.com/go-sql-driver/mysql"
 	"github.com/goccy/go-json"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -45,10 +44,6 @@ import (
 )
 
 func main() {
-	if err := mysql.SetLogger(logger.Std()); err != nil {
-		logger.Panic("can't replace mysql driver's errLog", zap.Error(err))
-	}
-
 	if err := start(); err != nil {
 		logger.Fatal("failed to start app", zap.Error(err))
 	}
@@ -59,8 +54,8 @@ func start() error {
 		logger.FxLogger(),
 		// driver and connector
 		fx.Provide(
-			driver.NewRedisClient, // redis
-			dal.NewConnectionPool,
+			driver.NewRedisClient,         // redis
+			driver.NewMysqlConnectionPool, // mysql
 			dal.NewDB,
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
