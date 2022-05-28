@@ -53,7 +53,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 		}
 	}
 
-	v0 := app.Group("/v0", h.AccessTokenAuthMiddleware)
+	v0 := app.Group("/v0/", h.AccessTokenAuthMiddleware)
 
 	v0.Get("/subjects/:id", addMetrics(h.GetSubject))
 	v0.Get("/subjects/:id/persons", addMetrics(h.GetSubjectRelatedPersons))
@@ -94,7 +94,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	private.Get("/me", addMetrics(h.GetCurrentUser))
 
-	privateHTML := app.Group("/page", origin.New(config.FrontendOrigin), h.SessionAuthMiddleware)
+	privateHTML := app.Group("/page/", origin.New(config.FrontendOrigin), h.SessionAuthMiddleware)
 	privateHTML.Get("/login", h.PageLogin)
 
 	app.Use("/static/", filesystem.New(filesystem.Config{
