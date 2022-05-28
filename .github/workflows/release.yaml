@@ -56,7 +56,7 @@ jobs:
         with:
           push: true
           file: etc/Dockerfile
-          tags: ghcr.io/${{ env.IMAGE }}:latest,"ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
+          tags: ghcr.io/${{ env.IMAGE }}:latest,ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
 
   docker-cmd-archive:
     runs-on: ubuntu-latest
@@ -95,7 +95,7 @@ jobs:
         with:
           push: true
           file: etc/archive.Dockerfile
-          tags: ghcr.io/${{ env.IMAGE }}:latest,"ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
+          tags: ghcr.io/${{ env.IMAGE }}:latest,ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
 
   openapi-v0:
     runs-on: ubuntu-latest
