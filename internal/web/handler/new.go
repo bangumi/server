@@ -81,7 +81,7 @@ func New(
 		captcha:              captcha,
 		v:                    validate,
 		validatorTranslation: trans,
-		
+
 		template: engine,
 		q:        q,
 		buffPool: buffer.NewPool(),
