@@ -1,0 +1,89 @@
+{{- /*gotype: github.com/bangumi/server/internal/web/frontend.ListAccessToken*/ -}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{{.Title}}</title>
+
+    {{template "common_resource.gohtml"}}
+</head>
+<body>
+{{template "header" .User}}
+{{ if ne .User.ID 0}}
+<div class="container mt-5">
+    {{.User.UserName}} 已经登录
+  <button class="btn btn-danger" onclick="logout()"> 登出</button>
+</div>
+<script>
+  async function logout() {
+    await fetch('/p/logout', {method: "post"});
+    location.reload()
+  }
+</script>
+{{else}}
+<script src="https://js.hcaptcha.com/1/api.js?hl=zh-CN" defer></script>
+<script src="/static/jquery-3.6.0.slim.min.js"></script>
+<div class="container mt-5">
+  <div class="row">
+    <ul class="list-group error-details"></ul>
+  </div>
+
+  <div class="row tokens">
+    <form>
+      <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Email address</label>
+        <input type="email" class="form-control" name="email" id="exampleInputEmail1"
+               aria-describedby="emailHelp">
+        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+      </div>
+      <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" id="exampleInputPassword1">
+      </div>
+      <div class="mb-3">
+        <div class="h-captcha" data-sitekey="4874acee-9c6e-4e47-99ad-e2ea1606961f"></div>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+
+</div>
+<script>
+  $(document).ready(function () { // Wait until document is fully parsed
+    $("form").on("submit", function (e) {
+        e.preventDefault();
+        $(".error-details").html("")
+        const data = {}
+
+        Array.from($("form").serializeArray()).forEach(({name, value}, index) => {
+          data[name] = value
+        })
+
+        async function submit() {
+          const res = await fetch('/p/login', {
+            method: "post",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+          if (res.status > 300) {
+            const d = await res.json()
+            console.log(d)
+            d.details.forEach((detail, index) => {
+              $(".error-details").prepend(`<li class="m-1 list-group-item list-group-item-danger">${detail}</li>`)
+            })
+          } else {
+            console.log(await res.json());
+            location.reload()
+          }
+        }
+
+
+        submit()
+      }
+    )
+  })
+</script>
+{{end}}
+</body>
+</html>

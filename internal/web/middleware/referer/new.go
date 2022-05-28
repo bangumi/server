@@ -14,10 +14,10 @@
 
 //go:build !dev
 
-package origin
+package referer
 
 import (
-	"net/http"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -25,20 +25,13 @@ import (
 	"github.com/bangumi/server/internal/web/res/code"
 )
 
-func New(allowed string) fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
-		if ctx.Method() == http.MethodGet {
-			return ctx.Next()
+func New(referer string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ref := c.Get(fiber.HeaderReferer)
+		if ref == "" || strings.HasPrefix(ref, referer) {
+			return c.Next()
 		}
 
-		origin := ctx.Get(fiber.HeaderOrigin)
-		if origin == "" {
-			return res.HTTPError(ctx, code.BadRequest, "empty origin is not allowed")
-		}
-		if origin != allowed {
-			return res.HTTPError(ctx, code.BadRequest, "cross-site request is not allowed")
-		}
-
-		return ctx.Next()
+		return res.HTTPError(c, code.BadRequest, "bad referer, cross-site api request is not allowed")
 	}
 }

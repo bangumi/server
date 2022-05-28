@@ -12,33 +12,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
-
-package origin
+package handler
 
 import (
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
-func New(allowed string) fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
-		if ctx.Method() == http.MethodGet {
-			return ctx.Next()
-		}
+func (h Handler) PageLogin(c *fiber.Ctx) error {
+	v := h.getHTTPAccessor(c)
+	var u model.User
+	var err error
+	if v.login {
+		u, err = h.u.GetByID(c.Context(), v.ID)
 
-		origin := ctx.Get(fiber.HeaderOrigin)
-		if origin == "" {
-			return res.HTTPError(ctx, code.BadRequest, "empty origin is not allowed")
+		if err != nil {
+			return res.InternalError(c, err, "failed to get current user")
 		}
-		if origin != allowed {
-			return res.HTTPError(ctx, code.BadRequest, "cross-site request is not allowed")
-		}
-
-		return ctx.Next()
 	}
+
+	return h.render(c, frontend.TplLogin, struct {
+		Title string
+		User  model.User
+	}{Title: "Login", User: u})
 }
