@@ -94,8 +94,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	private.Get("/me", addMetrics(h.GetCurrentUser))
 
-	privateHTML := app.Group("/page",
-		origin.New(config.FrontendOrigin), referer.New(config.FrontendOrigin+"/"), h.SessionAuthMiddleware)
+	privateHTML := app.Group("/page", origin.New(config.FrontendOrigin), h.SessionAuthMiddleware)
 	privateHTML.Get("/login", h.PageLogin)
 
 	app.Use("/static/", filesystem.New(filesystem.Config{
