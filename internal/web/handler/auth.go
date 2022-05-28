@@ -129,7 +129,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain
 		MaxAge:   timex.OneWeekSec * 2,
 		Secure:   !config.Development,
 		HTTPOnly: true,
-		SameSite: fiber.CookieSameSiteStrictMode,
+		SameSite: fiber.CookieSameSiteLaxMode,
 	})
 
 	user, err := h.u.GetByID(c.Context(), s.UserID)

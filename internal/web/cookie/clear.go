@@ -19,5 +19,5 @@ import (
 )
 
 func Clear(c *fiber.Ctx, key string) {
-	c.Cookie(&fiber.Cookie{Name: key, Value: "", SameSite: fiber.CookieSameSiteStrictMode, HTTPOnly: true})
+	c.Cookie(&fiber.Cookie{Name: key, Value: "", SameSite: fiber.CookieSameSiteLaxMode, HTTPOnly: true})
 }
