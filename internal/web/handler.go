@@ -15,15 +15,20 @@
 package web
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/utils"
+	"github.com/gookit/goutil/timex"
 	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/middleware/origin"
+	"github.com/bangumi/server/internal/web/middleware/referer"
 	"github.com/bangumi/server/internal/web/middleware/ua"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -82,12 +87,22 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	// frontend private api
 	private := app.Group("/p",
-		origin.New(config.FrontendOrigin), checkReferer(config.FrontendOrigin+"/"), h.SessionAuthMiddleware)
+		origin.New(config.FrontendOrigin), referer.New(config.FrontendOrigin+"/"), h.SessionAuthMiddleware)
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
 
 	private.Get("/me", addMetrics(h.GetCurrentUser))
+
+	privateHTML := app.Group("/page",
+		origin.New(config.FrontendOrigin), referer.New(config.FrontendOrigin+"/"), h.SessionAuthMiddleware)
+	privateHTML.Get("/login", h.PageLogin)
+
+	app.Use("/static/", filesystem.New(filesystem.Config{
+		PathPrefix: "static",
+		Root:       http.FS(frontend.StaticFS),
+		MaxAge:     timex.OneWeekSec,
+	}))
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
@@ -101,15 +116,4 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 func trimFuncName(s string) string {
 	return strings.TrimSuffix(strings.TrimPrefix(s, "github.com/bangumi/server/web/handler.Handler."), "-fm")
-}
-
-func checkReferer(referer string) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		ref := c.Get(fiber.HeaderReferer)
-		if ref == "" || strings.HasPrefix(ref, referer) {
-			return c.Next()
-		}
-
-		return res.HTTPError(c, code.BadRequest, "bad referer, cross-site api request is not allowed")
-	}
 }

@@ -76,6 +76,9 @@ func Listen(lc fx.Lifecycle, c config.AppConfig, app *fiber.App) {
 		OnStart: func(ctx context.Context) error {
 			logger.Infoln("start http server at port", c.HTTPPort)
 			addr := fmt.Sprintf(":%d", c.HTTPPort)
+			if config.Development {
+				addr = "127.0.0.1" + addr
+			}
 			ln, err := net.Listen("tcp", addr)
 			if err != nil {
 				return errgo.Wrap(err, "failed to start listener")

@@ -12,33 +12,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
-
-package origin
+package handler
 
 import (
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
-func New(allowed string) fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
-		if ctx.Method() == http.MethodGet {
-			return ctx.Next()
-		}
+func (h Handler) render(c *fiber.Ctx, templateName string, data interface{}) error {
+	var buf = h.buffPool.Get()
+	defer buf.Free()
 
-		origin := ctx.Get(fiber.HeaderOrigin)
-		if origin == "" {
-			return res.HTTPError(ctx, code.BadRequest, "empty origin is not allowed")
-		}
-		if origin != allowed {
-			return res.HTTPError(ctx, code.BadRequest, "cross-site request is not allowed")
-		}
-
-		return ctx.Next()
+	err := h.template.Execute(buf, templateName, data)
+	if err != nil {
+		return res.InternalError(c, err, "failed to execute html/template")
 	}
+
+	c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
+	return c.Send(buf.Bytes())
 }

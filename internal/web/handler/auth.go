@@ -25,7 +25,9 @@ import (
 	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/res/code"
@@ -124,10 +126,8 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain
 	c.Cookie(&fiber.Cookie{
 		Name:     session.Key,
 		Value:    key,
-		Path:     "/",
-		Domain:   "next.bgm.tv",
 		MaxAge:   timex.OneWeekSec * 2,
-		Secure:   true,
+		Secure:   !config.Development,
 		HTTPOnly: true,
 		SameSite: fiber.CookieSameSiteStrictMode,
 	})
@@ -162,7 +162,8 @@ func (h Handler) PrivateLogout(c *fiber.Ctx) error {
 		return res.InternalError(c, err, "failed to revoke session")
 	}
 
-	c.Status(code.NoContent).ClearCookie(session.Key)
+	cookie.Clear(c, session.Key)
+	c.Status(code.NoContent)
 
 	return nil
 }

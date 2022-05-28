@@ -12,33 +12,39 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
-
-package origin
+package frontend
 
 import (
-	"net/http"
+	"html/template"
+	"io"
+	"math/rand"
+	"time"
 
-	"github.com/gofiber/fiber/v2"
-
-	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
+	"github.com/bangumi/server/internal/model"
 )
 
-func New(allowed string) fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
-		if ctx.Method() == http.MethodGet {
-			return ctx.Next()
-		}
+const TplLogin = "login.gohtml"
 
-		origin := ctx.Get(fiber.HeaderOrigin)
-		if origin == "" {
-			return res.HTTPError(ctx, code.BadRequest, "empty origin is not allowed")
-		}
-		if origin != allowed {
-			return res.HTTPError(ctx, code.BadRequest, "cross-site request is not allowed")
-		}
-
-		return ctx.Next()
+func filters() map[string]interface{} {
+	return map[string]interface{}{
+		"RandInt": func() int {
+			return rand.Intn(6) //nolint:gomnd,gosec
+		},
+		"FormatDate": func(t time.Time) string {
+			return t.Format("2006-01-02")
+		},
 	}
+}
+
+type TemplateEngine struct {
+	t *template.Template
+}
+
+var _ interface {
+	Execute(w io.Writer, name string, data interface{}) error
+} = TemplateEngine{}
+
+type Login struct {
+	Title string
+	User  model.User
 }

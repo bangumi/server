@@ -12,33 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
+//go:build dev
 
-package origin
+package frontend
+
+// dev file to avoid rebuild whole application when only editing template and static files.
 
 import (
-	"net/http"
+	"html/template"
+	"io"
+	"os"
 
-	"github.com/gofiber/fiber/v2"
-
-	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
+	"github.com/Masterminds/sprig/v3"
 )
 
-func New(allowed string) fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
-		if ctx.Method() == http.MethodGet {
-			return ctx.Next()
-		}
+var StaticFS = os.DirFS("./internal/web/frontend") //nolint:gochecknoglobals
 
-		origin := ctx.Get(fiber.HeaderOrigin)
-		if origin == "" {
-			return res.HTTPError(ctx, code.BadRequest, "empty origin is not allowed")
-		}
-		if origin != allowed {
-			return res.HTTPError(ctx, code.BadRequest, "cross-site request is not allowed")
-		}
+func NewTemplateEngine() (TemplateEngine, error) {
+	return TemplateEngine{}, nil
+}
 
-		return ctx.Next()
+func (e TemplateEngine) Execute(w io.Writer, name string, data interface{}) error {
+	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).
+		ParseGlob("./internal/web/frontend/templates/**.gohtml")
+	if err != nil {
+		return err
 	}
+
+	return t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
 }
