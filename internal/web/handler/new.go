@@ -25,12 +25,14 @@ import (
 	"github.com/go-playground/validator/v10"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh" //nolint:importas
 	"go.uber.org/zap"
+	"go.uber.org/zap/buffer"
 
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/web/captcha"
+	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -52,6 +54,7 @@ func New(
 	session session.Manager,
 	rateLimit rate.Manager,
 	log *zap.Logger,
+	engine frontend.TemplateEngine,
 ) (Handler, error) {
 
 	validate, trans, err := getValidator()
@@ -76,10 +79,14 @@ func New(
 		captcha:              captcha,
 		v:                    validate,
 		validatorTranslation: trans,
+
+		template: engine,
+		buffPool: buffer.NewPool(),
 	}, nil
 }
 
 type Handler struct {
+	validatorTranslation ut.Translator
 	rateLimit            rate.Manager
 	s                    domain.SubjectService
 	p                    domain.PersonService
@@ -92,9 +99,10 @@ type Handler struct {
 	cache                cache.Generic
 	i                    domain.IndexRepo
 	r                    domain.RevisionRepo
-	validatorTranslation ut.Translator
+	buffPool             buffer.Pool
 	log                  *zap.Logger
 	v                    *validator.Validate
+	template             frontend.TemplateEngine
 	cfg                  config.AppConfig
 }
 

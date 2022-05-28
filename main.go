@@ -38,6 +38,7 @@ import (
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web"
 	"github.com/bangumi/server/internal/web/captcha/hcaptcha"
+	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/session"
@@ -77,7 +78,7 @@ func start() error {
 		),
 
 		fx.Provide(
-			session.NewMysqlRepo, rate.New, hcaptcha.New, session.New, handler.New, web.New,
+			session.NewMysqlRepo, rate.New, hcaptcha.New, session.New, handler.New, web.New, frontend.NewTemplateEngine,
 		),
 
 		fx.Invoke(

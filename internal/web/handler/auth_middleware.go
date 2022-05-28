@@ -15,7 +15,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"net"
 	"sync"
@@ -28,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/strutil"
+	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/handler/ctxkey"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/res/code"
@@ -46,14 +46,14 @@ func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 
 	value := utils.UnsafeString(c.Context().Request.Header.Cookie(session.Key))
 	if value != "" {
-		s, err := h.getSession(c.Context(), value)
+		s, err := h.getSession(c, value)
 		if err != nil {
 			if errors.Is(err, session.ErrExpired) {
 				return res.HTTPError(c, code.Unauthorized, "token expired")
 			}
 
 			h.log.Error("get session", zap.Error(err), a.LogRequestID())
-			return res.InternalError(c, err, "failed to read session")
+			return res.InternalError(c, err, "failed to read session, please try clear browser cookies and re-try")
 		}
 
 		auth, err := h.a.GetByIDWithCache(c.Context(), s.UserID)
@@ -69,10 +69,11 @@ func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 	return c.Next()
 }
 
-func (h Handler) getSession(ctx context.Context, value string) (session.Session, error) {
-	s, err := h.session.Get(ctx, value)
+func (h Handler) getSession(c *fiber.Ctx, value string) (session.Session, error) {
+	s, err := h.session.Get(c.Context(), value)
 
 	if err != nil {
+		cookie.Clear(c, session.Key)
 		return session.Session{}, errgo.Wrap(err, "sessionManager.Get")
 	}
 

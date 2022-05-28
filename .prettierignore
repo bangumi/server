@@ -2,3 +2,4 @@
 /pkg/wiki/testdata/wiki-syntax-spec/
 .vscode/
 .idea/
+static/

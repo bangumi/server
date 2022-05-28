@@ -14,31 +14,33 @@
 
 //go:build !dev
 
-package origin
+package frontend
 
 import (
-	"net/http"
+	"embed"
+	"html/template"
+	"io"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/Masterminds/sprig/v3"
 
-	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
+	"github.com/bangumi/server/internal/errgo"
 )
 
-func New(allowed string) fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
-		if ctx.Method() == http.MethodGet {
-			return ctx.Next()
-		}
+//go:embed static
+var StaticFS embed.FS
 
-		origin := ctx.Get(fiber.HeaderOrigin)
-		if origin == "" {
-			return res.HTTPError(ctx, code.BadRequest, "empty origin is not allowed")
-		}
-		if origin != allowed {
-			return res.HTTPError(ctx, code.BadRequest, "cross-site request is not allowed")
-		}
+//go:embed templates
+var templateFS embed.FS
 
-		return ctx.Next()
+func NewTemplateEngine() (TemplateEngine, error) {
+	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).ParseFS(templateFS, "templates/**.gohtml")
+	if err != nil {
+		return TemplateEngine{}, errgo.Wrap(err, "template")
 	}
+
+	return TemplateEngine{t: t}, nil
+}
+
+func (e TemplateEngine) Execute(w io.Writer, name string, data interface{}) error {
+	return e.t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
 }

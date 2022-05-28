@@ -12,33 +12,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
+//go:build dev
 
-package origin
+package referer
 
 import (
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
-
-	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 func New(allowed string) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		if ctx.Method() == http.MethodGet {
-			return ctx.Next()
-		}
-
-		origin := ctx.Get(fiber.HeaderOrigin)
-		if origin == "" {
-			return res.HTTPError(ctx, code.BadRequest, "empty origin is not allowed")
-		}
-		if origin != allowed {
-			return res.HTTPError(ctx, code.BadRequest, "cross-site request is not allowed")
-		}
-
 		return ctx.Next()
 	}
 }
