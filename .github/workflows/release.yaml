@@ -54,6 +54,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
+          context: ./
           push: true
           file: etc/Dockerfile
           tags: ghcr.io/${{ env.IMAGE }}:latest,ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
@@ -94,6 +95,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
+          context: ./
           file: etc/archive.Dockerfile
           tags: ghcr.io/${{ env.IMAGE }}:latest,ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
 
