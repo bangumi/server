@@ -86,7 +86,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
 
 	// frontend private api
-	private := app.Group("/p",
+	private := app.Group("/p/",
 		origin.New(config.FrontendOrigin), referer.New(config.FrontendOrigin+"/"), h.SessionAuthMiddleware)
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
