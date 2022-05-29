@@ -324,7 +324,7 @@ func convertModelSubjectRevision(
 ) res.SubjectRevision {
 	creator := creatorMap[r.CreatorID]
 	var data *res.SubjectRevisionData
-	if r.Data != (*model.SubjectRevisionData)(nil) {
+	if r.Data != nil {
 		subjectData := r.Data
 		data = &res.SubjectRevisionData{
 			Name:         subjectData.Name,
