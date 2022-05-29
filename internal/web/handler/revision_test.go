@@ -32,7 +32,8 @@ import (
 func TestHandler_ListPersonRevision_HappyPath(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewRevisionRepo(t)
-	m.EXPECT().ListPersonRelated(mock.Anything, uint32(9), 30, 0).Return([]model.Revision{{ID: 348475}}, nil)
+	m.EXPECT().ListPersonRelated(mock.Anything, uint32(9), 30, 0).Return(
+		[]model.PersonRevision{{RevisionCommon: model.RevisionCommon{ID: 348475}}}, nil)
 	m.EXPECT().CountPersonRelated(mock.Anything, uint32(9)).Return(1, nil)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
@@ -70,7 +71,8 @@ func TestHandler_ListPersonRevision_Bad_ID(t *testing.T) {
 func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewRevisionRepo(t)
-	m.EXPECT().GetPersonRelated(mock.Anything, uint32(348475)).Return(model.Revision{ID: 348475}, nil)
+	m.EXPECT().GetPersonRelated(mock.Anything, uint32(348475)).Return(
+		model.PersonRevision{RevisionCommon: model.RevisionCommon{ID: 348475}}, nil)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
@@ -84,7 +86,8 @@ func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewRevisionRepo(t)
-	m.EXPECT().ListSubjectRelated(mock.Anything, uint32(26), 30, 0).Return([]model.Revision{{ID: 665556}}, nil)
+	m.EXPECT().ListSubjectRelated(mock.Anything, uint32(26), 30, 0).Return(
+		[]model.SubjectRevision{{RevisionCommon: model.RevisionCommon{ID: 665556}}}, nil)
 	m.EXPECT().CountSubjectRelated(mock.Anything, uint32(26)).Return(1, nil)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
@@ -124,7 +127,8 @@ func TestHandler_ListSubjectRevision_Bad_ID(t *testing.T) {
 func TestHandler_GetSubjectRevision_HappyPath(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewRevisionRepo(t)
-	m.EXPECT().GetSubjectRelated(mock.Anything, uint32(665556)).Return(model.Revision{ID: 665556}, nil)
+	m.EXPECT().GetSubjectRelated(mock.Anything, uint32(665556)).Return(
+		model.SubjectRevision{RevisionCommon: model.RevisionCommon{ID: 665556}}, nil)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 

@@ -24,7 +24,6 @@ import (
 
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/test"
 )
@@ -46,9 +45,7 @@ func TestGetPersonRelatedBasic(t *testing.T) {
 	r, err := repo.GetPersonRelated(context.Background(), 348475)
 	require.NoError(t, err)
 	require.Equal(t, uint32(348475), r.ID)
-	data, ok := r.Data.(map[string]model.PersonRevisionDataItem)
-	require.True(t, ok)
-	d, ok := data["348475"]
+	d, ok := r.Data["348475"]
 	require.True(t, ok)
 	require.Equal(t, "森岡浩之", d.Name)
 }
@@ -85,7 +82,7 @@ func TestGetCharacterRelatedBasic(t *testing.T) {
 	r, err := repo.GetCharacterRelated(context.Background(), rid)
 	require.NoError(t, err)
 	require.Equal(t, rid, r.ID)
-	d, ok := r.Data.CharacterRevisionEdit[strconv.FormatUint(uint64(rid), 10)]
+	d, ok := r.Data[strconv.FormatUint(uint64(rid), 10)]
 	require.True(t, ok)
 	require.Equal(t, "C.C.", d.Name)
 }
@@ -125,9 +122,7 @@ func TestGetSubjectRelatedBasic(t *testing.T) {
 	r, err := repo.GetSubjectRelated(context.Background(), 718391)
 	require.NoError(t, err)
 	require.Equal(t, uint32(718391), r.ID)
-	data, ok := r.Data.(*model.SubjectRevisionData)
-	require.True(t, ok)
-	require.Equal(t, "第一次的親密接觸", data.Name)
+	require.Equal(t, "第一次的親密接觸", r.Data.Name)
 }
 
 func TestGetSubjectRelatedNotFound(t *testing.T) {

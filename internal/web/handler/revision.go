@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/goccy/go-reflect"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
@@ -71,7 +70,11 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonIDType, p
 
 	data := make([]res.PersonRevision, len(revisions))
 
-	creatorMap, err := h.u.GetByIDs(c.Context(), listUniqueCreatorID(revisions)...)
+	creatorIDs := make([]model.UIDType, 0, len(revisions))
+	for _, revision := range revisions {
+		creatorIDs = append(creatorIDs, revision.CreatorID)
+	}
+	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -146,11 +149,11 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 		return errgo.Wrap(err, "revision.ListCharacterRelated")
 	}
 
-	creatorIDs := make([]uint32, 0, len(revisions))
+	creatorIDs := make([]model.UIDType, 0, len(revisions))
 	for _, revision := range revisions {
-		creatorIDs = append(creatorIDs, revision.RevisionCommon.CreatorID)
+		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeCreatorID(creatorIDs)...)
+	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -230,7 +233,11 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectIDType
 
 	data := make([]res.SubjectRevision, len(revisions))
 
-	creatorMap, err := h.u.GetByIDs(c.Context(), listUniqueCreatorID(revisions)...)
+	creatorIDs := make([]model.UIDType, 0, len(revisions))
+	for _, revision := range revisions {
+		creatorIDs = append(creatorIDs, revision.CreatorID)
+	}
+	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -263,10 +270,10 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	return c.JSON(convertModelSubjectRevision(&r, creatorMap))
 }
 
-func dedupeCreatorID(creatorIDs []uint32) []model.UIDType {
-	m := make(map[model.UIDType]bool, len(creatorIDs))
-	ret := make([]model.UIDType, 0, len(creatorIDs))
-	for _, r := range creatorIDs {
+func dedupeUIDs(uids ...model.UIDType) []model.UIDType {
+	m := make(map[model.UIDType]bool, len(uids))
+	ret := make([]model.UIDType, 0, len(uids))
+	for _, r := range uids {
 		if _, ok := m[r]; !ok {
 			m[r] = true
 			ret = append(ret, r)
@@ -275,21 +282,7 @@ func dedupeCreatorID(creatorIDs []uint32) []model.UIDType {
 	return ret
 }
 
-func listUniqueCreatorID(revisions []model.Revision) []model.UIDType {
-	m := make(map[model.UIDType]bool, len(revisions))
-	ret := make([]model.UIDType, len(revisions))
-	i := 0
-	for _, r := range revisions {
-		if _, ok := m[r.CreatorID]; !ok {
-			m[r.CreatorID] = true
-			ret[i] = r.CreatorID
-			i++
-		}
-	}
-	return ret[:i]
-}
-
-func convertModelPersonRevision(r *model.Revision, creatorMap map[model.UIDType]model.User) res.PersonRevision {
+func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UIDType]model.User) res.PersonRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.PersonRevision{
 		ID:      r.ID,
@@ -302,52 +295,48 @@ func convertModelPersonRevision(r *model.Revision, creatorMap map[model.UIDType]
 		CreatedAt: r.CreatedAt,
 		Data:      nil,
 	}
-	if data, ok := r.Data.(map[string]model.PersonRevisionDataItem); ok {
-		ret.Data = make(map[string]res.PersonRevisionDataItem, len(data))
-		for id, item := range data {
-			ret.Data[id] = res.PersonRevisionDataItem{
-				InfoBox: item.InfoBox,
-				Summary: item.Summary,
-				Profession: res.Profession{
-					Writer:      item.Profession.Writer,
-					Producer:    item.Profession.Producer,
-					Mangaka:     item.Profession.Mangaka,
-					Artist:      item.Profession.Artist,
-					Seiyu:       item.Profession.Seiyu,
-					Illustrator: item.Profession.Illustrator,
-					Actor:       item.Profession.Actor,
-				},
-				Extra: res.Extra{
-					Img: item.Extra.Img,
-				},
-				Name: item.Name,
-			}
+	ret.Data = make(map[string]res.PersonRevisionDataItem, len(r.Data))
+	for id, item := range r.Data {
+		ret.Data[id] = res.PersonRevisionDataItem{
+			InfoBox: item.InfoBox,
+			Summary: item.Summary,
+			Profession: res.Profession{
+				Writer:      item.Profession.Writer,
+				Producer:    item.Profession.Producer,
+				Mangaka:     item.Profession.Mangaka,
+				Artist:      item.Profession.Artist,
+				Seiyu:       item.Profession.Seiyu,
+				Illustrator: item.Profession.Illustrator,
+				Actor:       item.Profession.Actor,
+			},
+			Extra: res.Extra{
+				Img: item.Extra.Img,
+			},
+			Name: item.Name,
 		}
 	}
+
 	return ret
 }
 
-func convertModelSubjectRevision(r *model.Revision, creatorMap map[model.UIDType]model.User) res.SubjectRevision {
+func convertModelSubjectRevision(
+	r *model.SubjectRevision, creatorMap map[model.UIDType]model.User,
+) res.SubjectRevision {
 	creator := creatorMap[r.CreatorID]
 	var data *res.SubjectRevisionData
-	v := reflect.ValueNoEscapeOf(r.Data)
-	if v.IsValid() && (!v.IsZero()) && (!v.IsNil()) {
-		// can't compare r.Data != nil
-		// see https://yourbasic.org/golang/gotcha-why-nil-error-not-equal-nil/ for this detail.
-		// replace it with generic type after we upgrade to go 1.18
-		if subjectData, ok := r.Data.(*model.SubjectRevisionData); ok {
-			data = &res.SubjectRevisionData{
-				Name:         subjectData.Name,
-				NameCN:       subjectData.NameCN,
-				VoteField:    subjectData.VoteField,
-				FieldInfobox: subjectData.FieldInfobox,
-				FieldSummary: subjectData.FieldSummary,
-				Platform:     subjectData.Platform,
-				TypeID:       subjectData.TypeID,
-				SubjectID:    subjectData.SubjectID,
-				FieldEps:     subjectData.FieldEps,
-				Type:         subjectData.Type,
-			}
+	if r.Data != (*model.SubjectRevisionData)(nil) {
+		subjectData := r.Data
+		data = &res.SubjectRevisionData{
+			Name:         subjectData.Name,
+			NameCN:       subjectData.NameCN,
+			VoteField:    subjectData.VoteField,
+			FieldInfobox: subjectData.FieldInfobox,
+			FieldSummary: subjectData.FieldSummary,
+			Platform:     subjectData.Platform,
+			TypeID:       subjectData.TypeID,
+			SubjectID:    subjectData.SubjectID,
+			FieldEps:     subjectData.FieldEps,
+			Type:         subjectData.Type,
 		}
 	}
 	return res.SubjectRevision{
@@ -377,8 +366,8 @@ func convertModelCharacterRevision(
 		},
 		CreatedAt: r.CreatedAt,
 	}
-	ret.Data = make(map[string]res.CharacterRevisionDataItem, len(r.Data.CharacterRevisionEdit))
-	for id, item := range r.Data.CharacterRevisionEdit {
+	ret.Data = make(map[string]res.CharacterRevisionDataItem, len(r.Data))
+	for id, item := range r.Data {
 		ret.Data[id] = res.CharacterRevisionDataItem{
 			InfoBox: item.InfoBox,
 			Summary: item.Summary,

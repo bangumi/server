@@ -25,17 +25,17 @@ type RevisionRepo interface {
 
 	ListPersonRelated(
 		ctx context.Context, personID model.PersonIDType, limit int, offset int,
-	) ([]model.Revision, error)
+	) ([]model.PersonRevision, error)
 
-	GetPersonRelated(ctx context.Context, id model.UIDType) (model.Revision, error)
+	GetPersonRelated(ctx context.Context, id model.UIDType) (model.PersonRevision, error)
 
 	CountSubjectRelated(ctx context.Context, id model.SubjectIDType) (int64, error)
 
 	ListSubjectRelated(
 		ctx context.Context, id model.SubjectIDType, limit int, offset int,
-	) ([]model.Revision, error)
+	) ([]model.SubjectRevision, error)
 
-	GetSubjectRelated(ctx context.Context, id model.UIDType) (model.Revision, error)
+	GetSubjectRelated(ctx context.Context, id model.UIDType) (model.SubjectRevision, error)
 
 	CountCharacterRelated(ctx context.Context, characterID model.CharacterIDType) (int64, error)
 
