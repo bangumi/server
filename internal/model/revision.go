@@ -18,18 +18,28 @@ import (
 	"time"
 )
 
-type Creator struct {
-	Username string
-	Nickname string
-}
-
-type Revision struct {
-	Data      interface{}
+// RevisionCommon common parts in revision.
+type RevisionCommon struct {
 	CreatedAt time.Time
 	Summary   string
-	Type      uint8
 	ID        uint32
 	CreatorID uint32
+	Type      uint8
+}
+
+type PersonRevision struct {
+	Data PersonRevisionData
+	RevisionCommon
+}
+
+type PersonRevisionData map[string]PersonRevisionDataItem
+
+type PersonRevisionDataItem struct {
+	Name       string     `json:"name" mapstructure:"prsn_name"`
+	InfoBox    string     `json:"infobox" mapstructure:"prsn_infobox"`
+	Summary    string     `json:"summary" mapstructure:"prsn_summary"`
+	Profession Profession `json:"profession"`
+	Extra      Extra      `json:"extra"`
 }
 
 type Profession struct {
@@ -46,12 +56,9 @@ type Extra struct {
 	Img string `json:"img,omitempty"`
 }
 
-type PersonRevisionDataItem struct {
-	InfoBox    string     `json:"prsn_infobox"`
-	Summary    string     `json:"prsn_summary"`
-	Profession Profession `json:"profession"`
-	Extra      Extra      `json:"extra"`
-	Name       string     `json:"prsn_name"`
+type SubjectRevision struct {
+	Data *SubjectRevisionData
+	RevisionCommon
 }
 
 type SubjectRevisionData struct {
@@ -67,28 +74,15 @@ type SubjectRevisionData struct {
 	Type         uint8
 }
 
-// RevisionCommon common parts in revision.
-// TODO: rename RevisionCommon to Revision and replace the latter.
-type RevisionCommon struct {
-	CreatedAt time.Time
-	Summary   string
-	ID        uint32
-	CreatorID uint32
-	Type      uint8
-}
-
 // CharacterRevision concrete revision data type.
 type CharacterRevision struct {
 	Data CharacterRevisionData
 	RevisionCommon
 }
 
-type CharacterRevisionData struct {
-	CharacterRevisionEdit
-}
-type CharacterRevisionEdit map[string]CharacterRevisionEditItem
+type CharacterRevisionData map[string]CharacterRevisionDataItem
 
-type CharacterRevisionEditItem struct {
+type CharacterRevisionDataItem struct {
 	Name    string `json:"name" mapstructure:"crt_name"`
 	InfoBox string `json:"infobox" mapstructure:"crt_infobox"`
 	Summary string `json:"summary"`
