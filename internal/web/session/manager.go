@@ -96,7 +96,7 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 
 	now := time.Now()
 	if now.After(ws.ExpiredAt) {
-		return Session{}, domain.ErrNotFound
+		return Session{}, ErrExpired
 	}
 
 	s = ws.Value

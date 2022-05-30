@@ -48,7 +48,7 @@ func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 	if value != "" {
 		s, err := h.getSession(c, value)
 		if err != nil {
-			if errors.Is(err, session.ErrExpired) {
+			if errors.Is(err, session.ErrExpired) || errors.Is(err, domain.ErrNotFound) {
 				return res.HTTPError(c, code.Unauthorized, "token expired")
 			}
 
