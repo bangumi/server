@@ -14,6 +14,11 @@
 
 package res
 
+import (
+	"github.com/goccy/go-json"
+	"github.com/tidwall/gjson"
+)
+
 type PersonImages struct {
 	Small  string `json:"small"`
 	Grid   string `json:"grid"`
@@ -54,4 +59,13 @@ func PersonImage(s string) PersonImages {
 		Large:  "https://lain.bgm.tv/pic/crt/l/" + s,
 		Medium: "https://lain.bgm.tv/pic/crt/m/" + s,
 	}
+}
+
+func SelectImageURL(s interface{}, key string) (string, bool) {
+	b, err := json.Marshal(s)
+	if err != nil {
+		return "", false
+	}
+	u := gjson.GetBytes(b, key)
+	return u.String(), u.Exists()
 }

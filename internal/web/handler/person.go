@@ -127,6 +127,32 @@ var genderMap = map[uint8]string{
 	2: "female",
 }
 
+func (h Handler) GetPersonImage(c *fiber.Ctx) error {
+	id, err := strparse.PersonID(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	}
+
+	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	l, ok := res.SelectImageURL(r.Images, c.Query("type"))
+	if !ok {
+		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+	}
+
+	return c.Redirect(l)
+}
+
 func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 	id, err := strparse.PersonID(c.Params("id"))
 	if err != nil || id == 0 {
