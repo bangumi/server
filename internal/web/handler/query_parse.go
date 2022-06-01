@@ -22,20 +22,15 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strparse"
+	"github.com/bangumi/server/internal/web/res/code"
 )
 
-func parseSubjectID(s string) (model.SubjectIDType, error) {
-	if s == "" {
-		return 0, nil
-	}
-
-	subjectID, err := strconv.ParseUint(s, 10, 32)
-	if err != nil {
-		return 0, fiber.NewError(http.StatusBadRequest, "bad subject id: "+strconv.Quote(s))
-	}
-
-	return model.SubjectIDType(subjectID), nil
-}
+// these errors result in to 400 http response.
+var errMissingCharacterID = fiber.NewError(code.BadRequest, "character ID is required")
+var errMissingSubjectID = fiber.NewError(code.BadRequest, "subject ID is required")
+var errMissingPersonID = fiber.NewError(code.BadRequest, "person ID is required")
+var errMissingEpisodeID = fiber.NewError(code.BadRequest, "episode ID is required")
+var errMissingIndexID = fiber.NewError(code.BadRequest, "index ID is required")
 
 func parseSubjectType(s string) (uint8, error) {
 	if s == "" {
@@ -53,5 +48,75 @@ func parseSubjectType(s string) (uint8, error) {
 		return t, nil
 	}
 
-	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+"is not a valid subject type")
+	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+" is not a valid subject type")
+}
+
+func parseSubjectID(s string) (model.SubjectIDType, error) {
+	if s == "" {
+		return 0, errMissingSubjectID
+	}
+
+	v, err := strparse.SubjectID(s)
+
+	if err != nil {
+		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not valid subject ID")
+	}
+
+	return v, nil
+}
+
+func parseCharacterID(s string) (model.CharacterIDType, error) {
+	if s == "" {
+		return 0, errMissingCharacterID
+	}
+
+	v, err := strparse.CharacterID(s)
+
+	if err != nil {
+		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not valid character ID")
+	}
+
+	return v, nil
+}
+
+func parsePersonID(s string) (model.PersonIDType, error) {
+	if s == "" {
+		return 0, errMissingPersonID
+	}
+
+	v, err := strparse.PersonID(s)
+
+	if err != nil {
+		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not valid person ID")
+	}
+
+	return v, nil
+}
+
+func parseEpisodeID(s string) (model.EpisodeIDType, error) {
+	if s == "" {
+		return 0, errMissingEpisodeID
+	}
+
+	v, err := strparse.EpisodeID(s)
+
+	if err != nil {
+		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not a valid episode ID")
+	}
+
+	return v, nil
+}
+
+func parseIndexID(s string) (model.IndexIDType, error) {
+	if s == "" {
+		return 0, errMissingIndexID
+	}
+
+	v, err := strparse.IndexID(s)
+
+	if err != nil {
+		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not a valid index ID")
+	}
+
+	return v, nil
 }

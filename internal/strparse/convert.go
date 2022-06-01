@@ -67,7 +67,7 @@ func EpisodeID(s string) (model.PersonIDType, error) {
 	return uint32NonZero(s)
 }
 
-func IndexID(s string) (model.PersonIDType, error) {
+func IndexID(s string) (model.IndexIDType, error) {
 	return uint32NonZero(s)
 }
 

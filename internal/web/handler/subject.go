@@ -41,8 +41,8 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
 	id, err := parseSubjectID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -130,9 +130,9 @@ func platformString(s model.Subject) *string {
 func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := strparse.SubjectID(c.Params("id"))
+	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+		return fiber.NewError(http.StatusBadRequest, err.Error())
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)

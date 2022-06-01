@@ -22,7 +22,7 @@ type Index struct {
 	Description string
 	CreatorID   uint32
 	Total       uint32
-	ID          uint32
+	ID          IndexIDType
 	Comments    uint32
 	Collects    uint32
 	Ban         bool

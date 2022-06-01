@@ -30,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/vars"
@@ -38,9 +37,9 @@ import (
 )
 
 func (h Handler) GetPerson(c *fiber.Ctx) error {
-	id, err := strparse.PersonID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	id, err := parsePersonID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getPersonWithCache(c.Context(), id)
@@ -128,9 +127,9 @@ var genderMap = map[uint8]string{
 }
 
 func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
-	id, err := strparse.PersonID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+	id, err := parsePersonID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getPersonWithCache(c.Context(), id)
@@ -167,9 +166,9 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 }
 
 func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
-	id, err := strparse.PersonID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+	id, err := parsePersonID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getPersonWithCache(c.Context(), id)

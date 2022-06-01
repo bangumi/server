@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger/log"
-	"github.com/bangumi/server/internal/strparse"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/wiki"
@@ -90,9 +90,9 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 func (h Handler) GetIndex(c *fiber.Ctx) error {
 	user := h.getHTTPAccessor(c)
 
-	id, err := strparse.IndexID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad index_id")
+	id, err := parseIndexID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getIndexWithCache(c.Context(), id)
@@ -113,9 +113,9 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 	user := h.getHTTPAccessor(c)
 
-	id, err := strparse.IndexID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad index_id")
+	id, err := parseIndexID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	subjectType, err := parseSubjectType(c.Query("type"))
@@ -144,7 +144,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 }
 
 func (h Handler) getIndexSubjects(
-	c *fiber.Ctx, id uint32, subjectType uint8, page pageQuery,
+	c *fiber.Ctx, id model.IndexIDType, subjectType uint8, page pageQuery,
 ) error {
 	count, err := h.i.CountSubjects(c.Context(), id, subjectType)
 	if err != nil {
