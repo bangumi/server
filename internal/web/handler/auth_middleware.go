@@ -95,7 +95,8 @@ func (h Handler) AccessTokenAuthMiddleware(ctx *fiber.Ctx) error {
 		var auth domain.Auth
 		var err error
 		if auth, err = h.a.GetByTokenWithCache(ctx.Context(), token); err != nil {
-			if errors.Is(err, domain.ErrNotFound) {
+			if errors.Is(err, domain.ErrNotFound) || errors.Is(err, session.ErrExpired) {
+				cookie.Clear(ctx, session.Key)
 				return res.HTTPError(ctx, fiber.StatusUnauthorized, "access token has been expired or doesn't exist")
 			}
 
