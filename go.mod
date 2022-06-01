@@ -13,7 +13,6 @@ require (
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goccy/go-json v0.9.7
-	github.com/goccy/go-reflect v1.1.0
 	github.com/gofiber/adaptor/v2 v2.1.24
 	github.com/gofiber/fiber/v2 v2.34.0
 	github.com/gookit/goutil v0.5.2
