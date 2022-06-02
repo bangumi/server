@@ -140,18 +140,8 @@ func (h Handler) GetCharacterImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
-	}
-
-	if r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+	if !ok || r.NSFW && !u.AllowNSFW() || r.Images.Small == "" {
+		return c.Redirect(res.DefaultPersonImageURL)
 	}
 
 	l, ok := res.SelectPersonImageURL(r.Images, c.Query("type"))
