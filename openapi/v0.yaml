@@ -67,13 +67,16 @@ paths:
             Location:
               schema:
                 type: string
-              description: 图片链接
+              description: |-
+                图片链接
+                无图时返回默认图片 https://lain.bgm.tv/img/no_icon_subject.png
         "400":
           description: Validation Error
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
+
         "404":
           description: Not Found
           content:
@@ -350,13 +353,16 @@ paths:
             Location:
               schema:
                 type: string
-              description: 图片链接
+              description: |-
+                图片链接
+                无图时返回默认图片 https://lain.bgm.tv/img/no_icon_subject.png
         "400":
           description: Validation Error
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
+
         "404":
           description: Not Found
           content:
@@ -497,7 +503,9 @@ paths:
             Location:
               schema:
                 type: string
-              description: 图片链接
+              description: |-
+                图片链接
+                无图时返回默认图片 https://lain.bgm.tv/img/no_icon_subject.png
         "400":
           description: Validation Error
           content:

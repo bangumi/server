@@ -56,6 +56,10 @@ func PersonImage(s string) PersonImages {
 	}
 }
 
+const (
+	DefaultImageURL = "https://lain.bgm.tv/img/no_icon_subject.png"
+)
+
 func SelectSubjectImageURL(s SubjectImages, key string) (string, bool) {
 	switch key {
 	case "small":

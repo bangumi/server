@@ -151,6 +151,10 @@ func (h Handler) GetPersonImage(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
 	}
 
+	if l == "" {
+		return c.Redirect(res.DefaultImageURL)
+	}
+
 	return c.Redirect(l)
 }
 

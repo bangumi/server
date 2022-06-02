@@ -142,14 +142,7 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
-	}
-
-	if r.NSFW && !u.AllowNSFW() {
+	if !ok || r.NSFW && !u.AllowNSFW() {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
@@ -159,6 +152,10 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	l, ok := res.SelectSubjectImageURL(r.Image, c.Query("type"))
 	if !ok {
 		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+	}
+
+	if l == "" {
+		return c.Redirect(res.DefaultImageURL)
 	}
 
 	return c.Redirect(l)
