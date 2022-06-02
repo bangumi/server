@@ -41,8 +41,8 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
 	id, err := parseSubjectID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -71,6 +71,8 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	return c.JSON(r)
 }
 
+// first try to read from cache, then fallback to reading from database.
+// return data, database record existence and error.
 func (h Handler) getSubjectWithCache(
 	ctx context.Context,
 	id model.SubjectIDType,
@@ -165,9 +167,9 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := strparse.SubjectID(c.Params("id"))
+	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+		return fiber.NewError(http.StatusBadRequest, err.Error())
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)

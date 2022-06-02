@@ -22,11 +22,11 @@ import (
 )
 
 type IndexRepo interface {
-	Get(ctx context.Context, id uint32) (model.Index, error)
+	Get(ctx context.Context, id model.IndexIDType) (model.Index, error)
 
-	CountSubjects(ctx context.Context, id uint32, subjectType model.SubjectType) (int64, error)
+	CountSubjects(ctx context.Context, id model.IndexIDType, subjectType model.SubjectType) (int64, error)
 	ListSubjects(
-		ctx context.Context, id uint32, subjectType model.SubjectType, limit, offset int,
+		ctx context.Context, id model.IndexIDType, subjectType model.SubjectType, limit, offset int,
 	) ([]IndexSubject, error)
 }
 

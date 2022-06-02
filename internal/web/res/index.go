@@ -14,16 +14,20 @@
 
 package res
 
-import "time"
+import (
+	"time"
+
+	"github.com/bangumi/server/internal/model"
+)
 
 type Index struct {
-	CreatedAt   time.Time `json:"created_at"`
-	Creator     Creator   `json:"creator"`
-	Title       string    `json:"title"`
-	Description string    `json:"desc"`
-	Total       uint32    `json:"total"`
-	ID          uint32    `json:"id"`
-	Stat        Stat      `json:"stat"`
-	Ban         bool      `json:"ban"`
-	NSFW        bool      `json:"nsfw" doc:"if index contains any nsfw subjects"`
+	CreatedAt   time.Time         `json:"created_at"`
+	Creator     Creator           `json:"creator"`
+	Title       string            `json:"title"`
+	Description string            `json:"desc"`
+	Total       uint32            `json:"total"`
+	ID          model.IndexIDType `json:"id"`
+	Stat        Stat              `json:"stat"`
+	Ban         bool              `json:"ban"`
+	NSFW        bool              `json:"nsfw" doc:"if index contains any nsfw subjects"`
 }

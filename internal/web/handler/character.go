@@ -30,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/wiki"
@@ -38,9 +37,9 @@ import (
 
 func (h Handler) GetCharacter(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := strparse.CharacterID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+	id, err := parseCharacterID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getCharacterWithCache(c.Context(), id)
@@ -69,6 +68,8 @@ func (h Handler) GetCharacter(c *fiber.Ctx) error {
 	return c.JSON(r)
 }
 
+// first try to read from cache, then fallback to reading from database.
+// return data, database record existence and error.
 func (h Handler) getCharacterWithCache(
 	ctx context.Context, id uint32) (res.CharacterV0, bool, error) {
 	var key = cachekey.Character(id)
@@ -163,9 +164,9 @@ func (h Handler) GetCharacterImage(c *fiber.Ctx) error {
 
 func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := strparse.CharacterID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	id, err := parseCharacterID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getCharacterWithCache(c.Context(), id)
@@ -203,9 +204,9 @@ func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 
 func (h Handler) GetCharacterRelatedSubjects(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := strparse.CharacterID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	id, err := parseCharacterID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getCharacterWithCache(c.Context(), id)
