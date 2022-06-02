@@ -129,9 +129,9 @@ var genderMap = map[uint8]string{
 }
 
 func (h Handler) GetPersonImage(c *fiber.Ctx) error {
-	id, err := strparse.PersonID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	id, err := parsePersonID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getPersonWithCache(c.Context(), id)

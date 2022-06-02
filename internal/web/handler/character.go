@@ -130,9 +130,9 @@ func convertModelCharacter(s model.Character) res.CharacterV0 {
 
 func (h Handler) GetCharacterImage(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := strparse.CharacterID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+	id, err := parseCharacterID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getCharacterWithCache(c.Context(), id)
