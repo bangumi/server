@@ -24,7 +24,6 @@ require (
 	github.com/prometheus/client_golang v1.12.2
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.1
-	github.com/tidwall/gjson v1.14.1
 	github.com/uber-go/tally/v4 v4.1.1
 	go.uber.org/fx v1.17.1
 	go.uber.org/zap v1.21.0
@@ -68,8 +67,6 @@ require (
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
-	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.37.0 // indirect
