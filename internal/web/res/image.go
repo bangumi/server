@@ -55,3 +55,35 @@ func PersonImage(s string) PersonImages {
 		Medium: "https://lain.bgm.tv/pic/crt/m/" + s,
 	}
 }
+
+func SelectSubjectImageURL(s SubjectImages, key string) (string, bool) {
+	switch key {
+	case "small":
+		return s.Small, true
+	case "grid":
+		return s.Grid, true
+	case "large":
+		return s.Large, true
+	case "medium":
+		return s.Medium, true
+	case "common":
+		return s.Common, true
+	default:
+		return "", false
+	}
+}
+
+func SelectPersonImageURL(s PersonImages, key string) (string, bool) {
+	switch key {
+	case "small":
+		return s.Small, true
+	case "grid":
+		return s.Grid, true
+	case "large":
+		return s.Large, true
+	case "medium":
+		return s.Medium, true
+	default:
+		return "", false
+	}
+}

@@ -129,6 +129,41 @@ func platformString(s model.Subject) *string {
 	return &v
 }
 
+func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
+	u := h.getHTTPAccessor(c)
+
+	id, err := parseSubjectID(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+	}
+
+	r, ok, err := h.getSubjectWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	if r.NSFW && !u.AllowNSFW() {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	l, ok := res.SelectSubjectImageURL(r.Image, c.Query("type"))
+	if !ok {
+		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+	}
+
+	return c.Redirect(l)
+}
+
 func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 

@@ -29,6 +29,7 @@ bin/
 coverage.out
 .bin/
 /gen/
+pnpm-lock.yaml
 
 /index.html
 node_modules/
