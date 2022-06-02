@@ -139,13 +139,20 @@ func (h Handler) GetPersonImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok || r.Images.Small == "" {
-		return c.Redirect(res.DefaultPersonImageURL)
+	if !ok {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
 	}
 
 	l, ok := res.SelectPersonImageURL(r.Images, c.Query("type"))
 	if !ok {
 		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+	}
+
+	if l == "" {
+		return c.Redirect(res.DefaultImageURL)
 	}
 
 	return c.Redirect(l)

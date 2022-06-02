@@ -69,9 +69,16 @@ paths:
                 type: string
               description: |-
                 图片链接
-                404 Not Found 时返回默认图片 https://bgm.tv/img/no_icon_subject.png
+                无图时返回默认图片 https://lain.bgm.tv/img/no_icon_subject.png
         "400":
           description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -348,9 +355,16 @@ paths:
                 type: string
               description: |-
                 图片链接
-                404 Not Found 时返回默认图片 https://bgm.tv/img/info_only.png
+                无图时返回默认图片 https://lain.bgm.tv/img/no_icon_subject.png
         "400":
           description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -491,9 +505,15 @@ paths:
                 type: string
               description: |-
                 图片链接
-                404 Not Found 时返回默认图片 https://bgm.tv/img/info_only.png
+                无图时返回默认图片 https://lain.bgm.tv/img/no_icon_subject.png
         "400":
           description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:

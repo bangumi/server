@@ -57,8 +57,7 @@ func PersonImage(s string) PersonImages {
 }
 
 const (
-	DefaultSubjectImageURL = "https://bgm.tv/img/no_icon_subject.png"
-	DefaultPersonImageURL  = "https://bgm.tv/img/info_only.png"
+	DefaultImageURL = "https://lain.bgm.tv/img/no_icon_subject.png"
 )
 
 func SelectSubjectImageURL(s SubjectImages, key string) (string, bool) {
