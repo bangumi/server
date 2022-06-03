@@ -17,6 +17,7 @@ package main
 import (
 	"github.com/go-resty/resty/v2"
 	"github.com/goccy/go-json"
+	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -51,7 +52,11 @@ func main() {
 }
 
 func start() error {
-	app := fx.New(
+
+	var app *fiber.App
+	var cfg config.AppConfig
+
+	err := fx.New(
 		logger.FxLogger(),
 		// driver and connector
 		fx.Provide(
@@ -81,12 +86,14 @@ func start() error {
 			session.NewMysqlRepo, rate.New, hcaptcha.New, session.New, handler.New, web.New, frontend.NewTemplateEngine,
 		),
 
-		fx.Invoke(
-			web.ResistRouter, web.Listen,
-		),
-	)
+		fx.Invoke(web.ResistRouter),
 
-	app.Run()
+		fx.Populate(&app, &cfg),
+	).Err()
 
-	return errgo.Wrap(app.Err(), "failed to start app")
+	if err != nil {
+		return errgo.Wrap(err, "fx")
+	}
+
+	return errgo.Wrap(web.Start(cfg, app), "failed to start app")
 }

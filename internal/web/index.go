@@ -15,9 +15,7 @@
 package web
 
 import (
-	"context"
 	"fmt"
-	"net"
 	"strconv"
 	"time"
 
@@ -27,7 +25,6 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
-	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -71,32 +68,14 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 	return app
 }
 
-func Listen(lc fx.Lifecycle, c config.AppConfig, app *fiber.App) {
-	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			logger.Infoln("start http server at port", c.HTTPPort)
-			addr := fmt.Sprintf(":%d", c.HTTPPort)
-			if config.Development {
-				addr = "127.0.0.1" + addr
-			}
-			ln, err := net.Listen("tcp", addr)
-			if err != nil {
-				return errgo.Wrap(err, "failed to start listener")
-			}
+func Start(c config.AppConfig, app *fiber.App) error {
+	logger.Infoln("start http server at port", c.HTTPPort)
+	addr := fmt.Sprintf(":%d", c.HTTPPort)
+	if config.Development {
+		addr = "127.0.0.1" + addr
+	}
 
-			go func() {
-				err := app.Listener(ln)
-				if err != nil {
-					logger.Panic("failed to start fiber app on listener", zap.Error(err))
-				}
-			}()
-
-			return nil
-		},
-		OnStop: func(ctx context.Context) error {
-			return errgo.Wrap(app.Shutdown(), "web.Shutdown")
-		},
-	})
+	return errgo.Wrap(app.Listen(addr), "fiber.App.Listen")
 }
 
 func getDefaultErrorHandler() func(c *fiber.Ctx, err error) error {
