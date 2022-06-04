@@ -32,6 +32,11 @@ func newOAuthClient(db *gorm.DB) oAuthClient {
 	_oAuthClient.GrantTypes = field.NewString(tableName, "grant_types")
 	_oAuthClient.Scope = field.NewString(tableName, "scope")
 	_oAuthClient.UserID = field.NewString(tableName, "user_id")
+	_oAuthClient.App = oAuthClientBelongsToApp{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("App", "dao.App"),
+	}
 
 	_oAuthClient.fillFieldMap()
 
@@ -49,6 +54,7 @@ type oAuthClient struct {
 	GrantTypes   field.String
 	Scope        field.String
 	UserID       field.String
+	App          oAuthClientBelongsToApp
 
 	fieldMap map[string]field.Expr
 }
@@ -96,7 +102,7 @@ func (o *oAuthClient) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (o *oAuthClient) fillFieldMap() {
-	o.fieldMap = make(map[string]field.Expr, 7)
+	o.fieldMap = make(map[string]field.Expr, 8)
 	o.fieldMap["app_id"] = o.AppID
 	o.fieldMap["client_id"] = o.ClientID
 	o.fieldMap["client_secret"] = o.ClientSecret
@@ -104,11 +110,78 @@ func (o *oAuthClient) fillFieldMap() {
 	o.fieldMap["grant_types"] = o.GrantTypes
 	o.fieldMap["scope"] = o.Scope
 	o.fieldMap["user_id"] = o.UserID
+
 }
 
 func (o oAuthClient) clone(db *gorm.DB) oAuthClient {
 	o.oAuthClientDo.ReplaceDB(db)
 	return o
+}
+
+type oAuthClientBelongsToApp struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a oAuthClientBelongsToApp) Where(conds ...field.Expr) *oAuthClientBelongsToApp {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a oAuthClientBelongsToApp) WithContext(ctx context.Context) *oAuthClientBelongsToApp {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a oAuthClientBelongsToApp) Model(m *dao.OAuthClient) *oAuthClientBelongsToAppTx {
+	return &oAuthClientBelongsToAppTx{a.db.Model(m).Association(a.Name())}
+}
+
+type oAuthClientBelongsToAppTx struct{ tx *gorm.Association }
+
+func (a oAuthClientBelongsToAppTx) Find() (result *dao.App, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a oAuthClientBelongsToAppTx) Append(values ...*dao.App) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a oAuthClientBelongsToAppTx) Replace(values ...*dao.App) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a oAuthClientBelongsToAppTx) Delete(values ...*dao.App) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a oAuthClientBelongsToAppTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a oAuthClientBelongsToAppTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type oAuthClientDo struct{ gen.DO }

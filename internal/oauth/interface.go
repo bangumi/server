@@ -26,6 +26,7 @@ type Client struct {
 	RedirectURI string
 	GrantTypes  string
 	Scope       string
+	AppName     string
 	UserID      uint32
 	AppID       uint32
 }

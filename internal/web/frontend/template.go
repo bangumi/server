@@ -54,10 +54,10 @@ type Login struct {
 }
 
 type ListAccessToken struct {
+	Clients map[string]oauth.Client
 	Title   string
 	User    model.User
 	Tokens  []domain.AccessToken
-	Clients map[string]oauth.Client
 }
 
 type CreateAccessToken struct {

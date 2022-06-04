@@ -36,7 +36,8 @@ type mysqlRepo struct {
 }
 
 func (m mysqlRepo) GetClientByID(ctx context.Context, clientIDs ...string) (map[string]Client, error) {
-	clients, err := m.q.OAuthClient.WithContext(ctx).Where(m.q.OAuthClient.ClientID.In(clientIDs...)).Find()
+	clients, err := m.q.OAuthClient.WithContext(ctx).Joins(m.q.OAuthClient.App).
+		Where(m.q.OAuthClient.ClientID.In(clientIDs...)).Find()
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
 	}
@@ -63,6 +64,6 @@ func convertFromDao(record *dao.OAuthClient) Client {
 		Scope:       record.Scope,
 		UserID:      userID,
 		AppID:       record.AppID,
+		AppName:     record.App.Name,
 	}
-
 }

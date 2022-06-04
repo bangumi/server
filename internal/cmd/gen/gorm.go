@@ -136,10 +136,7 @@ func main() {
 		gen.FieldType("usr_grp_perm", "[]byte"),
 	))
 
-	g.ApplyBasic(g.GenerateModelAs("chii_oauth_clients", "OAuthClient",
-		gen.FieldType("app_id", "uint32")))
-
-	g.ApplyBasic(g.GenerateModelAs("chii_apps", "App",
+	var oauthApp = g.GenerateModelAs("chii_apps", "App",
 		gen.FieldTrimPrefix("app_"),
 		gen.FieldType("app_id", "uint32"),
 		gen.FieldRename("app_desc", "description"),
@@ -147,7 +144,16 @@ func main() {
 		gen.FieldRename("app_lasttouch", "UpdatedAt"),
 		gen.FieldRename("app_timestamp", "CreatedAt"),
 		gen.FieldType("app_creator", userIDTypeString),
+	)
+
+	g.ApplyBasic(g.GenerateModelAs("chii_oauth_clients", "OAuthClient",
+		gen.FieldType("app_id", "uint32"),
+		gen.FieldRelate(field.BelongsTo, "App", oauthApp, &field.RelateConfig{
+			GORMTag: "foreignKey:app_id;references:app_id",
+		}),
 	))
+
+	g.ApplyBasic(oauthApp)
 
 	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "AccessToken",
 		gen.FieldType("type", "uint8"),

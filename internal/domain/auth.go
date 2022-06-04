@@ -83,9 +83,9 @@ type AccessToken struct {
 	ExpiredAt time.Time
 	CreatedAt time.Time
 	Name      string
+	ClientID  string
 	ID        uint32
 	UserID    model.UIDType
-	ClientID  string
 }
 
 type Permission struct {

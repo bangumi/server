@@ -15,6 +15,7 @@ type OAuthClient struct {
 	GrantTypes   string `gorm:"column:grant_types;type:varchar(80)" json:"grant_types"`
 	Scope        string `gorm:"column:scope;type:varchar(4000)" json:"scope"`
 	UserID       string `gorm:"column:user_id;type:varchar(80)" json:"user_id"`
+	App          App    `gorm:"foreignKey:app_id;references:app_id" json:"app"`
 }
 
 // TableName OAuthClient's table name

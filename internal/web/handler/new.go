@@ -64,7 +64,7 @@ func New(
 		return Handler{}, err
 	}
 
-	log = log.Named("web.handler"),
+	log = log.Named("web.handler")
 
 	return Handler{
 		cfg:                  cfg,
