@@ -278,15 +278,22 @@ const defaultOauthAccessExpiration = timex.OneDay * 90
 func convertAccessToken(t *dao.AccessToken) domain.AccessToken {
 	var createdAt time.Time
 	var name = "oauth token"
-	if t.Type == TokenTypeOauthToken {
-		createdAt = t.ExpiredAt.Add(-defaultOauthAccessExpiration)
-	} else {
-		var info TokenInfo
-		if err := json.UnmarshalNoEscape(t.Info, &info); err != nil {
-			logger.Fatal("unexpected error when trying to unmarshal json data", zap.Error(err), zap.ByteString("raw", t.Info))
+
+	switch t.Type {
+	case TokenTypeAccessToken:
+		if len(t.Info) > 0 {
+			var info TokenInfo
+			if err := json.UnmarshalNoEscape(t.Info, &info); err != nil {
+				logger.Fatal("unexpected error when trying to unmarshal json data",
+					zap.Error(err), zap.ByteString("raw", t.Info))
+			}
+			name = info.Name
+			createdAt = info.CreatedAt
+		} else {
+			name = "personal access token"
 		}
-		name = info.Name
-		createdAt = info.CreatedAt
+	case TokenTypeOauthToken:
+		createdAt = t.ExpiredAt.Add(-defaultOauthAccessExpiration)
 	}
 
 	v, err := strconv.ParseUint(t.UserID, 10, 32)
