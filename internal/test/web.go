@@ -56,6 +56,8 @@ type Mock struct {
 	AuthRepo       domain.AuthRepo
 	AuthService    domain.AuthService
 	EpisodeRepo    domain.EpisodeRepo
+	CommentRepo    domain.CommentRepo
+	TopicService   domain.TopicService
 	UserRepo       domain.UserRepo
 	IndexRepo      domain.IndexRepo
 	RevisionRepo   domain.RevisionRepo
@@ -92,6 +94,8 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
+		MockTopicService(m.TopicService),
+		MockCommentRepo(m.CommentRepo),
 		MockAuthRepo(m.AuthRepo),
 		MockOAuthManager(m.OAuthManager),
 		MockAuthService(m.AuthService),
