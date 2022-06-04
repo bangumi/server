@@ -1,0 +1,93 @@
+{{- /*gotype: github.com/bangumi/server/internal/web/frontend.CreateAccessToken*/ -}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>创建令牌</title>
+
+    {{template "common_resource.gohtml"}}
+</head>
+<body>
+{{template "header" .User}}
+<div class="container mt-5">
+  <div class="row">
+    <a href="/demo/access-token">查看所有令牌</a>
+  </div>
+  <div class="row">
+    <ul class="list-group error-details"></ul>
+  </div>
+
+  <div class="row">
+    <h1>create personal access token</h1>
+  </div>
+
+  <div class="row">
+    <form>
+      <div class="mb-3">
+        <label for="tokenName" class="form-label">名称</label>
+        <input class="form-control" name="name" id="tokenName" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">有效期</label>
+        <select name="duration_days" class="form-select" aria-label="Default select example">
+          <option value="30">30天</option>
+          <option value="90">90天</option>
+          <option value="180">180天</option>
+          <option value="365">365天</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <div class="h-captcha" data-sitekey="4874acee-9c6e-4e47-99ad-e2ea1606961f"></div>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+
+</div>
+<script>
+  $(document).ready(function () { // Wait until document is fully parsed
+    $("form").on("submit", function (e) {
+        e.preventDefault();
+        $(".error-details").html("")
+        const data = {}
+
+        Array.from($("form").serializeArray()).forEach(({name, value}, index) => {
+          data[name] = value
+        })
+
+        async function submit() {
+          const res = await fetch('/p/access-tokens', {
+            method: "post",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({name: data.name, duration_days: parseInt(data['duration_days'], 10)})
+          });
+          if (res.status > 300) {
+            const content = await res.text()
+            try {
+              const d = JSON.parse(content)
+              console.log(d)
+              $(".error-details").prepend(`<li class="m-1 list-group-item list-group-item-danger">${JSON.stringify(d.details)}</li>`)
+            } catch (e) {
+              $(".error-details").prepend(`<li class="m-1 list-group-item list-group-item-danger">${content}</li>`)
+            }
+          } else {
+            const token = await res.json();
+            $(".error-details")
+              .append(`<li class="m-1 list-group-item list-group-item-success">${token}</li>`)
+              .append(`<li class="m-1 list-group-item list-group-item-success">请复制token，不会再次显示</li>`)
+          }
+        }
+
+        const btn = $('form button')
+        btn.addClass('disabled')
+
+        submit().then(() => {
+          btn.removeClass('disabled')
+        })
+      }
+    )
+  })
+</script>
+</body>
+</html>

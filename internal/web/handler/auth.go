@@ -15,10 +15,8 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
@@ -55,22 +53,11 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	}
 
 	if err := h.v.Struct(r); err != nil {
-		var validationErrors validator.ValidationErrors
-		if ok := errors.As(err, &validationErrors); ok {
-			var details = make([]string, len(validationErrors))
-			for i, e := range validationErrors {
-				// can translate each error one at a time.
-				details[i] = e.Translate(h.validatorTranslation)
-			}
-
-			return res.JSON(c.Status(code.BadRequest), res.Error{
-				Title:       http.StatusText(code.BadRequest),
-				Description: "can't validate request body",
-				Details:     details,
-			})
-		}
-
-		return res.WithError(c, err, code.BadRequest, "can't validate request body")
+		return res.JSON(c.Status(code.BadRequest), res.Error{
+			Title:       http.StatusText(code.BadRequest),
+			Description: "can't validate request body",
+			Details:     h.translationValidationError(err),
+		})
 	}
 
 	allowed, remain, err := h.rateLimit.Allowed(c.Context(), c.Context().RemoteIP().String())

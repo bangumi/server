@@ -123,6 +123,11 @@ func getValidator() (*validator.Validate, ut.Translator, error) {
 	}
 
 	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
+		docName := field.Tag.Get("validateName")
+		if docName != "" {
+			return docName
+		}
+
 		tag := field.Tag.Get("json")
 		if tag == "" {
 			return field.Name

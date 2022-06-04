@@ -10,6 +10,12 @@
 {{template "header" .User}}
 {{ if ne .User.ID 0}}
 <div class="container mt-5">
+  <div class="row">
+    <a href="/demo/access-token">查看所有有效令牌</a>
+  </div>
+  <div class="row">
+    <a href="/demo/access-token/create">创建个人令牌</a>
+  </div>
     {{.User.UserName}} 已经登录
   <button class="btn btn-danger" onclick="logout()"> 登出</button>
 </div>
@@ -21,13 +27,12 @@
 </script>
 {{else}}
 <script src="https://js.hcaptcha.com/1/api.js?hl=zh-CN" defer></script>
-<script src="/static/jquery-3.6.0.slim.min.js"></script>
 <div class="container mt-5">
   <div class="row">
     <ul class="list-group error-details"></ul>
   </div>
 
-  <div class="row tokens">
+  <div class="row">
     <form>
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">Email address</label>

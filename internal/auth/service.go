@@ -32,6 +32,9 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
+const TokenTypeOauthToken = 0
+const TokenTypeAccessToken = 1
+
 func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.Generic) domain.AuthService {
 	return service{
 		localCache: cache.NewMemoryCache(),
@@ -213,4 +216,26 @@ func (s service) GetPermission(ctx context.Context, id model.GroupID) (domain.Pe
 	_ = s.localCache.Set(ctx, key, p, time.Minute)
 
 	return p, nil
+}
+
+func (s service) CreateAccessToken(
+	ctx context.Context, userID model.UIDType, name string, expiration time.Duration,
+) (string, error) {
+	token, err := s.repo.CreateAccessToken(ctx, userID, name, expiration)
+	return token, errgo.Wrap(err, "repo.CreateAccessToken")
+}
+
+func (s service) ListAccessToken(ctx context.Context, userID model.UIDType) ([]domain.AccessToken, error) {
+	tokens, err := s.repo.ListAccessToken(ctx, userID)
+	return tokens, errgo.Wrap(err, "repo.ListAccessToken")
+}
+
+func (s service) DeleteAccessToken(ctx context.Context, id uint32) (bool, error) {
+	result, err := s.repo.DeleteAccessToken(ctx, id)
+	return result, errgo.Wrap(err, "repo.DeleteAccessToken")
+}
+
+func (s service) GetTokenByID(ctx context.Context, id uint32) (domain.AccessToken, error) {
+	result, err := s.repo.GetTokenByID(ctx, id)
+	return result, errgo.Wrap(err, "repo.GetTokenByID")
 }
