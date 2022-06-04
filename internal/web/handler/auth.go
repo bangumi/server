@@ -60,7 +60,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	allowed, remain, err := h.rateLimit.Allowed(c.Context(), c.Context().RemoteIP().String())
+	allowed, remain, err := h.rateLimit.Allowed(c.Context(), a.ip.String())
 	if err != nil {
 		h.log.Error("failed to apply rate limit", zap.Error(err), a.LogRequestID())
 		return res.InternalError(c, err, "failed to apply rate limit")
