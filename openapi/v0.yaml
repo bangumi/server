@@ -55,23 +55,6 @@ paths:
             type: integer
           name: subject_id
           in: path
-        - required: false
-          schema:
-            title: Limit
-            maximum: 200
-            minimum: 0
-            type: integer
-            default: 100
-          name: limit
-          in: query
-        - required: false
-          schema:
-            title: Offset
-            minimum: 0
-            type: integer
-            default: 0
-          name: offset
-          in: query
       responses:
         "200":
           description: Successful Response
