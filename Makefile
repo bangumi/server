@@ -36,7 +36,8 @@ build: ./dist/chii.exe
 
 # we should use gomock once https://github.com/golang/mock/issues/622 is resolved.
 mocks: internal/web/session/repo_mock_test.go internal/mocks/SessionManager.go \
-		internal/mocks/CaptchaManager.go internal/mocks/RateLimiter.go
+		internal/mocks/CaptchaManager.go internal/mocks/RateLimiter.go \
+		internal/mocks/OAuthManger.go
 	mockery --all --dir ./internal/domain $(MOCKERY_ARGS)
 	mockery --all --dir ./internal/cache $(MOCKERY_ARGS)
 
@@ -48,6 +49,9 @@ internal/mocks/SessionManager.go: internal/web/session/manager.go
 
 internal/mocks/CaptchaManager.go: internal/web/captcha/manager.go
 	mockery --dir ./internal/web/captcha --name Manager --filename CaptchaManager.go --structname CaptchaManager $(MOCKERY_ARGS)
+
+internal/mocks/OAuthManger.go: internal/oauth/interface.go
+	mockery --dir ./internal/oauth/ --name Manager --filename OAuthManger.go --structname OAuthManger $(MOCKERY_ARGS)
 
 internal/mocks/RateLimiter.go: internal/web/rate/new.go
 	mockery --dir ./internal/web/rate --name Manager --filename RateLimiter.go --structname RateLimiter $(MOCKERY_ARGS)

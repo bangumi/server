@@ -17,9 +17,10 @@
         {{range .Tokens }}
           <li class="list-group-item d-flex justify-content-between align-items-center" id="token-{{ .ID }}">
             <div class="ms-2 me-auto">
-              <div class="fw-bold">{{ .Name }}</div>
-              创建日期： {{ .CreatedAt | FormatDate }}
-              有效期至： {{ .ExpiredAt | FormatDate }}
+                {{ $oauth := index $.Clients .ClientID}}
+              <div class="fw-bold">{{if ne $oauth.AppName "" }}{{ $oauth.AppName }}{{else}}{{ .Name }}{{end}}</div>
+              <span> 创建日期： {{ .CreatedAt | FormatDate }}</span>
+              <span> 有效期至： {{ .ExpiredAt | FormatDate }}</span>
             </div>
             <button class="btn btn-danger" onclick="revoke('{{ .ID }}')">delete
             </button>
