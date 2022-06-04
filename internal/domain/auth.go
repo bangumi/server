@@ -85,6 +85,7 @@ type AccessToken struct {
 	Name      string
 	ID        uint32
 	UserID    model.UIDType
+	ClientID  string
 }
 
 type Permission struct {

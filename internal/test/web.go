@@ -38,6 +38,7 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web"
@@ -62,6 +63,7 @@ type Mock struct {
 	SessionManager session.Manager
 	Cache          cache.Generic
 	RateLimiter    rate.Manager
+	OAuthManager   oauth.Manager
 	HTTPMock       *httpmock.MockTransport
 }
 
@@ -91,6 +93,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
 		MockAuthRepo(m.AuthRepo),
+		MockOAuthManager(m.OAuthManager),
 		MockAuthService(m.AuthService),
 		MockUserRepo(m.UserRepo),
 		MockIndexRepo(m.IndexRepo),
@@ -246,6 +249,14 @@ func MockAuthService(m domain.AuthService) fx.Option {
 	}
 
 	return fx.Provide(func() domain.AuthService { return m })
+}
+
+func MockOAuthManager(m oauth.Manager) fx.Option {
+	if m == nil {
+		return fx.Provide(oauth.NewMysqlRepo)
+	}
+
+	return fx.Provide(func() oauth.Manager { return m })
 }
 
 func MockSubjectRepo(m domain.SubjectRepo) fx.Option {

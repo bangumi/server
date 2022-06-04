@@ -18,6 +18,11 @@ import (
 	"errors"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
+
+	"github.com/bangumi/server/internal/web/res"
+	"github.com/bangumi/server/internal/web/res/code"
 )
 
 func (h Handler) translationValidationError(err error) []string {
@@ -33,4 +38,13 @@ func (h Handler) translationValidationError(err error) []string {
 	}
 
 	return []string{err.Error()}
+}
+
+func (h Handler) InternalServerError(c *fiber.Ctx, err error, message string) error {
+	h.skip1Log.Error("internal server error", zap.Error(err))
+	return res.JSON(c.Status(code.InternalServerError), res.Error{
+		Title:       "Internal Server Error",
+		Description: message,
+		Details:     err.Error(),
+	})
 }

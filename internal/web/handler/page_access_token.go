@@ -17,6 +17,7 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -31,15 +32,34 @@ func (h Handler) PageListAccessToken(c *fiber.Ctx) error {
 
 	u, err := h.u.GetByID(c.Context(), v.ID)
 	if err != nil {
-		return res.InternalError(c, err, "failed to get current user")
+		return h.InternalServerError(c, err, "failed to get current user")
 	}
 
 	tokens, err := h.a.ListAccessToken(c.Context(), v.ID)
 	if err != nil {
-		return res.InternalError(c, err, "failed to fetch access tokens")
+		return h.InternalServerError(c, err, "failed to fetch access tokens")
 	}
 
-	return h.render(c, frontend.TplListAccessToken, frontend.ListAccessToken{Tokens: tokens, User: u})
+	clients, err := h.oauth.GetClientByID(c.Context(), clientIDs(tokens)...)
+	if err != nil {
+		return h.InternalServerError(c, err, "failed to fetch access tokens")
+	}
+
+	return h.render(c, frontend.TplListAccessToken, frontend.ListAccessToken{Tokens: tokens, User: u, Clients: clients})
+}
+
+func clientIDs(tokens []domain.AccessToken) []string {
+	var clientIDs = make(map[string]struct{}, len(tokens))
+	for _, token := range tokens {
+		clientIDs[token.ClientID] = struct{}{}
+	}
+
+	var s = make([]string, 0, len(clientIDs))
+	for token := range clientIDs {
+		s = append(s, token)
+	}
+
+	return s
 }
 
 func (h Handler) PageCreateAccessToken(c *fiber.Ctx) error {
