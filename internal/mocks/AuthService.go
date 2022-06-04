@@ -116,20 +116,20 @@ func (_c *AuthService_CreateAccessToken_Call) Return(token string, err error) *A
 	return _c
 }
 
-// DeleteAccessToken provides a mock function with given fields: ctx, id
-func (_m *AuthService) DeleteAccessToken(ctx context.Context, id uint32) (bool, error) {
-	ret := _m.Called(ctx, id)
+// DeleteAccessToken provides a mock function with given fields: ctx, tokenID
+func (_m *AuthService) DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error) {
+	ret := _m.Called(ctx, tokenID)
 
 	var r0 bool
 	if rf, ok := ret.Get(0).(func(context.Context, uint32) bool); ok {
-		r0 = rf(ctx, id)
+		r0 = rf(ctx, tokenID)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
-		r1 = rf(ctx, id)
+		r1 = rf(ctx, tokenID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -144,12 +144,12 @@ type AuthService_DeleteAccessToken_Call struct {
 
 // DeleteAccessToken is a helper method to define mock.On call
 //  - ctx context.Context
-//  - id uint32
-func (_e *AuthService_Expecter) DeleteAccessToken(ctx interface{}, id interface{}) *AuthService_DeleteAccessToken_Call {
-	return &AuthService_DeleteAccessToken_Call{Call: _e.mock.On("DeleteAccessToken", ctx, id)}
+//  - tokenID uint32
+func (_e *AuthService_Expecter) DeleteAccessToken(ctx interface{}, tokenID interface{}) *AuthService_DeleteAccessToken_Call {
+	return &AuthService_DeleteAccessToken_Call{Call: _e.mock.On("DeleteAccessToken", ctx, tokenID)}
 }
 
-func (_c *AuthService_DeleteAccessToken_Call) Run(run func(ctx context.Context, id uint32)) *AuthService_DeleteAccessToken_Call {
+func (_c *AuthService_DeleteAccessToken_Call) Run(run func(ctx context.Context, tokenID uint32)) *AuthService_DeleteAccessToken_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uint32))
 	})
@@ -386,20 +386,20 @@ func (_c *AuthService_GetPermission_Call) Return(_a0 domain.Permission, _a1 erro
 	return _c
 }
 
-// GetTokenByID provides a mock function with given fields: ctx, id
-func (_m *AuthService) GetTokenByID(ctx context.Context, id uint32) (domain.AccessToken, error) {
-	ret := _m.Called(ctx, id)
+// GetTokenByID provides a mock function with given fields: ctx, tokenID
+func (_m *AuthService) GetTokenByID(ctx context.Context, tokenID uint32) (domain.AccessToken, error) {
+	ret := _m.Called(ctx, tokenID)
 
 	var r0 domain.AccessToken
 	if rf, ok := ret.Get(0).(func(context.Context, uint32) domain.AccessToken); ok {
-		r0 = rf(ctx, id)
+		r0 = rf(ctx, tokenID)
 	} else {
 		r0 = ret.Get(0).(domain.AccessToken)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
-		r1 = rf(ctx, id)
+		r1 = rf(ctx, tokenID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -414,12 +414,12 @@ type AuthService_GetTokenByID_Call struct {
 
 // GetTokenByID is a helper method to define mock.On call
 //  - ctx context.Context
-//  - id uint32
-func (_e *AuthService_Expecter) GetTokenByID(ctx interface{}, id interface{}) *AuthService_GetTokenByID_Call {
-	return &AuthService_GetTokenByID_Call{Call: _e.mock.On("GetTokenByID", ctx, id)}
+//  - tokenID uint32
+func (_e *AuthService_Expecter) GetTokenByID(ctx interface{}, tokenID interface{}) *AuthService_GetTokenByID_Call {
+	return &AuthService_GetTokenByID_Call{Call: _e.mock.On("GetTokenByID", ctx, tokenID)}
 }
 
-func (_c *AuthService_GetTokenByID_Call) Run(run func(ctx context.Context, id uint32)) *AuthService_GetTokenByID_Call {
+func (_c *AuthService_GetTokenByID_Call) Run(run func(ctx context.Context, tokenID uint32)) *AuthService_GetTokenByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uint32))
 	})

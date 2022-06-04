@@ -28,11 +28,11 @@ type AuthRepo interface {
 	GetPermission(ctx context.Context, groupID uint8) (Permission, error)
 
 	CreateAccessToken(
-		ctx context.Context, id model.UIDType, name string, expiration time.Duration,
+		ctx context.Context, userID model.UIDType, name string, expiration time.Duration,
 	) (token string, err error)
 
 	ListAccessToken(ctx context.Context, userID model.UIDType) ([]AccessToken, error)
-	DeleteAccessToken(ctx context.Context, id uint32) (bool, error)
+	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
 
 	// GetByEmail return (Auth, HashedPassword, error)
 	GetByEmail(ctx context.Context, email string) (Auth, []byte, error)
@@ -69,12 +69,12 @@ type AuthService interface {
 
 	Login(ctx context.Context, email, password string) (Auth, bool, error)
 
-	GetTokenByID(ctx context.Context, id uint32) (AccessToken, error)
+	GetTokenByID(ctx context.Context, tokenID uint32) (AccessToken, error)
 	CreateAccessToken(
 		ctx context.Context, userID model.UIDType, name string, expiration time.Duration,
 	) (token string, err error)
 	ListAccessToken(ctx context.Context, userID model.UIDType) ([]AccessToken, error)
-	DeleteAccessToken(ctx context.Context, id uint32) (bool, error)
+	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
 
 	GetPermission(ctx context.Context, id model.GroupID) (Permission, error)
 }

@@ -24,20 +24,20 @@ func (_m *AuthRepo) EXPECT() *AuthRepo_Expecter {
 	return &AuthRepo_Expecter{mock: &_m.Mock}
 }
 
-// CreateAccessToken provides a mock function with given fields: ctx, id, name, expiration
-func (_m *AuthRepo) CreateAccessToken(ctx context.Context, id uint32, name string, expiration time.Duration) (string, error) {
-	ret := _m.Called(ctx, id, name, expiration)
+// CreateAccessToken provides a mock function with given fields: ctx, userID, name, expiration
+func (_m *AuthRepo) CreateAccessToken(ctx context.Context, userID uint32, name string, expiration time.Duration) (string, error) {
+	ret := _m.Called(ctx, userID, name, expiration)
 
 	var r0 string
 	if rf, ok := ret.Get(0).(func(context.Context, uint32, string, time.Duration) string); ok {
-		r0 = rf(ctx, id, name, expiration)
+		r0 = rf(ctx, userID, name, expiration)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, uint32, string, time.Duration) error); ok {
-		r1 = rf(ctx, id, name, expiration)
+		r1 = rf(ctx, userID, name, expiration)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -52,14 +52,14 @@ type AuthRepo_CreateAccessToken_Call struct {
 
 // CreateAccessToken is a helper method to define mock.On call
 //  - ctx context.Context
-//  - id uint32
+//  - userID uint32
 //  - name string
 //  - expiration time.Duration
-func (_e *AuthRepo_Expecter) CreateAccessToken(ctx interface{}, id interface{}, name interface{}, expiration interface{}) *AuthRepo_CreateAccessToken_Call {
-	return &AuthRepo_CreateAccessToken_Call{Call: _e.mock.On("CreateAccessToken", ctx, id, name, expiration)}
+func (_e *AuthRepo_Expecter) CreateAccessToken(ctx interface{}, userID interface{}, name interface{}, expiration interface{}) *AuthRepo_CreateAccessToken_Call {
+	return &AuthRepo_CreateAccessToken_Call{Call: _e.mock.On("CreateAccessToken", ctx, userID, name, expiration)}
 }
 
-func (_c *AuthRepo_CreateAccessToken_Call) Run(run func(ctx context.Context, id uint32, name string, expiration time.Duration)) *AuthRepo_CreateAccessToken_Call {
+func (_c *AuthRepo_CreateAccessToken_Call) Run(run func(ctx context.Context, userID uint32, name string, expiration time.Duration)) *AuthRepo_CreateAccessToken_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uint32), args[2].(string), args[3].(time.Duration))
 	})
@@ -71,20 +71,20 @@ func (_c *AuthRepo_CreateAccessToken_Call) Return(token string, err error) *Auth
 	return _c
 }
 
-// DeleteAccessToken provides a mock function with given fields: ctx, id
-func (_m *AuthRepo) DeleteAccessToken(ctx context.Context, id uint32) (bool, error) {
-	ret := _m.Called(ctx, id)
+// DeleteAccessToken provides a mock function with given fields: ctx, tokenID
+func (_m *AuthRepo) DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error) {
+	ret := _m.Called(ctx, tokenID)
 
 	var r0 bool
 	if rf, ok := ret.Get(0).(func(context.Context, uint32) bool); ok {
-		r0 = rf(ctx, id)
+		r0 = rf(ctx, tokenID)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
-		r1 = rf(ctx, id)
+		r1 = rf(ctx, tokenID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -99,12 +99,12 @@ type AuthRepo_DeleteAccessToken_Call struct {
 
 // DeleteAccessToken is a helper method to define mock.On call
 //  - ctx context.Context
-//  - id uint32
-func (_e *AuthRepo_Expecter) DeleteAccessToken(ctx interface{}, id interface{}) *AuthRepo_DeleteAccessToken_Call {
-	return &AuthRepo_DeleteAccessToken_Call{Call: _e.mock.On("DeleteAccessToken", ctx, id)}
+//  - tokenID uint32
+func (_e *AuthRepo_Expecter) DeleteAccessToken(ctx interface{}, tokenID interface{}) *AuthRepo_DeleteAccessToken_Call {
+	return &AuthRepo_DeleteAccessToken_Call{Call: _e.mock.On("DeleteAccessToken", ctx, tokenID)}
 }
 
-func (_c *AuthRepo_DeleteAccessToken_Call) Run(run func(ctx context.Context, id uint32)) *AuthRepo_DeleteAccessToken_Call {
+func (_c *AuthRepo_DeleteAccessToken_Call) Run(run func(ctx context.Context, tokenID uint32)) *AuthRepo_DeleteAccessToken_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uint32))
 	})
