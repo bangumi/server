@@ -25,11 +25,14 @@ func newAccessToken(db *gorm.DB) accessToken {
 
 	tableName := _accessToken.accessTokenDo.TableName()
 	_accessToken.ALL = field.NewField(tableName, "*")
+	_accessToken.ID = field.NewUint32(tableName, "id")
+	_accessToken.Type = field.NewUint8(tableName, "type")
 	_accessToken.AccessToken = field.NewString(tableName, "access_token")
 	_accessToken.ClientID = field.NewString(tableName, "client_id")
 	_accessToken.UserID = field.NewString(tableName, "user_id")
 	_accessToken.ExpiredAt = field.NewTime(tableName, "expires")
 	_accessToken.Scope = field.NewString(tableName, "scope")
+	_accessToken.Info = field.NewField(tableName, "info")
 
 	_accessToken.fillFieldMap()
 
@@ -40,11 +43,14 @@ type accessToken struct {
 	accessTokenDo accessTokenDo
 
 	ALL         field.Field
+	ID          field.Uint32
+	Type        field.Uint8
 	AccessToken field.String
 	ClientID    field.String
 	UserID      field.String
 	ExpiredAt   field.Time
 	Scope       field.String
+	Info        field.Field
 
 	fieldMap map[string]field.Expr
 }
@@ -61,11 +67,14 @@ func (a accessToken) As(alias string) *accessToken {
 
 func (a *accessToken) updateTableName(table string) *accessToken {
 	a.ALL = field.NewField(table, "*")
+	a.ID = field.NewUint32(table, "id")
+	a.Type = field.NewUint8(table, "type")
 	a.AccessToken = field.NewString(table, "access_token")
 	a.ClientID = field.NewString(table, "client_id")
 	a.UserID = field.NewString(table, "user_id")
 	a.ExpiredAt = field.NewTime(table, "expires")
 	a.Scope = field.NewString(table, "scope")
+	a.Info = field.NewField(table, "info")
 
 	a.fillFieldMap()
 
@@ -90,12 +99,15 @@ func (a *accessToken) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (a *accessToken) fillFieldMap() {
-	a.fieldMap = make(map[string]field.Expr, 5)
+	a.fieldMap = make(map[string]field.Expr, 8)
+	a.fieldMap["id"] = a.ID
+	a.fieldMap["type"] = a.Type
 	a.fieldMap["access_token"] = a.AccessToken
 	a.fieldMap["client_id"] = a.ClientID
 	a.fieldMap["user_id"] = a.UserID
 	a.fieldMap["expires"] = a.ExpiredAt
 	a.fieldMap["scope"] = a.Scope
+	a.fieldMap["info"] = a.Info
 }
 
 func (a accessToken) clone(db *gorm.DB) accessToken {
