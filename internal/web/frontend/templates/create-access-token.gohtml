@@ -2,14 +2,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>create personal access token</title>
+  <title>创建令牌</title>
 
     {{template "common_resource.gohtml"}}
 </head>
 <body>
 {{template "header" .User}}
-<script src="/static/jquery-3.6.0.slim.min.js"></script>
 <div class="container mt-5">
+  <div class="row">
+    <a href="/demo/access-token">查看所有令牌</a>
+  </div>
   <div class="row">
     <ul class="list-group error-details"></ul>
   </div>

@@ -258,7 +258,7 @@ type TokenInfo struct {
 
 func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UIDType) ([]domain.AccessToken, error) {
 	records, err := m.q.AccessToken.WithContext(ctx).
-		Where(m.q.AccessToken.UserID.Eq(strconv.FormatUint(uint64(userID), 10))).Find()
+		Where(m.q.AccessToken.UserID.Eq(strconv.FormatUint(uint64(userID), 10)), m.q.AccessToken.ExpiredAt.Gte(time.Now())).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
@@ -284,6 +284,7 @@ func convertAccessToken(t *dao.AccessToken) domain.AccessToken {
 		if err := json.UnmarshalNoEscape(t.Info, &info); err != nil {
 			logger.Fatal("unexpected error when trying to unmarshal json data", zap.Error(err), zap.ByteString("raw", t.Info))
 		}
+		name = info.Name
 		createdAt = info.CreatedAt
 	}
 
