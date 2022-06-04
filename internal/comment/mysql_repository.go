@@ -81,7 +81,7 @@ func ConvertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         v.UID,
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.Dateline), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
 		}, nil
 	case *dao.GroupTopicComment:
@@ -90,7 +90,7 @@ func ConvertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         v.UID,
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.Dateline), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
 		}, nil
 	case *dao.IndexComment:
@@ -99,7 +99,7 @@ func ConvertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         v.UID,
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.Dateline), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
 		}, nil
 	case *dao.EpisodeComment:
@@ -108,7 +108,7 @@ func ConvertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         v.UID,
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.Dateline), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
 		}, nil
 	case *dao.CharacterComment:
@@ -117,7 +117,7 @@ func ConvertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         v.UID,
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.Dateline), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
 		}, nil
 	default:

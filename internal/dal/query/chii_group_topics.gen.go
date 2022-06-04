@@ -26,11 +26,11 @@ func newGroupTopic(db *gorm.DB) groupTopic {
 	tableName := _groupTopic.groupTopicDo.TableName()
 	_groupTopic.ALL = field.NewField(tableName, "*")
 	_groupTopic.ID = field.NewUint32(tableName, "grp_tpc_id")
-	_groupTopic.Gid = field.NewUint32(tableName, "grp_tpc_gid")
+	_groupTopic.GroupID = field.NewUint32(tableName, "grp_tpc_gid")
 	_groupTopic.UID = field.NewUint32(tableName, "grp_tpc_uid")
 	_groupTopic.Title = field.NewString(tableName, "grp_tpc_title")
-	_groupTopic.Dateline = field.NewUint32(tableName, "grp_tpc_dateline")
-	_groupTopic.Lastpost = field.NewUint32(tableName, "grp_tpc_lastpost")
+	_groupTopic.CreatedAt = field.NewUint32(tableName, "grp_tpc_dateline")
+	_groupTopic.UpdatedAt = field.NewUint32(tableName, "grp_tpc_lastpost")
 	_groupTopic.Replies = field.NewUint32(tableName, "grp_tpc_replies")
 	_groupTopic.State = field.NewBool(tableName, "grp_tpc_state")
 	_groupTopic.Display = field.NewBool(tableName, "grp_tpc_display")
@@ -43,16 +43,16 @@ func newGroupTopic(db *gorm.DB) groupTopic {
 type groupTopic struct {
 	groupTopicDo groupTopicDo
 
-	ALL      field.Field
-	ID       field.Uint32
-	Gid      field.Uint32
-	UID      field.Uint32
-	Title    field.String
-	Dateline field.Uint32
-	Lastpost field.Uint32
-	Replies  field.Uint32
-	State    field.Bool
-	Display  field.Bool
+	ALL       field.Field
+	ID        field.Uint32
+	GroupID   field.Uint32
+	UID       field.Uint32
+	Title     field.String
+	CreatedAt field.Uint32
+	UpdatedAt field.Uint32
+	Replies   field.Uint32
+	State     field.Bool
+	Display   field.Bool
 
 	fieldMap map[string]field.Expr
 }
@@ -70,11 +70,11 @@ func (g groupTopic) As(alias string) *groupTopic {
 func (g *groupTopic) updateTableName(table string) *groupTopic {
 	g.ALL = field.NewField(table, "*")
 	g.ID = field.NewUint32(table, "grp_tpc_id")
-	g.Gid = field.NewUint32(table, "grp_tpc_gid")
+	g.GroupID = field.NewUint32(table, "grp_tpc_gid")
 	g.UID = field.NewUint32(table, "grp_tpc_uid")
 	g.Title = field.NewString(table, "grp_tpc_title")
-	g.Dateline = field.NewUint32(table, "grp_tpc_dateline")
-	g.Lastpost = field.NewUint32(table, "grp_tpc_lastpost")
+	g.CreatedAt = field.NewUint32(table, "grp_tpc_dateline")
+	g.UpdatedAt = field.NewUint32(table, "grp_tpc_lastpost")
 	g.Replies = field.NewUint32(table, "grp_tpc_replies")
 	g.State = field.NewBool(table, "grp_tpc_state")
 	g.Display = field.NewBool(table, "grp_tpc_display")
@@ -104,11 +104,11 @@ func (g *groupTopic) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 func (g *groupTopic) fillFieldMap() {
 	g.fieldMap = make(map[string]field.Expr, 9)
 	g.fieldMap["grp_tpc_id"] = g.ID
-	g.fieldMap["grp_tpc_gid"] = g.Gid
+	g.fieldMap["grp_tpc_gid"] = g.GroupID
 	g.fieldMap["grp_tpc_uid"] = g.UID
 	g.fieldMap["grp_tpc_title"] = g.Title
-	g.fieldMap["grp_tpc_dateline"] = g.Dateline
-	g.fieldMap["grp_tpc_lastpost"] = g.Lastpost
+	g.fieldMap["grp_tpc_dateline"] = g.CreatedAt
+	g.fieldMap["grp_tpc_lastpost"] = g.UpdatedAt
 	g.fieldMap["grp_tpc_replies"] = g.Replies
 	g.fieldMap["grp_tpc_state"] = g.State
 	g.fieldMap["grp_tpc_display"] = g.Display

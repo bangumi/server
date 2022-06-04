@@ -12,7 +12,7 @@ type IndexComment struct {
 	MentionedID uint32 `gorm:"column:idx_pst_mid;type:mediumint(8) unsigned;not null;index:idx_pst_mid,priority:1" json:"idx_pst_mid"`
 	UID         uint32 `gorm:"column:idx_pst_uid;type:mediumint(8) unsigned;not null;index:idx_pst_uid,priority:1" json:"idx_pst_uid"`
 	Related     uint32 `gorm:"column:idx_pst_related;type:mediumint(8) unsigned;not null;index:idx_pst_related,priority:1" json:"idx_pst_related"`
-	Dateline    uint32 `gorm:"column:idx_pst_dateline;type:int(10) unsigned;not null" json:"idx_pst_dateline"`
+	CreatedAt   uint32 `gorm:"column:idx_pst_dateline;type:int(10) unsigned;not null" json:"idx_pst_dateline"`
 	Content     string `gorm:"column:idx_pst_content;type:mediumtext;not null" json:"idx_pst_content"`
 }
 

@@ -29,8 +29,8 @@ func newSubjectTopic(db *gorm.DB) subjectTopic {
 	_subjectTopic.SubjectID = field.NewUint32(tableName, "sbj_tpc_subject_id")
 	_subjectTopic.UID = field.NewUint32(tableName, "sbj_tpc_uid")
 	_subjectTopic.Title = field.NewString(tableName, "sbj_tpc_title")
-	_subjectTopic.Dateline = field.NewUint32(tableName, "sbj_tpc_dateline")
-	_subjectTopic.Lastpost = field.NewUint32(tableName, "sbj_tpc_lastpost")
+	_subjectTopic.CreatedAt = field.NewUint32(tableName, "sbj_tpc_dateline")
+	_subjectTopic.UpdatedAt = field.NewUint32(tableName, "sbj_tpc_lastpost")
 	_subjectTopic.Replies = field.NewUint32(tableName, "sbj_tpc_replies")
 	_subjectTopic.State = field.NewBool(tableName, "sbj_tpc_state")
 	_subjectTopic.Display = field.NewBool(tableName, "sbj_tpc_display")
@@ -48,8 +48,8 @@ type subjectTopic struct {
 	SubjectID field.Uint32
 	UID       field.Uint32
 	Title     field.String
-	Dateline  field.Uint32
-	Lastpost  field.Uint32
+	CreatedAt field.Uint32
+	UpdatedAt field.Uint32
 	Replies   field.Uint32
 	State     field.Bool
 	Display   field.Bool
@@ -73,8 +73,8 @@ func (s *subjectTopic) updateTableName(table string) *subjectTopic {
 	s.SubjectID = field.NewUint32(table, "sbj_tpc_subject_id")
 	s.UID = field.NewUint32(table, "sbj_tpc_uid")
 	s.Title = field.NewString(table, "sbj_tpc_title")
-	s.Dateline = field.NewUint32(table, "sbj_tpc_dateline")
-	s.Lastpost = field.NewUint32(table, "sbj_tpc_lastpost")
+	s.CreatedAt = field.NewUint32(table, "sbj_tpc_dateline")
+	s.UpdatedAt = field.NewUint32(table, "sbj_tpc_lastpost")
 	s.Replies = field.NewUint32(table, "sbj_tpc_replies")
 	s.State = field.NewBool(table, "sbj_tpc_state")
 	s.Display = field.NewBool(table, "sbj_tpc_display")
@@ -107,8 +107,8 @@ func (s *subjectTopic) fillFieldMap() {
 	s.fieldMap["sbj_tpc_subject_id"] = s.SubjectID
 	s.fieldMap["sbj_tpc_uid"] = s.UID
 	s.fieldMap["sbj_tpc_title"] = s.Title
-	s.fieldMap["sbj_tpc_dateline"] = s.Dateline
-	s.fieldMap["sbj_tpc_lastpost"] = s.Lastpost
+	s.fieldMap["sbj_tpc_dateline"] = s.CreatedAt
+	s.fieldMap["sbj_tpc_lastpost"] = s.UpdatedAt
 	s.fieldMap["sbj_tpc_replies"] = s.Replies
 	s.fieldMap["sbj_tpc_state"] = s.State
 	s.fieldMap["sbj_tpc_display"] = s.Display

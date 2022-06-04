@@ -31,7 +31,7 @@ func newSubjectTopicComment(db *gorm.DB) subjectTopicComment {
 	_subjectTopicComment.Related = field.NewUint32(tableName, "sbj_pst_related")
 	_subjectTopicComment.Content = field.NewString(tableName, "sbj_pst_content")
 	_subjectTopicComment.State = field.NewBool(tableName, "sbj_pst_state")
-	_subjectTopicComment.Dateline = field.NewUint32(tableName, "sbj_pst_dateline")
+	_subjectTopicComment.CreatedAt = field.NewUint32(tableName, "sbj_pst_dateline")
 
 	_subjectTopicComment.fillFieldMap()
 
@@ -48,7 +48,7 @@ type subjectTopicComment struct {
 	Related     field.Uint32
 	Content     field.String
 	State       field.Bool
-	Dateline    field.Uint32
+	CreatedAt   field.Uint32
 
 	fieldMap map[string]field.Expr
 }
@@ -71,7 +71,7 @@ func (s *subjectTopicComment) updateTableName(table string) *subjectTopicComment
 	s.Related = field.NewUint32(table, "sbj_pst_related")
 	s.Content = field.NewString(table, "sbj_pst_content")
 	s.State = field.NewBool(table, "sbj_pst_state")
-	s.Dateline = field.NewUint32(table, "sbj_pst_dateline")
+	s.CreatedAt = field.NewUint32(table, "sbj_pst_dateline")
 
 	s.fillFieldMap()
 
@@ -103,7 +103,7 @@ func (s *subjectTopicComment) fillFieldMap() {
 	s.fieldMap["sbj_pst_related"] = s.Related
 	s.fieldMap["sbj_pst_content"] = s.Content
 	s.fieldMap["sbj_pst_state"] = s.State
-	s.fieldMap["sbj_pst_dateline"] = s.Dateline
+	s.fieldMap["sbj_pst_dateline"] = s.CreatedAt
 }
 
 func (s subjectTopicComment) clone(db *gorm.DB) subjectTopicComment {

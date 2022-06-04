@@ -29,7 +29,7 @@ func newCharacterComment(db *gorm.DB) characterComment {
 	_characterComment.MentionedID = field.NewUint32(tableName, "crt_pst_mid")
 	_characterComment.UID = field.NewUint32(tableName, "crt_pst_uid")
 	_characterComment.Related = field.NewUint32(tableName, "crt_pst_related")
-	_characterComment.Dateline = field.NewUint32(tableName, "crt_pst_dateline")
+	_characterComment.CreatedAt = field.NewUint32(tableName, "crt_pst_dateline")
 	_characterComment.Content = field.NewString(tableName, "crt_pst_content")
 
 	_characterComment.fillFieldMap()
@@ -45,7 +45,7 @@ type characterComment struct {
 	MentionedID field.Uint32
 	UID         field.Uint32
 	Related     field.Uint32
-	Dateline    field.Uint32
+	CreatedAt   field.Uint32
 	Content     field.String
 
 	fieldMap map[string]field.Expr
@@ -67,7 +67,7 @@ func (c *characterComment) updateTableName(table string) *characterComment {
 	c.MentionedID = field.NewUint32(table, "crt_pst_mid")
 	c.UID = field.NewUint32(table, "crt_pst_uid")
 	c.Related = field.NewUint32(table, "crt_pst_related")
-	c.Dateline = field.NewUint32(table, "crt_pst_dateline")
+	c.CreatedAt = field.NewUint32(table, "crt_pst_dateline")
 	c.Content = field.NewString(table, "crt_pst_content")
 
 	c.fillFieldMap()
@@ -98,7 +98,7 @@ func (c *characterComment) fillFieldMap() {
 	c.fieldMap["crt_pst_mid"] = c.MentionedID
 	c.fieldMap["crt_pst_uid"] = c.UID
 	c.fieldMap["crt_pst_related"] = c.Related
-	c.fieldMap["crt_pst_dateline"] = c.Dateline
+	c.fieldMap["crt_pst_dateline"] = c.CreatedAt
 	c.fieldMap["crt_pst_content"] = c.Content
 }
 

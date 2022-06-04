@@ -74,7 +74,7 @@ func (r mysqlRepo) GetTopicsByObjectID(
 	)
 	switch topicType {
 	case model.TopicTypeGroup:
-		topics, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.Gid.Eq(id)).Find()
+		topics, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).Find()
 	case model.TopicTypeSubject:
 		topics, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).Find()
 	default:
@@ -118,11 +118,11 @@ func ConvertDao(in interface{}) (model.Topic, error) {
 	case *dao.GroupTopic:
 		return model.Topic{
 			ID:        v.ID,
-			ObjectID:  v.Gid,
+			ObjectID:  v.GroupID,
 			UID:       v.UID,
 			Title:     v.Title,
-			CreatedAt: time.Unix(int64(v.Dateline), 0),
-			UpdatedAt: time.Unix(int64(v.Lastpost), 0),
+			CreatedAt: time.Unix(int64(v.CreatedAt), 0),
+			UpdatedAt: time.Unix(int64(v.UpdatedAt), 0),
 			Replies:   v.Replies,
 			State:     v.State,
 			Display:   v.Display,
@@ -133,8 +133,8 @@ func ConvertDao(in interface{}) (model.Topic, error) {
 			ObjectID:  v.SubjectID,
 			UID:       v.UID,
 			Title:     v.Title,
-			CreatedAt: time.Unix(int64(v.Dateline), 0),
-			UpdatedAt: time.Unix(int64(v.Lastpost), 0),
+			CreatedAt: time.Unix(int64(v.CreatedAt), 0),
+			UpdatedAt: time.Unix(int64(v.UpdatedAt), 0),
 			Replies:   v.Replies,
 			State:     v.State,
 			Display:   v.Display,

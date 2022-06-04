@@ -14,7 +14,7 @@ type GroupTopicComment struct {
 	Related     uint32 `gorm:"column:grp_pst_related;type:mediumint(8) unsigned;not null;index:grp_pst_related,priority:1" json:"grp_pst_related"` // 关联回复ID
 	Content     string `gorm:"column:grp_pst_content;type:mediumtext;not null" json:"grp_pst_content"`
 	State       bool   `gorm:"column:grp_pst_state;type:tinyint(1) unsigned;not null" json:"grp_pst_state"`
-	Dateline    uint32 `gorm:"column:grp_pst_dateline;type:int(10) unsigned;not null" json:"grp_pst_dateline"`
+	CreatedAt   uint32 `gorm:"column:grp_pst_dateline;type:int(10) unsigned;not null" json:"grp_pst_dateline"`
 }
 
 // TableName GroupTopicComment's table name

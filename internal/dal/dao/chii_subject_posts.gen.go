@@ -14,7 +14,7 @@ type SubjectTopicComment struct {
 	Related     uint32 `gorm:"column:sbj_pst_related;type:mediumint(8) unsigned;not null;index:sbj_pst_related,priority:1" json:"sbj_pst_related"`
 	Content     string `gorm:"column:sbj_pst_content;type:mediumtext;not null" json:"sbj_pst_content"`
 	State       bool   `gorm:"column:sbj_pst_state;type:tinyint(1) unsigned;not null" json:"sbj_pst_state"`
-	Dateline    uint32 `gorm:"column:sbj_pst_dateline;type:int(10) unsigned;not null" json:"sbj_pst_dateline"`
+	CreatedAt   uint32 `gorm:"column:sbj_pst_dateline;type:int(10) unsigned;not null" json:"sbj_pst_dateline"`
 }
 
 // TableName SubjectTopicComment's table name

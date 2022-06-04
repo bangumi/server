@@ -29,7 +29,7 @@ func newEpisodeComment(db *gorm.DB) episodeComment {
 	_episodeComment.MentionedID = field.NewUint32(tableName, "ep_pst_mid")
 	_episodeComment.UID = field.NewUint32(tableName, "ep_pst_uid")
 	_episodeComment.Related = field.NewUint32(tableName, "ep_pst_related")
-	_episodeComment.Dateline = field.NewUint32(tableName, "ep_pst_dateline")
+	_episodeComment.CreatedAt = field.NewUint32(tableName, "ep_pst_dateline")
 	_episodeComment.Content = field.NewString(tableName, "ep_pst_content")
 
 	_episodeComment.fillFieldMap()
@@ -45,7 +45,7 @@ type episodeComment struct {
 	MentionedID field.Uint32
 	UID         field.Uint32
 	Related     field.Uint32
-	Dateline    field.Uint32
+	CreatedAt   field.Uint32
 	Content     field.String
 
 	fieldMap map[string]field.Expr
@@ -67,7 +67,7 @@ func (e *episodeComment) updateTableName(table string) *episodeComment {
 	e.MentionedID = field.NewUint32(table, "ep_pst_mid")
 	e.UID = field.NewUint32(table, "ep_pst_uid")
 	e.Related = field.NewUint32(table, "ep_pst_related")
-	e.Dateline = field.NewUint32(table, "ep_pst_dateline")
+	e.CreatedAt = field.NewUint32(table, "ep_pst_dateline")
 	e.Content = field.NewString(table, "ep_pst_content")
 
 	e.fillFieldMap()
@@ -98,7 +98,7 @@ func (e *episodeComment) fillFieldMap() {
 	e.fieldMap["ep_pst_mid"] = e.MentionedID
 	e.fieldMap["ep_pst_uid"] = e.UID
 	e.fieldMap["ep_pst_related"] = e.Related
-	e.fieldMap["ep_pst_dateline"] = e.Dateline
+	e.fieldMap["ep_pst_dateline"] = e.CreatedAt
 	e.fieldMap["ep_pst_content"] = e.Content
 }
 
