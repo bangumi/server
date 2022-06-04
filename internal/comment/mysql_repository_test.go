@@ -49,13 +49,13 @@ func TestGet(t *testing.T) {
 	require.Equal(t, model.CommentIDType(1038), s.ID)
 }
 
-func TestMysqlRepo_GetCommentsByMentionedID(t *testing.T) {
+func TestMysqlRepo_GetComments(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
 
-	s, err := repo.GetComments(context.Background(), domain.CommentTypeSubjectTopic, 0, 0, 1)
+	s, err := repo.GetComments(context.Background(), domain.CommentTypeSubjectTopic, 1, 0, 0)
 	require.NoError(t, err)
 
 	require.True(t, len(s.Data) != 0, "cannot fetch comments")
