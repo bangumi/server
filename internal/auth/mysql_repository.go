@@ -258,7 +258,8 @@ type TokenInfo struct {
 
 func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UIDType) ([]domain.AccessToken, error) {
 	records, err := m.q.AccessToken.WithContext(ctx).
-		Where(m.q.AccessToken.UserID.Eq(strconv.FormatUint(uint64(userID), 10)), m.q.AccessToken.ExpiredAt.Gte(time.Now())).Find()
+		Where(m.q.AccessToken.UserID.Eq(strconv.FormatUint(uint64(userID), 10)),
+			m.q.AccessToken.ExpiredAt.Gte(time.Now())).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
