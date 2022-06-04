@@ -181,37 +181,7 @@ func (h Handler) GetSubjectTopics(c *fiber.Ctx) error {
 		})
 	}
 
-	topics, err := h.t.GetTopicsByObjectID(c.Context(), model.TopicTypeSubject, id)
-	if err != nil {
-		return errgo.Wrap(err, "repo.topic.GetTopicsByObjectID")
-	}
-
-	userIDs := make([]model.UIDType, 0)
-	for _, v := range topics {
-		userIDs = append(userIDs, v.UID)
-	}
-
-	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
-	if err != nil {
-		return errgo.Wrap(err, "user.GetByIDs")
-	}
-
-	response := make([]res.Topic, 0)
-	for _, v := range topics {
-		creator := userMap[v.UID]
-		response = append(response, res.Topic{
-			ID:        v.ID,
-			Title:     v.Title,
-			CreatedAt: v.CreatedAt,
-			Creator: res.Creator{
-				Username: creator.UserName,
-				Nickname: creator.NickName,
-			},
-			Replies:  v.Replies,
-			Comments: &res.Comments{},
-		})
-	}
-	return c.JSON(response)
+	return h.listTopics(c, model.TopicTypeSubject, id)
 }
 
 func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
@@ -264,13 +234,9 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 		})
 	}
 
-	userIDs := make([]model.UIDType, 0)
-	for _, v := range topic.Comments.Data {
-		userIDs = append(userIDs, v.UID)
-	}
-	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(append(userIDs, topic.UID)...)...)
+	userMap, err := h.getUserMapOfTopics(c, topic)
 	if err != nil {
-		return errgo.Wrap(err, "user.GetByIDs")
+		return err
 	}
 
 	topic.Comments.Data = model.ConvertModelCommentsToTree(topic.Comments.Data, 0)

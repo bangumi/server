@@ -12,18 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package oauth
 
-import (
-	"context"
+import "context"
 
-	"github.com/bangumi/server/internal/model"
-)
+type Manager interface {
+	GetClientByID(ctx context.Context, clientIDs ...string) (map[string]Client, error)
+}
 
-type CommentRepo interface {
-	Get(ctx context.Context, commentType model.CommentType, id model.CommentIDType) (model.Comment, error)
-
-	GetCommentsByMentionedID(
-		ctx context.Context, commentType model.CommentType, limit int, offset int, id uint32,
-	) (model.Comments, error)
+type Client struct {
+	ID          string
+	Secret      string
+	RedirectURI string
+	GrantTypes  string
+	Scope       string
+	AppName     string
+	UserID      uint32
+	AppID       uint32
 }

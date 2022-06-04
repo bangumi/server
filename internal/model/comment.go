@@ -17,21 +17,21 @@ package model
 import "time"
 
 type Comment struct {
-	ID          CommentIDType
-	MentionedID uint32
-	UID         uint32
-	Related     uint32
 	CreatedAt   time.Time
-	State       uint32
 	Content     string
 	Replies     []Comment
+	UID         uint32
+	Related     uint32
+	State       uint32
+	ID          CommentIDType
+	MentionedID uint32
 }
 
 type Comments struct {
+	Data   []Comment
 	Total  uint32
 	Limit  uint32
 	Offset uint32
-	Data   []Comment
 }
 
 func ConvertModelCommentsToTree(comments []Comment, related uint32) []Comment {

@@ -15,6 +15,7 @@ func Use(db *gorm.DB) *Query {
 	return &Query{
 		db:                  db,
 		AccessToken:         newAccessToken(db),
+		App:                 newApp(db),
 		Cast:                newCast(db),
 		Character:           newCharacter(db),
 		CharacterComment:    newCharacterComment(db),
@@ -27,6 +28,7 @@ func Use(db *gorm.DB) *Query {
 		IndexComment:        newIndexComment(db),
 		IndexSubject:        newIndexSubject(db),
 		Member:              newMember(db),
+		OAuthClient:         newOAuthClient(db),
 		Person:              newPerson(db),
 		PersonField:         newPersonField(db),
 		PersonSubjects:      newPersonSubjects(db),
@@ -48,6 +50,7 @@ type Query struct {
 	db *gorm.DB
 
 	AccessToken         accessToken
+	App                 app
 	Cast                cast
 	Character           character
 	CharacterComment    characterComment
@@ -60,6 +63,7 @@ type Query struct {
 	IndexComment        indexComment
 	IndexSubject        indexSubject
 	Member              member
+	OAuthClient         oAuthClient
 	Person              person
 	PersonField         personField
 	PersonSubjects      personSubjects
@@ -82,6 +86,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:                  db,
 		AccessToken:         q.AccessToken.clone(db),
+		App:                 q.App.clone(db),
 		Cast:                q.Cast.clone(db),
 		Character:           q.Character.clone(db),
 		CharacterComment:    q.CharacterComment.clone(db),
@@ -94,6 +99,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		IndexComment:        q.IndexComment.clone(db),
 		IndexSubject:        q.IndexSubject.clone(db),
 		Member:              q.Member.clone(db),
+		OAuthClient:         q.OAuthClient.clone(db),
 		Person:              q.Person.clone(db),
 		PersonField:         q.PersonField.clone(db),
 		PersonSubjects:      q.PersonSubjects.clone(db),
@@ -113,6 +119,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 
 type queryCtx struct {
 	AccessToken         accessTokenDo
+	App                 appDo
 	Cast                castDo
 	Character           characterDo
 	CharacterComment    characterCommentDo
@@ -125,6 +132,7 @@ type queryCtx struct {
 	IndexComment        indexCommentDo
 	IndexSubject        indexSubjectDo
 	Member              memberDo
+	OAuthClient         oAuthClientDo
 	Person              personDo
 	PersonField         personFieldDo
 	PersonSubjects      personSubjectsDo
@@ -144,6 +152,7 @@ type queryCtx struct {
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		AccessToken:         *q.AccessToken.WithContext(ctx),
+		App:                 *q.App.WithContext(ctx),
 		Cast:                *q.Cast.WithContext(ctx),
 		Character:           *q.Character.WithContext(ctx),
 		CharacterComment:    *q.CharacterComment.WithContext(ctx),
@@ -156,6 +165,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		IndexComment:        *q.IndexComment.WithContext(ctx),
 		IndexSubject:        *q.IndexSubject.WithContext(ctx),
 		Member:              *q.Member.WithContext(ctx),
+		OAuthClient:         *q.OAuthClient.WithContext(ctx),
 		Person:              *q.Person.WithContext(ctx),
 		PersonField:         *q.PersonField.WithContext(ctx),
 		PersonSubjects:      *q.PersonSubjects.WithContext(ctx),

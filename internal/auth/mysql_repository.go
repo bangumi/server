@@ -305,6 +305,7 @@ func convertAccessToken(t *dao.AccessToken) domain.AccessToken {
 		CreatedAt: createdAt,
 		Name:      name,
 		UserID:    model.UIDType(v),
+		ClientID:  t.ClientID,
 		ID:        t.ID,
 	}
 }

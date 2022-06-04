@@ -12,18 +12,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
-
-import (
-	"context"
-
-	"github.com/bangumi/server/internal/model"
-)
-
-type CommentRepo interface {
-	Get(ctx context.Context, commentType model.CommentType, id model.CommentIDType) (model.Comment, error)
-
-	GetCommentsByMentionedID(
-		ctx context.Context, commentType model.CommentType, limit int, offset int, id uint32,
-	) (model.Comments, error)
-}
+package oauth_test

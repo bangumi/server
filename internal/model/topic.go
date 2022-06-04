@@ -17,14 +17,14 @@ package model
 import "time"
 
 type Topic struct {
-	ID        TopicIDType
-	ObjectID  uint32
-	UID       uint32
-	Title     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Replies   uint32
+	Title     string
 	Comments  Comments
+	ID        TopicIDType
+	UID       uint32
+	Replies   uint32
+	ObjectID  uint32
 	State     bool
 	Display   bool
 }

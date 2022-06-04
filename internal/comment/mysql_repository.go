@@ -17,7 +17,6 @@ package comment
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"go.uber.org/zap"
@@ -39,7 +38,9 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CommentRepo, error) {
 	return mysqlRepo{q: q, log: log.Named("comment.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, commentType model.CommentType, id model.CommentIDType) (model.Comment, error) {
+func (r mysqlRepo) Get(
+	ctx context.Context, commentType model.CommentType, id model.CommentIDType,
+) (model.Comment, error) {
 	var (
 		comment interface{}
 		err     error
@@ -122,7 +123,9 @@ func ConvertDao(in interface{}) (model.Comment, error) {
 	}
 }
 
-func (r mysqlRepo) GetCommentsByMentionedID(ctx context.Context, commentType model.CommentType, limit int, offset int, id uint32) (model.Comments, error) {
+func (r mysqlRepo) GetCommentsByMentionedID(
+	ctx context.Context, commentType model.CommentType, limit int, offset int, id uint32,
+) (model.Comments, error) {
 	var (
 		comments interface{}
 		total    int64
@@ -156,22 +159,29 @@ func (r mysqlRepo) GetCommentsByMentionedID(ctx context.Context, commentType mod
 		return model.Comments{}, errgo.Wrap(err, "dal")
 	}
 
-	result := make([]model.Comment, 0)
-	switch list := comments.(type) {
-	case []*dao.SubjectTopicComment:
-		for _, v := range list {
-			if comment, e := ConvertDao(v); e == nil {
-				result = append(result, comment)
-			} else {
-				fmt.Println(e)
-			}
-		}
-	}
-
 	return model.Comments{
 		Total:  uint32(total),
 		Limit:  uint32(limit),
 		Offset: uint32(offset),
-		Data:   result,
+		Data:   convertModelComments(comments),
 	}, nil
+}
+
+func convertModelComments(in interface{}) []model.Comment {
+	result := make([]model.Comment, 0)
+	switch list := in.(type) {
+	case []*dao.SubjectTopicComment:
+		for _, v := range list {
+			if comment, e := ConvertDao(v); e == nil {
+				result = append(result, comment)
+			}
+		}
+	case []*dao.GroupTopicComment:
+		for _, v := range list {
+			if comment, e := ConvertDao(v); e == nil {
+				result = append(result, comment)
+			}
+		}
+	}
+	return result
 }

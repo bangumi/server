@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -34,6 +35,9 @@ func (s service) Get(
 	ctx context.Context, topicType model.TopicType, limit int, offset int, id model.TopicIDType,
 ) (model.Topic, error) {
 	topic, err := s.repo.Get(ctx, topicType, limit, offset, id)
+	if err != nil {
+		return model.Topic{}, errgo.Wrap(err, "TopicRepo.Get")
+	}
 
 	commentType := map[model.TopicType]model.CommentType{
 		model.TopicTypeGroup:   model.CommentTypeGroupTopic,
@@ -42,12 +46,16 @@ func (s service) Get(
 
 	comments, err := s.m.GetCommentsByMentionedID(ctx, commentType, limit, offset, topic.ID)
 	if err != nil {
-		return model.Topic{}, err
+		return model.Topic{}, errgo.Wrap(err, "CommentRepo.GetCommentsByMentionedID")
 	}
 	topic.Comments = comments
 	return topic, nil
 }
 
 func (s service) GetTopicsByObjectID(ctx context.Context, topicType model.TopicType, id uint32) ([]model.Topic, error) {
-	return s.repo.GetTopicsByObjectID(ctx, topicType, id)
+	topics, err := s.repo.GetTopicsByObjectID(ctx, topicType, id)
+	if err != nil {
+		return nil, errgo.Wrap(err, "TopicRepo.GetTopicsByObjectID")
+	}
+	return topics, nil
 }

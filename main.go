@@ -34,6 +34,7 @@ import (
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
+	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/subject"
@@ -77,6 +78,8 @@ func start() error {
 			config.NewAppConfig, logger.Copy, metrics.NewScope,
 
 			query.Use, cache.NewRedisCache,
+
+			oauth.NewMysqlRepo,
 
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo,

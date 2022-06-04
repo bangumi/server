@@ -107,35 +107,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 			Details: util.DetailFromRequest(c),
 		})
 	}
-
-	comments, err := h.m.GetCommentsByMentionedID(c.Context(), model.CommentEpisode, page.Limit, page.Offset, id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return c.Status(http.StatusNotFound).JSON(res.Error{
-				Title:   "Not Found",
-				Details: util.DetailFromRequest(c),
-			})
-		}
-		return errgo.Wrap(err, "Comment.GetCommentsByMentionedID")
-	}
-
-	userIDs := make([]model.UIDType, 0)
-	for _, v := range comments.Data {
-		userIDs = append(userIDs, v.UID)
-	}
-
-	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
-	if err != nil {
-		return errgo.Wrap(err, "user.GetByIDs")
-	}
-	comments.Data = model.ConvertModelCommentsToTree(comments.Data, 0)
-
-	return c.JSON(res.Comments{
-		Total:  comments.Total,
-		Limit:  comments.Limit,
-		Offset: comments.Offset,
-		Data:   convertModelTopicComments(comments.Data, userMap),
-	})
+	return h.listComments(c, page, model.CommentEpisode, id)
 }
 
 // first try to read from cache, then fallback to reading from database.

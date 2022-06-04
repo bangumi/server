@@ -31,6 +31,7 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/rate"
@@ -57,6 +58,7 @@ func New(
 	rateLimit rate.Manager,
 	log *zap.Logger,
 	engine frontend.TemplateEngine,
+	oauth oauth.Manager,
 ) (Handler, error) {
 
 	validate, trans, err := getValidator()
@@ -64,10 +66,12 @@ func New(
 		return Handler{}, err
 	}
 
+	log = log.Named("web.handler")
+
 	return Handler{
 		cfg:                  cfg,
 		cache:                cache,
-		log:                  log.Named("web.handler"),
+		log:                  log,
 		rateLimit:            rateLimit,
 		session:              session,
 		p:                    p,
@@ -84,6 +88,8 @@ func New(
 		v:                    validate,
 		validatorTranslation: trans,
 
+		skip1Log: log.WithOptions(zap.AddCallerSkip(1)),
+		oauth:    oauth,
 		template: engine,
 		buffPool: buffer.NewPool(),
 	}, nil
@@ -106,7 +112,9 @@ type Handler struct {
 	m                    domain.CommentRepo
 	t                    domain.TopicService
 	buffPool             buffer.Pool
+	oauth                oauth.Manager
 	log                  *zap.Logger
+	skip1Log             *zap.Logger
 	v                    *validator.Validate
 	template             frontend.TemplateEngine
 	cfg                  config.AppConfig
