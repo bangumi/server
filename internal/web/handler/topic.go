@@ -15,12 +15,39 @@
 package handler
 
 import (
+	"errors"
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
+	"github.com/bangumi/server/internal/web/util"
 )
+
+func (h Handler) getTopic(c *fiber.Ctx, id model.TopicIDType) (model.Topic, error) {
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	topic, err := h.t.Get(c.Context(), model.TopicTypeSubject, page.Limit, page.Offset, id)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
+				Title:   "Not Found",
+				Details: util.DetailFromRequest(c),
+			})
+		}
+		return model.Topic{}, errgo.Wrap(err, "Topic.Get")
+	}
+	return topic, nil
+}
 
 func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[uint32]model.User, error) {
 	userIDs := make([]model.UIDType, 0)
@@ -59,9 +86,53 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType model.TopicType, id uint32) 
 				Username: creator.UserName,
 				Nickname: creator.NickName,
 			},
-			Replies:  v.Replies,
-			Comments: &res.Comments{},
+			Replies: v.Replies,
 		})
 	}
 	return c.JSON(response)
+}
+
+func (h Handler) getResTopic(c *fiber.Ctx, topic model.Topic) error {
+	userMap, err := h.getUserMapOfTopics(c, topic)
+	if err != nil {
+		return err
+	}
+
+	creator := userMap[topic.UID]
+	topic.Comments.Data = model.ConvertModelCommentsToTree(topic.Comments.Data, 0)
+	response := res.Topic{
+		ID:        topic.ID,
+		Title:     topic.Title,
+		CreatedAt: topic.CreatedAt,
+		Creator: res.Creator{
+			Username: creator.UserName,
+			Nickname: creator.NickName,
+		},
+		Replies: topic.Replies,
+		Comments: &res.Comments{
+			Total:  topic.Comments.Limit,
+			Limit:  topic.Comments.Limit,
+			Offset: topic.Comments.Offset,
+			Data:   convertModelTopicComments(topic.Comments.Data, userMap),
+		},
+	}
+	return c.JSON(response)
+}
+
+func convertModelTopicComments(comments []model.Comment, userMap map[uint32]model.User) []res.Comment {
+	replies := make([]res.Comment, 0)
+	for _, v := range comments {
+		creator := userMap[v.UID]
+		replies = append(replies, res.Comment{
+			ID:        v.ID,
+			Text:      v.Content,
+			CreatedAt: v.CreatedAt,
+			Creator: res.Creator{
+				Username: creator.UserName,
+				Nickname: creator.NickName,
+			},
+			Replies: convertModelTopicComments(v.Replies, userMap),
+		})
+	}
+	return replies
 }

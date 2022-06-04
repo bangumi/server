@@ -51,7 +51,7 @@ func (r mysqlRepo) Get(
 	case model.TopicTypeSubject:
 		topic, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.ID.Eq(id)).First()
 	default:
-		return model.Topic{}, errors.New("topic type not support")
+		return model.Topic{}, errUnsupportTopicType
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -78,7 +78,7 @@ func (r mysqlRepo) GetTopicsByObjectID(
 	case model.TopicTypeSubject:
 		topics, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).Find()
 	default:
-		return nil, errors.New("topic type not support")
+		return nil, errUnsupportTopicType
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -89,23 +89,28 @@ func (r mysqlRepo) GetTopicsByObjectID(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	result := make([]model.Topic, 0)
-	switch list := topics.(type) {
+	return convertModelTopics(topics), nil
+}
+
+var errUnsupportTopicType = errors.New("topic type not support")
+
+func convertModelTopics(in interface{}) []model.Topic {
+	topics := make([]model.Topic, 0)
+	switch list := in.(type) {
 	case []*dao.SubjectTopic:
 		for _, v := range list {
 			if topic, e := ConvertDao(v); e == nil {
-				result = append(result, topic)
+				topics = append(topics, topic)
 			}
 		}
 	case []*dao.GroupTopic:
 		for _, v := range list {
 			if topic, e := ConvertDao(v); e == nil {
-				result = append(result, topic)
+				topics = append(topics, topic)
 			}
 		}
 	}
-
-	return result, nil
+	return topics
 }
 
 func ConvertDao(in interface{}) (model.Topic, error) {
@@ -135,6 +140,6 @@ func ConvertDao(in interface{}) (model.Topic, error) {
 			Display:   v.Display,
 		}, nil
 	default:
-		return model.Topic{}, errors.New("topic type not support")
+		return model.Topic{}, errUnsupportTopicType
 	}
 }

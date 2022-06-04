@@ -110,6 +110,29 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 	return c.JSON(r)
 }
 
+func (h Handler) GetIndexComments(c *fiber.Ctx) error {
+	user := h.getHTTPAccessor(c)
+
+	id, err := parseIndexID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	r, ok, err := h.getIndexWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok || r.NSFW && !user.AllowNSFW() {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	return h.listComments(c, model.CommentIndex, id)
+}
+
 func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 	user := h.getHTTPAccessor(c)
 

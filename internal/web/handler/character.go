@@ -68,6 +68,39 @@ func (h Handler) GetCharacter(c *fiber.Ctx) error {
 	return c.JSON(r)
 }
 
+func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
+	u := h.getHTTPAccessor(c)
+	id, err := parseCharacterID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	if r.Redirect != 0 {
+		return c.Redirect("/v0/characters/" + strconv.FormatUint(uint64(r.Redirect), 10))
+	}
+
+	if r.NSFW && !u.AllowNSFW() {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	return h.listComments(c, model.CommentCharacter, id)
+}
+
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
 func (h Handler) getCharacterWithCache(

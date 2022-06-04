@@ -191,37 +191,15 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 	if err != nil || topicID == 0 {
 		return errMissingTopicID
 	}
-
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	topic, err := h.getTopic(c, topicID)
 	if err != nil {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return err
 	}
 
-	topic, err := h.t.Get(c.Context(), model.TopicTypeSubject, page.Limit, page.Offset, topicID)
+	subjectID, err := getExpectSubjectID(c, topic)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return c.Status(http.StatusNotFound).JSON(res.Error{
-				Title:   "Not Found",
-				Details: util.DetailFromRequest(c),
-			})
-		}
-		return errgo.Wrap(err, "Topic.Get")
+		return err
 	}
-
-	var subjectID model.SubjectIDType
-	subjectID, err = parseSubjectID(c.Params("id"))
-	if err != nil || subjectID == 0 {
-		subjectID = topic.ObjectID
-	} else if subjectID != topic.ObjectID {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
-	}
-
 	r, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
 	if err != nil {
 		return err
@@ -234,51 +212,20 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 		})
 	}
 
-	userMap, err := h.getUserMapOfTopics(c, topic)
-	if err != nil {
-		return err
-	}
-
-	topic.Comments.Data = model.ConvertModelCommentsToTree(topic.Comments.Data, 0)
-	return c.JSON(convertModelTopic(topic, userMap))
+	return h.getResTopic(c, topic)
 }
 
-func convertModelTopic(topic model.Topic, userMap map[uint32]model.User) res.Topic {
-	creator := userMap[topic.UID]
-	return res.Topic{
-		ID:        topic.ID,
-		Title:     topic.Title,
-		CreatedAt: topic.CreatedAt,
-		Creator: res.Creator{
-			Username: creator.UserName,
-			Nickname: creator.NickName,
-		},
-		Replies: topic.Replies,
-		Comments: &res.Comments{
-			Total:  topic.Comments.Limit,
-			Limit:  topic.Comments.Limit,
-			Offset: topic.Comments.Offset,
-			Data:   convertModelTopicComments(topic.Comments.Data, userMap),
-		},
-	}
-}
-
-func convertModelTopicComments(comments []model.Comment, userMap map[uint32]model.User) []res.Comment {
-	replies := make([]res.Comment, 0)
-	for _, v := range comments {
-		creator := userMap[v.UID]
-		replies = append(replies, res.Comment{
-			ID:        v.ID,
-			Text:      v.Content,
-			CreatedAt: v.CreatedAt,
-			Creator: res.Creator{
-				Username: creator.UserName,
-				Nickname: creator.NickName,
-			},
-			Replies: convertModelTopicComments(v.Replies, userMap),
+func getExpectSubjectID(c *fiber.Ctx, topic model.Topic) (model.SubjectIDType, error) {
+	subjectID, err := parseSubjectID(c.Params("id"))
+	if err != nil || subjectID == 0 {
+		subjectID = topic.ObjectID
+	} else if subjectID != topic.ObjectID {
+		return subjectID, c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
 		})
 	}
-	return replies
+	return subjectID, nil
 }
 
 func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {

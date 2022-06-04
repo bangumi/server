@@ -57,7 +57,7 @@ func (r mysqlRepo) Get(
 	case model.CommentEpisode:
 		comment, err = r.q.EpisodeComment.WithContext(ctx).Where(r.q.EpisodeComment.ID.Eq(id)).First()
 	default:
-		return model.Comment{}, errors.New("comment type not support")
+		return model.Comment{}, errUnsupportCommentType
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -70,6 +70,8 @@ func (r mysqlRepo) Get(
 
 	return ConvertDao(comment)
 }
+
+var errUnsupportCommentType = errors.New("comment type not support")
 
 func ConvertDao(in interface{}) (model.Comment, error) {
 	switch v := in.(type) {
@@ -119,7 +121,7 @@ func ConvertDao(in interface{}) (model.Comment, error) {
 			Content:     v.Content,
 		}, nil
 	default:
-		return model.Comment{}, errors.New("comment type not support")
+		return model.Comment{}, errUnsupportCommentType
 	}
 }
 
@@ -148,7 +150,7 @@ func (r mysqlRepo) GetCommentsByMentionedID(
 		comments, total, err = r.q.EpisodeComment.WithContext(ctx).
 			Where(r.q.EpisodeComment.MentionedID.Eq(id)).FindByPage(offset, limit)
 	default:
-		return model.Comments{}, errors.New("comment type not support")
+		return model.Comments{}, errUnsupportCommentType
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -168,20 +170,20 @@ func (r mysqlRepo) GetCommentsByMentionedID(
 }
 
 func convertModelComments(in interface{}) []model.Comment {
-	result := make([]model.Comment, 0)
+	comments := make([]model.Comment, 0)
 	switch list := in.(type) {
 	case []*dao.SubjectTopicComment:
 		for _, v := range list {
 			if comment, e := ConvertDao(v); e == nil {
-				result = append(result, comment)
+				comments = append(comments, comment)
 			}
 		}
 	case []*dao.GroupTopicComment:
 		for _, v := range list {
 			if comment, e := ConvertDao(v); e == nil {
-				result = append(result, comment)
+				comments = append(comments, comment)
 			}
 		}
 	}
-	return result
+	return comments
 }

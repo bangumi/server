@@ -27,7 +27,15 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
-func (h Handler) listComments(c *fiber.Ctx, page pageQuery, commentType model.CommentType, id uint32) error {
+func (h Handler) listComments(c *fiber.Ctx, commentType model.CommentType, id uint32) error {
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
 	comments, err := h.m.GetCommentsByMentionedID(c.Context(), commentType, page.Limit, page.Offset, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {

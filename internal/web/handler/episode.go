@@ -71,14 +71,6 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
-	if err != nil {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
-	}
-
 	id, err := parseEpisodeID(c.Params("id"))
 	if err != nil {
 		return err
@@ -107,7 +99,8 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 			Details: util.DetailFromRequest(c),
 		})
 	}
-	return h.listComments(c, page, model.CommentEpisode, id)
+
+	return h.listComments(c, model.CommentEpisode, id)
 }
 
 // first try to read from cache, then fallback to reading from database.
