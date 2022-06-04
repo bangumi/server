@@ -45,7 +45,7 @@ func (_m *MockRepo) Create(ctx context.Context, key string, userID uint32, regTi
 	return r0, r1
 }
 
-// MockRepo_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+// MockRepo_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateAccessToken'
 type MockRepo_Create_Call struct {
 	*mock.Call
 }
@@ -56,7 +56,7 @@ type MockRepo_Create_Call struct {
 //  - userID uint32
 //  - regTime time.Time
 func (_e *MockRepo_Expecter) Create(ctx interface{}, key interface{}, userID interface{}, regTime interface{}) *MockRepo_Create_Call {
-	return &MockRepo_Create_Call{Call: _e.mock.On("Create", ctx, key, userID, regTime)}
+	return &MockRepo_Create_Call{Call: _e.mock.On("CreateAccessToken", ctx, key, userID, regTime)}
 }
 
 func (_c *MockRepo_Create_Call) Run(run func(ctx context.Context, key string, userID uint32, regTime time.Time)) *MockRepo_Create_Call {

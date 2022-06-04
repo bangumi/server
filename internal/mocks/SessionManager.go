@@ -52,7 +52,7 @@ func (_m *SessionManager) Create(ctx context.Context, a domain.Auth) (string, se
 	return r0, r1, r2
 }
 
-// SessionManager_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+// SessionManager_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateAccessToken'
 type SessionManager_Create_Call struct {
 	*mock.Call
 }
@@ -61,7 +61,7 @@ type SessionManager_Create_Call struct {
 //  - ctx context.Context
 //  - a domain.Auth
 func (_e *SessionManager_Expecter) Create(ctx interface{}, a interface{}) *SessionManager_Create_Call {
-	return &SessionManager_Create_Call{Call: _e.mock.On("Create", ctx, a)}
+	return &SessionManager_Create_Call{Call: _e.mock.On("CreateAccessToken", ctx, a)}
 }
 
 func (_c *SessionManager_Create_Call) Run(run func(ctx context.Context, a domain.Auth)) *SessionManager_Create_Call {

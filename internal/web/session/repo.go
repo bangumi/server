@@ -90,7 +90,7 @@ func (r mysqlRepo) Create(ctx context.Context, key string, userID model.UIDType,
 
 	err = tx.WebSession.WithContext(ctx).Create(&webSession)
 	if err != nil {
-		return Session{}, errgo.Wrap(err, "orm.Tx.Create")
+		return Session{}, errgo.Wrap(err, "orm.Tx.CreateAccessToken")
 	}
 
 	err = tx.Commit()

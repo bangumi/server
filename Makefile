@@ -52,7 +52,9 @@ internal/mocks/CaptchaManager.go: internal/web/captcha/manager.go
 internal/mocks/RateLimiter.go: internal/web/rate/new.go
 	mockery --dir ./internal/web/rate --name Manager --filename RateLimiter.go --structname RateLimiter $(MOCKERY_ARGS)
 
-gen: ./dal/query/gen.go mocks
+gorm: ./dal/query/gen.go
+
+gen: gorm mocks
 
 # don't enable `-race` in test because it require cgo, only enable it at coverage.
 test: .bin/gotestfmt.exe
@@ -86,4 +88,4 @@ clean::
 	rm -rf ./out
 	rm -rf ./dist ./.bin
 
-.PHONY:: install help build test test-all bench coverage clean gen lint mocks
+.PHONY:: install help build test test-all bench coverage clean gen lint mocks gorm

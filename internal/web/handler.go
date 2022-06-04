@@ -95,10 +95,15 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
 
+	private.Post("/access-tokens", h.CreatePersonalAccessToken)
+	private.Delete("/access-tokens", h.DeletePersonalAccessToken)
+
 	private.Get("/me", addMetrics(h.GetCurrentUser))
 
 	privateHTML := app.Group("/demo/", origin.New(config.FrontendOrigin), h.SessionAuthMiddleware)
 	privateHTML.Get("/login", h.PageLogin)
+	privateHTML.Get("/access-token", h.PageListAccessToken)
+	privateHTML.Get("/access-token/create", h.PageCreateAccessToken)
 
 	app.Use("/static/", filesystem.New(filesystem.Config{
 		PathPrefix: "static",
