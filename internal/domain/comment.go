@@ -23,8 +23,8 @@ import (
 type CommentRepo interface {
 	Get(ctx context.Context, commentType CommentType, id model.CommentIDType) (model.Comment, error)
 
-	GetCommentsByMentionedID(
-		ctx context.Context, commentType CommentType, limit int, offset int, id uint32,
+	GetComments(
+		ctx context.Context, commentType CommentType, id uint32, limit int, offset int,
 	) (model.Comments, error)
 }
 

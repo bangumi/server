@@ -36,7 +36,7 @@ func (h Handler) getTopic(c *fiber.Ctx, id model.TopicIDType) (model.Topic, erro
 		})
 	}
 
-	topic, err := h.t.Get(c.Context(), domain.TopicTypeSubject, page.Limit, page.Offset, id)
+	topic, err := h.t.Get(c.Context(), domain.TopicTypeSubject, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
@@ -65,7 +65,7 @@ func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[ui
 }
 
 func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32) error {
-	topics, err := h.t.GetTopicsByObjectID(c.Context(), topicType, id)
+	topics, err := h.t.GetTopics(c.Context(), topicType, id)
 	if err != nil {
 		return errgo.Wrap(err, "repo.topic.GetTopicsByObjectID")
 	}

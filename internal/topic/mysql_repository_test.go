@@ -49,13 +49,13 @@ func TestGet(t *testing.T) {
 	require.Equal(t, model.TopicIDType(1), s.ID)
 }
 
-func TestMysqlRepo_GetTopicsByObjectID(t *testing.T) {
+func TestMysqlRepo_GetTopics(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
 
-	_, err := repo.GetTopicsByObjectID(context.Background(), domain.TopicTypeSubject, 2)
+	_, err := repo.GetTopics(context.Background(), domain.TopicTypeSubject, 2)
 	require.NoError(t, err)
 }
 

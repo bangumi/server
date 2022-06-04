@@ -36,7 +36,7 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 		})
 	}
 
-	comments, err := h.m.GetCommentsByMentionedID(c.Context(), commentType, page.Limit, page.Offset, id)
+	comments, err := h.m.GetComments(c.Context(), commentType, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return c.Status(http.StatusNotFound).JSON(res.Error{

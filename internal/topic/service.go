@@ -32,9 +32,9 @@ type service struct {
 }
 
 func (s service) Get(
-	ctx context.Context, topicType domain.TopicType, limit int, offset int, id model.TopicIDType,
+	ctx context.Context, topicType domain.TopicType, id model.TopicIDType, limit int, offset int,
 ) (model.Topic, error) {
-	topic, err := s.repo.Get(ctx, topicType, limit, offset, id)
+	topic, err := s.repo.Get(ctx, topicType, id, limit, offset)
 	if err != nil {
 		return model.Topic{}, errgo.Wrap(err, "TopicRepo.Get")
 	}
@@ -44,7 +44,7 @@ func (s service) Get(
 		domain.TopicTypeSubject: domain.CommentTypeSubjectTopic,
 	}[topicType]
 
-	comments, err := s.m.GetCommentsByMentionedID(ctx, commentType, limit, offset, topic.ID)
+	comments, err := s.m.GetComments(ctx, commentType, topic.ID, limit, offset)
 	if err != nil {
 		return model.Topic{}, errgo.Wrap(err, "CommentRepo.GetCommentsByMentionedID")
 	}
@@ -52,10 +52,10 @@ func (s service) Get(
 	return topic, nil
 }
 
-func (s service) GetTopicsByObjectID(
+func (s service) GetTopics(
 	ctx context.Context, topicType domain.TopicType, id uint32,
 ) ([]model.Topic, error) {
-	topics, err := s.repo.GetTopicsByObjectID(ctx, topicType, id)
+	topics, err := s.repo.GetTopics(ctx, topicType, id)
 	if err != nil {
 		return nil, errgo.Wrap(err, "TopicRepo.GetTopicsByObjectID")
 	}

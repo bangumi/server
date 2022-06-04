@@ -39,7 +39,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TopicRepo, error) {
 }
 
 func (r mysqlRepo) Get(
-	ctx context.Context, topicType domain.TopicType, limit int, offset int, id model.TopicIDType,
+	ctx context.Context, topicType domain.TopicType, id model.TopicIDType, limit int, offset int,
 ) (model.Topic, error) {
 	var (
 		topic interface{}
@@ -65,7 +65,7 @@ func (r mysqlRepo) Get(
 	return ConvertDao(topic)
 }
 
-func (r mysqlRepo) GetTopicsByObjectID(
+func (r mysqlRepo) GetTopics(
 	ctx context.Context, topicType domain.TopicType, id uint32,
 ) ([]model.Topic, error) {
 	var (

@@ -125,8 +125,8 @@ func ConvertDao(in interface{}) (model.Comment, error) {
 	}
 }
 
-func (r mysqlRepo) GetCommentsByMentionedID(
-	ctx context.Context, commentType domain.CommentType, limit int, offset int, id uint32,
+func (r mysqlRepo) GetComments(
+	ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int,
 ) (model.Comments, error) {
 	var (
 		comments interface{}

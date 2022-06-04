@@ -21,15 +21,15 @@ import (
 )
 
 type TopicRepo interface {
-	Get(ctx context.Context, topicType TopicType, limit int, offset int, id model.TopicIDType) (model.Topic, error)
+	Get(ctx context.Context, topicType TopicType, id model.TopicIDType, limit int, offset int) (model.Topic, error)
 
-	GetTopicsByObjectID(ctx context.Context, topicType TopicType, id uint32) ([]model.Topic, error)
+	GetTopics(ctx context.Context, topicType TopicType, id uint32) ([]model.Topic, error)
 }
 
 type TopicService interface {
-	Get(ctx context.Context, topicType TopicType, limit int, offset int, id model.TopicIDType) (model.Topic, error)
+	Get(ctx context.Context, topicType TopicType, id model.TopicIDType, limit int, offset int) (model.Topic, error)
 
-	GetTopicsByObjectID(ctx context.Context, topicType TopicType, id uint32) ([]model.Topic, error)
+	GetTopics(ctx context.Context, topicType TopicType, id uint32) ([]model.Topic, error)
 }
 
 type TopicType uint32
