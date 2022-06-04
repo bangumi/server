@@ -139,7 +139,108 @@ paths:
                 $ref: "#/components/schemas/User"
         "401":
           description: 用户未登录或者 session 已失效
-
+  "/p/subjects/{subject_id}/topics":
+    get:
+      tags:
+        - 条目
+        - 讨论
+      summary: 获取条目全部讨论
+      description: cache with 300s
+      operationId: getSubjectTopicsById
+      parameters:
+        - required: true
+          schema:
+            title: Subject ID
+            minimum: 0
+            type: integer
+          name: subject_id
+          in: path
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Topic"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+  "/p/subjects/{subject_id}/topics/{topic_id}":
+    get:
+      tags:
+        - 条目
+        - 讨论
+        - 回复
+      summary: 获取条目讨论内容
+      description: cache with 300s
+      operationId: getSubjectTopicById
+      parameters:
+        - required: true
+          description: 可以填`-`
+          schema:
+            title: Subject ID
+            minimum: 0
+            type: integer
+          name: subject_id
+          in: path
+        - required: true
+          schema:
+            title: Topic ID
+            minimum: 0
+            type: integer
+          name: topic_id
+          in: path
+        - required: false
+          schema:
+            title: Limit
+            maximum: 200
+            minimum: 0
+            type: integer
+            default: 100
+          name: limit
+          in: query
+        - required: false
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Topic"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
 components:
   schemas:
     User:
@@ -148,6 +249,92 @@ components:
       $ref: "./components/avatar.yaml"
     ErrorDetail:
       $ref: "./components/error_detail.yaml"
+    Topic:
+      title: Topic
+      required:
+        - id
+        - replies
+        - title
+        - created_at
+        - creator
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+        replies:
+          title: Replies Count
+          type: integer
+        title:
+          title: Title
+          type: string
+        creator:
+          "$ref": "#/components/schemas/Creator"
+        created_at:
+          title: Created At
+          type: string
+          format: date-time
+        comments:
+          "$ref": "#/components/schemas/Comments"
+    Comments:
+      title: Comments
+      required:
+        - data
+        - total
+        - limit
+        - offset
+      type: object
+      properties:
+        data:
+          title: Comment Array
+          type: array
+          items:
+            "$ref": "#/components/schemas/Comment"
+          default: []
+        total:
+          title: Total
+          type: integer
+        limit:
+          title: Limit
+          type: integer
+        offset:
+          title: Offset
+          type: integer
+    Comment:
+      title: Comment
+      required:
+        - id
+        - text
+        - created_at
+        - creator
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+        text:
+          title: Content Text
+          type: string
+        creator:
+          "$ref": "#/components/schemas/Creator"
+        created_at:
+          title: Created At
+          type: string
+          format: date-time
+    Creator:
+      title: Creator
+      required:
+        - username
+        - nickname
+      type: object
+      properties:
+        username:
+          title: Username
+          type: string
+        nickname:
+          title: Nickname
+          type: string
+      description: 意义同<a href="#model-Me">Me</a>
   securitySchemes:
     CookiesSession:
       name: sessionID

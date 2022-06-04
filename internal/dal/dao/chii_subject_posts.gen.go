@@ -13,7 +13,7 @@ type SubjectTopicComment struct {
 	UID         uint32 `gorm:"column:sbj_pst_uid;type:mediumint(8) unsigned;not null;index:sbj_pst_uid,priority:1" json:"sbj_pst_uid"`
 	Related     uint32 `gorm:"column:sbj_pst_related;type:mediumint(8) unsigned;not null;index:sbj_pst_related,priority:1" json:"sbj_pst_related"`
 	Content     string `gorm:"column:sbj_pst_content;type:mediumtext;not null" json:"sbj_pst_content"`
-	State       bool   `gorm:"column:sbj_pst_state;type:tinyint(1) unsigned;not null" json:"sbj_pst_state"`
+	State       uint8  `gorm:"column:sbj_pst_state;type:tinyint(1) unsigned;not null" json:"sbj_pst_state"`
 	CreatedAt   uint32 `gorm:"column:sbj_pst_dateline;type:int(10) unsigned;not null" json:"sbj_pst_dateline"`
 }
 

@@ -30,7 +30,7 @@ func newSubjectTopicComment(db *gorm.DB) subjectTopicComment {
 	_subjectTopicComment.UID = field.NewUint32(tableName, "sbj_pst_uid")
 	_subjectTopicComment.Related = field.NewUint32(tableName, "sbj_pst_related")
 	_subjectTopicComment.Content = field.NewString(tableName, "sbj_pst_content")
-	_subjectTopicComment.State = field.NewBool(tableName, "sbj_pst_state")
+	_subjectTopicComment.State = field.NewUint8(tableName, "sbj_pst_state")
 	_subjectTopicComment.CreatedAt = field.NewUint32(tableName, "sbj_pst_dateline")
 
 	_subjectTopicComment.fillFieldMap()
@@ -47,7 +47,7 @@ type subjectTopicComment struct {
 	UID         field.Uint32
 	Related     field.Uint32
 	Content     field.String
-	State       field.Bool
+	State       field.Uint8
 	CreatedAt   field.Uint32
 
 	fieldMap map[string]field.Expr
@@ -70,7 +70,7 @@ func (s *subjectTopicComment) updateTableName(table string) *subjectTopicComment
 	s.UID = field.NewUint32(table, "sbj_pst_uid")
 	s.Related = field.NewUint32(table, "sbj_pst_related")
 	s.Content = field.NewString(table, "sbj_pst_content")
-	s.State = field.NewBool(table, "sbj_pst_state")
+	s.State = field.NewUint8(table, "sbj_pst_state")
 	s.CreatedAt = field.NewUint32(table, "sbj_pst_dateline")
 
 	s.fillFieldMap()

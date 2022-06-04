@@ -13,7 +13,7 @@ type GroupTopicComment struct {
 	UID         uint32 `gorm:"column:grp_pst_uid;type:mediumint(8) unsigned;not null;index:grp_pst_uid,priority:1" json:"grp_pst_uid"`
 	Related     uint32 `gorm:"column:grp_pst_related;type:mediumint(8) unsigned;not null;index:grp_pst_related,priority:1" json:"grp_pst_related"` // 关联回复ID
 	Content     string `gorm:"column:grp_pst_content;type:mediumtext;not null" json:"grp_pst_content"`
-	State       bool   `gorm:"column:grp_pst_state;type:tinyint(1) unsigned;not null" json:"grp_pst_state"`
+	State       uint8  `gorm:"column:grp_pst_state;type:tinyint(1) unsigned;not null" json:"grp_pst_state"`
 	CreatedAt   uint32 `gorm:"column:grp_pst_dateline;type:int(10) unsigned;not null" json:"grp_pst_dateline"`
 }
 

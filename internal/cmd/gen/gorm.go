@@ -344,12 +344,14 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_posts", "SubjectTopicComment",
 		gen.FieldTrimPrefix("sbj_pst_"),
 		gen.FieldRename("sbj_pst_mid", "MentionedID"),
+		gen.FieldType("sbj_pst_state", "uint8"),
 		gen.FieldRename("sbj_pst_dateline", "CreatedAt"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_group_posts", "GroupTopicComment",
 		gen.FieldTrimPrefix("grp_pst_"),
 		gen.FieldRename("grp_pst_mid", "MentionedID"),
+		gen.FieldType("grp_pst_state", "uint8"),
 		gen.FieldRename("grp_pst_dateline", "CreatedAt"),
 	))
 
