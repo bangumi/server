@@ -73,10 +73,16 @@
           });
           if (res.status > 300) {
             const d = await res.json()
-            console.log(d)
-            d.details.forEach((detail, index) => {
-              $(".error-details").prepend(`<li class="m-1 list-group-item list-group-item-danger">${detail}</li>`)
-            })
+            if (res.status === 401) {
+              $(".error-details")
+                .append(`<li class="m-1 list-group-item list-group-item-danger">账号密码错误</li>`)
+                .append(`<li class="m-1 list-group-item list-group-item-danger">剩余登录次数: ${d.details.remain}</li>`)
+            } else {
+              console.log(d)
+              d.details.forEach((detail, index) => {
+                $(".error-details").prepend(`<li class="m-1 list-group-item list-group-item-danger">${detail}</li>`)
+              })
+            }
           } else {
             console.log(await res.json());
             location.reload()
