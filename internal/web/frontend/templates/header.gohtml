@@ -10,28 +10,20 @@
               </a>
             </div>
 
-            <div class="col-2">
-              后端 API 演示 demo
-            </div>
+            <div class="col-2">后端 API 演示 demo</div>
           </div>
         </div>
-
           {{if eq .ID 0}}
-
             <div class="col-1 h-100 d-flex justify-content-center align-items-center">
               <a href="./login" class="h-50 text-decoration-none text-black"> 登录 </a>
             </div>
-
           {{else}}
             <div class="col-1 h-100 d-flex justify-content-center">
               <a href="https://bgm.tv/user/{{ .UserName }}" class="h-100 avatar">
-                <img class="img-fluid h-100" src="https://lain.bgm.tv/pic/user/l/{{ .Avatar }}"
-                     alt="">
+                <img class="img-fluid h-100" src="https://lain.bgm.tv/pic/user/l/{{ .Avatar }}" alt="">
               </a>
             </div>
-
           {{ end }}
-
       </div>
     </div>
     <style>
@@ -54,35 +46,5 @@
             width: 40px;
             height: 50px;
         }
-
-        div.musume_0 {
-        }
-
-        div.musume_1 {
-            background-position: -40px 0;
-        }
-
-        div.musume_2 {
-            background-position: -80px 0;
-        }
-
-        div.musume_3 {
-            background-position: -120px 0;
-        }
-
-        div.musume_4 {
-            background-position: -160px 0;
-        }
-
-        div.musume_5 {
-            background-position: -200px 0;
-        }
-
-        div.musume_6 {
-            background-position: -240px 0;
-        }
-
     </style>
-
-
 {{end}}
