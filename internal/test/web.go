@@ -30,6 +30,7 @@ import (
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
+	"github.com/bangumi/server/internal/comment"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/query"
@@ -41,6 +42,7 @@ import (
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/web"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
@@ -87,7 +89,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 		fx.Provide(
 			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
-			person.NewService, frontend.NewTemplateEngine,
+			person.NewService, topic.NewService, comment.NewMysqlRepo, frontend.NewTemplateEngine,
 		),
 
 		MockPersonRepo(m.PersonRepo),
