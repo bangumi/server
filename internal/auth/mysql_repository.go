@@ -22,7 +22,6 @@ import (
 
 	"github.com/elliotchance/phpserialize"
 	"github.com/goccy/go-json"
-	"github.com/gookit/goutil/timex"
 	"github.com/mitchellh/mapstructure"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -273,7 +272,7 @@ func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UIDType) ([
 	return tokens, errgo.Wrap(err, "dal")
 }
 
-const defaultOauthAccessExpiration = timex.OneDay * 90
+const defaultOauthAccessExpiration = time.Hour * 168
 
 func convertAccessToken(t *dao.AccessToken) domain.AccessToken {
 	var createdAt time.Time
