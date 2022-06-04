@@ -17,71 +17,71 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newOAuthAccessToken(db *gorm.DB) oAuthAccessToken {
-	_oAuthAccessToken := oAuthAccessToken{}
+func newAccessToken(db *gorm.DB) accessToken {
+	_accessToken := accessToken{}
 
-	_oAuthAccessToken.oAuthAccessTokenDo.UseDB(db)
-	_oAuthAccessToken.oAuthAccessTokenDo.UseModel(&dao.OAuthAccessToken{})
+	_accessToken.accessTokenDo.UseDB(db)
+	_accessToken.accessTokenDo.UseModel(&dao.AccessToken{})
 
-	tableName := _oAuthAccessToken.oAuthAccessTokenDo.TableName()
-	_oAuthAccessToken.ALL = field.NewField(tableName, "*")
-	_oAuthAccessToken.AccessToken = field.NewString(tableName, "access_token")
-	_oAuthAccessToken.ClientID = field.NewString(tableName, "client_id")
-	_oAuthAccessToken.UserID = field.NewString(tableName, "user_id")
-	_oAuthAccessToken.Expires = field.NewTime(tableName, "expires")
-	_oAuthAccessToken.Scope = field.NewString(tableName, "scope")
+	tableName := _accessToken.accessTokenDo.TableName()
+	_accessToken.ALL = field.NewField(tableName, "*")
+	_accessToken.AccessToken = field.NewString(tableName, "access_token")
+	_accessToken.ClientID = field.NewString(tableName, "client_id")
+	_accessToken.UserID = field.NewString(tableName, "user_id")
+	_accessToken.ExpiredAt = field.NewTime(tableName, "expires")
+	_accessToken.Scope = field.NewString(tableName, "scope")
 
-	_oAuthAccessToken.fillFieldMap()
+	_accessToken.fillFieldMap()
 
-	return _oAuthAccessToken
+	return _accessToken
 }
 
-type oAuthAccessToken struct {
-	oAuthAccessTokenDo oAuthAccessTokenDo
+type accessToken struct {
+	accessTokenDo accessTokenDo
 
 	ALL         field.Field
 	AccessToken field.String
 	ClientID    field.String
 	UserID      field.String
-	Expires     field.Time
+	ExpiredAt   field.Time
 	Scope       field.String
 
 	fieldMap map[string]field.Expr
 }
 
-func (o oAuthAccessToken) Table(newTableName string) *oAuthAccessToken {
-	o.oAuthAccessTokenDo.UseTable(newTableName)
-	return o.updateTableName(newTableName)
+func (a accessToken) Table(newTableName string) *accessToken {
+	a.accessTokenDo.UseTable(newTableName)
+	return a.updateTableName(newTableName)
 }
 
-func (o oAuthAccessToken) As(alias string) *oAuthAccessToken {
-	o.oAuthAccessTokenDo.DO = *(o.oAuthAccessTokenDo.As(alias).(*gen.DO))
-	return o.updateTableName(alias)
+func (a accessToken) As(alias string) *accessToken {
+	a.accessTokenDo.DO = *(a.accessTokenDo.As(alias).(*gen.DO))
+	return a.updateTableName(alias)
 }
 
-func (o *oAuthAccessToken) updateTableName(table string) *oAuthAccessToken {
-	o.ALL = field.NewField(table, "*")
-	o.AccessToken = field.NewString(table, "access_token")
-	o.ClientID = field.NewString(table, "client_id")
-	o.UserID = field.NewString(table, "user_id")
-	o.Expires = field.NewTime(table, "expires")
-	o.Scope = field.NewString(table, "scope")
+func (a *accessToken) updateTableName(table string) *accessToken {
+	a.ALL = field.NewField(table, "*")
+	a.AccessToken = field.NewString(table, "access_token")
+	a.ClientID = field.NewString(table, "client_id")
+	a.UserID = field.NewString(table, "user_id")
+	a.ExpiredAt = field.NewTime(table, "expires")
+	a.Scope = field.NewString(table, "scope")
 
-	o.fillFieldMap()
+	a.fillFieldMap()
 
-	return o
+	return a
 }
 
-func (o *oAuthAccessToken) WithContext(ctx context.Context) *oAuthAccessTokenDo {
-	return o.oAuthAccessTokenDo.WithContext(ctx)
+func (a *accessToken) WithContext(ctx context.Context) *accessTokenDo {
+	return a.accessTokenDo.WithContext(ctx)
 }
 
-func (o oAuthAccessToken) TableName() string { return o.oAuthAccessTokenDo.TableName() }
+func (a accessToken) TableName() string { return a.accessTokenDo.TableName() }
 
-func (o oAuthAccessToken) Alias() string { return o.oAuthAccessTokenDo.Alias() }
+func (a accessToken) Alias() string { return a.accessTokenDo.Alias() }
 
-func (o *oAuthAccessToken) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
-	_f, ok := o.fieldMap[fieldName]
+func (a *accessToken) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
+	_f, ok := a.fieldMap[fieldName]
 	if !ok || _f == nil {
 		return nil, false
 	}
@@ -89,208 +89,208 @@ func (o *oAuthAccessToken) GetFieldByName(fieldName string) (field.OrderExpr, bo
 	return _oe, ok
 }
 
-func (o *oAuthAccessToken) fillFieldMap() {
-	o.fieldMap = make(map[string]field.Expr, 5)
-	o.fieldMap["access_token"] = o.AccessToken
-	o.fieldMap["client_id"] = o.ClientID
-	o.fieldMap["user_id"] = o.UserID
-	o.fieldMap["expires"] = o.Expires
-	o.fieldMap["scope"] = o.Scope
+func (a *accessToken) fillFieldMap() {
+	a.fieldMap = make(map[string]field.Expr, 5)
+	a.fieldMap["access_token"] = a.AccessToken
+	a.fieldMap["client_id"] = a.ClientID
+	a.fieldMap["user_id"] = a.UserID
+	a.fieldMap["expires"] = a.ExpiredAt
+	a.fieldMap["scope"] = a.Scope
 }
 
-func (o oAuthAccessToken) clone(db *gorm.DB) oAuthAccessToken {
-	o.oAuthAccessTokenDo.ReplaceDB(db)
-	return o
+func (a accessToken) clone(db *gorm.DB) accessToken {
+	a.accessTokenDo.ReplaceDB(db)
+	return a
 }
 
-type oAuthAccessTokenDo struct{ gen.DO }
+type accessTokenDo struct{ gen.DO }
 
-func (o oAuthAccessTokenDo) Debug() *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Debug())
+func (a accessTokenDo) Debug() *accessTokenDo {
+	return a.withDO(a.DO.Debug())
 }
 
-func (o oAuthAccessTokenDo) WithContext(ctx context.Context) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.WithContext(ctx))
+func (a accessTokenDo) WithContext(ctx context.Context) *accessTokenDo {
+	return a.withDO(a.DO.WithContext(ctx))
 }
 
-func (o oAuthAccessTokenDo) Clauses(conds ...clause.Expression) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Clauses(conds...))
+func (a accessTokenDo) Clauses(conds ...clause.Expression) *accessTokenDo {
+	return a.withDO(a.DO.Clauses(conds...))
 }
 
-func (o oAuthAccessTokenDo) Returning(value interface{}, columns ...string) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Returning(value, columns...))
+func (a accessTokenDo) Returning(value interface{}, columns ...string) *accessTokenDo {
+	return a.withDO(a.DO.Returning(value, columns...))
 }
 
-func (o oAuthAccessTokenDo) Not(conds ...gen.Condition) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Not(conds...))
+func (a accessTokenDo) Not(conds ...gen.Condition) *accessTokenDo {
+	return a.withDO(a.DO.Not(conds...))
 }
 
-func (o oAuthAccessTokenDo) Or(conds ...gen.Condition) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Or(conds...))
+func (a accessTokenDo) Or(conds ...gen.Condition) *accessTokenDo {
+	return a.withDO(a.DO.Or(conds...))
 }
 
-func (o oAuthAccessTokenDo) Select(conds ...field.Expr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Select(conds...))
+func (a accessTokenDo) Select(conds ...field.Expr) *accessTokenDo {
+	return a.withDO(a.DO.Select(conds...))
 }
 
-func (o oAuthAccessTokenDo) Where(conds ...gen.Condition) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Where(conds...))
+func (a accessTokenDo) Where(conds ...gen.Condition) *accessTokenDo {
+	return a.withDO(a.DO.Where(conds...))
 }
 
-func (o oAuthAccessTokenDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *oAuthAccessTokenDo {
-	return o.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
+func (a accessTokenDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *accessTokenDo {
+	return a.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
-func (o oAuthAccessTokenDo) Order(conds ...field.Expr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Order(conds...))
+func (a accessTokenDo) Order(conds ...field.Expr) *accessTokenDo {
+	return a.withDO(a.DO.Order(conds...))
 }
 
-func (o oAuthAccessTokenDo) Distinct(cols ...field.Expr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Distinct(cols...))
+func (a accessTokenDo) Distinct(cols ...field.Expr) *accessTokenDo {
+	return a.withDO(a.DO.Distinct(cols...))
 }
 
-func (o oAuthAccessTokenDo) Omit(cols ...field.Expr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Omit(cols...))
+func (a accessTokenDo) Omit(cols ...field.Expr) *accessTokenDo {
+	return a.withDO(a.DO.Omit(cols...))
 }
 
-func (o oAuthAccessTokenDo) Join(table schema.Tabler, on ...field.Expr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Join(table, on...))
+func (a accessTokenDo) Join(table schema.Tabler, on ...field.Expr) *accessTokenDo {
+	return a.withDO(a.DO.Join(table, on...))
 }
 
-func (o oAuthAccessTokenDo) LeftJoin(table schema.Tabler, on ...field.Expr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.LeftJoin(table, on...))
+func (a accessTokenDo) LeftJoin(table schema.Tabler, on ...field.Expr) *accessTokenDo {
+	return a.withDO(a.DO.LeftJoin(table, on...))
 }
 
-func (o oAuthAccessTokenDo) RightJoin(table schema.Tabler, on ...field.Expr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.RightJoin(table, on...))
+func (a accessTokenDo) RightJoin(table schema.Tabler, on ...field.Expr) *accessTokenDo {
+	return a.withDO(a.DO.RightJoin(table, on...))
 }
 
-func (o oAuthAccessTokenDo) Group(cols ...field.Expr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Group(cols...))
+func (a accessTokenDo) Group(cols ...field.Expr) *accessTokenDo {
+	return a.withDO(a.DO.Group(cols...))
 }
 
-func (o oAuthAccessTokenDo) Having(conds ...gen.Condition) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Having(conds...))
+func (a accessTokenDo) Having(conds ...gen.Condition) *accessTokenDo {
+	return a.withDO(a.DO.Having(conds...))
 }
 
-func (o oAuthAccessTokenDo) Limit(limit int) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Limit(limit))
+func (a accessTokenDo) Limit(limit int) *accessTokenDo {
+	return a.withDO(a.DO.Limit(limit))
 }
 
-func (o oAuthAccessTokenDo) Offset(offset int) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Offset(offset))
+func (a accessTokenDo) Offset(offset int) *accessTokenDo {
+	return a.withDO(a.DO.Offset(offset))
 }
 
-func (o oAuthAccessTokenDo) Scopes(funcs ...func(gen.Dao) gen.Dao) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Scopes(funcs...))
+func (a accessTokenDo) Scopes(funcs ...func(gen.Dao) gen.Dao) *accessTokenDo {
+	return a.withDO(a.DO.Scopes(funcs...))
 }
 
-func (o oAuthAccessTokenDo) Unscoped() *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Unscoped())
+func (a accessTokenDo) Unscoped() *accessTokenDo {
+	return a.withDO(a.DO.Unscoped())
 }
 
-func (o oAuthAccessTokenDo) Create(values ...*dao.OAuthAccessToken) error {
+func (a accessTokenDo) Create(values ...*dao.AccessToken) error {
 	if len(values) == 0 {
 		return nil
 	}
-	return o.DO.Create(values)
+	return a.DO.Create(values)
 }
 
-func (o oAuthAccessTokenDo) CreateInBatches(values []*dao.OAuthAccessToken, batchSize int) error {
-	return o.DO.CreateInBatches(values, batchSize)
+func (a accessTokenDo) CreateInBatches(values []*dao.AccessToken, batchSize int) error {
+	return a.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (o oAuthAccessTokenDo) Save(values ...*dao.OAuthAccessToken) error {
+func (a accessTokenDo) Save(values ...*dao.AccessToken) error {
 	if len(values) == 0 {
 		return nil
 	}
-	return o.DO.Save(values)
+	return a.DO.Save(values)
 }
 
-func (o oAuthAccessTokenDo) First() (*dao.OAuthAccessToken, error) {
-	if result, err := o.DO.First(); err != nil {
+func (a accessTokenDo) First() (*dao.AccessToken, error) {
+	if result, err := a.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*dao.OAuthAccessToken), nil
+		return result.(*dao.AccessToken), nil
 	}
 }
 
-func (o oAuthAccessTokenDo) Take() (*dao.OAuthAccessToken, error) {
-	if result, err := o.DO.Take(); err != nil {
+func (a accessTokenDo) Take() (*dao.AccessToken, error) {
+	if result, err := a.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*dao.OAuthAccessToken), nil
+		return result.(*dao.AccessToken), nil
 	}
 }
 
-func (o oAuthAccessTokenDo) Last() (*dao.OAuthAccessToken, error) {
-	if result, err := o.DO.Last(); err != nil {
+func (a accessTokenDo) Last() (*dao.AccessToken, error) {
+	if result, err := a.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*dao.OAuthAccessToken), nil
+		return result.(*dao.AccessToken), nil
 	}
 }
 
-func (o oAuthAccessTokenDo) Find() ([]*dao.OAuthAccessToken, error) {
-	result, err := o.DO.Find()
-	return result.([]*dao.OAuthAccessToken), err
+func (a accessTokenDo) Find() ([]*dao.AccessToken, error) {
+	result, err := a.DO.Find()
+	return result.([]*dao.AccessToken), err
 }
 
-func (o oAuthAccessTokenDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*dao.OAuthAccessToken, err error) {
-	buf := make([]*dao.OAuthAccessToken, 0, batchSize)
-	err = o.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
+func (a accessTokenDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*dao.AccessToken, err error) {
+	buf := make([]*dao.AccessToken, 0, batchSize)
+	err = a.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
 	})
 	return results, err
 }
 
-func (o oAuthAccessTokenDo) FindInBatches(result *[]*dao.OAuthAccessToken, batchSize int, fc func(tx gen.Dao, batch int) error) error {
-	return o.DO.FindInBatches(result, batchSize, fc)
+func (a accessTokenDo) FindInBatches(result *[]*dao.AccessToken, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+	return a.DO.FindInBatches(result, batchSize, fc)
 }
 
-func (o oAuthAccessTokenDo) Attrs(attrs ...field.AssignExpr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Attrs(attrs...))
+func (a accessTokenDo) Attrs(attrs ...field.AssignExpr) *accessTokenDo {
+	return a.withDO(a.DO.Attrs(attrs...))
 }
 
-func (o oAuthAccessTokenDo) Assign(attrs ...field.AssignExpr) *oAuthAccessTokenDo {
-	return o.withDO(o.DO.Assign(attrs...))
+func (a accessTokenDo) Assign(attrs ...field.AssignExpr) *accessTokenDo {
+	return a.withDO(a.DO.Assign(attrs...))
 }
 
-func (o oAuthAccessTokenDo) Joins(fields ...field.RelationField) *oAuthAccessTokenDo {
+func (a accessTokenDo) Joins(fields ...field.RelationField) *accessTokenDo {
 	for _, _f := range fields {
-		o = *o.withDO(o.DO.Joins(_f))
+		a = *a.withDO(a.DO.Joins(_f))
 	}
-	return &o
+	return &a
 }
 
-func (o oAuthAccessTokenDo) Preload(fields ...field.RelationField) *oAuthAccessTokenDo {
+func (a accessTokenDo) Preload(fields ...field.RelationField) *accessTokenDo {
 	for _, _f := range fields {
-		o = *o.withDO(o.DO.Preload(_f))
+		a = *a.withDO(a.DO.Preload(_f))
 	}
-	return &o
+	return &a
 }
 
-func (o oAuthAccessTokenDo) FirstOrInit() (*dao.OAuthAccessToken, error) {
-	if result, err := o.DO.FirstOrInit(); err != nil {
+func (a accessTokenDo) FirstOrInit() (*dao.AccessToken, error) {
+	if result, err := a.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*dao.OAuthAccessToken), nil
+		return result.(*dao.AccessToken), nil
 	}
 }
 
-func (o oAuthAccessTokenDo) FirstOrCreate() (*dao.OAuthAccessToken, error) {
-	if result, err := o.DO.FirstOrCreate(); err != nil {
+func (a accessTokenDo) FirstOrCreate() (*dao.AccessToken, error) {
+	if result, err := a.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*dao.OAuthAccessToken), nil
+		return result.(*dao.AccessToken), nil
 	}
 }
 
-func (o oAuthAccessTokenDo) FindByPage(offset int, limit int) (result []*dao.OAuthAccessToken, count int64, err error) {
-	result, err = o.Offset(offset).Limit(limit).Find()
+func (a accessTokenDo) FindByPage(offset int, limit int) (result []*dao.AccessToken, count int64, err error) {
+	result, err = a.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
 	}
@@ -300,21 +300,21 @@ func (o oAuthAccessTokenDo) FindByPage(offset int, limit int) (result []*dao.OAu
 		return
 	}
 
-	count, err = o.Offset(-1).Limit(-1).Count()
+	count, err = a.Offset(-1).Limit(-1).Count()
 	return
 }
 
-func (o oAuthAccessTokenDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
-	count, err = o.Count()
+func (a accessTokenDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+	count, err = a.Count()
 	if err != nil {
 		return
 	}
 
-	err = o.Offset(offset).Limit(limit).Scan(result)
+	err = a.Offset(offset).Limit(limit).Scan(result)
 	return
 }
 
-func (o *oAuthAccessTokenDo) withDO(do gen.Dao) *oAuthAccessTokenDo {
-	o.DO = *do.(*gen.DO)
-	return o
+func (a *accessTokenDo) withDO(do gen.Dao) *accessTokenDo {
+	a.DO = *do.(*gen.DO)
+	return a
 }

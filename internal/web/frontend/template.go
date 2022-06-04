@@ -20,10 +20,13 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 )
 
 const TplLogin = "login.gohtml"
+const TplListAccessToken = "list-access-token.gohtml"
+const TplCreateAccessToken = "create-access-token.gohtml"
 
 func filters() map[string]interface{} {
 	return map[string]interface{}{
@@ -47,4 +50,14 @@ var _ interface {
 type Login struct {
 	Title string
 	User  model.User
+}
+
+type ListAccessToken struct {
+	Title  string
+	User   model.User
+	Tokens []domain.AccessToken
+}
+
+type CreateAccessToken struct {
+	User model.User
 }

@@ -36,6 +36,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
+var userIDTypeString = reflect.TypeOf(new(model.UIDType)).Elem().Name()
 var personIDTypeString = reflect.TypeOf(new(model.PersonIDType)).Elem().Name()
 var characterIDTypeString = reflect.TypeOf(new(model.CharacterIDType)).Elem().Name()
 var episodeIDTypeString = reflect.TypeOf(new(model.EpisodeIDType)).Elem().Name()
@@ -135,7 +136,23 @@ func main() {
 		gen.FieldType("usr_grp_perm", "[]byte"),
 	))
 
-	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "OAuthAccessToken"))
+	// g.ApplyBasic(g.GenerateModelAs("chii_apps", "App",
+	// 	gen.FieldTrimPrefix("app_"),
+	// 	gen.FieldType("app_id", "uint32"),
+	// 	gen.FieldRename("app_desc", "description"),
+	// 	gen.FieldType("app_type", "uint8"),
+	// 	gen.FieldRename("app_lasttouch", "UpdatedAt"),
+	// 	gen.FieldRename("app_timestamp", "CreatedAt"),
+	// 	gen.FieldType("app_creator", userIDTypeString),
+	// ))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "AccessToken",
+		gen.FieldType("type", "uint8"),
+		gen.FieldType("id", "uint32"),
+		gen.FieldType("scope", "*string"),
+		gen.FieldType("info", "[]byte"),
+		gen.FieldRename("expires", "ExpiredAt"),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_interests", "SubjectCollection",
 		gen.FieldType("interest_subject_type", subjectTypeIDTypeString),

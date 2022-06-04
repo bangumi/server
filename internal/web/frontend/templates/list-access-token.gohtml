@@ -1,0 +1,56 @@
+{{- /*gotype: github.com/bangumi/server/internal/web/frontend.ListAccessToken*/ -}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Access Token</title>
+
+    {{template "common_resource.gohtml"}}
+</head>
+<body>
+{{template "header" .User}}
+<div class="container mt-5">
+  <div class="row">
+    <a href="/demo/access-token/create">创建个人令牌</a>
+  </div>
+  <div class="row">
+    <ul class="list-group">
+        {{range .Tokens }}
+          <li class="list-group-item d-flex justify-content-between align-items-center" id="token-{{ .ID }}">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold">{{ .Name }}</div>
+              创建日期： {{ .CreatedAt | FormatDate }}
+              有效期至： {{ .ExpiredAt | FormatDate }}
+            </div>
+            <button class="btn btn-danger" onclick="revoke('{{ .ID }}')">delete
+            </button>
+          </li>
+        {{end}}
+    </ul>
+  </div>
+</div>
+
+<script>
+  async function revoke(token_id) {
+    const row = $(`#token-${token_id}`)
+    row.find("button").addClass("disabled")
+
+    const res = await fetch('/p/access-tokens', {
+      method: "delete",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({id: parseInt(token_id, 10)})
+    });
+
+    if (res.status === 204) {
+      row.remove()
+      return
+    }
+
+    const data = await res.json()
+    alert(JSON.stringify(data));
+    row.find("button").removeClass("disabled")
+  }
+</script>
+</body>
+</html>

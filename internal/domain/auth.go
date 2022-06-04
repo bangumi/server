@@ -27,8 +27,16 @@ type AuthRepo interface {
 	GetByToken(ctx context.Context, token string) (Auth, error)
 	GetPermission(ctx context.Context, groupID uint8) (Permission, error)
 
+	CreateAccessToken(
+		ctx context.Context, userID model.UIDType, name string, expiration time.Duration,
+	) (token string, err error)
+
+	ListAccessToken(ctx context.Context, userID model.UIDType) ([]AccessToken, error)
+	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
+
 	// GetByEmail return (Auth, HashedPassword, error)
 	GetByEmail(ctx context.Context, email string) (Auth, []byte, error)
+	GetTokenByID(ctx context.Context, id uint32) (AccessToken, error)
 }
 
 // Auth is the basic authorization represent a user.
@@ -61,7 +69,22 @@ type AuthService interface {
 
 	Login(ctx context.Context, email, password string) (Auth, bool, error)
 
+	GetTokenByID(ctx context.Context, tokenID uint32) (AccessToken, error)
+	CreateAccessToken(
+		ctx context.Context, userID model.UIDType, name string, expiration time.Duration,
+	) (token string, err error)
+	ListAccessToken(ctx context.Context, userID model.UIDType) ([]AccessToken, error)
+	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
+
 	GetPermission(ctx context.Context, id model.GroupID) (Permission, error)
+}
+
+type AccessToken struct {
+	ExpiredAt time.Time
+	CreatedAt time.Time
+	Name      string
+	ID        uint32
+	UserID    model.UIDType
 }
 
 type Permission struct {

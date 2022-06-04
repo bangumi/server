@@ -12,23 +12,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package req
+package handler
 
-type UserLogin struct {
-	Email            string `json:"email" validate:"required,email"`
-	Password         string `json:"password" validate:"required"`
-	HCaptchaResponse string `json:"h-captcha-response" validate:"required"` //nolint:tagliatelle
-}
+import (
+	"errors"
 
-type RevokeSession struct {
-	UID uint32 `validate:"required,gt=0" json:"uid"`
-}
+	"github.com/go-playground/validator/v10"
+)
 
-type CreatePersonalAccessToken struct {
-	Name         string `json:"name"`
-	DurationDays uint   `json:"duration_days" validate:"required,lte=365" validateName:"有效期"`
-}
+func (h Handler) translationValidationError(err error) []string {
+	var validationErrors validator.ValidationErrors
+	if ok := errors.As(err, &validationErrors); ok {
+		var details = make([]string, len(validationErrors))
+		for i, e := range validationErrors {
+			// can translate each error one at a time.
+			details[i] = e.Translate(h.validatorTranslation)
+		}
 
-type DeletePersonalAccessToken struct {
-	ID uint32 `json:"id" validate:"required"`
+		return details
+	}
+
+	return []string{err.Error()}
 }
