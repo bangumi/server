@@ -181,7 +181,7 @@ func (h Handler) GetSubjectTopics(c *fiber.Ctx) error {
 		})
 	}
 
-	return h.listTopics(c, model.TopicTypeSubject, id)
+	return h.listTopics(c, domain.TopicTypeSubject, id)
 }
 
 func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {

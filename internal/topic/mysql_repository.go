@@ -39,16 +39,16 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TopicRepo, error) {
 }
 
 func (r mysqlRepo) Get(
-	ctx context.Context, topicType model.TopicType, limit int, offset int, id model.TopicIDType,
+	ctx context.Context, topicType domain.TopicType, limit int, offset int, id model.TopicIDType,
 ) (model.Topic, error) {
 	var (
 		topic interface{}
 		err   error
 	)
 	switch topicType {
-	case model.TopicTypeGroup:
+	case domain.TopicTypeGroup:
 		topic, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.ID.Eq(id)).First()
-	case model.TopicTypeSubject:
+	case domain.TopicTypeSubject:
 		topic, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.ID.Eq(id)).First()
 	default:
 		return model.Topic{}, errUnsupportTopicType
@@ -66,16 +66,16 @@ func (r mysqlRepo) Get(
 }
 
 func (r mysqlRepo) GetTopicsByObjectID(
-	ctx context.Context, topicType model.TopicType, id uint32,
+	ctx context.Context, topicType domain.TopicType, id uint32,
 ) ([]model.Topic, error) {
 	var (
 		topics interface{}
 		err    error
 	)
 	switch topicType {
-	case model.TopicTypeGroup:
+	case domain.TopicTypeGroup:
 		topics, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).Find()
-	case model.TopicTypeSubject:
+	case domain.TopicTypeSubject:
 		topics, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).Find()
 	default:
 		return nil, errUnsupportTopicType

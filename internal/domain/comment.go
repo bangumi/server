@@ -21,9 +21,19 @@ import (
 )
 
 type CommentRepo interface {
-	Get(ctx context.Context, commentType model.CommentType, id model.CommentIDType) (model.Comment, error)
+	Get(ctx context.Context, commentType CommentType, id model.CommentIDType) (model.Comment, error)
 
 	GetCommentsByMentionedID(
-		ctx context.Context, commentType model.CommentType, limit int, offset int, id uint32,
+		ctx context.Context, commentType CommentType, limit int, offset int, id uint32,
 	) (model.Comments, error)
 }
+
+type CommentType uint32
+
+const (
+	CommentTypeSubjectTopic CommentType = iota
+	CommentTypeGroupTopic
+	CommentIndex
+	CommentCharacter
+	CommentEpisode
+)

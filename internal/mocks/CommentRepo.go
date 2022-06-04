@@ -5,6 +5,7 @@ package mocks
 import (
 	context "context"
 
+	domain "github.com/bangumi/server/internal/domain"
 	mock "github.com/stretchr/testify/mock"
 
 	model "github.com/bangumi/server/internal/model"
@@ -24,18 +25,18 @@ func (_m *CommentRepo) EXPECT() *CommentRepo_Expecter {
 }
 
 // Get provides a mock function with given fields: ctx, commentType, id
-func (_m *CommentRepo) Get(ctx context.Context, commentType model.CommentType, id uint32) (model.Comment, error) {
+func (_m *CommentRepo) Get(ctx context.Context, commentType domain.CommentType, id uint32) (model.Comment, error) {
 	ret := _m.Called(ctx, commentType, id)
 
 	var r0 model.Comment
-	if rf, ok := ret.Get(0).(func(context.Context, model.CommentType, uint32) model.Comment); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, uint32) model.Comment); ok {
 		r0 = rf(ctx, commentType, id)
 	} else {
 		r0 = ret.Get(0).(model.Comment)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.CommentType, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, uint32) error); ok {
 		r1 = rf(ctx, commentType, id)
 	} else {
 		r1 = ret.Error(1)
@@ -51,15 +52,15 @@ type CommentRepo_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //  - ctx context.Context
-//  - commentType model.CommentType
+//  - commentType domain.CommentType
 //  - id uint32
 func (_e *CommentRepo_Expecter) Get(ctx interface{}, commentType interface{}, id interface{}) *CommentRepo_Get_Call {
 	return &CommentRepo_Get_Call{Call: _e.mock.On("Get", ctx, commentType, id)}
 }
 
-func (_c *CommentRepo_Get_Call) Run(run func(ctx context.Context, commentType model.CommentType, id uint32)) *CommentRepo_Get_Call {
+func (_c *CommentRepo_Get_Call) Run(run func(ctx context.Context, commentType domain.CommentType, id uint32)) *CommentRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.CommentType), args[2].(uint32))
+		run(args[0].(context.Context), args[1].(domain.CommentType), args[2].(uint32))
 	})
 	return _c
 }
@@ -70,18 +71,18 @@ func (_c *CommentRepo_Get_Call) Return(_a0 model.Comment, _a1 error) *CommentRep
 }
 
 // GetCommentsByMentionedID provides a mock function with given fields: ctx, commentType, limit, offset, id
-func (_m *CommentRepo) GetCommentsByMentionedID(ctx context.Context, commentType model.CommentType, limit int, offset int, id uint32) (model.Comments, error) {
+func (_m *CommentRepo) GetCommentsByMentionedID(ctx context.Context, commentType domain.CommentType, limit int, offset int, id uint32) (model.Comments, error) {
 	ret := _m.Called(ctx, commentType, limit, offset, id)
 
 	var r0 model.Comments
-	if rf, ok := ret.Get(0).(func(context.Context, model.CommentType, int, int, uint32) model.Comments); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, int, int, uint32) model.Comments); ok {
 		r0 = rf(ctx, commentType, limit, offset, id)
 	} else {
 		r0 = ret.Get(0).(model.Comments)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.CommentType, int, int, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, int, int, uint32) error); ok {
 		r1 = rf(ctx, commentType, limit, offset, id)
 	} else {
 		r1 = ret.Error(1)
@@ -97,7 +98,7 @@ type CommentRepo_GetCommentsByMentionedID_Call struct {
 
 // GetCommentsByMentionedID is a helper method to define mock.On call
 //  - ctx context.Context
-//  - commentType model.CommentType
+//  - commentType domain.CommentType
 //  - limit int
 //  - offset int
 //  - id uint32
@@ -105,9 +106,9 @@ func (_e *CommentRepo_Expecter) GetCommentsByMentionedID(ctx interface{}, commen
 	return &CommentRepo_GetCommentsByMentionedID_Call{Call: _e.mock.On("GetCommentsByMentionedID", ctx, commentType, limit, offset, id)}
 }
 
-func (_c *CommentRepo_GetCommentsByMentionedID_Call) Run(run func(ctx context.Context, commentType model.CommentType, limit int, offset int, id uint32)) *CommentRepo_GetCommentsByMentionedID_Call {
+func (_c *CommentRepo_GetCommentsByMentionedID_Call) Run(run func(ctx context.Context, commentType domain.CommentType, limit int, offset int, id uint32)) *CommentRepo_GetCommentsByMentionedID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.CommentType), args[2].(int), args[3].(int), args[4].(uint32))
+		run(args[0].(context.Context), args[1].(domain.CommentType), args[2].(int), args[3].(int), args[4].(uint32))
 	})
 	return _c
 }

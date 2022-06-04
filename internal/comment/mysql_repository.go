@@ -39,22 +39,22 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CommentRepo, error) {
 }
 
 func (r mysqlRepo) Get(
-	ctx context.Context, commentType model.CommentType, id model.CommentIDType,
+	ctx context.Context, commentType domain.CommentType, id model.CommentIDType,
 ) (model.Comment, error) {
 	var (
 		comment interface{}
 		err     error
 	)
 	switch commentType {
-	case model.CommentTypeGroupTopic:
+	case domain.CommentTypeGroupTopic:
 		comment, err = r.q.GroupTopicComment.WithContext(ctx).Where(r.q.GroupTopicComment.ID.Eq(id)).First()
-	case model.CommentTypeSubjectTopic:
+	case domain.CommentTypeSubjectTopic:
 		comment, err = r.q.SubjectTopicComment.WithContext(ctx).Where(r.q.SubjectTopicComment.ID.Eq(id)).First()
-	case model.CommentIndex:
+	case domain.CommentIndex:
 		comment, err = r.q.IndexComment.WithContext(ctx).Where(r.q.IndexComment.ID.Eq(id)).First()
-	case model.CommentCharacter:
+	case domain.CommentCharacter:
 		comment, err = r.q.CharacterComment.WithContext(ctx).Where(r.q.CharacterComment.ID.Eq(id)).First()
-	case model.CommentEpisode:
+	case domain.CommentEpisode:
 		comment, err = r.q.EpisodeComment.WithContext(ctx).Where(r.q.EpisodeComment.ID.Eq(id)).First()
 	default:
 		return model.Comment{}, errUnsupportCommentType
@@ -126,7 +126,7 @@ func ConvertDao(in interface{}) (model.Comment, error) {
 }
 
 func (r mysqlRepo) GetCommentsByMentionedID(
-	ctx context.Context, commentType model.CommentType, limit int, offset int, id uint32,
+	ctx context.Context, commentType domain.CommentType, limit int, offset int, id uint32,
 ) (model.Comments, error) {
 	var (
 		comments interface{}
@@ -134,19 +134,19 @@ func (r mysqlRepo) GetCommentsByMentionedID(
 		err      error
 	)
 	switch commentType {
-	case model.CommentTypeGroupTopic:
+	case domain.CommentTypeGroupTopic:
 		comments, total, err = r.q.GroupTopicComment.WithContext(ctx).
 			Where(r.q.GroupTopicComment.MentionedID.Eq(id)).FindByPage(offset, limit)
-	case model.CommentTypeSubjectTopic:
+	case domain.CommentTypeSubjectTopic:
 		comments, total, err = r.q.SubjectTopicComment.WithContext(ctx).
 			Where(r.q.SubjectTopicComment.MentionedID.Eq(id)).FindByPage(offset, limit)
-	case model.CommentIndex:
+	case domain.CommentIndex:
 		comments, total, err = r.q.IndexComment.WithContext(ctx).
 			Where(r.q.IndexComment.MentionedID.Eq(id)).FindByPage(offset, limit)
-	case model.CommentCharacter:
+	case domain.CommentCharacter:
 		comments, total, err = r.q.CharacterComment.WithContext(ctx).
 			Where(r.q.CharacterComment.MentionedID.Eq(id)).FindByPage(offset, limit)
-	case model.CommentEpisode:
+	case domain.CommentEpisode:
 		comments, total, err = r.q.EpisodeComment.WithContext(ctx).
 			Where(r.q.EpisodeComment.MentionedID.Eq(id)).FindByPage(offset, limit)
 	default:

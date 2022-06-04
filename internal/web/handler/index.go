@@ -130,7 +130,7 @@ func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 		})
 	}
 
-	return h.listComments(c, model.CommentIndex, id)
+	return h.listComments(c, domain.CommentIndex, id)
 }
 
 func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {

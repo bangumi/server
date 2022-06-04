@@ -98,7 +98,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		})
 	}
 
-	return h.listComments(c, model.CommentCharacter, id)
+	return h.listComments(c, domain.CommentCharacter, id)
 }
 
 // first try to read from cache, then fallback to reading from database.

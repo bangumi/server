@@ -30,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
-	"github.com/bangumi/server/internal/comment"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/query"
@@ -42,7 +41,6 @@ import (
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
-	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/web"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
@@ -89,7 +87,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 		fx.Provide(
 			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
-			person.NewService, topic.NewService, comment.NewMysqlRepo, frontend.NewTemplateEngine,
+			person.NewService, frontend.NewTemplateEngine,
 		),
 
 		MockPersonRepo(m.PersonRepo),
@@ -245,7 +243,7 @@ func MockCommentRepo(m domain.CommentRepo) fx.Option {
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.EpisodeRepo))))
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.CommentRepo))))
 }
 
 func MockTopicService(m domain.TopicService) fx.Option {
@@ -253,11 +251,11 @@ func MockTopicService(m domain.TopicService) fx.Option {
 		mocker := &mocks.TopicService{}
 		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return(model.Topic{}, nil)
-
+		mocker.EXPECT().GetTopicsByObjectID(mock.Anything, mock.Anything, mock.Anything).Return([]model.Topic{}, nil)
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.EpisodeRepo))))
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.TopicService))))
 }
 
 func MockAuthRepo(m domain.AuthRepo) fx.Option {

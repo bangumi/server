@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
-func (h Handler) listComments(c *fiber.Ctx, commentType model.CommentType, id uint32) error {
+func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id uint32) error {
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return c.Status(http.StatusNotFound).JSON(res.Error{

@@ -43,7 +43,7 @@ func TestGet(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.Get(context.Background(), model.CommentIndex, 1038)
+	s, err := repo.Get(context.Background(), domain.CommentIndex, 1038)
 	require.NoError(t, err)
 
 	require.Equal(t, model.CommentIDType(1038), s.ID)
@@ -55,7 +55,7 @@ func TestMysqlRepo_GetCommentsByMentionedID(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.GetCommentsByMentionedID(context.Background(), model.CommentTypeSubjectTopic, 0, 0, 2)
+	s, err := repo.GetCommentsByMentionedID(context.Background(), domain.CommentTypeSubjectTopic, 0, 0, 2)
 	require.NoError(t, err)
 
 	require.True(t, len(s.Data) != 0, "cannot fetch comments")

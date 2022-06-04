@@ -5,6 +5,7 @@ package mocks
 import (
 	context "context"
 
+	domain "github.com/bangumi/server/internal/domain"
 	mock "github.com/stretchr/testify/mock"
 
 	model "github.com/bangumi/server/internal/model"
@@ -24,18 +25,18 @@ func (_m *TopicService) EXPECT() *TopicService_Expecter {
 }
 
 // Get provides a mock function with given fields: ctx, topicType, limit, offset, id
-func (_m *TopicService) Get(ctx context.Context, topicType model.TopicType, limit int, offset int, id uint32) (model.Topic, error) {
+func (_m *TopicService) Get(ctx context.Context, topicType domain.TopicType, limit int, offset int, id uint32) (model.Topic, error) {
 	ret := _m.Called(ctx, topicType, limit, offset, id)
 
 	var r0 model.Topic
-	if rf, ok := ret.Get(0).(func(context.Context, model.TopicType, int, int, uint32) model.Topic); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.TopicType, int, int, uint32) model.Topic); ok {
 		r0 = rf(ctx, topicType, limit, offset, id)
 	} else {
 		r0 = ret.Get(0).(model.Topic)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.TopicType, int, int, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.TopicType, int, int, uint32) error); ok {
 		r1 = rf(ctx, topicType, limit, offset, id)
 	} else {
 		r1 = ret.Error(1)
@@ -51,7 +52,7 @@ type TopicService_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //  - ctx context.Context
-//  - topicType model.TopicType
+//  - topicType domain.TopicType
 //  - limit int
 //  - offset int
 //  - id uint32
@@ -59,9 +60,9 @@ func (_e *TopicService_Expecter) Get(ctx interface{}, topicType interface{}, lim
 	return &TopicService_Get_Call{Call: _e.mock.On("Get", ctx, topicType, limit, offset, id)}
 }
 
-func (_c *TopicService_Get_Call) Run(run func(ctx context.Context, topicType model.TopicType, limit int, offset int, id uint32)) *TopicService_Get_Call {
+func (_c *TopicService_Get_Call) Run(run func(ctx context.Context, topicType domain.TopicType, limit int, offset int, id uint32)) *TopicService_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.TopicType), args[2].(int), args[3].(int), args[4].(uint32))
+		run(args[0].(context.Context), args[1].(domain.TopicType), args[2].(int), args[3].(int), args[4].(uint32))
 	})
 	return _c
 }
@@ -72,11 +73,11 @@ func (_c *TopicService_Get_Call) Return(_a0 model.Topic, _a1 error) *TopicServic
 }
 
 // GetTopicsByObjectID provides a mock function with given fields: ctx, topicType, id
-func (_m *TopicService) GetTopicsByObjectID(ctx context.Context, topicType model.TopicType, id uint32) ([]model.Topic, error) {
+func (_m *TopicService) GetTopicsByObjectID(ctx context.Context, topicType domain.TopicType, id uint32) ([]model.Topic, error) {
 	ret := _m.Called(ctx, topicType, id)
 
 	var r0 []model.Topic
-	if rf, ok := ret.Get(0).(func(context.Context, model.TopicType, uint32) []model.Topic); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.TopicType, uint32) []model.Topic); ok {
 		r0 = rf(ctx, topicType, id)
 	} else {
 		if ret.Get(0) != nil {
@@ -85,7 +86,7 @@ func (_m *TopicService) GetTopicsByObjectID(ctx context.Context, topicType model
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.TopicType, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.TopicType, uint32) error); ok {
 		r1 = rf(ctx, topicType, id)
 	} else {
 		r1 = ret.Error(1)
@@ -101,15 +102,15 @@ type TopicService_GetTopicsByObjectID_Call struct {
 
 // GetTopicsByObjectID is a helper method to define mock.On call
 //  - ctx context.Context
-//  - topicType model.TopicType
+//  - topicType domain.TopicType
 //  - id uint32
 func (_e *TopicService_Expecter) GetTopicsByObjectID(ctx interface{}, topicType interface{}, id interface{}) *TopicService_GetTopicsByObjectID_Call {
 	return &TopicService_GetTopicsByObjectID_Call{Call: _e.mock.On("GetTopicsByObjectID", ctx, topicType, id)}
 }
 
-func (_c *TopicService_GetTopicsByObjectID_Call) Run(run func(ctx context.Context, topicType model.TopicType, id uint32)) *TopicService_GetTopicsByObjectID_Call {
+func (_c *TopicService_GetTopicsByObjectID_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id uint32)) *TopicService_GetTopicsByObjectID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.TopicType), args[2].(uint32))
+		run(args[0].(context.Context), args[1].(domain.TopicType), args[2].(uint32))
 	})
 	return _c
 }

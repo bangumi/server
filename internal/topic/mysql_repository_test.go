@@ -43,7 +43,7 @@ func TestGet(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.Get(context.Background(), model.TopicTypeSubject, 10, 10, 1)
+	s, err := repo.Get(context.Background(), domain.TopicTypeSubject, 10, 10, 1)
 	require.NoError(t, err)
 
 	require.Equal(t, model.TopicIDType(1), s.ID)
@@ -55,7 +55,7 @@ func TestMysqlRepo_GetTopicsByObjectID(t *testing.T) {
 
 	repo := getRepo(t)
 
-	_, err := repo.GetTopicsByObjectID(context.Background(), model.TopicTypeSubject, 2)
+	_, err := repo.GetTopicsByObjectID(context.Background(), domain.TopicTypeSubject, 2)
 	require.NoError(t, err)
 }
 
