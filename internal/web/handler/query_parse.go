@@ -31,6 +31,7 @@ var errMissingSubjectID = fiber.NewError(code.BadRequest, "subject ID is require
 var errMissingPersonID = fiber.NewError(code.BadRequest, "person ID is required")
 var errMissingEpisodeID = fiber.NewError(code.BadRequest, "episode ID is required")
 var errMissingIndexID = fiber.NewError(code.BadRequest, "index ID is required")
+var errMissingTopicID = fiber.NewError(code.BadRequest, "topic ID is required")
 
 func parseSubjectType(s string) (uint8, error) {
 	if s == "" {
@@ -116,6 +117,20 @@ func parseIndexID(s string) (model.IndexIDType, error) {
 
 	if err != nil {
 		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not a valid index ID")
+	}
+
+	return v, nil
+}
+
+func parseTopicID(s string) (model.TopicIDType, error) {
+	if s == "" {
+		return 0, errMissingSubjectID
+	}
+
+	v, err := strparse.TopicID(s)
+
+	if err != nil {
+		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not valid topic ID")
 	}
 
 	return v, nil

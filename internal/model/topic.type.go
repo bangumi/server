@@ -14,15 +14,9 @@
 
 package model
 
-type UIDType = uint32 // UserID
-type GroupID = uint8
+type TopicType uint32
 
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type IndexIDType = uint32
-type EpisodeIDType = uint32
-type EpTypeType = int16
-type RevisionTypeType = uint8
-type TopicIDType = uint32
-type CommentIDType = uint32
+const (
+	TopicTypeSubject TopicType = iota
+	TopicTypeGroup
+)

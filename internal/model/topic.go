@@ -14,15 +14,17 @@
 
 package model
 
-type UIDType = uint32 // UserID
-type GroupID = uint8
+import "time"
 
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type IndexIDType = uint32
-type EpisodeIDType = uint32
-type EpTypeType = int16
-type RevisionTypeType = uint8
-type TopicIDType = uint32
-type CommentIDType = uint32
+type Topic struct {
+	ID        TopicIDType
+	ObjectID  uint32
+	UID       uint32
+	Title     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Replies   uint32
+	Comments  Comments
+	State     bool
+	Display   bool
+}

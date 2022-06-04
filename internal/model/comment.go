@@ -14,15 +14,33 @@
 
 package model
 
-type UIDType = uint32 // UserID
-type GroupID = uint8
+import "time"
 
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type IndexIDType = uint32
-type EpisodeIDType = uint32
-type EpTypeType = int16
-type RevisionTypeType = uint8
-type TopicIDType = uint32
-type CommentIDType = uint32
+type Comment struct {
+	ID          CommentIDType
+	MentionedID uint32
+	UID         uint32
+	Related     uint32
+	CreatedAt   time.Time
+	State       uint32
+	Content     string
+	Replies     []Comment
+}
+
+type Comments struct {
+	Total  uint32
+	Limit  uint32
+	Offset uint32
+	Data   []Comment
+}
+
+func ConvertModelCommentsToTree(comments []Comment, related uint32) []Comment {
+	result := make([]Comment, 0)
+	for _, v := range comments {
+		if v.Related == related {
+			v.Replies = ConvertModelCommentsToTree(comments, v.ID)
+			result = append(result, v)
+		}
+	}
+	return result
+}

@@ -13,128 +13,163 @@ import (
 
 func Use(db *gorm.DB) *Query {
 	return &Query{
-		db:                db,
-		Cast:              newCast(db),
-		Character:         newCharacter(db),
-		CharacterSubjects: newCharacterSubjects(db),
-		Episode:           newEpisode(db),
-		Index:             newIndex(db),
-		IndexSubject:      newIndexSubject(db),
-		Member:            newMember(db),
-		OAuthAccessToken:  newOAuthAccessToken(db),
-		Person:            newPerson(db),
-		PersonField:       newPersonField(db),
-		PersonSubjects:    newPersonSubjects(db),
-		RevisionHistory:   newRevisionHistory(db),
-		RevisionText:      newRevisionText(db),
-		Subject:           newSubject(db),
-		SubjectCollection: newSubjectCollection(db),
-		SubjectField:      newSubjectField(db),
-		SubjectRelation:   newSubjectRelation(db),
-		SubjectRevision:   newSubjectRevision(db),
-		UserGroup:         newUserGroup(db),
-		WebSession:        newWebSession(db),
+		db:                  db,
+		Cast:                newCast(db),
+		Character:           newCharacter(db),
+		CharacterComment:    newCharacterComment(db),
+		CharacterSubjects:   newCharacterSubjects(db),
+		Episode:             newEpisode(db),
+		EpisodeComment:      newEpisodeComment(db),
+		GroupTopic:          newGroupTopic(db),
+		GroupTopicComment:   newGroupTopicComment(db),
+		Index:               newIndex(db),
+		IndexComment:        newIndexComment(db),
+		IndexSubject:        newIndexSubject(db),
+		Member:              newMember(db),
+		OAuthAccessToken:    newOAuthAccessToken(db),
+		Person:              newPerson(db),
+		PersonField:         newPersonField(db),
+		PersonSubjects:      newPersonSubjects(db),
+		RevisionHistory:     newRevisionHistory(db),
+		RevisionText:        newRevisionText(db),
+		Subject:             newSubject(db),
+		SubjectCollection:   newSubjectCollection(db),
+		SubjectField:        newSubjectField(db),
+		SubjectRelation:     newSubjectRelation(db),
+		SubjectRevision:     newSubjectRevision(db),
+		SubjectTopic:        newSubjectTopic(db),
+		SubjectTopicComment: newSubjectTopicComment(db),
+		UserGroup:           newUserGroup(db),
+		WebSession:          newWebSession(db),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Cast              cast
-	Character         character
-	CharacterSubjects characterSubjects
-	Episode           episode
-	Index             index
-	IndexSubject      indexSubject
-	Member            member
-	OAuthAccessToken  oAuthAccessToken
-	Person            person
-	PersonField       personField
-	PersonSubjects    personSubjects
-	RevisionHistory   revisionHistory
-	RevisionText      revisionText
-	Subject           subject
-	SubjectCollection subjectCollection
-	SubjectField      subjectField
-	SubjectRelation   subjectRelation
-	SubjectRevision   subjectRevision
-	UserGroup         userGroup
-	WebSession        webSession
+	Cast                cast
+	Character           character
+	CharacterComment    characterComment
+	CharacterSubjects   characterSubjects
+	Episode             episode
+	EpisodeComment      episodeComment
+	GroupTopic          groupTopic
+	GroupTopicComment   groupTopicComment
+	Index               index
+	IndexComment        indexComment
+	IndexSubject        indexSubject
+	Member              member
+	OAuthAccessToken    oAuthAccessToken
+	Person              person
+	PersonField         personField
+	PersonSubjects      personSubjects
+	RevisionHistory     revisionHistory
+	RevisionText        revisionText
+	Subject             subject
+	SubjectCollection   subjectCollection
+	SubjectField        subjectField
+	SubjectRelation     subjectRelation
+	SubjectRevision     subjectRevision
+	SubjectTopic        subjectTopic
+	SubjectTopicComment subjectTopicComment
+	UserGroup           userGroup
+	WebSession          webSession
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:                db,
-		Cast:              q.Cast.clone(db),
-		Character:         q.Character.clone(db),
-		CharacterSubjects: q.CharacterSubjects.clone(db),
-		Episode:           q.Episode.clone(db),
-		Index:             q.Index.clone(db),
-		IndexSubject:      q.IndexSubject.clone(db),
-		Member:            q.Member.clone(db),
-		OAuthAccessToken:  q.OAuthAccessToken.clone(db),
-		Person:            q.Person.clone(db),
-		PersonField:       q.PersonField.clone(db),
-		PersonSubjects:    q.PersonSubjects.clone(db),
-		RevisionHistory:   q.RevisionHistory.clone(db),
-		RevisionText:      q.RevisionText.clone(db),
-		Subject:           q.Subject.clone(db),
-		SubjectCollection: q.SubjectCollection.clone(db),
-		SubjectField:      q.SubjectField.clone(db),
-		SubjectRelation:   q.SubjectRelation.clone(db),
-		SubjectRevision:   q.SubjectRevision.clone(db),
-		UserGroup:         q.UserGroup.clone(db),
-		WebSession:        q.WebSession.clone(db),
+		db:                  db,
+		Cast:                q.Cast.clone(db),
+		Character:           q.Character.clone(db),
+		CharacterComment:    q.CharacterComment.clone(db),
+		CharacterSubjects:   q.CharacterSubjects.clone(db),
+		Episode:             q.Episode.clone(db),
+		EpisodeComment:      q.EpisodeComment.clone(db),
+		GroupTopic:          q.GroupTopic.clone(db),
+		GroupTopicComment:   q.GroupTopicComment.clone(db),
+		Index:               q.Index.clone(db),
+		IndexComment:        q.IndexComment.clone(db),
+		IndexSubject:        q.IndexSubject.clone(db),
+		Member:              q.Member.clone(db),
+		OAuthAccessToken:    q.OAuthAccessToken.clone(db),
+		Person:              q.Person.clone(db),
+		PersonField:         q.PersonField.clone(db),
+		PersonSubjects:      q.PersonSubjects.clone(db),
+		RevisionHistory:     q.RevisionHistory.clone(db),
+		RevisionText:        q.RevisionText.clone(db),
+		Subject:             q.Subject.clone(db),
+		SubjectCollection:   q.SubjectCollection.clone(db),
+		SubjectField:        q.SubjectField.clone(db),
+		SubjectRelation:     q.SubjectRelation.clone(db),
+		SubjectRevision:     q.SubjectRevision.clone(db),
+		SubjectTopic:        q.SubjectTopic.clone(db),
+		SubjectTopicComment: q.SubjectTopicComment.clone(db),
+		UserGroup:           q.UserGroup.clone(db),
+		WebSession:          q.WebSession.clone(db),
 	}
 }
 
 type queryCtx struct {
-	Cast              castDo
-	Character         characterDo
-	CharacterSubjects characterSubjectsDo
-	Episode           episodeDo
-	Index             indexDo
-	IndexSubject      indexSubjectDo
-	Member            memberDo
-	OAuthAccessToken  oAuthAccessTokenDo
-	Person            personDo
-	PersonField       personFieldDo
-	PersonSubjects    personSubjectsDo
-	RevisionHistory   revisionHistoryDo
-	RevisionText      revisionTextDo
-	Subject           subjectDo
-	SubjectCollection subjectCollectionDo
-	SubjectField      subjectFieldDo
-	SubjectRelation   subjectRelationDo
-	SubjectRevision   subjectRevisionDo
-	UserGroup         userGroupDo
-	WebSession        webSessionDo
+	Cast                castDo
+	Character           characterDo
+	CharacterComment    characterCommentDo
+	CharacterSubjects   characterSubjectsDo
+	Episode             episodeDo
+	EpisodeComment      episodeCommentDo
+	GroupTopic          groupTopicDo
+	GroupTopicComment   groupTopicCommentDo
+	Index               indexDo
+	IndexComment        indexCommentDo
+	IndexSubject        indexSubjectDo
+	Member              memberDo
+	OAuthAccessToken    oAuthAccessTokenDo
+	Person              personDo
+	PersonField         personFieldDo
+	PersonSubjects      personSubjectsDo
+	RevisionHistory     revisionHistoryDo
+	RevisionText        revisionTextDo
+	Subject             subjectDo
+	SubjectCollection   subjectCollectionDo
+	SubjectField        subjectFieldDo
+	SubjectRelation     subjectRelationDo
+	SubjectRevision     subjectRevisionDo
+	SubjectTopic        subjectTopicDo
+	SubjectTopicComment subjectTopicCommentDo
+	UserGroup           userGroupDo
+	WebSession          webSessionDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Cast:              *q.Cast.WithContext(ctx),
-		Character:         *q.Character.WithContext(ctx),
-		CharacterSubjects: *q.CharacterSubjects.WithContext(ctx),
-		Episode:           *q.Episode.WithContext(ctx),
-		Index:             *q.Index.WithContext(ctx),
-		IndexSubject:      *q.IndexSubject.WithContext(ctx),
-		Member:            *q.Member.WithContext(ctx),
-		OAuthAccessToken:  *q.OAuthAccessToken.WithContext(ctx),
-		Person:            *q.Person.WithContext(ctx),
-		PersonField:       *q.PersonField.WithContext(ctx),
-		PersonSubjects:    *q.PersonSubjects.WithContext(ctx),
-		RevisionHistory:   *q.RevisionHistory.WithContext(ctx),
-		RevisionText:      *q.RevisionText.WithContext(ctx),
-		Subject:           *q.Subject.WithContext(ctx),
-		SubjectCollection: *q.SubjectCollection.WithContext(ctx),
-		SubjectField:      *q.SubjectField.WithContext(ctx),
-		SubjectRelation:   *q.SubjectRelation.WithContext(ctx),
-		SubjectRevision:   *q.SubjectRevision.WithContext(ctx),
-		UserGroup:         *q.UserGroup.WithContext(ctx),
-		WebSession:        *q.WebSession.WithContext(ctx),
+		Cast:                *q.Cast.WithContext(ctx),
+		Character:           *q.Character.WithContext(ctx),
+		CharacterComment:    *q.CharacterComment.WithContext(ctx),
+		CharacterSubjects:   *q.CharacterSubjects.WithContext(ctx),
+		Episode:             *q.Episode.WithContext(ctx),
+		EpisodeComment:      *q.EpisodeComment.WithContext(ctx),
+		GroupTopic:          *q.GroupTopic.WithContext(ctx),
+		GroupTopicComment:   *q.GroupTopicComment.WithContext(ctx),
+		Index:               *q.Index.WithContext(ctx),
+		IndexComment:        *q.IndexComment.WithContext(ctx),
+		IndexSubject:        *q.IndexSubject.WithContext(ctx),
+		Member:              *q.Member.WithContext(ctx),
+		OAuthAccessToken:    *q.OAuthAccessToken.WithContext(ctx),
+		Person:              *q.Person.WithContext(ctx),
+		PersonField:         *q.PersonField.WithContext(ctx),
+		PersonSubjects:      *q.PersonSubjects.WithContext(ctx),
+		RevisionHistory:     *q.RevisionHistory.WithContext(ctx),
+		RevisionText:        *q.RevisionText.WithContext(ctx),
+		Subject:             *q.Subject.WithContext(ctx),
+		SubjectCollection:   *q.SubjectCollection.WithContext(ctx),
+		SubjectField:        *q.SubjectField.WithContext(ctx),
+		SubjectRelation:     *q.SubjectRelation.WithContext(ctx),
+		SubjectRevision:     *q.SubjectRevision.WithContext(ctx),
+		SubjectTopic:        *q.SubjectTopic.WithContext(ctx),
+		SubjectTopicComment: *q.SubjectTopicComment.WithContext(ctx),
+		UserGroup:           *q.UserGroup.WithContext(ctx),
+		WebSession:          *q.WebSession.WithContext(ctx),
 	}
 }
 

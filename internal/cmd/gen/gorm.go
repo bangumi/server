@@ -302,6 +302,39 @@ func main() {
 		gen.FieldRename("rev_creator", "CreatorID"),
 	))
 
+	g.ApplyBasic(g.GenerateModelAs("chii_subject_topics", "SubjectTopic",
+		gen.FieldTrimPrefix("sbj_tpc_"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_group_topics", "GroupTopic",
+		gen.FieldTrimPrefix("grp_tpc_"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_subject_posts", "SubjectTopicComment",
+		gen.FieldTrimPrefix("sbj_pst_"),
+		gen.FieldRename("sbj_pst_mid", "MentionedID"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_group_posts", "GroupTopicComment",
+		gen.FieldTrimPrefix("grp_pst_"),
+		gen.FieldRename("grp_pst_mid", "MentionedID"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_ep_comments", "EpisodeComment",
+		gen.FieldTrimPrefix("ep_pst_"),
+		gen.FieldRename("ep_pst_mid", "MentionedID"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_crt_comments", "CharacterComment",
+		gen.FieldTrimPrefix("crt_pst_"),
+		gen.FieldRename("crt_pst_mid", "MentionedID"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_index_comments", "IndexComment",
+		gen.FieldTrimPrefix("idx_pst"),
+		gen.FieldRename("idx_pst_mid", "MentionedID"),
+	))
+
 	// execute the action of code generation
 	g.Execute()
 }

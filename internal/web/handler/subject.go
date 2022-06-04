@@ -161,6 +161,160 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	return c.Redirect(l)
 }
 
+func (h Handler) GetSubjectTopics(c *fiber.Ctx) error {
+	u := h.getHTTPAccessor(c)
+
+	id, err := parseSubjectID(c.Params("id"))
+	if err != nil || id == 0 {
+		return fiber.NewError(http.StatusBadRequest, err.Error())
+	}
+
+	r, ok, err := h.getSubjectWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	topics, err := h.t.GetTopicsByObjectID(c.Context(), model.TopicTypeSubject, id)
+	if err != nil {
+		return errgo.Wrap(err, "repo.topic.GetTopicsByObjectID")
+	}
+
+	userIDs := make([]model.UIDType, 0)
+	for _, v := range topics {
+		userIDs = append(userIDs, v.UID)
+	}
+
+	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
+	if err != nil {
+		return errgo.Wrap(err, "user.GetByIDs")
+	}
+
+	response := make([]res.Topic, 0)
+	for _, v := range topics {
+		creator := userMap[v.UID]
+		response = append(response, res.Topic{
+			ID:        v.ID,
+			Title:     v.Title,
+			CreatedAt: v.CreatedAt,
+			Creator: res.Creator{
+				Username: creator.UserName,
+				Nickname: creator.NickName,
+			},
+			Replies:  v.Replies,
+			Comments: &res.Comments{},
+		})
+	}
+	return c.JSON(response)
+}
+
+func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
+	u := h.getHTTPAccessor(c)
+
+	topicID, err := parseTopicID(c.Params("topic_id"))
+	if err != nil || topicID == 0 {
+		return errMissingTopicID
+	}
+
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	topic, err := h.t.Get(c.Context(), model.TopicTypeSubject, page.Limit, page.Offset, topicID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return c.Status(http.StatusNotFound).JSON(res.Error{
+				Title:   "Not Found",
+				Details: util.DetailFromRequest(c),
+			})
+		}
+		return errgo.Wrap(err, "Topic.Get")
+	}
+
+	var subjectID model.SubjectIDType
+	subjectID, err = parseSubjectID(c.Params("id"))
+	if err != nil || subjectID == 0 {
+		subjectID = topic.ObjectID
+	} else if subjectID != topic.ObjectID {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	r, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
+	if err != nil {
+		return err
+	}
+
+	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	userIDs := make([]model.UIDType, 0)
+	for _, v := range topic.Comments.Data {
+		userIDs = append(userIDs, v.UID)
+	}
+	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(append(userIDs, topic.UID)...)...)
+	if err != nil {
+		return errgo.Wrap(err, "user.GetByIDs")
+	}
+
+	topic.Comments.Data = model.ConvertModelCommentsToTree(topic.Comments.Data, 0)
+	return c.JSON(convertModelTopic(topic, userMap))
+}
+
+func convertModelTopic(topic model.Topic, userMap map[uint32]model.User) res.Topic {
+	creator := userMap[topic.UID]
+	return res.Topic{
+		ID:        topic.ID,
+		Title:     topic.Title,
+		CreatedAt: topic.CreatedAt,
+		Creator: res.Creator{
+			Username: creator.UserName,
+			Nickname: creator.NickName,
+		},
+		Replies: topic.Replies,
+		Comments: &res.Comments{
+			Total:  topic.Comments.Limit,
+			Limit:  topic.Comments.Limit,
+			Offset: topic.Comments.Offset,
+			Data:   convertModelTopicComments(topic.Comments.Data, userMap),
+		},
+	}
+}
+
+func convertModelTopicComments(comments []model.Comment, userMap map[uint32]model.User) []res.Comment {
+	replies := make([]res.Comment, 0)
+	for _, v := range comments {
+		creator := userMap[v.UID]
+		replies = append(replies, res.Comment{
+			ID:        v.ID,
+			Text:      v.Content,
+			CreatedAt: v.CreatedAt,
+			Creator: res.Creator{
+				Username: creator.UserName,
+				Nickname: creator.NickName,
+			},
+			Replies: convertModelTopicComments(v.Replies, userMap),
+		})
+	}
+	return replies
+}
+
 func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 

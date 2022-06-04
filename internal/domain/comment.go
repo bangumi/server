@@ -12,17 +12,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package domain
 
-type UIDType = uint32 // UserID
-type GroupID = uint8
+import (
+	"context"
 
-type SubjectIDType = uint32 // in case we need future change, but I guess not...
-type CharacterIDType = uint32
-type PersonIDType = uint32
-type IndexIDType = uint32
-type EpisodeIDType = uint32
-type EpTypeType = int16
-type RevisionTypeType = uint8
-type TopicIDType = uint32
-type CommentIDType = uint32
+	"github.com/bangumi/server/internal/model"
+)
+
+type CommentRepo interface {
+	Get(ctx context.Context, commentType model.CommentType, id model.CommentIDType) (model.Comment, error)
+
+	GetCommentsByMentionedID(ctx context.Context, commentType model.CommentType, limit int, offset int, id uint32) (model.Comments, error)
+}

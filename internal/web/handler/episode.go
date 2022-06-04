@@ -68,6 +68,76 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 	return c.JSON(e)
 }
 
+func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
+	u := h.getHTTPAccessor(c)
+
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	id, err := parseEpisodeID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	e, ok, err := h.getEpisodeWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	s, ok, err := h.getSubjectWithCache(c.Context(), e.SubjectID)
+	if err != nil {
+		return err
+	}
+
+	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	comments, err := h.m.GetCommentsByMentionedID(c.Context(), model.CommentEpisode, page.Limit, page.Offset, id)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return c.Status(http.StatusNotFound).JSON(res.Error{
+				Title:   "Not Found",
+				Details: util.DetailFromRequest(c),
+			})
+		}
+		return errgo.Wrap(err, "Comment.GetCommentsByMentionedID")
+	}
+
+	userIDs := make([]model.UIDType, 0)
+	for _, v := range comments.Data {
+		userIDs = append(userIDs, v.UID)
+	}
+
+	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
+	if err != nil {
+		return errgo.Wrap(err, "user.GetByIDs")
+	}
+	comments.Data = model.ConvertModelCommentsToTree(comments.Data, 0)
+
+	return c.JSON(res.Comments{
+		Total:  comments.Total,
+		Limit:  comments.Limit,
+		Offset: comments.Offset,
+		Data:   convertModelTopicComments(comments.Data, userMap),
+	})
+}
+
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
 func (h Handler) getEpisodeWithCache(ctx context.Context, id uint32) (res.Episode, bool, error) {

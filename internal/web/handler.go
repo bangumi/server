@@ -57,6 +57,8 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	v0.Get("/subjects/:id", addMetrics(h.GetSubject))
 	v0.Get("/subjects/:id/image", addMetrics(h.GetSubjectImage))
+	v0.Get("/subjects/:id/topics", addMetrics(h.GetSubjectTopics))
+	v0.Get("/subjects/:id/topics/:topic_id", addMetrics(h.GetSubjectTopic))
 	v0.Get("/subjects/:id/persons", addMetrics(h.GetSubjectRelatedPersons))
 	v0.Get("/subjects/:id/subjects", addMetrics(h.GetSubjectRelatedSubjects))
 	v0.Get("/subjects/:id/characters", addMetrics(h.GetSubjectRelatedCharacters))
@@ -69,6 +71,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	v0.Get("/characters/:id/subjects", addMetrics(h.GetCharacterRelatedSubjects))
 	v0.Get("/characters/:id/persons", addMetrics(h.GetCharacterRelatedPersons))
 	v0.Get("/episodes/:id", addMetrics(h.GetEpisode))
+	v0.Get("/episodes/:id/comments", addMetrics(h.GetEpisode))
 	v0.Get("/episodes", addMetrics(h.ListEpisode))
 
 	v0.Get("/me", addMetrics(h.GetCurrentUser))

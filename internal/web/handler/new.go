@@ -47,6 +47,8 @@ func New(
 	a domain.AuthService,
 	e domain.EpisodeRepo,
 	r domain.RevisionRepo,
+	t domain.TopicService,
+	m domain.CommentRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
 	cache cache.Generic,
@@ -76,6 +78,8 @@ func New(
 		c:                    c,
 		i:                    index,
 		r:                    r,
+		t:                    t,
+		m:                    m,
 		captcha:              captcha,
 		v:                    validate,
 		validatorTranslation: trans,
@@ -99,6 +103,8 @@ type Handler struct {
 	cache                cache.Generic
 	i                    domain.IndexRepo
 	r                    domain.RevisionRepo
+	m                    domain.CommentRepo
+	t                    domain.TopicService
 	buffPool             buffer.Pool
 	log                  *zap.Logger
 	v                    *validator.Validate
