@@ -253,7 +253,7 @@ func MockAuthService(m domain.AuthService) fx.Option {
 
 func MockOAuthManager(m oauth.Manager) fx.Option {
 	if m == nil {
-		return fx.Provide(oauth.NewMysqlRepo)
+		m = &mocks.OAuthManger{}
 	}
 
 	return fx.Provide(func() oauth.Manager { return m })
