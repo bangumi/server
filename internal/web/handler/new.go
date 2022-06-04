@@ -29,7 +29,6 @@ import (
 
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/web/captcha"
@@ -56,7 +55,6 @@ func New(
 	rateLimit rate.Manager,
 	log *zap.Logger,
 	engine frontend.TemplateEngine,
-	q *query.Query,
 ) (Handler, error) {
 
 	validate, trans, err := getValidator()
@@ -82,14 +80,12 @@ func New(
 		v:                    validate,
 		validatorTranslation: trans,
 
-		q:        q,
 		template: engine,
 		buffPool: buffer.NewPool(),
 	}, nil
 }
 
 type Handler struct {
-	q                    *query.Query
 	validatorTranslation ut.Translator
 	rateLimit            rate.Manager
 	s                    domain.SubjectService
