@@ -43,7 +43,7 @@ func TestGet(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.Get(context.Background(), domain.TopicTypeSubject, 10, 10, 1)
+	s, err := repo.Get(context.Background(), domain.TopicTypeSubject, 1, 0, 0)
 	require.NoError(t, err)
 
 	require.Equal(t, model.TopicIDType(1), s.ID)
