@@ -55,7 +55,7 @@ func TestMysqlRepo_GetCommentsByMentionedID(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.GetCommentsByMentionedID(context.Background(), domain.CommentTypeSubjectTopic, 0, 0, 2)
+	s, err := repo.GetCommentsByMentionedID(context.Background(), domain.CommentTypeSubjectTopic, 0, 0, 1)
 	require.NoError(t, err)
 
 	require.True(t, len(s.Data) != 0, "cannot fetch comments")

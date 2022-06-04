@@ -52,7 +52,9 @@ func (s service) Get(
 	return topic, nil
 }
 
-func (s service) GetTopicsByObjectID(ctx context.Context, topicType domain.TopicType, id uint32) ([]model.Topic, error) {
+func (s service) GetTopicsByObjectID(
+	ctx context.Context, topicType domain.TopicType, id uint32,
+) ([]model.Topic, error) {
 	topics, err := s.repo.GetTopicsByObjectID(ctx, topicType, id)
 	if err != nil {
 		return nil, errgo.Wrap(err, "TopicRepo.GetTopicsByObjectID")
