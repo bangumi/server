@@ -231,6 +231,29 @@ func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 	return fx.Supply(fx.Annotate(m, fx.As(new(domain.EpisodeRepo))))
 }
 
+func MockCommentRepo(m domain.CommentRepo) fx.Option {
+	if m == nil {
+		mocker := &mocks.CommentRepo{}
+		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(model.Comment{}, nil)
+
+		m = mocker
+	}
+
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.EpisodeRepo))))
+}
+
+func MockTopicService(m domain.TopicService) fx.Option {
+	if m == nil {
+		mocker := &mocks.TopicService{}
+		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			Return(model.Topic{}, nil)
+
+		m = mocker
+	}
+
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.EpisodeRepo))))
+}
+
 func MockAuthRepo(m domain.AuthRepo) fx.Option {
 	if m == nil {
 		mocker := &mocks.AuthRepo{}
