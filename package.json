@@ -1,5 +1,5 @@
 {
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "tools to bundle openapi spec, not used in our server",
   "private": true,
   "scripts": {

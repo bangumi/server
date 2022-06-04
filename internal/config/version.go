@@ -2,4 +2,4 @@
 
 package config
 
-const Version = "v0.18.0"
+const Version = "v0.18.1"
