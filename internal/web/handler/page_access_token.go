@@ -48,20 +48,6 @@ func (h Handler) PageListAccessToken(c *fiber.Ctx) error {
 	return h.render(c, frontend.TplListAccessToken, frontend.ListAccessToken{Tokens: tokens, User: u, Clients: clients})
 }
 
-func clientIDs(tokens []domain.AccessToken) []string {
-	var clientIDs = make(map[string]struct{}, len(tokens))
-	for _, token := range tokens {
-		clientIDs[token.ClientID] = struct{}{}
-	}
-
-	var s = make([]string, 0, len(clientIDs))
-	for token := range clientIDs {
-		s = append(s, token)
-	}
-
-	return s
-}
-
 func (h Handler) PageCreateAccessToken(c *fiber.Ctx) error {
 	v := h.getHTTPAccessor(c)
 	if !v.login {
@@ -74,4 +60,18 @@ func (h Handler) PageCreateAccessToken(c *fiber.Ctx) error {
 	}
 
 	return h.render(c, frontend.TplCreateAccessToken, frontend.CreateAccessToken{User: u})
+}
+
+func clientIDs(tokens []domain.AccessToken) []string {
+	var clientIDs = make(map[string]struct{}, len(tokens))
+	for _, token := range tokens {
+		clientIDs[token.ClientID] = struct{}{}
+	}
+
+	var s = make([]string, 0, len(clientIDs))
+	for token := range clientIDs {
+		s = append(s, token)
+	}
+
+	return s
 }
