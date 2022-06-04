@@ -22,7 +22,7 @@ import (
 
 	"github.com/elliotchance/phpserialize"
 	"github.com/goccy/go-json"
-	"github.com/mitchellh/mapstructure"
+	ms "github.com/mitchellh/mapstructure"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -124,7 +124,7 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Per
 			m.log.Error("failed to decode php serialized content", zap.Error(err), log.GroupID(groupID))
 			return domain.Permission{}, nil
 		}
-		if err = mapstructure.Decode(d, &p); err != nil {
+		if err = ms.Decode(d, &p); err != nil {
 			m.log.Error("failed to convert from map to struct when decoding permission",
 				zap.Error(err), zap.Uint8("group_id", groupID))
 			return domain.Permission{}, nil

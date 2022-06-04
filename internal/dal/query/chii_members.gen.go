@@ -41,7 +41,7 @@ func newMember(db *gorm.DB) member {
 	_member.Timeoffset = field.NewString(tableName, "timeoffset")
 	_member.Newpm = field.NewBool(tableName, "newpm")
 	_member.NewNotify = field.NewUint16(tableName, "new_notify")
-	_member.Sign = field.NewString(tableName, "SIGN")
+	_member.Sign = field.NewString(tableName, "sign")
 	_member.PasswordCrypt = field.NewField(tableName, "password_crypt")
 	_member.Email = field.NewString(tableName, "email")
 	_member.Fields = memberHasOneFields{
@@ -107,7 +107,7 @@ func (m *member) updateTableName(table string) *member {
 	m.Timeoffset = field.NewString(table, "timeoffset")
 	m.Newpm = field.NewBool(table, "newpm")
 	m.NewNotify = field.NewUint16(table, "new_notify")
-	m.Sign = field.NewString(table, "SIGN")
+	m.Sign = field.NewString(table, "sign")
 	m.PasswordCrypt = field.NewField(table, "password_crypt")
 	m.Email = field.NewString(table, "email")
 
@@ -147,7 +147,7 @@ func (m *member) fillFieldMap() {
 	m.fieldMap["timeoffset"] = m.Timeoffset
 	m.fieldMap["newpm"] = m.Newpm
 	m.fieldMap["new_notify"] = m.NewNotify
-	m.fieldMap["SIGN"] = m.Sign
+	m.fieldMap["sign"] = m.Sign
 	m.fieldMap["password_crypt"] = m.PasswordCrypt
 	m.fieldMap["email"] = m.Email
 

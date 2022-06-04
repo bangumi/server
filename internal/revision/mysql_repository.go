@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/elliotchance/phpserialize"
-	"github.com/mitchellh/mapstructure"
+	ms "github.com/mitchellh/mapstructure"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -261,7 +261,7 @@ func castCharacterData(raw map[string]interface{}) model.CharacterRevisionData {
 		return nil
 	}
 	result := make(map[string]model.CharacterRevisionDataItem, len(raw))
-	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+	decoder, err := ms.NewDecoder(&ms.DecoderConfig{
 		DecodeHook: safeDecodeExtra,
 		Result:     &result,
 	})
@@ -276,7 +276,7 @@ func castPersonData(raw map[string]interface{}) model.PersonRevisionData {
 		return nil
 	}
 	result := make(map[string]model.PersonRevisionDataItem, len(raw))
-	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+	decoder, err := ms.NewDecoder(&ms.DecoderConfig{
 		DecodeHook: safeDecodeExtra,
 		Result:     &result,
 	})

@@ -36,11 +36,13 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-var userIDTypeString = "model.UserID"           // reflect.TypeOf(new(model.UserID)).Elem().Name()
-var personIDTypeString = "model.PersonID"       // reflect.TypeOf(new(model.PersonID)).Elem().Name()
-var characterIDTypeString = "model.CharacterID" // reflect.TypeOf(new(model.CharacterID)).Elem().Name()
-var episodeIDTypeString = "model.EpisodeID"     // reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
-var subjectIDTypeString = "model.SubjectID"     // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
+var userIDTypeString = "model.UserID"
+var personIDTypeString = "model.PersonID"
+var characterIDTypeString = "model.CharacterID"
+var episodeIDTypeString = "model.EpisodeID"
+var subjectIDTypeString = "model.SubjectID"
+var timelineIDTypeString = reflect.TypeOf(new(model.TimeLineID)).Elem().Kind().String()
+var timelineTypeTypeString = reflect.TypeOf(new(model.TimeLineType)).Elem().Kind().String()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
@@ -160,6 +162,14 @@ func main() {
 	))
 
 	g.ApplyBasic(oauthApp)
+
+	g.ApplyBasic(g.GenerateModelAs("chii_timeline", "TimeLine",
+		gen.FieldTrimPrefix("tml_"),
+		gen.FieldType("tml_id", timelineIDTypeString),
+		gen.FieldType("tml_type", timelineTypeTypeString),
+		gen.FieldType("tml_img", "[]byte"),
+		gen.FieldType("tml_memo", "[]byte"),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "AccessToken",
 		gen.FieldType("type", "uint8"),

@@ -55,6 +55,8 @@ func convertFromDao(record *dao.OAuthClient) Client {
 	var userID model.UserID
 	var err error
 	if record.UserID != "" {
+		userID = 0
+	} else {
 		userID, err = strparse.UserID(record.UserID)
 		if err != nil {
 			logger.Fatal("unexpected error when parsing userID", zap.Error(err), zap.String("raw", record.UserID))

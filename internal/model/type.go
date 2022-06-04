@@ -27,12 +27,16 @@ type RevisionID = uint32
 type GroupID = uint8
 type EpType = int16
 type RevisionType = uint8
+type TimeLineID uint32
+
+type TimeLineType uint16
 
 var _ driver.Valuer = UserID(0)
 var _ driver.Valuer = PersonID(0)
 var _ driver.Valuer = CharacterID(0)
 var _ driver.Valuer = SubjectID(0)
-var _ driver.Valuer = EpisodeID(0)
+var _ driver.Valuer = TimeLineID(0)
+var _ driver.Valuer = TimeLineType(0)
 
 func (v UserID) Value() (driver.Value, error) {
 	return int64(v), nil
@@ -52,4 +56,12 @@ func (v SubjectID) Value() (driver.Value, error) {
 
 func (v EpisodeID) Value() (driver.Value, error) {
 	return int64(v), nil
+}
+
+func (t TimeLineID) Value() (driver.Value, error) {
+	return int64(t), nil
+}
+
+func (t TimeLineType) Value() (driver.Value, error) {
+	return int64(t), nil
 }
