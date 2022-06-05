@@ -17,17 +17,14 @@ package domain_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/stretchr/testify/require"
 )
 
 func TestConvertModelCommentsToTree(t *testing.T) {
 	t.Parallel()
-	type args struct {
-		comments []model.Comment
-		related  uint32
-	}
 
 	input := []model.Comment{
 		{
