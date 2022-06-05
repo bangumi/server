@@ -65,7 +65,7 @@ func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[ui
 }
 
 func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32) error {
-	topics, err := h.t.GetTopics(c.Context(), topicType, id)
+	topics, err := h.t.ListTopics(c.Context(), topicType, id)
 	if err != nil {
 		return errgo.Wrap(err, "repo.topic.GetTopicsByObjectID")
 	}
@@ -99,7 +99,7 @@ func (h Handler) getResTopic(c *fiber.Ctx, topic model.Topic) error {
 	}
 
 	creator := userMap[topic.UID]
-	topic.Comments.Data = model.ConvertModelCommentsToTree(topic.Comments.Data, 0)
+	topic.Comments.Data = domain.ConvertModelCommentsToTree(topic.Comments.Data, 0)
 	response := res.Topic{
 		ID:        topic.ID,
 		Title:     topic.Title,

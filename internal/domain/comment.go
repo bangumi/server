@@ -31,9 +31,22 @@ type CommentRepo interface {
 type CommentType uint32
 
 const (
-	CommentTypeSubjectTopic CommentType = iota
+	CommentTypeSubjectTopic CommentType = iota + 1
 	CommentTypeGroupTopic
 	CommentIndex
 	CommentCharacter
 	CommentEpisode
 )
+
+func ConvertModelCommentsToTree(comments []model.Comment, related uint32) []model.Comment {
+	result := make([]model.Comment, 0)
+	for _, v := range comments {
+		if v.Related == related {
+			if replies := ConvertModelCommentsToTree(comments, v.ID); len(replies) != 0 {
+				v.Replies = replies
+			}
+			result = append(result, v)
+		}
+	}
+	return result
+}

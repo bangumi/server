@@ -65,7 +65,7 @@ func (r mysqlRepo) Get(
 	return ConvertDao(topic)
 }
 
-func (r mysqlRepo) GetTopics(
+func (r mysqlRepo) ListTopics(
 	ctx context.Context, topicType domain.TopicType, id uint32,
 ) ([]model.Topic, error) {
 	var (

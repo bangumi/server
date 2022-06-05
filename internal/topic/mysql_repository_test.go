@@ -55,7 +55,7 @@ func TestMysqlRepo_GetTopics(t *testing.T) {
 
 	repo := getRepo(t)
 
-	_, err := repo.GetTopics(context.Background(), domain.TopicTypeSubject, 2)
+	_, err := repo.ListTopics(context.Background(), domain.TopicTypeSubject, 2)
 	require.NoError(t, err)
 }
 

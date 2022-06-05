@@ -72,8 +72,8 @@ func (_c *TopicService_Get_Call) Return(_a0 model.Topic, _a1 error) *TopicServic
 	return _c
 }
 
-// GetTopics provides a mock function with given fields: ctx, topicType, id
-func (_m *TopicService) GetTopics(ctx context.Context, topicType domain.TopicType, id uint32) ([]model.Topic, error) {
+// ListTopics provides a mock function with given fields: ctx, topicType, id
+func (_m *TopicService) ListTopics(ctx context.Context, topicType domain.TopicType, id uint32) ([]model.Topic, error) {
 	ret := _m.Called(ctx, topicType, id)
 
 	var r0 []model.Topic
@@ -95,27 +95,27 @@ func (_m *TopicService) GetTopics(ctx context.Context, topicType domain.TopicTyp
 	return r0, r1
 }
 
-// TopicService_GetTopics_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTopics'
-type TopicService_GetTopics_Call struct {
+// TopicService_ListTopics_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListTopics'
+type TopicService_ListTopics_Call struct {
 	*mock.Call
 }
 
-// GetTopics is a helper method to define mock.On call
+// ListTopics is a helper method to define mock.On call
 //  - ctx context.Context
 //  - topicType domain.TopicType
 //  - id uint32
-func (_e *TopicService_Expecter) GetTopics(ctx interface{}, topicType interface{}, id interface{}) *TopicService_GetTopics_Call {
-	return &TopicService_GetTopics_Call{Call: _e.mock.On("GetTopics", ctx, topicType, id)}
+func (_e *TopicService_Expecter) ListTopics(ctx interface{}, topicType interface{}, id interface{}) *TopicService_ListTopics_Call {
+	return &TopicService_ListTopics_Call{Call: _e.mock.On("ListTopics", ctx, topicType, id)}
 }
 
-func (_c *TopicService_GetTopics_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id uint32)) *TopicService_GetTopics_Call {
+func (_c *TopicService_ListTopics_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id uint32)) *TopicService_ListTopics_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(domain.TopicType), args[2].(uint32))
 	})
 	return _c
 }
 
-func (_c *TopicService_GetTopics_Call) Return(_a0 []model.Topic, _a1 error) *TopicService_GetTopics_Call {
+func (_c *TopicService_ListTopics_Call) Return(_a0 []model.Topic, _a1 error) *TopicService_ListTopics_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
