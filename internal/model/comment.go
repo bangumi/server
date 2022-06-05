@@ -28,8 +28,8 @@ type Comment struct {
 }
 
 type Comments struct {
-	Data   []Comment
-	Total  uint32
-	Limit  uint32
-	Offset uint32
+	Data    []Comment
+	HasMore bool
+	Limit   uint32
+	Offset  uint32
 }

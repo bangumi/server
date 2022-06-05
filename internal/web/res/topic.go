@@ -18,6 +18,13 @@ import (
 	"time"
 )
 
+type Topics struct {
+	Data    []Topic `json:"data"`
+	HasMore bool    `json:"has_more"`
+	Limit   uint32  `json:"limit"`
+	Offset  uint32  `json:"offset"`
+}
+
 type Topic struct {
 	CreatedAt time.Time `json:"created_at"`
 	Comments  *Comments `json:"comments,omitempty"`
@@ -28,10 +35,10 @@ type Topic struct {
 }
 
 type Comments struct {
-	Data   []Comment `json:"data"`
-	Total  uint32    `json:"total"`
-	Limit  uint32    `json:"limit"`
-	Offset uint32    `json:"offset"`
+	Data    []Comment `json:"data"`
+	HasMore bool      `json:"has_more"`
+	Limit   uint32    `json:"limit"`
+	Offset  uint32    `json:"offset"`
 }
 
 type Comment struct {

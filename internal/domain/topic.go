@@ -23,13 +23,13 @@ import (
 type TopicRepo interface {
 	Get(ctx context.Context, topicType TopicType, id model.TopicIDType, limit int, offset int) (model.Topic, error)
 
-	ListTopics(ctx context.Context, topicType TopicType, id uint32) ([]model.Topic, error)
+	ListTopics(ctx context.Context, topicType TopicType, id uint32, limit int, offset int) (model.Topics, error)
 }
 
 type TopicService interface {
 	Get(ctx context.Context, topicType TopicType, id model.TopicIDType, limit int, offset int) (model.Topic, error)
 
-	ListTopics(ctx context.Context, topicType TopicType, id uint32) ([]model.Topic, error)
+	ListTopics(ctx context.Context, topicType TopicType, id uint32, limit int, offset int) (model.Topics, error)
 }
 
 type TopicType uint32

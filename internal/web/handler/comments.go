@@ -59,9 +59,9 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 	comments.Data = domain.ConvertModelCommentsToTree(comments.Data, 0)
 
 	return c.JSON(res.Comments{
-		Total:  comments.Total,
-		Limit:  comments.Limit,
-		Offset: comments.Offset,
-		Data:   convertModelTopicComments(comments.Data, userMap),
+		HasMore: comments.HasMore,
+		Limit:   comments.Limit,
+		Offset:  comments.Offset,
+		Data:    convertModelTopicComments(comments.Data, userMap),
 	})
 }

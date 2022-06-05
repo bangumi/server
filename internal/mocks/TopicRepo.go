@@ -72,22 +72,20 @@ func (_c *TopicRepo_Get_Call) Return(_a0 model.Topic, _a1 error) *TopicRepo_Get_
 	return _c
 }
 
-// ListTopics provides a mock function with given fields: ctx, topicType, id
-func (_m *TopicRepo) ListTopics(ctx context.Context, topicType domain.TopicType, id uint32) ([]model.Topic, error) {
-	ret := _m.Called(ctx, topicType, id)
+// ListTopics provides a mock function with given fields: ctx, topicType, id, limit, offset
+func (_m *TopicRepo) ListTopics(ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int) (model.Topics, error) {
+	ret := _m.Called(ctx, topicType, id, limit, offset)
 
-	var r0 []model.Topic
-	if rf, ok := ret.Get(0).(func(context.Context, domain.TopicType, uint32) []model.Topic); ok {
-		r0 = rf(ctx, topicType, id)
+	var r0 model.Topics
+	if rf, ok := ret.Get(0).(func(context.Context, domain.TopicType, uint32, int, int) model.Topics); ok {
+		r0 = rf(ctx, topicType, id, limit, offset)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.Topic)
-		}
+		r0 = ret.Get(0).(model.Topics)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.TopicType, uint32) error); ok {
-		r1 = rf(ctx, topicType, id)
+	if rf, ok := ret.Get(1).(func(context.Context, domain.TopicType, uint32, int, int) error); ok {
+		r1 = rf(ctx, topicType, id, limit, offset)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -104,18 +102,20 @@ type TopicRepo_ListTopics_Call struct {
 //  - ctx context.Context
 //  - topicType domain.TopicType
 //  - id uint32
-func (_e *TopicRepo_Expecter) ListTopics(ctx interface{}, topicType interface{}, id interface{}) *TopicRepo_ListTopics_Call {
-	return &TopicRepo_ListTopics_Call{Call: _e.mock.On("ListTopics", ctx, topicType, id)}
+//  - limit int
+//  - offset int
+func (_e *TopicRepo_Expecter) ListTopics(ctx interface{}, topicType interface{}, id interface{}, limit interface{}, offset interface{}) *TopicRepo_ListTopics_Call {
+	return &TopicRepo_ListTopics_Call{Call: _e.mock.On("ListTopics", ctx, topicType, id, limit, offset)}
 }
 
-func (_c *TopicRepo_ListTopics_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id uint32)) *TopicRepo_ListTopics_Call {
+func (_c *TopicRepo_ListTopics_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int)) *TopicRepo_ListTopics_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(domain.TopicType), args[2].(uint32))
+		run(args[0].(context.Context), args[1].(domain.TopicType), args[2].(uint32), args[3].(int), args[4].(int))
 	})
 	return _c
 }
 
-func (_c *TopicRepo_ListTopics_Call) Return(_a0 []model.Topic, _a1 error) *TopicRepo_ListTopics_Call {
+func (_c *TopicRepo_ListTopics_Call) Return(_a0 model.Topics, _a1 error) *TopicRepo_ListTopics_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

@@ -62,34 +62,41 @@ func (r mysqlRepo) Get(
 		return model.Topic{}, errgo.Wrap(err, "dal")
 	}
 
-	return ConvertDao(topic)
+	return convertDao(topic)
 }
 
 func (r mysqlRepo) ListTopics(
-	ctx context.Context, topicType domain.TopicType, id uint32,
-) ([]model.Topic, error) {
+	ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int,
+) (model.Topics, error) {
 	var (
 		topics interface{}
 		err    error
 	)
 	switch topicType {
 	case domain.TopicTypeGroup:
-		topics, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).Find()
+		topics, err = r.q.GroupTopic.WithContext(ctx).
+			Where(r.q.GroupTopic.GroupID.Eq(id)).Offset(offset).Limit(limit).Find()
 	case domain.TopicTypeSubject:
-		topics, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).Find()
+		topics, err = r.q.SubjectTopic.WithContext(ctx).
+			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Offset(offset).Limit(limit).Find()
 	default:
-		return nil, errUnsupportTopicType
+		return model.Topics{}, errUnsupportTopicType
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, domain.ErrNotFound
+			return model.Topics{}, domain.ErrNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))
-		return nil, errgo.Wrap(err, "dal")
+		return model.Topics{}, errgo.Wrap(err, "dal")
 	}
-
-	return convertModelTopics(topics), nil
+	result := convertModelTopics(topics)
+	return model.Topics{
+		Data:    result,
+		HasMore: len(result) == limit,
+		Limit:   uint32(limit),
+		Offset:  uint32(offset),
+	}, nil
 }
 
 var errUnsupportTopicType = errors.New("topic type not support")
@@ -99,13 +106,13 @@ func convertModelTopics(in interface{}) []model.Topic {
 	switch list := in.(type) {
 	case []*dao.SubjectTopic:
 		for _, v := range list {
-			if topic, e := ConvertDao(v); e == nil {
+			if topic, e := convertDao(v); e == nil {
 				topics = append(topics, topic)
 			}
 		}
 	case []*dao.GroupTopic:
 		for _, v := range list {
-			if topic, e := ConvertDao(v); e == nil {
+			if topic, e := convertDao(v); e == nil {
 				topics = append(topics, topic)
 			}
 		}
@@ -113,7 +120,7 @@ func convertModelTopics(in interface{}) []model.Topic {
 	return topics
 }
 
-func ConvertDao(in interface{}) (model.Topic, error) {
+func convertDao(in interface{}) (model.Topic, error) {
 	switch v := in.(type) {
 	case *dao.GroupTopic:
 		return model.Topic{

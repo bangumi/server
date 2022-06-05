@@ -124,7 +124,7 @@ func parseIndexID(s string) (model.IndexIDType, error) {
 
 func parseTopicID(s string) (model.TopicIDType, error) {
 	if s == "" {
-		return 0, errMissingSubjectID
+		return 0, errMissingTopicID
 	}
 
 	v, err := strparse.TopicID(s)

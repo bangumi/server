@@ -130,25 +130,24 @@ func (r mysqlRepo) GetComments(
 ) (model.Comments, error) {
 	var (
 		comments interface{}
-		total    int64
 		err      error
 	)
 	switch commentType {
 	case domain.CommentTypeGroupTopic:
-		comments, total, err = r.q.GroupTopicComment.WithContext(ctx).
-			Where(r.q.GroupTopicComment.MentionedID.Eq(id)).FindByPage(offset, limit)
+		comments, err = r.q.GroupTopicComment.WithContext(ctx).
+			Where(r.q.GroupTopicComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
 	case domain.CommentTypeSubjectTopic:
-		comments, total, err = r.q.SubjectTopicComment.WithContext(ctx).
-			Where(r.q.SubjectTopicComment.MentionedID.Eq(id)).FindByPage(offset, limit)
+		comments, err = r.q.SubjectTopicComment.WithContext(ctx).
+			Where(r.q.SubjectTopicComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
 	case domain.CommentIndex:
-		comments, total, err = r.q.IndexComment.WithContext(ctx).
-			Where(r.q.IndexComment.MentionedID.Eq(id)).FindByPage(offset, limit)
+		comments, err = r.q.IndexComment.WithContext(ctx).
+			Where(r.q.IndexComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
 	case domain.CommentCharacter:
-		comments, total, err = r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.MentionedID.Eq(id)).FindByPage(offset, limit)
+		comments, err = r.q.CharacterComment.WithContext(ctx).
+			Where(r.q.CharacterComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
 	case domain.CommentEpisode:
-		comments, total, err = r.q.EpisodeComment.WithContext(ctx).
-			Where(r.q.EpisodeComment.MentionedID.Eq(id)).FindByPage(offset, limit)
+		comments, err = r.q.EpisodeComment.WithContext(ctx).
+			Where(r.q.EpisodeComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
 	default:
 		return model.Comments{}, errUnsupportCommentType
 	}
@@ -160,12 +159,12 @@ func (r mysqlRepo) GetComments(
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.Comments{}, errgo.Wrap(err, "dal")
 	}
-
+	result := convertModelComments(comments)
 	return model.Comments{
-		Total:  uint32(total),
-		Limit:  uint32(limit),
-		Offset: uint32(offset),
-		Data:   convertModelComments(comments),
+		HasMore: len(result) == limit,
+		Limit:   uint32(limit),
+		Offset:  uint32(offset),
+		Data:    result,
 	}, nil
 }
 

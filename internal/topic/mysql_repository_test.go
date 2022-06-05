@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package topic_test
+package topic
 
 import (
 	"context"
@@ -26,12 +26,11 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/test"
-	"github.com/bangumi/server/internal/topic"
 )
 
 func getRepo(t *testing.T) domain.TopicRepo {
 	t.Helper()
-	repo, err := topic.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
+	repo, err := NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)
 
 	return repo
@@ -55,14 +54,14 @@ func TestMysqlRepo_GetTopics(t *testing.T) {
 
 	repo := getRepo(t)
 
-	_, err := repo.ListTopics(context.Background(), domain.TopicTypeSubject, 2)
+	_, err := repo.ListTopics(context.Background(), domain.TopicTypeSubject, 2, 0, 0)
 	require.NoError(t, err)
 }
 
-func TestMysqlRepo_ConvertDao(t *testing.T) {
+func TestMysqlRepo_convertDao(t *testing.T) {
 	t.Parallel()
 
-	p, err := topic.ConvertDao(&dao.SubjectTopic{
+	p, err := convertDao(&dao.SubjectTopic{
 		ID:        10,
 		SubjectID: 20,
 	})

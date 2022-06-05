@@ -65,20 +65,33 @@ func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[ui
 }
 
 func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32) error {
-	topics, err := h.t.ListTopics(c.Context(), topicType, id)
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	topics, err := h.t.ListTopics(c.Context(), topicType, id, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "repo.topic.GetTopicsByObjectID")
 	}
 
-	userMap, err := h.getUserMapOfTopics(c, topics...)
+	userMap, err := h.getUserMapOfTopics(c, topics.Data...)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	response := make([]res.Topic, 0)
-	for _, v := range topics {
+	response := res.Topics{
+		Data:    make([]res.Topic, 0),
+		HasMore: topics.HasMore,
+		Limit:   topics.Limit,
+		Offset:  topics.Offset,
+	}
+	for _, v := range topics.Data {
 		creator := userMap[v.UID]
-		response = append(response, res.Topic{
+		response.Data = append(response.Data, res.Topic{
 			ID:        v.ID,
 			Title:     v.Title,
 			CreatedAt: v.CreatedAt,
@@ -110,10 +123,10 @@ func (h Handler) getResTopic(c *fiber.Ctx, topic model.Topic) error {
 		},
 		Replies: topic.Replies,
 		Comments: &res.Comments{
-			Total:  topic.Comments.Limit,
-			Limit:  topic.Comments.Limit,
-			Offset: topic.Comments.Offset,
-			Data:   convertModelTopicComments(topic.Comments.Data, userMap),
+			HasMore: topic.Comments.HasMore,
+			Limit:   topic.Comments.Limit,
+			Offset:  topic.Comments.Offset,
+			Data:    convertModelTopicComments(topic.Comments.Data, userMap),
 		},
 	}
 	return c.JSON(response)

@@ -145,7 +145,6 @@ paths:
         - 条目
         - 讨论
       summary: 获取条目全部讨论
-      description: cache with 300s
       operationId: getSubjectTopicsById
       parameters:
         - required: true
@@ -155,15 +154,30 @@ paths:
             type: integer
           name: subject_id
           in: path
+        - required: true
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: true
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
       responses:
         "200":
           description: Successful Response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  "$ref": "#/components/schemas/Topic"
+                "$ref": "#/components/schemas/Topics"
         "400":
           description: Validation Error
           content:
@@ -183,9 +197,7 @@ paths:
       tags:
         - 条目
         - 讨论
-        - 回复
       summary: 获取条目讨论内容
-      description: cache with 300s
       operationId: getSubjectTopicById
       parameters:
         - required: true
@@ -206,10 +218,10 @@ paths:
         - required: false
           schema:
             title: Limit
-            maximum: 200
+            maximum: 100
             minimum: 0
             type: integer
-            default: 100
+            default: 30
           name: limit
           in: query
         - required: false
@@ -249,6 +261,30 @@ components:
       $ref: "./components/avatar.yaml"
     ErrorDetail:
       $ref: "./components/error_detail.yaml"
+    Topics:
+      title: Topics
+      required:
+        - data
+        - has_more
+        - limit
+        - offset
+      type: object
+      properties:
+        data:
+          title: Topic Array
+          type: array
+          items:
+            "$ref": "#/components/schemas/Topic"
+          default: []
+        has_more:
+          title: Has More Data
+          type: bool
+        limit:
+          title: Limit
+          type: integer
+        offset:
+          title: Offset
+          type: integer
     Topic:
       title: Topic
       required:
@@ -280,7 +316,7 @@ components:
       title: Comments
       required:
         - data
-        - total
+        - has_more
         - limit
         - offset
       type: object
@@ -291,9 +327,9 @@ components:
           items:
             "$ref": "#/components/schemas/Comment"
           default: []
-        total:
-          title: Total
-          type: integer
+        has_more:
+          title: Has More Data
+          type: bool
         limit:
           title: Limit
           type: integer

@@ -53,11 +53,11 @@ func (s service) Get(
 }
 
 func (s service) ListTopics(
-	ctx context.Context, topicType domain.TopicType, id uint32,
-) ([]model.Topic, error) {
-	topics, err := s.repo.ListTopics(ctx, topicType, id)
+	ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int,
+) (model.Topics, error) {
+	topics, err := s.repo.ListTopics(ctx, topicType, id, limit, offset)
 	if err != nil {
-		return nil, errgo.Wrap(err, "TopicRepo.GetTopicsByObjectID")
+		return model.Topics{}, errgo.Wrap(err, "TopicRepo.GetTopicsByObjectID")
 	}
 	return topics, nil
 }

@@ -251,7 +251,8 @@ func MockTopicService(m domain.TopicService) fx.Option {
 		mocker := &mocks.TopicService{}
 		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return(model.Topic{}, nil)
-		mocker.EXPECT().ListTopics(mock.Anything, mock.Anything, mock.Anything).Return([]model.Topic{}, nil)
+		mocker.EXPECT().ListTopics(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			Return(model.Topics{}, nil)
 		m = mocker
 	}
 
