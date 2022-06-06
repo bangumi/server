@@ -35,19 +35,19 @@ func TestMysqlRepo_convertDao(t *testing.T) {
 		},
 		{
 			id: 2,
-			in: &dao.GroupTopicComment{ID: 1},
+			in: &dao.GroupTopicComment{ID: 2},
 		},
 		{
 			id: 3,
-			in: &dao.IndexComment{ID: 1},
+			in: &dao.IndexComment{ID: 3},
 		},
 		{
 			id: 4,
-			in: &dao.EpisodeComment{ID: 1},
+			in: &dao.EpisodeComment{ID: 4},
 		},
 		{
 			id: 5,
-			in: &dao.CharacterComment{ID: 1},
+			in: &dao.CharacterComment{ID: 5},
 		},
 	}
 	for _, tt := range tests {
