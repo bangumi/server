@@ -191,7 +191,7 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 	if err != nil || topicID == 0 {
 		return errMissingTopicID
 	}
-	topic, err := h.getTopic(c, topicID)
+	topic, err := h.getTopic(c, domain.TopicTypeSubject, topicID)
 	if err != nil {
 		return err
 	}

@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
-func (h Handler) getTopic(c *fiber.Ctx, id model.TopicIDType) (model.Topic, error) {
+func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.TopicIDType) (model.Topic, error) {
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
@@ -36,7 +36,7 @@ func (h Handler) getTopic(c *fiber.Ctx, id model.TopicIDType) (model.Topic, erro
 		})
 	}
 
-	topic, err := h.t.Get(c.Context(), domain.TopicTypeSubject, id, page.Limit, page.Offset)
+	topic, err := h.t.Get(c.Context(), topicType, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{

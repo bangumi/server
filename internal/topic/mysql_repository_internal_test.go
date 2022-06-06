@@ -20,17 +20,27 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/dal/dao"
-	"github.com/bangumi/server/internal/model"
 )
 
 func TestMysqlRepo_convertDao(t *testing.T) {
 	t.Parallel()
 
-	p, err := convertDao(&dao.SubjectTopic{
-		ID:        10,
-		SubjectID: 20,
-	})
-	require.NoError(t, err)
-	require.Equal(t, p.ID, model.TopicIDType(10))
-	require.Equal(t, p.ObjectID, uint32(20))
+	tests := []struct {
+		in interface{}
+		id uint32
+	}{
+		{
+			in: &dao.GroupTopic{ID: 1},
+			id: 1,
+		},
+		{
+			in: &dao.SubjectTopic{ID: 2},
+			id: 2,
+		},
+	}
+	for _, tt := range tests {
+		p, err := convertDao(tt.in)
+		require.NoError(t, err)
+		require.Equal(t, p.ID, tt.id)
+	}
 }
