@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"fmt"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -305,7 +304,6 @@ func (g groupTopicCommentDo) FindByPage(offset int, limit int) (result []*dao.Gr
 	}
 
 	if size := len(result); 0 < limit && 0 < size && size < limit {
-		fmt.Println(size,offset)
 		count = int64(size + offset)
 		return
 	}

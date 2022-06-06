@@ -22,7 +22,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/comment"
-	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
@@ -59,14 +58,4 @@ func TestMysqlRepo_GetComments(t *testing.T) {
 	require.NoError(t, err)
 
 	require.True(t, len(s.Data) != 0, "cannot fetch comments")
-}
-
-func TestMysqlRepo_ConvertDao(t *testing.T) {
-	t.Parallel()
-
-	s, err := comment.ConvertDao(&dao.SubjectTopicComment{
-		ID: 10,
-	})
-	require.NoError(t, err)
-	require.Equal(t, s.ID, model.CommentIDType(10))
 }

@@ -68,12 +68,12 @@ func (r mysqlRepo) Get(
 		return model.Comment{}, errgo.Wrap(err, "dal")
 	}
 
-	return ConvertDao(comment)
+	return convertDao(comment)
 }
 
 var errUnsupportCommentType = errors.New("comment type not support")
 
-func ConvertDao(in interface{}) (model.Comment, error) {
+func convertDao(in interface{}) (model.Comment, error) {
 	switch v := in.(type) {
 	case *dao.SubjectTopicComment:
 		return model.Comment{
@@ -173,13 +173,13 @@ func convertModelComments(in interface{}) []model.Comment {
 	switch list := in.(type) {
 	case []*dao.SubjectTopicComment:
 		for _, v := range list {
-			if comment, e := ConvertDao(v); e == nil {
+			if comment, e := convertDao(v); e == nil {
 				comments = append(comments, comment)
 			}
 		}
 	case []*dao.GroupTopicComment:
 		for _, v := range list {
-			if comment, e := ConvertDao(v); e == nil {
+			if comment, e := convertDao(v); e == nil {
 				comments = append(comments, comment)
 			}
 		}
