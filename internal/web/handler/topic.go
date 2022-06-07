@@ -28,15 +28,7 @@ import (
 )
 
 func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.TopicIDType) (model.Topic, error) {
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
-	if err != nil {
-		return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
-	}
-
-	topic, err := h.t.Get(c.Context(), topicType, id, page.Limit, page.Offset)
+	topic, err := h.t.Get(c.Context(), topicType, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
@@ -46,6 +38,16 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 		}
 		return model.Topic{}, errgo.Wrap(err, "Topic.Get")
 	}
+
+	switch {
+	case topic.State == model.TopicStateClosed,
+		topic.State == model.TopicStateDelete:
+		return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
 	return topic, nil
 }
 
@@ -53,7 +55,7 @@ func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[ui
 	userIDs := make([]model.UIDType, 0)
 	for _, topic := range topics {
 		userIDs = append(userIDs, topic.UID)
-		for _, v := range topic.Comments.Data {
+		for _, v := range topic.Comments {
 			userIDs = append(userIDs, v.UID)
 		}
 	}
@@ -105,24 +107,46 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	return c.JSON(response)
 }
 
-func (h Handler) getResTopic(c *fiber.Ctx, topic model.Topic) error {
+func (h Handler) getResTopicWithComments(
+	c *fiber.Ctx, topicType domain.TopicType, topic model.Topic,
+) error {
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return err
+	}
+
 	userMap, err := h.getUserMapOfTopics(c, topic)
 	if err != nil {
 		return err
 	}
 
-	topic.Comments.Data = model.ConvertModelCommentsToTree(topic.Comments.Data, 0)
+	commentType := map[domain.TopicType]domain.CommentType{
+		domain.TopicTypeGroup:   domain.CommentTypeGroupTopic,
+		domain.TopicTypeSubject: domain.CommentTypeSubjectTopic,
+	}[topicType]
+
+	comments, err := h.m.GetComments(c.Context(), commentType, topic.ID, page.Limit, page.Offset)
+	if err != nil {
+		return errgo.Wrap(err, "repo.comments.GetComments")
+	}
+
+	count, err := h.m.Count(c.Context(), commentType, topic.ID)
+	if err != nil {
+		return errgo.Wrap(err, "repo.comments.Count")
+	}
+
+	comments = model.ConvertModelCommentsToTree(comments, 0)
 	response := res.Topic{
 		ID:        topic.ID,
 		Title:     topic.Title,
 		CreatedAt: topic.CreatedAt,
 		Creator:   convertModelUser(userMap[topic.UID]),
 		Replies:   topic.Replies,
-		Comments: &res.Comments{
-			HasMore: topic.Comments.HasMore,
-			Limit:   topic.Comments.Limit,
-			Offset:  topic.Comments.Offset,
-			Data:    convertModelTopicComments(topic.Comments.Data, userMap),
+		Comments: &res.Paged{
+			Total:  count,
+			Limit:  page.Limit,
+			Offset: page.Offset,
+			Data:   convertModelTopicComments(comments, userMap),
 		},
 	}
 	return c.JSON(response)

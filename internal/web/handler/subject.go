@@ -191,6 +191,7 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 	if err != nil || topicID == 0 {
 		return errMissingTopicID
 	}
+
 	topic, err := h.getTopic(c, domain.TopicTypeSubject, topicID)
 	if err != nil {
 		return err
@@ -212,7 +213,7 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 		})
 	}
 
-	return h.getResTopic(c, topic)
+	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
 }
 
 func getExpectSubjectID(c *fiber.Ctx, topic model.Topic) (model.SubjectIDType, error) {

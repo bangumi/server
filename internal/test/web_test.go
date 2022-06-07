@@ -26,12 +26,12 @@ func TestGetWebApp(t *testing.T) {
 
 	test.GetWebApp(t,
 		test.Mock{
-			SubjectRepo:  mocks.NewSubjectRepo(t),
-			AuthRepo:     mocks.NewAuthRepo(t),
-			EpisodeRepo:  mocks.NewEpisodeRepo(t),
-			CommentRepo:  mocks.NewCommentRepo(t),
-			TopicService: mocks.NewTopicService(t),
-			Cache:        mocks.NewGeneric(t),
+			SubjectRepo: mocks.NewSubjectRepo(t),
+			AuthRepo:    mocks.NewAuthRepo(t),
+			EpisodeRepo: mocks.NewEpisodeRepo(t),
+			CommentRepo: mocks.NewCommentRepo(t),
+			TopicRepo:   mocks.NewTopicRepo(t),
+			Cache:       mocks.NewGeneric(t),
 		},
 	)
 

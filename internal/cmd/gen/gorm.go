@@ -332,6 +332,9 @@ func main() {
 		gen.FieldTrimPrefix("sbj_tpc_"),
 		gen.FieldRename("sbj_tpc_dateline", "CreatedAt"),
 		gen.FieldRename("sbj_tpc_lastpost", "UpdatedAt"),
+		gen.FieldRename("sbj_tpc_display", "Status"),
+		gen.FieldType("sbj_tpc_state", "uint8"),
+		gen.FieldType("sbj_tpc_display", "uint8"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_group_topics", "GroupTopic",
@@ -339,6 +342,9 @@ func main() {
 		gen.FieldRename("grp_tpc_gid", "GroupID"),
 		gen.FieldRename("grp_tpc_dateline", "CreatedAt"),
 		gen.FieldRename("grp_tpc_lastpost", "UpdatedAt"),
+		gen.FieldRename("grp_tpc_display", "Status"),
+		gen.FieldType("grp_tpc_state", "uint8"),
+		gen.FieldType("grp_tpc_display", "uint8"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_posts", "SubjectTopicComment",

@@ -27,18 +27,11 @@ type Topics struct {
 
 type Topic struct {
 	CreatedAt time.Time `json:"created_at"`
-	Comments  *Comments `json:"comments,omitempty"`
+	Comments  *Paged    `json:"comments,omitempty"`
 	Title     string    `json:"title"`
 	Creator   User      `json:"creator"`
 	ID        uint32    `json:"id"`
 	Replies   uint32    `json:"replies"`
-}
-
-type Comments struct {
-	Data    []Comment `json:"data"`
-	HasMore bool      `json:"has_more"`
-	Limit   uint32    `json:"limit"`
-	Offset  uint32    `json:"offset"`
 }
 
 type Comment struct {

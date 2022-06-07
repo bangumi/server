@@ -27,13 +27,6 @@ type Comment struct {
 	MentionedID uint32
 }
 
-type Comments struct {
-	Data    []Comment
-	HasMore bool
-	Limit   uint32
-	Offset  uint32
-}
-
 func ConvertModelCommentsToTree(comments []Comment, related uint32) []Comment {
 	result := make([]Comment, 0)
 	for _, v := range comments {

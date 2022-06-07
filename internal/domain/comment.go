@@ -27,7 +27,7 @@ type CommentRepo interface {
 
 	GetComments(
 		ctx context.Context, commentType CommentType, id uint32, limit int, offset int,
-	) (model.Comments, error)
+	) ([]model.Comment, error)
 }
 
 type CommentType uint32

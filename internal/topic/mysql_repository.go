@@ -38,9 +38,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TopicRepo, error) {
 	return mysqlRepo{q: q, log: log.Named("subject.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Get(
-	ctx context.Context, topicType domain.TopicType, id model.TopicIDType, limit int, offset int,
-) (model.Topic, error) {
+func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model.TopicIDType) (model.Topic, error) {
 	var (
 		topic interface{}
 		err   error
@@ -144,8 +142,8 @@ func convertDao(in interface{}) (model.Topic, error) {
 			CreatedAt: time.Unix(int64(v.CreatedAt), 0),
 			UpdatedAt: time.Unix(int64(v.UpdatedAt), 0),
 			Replies:   v.Replies,
-			State:     v.State,
-			Display:   v.Display,
+			State:     model.TopicState(v.State),
+			Status:    model.TopicStatus(v.Status),
 		}, nil
 	case *dao.SubjectTopic:
 		return model.Topic{
@@ -156,8 +154,8 @@ func convertDao(in interface{}) (model.Topic, error) {
 			CreatedAt: time.Unix(int64(v.CreatedAt), 0),
 			UpdatedAt: time.Unix(int64(v.UpdatedAt), 0),
 			Replies:   v.Replies,
-			State:     v.State,
-			Display:   v.Display,
+			State:     model.TopicState(v.State),
+			Status:    model.TopicStatus(v.Status),
 		}, nil
 	default:
 		return model.Topic{}, errUnsupportTopicType

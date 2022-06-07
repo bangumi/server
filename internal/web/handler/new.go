@@ -48,7 +48,7 @@ func New(
 	a domain.AuthService,
 	e domain.EpisodeRepo,
 	r domain.RevisionRepo,
-	t domain.TopicService,
+	t domain.TopicRepo,
 	m domain.CommentRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
@@ -110,7 +110,7 @@ type Handler struct {
 	i                    domain.IndexRepo
 	r                    domain.RevisionRepo
 	m                    domain.CommentRepo
-	t                    domain.TopicService
+	t                    domain.TopicRepo
 	buffPool             buffer.Pool
 	oauth                oauth.Manager
 	log                  *zap.Logger

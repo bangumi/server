@@ -59,5 +59,5 @@ func TestMysqlRepo_GetComments(t *testing.T) {
 	s, err := repo.GetComments(context.Background(), domain.CommentTypeSubjectTopic, 1, 0, 0)
 	require.NoError(t, err)
 
-	require.True(t, len(s.Data) != 0, "cannot fetch comments")
+	require.True(t, len(s) != 0, "cannot fetch comments")
 }

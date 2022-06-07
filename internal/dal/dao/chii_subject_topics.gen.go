@@ -15,8 +15,8 @@ type SubjectTopic struct {
 	CreatedAt uint32 `gorm:"column:sbj_tpc_dateline;type:int(10) unsigned;not null" json:"sbj_tpc_dateline"`
 	UpdatedAt uint32 `gorm:"column:sbj_tpc_lastpost;type:int(10) unsigned;not null;index:sbj_tpc_lastpost,priority:1" json:"sbj_tpc_lastpost"`
 	Replies   uint32 `gorm:"column:sbj_tpc_replies;type:mediumint(8) unsigned;not null" json:"sbj_tpc_replies"`
-	State     bool   `gorm:"column:sbj_tpc_state;type:tinyint(1) unsigned;not null" json:"sbj_tpc_state"`
-	Display   bool   `gorm:"column:sbj_tpc_display;type:tinyint(1) unsigned;not null;index:tpc_display,priority:1;index:sbj_tpc_lastpost,priority:3;default:1" json:"sbj_tpc_display"`
+	State     uint8  `gorm:"column:sbj_tpc_state;type:tinyint(1) unsigned;not null" json:"sbj_tpc_state"`
+	Status    uint8  `gorm:"column:sbj_tpc_display;type:tinyint(1) unsigned;not null;index:tpc_display,priority:1;index:sbj_tpc_lastpost,priority:3;default:1" json:"sbj_tpc_display"`
 }
 
 // TableName SubjectTopic's table name

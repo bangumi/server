@@ -117,14 +117,16 @@ func (_c *CommentRepo_Get_Call) Return(_a0 model.Comment, _a1 error) *CommentRep
 }
 
 // GetComments provides a mock function with given fields: ctx, commentType, id, limit, offset
-func (_m *CommentRepo) GetComments(ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int) (model.Comments, error) {
+func (_m *CommentRepo) GetComments(ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int) ([]model.Comment, error) {
 	ret := _m.Called(ctx, commentType, id, limit, offset)
 
-	var r0 model.Comments
-	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, uint32, int, int) model.Comments); ok {
+	var r0 []model.Comment
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, uint32, int, int) []model.Comment); ok {
 		r0 = rf(ctx, commentType, id, limit, offset)
 	} else {
-		r0 = ret.Get(0).(model.Comments)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Comment)
+		}
 	}
 
 	var r1 error
@@ -159,7 +161,7 @@ func (_c *CommentRepo_GetComments_Call) Run(run func(ctx context.Context, commen
 	return _c
 }
 
-func (_c *CommentRepo_GetComments_Call) Return(_a0 model.Comments, _a1 error) *CommentRepo_GetComments_Call {
+func (_c *CommentRepo_GetComments_Call) Return(_a0 []model.Comment, _a1 error) *CommentRepo_GetComments_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

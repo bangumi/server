@@ -291,7 +291,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Comments"
+                "$ref": "#/components/schemas/Paged_Comment"
         "400":
           description: Validation Error
           content:
@@ -344,7 +344,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Comments"
+                "$ref": "#/components/schemas/Paged_Comment"
         "400":
           description: Validation Error
           content:
@@ -397,7 +397,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Comments"
+                "$ref": "#/components/schemas/Paged_Comment"
         "400":
           description: Validation Error
           content:
@@ -450,7 +450,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Comments"
+                "$ref": "#/components/schemas/Paged_Comment"
         "400":
           description: Validation Error
           content:
@@ -515,18 +515,18 @@ components:
           title: Title
           type: string
         creator:
-          "$ref": "#/components/schemas/Creator"
+          "$ref": "#/components/schemas/User"
         created_at:
           title: Created At
           type: string
           format: date-time
         comments:
-          "$ref": "#/components/schemas/Comments"
-    Comments:
-      title: Comments
+          "$ref": "#/components/schemas/Paged_Comment"
+    Paged_Comment:
+      title: Paged[Comment]
       required:
         - data
-        - has_more
+        - total
         - limit
         - offset
       type: object
@@ -537,9 +537,9 @@ components:
           items:
             "$ref": "#/components/schemas/Comment"
           default: []
-        has_more:
-          title: Has More Data
-          type: bool
+        total:
+          title: Total
+          type: int
         limit:
           title: Limit
           type: integer
@@ -562,25 +562,11 @@ components:
           title: Content Text
           type: string
         creator:
-          "$ref": "#/components/schemas/Creator"
+          "$ref": "#/components/schemas/User"
         created_at:
           title: Created At
           type: string
           format: date-time
-    Creator:
-      title: Creator
-      required:
-        - username
-        - nickname
-      type: object
-      properties:
-        username:
-          title: Username
-          type: string
-        nickname:
-          title: Nickname
-          type: string
-      description: 意义同<a href="#model-Me">Me</a>
   securitySchemes:
     CookiesSession:
       name: sessionID

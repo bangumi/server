@@ -171,7 +171,7 @@ func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id
 
 func (r mysqlRepo) GetComments(
 	ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int,
-) (model.Comments, error) {
+) ([]model.Comment, error) {
 	var (
 		comments interface{}
 		err      error
@@ -196,26 +196,21 @@ func (r mysqlRepo) GetComments(
 		comments, err = r.q.EpisodeComment.WithContext(ctx).
 			Where(r.q.EpisodeComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
 	default:
-		return model.Comments{}, errUnsupportCommentType
+		return nil, errUnsupportCommentType
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Comments{}, domain.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))
-		return model.Comments{}, errgo.Wrap(err, "dal")
+		return nil, errgo.Wrap(err, "dal")
 	}
 	result, err := convertModelComments(comments)
 	if err != nil {
-		return model.Comments{}, errgo.Wrap(err, "convert user")
+		return nil, errgo.Wrap(err, "convert user")
 	}
-	return model.Comments{
-		HasMore: len(result) == limit,
-		Limit:   uint32(limit),
-		Offset:  uint32(offset),
-		Data:    result,
-	}, nil
+	return result, nil
 }
 
 var errInputNilComments = errors.New("input nil comments")

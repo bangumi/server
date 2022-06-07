@@ -57,7 +57,7 @@ type Mock struct {
 	AuthService    domain.AuthService
 	EpisodeRepo    domain.EpisodeRepo
 	CommentRepo    domain.CommentRepo
-	TopicService   domain.TopicService
+	TopicRepo      domain.TopicRepo
 	UserRepo       domain.UserRepo
 	IndexRepo      domain.IndexRepo
 	RevisionRepo   domain.RevisionRepo
@@ -94,7 +94,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
-		MockTopicService(m.TopicService),
+		MockTopicRepo(m.TopicRepo),
 		MockCommentRepo(m.CommentRepo),
 		MockAuthRepo(m.AuthRepo),
 		MockOAuthManager(m.OAuthManager),
@@ -246,17 +246,17 @@ func MockCommentRepo(m domain.CommentRepo) fx.Option {
 	return fx.Supply(fx.Annotate(m, fx.As(new(domain.CommentRepo))))
 }
 
-func MockTopicService(m domain.TopicService) fx.Option {
+func MockTopicRepo(m domain.TopicRepo) fx.Option {
 	if m == nil {
-		mocker := &mocks.TopicService{}
-		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		mocker := &mocks.TopicRepo{}
+		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).
 			Return(model.Topic{}, nil)
 		mocker.EXPECT().ListTopics(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return([]model.Topic{}, nil)
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.TopicService))))
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.TopicRepo))))
 }
 
 func MockAuthRepo(m domain.AuthRepo) fx.Option {

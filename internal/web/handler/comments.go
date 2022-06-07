@@ -48,7 +48,7 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 	}
 
 	userIDs := make([]model.UIDType, 0)
-	for _, v := range comments.Data {
+	for _, v := range comments {
 		userIDs = append(userIDs, v.UID)
 	}
 
@@ -56,12 +56,16 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
-	comments.Data = model.ConvertModelCommentsToTree(comments.Data, 0)
+	comments = model.ConvertModelCommentsToTree(comments, 0)
+	count, err := h.m.Count(c.Context(), commentType, id)
+	if err != nil {
+		return errgo.Wrap(err, "repo.comments.Count")
+	}
 
-	return c.JSON(res.Comments{
-		HasMore: comments.HasMore,
-		Limit:   comments.Limit,
-		Offset:  comments.Offset,
-		Data:    convertModelTopicComments(comments.Data, userMap),
+	return c.JSON(res.Paged{
+		Total:  count,
+		Limit:  page.Limit,
+		Offset: page.Offset,
+		Data:   convertModelTopicComments(comments, userMap),
 	})
 }

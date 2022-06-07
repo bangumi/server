@@ -20,11 +20,32 @@ type Topic struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Title     string
-	Comments  Comments
+	Comments  []Comment
 	ID        TopicIDType
 	UID       uint32
 	Replies   uint32
 	ObjectID  uint32
-	State     bool
-	Display   bool
+	State     TopicState
+	Status    TopicStatus
 }
+
+type TopicState uint8
+
+const (
+	TopicStateNone TopicState = iota
+	TopicStateClosed
+	TopicStateReopen
+	TopicStatePin
+	TopicStateMerge
+	TopicStateSilent
+	TopicStateDelete
+	TopicStatePrivate
+)
+
+type TopicStatus uint8
+
+const (
+	TopicStatusBan TopicStatus = iota
+	TopicStatusNormal
+	TopicStatusReview
+)
