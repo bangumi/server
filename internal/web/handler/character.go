@@ -87,10 +87,6 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		})
 	}
 
-	if r.Redirect != 0 {
-		return c.Redirect("/p/characters/" + strconv.FormatUint(uint64(r.Redirect), 10) + "/comments")
-	}
-
 	if r.NSFW && !u.AllowNSFW() {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",

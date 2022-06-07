@@ -134,7 +134,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	_, ok, err := h.getPersonWithCache(c.Context(), id)
 	if err != nil {
 		return err
 	}
@@ -144,10 +144,6 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
 		})
-	}
-
-	if r.Redirect != 0 {
-		return c.Redirect("/p/persons/" + strconv.FormatUint(uint64(r.Redirect), 10) + "/comments")
 	}
 
 	return h.listComments(c, domain.CommentPerson, id)
