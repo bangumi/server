@@ -3,7 +3,7 @@
   "description": "tools to bundle openapi spec, not used in our server",
   "private": true,
   "scripts": {
-    "format": "prettier -w ./",
+    "format": "prettier -w --list-different ./",
     "test": "node openapi/test.js",
     "version": "node scripts/bump.js"
   },
