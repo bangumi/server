@@ -177,7 +177,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Topics"
+                "$ref": "#/components/schemas/Paged_Topic"
         "400":
           description: Validation Error
           content:
@@ -261,30 +261,28 @@ components:
       $ref: "./components/avatar.yaml"
     ErrorDetail:
       $ref: "./components/error_detail.yaml"
-    Topics:
-      title: Topics
-      required:
-        - data
-        - has_more
-        - limit
-        - offset
+    Paged_Topic:
+      title: Paged[Topic]
       type: object
       properties:
+        total:
+          title: Total
+          type: integer
+          default: 0
+        limit:
+          title: Limit
+          type: integer
+          default: 0
+        offset:
+          title: Offset
+          type: integer
+          default: 0
         data:
-          title: Topic Array
+          title: Data
           type: array
           items:
             "$ref": "#/components/schemas/Topic"
           default: []
-        has_more:
-          title: Has More Data
-          type: bool
-        limit:
-          title: Limit
-          type: integer
-        offset:
-          title: Offset
-          type: integer
     Topic:
       title: Topic
       required:
