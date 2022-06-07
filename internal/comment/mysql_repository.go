@@ -189,7 +189,10 @@ func (r mysqlRepo) GetComments(
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.Comments{}, errgo.Wrap(err, "dal")
 	}
-	result := convertModelComments(comments)
+	result, err := convertModelComments(comments)
+	if err != nil {
+		return model.Comments{}, errgo.Wrap(err, "convert user")
+	}
 	return model.Comments{
 		HasMore: len(result) == limit,
 		Limit:   uint32(limit),
@@ -198,15 +201,22 @@ func (r mysqlRepo) GetComments(
 	}, nil
 }
 
-func convertModelComments(in interface{}) []model.Comment {
+var errInputNilComments = errors.New("input nil comments")
+
+func convertModelComments(in interface{}) ([]model.Comment, error) {
 	comments := make([]model.Comment, 0)
+	if !reflect.ValueOf(in).IsValid() {
+		return nil, errInputNilComments
+	}
 	if reflect.TypeOf(in).Kind() == reflect.Slice {
 		s := reflect.ValueOf(in)
 		for i := 0; i < s.Len(); i++ {
-			if comment, e := convertDao(s.Index(i).Interface()); e == nil {
+			if comment, err := convertDao(s.Index(i).Interface()); err == nil {
 				comments = append(comments, comment)
+			} else {
+				return comments, err
 			}
 		}
 	}
-	return comments
+	return comments, nil
 }

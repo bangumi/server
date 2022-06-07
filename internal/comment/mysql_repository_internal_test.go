@@ -56,3 +56,31 @@ func TestMysqlRepo_convertDao(t *testing.T) {
 		require.Equal(t, s.ID, tt.id)
 	}
 }
+
+func TestMysqlRepo_convertModelComments(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		in  interface{}
+		err error
+		len int
+	}{
+		{
+			len: 0,
+			in:  nil,
+			err: errInputNilComments,
+		},
+		{
+			len: 2,
+			in: []interface{}{
+				&dao.CharacterComment{ID: 2},
+				&dao.CharacterComment{ID: 5},
+			},
+		},
+	}
+	for _, tt := range tests {
+		s, err := convertModelComments(tt.in)
+		require.ErrorIs(t, err, tt.err)
+		require.Equal(t, len(s), tt.len)
+	}
+}
