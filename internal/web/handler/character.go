@@ -88,7 +88,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 	}
 
 	if r.Redirect != 0 {
-		return c.Redirect("/v0/characters/" + strconv.FormatUint(uint64(r.Redirect), 10))
+		return c.Redirect("/p/characters/" + strconv.FormatUint(uint64(r.Redirect), 10) + "/comments")
 	}
 
 	if r.NSFW && !u.AllowNSFW() {

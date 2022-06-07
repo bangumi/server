@@ -55,6 +55,8 @@ func (r mysqlRepo) Get(
 		comment, err = r.q.IndexComment.WithContext(ctx).Where(r.q.IndexComment.ID.Eq(id)).First()
 	case domain.CommentCharacter:
 		comment, err = r.q.CharacterComment.WithContext(ctx).Where(r.q.CharacterComment.ID.Eq(id)).First()
+	case domain.CommentPerson:
+		comment, err = r.q.CharacterComment.WithContext(ctx).Where(r.q.CharacterComment.ID.Eq(id)).First()
 	case domain.CommentEpisode:
 		comment, err = r.q.EpisodeComment.WithContext(ctx).Where(r.q.EpisodeComment.ID.Eq(id)).First()
 	default:
@@ -121,6 +123,15 @@ func convertDao(in interface{}) (model.Comment, error) {
 			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
 		}, nil
+	case *dao.PersonComment:
+		return model.Comment{
+			ID:          v.ID,
+			MentionedID: v.MentionedID,
+			UID:         v.UID,
+			Related:     v.Related,
+			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
+			Content:     v.Content,
+		}, nil
 	default:
 		return model.Comment{}, errUnsupportCommentType
 	}
@@ -141,6 +152,9 @@ func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id
 		count, err = r.q.IndexComment.WithContext(ctx).
 			Where(r.q.IndexComment.MentionedID.Eq(id)).Count()
 	case domain.CommentCharacter:
+		count, err = r.q.CharacterComment.WithContext(ctx).
+			Where(r.q.CharacterComment.MentionedID.Eq(id)).Count()
+	case domain.CommentPerson:
 		count, err = r.q.CharacterComment.WithContext(ctx).
 			Where(r.q.CharacterComment.MentionedID.Eq(id)).Count()
 	case domain.CommentEpisode:
@@ -173,6 +187,9 @@ func (r mysqlRepo) GetComments(
 		comments, err = r.q.IndexComment.WithContext(ctx).
 			Where(r.q.IndexComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
 	case domain.CommentCharacter:
+		comments, err = r.q.CharacterComment.WithContext(ctx).
+			Where(r.q.CharacterComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
+	case domain.CommentPerson:
 		comments, err = r.q.CharacterComment.WithContext(ctx).
 			Where(r.q.CharacterComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
 	case domain.CommentEpisode:

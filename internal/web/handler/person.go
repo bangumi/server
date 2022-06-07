@@ -128,6 +128,31 @@ var genderMap = map[uint8]string{
 	2: "female",
 }
 
+func (h Handler) GetPersonComments(c *fiber.Ctx) error {
+	id, err := parsePersonID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return c.Status(http.StatusNotFound).JSON(res.Error{
+			Title:   "Not Found",
+			Details: util.DetailFromRequest(c),
+		})
+	}
+
+	if r.Redirect != 0 {
+		return c.Redirect("/p/persons/" + strconv.FormatUint(uint64(r.Redirect), 10) + "/comments")
+	}
+
+	return h.listComments(c, domain.CommentPerson, id)
+}
+
 func (h Handler) GetPersonImage(c *fiber.Ctx) error {
 	id, err := parsePersonID(c.Params("id"))
 	if err != nil {

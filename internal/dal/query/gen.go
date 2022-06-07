@@ -30,6 +30,7 @@ func Use(db *gorm.DB) *Query {
 		Member:              newMember(db),
 		OAuthClient:         newOAuthClient(db),
 		Person:              newPerson(db),
+		PersonComment:       newPersonComment(db),
 		PersonField:         newPersonField(db),
 		PersonSubjects:      newPersonSubjects(db),
 		RevisionHistory:     newRevisionHistory(db),
@@ -65,6 +66,7 @@ type Query struct {
 	Member              member
 	OAuthClient         oAuthClient
 	Person              person
+	PersonComment       personComment
 	PersonField         personField
 	PersonSubjects      personSubjects
 	RevisionHistory     revisionHistory
@@ -101,6 +103,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Member:              q.Member.clone(db),
 		OAuthClient:         q.OAuthClient.clone(db),
 		Person:              q.Person.clone(db),
+		PersonComment:       q.PersonComment.clone(db),
 		PersonField:         q.PersonField.clone(db),
 		PersonSubjects:      q.PersonSubjects.clone(db),
 		RevisionHistory:     q.RevisionHistory.clone(db),
@@ -134,6 +137,7 @@ type queryCtx struct {
 	Member              memberDo
 	OAuthClient         oAuthClientDo
 	Person              personDo
+	PersonComment       personCommentDo
 	PersonField         personFieldDo
 	PersonSubjects      personSubjectsDo
 	RevisionHistory     revisionHistoryDo
@@ -167,6 +171,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Member:              *q.Member.WithContext(ctx),
 		OAuthClient:         *q.OAuthClient.WithContext(ctx),
 		Person:              *q.Person.WithContext(ctx),
+		PersonComment:       *q.PersonComment.WithContext(ctx),
 		PersonField:         *q.PersonField.WithContext(ctx),
 		PersonSubjects:      *q.PersonSubjects.WithContext(ctx),
 		RevisionHistory:     *q.RevisionHistory.WithContext(ctx),

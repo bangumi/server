@@ -103,6 +103,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	private.Get("/indices/:id/comments", addMetrics(h.GetIndexComments))
 	private.Get("/episodes/:id/comments", addMetrics(h.GetEpisodeComments))
 	private.Get("/characters/:id/comments", addMetrics(h.GetCharacterComments))
+	private.Get("/persons/:id/comments", addMetrics(h.GetPersonComments))
 
 	// un-documented
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))

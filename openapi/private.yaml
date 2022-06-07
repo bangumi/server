@@ -412,6 +412,59 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+  "/p/persons/{person_id}/comments":
+    get:
+      tags:
+        - 人物
+        - 讨论
+      summary: 获取人物讨论内容
+      operationId: getPersonCommentsById
+      parameters:
+        - required: true
+          schema:
+            title: Persoon ID
+            minimum: 0
+            type: integer
+          name: person_id
+          in: path
+        - required: false
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Comments"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
 components:
   schemas:
     User:

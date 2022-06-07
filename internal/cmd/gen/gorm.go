@@ -368,9 +368,15 @@ func main() {
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index_comments", "IndexComment",
-		gen.FieldTrimPrefix("idx_pst"),
+		gen.FieldTrimPrefix("idx_pst_"),
 		gen.FieldRename("idx_pst_mid", "MentionedID"),
 		gen.FieldRename("idx_pst_dateline", "CreatedAt"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_prsn_comments", "PersonComment",
+		gen.FieldTrimPrefix("prsn_pst_"),
+		gen.FieldRename("prsn_pst_mid", "MentionedID"),
+		gen.FieldRename("prsn_pst_dateline", "CreatedAt"),
 	))
 
 	// execute the action of code generation

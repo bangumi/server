@@ -37,5 +37,6 @@ const (
 	CommentTypeGroupTopic
 	CommentIndex
 	CommentCharacter
+	CommentPerson
 	CommentEpisode
 )

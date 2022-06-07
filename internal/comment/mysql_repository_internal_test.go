@@ -49,6 +49,10 @@ func TestMysqlRepo_convertDao(t *testing.T) {
 			id: 5,
 			in: &dao.CharacterComment{ID: 5},
 		},
+		{
+			id: 6,
+			in: &dao.PersonComment{ID: 6},
+		},
 	}
 	for _, tt := range tests {
 		s, err := convertDao(tt.in)
