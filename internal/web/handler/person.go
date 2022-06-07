@@ -134,12 +134,12 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, ok, err := h.getPersonWithCache(c.Context(), id)
+	r, ok, err := h.getPersonWithCache(c.Context(), id)
 	if err != nil {
 		return err
 	}
 
-	if !ok {
+	if !ok || r.Redirect != 0 {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),

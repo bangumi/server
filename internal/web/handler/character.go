@@ -80,14 +80,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
-	}
-
-	if r.NSFW && !u.AllowNSFW() {
+	if !ok || r.Redirect != 0 || r.NSFW && !u.AllowNSFW() {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
