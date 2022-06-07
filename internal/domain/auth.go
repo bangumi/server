@@ -51,11 +51,15 @@ const nsfwThreshold = -time.Hour * 24 * 60
 
 // AllowNSFW return if current user is allowed to see NSFW resource.
 func (u Auth) AllowNSFW() bool {
+	return u.RegisteredTime(nsfwThreshold)
+}
+
+func (u Auth) RegisteredTime(t time.Duration) bool {
 	if u.ID == 0 {
 		return false
 	}
 
-	return u.RegTime.Add(nsfwThreshold).Before(time.Now())
+	return u.RegTime.Add(t).Before(time.Now())
 }
 
 type AuthService interface {

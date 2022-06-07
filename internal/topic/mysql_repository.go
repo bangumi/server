@@ -63,16 +63,20 @@ func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model
 	return convertDao(topic)
 }
 
-func (r mysqlRepo) Count(ctx context.Context, topicType domain.TopicType, id uint32) (int64, error) {
+func (r mysqlRepo) Count(
+	ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus,
+) (int64, error) {
 	var (
 		count int64
 		err   error
 	)
 	switch topicType {
 	case domain.TopicTypeGroup:
-		count, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).Count()
+		count, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
+			Where(r.q.GroupTopic.Status.In(convertToUint8Status(statuses)...)).Count()
 	case domain.TopicTypeSubject:
-		count, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).Count()
+		count, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).
+			Where(r.q.SubjectTopic.Status.In(convertToUint8Status(statuses)...)).Count()
 	default:
 		return 0, errUnsupportTopicType
 	}
@@ -82,8 +86,16 @@ func (r mysqlRepo) Count(ctx context.Context, topicType domain.TopicType, id uin
 	return count, nil
 }
 
+func convertToUint8Status(statuses []model.TopicStatus) []uint8 {
+	s := make([]uint8, len(statuses))
+	for i, v := range statuses {
+		s[i] = uint8(v)
+	}
+	return s
+}
+
 func (r mysqlRepo) ListTopics(
-	ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int,
+	ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int,
 ) ([]model.Topic, error) {
 	var (
 		topics interface{}
@@ -91,11 +103,13 @@ func (r mysqlRepo) ListTopics(
 	)
 	switch topicType {
 	case domain.TopicTypeGroup:
-		topics, err = r.q.GroupTopic.WithContext(ctx).
-			Where(r.q.GroupTopic.GroupID.Eq(id)).Offset(offset).Limit(limit).Find()
+		topics, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
+			Where(r.q.GroupTopic.Status.In(convertToUint8Status(statuses)...)).
+			Offset(offset).Limit(limit).Find()
 	case domain.TopicTypeSubject:
 		topics, err = r.q.SubjectTopic.WithContext(ctx).
-			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Offset(offset).Limit(limit).Find()
+			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Where(r.q.SubjectTopic.Status.In(convertToUint8Status(statuses)...)).
+			Offset(offset).Limit(limit).Find()
 	default:
 		return nil, errUnsupportTopicType
 	}

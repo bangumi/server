@@ -17,6 +17,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -27,7 +28,11 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
+const canViewStateClosedTopic = -time.Hour * 24 * 180
+const canViewStateDeleteTopic = -time.Hour * 24 * 180
+
 func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.TopicIDType) (model.Topic, error) {
+	u := h.getHTTPAccessor(c)
 	topic, err := h.t.Get(c.Context(), topicType, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -40,8 +45,9 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 	}
 
 	switch {
-	case topic.State == model.TopicStateClosed,
-		topic.State == model.TopicStateDelete:
+	case !u.Permission.ManageTopicState && topic.Status == model.TopicStatusReview,
+		topic.State == model.TopicStateClosed && !u.RegisteredTime(canViewStateClosedTopic),
+		topic.State == model.TopicStateDelete && !u.RegisteredTime(canViewStateDeleteTopic):
 		return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
@@ -67,6 +73,7 @@ func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[ui
 }
 
 func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32) error {
+	u := h.getHTTPAccessor(c)
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
@@ -79,7 +86,12 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		Offset: page.Offset,
 	}
 
-	topics, err := h.t.ListTopics(c.Context(), topicType, id, page.Limit, page.Offset)
+	statuses := []model.TopicStatus{model.TopicStatusNormal}
+	if u.Permission.ManageTopicState {
+		statuses = append(statuses, model.TopicStatusReview)
+	}
+
+	topics, err := h.t.ListTopics(c.Context(), topicType, id, statuses, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "repo.topic.GetTopics")
 	}
@@ -88,10 +100,12 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
-	count, err := h.t.Count(c.Context(), topicType, id)
+
+	count, err := h.t.Count(c.Context(), topicType, id, statuses)
 	if err != nil {
 		return errgo.Wrap(err, "repo.topic.Count")
 	}
+
 	response.Total = count
 	var data = make([]res.Topic, len(topics))
 	for i, topic := range topics {

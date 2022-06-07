@@ -23,9 +23,11 @@ import (
 type TopicRepo interface {
 	Get(ctx context.Context, topicType TopicType, id model.TopicIDType) (model.Topic, error)
 
-	Count(ctx context.Context, topicType TopicType, id uint32) (int64, error)
+	Count(ctx context.Context, topicType TopicType, id uint32, statuses []model.TopicStatus) (int64, error)
 
-	ListTopics(ctx context.Context, topicType TopicType, id uint32, limit int, offset int) ([]model.Topic, error)
+	ListTopics(
+		ctx context.Context, topicType TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int,
+	) ([]model.Topic, error)
 }
 
 type TopicType uint32

@@ -251,7 +251,8 @@ func MockTopicRepo(m domain.TopicRepo) fx.Option {
 		mocker := &mocks.TopicRepo{}
 		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).
 			Return(model.Topic{}, nil)
-		mocker.EXPECT().ListTopics(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		mocker.EXPECT().
+			ListTopics(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return([]model.Topic{}, nil)
 		m = mocker
 	}
