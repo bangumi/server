@@ -253,6 +253,165 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+  "/p/indices/{index_id}/comments":
+    get:
+      tags:
+        - 目录
+        - 讨论
+      summary: 获取目录讨论内容
+      operationId: getIndexCommentsById
+      parameters:
+        - required: true
+          schema:
+            title: Index ID
+            minimum: 0
+            type: integer
+          name: index_id
+          in: path
+        - required: false
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Comments"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+  "/p/episodes/{episode_id}/comments":
+    get:
+      tags:
+        - 章节
+        - 讨论
+      summary: 获取章节讨论内容
+      operationId: getEpisodeCommentsById
+      parameters:
+        - required: true
+          schema:
+            title: Episode ID
+            minimum: 0
+            type: integer
+          name: episode_id
+          in: path
+        - required: false
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Comments"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+  "/p/characters/{character_id}/comments":
+    get:
+      tags:
+        - 角色
+        - 讨论
+      summary: 获取角色讨论内容
+      operationId: getCharacterCommentsById
+      parameters:
+        - required: true
+          schema:
+            title: Character ID
+            minimum: 0
+            type: integer
+          name: character_id
+          in: path
+        - required: false
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Comments"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
 components:
   schemas:
     User:

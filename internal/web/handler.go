@@ -67,12 +67,10 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	v0.Get("/persons/:id/subjects", addMetrics(h.GetPersonRelatedSubjects))
 	v0.Get("/persons/:id/characters", addMetrics(h.GetPersonRelatedCharacters))
 	v0.Get("/characters/:id", addMetrics(h.GetCharacter))
-	// v0.Get("/characters/:id/comments", addMetrics(h.GetEpisodeComments))
 	v0.Get("/characters/:id/image", addMetrics(h.GetCharacterImage))
 	v0.Get("/characters/:id/subjects", addMetrics(h.GetCharacterRelatedSubjects))
 	v0.Get("/characters/:id/persons", addMetrics(h.GetCharacterRelatedPersons))
 	v0.Get("/episodes/:id", addMetrics(h.GetEpisode))
-	// v0.Get("/episodes/:id/comments", addMetrics(h.GetEpisodeComments))
 	v0.Get("/episodes", addMetrics(h.ListEpisode))
 
 	v0.Get("/me", addMetrics(h.GetCurrentUser))
@@ -81,7 +79,6 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	v0.Get("/users/:username", addMetrics(h.GetUser))
 
 	v0.Get("/indices/:id", addMetrics(h.GetIndex))
-	// v0.Get("/indices/:id/comments", addMetrics(h.GetIndexComments))
 	v0.Get("/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
 
 	v0.Get("/revisions/persons/:id", addMetrics(h.GetPersonRevision))
@@ -104,6 +101,8 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	private.Get("/subjects/:id/topics", addMetrics(h.GetSubjectTopics))
 	private.Get("/subjects/:id/topics/:topic_id", addMetrics(h.GetSubjectTopic))
 	private.Get("/indices/:id/comments", addMetrics(h.GetIndexComments))
+	private.Get("/episodes/:id/comments", addMetrics(h.GetEpisodeComments))
+	private.Get("/characters/:id/comments", addMetrics(h.GetCharacterComments))
 
 	// un-documented
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))
