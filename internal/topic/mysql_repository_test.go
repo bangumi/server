@@ -48,6 +48,17 @@ func TestGet(t *testing.T) {
 	require.Equal(t, model.TopicIDType(1), s.ID)
 }
 
+func TestMysqlRepo_Count(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	count, err := repo.Count(context.Background(), domain.TopicTypeSubject, 1)
+	require.NoError(t, err)
+	require.Equal(t, count, int64(1))
+}
+
 func TestMysqlRepo_GetTopics(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()

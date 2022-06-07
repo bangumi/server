@@ -65,9 +65,28 @@ func (r mysqlRepo) Get(
 	return convertDao(topic)
 }
 
+func (r mysqlRepo) Count(ctx context.Context, topicType domain.TopicType, id uint32) (int64, error) {
+	var (
+		count int64
+		err   error
+	)
+	switch topicType {
+	case domain.TopicTypeGroup:
+		count, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).Count()
+	case domain.TopicTypeSubject:
+		count, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).Count()
+	default:
+		return 0, errUnsupportTopicType
+	}
+	if err != nil {
+		return 0, errgo.Wrap(err, "dal")
+	}
+	return count, nil
+}
+
 func (r mysqlRepo) ListTopics(
 	ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int,
-) (model.Topics, error) {
+) ([]model.Topic, error) {
 	var (
 		topics interface{}
 		err    error
@@ -80,23 +99,17 @@ func (r mysqlRepo) ListTopics(
 		topics, err = r.q.SubjectTopic.WithContext(ctx).
 			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Offset(offset).Limit(limit).Find()
 	default:
-		return model.Topics{}, errUnsupportTopicType
+		return nil, errUnsupportTopicType
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Topics{}, domain.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))
-		return model.Topics{}, errgo.Wrap(err, "dal")
+		return nil, errgo.Wrap(err, "dal")
 	}
-	result := convertModelTopics(topics)
-	return model.Topics{
-		Data:    result,
-		HasMore: len(result) == limit,
-		Limit:   uint32(limit),
-		Offset:  uint32(offset),
-	}, nil
+	return convertModelTopics(topics), nil
 }
 
 var errUnsupportTopicType = errors.New("topic type not support")

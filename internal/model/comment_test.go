@@ -12,14 +12,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain_test
+package model_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -67,5 +66,5 @@ func TestConvertModelCommentsToTree(t *testing.T) {
 		},
 	}
 
-	require.Equal(t, want, domain.ConvertModelCommentsToTree(input, 0))
+	require.Equal(t, want, model.ConvertModelCommentsToTree(input, 0))
 }

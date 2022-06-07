@@ -24,6 +24,52 @@ func (_m *TopicService) EXPECT() *TopicService_Expecter {
 	return &TopicService_Expecter{mock: &_m.Mock}
 }
 
+// Count provides a mock function with given fields: ctx, topicType, id
+func (_m *TopicService) Count(ctx context.Context, topicType domain.TopicType, id uint32) (int64, error) {
+	ret := _m.Called(ctx, topicType, id)
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(context.Context, domain.TopicType, uint32) int64); ok {
+		r0 = rf(ctx, topicType, id)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, domain.TopicType, uint32) error); ok {
+		r1 = rf(ctx, topicType, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// TopicService_Count_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Count'
+type TopicService_Count_Call struct {
+	*mock.Call
+}
+
+// Count is a helper method to define mock.On call
+//  - ctx context.Context
+//  - topicType domain.TopicType
+//  - id uint32
+func (_e *TopicService_Expecter) Count(ctx interface{}, topicType interface{}, id interface{}) *TopicService_Count_Call {
+	return &TopicService_Count_Call{Call: _e.mock.On("Count", ctx, topicType, id)}
+}
+
+func (_c *TopicService_Count_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id uint32)) *TopicService_Count_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(domain.TopicType), args[2].(uint32))
+	})
+	return _c
+}
+
+func (_c *TopicService_Count_Call) Return(_a0 int64, _a1 error) *TopicService_Count_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, topicType, id, limit, offset
 func (_m *TopicService) Get(ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int) (model.Topic, error) {
 	ret := _m.Called(ctx, topicType, id, limit, offset)
@@ -73,14 +119,16 @@ func (_c *TopicService_Get_Call) Return(_a0 model.Topic, _a1 error) *TopicServic
 }
 
 // ListTopics provides a mock function with given fields: ctx, topicType, id, limit, offset
-func (_m *TopicService) ListTopics(ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int) (model.Topics, error) {
+func (_m *TopicService) ListTopics(ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int) ([]model.Topic, error) {
 	ret := _m.Called(ctx, topicType, id, limit, offset)
 
-	var r0 model.Topics
-	if rf, ok := ret.Get(0).(func(context.Context, domain.TopicType, uint32, int, int) model.Topics); ok {
+	var r0 []model.Topic
+	if rf, ok := ret.Get(0).(func(context.Context, domain.TopicType, uint32, int, int) []model.Topic); ok {
 		r0 = rf(ctx, topicType, id, limit, offset)
 	} else {
-		r0 = ret.Get(0).(model.Topics)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Topic)
+		}
 	}
 
 	var r1 error
@@ -115,7 +163,7 @@ func (_c *TopicService_ListTopics_Call) Run(run func(ctx context.Context, topicT
 	return _c
 }
 
-func (_c *TopicService_ListTopics_Call) Return(_a0 model.Topics, _a1 error) *TopicService_ListTopics_Call {
+func (_c *TopicService_ListTopics_Call) Return(_a0 []model.Topic, _a1 error) *TopicService_ListTopics_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

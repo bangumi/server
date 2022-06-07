@@ -23,6 +23,8 @@ import (
 type CommentRepo interface {
 	Get(ctx context.Context, commentType CommentType, id model.CommentIDType) (model.Comment, error)
 
+	Count(ctx context.Context, commentType CommentType, id uint32) (int64, error)
+
 	GetComments(
 		ctx context.Context, commentType CommentType, id uint32, limit int, offset int,
 	) (model.Comments, error)
@@ -37,16 +39,3 @@ const (
 	CommentCharacter
 	CommentEpisode
 )
-
-func ConvertModelCommentsToTree(comments []model.Comment, related uint32) []model.Comment {
-	result := make([]model.Comment, 0)
-	for _, v := range comments {
-		if v.Related == related {
-			if replies := ConvertModelCommentsToTree(comments, v.ID); len(replies) != 0 {
-				v.Replies = replies
-			}
-			result = append(result, v)
-		}
-	}
-	return result
-}

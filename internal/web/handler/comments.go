@@ -56,7 +56,7 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
-	comments.Data = domain.ConvertModelCommentsToTree(comments.Data, 0)
+	comments.Data = model.ConvertModelCommentsToTree(comments.Data, 0)
 
 	return c.JSON(res.Comments{
 		HasMore: comments.HasMore,

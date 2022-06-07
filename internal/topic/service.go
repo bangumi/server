@@ -52,12 +52,20 @@ func (s service) Get(
 	return topic, nil
 }
 
+func (s service) Count(ctx context.Context, topicType domain.TopicType, id uint32) (int64, error) {
+	topics, err := s.repo.Count(ctx, topicType, id)
+	if err != nil {
+		return 0, errgo.Wrap(err, "TopicRepo.Count")
+	}
+	return topics, nil
+}
+
 func (s service) ListTopics(
 	ctx context.Context, topicType domain.TopicType, id uint32, limit int, offset int,
-) (model.Topics, error) {
+) ([]model.Topic, error) {
 	topics, err := s.repo.ListTopics(ctx, topicType, id, limit, offset)
 	if err != nil {
-		return model.Topics{}, errgo.Wrap(err, "TopicRepo.GetTopicsByObjectID")
+		return nil, errgo.Wrap(err, "TopicRepo.GetTopicsByObjectID")
 	}
 	return topics, nil
 }

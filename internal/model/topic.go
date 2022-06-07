@@ -16,13 +16,6 @@ package model
 
 import "time"
 
-type Topics struct {
-	Data    []Topic
-	HasMore bool
-	Limit   uint32
-	Offset  uint32
-}
-
 type Topic struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time

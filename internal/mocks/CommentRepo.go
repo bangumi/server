@@ -24,6 +24,52 @@ func (_m *CommentRepo) EXPECT() *CommentRepo_Expecter {
 	return &CommentRepo_Expecter{mock: &_m.Mock}
 }
 
+// Count provides a mock function with given fields: ctx, commentType, id
+func (_m *CommentRepo) Count(ctx context.Context, commentType domain.CommentType, id uint32) (int64, error) {
+	ret := _m.Called(ctx, commentType, id)
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, uint32) int64); ok {
+		r0 = rf(ctx, commentType, id)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, uint32) error); ok {
+		r1 = rf(ctx, commentType, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// CommentRepo_Count_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Count'
+type CommentRepo_Count_Call struct {
+	*mock.Call
+}
+
+// Count is a helper method to define mock.On call
+//  - ctx context.Context
+//  - commentType domain.CommentType
+//  - id uint32
+func (_e *CommentRepo_Expecter) Count(ctx interface{}, commentType interface{}, id interface{}) *CommentRepo_Count_Call {
+	return &CommentRepo_Count_Call{Call: _e.mock.On("Count", ctx, commentType, id)}
+}
+
+func (_c *CommentRepo_Count_Call) Run(run func(ctx context.Context, commentType domain.CommentType, id uint32)) *CommentRepo_Count_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(domain.CommentType), args[2].(uint32))
+	})
+	return _c
+}
+
+func (_c *CommentRepo_Count_Call) Return(_a0 int64, _a1 error) *CommentRepo_Count_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, commentType, id
 func (_m *CommentRepo) Get(ctx context.Context, commentType domain.CommentType, id uint32) (model.Comment, error) {
 	ret := _m.Called(ctx, commentType, id)

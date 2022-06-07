@@ -125,6 +125,35 @@ func convertDao(in interface{}) (model.Comment, error) {
 	}
 }
 
+func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id uint32) (int64, error) {
+	var (
+		count int64
+		err   error
+	)
+	switch commentType {
+	case domain.CommentTypeGroupTopic:
+		count, err = r.q.GroupTopicComment.WithContext(ctx).Where(r.q.GroupTopicComment.MentionedID.Eq(id)).Count()
+	case domain.CommentTypeSubjectTopic:
+		count, err = r.q.SubjectTopicComment.WithContext(ctx).
+			Where(r.q.SubjectTopicComment.MentionedID.Eq(id)).Count()
+	case domain.CommentIndex:
+		count, err = r.q.IndexComment.WithContext(ctx).
+			Where(r.q.IndexComment.MentionedID.Eq(id)).Count()
+	case domain.CommentCharacter:
+		count, err = r.q.CharacterComment.WithContext(ctx).
+			Where(r.q.CharacterComment.MentionedID.Eq(id)).Count()
+	case domain.CommentEpisode:
+		count, err = r.q.EpisodeComment.WithContext(ctx).
+			Where(r.q.EpisodeComment.MentionedID.Eq(id)).Count()
+	default:
+		return 0, errUnsupportCommentType
+	}
+	if err != nil {
+		return count, errgo.Wrap(err, "dal")
+	}
+	return count, nil
+}
+
 func (r mysqlRepo) GetComments(
 	ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int,
 ) (model.Comments, error) {

@@ -33,3 +33,16 @@ type Comments struct {
 	Limit   uint32
 	Offset  uint32
 }
+
+func ConvertModelCommentsToTree(comments []Comment, related uint32) []Comment {
+	result := make([]Comment, 0)
+	for _, v := range comments {
+		if v.Related == related {
+			if replies := ConvertModelCommentsToTree(comments, v.ID); len(replies) != 0 {
+				v.Replies = replies
+			}
+			result = append(result, v)
+		}
+	}
+	return result
+}

@@ -72,26 +72,29 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 			Details: util.DetailFromRequest(c),
 		})
 	}
+	var response = res.Paged{
+		Limit:  page.Limit,
+		Offset: page.Offset,
+	}
 
 	topics, err := h.t.ListTopics(c.Context(), topicType, id, page.Limit, page.Offset)
 	if err != nil {
-		return errgo.Wrap(err, "repo.topic.GetTopicsByObjectID")
+		return errgo.Wrap(err, "repo.topic.GetTopics")
 	}
 
-	userMap, err := h.getUserMapOfTopics(c, topics.Data...)
+	userMap, err := h.getUserMapOfTopics(c, topics...)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
-
-	response := res.Topics{
-		Data:    make([]res.Topic, 0),
-		HasMore: topics.HasMore,
-		Limit:   topics.Limit,
-		Offset:  topics.Offset,
+	count, err := h.t.Count(c.Context(), topicType, id)
+	if err != nil {
+		return errgo.Wrap(err, "repo.topic.Count")
 	}
-	for _, v := range topics.Data {
+	response.Total = count
+	var data = make([]res.Topic, len(topics))
+	for _, v := range topics {
 		creator := userMap[v.UID]
-		response.Data = append(response.Data, res.Topic{
+		data = append(data, res.Topic{
 			ID:        v.ID,
 			Title:     v.Title,
 			CreatedAt: v.CreatedAt,
@@ -102,6 +105,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 			Replies: v.Replies,
 		})
 	}
+	response.Data = data
 	return c.JSON(response)
 }
 
@@ -112,7 +116,7 @@ func (h Handler) getResTopic(c *fiber.Ctx, topic model.Topic) error {
 	}
 
 	creator := userMap[topic.UID]
-	topic.Comments.Data = domain.ConvertModelCommentsToTree(topic.Comments.Data, 0)
+	topic.Comments.Data = model.ConvertModelCommentsToTree(topic.Comments.Data, 0)
 	response := res.Topic{
 		ID:        topic.ID,
 		Title:     topic.Title,
