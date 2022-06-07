@@ -92,18 +92,18 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	}
 	response.Total = count
 	var data = make([]res.Topic, len(topics))
-	for _, v := range topics {
-		creator := userMap[v.UID]
-		data = append(data, res.Topic{
-			ID:        v.ID,
-			Title:     v.Title,
-			CreatedAt: v.CreatedAt,
+	for i, topic := range topics {
+		creator := userMap[topic.UID]
+		data[i] = res.Topic{
+			ID:        topic.ID,
+			Title:     topic.Title,
+			CreatedAt: topic.CreatedAt,
 			Creator: res.Creator{
 				Username: creator.UserName,
 				Nickname: creator.NickName,
 			},
-			Replies: v.Replies,
-		})
+			Replies: topic.Replies,
+		}
 	}
 	response.Data = data
 	return c.JSON(response)
