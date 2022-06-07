@@ -93,16 +93,12 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	response.Total = count
 	var data = make([]res.Topic, len(topics))
 	for i, topic := range topics {
-		creator := userMap[topic.UID]
 		data[i] = res.Topic{
 			ID:        topic.ID,
 			Title:     topic.Title,
 			CreatedAt: topic.CreatedAt,
-			Creator: res.Creator{
-				Username: creator.UserName,
-				Nickname: creator.NickName,
-			},
-			Replies: topic.Replies,
+			Creator:   convertModelUser(userMap[topic.UID]),
+			Replies:   topic.Replies,
 		}
 	}
 	response.Data = data
@@ -115,17 +111,13 @@ func (h Handler) getResTopic(c *fiber.Ctx, topic model.Topic) error {
 		return err
 	}
 
-	creator := userMap[topic.UID]
 	topic.Comments.Data = model.ConvertModelCommentsToTree(topic.Comments.Data, 0)
 	response := res.Topic{
 		ID:        topic.ID,
 		Title:     topic.Title,
 		CreatedAt: topic.CreatedAt,
-		Creator: res.Creator{
-			Username: creator.UserName,
-			Nickname: creator.NickName,
-		},
-		Replies: topic.Replies,
+		Creator:   convertModelUser(userMap[topic.UID]),
+		Replies:   topic.Replies,
 		Comments: &res.Comments{
 			HasMore: topic.Comments.HasMore,
 			Limit:   topic.Comments.Limit,
@@ -139,16 +131,12 @@ func (h Handler) getResTopic(c *fiber.Ctx, topic model.Topic) error {
 func convertModelTopicComments(comments []model.Comment, userMap map[uint32]model.User) []res.Comment {
 	replies := make([]res.Comment, 0)
 	for _, v := range comments {
-		creator := userMap[v.UID]
 		replies = append(replies, res.Comment{
 			ID:        v.ID,
 			Text:      v.Content,
 			CreatedAt: v.CreatedAt,
-			Creator: res.Creator{
-				Username: creator.UserName,
-				Nickname: creator.NickName,
-			},
-			Replies: convertModelTopicComments(v.Replies, userMap),
+			Creator:   convertModelUser(userMap[v.UID]),
+			Replies:   convertModelTopicComments(v.Replies, userMap),
 		})
 	}
 	return replies

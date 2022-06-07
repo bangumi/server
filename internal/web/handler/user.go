@@ -24,6 +24,7 @@ import (
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -38,15 +39,7 @@ func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "repo")
 	}
 
-	var me = res.User{
-		ID:        user.ID,
-		URL:       "https://bgm.tv/user/" + user.UserName,
-		Username:  user.UserName,
-		Nickname:  user.NickName,
-		UserGroup: user.UserGroup,
-		Avatar:    res.Avatar{}.Fill(user.Avatar),
-		Sign:      user.Sign,
-	}
+	var me = convertModelUser(user)
 
 	return res.JSON(c, me)
 }
@@ -70,15 +63,19 @@ func (h Handler) GetUser(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "user.GetByName")
 	}
 
-	var r = res.User{
-		ID:        user.ID,
-		URL:       "https://bgm.tv/user/" + user.UserName,
-		Username:  user.UserName,
-		Nickname:  user.NickName,
-		UserGroup: user.UserGroup,
-		Avatar:    res.Avatar{}.Fill(user.Avatar),
-		Sign:      user.Sign,
-	}
+	var r = convertModelUser(user)
 
 	return c.JSON(r)
+}
+
+func convertModelUser(u model.User) res.User {
+	return res.User{
+		ID:        u.ID,
+		URL:       "https://bgm.tv/user/" + u.UserName,
+		Username:  u.UserName,
+		Nickname:  u.NickName,
+		UserGroup: u.UserGroup,
+		Avatar:    res.Avatar{}.Fill(u.Avatar),
+		Sign:      u.Sign,
+	}
 }

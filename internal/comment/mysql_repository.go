@@ -17,6 +17,7 @@ package comment
 import (
 	"context"
 	"errors"
+	"reflect"
 	"time"
 
 	"go.uber.org/zap"
@@ -199,16 +200,10 @@ func (r mysqlRepo) GetComments(
 
 func convertModelComments(in interface{}) []model.Comment {
 	comments := make([]model.Comment, 0)
-	switch list := in.(type) {
-	case []*dao.SubjectTopicComment:
-		for _, v := range list {
-			if comment, e := convertDao(v); e == nil {
-				comments = append(comments, comment)
-			}
-		}
-	case []*dao.GroupTopicComment:
-		for _, v := range list {
-			if comment, e := convertDao(v); e == nil {
+	if reflect.TypeOf(in).Kind() == reflect.Slice {
+		s := reflect.ValueOf(in)
+		for i := 0; i < s.Len(); i++ {
+			if comment, e := convertDao(s.Index(i).Interface()); e == nil {
 				comments = append(comments, comment)
 			}
 		}

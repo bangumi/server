@@ -1388,7 +1388,7 @@ components:
           title: Type
           type: integer
         creator:
-          "$ref": "#/components/schemas/Creator"
+          "$ref": "#/components/schemas/User"
         summary:
           title: Summary
           type: string
@@ -1762,7 +1762,7 @@ components:
           type: string
           format: date-time
         creator:
-          "$ref": "#/components/schemas/Creator"
+          "$ref": "#/components/schemas/User"
         ban:
           title: Ban
           type: boolean
@@ -2260,7 +2260,7 @@ components:
           title: Type
           type: integer
         creator:
-          "$ref": "#/components/schemas/Creator"
+          "$ref": "#/components/schemas/User"
         summary:
           title: Summary
           type: string

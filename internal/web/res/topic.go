@@ -28,8 +28,8 @@ type Topics struct {
 type Topic struct {
 	CreatedAt time.Time `json:"created_at"`
 	Comments  *Comments `json:"comments,omitempty"`
-	Creator   Creator   `json:"creator"`
 	Title     string    `json:"title"`
+	Creator   User      `json:"creator"`
 	ID        uint32    `json:"id"`
 	Replies   uint32    `json:"replies"`
 }
@@ -43,7 +43,7 @@ type Comments struct {
 
 type Comment struct {
 	CreatedAt time.Time `json:"created_at"`
-	Creator   Creator   `json:"creator"`
+	Creator   User      `json:"creator"`
 	Text      string    `json:"text"`
 	Replies   []Comment `json:"replies,omitempty"`
 	ID        uint32    `json:"id"`
