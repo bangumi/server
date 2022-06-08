@@ -139,7 +139,7 @@ func (h Handler) getResTopicWithComments(
 		domain.TopicTypeSubject: domain.CommentTypeSubjectTopic,
 	}[topicType]
 
-	comments, err := h.m.GetComments(c.Context(), commentType, topic.ID, page.Limit, page.Offset)
+	comments, err := h.m.ListComments(c.Context(), commentType, topic.ID, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "repo.comments.GetComments")
 	}

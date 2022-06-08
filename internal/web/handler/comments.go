@@ -36,7 +36,20 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 		})
 	}
 
-	comments, err := h.m.GetComments(c.Context(), commentType, id, page.Limit, page.Offset)
+	count, err := h.m.Count(c.Context(), commentType, id)
+	if err != nil {
+		return errgo.Wrap(err, "repo.comments.Count")
+	}
+
+	if count == 0 {
+		return c.JSON(res.Paged{Data: []res.Comment{}, Total: count, Limit: page.Limit, Offset: page.Offset})
+	}
+
+	if err = page.check(count); err != nil {
+		return err
+	}
+
+	comments, err := h.m.ListComments(c.Context(), commentType, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return c.Status(http.StatusNotFound).JSON(res.Error{
@@ -56,12 +69,8 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
-	comments = model.ConvertModelCommentsToTree(comments, 0)
-	count, err := h.m.Count(c.Context(), commentType, id)
-	if err != nil {
-		return errgo.Wrap(err, "repo.comments.Count")
-	}
 
+	comments = model.ConvertModelCommentsToTree(comments, 0)
 	return c.JSON(res.Paged{
 		Total:  count,
 		Limit:  page.Limit,

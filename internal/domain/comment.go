@@ -25,7 +25,7 @@ type CommentRepo interface {
 
 	Count(ctx context.Context, commentType CommentType, id uint32) (int64, error)
 
-	GetComments(
+	ListComments(
 		ctx context.Context, commentType CommentType, id uint32, limit int, offset int,
 	) ([]model.Comment, error)
 }
