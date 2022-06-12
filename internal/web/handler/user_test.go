@@ -88,3 +88,38 @@ func TestHandler_GetUser_404(t *testing.T) {
 	resp := test.New(t).Get("/v0/users/u").Execute(app)
 	require.Equal(t, http.StatusNotFound, resp.StatusCode, resp.BodyString())
 }
+
+func TestHandler_GetUserAvatar_302(t *testing.T) {
+	t.Parallel()
+
+	m := mocks.NewUserRepo(t)
+	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{}, nil)
+	app := test.GetWebApp(t,
+		test.Mock{
+			UserRepo: m,
+		},
+	)
+	for _, imageType := range []string{"large", "medium", "small"} {
+		t.Run(imageType, func(t *testing.T) {
+			t.Parallel()
+
+			resp := test.New(t).Get("/v0/users/u/avatar?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+		})
+	}
+}
+
+func TestHandler_GetUserAvatar_400(t *testing.T) {
+	t.Parallel()
+
+	m := mocks.NewUserRepo(t)
+	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{}, nil)
+	app := test.GetWebApp(t,
+		test.Mock{
+			UserRepo: m,
+		},
+	)
+
+	resp := test.New(t).Get("/v0/users/u/avatar").Execute(app)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
+}

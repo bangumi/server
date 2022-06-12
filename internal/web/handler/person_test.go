@@ -67,3 +67,31 @@ func TestHandler_GetPerson_Redirect_cached(t *testing.T) {
 	require.Equal(t, http.StatusFound, resp.StatusCode)
 	require.Equal(t, "/v0/persons/8", resp.Header.Get("Location"))
 }
+
+func TestHandler_GetPersonImage_302(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewPersonRepo(t)
+	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Person{}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
+
+	for _, imageType := range []string{"small", "grid", "large", "medium"} {
+		t.Run(imageType, func(t *testing.T) {
+			t.Parallel()
+
+			resp := test.New(t).Get("/v0/persons/1/image?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+		})
+	}
+}
+
+func TestHandler_GetPersonImage_400(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewPersonRepo(t)
+	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Person{}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
+
+	resp := test.New(t).Get("/v0/persons/1/image").Execute(app)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
+}
