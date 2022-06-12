@@ -169,7 +169,7 @@ func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id
 	return count, nil
 }
 
-func (r mysqlRepo) ListComments(
+func (r mysqlRepo) List(
 	ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int,
 ) ([]model.Comment, error) {
 	var (

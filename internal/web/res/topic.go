@@ -27,6 +27,7 @@ type Topics struct {
 
 type Topic struct {
 	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 	Comments  *Paged    `json:"comments,omitempty"`
 	Title     string    `json:"title"`
 	Creator   User      `json:"creator"`

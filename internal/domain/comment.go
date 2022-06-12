@@ -23,9 +23,11 @@ import (
 type CommentRepo interface {
 	Get(ctx context.Context, commentType CommentType, id model.CommentIDType) (model.Comment, error)
 
+	// Count all comment for a topic/index/character/person/episode.
 	Count(ctx context.Context, commentType CommentType, id uint32) (int64, error)
 
-	ListComments(
+	// List return paged comment list of a topic/index/character/person/episode.
+	List(
 		ctx context.Context, commentType CommentType, id uint32, limit int, offset int,
 	) ([]model.Comment, error)
 }

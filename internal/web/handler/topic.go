@@ -91,7 +91,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		statuses = append(statuses, model.TopicStatusReview)
 	}
 
-	topics, err := h.t.ListTopics(c.Context(), topicType, id, statuses, page.Limit, page.Offset)
+	topics, err := h.t.List(c.Context(), topicType, id, statuses, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "repo.topic.GetTopics")
 	}
@@ -113,6 +113,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 			ID:        topic.ID,
 			Title:     topic.Title,
 			CreatedAt: topic.CreatedAt,
+			UpdatedAt: topic.UpdatedAt,
 			Creator:   convertModelUser(userMap[topic.UID]),
 			Replies:   topic.Replies,
 		}
@@ -139,7 +140,7 @@ func (h Handler) getResTopicWithComments(
 		domain.TopicTypeSubject: domain.CommentTypeSubjectTopic,
 	}[topicType]
 
-	comments, err := h.m.ListComments(c.Context(), commentType, topic.ID, page.Limit, page.Offset)
+	comments, err := h.m.List(c.Context(), commentType, topic.ID, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "repo.comments.GetComments")
 	}
@@ -154,6 +155,7 @@ func (h Handler) getResTopicWithComments(
 		ID:        topic.ID,
 		Title:     topic.Title,
 		CreatedAt: topic.CreatedAt,
+		UpdatedAt: topic.UpdatedAt,
 		Creator:   convertModelUser(userMap[topic.UID]),
 		Replies:   topic.Replies,
 		Comments: &res.Paged{

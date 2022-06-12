@@ -49,7 +49,7 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 		return err
 	}
 
-	comments, err := h.m.ListComments(c.Context(), commentType, id, page.Limit, page.Offset)
+	comments, err := h.m.List(c.Context(), commentType, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return c.Status(http.StatusNotFound).JSON(res.Error{

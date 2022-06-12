@@ -116,8 +116,8 @@ func (_c *CommentRepo_Get_Call) Return(_a0 model.Comment, _a1 error) *CommentRep
 	return _c
 }
 
-// ListComments provides a mock function with given fields: ctx, commentType, id, limit, offset
-func (_m *CommentRepo) ListComments(ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int) ([]model.Comment, error) {
+// List provides a mock function with given fields: ctx, commentType, id, limit, offset
+func (_m *CommentRepo) List(ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int) ([]model.Comment, error) {
 	ret := _m.Called(ctx, commentType, id, limit, offset)
 
 	var r0 []model.Comment
@@ -139,29 +139,29 @@ func (_m *CommentRepo) ListComments(ctx context.Context, commentType domain.Comm
 	return r0, r1
 }
 
-// CommentRepo_ListComments_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListComments'
-type CommentRepo_ListComments_Call struct {
+// CommentRepo_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type CommentRepo_List_Call struct {
 	*mock.Call
 }
 
-// ListComments is a helper method to define mock.On call
+// List is a helper method to define mock.On call
 //  - ctx context.Context
 //  - commentType domain.CommentType
 //  - id uint32
 //  - limit int
 //  - offset int
-func (_e *CommentRepo_Expecter) ListComments(ctx interface{}, commentType interface{}, id interface{}, limit interface{}, offset interface{}) *CommentRepo_ListComments_Call {
-	return &CommentRepo_ListComments_Call{Call: _e.mock.On("ListComments", ctx, commentType, id, limit, offset)}
+func (_e *CommentRepo_Expecter) List(ctx interface{}, commentType interface{}, id interface{}, limit interface{}, offset interface{}) *CommentRepo_List_Call {
+	return &CommentRepo_List_Call{Call: _e.mock.On("List", ctx, commentType, id, limit, offset)}
 }
 
-func (_c *CommentRepo_ListComments_Call) Run(run func(ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int)) *CommentRepo_ListComments_Call {
+func (_c *CommentRepo_List_Call) Run(run func(ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int)) *CommentRepo_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(domain.CommentType), args[2].(uint32), args[3].(int), args[4].(int))
 	})
 	return _c
 }
 
-func (_c *CommentRepo_ListComments_Call) Return(_a0 []model.Comment, _a1 error) *CommentRepo_ListComments_Call {
+func (_c *CommentRepo_List_Call) Return(_a0 []model.Comment, _a1 error) *CommentRepo_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

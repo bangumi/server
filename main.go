@@ -86,7 +86,6 @@ func start() error {
 			comment.NewMysqlRepo, topic.NewMysqlRepo,
 
 			auth.NewService, character.NewService, subject.NewService, person.NewService,
-			topic.NewMysqlRepo,
 		),
 
 		fx.Provide(

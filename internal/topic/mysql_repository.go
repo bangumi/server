@@ -94,7 +94,7 @@ func convertToUint8Status(statuses []model.TopicStatus) []uint8 {
 	return s
 }
 
-func (r mysqlRepo) ListTopics(
+func (r mysqlRepo) List(
 	ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int,
 ) ([]model.Topic, error) {
 	var (
@@ -105,11 +105,11 @@ func (r mysqlRepo) ListTopics(
 	case domain.TopicTypeGroup:
 		topics, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
 			Where(r.q.GroupTopic.Status.In(convertToUint8Status(statuses)...)).
-			Offset(offset).Limit(limit).Find()
+			Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedAt.Desc()).Find()
 	case domain.TopicTypeSubject:
 		topics, err = r.q.SubjectTopic.WithContext(ctx).
 			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Where(r.q.SubjectTopic.Status.In(convertToUint8Status(statuses)...)).
-			Offset(offset).Limit(limit).Find()
+			Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedAt.Desc()).Find()
 	default:
 		return nil, errUnsupportTopicType
 	}

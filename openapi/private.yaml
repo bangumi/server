@@ -144,7 +144,7 @@ paths:
       tags:
         - 条目
         - 讨论
-      summary: 获取条目全部讨论
+      summary: 分页获取条目讨论列表，使用时间更新时间倒序分页
       operationId: getSubjectTopicsById
       parameters:
         - required: true
@@ -197,7 +197,7 @@ paths:
       tags:
         - 条目
         - 讨论
-      summary: 获取条目讨论内容
+      summary: 分页获取条目讨论列表，按照时间顺序分页
       operationId: getSubjectTopicById
       parameters:
         - required: true
@@ -258,7 +258,7 @@ paths:
       tags:
         - 目录
         - 讨论
-      summary: 获取目录讨论内容
+      summary: 分页获取目录讨论列表，按照时间顺序分页
       operationId: getIndexCommentsById
       parameters:
         - required: true
@@ -311,7 +311,7 @@ paths:
       tags:
         - 章节
         - 讨论
-      summary: 获取章节讨论内容
+      summary: 分页获取章节讨论列表，按照时间顺序分页
       operationId: getEpisodeCommentsById
       parameters:
         - required: true
@@ -364,7 +364,7 @@ paths:
       tags:
         - 角色
         - 讨论
-      summary: 获取角色讨论内容
+      summary: 分页获取角色讨论列表，按照时间顺序分页
       operationId: getCharacterCommentsById
       parameters:
         - required: true
@@ -417,7 +417,7 @@ paths:
       tags:
         - 人物
         - 讨论
-      summary: 获取人物讨论内容
+      summary: 分页获取人物讨论列表，按照时间顺序分页
       operationId: getPersonCommentsById
       parameters:
         - required: true
@@ -502,6 +502,7 @@ components:
         - replies
         - title
         - created_at
+        - updated_at
         - creator
       type: object
       properties:
@@ -518,6 +519,10 @@ components:
           "$ref": "#/components/schemas/User"
         created_at:
           title: Created At
+          type: string
+          format: date-time
+        updated_at:
+          title: Updated At
           type: string
           format: date-time
         comments:

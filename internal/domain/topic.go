@@ -23,9 +23,11 @@ import (
 type TopicRepo interface {
 	Get(ctx context.Context, topicType TopicType, id model.TopicIDType) (model.Topic, error)
 
+	// Count all topic for a subject/group.
 	Count(ctx context.Context, topicType TopicType, id uint32, statuses []model.TopicStatus) (int64, error)
 
-	ListTopics(
+	// List return paged topic list of a subject/group.
+	List(
 		ctx context.Context, topicType TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int,
 	) ([]model.Topic, error)
 }

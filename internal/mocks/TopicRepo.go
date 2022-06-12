@@ -117,8 +117,8 @@ func (_c *TopicRepo_Get_Call) Return(_a0 model.Topic, _a1 error) *TopicRepo_Get_
 	return _c
 }
 
-// ListTopics provides a mock function with given fields: ctx, topicType, id, statuses, limit, offset
-func (_m *TopicRepo) ListTopics(ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int) ([]model.Topic, error) {
+// List provides a mock function with given fields: ctx, topicType, id, statuses, limit, offset
+func (_m *TopicRepo) List(ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int) ([]model.Topic, error) {
 	ret := _m.Called(ctx, topicType, id, statuses, limit, offset)
 
 	var r0 []model.Topic
@@ -140,30 +140,30 @@ func (_m *TopicRepo) ListTopics(ctx context.Context, topicType domain.TopicType,
 	return r0, r1
 }
 
-// TopicRepo_ListTopics_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListTopics'
-type TopicRepo_ListTopics_Call struct {
+// TopicRepo_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type TopicRepo_List_Call struct {
 	*mock.Call
 }
 
-// ListTopics is a helper method to define mock.On call
+// List is a helper method to define mock.On call
 //  - ctx context.Context
 //  - topicType domain.TopicType
 //  - id uint32
 //  - statuses []model.TopicStatus
 //  - limit int
 //  - offset int
-func (_e *TopicRepo_Expecter) ListTopics(ctx interface{}, topicType interface{}, id interface{}, statuses interface{}, limit interface{}, offset interface{}) *TopicRepo_ListTopics_Call {
-	return &TopicRepo_ListTopics_Call{Call: _e.mock.On("ListTopics", ctx, topicType, id, statuses, limit, offset)}
+func (_e *TopicRepo_Expecter) List(ctx interface{}, topicType interface{}, id interface{}, statuses interface{}, limit interface{}, offset interface{}) *TopicRepo_List_Call {
+	return &TopicRepo_List_Call{Call: _e.mock.On("List", ctx, topicType, id, statuses, limit, offset)}
 }
 
-func (_c *TopicRepo_ListTopics_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int)) *TopicRepo_ListTopics_Call {
+func (_c *TopicRepo_List_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int)) *TopicRepo_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(domain.TopicType), args[2].(uint32), args[3].([]model.TopicStatus), args[4].(int), args[5].(int))
 	})
 	return _c
 }
 
-func (_c *TopicRepo_ListTopics_Call) Return(_a0 []model.Topic, _a1 error) *TopicRepo_ListTopics_Call {
+func (_c *TopicRepo_List_Call) Return(_a0 []model.Topic, _a1 error) *TopicRepo_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
