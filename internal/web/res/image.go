@@ -14,6 +14,8 @@
 
 package res
 
+import "reflect"
+
 type PersonImages struct {
 	Small  string `json:"small"`
 	Grid   string `json:"grid"`
@@ -60,34 +62,15 @@ const (
 	DefaultImageURL = "https://lain.bgm.tv/img/no_icon_subject.png"
 )
 
-func SelectSubjectImageURL(s SubjectImages, key string) (string, bool) {
-	switch key {
-	case "small": //nolint:goconst
-		return s.Small, true
-	case "grid":
-		return s.Grid, true
-	case "large": //nolint:goconst
-		return s.Large, true
-	case "medium": //nolint:goconst
-		return s.Medium, true
-	case "common":
-		return s.Common, true
-	default:
+func SelectImageByType(in interface{}, key string) (string, bool) {
+	if in == nil {
 		return "", false
 	}
-}
-
-func SelectPersonImageURL(s PersonImages, key string) (string, bool) {
-	switch key {
-	case "small":
-		return s.Small, true
-	case "grid":
-		return s.Grid, true
-	case "large":
-		return s.Large, true
-	case "medium":
-		return s.Medium, true
-	default:
-		return "", false
+	t := reflect.TypeOf(in)
+	for i := 0; i < t.NumField(); i++ {
+		if t.Field(i).Tag.Get("json") == key {
+			return reflect.ValueOf(in).Field(i).String(), true
+		}
 	}
+	return "", false
 }

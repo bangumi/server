@@ -102,7 +102,7 @@ func (h Handler) GetUserAvatar(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "user.GetByName")
 	}
 
-	l, ok := res.Avatar{}.Fill(user.Avatar).Select(c.Query("type"))
+	l, ok := res.SelectImageByType(res.Avatar{}.Fill(user.Avatar), c.Query("type"))
 	if !ok {
 		return fiber.NewError(http.StatusBadRequest, "bad avatar type: "+c.Query("type"))
 	}
