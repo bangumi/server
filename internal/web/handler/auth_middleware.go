@@ -42,6 +42,7 @@ var accessorPool = sync.Pool{New: func() interface{} { return &accessor{} }} //n
 func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 	var a = accessorPool.Get().(*accessor) //nolint:forcetypeassert
 	defer accessorPool.Put(a)
+	defer a.reset()
 	a.fillBasicInfo(c)
 
 	value := utils.UnsafeString(c.Context().Request.Header.Cookie(session.Key))
@@ -143,4 +144,12 @@ func (a *accessor) fillAuth(auth domain.Auth) {
 
 func (a accessor) LogRequestID() zap.Field {
 	return zap.String("request_id", a.cfRay)
+}
+
+// reset struct to zero value before put it back to pool.
+func (a *accessor) reset() {
+	a.cfRay = ""
+	a.ip = nil
+	a.login = false
+	a.Auth = domain.Auth{}
 }
