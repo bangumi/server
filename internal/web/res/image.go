@@ -62,13 +62,13 @@ const (
 
 func SelectSubjectImageURL(s SubjectImages, key string) (string, bool) {
 	switch key {
-	case "small":
+	case "small": //nolint:goconst
 		return s.Small, true
 	case "grid":
 		return s.Grid, true
-	case "large":
+	case "large": //nolint:goconst
 		return s.Large, true
-	case "medium":
+	case "medium": //nolint:goconst
 		return s.Medium, true
 	case "common":
 		return s.Common, true

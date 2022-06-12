@@ -40,11 +40,11 @@ func (a Avatar) Fill(s string) Avatar {
 
 func (a Avatar) Select(s string) (string, bool) {
 	switch s {
-	case "large": //nolint:goconst
+	case "large":
 		return a.Large, true
-	case "medium": //nolint:goconst
+	case "medium":
 		return a.Medium, true
-	case "small": //nolint:goconst
+	case "small":
 		return a.Small, true
 	default:
 		return "", false
