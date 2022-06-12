@@ -15,6 +15,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -25,6 +26,8 @@ import (
 	"github.com/bangumi/server/internal/logger"
 )
 
+const defaultMaxMysqlConnection = 4
+
 func NewAppConfig() AppConfig {
 	logger.Info("reading app config", zap.String("version", Version))
 	host := getEnv("MYSQL_HOST", "127.0.0.1")
@@ -32,10 +35,7 @@ func NewAppConfig() AppConfig {
 	user := getEnv("MYSQL_USER", "user")
 	pass := getEnv("MYSQL_PASS", "password")
 	db := getEnv("MYSQL_DB", "bangumi")
-	connection, err := strconv.Atoi(getEnv("MYSQL_MAX_CONNECTION", "4"))
-	if err != nil {
-		connection = 100
-	}
+	maxConnection := getEnvInt("MYSQL_MAX_CONNECTION", defaultMaxMysqlConnection)
 
 	httpPort, err := strconv.Atoi(getEnv("HTTP_PORT", "3000"))
 	if err != nil {
@@ -64,7 +64,7 @@ func NewAppConfig() AppConfig {
 		MySQLUserName: user,
 		MySQLPassword: pass,
 		MySQLDatabase: db,
-		MySQLMaxConn:  connection,
+		MySQLMaxConn:  maxConnection,
 		Debug:         debug,
 		HTTPPort:      httpPort,
 
@@ -91,4 +91,18 @@ func getEnv(n, v string) string {
 	}
 
 	return v
+}
+
+func getEnvInt(name string, defaultValue int) int {
+	if raw, ok := os.LookupEnv(name); ok {
+		v, err := strconv.Atoi(raw)
+		if err != nil {
+			logger.Fatal(fmt.Sprintf("failed to read config from env, can't convert '%v' to int", raw),
+				zap.Error(err), zap.String("env_name", name))
+		}
+
+		return v
+	}
+
+	return defaultValue
 }
