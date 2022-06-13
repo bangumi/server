@@ -14,7 +14,13 @@
 
 package res
 
-import "reflect"
+const (
+	imageSizeLarge  = "large"
+	imageSizeMedium = "medium"
+	imageSizeSmall  = "small"
+	imageSizeGrid   = "grid"
+	imageSizeCommon = "common"
+)
 
 type PersonImages struct {
 	Small  string `json:"small"`
@@ -23,12 +29,44 @@ type PersonImages struct {
 	Medium string `json:"medium"`
 }
 
+func (i PersonImages) Select(t string) (string, bool) {
+	switch t {
+	case imageSizeSmall:
+		return i.Small, true
+	case imageSizeGrid:
+		return i.Grid, true
+	case imageSizeLarge:
+		return i.Large, true
+	case imageSizeMedium:
+		return i.Medium, true
+	default:
+		return "", false
+	}
+}
+
 type SubjectImages struct {
 	Small  string `json:"small"`
 	Grid   string `json:"grid"`
 	Large  string `json:"large"`
 	Medium string `json:"medium"`
 	Common string `json:"common"`
+}
+
+func (i SubjectImages) Select(t string) (string, bool) {
+	switch t {
+	case imageSizeSmall:
+		return i.Small, true
+	case imageSizeGrid:
+		return i.Grid, true
+	case imageSizeLarge:
+		return i.Large, true
+	case imageSizeMedium:
+		return i.Medium, true
+	case imageSizeCommon:
+		return i.Common, true
+	default:
+		return "", false
+	}
 }
 
 func SubjectImage(s string) SubjectImages {
@@ -61,16 +99,3 @@ func PersonImage(s string) PersonImages {
 const (
 	DefaultImageURL = "https://lain.bgm.tv/img/no_icon_subject.png"
 )
-
-func SelectImageByType(in interface{}, key string) (string, bool) {
-	if in == nil {
-		return "", false
-	}
-	t := reflect.TypeOf(in)
-	for i := 0; i < t.NumField(); i++ {
-		if t.Field(i).Tag.Get("json") == key {
-			return reflect.ValueOf(in).Field(i).String(), true
-		}
-	}
-	return "", false
-}

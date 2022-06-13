@@ -142,7 +142,7 @@ func Test_web_subject_bad_id(t *testing.T) {
 func TestHandler_GetSubjectImage_302(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{}, nil)
+	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{Image: "temp"}, nil)
 
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 
@@ -159,7 +159,7 @@ func TestHandler_GetSubjectImage_302(t *testing.T) {
 func TestHandler_GetSubjectImage_400(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{}, nil)
+	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{Image: "temp"}, nil)
 
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 

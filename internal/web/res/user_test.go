@@ -22,20 +22,11 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func TestPersonImages_Select(t *testing.T) {
+func TestAvatar_Select(t *testing.T) {
 	t.Parallel()
 
-	personImage := res.PersonImage("temp")
-	img, ok := personImage.Select("large")
+	userAvatar := res.Avatar{}.Fill("temp")
+	img, ok := userAvatar.Select("large")
 	require.Equal(t, ok, true, "get img url")
-	require.Equal(t, img, "https://lain.bgm.tv/pic/crt/l/temp")
-}
-
-func TestSubjectImages_Select(t *testing.T) {
-	t.Parallel()
-
-	subjectImage := res.SubjectImage("temp")
-	img, ok := subjectImage.Select("large")
-	require.Equal(t, ok, true, "get img url")
-	require.Equal(t, img, "https://lain.bgm.tv/pic/cover/l/temp")
+	require.Equal(t, img, "https://lain.bgm.tv/pic/user/l/temp")
 }

@@ -97,3 +97,31 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
 	require.Equal(t, model.CharacterIDType(7), r.ID)
 }
+
+func TestHandler_GetCharacterImage_200(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewCharacterRepo(t)
+	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
+
+	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
+
+	for _, imageType := range []string{"large", "grid", "medium", "small"} {
+		t.Run(imageType, func(t *testing.T) {
+			t.Parallel()
+
+			resp := test.New(t).Get("/v0/characters/7/image?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+		})
+	}
+}
+
+func TestHandler_GetCharacterImage_400(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewCharacterRepo(t)
+	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
+
+	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
+
+	resp := test.New(t).Get("/v0/characters/7/image").Execute(app)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
+}

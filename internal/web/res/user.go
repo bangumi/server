@@ -40,11 +40,11 @@ func (a Avatar) Fill(s string) Avatar {
 
 func (a Avatar) Select(s string) (string, bool) {
 	switch s {
-	case "large":
+	case imageSizeLarge:
 		return a.Large, true
-	case "medium":
+	case imageSizeMedium:
 		return a.Medium, true
-	case "small":
+	case imageSizeSmall:
 		return a.Small, true
 	default:
 		return "", false

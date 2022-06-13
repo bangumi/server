@@ -149,7 +149,7 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 		})
 	}
 
-	l, ok := res.SelectImageByType(r.Image, c.Query("type"))
+	l, ok := r.Image.Select(c.Query("type"))
 	if !ok {
 		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
 	}

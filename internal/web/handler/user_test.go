@@ -93,12 +93,8 @@ func TestHandler_GetUserAvatar_302(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{}, nil)
-	app := test.GetWebApp(t,
-		test.Mock{
-			UserRepo: m,
-		},
-	)
+	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{Avatar: "temp"}, nil)
+	app := test.GetWebApp(t, test.Mock{UserRepo: m})
 	for _, imageType := range []string{"large", "medium", "small"} {
 		t.Run(imageType, func(t *testing.T) {
 			t.Parallel()
@@ -113,7 +109,7 @@ func TestHandler_GetUserAvatar_400(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{}, nil)
+	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{Avatar: "temp"}, nil)
 	app := test.GetWebApp(t,
 		test.Mock{
 			UserRepo: m,
