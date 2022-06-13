@@ -14,11 +14,34 @@
 
 package res
 
+const (
+	imageSizeLarge  = "large"
+	imageSizeMedium = "medium"
+	imageSizeSmall  = "small"
+	imageSizeGrid   = "grid"
+	imageSizeCommon = "common"
+)
+
 type PersonImages struct {
 	Small  string `json:"small"`
 	Grid   string `json:"grid"`
 	Large  string `json:"large"`
 	Medium string `json:"medium"`
+}
+
+func (i PersonImages) Select(t string) (string, bool) {
+	switch t {
+	case imageSizeSmall:
+		return i.Small, true
+	case imageSizeGrid:
+		return i.Grid, true
+	case imageSizeLarge:
+		return i.Large, true
+	case imageSizeMedium:
+		return i.Medium, true
+	default:
+		return "", false
+	}
 }
 
 type SubjectImages struct {
@@ -27,6 +50,23 @@ type SubjectImages struct {
 	Large  string `json:"large"`
 	Medium string `json:"medium"`
 	Common string `json:"common"`
+}
+
+func (i SubjectImages) Select(t string) (string, bool) {
+	switch t {
+	case imageSizeSmall:
+		return i.Small, true
+	case imageSizeGrid:
+		return i.Grid, true
+	case imageSizeLarge:
+		return i.Large, true
+	case imageSizeMedium:
+		return i.Medium, true
+	case imageSizeCommon:
+		return i.Common, true
+	default:
+		return "", false
+	}
 }
 
 func SubjectImage(s string) SubjectImages {
@@ -59,35 +99,3 @@ func PersonImage(s string) PersonImages {
 const (
 	DefaultImageURL = "https://lain.bgm.tv/img/no_icon_subject.png"
 )
-
-func SelectSubjectImageURL(s SubjectImages, key string) (string, bool) {
-	switch key {
-	case "small":
-		return s.Small, true
-	case "grid":
-		return s.Grid, true
-	case "large":
-		return s.Large, true
-	case "medium":
-		return s.Medium, true
-	case "common":
-		return s.Common, true
-	default:
-		return "", false
-	}
-}
-
-func SelectPersonImageURL(s PersonImages, key string) (string, bool) {
-	switch key {
-	case "small":
-		return s.Small, true
-	case "grid":
-		return s.Grid, true
-	case "large":
-		return s.Large, true
-	case "medium":
-		return s.Medium, true
-	default:
-		return "", false
-	}
-}

@@ -67,3 +67,39 @@ func TestHandler_GetPerson_Redirect_cached(t *testing.T) {
 	require.Equal(t, http.StatusFound, resp.StatusCode)
 	require.Equal(t, "/v0/persons/8", resp.Header.Get("Location"))
 }
+
+func TestHandler_GetPersonImage_302(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewPersonRepo(t)
+	m.EXPECT().Get(mock.Anything, model.PersonIDType(1)).Return(model.Person{ID: 1, Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, model.PersonIDType(3)).Return(model.Person{ID: 3}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
+
+	for _, imageType := range []string{"small", "grid", "large", "medium"} {
+		t.Run(imageType, func(t *testing.T) {
+			t.Parallel()
+
+			resp := test.New(t).Get("/v0/persons/1/image?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			expected, _ := res.PersonImage("temp").Select(imageType)
+			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
+
+			//should redirect to default image
+			resp = test.New(t).Get("/v0/persons/3/image?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			require.Equal(t, res.DefaultImageURL, resp.Header.Get("Location"), "should redirect to default image")
+		})
+	}
+}
+
+func TestHandler_GetPersonImage_400(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewPersonRepo(t)
+	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Person{Image: "temp"}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
+
+	resp := test.New(t).Get("/v0/persons/1/image").Execute(app)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
+}

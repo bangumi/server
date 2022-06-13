@@ -38,6 +38,19 @@ func (a Avatar) Fill(s string) Avatar {
 	}
 }
 
+func (a Avatar) Select(s string) (string, bool) {
+	switch s {
+	case imageSizeLarge:
+		return a.Large, true
+	case imageSizeMedium:
+		return a.Medium, true
+	case imageSizeSmall:
+		return a.Small, true
+	default:
+		return "", false
+	}
+}
+
 type User struct {
 	Avatar    Avatar `json:"avatar"`
 	Sign      string `json:"sign"`

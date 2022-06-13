@@ -82,3 +82,30 @@ func (h Handler) GetUser(c *fiber.Ctx) error {
 
 	return c.JSON(r)
 }
+
+func (h Handler) GetUserAvatar(c *fiber.Ctx) error {
+	username := c.Params("username")
+	if username == "" {
+		return fiber.NewError(http.StatusBadRequest, "missing require parameters `username`")
+	}
+	if len(username) >= 32 {
+		return res.HTTPError(c, http.StatusBadRequest, "username is too long")
+	}
+
+	user, err := h.u.GetByName(c.Context(), username)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.HTTPError(c, http.StatusNotFound, "can't find user with username "+strconv.Quote(username))
+		}
+
+		h.log.Error("unexpected error happened", zap.Error(err))
+		return errgo.Wrap(err, "user.GetByName")
+	}
+
+	l, ok := res.Avatar{}.Fill(user.Avatar).Select(c.Query("type"))
+	if !ok {
+		return fiber.NewError(http.StatusBadRequest, "bad avatar type: "+c.Query("type"))
+	}
+
+	return c.Redirect(l)
+}

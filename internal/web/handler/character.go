@@ -147,7 +147,7 @@ func (h Handler) GetCharacterImage(c *fiber.Ctx) error {
 		})
 	}
 
-	l, ok := res.SelectPersonImageURL(r.Images, c.Query("type"))
+	l, ok := r.Images.Select(c.Query("type"))
 	if !ok {
 		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
 	}
