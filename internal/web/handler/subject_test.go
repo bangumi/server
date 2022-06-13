@@ -142,7 +142,8 @@ func Test_web_subject_bad_id(t *testing.T) {
 func TestHandler_GetSubjectImage_302(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectIDType(1)).Return(model.Subject{ID: 1, Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectIDType(3)).Return(model.Subject{ID: 1}, nil)
 
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 
@@ -152,6 +153,13 @@ func TestHandler_GetSubjectImage_302(t *testing.T) {
 
 			resp := test.New(t).Get("/v0/subjects/1/image?type=" + imageType).Execute(app)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			expected, _ := res.SubjectImage("temp").Select(imageType)
+			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
+
+			//should redirect to default image
+			resp = test.New(t).Get("/v0/subjects/3/image?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			require.Equal(t, res.DefaultImageURL, resp.Header.Get("Location"), "should redirect to default image")
 		})
 	}
 }

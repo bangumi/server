@@ -93,7 +93,8 @@ func TestHandler_GetUserAvatar_302(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{Avatar: "temp"}, nil)
+	m.EXPECT().GetByName(mock.Anything, "u").Return(model.User{ID: 1, Avatar: "temp"}, nil)
+
 	app := test.GetWebApp(t, test.Mock{UserRepo: m})
 	for _, imageType := range []string{"large", "medium", "small"} {
 		t.Run(imageType, func(t *testing.T) {
@@ -101,6 +102,8 @@ func TestHandler_GetUserAvatar_302(t *testing.T) {
 
 			resp := test.New(t).Get("/v0/users/u/avatar?type=" + imageType).Execute(app)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			expected, _ := res.Avatar{}.Fill("temp").Select(imageType)
+			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
 		})
 	}
 }

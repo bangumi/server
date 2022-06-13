@@ -102,6 +102,7 @@ func TestHandler_GetCharacterImage_200(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
 	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, uint32(8)).Return(model.Character{ID: 8}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
@@ -111,6 +112,13 @@ func TestHandler_GetCharacterImage_200(t *testing.T) {
 
 			resp := test.New(t).Get("/v0/characters/7/image?type=" + imageType).Execute(app)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			expected, _ := res.PersonImage("temp").Select(imageType)
+			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
+
+			//should redirect to default image
+			resp = test.New(t).Get("/v0/characters/8/image?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			require.Equal(t, res.DefaultImageURL, resp.Header.Get("Location"), "should redirect to default image")
 		})
 	}
 }
