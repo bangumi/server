@@ -30,6 +30,7 @@ services:
       MYSQL_USER: "mysql_user"
       MYSQL_PASS: "mysql_password"
       REDIS_URI: "redis://:redis_password@chii-redis:6379/0"
+      WEB_DOMAIN: "next.bgm.tv"
       MYSQL_MAX_CONNECTION: "4"
 
   chii-mysql:

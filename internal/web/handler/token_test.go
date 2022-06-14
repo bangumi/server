@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -48,7 +47,7 @@ func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Post("/p/access-tokens").Header(fiber.HeaderOrigin, config.FrontendOrigin).JSON(fiber.Map{
+	resp := test.New(t).Post("/p/access-tokens").JSON(fiber.Map{
 		"name":          "token name",
 		"duration_days": 1,
 	}).Cookie(session.Key, "session key").Execute(app, -1)
@@ -75,9 +74,8 @@ func TestHandler_DeletePersonalAccessToken_401(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Delete("/p/access-tokens").Header(fiber.HeaderOrigin, config.FrontendOrigin).JSON(fiber.Map{
-		"id": tokenID,
-	}).Cookie(session.Key, "session key").Execute(app, -1)
+	resp := test.New(t).Delete("/p/access-tokens").JSON(fiber.Map{"id": tokenID}).
+		Cookie(session.Key, "session key").Execute(app, -1)
 
 	require.Equal(t, fiber.StatusUnauthorized, resp.StatusCode, resp.BodyString())
 }
