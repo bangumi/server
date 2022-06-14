@@ -19,7 +19,6 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gookit/goutil/timex"
@@ -54,11 +53,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 		}
 	}
 
-	v0 := app.Group("/v0/", cors.New(cors.Config{
-		AllowMethods: fiber.MethodGet,
-		AllowHeaders: fiber.HeaderAuthorization,
-		MaxAge:       timex.OneHourSec,
-	}), h.AccessTokenAuthMiddleware)
+	v0 := app.Group("/v0/", h.AccessTokenAuthMiddleware)
 
 	v0.Get("/subjects/:id", addMetrics(h.GetSubject))
 	v0.Get("/subjects/:id/image", addMetrics(h.GetSubjectImage))
