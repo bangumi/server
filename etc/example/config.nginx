@@ -1,0 +1,26 @@
+server {
+  server_name api.bgm.tv;
+  listen 433;
+  absolute_redirect off;
+
+  location /v0/ {
+    if ($request_method = 'OPTIONS') {
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Headers' 'Authorization';
+      add_header 'Access-Control-Allow-Methods' 'GET,OPTIONS';
+      add_header 'Access-Control-Max-Age' 1728000;
+      add_header 'Content-Type' 'text/plain charset=UTF-8';
+      add_header 'Content-Length' 0;
+      return 204;
+    }
+
+    add_header 'Access-Control-Allow-Origin' '*' always;
+    proxy_set_header "cf_ray" "$request_id"; # backend will read cf_raw as request ID
+    proxy_pass http://127.0.0.1:3000;
+  }
+
+  location / {
+    return 404;
+    access_log off;
+  }
+}
