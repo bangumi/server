@@ -36,7 +36,7 @@ services:
   chii-mysql:
     # 需要从 https://github.com/bangumi/dev-env 手动导入所有的数据表定义，后端服务器不会自动初始化数据库。
     container_name: "chii-mysql"
-    image: "mysql:5.7.33"
+    image: "mysql:5.7.38"
     ports:
       - "3308:3306"
     command: mysqld --character-set-server=utf8mb4
