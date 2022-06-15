@@ -58,7 +58,7 @@ func TestMysqlRepo_GetByToken(t *testing.T) {
 	u, err := repo.GetByToken(context.Background(), "a_development_access_token")
 	require.NoError(t, err)
 
-	require.Equal(t, uint32(382951), u.ID)
+	require.EqualValues(t, 382951, u.ID)
 }
 
 func TestMysqlRepo_GetByToken_expired(t *testing.T) {

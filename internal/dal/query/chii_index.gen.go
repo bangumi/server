@@ -37,7 +37,7 @@ func newIndex(db *gorm.DB) index {
 	_index.Stats = field.NewString(tableName, "idx_stats")
 	_index.Dateline = field.NewInt32(tableName, "idx_dateline")
 	_index.Lasttouch = field.NewUint32(tableName, "idx_lasttouch")
-	_index.CreatorID = field.NewUint32(tableName, "idx_uid")
+	_index.CreatorID = field.NewField(tableName, "idx_uid")
 	_index.Ban = field.NewBool(tableName, "idx_ban")
 
 	_index.fillFieldMap()
@@ -59,7 +59,7 @@ type index struct {
 	Stats        field.String
 	Dateline     field.Int32
 	Lasttouch    field.Uint32
-	CreatorID    field.Uint32
+	CreatorID    field.Field
 	Ban          field.Bool
 
 	fieldMap map[string]field.Expr
@@ -87,7 +87,7 @@ func (i *index) updateTableName(table string) *index {
 	i.Stats = field.NewString(table, "idx_stats")
 	i.Dateline = field.NewInt32(table, "idx_dateline")
 	i.Lasttouch = field.NewUint32(table, "idx_lasttouch")
-	i.CreatorID = field.NewUint32(table, "idx_uid")
+	i.CreatorID = field.NewField(table, "idx_uid")
 	i.Ban = field.NewBool(table, "idx_ban")
 
 	i.fillFieldMap()

@@ -4,29 +4,33 @@
 
 package dao
 
+import (
+	"github.com/bangumi/server/internal/model"
+)
+
 const TableNameEpisode = "chii_episodes"
 
 // Episode mapped from table <chii_episodes>
 type Episode struct {
-	ID        uint32  `gorm:"column:ep_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:"ep_id"`
-	SubjectID uint32  `gorm:"column:ep_subject_id;type:mediumint(8) unsigned;not null;index:ep_subject_id,priority:1;index:ep_subject_id_2,priority:1" json:"ep_subject_id"`
-	Sort      float32 `gorm:"column:ep_sort;type:float unsigned;not null;index:ep_sort,priority:1;index:ep_subject_id_2,priority:3" json:"ep_sort"`
-	Type      int16   `gorm:"column:ep_type;type:tinyint(1) unsigned;not null" json:"ep_type"`
-	Disc      uint8   `gorm:"column:ep_disc;type:tinyint(3) unsigned;not null;index:ep_disc,priority:1" json:"ep_disc"` // 碟片数
-	Name      string  `gorm:"column:ep_name;type:varchar(80);not null" json:"ep_name"`
-	NameCn    string  `gorm:"column:ep_name_cn;type:varchar(80);not null" json:"ep_name_cn"`
-	Rate      int8    `gorm:"column:ep_rate;type:tinyint(3);not null" json:"ep_rate"`
-	Duration  string  `gorm:"column:ep_duration;type:varchar(80);not null" json:"ep_duration"`
-	Airdate   string  `gorm:"column:ep_airdate;type:varchar(80);not null" json:"ep_airdate"`
-	Online    string  `gorm:"column:ep_online;type:mediumtext;not null" json:"ep_online"`
-	Comment   uint32  `gorm:"column:ep_comment;type:mediumint(8) unsigned;not null" json:"ep_comment"`
-	Resources uint32  `gorm:"column:ep_resources;type:mediumint(8) unsigned;not null" json:"ep_resources"`
-	Desc      string  `gorm:"column:ep_desc;type:mediumtext;not null" json:"ep_desc"`
-	Dateline  uint32  `gorm:"column:ep_dateline;type:int(10) unsigned;not null" json:"ep_dateline"`
-	Lastpost  uint32  `gorm:"column:ep_lastpost;type:int(10) unsigned;not null;index:ep_lastpost,priority:1" json:"ep_lastpost"`
-	Lock      uint8   `gorm:"column:ep_lock;type:tinyint(3) unsigned;not null" json:"ep_lock"`
-	Ban       uint8   `gorm:"column:ep_ban;type:tinyint(3) unsigned;not null;index:ep_ban,priority:1;index:ep_subject_id_2,priority:2" json:"ep_ban"`
-	Subject   Subject `gorm:"foreignKey:ep_subject_id;references:subject_id" json:"subject"`
+	ID        model.EpisodeID `gorm:"column:ep_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:"ep_id"`
+	SubjectID model.SubjectID `gorm:"column:ep_subject_id;type:mediumint(8) unsigned;not null;index:ep_subject_id,priority:1;index:ep_subject_id_2,priority:1" json:"ep_subject_id"`
+	Sort      float32         `gorm:"column:ep_sort;type:float unsigned;not null;index:ep_sort,priority:1;index:ep_subject_id_2,priority:3" json:"ep_sort"`
+	Type      int16           `gorm:"column:ep_type;type:tinyint(1) unsigned;not null" json:"ep_type"`
+	Disc      uint8           `gorm:"column:ep_disc;type:tinyint(3) unsigned;not null;index:ep_disc,priority:1" json:"ep_disc"` // 碟片数
+	Name      string          `gorm:"column:ep_name;type:varchar(80);not null" json:"ep_name"`
+	NameCn    string          `gorm:"column:ep_name_cn;type:varchar(80);not null" json:"ep_name_cn"`
+	Rate      int8            `gorm:"column:ep_rate;type:tinyint(3);not null" json:"ep_rate"`
+	Duration  string          `gorm:"column:ep_duration;type:varchar(80);not null" json:"ep_duration"`
+	Airdate   string          `gorm:"column:ep_airdate;type:varchar(80);not null" json:"ep_airdate"`
+	Online    string          `gorm:"column:ep_online;type:mediumtext;not null" json:"ep_online"`
+	Comment   uint32          `gorm:"column:ep_comment;type:mediumint(8) unsigned;not null" json:"ep_comment"`
+	Resources uint32          `gorm:"column:ep_resources;type:mediumint(8) unsigned;not null" json:"ep_resources"`
+	Desc      string          `gorm:"column:ep_desc;type:mediumtext;not null" json:"ep_desc"`
+	Dateline  uint32          `gorm:"column:ep_dateline;type:int(10) unsigned;not null" json:"ep_dateline"`
+	Lastpost  uint32          `gorm:"column:ep_lastpost;type:int(10) unsigned;not null;index:ep_lastpost,priority:1" json:"ep_lastpost"`
+	Lock      uint8           `gorm:"column:ep_lock;type:tinyint(3) unsigned;not null" json:"ep_lock"`
+	Ban       uint8           `gorm:"column:ep_ban;type:tinyint(3) unsigned;not null;index:ep_ban,priority:1;index:ep_subject_id_2,priority:2" json:"ep_ban"`
+	Subject   Subject         `gorm:"foreignKey:ep_subject_id;references:subject_id" json:"subject"`
 }
 
 // TableName Episode's table name

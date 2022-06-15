@@ -24,18 +24,18 @@ func (_m *SubjectService) EXPECT() *SubjectService_Expecter {
 }
 
 // Get provides a mock function with given fields: ctx, id
-func (_m *SubjectService) Get(ctx context.Context, id uint32) (model.Subject, error) {
+func (_m *SubjectService) Get(ctx context.Context, id model.SubjectID) (model.Subject, error) {
 	ret := _m.Called(ctx, id)
 
 	var r0 model.Subject
-	if rf, ok := ret.Get(0).(func(context.Context, uint32) model.Subject); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID) model.Subject); ok {
 		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Get(0).(model.Subject)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID) error); ok {
 		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
@@ -51,14 +51,14 @@ type SubjectService_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //  - ctx context.Context
-//  - id uint32
+//  - id model.SubjectID
 func (_e *SubjectService_Expecter) Get(ctx interface{}, id interface{}) *SubjectService_Get_Call {
 	return &SubjectService_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
 
-func (_c *SubjectService_Get_Call) Run(run func(ctx context.Context, id uint32)) *SubjectService_Get_Call {
+func (_c *SubjectService_Get_Call) Run(run func(ctx context.Context, id model.SubjectID)) *SubjectService_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32))
+		run(args[0].(context.Context), args[1].(model.SubjectID))
 	})
 	return _c
 }
@@ -69,7 +69,7 @@ func (_c *SubjectService_Get_Call) Return(_a0 model.Subject, _a1 error) *Subject
 }
 
 // GetActors provides a mock function with given fields: ctx, subjectID, characterIDs
-func (_m *SubjectService) GetActors(ctx context.Context, subjectID uint32, characterIDs ...uint32) (map[uint32][]model.Person, error) {
+func (_m *SubjectService) GetActors(ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID) (map[model.CharacterID][]model.Person, error) {
 	_va := make([]interface{}, len(characterIDs))
 	for _i := range characterIDs {
 		_va[_i] = characterIDs[_i]
@@ -79,17 +79,17 @@ func (_m *SubjectService) GetActors(ctx context.Context, subjectID uint32, chara
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
-	var r0 map[uint32][]model.Person
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, ...uint32) map[uint32][]model.Person); ok {
+	var r0 map[model.CharacterID][]model.Person
+	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, ...model.CharacterID) map[model.CharacterID][]model.Person); ok {
 		r0 = rf(ctx, subjectID, characterIDs...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[uint32][]model.Person)
+			r0 = ret.Get(0).(map[model.CharacterID][]model.Person)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32, ...uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, ...model.CharacterID) error); ok {
 		r1 = rf(ctx, subjectID, characterIDs...)
 	} else {
 		r1 = ret.Error(1)
@@ -105,37 +105,37 @@ type SubjectService_GetActors_Call struct {
 
 // GetActors is a helper method to define mock.On call
 //  - ctx context.Context
-//  - subjectID uint32
-//  - characterIDs ...uint32
+//  - subjectID model.SubjectID
+//  - characterIDs ...model.CharacterID
 func (_e *SubjectService_Expecter) GetActors(ctx interface{}, subjectID interface{}, characterIDs ...interface{}) *SubjectService_GetActors_Call {
 	return &SubjectService_GetActors_Call{Call: _e.mock.On("GetActors",
 		append([]interface{}{ctx, subjectID}, characterIDs...)...)}
 }
 
-func (_c *SubjectService_GetActors_Call) Run(run func(ctx context.Context, subjectID uint32, characterIDs ...uint32)) *SubjectService_GetActors_Call {
+func (_c *SubjectService_GetActors_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID)) *SubjectService_GetActors_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]uint32, len(args)-2)
+		variadicArgs := make([]model.CharacterID, len(args)-2)
 		for i, a := range args[2:] {
 			if a != nil {
-				variadicArgs[i] = a.(uint32)
+				variadicArgs[i] = a.(model.CharacterID)
 			}
 		}
-		run(args[0].(context.Context), args[1].(uint32), variadicArgs...)
+		run(args[0].(context.Context), args[1].(model.SubjectID), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *SubjectService_GetActors_Call) Return(_a0 map[uint32][]model.Person, _a1 error) *SubjectService_GetActors_Call {
+func (_c *SubjectService_GetActors_Call) Return(_a0 map[model.CharacterID][]model.Person, _a1 error) *SubjectService_GetActors_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
 // GetCharacterRelated provides a mock function with given fields: ctx, characterID
-func (_m *SubjectService) GetCharacterRelated(ctx context.Context, characterID uint32) ([]model.SubjectCharacterRelation, error) {
+func (_m *SubjectService) GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]model.SubjectCharacterRelation, error) {
 	ret := _m.Called(ctx, characterID)
 
 	var r0 []model.SubjectCharacterRelation
-	if rf, ok := ret.Get(0).(func(context.Context, uint32) []model.SubjectCharacterRelation); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.CharacterID) []model.SubjectCharacterRelation); ok {
 		r0 = rf(ctx, characterID)
 	} else {
 		if ret.Get(0) != nil {
@@ -144,7 +144,7 @@ func (_m *SubjectService) GetCharacterRelated(ctx context.Context, characterID u
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.CharacterID) error); ok {
 		r1 = rf(ctx, characterID)
 	} else {
 		r1 = ret.Error(1)
@@ -160,14 +160,14 @@ type SubjectService_GetCharacterRelated_Call struct {
 
 // GetCharacterRelated is a helper method to define mock.On call
 //  - ctx context.Context
-//  - characterID uint32
+//  - characterID model.CharacterID
 func (_e *SubjectService_Expecter) GetCharacterRelated(ctx interface{}, characterID interface{}) *SubjectService_GetCharacterRelated_Call {
 	return &SubjectService_GetCharacterRelated_Call{Call: _e.mock.On("GetCharacterRelated", ctx, characterID)}
 }
 
-func (_c *SubjectService_GetCharacterRelated_Call) Run(run func(ctx context.Context, characterID uint32)) *SubjectService_GetCharacterRelated_Call {
+func (_c *SubjectService_GetCharacterRelated_Call) Run(run func(ctx context.Context, characterID model.CharacterID)) *SubjectService_GetCharacterRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32))
+		run(args[0].(context.Context), args[1].(model.CharacterID))
 	})
 	return _c
 }
@@ -178,11 +178,11 @@ func (_c *SubjectService_GetCharacterRelated_Call) Return(_a0 []model.SubjectCha
 }
 
 // GetPersonRelated provides a mock function with given fields: ctx, personID
-func (_m *SubjectService) GetPersonRelated(ctx context.Context, personID uint32) ([]model.SubjectPersonRelation, error) {
+func (_m *SubjectService) GetPersonRelated(ctx context.Context, personID model.PersonID) ([]model.SubjectPersonRelation, error) {
 	ret := _m.Called(ctx, personID)
 
 	var r0 []model.SubjectPersonRelation
-	if rf, ok := ret.Get(0).(func(context.Context, uint32) []model.SubjectPersonRelation); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.PersonID) []model.SubjectPersonRelation); ok {
 		r0 = rf(ctx, personID)
 	} else {
 		if ret.Get(0) != nil {
@@ -191,7 +191,7 @@ func (_m *SubjectService) GetPersonRelated(ctx context.Context, personID uint32)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.PersonID) error); ok {
 		r1 = rf(ctx, personID)
 	} else {
 		r1 = ret.Error(1)
@@ -207,14 +207,14 @@ type SubjectService_GetPersonRelated_Call struct {
 
 // GetPersonRelated is a helper method to define mock.On call
 //  - ctx context.Context
-//  - personID uint32
+//  - personID model.PersonID
 func (_e *SubjectService_Expecter) GetPersonRelated(ctx interface{}, personID interface{}) *SubjectService_GetPersonRelated_Call {
 	return &SubjectService_GetPersonRelated_Call{Call: _e.mock.On("GetPersonRelated", ctx, personID)}
 }
 
-func (_c *SubjectService_GetPersonRelated_Call) Run(run func(ctx context.Context, personID uint32)) *SubjectService_GetPersonRelated_Call {
+func (_c *SubjectService_GetPersonRelated_Call) Run(run func(ctx context.Context, personID model.PersonID)) *SubjectService_GetPersonRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32))
+		run(args[0].(context.Context), args[1].(model.PersonID))
 	})
 	return _c
 }
@@ -225,11 +225,11 @@ func (_c *SubjectService_GetPersonRelated_Call) Return(_a0 []model.SubjectPerson
 }
 
 // GetSubjectRelated provides a mock function with given fields: ctx, subjectID
-func (_m *SubjectService) GetSubjectRelated(ctx context.Context, subjectID uint32) ([]model.SubjectInternalRelation, error) {
+func (_m *SubjectService) GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectInternalRelation, error) {
 	ret := _m.Called(ctx, subjectID)
 
 	var r0 []model.SubjectInternalRelation
-	if rf, ok := ret.Get(0).(func(context.Context, uint32) []model.SubjectInternalRelation); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID) []model.SubjectInternalRelation); ok {
 		r0 = rf(ctx, subjectID)
 	} else {
 		if ret.Get(0) != nil {
@@ -238,7 +238,7 @@ func (_m *SubjectService) GetSubjectRelated(ctx context.Context, subjectID uint3
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID) error); ok {
 		r1 = rf(ctx, subjectID)
 	} else {
 		r1 = ret.Error(1)
@@ -254,14 +254,14 @@ type SubjectService_GetSubjectRelated_Call struct {
 
 // GetSubjectRelated is a helper method to define mock.On call
 //  - ctx context.Context
-//  - subjectID uint32
+//  - subjectID model.SubjectID
 func (_e *SubjectService_Expecter) GetSubjectRelated(ctx interface{}, subjectID interface{}) *SubjectService_GetSubjectRelated_Call {
 	return &SubjectService_GetSubjectRelated_Call{Call: _e.mock.On("GetSubjectRelated", ctx, subjectID)}
 }
 
-func (_c *SubjectService_GetSubjectRelated_Call) Run(run func(ctx context.Context, subjectID uint32)) *SubjectService_GetSubjectRelated_Call {
+func (_c *SubjectService_GetSubjectRelated_Call) Run(run func(ctx context.Context, subjectID model.SubjectID)) *SubjectService_GetSubjectRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32))
+		run(args[0].(context.Context), args[1].(model.SubjectID))
 	})
 	return _c
 }

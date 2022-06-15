@@ -27,8 +27,8 @@ func newCharacterSubjects(db *gorm.DB) characterSubjects {
 
 	tableName := _characterSubjects.characterSubjectsDo.TableName()
 	_characterSubjects.ALL = field.NewField(tableName, "*")
-	_characterSubjects.CharacterID = field.NewUint32(tableName, "crt_id")
-	_characterSubjects.SubjectID = field.NewUint32(tableName, "subject_id")
+	_characterSubjects.CharacterID = field.NewField(tableName, "crt_id")
+	_characterSubjects.SubjectID = field.NewField(tableName, "subject_id")
 	_characterSubjects.SubjectTypeID = field.NewUint8(tableName, "subject_type_id")
 	_characterSubjects.CrtType = field.NewUint8(tableName, "crt_type")
 	_characterSubjects.CtrAppearEps = field.NewString(tableName, "ctr_appear_eps")
@@ -64,8 +64,8 @@ type characterSubjects struct {
 	characterSubjectsDo characterSubjectsDo
 
 	ALL           field.Field
-	CharacterID   field.Uint32
-	SubjectID     field.Uint32
+	CharacterID   field.Field
+	SubjectID     field.Field
 	SubjectTypeID field.Uint8
 	CrtType       field.Uint8
 	CtrAppearEps  field.String
@@ -89,8 +89,8 @@ func (c characterSubjects) As(alias string) *characterSubjects {
 
 func (c *characterSubjects) updateTableName(table string) *characterSubjects {
 	c.ALL = field.NewField(table, "*")
-	c.CharacterID = field.NewUint32(table, "crt_id")
-	c.SubjectID = field.NewUint32(table, "subject_id")
+	c.CharacterID = field.NewField(table, "crt_id")
+	c.SubjectID = field.NewField(table, "subject_id")
 	c.SubjectTypeID = field.NewUint8(table, "subject_type_id")
 	c.CrtType = field.NewUint8(table, "crt_type")
 	c.CtrAppearEps = field.NewString(table, "ctr_appear_eps")

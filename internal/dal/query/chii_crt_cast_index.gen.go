@@ -27,9 +27,9 @@ func newCast(db *gorm.DB) cast {
 
 	tableName := _cast.castDo.TableName()
 	_cast.ALL = field.NewField(tableName, "*")
-	_cast.CharacterID = field.NewUint32(tableName, "crt_id")
-	_cast.PersonID = field.NewUint32(tableName, "prsn_id")
-	_cast.SubjectID = field.NewUint32(tableName, "subject_id")
+	_cast.CharacterID = field.NewField(tableName, "crt_id")
+	_cast.PersonID = field.NewField(tableName, "prsn_id")
+	_cast.SubjectID = field.NewField(tableName, "subject_id")
 	_cast.SubjectTypeID = field.NewUint8(tableName, "subject_type_id")
 	_cast.Summary = field.NewString(tableName, "summary")
 	_cast.Character = castHasOneCharacter{
@@ -74,9 +74,9 @@ type cast struct {
 	castDo castDo
 
 	ALL           field.Field
-	CharacterID   field.Uint32
-	PersonID      field.Uint32
-	SubjectID     field.Uint32
+	CharacterID   field.Field
+	PersonID      field.Field
+	SubjectID     field.Field
 	SubjectTypeID field.Uint8
 	Summary       field.String
 	Character     castHasOneCharacter
@@ -100,9 +100,9 @@ func (c cast) As(alias string) *cast {
 
 func (c *cast) updateTableName(table string) *cast {
 	c.ALL = field.NewField(table, "*")
-	c.CharacterID = field.NewUint32(table, "crt_id")
-	c.PersonID = field.NewUint32(table, "prsn_id")
-	c.SubjectID = field.NewUint32(table, "subject_id")
+	c.CharacterID = field.NewField(table, "crt_id")
+	c.PersonID = field.NewField(table, "prsn_id")
+	c.SubjectID = field.NewField(table, "subject_id")
 	c.SubjectTypeID = field.NewUint8(table, "subject_type_id")
 	c.Summary = field.NewString(table, "summary")
 

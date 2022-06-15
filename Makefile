@@ -70,8 +70,8 @@ test-all: .bin/dotenv.exe .bin/gotestfmt.exe
 bench:
 	go test -bench=. -benchmem ./pkg/wiki
 
-./dal/query/gen.go: ./internal/cmd/gen/gorm.go go.mod .bin/dotenv.exe
-	.bin/dotenv.exe go run ./internal/cmd/gen/gorm.go
+./dal/query/gen.go: ./internal/cmd/gen/gorm/main.go go.mod .bin/dotenv.exe
+	.bin/dotenv.exe go run ./internal/cmd/gen/gorm/main.go
 
 coverage: .bin/dotenv.exe .bin/gotestfmt.exe
 	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -json -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages

@@ -29,9 +29,9 @@ func newSubjectRevision(db *gorm.DB) subjectRevision {
 	_subjectRevision.ALL = field.NewField(tableName, "*")
 	_subjectRevision.ID = field.NewUint32(tableName, "rev_id")
 	_subjectRevision.Type = field.NewUint8(tableName, "rev_type")
-	_subjectRevision.SubjectID = field.NewUint32(tableName, "rev_subject_id")
+	_subjectRevision.SubjectID = field.NewField(tableName, "rev_subject_id")
 	_subjectRevision.TypeID = field.NewUint16(tableName, "rev_type_id")
-	_subjectRevision.CreatorID = field.NewUint32(tableName, "rev_creator")
+	_subjectRevision.CreatorID = field.NewField(tableName, "rev_creator")
 	_subjectRevision.Dateline = field.NewUint32(tableName, "rev_dateline")
 	_subjectRevision.Name = field.NewString(tableName, "rev_name")
 	_subjectRevision.NameCN = field.NewString(tableName, "rev_name_cn")
@@ -63,9 +63,9 @@ type subjectRevision struct {
 	ALL          field.Field
 	ID           field.Uint32
 	Type         field.Uint8
-	SubjectID    field.Uint32
+	SubjectID    field.Field
 	TypeID       field.Uint16
-	CreatorID    field.Uint32
+	CreatorID    field.Field
 	Dateline     field.Uint32
 	Name         field.String
 	NameCN       field.String
@@ -94,9 +94,9 @@ func (s *subjectRevision) updateTableName(table string) *subjectRevision {
 	s.ALL = field.NewField(table, "*")
 	s.ID = field.NewUint32(table, "rev_id")
 	s.Type = field.NewUint8(table, "rev_type")
-	s.SubjectID = field.NewUint32(table, "rev_subject_id")
+	s.SubjectID = field.NewField(table, "rev_subject_id")
 	s.TypeID = field.NewUint16(table, "rev_type_id")
-	s.CreatorID = field.NewUint32(table, "rev_creator")
+	s.CreatorID = field.NewField(table, "rev_creator")
 	s.Dateline = field.NewUint32(table, "rev_dateline")
 	s.Name = field.NewString(table, "rev_name")
 	s.NameCN = field.NewString(table, "rev_name_cn")

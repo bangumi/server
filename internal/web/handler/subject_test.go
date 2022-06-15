@@ -59,14 +59,14 @@ func TestHappyPath(t *testing.T) {
 		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-	require.Equal(t, uint32(7), r.ID)
+	require.EqualValues(t, 7, r.ID)
 }
 
 func TestNSFW_200(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(7)).Return(model.Subject{NSFW: true}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
@@ -91,7 +91,7 @@ func TestNSFW_404(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{NSFW: true}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(7)).Return(model.Subject{NSFW: true}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
@@ -114,7 +114,7 @@ func TestNSFW_404(t *testing.T) {
 func Test_web_subject_Redirect(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(8)).Return(model.Subject{Redirect: 2}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(8)).Return(model.Subject{Redirect: 2}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{

@@ -48,23 +48,33 @@ func uint32NonZero(s string) (uint32, error) {
 }
 
 func UserID(s string) (model.UserID, error) {
-	return uint32NonZero(s)
+	v, err := uint32NonZero(s)
+
+	return model.UserID(v), err
 }
 
 func SubjectID(s string) (model.SubjectID, error) {
-	return uint32NonZero(s)
+	v, err := uint32NonZero(s)
+
+	return model.SubjectID(v), err
 }
 
 func PersonID(s string) (model.PersonID, error) {
-	return uint32NonZero(s)
+	v, err := uint32NonZero(s)
+
+	return model.PersonID(v), err
 }
 
 func CharacterID(s string) (model.CharacterID, error) {
-	return uint32NonZero(s)
+	v, err := uint32NonZero(s)
+
+	return model.CharacterID(v), err
 }
 
 func EpisodeID(s string) (model.EpisodeID, error) {
-	return uint32NonZero(s)
+	v, err := uint32NonZero(s)
+
+	return model.EpisodeID(v), err
 }
 
 func IndexID(s string) (model.IndexID, error) {

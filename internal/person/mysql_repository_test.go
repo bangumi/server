@@ -42,7 +42,7 @@ func TestGet(t *testing.T) {
 	s, err := repo.Get(context.Background(), 1)
 	require.NoError(t, err)
 
-	require.Equal(t, uint32(1), s.ID)
+	require.EqualValues(t, 1, s.ID)
 }
 
 func TestMysqlRepo_GetByIDs(t *testing.T) {

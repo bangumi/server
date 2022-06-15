@@ -27,7 +27,7 @@ func newCharacter(db *gorm.DB) character {
 
 	tableName := _character.characterDo.TableName()
 	_character.ALL = field.NewField(tableName, "*")
-	_character.ID = field.NewUint32(tableName, "crt_id")
+	_character.ID = field.NewField(tableName, "crt_id")
 	_character.Name = field.NewString(tableName, "crt_name")
 	_character.Role = field.NewUint8(tableName, "crt_role")
 	_character.Infobox = field.NewString(tableName, "crt_infobox")
@@ -41,7 +41,7 @@ func newCharacter(db *gorm.DB) character {
 	_character.ImgAnidb = field.NewString(tableName, "crt_img_anidb")
 	_character.AnidbID = field.NewUint32(tableName, "crt_anidb_id")
 	_character.Ban = field.NewUint8(tableName, "crt_ban")
-	_character.Redirect = field.NewUint32(tableName, "crt_redirect")
+	_character.Redirect = field.NewField(tableName, "crt_redirect")
 	_character.Nsfw = field.NewBool(tableName, "crt_nsfw")
 	_character.Fields = characterHasOneFields{
 		db: db.Session(&gorm.Session{}),
@@ -58,7 +58,7 @@ type character struct {
 	characterDo characterDo
 
 	ALL      field.Field
-	ID       field.Uint32
+	ID       field.Field
 	Name     field.String
 	Role     field.Uint8
 	Infobox  field.String
@@ -72,7 +72,7 @@ type character struct {
 	ImgAnidb field.String
 	AnidbID  field.Uint32
 	Ban      field.Uint8
-	Redirect field.Uint32
+	Redirect field.Field
 	Nsfw     field.Bool
 	Fields   characterHasOneFields
 
@@ -91,7 +91,7 @@ func (c character) As(alias string) *character {
 
 func (c *character) updateTableName(table string) *character {
 	c.ALL = field.NewField(table, "*")
-	c.ID = field.NewUint32(table, "crt_id")
+	c.ID = field.NewField(table, "crt_id")
 	c.Name = field.NewString(table, "crt_name")
 	c.Role = field.NewUint8(table, "crt_role")
 	c.Infobox = field.NewString(table, "crt_infobox")
@@ -105,7 +105,7 @@ func (c *character) updateTableName(table string) *character {
 	c.ImgAnidb = field.NewString(table, "crt_img_anidb")
 	c.AnidbID = field.NewUint32(table, "crt_anidb_id")
 	c.Ban = field.NewUint8(table, "crt_ban")
-	c.Redirect = field.NewUint32(table, "crt_redirect")
+	c.Redirect = field.NewField(table, "crt_redirect")
 	c.Nsfw = field.NewBool(table, "crt_nsfw")
 
 	c.fillFieldMap()

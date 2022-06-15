@@ -34,7 +34,7 @@ import (
 func TestHandler_GetPerson_HappyPath(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPersonRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Person{ID: 7}, nil)
+	m.EXPECT().Get(mock.Anything, model.PersonID(7)).Return(model.Person{ID: 7}, nil)
 
 	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
 
@@ -46,7 +46,7 @@ func TestHandler_GetPerson_HappyPath(t *testing.T) {
 func TestHandler_GetPerson_Redirect(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPersonRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Person{ID: 7}, nil)
+	m.EXPECT().Get(mock.Anything, model.PersonID(7)).Return(model.Person{ID: 7}, nil)
 
 	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
 

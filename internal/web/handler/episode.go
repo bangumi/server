@@ -70,7 +70,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
-func (h Handler) getEpisodeWithCache(ctx context.Context, id uint32) (res.Episode, bool, error) {
+func (h Handler) getEpisodeWithCache(ctx context.Context, id model.EpisodeID) (res.Episode, bool, error) {
 	var key = cachekey.Episode(id)
 	// try to read from cache
 	var r res.Episode

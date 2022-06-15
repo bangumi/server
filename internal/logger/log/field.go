@@ -21,7 +21,7 @@ import (
 )
 
 func UserID(id model.UserID) zap.Field {
-	return zap.Uint32("user_id", id)
+	return zap.Uint32("user_id", uint32(id))
 }
 
 func GroupID(id model.GroupID) zap.Field {
@@ -29,5 +29,5 @@ func GroupID(id model.GroupID) zap.Field {
 }
 
 func SubjectID(id model.SubjectID) zap.Field {
-	return zap.Uint32("subject_id", id)
+	return zap.Uint32("subject_id", uint32(id))
 }

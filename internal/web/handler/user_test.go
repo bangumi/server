@@ -51,7 +51,7 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-	require.Equal(t, uid, r.ID, resp.BodyString())
+	require.EqualValues(t, uid, r.ID, resp.BodyString())
 }
 
 func TestHandler_GetUser_200(t *testing.T) {

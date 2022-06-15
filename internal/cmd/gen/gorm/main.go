@@ -36,11 +36,11 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-var userIDTypeString = reflect.TypeOf(new(model.UserID)).Elem().Name()
-var personIDTypeString = reflect.TypeOf(new(model.PersonID)).Elem().Name()
-var characterIDTypeString = reflect.TypeOf(new(model.CharacterID)).Elem().Name()
-var episodeIDTypeString = reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
-var subjectIDTypeString = reflect.TypeOf(new(model.SubjectID)).Elem().Name()
+var userIDTypeString = "model.UserID"           // reflect.TypeOf(new(model.UserID)).Elem().Name()
+var personIDTypeString = "model.PersonID"       // reflect.TypeOf(new(model.PersonID)).Elem().Name()
+var characterIDTypeString = "model.CharacterID" // reflect.TypeOf(new(model.CharacterID)).Elem().Name()
+var episodeIDTypeString = "model.EpisodeID"     // reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
+var subjectIDTypeString = "model.SubjectID"     // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 

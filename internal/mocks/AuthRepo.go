@@ -8,6 +8,8 @@ import (
 	domain "github.com/bangumi/server/internal/domain"
 	mock "github.com/stretchr/testify/mock"
 
+	model "github.com/bangumi/server/internal/model"
+
 	time "time"
 )
 
@@ -25,18 +27,18 @@ func (_m *AuthRepo) EXPECT() *AuthRepo_Expecter {
 }
 
 // CreateAccessToken provides a mock function with given fields: ctx, userID, name, expiration
-func (_m *AuthRepo) CreateAccessToken(ctx context.Context, userID uint32, name string, expiration time.Duration) (string, error) {
+func (_m *AuthRepo) CreateAccessToken(ctx context.Context, userID model.UserID, name string, expiration time.Duration) (string, error) {
 	ret := _m.Called(ctx, userID, name, expiration)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, string, time.Duration) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, string, time.Duration) string); ok {
 		r0 = rf(ctx, userID, name, expiration)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32, string, time.Duration) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, string, time.Duration) error); ok {
 		r1 = rf(ctx, userID, name, expiration)
 	} else {
 		r1 = ret.Error(1)
@@ -52,16 +54,16 @@ type AuthRepo_CreateAccessToken_Call struct {
 
 // CreateAccessToken is a helper method to define mock.On call
 //  - ctx context.Context
-//  - userID uint32
+//  - userID model.UserID
 //  - name string
 //  - expiration time.Duration
 func (_e *AuthRepo_Expecter) CreateAccessToken(ctx interface{}, userID interface{}, name interface{}, expiration interface{}) *AuthRepo_CreateAccessToken_Call {
 	return &AuthRepo_CreateAccessToken_Call{Call: _e.mock.On("CreateAccessToken", ctx, userID, name, expiration)}
 }
 
-func (_c *AuthRepo_CreateAccessToken_Call) Run(run func(ctx context.Context, userID uint32, name string, expiration time.Duration)) *AuthRepo_CreateAccessToken_Call {
+func (_c *AuthRepo_CreateAccessToken_Call) Run(run func(ctx context.Context, userID model.UserID, name string, expiration time.Duration)) *AuthRepo_CreateAccessToken_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(string), args[3].(time.Duration))
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(string), args[3].(time.Duration))
 	})
 	return _c
 }
@@ -306,11 +308,11 @@ func (_c *AuthRepo_GetTokenByID_Call) Return(_a0 domain.AccessToken, _a1 error) 
 }
 
 // ListAccessToken provides a mock function with given fields: ctx, userID
-func (_m *AuthRepo) ListAccessToken(ctx context.Context, userID uint32) ([]domain.AccessToken, error) {
+func (_m *AuthRepo) ListAccessToken(ctx context.Context, userID model.UserID) ([]domain.AccessToken, error) {
 	ret := _m.Called(ctx, userID)
 
 	var r0 []domain.AccessToken
-	if rf, ok := ret.Get(0).(func(context.Context, uint32) []domain.AccessToken); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) []domain.AccessToken); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
@@ -319,7 +321,7 @@ func (_m *AuthRepo) ListAccessToken(ctx context.Context, userID uint32) ([]domai
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID) error); ok {
 		r1 = rf(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
@@ -335,14 +337,14 @@ type AuthRepo_ListAccessToken_Call struct {
 
 // ListAccessToken is a helper method to define mock.On call
 //  - ctx context.Context
-//  - userID uint32
+//  - userID model.UserID
 func (_e *AuthRepo_Expecter) ListAccessToken(ctx interface{}, userID interface{}) *AuthRepo_ListAccessToken_Call {
 	return &AuthRepo_ListAccessToken_Call{Call: _e.mock.On("ListAccessToken", ctx, userID)}
 }
 
-func (_c *AuthRepo_ListAccessToken_Call) Run(run func(ctx context.Context, userID uint32)) *AuthRepo_ListAccessToken_Call {
+func (_c *AuthRepo_ListAccessToken_Call) Run(run func(ctx context.Context, userID model.UserID)) *AuthRepo_ListAccessToken_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32))
+		run(args[0].(context.Context), args[1].(model.UserID))
 	})
 	return _c
 }

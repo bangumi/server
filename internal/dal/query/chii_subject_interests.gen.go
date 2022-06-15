@@ -28,8 +28,8 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 	tableName := _subjectCollection.subjectCollectionDo.TableName()
 	_subjectCollection.ALL = field.NewField(tableName, "*")
 	_subjectCollection.ID = field.NewUint32(tableName, "interest_id")
-	_subjectCollection.UserID = field.NewUint32(tableName, "interest_uid")
-	_subjectCollection.SubjectID = field.NewUint32(tableName, "interest_subject_id")
+	_subjectCollection.UserID = field.NewField(tableName, "interest_uid")
+	_subjectCollection.SubjectID = field.NewField(tableName, "interest_subject_id")
 	_subjectCollection.SubjectType = field.NewUint8(tableName, "interest_subject_type")
 	_subjectCollection.Rate = field.NewUint8(tableName, "interest_rate")
 	_subjectCollection.Type = field.NewUint8(tableName, "interest_type")
@@ -56,8 +56,8 @@ type subjectCollection struct {
 
 	ALL             field.Field
 	ID              field.Uint32
-	UserID          field.Uint32
-	SubjectID       field.Uint32
+	UserID          field.Field
+	SubjectID       field.Field
 	SubjectType     field.Uint8
 	Rate            field.Uint8
 	Type            field.Uint8
@@ -90,8 +90,8 @@ func (s subjectCollection) As(alias string) *subjectCollection {
 func (s *subjectCollection) updateTableName(table string) *subjectCollection {
 	s.ALL = field.NewField(table, "*")
 	s.ID = field.NewUint32(table, "interest_id")
-	s.UserID = field.NewUint32(table, "interest_uid")
-	s.SubjectID = field.NewUint32(table, "interest_subject_id")
+	s.UserID = field.NewField(table, "interest_uid")
+	s.SubjectID = field.NewField(table, "interest_subject_id")
 	s.SubjectType = field.NewUint8(table, "interest_subject_type")
 	s.Rate = field.NewUint8(table, "interest_rate")
 	s.Type = field.NewUint8(table, "interest_type")

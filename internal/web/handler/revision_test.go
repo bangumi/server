@@ -144,8 +144,8 @@ func TestHandler_GetSubjectRevision_HappyPath(t *testing.T) {
 }
 
 func TestHandler_ListCharacterRevision_HappyPath(t *testing.T) {
-	var cid uint32 = 20         // character id
-	var mockRID uint32 = 307134 // revision id
+	var cid model.CharacterID = 20        // character id
+	var mockRID model.RevisionID = 307134 // revision id
 
 	t.Parallel()
 	m := mocks.NewRevisionRepo(t)

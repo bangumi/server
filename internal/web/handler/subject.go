@@ -333,7 +333,7 @@ func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID model.Subje
 		return errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
 	}
 
-	var characterIDs = make([]model.PersonID, len(relations))
+	var characterIDs = make([]model.CharacterID, len(relations))
 	for i, rel := range relations {
 		characterIDs[i] = rel.Character.ID
 	}

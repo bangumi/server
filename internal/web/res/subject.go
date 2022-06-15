@@ -117,11 +117,11 @@ type PersonRelatedCharacter struct {
 type CharacterRelatedPerson struct {
 	Images        PersonImages `json:"images"`
 	Name          string
-	SubjectName   string            `json:"subject_name"`
-	SubjectNameCn string            `json:"subject_name_cn"`
-	SubjectID     model.SubjectID   `json:"subject_id"`
-	ID            model.CharacterID `json:"id"`
-	Type          uint8             `json:"type" doc:"person type"`
+	SubjectName   string          `json:"subject_name"`
+	SubjectNameCn string          `json:"subject_name_cn"`
+	SubjectID     model.SubjectID `json:"subject_id"`
+	ID            model.PersonID  `json:"id"`
+	Type          uint8           `json:"type" doc:"person type"`
 }
 
 type CharacterRelatedSubject struct {
@@ -142,12 +142,12 @@ type SubjectRelatedSubject struct {
 }
 
 type SubjectRelatedCharacter struct {
-	Images   PersonImages   `json:"images"`
-	Name     string         `json:"name"`
-	Relation string         `json:"relation"`
-	Actors   []Actor        `json:"actors"`
-	Type     uint8          `json:"type"`
-	ID       model.PersonID `json:"id"`
+	Images   PersonImages      `json:"images"`
+	Name     string            `json:"name"`
+	Relation string            `json:"relation"`
+	Actors   []Actor           `json:"actors"`
+	Type     uint8             `json:"type"`
+	ID       model.CharacterID `json:"id"`
 }
 
 type SubjectRelatedPerson struct {

@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/model/generic"
 )
 
 type mysqlRepo struct {
@@ -101,7 +102,8 @@ func (r mysqlRepo) GetCharacterRelated(
 func (r mysqlRepo) GetByIDs(
 	ctx context.Context, ids ...model.PersonID,
 ) (map[model.PersonID]model.Person, error) {
-	u, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).Where(r.q.Person.ID.In(ids...)).Find()
+	u, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).
+		Where(r.q.Person.ID.In(generic.PersonIDToValuerSlice(ids)...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")

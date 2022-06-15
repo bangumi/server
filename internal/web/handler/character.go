@@ -71,7 +71,7 @@ func (h Handler) GetCharacter(c *fiber.Ctx) error {
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
 func (h Handler) getCharacterWithCache(
-	ctx context.Context, id uint32) (res.CharacterV0, bool, error) {
+	ctx context.Context, id model.CharacterID) (res.CharacterV0, bool, error) {
 	var key = cachekey.Character(id)
 
 	// try to read from cache

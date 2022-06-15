@@ -24,6 +24,7 @@ import (
 
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/test"
 )
@@ -44,7 +45,7 @@ func TestGetPersonRelatedBasic(t *testing.T) {
 
 	r, err := repo.GetPersonRelated(context.Background(), 348475)
 	require.NoError(t, err)
-	require.Equal(t, uint32(348475), r.ID)
+	require.EqualValues(t, 348475, r.ID)
 	d, ok := r.Data["348475"]
 	require.True(t, ok)
 	require.Equal(t, "森岡浩之", d.Name)
@@ -68,7 +69,7 @@ func TestListPersonRelated(t *testing.T) {
 
 	r, err := repo.ListPersonRelated(context.Background(), 9, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, uint32(181882), r[0].CreatorID)
+	require.EqualValues(t, model.UserID(181882), r[0].CreatorID)
 }
 
 func TestGetCharacterRelatedBasic(t *testing.T) {
@@ -100,8 +101,8 @@ func TestGetCharacterRelatedNotFound(t *testing.T) {
 }
 
 func TestListCharacterRelated(t *testing.T) {
-	var cid uint32 = 3          // character id
-	var expRID uint32 = 1062064 // expected revision id
+	var cid model.CharacterID = 3 // character id
+	var expRID uint32 = 1062064   // expected revision id
 
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
@@ -121,7 +122,7 @@ func TestGetSubjectRelatedBasic(t *testing.T) {
 
 	r, err := repo.GetSubjectRelated(context.Background(), 718391)
 	require.NoError(t, err)
-	require.Equal(t, uint32(718391), r.ID)
+	require.EqualValues(t, 718391, r.ID)
 	require.Equal(t, "第一次的親密接觸", r.Data.Name)
 }
 
@@ -143,5 +144,5 @@ func TestListSubjectRelated(t *testing.T) {
 
 	r, err := repo.ListSubjectRelated(context.Background(), 26, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, uint32(181882), r[0].CreatorID)
+	require.EqualValues(t, 181882, r[0].CreatorID)
 }

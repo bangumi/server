@@ -36,7 +36,7 @@ import (
 func TestHandler_GetCharacter_HappyPath(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
@@ -45,13 +45,13 @@ func TestHandler_GetCharacter_HappyPath(t *testing.T) {
 		Execute(app).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
-	require.Equal(t, uint32(7), r.ID)
+	require.EqualValues(t, 7, r.ID)
 }
 
 func TestHandler_GetCharacter_Redirect(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7, Redirect: 8}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Redirect: 8}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
@@ -101,8 +101,8 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 func TestHandler_GetCharacterImage_200(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
-	m.EXPECT().Get(mock.Anything, uint32(8)).Return(model.Character{ID: 8}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(8)).Return(model.Character{ID: 8}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
@@ -126,7 +126,7 @@ func TestHandler_GetCharacterImage_200(t *testing.T) {
 func TestHandler_GetCharacterImage_400(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 

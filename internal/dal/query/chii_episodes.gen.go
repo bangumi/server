@@ -27,8 +27,8 @@ func newEpisode(db *gorm.DB) episode {
 
 	tableName := _episode.episodeDo.TableName()
 	_episode.ALL = field.NewField(tableName, "*")
-	_episode.ID = field.NewUint32(tableName, "ep_id")
-	_episode.SubjectID = field.NewUint32(tableName, "ep_subject_id")
+	_episode.ID = field.NewField(tableName, "ep_id")
+	_episode.SubjectID = field.NewField(tableName, "ep_subject_id")
 	_episode.Sort = field.NewFloat32(tableName, "ep_sort")
 	_episode.Type = field.NewInt16(tableName, "ep_type")
 	_episode.Disc = field.NewUint8(tableName, "ep_disc")
@@ -65,8 +65,8 @@ type episode struct {
 	episodeDo episodeDo
 
 	ALL       field.Field
-	ID        field.Uint32
-	SubjectID field.Uint32
+	ID        field.Field
+	SubjectID field.Field
 	Sort      field.Float32
 	Type      field.Int16
 	Disc      field.Uint8
@@ -100,8 +100,8 @@ func (e episode) As(alias string) *episode {
 
 func (e *episode) updateTableName(table string) *episode {
 	e.ALL = field.NewField(table, "*")
-	e.ID = field.NewUint32(table, "ep_id")
-	e.SubjectID = field.NewUint32(table, "ep_subject_id")
+	e.ID = field.NewField(table, "ep_id")
+	e.SubjectID = field.NewField(table, "ep_subject_id")
 	e.Sort = field.NewFloat32(table, "ep_sort")
 	e.Type = field.NewInt16(table, "ep_type")
 	e.Disc = field.NewUint8(table, "ep_disc")

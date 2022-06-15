@@ -24,18 +24,18 @@ func (_m *UserRepo) EXPECT() *UserRepo_Expecter {
 }
 
 // CountCollections provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate
-func (_m *UserRepo) CountCollections(ctx context.Context, userID uint32, subjectType uint8, collectionType uint8, showPrivate bool) (int64, error) {
+func (_m *UserRepo) CountCollections(ctx context.Context, userID model.UserID, subjectType uint8, collectionType uint8, showPrivate bool) (int64, error) {
 	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate)
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint8, uint8, bool) int64); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, uint8, uint8, bool) int64); ok {
 		r0 = rf(ctx, userID, subjectType, collectionType, showPrivate)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint8, uint8, bool) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, uint8, uint8, bool) error); ok {
 		r1 = rf(ctx, userID, subjectType, collectionType, showPrivate)
 	} else {
 		r1 = ret.Error(1)
@@ -51,7 +51,7 @@ type UserRepo_CountCollections_Call struct {
 
 // CountCollections is a helper method to define mock.On call
 //  - ctx context.Context
-//  - userID uint32
+//  - userID model.UserID
 //  - subjectType uint8
 //  - collectionType uint8
 //  - showPrivate bool
@@ -59,9 +59,9 @@ func (_e *UserRepo_Expecter) CountCollections(ctx interface{}, userID interface{
 	return &UserRepo_CountCollections_Call{Call: _e.mock.On("CountCollections", ctx, userID, subjectType, collectionType, showPrivate)}
 }
 
-func (_c *UserRepo_CountCollections_Call) Run(run func(ctx context.Context, userID uint32, subjectType uint8, collectionType uint8, showPrivate bool)) *UserRepo_CountCollections_Call {
+func (_c *UserRepo_CountCollections_Call) Run(run func(ctx context.Context, userID model.UserID, subjectType uint8, collectionType uint8, showPrivate bool)) *UserRepo_CountCollections_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(uint8), args[3].(uint8), args[4].(bool))
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(uint8), args[3].(uint8), args[4].(bool))
 	})
 	return _c
 }
@@ -72,18 +72,18 @@ func (_c *UserRepo_CountCollections_Call) Return(_a0 int64, _a1 error) *UserRepo
 }
 
 // GetByID provides a mock function with given fields: ctx, userID
-func (_m *UserRepo) GetByID(ctx context.Context, userID uint32) (model.User, error) {
+func (_m *UserRepo) GetByID(ctx context.Context, userID model.UserID) (model.User, error) {
 	ret := _m.Called(ctx, userID)
 
 	var r0 model.User
-	if rf, ok := ret.Get(0).(func(context.Context, uint32) model.User); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) model.User); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		r0 = ret.Get(0).(model.User)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID) error); ok {
 		r1 = rf(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
@@ -99,14 +99,14 @@ type UserRepo_GetByID_Call struct {
 
 // GetByID is a helper method to define mock.On call
 //  - ctx context.Context
-//  - userID uint32
+//  - userID model.UserID
 func (_e *UserRepo_Expecter) GetByID(ctx interface{}, userID interface{}) *UserRepo_GetByID_Call {
 	return &UserRepo_GetByID_Call{Call: _e.mock.On("GetByID", ctx, userID)}
 }
 
-func (_c *UserRepo_GetByID_Call) Run(run func(ctx context.Context, userID uint32)) *UserRepo_GetByID_Call {
+func (_c *UserRepo_GetByID_Call) Run(run func(ctx context.Context, userID model.UserID)) *UserRepo_GetByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32))
+		run(args[0].(context.Context), args[1].(model.UserID))
 	})
 	return _c
 }
@@ -117,7 +117,7 @@ func (_c *UserRepo_GetByID_Call) Return(_a0 model.User, _a1 error) *UserRepo_Get
 }
 
 // GetByIDs provides a mock function with given fields: ctx, ids
-func (_m *UserRepo) GetByIDs(ctx context.Context, ids ...uint32) (map[uint32]model.User, error) {
+func (_m *UserRepo) GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error) {
 	_va := make([]interface{}, len(ids))
 	for _i := range ids {
 		_va[_i] = ids[_i]
@@ -127,17 +127,17 @@ func (_m *UserRepo) GetByIDs(ctx context.Context, ids ...uint32) (map[uint32]mod
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
-	var r0 map[uint32]model.User
-	if rf, ok := ret.Get(0).(func(context.Context, ...uint32) map[uint32]model.User); ok {
+	var r0 map[model.UserID]model.User
+	if rf, ok := ret.Get(0).(func(context.Context, ...model.UserID) map[model.UserID]model.User); ok {
 		r0 = rf(ctx, ids...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[uint32]model.User)
+			r0 = ret.Get(0).(map[model.UserID]model.User)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, ...uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, ...model.UserID) error); ok {
 		r1 = rf(ctx, ids...)
 	} else {
 		r1 = ret.Error(1)
@@ -153,18 +153,18 @@ type UserRepo_GetByIDs_Call struct {
 
 // GetByIDs is a helper method to define mock.On call
 //  - ctx context.Context
-//  - ids ...uint32
+//  - ids ...model.UserID
 func (_e *UserRepo_Expecter) GetByIDs(ctx interface{}, ids ...interface{}) *UserRepo_GetByIDs_Call {
 	return &UserRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs",
 		append([]interface{}{ctx}, ids...)...)}
 }
 
-func (_c *UserRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids ...uint32)) *UserRepo_GetByIDs_Call {
+func (_c *UserRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids ...model.UserID)) *UserRepo_GetByIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]uint32, len(args)-1)
+		variadicArgs := make([]model.UserID, len(args)-1)
 		for i, a := range args[1:] {
 			if a != nil {
-				variadicArgs[i] = a.(uint32)
+				variadicArgs[i] = a.(model.UserID)
 			}
 		}
 		run(args[0].(context.Context), variadicArgs...)
@@ -172,7 +172,7 @@ func (_c *UserRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids ...uint3
 	return _c
 }
 
-func (_c *UserRepo_GetByIDs_Call) Return(_a0 map[uint32]model.User, _a1 error) *UserRepo_GetByIDs_Call {
+func (_c *UserRepo_GetByIDs_Call) Return(_a0 map[model.UserID]model.User, _a1 error) *UserRepo_GetByIDs_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
@@ -223,18 +223,18 @@ func (_c *UserRepo_GetByName_Call) Return(_a0 model.User, _a1 error) *UserRepo_G
 }
 
 // GetCollection provides a mock function with given fields: ctx, userID, subjectID
-func (_m *UserRepo) GetCollection(ctx context.Context, userID uint32, subjectID uint32) (model.Collection, error) {
+func (_m *UserRepo) GetCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) (model.Collection, error) {
 	ret := _m.Called(ctx, userID, subjectID)
 
 	var r0 model.Collection
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) model.Collection); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID) model.Collection); ok {
 		r0 = rf(ctx, userID, subjectID)
 	} else {
 		r0 = ret.Get(0).(model.Collection)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, model.SubjectID) error); ok {
 		r1 = rf(ctx, userID, subjectID)
 	} else {
 		r1 = ret.Error(1)
@@ -250,15 +250,15 @@ type UserRepo_GetCollection_Call struct {
 
 // GetCollection is a helper method to define mock.On call
 //  - ctx context.Context
-//  - userID uint32
-//  - subjectID uint32
+//  - userID model.UserID
+//  - subjectID model.SubjectID
 func (_e *UserRepo_Expecter) GetCollection(ctx interface{}, userID interface{}, subjectID interface{}) *UserRepo_GetCollection_Call {
 	return &UserRepo_GetCollection_Call{Call: _e.mock.On("GetCollection", ctx, userID, subjectID)}
 }
 
-func (_c *UserRepo_GetCollection_Call) Run(run func(ctx context.Context, userID uint32, subjectID uint32)) *UserRepo_GetCollection_Call {
+func (_c *UserRepo_GetCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectID model.SubjectID)) *UserRepo_GetCollection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32))
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.SubjectID))
 	})
 	return _c
 }
@@ -269,11 +269,11 @@ func (_c *UserRepo_GetCollection_Call) Return(_a0 model.Collection, _a1 error) *
 }
 
 // ListCollections provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate, limit, offset
-func (_m *UserRepo) ListCollections(ctx context.Context, userID uint32, subjectType uint8, collectionType uint8, showPrivate bool, limit int, offset int) ([]model.Collection, error) {
+func (_m *UserRepo) ListCollections(ctx context.Context, userID model.UserID, subjectType uint8, collectionType uint8, showPrivate bool, limit int, offset int) ([]model.Collection, error) {
 	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
 
 	var r0 []model.Collection
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint8, uint8, bool, int, int) []model.Collection); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, uint8, uint8, bool, int, int) []model.Collection); ok {
 		r0 = rf(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
 	} else {
 		if ret.Get(0) != nil {
@@ -282,7 +282,7 @@ func (_m *UserRepo) ListCollections(ctx context.Context, userID uint32, subjectT
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint8, uint8, bool, int, int) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, uint8, uint8, bool, int, int) error); ok {
 		r1 = rf(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
 	} else {
 		r1 = ret.Error(1)
@@ -298,7 +298,7 @@ type UserRepo_ListCollections_Call struct {
 
 // ListCollections is a helper method to define mock.On call
 //  - ctx context.Context
-//  - userID uint32
+//  - userID model.UserID
 //  - subjectType uint8
 //  - collectionType uint8
 //  - showPrivate bool
@@ -308,9 +308,9 @@ func (_e *UserRepo_Expecter) ListCollections(ctx interface{}, userID interface{}
 	return &UserRepo_ListCollections_Call{Call: _e.mock.On("ListCollections", ctx, userID, subjectType, collectionType, showPrivate, limit, offset)}
 }
 
-func (_c *UserRepo_ListCollections_Call) Run(run func(ctx context.Context, userID uint32, subjectType uint8, collectionType uint8, showPrivate bool, limit int, offset int)) *UserRepo_ListCollections_Call {
+func (_c *UserRepo_ListCollections_Call) Run(run func(ctx context.Context, userID model.UserID, subjectType uint8, collectionType uint8, showPrivate bool, limit int, offset int)) *UserRepo_ListCollections_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(uint8), args[3].(uint8), args[4].(bool), args[5].(int), args[6].(int))
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(uint8), args[3].(uint8), args[4].(bool), args[5].(int), args[6].(int))
 	})
 	return _c
 }
