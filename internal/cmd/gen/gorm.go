@@ -273,8 +273,8 @@ func main() {
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_crt_cast_index", "Cast",
-		gen.FieldRename("prsn_id", "PersonIDType"),
-		gen.FieldRename("crt_id", "CharacterIDType"),
+		gen.FieldRename("prsn_id", "PersonID"),
+		gen.FieldRename("crt_id", "CharacterID"),
 		gen.FieldType("crt_id", characterIDTypeString),
 		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("subject_id", subjectIDTypeString),
@@ -291,7 +291,7 @@ func main() {
 
 	g.ApplyBasic(
 		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
-			gen.FieldRename("crt_id", "CharacterIDType"),
+			gen.FieldRename("crt_id", "CharacterID"),
 			gen.FieldType("subject_id", subjectIDTypeString),
 			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 			gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
