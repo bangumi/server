@@ -119,6 +119,7 @@ func main() {
 
 	modelMember := g.GenerateModelAs("chii_members", "Member",
 		gen.FieldType("uid", "uint32"),
+		gen.FieldRename("SIGN", "Sign"),
 		gen.FieldType("regdate", "int64"),
 		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),

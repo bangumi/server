@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -39,7 +41,7 @@ func newMember(db *gorm.DB) member {
 	_member.Timeoffset = field.NewString(tableName, "timeoffset")
 	_member.Newpm = field.NewBool(tableName, "newpm")
 	_member.NewNotify = field.NewUint16(tableName, "new_notify")
-	_member.Sign = field.NewString(tableName, "sign")
+	_member.Sign = field.NewString(tableName, "SIGN")
 	_member.PasswordCrypt = field.NewField(tableName, "password_crypt")
 	_member.Email = field.NewString(tableName, "email")
 	_member.Fields = memberHasOneFields{
@@ -105,7 +107,7 @@ func (m *member) updateTableName(table string) *member {
 	m.Timeoffset = field.NewString(table, "timeoffset")
 	m.Newpm = field.NewBool(table, "newpm")
 	m.NewNotify = field.NewUint16(table, "new_notify")
-	m.Sign = field.NewString(table, "sign")
+	m.Sign = field.NewString(table, "SIGN")
 	m.PasswordCrypt = field.NewField(table, "password_crypt")
 	m.Email = field.NewString(table, "email")
 
@@ -145,7 +147,7 @@ func (m *member) fillFieldMap() {
 	m.fieldMap["timeoffset"] = m.Timeoffset
 	m.fieldMap["newpm"] = m.Newpm
 	m.fieldMap["new_notify"] = m.NewNotify
-	m.fieldMap["sign"] = m.Sign
+	m.fieldMap["SIGN"] = m.Sign
 	m.fieldMap["password_crypt"] = m.PasswordCrypt
 	m.fieldMap["email"] = m.Email
 
@@ -230,6 +232,14 @@ func (m memberDo) Debug() *memberDo {
 
 func (m memberDo) WithContext(ctx context.Context) *memberDo {
 	return m.withDO(m.DO.WithContext(ctx))
+}
+
+func (m memberDo) ReadDB(ctx context.Context) *memberDo {
+	return m.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (m memberDo) WriteDB(ctx context.Context) *memberDo {
+	return m.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (m memberDo) Clauses(conds ...clause.Expression) *memberDo {

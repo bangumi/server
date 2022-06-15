@@ -14,8 +14,8 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goccy/go-json v0.9.7
 	github.com/gofiber/adaptor/v2 v2.1.24
-	github.com/gofiber/fiber/v2 v2.34.0
-	github.com/gookit/goutil v0.5.2
+	github.com/gofiber/fiber/v2 v2.34.1
+	github.com/gookit/goutil v0.5.4
 	github.com/haveyoudebuggedit/gotestfmt/v2 v2.3.2
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/joho/godotenv v1.4.0
@@ -23,15 +23,16 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.12.2
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.7.2
 	github.com/uber-go/tally/v4 v4.1.1
 	go.uber.org/fx v1.17.1
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
-	gopkg.in/yaml.v3 v3.0.0
-	gorm.io/driver/mysql v1.3.3
-	gorm.io/gen v0.3.4
-	gorm.io/gorm v1.23.5
+	gopkg.in/yaml.v3 v3.0.1
+	gorm.io/driver/mysql v1.3.4
+	gorm.io/gen v0.3.8
+	gorm.io/gorm v1.23.6
+	gorm.io/plugin/dbresolver v1.2.1
 )
 
 require (
@@ -47,11 +48,11 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/google/uuid v1.1.1 // indirect
-	github.com/gookit/color v1.5.0 // indirect
+	github.com/gookit/color v1.5.1 // indirect
 	github.com/huandu/xstrings v1.3.1 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.4 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -82,6 +83,6 @@ require (
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
-	gorm.io/datatypes v1.0.6 // indirect
+	gorm.io/datatypes v1.0.7-0.20220608135749-9359a769c0b6 // indirect
 	gorm.io/hints v1.1.0 // indirect
 )
