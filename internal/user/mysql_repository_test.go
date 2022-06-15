@@ -43,7 +43,7 @@ func TestGetByID(t *testing.T) {
 
 	repo := getRepo(t)
 
-	const id model.UIDType = 382951
+	const id model.UserID = 382951
 
 	u, err := repo.GetByID(context.Background(), id)
 	require.NoError(t, err)
@@ -59,7 +59,7 @@ func TestGetByName(t *testing.T) {
 
 	repo := getRepo(t)
 
-	const id model.UIDType = 382951
+	const id model.UserID = 382951
 
 	u, err := repo.GetByName(context.Background(), "382951")
 	require.NoError(t, err)
@@ -74,19 +74,19 @@ func TestMysqlRepo_GetCollection(t *testing.T) {
 
 	repo := getRepo(t)
 
-	const id model.UIDType = 382951
+	const id model.UserID = 382951
 	const subjectID model.SubjectIDType = 888998
 
 	q := test.GetQuery(t)
 	err := q.WithContext(context.Background()).SubjectCollection.Create(&dao.SubjectCollection{
-		UID:       id,
+		UserID:    id,
 		SubjectID: subjectID,
 		Rate:      2,
 	})
 	require.NoError(t, err)
 	t.Cleanup(func() {
 		_, err = q.WithContext(context.Background()).SubjectCollection.
-			Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UID.Eq(id)).Delete()
+			Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(id)).Delete()
 		require.NoError(t, err)
 	})
 

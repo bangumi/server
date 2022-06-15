@@ -20,7 +20,7 @@ type Index struct {
 	CreatedAt   time.Time
 	Title       string
 	Description string
-	CreatorID   uint32
+	CreatorID   UserID
 	Total       uint32
 	ID          IndexIDType
 	Comments    uint32

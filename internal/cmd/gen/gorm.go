@@ -36,7 +36,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-var userIDTypeString = reflect.TypeOf(new(model.UIDType)).Elem().Name()
+var userIDTypeString = reflect.TypeOf(new(model.UserID)).Elem().Name()
 var personIDTypeString = reflect.TypeOf(new(model.PersonIDType)).Elem().Name()
 var characterIDTypeString = reflect.TypeOf(new(model.CharacterIDType)).Elem().Name()
 var episodeIDTypeString = reflect.TypeOf(new(model.EpisodeIDType)).Elem().Name()
@@ -63,6 +63,8 @@ func main() {
 		// if you need unit tests for query code, set WithUnitTest true
 		// WithUnitTest: true,
 	})
+
+	g.WithImportPkgPath("github.com/bangumi/server/internal/model")
 
 	// reuse the database connection in Project or create a connection here
 	// if you want to use GenerateModel/GenerateModelAs, UseDB is necessary, otherwise it will panic
@@ -114,22 +116,25 @@ func main() {
 	g.WithDataTypeMap(dataMap)
 
 	modelField := g.GenerateModelAs("chii_memberfields", "MemberField",
-		gen.FieldType("uid", "uint32"),
+		gen.FieldType("uid", userIDTypeString),
 	)
 
 	modelMember := g.GenerateModelAs("chii_members", "Member",
-		gen.FieldType("uid", "uint32"),
+		gen.FieldRename("uid", "ID"),
+		gen.FieldType("uid", userIDTypeString),
 		gen.FieldRename("SIGN", "Sign"),
 		gen.FieldType("regdate", "int64"),
 		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
-			GORMTag: "foreignKey:UID;references:UID",
+			GORMTag: "foreignKey:uid;references:uid",
 		}))
 
 	g.ApplyBasic(modelMember)
 
-	g.ApplyBasic(g.GenerateModelAs("chii_os_web_sessions", "WebSession"))
+	g.ApplyBasic(g.GenerateModelAs("chii_os_web_sessions", "WebSession",
+		gen.FieldType("user_id", userIDTypeString),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_usergroup", "UserGroup",
 		gen.FieldTrimPrefix("usr_grp_"),
@@ -167,6 +172,8 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_interests", "SubjectCollection",
 		gen.FieldType("interest_subject_type", subjectTypeIDTypeString),
 		gen.FieldType("interest_type", "uint8"),
+		gen.FieldType("interest_uid", userIDTypeString),
+		gen.FieldRename("interest_uid", "UserID"),
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
 		gen.FieldTrimPrefix("interest_")))
@@ -174,7 +181,8 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
 		gen.FieldTrimPrefix("idx_"),
 		gen.FieldType("idx_id", "uint32"),
-		gen.FieldType("idx_uid", "uint32"),
+		gen.FieldType("idx_uid", userIDTypeString),
+		gen.FieldRename("idx_uid", "CreatorID"),
 		gen.FieldType("idx_collects", "uint32")))
 
 	modelPersonField := g.GenerateModelAs("chii_person_fields", "PersonField",
@@ -266,6 +274,8 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_revisions", "SubjectRevision",
 		gen.FieldTrimPrefix("rev_"),
 		gen.FieldRename("rev_name_cn", "NameCN"),
+		gen.FieldRename("rev_creator", "CreatorID"),
+		gen.FieldType("rev_creator", userIDTypeString),
 		gen.FieldType("rev_subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:rev_subject_id;references:subject_id",
@@ -333,6 +343,7 @@ func main() {
 		gen.FieldRename("rev_edit_summary", "Summary"),
 		gen.FieldRename("rev_dateline", "CreatedAt"),
 		gen.FieldRename("rev_creator", "CreatorID"),
+		gen.FieldType("rev_creator", userIDTypeString),
 	))
 
 	// execute the action of code generation

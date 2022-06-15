@@ -28,10 +28,10 @@ type AuthRepo interface {
 	GetPermission(ctx context.Context, groupID uint8) (Permission, error)
 
 	CreateAccessToken(
-		ctx context.Context, userID model.UIDType, name string, expiration time.Duration,
+		ctx context.Context, userID model.UserID, name string, expiration time.Duration,
 	) (token string, err error)
 
-	ListAccessToken(ctx context.Context, userID model.UIDType) ([]AccessToken, error)
+	ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error)
 	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
 
 	// GetByEmail return (Auth, HashedPassword, error)
@@ -42,7 +42,7 @@ type AuthRepo interface {
 // Auth is the basic authorization represent a user.
 type Auth struct {
 	RegTime    time.Time
-	ID         model.UIDType // user id
+	ID         model.UserID // user id
 	GroupID    model.GroupID
 	Permission Permission `json:"-"` // disable cache for this field.
 }
@@ -59,11 +59,11 @@ func (u Auth) AllowNSFW() bool {
 }
 
 type AuthService interface {
-	GetByID(ctx context.Context, userID model.UIDType) (Auth, error)
+	GetByID(ctx context.Context, userID model.UserID) (Auth, error)
 	GetByToken(ctx context.Context, token string) (Auth, error)
 
 	GetByTokenWithCache(ctx context.Context, token string) (Auth, error)
-	GetByIDWithCache(ctx context.Context, userID model.UIDType) (Auth, error)
+	GetByIDWithCache(ctx context.Context, userID model.UserID) (Auth, error)
 
 	ComparePassword(hashed []byte, password string) (bool, error)
 
@@ -71,9 +71,9 @@ type AuthService interface {
 
 	GetTokenByID(ctx context.Context, tokenID uint32) (AccessToken, error)
 	CreateAccessToken(
-		ctx context.Context, userID model.UIDType, name string, expiration time.Duration,
+		ctx context.Context, userID model.UserID, name string, expiration time.Duration,
 	) (token string, err error)
-	ListAccessToken(ctx context.Context, userID model.UIDType) ([]AccessToken, error)
+	ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error)
 	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
 
 	GetPermission(ctx context.Context, id model.GroupID) (Permission, error)
@@ -85,7 +85,7 @@ type AccessToken struct {
 	Name      string
 	ClientID  string
 	ID        uint32
-	UserID    model.UIDType
+	UserID    model.UserID
 }
 
 type Permission struct {

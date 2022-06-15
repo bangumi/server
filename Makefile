@@ -62,7 +62,7 @@ gen: gorm mocks
 
 # don't enable `-race` in test because it require cgo, only enable it at coverage.
 test: .bin/gotestfmt.exe
-	go test -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+	go test -timeout 1s -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
 
 test-all: .bin/dotenv.exe .bin/gotestfmt.exe
 	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./...

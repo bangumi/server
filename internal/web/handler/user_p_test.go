@@ -30,7 +30,7 @@ import (
 
 func TestHandler_GetCurrentUser_private(t *testing.T) {
 	t.Parallel()
-	const uid model.UIDType = 7
+	const uid model.UserID = 7
 	const sessionID = "ss"
 
 	u := mocks.NewUserRepo(t)

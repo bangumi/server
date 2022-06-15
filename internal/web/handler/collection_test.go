@@ -34,7 +34,7 @@ import (
 func TestHandler_GetCollection(t *testing.T) {
 	t.Parallel()
 	const username = "ni"
-	const userID model.UIDType = 7
+	const userID model.UserID = 7
 	const subjectID model.SubjectIDType = 9
 
 	m := mocks.NewUserRepo(t)
@@ -55,7 +55,7 @@ func TestHandler_GetCollection(t *testing.T) {
 func TestHandler_GetCollection_other_user(t *testing.T) {
 	t.Parallel()
 	const username = "ni"
-	const userID model.UIDType = 7
+	const userID model.UserID = 7
 	const subjectID model.SubjectIDType = 9
 
 	a := mocks.NewAuthService(t)

@@ -25,7 +25,7 @@ type User struct {
 	Avatar           string
 	Sign             string
 	UserName         string
-	ID               uint32
+	ID               UserID
 	UserGroup        GroupID
 }
 

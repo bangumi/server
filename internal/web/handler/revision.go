@@ -70,7 +70,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonIDType, p
 
 	data := make([]res.PersonRevision, len(revisions))
 
-	creatorIDs := make([]model.UIDType, 0, len(revisions))
+	creatorIDs := make([]model.UserID, 0, len(revisions))
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
@@ -148,7 +148,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 		return errgo.Wrap(err, "revision.ListCharacterRelated")
 	}
 
-	creatorIDs := make([]model.UIDType, 0, len(revisions))
+	creatorIDs := make([]model.UserID, 0, len(revisions))
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
@@ -232,7 +232,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectIDType
 
 	data := make([]res.SubjectRevision, len(revisions))
 
-	creatorIDs := make([]model.UIDType, 0, len(revisions))
+	creatorIDs := make([]model.UserID, 0, len(revisions))
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
@@ -269,9 +269,9 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	return c.JSON(convertModelSubjectRevision(&r, creatorMap))
 }
 
-func dedupeUIDs(uids ...model.UIDType) []model.UIDType {
-	m := make(map[model.UIDType]bool, len(uids))
-	ret := make([]model.UIDType, 0, len(uids))
+func dedupeUIDs(uids ...model.UserID) []model.UserID {
+	m := make(map[model.UserID]bool, len(uids))
+	ret := make([]model.UserID, 0, len(uids))
 	for _, r := range uids {
 		if _, ok := m[r]; !ok {
 			m[r] = true
@@ -281,7 +281,7 @@ func dedupeUIDs(uids ...model.UIDType) []model.UIDType {
 	return ret
 }
 
-func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UIDType]model.User) res.PersonRevision {
+func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UserID]model.User) res.PersonRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.PersonRevision{
 		ID:      r.ID,
@@ -319,7 +319,7 @@ func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UI
 }
 
 func convertModelSubjectRevision(
-	r *model.SubjectRevision, creatorMap map[model.UIDType]model.User,
+	r *model.SubjectRevision, creatorMap map[model.UserID]model.User,
 ) res.SubjectRevision {
 	creator := creatorMap[r.CreatorID]
 	var data *res.SubjectRevisionData
@@ -352,7 +352,7 @@ func convertModelSubjectRevision(
 }
 
 func convertModelCharacterRevision(
-	r *model.CharacterRevision, creatorMap map[model.UIDType]model.User,
+	r *model.CharacterRevision, creatorMap map[model.UserID]model.User,
 ) res.CharacterRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.CharacterRevision{

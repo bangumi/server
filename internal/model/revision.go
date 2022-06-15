@@ -23,7 +23,7 @@ type RevisionCommon struct {
 	CreatedAt time.Time
 	Summary   string
 	ID        uint32
-	CreatorID uint32
+	CreatorID UserID
 	Type      uint8
 }
 

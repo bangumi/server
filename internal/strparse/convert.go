@@ -47,7 +47,7 @@ func uint32NonZero(s string) (uint32, error) {
 	return v, nil
 }
 
-func UserID(s string) (model.UIDType, error) {
+func UserID(s string) (model.UserID, error) {
 	return uint32NonZero(s)
 }
 

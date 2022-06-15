@@ -73,7 +73,7 @@ func (r mysqlRepo) ListPersonRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.UIDType) (model.PersonRevision, error) {
+func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.PersonIDType) (model.PersonRevision, error) {
 	revision, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.ID.Eq(id),
 			r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).
@@ -131,7 +131,7 @@ func (r mysqlRepo) ListCharacterRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.UIDType) (model.CharacterRevision, error) {
+func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.CharacterIDType) (model.CharacterRevision, error) {
 	revision, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.ID.Eq(id),
 			r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...)).
@@ -188,7 +188,7 @@ func (r mysqlRepo) ListSubjectRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.UIDType) (model.SubjectRevision, error) {
+func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.SubjectIDType) (model.SubjectRevision, error) {
 	revision, err := r.q.SubjectRevision.WithContext(ctx).
 		Where(r.q.SubjectRevision.ID.Eq(id)).
 		First()
@@ -341,7 +341,7 @@ func convertSubjectRevisionDao(r *dao.SubjectRevision, isDetailed bool) model.Su
 		ID:        r.ID,
 		Type:      r.Type,
 		Summary:   r.EditSummary,
-		CreatorID: r.Creator,
+		CreatorID: r.CreatorID,
 		CreatedAt: time.Unix(int64(r.Dateline), 0),
 	},
 		Data: data,

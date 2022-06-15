@@ -31,10 +31,12 @@ import (
 
 func TestHandler_ListPersonRevision_HappyPath(t *testing.T) {
 	t.Parallel()
+	const uid model.PersonIDType = 9
+
 	m := mocks.NewRevisionRepo(t)
-	m.EXPECT().ListPersonRelated(mock.Anything, uint32(9), 30, 0).Return(
+	m.EXPECT().ListPersonRelated(mock.Anything, uid, 30, 0).Return(
 		[]model.PersonRevision{{RevisionCommon: model.RevisionCommon{ID: 348475}}}, nil)
-	m.EXPECT().CountPersonRelated(mock.Anything, uint32(9)).Return(1, nil)
+	m.EXPECT().CountPersonRelated(mock.Anything, uid).Return(1, nil)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
@@ -85,15 +87,17 @@ func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 
 func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
 	t.Parallel()
+	const subjectID model.SubjectIDType = 26
+
 	m := mocks.NewRevisionRepo(t)
-	m.EXPECT().ListSubjectRelated(mock.Anything, uint32(26), 30, 0).Return(
+	m.EXPECT().ListSubjectRelated(mock.Anything, subjectID, 30, 0).Return(
 		[]model.SubjectRevision{{RevisionCommon: model.RevisionCommon{ID: 665556}}}, nil)
-	m.EXPECT().CountSubjectRelated(mock.Anything, uint32(26)).Return(1, nil)
+	m.EXPECT().CountSubjectRelated(mock.Anything, subjectID).Return(1, nil)
 
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
 	var r res.Paged
-	resp := test.New(t).Get("/v0/revisions/subjects?subject_id=26").Execute(app, -1).JSON(&r)
+	resp := test.New(t).Get("/v0/revisions/subjects?subject_id=26").Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -155,7 +159,7 @@ func TestHandler_ListCharacterRevision_HappyPath(t *testing.T) {
 	var r res.Paged
 	resp := test.New(t).Get("/v0/revisions/characters").
 		Query("character_id", strconv.FormatUint(uint64(cid), 10)).
-		Execute(app, -1).
+		Execute(app).
 		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -185,7 +189,7 @@ func TestHandler_GetCharacterRevision_HappyPath(t *testing.T) {
 
 	var r res.CharacterRevision
 	resp := test.New(t).Get(fmt.Sprintf("/v0/revisions/characters/%d", mockRID)).
-		Execute(app, -1).
+		Execute(app).
 		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)

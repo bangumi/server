@@ -28,7 +28,7 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 	tableName := _subjectCollection.subjectCollectionDo.TableName()
 	_subjectCollection.ALL = field.NewField(tableName, "*")
 	_subjectCollection.ID = field.NewUint32(tableName, "interest_id")
-	_subjectCollection.UID = field.NewUint32(tableName, "interest_uid")
+	_subjectCollection.UserID = field.NewUint32(tableName, "interest_uid")
 	_subjectCollection.SubjectID = field.NewUint32(tableName, "interest_subject_id")
 	_subjectCollection.SubjectType = field.NewUint8(tableName, "interest_subject_type")
 	_subjectCollection.Rate = field.NewUint8(tableName, "interest_rate")
@@ -56,7 +56,7 @@ type subjectCollection struct {
 
 	ALL             field.Field
 	ID              field.Uint32
-	UID             field.Uint32
+	UserID          field.Uint32
 	SubjectID       field.Uint32
 	SubjectType     field.Uint8
 	Rate            field.Uint8
@@ -90,7 +90,7 @@ func (s subjectCollection) As(alias string) *subjectCollection {
 func (s *subjectCollection) updateTableName(table string) *subjectCollection {
 	s.ALL = field.NewField(table, "*")
 	s.ID = field.NewUint32(table, "interest_id")
-	s.UID = field.NewUint32(table, "interest_uid")
+	s.UserID = field.NewUint32(table, "interest_uid")
 	s.SubjectID = field.NewUint32(table, "interest_subject_id")
 	s.SubjectType = field.NewUint8(table, "interest_subject_type")
 	s.Rate = field.NewUint8(table, "interest_rate")
@@ -133,7 +133,7 @@ func (s *subjectCollection) GetFieldByName(fieldName string) (field.OrderExpr, b
 func (s *subjectCollection) fillFieldMap() {
 	s.fieldMap = make(map[string]field.Expr, 18)
 	s.fieldMap["interest_id"] = s.ID
-	s.fieldMap["interest_uid"] = s.UID
+	s.fieldMap["interest_uid"] = s.UserID
 	s.fieldMap["interest_subject_id"] = s.SubjectID
 	s.fieldMap["interest_subject_type"] = s.SubjectType
 	s.fieldMap["interest_rate"] = s.Rate

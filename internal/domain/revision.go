@@ -27,7 +27,7 @@ type RevisionRepo interface {
 		ctx context.Context, personID model.PersonIDType, limit int, offset int,
 	) ([]model.PersonRevision, error)
 
-	GetPersonRelated(ctx context.Context, id model.UIDType) (model.PersonRevision, error)
+	GetPersonRelated(ctx context.Context, id model.PersonIDType) (model.PersonRevision, error)
 
 	CountSubjectRelated(ctx context.Context, id model.SubjectIDType) (int64, error)
 
@@ -35,7 +35,7 @@ type RevisionRepo interface {
 		ctx context.Context, id model.SubjectIDType, limit int, offset int,
 	) ([]model.SubjectRevision, error)
 
-	GetSubjectRelated(ctx context.Context, id model.UIDType) (model.SubjectRevision, error)
+	GetSubjectRelated(ctx context.Context, id model.SubjectIDType) (model.SubjectRevision, error)
 
 	CountCharacterRelated(ctx context.Context, characterID model.CharacterIDType) (int64, error)
 
@@ -43,5 +43,5 @@ type RevisionRepo interface {
 		ctx context.Context, characterID model.CharacterIDType, limit int, offset int,
 	) ([]model.CharacterRevision, error)
 
-	GetCharacterRelated(ctx context.Context, id model.UIDType) (model.CharacterRevision, error)
+	GetCharacterRelated(ctx context.Context, id model.CharacterIDType) (model.CharacterRevision, error)
 }

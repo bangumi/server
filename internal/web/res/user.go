@@ -52,13 +52,13 @@ func (a Avatar) Select(s string) (string, bool) {
 }
 
 type User struct {
-	Avatar    Avatar `json:"avatar"`
-	Sign      string `json:"sign"`
-	URL       string `json:"url"`
-	Username  string `json:"username"`
-	Nickname  string `json:"nickname"`
-	ID        uint32 `json:"id"`
-	UserGroup uint8  `json:"user_group"`
+	Avatar    Avatar       `json:"avatar"`
+	Sign      string       `json:"sign"`
+	URL       string       `json:"url"`
+	Username  string       `json:"username"`
+	Nickname  string       `json:"nickname"`
+	ID        model.UserID `json:"id"`
+	UserGroup uint8        `json:"user_group"`
 }
 
 type Collection struct {

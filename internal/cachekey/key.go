@@ -52,6 +52,6 @@ func Auth(token string) string {
 	return "chii:" + config.Version + ":auth:access-token:" + token
 }
 
-func User(id model.UIDType) string {
+func User(id model.UserID) string {
 	return globalPrefix + "user:" + strconv.FormatUint(uint64(id), 10)
 }

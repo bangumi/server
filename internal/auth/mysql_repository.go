@@ -59,7 +59,7 @@ func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (domain.Auth, [
 
 	return domain.Auth{
 		RegTime: time.Unix(u.Regdate, 0),
-		ID:      u.UID,
+		ID:      u.ID,
 		GroupID: u.Groupid,
 	}, u.PasswordCrypt, nil
 }
@@ -84,7 +84,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, e
 		return domain.Auth{}, errgo.Wrap(err, "parsing user id")
 	}
 
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.UID.Eq(id)).First()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			m.log.Error("can't find user of access token",
@@ -100,7 +100,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, e
 
 	return domain.Auth{
 		RegTime: time.Unix(u.Regdate, 0),
-		ID:      u.UID,
+		ID:      u.ID,
 		GroupID: u.Groupid,
 	}, nil
 }
@@ -209,7 +209,7 @@ type phpPermission struct {
 const defaultAccessTokenLength = 40
 
 func (m mysqlRepo) CreateAccessToken(
-	ctx context.Context, id model.UIDType, name string, expiration time.Duration,
+	ctx context.Context, id model.UserID, name string, expiration time.Duration,
 ) (string, error) {
 	token := random.Base62String(defaultAccessTokenLength)
 	var now = time.Now()
@@ -255,7 +255,7 @@ type TokenInfo struct {
 	Name      string    `json:"name"`
 }
 
-func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UIDType) ([]domain.AccessToken, error) {
+func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UserID) ([]domain.AccessToken, error) {
 	records, err := m.q.AccessToken.WithContext(ctx).
 		Where(m.q.AccessToken.UserID.Eq(strconv.FormatUint(uint64(userID), 10)),
 			m.q.AccessToken.ExpiredAt.Gte(time.Now())).Find()
@@ -304,7 +304,7 @@ func convertAccessToken(t *dao.AccessToken) domain.AccessToken {
 		ExpiredAt: t.ExpiredAt,
 		CreatedAt: createdAt,
 		Name:      name,
-		UserID:    model.UIDType(v),
+		UserID:    model.UserID(v),
 		ClientID:  t.ClientID,
 		ID:        t.ID,
 	}

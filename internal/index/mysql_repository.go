@@ -70,7 +70,7 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
 		CreatedAt:   time.Unix(int64(i.Dateline), 0),
 		Title:       i.Title,
 		Description: i.Desc,
-		CreatorID:   i.UID,
+		CreatorID:   i.CreatorID,
 		Total:       i.SubjectTotal,
 		ID:          id,
 		Comments:    i.Replies,

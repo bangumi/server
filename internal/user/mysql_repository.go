@@ -42,13 +42,13 @@ type mysqlRepo struct {
 
 func (m mysqlRepo) CountCollections(
 	ctx context.Context,
-	userID model.UIDType,
+	userID model.UserID,
 	subjectType model.SubjectType,
 	collectionType uint8,
 	showPrivate bool,
 ) (int64, error) {
 	q := m.q.SubjectCollection.WithContext(ctx).
-		Where(m.q.SubjectCollection.UID.Eq(userID))
+		Where(m.q.SubjectCollection.UserID.Eq(userID))
 
 	if subjectType != 0 {
 		q = q.Where(m.q.SubjectCollection.SubjectType.Eq(subjectType))
@@ -72,7 +72,7 @@ func (m mysqlRepo) CountCollections(
 
 func (m mysqlRepo) ListCollections(
 	ctx context.Context,
-	userID model.UIDType,
+	userID model.UserID,
 	subjectType model.SubjectType,
 	collectionType uint8,
 	showPrivate bool,
@@ -80,7 +80,7 @@ func (m mysqlRepo) ListCollections(
 ) ([]model.Collection, error) {
 	q := m.q.SubjectCollection.WithContext(ctx).
 		Order(m.q.SubjectCollection.Lasttouch.Desc()).
-		Where(m.q.SubjectCollection.UID.Eq(userID)).Limit(limit).Offset(offset)
+		Where(m.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
 
 	if subjectType != 0 {
 		q = q.Where(m.q.SubjectCollection.SubjectType.Eq(subjectType))
@@ -120,10 +120,10 @@ func (m mysqlRepo) ListCollections(
 }
 
 func (m mysqlRepo) GetCollection(
-	ctx context.Context, userID model.UIDType, subjectID model.SubjectIDType,
+	ctx context.Context, userID model.UserID, subjectID model.SubjectIDType,
 ) (model.Collection, error) {
 	c, err := m.q.SubjectCollection.WithContext(ctx).
-		Where(m.q.SubjectCollection.UID.Eq(userID), m.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
+		Where(m.q.SubjectCollection.UserID.Eq(userID), m.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Collection{}, domain.ErrNotFound
@@ -147,8 +147,8 @@ func (m mysqlRepo) GetCollection(
 	}, nil
 }
 
-func (m mysqlRepo) GetByID(ctx context.Context, userID model.UIDType) (model.User, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.UID.Eq(userID)).First()
+func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (model.User, error) {
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(userID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.User{}, domain.ErrNotFound
@@ -175,17 +175,17 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (model.User, 
 	return fromDao(u), nil
 }
 
-func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...model.UIDType) (map[model.UIDType]model.User, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.UID.In(ids...)).Find()
+func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error) {
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(ids...)).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var r = make(map[model.UIDType]model.User, len(ids))
+	var r = make(map[model.UserID]model.User, len(ids))
 
 	for _, member := range u {
-		r[member.UID] = fromDao(member)
+		r[member.ID] = fromDao(member)
 	}
 
 	return r, nil
@@ -198,7 +198,7 @@ func fromDao(m *dao.Member) model.User {
 		UserGroup:        m.Groupid,
 		Avatar:           m.Avatar,
 		Sign:             m.Sign,
-		ID:               m.UID,
+		ID:               m.ID,
 		RegistrationTime: time.Unix(m.Regdate, 0),
 	}
 }

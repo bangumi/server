@@ -31,7 +31,7 @@ func newSubjectRevision(db *gorm.DB) subjectRevision {
 	_subjectRevision.Type = field.NewUint8(tableName, "rev_type")
 	_subjectRevision.SubjectID = field.NewUint32(tableName, "rev_subject_id")
 	_subjectRevision.TypeID = field.NewUint16(tableName, "rev_type_id")
-	_subjectRevision.Creator = field.NewUint32(tableName, "rev_creator")
+	_subjectRevision.CreatorID = field.NewUint32(tableName, "rev_creator")
 	_subjectRevision.Dateline = field.NewUint32(tableName, "rev_dateline")
 	_subjectRevision.Name = field.NewString(tableName, "rev_name")
 	_subjectRevision.NameCN = field.NewString(tableName, "rev_name_cn")
@@ -65,7 +65,7 @@ type subjectRevision struct {
 	Type         field.Uint8
 	SubjectID    field.Uint32
 	TypeID       field.Uint16
-	Creator      field.Uint32
+	CreatorID    field.Uint32
 	Dateline     field.Uint32
 	Name         field.String
 	NameCN       field.String
@@ -96,7 +96,7 @@ func (s *subjectRevision) updateTableName(table string) *subjectRevision {
 	s.Type = field.NewUint8(table, "rev_type")
 	s.SubjectID = field.NewUint32(table, "rev_subject_id")
 	s.TypeID = field.NewUint16(table, "rev_type_id")
-	s.Creator = field.NewUint32(table, "rev_creator")
+	s.CreatorID = field.NewUint32(table, "rev_creator")
 	s.Dateline = field.NewUint32(table, "rev_dateline")
 	s.Name = field.NewString(table, "rev_name")
 	s.NameCN = field.NewString(table, "rev_name_cn")
@@ -135,7 +135,7 @@ func (s *subjectRevision) fillFieldMap() {
 	s.fieldMap["rev_type"] = s.Type
 	s.fieldMap["rev_subject_id"] = s.SubjectID
 	s.fieldMap["rev_type_id"] = s.TypeID
-	s.fieldMap["rev_creator"] = s.Creator
+	s.fieldMap["rev_creator"] = s.CreatorID
 	s.fieldMap["rev_dateline"] = s.Dateline
 	s.fieldMap["rev_name"] = s.Name
 	s.fieldMap["rev_name_cn"] = s.NameCN

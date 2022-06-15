@@ -22,15 +22,15 @@ import (
 
 type UserRepo interface {
 	// GetByID find a user by uid.
-	GetByID(ctx context.Context, userID model.UIDType) (model.User, error)
+	GetByID(ctx context.Context, userID model.UserID) (model.User, error)
 	// GetByName find a user by username.
 	GetByName(ctx context.Context, username string) (model.User, error)
 
-	GetByIDs(ctx context.Context, ids ...model.UIDType) (map[model.UIDType]model.User, error)
+	GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error)
 
 	CountCollections(
 		ctx context.Context,
-		userID model.UIDType,
+		userID model.UserID,
 		subjectType model.SubjectType,
 		collectionType uint8,
 		showPrivate bool,
@@ -38,12 +38,12 @@ type UserRepo interface {
 
 	ListCollections(
 		ctx context.Context,
-		userID model.UIDType,
+		userID model.UserID,
 		subjectType model.SubjectType,
 		collectionType uint8,
 		showPrivate bool,
 		limit, offset int,
 	) ([]model.Collection, error)
 
-	GetCollection(ctx context.Context, userID model.UIDType, subjectID model.SubjectIDType) (model.Collection, error)
+	GetCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectIDType) (model.Collection, error)
 }

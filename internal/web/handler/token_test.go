@@ -31,7 +31,7 @@ import (
 
 func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 	t.Parallel()
-	const userID model.UIDType = 1
+	const userID model.UserID = 1
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().CreateAccessToken(mock.Anything, userID, "token name", timex.OneDay).Return("ttt", nil)
@@ -57,7 +57,7 @@ func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 
 func TestHandler_DeletePersonalAccessToken_401(t *testing.T) {
 	t.Parallel()
-	const userID model.UIDType = 1
+	const userID model.UserID = 1
 	const tokenID uint32 = 5
 
 	mockAuth := mocks.NewAuthService(t)

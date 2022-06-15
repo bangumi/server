@@ -18,7 +18,7 @@ type Index struct {
 	Stats        string `gorm:"column:idx_stats;type:mediumtext;not null" json:"idx_stats"`
 	Dateline     int32  `gorm:"column:idx_dateline;type:int(10);not null" json:"idx_dateline"` // 创建时间
 	Lasttouch    uint32 `gorm:"column:idx_lasttouch;type:int(10) unsigned;not null" json:"idx_lasttouch"`
-	UID          uint32 `gorm:"column:idx_uid;type:mediumint(8);not null;index:idx_uid,priority:1" json:"idx_uid"` // 创建人UID
+	CreatorID    uint32 `gorm:"column:idx_uid;type:mediumint(8);not null;index:idx_uid,priority:1" json:"idx_uid"` // 创建人UID
 	Ban          bool   `gorm:"column:idx_ban;type:tinyint(1) unsigned;not null;index:idx_ban,priority:1" json:"idx_ban"`
 }
 

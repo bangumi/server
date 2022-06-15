@@ -31,11 +31,11 @@ import (
 
 func TestManager_Create(t *testing.T) {
 	t.Parallel()
-	const uid model.UIDType = 1
+	const uid model.UserID = 1
 
 	m := session.NewMockRepo(t)
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.Anything).
-		Run(func(ctx context.Context, key string, userID model.UIDType, regTime time.Time) {
+		Run(func(ctx context.Context, key string, userID model.UserID, regTime time.Time) {
 			require.Equal(t, uid, userID)
 		}).Return(session.Session{UserID: uid}, nil)
 
@@ -48,10 +48,10 @@ func TestManager_Create(t *testing.T) {
 
 func TestManager_Get(t *testing.T) {
 	t.Parallel()
-	const uid model.UIDType = 1
+	const uid model.UserID = 1
 	m := session.NewMockRepo(t)
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.Anything).
-		Run(func(ctx context.Context, key string, userID model.UIDType, regTime time.Time) {
+		Run(func(ctx context.Context, key string, userID model.UserID, regTime time.Time) {
 			require.Equal(t, uid, userID)
 		}).Return(session.Session{UserID: uid}, nil)
 
@@ -66,10 +66,10 @@ func TestManager_Get(t *testing.T) {
 func TestManager_Revoke(t *testing.T) {
 	t.Parallel()
 
-	const uid model.UIDType = 1
+	const uid model.UserID = 1
 	m := session.NewMockRepo(t)
 	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.Anything).
-		Run(func(ctx context.Context, key string, userID model.UIDType, regTime time.Time) {
+		Run(func(ctx context.Context, key string, userID model.UserID, regTime time.Time) {
 			require.Equal(t, uid, userID)
 		}).Return(session.Session{UserID: uid}, nil)
 

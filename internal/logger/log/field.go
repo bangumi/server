@@ -20,7 +20,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-func UserID(id model.UIDType) zap.Field {
+func UserID(id model.UserID) zap.Field {
 	return zap.Uint32("user_id", id)
 }
 

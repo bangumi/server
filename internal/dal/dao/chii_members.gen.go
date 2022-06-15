@@ -8,7 +8,7 @@ const TableNameMember = "chii_members"
 
 // Member mapped from table <chii_members>
 type Member struct {
-	UID           uint32      `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:"uid"`
+	ID            uint32      `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:"uid"`
 	Username      string      `gorm:"column:username;type:char(15);not null;uniqueIndex:username,priority:1" json:"username"`
 	Nickname      string      `gorm:"column:nickname;type:varchar(30);not null" json:"nickname"`
 	Avatar        string      `gorm:"column:avatar;type:varchar(255);not null" json:"avatar"`
@@ -25,7 +25,7 @@ type Member struct {
 	Sign          string      `gorm:"column:SIGN;type:varchar(255);not null" json:"SIGN"`
 	PasswordCrypt []byte      `gorm:"column:password_crypt;type:char(64);not null" json:"password_crypt"`
 	Email         string      `gorm:"column:email;type:char(50);not null" json:"email"`
-	Fields        MemberField `gorm:"foreignKey:UID;references:UID" json:"fields"`
+	Fields        MemberField `gorm:"foreignKey:uid;references:uid" json:"fields"`
 }
 
 // TableName Member's table name
