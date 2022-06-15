@@ -78,7 +78,7 @@ func (h Handler) getCharacterWithCache(
 	var r res.CharacterV0
 	ok, err := h.cache.Get(ctx, key, &r)
 	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.GetByID")
+		return r, ok, errgo.Wrap(err, "cache.Get")
 	}
 
 	if ok {

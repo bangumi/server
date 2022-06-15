@@ -40,7 +40,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 	var r res.Index
 	ok, err := h.cache.Get(c, key, &r)
 	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.GetByID")
+		return r, ok, errgo.Wrap(err, "cache.Get")
 	}
 
 	i, err := h.i.Get(c, id)

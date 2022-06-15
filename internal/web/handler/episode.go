@@ -76,7 +76,7 @@ func (h Handler) getEpisodeWithCache(ctx context.Context, id model.EpisodeID) (r
 	var r res.Episode
 	ok, err := h.cache.Get(ctx, key, &r)
 	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.GetByID")
+		return r, ok, errgo.Wrap(err, "cache.Get")
 	}
 
 	if ok {

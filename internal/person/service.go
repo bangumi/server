@@ -55,7 +55,7 @@ func (s service) GetSubjectRelated(
 
 	subject, err := s.s.Get(ctx, subjectID)
 	if err != nil {
-		return nil, errgo.Wrap(err, "SubjectRepo.GetByID")
+		return nil, errgo.Wrap(err, "SubjectRepo.Get")
 	}
 
 	var results = make([]model.SubjectPersonRelation, len(relations))
@@ -92,7 +92,7 @@ func (s service) GetCharacterRelated(
 
 	subjects, err := s.s.GetByIDs(ctx, subjectIDs...)
 	if err != nil {
-		return nil, errgo.Wrap(err, "SubjectRepo.GetByID")
+		return nil, errgo.Wrap(err, "SubjectRepo.Get")
 	}
 
 	var results = make([]model.PersonCharacterRelation, len(relations))
