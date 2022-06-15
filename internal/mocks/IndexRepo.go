@@ -91,7 +91,7 @@ func (_m *IndexRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
 	return r0, r1
 }
 
-// IndexRepo_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+// IndexRepo_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
 type IndexRepo_Get_Call struct {
 	*mock.Call
 }
@@ -100,7 +100,7 @@ type IndexRepo_Get_Call struct {
 //  - ctx context.Context
 //  - id uint32
 func (_e *IndexRepo_Expecter) Get(ctx interface{}, id interface{}) *IndexRepo_Get_Call {
-	return &IndexRepo_Get_Call{Call: _e.mock.On("GetByID", ctx, id)}
+	return &IndexRepo_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
 
 func (_c *IndexRepo_Get_Call) Run(run func(ctx context.Context, id uint32)) *IndexRepo_Get_Call {

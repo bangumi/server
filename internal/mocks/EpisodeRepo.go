@@ -135,7 +135,7 @@ func (_m *EpisodeRepo) Get(ctx context.Context, episodeID model.EpisodeID) (mode
 	return r0, r1
 }
 
-// EpisodeRepo_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+// EpisodeRepo_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
 type EpisodeRepo_Get_Call struct {
 	*mock.Call
 }
@@ -144,7 +144,7 @@ type EpisodeRepo_Get_Call struct {
 //  - ctx context.Context
 //  - episodeID model.EpisodeID
 func (_e *EpisodeRepo_Expecter) Get(ctx interface{}, episodeID interface{}) *EpisodeRepo_Get_Call {
-	return &EpisodeRepo_Get_Call{Call: _e.mock.On("GetByID", ctx, episodeID)}
+	return &EpisodeRepo_Get_Call{Call: _e.mock.On("Get", ctx, episodeID)}
 }
 
 func (_c *EpisodeRepo_Get_Call) Run(run func(ctx context.Context, episodeID model.EpisodeID)) *EpisodeRepo_Get_Call {
