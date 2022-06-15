@@ -31,14 +31,14 @@ type Subject struct {
 	Wish          uint32
 	Collect       uint32
 	Doing         uint32
-	ID            uint32
+	ID            SubjectIDType
 	PlatformID    uint16
 	TypeID        SubjectType
 	Ban           uint8
 	Airtime       uint8 // air weekday, start from
 	NSFW          bool
 	Rating        Rating
-	Redirect      uint32
+	Redirect      SubjectIDType
 }
 
 func (s Subject) Locked() bool {

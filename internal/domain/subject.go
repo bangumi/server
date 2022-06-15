@@ -22,7 +22,7 @@ import (
 
 type SubjectRepo interface {
 	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
+	Get(ctx context.Context, id model.SubjectIDType) (model.Subject, error)
 	GetByIDs(ctx context.Context, ids ...model.SubjectIDType) (map[model.SubjectIDType]model.Subject, error)
 
 	GetPersonRelated(ctx context.Context, personID model.PersonIDType) ([]SubjectPersonRelation, error)
@@ -36,7 +36,7 @@ type SubjectRepo interface {
 
 type SubjectService interface {
 	// Get return a repository model.
-	Get(ctx context.Context, id uint32) (model.Subject, error)
+	Get(ctx context.Context, id model.SubjectIDType) (model.Subject, error)
 
 	GetPersonRelated(ctx context.Context, personID model.PersonIDType) ([]model.SubjectPersonRelation, error)
 	GetCharacterRelated(ctx context.Context, characterID model.PersonIDType) ([]model.SubjectCharacterRelation, error)

@@ -30,7 +30,7 @@ type service struct {
 	repo domain.SubjectRepo
 }
 
-func (s service) Get(ctx context.Context, id uint32) (model.Subject, error) {
+func (s service) Get(ctx context.Context, id model.SubjectIDType) (model.Subject, error) {
 	return s.repo.Get(ctx, id) //nolint:wrapcheck
 }
 

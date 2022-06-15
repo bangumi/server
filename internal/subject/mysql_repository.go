@@ -39,7 +39,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.SubjectRepo, error) {
 	return mysqlRepo{q: q, log: log.Named("subject.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Subject, error) {
+func (r mysqlRepo) Get(ctx context.Context, id model.SubjectIDType) (model.Subject, error) {
 	s, err := r.q.Subject.WithContext(ctx).Preload(r.q.Subject.Fields).Where(r.q.Subject.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -191,7 +191,8 @@ func (r mysqlRepo) GetSubjectRelated(
 func (r mysqlRepo) GetByIDs(
 	ctx context.Context, ids ...model.SubjectIDType,
 ) (map[model.SubjectIDType]model.Subject, error) {
-	records, err := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(ids...)).Find()
+	records, err := r.q.Subject.WithContext(ctx).
+		Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(ids...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
@@ -205,6 +206,7 @@ func (r mysqlRepo) GetByIDs(
 
 	return result, nil
 }
+
 func (r mysqlRepo) GetActors(
 	ctx context.Context,
 	subjectID model.SubjectIDType,

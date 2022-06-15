@@ -167,6 +167,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_interests", "SubjectCollection",
 		gen.FieldType("interest_subject_type", subjectTypeIDTypeString),
 		gen.FieldType("interest_type", "uint8"),
+		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
 		gen.FieldTrimPrefix("interest_")))
 
@@ -244,6 +245,7 @@ func main() {
 		gen.FieldTrimPrefix("ep_"),
 		gen.FieldType("ep_id", episodeIDTypeString),
 		gen.FieldType("ep_type", episodeTypeTypeString),
+		gen.FieldType("ep_subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:ep_subject_id;references:subject_id",
 		}),
@@ -264,14 +266,18 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_revisions", "SubjectRevision",
 		gen.FieldTrimPrefix("rev_"),
 		gen.FieldRename("rev_name_cn", "NameCN"),
+		gen.FieldType("rev_subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:rev_subject_id;references:subject_id",
 		}),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_crt_cast_index", "Cast",
-		gen.FieldRename("prsn_id", "PersonID"),
-		gen.FieldRename("crt_id", "CharacterID"),
+		gen.FieldRename("prsn_id", "PersonIDType"),
+		gen.FieldRename("crt_id", "CharacterIDType"),
+		gen.FieldType("crt_id", characterIDTypeString),
+		gen.FieldType("prsn_id", personIDTypeString),
+		gen.FieldType("subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
 			GORMTag: "foreignKey:crt_id;references:crt_id",
 		}),
@@ -285,7 +291,7 @@ func main() {
 
 	g.ApplyBasic(
 		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
-			gen.FieldRename("crt_id", "CharacterID"),
+			gen.FieldRename("crt_id", "CharacterIDType"),
 			gen.FieldType("subject_id", subjectIDTypeString),
 			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 			gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{

@@ -115,7 +115,7 @@ func TestHandler_GetCharacterImage_200(t *testing.T) {
 			expected, _ := res.PersonImage("temp").Select(imageType)
 			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
 
-			//should redirect to default image
+			// should redirect to default image
 			resp = test.New(t).Get("/v0/characters/8/image?type=" + imageType).Execute(app)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
 			require.Equal(t, res.DefaultImageURL, resp.Header.Get("Location"), "should redirect to default image")

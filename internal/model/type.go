@@ -14,7 +14,7 @@
 
 package model
 
-type UIDType = uint32 // UserID
+type UIDType = uint32 // UIDType
 type GroupID = uint8
 
 type SubjectIDType = uint32 // in case we need future change, but I guess not...

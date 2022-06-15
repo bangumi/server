@@ -29,6 +29,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
@@ -116,7 +117,7 @@ func platformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
 	if !ok && s.TypeID != 0 {
 		logger.Warn("unknown platform",
-			zap.Uint32("subject_id", s.ID),
+			log.SubjectID(s.ID),
 			zap.Uint8("type", s.TypeID),
 			zap.Uint16("platform", s.PlatformID),
 		)
@@ -204,7 +205,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 func convertModelSubject(s model.Subject) res.SubjectV0 {
 	tags, err := compat.ParseTags(s.CompatRawTags)
 	if err != nil {
-		logger.Warn("failed to parse tags", zap.Uint32("subject_id", s.ID))
+		logger.Warn("failed to parse tags", log.SubjectID(s.ID))
 	}
 
 	var date *string

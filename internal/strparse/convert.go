@@ -51,7 +51,7 @@ func UserID(s string) (model.UIDType, error) {
 	return uint32NonZero(s)
 }
 
-func SubjectID(s string) (model.PersonIDType, error) {
+func SubjectID(s string) (model.SubjectIDType, error) {
 	return uint32NonZero(s)
 }
 

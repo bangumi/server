@@ -39,7 +39,7 @@ type SubjectV0 struct {
 	ID            model.SubjectIDType   `json:"id"`
 	Eps           uint32                `json:"eps"`
 	Volumes       uint32                `json:"volumes"`
-	Redirect      uint32                `json:"-"`
+	Redirect      model.SubjectIDType   `json:"-"`
 	Locked        bool                  `json:"locked"`
 	NSFW          bool                  `json:"nsfw"`
 	TypeID        model.SubjectType     `json:"type"`
@@ -170,13 +170,13 @@ type Actor struct {
 }
 
 type SlimSubjectV0 struct {
-	AddedAt time.Time         `json:"added_at"`
-	Date    *string           `json:"date"`
-	Image   SubjectImages     `json:"images"`
-	Name    string            `json:"name"`
-	NameCN  string            `json:"name_cn"`
-	Comment string            `json:"comment"`
-	Infobox v0wiki            `json:"infobox"`
-	ID      uint32            `json:"id"`
-	TypeID  model.SubjectType `json:"type"`
+	AddedAt time.Time           `json:"added_at"`
+	Date    *string             `json:"date"`
+	Image   SubjectImages       `json:"images"`
+	Name    string              `json:"name"`
+	NameCN  string              `json:"name_cn"`
+	Comment string              `json:"comment"`
+	Infobox v0wiki              `json:"infobox"`
+	ID      model.SubjectIDType `json:"id"`
+	TypeID  model.SubjectType   `json:"type"`
 }
