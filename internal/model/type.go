@@ -24,7 +24,7 @@ type UserID uint32
 
 type IndexID = uint32
 type RevisionID = uint32
-type GroupID = uint8
+type UserGroupID = uint8
 type EpType = int16
 type RevisionType = uint8
 

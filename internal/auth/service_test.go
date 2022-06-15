@@ -51,7 +51,7 @@ func TestService_GetByTokenWithCache(t *testing.T) {
 
 	var m = mocks.NewAuthRepo(t)
 	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(domain.Auth{GroupID: 2}, nil)
-	m.EXPECT().GetPermission(mock.Anything, model.GroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
+	m.EXPECT().GetPermission(mock.Anything, model.UserGroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
 
 	var u = mocks.NewUserRepo(t)
 
@@ -60,7 +60,7 @@ func TestService_GetByTokenWithCache(t *testing.T) {
 	a, err := s.GetByTokenWithCache(context.Background(), test.TreeHoleAccessToken)
 	require.NoError(t, err)
 
-	require.Equal(t, model.GroupID(2), a.GroupID)
+	require.Equal(t, model.UserGroupID(2), a.GroupID)
 	require.True(t, a.Permission.EpEdit)
 }
 
@@ -75,7 +75,7 @@ func TestService_GetByTokenWithCache_cached(t *testing.T) {
 		}).Return(true, nil)
 
 	var m = mocks.NewAuthRepo(t)
-	m.EXPECT().GetPermission(mock.Anything, model.GroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
+	m.EXPECT().GetPermission(mock.Anything, model.UserGroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
 	var u = mocks.NewUserRepo(t)
 
 	s := auth.NewService(m, u, zap.NewNop(), c)
@@ -83,6 +83,6 @@ func TestService_GetByTokenWithCache_cached(t *testing.T) {
 	a, err := s.GetByTokenWithCache(context.Background(), test.TreeHoleAccessToken)
 	require.NoError(t, err)
 
-	require.Equal(t, model.GroupID(2), a.GroupID)
+	require.Equal(t, model.UserGroupID(2), a.GroupID)
 	require.True(t, a.Permission.EpEdit)
 }

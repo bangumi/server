@@ -26,7 +26,7 @@ type User struct {
 	Sign             string
 	UserName         string
 	ID               UserID
-	UserGroup        GroupID
+	UserGroup        UserGroupID
 }
 
 const (

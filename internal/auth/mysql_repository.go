@@ -109,7 +109,7 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Per
 	r, err := m.q.UserGroup.WithContext(ctx).Where(m.q.UserGroup.ID.Eq(groupID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			m.log.Error("can't find permission for group", log.GroupID(groupID))
+			m.log.Error("can't find permission for group", log.UserGroup(groupID))
 			return domain.Permission{}, nil
 		}
 
@@ -121,7 +121,7 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Per
 	if len(r.Perm) > 0 {
 		d, err := phpserialize.UnmarshalAssociativeArray(r.Perm)
 		if err != nil {
-			m.log.Error("failed to decode php serialized content", zap.Error(err), log.GroupID(groupID))
+			m.log.Error("failed to decode php serialized content", zap.Error(err), log.UserGroup(groupID))
 			return domain.Permission{}, nil
 		}
 		if err = mapstructure.Decode(d, &p); err != nil {

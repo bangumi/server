@@ -70,7 +70,7 @@ test-all: .bin/dotenv.exe .bin/gotestfmt.exe
 bench:
 	go test -bench=. -benchmem ./pkg/wiki
 
-./dal/query/gen.go: ./internal/cmd/gen/gorm/main.go go.mod .bin/dotenv.exe
+./dal/query/gen.go: internal/cmd/gen/gorm/main.go go.mod .bin/dotenv.exe
 	.bin/dotenv.exe go run ./internal/cmd/gen/gorm/main.go
 
 coverage: .bin/dotenv.exe .bin/gotestfmt.exe
