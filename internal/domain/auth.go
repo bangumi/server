@@ -43,7 +43,7 @@ type AuthRepo interface {
 type Auth struct {
 	RegTime    time.Time
 	ID         model.UserID // user id
-	GroupID    model.GroupID
+	GroupID    model.UserGroupID
 	Permission Permission `json:"-"` // disable cache for this field.
 }
 
@@ -76,7 +76,7 @@ type AuthService interface {
 	ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error)
 	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
 
-	GetPermission(ctx context.Context, id model.GroupID) (Permission, error)
+	GetPermission(ctx context.Context, id model.UserGroupID) (Permission, error)
 }
 
 type AccessToken struct {

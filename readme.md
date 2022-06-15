@@ -7,6 +7,7 @@
 
 - [Go 1.17+](https://go.dev/)
 - [GNU make](https://www.gnu.org/software/make/)
+- bash: (`git bash` if you are using windows)
 
 ## Optional Requirements:
 

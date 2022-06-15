@@ -30,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/handler/ctxkey"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 	"github.com/bangumi/server/internal/web/session"
 	"github.com/bangumi/server/internal/web/util"
 )
@@ -50,7 +49,8 @@ func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 		s, err := h.getSession(c, value)
 		if err != nil {
 			if errors.Is(err, session.ErrExpired) || errors.Is(err, domain.ErrNotFound) {
-				return res.HTTPError(c, code.Unauthorized, "token expired")
+				cookie.Clear(c, session.Key)
+				return c.Next()
 			}
 
 			h.log.Error("get session", zap.Error(err), a.LogRequestID())
@@ -67,14 +67,13 @@ func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 	}
 
 	c.Context().SetUserValue(ctxkey.User, a)
+
 	return c.Next()
 }
 
 func (h Handler) getSession(c *fiber.Ctx, value string) (session.Session, error) {
 	s, err := h.session.Get(c.Context(), value)
-
 	if err != nil {
-		cookie.Clear(c, session.Key)
 		return session.Session{}, errgo.Wrap(err, "sessionManager.Get")
 	}
 
