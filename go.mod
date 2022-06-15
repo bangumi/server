@@ -32,6 +32,7 @@ require (
 	gorm.io/driver/mysql v1.3.4
 	gorm.io/gen v0.3.8
 	gorm.io/gorm v1.23.6
+	gorm.io/plugin/dbresolver v1.2.1
 )
 
 require (
@@ -84,5 +85,4 @@ require (
 	google.golang.org/protobuf v1.27.1 // indirect
 	gorm.io/datatypes v1.0.7-0.20220608135749-9359a769c0b6 // indirect
 	gorm.io/hints v1.1.0 // indirect
-	gorm.io/plugin/dbresolver v1.2.1 // indirect
 )

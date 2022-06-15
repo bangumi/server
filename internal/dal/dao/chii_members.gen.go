@@ -22,7 +22,7 @@ type Member struct {
 	Timeoffset    string      `gorm:"column:timeoffset;type:char(4);not null" json:"timeoffset"`
 	Newpm         bool        `gorm:"column:newpm;type:tinyint(1);not null" json:"newpm"`
 	NewNotify     uint16      `gorm:"column:new_notify;type:smallint(6) unsigned;not null" json:"new_notify"` // 新提醒
-	Sign          string      `gorm:"column:sign;type:varchar(255);not null" json:"sign"`
+	Sign          string      `gorm:"column:SIGN;type:varchar(255);not null" json:"SIGN"`
 	PasswordCrypt []byte      `gorm:"column:password_crypt;type:char(64);not null" json:"password_crypt"`
 	Email         string      `gorm:"column:email;type:char(50);not null" json:"email"`
 	Fields        MemberField `gorm:"foreignKey:UID;references:UID" json:"fields"`

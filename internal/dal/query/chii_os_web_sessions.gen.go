@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -111,6 +113,14 @@ func (w webSessionDo) Debug() *webSessionDo {
 
 func (w webSessionDo) WithContext(ctx context.Context) *webSessionDo {
 	return w.withDO(w.DO.WithContext(ctx))
+}
+
+func (w webSessionDo) ReadDB(ctx context.Context) *webSessionDo {
+	return w.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (w webSessionDo) WriteDB(ctx context.Context) *webSessionDo {
+	return w.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (w webSessionDo) Clauses(conds ...clause.Expression) *webSessionDo {
