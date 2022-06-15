@@ -56,33 +56,20 @@ func (m mysqlRepo) GetByID(ctx context.Context, id model.TimeLineID) (model.Time
 	return convertDAO(record)
 }
 
-//nolint:gomnd
+//nolint:gomnd,gocyclo
 func convertBatchDao(record *dao.TimeLine) (model.TimeLine, error) {
 	var memo model.TimeLineContent
 	var err error
 
 	switch {
 	case record.Cat == 3: // Subject
-		// will
 	case record.Cat == 1 && record.Type == 2: // relation
-		// will
 		memo, err = parseRelationMemo(record.Memo)
 	case record.Cat == 1 && (record.Type == 3 || record.Type == 4): // group
-		// will
 		memo, err = parseGroupMemo(record.Memo)
 	case record.Cat == 8: // mono
-		// will
 		memo, err = parseMenoMemo(record.Memo)
 	case record.Cat == 9: // doujin
-		// will
-		fmt.Println(string(record.Memo))
-		data, err := phpserialize.UnmarshalAssociativeArray(record.Memo)
-		if err != nil {
-			panic(err)
-		}
-
-		dump.P(data)
-
 		memo, err = parseDoujinMemo(record.Memo)
 	default:
 		panic(dump.Format(record.Cat, record.Type))
