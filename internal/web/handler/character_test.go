@@ -76,7 +76,7 @@ func TestHandler_GetCharacter_Redirect_cached(t *testing.T) {
 func TestHandler_GetCharacter_NSFW(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
-	m.EXPECT().Get(mock.Anything, model.CharacterIDType(7)).Return(model.Character{ID: 7, NSFW: true}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, NSFW: true}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
@@ -95,7 +95,7 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
-	require.Equal(t, model.CharacterIDType(7), r.ID)
+	require.Equal(t, model.CharacterID(7), r.ID)
 }
 
 func TestHandler_GetCharacterImage_200(t *testing.T) {

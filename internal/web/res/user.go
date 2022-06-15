@@ -62,16 +62,16 @@ type User struct {
 }
 
 type Collection struct {
-	UpdatedAt   time.Time           `json:"updated_at"`
-	Comment     *string             `json:"comment"`
-	Tags        []string            `json:"tags"`
-	SubjectID   model.SubjectIDType `json:"subject_id"`
-	EpStatus    uint32              `json:"ep_status"`
-	VolStatus   uint32              `json:"vol_status"`
-	SubjectType uint8               `json:"subject_type"`
-	Type        uint8               `json:"type"`
-	Rate        uint8               `json:"rate"`
-	Private     bool                `json:"private"`
+	UpdatedAt   time.Time       `json:"updated_at"`
+	Comment     *string         `json:"comment"`
+	Tags        []string        `json:"tags"`
+	SubjectID   model.SubjectID `json:"subject_id"`
+	EpStatus    uint32          `json:"ep_status"`
+	VolStatus   uint32          `json:"vol_status"`
+	SubjectType uint8           `json:"subject_type"`
+	Type        uint8           `json:"type"`
+	Rate        uint8           `json:"rate"`
+	Private     bool            `json:"private"`
 }
 
 type Creator struct {

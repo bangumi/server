@@ -63,7 +63,7 @@ func (h Handler) GetPerson(c *fiber.Ctx) error {
 
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
-func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonIDType) (res.PersonV0, bool, error) {
+func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonID) (res.PersonV0, bool, error) {
 	var key = cachekey.Person(id)
 
 	// try to read from cache

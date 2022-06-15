@@ -76,7 +76,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 // return data, database record existence and error.
 func (h Handler) getSubjectWithCache(
 	ctx context.Context,
-	id model.SubjectIDType,
+	id model.SubjectID,
 ) (res.SubjectV0, bool, error) {
 	var key = cachekey.Subject(id)
 
@@ -327,18 +327,18 @@ func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	return h.getSubjectRelatedCharacters(c, id)
 }
 
-func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID model.SubjectIDType) error {
+func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID model.SubjectID) error {
 	relations, err := h.c.GetSubjectRelated(c.Context(), subjectID)
 	if err != nil {
 		return errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
 	}
 
-	var characterIDs = make([]model.PersonIDType, len(relations))
+	var characterIDs = make([]model.PersonID, len(relations))
 	for i, rel := range relations {
 		characterIDs[i] = rel.Character.ID
 	}
 
-	var actors map[model.CharacterIDType][]model.Person
+	var actors map[model.CharacterID][]model.Person
 	if len(characterIDs) != 0 {
 		actors, err = h.s.GetActors(c.Context(), subjectID, characterIDs...)
 		if err != nil {

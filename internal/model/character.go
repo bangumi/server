@@ -19,7 +19,7 @@ type Character struct {
 	Image          string
 	Infobox        string
 	Summary        string
-	ID             CharacterIDType
+	ID             CharacterID
 	Redirect       uint32
 	CollectCount   uint32
 	CommentCount   uint32

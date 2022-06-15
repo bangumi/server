@@ -75,7 +75,7 @@ func TestMysqlRepo_GetCollection(t *testing.T) {
 	repo := getRepo(t)
 
 	const id model.UserID = 382951
-	const subjectID model.SubjectIDType = 888998
+	const subjectID model.SubjectID = 888998
 
 	q := test.GetQuery(t)
 	err := q.WithContext(context.Background()).SubjectCollection.Create(&dao.SubjectCollection{

@@ -28,6 +28,6 @@ func GroupID(id model.GroupID) zap.Field {
 	return zap.Uint8("group_id", id)
 }
 
-func SubjectID(id model.SubjectIDType) zap.Field {
+func SubjectID(id model.SubjectID) zap.Field {
 	return zap.Uint32("subject_id", id)
 }

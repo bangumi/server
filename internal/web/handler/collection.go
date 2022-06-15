@@ -150,7 +150,7 @@ func (h Handler) GetCollection(c *fiber.Ctx) error {
 	return h.getCollection(c, username, subjectID)
 }
 
-func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.SubjectIDType) error {
+func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.SubjectID) error {
 	const notFoundMessage = "subject is not collected by user"
 	v := h.getHTTPAccessor(c)
 

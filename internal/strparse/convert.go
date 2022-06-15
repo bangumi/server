@@ -51,23 +51,23 @@ func UserID(s string) (model.UserID, error) {
 	return uint32NonZero(s)
 }
 
-func SubjectID(s string) (model.SubjectIDType, error) {
+func SubjectID(s string) (model.SubjectID, error) {
 	return uint32NonZero(s)
 }
 
-func PersonID(s string) (model.PersonIDType, error) {
+func PersonID(s string) (model.PersonID, error) {
 	return uint32NonZero(s)
 }
 
-func CharacterID(s string) (model.PersonIDType, error) {
+func CharacterID(s string) (model.PersonID, error) {
 	return uint32NonZero(s)
 }
 
-func EpisodeID(s string) (model.PersonIDType, error) {
+func EpisodeID(s string) (model.PersonID, error) {
 	return uint32NonZero(s)
 }
 
-func IndexID(s string) (model.IndexIDType, error) {
+func IndexID(s string) (model.IndexID, error) {
 	return uint32NonZero(s)
 }
 

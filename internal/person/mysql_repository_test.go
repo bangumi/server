@@ -56,11 +56,11 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 
 	_, ok := s[1]
 	require.True(t, ok)
-	require.Equal(t, model.PersonIDType(1), s[1].ID)
+	require.Equal(t, model.PersonID(1), s[1].ID)
 
 	_, ok = s[2]
 	require.True(t, ok)
-	require.Equal(t, model.PersonIDType(2), s[2].ID)
+	require.Equal(t, model.PersonID(2), s[2].ID)
 }
 
 func TestMysqlRepo_GetSubjectRelated(t *testing.T) {

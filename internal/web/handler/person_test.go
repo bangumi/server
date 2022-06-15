@@ -71,8 +71,8 @@ func TestHandler_GetPerson_Redirect_cached(t *testing.T) {
 func TestHandler_GetPersonImage_302(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPersonRepo(t)
-	m.EXPECT().Get(mock.Anything, model.PersonIDType(1)).Return(model.Person{ID: 1, Image: "temp"}, nil)
-	m.EXPECT().Get(mock.Anything, model.PersonIDType(3)).Return(model.Person{ID: 3}, nil)
+	m.EXPECT().Get(mock.Anything, model.PersonID(1)).Return(model.Person{ID: 1, Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, model.PersonID(3)).Return(model.Person{ID: 3}, nil)
 
 	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
 

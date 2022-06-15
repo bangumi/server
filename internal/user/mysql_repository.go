@@ -120,7 +120,7 @@ func (m mysqlRepo) ListCollections(
 }
 
 func (m mysqlRepo) GetCollection(
-	ctx context.Context, userID model.UserID, subjectID model.SubjectIDType,
+	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 ) (model.Collection, error) {
 	c, err := m.q.SubjectCollection.WithContext(ctx).
 		Where(m.q.SubjectCollection.UserID.Eq(userID), m.q.SubjectCollection.SubjectID.Eq(subjectID)).First()

@@ -159,7 +159,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 
 func (h Handler) listEpisode(
 	c *fiber.Ctx,
-	subjectID model.SubjectIDType,
+	subjectID model.SubjectID,
 	page pageQuery,
 	epType enum.EpType,
 ) error {
@@ -215,7 +215,7 @@ func (h Handler) listEpisode(
 	return c.JSON(response)
 }
 
-func parseEpType(s string) (model.EpTypeType, error) {
+func parseEpType(s string) (model.EpType, error) {
 	if s == "" {
 		return -1, nil
 	}
@@ -225,7 +225,7 @@ func parseEpType(s string) (model.EpTypeType, error) {
 		return -1, fiber.NewError(http.StatusBadRequest, "wrong value for query `type`")
 	}
 
-	e := model.EpTypeType(v)
+	e := model.EpType(v)
 	switch e {
 	case enum.EpTypeNormal, enum.EpTypeSpecial,
 		enum.EpTypeOpening, enum.EpTypeEnding,

@@ -32,7 +32,7 @@ import (
 
 func TestHappyPath(t *testing.T) {
 	t.Parallel()
-	var subjectID model.SubjectIDType = 7
+	var subjectID model.SubjectID = 7
 
 	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, subjectID).Return(model.Subject{ID: subjectID}, nil)
@@ -148,8 +148,8 @@ func Test_web_subject_bad_id(t *testing.T) {
 func TestHandler_GetSubjectImage_302(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, model.SubjectIDType(1)).Return(model.Subject{ID: 1, Image: "temp"}, nil)
-	m.EXPECT().Get(mock.Anything, model.SubjectIDType(3)).Return(model.Subject{ID: 1}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(1)).Return(model.Subject{ID: 1, Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(3)).Return(model.Subject{ID: 1}, nil)
 
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 

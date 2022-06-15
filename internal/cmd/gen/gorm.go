@@ -37,12 +37,12 @@ import (
 )
 
 var userIDTypeString = reflect.TypeOf(new(model.UserID)).Elem().Name()
-var personIDTypeString = reflect.TypeOf(new(model.PersonIDType)).Elem().Name()
-var characterIDTypeString = reflect.TypeOf(new(model.CharacterIDType)).Elem().Name()
-var episodeIDTypeString = reflect.TypeOf(new(model.EpisodeIDType)).Elem().Name()
-var subjectIDTypeString = reflect.TypeOf(new(model.SubjectIDType)).Elem().Name()
+var personIDTypeString = reflect.TypeOf(new(model.PersonID)).Elem().Name()
+var characterIDTypeString = reflect.TypeOf(new(model.CharacterID)).Elem().Name()
+var episodeIDTypeString = reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
+var subjectIDTypeString = reflect.TypeOf(new(model.SubjectID)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
-var episodeTypeTypeString = reflect.TypeOf(new(model.EpTypeType)).Elem().Name()
+var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
 // generate code.
 func main() {

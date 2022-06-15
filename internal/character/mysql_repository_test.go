@@ -59,9 +59,9 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 
 	_, ok := s[1]
 	require.True(t, ok)
-	require.Equal(t, model.CharacterIDType(1), s[1].ID)
+	require.Equal(t, model.CharacterID(1), s[1].ID)
 
 	_, ok = s[2]
 	require.True(t, ok)
-	require.Equal(t, model.CharacterIDType(2), s[2].ID)
+	require.Equal(t, model.CharacterID(2), s[2].ID)
 }

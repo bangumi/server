@@ -30,19 +30,19 @@ type service struct {
 	repo domain.SubjectRepo
 }
 
-func (s service) Get(ctx context.Context, id model.SubjectIDType) (model.Subject, error) {
+func (s service) Get(ctx context.Context, id model.SubjectID) (model.Subject, error) {
 	return s.repo.Get(ctx, id) //nolint:wrapcheck
 }
 
 func (s service) GetPersonRelated(
-	ctx context.Context, personID model.PersonIDType,
+	ctx context.Context, personID model.PersonID,
 ) ([]model.SubjectPersonRelation, error) {
 	relations, err := s.repo.GetPersonRelated(ctx, personID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	var subjectIDs = make([]model.SubjectIDType, len(relations))
+	var subjectIDs = make([]model.SubjectID, len(relations))
 	var results = make([]model.SubjectPersonRelation, len(relations))
 	for i, relation := range relations {
 		subjectIDs[i] = relation.SubjectID
@@ -62,14 +62,14 @@ func (s service) GetPersonRelated(
 }
 
 func (s service) GetCharacterRelated(
-	ctx context.Context, characterID model.PersonIDType,
+	ctx context.Context, characterID model.PersonID,
 ) ([]model.SubjectCharacterRelation, error) {
 	relations, err := s.repo.GetCharacterRelated(ctx, characterID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetCharacterRelated")
 	}
 
-	var subjectIDs = make([]model.SubjectIDType, len(relations))
+	var subjectIDs = make([]model.SubjectID, len(relations))
 	for i, relation := range relations {
 		subjectIDs[i] = relation.SubjectID
 	}
@@ -91,14 +91,14 @@ func (s service) GetCharacterRelated(
 }
 
 func (s service) GetSubjectRelated(
-	ctx context.Context, subjectID model.SubjectIDType,
+	ctx context.Context, subjectID model.SubjectID,
 ) ([]model.SubjectInternalRelation, error) {
 	relations, err := s.repo.GetSubjectRelated(ctx, subjectID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetSubjectRelated")
 	}
 
-	var subjectIDs = make([]model.SubjectIDType, len(relations))
+	var subjectIDs = make([]model.SubjectID, len(relations))
 	var results = make([]model.SubjectInternalRelation, len(relations))
 	for i, relation := range relations {
 		subjectIDs[i] = relation.DestinationID
@@ -118,7 +118,7 @@ func (s service) GetSubjectRelated(
 }
 
 func (s service) GetActors(
-	ctx context.Context, subjectID model.SubjectIDType, characterIDs ...model.CharacterIDType,
-) (map[model.CharacterIDType][]model.Person, error) {
+	ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
+) (map[model.CharacterID][]model.Person, error) {
 	return s.repo.GetActors(ctx, subjectID, characterIDs...) //nolint:wrapcheck
 }

@@ -19,16 +19,16 @@ import (
 )
 
 type Episode struct {
-	Airdate     string              `json:"airdate"`
-	Name        string              `json:"name"`
-	NameCN      string              `json:"name_cn"`
-	Duration    string              `json:"duration"`
-	Description string              `json:"desc"`
-	Ep          float32             `json:"ep"`
-	Sort        float32             `json:"sort"`
-	ID          model.EpisodeIDType `json:"id"`
-	SubjectID   model.SubjectIDType `json:"subject_id"`
-	Comment     uint32              `json:"comment"`
-	Type        model.EpTypeType    `json:"type"`
-	Disc        uint8               `json:"disc"`
+	Airdate     string          `json:"airdate"`
+	Name        string          `json:"name"`
+	NameCN      string          `json:"name_cn"`
+	Duration    string          `json:"duration"`
+	Description string          `json:"desc"`
+	Ep          float32         `json:"ep"`
+	Sort        float32         `json:"sort"`
+	ID          model.EpisodeID `json:"id"`
+	SubjectID   model.SubjectID `json:"subject_id"`
+	Comment     uint32          `json:"comment"`
+	Type        model.EpType    `json:"type"`
+	Disc        uint8           `json:"disc"`
 }

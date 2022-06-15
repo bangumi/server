@@ -36,14 +36,14 @@ func (s service) Get(ctx context.Context, id uint32) (model.Person, error) {
 }
 
 func (s service) GetSubjectRelated(
-	ctx context.Context, subjectID model.SubjectIDType,
+	ctx context.Context, subjectID model.SubjectID,
 ) ([]model.SubjectPersonRelation, error) {
 	relations, err := s.repo.GetSubjectRelated(ctx, subjectID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetSubjectRelated")
 	}
 
-	var personIDs = make([]model.PersonIDType, len(relations))
+	var personIDs = make([]model.PersonID, len(relations))
 	for i, relation := range relations {
 		personIDs[i] = relation.PersonID
 	}
@@ -71,15 +71,15 @@ func (s service) GetSubjectRelated(
 }
 
 func (s service) GetCharacterRelated(
-	ctx context.Context, characterID model.CharacterIDType,
+	ctx context.Context, characterID model.CharacterID,
 ) ([]model.PersonCharacterRelation, error) {
 	relations, err := s.repo.GetCharacterRelated(ctx, characterID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetCharacterRelated")
 	}
 
-	var personIDs = make([]model.PersonIDType, len(relations))
-	var subjectIDs = make([]model.SubjectIDType, len(relations))
+	var personIDs = make([]model.PersonID, len(relations))
+	var subjectIDs = make([]model.SubjectID, len(relations))
 	for i, relation := range relations {
 		personIDs[i] = relation.PersonID
 		subjectIDs[i] = relation.SubjectID

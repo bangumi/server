@@ -31,7 +31,7 @@ import (
 
 func TestHandler_ListPersonRevision_HappyPath(t *testing.T) {
 	t.Parallel()
-	const uid model.PersonIDType = 9
+	const uid model.PersonID = 9
 
 	m := mocks.NewRevisionRepo(t)
 	m.EXPECT().ListPersonRelated(mock.Anything, uid, 30, 0).Return(
@@ -87,7 +87,7 @@ func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 
 func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
 	t.Parallel()
-	const subjectID model.SubjectIDType = 26
+	const subjectID model.SubjectID = 26
 
 	m := mocks.NewRevisionRepo(t)
 	m.EXPECT().ListSubjectRelated(mock.Anything, subjectID, 30, 0).Return(

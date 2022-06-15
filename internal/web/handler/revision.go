@@ -41,7 +41,7 @@ func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
 	return h.listPersonRevision(c, personID, page)
 }
 
-func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonIDType, page pageQuery) error {
+func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page pageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -121,7 +121,7 @@ func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
 	return h.listCharacterRevision(c, characterID, page)
 }
 
-func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.CharacterIDType, page pageQuery) error {
+func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.CharacterID, page pageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -203,7 +203,7 @@ func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
 	return h.listSubjectRevision(c, subjectID, page)
 }
 
-func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectIDType, page pageQuery) error {
+func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, page pageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,

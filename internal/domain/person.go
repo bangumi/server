@@ -22,15 +22,15 @@ import (
 
 type PersonRepo interface {
 	Get(ctx context.Context, id uint32) (model.Person, error)
-	GetByIDs(ctx context.Context, ids ...model.PersonIDType) (map[model.PersonIDType]model.Person, error)
+	GetByIDs(ctx context.Context, ids ...model.PersonID) (map[model.PersonID]model.Person, error)
 
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, subjectID model.CharacterIDType) ([]PersonCharacterRelation, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectPersonRelation, error)
+	GetCharacterRelated(ctx context.Context, subjectID model.CharacterID) ([]PersonCharacterRelation, error)
 }
 
 type PersonService interface {
 	Get(ctx context.Context, id uint32) (model.Person, error)
 
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]model.SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, characterID model.CharacterIDType) ([]model.PersonCharacterRelation, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectPersonRelation, error)
+	GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]model.PersonCharacterRelation, error)
 }

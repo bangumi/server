@@ -32,7 +32,7 @@ func Person(id uint32) string {
 	return globalPrefix + "person:" + strconv.FormatUint(uint64(id), 10)
 }
 
-func Subject(id model.SubjectIDType) string {
+func Subject(id model.SubjectID) string {
 	return globalPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
 }
 

@@ -22,48 +22,48 @@ import (
 
 type SubjectRepo interface {
 	// Get return a repository model.
-	Get(ctx context.Context, id model.SubjectIDType) (model.Subject, error)
-	GetByIDs(ctx context.Context, ids ...model.SubjectIDType) (map[model.SubjectIDType]model.Subject, error)
+	Get(ctx context.Context, id model.SubjectID) (model.Subject, error)
+	GetByIDs(ctx context.Context, ids ...model.SubjectID) (map[model.SubjectID]model.Subject, error)
 
-	GetPersonRelated(ctx context.Context, personID model.PersonIDType) ([]SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, characterID model.PersonIDType) ([]SubjectCharacterRelation, error)
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]SubjectInternalRelation, error)
+	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]SubjectPersonRelation, error)
+	GetCharacterRelated(ctx context.Context, characterID model.PersonID) ([]SubjectCharacterRelation, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectInternalRelation, error)
 
 	GetActors(
-		ctx context.Context, subjectID model.SubjectIDType, characterIDs ...model.CharacterIDType,
-	) (map[model.CharacterIDType][]model.Person, error)
+		ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
+	) (map[model.CharacterID][]model.Person, error)
 }
 
 type SubjectService interface {
 	// Get return a repository model.
-	Get(ctx context.Context, id model.SubjectIDType) (model.Subject, error)
+	Get(ctx context.Context, id model.SubjectID) (model.Subject, error)
 
-	GetPersonRelated(ctx context.Context, personID model.PersonIDType) ([]model.SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, characterID model.PersonIDType) ([]model.SubjectCharacterRelation, error)
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]model.SubjectInternalRelation, error)
+	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]model.SubjectPersonRelation, error)
+	GetCharacterRelated(ctx context.Context, characterID model.PersonID) ([]model.SubjectCharacterRelation, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectInternalRelation, error)
 
 	GetActors(
-		ctx context.Context, subjectID model.SubjectIDType, characterIDs ...model.CharacterIDType,
-	) (map[model.CharacterIDType][]model.Person, error)
+		ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
+	) (map[model.CharacterID][]model.Person, error)
 }
 
 type SubjectPersonRelation struct {
 	TypeID uint16
 
-	PersonID  model.PersonIDType
-	SubjectID model.SubjectIDType
+	PersonID  model.PersonID
+	SubjectID model.SubjectID
 }
 
 type SubjectCharacterRelation struct {
 	TypeID uint8
 
-	SubjectID   model.SubjectIDType
-	CharacterID model.CharacterIDType
+	SubjectID   model.SubjectID
+	CharacterID model.CharacterID
 }
 
 type SubjectInternalRelation struct {
 	TypeID uint16
 
-	SourceID      model.SubjectIDType
-	DestinationID model.SubjectIDType
+	SourceID      model.SubjectID
+	DestinationID model.SubjectID
 }

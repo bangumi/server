@@ -51,7 +51,7 @@ func parseSubjectType(s string) (uint8, error) {
 	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+" is not a valid subject type")
 }
 
-func parseSubjectID(s string) (model.SubjectIDType, error) {
+func parseSubjectID(s string) (model.SubjectID, error) {
 	if s == "" {
 		return 0, errMissingSubjectID
 	}
@@ -65,7 +65,7 @@ func parseSubjectID(s string) (model.SubjectIDType, error) {
 	return v, nil
 }
 
-func parseCharacterID(s string) (model.CharacterIDType, error) {
+func parseCharacterID(s string) (model.CharacterID, error) {
 	if s == "" {
 		return 0, errMissingCharacterID
 	}
@@ -79,7 +79,7 @@ func parseCharacterID(s string) (model.CharacterIDType, error) {
 	return v, nil
 }
 
-func parsePersonID(s string) (model.PersonIDType, error) {
+func parsePersonID(s string) (model.PersonID, error) {
 	if s == "" {
 		return 0, errMissingPersonID
 	}
@@ -93,7 +93,7 @@ func parsePersonID(s string) (model.PersonIDType, error) {
 	return v, nil
 }
 
-func parseEpisodeID(s string) (model.EpisodeIDType, error) {
+func parseEpisodeID(s string) (model.EpisodeID, error) {
 	if s == "" {
 		return 0, errMissingEpisodeID
 	}
@@ -107,7 +107,7 @@ func parseEpisodeID(s string) (model.EpisodeIDType, error) {
 	return v, nil
 }
 
-func parseIndexID(s string) (model.IndexIDType, error) {
+func parseIndexID(s string) (model.IndexID, error) {
 	if s == "" {
 		return 0, errMissingIndexID
 	}

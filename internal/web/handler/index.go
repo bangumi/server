@@ -144,7 +144,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 }
 
 func (h Handler) getIndexSubjects(
-	c *fiber.Ctx, id model.IndexIDType, subjectType uint8, page pageQuery,
+	c *fiber.Ctx, id model.IndexID, subjectType uint8, page pageQuery,
 ) error {
 	count, err := h.i.CountSubjects(c.Context(), id, subjectType)
 	if err != nil {

@@ -45,7 +45,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.RevisionRepo, error) 
 	return mysqlRepo{q: q, log: log.Named("revision.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) CountPersonRelated(ctx context.Context, id model.PersonIDType) (int64, error) {
+func (r mysqlRepo) CountPersonRelated(ctx context.Context, id model.PersonID) (int64, error) {
 	c, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.Mid.Eq(id), r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).Count()
 	if err != nil {
@@ -55,7 +55,7 @@ func (r mysqlRepo) CountPersonRelated(ctx context.Context, id model.PersonIDType
 }
 
 func (r mysqlRepo) ListPersonRelated(
-	ctx context.Context, personID model.PersonIDType, limit int, offset int,
+	ctx context.Context, personID model.PersonID, limit int, offset int,
 ) ([]model.PersonRevision, error) {
 	revisions, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.Mid.Eq(personID), r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).
@@ -73,7 +73,7 @@ func (r mysqlRepo) ListPersonRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.PersonIDType) (model.PersonRevision, error) {
+func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.PersonID) (model.PersonRevision, error) {
 	revision, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.ID.Eq(id),
 			r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).
@@ -100,7 +100,7 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.PersonIDType) 
 	return convertPersonRevisionDao(revision, data), nil
 }
 
-func (r mysqlRepo) CountCharacterRelated(ctx context.Context, characterID model.CharacterIDType) (int64, error) {
+func (r mysqlRepo) CountCharacterRelated(ctx context.Context, characterID model.CharacterID) (int64, error) {
 	c, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(
 			r.q.RevisionHistory.Mid.Eq(characterID),
@@ -110,7 +110,7 @@ func (r mysqlRepo) CountCharacterRelated(ctx context.Context, characterID model.
 }
 
 func (r mysqlRepo) ListCharacterRelated(
-	ctx context.Context, characterID model.CharacterIDType, limit int, offset int,
+	ctx context.Context, characterID model.CharacterID, limit int, offset int,
 ) ([]model.CharacterRevision, error) {
 	revisions, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(
@@ -131,7 +131,7 @@ func (r mysqlRepo) ListCharacterRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.CharacterIDType) (model.CharacterRevision, error) {
+func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.CharacterID) (model.CharacterRevision, error) {
 	revision, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.ID.Eq(id),
 			r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...)).
@@ -160,7 +160,7 @@ func wrapGORMError(err error) error {
 	return errgo.Wrap(err, "dal")
 }
 
-func (r mysqlRepo) CountSubjectRelated(ctx context.Context, id model.SubjectIDType) (int64, error) {
+func (r mysqlRepo) CountSubjectRelated(ctx context.Context, id model.SubjectID) (int64, error) {
 	c, err := r.q.SubjectRevision.WithContext(ctx).
 		Where(r.q.SubjectRevision.SubjectID.Eq(id)).Count()
 	if err != nil {
@@ -170,7 +170,7 @@ func (r mysqlRepo) CountSubjectRelated(ctx context.Context, id model.SubjectIDTy
 }
 
 func (r mysqlRepo) ListSubjectRelated(
-	ctx context.Context, id model.SubjectIDType, limit int, offset int,
+	ctx context.Context, id model.SubjectID, limit int, offset int,
 ) ([]model.SubjectRevision, error) {
 	revisions, err := r.q.SubjectRevision.WithContext(ctx).
 		Where(r.q.SubjectRevision.SubjectID.Eq(id)).
@@ -188,7 +188,7 @@ func (r mysqlRepo) ListSubjectRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.SubjectIDType) (model.SubjectRevision, error) {
+func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.SubjectID) (model.SubjectRevision, error) {
 	revision, err := r.q.SubjectRevision.WithContext(ctx).
 		Where(r.q.SubjectRevision.ID.Eq(id)).
 		First()

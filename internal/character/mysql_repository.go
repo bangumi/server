@@ -52,15 +52,15 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Character, error) 
 }
 
 func (r mysqlRepo) GetByIDs(
-	ctx context.Context, ids ...model.CharacterIDType,
-) (map[model.CharacterIDType]model.Character, error) {
+	ctx context.Context, ids ...model.CharacterID,
+) (map[model.CharacterID]model.Character, error) {
 	records, err := r.q.Character.WithContext(ctx).Preload(r.q.Character.Fields).Where(r.q.Character.ID.In(ids...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var results = make(map[model.CharacterIDType]model.Character, len(records))
+	var results = make(map[model.CharacterID]model.Character, len(records))
 	for _, s := range records {
 		results[s.ID] = ConvertDao(s)
 	}
@@ -69,7 +69,7 @@ func (r mysqlRepo) GetByIDs(
 }
 
 func (r mysqlRepo) GetPersonRelated(
-	ctx context.Context, personID model.PersonIDType,
+	ctx context.Context, personID model.PersonID,
 ) ([]domain.PersonCharacterRelation, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
 		Where(r.q.Cast.PersonID.Eq(personID)).
@@ -93,7 +93,7 @@ func (r mysqlRepo) GetPersonRelated(
 }
 
 func (r mysqlRepo) GetSubjectRelated(
-	ctx context.Context, subjectID model.SubjectIDType,
+	ctx context.Context, subjectID model.SubjectID,
 ) ([]domain.SubjectCharacterRelation, error) {
 	relations, err := r.q.CharacterSubjects.WithContext(ctx).
 		Where(r.q.CharacterSubjects.SubjectID.Eq(subjectID)).

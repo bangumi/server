@@ -44,7 +44,7 @@ type Collection struct {
 	Tags        []string
 	VolStatus   uint32
 	EpStatus    uint32
-	SubjectID   SubjectIDType
+	SubjectID   SubjectID
 	SubjectType uint8
 	Rate        uint8
 	Type        uint8

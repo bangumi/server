@@ -22,20 +22,20 @@ import (
 )
 
 type EpisodeRepo interface {
-	Get(ctx context.Context, episodeID model.EpisodeIDType) (model.Episode, error)
+	Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error)
 
 	// Count all episode for a subject.
-	Count(ctx context.Context, subjectID model.SubjectIDType) (int64, error)
+	Count(ctx context.Context, subjectID model.SubjectID) (int64, error)
 
 	// CountByType count episode for a subject and filter by type.
 	// This is because 0 means episode type normal.
-	CountByType(ctx context.Context, subjectID model.SubjectIDType, epType model.EpTypeType) (int64, error)
+	CountByType(ctx context.Context, subjectID model.SubjectID, epType model.EpType) (int64, error)
 
 	// List return all episode.
-	List(ctx context.Context, subjectID model.SubjectIDType, limit int, offset int) ([]model.Episode, error)
+	List(ctx context.Context, subjectID model.SubjectID, limit int, offset int) ([]model.Episode, error)
 
 	// ListByType return episodes filtered by episode type.
 	ListByType(
-		ctx context.Context, subjectID model.SubjectIDType, epType enum.EpType, limit int, offset int,
+		ctx context.Context, subjectID model.SubjectID, epType enum.EpType, limit int, offset int,
 	) ([]model.Episode, error)
 }

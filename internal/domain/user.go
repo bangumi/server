@@ -45,5 +45,5 @@ type UserRepo interface {
 		limit, offset int,
 	) ([]model.Collection, error)
 
-	GetCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectIDType) (model.Collection, error)
+	GetCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) (model.Collection, error)
 }
