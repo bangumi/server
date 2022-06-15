@@ -12,26 +12,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package log
+package handler
 
 import (
-	"go.uber.org/zap"
+	"errors"
 
-	"github.com/bangumi/server/internal/model"
+	"github.com/gofiber/fiber/v2"
+
+	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/web/res"
 )
 
-func UserID(id model.UserID) zap.Field {
-	return zap.Uint32("user_id", uint32(id))
-}
+func (h Handler) GetGroupByName(c *fiber.Ctx) error {
+	groupName := c.Params("name")
+	g, err := h.g.GetByName(c.Context(), groupName)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.NotFound(c)
+		}
 
-func UserGroup(id model.UserGroupID) zap.Field {
-	return zap.Uint8("user_group_id", id)
-}
+		return res.InternalError(c, err, "un expected error")
+	}
 
-func SubjectID(id model.SubjectID) zap.Field {
-	return zap.Uint32("subject_id", uint32(id))
-}
-
-func GroupID(id model.GroupID) zap.Field {
-	return zap.Uint16("group_id", uint16(id))
+	return res.JSON(c, res.Group{
+		ID:   g.ID,
+		Name: g.Name,
+	})
 }

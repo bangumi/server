@@ -44,7 +44,7 @@ func (_m *CharacterService) Get(ctx context.Context, id model.CharacterID) (mode
 	return r0, r1
 }
 
-// CharacterService_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+// CharacterService_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
 type CharacterService_Get_Call struct {
 	*mock.Call
 }
@@ -53,7 +53,7 @@ type CharacterService_Get_Call struct {
 //  - ctx context.Context
 //  - id model.CharacterID
 func (_e *CharacterService_Expecter) Get(ctx interface{}, id interface{}) *CharacterService_Get_Call {
-	return &CharacterService_Get_Call{Call: _e.mock.On("Get", ctx, id)}
+	return &CharacterService_Get_Call{Call: _e.mock.On("GetByID", ctx, id)}
 }
 
 func (_c *CharacterService_Get_Call) Run(run func(ctx context.Context, id model.CharacterID)) *CharacterService_Get_Call {

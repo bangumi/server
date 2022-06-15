@@ -70,7 +70,7 @@ func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonID) (res
 	var r res.PersonV0
 	ok, err := h.cache.Get(ctx, key, &r)
 	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
+		return r, ok, errgo.Wrap(err, "cache.GetByID")
 	}
 
 	if ok {

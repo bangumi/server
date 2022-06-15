@@ -75,7 +75,7 @@ func (h Handler) getSession(c *fiber.Ctx, value string) (session.Session, error)
 
 	if err != nil {
 		cookie.Clear(c, session.Key)
-		return session.Session{}, errgo.Wrap(err, "sessionManager.Get")
+		return session.Session{}, errgo.Wrap(err, "sessionManager.GetByID")
 	}
 
 	return s, nil

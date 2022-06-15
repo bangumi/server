@@ -27,7 +27,7 @@ import (
 type Error struct {
 	Title       string      `json:"title"`
 	Details     interface{} `json:"details,omitempty"`
-	Description string      `json:"description"`
+	Description string      `json:"description,omitempty"`
 }
 
 func WithError(c *fiber.Ctx, err error, code int, message string) error {
@@ -50,5 +50,12 @@ func InternalError(c *fiber.Ctx, err error, message string) error {
 		Title:       "Internal Server Error",
 		Description: message,
 		Details:     err.Error(),
+	})
+}
+
+func NotFound(c *fiber.Ctx) error {
+	return JSON(c.Status(code.NotFound), Error{
+		Title:   http.StatusText(code.NotFound),
+		Details: util.DetailFromRequest(c),
 	})
 }

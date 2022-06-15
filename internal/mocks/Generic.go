@@ -95,7 +95,7 @@ func (_m *Generic) Get(ctx context.Context, key string, value interface{}) (bool
 	return r0, r1
 }
 
-// Generic_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+// Generic_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
 type Generic_Get_Call struct {
 	*mock.Call
 }
@@ -105,7 +105,7 @@ type Generic_Get_Call struct {
 //  - key string
 //  - value interface{}
 func (_e *Generic_Expecter) Get(ctx interface{}, key interface{}, value interface{}) *Generic_Get_Call {
-	return &Generic_Get_Call{Call: _e.mock.On("Get", ctx, key, value)}
+	return &Generic_Get_Call{Call: _e.mock.On("GetByID", ctx, key, value)}
 }
 
 func (_c *Generic_Get_Call) Run(run func(ctx context.Context, key string, value interface{})) *Generic_Get_Call {

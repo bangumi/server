@@ -237,6 +237,7 @@ linters-settings:
       - "func github.com/bangumi/server/internal/web/res.HTTPError("
       - "func github.com/bangumi/server/internal/web/res.WithError("
       - "func github.com/bangumi/server/internal/web/res.InternalError("
+      - "func github.com/bangumi/server/internal/web/res.NotFound("
       - "func github.com/bangumi/server/internal/web/res.JSON("
 
   nlreturn:

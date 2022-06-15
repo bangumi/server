@@ -104,6 +104,7 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
 	private.Get("/me", addMetrics(h.GetCurrentUser))
+	private.Get("/group/:name", addMetrics(h.GetGroupByName))
 
 	// un-documented
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))

@@ -21,6 +21,7 @@ type SubjectID uint32
 type PersonID uint32
 type CharacterID uint32
 type UserID uint32
+type GroupID uint16
 
 type IndexID = uint32
 type RevisionID = uint32
@@ -33,6 +34,7 @@ var _ driver.Valuer = PersonID(0)
 var _ driver.Valuer = CharacterID(0)
 var _ driver.Valuer = SubjectID(0)
 var _ driver.Valuer = EpisodeID(0)
+var _ driver.Valuer = GroupID(0)
 
 func (v UserID) Value() (driver.Value, error) {
 	return int64(v), nil
@@ -51,5 +53,9 @@ func (v SubjectID) Value() (driver.Value, error) {
 }
 
 func (v EpisodeID) Value() (driver.Value, error) {
+	return int64(v), nil
+}
+
+func (v GroupID) Value() (driver.Value, error) {
 	return int64(v), nil
 }

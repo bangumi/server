@@ -84,7 +84,7 @@ func (h Handler) getSubjectWithCache(
 	var r res.SubjectV0
 	ok, err := h.cache.Get(ctx, key, &r)
 	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
+		return r, ok, errgo.Wrap(err, "cache.GetByID")
 	}
 
 	if ok {

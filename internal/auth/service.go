@@ -79,7 +79,7 @@ func (s service) GetByIDWithCache(ctx context.Context, userID model.UserID) (dom
 
 	ok, err := s.cache.Get(ctx, cacheKey, &a)
 	if err != nil {
-		return domain.Auth{}, errgo.Wrap(err, "cache.Get")
+		return domain.Auth{}, errgo.Wrap(err, "cache.GetByID")
 	}
 	if ok {
 		if a.Permission, err = s.GetPermission(ctx, a.GroupID); err != nil {
@@ -136,7 +136,7 @@ func (s service) GetByTokenWithCache(ctx context.Context, token string) (domain.
 
 	ok, err := s.cache.Get(ctx, cacheKey, &a)
 	if err != nil {
-		return domain.Auth{}, errgo.Wrap(err, "cache.Get")
+		return domain.Auth{}, errgo.Wrap(err, "cache.GetByID")
 	}
 	if ok {
 		if a.Permission, err = s.GetPermission(ctx, a.GroupID); err != nil {

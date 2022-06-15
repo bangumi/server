@@ -30,6 +30,7 @@ import (
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
@@ -82,7 +83,7 @@ func start() error {
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo,
 
-			auth.NewService, character.NewService, subject.NewService, person.NewService,
+			auth.NewService, character.NewService, subject.NewService, person.NewService, group.NewMysqlRepo,
 		),
 
 		fx.Provide(

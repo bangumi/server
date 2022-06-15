@@ -92,7 +92,7 @@ func (_m *MockRepo) Get(ctx context.Context, key string) (persistSession, error)
 	return r0, r1
 }
 
-// MockRepo_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+// MockRepo_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
 type MockRepo_Get_Call struct {
 	*mock.Call
 }
@@ -101,7 +101,7 @@ type MockRepo_Get_Call struct {
 //  - ctx context.Context
 //  - key string
 func (_e *MockRepo_Expecter) Get(ctx interface{}, key interface{}) *MockRepo_Get_Call {
-	return &MockRepo_Get_Call{Call: _e.mock.On("Get", ctx, key)}
+	return &MockRepo_Get_Call{Call: _e.mock.On("GetByID", ctx, key)}
 }
 
 func (_c *MockRepo_Get_Call) Run(run func(ctx context.Context, key string)) *MockRepo_Get_Call {

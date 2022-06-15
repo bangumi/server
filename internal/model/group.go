@@ -12,26 +12,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package log
+package model
 
-import (
-	"go.uber.org/zap"
+import "time"
 
-	"github.com/bangumi/server/internal/model"
-)
-
-func UserID(id model.UserID) zap.Field {
-	return zap.Uint32("user_id", uint32(id))
+type Group struct {
+	CreatedAt   time.Time
+	Name        string
+	Description string
+	ID          GroupID
+	NSFW        bool
 }
 
-func UserGroup(id model.UserGroupID) zap.Field {
-	return zap.Uint8("user_group_id", id)
-}
-
-func SubjectID(id model.SubjectID) zap.Field {
-	return zap.Uint32("subject_id", uint32(id))
-}
-
-func GroupID(id model.GroupID) zap.Field {
-	return zap.Uint16("group_id", uint16(id))
+type GroupMember struct {
+	UserID UserID
 }

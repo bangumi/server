@@ -40,7 +40,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 	var r res.Index
 	ok, err := h.cache.Get(c, key, &r)
 	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
+		return r, ok, errgo.Wrap(err, "cache.GetByID")
 	}
 
 	i, err := h.i.Get(c, id)
@@ -49,7 +49,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 			return res.Index{}, false, nil
 		}
 
-		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
+		return res.Index{}, false, errgo.Wrap(err, "Index.GetByID")
 	}
 
 	u, err := h.u.GetByID(c, i.CreatorID)
@@ -59,7 +59,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 			return res.Index{}, false, fiber.ErrInternalServerError
 		}
 
-		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
+		return res.Index{}, false, errgo.Wrap(err, "Index.GetByID")
 	}
 
 	r = res.Index{

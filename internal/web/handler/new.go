@@ -48,6 +48,7 @@ func New(
 	a domain.AuthService,
 	e domain.EpisodeRepo,
 	r domain.RevisionRepo,
+	g domain.GroupRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
 	cache cache.Generic,
@@ -105,6 +106,7 @@ type Handler struct {
 	cache                cache.Generic
 	i                    domain.IndexRepo
 	r                    domain.RevisionRepo
+	g                    domain.GroupRepo
 	buffPool             buffer.Pool
 	oauth                oauth.Manager
 	log                  *zap.Logger

@@ -12,26 +12,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package log
+package domain
 
 import (
-	"go.uber.org/zap"
+	"context"
 
 	"github.com/bangumi/server/internal/model"
 )
 
-func UserID(id model.UserID) zap.Field {
-	return zap.Uint32("user_id", uint32(id))
-}
+type GroupRepo interface {
+	GetByID(ctx context.Context, id model.GroupID) (model.Group, error)
+	// GetByName name is in url path.
+	GetByName(ctx context.Context, name string) (model.Group, error)
 
-func UserGroup(id model.UserGroupID) zap.Field {
-	return zap.Uint8("user_group_id", id)
-}
+	CountMembersByName(ctx context.Context, name string) (int64, error)
+	ListMembersByName(ctx context.Context, name string, limit, offset int) ([]model.GroupMember, error)
 
-func SubjectID(id model.SubjectID) zap.Field {
-	return zap.Uint32("subject_id", uint32(id))
-}
-
-func GroupID(id model.GroupID) zap.Field {
-	return zap.Uint16("group_id", uint16(id))
+	CountMembersByID(ctx context.Context, id model.GroupID) (int64, error)
+	ListMembersByID(ctx context.Context, id model.GroupID, limit, offset int) ([]model.GroupMember, error)
 }
