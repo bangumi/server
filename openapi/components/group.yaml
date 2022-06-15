@@ -1,0 +1,32 @@
+additionalProperties: false
+example:
+  created_at: "2008-08-01T06:11:29+08:00"
+  description: |-
+    本小组欢迎对各种技术有一定了解的人，
+    比如像橘花热衷杀人技术……
+
+    不过、本组主要谈论ＰＣ软硬件方面，
+    想了解相关知识，结识可怕的技术宅，请进。
+  icon: https://lain.bgm.tv/pic/icon/l/000/00/00/11.jpg
+  name: boring
+  title: 靠谱人生茶话会
+properties:
+  created_at:
+    format: date-time
+    type: string
+  description:
+    type: string
+  icon:
+    format: url
+    type: string
+  name:
+    type: string
+  title:
+    type: string
+required:
+- name
+- title
+- description
+- icon
+- created_at
+type: object

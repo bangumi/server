@@ -58,7 +58,12 @@ internal/mocks/RateLimiter.go: internal/web/rate/new.go
 
 gorm: ./dal/query/gen.go
 
-gen: gorm mocks
+gen: gorm mocks openapi
+
+openapi: openapi/components/group.yaml
+
+openapi/components/group.yaml: internal/cmd/gen/openapi/main.go
+	go run $?
 
 # don't enable `-race` in test because it require cgo, only enable it at coverage.
 test: .bin/gotestfmt.exe
@@ -92,4 +97,4 @@ clean::
 	rm -rf ./out
 	rm -rf ./dist ./.bin
 
-.PHONY:: install help build test test-all bench coverage clean gen lint mocks gorm
+.PHONY:: install help build test test-all bench coverage clean gen lint mocks gorm openapi

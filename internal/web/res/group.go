@@ -14,9 +14,14 @@
 
 package res
 
-import "github.com/bangumi/server/internal/model"
+import (
+	"time"
+)
 
 type Group struct {
-	Name string        `json:"name"`
-	ID   model.GroupID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	Name        string    `json:"name"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Icon        string    `json:"icon" format:"url"`
 }

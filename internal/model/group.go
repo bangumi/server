@@ -19,7 +19,9 @@ import "time"
 type Group struct {
 	CreatedAt   time.Time
 	Name        string
+	Icon        string
 	Description string
+	Title       string
 	ID          GroupID
 	NSFW        bool
 }

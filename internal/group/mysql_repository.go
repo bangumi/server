@@ -121,6 +121,8 @@ func convertDao(g *dao.Group) model.Group {
 		NSFW:        g.Nsfw,
 		ID:          g.ID,
 		Description: g.Description,
+		Icon:        g.Icon,
+		Title:       g.Title,
 		CreatedAt:   time.Unix(int64(g.CreatedAt), 0),
 	}
 }

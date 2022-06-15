@@ -35,7 +35,10 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 	}
 
 	return res.JSON(c, res.Group{
-		ID:   g.ID,
-		Name: g.Name,
+		Name:        g.Name,
+		Title:       g.Title,
+		Description: g.Description,
+		Icon:        "https://lain.bgm.tv/pic/icon/l/" + g.Icon,
+		// ID:          g.ID,
 	})
 }
