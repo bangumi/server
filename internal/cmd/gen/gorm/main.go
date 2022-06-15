@@ -22,6 +22,7 @@ package main
 // disable lint in this package as it's only a generator
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -41,13 +42,14 @@ var personIDTypeString = "model.PersonID"
 var characterIDTypeString = "model.CharacterID"
 var episodeIDTypeString = "model.EpisodeID"
 var subjectIDTypeString = "model.SubjectID"
-var timelineIDTypeString = reflect.TypeOf(new(model.TimeLineID)).Elem().Kind().String()
-var timelineTypeTypeString = reflect.TypeOf(new(model.TimeLineType)).Elem().Kind().String()
+var timelineIDTypeString = "model." + reflect.TypeOf(new(model.TimeLineID)).Elem().Name()
+var timelineTypeTypeString = "model." + reflect.TypeOf(new(model.TimeLineType)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
 // generate code.
 func main() {
+	fmt.Println(timelineIDTypeString)
 	// specify the output directory (default: "./query")
 	// ### if you want to query without context constrain, set mode gen.WithoutContext ###
 	const dalBase = "./internal/dal"

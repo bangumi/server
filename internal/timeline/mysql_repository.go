@@ -42,7 +42,7 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (m mysqlRepo) GetByID(ctx context.Context, id model.TimeLineType) (model.TimeLine, error) {
+func (m mysqlRepo) GetByID(ctx context.Context, id model.TimeLineID) (model.TimeLine, error) {
 	record, err := m.q.TimeLine.WithContext(ctx).Where(m.q.TimeLine.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

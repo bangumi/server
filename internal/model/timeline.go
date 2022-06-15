@@ -45,7 +45,7 @@ type TimelineImage struct {
 }
 
 const (
-	TimeLineTypeAll = iota
+	TimeLineTypeAll TimeLineType = iota
 	TimeLineTypeSubject
 	TimeLineTypeProgress
 	TimeLineTypeRelation
