@@ -61,7 +61,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 		"email":              "a@example.com",
 		"password":           "p",
 		"h-captcha-response": "req",
-	}).Execute(app, -1)
+	}).Execute(app)
 
 	require.Equal(t, fiber.StatusOK, resp.StatusCode, resp.BodyString())
 
@@ -75,7 +75,7 @@ func TestHandler_PrivateLogin_content_type(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{})
 
-	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").Execute(app, -1)
+	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").Execute(app)
 
 	require.Equal(t, fiber.StatusBadRequest, resp.StatusCode, resp.BodyString())
 }
@@ -93,7 +93,7 @@ func TestHandler_PrivateLogout(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{SessionManager: mockCaptcha})
 
-	resp := test.New(t).Post("/p/logout").Cookie(session.Key, "req").Execute(app, -1)
+	resp := test.New(t).Post("/p/logout").Cookie(session.Key, "req").Execute(app)
 
 	require.Equal(t, fiber.StatusNoContent, resp.StatusCode, resp.BodyString())
 

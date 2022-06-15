@@ -92,10 +92,12 @@ func TestMysqlRepo_DeleteAccessToken(t *testing.T) {
 
 	const id = 100
 	repo, q := getRepo(t)
-	t.Cleanup(func() {
+
+	cleanup := func() {
 		_, err := q.AccessToken.WithContext(context.TODO()).Where(q.AccessToken.ID.Eq(id)).Delete()
 		require.NoError(t, err)
-	})
+	}
+	t.Cleanup(cleanup)
 
 	err := q.AccessToken.WithContext(context.Background()).Create(&dao.AccessToken{
 		ID:          id,
@@ -121,10 +123,11 @@ func TestMysqlRepo_ListAccessToken(t *testing.T) {
 
 	repo, q := getRepo(t)
 
-	t.Cleanup(func() {
+	cleanup := func() {
 		_, err := q.AccessToken.WithContext(context.TODO()).Where(q.AccessToken.UserID.Eq("3")).Delete()
 		require.NoError(t, err)
-	})
+	}
+	t.Cleanup(cleanup)
 
 	for i := 101; i < 105; i++ {
 		err := q.AccessToken.WithContext(context.Background()).Create(&dao.AccessToken{
