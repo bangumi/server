@@ -32,8 +32,10 @@ import (
 
 func TestHappyPath(t *testing.T) {
 	t.Parallel()
+	var subjectID model.SubjectIDType = 7
+
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Subject{ID: 7}, nil)
+	m.EXPECT().Get(mock.Anything, subjectID).Return(model.Subject{ID: subjectID}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
@@ -41,10 +43,14 @@ func TestHappyPath(t *testing.T) {
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
 		Return(domain.Permission{}, nil)
 
+	ep := mocks.NewEpisodeRepo(t)
+	ep.EXPECT().Count(mock.Anything, subjectID).Return(3, nil)
+
 	app := test.GetWebApp(t,
 		test.Mock{
 			AuthRepo:    mockAuth,
 			SubjectRepo: m,
+			EpisodeRepo: ep,
 		},
 	)
 
@@ -156,7 +162,7 @@ func TestHandler_GetSubjectImage_302(t *testing.T) {
 			expected, _ := res.SubjectImage("temp").Select(imageType)
 			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
 
-			//should redirect to default image
+			// should redirect to default image
 			resp = test.New(t).Get("/v0/subjects/3/image?type=" + imageType).Execute(app)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
 			require.Equal(t, res.DefaultImageURL, resp.Header.Get("Location"), "should redirect to default image")
