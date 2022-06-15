@@ -91,7 +91,7 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 
 	ws, err := m.repo.Get(ctx, key)
 	if err != nil {
-		return Session{}, errgo.Wrap(err, "mysqlRepo.GetByID")
+		return Session{}, errgo.Wrap(err, "mysqlRepo.Get")
 	}
 
 	now := time.Now()
