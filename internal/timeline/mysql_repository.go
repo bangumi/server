@@ -278,7 +278,7 @@ func parseDoujinMemoBatch(b []byte) ([]DoujinMemo, error) {
 
 	for _, d := range data {
 		var o DoujinMemo
-		err := decodeMap(d, &o)
+		err = decodeMap(d, &o)
 		if err != nil {
 			return nil, err
 		}

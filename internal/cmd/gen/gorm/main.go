@@ -22,7 +22,6 @@ package main
 // disable lint in this package as it's only a generator
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -49,7 +48,6 @@ var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
 // generate code.
 func main() {
-	fmt.Println(timelineIDTypeString)
 	// specify the output directory (default: "./query")
 	// ### if you want to query without context constrain, set mode gen.WithoutContext ###
 	const dalBase = "./internal/dal"
