@@ -74,7 +74,7 @@ bench:
 	.bin/dotenv.exe go run ./internal/cmd/gen/gorm/main.go
 
 coverage: .bin/dotenv.exe .bin/gotestfmt.exe
-	.bin/dotenv.exe env TEST_MYSQL=1 TEST_REDIS=1 go test -json -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages
+	.bin/dotenv.exe bash -c "TEST_MYSQL=1 TEST_REDIS=1 go test -json -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages"
 
 .bin/gotestfmt.exe: go.mod
 	go build -o $@ github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt
