@@ -188,7 +188,7 @@ func (r mysqlRepo) ListSubjectRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.SubjectID) (model.SubjectRevision, error) {
+func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.RevisionID) (model.SubjectRevision, error) {
 	revision, err := r.q.SubjectRevision.WithContext(ctx).
 		Where(r.q.SubjectRevision.ID.Eq(id)).
 		First()

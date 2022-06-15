@@ -29,7 +29,7 @@ type CharacterRepo interface {
 }
 
 type CharacterService interface {
-	Get(ctx context.Context, id uint32) (model.Character, error)
+	Get(ctx context.Context, id model.CharacterID) (model.Character, error)
 
 	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]model.PersonCharacterRelation, error)
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectCharacterRelation, error)

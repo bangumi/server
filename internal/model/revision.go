@@ -22,7 +22,7 @@ import (
 type RevisionCommon struct {
 	CreatedAt time.Time
 	Summary   string
-	ID        uint32
+	ID        RevisionID
 	CreatorID UserID
 	Type      uint8
 }
