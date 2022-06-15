@@ -44,12 +44,12 @@ func TestHandler_GetCollection(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{UserRepo: m})
 
 	var r res.Collection
-	test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
+	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
 		Execute(app).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
 
-	require.Equal(t, subjectID, r.SubjectID)
+	require.Equal(t, subjectID, r.SubjectID, resp.BodyString())
 }
 
 func TestHandler_GetCollection_other_user(t *testing.T) {

@@ -99,7 +99,7 @@ func (_m *SessionManager) Get(ctx context.Context, key string) (session.Session,
 	return r0, r1
 }
 
-// SessionManager_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+// SessionManager_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
 type SessionManager_Get_Call struct {
 	*mock.Call
 }
@@ -108,7 +108,7 @@ type SessionManager_Get_Call struct {
 //  - ctx context.Context
 //  - key string
 func (_e *SessionManager_Expecter) Get(ctx interface{}, key interface{}) *SessionManager_Get_Call {
-	return &SessionManager_Get_Call{Call: _e.mock.On("GetByID", ctx, key)}
+	return &SessionManager_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
 func (_c *SessionManager_Get_Call) Run(run func(ctx context.Context, key string)) *SessionManager_Get_Call {
