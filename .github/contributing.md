@@ -28,7 +28,7 @@ service 和 repository 在[internal/domain/](../internal/domain)定义为 interf
 
 `parser_internal_test.go` 属于 `package wiki`，可以使用 `wiki` 包内的非导出函数和方法。
 
-`parser_test.go` 属于 `package wiki_test`，只能调用 `wiki`包的非导出函数和方法。
+`parser_test.go` 属于 `package wiki_test`，只能使用 `wiki` 包的导出函数和方法。
 
 ### mock 外部资源
 
