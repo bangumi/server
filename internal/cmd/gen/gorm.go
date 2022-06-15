@@ -198,6 +198,7 @@ func main() {
 
 	modelPerson := g.GenerateModelAs("chii_persons", "Person",
 		gen.FieldTrimPrefix("prsn_"),
+		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("prsn_illustrator", "bool"),
 		gen.FieldType("prsn_writer", "bool"),
 		gen.FieldType("prsn_redirect", personIDTypeString),
@@ -210,7 +211,7 @@ func main() {
 	modelCharacter := g.GenerateModelAs("chii_characters", "Character",
 		gen.FieldTrimPrefix("crt_"),
 		gen.FieldType("crt_id", characterIDTypeString),
-		gen.FieldType("crt_redirect", personIDTypeString),
+		gen.FieldType("crt_redirect", characterIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
 			GORMTag: "foreignKey:crt_id;polymorphic:Owner;polymorphicValue:crt",
 		}),
@@ -302,6 +303,7 @@ func main() {
 	g.ApplyBasic(
 		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
 			gen.FieldRename("crt_id", "CharacterID"),
+			gen.FieldType("crt_id", characterIDTypeString),
 			gen.FieldType("subject_id", subjectIDTypeString),
 			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 			gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
@@ -315,6 +317,7 @@ func main() {
 
 	g.ApplyBasic(g.GenerateModelAs("chii_person_cs_index", "PersonSubjects",
 		gen.FieldRename("prsn_id", "person_id"),
+		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("subject_id", subjectIDTypeString),
 		gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{

@@ -24,11 +24,11 @@ import (
 // Put version in cache key to avoid model changes.
 const globalPrefix = "chii:" + config.Version + ":res:"
 
-func Character(id uint32) string {
+func Character(id model.CharacterID) string {
 	return globalPrefix + "character:" + strconv.FormatUint(uint64(id), 10)
 }
 
-func Person(id uint32) string {
+func Person(id model.PersonID) string {
 	return globalPrefix + "person:" + strconv.FormatUint(uint64(id), 10)
 }
 
@@ -36,15 +36,11 @@ func Subject(id model.SubjectID) string {
 	return globalPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
 }
 
-func Episode(id uint32) string {
+func Episode(id model.EpisodeID) string {
 	return globalPrefix + "episode:" + strconv.FormatUint(uint64(id), 10)
 }
 
-func IndexNSFW(id uint32) string {
-	return globalPrefix + "index:nsfw:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func Index(id uint32) string {
+func Index(id model.IndexID) string {
 	return globalPrefix + "index:" + strconv.FormatUint(uint64(id), 10)
 }
 

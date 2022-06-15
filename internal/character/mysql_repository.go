@@ -37,7 +37,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CharacterRepo, error)
 	return mysqlRepo{q: q, log: log.Named("character.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Character, error) {
+func (r mysqlRepo) Get(ctx context.Context, id model.CharacterID) (model.Character, error) {
 	s, err := r.q.Character.WithContext(ctx).Preload(r.q.Character.Fields).Where(r.q.Character.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

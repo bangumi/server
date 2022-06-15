@@ -37,7 +37,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) domain.PersonRepo {
 	return mysqlRepo{q: q, log: log.Named("person.mysqlRepo")}
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Person, error) {
+func (r mysqlRepo) Get(ctx context.Context, id model.PersonID) (model.Person, error) {
 	p, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).Where(r.q.Person.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

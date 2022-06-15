@@ -19,6 +19,7 @@ type GroupID = uint8
 type SubjectID = uint32
 type CharacterID = uint32
 type PersonID = uint32
+type RevisionID = uint32
 type IndexID = uint32
 type EpisodeID = uint32
 type EpType = int16

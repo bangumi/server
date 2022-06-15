@@ -142,7 +142,7 @@ func (r mysqlRepo) GetPersonRelated(
 
 func (r mysqlRepo) GetCharacterRelated(
 	ctx context.Context,
-	characterID model.PersonID,
+	characterID model.CharacterID,
 ) ([]domain.SubjectCharacterRelation, error) {
 	relations, err := r.q.CharacterSubjects.WithContext(ctx).
 		Joins(r.q.CharacterSubjects.Subject).

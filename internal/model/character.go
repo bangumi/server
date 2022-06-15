@@ -20,7 +20,7 @@ type Character struct {
 	Infobox        string
 	Summary        string
 	ID             CharacterID
-	Redirect       uint32
+	Redirect       CharacterID
 	CollectCount   uint32
 	CommentCount   uint32
 	FieldBirthYear uint16

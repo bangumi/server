@@ -59,11 +59,11 @@ func PersonID(s string) (model.PersonID, error) {
 	return uint32NonZero(s)
 }
 
-func CharacterID(s string) (model.PersonID, error) {
+func CharacterID(s string) (model.CharacterID, error) {
 	return uint32NonZero(s)
 }
 
-func EpisodeID(s string) (model.PersonID, error) {
+func EpisodeID(s string) (model.EpisodeID, error) {
 	return uint32NonZero(s)
 }
 

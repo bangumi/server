@@ -31,7 +31,7 @@ type service struct {
 	s    domain.SubjectRepo
 }
 
-func (s service) Get(ctx context.Context, id uint32) (model.Person, error) {
+func (s service) Get(ctx context.Context, id model.PersonID) (model.Person, error) {
 	return s.repo.Get(ctx, id) //nolint:wrapcheck
 }
 

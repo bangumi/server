@@ -21,7 +21,7 @@ import (
 )
 
 type PersonRepo interface {
-	Get(ctx context.Context, id uint32) (model.Person, error)
+	Get(ctx context.Context, id model.PersonID) (model.Person, error)
 	GetByIDs(ctx context.Context, ids ...model.PersonID) (map[model.PersonID]model.Person, error)
 
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectPersonRelation, error)
@@ -29,7 +29,7 @@ type PersonRepo interface {
 }
 
 type PersonService interface {
-	Get(ctx context.Context, id uint32) (model.Person, error)
+	Get(ctx context.Context, id model.PersonID) (model.Person, error)
 
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectPersonRelation, error)
 	GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]model.PersonCharacterRelation, error)

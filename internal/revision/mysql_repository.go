@@ -45,9 +45,9 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.RevisionRepo, error) 
 	return mysqlRepo{q: q, log: log.Named("revision.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) CountPersonRelated(ctx context.Context, id model.PersonID) (int64, error) {
+func (r mysqlRepo) CountPersonRelated(ctx context.Context, personID model.PersonID) (int64, error) {
 	c, err := r.q.RevisionHistory.WithContext(ctx).
-		Where(r.q.RevisionHistory.Mid.Eq(id), r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).Count()
+		Where(r.q.RevisionHistory.Mid.Eq(personID), r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).Count()
 	if err != nil {
 		return 0, errgo.Wrap(err, "dal")
 	}
@@ -73,7 +73,7 @@ func (r mysqlRepo) ListPersonRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.PersonID) (model.PersonRevision, error) {
+func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.RevisionID) (model.PersonRevision, error) {
 	revision, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.ID.Eq(id),
 			r.q.RevisionHistory.Type.In(model.PersonRevisionTypes()...)).
@@ -131,7 +131,7 @@ func (r mysqlRepo) ListCharacterRelated(
 	return result, nil
 }
 
-func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.CharacterID) (model.CharacterRevision, error) {
+func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.RevisionID) (model.CharacterRevision, error) {
 	revision, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(r.q.RevisionHistory.ID.Eq(id),
 			r.q.RevisionHistory.Type.In(model.CharacterRevisionTypes()...)).

@@ -62,7 +62,7 @@ func (s service) GetPersonRelated(
 }
 
 func (s service) GetCharacterRelated(
-	ctx context.Context, characterID model.PersonID,
+	ctx context.Context, characterID model.CharacterID,
 ) ([]model.SubjectCharacterRelation, error) {
 	relations, err := s.repo.GetCharacterRelated(ctx, characterID)
 	if err != nil {

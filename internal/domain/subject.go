@@ -26,7 +26,7 @@ type SubjectRepo interface {
 	GetByIDs(ctx context.Context, ids ...model.SubjectID) (map[model.SubjectID]model.Subject, error)
 
 	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, characterID model.PersonID) ([]SubjectCharacterRelation, error)
+	GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]SubjectCharacterRelation, error)
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectInternalRelation, error)
 
 	GetActors(
@@ -39,7 +39,7 @@ type SubjectService interface {
 	Get(ctx context.Context, id model.SubjectID) (model.Subject, error)
 
 	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]model.SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, characterID model.PersonID) ([]model.SubjectCharacterRelation, error)
+	GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]model.SubjectCharacterRelation, error)
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectInternalRelation, error)
 
 	GetActors(

@@ -61,7 +61,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 		"email":              "a@example.com",
 		"password":           "p",
 		"h-captcha-response": "req",
-	}).Execute(app)
+	}).Execute(app, 3000)
 
 	require.Equal(t, fiber.StatusOK, resp.StatusCode, resp.BodyString())
 
