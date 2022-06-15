@@ -140,10 +140,30 @@ paths:
         "401":
           description: 用户未登录或者 session 已失效
 
+  "/p/group/{name}":
+    get:
+      summary: 登出
+      operationId: getCurrentUser
+      parameters:
+        - name: name
+          in: path
+          required: true
+      responses:
+        "200":
+          description: "返回当前用户"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "404":
+          description: 小组不存在
+
 components:
   schemas:
     User:
       $ref: "./components/user.yaml"
+    Group:
+      $ref: "./components/group.yaml"
     Avatar:
       $ref: "./components/avatar.yaml"
     ErrorDetail:

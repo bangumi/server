@@ -24,9 +24,9 @@ properties:
   title:
     type: string
 required:
-- name
-- title
-- description
-- icon
-- created_at
+  - name
+  - title
+  - description
+  - icon
+  - created_at
 type: object
