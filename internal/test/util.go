@@ -22,6 +22,8 @@ import (
 
 // RunAndCleanup will run a function immediately and add it to t.Cleanup.
 func RunAndCleanup(tb testing.TB, f func()) {
+	tb.Helper()
+
 	f()
 	tb.Cleanup(f)
 }
@@ -29,6 +31,8 @@ func RunAndCleanup(tb testing.TB, f func()) {
 // RunAndCleanupE will run a function immediately and add it to t.Cleanup.
 // will also assert function return no error.
 func RunAndCleanupE(tb testing.TB, f func() error) {
+	tb.Helper()
+
 	require.NoError(tb, f())
 	tb.Cleanup(func() {
 		require.NoError(tb, f())

@@ -67,7 +67,7 @@ func TestMysqlRepo_GetCollection(t *testing.T) {
 	require.Equal(t, uint8(2), c.Rate)
 }
 
-// env TEST_MYSQL=1 go test ./internal/collection -run TestMysqlRepo_UpdateCollection_Create
+// env TEST_MYSQL=1 go test ./internal/collection -run TestMysqlRepo_UpdateCollection_Create.
 func TestMysqlRepo_UpdateCollection_Create(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
@@ -95,7 +95,7 @@ func TestMysqlRepo_UpdateCollection_Create(t *testing.T) {
 	require.Equal(t, now.Unix(), c.UpdatedAt.Unix())
 }
 
-// env TEST_MYSQL=1 go test ./internal/collection -run TestMysqlRepo_UpdateCollection_Update
+// env TEST_MYSQL=1 go test ./internal/collection -run TestMysqlRepo_UpdateCollection_Update.
 func TestMysqlRepo_UpdateCollection_Update(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)

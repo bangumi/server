@@ -39,7 +39,8 @@ func TestHandler_GetCollection(t *testing.T) {
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
-	m.EXPECT().GetCollection(mock.Anything, userID, mock.Anything).Return(model.SubjectCollection{SubjectID: subjectID}, nil)
+	m.EXPECT().GetCollection(mock.Anything, userID, mock.Anything).
+		Return(model.SubjectCollection{SubjectID: subjectID}, nil)
 
 	app := test.GetWebApp(t, test.Mock{UserRepo: m})
 
