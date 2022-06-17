@@ -59,6 +59,7 @@ type Mock struct {
 	UserRepo       domain.UserRepo
 	IndexRepo      domain.IndexRepo
 	RevisionRepo   domain.RevisionRepo
+	CollectionRepo domain.CollectionRepo
 	CaptchaManager captcha.Manager
 	SessionManager session.Manager
 	Cache          cache.Generic
@@ -89,6 +90,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		),
 
 		MockPersonRepo(m.PersonRepo),
+		MockCollectionRepo(m.CollectionRepo),
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
@@ -165,6 +167,16 @@ func MockSessionManager(repo session.Manager) fx.Option {
 	}
 
 	return fx.Provide(func() session.Manager { return repo })
+}
+
+func MockCollectionRepo(repo domain.CollectionRepo) fx.Option {
+	if repo == nil {
+		mocker := &mocks.CollectionRepo{}
+
+		repo = mocker
+	}
+
+	return fx.Provide(func() domain.CollectionRepo { return repo })
 }
 
 func MockCaptchaManager(repo captcha.Manager) fx.Option {

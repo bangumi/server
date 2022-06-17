@@ -36,6 +36,7 @@ func getRepo(t *testing.T) domain.UserRepo {
 	return repo
 }
 
+// env TEST_MYSQL=1 go test ./internal/user -run TestGetByID
 func TestGetByID(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
