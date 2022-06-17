@@ -52,3 +52,20 @@ func InternalError(c *fiber.Ctx, err error, message string) error {
 		Details:     err.Error(),
 	})
 }
+
+const DefaultUnauthorizedMessage = "you are not allowed to do this"
+
+func Unauthorized(c *fiber.Ctx, message string) error {
+	return JSON(c.Status(code.Unauthorized), Error{
+		Title:       "Unauthorized",
+		Description: message,
+	})
+}
+
+func NotFound(c *fiber.Ctx, message string) error {
+	return JSON(c.Status(code.NotFound), Error{
+		Title:       "Not Found",
+		Description: message,
+		Details:     util.DetailFromRequest(c),
+	})
+}

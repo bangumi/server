@@ -17,13 +17,13 @@ x-ms-enum:
   modelAsString: false
   values:
     - Wish
-    - Collect
+    - Done
     - Doing
     - OnHold
     - Dropped
 x-enum-varnames:
   - Wish
-  - Collect
+  - Done
   - Doing
   - OnHold
   - Dropped

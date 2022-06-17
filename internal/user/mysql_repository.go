@@ -78,7 +78,7 @@ func (m mysqlRepo) ListCollections(
 	collectionType uint8,
 	showPrivate bool,
 	limit, offset int,
-) ([]model.Collection, error) {
+) ([]model.SubjectCollection, error) {
 	q := m.q.SubjectCollection.WithContext(ctx).
 		Order(m.q.SubjectCollection.Lasttouch.Desc()).
 		Where(m.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
@@ -101,9 +101,9 @@ func (m mysqlRepo) ListCollections(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var results = make([]model.Collection, len(collections))
+	var results = make([]model.SubjectCollection, len(collections))
 	for i, c := range collections {
-		results[i] = model.Collection{
+		results[i] = model.SubjectCollection{
 			UpdatedAt:   time.Unix(int64(c.Lasttouch), 0),
 			Comment:     c.Comment,
 			Tags:        strutil.Split(c.Tag, " "),
@@ -122,19 +122,19 @@ func (m mysqlRepo) ListCollections(
 
 func (m mysqlRepo) GetCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-) (model.Collection, error) {
+) (model.SubjectCollection, error) {
 	c, err := m.q.SubjectCollection.WithContext(ctx).
 		Where(m.q.SubjectCollection.UserID.Eq(userID), m.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Collection{}, domain.ErrNotFound
+			return model.SubjectCollection{}, domain.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
-		return model.Collection{}, errgo.Wrap(err, "dal")
+		return model.SubjectCollection{}, errgo.Wrap(err, "dal")
 	}
 
-	return model.Collection{
+	return model.SubjectCollection{
 		UpdatedAt:   time.Unix(int64(c.Lasttouch), 0),
 		Comment:     c.Comment,
 		Tags:        strutil.Split(c.Tag, " "),

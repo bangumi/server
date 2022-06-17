@@ -43,7 +43,11 @@ type UserRepo interface {
 		collectionType uint8,
 		showPrivate bool,
 		limit, offset int,
-	) ([]model.Collection, error)
+	) ([]model.SubjectCollection, error)
 
-	GetCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) (model.Collection, error)
+	GetCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) (model.SubjectCollection, error)
+
+	UpdateCollection(
+		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
+	) error
 }

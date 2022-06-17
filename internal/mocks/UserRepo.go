@@ -223,14 +223,14 @@ func (_c *UserRepo_GetByName_Call) Return(_a0 model.User, _a1 error) *UserRepo_G
 }
 
 // GetCollection provides a mock function with given fields: ctx, userID, subjectID
-func (_m *UserRepo) GetCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) (model.Collection, error) {
+func (_m *UserRepo) GetCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) (model.SubjectCollection, error) {
 	ret := _m.Called(ctx, userID, subjectID)
 
-	var r0 model.Collection
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID) model.Collection); ok {
+	var r0 model.SubjectCollection
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID) model.SubjectCollection); ok {
 		r0 = rf(ctx, userID, subjectID)
 	} else {
-		r0 = ret.Get(0).(model.Collection)
+		r0 = ret.Get(0).(model.SubjectCollection)
 	}
 
 	var r1 error
@@ -263,21 +263,21 @@ func (_c *UserRepo_GetCollection_Call) Run(run func(ctx context.Context, userID 
 	return _c
 }
 
-func (_c *UserRepo_GetCollection_Call) Return(_a0 model.Collection, _a1 error) *UserRepo_GetCollection_Call {
+func (_c *UserRepo_GetCollection_Call) Return(_a0 model.SubjectCollection, _a1 error) *UserRepo_GetCollection_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
 // ListCollections provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate, limit, offset
-func (_m *UserRepo) ListCollections(ctx context.Context, userID model.UserID, subjectType uint8, collectionType uint8, showPrivate bool, limit int, offset int) ([]model.Collection, error) {
+func (_m *UserRepo) ListCollections(ctx context.Context, userID model.UserID, subjectType uint8, collectionType uint8, showPrivate bool, limit int, offset int) ([]model.SubjectCollection, error) {
 	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
 
-	var r0 []model.Collection
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, uint8, uint8, bool, int, int) []model.Collection); ok {
+	var r0 []model.SubjectCollection
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, uint8, uint8, bool, int, int) []model.SubjectCollection); ok {
 		r0 = rf(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.Collection)
+			r0 = ret.Get(0).([]model.SubjectCollection)
 		}
 	}
 
@@ -315,8 +315,48 @@ func (_c *UserRepo_ListCollections_Call) Run(run func(ctx context.Context, userI
 	return _c
 }
 
-func (_c *UserRepo_ListCollections_Call) Return(_a0 []model.Collection, _a1 error) *UserRepo_ListCollections_Call {
+func (_c *UserRepo_ListCollections_Call) Return(_a0 []model.SubjectCollection, _a1 error) *UserRepo_ListCollections_Call {
 	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// UpdateCollection provides a mock function with given fields: ctx, userID, subjectID, data
+func (_m *UserRepo) UpdateCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate) error {
+	ret := _m.Called(ctx, userID, subjectID, data)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID, model.SubjectCollectionUpdate) error); ok {
+		r0 = rf(ctx, userID, subjectID, data)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UserRepo_UpdateCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateCollection'
+type UserRepo_UpdateCollection_Call struct {
+	*mock.Call
+}
+
+// UpdateCollection is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID model.UserID
+//  - subjectID model.SubjectID
+//  - data model.SubjectCollectionUpdate
+func (_e *UserRepo_Expecter) UpdateCollection(ctx interface{}, userID interface{}, subjectID interface{}, data interface{}) *UserRepo_UpdateCollection_Call {
+	return &UserRepo_UpdateCollection_Call{Call: _e.mock.On("UpdateCollection", ctx, userID, subjectID, data)}
+}
+
+func (_c *UserRepo_UpdateCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate)) *UserRepo_UpdateCollection_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.SubjectID), args[3].(model.SubjectCollectionUpdate))
+	})
+	return _c
+}
+
+func (_c *UserRepo_UpdateCollection_Call) Return(_a0 error) *UserRepo_UpdateCollection_Call {
+	_c.Call.Return(_a0)
 	return _c
 }
 

@@ -25,6 +25,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.2
 	github.com/uber-go/tally/v4 v4.1.1
+	github.com/volatiletech/null/v9 v9.0.0
 	go.uber.org/fx v1.17.1
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
@@ -76,12 +77,11 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/dig v1.14.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sys v0.0.0-20220307203707-22a9840ba4d7 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.10 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	golang.org/x/tools v0.1.11 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gorm.io/datatypes v1.0.7-0.20220608135749-9359a769c0b6 // indirect
 	gorm.io/hints v1.1.0 // indirect

@@ -15,8 +15,6 @@
 package res
 
 import (
-	"time"
-
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -59,19 +57,6 @@ type User struct {
 	Nickname  string       `json:"nickname"`
 	ID        model.UserID `json:"id"`
 	UserGroup uint8        `json:"user_group"`
-}
-
-type Collection struct {
-	UpdatedAt   time.Time       `json:"updated_at"`
-	Comment     *string         `json:"comment"`
-	Tags        []string        `json:"tags"`
-	SubjectID   model.SubjectID `json:"subject_id"`
-	EpStatus    uint32          `json:"ep_status"`
-	VolStatus   uint32          `json:"vol_status"`
-	SubjectType uint8           `json:"subject_type"`
-	Type        uint8           `json:"type"`
-	Rate        uint8           `json:"rate"`
-	Private     bool            `json:"private"`
 }
 
 type Creator struct {

@@ -18,13 +18,16 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strparse"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/res/code"
 )
@@ -92,9 +95,9 @@ func (h Handler) listCollection(
 		return errgo.Wrap(err, "user.ListCollections")
 	}
 
-	var data = make([]res.Collection, len(collections))
+	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
-		c := res.Collection{
+		c := res.SubjectCollection{
 			SubjectID:   collection.SubjectID,
 			SubjectType: collection.SubjectType,
 			Rate:        collection.Rate,
@@ -178,7 +181,77 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 		return res.HTTPError(c, code.NotFound, notFoundMessage)
 	}
 
-	return res.JSON(c, res.Collection{
+	return res.JSON(c, res.SubjectCollection{
+		SubjectID:   collection.SubjectID,
+		SubjectType: collection.SubjectType,
+		Rate:        collection.Rate,
+		Type:        collection.Type,
+		Tags:        collection.Tags,
+		EpStatus:    collection.EpStatus,
+		VolStatus:   collection.VolStatus,
+		UpdatedAt:   collection.UpdatedAt,
+		Private:     collection.Private,
+		Comment:     nilString(collection.Comment),
+	})
+}
+
+func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
+	v := h.getHTTPAccessor(c)
+	if !v.login {
+		return res.Unauthorized(c, res.DefaultUnauthorizedMessage)
+	}
+
+	subjectID, err := parseSubjectID(c.Params("subject_id"))
+	if err != nil {
+		return err
+	}
+
+	var input req.PutSubjectCollection
+	if err = json.UnmarshalNoEscape(c.Body(), &input); err != nil {
+		return res.WithError(c, err, code.UnprocessableEntity, "can't decode request body as json")
+	}
+
+	const notFoundMessage = "subject is not found"
+
+	_, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
+	if err != nil {
+		return h.InternalServerError(c, err, "failed to get subject info")
+	}
+
+	if !ok {
+		return res.NotFound(c, "subject not found, maybe locked")
+	}
+
+	_, err = h.u.GetCollection(c.Context(), v.ID, subjectID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.HTTPError(c, code.NotFound, notFoundMessage)
+		}
+
+		return errgo.Wrap(err, "user.GetCollection")
+	}
+
+	var update = model.SubjectCollectionUpdate{
+		UpdatedAt: time.Now(),
+		Comment:   input.Comment,
+		Tags:      input.Tags,
+		VolStatus: input.VolStatus,
+		EpStatus:  input.EpStatus,
+		Rate:      input.Rate,
+		Type:      input.Type,
+		Private:   input.Private,
+	}
+
+	if err = h.u.UpdateCollection(c.Context(), v.ID, subjectID, update); err != nil {
+		return h.InternalServerError(c, err, "failed to update subject collection")
+	}
+
+	collection, err := h.u.GetCollection(c.Context(), v.ID, subjectID)
+	if err != nil {
+		return errgo.Wrap(err, "user.GetCollection")
+	}
+
+	return res.JSON(c, res.SubjectCollection{
 		SubjectID:   collection.SubjectID,
 		SubjectType: collection.SubjectType,
 		Rate:        collection.Rate,

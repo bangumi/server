@@ -38,7 +38,7 @@ const (
 	CollectPrivacyBan = 2
 )
 
-type Collection struct {
+type SubjectCollection struct {
 	UpdatedAt   time.Time
 	Comment     string
 	Tags        []string
@@ -49,4 +49,15 @@ type Collection struct {
 	Rate        uint8
 	Type        uint8
 	Private     bool
+}
+
+type SubjectCollectionUpdate struct {
+	UpdatedAt time.Time
+	Comment   string
+	Tags      []string
+	VolStatus uint32
+	EpStatus  uint32
+	Rate      uint8
+	Type      CollectionType
+	Private   bool
 }

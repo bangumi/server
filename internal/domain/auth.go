@@ -42,7 +42,7 @@ type AuthRepo interface {
 // Auth is the basic authorization represent a user.
 type Auth struct {
 	RegTime    time.Time
-	ID         model.UserID // user id
+	ID         model.UserID
 	GroupID    model.UserGroupID
 	Permission Permission `json:"-"` // disable cache for this field.
 }
