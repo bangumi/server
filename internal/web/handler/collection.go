@@ -211,6 +211,12 @@ func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
 		return res.WithError(c, err, code.UnprocessableEntity, "can't decode request body as json")
 	}
 
+	return h.putSubjectCollection(c, v.ID, subjectID, input)
+}
+
+func (h Handler) putSubjectCollection(
+	c *fiber.Ctx, userID model.UserID, subjectID model.SubjectID, input req.PutSubjectCollection,
+) error {
 	const notFoundMessage = "subject is not found"
 
 	s, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
@@ -222,7 +228,7 @@ func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
 		return res.NotFound(c, "subject not found, maybe locked")
 	}
 
-	_, err = h.collect.GetCollection(c.Context(), v.ID, subjectID)
+	_, err = h.collect.GetCollection(c.Context(), userID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.HTTPError(c, code.NotFound, notFoundMessage)
@@ -243,11 +249,11 @@ func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
 		Private:     input.Private,
 	}
 
-	if err = h.collect.UpdateCollection(c.Context(), v.ID, subjectID, update); err != nil {
+	if err = h.collect.UpdateCollection(c.Context(), userID, subjectID, update); err != nil {
 		return h.InternalServerError(c, err, "failed to update subject collection")
 	}
 
-	collection, err := h.collect.GetCollection(c.Context(), v.ID, subjectID)
+	collection, err := h.collect.GetCollection(c.Context(), userID, subjectID)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetCollection")
 	}
