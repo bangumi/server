@@ -27,7 +27,9 @@ type UserRepo interface {
 	GetByName(ctx context.Context, username string) (model.User, error)
 
 	GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error)
+}
 
+type CollectionRepo interface {
 	CountCollections(
 		ctx context.Context,
 		userID model.UserID,

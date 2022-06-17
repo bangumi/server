@@ -76,7 +76,7 @@ func (h Handler) listCollection(
 	page pageQuery,
 	showPrivate bool,
 ) error {
-	count, err := h.u.CountCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
+	count, err := h.collect.CountCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
 		return errgo.Wrap(err, "user.CountCollections")
 	}
@@ -89,7 +89,7 @@ func (h Handler) listCollection(
 		return err
 	}
 
-	collections, err := h.u.ListCollections(c.Context(),
+	collections, err := h.collect.ListCollections(c.Context(),
 		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "user.ListCollections")
@@ -168,7 +168,7 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 
 	var showPrivate = u.ID == v.ID
 
-	collection, err := h.u.GetCollection(c.Context(), u.ID, subjectID)
+	collection, err := h.collect.GetCollection(c.Context(), u.ID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.HTTPError(c, code.NotFound, notFoundMessage)
@@ -213,7 +213,7 @@ func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
 
 	const notFoundMessage = "subject is not found"
 
-	_, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
+	s, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
 	if err != nil {
 		return h.InternalServerError(c, err, "failed to get subject info")
 	}
@@ -222,7 +222,7 @@ func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
 		return res.NotFound(c, "subject not found, maybe locked")
 	}
 
-	_, err = h.u.GetCollection(c.Context(), v.ID, subjectID)
+	_, err = h.collect.GetCollection(c.Context(), v.ID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.HTTPError(c, code.NotFound, notFoundMessage)
@@ -232,21 +232,22 @@ func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
 	}
 
 	var update = model.SubjectCollectionUpdate{
-		UpdatedAt: time.Now(),
-		Comment:   input.Comment,
-		Tags:      input.Tags,
-		VolStatus: input.VolStatus,
-		EpStatus:  input.EpStatus,
-		Rate:      input.Rate,
-		Type:      input.Type,
-		Private:   input.Private,
+		UpdatedAt:   time.Now(),
+		SubjectType: s.TypeID,
+		Comment:     input.Comment,
+		Tags:        input.Tags,
+		VolStatus:   input.VolStatus,
+		EpStatus:    input.EpStatus,
+		Rate:        input.Rate,
+		Type:        input.Type,
+		Private:     input.Private,
 	}
 
-	if err = h.u.UpdateCollection(c.Context(), v.ID, subjectID, update); err != nil {
+	if err = h.collect.UpdateCollection(c.Context(), v.ID, subjectID, update); err != nil {
 		return h.InternalServerError(c, err, "failed to update subject collection")
 	}
 
-	collection, err := h.u.GetCollection(c.Context(), v.ID, subjectID)
+	collection, err := h.collect.GetCollection(c.Context(), v.ID, subjectID)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetCollection")
 	}

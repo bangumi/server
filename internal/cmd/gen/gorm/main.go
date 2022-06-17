@@ -174,6 +174,13 @@ func main() {
 		gen.FieldType("interest_type", "uint8"),
 		gen.FieldType("interest_uid", userIDTypeString),
 		gen.FieldRename("interest_uid", "UserID"),
+
+		gen.FieldRename("interest_collect_dateline", "DoneAt"),
+		gen.FieldRename("interest_doing_dateline", "DoingAt"),
+		gen.FieldRename("interest_on_hold_dateline", "OnHoldAt"),
+		gen.FieldRename("interest_dropped_dateline", "droppedAt"),
+		gen.FieldRename("interest_wish_dateline", "wishAt"),
+		gen.FieldRename("interest_lasttouch", "UpdatedAt"),
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
 		gen.FieldTrimPrefix("interest_")))
