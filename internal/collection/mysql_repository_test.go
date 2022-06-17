@@ -73,7 +73,7 @@ func TestMysqlRepo_UpdateCollection_Create(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 
 	const userID model.UserID = 382951
-	const subjectID model.SubjectID = 888998
+	const subjectID model.SubjectID = 888999
 
 	repo, q := getRepo(t)
 
@@ -101,7 +101,7 @@ func TestMysqlRepo_UpdateCollection_Update(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 
 	const userID model.UserID = 382951
-	const subjectID model.SubjectID = 888998
+	const subjectID model.SubjectID = 888990
 
 	repo, q := getRepo(t)
 
