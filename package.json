@@ -8,6 +8,11 @@
     "start": "nodemon openapi/dev-server.js",
     "version": "node scripts/bump.js"
   },
+  "lint-stages": {
+    "pre-commit": {
+      "*.{js,ts,yaml,yml,json}": "prettier -w"
+    }
+  },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "@koa/router": "^10.1.1",
@@ -15,10 +20,9 @@
     "conventional-changelog": "^3.1.25",
     "js-yaml": "^4.1.0",
     "koa": "^2.13.4",
+    "lint-staged": "^13.0.2",
     "lodash": "^4.17.21",
-    "prettier": "^2.6.2"
-  },
-  "devDependencies": {
+    "prettier": "^2.6.2",
     "@types/conventional-changelog": "^3.1.1",
     "livereload": "^0.9.3",
     "nodemon": "^2.0.16"
