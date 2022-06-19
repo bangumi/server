@@ -37,5 +37,6 @@ func DetailFromRequest(c *fiber.Ctx) Detail {
 type Detail struct {
 	Error       string `json:"error,omitempty"`
 	Path        string `json:"path,omitempty"`
+	Method      string `json:"method,omitempty"`
 	QueryString string `json:"query_string,omitempty"`
 }

@@ -128,7 +128,7 @@ func getDefaultErrorHandler() func(c *fiber.Ctx, err error) error {
 				zap.Error(err),
 				zap.String("path", ctx.Path()),
 				zap.ByteString("query", ctx.Request().URI().QueryString()),
-				zap.String("cf-ray", ctx.Get("cf-ray")),
+				zap.String("cf-ray", ctx.Get(handler.HeaderCFRay)),
 			)
 		}
 
@@ -138,6 +138,7 @@ func getDefaultErrorHandler() func(c *fiber.Ctx, err error) error {
 			Details: util.Detail{
 				Error:       err.Error(),
 				Path:        ctx.Path(),
+				Method:      ctx.Method(),
 				QueryString: utils.UnsafeString(ctx.Request().URI().QueryString()),
 			},
 		})
