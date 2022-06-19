@@ -26,7 +26,7 @@ async function main() {
     const openapi = await $RefParser.bundle(path.join(__dirname, filePath));
 
     try {
-      console.log("try to lint", filePath)
+      console.log("try to lint", filePath);
       // JSON deep copy to remove anchor
       await validator.validate(JSON.parse(JSON.stringify(openapi)), {
         lint: true,
