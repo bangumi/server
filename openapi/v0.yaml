@@ -18,8 +18,11 @@ x-parameters:
     required: true
     name: subject_id
     description: 条目 ID
-    schema:
-      $ref: "#/components/schemas/SubjectID"
+    schema: &schema_subject_id
+      title: Subject ID
+      minimum: 1
+      description: 条目 ID
+      type: integer
     in: path
 
   path_character_id: &path_character_id
@@ -45,7 +48,10 @@ x-parameters:
   path_episode_id: &path_episode_id
     required: true
     schema:
-      $ref: "#/components/schemas/EpisodeID"
+      title: Episode ID
+      minimum: 1
+      description: 剧集 ID
+      type: integer
     name: episode_id
     description: 章节 ID
     in: path
@@ -54,14 +60,13 @@ x-parameters:
     required: true
     name: subject_id
     description: 条目 ID
-    schema:
-      $ref: "#/components/schemas/SubjectID"
+    schema: *schema_subject_id
     in: query
 
   path_username: &path_username
     required: true
     schema:
-      $ref: "#/components/schemas/UserName"
+      type: string
     description: 设置了用户名之后无法使用 UID。
     name: username
     in: path
@@ -1102,19 +1107,6 @@ components:
       $ref: "./components/avatar.yaml"
     UserGroup:
       $ref: "./components/user_group.yaml"
-    UserName:
-      type: string
-      description: 获取用户信息，设置了 username 之后无法使用数字 UID。
-    SubjectID:
-      title: Subject ID
-      minimum: 1
-      description: 条目 ID
-      type: integer
-    EpisodeID:
-      title: Episode ID
-      minimum: 1
-      description: 剧集 ID
-      type: integer
     BloodType:
       title: BloodType
       enum:
