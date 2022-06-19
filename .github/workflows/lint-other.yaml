@@ -41,6 +41,4 @@ jobs:
       - name: prettier
         run: npm run format
 
-      - run: git diff --exit-code
-
       - uses: reviewdog/action-suggester@v1
