@@ -7,7 +7,7 @@ example:
   "username": "sai"
   "nickname": "Sai🖖"
   "id": 1
-  "user_group": 1
+  "user_group":  1
 title: User
 description: |
   实际的返回值可能包括文档未声明的 `url` 字段，此字段主要用于开发者从 api 响应直接转跳到网页。
