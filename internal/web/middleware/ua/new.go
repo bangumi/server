@@ -25,8 +25,9 @@ import (
 
 var _ fiber.Handler = DisableDefaultHTTPLibrary
 
-const forbiddenMessage = "default HTTP request library User-Agent is forbidden, " +
-	"please use your app name (maybe and version) as User-Agent"
+const forbiddenMessage = "using HTTP request library's default User-Agent is forbidden, " +
+	"please read the document for User-Agent suggestion " +
+	"https://github.com/bangumi/api/blob/master/docs-raw/user%20agent.md"
 
 func DisableDefaultHTTPLibrary(c *fiber.Ctx) error {
 	u := c.Get(fiber.HeaderUserAgent)
