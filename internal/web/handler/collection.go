@@ -238,6 +238,10 @@ func (h Handler) putSubjectCollection(
 		return errgo.Wrap(err, "user.GetCollection")
 	}
 
+	if s.TypeID != model.SubjectBook && input.VolStatus != 0 {
+		return res.HTTPError(c, code.BadRequest, "subject is not book, you can't update `vol_status`")
+	}
+
 	var update = model.SubjectCollectionUpdate{
 		UpdatedAt:   time.Now(),
 		SubjectType: s.TypeID,

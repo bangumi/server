@@ -17,12 +17,15 @@ package collection
 import (
 	"context"
 	"errors"
+	"fmt"
+	"reflect"
 	"strings"
 	"time"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"gorm.io/gorm/schema"
 
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
@@ -34,12 +37,22 @@ import (
 )
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CollectionRepo, error) {
-	return mysqlRepo{q: q, log: log.Named("collection.mysqlRepo")}, nil
+	columns, err := getAllNonIndexFields(dao.SubjectCollection{})
+	if err != nil {
+		return nil, err
+	}
+
+	return mysqlRepo{
+		q:             q,
+		log:           log.Named("collection.mysqlRepo"),
+		subjectUpsert: clause.OnConflict{DoUpdates: clause.AssignmentColumns(columns)},
+	}, nil
 }
 
 type mysqlRepo struct {
-	q   *query.Query
-	log *zap.Logger
+	q             *query.Query
+	log           *zap.Logger
+	subjectUpsert clause.OnConflict
 }
 
 func (m mysqlRepo) UpdateCollection(
@@ -56,7 +69,7 @@ func (m mysqlRepo) UpdateCollection(
 		Comment:     data.Comment,
 		Tag:         strings.Join(data.Tags, " "),
 		EpStatus:    data.EpStatus,
-		VolStatus:   data.EpStatus,
+		VolStatus:   data.VolStatus,
 		UpdatedAt:   uint32(data.UpdatedAt.Unix()),
 		Private:     0,
 	}
@@ -74,11 +87,7 @@ func (m mysqlRepo) UpdateCollection(
 		d.DroppedAt = d.UpdatedAt
 	}
 
-	err := m.q.SubjectCollection.WithContext(ctx).Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "interest_uid"}, {Name: "interest_subject_id"}},
-		UpdateAll: true,
-	}).Create(d)
-
+	err := m.q.SubjectCollection.WithContext(ctx).Clauses(m.subjectUpsert).Create(d)
 	if err != nil {
 		m.log.Error("unexpected error happened when updating subject collection", zap.Error(err),
 			log.UserID(userID), log.SubjectID(subjectID), zap.Reflect("dao", d), zap.Reflect("data", data))
@@ -193,4 +202,22 @@ func (m mysqlRepo) GetCollection(
 		Type:        model.CollectionType(c.Type),
 		Private:     c.Private != model.CollectPrivacyNone,
 	}, nil
+}
+
+func getAllNonIndexFields(v interface{}) ([]string, error) {
+	rvType := reflect.TypeOf(v)
+	s := make([]string, 0, rvType.NumField())
+	for i := 0; i < rvType.NumField(); i++ {
+		cfg := schema.ParseTagSetting(rvType.Field(i).Tag.Get("gorm"), ";")
+		column := cfg[strings.ToUpper("column")]
+		if column == "" {
+			return nil, fmt.Errorf("failed to parse struct field %s, '%s' ,%v", rvType.Field(i).Name, rvType.Field(i).Tag.Get("gorm"), column)
+		}
+		if column == "interest_id" || column == "interest_uid" || column == "interest_subject_id" {
+			continue
+		}
+		s = append(s, column)
+	}
+
+	return s, nil
 }

@@ -17,6 +17,7 @@ package web
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -24,6 +25,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/utils"
+	"github.com/gookit/goutil/timex"
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/zap"
@@ -33,10 +35,15 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
+	"github.com/bangumi/server/internal/random"
+	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/middleware/recovery"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/util"
 )
+
+const headerProcessTime = "x-process-time-ms"
+const headerServerVersion = "x-server-version"
 
 func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 	app := fiber.New(fiber.Config{
@@ -57,14 +64,24 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 
 		sub := time.Since(start)
 		histogram.RecordDuration(sub)
-		c.Set("x-process-time-ms", strconv.FormatInt(sub.Milliseconds(), 10))
-		c.Set("x-server-version", config.Version)
+		c.Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
+		c.Set(headerServerVersion, config.Version)
 
 		return err
 	})
 
 	if config.Development {
-		app.Use(cors.New())
+		app.Use(func(c *fiber.Ctx) error {
+			devRequestID := "fake-ray-" + random.Base62String(10)
+			c.Request().Header.Set(handler.HeaderCFRay, devRequestID)
+			c.Set(handler.HeaderCFRay, devRequestID)
+
+			return c.Next()
+		})
+		app.Use(cors.New(cors.Config{
+			MaxAge:        timex.OneWeekSec,
+			ExposeHeaders: strings.Join([]string{headerProcessTime, headerServerVersion, handler.HeaderCFRay}, ","),
+		}))
 	}
 
 	app.Use(recovery.New())

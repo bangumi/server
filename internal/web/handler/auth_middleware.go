@@ -34,7 +34,7 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
-const headerCFRay = "Cf-Ray"
+const HeaderCFRay = "Cf-Ray"
 
 var accessorPool = sync.Pool{New: func() interface{} { return &accessor{} }} //nolint:gochecknoglobals
 
@@ -132,7 +132,7 @@ func (a *accessor) AllowNSFW() bool {
 
 func (a *accessor) fillBasicInfo(c *fiber.Ctx) {
 	a.login = false
-	a.cfRay = c.Get(headerCFRay)
+	a.cfRay = c.Get(HeaderCFRay)
 	a.ip = util.RequestIP(c)
 }
 
