@@ -803,7 +803,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UserCollection"
+                "$ref": "#/components/schemas/UserSubjectCollection"
         "400":
           description: Validation Error
           content:
@@ -818,6 +818,49 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+
+  "/users/-/collections/:subject_id":
+    put:
+      tags:
+        - 收藏
+      summary: 更新用户条目收藏状态
+      description: 获取对应用户的收藏，查看私有收藏需要access token。
+      operationId: putUserCollection
+      parameters:
+        - required: true
+          schema:
+            title: subject ID
+            type: integer
+          name: subject_id
+          in: path
+      requestBody:
+        description: 收藏信息
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/PutSubjectCollection"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserSubjectCollection"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 用户不存在或者条目未收藏，或者条目为私有收藏
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - HTTPBearer: []
 
   "/v0/revisions/persons":
     get:
@@ -1230,6 +1273,8 @@ components:
     UserName:
       type: string
       description: 获取用户信息，设置了 username 之后无法使用数字 UID。
+    PutSubjectCollection:
+      $ref: "./components/put_subject_collection.yaml"
     BloodType:
       title: BloodType
       enum:
@@ -1971,7 +2016,7 @@ components:
           title: Data
           type: array
           items:
-            "$ref": "#/components/schemas/UserCollection"
+            "$ref": "#/components/schemas/UserSubjectCollection"
           default: []
     Person:
       title: Person
@@ -2419,7 +2464,7 @@ components:
         count:
           title: Count
           type: integer
-    UserCollection:
+    UserSubjectCollection:
       $ref: "./components/subject_collection.yaml"
     V:
       title: V

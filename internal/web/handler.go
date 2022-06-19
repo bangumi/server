@@ -75,6 +75,7 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 	v0.Get("/me", addMetrics(h.GetCurrentUser))
 	v0.Get("/users/:username/collections", addMetrics(h.ListCollection))
 	v0.Get("/users/:username/collections/:subject_id", addMetrics(h.GetCollection))
+	v0.Put("/users/-/collections/:subject_id", addMetrics(h.PutSubjectCollection))
 	v0.Get("/users/:username", addMetrics(h.GetUser))
 	v0.Get("/users/:username/avatar", addMetrics(h.GetUserAvatar))
 
