@@ -212,6 +212,7 @@ func getAllNonIndexFields(v interface{}) ([]string, error) {
 		column := cfg[strings.ToUpper("column")]
 		if column == "" {
 			f := rvType.Field(i)
+			//nolint:goerr113
 			return nil, fmt.Errorf("failed to parse struct field %s, '%s' ,%v", f.Name, f.Tag.Get("gorm"), column)
 		}
 		if column == "interest_id" || column == "interest_uid" || column == "interest_subject_id" {
