@@ -792,12 +792,7 @@ paths:
       description: 获取对应用户的收藏，查看私有收藏需要access token。
       operationId: putUserCollection
       parameters:
-        - required: true
-          schema:
-            title: subject ID
-            type: integer
-          name: subject_id
-          in: path
+        - *path_subject_id
       requestBody:
         description: 收藏信息
         required: true
