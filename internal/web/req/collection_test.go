@@ -25,6 +25,9 @@ import (
 	"github.com/bangumi/server/internal/web/req"
 )
 
+/*
+go test ./internal/web/req -run '^TestPutSubjectCollection_validation$'
+*/
 func TestPutSubjectCollection_validation(t *testing.T) {
 	t.Parallel()
 	v := validator.New()
@@ -41,6 +44,9 @@ func TestPutSubjectCollection_validation(t *testing.T) {
 	}
 }
 
+/*
+go test ./internal/web/req -run '^TestPutSubjectCollection_validation_error$'
+*/
 func TestPutSubjectCollection_validation_error(t *testing.T) {
 	t.Parallel()
 	v := validator.New()

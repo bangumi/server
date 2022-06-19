@@ -99,8 +99,7 @@ linters-settings:
     # comments to be checked: `declarations`, `toplevel`, or `all`
     scope: declarations
     # list of regexps for excluding particular comment lines from check
-    exclude:
-      - ".*go test.*"
+    exclude: []
     # example: exclude comments which contain numbers
     # - '[0-9]+'
     # check that each sentence starts with a capital letter
@@ -292,7 +291,7 @@ issues:
   exclude-use-default: true
   exclude-rules:
     - path: '.*_test\.go'
-      linters: [gocritic, gochecknoglobals]
+      linters: [gocritic, gochecknoglobals, godot]
 
     - source: "var log"
       linters: [gochecknoglobals]
