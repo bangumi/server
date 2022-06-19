@@ -211,7 +211,8 @@ func getAllNonIndexFields(v interface{}) ([]string, error) {
 		cfg := schema.ParseTagSetting(rvType.Field(i).Tag.Get("gorm"), ";")
 		column := cfg[strings.ToUpper("column")]
 		if column == "" {
-			return nil, fmt.Errorf("failed to parse struct field %s, '%s' ,%v", rvType.Field(i).Name, rvType.Field(i).Tag.Get("gorm"), column)
+			f := rvType.Field(i)
+			return nil, fmt.Errorf("failed to parse struct field %s, '%s' ,%v", f.Name, f.Tag.Get("gorm"), column)
 		}
 		if column == "interest_id" || column == "interest_uid" || column == "interest_subject_id" {
 			continue
