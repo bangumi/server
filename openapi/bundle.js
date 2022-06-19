@@ -10,7 +10,7 @@ async function main() {
   schema = lodash.omit(schema, "x-parameters");
 
   if (process.argv[3]) {
-    await fs.writeFile(process.argv[3], yaml.dump(schema, {noRefs: true}));
+    await fs.writeFile(process.argv[3], yaml.dump(schema, { noRefs: true }));
   } else {
     console.log(schema);
   }
