@@ -10,6 +10,11 @@
   "postUpdateOptions": ["gomodTidy1.17"],
   "packageRules": [
     {
+      "matchManagers": ["docker-compose"],
+      "matchPackageNames": ["mysql"],
+      "enabled": false
+    },
+    {
       "groupName": "deps",
       "matchManagers": ["gomod"],
       "semanticCommitType": "build"
