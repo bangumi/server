@@ -8,14 +8,6 @@
     "start": "nodemon openapi/dev-server.js",
     "version": "node scripts/bump.js"
   },
-  "lint-staged": {
-    "*.{js,ts,yaml,yml,json}": "prettier -w --list-different"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "@koa/router": "^10.1.1",
@@ -28,8 +20,6 @@
   },
   "devDependencies": {
     "@types/conventional-changelog": "^3.1.1",
-    "husky": "^4.0.1",
-    "lint-staged": "^13.0.2",
     "nodemon": "^2.0.16",
     "prettier": "^2.6.2"
   }
