@@ -40,7 +40,7 @@ async function main() {
       for (const {
         pointer,
         ruleName,
-        rule: {description},
+        rule: { description },
       } of e.options.warnings) {
         const path = dataPathToJSONPath(pointer);
         console.error(ruleName, colors.red(`${description}:`), path);
