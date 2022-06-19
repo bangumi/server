@@ -28,7 +28,7 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 	g, err := h.g.GetByName(c.Context(), groupName)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound(c)
+			return res.NotFound(c, "group not found")
 		}
 
 		return res.InternalError(c, err, "un expected error")

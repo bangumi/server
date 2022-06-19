@@ -27,7 +27,7 @@ import (
 type Error struct {
 	Title       string      `json:"title"`
 	Details     interface{} `json:"details,omitempty"`
-	Description string      `json:"description,omitempty"`
+	Description string      `json:"description"`
 }
 
 func WithError(c *fiber.Ctx, err error, code int, message string) error {
@@ -53,9 +53,10 @@ func InternalError(c *fiber.Ctx, err error, message string) error {
 	})
 }
 
-func NotFound(c *fiber.Ctx) error {
+func NotFound(c *fiber.Ctx, description string) error {
 	return JSON(c.Status(code.NotFound), Error{
-		Title:   http.StatusText(code.NotFound),
-		Details: util.DetailFromRequest(c),
+		Title:       http.StatusText(code.NotFound),
+		Description: description,
+		Details:     util.DetailFromRequest(c),
 	})
 }
