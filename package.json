@@ -9,7 +9,7 @@
     "version": "node scripts/bump.js"
   },
   "lint-staged": {
-    "**.{js,ts,yaml,yml,json}": "prettier -w --list-different"
+    "*.{js,ts,yaml,yml,json}": "prettier -w --list-different"
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
