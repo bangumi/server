@@ -2,7 +2,7 @@ const fs = require("fs/promises");
 
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const yaml = require("js-yaml");
-const lodash = require("lodash")
+const lodash = require("lodash");
 
 async function main() {
   let schema = await $RefParser.bundle(process.argv[2]);
