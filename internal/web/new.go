@@ -22,6 +22,7 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
@@ -61,6 +62,10 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 
 		return err
 	})
+
+	if config.Development {
+		app.Use(cors.New())
+	}
 
 	app.Use(recovery.New())
 	app.Get("/metrics", adaptor.HTTPHandler(reporter.HTTPHandler()))

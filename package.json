@@ -5,6 +5,7 @@
   "scripts": {
     "format": "prettier -w --list-different ./",
     "test": "node openapi/test.js",
+    "start": "nodemon openapi/dev-server.js",
     "version": "node scripts/bump.js"
   },
   "dependencies": {
@@ -14,10 +15,12 @@
     "conventional-changelog": "^3.1.25",
     "js-yaml": "^4.1.0",
     "koa": "^2.13.4",
+    "lodash": "^4.17.21",
     "prettier": "^2.6.2"
   },
   "devDependencies": {
     "@types/conventional-changelog": "^3.1.1",
-    "livereload": "^0.9.3"
+    "livereload": "^0.9.3",
+    "nodemon": "^2.0.16"
   }
 }

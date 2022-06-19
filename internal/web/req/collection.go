@@ -32,8 +32,8 @@ type PutSubjectCollection struct {
 	Tags      []string             `json:"tags"`
 	EpStatus  uint32               `json:"ep_status"`
 	VolStatus uint32               `json:"vol_status"`
-	Type      model.CollectionType `json:"type"`
-	Rate      uint8                `json:"rate"`
+	Type      model.CollectionType `json:"type" validate:"max=5,min=1"`
+	Rate      uint8                `json:"rate" validate:"max=10,min=1"`
 	Private   bool                 `json:"private"`
 }
 

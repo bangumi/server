@@ -33,7 +33,7 @@ import (
 func getRepo(t *testing.T) (domain.CollectionRepo, *query.Query) {
 	t.Helper()
 	q := test.GetQuery(t)
-	repo, err := collection.NewCollectionRepo(q, zap.NewNop())
+	repo, err := collection.NewMysqlRepo(q, zap.NewNop())
 	require.NoError(t, err)
 
 	return repo, q

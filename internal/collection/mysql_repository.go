@@ -33,7 +33,7 @@ import (
 	"github.com/bangumi/server/internal/strutil"
 )
 
-func NewCollectionRepo(q *query.Query, log *zap.Logger) (domain.CollectionRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CollectionRepo, error) {
 	return mysqlRepo{q: q, log: log.Named("collection.mysqlRepo")}, nil
 }
 
@@ -159,7 +159,7 @@ func (m mysqlRepo) ListCollections(
 			SubjectID:   c.SubjectID,
 			EpStatus:    c.EpStatus,
 			VolStatus:   c.VolStatus,
-			Type:        c.Type,
+			Type:        model.CollectionType(c.Type),
 			Private:     c.Private != model.CollectPrivacyNone,
 		}
 	}
@@ -190,7 +190,7 @@ func (m mysqlRepo) GetCollection(
 		SubjectID:   c.SubjectID,
 		EpStatus:    c.EpStatus,
 		VolStatus:   c.VolStatus,
-		Type:        c.Type,
+		Type:        model.CollectionType(c.Type),
 		Private:     c.Private != model.CollectPrivacyNone,
 	}, nil
 }

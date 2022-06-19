@@ -819,7 +819,7 @@ paths:
       security:
         - OptionalHTTPBearer: []
 
-  "/users/-/collections/:subject_id":
+  "/v0/users/-/collections/{subject_id}":
     put:
       tags:
         - 收藏

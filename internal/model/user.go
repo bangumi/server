@@ -47,7 +47,7 @@ type SubjectCollection struct {
 	SubjectID   SubjectID
 	SubjectType uint8
 	Rate        uint8
-	Type        uint8
+	Type        CollectionType
 	Private     bool
 }
 

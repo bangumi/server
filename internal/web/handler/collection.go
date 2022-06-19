@@ -196,6 +196,7 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 }
 
 func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
+	h.log.Info("called")
 	v := h.getHTTPAccessor(c)
 	if !v.login {
 		return res.Unauthorized(c, res.DefaultUnauthorizedMessage)
