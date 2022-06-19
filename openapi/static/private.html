@@ -32,14 +32,10 @@
       layout: "BaseLayout",
       deepLinking: true,
       requestInterceptor: (req) => {
-        // will set default token
+        // 实际上是在 dev-server.js 转发时添加的
         req.headers.Cookie = 'sessionID=dev-session-id';
         return req;
       },
-      presets: [
-        SwaggerUIBundle.presets.apis,
-        SwaggerUIBundle.SwaggerUIStandalonePreset,
-      ],
     });
   };
 </script>

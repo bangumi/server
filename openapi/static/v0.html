@@ -7,11 +7,10 @@
     href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700"
     rel="stylesheet"
   />
-  <link
-    rel="stylesheet"
-    type="text/css"
-    href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css"
-  />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui-bundle.js"></script>
+
   <link
     rel="shortcut icon"
     href="https://bgm.tv/img/favicon.ico"
@@ -22,7 +21,6 @@
 
 <div id="swagger-ui"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
 <script>
   document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
 
@@ -37,10 +35,6 @@
         req.headers.Authorization = req.headers.Authorization ?? 'Bearer a_development_access_token';
         return req;
       },
-      presets: [
-        SwaggerUIBundle.presets.apis,
-        SwaggerUIBundle.SwaggerUIStandalonePreset,
-      ],
     });
   };
 </script>

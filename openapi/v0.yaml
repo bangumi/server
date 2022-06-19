@@ -720,10 +720,6 @@ paths:
           schema:
             allOf:
               - "$ref": "#/components/schemas/CollectionType"
-            description: |-
-              收藏类型，默认为全部
-
-              具体含义见 [CollectionType](#model-CollectionType)
             type: integer
           name: type
           in: query
