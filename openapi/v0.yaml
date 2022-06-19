@@ -38,7 +38,7 @@ x-parameters:
   path_person_id: &path_person_id
     required: true
     schema:
-      title:  Person ID
+      title: Person ID
       minimum: 1
       type: integer
     name: person_id
