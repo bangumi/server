@@ -40,6 +40,18 @@ func getRepo(tb testing.TB) (session.Repo, *query.Query) {
 	return repo, q
 }
 
+func TestMysqlRepo_Create_t(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	ctx := context.Background()
+	r, _ := getRepo(t)
+	var key = "dev session id"
+
+	_, err := r.Create(ctx, key, 382951, time.Now())
+	require.NoError(t, err, session.ErrKeyConflict)
+}
+
 func TestMysqlRepo_Create(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
