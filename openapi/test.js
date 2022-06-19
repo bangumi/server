@@ -14,25 +14,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>
  */
 const path = require("path");
-const fs = require("fs");
 
 const lodash = require("lodash");
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const validator = require("oas-validator");
-const yaml = require("js-yaml");
 const colors = require("colors/safe");
 
 async function main() {
-  process.chdir(__dirname);
   for (const filePath of ["v0.yaml", "private.yaml"]) {
     console.log("try to bundle", filePath);
+    const openapi = await $RefParser.bundle(path.join(__dirname, filePath));
 
-    // JSON deep copy to remove anchor
-    const raw = JSON.parse(JSON.stringify(yaml.load(fs.readFileSync(path.join(__dirname, filePath), "utf-8"))));
-
-    const openapi = await $RefParser.bundle(raw);
     try {
-      await validator.validate(openapi, {
+      console.log("try to lint", filePath)
+      // JSON deep copy to remove anchor
+      await validator.validate(JSON.parse(JSON.stringify(openapi)), {
         lint: true,
         lintSkip: ["info-contact", "contact-properties", "tag-description"],
       });
@@ -44,7 +40,7 @@ async function main() {
       for (const {
         pointer,
         ruleName,
-        rule: { description },
+        rule: {description},
       } of e.options.warnings) {
         const path = dataPathToJSONPath(pointer);
         console.error(ruleName, colors.red(`${description}:`), path);
