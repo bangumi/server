@@ -807,7 +807,7 @@ paths:
         - required: true
           schema:
             title: Person ID
-            minimum: 0
+            minimum: 1
             type: integer
           name: person_id
           description: 角色 ID
@@ -837,7 +837,7 @@ paths:
         - required: true
           schema:
             title: Revision ID
-            minimum: 0
+            minimum: 1
             type: integer
           name: revision_id
           description: 历史版本 ID
@@ -871,7 +871,7 @@ paths:
         - required: true
           schema:
             title: Character ID
-            minimum: 0
+            minimum: 1
             type: integer
           name: character_id
           description: 角色 ID
@@ -985,7 +985,7 @@ paths:
         - required: true
           schema:
             title: Episode ID
-            minimum: 0
+            minimum: 1
             type: integer
           name: episode_id
           description: 章节 ID
@@ -1079,7 +1079,7 @@ paths:
           description: "条目 ID"
           schema:
             title: Index ID
-            minimum: 0
+            minimum: 1
             type: integer
           name: index_id
           in: path
