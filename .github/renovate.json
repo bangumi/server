@@ -1,14 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "local>Trim21/renovate-config",
-    "local>Trim21/renovate-config:monthly"
-  ],
+  "extends": ["local>Trim21/renovate-config", "local>Trim21/renovate-config:monthly"],
   "separateMinorPatch": false,
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
   "postUpdateOptions": ["gomodTidy1.17"],
   "packageRules": [
+    {
+      "matchManagers": ["docker-compose"],
+      "matchPackageNames": ["mysql"],
+      "enabled": false
+    },
     {
       "groupName": "deps",
       "matchManagers": ["gomod"],
