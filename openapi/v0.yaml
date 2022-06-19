@@ -424,14 +424,7 @@ paths:
       summary: get character related subjects
       operationId: getRelatedSubjectsByCharacterId
       parameters:
-        - required: true
-          schema:
-            title: Character ID
-            minimum: 1
-            type: integer
-          name: character_id
-          description: 角色 ID
-          in: path
+        - *path_character_id
       responses:
         "200":
           description: Successful Response
@@ -460,14 +453,7 @@ paths:
       summary: get character related persons
       operationId: getRelatedPersonsByCharacterId
       parameters:
-        - required: true
-          schema:
-            title: Character ID
-            minimum: 1
-            type: integer
-          name: character_id
-          description: 角色 ID
-          in: path
+        - *path_character_id
       responses:
         "200":
           description: Successful Response
