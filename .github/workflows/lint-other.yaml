@@ -11,8 +11,7 @@ on:
       - "**.yml"
       - "**.html"
       - "**.json"
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  pull_request:
     branches:
       - master
     paths:
@@ -36,21 +35,12 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v3
-        if: ${{ github.event_name != 'push' }}
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-
-      - name: Checkout code
-        uses: actions/checkout@v3
-        if: ${{ github.event_name == 'push' }}
 
       - run: npm ci
 
       - name: prettier
-        run: npx prettier --write --list-different ./
+        run: npm run format
 
       - run: git diff --exit-code
 
       - uses: reviewdog/action-suggester@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
