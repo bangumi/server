@@ -28,6 +28,6 @@ type Group struct {
 
 type GroupMember struct {
 	UserID UserID
+	Mod    bool
+	JoinAt time.Time
 }
-
-type GroupModerator GroupMember

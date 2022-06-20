@@ -53,31 +53,31 @@ func (r mysqlRepo) GetByName(ctx context.Context, name string) (model.Group, err
 	return convertDao(g), nil
 }
 
-func (r mysqlRepo) GetByID(ctx context.Context, id model.GroupID) (model.Group, error) {
-	g, err := r.q.Group.WithContext(ctx).Where(r.q.Group.ID.Eq(id)).First()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Group{}, domain.ErrNotFound
-		}
-
-		r.log.Error("un-expected error when getting single group", zap.Error(err), log.GroupID(id))
-		return model.Group{}, errgo.Wrap(err, "dal")
-	}
-
-	return convertDao(g), nil
-}
-
-func (r mysqlRepo) CountMembersByName(ctx context.Context, name string) (int64, error) {
+func (r mysqlRepo) CountMembersByName(
+	ctx context.Context, name string, memberType domain.GroupMemberType,
+) (int64, error) {
 	g, err := r.GetByName(ctx, name)
 	if err != nil {
 		return 0, err
 	}
 
-	return r.CountMembersByID(ctx, g.ID)
+	return r.countMembersByID(ctx, g.ID, memberType)
 }
 
-func (r mysqlRepo) CountMembersByID(ctx context.Context, id model.GroupID) (int64, error) {
-	c, err := r.q.GroupMember.WithContext(ctx).Where(r.q.GroupMember.GroupID.Eq(id)).Count()
+func (r mysqlRepo) countMembersByID(
+	ctx context.Context, id model.GroupID, memberType domain.GroupMemberType,
+) (int64, error) {
+	q := r.q.GroupMember.WithContext(ctx).Where(r.q.GroupMember.GroupID.Eq(id))
+	switch memberType {
+	case domain.GroupMemberMod:
+		q = q.Where(r.q.GroupMember.Moderator.Is(true))
+	case domain.GroupMemberNormal:
+		q = q.Where(r.q.GroupMember.Moderator.Is(false))
+	case domain.GroupMemberAll:
+		// do nothing
+	}
+
+	c, err := q.Count()
 	if err != nil {
 		r.log.Error("un-expected error when counting group member", zap.Error(err), log.GroupID(id))
 		return 0, errgo.Wrap(err, "dal")
@@ -86,45 +86,43 @@ func (r mysqlRepo) CountMembersByID(ctx context.Context, id model.GroupID) (int6
 	return c, nil
 }
 
-func (r mysqlRepo) ListMembersByID(
-	ctx context.Context, id model.GroupID, limit, offset int,
+func (r mysqlRepo) listMembersByID(
+	ctx context.Context, id model.GroupID, memberType domain.GroupMemberType, limit, offset int,
 ) ([]model.GroupMember, error) {
-	c, err := r.q.GroupMember.WithContext(ctx).Where(r.q.GroupMember.GroupID.Eq(id)).Limit(limit).Offset(offset).Find()
+	q := r.q.GroupMember.WithContext(ctx).Where(r.q.GroupMember.GroupID.Eq(id))
+
+	switch memberType {
+	case domain.GroupMemberMod:
+		q = q.Where(r.q.GroupMember.Moderator.Is(true))
+	case domain.GroupMemberNormal:
+		q = q.Where(r.q.GroupMember.Moderator.Is(false))
+	case domain.GroupMemberAll:
+		// do nothing
+	}
+
+	c, err := q.Limit(limit).Offset(offset).Order(r.q.GroupMember.CreatedAt).Find()
 	if err != nil {
 		r.log.Error("un-expected error when counting group member", zap.Error(err), log.GroupID(id))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var members = make([]model.GroupMember, len(c))
-
+	members := make([]model.GroupMember, len(c))
 	for i, member := range c {
-		members[i] = model.GroupMember{UserID: member.UserID}
+		members[i] = convertMember(member)
 	}
 
 	return members, nil
 }
 
 func (r mysqlRepo) ListMembersByName(
-	ctx context.Context, name string, limit, offset int,
+	ctx context.Context, name string, memberType domain.GroupMemberType, limit, offset int,
 ) ([]model.GroupMember, error) {
 	g, err := r.GetByName(ctx, name)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.ListMembersByID(ctx, g.ID, limit, offset)
-}
-
-func (r mysqlRepo) CountModeratorsByName(
-	ctx context.Context, name string, limit, offset int,
-) ([]model.GroupModerator, error) {
-	panic("not implemented")
-}
-
-func (r mysqlRepo) ListModeratorsByName(
-	ctx context.Context, name string, limit, offset int,
-) ([]model.GroupModerator, error) {
-	panic("not implemented")
+	return r.listMembersByID(ctx, g.ID, memberType, limit, offset)
 }
 
 func convertDao(g *dao.Group) model.Group {
@@ -136,5 +134,13 @@ func convertDao(g *dao.Group) model.Group {
 		Icon:        g.Icon,
 		Title:       g.Title,
 		CreatedAt:   time.Unix(int64(g.CreatedAt), 0),
+	}
+}
+
+func convertMember(m *dao.GroupMember) model.GroupMember {
+	return model.GroupMember{
+		UserID: m.UserID,
+		Mod:    m.Moderator,
+		JoinAt: time.Unix(int64(m.CreatedAt), 0),
 	}
 }
