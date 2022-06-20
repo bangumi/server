@@ -35,15 +35,21 @@ func DisableDefaultHTTPLibrary(c *fiber.Ctx) error {
 		return res.HTTPError(c, code.Forbidden, "Please set a 'User-Agent'")
 	}
 
-	if strings.HasPrefix(u, "python-requests/") ||
-		strings.HasPrefix(u, "okhttp/") ||
-		strings.HasPrefix(u, "axios/") ||
-		strings.HasPrefix(u, "Faraday v") ||
-		strings.HasPrefix(u, "Apache-HttpClient/") ||
-		strings.HasPrefix(u, "Java/") ||
-		strings.HasPrefix(u, "node-fetch/") {
+	if isDefaultUA(u) {
 		return res.HTTPError(c, code.Forbidden, forbiddenMessage)
 	}
 
 	return c.Next()
+}
+
+func isDefaultUA(u string) bool {
+	return strings.HasPrefix(u, "Java/") ||
+		strings.HasPrefix(u, "axios/") ||
+		strings.HasPrefix(u, "okhttp/") ||
+		strings.HasPrefix(u, "Faraday v") ||
+		strings.HasPrefix(u, "node-fetch/") ||
+		strings.HasPrefix(u, "Apache-HttpClient/") ||
+		strings.HasPrefix(u, "python-requests/") ||
+		u == "node-fetch" ||
+		u == "database"
 }
