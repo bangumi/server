@@ -12,10 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
+// 作为生成 openapi component 的脚本文件示例。
+// 不要 commit 你的修改。
 package main
 
 import (
-	"os"
+	"fmt"
 	"reflect"
 	"time"
 
@@ -47,9 +49,7 @@ func main() {
 		logger.Fatal("failed to marshal yaml", zap.Error(err))
 	}
 
-	if err = os.WriteFile("./openapi/components/group.yaml", b, 0600); err != nil { //nolint:gomnd
-		logger.Fatal("failed to write file", zap.Error(err))
-	}
+	fmt.Println(string(b)) //nolint:forbidigo
 }
 
 type WithExampleValue struct {
