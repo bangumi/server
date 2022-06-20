@@ -96,11 +96,33 @@ func TestMysqlRepo_GetByToken(t *testing.T) {
 
 例外：
 
-### Group Similar Declarations
+## 99 character line length
+
+120。
+
+每个 tab 计 2 个字符宽。
+
+### Local Variable Declarations
+
+使用 `var` 或者 `:=` 均可。
+
+只有初始化变量为零值的时候应该用 `var`
+
+#### bad
+
+```golang
+var v = uint32(0)
+```
+
+#### good
+
+```golang
+var v uint32
+```
 
 ### Import Group Ordering
 
-golangci-lint 会自动处理 import 分组。
+import 应该分为 std, external, internal 三部分。
 
 ### Import Aliasing
 
