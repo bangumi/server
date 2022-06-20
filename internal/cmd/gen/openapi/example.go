@@ -38,8 +38,8 @@ func main() {
 	b, err := yaml.Marshal(WithExampleValue{
 		Schema: s,
 		Example: res.Group{
-			Name:        "boring",
-			Title:       "靠谱人生茶话会",
+			Name:        "a",
+			Title:       "～技术宅真可怕～",
 			Description: "本小组欢迎对各种技术有一定了解的人，\n比如像橘花热衷杀人技术……\n\n不过、本组主要谈论ＰＣ软硬件方面，\n想了解相关知识，结识可怕的技术宅，请进。",
 			Icon:        "https://lain.bgm.tv/pic/icon/l/000/00/00/11.jpg",
 			CreatedAt:   time.Unix(1217542289, 0),
