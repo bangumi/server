@@ -281,7 +281,6 @@ linters:
     - cyclop # we have gocyclo
     - goimports # we have gci already
     - nlreturn
-    - whitespace
     - godox
     - execinquery
   fast: false

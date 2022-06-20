@@ -46,7 +46,6 @@ func TestUserID(t *testing.T) {
 			u, err := strparse.UserID(tc.Input)
 			require.NoError(t, err)
 			require.Equal(t, tc.Expected, u)
-
 		})
 	}
 }

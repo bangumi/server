@@ -54,7 +54,6 @@ func main() {
 }
 
 func start() error {
-
 	var app *fiber.App
 	var cfg config.AppConfig
 

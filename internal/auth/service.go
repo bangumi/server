@@ -125,7 +125,6 @@ func (s service) Login(ctx context.Context, email, password string) (domain.Auth
 	a.Permission = p
 
 	return a, true, nil
-
 }
 
 // GetByTokenWithCache not sure should we cache it in service or let caller cache this.

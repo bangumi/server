@@ -23,7 +23,7 @@ import (
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	zh_translations "github.com/go-playground/validator/v10/translations/zh" 
+	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
@@ -59,7 +59,6 @@ func New(
 	engine frontend.TemplateEngine,
 	oauth oauth.Manager,
 ) (Handler, error) {
-
 	validate, trans, err := getValidator()
 	if err != nil {
 		return Handler{}, err
