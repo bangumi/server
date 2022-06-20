@@ -123,15 +123,13 @@ func TestMysqlRepo_ListAccessToken(t *testing.T) {
 
 	repo, q := getRepo(t)
 
-	cleanup := func() {
+	test.RunAndCleanup(t, func() {
 		_, err := q.AccessToken.WithContext(context.TODO()).Where(q.AccessToken.UserID.Eq("3")).Delete()
 		require.NoError(t, err)
-	}
-	t.Cleanup(cleanup)
+	})
 
-	for i := 101; i < 105; i++ {
+	for i := 1; i < 5; i++ {
 		err := q.AccessToken.WithContext(context.Background()).Create(&dao.AccessToken{
-			ID:          uint32(i),
 			Type:        auth.TokenTypeAccessToken,
 			AccessToken: t.Name() + strconv.Itoa(i),
 			ClientID:    "access token",
