@@ -222,7 +222,6 @@ func (m mysqlRepo) CreateAccessToken(
 	var expiredAt = now.Add(expiration)
 	if expiration < 0 {
 		expiredAt = time.Time{}
-
 	}
 
 	infoByte, err := json.MarshalNoEscape(info)

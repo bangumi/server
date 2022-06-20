@@ -58,7 +58,6 @@ func New(
 	engine frontend.TemplateEngine,
 	oauth oauth.Manager,
 ) (Handler, error) {
-
 	validate, trans, err := getValidator()
 	if err != nil {
 		return Handler{}, err

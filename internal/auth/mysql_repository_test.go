@@ -114,7 +114,6 @@ func TestMysqlRepo_DeleteAccessToken(t *testing.T) {
 	ok, err := repo.DeleteAccessToken(context.Background(), id)
 	require.NoError(t, err)
 	require.True(t, ok)
-
 }
 
 func TestMysqlRepo_ListAccessToken(t *testing.T) {
@@ -144,5 +143,4 @@ func TestMysqlRepo_ListAccessToken(t *testing.T) {
 	tokens, err := repo.ListAccessToken(context.Background(), 3)
 	require.NoError(t, err)
 	require.Len(t, tokens, 4)
-
 }
