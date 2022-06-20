@@ -1,6 +1,4 @@
-## Code Style
-
-[Uber Go Style Guide](https://github.com/uber-go/guide/blob/master/style.md)
+## 项目结构
 
 项目整体分为 web，service 和 repository 三层。
 
@@ -91,3 +89,25 @@ func TestMysqlRepo_GetByToken(t *testing.T) {
 	// then write your tests
 }
 ```
+
+## Code Style
+
+[Uber Go Style Guide](https://github.com/uber-go/guide/blob/master/style.md)
+
+例外：
+
+### Group Similar Declarations
+
+### Import Group Ordering
+
+golangci-lint 会自动处理 import 分组。
+
+### Import Aliasing
+
+go mod 在 v2 以上的版本会自动添加大版本后缀，不需要针对此情况添加 alias。
+
+### nil is a valid slice
+
+JSON encoder 不会把 `nil` 序列化为空数组，所以在 web 响应空数组时时不应该使用 `nil`。
+
+其他情况则应该使用 `nil` 代替返回空数组。
