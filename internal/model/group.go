@@ -29,3 +29,5 @@ type Group struct {
 type GroupMember struct {
 	UserID UserID
 }
+
+type GroupModerator GroupMember

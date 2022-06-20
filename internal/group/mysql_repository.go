@@ -115,6 +115,18 @@ func (r mysqlRepo) ListMembersByName(
 	return r.ListMembersByID(ctx, g.ID, limit, offset)
 }
 
+func (r mysqlRepo) CountModeratorsByName(
+	ctx context.Context, name string, limit, offset int,
+) ([]model.GroupModerator, error) {
+	panic("not implemented")
+}
+
+func (r mysqlRepo) ListModeratorsByName(
+	ctx context.Context, name string, limit, offset int,
+) ([]model.GroupModerator, error) {
+	panic("not implemented")
+}
+
 func convertDao(g *dao.Group) model.Group {
 	return model.Group{
 		Name:        g.Name,
