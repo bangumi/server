@@ -27,7 +27,7 @@ type Group struct {
 }
 
 type GroupMember struct {
+	JoinAt time.Time
 	UserID UserID
 	Mod    bool
-	JoinAt time.Time
 }
