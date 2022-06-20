@@ -23,6 +23,7 @@ require (
 	github.com/prometheus/client_golang v1.12.2
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
+	github.com/trim21/go-phpserialize v0.0.7
 	github.com/uber-go/tally/v4 v4.1.2
 	go.uber.org/fx v1.17.1
 	go.uber.org/zap v1.21.0
@@ -43,6 +44,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/goccy/go-reflect v1.2.0 // indirect
 	github.com/gofiber/utils v0.1.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect

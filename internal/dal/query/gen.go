@@ -36,6 +36,7 @@ func Use(db *gorm.DB) *Query {
 		SubjectField:      newSubjectField(db),
 		SubjectRelation:   newSubjectRelation(db),
 		SubjectRevision:   newSubjectRevision(db),
+		TimeLine:          newTimeLine(db),
 		UserGroup:         newUserGroup(db),
 		WebSession:        newWebSession(db),
 	}
@@ -66,6 +67,7 @@ type Query struct {
 	SubjectField      subjectField
 	SubjectRelation   subjectRelation
 	SubjectRevision   subjectRevision
+	TimeLine          timeLine
 	UserGroup         userGroup
 	WebSession        webSession
 }
@@ -97,6 +99,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		SubjectField:      q.SubjectField.clone(db),
 		SubjectRelation:   q.SubjectRelation.clone(db),
 		SubjectRevision:   q.SubjectRevision.clone(db),
+		TimeLine:          q.TimeLine.clone(db),
 		UserGroup:         q.UserGroup.clone(db),
 		WebSession:        q.WebSession.clone(db),
 	}
@@ -125,6 +128,7 @@ type queryCtx struct {
 	SubjectField      *subjectFieldDo
 	SubjectRelation   *subjectRelationDo
 	SubjectRevision   *subjectRevisionDo
+	TimeLine          *timeLineDo
 	UserGroup         *userGroupDo
 	WebSession        *webSessionDo
 }
@@ -153,6 +157,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		SubjectField:      q.SubjectField.WithContext(ctx),
 		SubjectRelation:   q.SubjectRelation.WithContext(ctx),
 		SubjectRevision:   q.SubjectRevision.WithContext(ctx),
+		TimeLine:          q.TimeLine.WithContext(ctx),
 		UserGroup:         q.UserGroup.WithContext(ctx),
 		WebSession:        q.WebSession.WithContext(ctx),
 	}
