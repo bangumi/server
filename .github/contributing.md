@@ -1,3 +1,7 @@
+## Code Style
+
+[Uber Go Style Guide](https://github.com/uber-go/guide/blob/master/style.md)
+
 项目整体分为 web，service 和 repository 三层。
 
 web 相关的组件和 handler 在[internal/web/](../internal/web) 文件夹中。
