@@ -149,11 +149,16 @@ paths:
 
   "/p/group/{name}":
     get:
-      summary: 登出
-      operationId: getCurrentUser
+      tags:
+        - 小组
+      summary: 获取小组信息
+      operationId: getGroupInfoByName
       parameters:
         - name: name
           in: path
+          schema:
+            type: string
+          description: "小组名，类似于 `https://bgm.tv/group/boring` 的 `boring`"
           required: true
       responses:
         "200":
