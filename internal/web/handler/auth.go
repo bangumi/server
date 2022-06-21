@@ -38,14 +38,13 @@ func (h Handler) RevokeSession(c *fiber.Ctx) error {
 	}
 
 	if err := h.v.Struct(r); err != nil {
-		return res.FromError(c, err, http.StatusBadRequest, "can't validate request body")
+		return h.ValidationError(c, err)
 	}
 
 	return c.JSON("session revoked")
 }
 
 func (h Handler) PrivateLogin(c *fiber.Ctx) error {
-	a := h.getHTTPAccessor(c)
 	var r req.UserLogin
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
 		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
@@ -55,6 +54,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return h.ValidationError(c, err)
 	}
 
+	a := h.getHTTPAccessor(c)
 	allowed, remain, err := h.rateLimit.Allowed(c.Context(), a.ip.String())
 	if err != nil {
 		return h.InternalError(c, err, "failed to apply rate limit", a.LogRequestID())
@@ -83,7 +83,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
-		return res.FromError(c, err, http.StatusInternalServerError, "Unexpected error happened when trying to log in")
+		return h.InternalError(c, err, "Unexpected error when logging in")
 	}
 
 	if !ok {
