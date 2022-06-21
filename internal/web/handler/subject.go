@@ -127,7 +127,7 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return res.BadRequest("bad id: " + c.Params("id"))
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -156,7 +156,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return res.BadRequest(err.Error())
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
