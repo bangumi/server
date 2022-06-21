@@ -19,7 +19,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-func ErrDetail(c *fiber.Ctx, err error) interface{} {
+func DetailWithErr(c *fiber.Ctx, err error) interface{} {
 	return detail{
 		Path:        c.Path(),
 		Error:       err.Error(),

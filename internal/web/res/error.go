@@ -50,7 +50,7 @@ func FromError(c *fiber.Ctx, err error, code int, message string) error {
 	return JSON(c.Status(code), Error{
 		Title:       utils.StatusMessage(code),
 		Description: message,
-		Details:     util.ErrDetail(c, err),
+		Details:     util.DetailWithErr(c, err),
 	})
 }
 
@@ -58,7 +58,7 @@ func InternalError(c *fiber.Ctx, err error, message string) error {
 	return JSON(c.Status(http.StatusInternalServerError), Error{
 		Title:       "Internal Server Error",
 		Description: message,
-		Details:     util.ErrDetail(c, err),
+		Details:     util.DetailWithErr(c, err),
 	})
 }
 

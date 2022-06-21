@@ -105,7 +105,7 @@ func getDefaultErrorHandler() func(*fiber.Ctx, error) error {
 		return res.JSON(ctx.Status(http.StatusInternalServerError), res.Error{
 			Title:       "Internal Server Error",
 			Description: "Unexpected Internal Server Error",
-			Details:     util.ErrDetail(ctx, err),
+			Details:     util.DetailWithErr(ctx, err),
 		})
 	}
 }
