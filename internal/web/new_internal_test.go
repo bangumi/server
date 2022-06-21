@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -36,7 +37,7 @@ func TestDefaultErrorHandler_resError(t *testing.T) {
 	})
 
 	req := httptest.NewRequest("GET", "/", nil)
-	resp, err := app.Test(req)
+	resp, err := app.Test(req, -1)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
@@ -53,11 +54,12 @@ func TestDefaultErrorHandler_internal(t *testing.T) {
 
 	app := fiber.New(fiber.Config{ErrorHandler: getDefaultErrorHandler()})
 	app.Get("/", func(c *fiber.Ctx) error {
+		time.Sleep(time.Second)
 		return errors.New("mm") //nolint:goerr113
 	})
 
 	req := httptest.NewRequest("GET", "/", nil)
-	resp, err := app.Test(req)
+	resp, err := app.Test(req, -1)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 

@@ -46,7 +46,7 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 		StrictRouting:         true,
 		CaseSensitive:         true,
 		ErrorHandler:          getDefaultErrorHandler(),
-		JSONEncoder:           json.MarshalNoEscape,
+		JSONEncoder:           json.Marshal,
 	})
 
 	count := scope.Counter("request_count_total")

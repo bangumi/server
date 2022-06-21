@@ -16,11 +16,11 @@ package util
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+	"github.com/gofiber/utils"
 )
 
-func DetailWithErr(c *fiber.Ctx, err error) interface{} {
-	return detail{
+func DetailWithErr(c *fiber.Ctx, err error) D {
+	return D{
 		Path:        c.Path(),
 		Error:       err.Error(),
 		Method:      c.Method(),
@@ -28,15 +28,15 @@ func DetailWithErr(c *fiber.Ctx, err error) interface{} {
 	}
 }
 
-func Detail(c *fiber.Ctx) interface{} {
-	return detail{
+func Detail(c *fiber.Ctx) D {
+	return D{
 		Path:        c.Path(),
 		Method:      c.Method(),
 		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
 	}
 }
 
-type detail struct {
+type D struct {
 	Error       string `json:"error,omitempty"`
 	Path        string `json:"path,omitempty"`
 	Method      string `json:"method,omitempty"`

@@ -224,7 +224,7 @@ func (m mysqlRepo) CreateAccessToken(
 		expiredAt = time.Time{}
 	}
 
-	infoByte, err := json.MarshalNoEscape(info)
+	infoByte, err := json.Marshal(info)
 	if err != nil {
 		// marshal simple struct should never fail
 		m.log.Fatal("marshal simple struct should never fail",
