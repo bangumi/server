@@ -21,6 +21,7 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 
@@ -38,12 +39,12 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 
 	var r req.CreatePersonalAccessToken
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
-		return res.WithError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
+		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
 	}
 
 	if err := h.v.Struct(r); err != nil {
 		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
-			Title:       http.StatusText(http.StatusBadRequest),
+			Title:       utils.StatusMessage(http.StatusBadRequest),
 			Description: "can't validate request body",
 			Details:     h.translationValidationError(err),
 		})
@@ -65,12 +66,12 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 
 	var r req.DeletePersonalAccessToken
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
-		return res.WithError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
+		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
 	}
 
 	if err := h.v.Struct(r); err != nil {
 		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
-			Title:       http.StatusText(http.StatusBadRequest),
+			Title:       utils.StatusMessage(http.StatusBadRequest),
 			Description: "can't validate request body",
 			Details:     h.translationValidationError(err),
 		})

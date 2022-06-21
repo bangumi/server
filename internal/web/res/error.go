@@ -19,6 +19,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 
 	"github.com/bangumi/server/internal/web/util"
 )
@@ -45,9 +46,9 @@ func (e *HTTPError) Error() string {
 	return strconv.Itoa(e.Code) + ": " + e.Msg
 }
 
-func WithError(c *fiber.Ctx, err error, code int, message string) error {
+func FromError(c *fiber.Ctx, err error, code int, message string) error {
 	return JSON(c.Status(code), Error{
-		Title:       http.StatusText(code),
+		Title:       utils.StatusMessage(code),
 		Description: message,
 		Details:     util.ErrDetail(c, err),
 	})
@@ -70,7 +71,7 @@ func BadRequest(message string) error {
 }
 
 func NotFound(message string) error {
-	return NewError(http.StatusBadRequest, message)
+	return NewError(http.StatusNotFound, message)
 }
 
 func Unauthorized(message string) error {

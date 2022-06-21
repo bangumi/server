@@ -62,9 +62,4 @@ func TestDefaultErrorHandler_fiberError(t *testing.T) {
 	defer resp.Body.Close()
 
 	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-
-	var body res.Error
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&body))
-
-	require.Equal(t, "mm", body.Description)
 }

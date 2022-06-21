@@ -34,11 +34,11 @@ import (
 func (h Handler) RevokeSession(c *fiber.Ctx) error {
 	var r req.RevokeSession
 	if err := json.UnmarshalNoEscape(c.Body(), r); err != nil {
-		return res.WithError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
+		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
 	}
 
 	if err := h.v.Struct(r); err != nil {
-		return res.WithError(c, err, http.StatusBadRequest, "can't validate request body")
+		return res.FromError(c, err, http.StatusBadRequest, "can't validate request body")
 	}
 
 	return c.JSON("session revoked")
@@ -48,12 +48,12 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	a := h.getHTTPAccessor(c)
 	var r req.UserLogin
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
-		return res.WithError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
+		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
 	}
 
 	if err := h.v.Struct(r); err != nil {
 		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
-			Title:       http.StatusText(http.StatusBadRequest),
+			Title:       utils.StatusMessage(http.StatusBadRequest),
 			Description: "can't validate request body",
 			Details:     h.translationValidationError(err),
 		})
@@ -70,12 +70,12 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 
 	ok, err := h.captcha.Verify(c.Context(), r.HCaptchaResponse)
 	if err != nil {
-		return res.WithError(c, err, http.StatusBadGateway, "Captcha verify http request error")
+		return res.FromError(c, err, http.StatusBadGateway, "Captcha verify http request error")
 	}
 
 	if !ok {
 		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
-			Title:       http.StatusText(http.StatusBadRequest),
+			Title:       utils.StatusMessage(http.StatusBadRequest),
 			Description: "can't validate request body",
 			Details:     []string{"未通过hCaptcha验证"},
 		})
@@ -87,7 +87,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
-		return res.WithError(c, err, http.StatusInternalServerError, "Unexpected error happened when trying to log in")
+		return res.FromError(c, err, http.StatusInternalServerError, "Unexpected error happened when trying to log in")
 	}
 
 	if !ok {
