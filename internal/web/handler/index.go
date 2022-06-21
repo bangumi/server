@@ -99,10 +99,7 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.NSFW && !user.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.NotFound("index not found")
 	}
 
 	return c.JSON(r)

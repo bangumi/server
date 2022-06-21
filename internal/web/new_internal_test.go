@@ -32,7 +32,7 @@ func TestDefaultErrorHandler_resError(t *testing.T) {
 
 	app := fiber.New(fiber.Config{ErrorHandler: getDefaultErrorHandler()})
 	app.Get("/", func(c *fiber.Ctx) error {
-		return res.NewError(http.StatusBadRequest, "mm")
+		return res.BadRequest("mm")
 	})
 
 	req := httptest.NewRequest("GET", "/", nil)

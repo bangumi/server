@@ -92,7 +92,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id <= 0 {
-		return res.NewError(http.StatusBadRequest, fmt.Sprintf("bad param id: %s", c.Params("id")))
+		return res.BadRequest(fmt.Sprintf("bad param id: %s", c.Params("id")))
 	}
 	r, err := h.r.GetPersonRelated(c.Context(), id)
 	if err != nil {
@@ -202,7 +202,7 @@ func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
 	}
 	subjectID, err := strparse.SubjectID(c.Query("subject_id"))
 	if err != nil || subjectID <= 0 {
-		return res.NewError(http.StatusBadRequest, fmt.Sprintf("bad query subject_id: %s", c.Query("subject_id")))
+		return res.BadRequest(fmt.Sprintf("bad query subject_id: %s", c.Query("subject_id")))
 	}
 
 	return h.listSubjectRevision(c, subjectID, page)
@@ -256,7 +256,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
-		return res.NewError(http.StatusBadRequest, "bad param id: "+strconv.Quote(c.Params("id")))
+		return res.BadRequest("bad param id: " + strconv.Quote(c.Params("id")))
 	}
 	r, err := h.r.GetSubjectRelated(c.Context(), id)
 	if err != nil {

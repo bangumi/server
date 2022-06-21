@@ -149,7 +149,7 @@ func (h Handler) GetCharacterImage(c *fiber.Ctx) error {
 
 	l, ok := r.Images.Select(c.Query("type"))
 	if !ok {
-		return res.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+		return res.BadRequest("bad image type: " + c.Query("type"))
 	}
 
 	if l == "" {

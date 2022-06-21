@@ -139,7 +139,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return err
 	}
 	if subjectID == 0 {
-		return res.NewError(http.StatusBadRequest, "missing required query `subject_id`")
+		return res.BadRequest("missing required query `subject_id`")
 	}
 
 	subject, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
@@ -188,7 +188,7 @@ func (h Handler) listEpisode(
 	}
 
 	if int64(page.Offset) >= count {
-		return res.NewError(http.StatusBadRequest, "offset if greater than count")
+		return res.BadRequest("offset if greater than count")
 	}
 
 	response.Total = count
@@ -222,7 +222,7 @@ func parseEpType(s string) (model.EpType, error) {
 
 	v, err := strparse.Uint8(s)
 	if err != nil {
-		return -1, res.NewError(http.StatusBadRequest, "wrong value for query `type`")
+		return -1, res.BadRequest("wrong value for query `type`")
 	}
 
 	e := model.EpType(v)
@@ -233,5 +233,5 @@ func parseEpType(s string) (model.EpType, error) {
 		return e, nil
 	}
 
-	return 0, res.NewError(http.StatusBadRequest, strconv.Quote(s)+" is not valid episode type")
+	return 0, res.BadRequest(strconv.Quote(s) + " is not valid episode type")
 }
