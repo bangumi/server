@@ -24,6 +24,7 @@ type Group struct {
 	Title       string
 	ID          GroupID
 	NSFW        bool
+	MemberCount int64
 }
 
 type GroupMember struct {

@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -63,9 +64,7 @@ func prepareGroupMemberData(t *testing.T, id model.GroupID) domain.GroupRepo {
 	return repo
 }
 
-/*
-TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./internal/group -run '^TestMysqlRepo_CountMembersByName'
-*/
+// TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./internal/group -run 'TestMysqlRepo_CountMembersByName'
 func TestMysqlRepo_CountMembersByName(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
@@ -94,9 +93,7 @@ func TestMysqlRepo_CountMembersByName(t *testing.T) {
 	})
 }
 
-/*
-TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./internal/group -run '^TestMysqlRepo_ListMembersByName$'
-*/
+// TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./internal/group -run '^TestMysqlRepo_ListMembersByName$'
 func TestMysqlRepo_ListMembersByName(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
@@ -149,4 +146,42 @@ func assertHaveID(t *testing.T, members []model.GroupMember, id ...model.UserID)
 	for _, userID := range id {
 		require.True(t, ids[userID], fmt.Sprintf("members should contain user %d", userID))
 	}
+}
+
+// TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./internal/group -run '^TestMysqlRepo_GetByName$'
+func TestMysqlRepo_GetByName(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+	const groupID model.GroupID = 200
+	const groupName = "aabbccdeeeffgg"
+
+	repo, q := getRepo(t)
+
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(context.Background()).Group.Where(q.Group.ID.Eq(groupID)).Delete()
+		assert.NoError(t, err)
+	})
+
+	err := q.WithContext(context.Background()).Group.Create(&dao.Group{
+		ID:        groupID,
+		Name:      groupName,
+		CreatorID: 1,
+		CreatedAt: uint32(time.Now().Unix()),
+	})
+	require.NoError(t, err)
+
+	g, err := repo.GetByName(context.Background(), groupName)
+	require.NoError(t, err)
+	require.Equal(t, groupID, g.ID)
+	require.Equal(t, groupName, g.Name)
+}
+
+// TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./internal/group -run '^TestMysqlRepo_GetByName_not_found'
+func TestMysqlRepo_GetByName_not_found(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+	repo, _ := getRepo(t)
+
+	_, err := repo.GetByName(context.Background(), group2Name)
+	require.ErrorIs(t, err, domain.ErrNotFound)
 }

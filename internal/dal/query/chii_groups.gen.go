@@ -34,8 +34,10 @@ func newGroup(db *gorm.DB) group {
 	_group.Icon = field.NewString(tableName, "grp_icon")
 	_group.CreatorID = field.NewField(tableName, "grp_creator")
 	_group.Topics = field.NewUint32(tableName, "grp_topics")
+	_group.Posts = field.NewUint32(tableName, "grp_posts")
 	_group.Members = field.NewUint32(tableName, "grp_members")
 	_group.Description = field.NewString(tableName, "grp_desc")
+	_group.LastPostedAt = field.NewUint32(tableName, "grp_lastpost")
 	_group.CreatedAt = field.NewUint32(tableName, "grp_builddate")
 	_group.Accessible = field.NewBool(tableName, "grp_accessible")
 	_group.Nsfw = field.NewBool(tableName, "grp_nsfw")
@@ -48,19 +50,21 @@ func newGroup(db *gorm.DB) group {
 type group struct {
 	groupDo groupDo
 
-	ALL         field.Field
-	ID          field.Field
-	Cat         field.Uint16
-	Name        field.String
-	Title       field.String
-	Icon        field.String
-	CreatorID   field.Field
-	Topics      field.Uint32
-	Members     field.Uint32
-	Description field.String
-	CreatedAt   field.Uint32
-	Accessible  field.Bool
-	Nsfw        field.Bool
+	ALL          field.Field
+	ID           field.Field
+	Cat          field.Uint16
+	Name         field.String
+	Title        field.String
+	Icon         field.String
+	CreatorID    field.Field
+	Topics       field.Uint32
+	Posts        field.Uint32
+	Members      field.Uint32
+	Description  field.String
+	LastPostedAt field.Uint32
+	CreatedAt    field.Uint32
+	Accessible   field.Bool
+	Nsfw         field.Bool
 
 	fieldMap map[string]field.Expr
 }
@@ -84,8 +88,10 @@ func (g *group) updateTableName(table string) *group {
 	g.Icon = field.NewString(table, "grp_icon")
 	g.CreatorID = field.NewField(table, "grp_creator")
 	g.Topics = field.NewUint32(table, "grp_topics")
+	g.Posts = field.NewUint32(table, "grp_posts")
 	g.Members = field.NewUint32(table, "grp_members")
 	g.Description = field.NewString(table, "grp_desc")
+	g.LastPostedAt = field.NewUint32(table, "grp_lastpost")
 	g.CreatedAt = field.NewUint32(table, "grp_builddate")
 	g.Accessible = field.NewBool(table, "grp_accessible")
 	g.Nsfw = field.NewBool(table, "grp_nsfw")
@@ -111,7 +117,7 @@ func (g *group) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *group) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 12)
+	g.fieldMap = make(map[string]field.Expr, 14)
 	g.fieldMap["grp_id"] = g.ID
 	g.fieldMap["grp_cat"] = g.Cat
 	g.fieldMap["grp_name"] = g.Name
@@ -119,8 +125,10 @@ func (g *group) fillFieldMap() {
 	g.fieldMap["grp_icon"] = g.Icon
 	g.fieldMap["grp_creator"] = g.CreatorID
 	g.fieldMap["grp_topics"] = g.Topics
+	g.fieldMap["grp_posts"] = g.Posts
 	g.fieldMap["grp_members"] = g.Members
 	g.fieldMap["grp_desc"] = g.Description
+	g.fieldMap["grp_lastpost"] = g.LastPostedAt
 	g.fieldMap["grp_builddate"] = g.CreatedAt
 	g.fieldMap["grp_accessible"] = g.Accessible
 	g.fieldMap["grp_nsfw"] = g.Nsfw

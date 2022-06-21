@@ -39,6 +39,20 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
+func (r mysqlRepo) getIDByName(ctx context.Context, name string) (model.GroupID, error) {
+	g, err := r.q.Group.WithContext(ctx).Where(r.q.Group.Name.Eq(name)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, domain.ErrNotFound
+		}
+
+		r.log.Error("un-expected error when getting single group", zap.Error(err), zap.String("group_name", name))
+		return 0, errgo.Wrap(err, "dal")
+	}
+
+	return g.ID, nil
+}
+
 func (r mysqlRepo) GetByName(ctx context.Context, name string) (model.Group, error) {
 	g, err := r.q.Group.WithContext(ctx).Where(r.q.Group.Name.Eq(name)).First()
 	if err != nil {
@@ -50,18 +64,20 @@ func (r mysqlRepo) GetByName(ctx context.Context, name string) (model.Group, err
 		return model.Group{}, errgo.Wrap(err, "dal")
 	}
 
-	return convertDao(g), nil
+	m := convertDao(g)
+
+	return m, nil
 }
 
 func (r mysqlRepo) CountMembersByName(
 	ctx context.Context, name string, memberType domain.GroupMemberType,
 ) (int64, error) {
-	g, err := r.GetByName(ctx, name)
+	id, err := r.getIDByName(ctx, name)
 	if err != nil {
 		return 0, err
 	}
 
-	return r.countMembersByID(ctx, g.ID, memberType)
+	return r.countMembersByID(ctx, id, memberType)
 }
 
 func (r mysqlRepo) countMembersByID(
@@ -117,12 +133,12 @@ func (r mysqlRepo) listMembersByID(
 func (r mysqlRepo) ListMembersByName(
 	ctx context.Context, name string, memberType domain.GroupMemberType, limit, offset int,
 ) ([]model.GroupMember, error) {
-	g, err := r.GetByName(ctx, name)
+	id, err := r.getIDByName(ctx, name)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.listMembersByID(ctx, g.ID, memberType, limit, offset)
+	return r.listMembersByID(ctx, id, memberType, limit, offset)
 }
 
 func convertDao(g *dao.Group) model.Group {
@@ -132,6 +148,7 @@ func convertDao(g *dao.Group) model.Group {
 		ID:          g.ID,
 		Description: g.Description,
 		Icon:        g.Icon,
+		MemberCount: int64(g.Members),
 		Title:       g.Title,
 		CreatedAt:   time.Unix(int64(g.CreatedAt), 0),
 	}

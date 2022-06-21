@@ -12,18 +12,20 @@ const TableNameGroup = "chii_groups"
 
 // Group mapped from table <chii_groups>
 type Group struct {
-	ID          model.GroupID `gorm:"column:grp_id;type:smallint(6) unsigned;primaryKey;autoIncrement:true" json:"grp_id"`
-	Cat         uint16        `gorm:"column:grp_cat;type:smallint(6) unsigned;not null" json:"grp_cat"`
-	Name        string        `gorm:"column:grp_name;type:char(50);not null" json:"grp_name"`
-	Title       string        `gorm:"column:grp_title;type:char(50);not null" json:"grp_title"`
-	Icon        string        `gorm:"column:grp_icon;type:varchar(255);not null" json:"grp_icon"`
-	CreatorID   model.UserID  `gorm:"column:grp_creator;type:mediumint(8) unsigned;not null" json:"grp_creator"`
-	Topics      uint32        `gorm:"column:grp_topics;type:mediumint(8) unsigned;not null" json:"grp_topics"`
-	Members     uint32        `gorm:"column:grp_members;type:mediumint(8) unsigned;not null;default:1" json:"grp_members"`
-	Description string        `gorm:"column:grp_desc;type:text;not null" json:"grp_desc"`
-	CreatedAt   uint32        `gorm:"column:grp_builddate;type:int(10) unsigned;not null" json:"grp_builddate"`
-	Accessible  bool          `gorm:"column:grp_accessible;type:tinyint(1);not null;default:1" json:"grp_accessible"` // 可访问性
-	Nsfw        bool          `gorm:"column:grp_nsfw;type:tinyint(1) unsigned;not null" json:"grp_nsfw"`
+	ID           model.GroupID `gorm:"column:grp_id;type:smallint(6) unsigned;primaryKey;autoIncrement:true"`
+	Cat          uint16        `gorm:"column:grp_cat;type:smallint(6) unsigned;not null"`
+	Name         string        `gorm:"column:grp_name;type:char(50);not null"`
+	Title        string        `gorm:"column:grp_title;type:char(50);not null"`
+	Icon         string        `gorm:"column:grp_icon;type:varchar(255);not null"`
+	CreatorID    model.UserID  `gorm:"column:grp_creator;type:mediumint(8) unsigned;not null"`
+	Topics       uint32        `gorm:"column:grp_topics;type:mediumint(8) unsigned;not null"`
+	Posts        uint32        `gorm:"column:grp_posts;type:mediumint(8) unsigned;not null"`
+	Members      uint32        `gorm:"column:grp_members;type:mediumint(8) unsigned;not null;default:1"`
+	Description  string        `gorm:"column:grp_desc;type:text;not null"`
+	LastPostedAt uint32        `gorm:"column:grp_lastpost;type:int(10) unsigned;not null" doc:always 0`
+	CreatedAt    uint32        `gorm:"column:grp_builddate;type:int(10) unsigned;not null"`
+	Accessible   bool          `gorm:"column:grp_accessible;type:tinyint(1);not null;default:1"` // 可访问性
+	Nsfw         bool          `gorm:"column:grp_nsfw;type:tinyint(1) unsigned;not null"`
 }
 
 // TableName Group's table name
