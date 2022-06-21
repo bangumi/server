@@ -46,7 +46,7 @@ func (h Handler) ListCollection(c *fiber.Ctx) error {
 
 	collectionType, err := parseCollectionType(c.Query("type"))
 	if err != nil {
-		return res.BadRequest("bad query 'type': " + err.Error())
+		return err
 	}
 
 	u, err := h.u.GetByName(c.Context(), username)
