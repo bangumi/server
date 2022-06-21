@@ -62,10 +62,6 @@ func InternalError(c *fiber.Ctx, err error, message string) error {
 	})
 }
 
-func Response(code int, message string) error {
-	return NewError(code, message)
-}
-
 func BadRequest(message string) error {
 	return NewError(http.StatusBadRequest, message)
 }

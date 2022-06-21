@@ -61,7 +61,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	}
 
 	if !allowed {
-		return res.Response(http.StatusTooManyRequests, "Too many requests, you are not allowed to log in for a while.")
+		return res.NewError(http.StatusTooManyRequests, "Too many requests, you are not allowed to log in for a while.")
 	}
 
 	ok, err := h.captcha.Verify(c.Context(), r.HCaptchaResponse)
