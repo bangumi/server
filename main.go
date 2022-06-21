@@ -67,7 +67,7 @@ func start() error {
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
 				httpClient.JSONUnmarshal = json.Unmarshal
-				httpClient.JSONMarshal = json.MarshalNoEscape
+				httpClient.JSONMarshal = json.Marshal
 				return httpClient
 			},
 		),

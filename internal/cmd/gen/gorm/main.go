@@ -70,6 +70,9 @@ func main() {
 	})
 
 	g.WithImportPkgPath("github.com/bangumi/server/internal/model")
+	g.WithJSONTagNameStrategy(func(_ string) string {
+		return ""
+	})
 
 	// reuse the database connection in Project or create a connection here
 	// if you want to use GenerateModel/GenerateModelAs, UseDB is necessary, otherwise it will panic

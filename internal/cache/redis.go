@@ -59,7 +59,7 @@ func (c redisCache) Get(
 
 func (c redisCache) Set(
 	ctx context.Context, key string, value interface{}, ttl time.Duration) error {
-	b, err := json.Marshal(value)
+	b, err := json.MarshalWithOption(value, json.DisableHTMLEscape())
 	if err != nil {
 		return errgo.Wrap(err, "json")
 	}

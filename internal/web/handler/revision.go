@@ -17,9 +17,11 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
@@ -63,7 +65,6 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 	response.Total = count
 
 	revisions, err := h.r.ListPersonRelated(c.Context(), personID, page.Limit, page.Offset)
-
 	if err != nil {
 		return errgo.Wrap(err, "revision.ListPersonRelated")
 	}
@@ -74,29 +75,32 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
 
+	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
+
 	for i := range revisions {
 		data[i] = convertModelPersonRevision(&revisions[i], creatorMap)
 	}
 	response.Data = data
+
 	return c.JSON(response)
 }
 
 func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id <= 0 {
-		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad param id: %s", c.Params("id")))
+		return res.BadRequest(fmt.Sprintf("bad param id: %s", c.Params("id")))
 	}
 	r, err := h.r.GetPersonRelated(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.ErrNotFound
+			return res.ErrNotFound
 		}
-		return fiber.ErrInternalServerError
+
+		return h.InternalError(c, err, "failed to get person related revision", zap.Uint32("rev_id", id))
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
@@ -169,17 +173,18 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id <= 0 {
-		return fiber.NewError(
-			fiber.StatusBadRequest,
+		return res.NewError(
+			http.StatusBadRequest,
 			fmt.Sprintf("bad param id: %s", strconv.Quote(c.Params("id"))),
 		)
 	}
 	r, err := h.r.GetCharacterRelated(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.ErrNotFound
+			return res.ErrNotFound
 		}
-		return fiber.ErrInternalServerError
+
+		return h.InternalError(c, err, "failed to get character related revision", zap.Uint32("rev_id", id))
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
@@ -195,9 +200,9 @@ func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	subjectID, err := strparse.SubjectID(c.Query("subject_id"))
-	if err != nil || subjectID <= 0 {
-		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad query subject_id: %s", c.Query("subject_id")))
+	subjectID, err := parseSubjectID(c.Query("subject_id"))
+	if err != nil {
+		return err
 	}
 
 	return h.listSubjectRevision(c, subjectID, page)
@@ -251,14 +256,15 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(fiber.StatusBadRequest, "bad param id: "+strconv.Quote(c.Params("id")))
+		return res.BadRequest("bad param id: " + strconv.Quote(c.Params("id")))
 	}
 	r, err := h.r.GetSubjectRelated(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.ErrNotFound
+			return res.ErrNotFound
 		}
-		return fiber.ErrInternalServerError
+
+		return h.InternalError(c, err, "failed to get subject related revision", zap.Uint32("rev_id", id))
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)

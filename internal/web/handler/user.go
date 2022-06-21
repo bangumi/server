@@ -16,95 +16,87 @@ package handler
 
 import (
 	"errors"
-	"net/http"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 	if !u.login || u.ID == 0 {
-		return fiber.ErrUnauthorized
+		return res.Unauthorized("need login")
 	}
 
 	user, err := h.u.GetByID(c.Context(), u.ID)
 	if err != nil {
-		return errgo.Wrap(err, "repo")
+		return h.InternalError(c, err, "failed to get user")
 	}
 
-	var me = res.User{
+	return res.JSON(c, res.User{
 		ID:        user.ID,
 		URL:       "https://bgm.tv/user/" + user.UserName,
 		Username:  user.UserName,
 		Nickname:  user.NickName,
 		UserGroup: user.UserGroup,
-		Avatar:    res.Avatar{}.Fill(user.Avatar),
+		Avatar:    res.UserAvatar(user.Avatar),
 		Sign:      user.Sign,
-	}
-
-	return res.JSON(c, me)
+	})
 }
 
 func (h Handler) GetUser(c *fiber.Ctx) error {
 	username := c.Params("username")
 	if username == "" {
-		return fiber.NewError(http.StatusBadRequest, "missing require parameters `username`")
+		return res.BadRequest("missing require parameters `username`")
 	}
 	if len(username) >= 32 {
-		return res.HTTPError(c, http.StatusBadRequest, "username is too long")
+		return res.BadRequest("username is too long")
 	}
 
 	user, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.HTTPError(c, http.StatusNotFound, "can't find user with username "+strconv.Quote(username))
+			return res.NotFound("can't find user with username " + strconv.Quote(username))
 		}
 
-		h.log.Error("unexpected error happened", zap.Error(err))
-		return errgo.Wrap(err, "user.GetByName")
+		return h.InternalError(c, err, "failed to get user by username", zap.String("username", username))
 	}
 
-	var r = res.User{
+	return res.JSON(c, res.User{
 		ID:        user.ID,
 		URL:       "https://bgm.tv/user/" + user.UserName,
 		Username:  user.UserName,
 		Nickname:  user.NickName,
 		UserGroup: user.UserGroup,
-		Avatar:    res.Avatar{}.Fill(user.Avatar),
+		Avatar:    res.UserAvatar(user.Avatar),
 		Sign:      user.Sign,
-	}
-
-	return c.JSON(r)
+	})
 }
 
 func (h Handler) GetUserAvatar(c *fiber.Ctx) error {
 	username := c.Params("username")
 	if username == "" {
-		return fiber.NewError(http.StatusBadRequest, "missing require parameters `username`")
+		return res.BadRequest("missing require parameters `username`")
 	}
 	if len(username) >= 32 {
-		return res.HTTPError(c, http.StatusBadRequest, "username is too long")
+		return res.BadRequest("username is too long")
 	}
 
 	user, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.HTTPError(c, http.StatusNotFound, "can't find user with username "+strconv.Quote(username))
+			return res.NotFound("can't find user with username " + strconv.Quote(username))
 		}
 
-		h.log.Error("unexpected error happened", zap.Error(err))
-		return errgo.Wrap(err, "user.GetByName")
+		return h.InternalError(c, err, "failed to get user by username")
 	}
 
-	l, ok := res.Avatar{}.Fill(user.Avatar).Select(c.Query("type"))
+	l, ok := res.UserAvatar(user.Avatar).Select(c.Query("type"))
 	if !ok {
-		return fiber.NewError(http.StatusBadRequest, "bad avatar type: "+c.Query("type"))
+		return res.BadRequest("bad avatar type: " + c.Query("type"))
 	}
 
 	return c.Redirect(l)
