@@ -17,7 +17,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"net/http"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -30,7 +29,6 @@ import (
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/wiki"
 )
 
@@ -129,10 +127,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 	}
 
 	if !ok || (r.NSFW && !user.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return h.getIndexSubjects(c, id, subjectType, page)

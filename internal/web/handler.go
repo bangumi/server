@@ -127,7 +127,7 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 	app.Use(func(c *fiber.Ctx) error {
 		return res.JSON(c.Status(http.StatusNotFound), res.Error{
 			Title:       "Not Found",
-			Description: "This is default response, if you see this response, please check your request path",
+			Description: "This is default response, if you see this response, please check your request",
 			Details:     util.Detail(c),
 		})
 	})

@@ -17,7 +17,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -33,7 +32,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -52,10 +50,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	if r.Redirect != 0 {
@@ -63,10 +58,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	}
 
 	if r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return c.JSON(r)
@@ -144,10 +136,7 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	l, ok := r.Image.Select(c.Query("type"))
@@ -176,10 +165,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	relations, err := h.p.GetSubjectRelated(c.Context(), id)
@@ -315,10 +301,7 @@ func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return h.getSubjectRelatedCharacters(c, id)

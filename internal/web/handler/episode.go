@@ -17,7 +17,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -30,7 +29,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/vars/enum"
 )
 
@@ -48,10 +46,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	s, ok, err := h.getSubjectWithCache(c.Context(), e.SubjectID)
@@ -59,10 +54,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 		return err
 	}
 	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return c.JSON(e)
@@ -148,10 +140,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 	}
 
 	if !ok || subject.Redirect != 0 || (subject.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return h.listEpisode(c, subjectID, page, epType)

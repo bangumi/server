@@ -17,7 +17,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -31,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -48,10 +46,7 @@ func (h Handler) GetPerson(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	if r.Redirect != 0 {
@@ -140,10 +135,7 @@ func (h Handler) GetPersonImage(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	l, ok := r.Images.Select(c.Query("type"))
@@ -170,10 +162,7 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	relations, err := h.c.GetPersonRelated(c.Context(), id)
@@ -209,10 +198,7 @@ func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.Detail(c),
-		})
+		return res.ErrNotFound
 	}
 
 	relations, err := h.s.GetPersonRelated(c.Context(), id)
