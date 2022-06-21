@@ -22,7 +22,7 @@ session manager
 
 # handler
 
-路由应该是 `internal/web/handler/Handler` 的一个方法。
+路由应该是 `internal/web/handler.Handler` 的一个方法。
 
 使用 `http.Status*` 作为返回码，不要使用 `fiber.Status*`。
 
