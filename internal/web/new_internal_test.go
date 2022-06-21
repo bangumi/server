@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func TestDefaultErrorHandler_interface(t *testing.T) {
+func TestDefaultErrorHandler_resError(t *testing.T) {
 	t.Parallel()
 
 	app := fiber.New(fiber.Config{ErrorHandler: getDefaultErrorHandler()})
@@ -48,7 +48,7 @@ func TestDefaultErrorHandler_interface(t *testing.T) {
 	require.Equal(t, "mm", body.Description)
 }
 
-func TestDefaultErrorHandler_fiberError(t *testing.T) {
+func TestDefaultErrorHandler_internal(t *testing.T) {
 	t.Parallel()
 
 	app := fiber.New(fiber.Config{ErrorHandler: getDefaultErrorHandler()})
