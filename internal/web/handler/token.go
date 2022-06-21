@@ -21,7 +21,6 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 
@@ -43,11 +42,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 	}
 
 	if err := h.v.Struct(r); err != nil {
-		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
-			Title:       utils.StatusMessage(http.StatusBadRequest),
-			Description: "can't validate request body",
-			Details:     h.translationValidationError(err),
-		})
+		return h.ValidationError(c, err)
 	}
 
 	token, err := h.a.CreateAccessToken(c.Context(), v.ID, r.Name, timex.OneDay*time.Duration(r.DurationDays))
@@ -68,13 +63,8 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
 		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
 	}
-
 	if err := h.v.Struct(r); err != nil {
-		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
-			Title:       utils.StatusMessage(http.StatusBadRequest),
-			Description: "can't validate request body",
-			Details:     h.translationValidationError(err),
-		})
+		return h.ValidationError(c, err)
 	}
 
 	token, err := h.a.GetTokenByID(c.Context(), r.ID)

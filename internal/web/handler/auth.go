@@ -52,11 +52,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	}
 
 	if err := h.v.Struct(r); err != nil {
-		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
-			Title:       utils.StatusMessage(http.StatusBadRequest),
-			Description: "can't validate request body",
-			Details:     h.translationValidationError(err),
-		})
+		return h.ValidationError(c, err)
 	}
 
 	allowed, remain, err := h.rateLimit.Allowed(c.Context(), a.ip.String())

@@ -16,9 +16,11 @@ package handler
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/web/res"
@@ -42,4 +44,12 @@ func (h Handler) translationValidationError(err error) []string {
 func (h Handler) InternalError(c *fiber.Ctx, err error, message string, logFields ...zap.Field) error {
 	h.skip1Log.Error(message, append(logFields, zap.Error(err))...)
 	return res.InternalError(c, err, message)
+}
+
+func (h Handler) ValidationError(c *fiber.Ctx, err error) error {
+	return res.JSON(c.Status(http.StatusBadRequest), res.Error{
+		Title:       utils.StatusMessage(http.StatusBadRequest),
+		Description: "can't validate request body",
+		Details:     h.translationValidationError(err),
+	})
 }
