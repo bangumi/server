@@ -50,7 +50,7 @@ func (h Handler) GetPerson(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
@@ -142,13 +142,13 @@ func (h Handler) GetPersonImage(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
 	l, ok := r.Images.Select(c.Query("type"))
 	if !ok {
-		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+		return res.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
 	}
 
 	if l == "" {
@@ -172,7 +172,7 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 	if !ok || r.Redirect != 0 {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
@@ -211,7 +211,7 @@ func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 	if !ok || r.Redirect != 0 {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 

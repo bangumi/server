@@ -19,23 +19,26 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-func ErrDetail(c *fiber.Ctx, err error) Detail {
-	return Detail{
+func ErrDetail(c *fiber.Ctx, err error) interface{} {
+	return detail{
 		Path:        c.Path(),
 		Error:       err.Error(),
+		Method:      c.Method(),
 		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
 	}
 }
 
-func DetailFromRequest(c *fiber.Ctx) Detail {
-	return Detail{
+func Detail(c *fiber.Ctx) interface{} {
+	return detail{
 		Path:        c.Path(),
+		Method:      c.Method(),
 		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
 	}
 }
 
-type Detail struct {
+type detail struct {
 	Error       string `json:"error,omitempty"`
 	Path        string `json:"path,omitempty"`
+	Method      string `json:"method,omitempty"`
 	QueryString string `json:"query_string,omitempty"`
 }

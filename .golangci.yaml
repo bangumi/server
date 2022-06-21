@@ -83,9 +83,12 @@ linters-settings:
   forbidigo:
     # Forbid the following identifiers (identifiers are written using regexp):
     forbid:
+      - ^fiber\.Status.*$
       - ^print.*$
-      - ^fmt.Println$
-      - ^fmt.Print$
+      - ^fmt\.Println$
+      - ^fmt\.Print$
+      - ^fiber\.Err.*$
+      - ^fiber\.NewErr.*$
 
   funlen:
     lines: 60
@@ -236,9 +239,13 @@ linters-settings:
       - "func (*github.com/gofiber/fiber/v2.Ctx).JSON("
       - "func os.Open(name string)"
       - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
-      - "func github.com/bangumi/server/internal/web/res.HTTPError("
+      - "func github.com/bangumi/server/internal/web/res.NewError("
+      - "func github.com/bangumi/server/internal/web/res.Response("
       - "func github.com/bangumi/server/internal/web/res.WithError("
       - "func github.com/bangumi/server/internal/web/res.InternalError("
+      - "func github.com/bangumi/server/internal/web/res.NotFound("
+      - "func github.com/bangumi/server/internal/web/res.Unauthorized("
+      - "func github.com/bangumi/server/internal/web/res.BadRequest("
       - "func github.com/bangumi/server/internal/web/res.JSON("
 
   nlreturn:

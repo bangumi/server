@@ -50,7 +50,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
@@ -61,7 +61,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
@@ -139,7 +139,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return err
 	}
 	if subjectID == 0 {
-		return fiber.NewError(http.StatusBadRequest, "missing required query `subject_id`")
+		return res.NewError(http.StatusBadRequest, "missing required query `subject_id`")
 	}
 
 	subject, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
@@ -150,7 +150,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 	if !ok || subject.Redirect != 0 || (subject.NSFW && !u.AllowNSFW()) {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
@@ -188,7 +188,7 @@ func (h Handler) listEpisode(
 	}
 
 	if int64(page.Offset) >= count {
-		return fiber.NewError(http.StatusBadRequest, "offset if greater than count")
+		return res.NewError(http.StatusBadRequest, "offset if greater than count")
 	}
 
 	response.Total = count
@@ -222,7 +222,7 @@ func parseEpType(s string) (model.EpType, error) {
 
 	v, err := strparse.Uint8(s)
 	if err != nil {
-		return -1, fiber.NewError(http.StatusBadRequest, "wrong value for query `type`")
+		return -1, res.NewError(http.StatusBadRequest, "wrong value for query `type`")
 	}
 
 	e := model.EpType(v)
@@ -233,5 +233,5 @@ func parseEpType(s string) (model.EpType, error) {
 		return e, nil
 	}
 
-	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+" is not valid episode type")
+	return 0, res.NewError(http.StatusBadRequest, strconv.Quote(s)+" is not valid episode type")
 }

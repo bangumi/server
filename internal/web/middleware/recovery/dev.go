@@ -20,6 +20,7 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"net/http"
 	"runtime"
 	"strconv"
 	"strings"
@@ -33,10 +34,10 @@ var _debugHTML string
 // New creates a new middleware handler with debug info.
 func New() fiber.Handler {
 	// Return new handler
-	return func(c *fiber.Ctx) (err error) {
+	return func(c *fiber.Ctx) (err error) { //nolint:nonamedreturns
 		defer func() {
 			if r := recover(); r != nil {
-				c.Status(fiber.StatusInternalServerError).
+				c.Status(http.StatusInternalServerError).
 					Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
 				_, err = fmt.Fprintf(c, _debugHTML, takeStacktrace(2))
 			}

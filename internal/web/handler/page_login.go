@@ -17,9 +17,9 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Handler) PageLogin(c *fiber.Ctx) error {
@@ -30,7 +30,7 @@ func (h Handler) PageLogin(c *fiber.Ctx) error {
 		u, err = h.u.GetByID(c.Context(), v.ID)
 
 		if err != nil {
-			return res.InternalError(c, err, "failed to get current user")
+			return h.InternalError(c, err, "failed to get current user", log.UserID(v.ID))
 		}
 	}
 

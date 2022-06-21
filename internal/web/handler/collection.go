@@ -26,7 +26,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 func (h Handler) ListCollection(c *fiber.Ctx) error {
@@ -38,23 +37,23 @@ func (h Handler) ListCollection(c *fiber.Ctx) error {
 
 	username := c.Params("username")
 	if username == "" {
-		return fiber.NewError(http.StatusBadRequest, "missing require parameters `username`")
+		return res.NewError(http.StatusBadRequest, "missing require parameters `username`")
 	}
 
 	subjectType, err := parseSubjectType(c.Query("subject_type"))
 	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, err.Error())
+		return res.NewError(http.StatusBadRequest, err.Error())
 	}
 
 	collectionType, err := parseCollectionType(c.Query("type"))
 	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, "bad query 'type': "+err.Error())
+		return res.NewError(http.StatusBadRequest, "bad query 'type': "+err.Error())
 	}
 
 	u, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.NewError(http.StatusNotFound, "user doesn't exist or has been removed")
+			return res.NewError(http.StatusNotFound, "user doesn't exist or has been removed")
 		}
 
 		return errgo.Wrap(err, "user.GetByName")
@@ -125,7 +124,7 @@ func parseCollectionType(s string) (uint8, error) {
 
 	t, err := strparse.Uint8(s)
 	if err != nil {
-		return 0, fiber.NewError(http.StatusBadRequest, "bad collection type: "+strconv.Quote(s))
+		return 0, res.NewError(http.StatusBadRequest, "bad collection type: "+strconv.Quote(s))
 	}
 
 	switch t {
@@ -133,13 +132,13 @@ func parseCollectionType(s string) (uint8, error) {
 		return t, nil
 	}
 
-	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+"is not a valid collection type")
+	return 0, res.NewError(http.StatusBadRequest, strconv.Quote(s)+"is not a valid collection type")
 }
 
 func (h Handler) GetCollection(c *fiber.Ctx) error {
 	username := c.Params("username")
 	if username == "" {
-		return res.HTTPError(c, code.BadRequest, "missing require parameters `username`")
+		return res.BadRequest("missing require parameters `username`")
 	}
 
 	subjectID, err := parseSubjectID(c.Params("subject_id"))
@@ -157,7 +156,7 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 	u, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.NewError(code.NotFound, "user doesn't exist or has been removed")
+			return res.NewError(http.StatusNotFound, "user doesn't exist or has been removed")
 		}
 
 		return errgo.Wrap(err, "user.GetByName")
@@ -168,14 +167,14 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 	collection, err := h.u.GetCollection(c.Context(), u.ID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.HTTPError(c, code.NotFound, notFoundMessage)
+			return res.NotFound(notFoundMessage)
 		}
 
 		return errgo.Wrap(err, "user.GetCollection")
 	}
 
 	if !showPrivate && collection.Private {
-		return res.HTTPError(c, code.NotFound, notFoundMessage)
+		return res.NotFound(notFoundMessage)
 	}
 
 	return res.JSON(c, res.Collection{

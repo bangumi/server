@@ -16,18 +16,33 @@ package res
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/web/res/code"
 	"github.com/bangumi/server/internal/web/util"
 )
+
+var ErrNotFound = NewError(http.StatusNotFound, "resource can't be found in the database or has been removed")
 
 // Error default error response.
 type Error struct {
 	Title       string      `json:"title"`
 	Details     interface{} `json:"details,omitempty"`
 	Description string      `json:"description"`
+}
+
+type HTTPError struct {
+	Msg  string
+	Code int
+}
+
+func NewError(code int, message string) error {
+	return &HTTPError{Code: code, Msg: message}
+}
+
+func (e *HTTPError) Error() string {
+	return strconv.Itoa(e.Code) + ": " + e.Msg
 }
 
 func WithError(c *fiber.Ctx, err error, code int, message string) error {
@@ -38,17 +53,26 @@ func WithError(c *fiber.Ctx, err error, code int, message string) error {
 	})
 }
 
-func HTTPError(c *fiber.Ctx, code int, message string) error {
-	return JSON(c.Status(code), Error{
-		Title:       http.StatusText(code),
+func InternalError(c *fiber.Ctx, err error, message string) error {
+	return JSON(c.Status(http.StatusInternalServerError), Error{
+		Title:       "Internal Server Error",
 		Description: message,
+		Details:     util.ErrDetail(c, err),
 	})
 }
 
-func InternalError(c *fiber.Ctx, err error, message string) error {
-	return JSON(c.Status(code.InternalServerError), Error{
-		Title:       "Internal Server Error",
-		Description: message,
-		Details:     err.Error(),
-	})
+func Response(code int, message string) error {
+	return NewError(code, message)
+}
+
+func BadRequest(message string) error {
+	return NewError(http.StatusBadRequest, message)
+}
+
+func NotFound(message string) error {
+	return NewError(http.StatusBadRequest, message)
+}
+
+func Unauthorized(message string) error {
+	return NewError(http.StatusUnauthorized, message)
 }

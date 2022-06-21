@@ -6,7 +6,7 @@ local ban_key = KEYS[2]
 -- check banned keys
 local banned = redis.call('EXISTS', ban_key)
 if banned == 1 then
-    return {0, 0, 0, 0}
+    return { 0, 0, 0, 0 }
 end
 
 -- not check rate limit
@@ -69,7 +69,7 @@ if remaining < 0 then
 
     local reset_after = tat - now
     local retry_after = diff * -1
-    return {0, 0, tostring(retry_after), tostring(reset_after)}
+    return { 0, 0, tostring(retry_after), tostring(reset_after) }
 end
 
 local reset_after = new_tat - now
@@ -77,4 +77,4 @@ if reset_after > 0 then
     redis.call("SET", rate_limit_key, new_tat, "EX", math.ceil(reset_after))
 end
 local retry_after = -1
-return {cost, remaining, tostring(retry_after), tostring(reset_after)}
+return { cost, remaining, tostring(retry_after), tostring(reset_after) }

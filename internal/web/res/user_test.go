@@ -25,7 +25,7 @@ import (
 func TestAvatar_Select(t *testing.T) {
 	t.Parallel()
 
-	userAvatar := res.Avatar{}.Fill("temp")
+	userAvatar := res.UserAvatar("temp")
 	img, ok := userAvatar.Select("large")
 	require.Equal(t, ok, true, "get img url")
 	require.Equal(t, img, "https://lain.bgm.tv/pic/user/l/temp")

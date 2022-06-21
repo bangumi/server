@@ -102,7 +102,7 @@ func TestHandler_GetUserAvatar_302(t *testing.T) {
 
 			resp := test.New(t).Get("/v0/users/u/avatar?type=" + imageType).Execute(app)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
-			expected, _ := res.Avatar{}.Fill("temp").Select(imageType)
+			expected, _ := res.UserAvatar("temp").Select(imageType)
 			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
 		})
 	}

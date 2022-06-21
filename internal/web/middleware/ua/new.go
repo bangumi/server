@@ -15,12 +15,12 @@
 package ua
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 var _ fiber.Handler = DisableDefaultHTTPLibrary
@@ -32,11 +32,11 @@ const forbiddenMessage = "using HTTP request library's default User-Agent is for
 func DisableDefaultHTTPLibrary(c *fiber.Ctx) error {
 	u := c.Get(fiber.HeaderUserAgent)
 	if u == "" {
-		return res.HTTPError(c, code.Forbidden, "Please set a 'User-Agent'")
+		return res.Response(http.StatusForbidden, "Please set a 'User-Agent'")
 	}
 
 	if isDefaultUA(u) {
-		return res.HTTPError(c, code.Forbidden, forbiddenMessage)
+		return res.Response(http.StatusForbidden, forbiddenMessage)
 	}
 
 	return c.Next()

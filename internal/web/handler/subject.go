@@ -54,7 +54,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
@@ -65,7 +65,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	if r.NSFW && !u.AllowNSFW() {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
@@ -135,7 +135,7 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+		return res.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -146,13 +146,13 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	if !ok || r.NSFW && !u.AllowNSFW() {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
 	l, ok := r.Image.Select(c.Query("type"))
 	if !ok {
-		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+		return res.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
 	}
 
 	if l == "" {
@@ -167,7 +167,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, err.Error())
+		return res.NewError(http.StatusBadRequest, err.Error())
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -178,7 +178,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
@@ -261,7 +261,7 @@ func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 
 	id, err := strparse.SubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+		return res.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -270,10 +270,7 @@ func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.NewError(http.StatusNotFound, "subject not found")
 	}
 
 	relations, err := h.s.GetSubjectRelated(c.Context(), id)
@@ -309,7 +306,7 @@ func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 	id, err := strparse.SubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+		return res.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -320,7 +317,7 @@ func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
 		return c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
+			Details: util.Detail(c),
 		})
 	}
 
