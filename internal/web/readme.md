@@ -46,19 +46,11 @@ func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
 		return res.Unauthorized("need login")
 	}
 
-	user, err := h.u.GetByID(c.Context(), u.ID)
+	data, err := h.service.FetchUserData(c.Context(), u.ID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get user", log.UserID(u.ID), u.LogRequestID())
 	}
 
-	return res.JSON(c, res.User{
-		ID:        user.ID,
-		URL:       "https://bgm.tv/user/" + user.UserName,
-		Username:  user.UserName,
-		Nickname:  user.NickName,
-		UserGroup: user.UserGroup,
-		Avatar:    res.UserAvatar(user.Avatar),
-		Sign:      user.Sign,
-	})
+	return res.JSON(c, data)
 }
 ```
