@@ -33,16 +33,18 @@ type Error struct {
 	Description string      `json:"description"`
 }
 
+var _ error = HTTPError{}
+
 type HTTPError struct {
 	Msg  string
 	Code int
 }
 
 func NewError(code int, message string) error {
-	return &HTTPError{Code: code, Msg: message}
+	return HTTPError{Code: code, Msg: message}
 }
 
-func (e *HTTPError) Error() string {
+func (e HTTPError) Error() string {
 	return strconv.Itoa(e.Code) + ": " + e.Msg
 }
 
