@@ -200,9 +200,9 @@ func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	subjectID, err := strparse.SubjectID(c.Query("subject_id"))
-	if err != nil || subjectID <= 0 {
-		return res.BadRequest(fmt.Sprintf("bad query subject_id: %s", c.Query("subject_id")))
+	subjectID, err := parseSubjectID(c.Query("subject_id"))
+	if err != nil {
+		return err
 	}
 
 	return h.listSubjectRevision(c, subjectID, page)

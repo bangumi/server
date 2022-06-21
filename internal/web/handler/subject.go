@@ -30,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
@@ -245,9 +244,9 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := strparse.SubjectID(c.Params("id"))
-	if err != nil || id == 0 {
-		return res.BadRequest("bad id: " + strconv.Quote(c.Params("id")))
+	id, err := parseSubjectID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -290,9 +289,9 @@ func readableRelation(destSubjectType model.SubjectType, relation uint16) string
 
 func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := strparse.SubjectID(c.Params("id"))
-	if err != nil || id == 0 {
-		return res.BadRequest("bad id: " + strconv.Quote(c.Params("id")))
+	id, err := parseSubjectID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
