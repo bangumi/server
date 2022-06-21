@@ -12,17 +12,17 @@ const TableNameApp = "chii_apps"
 
 // App mapped from table <chii_apps>
 type App struct {
-	ID          uint32       `gorm:"column:app_id;type:mediumint(8);primaryKey;autoIncrement:true" json:"app_id"`
-	Type        uint8        `gorm:"column:app_type;type:tinyint(1);not null;index:app_type,priority:1" json:"app_type"`
-	Creator     model.UserID `gorm:"column:app_creator;type:mediumint(8);not null;index:app_type,priority:2" json:"app_creator"`
-	Name        string       `gorm:"column:app_name;type:varchar(255);not null" json:"app_name"`
-	Description string       `gorm:"column:app_desc;type:mediumtext;not null" json:"app_desc"`
-	URL         string       `gorm:"column:app_url;type:varchar(2000);not null" json:"app_url"`
-	Collects    int32        `gorm:"column:app_collects;type:mediumint(8);not null" json:"app_collects"`
-	Status      bool         `gorm:"column:app_status;type:tinyint(1);not null;index:app_status,priority:1" json:"app_status"`
-	CreatedAt   int32        `gorm:"column:app_timestamp;type:int(10);not null" json:"app_timestamp"`
-	UpdatedAt   int32        `gorm:"column:app_lasttouch;type:int(10);not null" json:"app_lasttouch"`
-	Ban         bool         `gorm:"column:app_ban;type:tinyint(1);not null;index:app_ban,priority:1" json:"app_ban"`
+	ID          uint32       `gorm:"column:app_id;type:mediumint(8);primaryKey;autoIncrement:true"`
+	Type        uint8        `gorm:"column:app_type;type:tinyint(1);not null;index:app_type,priority:1"`
+	Creator     model.UserID `gorm:"column:app_creator;type:mediumint(8);not null;index:app_type,priority:2"`
+	Name        string       `gorm:"column:app_name;type:varchar(255);not null"`
+	Description string       `gorm:"column:app_desc;type:mediumtext;not null"`
+	URL         string       `gorm:"column:app_url;type:varchar(2000);not null"`
+	Collects    int32        `gorm:"column:app_collects;type:mediumint(8);not null"`
+	Status      bool         `gorm:"column:app_status;type:tinyint(1);not null;index:app_status,priority:1"`
+	CreatedAt   int32        `gorm:"column:app_timestamp;type:int(10);not null"`
+	UpdatedAt   int32        `gorm:"column:app_lasttouch;type:int(10);not null"`
+	Ban         bool         `gorm:"column:app_ban;type:tinyint(1);not null;index:app_ban,priority:1"`
 }
 
 // TableName App's table name

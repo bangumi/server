@@ -12,12 +12,12 @@ const TableNameCharacterSubjects = "chii_crt_subject_index"
 
 // CharacterSubjects mapped from table <chii_crt_subject_index>
 type CharacterSubjects struct {
-	CharacterID   model.CharacterID `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey" json:"crt_id"`
-	SubjectID     model.SubjectID   `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey;index:subject_id,priority:1" json:"subject_id"`
-	SubjectTypeID uint8             `gorm:"column:subject_type_id;type:tinyint(4) unsigned;not null;index:subject_type_id,priority:1" json:"subject_type_id"`
-	CrtType       uint8             `gorm:"column:crt_type;type:tinyint(4) unsigned;not null;index:crt_type,priority:1" json:"crt_type"` // 主角，配角
-	CtrAppearEps  string            `gorm:"column:ctr_appear_eps;type:mediumtext;not null" json:"ctr_appear_eps"`                        // 可选，角色出场的的章节
-	CrtOrder      uint8             `gorm:"column:crt_order;type:tinyint(3) unsigned;not null" json:"crt_order"`
+	CharacterID   model.CharacterID `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey"`
+	SubjectID     model.SubjectID   `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey;index:subject_id,priority:1"`
+	SubjectTypeID uint8             `gorm:"column:subject_type_id;type:tinyint(4) unsigned;not null;index:subject_type_id,priority:1"`
+	CrtType       uint8             `gorm:"column:crt_type;type:tinyint(4) unsigned;not null;index:crt_type,priority:1"` // 主角，配角
+	CtrAppearEps  string            `gorm:"column:ctr_appear_eps;type:mediumtext;not null"`                              // 可选，角色出场的的章节
+	CrtOrder      uint8             `gorm:"column:crt_order;type:tinyint(3) unsigned;not null"`
 	Character     Character         `gorm:"foreignKey:crt_id;references:crt_id" json:"character"`
 	Subject       Subject           `gorm:"foreignKey:subject_id;references:subject_id" json:"subject"`
 }

@@ -12,13 +12,13 @@ const TableNamePersonSubjects = "chii_person_cs_index"
 
 // PersonSubjects mapped from table <chii_person_cs_index>
 type PersonSubjects struct {
-	PrsnType      string          `gorm:"column:prsn_type;type:enum('prsn','crt');primaryKey" json:"prsn_type"`
-	PersonID      model.PersonID  `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey;index:prsn_id,priority:1" json:"prsn_id"`
-	PrsnPosition  uint16          `gorm:"column:prsn_position;type:smallint(5) unsigned;primaryKey;index:prsn_position,priority:1" json:"prsn_position"` // 监督，原案，脚本,..
-	SubjectID     model.SubjectID `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey;index:subject_id,priority:1" json:"subject_id"`
-	SubjectTypeID uint8           `gorm:"column:subject_type_id;type:tinyint(4) unsigned;not null;index:subject_type_id,priority:1" json:"subject_type_id"`
-	Summary       string          `gorm:"column:summary;type:mediumtext;not null" json:"summary"`
-	PrsnAppearEps string          `gorm:"column:prsn_appear_eps;type:mediumtext;not null" json:"prsn_appear_eps"` // 可选，人物参与的章节
+	PrsnType      string          `gorm:"column:prsn_type;type:enum('prsn','crt');primaryKey"`
+	PersonID      model.PersonID  `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey;index:prsn_id,priority:1"`
+	PrsnPosition  uint16          `gorm:"column:prsn_position;type:smallint(5) unsigned;primaryKey;index:prsn_position,priority:1"` // 监督，原案，脚本,..
+	SubjectID     model.SubjectID `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey;index:subject_id,priority:1"`
+	SubjectTypeID uint8           `gorm:"column:subject_type_id;type:tinyint(4) unsigned;not null;index:subject_type_id,priority:1"`
+	Summary       string          `gorm:"column:summary;type:mediumtext;not null"`
+	PrsnAppearEps string          `gorm:"column:prsn_appear_eps;type:mediumtext;not null"` // 可选，人物参与的章节
 	Subject       Subject         `gorm:"foreignKey:subject_id;references:subject_id" json:"subject"`
 	Person        Person          `gorm:"foreignKey:prsn_id;references:prsn_id" json:"person"`
 }
