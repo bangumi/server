@@ -56,10 +56,8 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			h.log.Error("index missing creator", zap.Uint32("index_id", id), log.UserID(i.CreatorID))
-			return res.Index{}, false, errgo.Wrap(err, "user.GetByID")
 		}
-
-		return res.Index{}, false, errgo.Wrap(err, "user.GetByID")
+		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
 	}
 
 	r = res.Index{
