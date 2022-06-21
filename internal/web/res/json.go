@@ -22,7 +22,7 @@ import (
 )
 
 func JSON(c *fiber.Ctx, v interface{}) error {
-	data, err := json.MarshalNoEscape(v)
+	data, err := json.Marshal(v)
 	if err != nil {
 		c.Status(http.StatusInternalServerError).Context().SetBodyString("failed to encode json body: " + err.Error())
 		return nil //nolint:nilerr

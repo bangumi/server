@@ -12,25 +12,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
+package req
 
-package referer
-
-import (
-	"strings"
-
-	"github.com/gofiber/fiber/v2"
-
-	"github.com/bangumi/server/internal/web/res"
-)
-
-func New(referer string) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		ref := c.Get(fiber.HeaderReferer)
-		if ref == "" || strings.HasPrefix(ref, referer) {
-			return c.Next()
-		}
-
-		return res.BadRequest("bad referer, cross-site api request is not allowed")
-	}
-}
+const HeaderCFRay = "Cf-Ray"

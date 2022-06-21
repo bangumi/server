@@ -17,7 +17,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -31,9 +30,7 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -52,10 +49,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	if r.Redirect != 0 {
@@ -63,10 +57,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	}
 
 	if r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return c.JSON(r)
@@ -135,7 +126,7 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -144,15 +135,12 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	l, ok := r.Image.Select(c.Query("type"))
 	if !ok {
-		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+		return res.BadRequest("bad image type: " + c.Query("type"))
 	}
 
 	if l == "" {
@@ -167,7 +155,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, err.Error())
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -176,10 +164,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	relations, err := h.p.GetSubjectRelated(c.Context(), id)
@@ -259,9 +244,9 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := strparse.SubjectID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	id, err := parseSubjectID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -270,10 +255,7 @@ func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.NotFound("subject not found")
 	}
 
 	relations, err := h.s.GetSubjectRelated(c.Context(), id)
@@ -307,9 +289,9 @@ func readableRelation(destSubjectType model.SubjectType, relation uint16) string
 
 func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := strparse.SubjectID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	id, err := parseSubjectID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -318,10 +300,7 @@ func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return h.getSubjectRelatedCharacters(c, id)
