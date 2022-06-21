@@ -32,7 +32,9 @@ type GroupRepo interface {
 	// GetByID(ctx context.Context, id model.GroupID) (model.Group, error)
 
 	CountMembersByID(ctx context.Context, id model.GroupID, memberType GroupMemberType) (int64, error)
-	ListMembersByID(ctx context.Context, id model.GroupID, memberType GroupMemberType, limit, offset int) ([]model.GroupMember, error)
+	ListMembersByID(
+		ctx context.Context, id model.GroupID, memberType GroupMemberType, limit, offset int,
+	) ([]model.GroupMember, error)
 }
 
 type GroupMemberType uint8

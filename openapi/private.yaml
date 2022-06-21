@@ -175,7 +175,7 @@ components:
     User:
       $ref: "./components/user.yaml"
     Group:
-      $ref: "./components/group.yaml"
+      $ref: "./components/private/group.yaml"
     Avatar:
       $ref: "./components/avatar.yaml"
     ErrorDetail:

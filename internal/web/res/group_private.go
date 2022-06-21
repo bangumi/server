@@ -36,8 +36,8 @@ type PrivateTopic struct {
 }
 
 type PrivateGroupMember struct {
-	ID       model.UserID `json:"id"`
-	UserName string       `json:"user_name"`
-	NickName string       `json:"nick_name"`
+	UserName string       `json:"username"`
+	NickName string       `json:"nickname"`
 	Avatar   Avatar       `json:"avatar"`
+	ID       model.UserID `json:"id"`
 }

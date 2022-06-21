@@ -141,11 +141,15 @@ func (r mysqlRepo) ListMembersByName(
 	return r.listMembersByID(ctx, id, memberType, limit, offset)
 }
 
-func (r mysqlRepo) CountMembersByID(ctx context.Context, id model.GroupID, memberType domain.GroupMemberType) (int64, error) {
+func (r mysqlRepo) CountMembersByID(
+	ctx context.Context, id model.GroupID, memberType domain.GroupMemberType,
+) (int64, error) {
 	return r.countMembersByID(ctx, id, memberType)
 }
 
-func (r mysqlRepo) ListMembersByID(ctx context.Context, id model.GroupID, memberType domain.GroupMemberType, limit, offset int) ([]model.GroupMember, error) {
+func (r mysqlRepo) ListMembersByID(
+	ctx context.Context, id model.GroupID, memberType domain.GroupMemberType, limit, offset int,
+) ([]model.GroupMember, error) {
 	return r.listMembersByID(ctx, id, memberType, limit, offset)
 }
 
