@@ -29,10 +29,10 @@ type GroupRepo interface {
 	) ([]model.GroupMember, error)
 	// CountModeratorsByName(ctx context.Context, name string, limit, offset int) ([]model.GroupModerator, error)
 	// ListModeratorsByName(ctx context.Context, name string, limit, offset int) ([]model.GroupModerator, error)
-
 	// GetByID(ctx context.Context, id model.GroupID) (model.Group, error)
-	// CountMembersByID(ctx context.Context, id model.GroupID) (int64, error)
-	// ListMembersByID(ctx context.Context, id model.GroupID, limit, offset int) ([]model.GroupMember, error)
+
+	CountMembersByID(ctx context.Context, id model.GroupID, memberType GroupMemberType) (int64, error)
+	ListMembersByID(ctx context.Context, id model.GroupID, memberType GroupMemberType, limit, offset int) ([]model.GroupMember, error)
 }
 
 type GroupMemberType uint8

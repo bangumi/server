@@ -18,8 +18,11 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -28,17 +31,51 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 	g, err := h.g.GetByName(c.Context(), groupName)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound(c, "group not found")
+			return res.NotFound("group not found")
 		}
 
-		return res.InternalError(c, err, "un expected error")
+		return h.InternalError(c, err, "failed to find group", zap.String("group_name", groupName))
 	}
 
-	return res.JSON(c, res.Group{
-		Name:        g.Name,
-		Title:       g.Title,
-		Description: g.Description,
-		Icon:        "https://lain.bgm.tv/pic/icon/l/" + g.Icon,
-		// ID:          g.ID,
+	members, err := h.g.ListMembersByID(c.Context(), g.ID, domain.GroupMemberAll, 10, 0)
+	if err != nil {
+		return h.InternalError(c, err, "failed to list recent members", log.GroupID(g.ID))
+	}
+
+	userIDs := make([]model.UserID, len(members))
+	for i, member := range members {
+		userIDs[i] = member.UserID
+	}
+	userMap, err := h.u.GetByIDs(c.Context(), userIDs...)
+	if err != nil {
+		return h.InternalError(c, err, "failed to get recent member user info")
+	}
+
+	return res.JSON(c, res.PrivateGroupProfile{
+		CreatedAt:    g.CreatedAt,
+		Name:         g.Name,
+		Title:        g.Title,
+		Description:  g.Description,
+		Icon:         "https://lain.bgm.tv/pic/icon/l/" + g.Icon,
+		TotalMembers: g.MemberCount,
+		// TODO
+		RelatedGroups: nil,
+		NewTopics:     nil,
+		NewMembers:    convertGroupMembers(members, userMap),
 	})
+}
+
+func convertGroupMembers(members []model.GroupMember, userMap map[model.UserID]model.User) []res.PrivateGroupMember {
+	s := make([]res.PrivateGroupMember, len(members))
+	for i, member := range members {
+		u := userMap[member.UserID]
+		s[i] = res.PrivateGroupMember{
+			ID:       member.UserID,
+			UserName: u.UserName,
+			NickName: u.NickName,
+			Avatar:   res.UserAvatar(u.Avatar),
+		}
+	}
+
+	return s
 }

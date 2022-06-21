@@ -30,14 +30,14 @@ import (
 )
 
 func main() {
-	s, err := schema.Generate(reflect.TypeOf(res.Group{}))
+	s, err := schema.Generate(reflect.TypeOf(res.PrivateGroupProfile{}))
 	if err != nil {
 		logger.Fatal("failed to generate schema", zap.Error(err))
 	}
 
 	b, err := yaml.Marshal(WithExampleValue{
 		Schema: s,
-		Example: res.Group{
+		Example: res.PrivateGroupProfile{
 			Name:        "a",
 			Title:       "～技术宅真可怕～",
 			Description: "本小组欢迎对各种技术有一定了解的人，\n比如像橘花热衷杀人技术……\n\n不过、本组主要谈论ＰＣ软硬件方面，\n想了解相关知识，结识可怕的技术宅，请进。",
