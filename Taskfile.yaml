@@ -15,6 +15,7 @@ tasks:
     desc: Build Web Server Binary
     sources:
       - ./**/*.go
+      - go.mod
     generates:
       - ./dist/chii.exe
     cmds:
@@ -26,6 +27,7 @@ tasks:
     desc: Build Web Server Binary
     sources:
       - ./**/*.go
+      - go.mod
     generates:
       - ./dist/archive.exe
     cmds:
