@@ -31,8 +31,9 @@ make install
 - `MYSQL_USER` 默认 `user`
 - `MYSQL_PASS` 默认 `password`
 - `REDIS_URI` 默认 `redis://127.0.0.1:6379/0`
+- `HTTP_PORT` 默认 `3000`
 
-你也可以把配置放在 `.env` 文件中。
+你也可以把配置放在 `.env` 文件中，`go-task` 会自动加载 `.env` 文件中的环境变量。
 
 example:
 
