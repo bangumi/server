@@ -33,8 +33,10 @@ type PrivateGroupProfile struct {
 }
 
 type PrivateGroup struct {
-	Name string `json:"name"`
-	Icon string `json:"icon" format:"url"`
+	Name         string `json:"name"`
+	Icon         string `json:"icon" format:"url"`
+	Title        string `json:"title"`
+	TotalMembers int64  `json:"total_members"`
 }
 
 type PrivateTopic struct {

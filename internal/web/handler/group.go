@@ -62,8 +62,10 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 	relatedGroups := make([]res.PrivateGroup, len(modelRelatedGroups))
 	for i, g := range modelRelatedGroups {
 		relatedGroups[i] = res.PrivateGroup{
-			Name: g.Name,
-			Icon: groupIconPrefix + g.Icon,
+			Name:         g.Name,
+			Icon:         groupIconPrefix + g.Icon,
+			Title:        g.Title,
+			TotalMembers: g.MemberCount,
 		}
 	}
 
