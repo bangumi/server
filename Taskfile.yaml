@@ -60,7 +60,7 @@ tasks:
     deps:
       - gotestfmt
     cmds:
-      - go test -timeout 3s -json -tags test -race ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+      - go test -timeout 3s -json -tags test -race {{.CLI_ARGS}} ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
