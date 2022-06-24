@@ -21,8 +21,7 @@ example:
       icon: "https://lain.bgm.tv/pic/icon/l/000/00/03/364.jpg"
       name: "boring"
       total_members: 9038
-
-  total_members: 0
+  total_members: 9450
 properties:
   id:
     type: integer
