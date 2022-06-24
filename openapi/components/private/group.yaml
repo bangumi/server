@@ -1,5 +1,6 @@
 additionalProperties: false
 example:
+  id: 11
   name: a
   title: ～技术宅真可怕～
   created_at: "2008-08-01T06:11:29+08:00"
