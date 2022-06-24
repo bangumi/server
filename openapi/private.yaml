@@ -151,8 +151,8 @@ paths:
     get:
       tags:
         - 小组
-      summary: 获取小组信息
-      operationId: getGroupInfoByName
+      summary: 获取小组首页信息
+      operationId: getGroupProfileByName
       parameters:
         - name: name
           in: path
