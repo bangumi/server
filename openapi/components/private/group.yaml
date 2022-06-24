@@ -35,6 +35,21 @@ properties:
   related_groups:
     items:
       type: object
+      required:
+        - name
+        - icon
+        - title
+        - total_members
+      properties:
+        name:
+          type: string
+        icon:
+          type: string
+          format: url
+        title:
+          type: string
+        total_members:
+          type: integer
     type: array
   title:
     type: string
