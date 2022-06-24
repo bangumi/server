@@ -21,15 +21,15 @@ import (
 )
 
 type PrivateGroupProfile struct {
-	ID            model.GroupID        `json:"id"`
 	CreatedAt     time.Time            `json:"created_at"`
 	Name          string               `json:"name"`
 	Title         string               `json:"title"`
 	Description   string               `json:"description" format:"bbcode"`
 	Icon          string               `json:"icon" format:"url"`
-	RelatedGroups []PrivateGroup       `json:"related_groups"` // 10个
-	NewMembers    []PrivateGroupMember `json:"new_members"`    // 10个
+	RelatedGroups []PrivateGroup       `json:"related_groups"`
+	NewMembers    []PrivateGroupMember `json:"new_members"`
 	TotalMembers  int64                `json:"total_members"`
+	ID            model.GroupID        `json:"id"`
 }
 
 type PrivateGroup struct {
