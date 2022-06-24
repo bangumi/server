@@ -34,6 +34,7 @@ properties:
     $ref: ./topic.yaml
   related_groups:
     items:
+      additionalProperties: false
       type: object
       required:
         - name
