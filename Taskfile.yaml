@@ -90,7 +90,7 @@ tasks:
   gorm:
     desc: Run gorm-gen to generate go struct from mysql database.
     generates:
-      - ./dal/query/gen.go
+      - ./internal/dal/query/gen.go
     sources:
       - ./internal/cmd/gen/gorm/main.go
       - go.mod
