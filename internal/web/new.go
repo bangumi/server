@@ -96,6 +96,23 @@ func getDefaultErrorHandler() func(*fiber.Ctx, error) error {
 			})
 		}
 
+		//nolint:forbidigo,errorlint
+		if fErr, ok := err.(*fiber.Error); ok {
+			log.Error("unexpected fiber error",
+				zap.Int("code", fErr.Code),
+				zap.String("message", fErr.Message),
+				zap.String("path", ctx.Path()),
+				zap.ByteString("query", ctx.Request().URI().QueryString()),
+				zap.String("cf-ray", ctx.Get(req.HeaderCFRay)),
+			)
+
+			return res.JSON(ctx.Status(http.StatusInternalServerError), res.Error{
+				Title:       utils.StatusMessage(fErr.Code),
+				Description: fErr.Message,
+				Details:     util.DetailWithErr(ctx, err),
+			})
+		}
+
 		log.Error("unexpected error",
 			zap.Error(err),
 			zap.String("path", ctx.Path()),
