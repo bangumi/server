@@ -39,11 +39,6 @@ type GroupRepo interface {
 	RelatedGroups(ctx context.Context, id model.GroupID, size int) ([]model.Group, error)
 }
 
-// type GroupService interface {
-// 	GroupRepo
-//
-// }
-
 type GroupMemberType uint8
 
 const (

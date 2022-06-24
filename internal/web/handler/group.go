@@ -27,6 +27,7 @@ import (
 )
 
 const groupIconPrefix = "https://lain.bgm.tv/pic/icon/l/"
+const defaultRelatedGroupLength = 6
 
 func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 	groupName := c.Params("name")
@@ -53,7 +54,7 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get recent member user info")
 	}
 
-	modelRelatedGroups, err := h.g.RelatedGroups(c.Context(), g.ID, 6)
+	modelRelatedGroups, err := h.g.RelatedGroups(c.Context(), g.ID, defaultRelatedGroupLength)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get related groups")
 	}
