@@ -70,6 +70,7 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 	}
 
 	return res.JSON(c, res.PrivateGroupProfile{
+		ID:            g.ID,
 		CreatedAt:     g.CreatedAt,
 		Name:          g.Name,
 		Title:         g.Title,

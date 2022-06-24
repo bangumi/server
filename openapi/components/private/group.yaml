@@ -15,6 +15,8 @@ example:
   related_groups: null
   total_members: 0
 properties:
+  id:
+    type: integer
   created_at:
     format: date-time
     type: string
@@ -64,4 +66,5 @@ required:
   - new_topics
   - new_members
   - total_members
+  - id
 type: object

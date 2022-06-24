@@ -21,6 +21,7 @@ import (
 )
 
 type PrivateGroupProfile struct {
+	ID            model.GroupID        `json:"id"`
 	CreatedAt     time.Time            `json:"created_at"`
 	Name          string               `json:"name"`
 	Title         string               `json:"title"`
