@@ -1,32 +1,16 @@
-items:
-  additionalProperties: false
-  properties:
-    avatar:
-      additionalProperties: false
-      properties:
-        large:
-          type: string
-        medium:
-          type: string
-        small:
-          type: string
-      required:
-        - large
-        - medium
-        - small
-      type: object
-    id:
-      format: int32
-      minimum: 0
-      type: integer
-    nick_name:
-      type: string
-    user_name:
-      type: string
-  required:
-    - id
-    - user_name
-    - nick_name
-    - avatar
-  type: object
-type: array
+additionalProperties: false
+properties:
+  avatar:
+    $ref: "../avatar.yaml"
+  id:
+    type: integer
+  nickname:
+    type: string
+  username:
+    type: string
+required:
+  - id
+  - username
+  - nickname
+  - avatar
+type: object
