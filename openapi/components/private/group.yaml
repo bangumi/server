@@ -30,8 +30,6 @@ properties:
     type: array
     items:
       "$ref": "./group_member.yaml"
-  new_topics:
-    $ref: ./topic.yaml
   related_groups:
     items:
       additionalProperties: false

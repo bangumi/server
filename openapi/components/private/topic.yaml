@@ -1,4 +1,0 @@
-items:
-  additionalProperties: false
-  type: object
-type: array

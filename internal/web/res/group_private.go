@@ -27,7 +27,6 @@ type PrivateGroupProfile struct {
 	Description   string               `json:"description" format:"bbcode"`
 	Icon          string               `json:"icon" format:"url"`
 	RelatedGroups []PrivateGroup       `json:"related_groups"` // 10个
-	NewTopics     []PrivateTopic       `json:"new_topics"`     // 6个
 	NewMembers    []PrivateGroupMember `json:"new_members"`    // 10个
 	TotalMembers  int64                `json:"total_members"`
 }
@@ -37,9 +36,6 @@ type PrivateGroup struct {
 	Icon         string `json:"icon" format:"url"`
 	Title        string `json:"title"`
 	TotalMembers int64  `json:"total_members"`
-}
-
-type PrivateTopic struct {
 }
 
 type PrivateGroupMember struct {

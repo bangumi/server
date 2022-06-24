@@ -77,7 +77,6 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 		Icon:          groupIconPrefix + g.Icon,
 		TotalMembers:  g.MemberCount,
 		RelatedGroups: relatedGroups,
-		NewTopics:     nil,
 		NewMembers:    convertGroupMembers(members, userMap),
 	})
 }
