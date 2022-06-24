@@ -1,0 +1,111 @@
+version: "3"
+
+dotenv: [".env", ".envrc"]
+
+includes:
+  mock: "./etc/mock.task.yaml"
+
+tasks:
+  default:
+    silent: true
+    cmds:
+      - task --list
+
+  build:
+    desc: Build Web Server Binary
+    sources:
+      - ./**/*.go
+    generates:
+      - ./dist/chii.exe
+    cmds:
+      - go build -o dist/chii.exe main.go
+    env:
+      CGO_ENABLED: "0"
+
+  build-archive:
+    desc: Build Web Server Binary
+    sources:
+      - ./**/*.go
+    generates:
+      - ./dist/archive.exe
+    cmds:
+      - go build -o ./dist/archive.exe ./internal/cmd/archive/
+    env:
+      CGO_ENABLED: "0"
+
+  lint:
+    silent: true
+    desc: Run 'golangci-lint'
+    cmds:
+      - golangci-lint run --fix
+
+  test:
+    desc: Run tests without mysql and redis.
+    deps:
+      - gotestfmt
+    cmds:
+      - go test -timeout 1s -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+    env:
+      CGO_ENABLED: "0"
+
+  bench:
+    desc: Run benchmark
+    cmds:
+      - go test -bench=. -benchmem ./pkg/wiki
+
+  test-all:
+    desc: Run all tests, need mysql and redis, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
+    deps:
+      - gotestfmt
+    cmds:
+      - go test -timeout 1s -json -tags test -race ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+    env:
+      TEST_MYSQL: "1"
+      TEST_REDIS: "1"
+
+  coverage:
+    desc: Run tests with coverage report, used in CI.
+    deps:
+      - gotestfmt
+    cmds:
+      - go test -json -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages
+    env:
+      TEST_MYSQL: "1"
+      TEST_REDIS: "1"
+
+  # generated files
+  gen:
+    desc: Generate all generated GO files
+    deps:
+      - gorm
+      - mock
+
+  mock:
+    desc: Generate Mocks.
+    deps:
+      - mock:all
+
+  gorm:
+    desc: Run gorm-gen to generate go struct from mysql database.
+    generates:
+      - ./dal/query/gen.go
+    sources:
+      - ./internal/cmd/gen/gorm/main.go
+      - go.mod
+    cmds:
+      - go run ./internal/cmd/gen/gorm/main.go
+
+  # binary tools
+  gotestfmt:
+    silent: true
+    sources:
+      - go.mod
+    generates:
+      - .bin/gotestfmt.exe
+    cmds:
+      - go build -o .bin/gotestfmt.exe github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt
+
+  clean:
+    cmds:
+      - rm -rf .task
+      - rm -rf .bin
