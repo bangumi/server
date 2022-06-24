@@ -11,9 +11,17 @@ example:
 
     不过、本组主要谈论ＰＣ软硬件方面，
     想了解相关知识，结识可怕的技术宅，请进。
-  new_members: null
-  new_topics: null
-  related_groups: null
+  new_members:
+    - id: "382951"
+      username: "382951"
+      nickname: "树洞酱"
+      avatar: "https://lain.bgm.tv/pic/user/l/icon.jpg"
+  related_groups:
+    - title: "靠谱人生茶话会"
+      icon: "https://lain.bgm.tv/pic/icon/l/000/00/03/364.jpg"
+      name: "boring"
+      total_members: 9038
+
   total_members: 0
 properties:
   id:
