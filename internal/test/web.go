@@ -279,7 +279,7 @@ func MockEmptyCache() fx.Option {
 }
 
 func NopCache() cache.Generic {
-	mc := &mocks.Generic{}
+	mc := &mocks.Cache{}
 	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
 	mc.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	mc.EXPECT().Del(mock.Anything, mock.Anything).Return(nil)
