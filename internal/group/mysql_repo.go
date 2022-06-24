@@ -67,9 +67,7 @@ func (r mysqlRepo) GetByName(ctx context.Context, name string) (model.Group, err
 		return model.Group{}, errgo.Wrap(err, "dal")
 	}
 
-	m := convertDao(g)
-
-	return m, nil
+	return convertDao(g), nil
 }
 
 func (r mysqlRepo) CountMembersByName(
