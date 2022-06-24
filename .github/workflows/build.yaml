@@ -46,9 +46,12 @@ jobs:
             go-cache-1-${{ hashFiles('**/go.sum') }}-
             go-cache-1-
 
+      - name: Install Task
+        uses: arduino/setup-task@v1
+
       - run: go get ./...
 
       - name: Build
-        run: make build
+        run: task build
 
       - run: docker build -f etc/Dockerfile .

@@ -6,13 +6,12 @@
 ## Requirements
 
 - [Go 1.17+](https://go.dev/)
-- [GNU make](https://www.gnu.org/software/make/)
-- bash: (`git bash` if you are using windows)
+- [go-task](https://taskfile.dev/installation/)
+- [golangci-lint](https://golangci-lint.run/)
 
 ## Optional Requirements:
 
 - nodejs: 用于生成 openapi 文件。
-- [mockery](https://github.com/vektra/mockery#installation): 用于生成测试用的 [mock](./internal/mocks/) 文件。
 
 ## Init
 
@@ -71,19 +70,19 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 使用 [mock](./internal/mocks/) 进行部分测试。
 
 ```
-make test
+task test
 ```
 
 运行全部测试，需要数据库环境。
 
 ```
-make test-all
+task test-all
 ```
 
 ## 代码风格
 
 ```bash
-make lint
+task lint
 ```
 
 ### 配置文件

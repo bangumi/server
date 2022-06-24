@@ -1,0 +1,245 @@
+version: "3"
+
+tasks:
+  mockery:
+    silent: true
+    generates:
+      - ./.bin/mockery.exe
+    sources:
+      - go.mod
+    cmds:
+      - go build -o .bin/mockery.exe github.com/vektra/mockery/v2
+
+  all:
+    deps:
+      - rate-limit
+      - oauth-manager
+      - captcha-manager
+      - session-manager
+      - session-repo
+      - cache
+      - AuthRepo
+      - AuthService
+      - CharacterRepo
+      - CharacterService
+      - IndexRepo
+      - RevisionRepo
+      - SubjectRepo
+      - SubjectService
+      - UserRepo
+      - EpisodeRepo
+      - PersonRepo
+      - PersonService
+
+  base-private-mock:
+    cmds:
+      - ./.bin/mockery.exe --inpackage --dir {{.DIR}} --testonly --name {{.NAME}} --filename {{.OUT_FILE}} --structname {{.OUT_STRUCT}} --with-expecter;
+    deps:
+      - mockery
+
+  base-mock:
+    cmds:
+      - cmd: ./.bin/mockery.exe --dir {{.SRC_DIR}} --filename '{{.MOCK_STRUCT|default .INTERFACE}}.go' --name '{{.INTERFACE | default "Manager"}}' --structname {{.MOCK_STRUCT|default .INTERFACE}} --output ./internal/mocks --with-expecter
+    deps:
+      - mockery
+
+  session-repo:
+    generates:
+      - internal/web/session/repo_mock_test.go
+    sources:
+      - internal/web/session/repo.go
+    cmds:
+      - task: base-private-mock
+        vars:
+          DIR: ./internal/web/session
+          NAME: Repo
+          OUT_FILE: repo_mock_test.go
+          OUT_STRUCT: MockRepo
+
+  cache:
+    generates:
+      - internal/cache/interface.go
+    sources:
+      - internal/cache/interface.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/cache
+          INTERFACE: "Generic"
+          MOCK_STRUCT: Cache
+
+  session-manager:
+    generates:
+      - internal/mocks/SessionManager.go
+    sources:
+      - internal/web/session/manager.go
+    cmds:
+      - task: base-mock
+        vars:
+          MOCK_STRUCT: SessionManager
+          SRC_DIR: ./internal/web/session
+
+  captcha-manager:
+    generates:
+      - internal/web/captcha/manager.go
+    sources:
+      - internal/mocks/CaptchaManager.go
+    cmds:
+      - task: base-mock
+        vars:
+          MOCK_STRUCT: CaptchaManager
+          SRC_DIR: ./internal/web/captcha
+
+  oauth-manager:
+    sources:
+      - internal/oauth/interface.go
+    generates:
+      - internal/mocks/OAuthManger.go
+    cmds:
+      - task: base-mock
+        vars:
+          MOCK_STRUCT: OAuthManger
+          SRC_DIR: ./internal/oauth
+
+  rate-limit:
+    sources:
+      - internal/web/rate/new.go
+    generates:
+      - internal/mocks/RateLimiter.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/web/rate
+          MOCK_STRUCT: RateLimiter
+
+  "AuthRepo":
+    sources:
+      - internal/domain/auth.go.go
+    generates:
+      - internal/mocks/AuthRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "AuthRepo"
+
+  "AuthService":
+    sources:
+      - internal/domain/auth.go.go
+    generates:
+      - internal/mocks/AuthService.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "AuthService"
+
+  "CharacterRepo":
+    sources:
+      - internal/domain/character.go.go
+    generates:
+      - internal/mocks/CharacterRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "CharacterRepo"
+
+  "CharacterService":
+    sources:
+      - internal/domain/character.go.go
+    generates:
+      - internal/mocks/CharacterService.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "CharacterService"
+
+  "IndexRepo":
+    sources:
+      - internal/domain/index.go.go
+    generates:
+      - internal/mocks/IndexRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "IndexRepo"
+
+  "RevisionRepo":
+    sources:
+      - internal/domain/revision.go.go
+    generates:
+      - internal/mocks/RevisionRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "RevisionRepo"
+
+  "SubjectRepo":
+    sources:
+      - internal/domain/subject.go.go
+    generates:
+      - internal/mocks/SubjectRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "SubjectRepo"
+
+  "SubjectService":
+    sources:
+      - internal/domain/subject.go.go
+    generates:
+      - internal/mocks/SubjectService.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "SubjectService"
+
+  "UserRepo":
+    sources:
+      - internal/domain/user.go.go
+    generates:
+      - internal/mocks/UserRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "UserRepo"
+
+  "EpisodeRepo":
+    sources:
+      - internal/domain/episode.go.go
+    generates:
+      - internal/mocks/EpisodeRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "EpisodeRepo"
+
+  "PersonRepo":
+    sources:
+      - internal/domain/person.go.go
+    generates:
+      - internal/mocks/PersonRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "PersonRepo"
+
+  "PersonService":
+    sources:
+      - internal/domain/person.go.go
+    generates:
+      - internal/mocks/PersonService.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: "PersonService"

@@ -29,7 +29,7 @@ func TestGetWebApp(t *testing.T) {
 			SubjectRepo: mocks.NewSubjectRepo(t),
 			AuthRepo:    mocks.NewAuthRepo(t),
 			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			Cache:       mocks.NewGeneric(t),
+			Cache:       mocks.NewCache(t),
 		},
 	)
 
@@ -38,7 +38,7 @@ func TestGetWebApp(t *testing.T) {
 			SubjectRepo: mocks.NewSubjectRepo(t),
 			AuthRepo:    mocks.NewAuthRepo(t),
 			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			Cache:       mocks.NewGeneric(t),
+			Cache:       mocks.NewCache(t),
 		},
 	)
 }
