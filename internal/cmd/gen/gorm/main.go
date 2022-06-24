@@ -45,10 +45,6 @@ var groupIDTypeString = "model." + reflect.TypeOf(new(model.GroupID)).Elem().Nam
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
-var noJSONTag = gen.FieldJSONTagWithNS(func(columnName string) (tagContent string) {
-	return ""
-})
-
 // generate code.
 func main() {
 	// specify the output directory (default: "./query")
@@ -358,7 +354,6 @@ func main() {
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_groups", "Group",
-		noJSONTag,
 		gen.FieldTrimPrefix("grp_"),
 		gen.FieldType("grp_id", groupIDTypeString),
 		gen.FieldType("grp_creator", userIDTypeString),
@@ -371,7 +366,6 @@ func main() {
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_group_members", "GroupMember",
-		noJSONTag,
 		gen.FieldTrimPrefix("gmb_"),
 		gen.FieldRename("gmb_uid", "UserID"),
 		gen.FieldType("gmb_uid", userIDTypeString),
