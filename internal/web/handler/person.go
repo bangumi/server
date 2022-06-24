@@ -78,7 +78,7 @@ func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonID) (res
 			return res.PersonV0{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "repo.subject.Set")
+		return r, ok, errgo.Wrap(err, "personRepo.Get")
 	}
 
 	r = convertModelPerson(s)

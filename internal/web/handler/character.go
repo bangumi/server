@@ -83,7 +83,7 @@ func (h Handler) getCharacterWithCache(
 			return res.CharacterV0{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "repo.subject.Set")
+		return r, ok, errgo.Wrap(err, "CharacterService.Get")
 	}
 
 	r = convertModelCharacter(s)

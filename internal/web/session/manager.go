@@ -83,7 +83,7 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 
 	ok, err := m.cache.Get(ctx, keyPrefix+key, &s)
 	if err != nil {
-		return Session{}, errgo.Wrap(err, "redis.Set")
+		return Session{}, errgo.Wrap(err, "redis.Get")
 	}
 	if ok {
 		return s, nil

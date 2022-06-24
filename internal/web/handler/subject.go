@@ -88,7 +88,7 @@ func (h Handler) getSubjectWithCache(
 			return res.SubjectV0{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "repo.subject.Set")
+		return r, ok, errgo.Wrap(err, "SubjectService.Get")
 	}
 
 	r = convertModelSubject(s)

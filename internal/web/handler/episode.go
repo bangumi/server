@@ -81,7 +81,7 @@ func (h Handler) getEpisodeWithCache(ctx context.Context, id model.EpisodeID) (r
 			return res.Episode{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "repo.episode.Set")
+		return r, ok, errgo.Wrap(err, "EpisodeRepo.Get")
 	}
 
 	r = convertModelEpisode(s)
