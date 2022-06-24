@@ -46,7 +46,7 @@ tasks:
     deps:
       - gotestfmt
     cmds:
-      - go test -timeout 1s -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+      - go test -timeout 3s -json -tags test ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
     env:
       CGO_ENABLED: "0"
 
@@ -60,7 +60,7 @@ tasks:
     deps:
       - gotestfmt
     cmds:
-      - go test -timeout 1s -json -tags test -race ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+      - go test -timeout 3s -json -tags test -race ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
