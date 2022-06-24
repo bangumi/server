@@ -82,7 +82,8 @@ func Start(c config.AppConfig, app *fiber.App) error {
 }
 
 func getDefaultErrorHandler() func(*fiber.Ctx, error) error {
-	var log = logger.Named("http.err").WithOptions(zap.AddStacktrace(zapcore.PanicLevel))
+	var log = logger.Named("http.err").
+		WithOptions(zap.AddStacktrace(zapcore.PanicLevel), zap.WithCaller(false))
 
 	return func(ctx *fiber.Ctx, err error) error {
 		var e res.HTTPError
