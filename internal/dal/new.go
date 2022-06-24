@@ -70,7 +70,7 @@ func NewDB(
 		return nil, errgo.Wrap(err, "create dal")
 	}
 
-	if err = setupMetrics(db, scope, register); err != nil {
+	if err = setupMetrics(db, conn, scope, register); err != nil {
 		return nil, errgo.Wrap(err, "setup metrics")
 	}
 
