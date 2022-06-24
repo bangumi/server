@@ -81,6 +81,12 @@ tasks:
     deps:
       - gorm
       - mock
+    sources:
+      - ./internal/cmd/gen/generic/generic.go
+    generates:
+      - ./internal/model/generic/valuer.go
+    cmds:
+      - go run internal/cmd/gen/generic/generic.go
 
   mock:
     desc: Generate Mocks.
@@ -90,7 +96,7 @@ tasks:
   gorm:
     desc: Run gorm-gen to generate go struct from mysql database.
     generates:
-      - ./dal/query/gen.go
+      - ./internal/dal/query/gen.go
     sources:
       - ./internal/cmd/gen/gorm/main.go
       - go.mod

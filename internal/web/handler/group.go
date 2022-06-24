@@ -26,6 +26,8 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
+const groupIconPrefix = "https://lain.bgm.tv/pic/icon/l/"
+
 func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 	groupName := c.Params("name")
 	g, err := h.g.GetByName(c.Context(), groupName)
@@ -51,15 +53,27 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get recent member user info")
 	}
 
+	modelRelatedGroups, err := h.g.RelatedGroups(c.Context(), g.ID, 6)
+	if err != nil {
+		return h.InternalError(c, err, "failed to get related groups")
+	}
+
+	relatedGroups := make([]res.PrivateGroup, len(modelRelatedGroups))
+	for i, g := range modelRelatedGroups {
+		relatedGroups[i] = res.PrivateGroup{
+			Name: g.Name,
+			Icon: groupIconPrefix + g.Icon,
+		}
+	}
+
 	return res.JSON(c, res.PrivateGroupProfile{
-		CreatedAt:    g.CreatedAt,
-		Name:         g.Name,
-		Title:        g.Title,
-		Description:  g.Description,
-		Icon:         "https://lain.bgm.tv/pic/icon/l/" + g.Icon,
-		TotalMembers: g.MemberCount,
-		// TODO
-		RelatedGroups: nil,
+		CreatedAt:     g.CreatedAt,
+		Name:          g.Name,
+		Title:         g.Title,
+		Description:   g.Description,
+		Icon:          groupIconPrefix + g.Icon,
+		TotalMembers:  g.MemberCount,
+		RelatedGroups: relatedGroups,
 		NewTopics:     nil,
 		NewMembers:    convertGroupMembers(members, userMap),
 	})

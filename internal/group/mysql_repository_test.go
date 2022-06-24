@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gookit/goutil/dump"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
@@ -184,4 +185,16 @@ func TestMysqlRepo_GetByName_not_found(t *testing.T) {
 
 	_, err := repo.GetByName(context.Background(), group2Name)
 	require.ErrorIs(t, err, domain.ErrNotFound)
+}
+
+// TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./internal/group -run '^TestMysqlRepo_RelatedGroups'
+func TestMysqlRepo_RelatedGroups(t *testing.T) {
+	t.Parallel()
+
+	repo, _ := getRepo(t)
+
+	g, err := repo.RelatedGroups(context.Background(), 2, 6)
+	require.NoError(t, err)
+	require.Len(t, g, 6)
+	dump.P(g)
 }
