@@ -16,7 +16,7 @@ package util
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/utils"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 func DetailWithErr(c *fiber.Ctx, err error) D {
