@@ -84,7 +84,7 @@ func (h Handler) ListGroupMembersPrivate(c *fiber.Ctx) error {
 	return h.listGroupMembersPrivate(c, groupName, page, memberType)
 }
 
-// fetch data
+// fetch data.
 func (h Handler) listGroupMembersPrivate(
 	c *fiber.Ctx,
 	groupName string,
