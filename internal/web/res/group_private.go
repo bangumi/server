@@ -32,9 +32,9 @@ type PrivateGroupProfile struct {
 }
 
 type PrivateGroupMember struct {
+	JoinAt   time.Time    `json:"join_at"`
+	Avatar   Avatar       `json:"avatar"`
 	UserName string       `json:"username"`
 	NickName string       `json:"nickname"`
-	Avatar   Avatar       `json:"avatar"`
 	ID       model.UserID `json:"id"`
-	JoinAt   time.Time    `json:"join_at"`
 }
