@@ -52,7 +52,7 @@ func TestHandler_GetGroupByNamePrivate(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{UserRepo: u, GroupRepo: g})
 
 	var r res.PrivateGroupProfile
-	test.New(t).Get("/p/group/g").
+	test.New(t).Get("/p/groups/g").
 		Execute(app).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
@@ -82,7 +82,7 @@ func TestHandler_ListGroupMembersPrivate(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{UserRepo: u, GroupRepo: g})
 
 	var r test.PagedResponse
-	test.New(t).Get("/p/group/g/members").
+	test.New(t).Get("/p/groups/g/members").
 		Query("limit", "1").Query("type", "mod").
 		Execute(app).
 		JSON(&r).
@@ -102,7 +102,7 @@ func TestHandler_ListGroupMembersPrivate_not_found(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{GroupRepo: g})
 
-	test.New(t).Get("/p/group/g/members").
+	test.New(t).Get("/p/groups/g/members").
 		Execute(app).
 		ExpectCode(http.StatusNotFound)
 }
@@ -114,7 +114,7 @@ func TestHandler_ListGroupMembersPrivate_bad_request(t *testing.T) {
 	t.Run("type", func(t *testing.T) {
 		t.Parallel()
 		app := test.GetWebApp(t, test.Mock{})
-		test.New(t).Get("/p/group/g/members").
+		test.New(t).Get("/p/groups/g/members").
 			Query("type", "no").
 			Execute(app).
 			ExpectCode(http.StatusBadRequest)

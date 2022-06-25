@@ -171,7 +171,7 @@ paths:
         "401":
           description: 用户未登录或者 session 已失效
 
-  "/p/group/{name}":
+  "/p/groups/{name}":
     get:
       tags:
         - 小组
@@ -182,7 +182,7 @@ paths:
           in: path
           schema:
             type: string
-          description: "小组名，类似于 `https://bgm.tv/group/boring` 的 `boring`"
+          description: "小组名，类似于 `https://bgm.tv/groups/boring` 的 `boring`"
           required: true
       responses:
         "200":
@@ -194,7 +194,7 @@ paths:
         "404":
           description: 小组不存在
 
-  "/p/group/{name}/members":
+  "/p/groups/{name}/members":
     get:
       tags:
         - 小组
@@ -205,7 +205,7 @@ paths:
           in: path
           schema:
             type: string
-          description: "小组名，类似于 `https://bgm.tv/group/boring` 的 `boring`"
+          description: "小组名，类似于 `https://bgm.tv/groups/boring` 的 `boring`"
           required: true
         - name: type
           in: query
