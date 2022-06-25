@@ -60,7 +60,7 @@ func prepareGroupMemberData(t *testing.T, id model.GroupID) domain.GroupRepo {
 	return repo
 }
 
-// task test-all -- -run 'TestMysqlRepo_CountMembersByName'
+// $ task test-all -- -run 'TestMysqlRepo_CountMembersByName'
 func TestMysqlRepo_CountMembersByName(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
@@ -89,7 +89,7 @@ func TestMysqlRepo_CountMembersByName(t *testing.T) {
 	})
 }
 
-// task test-all -- -run '^TestMysqlRepo_ListMembersByName$'
+// $ task test-all -- -run '^TestMysqlRepo_ListMembersByName$'
 func TestMysqlRepo_ListMembersByID(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
@@ -144,7 +144,7 @@ func assertHaveID(t *testing.T, members []model.GroupMember, id ...model.UserID)
 	}
 }
 
-// task test-all -- -run '^TestMysqlRepo_GetByName$'
+// $ task test-all -- -run '^TestMysqlRepo_GetByName$'
 func TestMysqlRepo_GetByName(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
@@ -172,7 +172,7 @@ func TestMysqlRepo_GetByName(t *testing.T) {
 	require.Equal(t, groupName, g.Name)
 }
 
-// task test-all -- -run '^TestMysqlRepo_GetByName_not_found'
+// $ task test-all -- -run '^TestMysqlRepo_GetByName_not_found'
 func TestMysqlRepo_GetByName_not_found(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()

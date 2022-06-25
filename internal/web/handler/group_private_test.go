@@ -30,7 +30,7 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-// task test -- -run TestHandler_GetGroupByNamePrivate
+// $ task test -- -run TestHandler_GetGroupByNamePrivate
 func TestHandler_GetGroupByNamePrivate(t *testing.T) {
 	t.Parallel()
 	const gid = model.GroupID(5)
@@ -59,7 +59,7 @@ func TestHandler_GetGroupByNamePrivate(t *testing.T) {
 	require.Equal(t, gid, r.ID)
 }
 
-// task test -- -run 'TestHandler_ListGroupMembersPrivate$'
+// $ task test -- -run 'TestHandler_ListGroupMembersPrivate$'
 func TestHandler_ListGroupMembersPrivate(t *testing.T) {
 	t.Parallel()
 	const gid = model.GroupID(1)
@@ -93,7 +93,7 @@ func TestHandler_ListGroupMembersPrivate(t *testing.T) {
 	require.NoError(t, json.Unmarshal(r.Data, &data))
 }
 
-// task test -- -run 'TestHandler_ListGroupMembersPrivate_not_found'
+// $ task test -- -run 'TestHandler_ListGroupMembersPrivate_not_found'
 func TestHandler_ListGroupMembersPrivate_not_found(t *testing.T) {
 	t.Parallel()
 
@@ -107,7 +107,7 @@ func TestHandler_ListGroupMembersPrivate_not_found(t *testing.T) {
 		ExpectCode(http.StatusNotFound)
 }
 
-// task test -- -run 'TestHandler_ListGroupMembersPrivate_bad_request'
+// $ task test -- -run 'TestHandler_ListGroupMembersPrivate_bad_request'
 func TestHandler_ListGroupMembersPrivate_bad_request(t *testing.T) {
 	t.Parallel()
 
