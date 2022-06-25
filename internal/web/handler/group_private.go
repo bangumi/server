@@ -31,7 +31,7 @@ import (
 
 const groupIconPrefix = "https://lain.bgm.tv/pic/icon/l/"
 
-func (h Handler) GetGroupByName(c *fiber.Ctx) error {
+func (h Handler) GetGroupByNamePrivate(c *fiber.Ctx) error {
 	groupName := c.Params("name")
 	if groupName == "" {
 		return res.BadRequest("group name is required")
@@ -63,7 +63,8 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 	})
 }
 
-func (h Handler) ListGroupMembers(c *fiber.Ctx) error {
+func (h Handler) ListGroupMembersPrivate(c *fiber.Ctx) error {
+	// parse request info
 	groupName := c.Params("name")
 	if groupName == "" {
 		return res.BadRequest("group name is required")
@@ -79,6 +80,17 @@ func (h Handler) ListGroupMembers(c *fiber.Ctx) error {
 		return err
 	}
 
+	// end parse query, fetch data
+	return h.listGroupMembersPrivate(c, groupName, page, memberType)
+}
+
+// fetch data
+func (h Handler) listGroupMembersPrivate(
+	c *fiber.Ctx,
+	groupName string,
+	page pageQuery,
+	memberType domain.GroupMemberType,
+) error {
 	g, err := h.g.GetByName(c.Context(), groupName)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
