@@ -54,31 +54,15 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get recent member user info")
 	}
 
-	modelRelatedGroups, err := h.g.RelatedGroups(c.Context(), g.ID, defaultRelatedGroupLength)
-	if err != nil {
-		return h.InternalError(c, err, "failed to get related groups")
-	}
-
-	relatedGroups := make([]res.PrivateGroup, len(modelRelatedGroups))
-	for i, g := range modelRelatedGroups {
-		relatedGroups[i] = res.PrivateGroup{
-			Name:         g.Name,
-			Icon:         groupIconPrefix + g.Icon,
-			Title:        g.Title,
-			TotalMembers: g.MemberCount,
-		}
-	}
-
 	return res.JSON(c, res.PrivateGroupProfile{
-		ID:            g.ID,
-		CreatedAt:     g.CreatedAt,
-		Name:          g.Name,
-		Title:         g.Title,
-		Description:   g.Description,
-		Icon:          groupIconPrefix + g.Icon,
-		TotalMembers:  g.MemberCount,
-		RelatedGroups: relatedGroups,
-		NewMembers:    convertGroupMembers(members, userMap),
+		ID:           g.ID,
+		CreatedAt:    g.CreatedAt,
+		Name:         g.Name,
+		Title:        g.Title,
+		Description:  g.Description,
+		Icon:         groupIconPrefix + g.Icon,
+		TotalMembers: g.MemberCount,
+		NewMembers:   convertGroupMembers(members, userMap),
 	})
 }
 

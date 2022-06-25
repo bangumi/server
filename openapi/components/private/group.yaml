@@ -11,11 +11,6 @@ example:
       username: "382951"
       nickname: "树洞酱"
       avatar: "https://lain.bgm.tv/pic/user/l/icon.jpg"
-  related_groups:
-    - title: "靠谱人生茶话会"
-      icon: "https://lain.bgm.tv/pic/icon/l/000/00/03/364.jpg"
-      name: "boring"
-      total_members: 9038
   total_members: 9450
 properties:
   id:
@@ -38,27 +33,6 @@ properties:
     type: array
     items:
       "$ref": "./group_member.yaml"
-  related_groups:
-    description: “小组用户也爱去”
-    items:
-      additionalProperties: false
-      type: object
-      required:
-        - name
-        - icon
-        - title
-        - total_members
-      properties:
-        name:
-          type: string
-        icon:
-          type: string
-          format: url
-        title:
-          type: string
-        total_members:
-          type: integer
-    type: array
   title:
     description: 小组名，如 “靠谱人生茶话会”
     type: string

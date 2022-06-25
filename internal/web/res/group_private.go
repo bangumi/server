@@ -21,22 +21,14 @@ import (
 )
 
 type PrivateGroupProfile struct {
-	CreatedAt     time.Time            `json:"created_at"`
-	Name          string               `json:"name"`
-	Title         string               `json:"title"`
-	Description   string               `json:"description" format:"bbcode"`
-	Icon          string               `json:"icon" format:"url"`
-	RelatedGroups []PrivateGroup       `json:"related_groups"`
-	NewMembers    []PrivateGroupMember `json:"new_members"`
-	TotalMembers  int64                `json:"total_members"`
-	ID            model.GroupID        `json:"id"`
-}
-
-type PrivateGroup struct {
-	Name         string `json:"name"`
-	Icon         string `json:"icon" format:"url"`
-	Title        string `json:"title"`
-	TotalMembers int64  `json:"total_members"`
+	CreatedAt    time.Time            `json:"created_at"`
+	Name         string               `json:"name"`
+	Title        string               `json:"title"`
+	Description  string               `json:"description" format:"bbcode"`
+	Icon         string               `json:"icon" format:"url"`
+	NewMembers   []PrivateGroupMember `json:"new_members"`
+	TotalMembers int64                `json:"total_members"`
+	ID           model.GroupID        `json:"id"`
 }
 
 type PrivateGroupMember struct {

@@ -186,14 +186,3 @@ func TestMysqlRepo_GetByName_not_found(t *testing.T) {
 	require.Error(t, err)
 	require.ErrorIs(t, err, domain.ErrNotFound)
 }
-
-// TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./internal/group -run '^TestMysqlRepo_RelatedGroups'
-func TestMysqlRepo_RelatedGroups(t *testing.T) {
-	t.Parallel()
-
-	repo, _ := getRepo(t)
-
-	g, err := repo.RelatedGroups(context.Background(), 2, 6)
-	require.NoError(t, err)
-	require.Len(t, g, 6)
-}

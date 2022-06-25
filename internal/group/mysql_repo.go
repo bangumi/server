@@ -28,7 +28,6 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/model/generic"
 )
 
 var _ domain.GroupRepo = mysqlRepo{}
@@ -173,39 +172,4 @@ func convertMember(m *dao.GroupMember) model.GroupMember {
 		Mod:    m.Moderator,
 		JoinAt: time.Unix(int64(m.CreatedAt), 0),
 	}
-}
-
-func (r mysqlRepo) RelatedGroups(ctx context.Context, id model.GroupID, size int) ([]model.Group, error) {
-	lookedGroup, err := r.q.WithContext(ctx).Group.Where(r.q.Group.ID.Eq(id)).First()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, domain.ErrNotFound
-		}
-
-		return nil, errgo.Wrap(err, "dal")
-	}
-
-	_, err = r.q.WithContext(ctx).Group.Order(r.q.Group.Members).Limit(1).First()
-	if err != nil {
-		return nil, errgo.Wrap(err, "dal")
-	}
-
-	var ids []model.GroupID
-	err = r.q.WithContext(ctx).Group.Debug().Where(r.q.Group.Members.Gt(3), r.q.Group.Nsfw.Is(lookedGroup.Nsfw)).
-		Limit(size).Pluck(r.q.Group.ID, &ids)
-	if err != nil {
-		return nil, errgo.Wrap(err, "dal")
-	}
-
-	gs, err := r.q.WithContext(ctx).Group.Where(r.q.Group.ID.In(generic.GroupIDToValuerSlice(ids)...)).Find()
-	if err != nil {
-		return nil, errgo.Wrap(err, "dal")
-	}
-
-	result := make([]model.Group, len(gs))
-	for i, g := range gs {
-		result[i] = convertDao(g)
-	}
-
-	return result, nil
 }
