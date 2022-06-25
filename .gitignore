@@ -13,8 +13,10 @@ coverage.out
 .bin/
 bin/
 dist/
-/gen/
 tmp/
+
+# bug of idea openapi plugin, see https://youtrack.jetbrains.com/issue/IDEA-285879
+/gen/
 
 node_modules/
 pnpm-lock.yaml
