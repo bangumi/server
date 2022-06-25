@@ -116,7 +116,7 @@ func (r mysqlRepo) listMembersByID(
 		// do nothing
 	}
 
-	c, err := q.Limit(limit).Offset(offset).Order(r.q.GroupMember.CreatedAt).Find()
+	c, err := q.Limit(limit).Offset(offset).Order(r.q.GroupMember.CreatedAt.Desc()).Find()
 	if err != nil {
 		r.log.Error("un-expected error when counting group member", zap.Error(err), log.GroupID(id))
 		return nil, errgo.Wrap(err, "dal")
