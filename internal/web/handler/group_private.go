@@ -16,6 +16,7 @@ package handler
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
@@ -36,7 +37,7 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 			return res.NotFound("group not found")
 		}
 
-		return h.InternalError(c, err, "failed to find group", zap.String("group_name", groupName))
+		return h.InternalError(c, err, "failed to get group", zap.String("group_name", groupName))
 	}
 
 	members, err := h.g.ListMembersByID(c.Context(), g.ID, domain.GroupMemberAll, 10, 0)
@@ -62,6 +63,76 @@ func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 		Icon:         groupIconPrefix + g.Icon,
 		TotalMembers: g.MemberCount,
 		NewMembers:   convertGroupMembers(members, userMap),
+	})
+}
+
+func (h Handler) ListGroupMembers(c *fiber.Ctx) error {
+	groupName := c.Params("name")
+	g, err := h.g.GetByName(c.Context(), groupName)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.NotFound("group not found")
+		}
+
+		return h.InternalError(c, err, "failed to get group", zap.String("group_name", groupName))
+	}
+
+	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	if err != nil {
+		return err
+	}
+
+	var memberType = domain.GroupMemberAll
+
+	memberQuery := c.Query("type")
+	switch memberQuery {
+	case "mod":
+		memberType = domain.GroupMemberMod
+	case "normal":
+		memberType = domain.GroupMemberNormal
+	case "all", "":
+	default:
+		return res.BadRequest(strconv.Quote(memberQuery) +
+			` is not a valid group member type, allowed: "mod", "normal", "all"(default)`)
+	}
+
+	memberCount, err := h.g.CountMembersByID(c.Context(), g.ID, memberType)
+	if err != nil {
+		return h.InternalError(c, err, "failed to count group member", zap.String("grou_name", groupName))
+	}
+
+	if memberCount == 0 {
+		return res.JSON(c, res.Paged{
+			Data:   res.EmptySlice(),
+			Total:  0,
+			Limit:  page.Limit,
+			Offset: page.Offset,
+		})
+	}
+
+	if err = page.check(memberCount); err != nil {
+		return err
+	}
+
+	members, err := h.g.ListMembersByID(c.Context(), g.ID, memberType, page.Limit, page.Offset)
+	if err != nil {
+		return h.InternalError(c, err, "failed to list recent members", log.GroupID(g.ID))
+	}
+
+	userIDs := make([]model.UserID, len(members))
+	for i, member := range members {
+		userIDs[i] = member.UserID
+	}
+	userMap, err := h.u.GetByIDs(c.Context(), userIDs...)
+	if err != nil {
+		return h.InternalError(c, err, "failed to get recent member user info")
+	}
+
+	return res.JSON(c, res.Paged{
+		Data:   convertGroupMembers(members, userMap),
+		Total:  memberCount,
+		Limit:  page.Limit,
+		Offset: page.Offset,
 	})
 }
 

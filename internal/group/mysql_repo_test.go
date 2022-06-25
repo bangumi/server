@@ -132,7 +132,7 @@ func TestMysqlRepo_ListMembersByName(t *testing.T) {
 		members, err := repo.ListMembersByName(context.Background(), group2Name, domain.GroupMemberAll, limit, 1)
 		require.NoError(t, err)
 		require.Len(t, members, 3)
-		assertHaveID(t, members, 2, 3, 4)
+		assertHaveID(t, members, 1, 2, 3)
 	})
 }
 
