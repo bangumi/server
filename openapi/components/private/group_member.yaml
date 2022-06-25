@@ -7,10 +7,10 @@ properties:
     example: 1
   nickname:
     type: string
-    example: sai
+    example: "Sai🖖"
   username:
     type: string
-    example: "Sai🖖"
+    example: sai
   join_at:
     type: string
     format: date-time
