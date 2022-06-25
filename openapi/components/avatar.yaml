@@ -1,3 +1,7 @@
+example:
+  "large": "https://lain.bgm.tv/pic/user/l/000/00/00/1.jpg?r=1391790456"
+  "medium": "https://lain.bgm.tv/pic/user/m/000/00/00/1.jpg?r=1391790456"
+  "small": "https://lain.bgm.tv/pic/user/s/000/00/00/1.jpg?r=1391790456"
 title: Avatar
 required:
   - large

@@ -4,13 +4,17 @@ properties:
     $ref: "../avatar.yaml"
   id:
     type: integer
+    example: 1
   nickname:
     type: string
+    example: sai
   username:
     type: string
+    example: "Sai🖖"
   join_at:
     type: string
     format: date-time
+    example: "2022-06-25T21:07:38.466+08:00"
 required:
   - id
   - username
