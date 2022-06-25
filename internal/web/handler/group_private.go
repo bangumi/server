@@ -31,7 +31,7 @@ import (
 
 const groupIconPrefix = "https://lain.bgm.tv/pic/icon/l/"
 
-func (h Handler) GetGroupByNamePrivate(c *fiber.Ctx) error {
+func (h Handler) GetGroupProfileByNamePrivate(c *fiber.Ctx) error {
 	groupName := c.Params("name")
 	if groupName == "" {
 		return res.BadRequest("group name is required")

@@ -70,52 +70,6 @@ func (_c *GroupRepo_CountMembersByID_Call) Return(_a0 int64, _a1 error) *GroupRe
 	return _c
 }
 
-// CountMembersByName provides a mock function with given fields: ctx, name, memberType
-func (_m *GroupRepo) CountMembersByName(ctx context.Context, name string, memberType domain.GroupMemberType) (int64, error) {
-	ret := _m.Called(ctx, name, memberType)
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func(context.Context, string, domain.GroupMemberType) int64); ok {
-		r0 = rf(ctx, name, memberType)
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, domain.GroupMemberType) error); ok {
-		r1 = rf(ctx, name, memberType)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// GroupRepo_CountMembersByName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountMembersByName'
-type GroupRepo_CountMembersByName_Call struct {
-	*mock.Call
-}
-
-// CountMembersByName is a helper method to define mock.On call
-//  - ctx context.Context
-//  - name string
-//  - memberType domain.GroupMemberType
-func (_e *GroupRepo_Expecter) CountMembersByName(ctx interface{}, name interface{}, memberType interface{}) *GroupRepo_CountMembersByName_Call {
-	return &GroupRepo_CountMembersByName_Call{Call: _e.mock.On("CountMembersByName", ctx, name, memberType)}
-}
-
-func (_c *GroupRepo_CountMembersByName_Call) Run(run func(ctx context.Context, name string, memberType domain.GroupMemberType)) *GroupRepo_CountMembersByName_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(domain.GroupMemberType))
-	})
-	return _c
-}
-
-func (_c *GroupRepo_CountMembersByName_Call) Return(_a0 int64, _a1 error) *GroupRepo_CountMembersByName_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
 // GetByName provides a mock function with given fields: ctx, name
 func (_m *GroupRepo) GetByName(ctx context.Context, name string) (model.Group, error) {
 	ret := _m.Called(ctx, name)
@@ -207,56 +161,6 @@ func (_c *GroupRepo_ListMembersByID_Call) Run(run func(ctx context.Context, id m
 }
 
 func (_c *GroupRepo_ListMembersByID_Call) Return(_a0 []model.GroupMember, _a1 error) *GroupRepo_ListMembersByID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-// ListMembersByName provides a mock function with given fields: ctx, name, memberType, limit, offset
-func (_m *GroupRepo) ListMembersByName(ctx context.Context, name string, memberType domain.GroupMemberType, limit int, offset int) ([]model.GroupMember, error) {
-	ret := _m.Called(ctx, name, memberType, limit, offset)
-
-	var r0 []model.GroupMember
-	if rf, ok := ret.Get(0).(func(context.Context, string, domain.GroupMemberType, int, int) []model.GroupMember); ok {
-		r0 = rf(ctx, name, memberType, limit, offset)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.GroupMember)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, domain.GroupMemberType, int, int) error); ok {
-		r1 = rf(ctx, name, memberType, limit, offset)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// GroupRepo_ListMembersByName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListMembersByName'
-type GroupRepo_ListMembersByName_Call struct {
-	*mock.Call
-}
-
-// ListMembersByName is a helper method to define mock.On call
-//  - ctx context.Context
-//  - name string
-//  - memberType domain.GroupMemberType
-//  - limit int
-//  - offset int
-func (_e *GroupRepo_Expecter) ListMembersByName(ctx interface{}, name interface{}, memberType interface{}, limit interface{}, offset interface{}) *GroupRepo_ListMembersByName_Call {
-	return &GroupRepo_ListMembersByName_Call{Call: _e.mock.On("ListMembersByName", ctx, name, memberType, limit, offset)}
-}
-
-func (_c *GroupRepo_ListMembersByName_Call) Run(run func(ctx context.Context, name string, memberType domain.GroupMemberType, limit int, offset int)) *GroupRepo_ListMembersByName_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(domain.GroupMemberType), args[3].(int), args[4].(int))
-	})
-	return _c
-}
-
-func (_c *GroupRepo_ListMembersByName_Call) Return(_a0 []model.GroupMember, _a1 error) *GroupRepo_ListMembersByName_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

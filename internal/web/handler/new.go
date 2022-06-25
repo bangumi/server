@@ -81,6 +81,7 @@ func New(
 		i:                    index,
 		r:                    r,
 		captcha:              captcha,
+		g:                    g,
 		v:                    validate,
 		validatorTranslation: trans,
 

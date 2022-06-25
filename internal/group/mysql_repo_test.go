@@ -32,10 +32,6 @@ import (
 	"github.com/bangumi/server/internal/test"
 )
 
-// dev-env 中预置的小组数据，小组的名称
-const group1Name = "pb"
-const group2Name = "forum"
-
 func getRepo(t *testing.T) (domain.GroupRepo, *query.Query) {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
@@ -73,28 +69,28 @@ func TestMysqlRepo_CountMembersByName(t *testing.T) {
 
 	t.Run("count all", func(t *testing.T) {
 		t.Parallel()
-		count, err := repo.CountMembersByName(context.Background(), group1Name, domain.GroupMemberAll)
+		count, err := repo.CountMembersByID(context.Background(), 1, domain.GroupMemberAll)
 		require.NoError(t, err)
 		require.EqualValues(t, 4, count)
 	})
 
 	t.Run("count mod", func(t *testing.T) {
 		t.Parallel()
-		count, err := repo.CountMembersByName(context.Background(), group1Name, domain.GroupMemberMod)
+		count, err := repo.CountMembersByID(context.Background(), 1, domain.GroupMemberMod)
 		require.NoError(t, err)
 		require.EqualValues(t, 3, count)
 	})
 
 	t.Run("count normal", func(t *testing.T) {
 		t.Parallel()
-		count, err := repo.CountMembersByName(context.Background(), group1Name, domain.GroupMemberNormal)
+		count, err := repo.CountMembersByID(context.Background(), 1, domain.GroupMemberNormal)
 		require.NoError(t, err)
 		require.EqualValues(t, 1, count)
 	})
 }
 
 // TEST_MYSQL=1 TEST_REDIS=1 go test -tags test ./internal/group -run '^TestMysqlRepo_ListMembersByName$'
-func TestMysqlRepo_ListMembersByName(t *testing.T) {
+func TestMysqlRepo_ListMembersByID(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
 
@@ -105,7 +101,7 @@ func TestMysqlRepo_ListMembersByName(t *testing.T) {
 
 	t.Run("list all", func(t *testing.T) {
 		t.Parallel()
-		members, err := repo.ListMembersByName(context.Background(), group2Name, domain.GroupMemberAll, limit, offset)
+		members, err := repo.ListMembersByID(context.Background(), 2, domain.GroupMemberAll, limit, offset)
 		require.NoError(t, err)
 		require.Len(t, members, 4)
 		assertHaveID(t, members, 1, 2, 3, 4)
@@ -113,7 +109,7 @@ func TestMysqlRepo_ListMembersByName(t *testing.T) {
 
 	t.Run("list mod", func(t *testing.T) {
 		t.Parallel()
-		members, err := repo.ListMembersByName(context.Background(), group2Name, domain.GroupMemberMod, limit, offset)
+		members, err := repo.ListMembersByID(context.Background(), 2, domain.GroupMemberMod, limit, offset)
 		require.NoError(t, err)
 		require.Len(t, members, 3)
 		assertHaveID(t, members, 1, 3, 4)
@@ -121,7 +117,7 @@ func TestMysqlRepo_ListMembersByName(t *testing.T) {
 
 	t.Run("list normal", func(t *testing.T) {
 		t.Parallel()
-		members, err := repo.ListMembersByName(context.Background(), group2Name, domain.GroupMemberNormal, limit, offset)
+		members, err := repo.ListMembersByID(context.Background(), 2, domain.GroupMemberNormal, limit, offset)
 		require.NoError(t, err)
 		require.Len(t, members, 1)
 		assertHaveID(t, members, 2)
@@ -129,7 +125,7 @@ func TestMysqlRepo_ListMembersByName(t *testing.T) {
 
 	t.Run("list offset", func(t *testing.T) {
 		t.Parallel()
-		members, err := repo.ListMembersByName(context.Background(), group2Name, domain.GroupMemberAll, limit, 1)
+		members, err := repo.ListMembersByID(context.Background(), 2, domain.GroupMemberAll, limit, 1)
 		require.NoError(t, err)
 		require.Len(t, members, 3)
 		assertHaveID(t, members, 1, 2, 3)
