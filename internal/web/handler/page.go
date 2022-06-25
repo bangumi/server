@@ -53,7 +53,7 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 			return q, res.BadRequest("limit should less equal than " + strconv.Itoa(maxLimit))
 		}
 		if q.Limit <= 0 {
-			return q, res.BadRequest("limit should greater equal zero")
+			return q, res.BadRequest("limit should be greater than zero")
 		}
 	}
 
@@ -65,7 +65,7 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 		}
 
 		if q.Offset < 0 {
-			return q, res.BadRequest("offset should greater than 0")
+			return q, res.BadRequest("offset should be greater than or equal to 0")
 		}
 	}
 
