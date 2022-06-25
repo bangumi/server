@@ -158,7 +158,7 @@ func convertGroupMembers(members []model.GroupMember, userMap map[model.UserID]m
 			ID:       member.UserID,
 			UserName: u.UserName,
 			NickName: u.NickName,
-			JoinAt:   member.JoinAt,
+			JoinedAt: member.JoinAt,
 			Avatar:   res.UserAvatar(u.Avatar),
 		}
 	}

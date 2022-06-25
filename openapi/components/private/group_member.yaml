@@ -11,7 +11,7 @@ properties:
   username:
     type: string
     example: sai
-  join_at:
+  joined_at:
     type: string
     format: date-time
     example: "2022-06-25T21:07:38.466+08:00"
@@ -20,5 +20,5 @@ required:
   - username
   - nickname
   - avatar
-  - join_at
+  - joined_at
 type: object
