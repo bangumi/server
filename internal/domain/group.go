@@ -35,8 +35,6 @@ type GroupRepo interface {
 	ListMembersByID(
 		ctx context.Context, id model.GroupID, memberType GroupMemberType, limit, offset int,
 	) ([]model.GroupMember, error)
-
-	RelatedGroups(ctx context.Context, id model.GroupID, size int) ([]model.Group, error)
 }
 
 type GroupMemberType uint8

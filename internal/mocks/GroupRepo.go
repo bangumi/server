@@ -261,54 +261,6 @@ func (_c *GroupRepo_ListMembersByName_Call) Return(_a0 []model.GroupMember, _a1 
 	return _c
 }
 
-// RelatedGroups provides a mock function with given fields: ctx, id, size
-func (_m *GroupRepo) RelatedGroups(ctx context.Context, id model.GroupID, size int) ([]model.Group, error) {
-	ret := _m.Called(ctx, id, size)
-
-	var r0 []model.Group
-	if rf, ok := ret.Get(0).(func(context.Context, model.GroupID, int) []model.Group); ok {
-		r0 = rf(ctx, id, size)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.Group)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.GroupID, int) error); ok {
-		r1 = rf(ctx, id, size)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// GroupRepo_RelatedGroups_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RelatedGroups'
-type GroupRepo_RelatedGroups_Call struct {
-	*mock.Call
-}
-
-// RelatedGroups is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id model.GroupID
-//  - size int
-func (_e *GroupRepo_Expecter) RelatedGroups(ctx interface{}, id interface{}, size interface{}) *GroupRepo_RelatedGroups_Call {
-	return &GroupRepo_RelatedGroups_Call{Call: _e.mock.On("RelatedGroups", ctx, id, size)}
-}
-
-func (_c *GroupRepo_RelatedGroups_Call) Run(run func(ctx context.Context, id model.GroupID, size int)) *GroupRepo_RelatedGroups_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.GroupID), args[2].(int))
-	})
-	return _c
-}
-
-func (_c *GroupRepo_RelatedGroups_Call) Return(_a0 []model.Group, _a1 error) *GroupRepo_RelatedGroups_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
 type mockConstructorTestingTNewGroupRepo interface {
 	mock.TestingT
 	Cleanup(func())
