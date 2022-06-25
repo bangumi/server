@@ -72,11 +72,8 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 }
 
 func Start(c config.AppConfig, app *fiber.App) error {
-	logger.Infoln("start http server at port", c.HTTPPort)
-	addr := fmt.Sprintf(":%d", c.HTTPPort)
-	if config.Development {
-		addr = "127.0.0.1" + addr
-	}
+	addr := fmt.Sprintf("127.0.0.1:%d", c.HTTPPort)
+	logger.Infoln("http server listening at", addr)
 
 	return errgo.Wrap(app.Listen(addr), "fiber.App.Listen")
 }

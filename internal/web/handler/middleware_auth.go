@@ -22,6 +22,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
@@ -140,7 +141,16 @@ func (a *accessor) fillAuth(auth domain.Auth) {
 }
 
 func (a accessor) LogRequestID() zap.Field {
-	return zap.String("request_id", a.cfRay)
+	return zap.Object("request", a)
+}
+
+func (a accessor) MarshalLogObject(encoder zapcore.ObjectEncoder) error {
+	encoder.AddString("id", a.cfRay)
+	encoder.AddString("ip", a.ip.String())
+	if a.login {
+		encoder.AddUint32("user_id", uint32(a.Auth.ID))
+	}
+	return nil
 }
 
 // reset struct to zero value before put it back to pool.
