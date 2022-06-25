@@ -27,7 +27,6 @@ import (
 )
 
 const groupIconPrefix = "https://lain.bgm.tv/pic/icon/l/"
-const defaultRelatedGroupLength = 6
 
 func (h Handler) GetGroupByName(c *fiber.Ctx) error {
 	groupName := c.Params("name")
