@@ -1,31 +1,23 @@
 additionalProperties: false
-example:
-  id: 11
-  name: a
-  title: ～技术宅真可怕～
-  created_at: "2008-08-01T06:11:29+08:00"
-  icon: https://lain.bgm.tv/pic/icon/l/000/00/00/11.jpg
-  description: "本小组欢迎对各种技术有一定了解的人，\r\n比如像橘花热衷杀人技术……\r\n\r\n不过、本组主要谈论ＰＣ软硬件方面，\r\n想了解相关知识，结识可怕的技术宅，请进。"
-  new_members:
-    - id: "382951"
-      username: "382951"
-      nickname: "树洞酱"
-      avatar: "https://lain.bgm.tv/pic/user/l/icon.jpg"
-  total_members: 9450
 properties:
   id:
     description: 小组的数字 ID
+    example: 11
     type: integer
   created_at:
     format: date-time
+    example: "2008-08-01T06:11:29+08:00"
     type: string
   description:
+    example: "本小组欢迎对各种技术有一定了解的人，\r\n比如像橘花热衷杀人技术……\r\n\r\n不过、本组主要谈论ＰＣ软硬件方面，\r\n想了解相关知识，结识可怕的技术宅，请进。"
     format: bbcode
     type: string
   icon:
     format: url
     type: string
+    example: https://lain.bgm.tv/pic/icon/l/000/00/00/11.jpg
   name:
+    example: a
     description: 小组的 string ID，原本出现在小组URL中
     type: string
   new_members:
@@ -34,9 +26,10 @@ properties:
     items:
       "$ref": "./group_member.yaml"
   title:
-    description: 小组名，如 “靠谱人生茶话会”
     type: string
+    example: ～技术宅真可怕～
   total_members:
+    example: 9450
     description: 用户数
     type: integer
 required:
