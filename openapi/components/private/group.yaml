@@ -19,6 +19,7 @@ example:
   total_members: 9450
 properties:
   id:
+    description: 小组的数字 ID
     type: integer
   created_at:
     format: date-time
@@ -30,12 +31,15 @@ properties:
     format: url
     type: string
   name:
+    description: 小组的 string ID，原本出现在小组URL中
     type: string
   new_members:
+    description: 新加入的用户，最多 10 个。
     type: array
     items:
       "$ref": "./group_member.yaml"
   related_groups:
+    description: “小组用户也爱去”
     items:
       additionalProperties: false
       type: object
@@ -56,8 +60,10 @@ properties:
           type: integer
     type: array
   title:
+    description: 小组名，如 “靠谱人生茶话会”
     type: string
   total_members:
+    description: 用户数
     type: integer
 required:
   - created_at
