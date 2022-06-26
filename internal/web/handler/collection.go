@@ -18,9 +18,11 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -71,7 +73,7 @@ func (h Handler) listCollection(
 ) error {
 	count, err := h.collect.CountSubjectCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
-		return errgo.Wrap(err, "collection.CountSubjectCollections")
+		return h.InternalError(c, err, "failed to count user's subject collections", log.UserID(u.ID))
 	}
 
 	if count == 0 {
@@ -85,7 +87,7 @@ func (h Handler) listCollection(
 	collections, err := h.collect.ListSubjectCollection(c.Context(),
 		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
-		return errgo.Wrap(err, "collection.ListSubjectCollection")
+		return h.InternalError(c, err, "failed to list user's subject collections", log.UserID(u.ID))
 	}
 
 	var data = make([]res.SubjectCollection, len(collections))
@@ -125,7 +127,7 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 			return res.NotFound("user doesn't exist or has been removed")
 		}
 
-		return errgo.Wrap(err, "user.GetByName")
+		return h.InternalError(c, err, "failed to get user by name", zap.String("name", username))
 	}
 
 	var showPrivate = u.ID == v.ID
@@ -136,7 +138,7 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 			return res.NotFound(notFoundMessage)
 		}
 
-		return errgo.Wrap(err, "collection.GetSubjectCollection")
+		return h.InternalError(c, err, "failed to get user's subject collection", log.UserID(u.ID), log.SubjectID(subjectID))
 	}
 
 	if !showPrivate && collection.Private {
