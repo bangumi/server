@@ -17,7 +17,6 @@ require (
 	github.com/goccy/go-json v0.9.7
 	github.com/gofiber/adaptor/v2 v2.1.24
 	github.com/gofiber/fiber/v2 v2.34.1
-	github.com/gookit/goutil v0.5.5
 	github.com/haveyoudebuggedit/gotestfmt/v2 v2.3.2
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/mattn/go-colorable v0.1.12
