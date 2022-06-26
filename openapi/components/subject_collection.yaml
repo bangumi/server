@@ -1,5 +1,4 @@
 title: UserSubjectCollection
-example:
 required:
   - subject_id
   - subject_type
