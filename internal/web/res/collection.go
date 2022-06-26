@@ -12,19 +12,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package res
 
 import (
-	"context"
+	"time"
 
 	"github.com/bangumi/server/internal/model"
 )
 
-type UserRepo interface {
-	// GetByID find a user by uid.
-	GetByID(ctx context.Context, userID model.UserID) (model.User, error)
-	// GetByName find a user by username.
-	GetByName(ctx context.Context, username string) (model.User, error)
-
-	GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error)
+type SubjectCollection struct {
+	UpdatedAt   time.Time            `json:"updated_at"`
+	Comment     *string              `json:"comment"`
+	Tags        []string             `json:"tags"`
+	SubjectID   model.SubjectID      `json:"subject_id"`
+	EpStatus    uint32               `json:"ep_status"`
+	VolStatus   uint32               `json:"vol_status"`
+	SubjectType uint8                `json:"subject_type"`
+	Type        model.CollectionType `json:"type"`
+	Rate        uint8                `json:"rate"`
+	Private     bool                 `json:"private"`
 }

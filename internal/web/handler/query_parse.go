@@ -40,8 +40,8 @@ func parseSubjectType(s string) (uint8, error) {
 	}
 
 	switch t {
-	case model.SubjectAnime, model.SubjectBook,
-		model.SubjectMusic, model.SubjectReal, model.SubjectGame:
+	case model.SubjectTypeAnime, model.SubjectTypeBook,
+		model.SubjectTypeMusic, model.SubjectTypeReal, model.SubjectTypeGame:
 		return t, nil
 	}
 
@@ -116,4 +116,28 @@ func parseIndexID(s string) (model.IndexID, error) {
 	}
 
 	return v, nil
+}
+
+func parseCollectionType(s string) (model.CollectionType, error) {
+	if s == "" {
+		return model.CollectionTypeAll, nil
+	}
+
+	t, err := strparse.Uint8(s)
+	if err != nil {
+		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
+	}
+
+	v := model.CollectionType(t)
+	switch v {
+	case model.CollectionTypeAll,
+		model.CollectionTypeWish,
+		model.CollectionTypeDone,
+		model.CollectionTypeDoing,
+		model.CollectionTypeOnHold,
+		model.CollectionTypeDropped:
+		return v, nil
+	}
+
+	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")
 }

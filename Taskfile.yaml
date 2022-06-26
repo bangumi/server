@@ -81,6 +81,20 @@ tasks:
     deps:
       - gorm
       - mock
+      - "gen:generic"
+      - "gen:stringer"
+
+  "gen:stringer":
+    sources:
+      - ./internal/model/collection_type.go
+    generates:
+      - ./internal/model/collection_type_string.gen.go
+    cmds:
+      - |
+        go run golang.org/x/tools/cmd/stringer -output ./internal/model/collection_type_string.gen.go \
+          -type CollectionType -linecomment ./internal/model/collection_type.go
+
+  "gen:generic":
     sources:
       - ./internal/cmd/gen/generic/generic.go
     generates:

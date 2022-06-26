@@ -1,4 +1,5 @@
 title: CollectionType
+example: 3
 enum:
   - 1
   - 2
@@ -17,13 +18,13 @@ x-ms-enum:
   modelAsString: false
   values:
     - Wish
-    - Collect
+    - Done
     - Doing
     - OnHold
     - Dropped
 x-enum-varnames:
   - Wish
-  - Collect
+  - Done
   - Doing
   - OnHold
   - Dropped

@@ -1,4 +1,5 @@
-title: UserCollection
+title: UserSubjectCollection
+example:
 required:
   - subject_id
   - subject_type
@@ -14,9 +15,11 @@ properties:
   subject_id:
     title: Subject ID
     type: integer
+    example: 8
   subject_type:
     "$ref": "./subject_type.yaml"
   rate:
+    example: 4
     title: Rate
     type: integer
   type:
@@ -24,18 +27,23 @@ properties:
   comment:
     title: Comment
     type: string
+    example: "看看"
   tags:
     title: Tags
     type: array
+    example: [柯南, 万年小学生, 推理, 青山刚昌, TV]
     items:
       type: string
   ep_status:
     title: Ep Status
     type: integer
+    example: 5
   vol_status:
     title: Vol Status
     type: integer
+    example: 0
   updated_at:
+    example: "2022-06-19T18:44:13.6140127+08:00"
     title: Updated At
     type: string
     format: date-time

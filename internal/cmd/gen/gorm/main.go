@@ -180,6 +180,7 @@ func main() {
 		gen.FieldRename("interest_uid", "UserID"),
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
+		gen.FieldRename("interest_lasttouch", "UpdatedAt"),
 		gen.FieldTrimPrefix("interest_")))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",

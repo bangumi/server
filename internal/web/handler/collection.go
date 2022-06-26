@@ -16,14 +16,14 @@ package handler
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -67,13 +67,13 @@ func (h Handler) listCollection(
 	c *fiber.Ctx,
 	u model.User,
 	subjectType model.SubjectType,
-	collectionType uint8,
+	collectionType model.CollectionType,
 	page pageQuery,
 	showPrivate bool,
 ) error {
-	count, err := h.u.CountCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
+	count, err := h.collect.CountSubjectCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
-		return errgo.Wrap(err, "user.CountCollections")
+		return h.InternalError(c, err, "failed to count user's subject collections", log.UserID(u.ID))
 	}
 
 	if count == 0 {
@@ -84,28 +84,15 @@ func (h Handler) listCollection(
 		return err
 	}
 
-	collections, err := h.u.ListCollections(c.Context(),
+	collections, err := h.collect.ListSubjectCollection(c.Context(),
 		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
-		return errgo.Wrap(err, "user.ListCollections")
+		return h.InternalError(c, err, "failed to list user's subject collections", log.UserID(u.ID))
 	}
 
-	var data = make([]res.Collection, len(collections))
+	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
-		c := res.Collection{
-			SubjectID:   collection.SubjectID,
-			SubjectType: collection.SubjectType,
-			Rate:        collection.Rate,
-			Type:        collection.Type,
-			Tags:        collection.Tags,
-			EpStatus:    collection.EpStatus,
-			VolStatus:   collection.VolStatus,
-			UpdatedAt:   collection.UpdatedAt,
-			Private:     collection.Private,
-			Comment:     nilString(collection.Comment),
-		}
-
-		data[i] = c
+		data[i] = convertModelSubjectCollection(collection)
 	}
 
 	return c.JSON(res.Paged{
@@ -114,24 +101,6 @@ func (h Handler) listCollection(
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	})
-}
-
-func parseCollectionType(s string) (uint8, error) {
-	if s == "" {
-		return 0, nil
-	}
-
-	t, err := strparse.Uint8(s)
-	if err != nil {
-		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
-	}
-
-	switch t {
-	case 1, 2, 3, 4, 5: //nolint:gomnd
-		return t, nil
-	}
-
-	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")
 }
 
 func (h Handler) GetCollection(c *fiber.Ctx) error {
@@ -158,25 +127,30 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 			return res.NotFound("user doesn't exist or has been removed")
 		}
 
-		return errgo.Wrap(err, "user.GetByName")
+		return h.InternalError(c, err, "failed to get user by name", zap.String("name", username))
 	}
 
 	var showPrivate = u.ID == v.ID
 
-	collection, err := h.u.GetCollection(c.Context(), u.ID, subjectID)
+	collection, err := h.collect.GetSubjectCollection(c.Context(), u.ID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound(notFoundMessage)
 		}
 
-		return errgo.Wrap(err, "user.GetCollection")
+		return h.InternalError(c, err, "failed to get user's subject collection",
+			log.UserID(u.ID), log.SubjectID(subjectID))
 	}
 
 	if !showPrivate && collection.Private {
 		return res.NotFound(notFoundMessage)
 	}
 
-	return res.JSON(c, res.Collection{
+	return res.JSON(c, convertModelSubjectCollection(collection))
+}
+
+func convertModelSubjectCollection(collection model.SubjectCollection) res.SubjectCollection {
+	return res.SubjectCollection{
 		SubjectID:   collection.SubjectID,
 		SubjectType: collection.SubjectType,
 		Rate:        collection.Rate,
@@ -187,5 +161,5 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 		UpdatedAt:   collection.UpdatedAt,
 		Private:     collection.Private,
 		Comment:     nilString(collection.Comment),
-	})
+	}
 }

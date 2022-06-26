@@ -12,40 +12,33 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package domain
 
-type SubjectType = uint8
+import (
+	"context"
 
-const (
-	SubjectBook SubjectType = iota + 1
-	SubjectAnime
-	SubjectMusic
-	SubjectGame
-	_
-	SubjectReal
+	"github.com/bangumi/server/internal/model"
 )
 
-const (
-	textSubjectBook  = "书籍"
-	textSubjectAnime = "动画"
-	textSubjectMusic = "音乐"
-	textSubjectGame  = "游戏"
-	textSubjectReal  = "三次元"
-)
+type CollectionRepo interface {
+	CountSubjectCollections(
+		ctx context.Context,
+		userID model.UserID,
+		subjectType model.SubjectType,
+		collectionType model.CollectionType,
+		showPrivate bool,
+	) (int64, error)
 
-func SubjectTypeString(s uint8) string {
-	switch s {
-	case SubjectBook:
-		return textSubjectBook
-	case SubjectAnime:
-		return textSubjectAnime
-	case SubjectMusic:
-		return textSubjectMusic
-	case SubjectGame:
-		return textSubjectGame
-	case SubjectReal:
-		return textSubjectReal
-	default:
-		return "unknown repository type"
-	}
+	ListSubjectCollection(
+		ctx context.Context,
+		userID model.UserID,
+		subjectType model.SubjectType,
+		collectionType model.CollectionType,
+		showPrivate bool,
+		limit, offset int,
+	) ([]model.SubjectCollection, error)
+
+	GetSubjectCollection(
+		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
+	) (model.SubjectCollection, error)
 }

@@ -28,7 +28,7 @@ type SubjectCollection struct {
 	CollectDateline uint32          `gorm:"column:interest_collect_dateline;type:int(10) unsigned;not null;index:interest_collect_dateline,priority:1;index:subject_collect,priority:4;index:user_collect_type,priority:5"`
 	OnHoldDateline  uint32          `gorm:"column:interest_on_hold_dateline;type:int(10) unsigned;not null"`
 	DroppedDateline uint32          `gorm:"column:interest_dropped_dateline;type:int(10) unsigned;not null"`
-	Lasttouch       uint32          `gorm:"column:interest_lasttouch;type:int(10) unsigned;not null;index:interest_lasttouch,priority:1;index:subject_lasttouch,priority:3;index:subject_comment,priority:4;index:interest_uid_2,priority:3"`
+	UpdatedAt       uint32          `gorm:"column:interest_lasttouch;type:int(10) unsigned;not null;index:interest_lasttouch,priority:1;index:subject_lasttouch,priority:3;index:subject_comment,priority:4;index:interest_uid_2,priority:3"`
 	Private         uint8           `gorm:"column:interest_private;type:tinyint(1) unsigned;not null;index:interest_private,priority:1;index:subject_lasttouch,priority:2;index:subject_comment,priority:3;index:subject_collect,priority:3;index:user_collect_type,priority:4;index:interest_id,priority:2;index:subject_rate,priority:3;index:user_collect_latest,priority:4;index:interest_uid_2,priority:2"`
 }
 

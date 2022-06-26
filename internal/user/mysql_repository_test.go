@@ -21,7 +21,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
@@ -37,6 +36,7 @@ func getRepo(t *testing.T) domain.UserRepo {
 	return repo
 }
 
+// env TEST_MYSQL=1 go test ./internal/user -run TestGetByID
 func TestGetByID(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
@@ -66,32 +66,4 @@ func TestGetByName(t *testing.T) {
 
 	require.Equal(t, id, u.ID)
 	require.Equal(t, "000/38/29/382951.jpg?r=1571167246", u.Avatar)
-}
-
-func TestMysqlRepo_GetCollection(t *testing.T) {
-	test.RequireEnv(t, test.EnvMysql)
-	t.Parallel()
-
-	repo := getRepo(t)
-
-	const id model.UserID = 382951
-	const subjectID model.SubjectID = 888998
-
-	q := test.GetQuery(t)
-	err := q.WithContext(context.Background()).SubjectCollection.Create(&dao.SubjectCollection{
-		UserID:    id,
-		SubjectID: subjectID,
-		Rate:      2,
-	})
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		_, err = q.WithContext(context.Background()).SubjectCollection.
-			Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(id)).Delete()
-		require.NoError(t, err)
-	})
-
-	c, err := repo.GetCollection(context.Background(), id, subjectID)
-	require.NoError(t, err)
-
-	require.Equal(t, uint8(2), c.Rate)
 }
