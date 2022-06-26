@@ -68,7 +68,6 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 		histogram.RecordDuration(sub)
 		c.Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
 		c.Set(headerServerVersion, config.Version)
-
 		return err
 	})
 
