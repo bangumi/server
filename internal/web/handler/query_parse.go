@@ -17,6 +17,7 @@ package handler
 import (
 	"strconv"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
@@ -118,9 +119,9 @@ func parseIndexID(s string) (model.IndexID, error) {
 	return v, nil
 }
 
-func parseCollectionType(s string) (model.CollectionType, error) {
+func parseCollectionType(s string) (domain.CollectionType, error) {
 	if s == "" {
-		return model.CollectionTypeAll, nil
+		return domain.CollectionTypeAll, nil
 	}
 
 	t, err := strparse.Uint8(s)
@@ -128,15 +129,15 @@ func parseCollectionType(s string) (model.CollectionType, error) {
 		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
 	}
 
-	v := model.CollectionType(t)
+	v := domain.CollectionType(t)
 	switch v {
-	case model.CollectionTypeWish,
-		model.CollectionTypeDone,
-		model.CollectionTypeDoing,
-		model.CollectionTypeOnHold,
-		model.CollectionTypeDropped:
+	case domain.CollectionTypeWish,
+		domain.CollectionTypeDone,
+		domain.CollectionTypeDoing,
+		domain.CollectionTypeOnHold,
+		domain.CollectionTypeDropped:
 		return v, nil
-	case model.CollectionTypeAll:
+	case domain.CollectionTypeAll:
 
 	}
 

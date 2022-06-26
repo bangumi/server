@@ -83,6 +83,17 @@ tasks:
       - mock
       - "gen:null"
       - "gen:generic"
+      - "gen:stringer"
+
+  "gen:stringer":
+    sources:
+      - ./internal/domain/collection_type.go
+    generates:
+      - ./internal/domain/collection_type_string.gen.go
+    cmds:
+      - |
+        go run golang.org/x/tools/cmd/stringer -output ./internal/domain/collection_type_string.gen.go \
+          -type CollectionType -linecomment ./internal/domain/collection_type.go
 
   "gen:generic":
     sources:

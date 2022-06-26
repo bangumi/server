@@ -80,15 +80,15 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	}
 
 	switch data.Type {
-	case model.CollectionTypeWish:
+	case domain.CollectionTypeWish:
 		d.WishAt = d.UpdatedAt
-	case model.CollectionTypeDone:
+	case domain.CollectionTypeDone:
 		d.DoneAt = d.UpdatedAt
-	case model.CollectionTypeDoing:
+	case domain.CollectionTypeDoing:
 		d.DoingAt = d.UpdatedAt
-	case model.CollectionTypeOnHold:
+	case domain.CollectionTypeOnHold:
 		d.OnHoldAt = d.UpdatedAt
-	case model.CollectionTypeDropped:
+	case domain.CollectionTypeDropped:
 		d.DroppedAt = d.UpdatedAt
 	}
 
@@ -106,7 +106,7 @@ func (r mysqlRepo) CountSubjectCollections(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType model.CollectionType,
+	collectionType domain.CollectionType,
 	showPrivate bool,
 ) (int64, error) {
 	q := r.q.SubjectCollection.WithContext(ctx).
@@ -136,7 +136,7 @@ func (r mysqlRepo) ListSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType model.CollectionType,
+	collectionType domain.CollectionType,
 	showPrivate bool,
 	limit, offset int,
 ) ([]model.SubjectCollection, error) {
@@ -173,7 +173,7 @@ func (r mysqlRepo) ListSubjectCollection(
 			SubjectID:   c.SubjectID,
 			EpStatus:    c.EpStatus,
 			VolStatus:   c.VolStatus,
-			Type:        model.CollectionType(c.Type),
+			Type:        domain.CollectionType(c.Type),
 			Private:     c.Private != model.CollectPrivacyNone,
 		}
 	}
@@ -204,7 +204,7 @@ func (r mysqlRepo) GetSubjectCollection(
 		SubjectID:   c.SubjectID,
 		EpStatus:    c.EpStatus,
 		VolStatus:   c.VolStatus,
-		Type:        model.CollectionType(c.Type),
+		Type:        domain.CollectionType(c.Type),
 		Private:     c.Private != model.CollectPrivacyNone,
 	}, nil
 }
@@ -262,8 +262,8 @@ func (r mysqlRepo) GetEpisodeCollection(
 }
 
 type epCollectionItem struct {
-	EpisodeID model.EpisodeID      `ms:"eid"`
-	Type      model.CollectionType `ms:"type"`
+	EpisodeID model.EpisodeID       `ms:"eid"`
+	Type      domain.CollectionType `ms:"type"`
 }
 
 var errEpisodeInvalid = errors.New("number is not valid as episode ID")
