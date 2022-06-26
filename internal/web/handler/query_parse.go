@@ -117,3 +117,27 @@ func parseIndexID(s string) (model.IndexID, error) {
 
 	return v, nil
 }
+
+func parseCollectionType(s string) (model.CollectionType, error) {
+	if s == "" {
+		return model.CollectionTypeAll, nil
+	}
+
+	t, err := strparse.Uint8(s)
+	if err != nil {
+		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
+	}
+
+	v := model.CollectionType(t)
+	switch v {
+	case model.CollectionTypeWish,
+		model.CollectionTypeDone,
+		model.CollectionTypeDoing,
+		model.CollectionTypeOnHold,
+		model.CollectionTypeDropped:
+		return v, nil
+	case model.CollectionTypeAll:
+	}
+
+	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")
+}

@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package user_test
+package collection_test
 
 import (
 	"context"
@@ -21,49 +21,48 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/collection"
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/test"
-	"github.com/bangumi/server/internal/user"
 )
 
-func getRepo(t *testing.T) domain.UserRepo {
+func getRepo(t *testing.T) (domain.CollectionRepo, *query.Query) {
 	t.Helper()
-	repo, err := user.NewUserRepo(query.Use(test.GetGorm(t)), zap.NewNop())
+	q := test.GetQuery(t)
+	repo, err := collection.NewMysqlRepo(q, zap.NewNop())
 	require.NoError(t, err)
 
-	return repo
+	return repo, q
 }
 
-// env TEST_MYSQL=1 go test ./internal/user -run TestGetByID
-func TestGetByID(t *testing.T) {
-	test.RequireEnv(t, "mysql")
+// $ task test-all -- -run TestMysqlRepo_GetCollections
+func TestMysqlRepo_GetCollection(t *testing.T) {
 	t.Parallel()
-
-	repo := getRepo(t)
+	test.RequireEnv(t, test.EnvMysql)
 
 	const id model.UserID = 382951
+	const subjectID model.SubjectID = 888998
 
-	u, err := repo.GetByID(context.Background(), id)
+	repo, q := getRepo(t)
+
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(context.Background()).SubjectCollection.
+			Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(id)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := q.WithContext(context.Background()).SubjectCollection.Create(&dao.SubjectCollection{
+		UserID:    id,
+		SubjectID: subjectID,
+		Rate:      2,
+	})
 	require.NoError(t, err)
 
-	require.Equal(t, id, u.ID)
-	require.Equal(t, "000/38/29/382951.jpg?r=1571167246", u.Avatar)
-	require.False(t, u.RegistrationTime.IsZero())
-}
-
-func TestGetByName(t *testing.T) {
-	test.RequireEnv(t, "mysql")
-	t.Parallel()
-
-	repo := getRepo(t)
-
-	const id model.UserID = 382951
-
-	u, err := repo.GetByName(context.Background(), "382951")
+	c, err := repo.GetSubjectCollection(context.Background(), id, subjectID)
 	require.NoError(t, err)
 
-	require.Equal(t, id, u.ID)
-	require.Equal(t, "000/38/29/382951.jpg?r=1571167246", u.Avatar)
+	require.Equal(t, uint8(2), c.Rate)
 }

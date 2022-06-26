@@ -20,11 +20,25 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type UserRepo interface {
-	// GetByID find a user by uid.
-	GetByID(ctx context.Context, userID model.UserID) (model.User, error)
-	// GetByName find a user by username.
-	GetByName(ctx context.Context, username string) (model.User, error)
+type CollectionRepo interface {
+	CountSubjectCollections(
+		ctx context.Context,
+		userID model.UserID,
+		subjectType model.SubjectType,
+		collectionType model.CollectionType,
+		showPrivate bool,
+	) (int64, error)
 
-	GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error)
+	ListSubjectCollection(
+		ctx context.Context,
+		userID model.UserID,
+		subjectType model.SubjectType,
+		collectionType model.CollectionType,
+		showPrivate bool,
+		limit, offset int,
+	) ([]model.SubjectCollection, error)
+
+	GetSubjectCollection(
+		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
+	) (model.SubjectCollection, error)
 }

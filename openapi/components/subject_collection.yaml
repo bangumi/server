@@ -1,4 +1,20 @@
-title: UserCollection
+title: UserSubjectCollection
+example:
+  comment: "看看"
+  ep_status: 1041
+  private: false
+  rate: 8
+  subject_id: 899
+  subject_type: 2
+  tags:
+    - 柯南
+    - 万年小学生
+    - 推理
+    - 青山刚昌
+    - TV
+  type: 3
+  updated_at: "2022-06-19T18:44:13.6140127+08:00"
+  vol_status: 0
 required:
   - subject_id
   - subject_type

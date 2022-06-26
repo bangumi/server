@@ -47,6 +47,7 @@ func New(
 	p domain.PersonService,
 	a domain.AuthService,
 	e domain.EpisodeRepo,
+	collect domain.CollectionRepo,
 	r domain.RevisionRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
@@ -78,6 +79,7 @@ func New(
 		u:                    user,
 		e:                    e,
 		c:                    c,
+		collect:              collect,
 		i:                    index,
 		r:                    r,
 		captcha:              captcha,
@@ -98,6 +100,7 @@ type Handler struct {
 	s                    domain.SubjectService
 	p                    domain.PersonService
 	a                    domain.AuthService
+	collect              domain.CollectionRepo
 	session              session.Manager
 	captcha              captcha.Manager
 	e                    domain.EpisodeRepo

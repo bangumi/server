@@ -768,7 +768,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UserCollection"
+                "$ref": "#/components/schemas/UserSubjectCollection"
         "400":
           description: Validation Error
           content:
@@ -1107,6 +1107,8 @@ components:
       $ref: "./components/avatar.yaml"
     UserGroup:
       $ref: "./components/user_group.yaml"
+    PatchSubjectCollection:
+      $ref: "./components/patch_subject_collection.yaml"
     BloodType:
       title: BloodType
       enum:
@@ -1848,7 +1850,7 @@ components:
           title: Data
           type: array
           items:
-            "$ref": "#/components/schemas/UserCollection"
+            "$ref": "#/components/schemas/UserSubjectCollection"
           default: []
     Person:
       title: Person
@@ -2295,7 +2297,7 @@ components:
         count:
           title: Count
           type: integer
-    UserCollection:
+    UserSubjectCollection:
       $ref: "./components/subject_collection.yaml"
     V:
       title: V

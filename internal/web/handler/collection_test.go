@@ -38,11 +38,13 @@ func TestHandler_GetCollection(t *testing.T) {
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
-	m.EXPECT().GetCollection(mock.Anything, userID, mock.Anything).Return(model.Collection{SubjectID: subjectID}, nil)
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).
+		Return(model.SubjectCollection{SubjectID: subjectID}, nil)
 
-	app := test.GetWebApp(t, test.Mock{UserRepo: m})
+	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c})
 
-	var r res.Collection
+	var r res.SubjectCollection
 	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
 		Execute(app).
 		JSON(&r).
@@ -62,10 +64,11 @@ func TestHandler_GetCollection_other_user(t *testing.T) {
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
-	m.EXPECT().GetCollection(mock.Anything, userID, mock.Anything).
-		Return(model.Collection{SubjectID: subjectID, Private: true}, nil)
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).
+		Return(model.SubjectCollection{SubjectID: subjectID, Private: true}, nil)
 
-	app := test.GetWebApp(t, test.Mock{UserRepo: m, AuthService: a})
+	app := test.GetWebApp(t, test.Mock{UserRepo: m, AuthService: a, CollectionRepo: c})
 
 	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
 		Header(fiber.HeaderAuthorization, "Bearer v").
