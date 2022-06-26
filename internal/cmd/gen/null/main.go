@@ -83,8 +83,7 @@ func Cmd(name string, arg ...string) {
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		fmt.Println(stdout.String())
 		fmt.Println(stderr.String())
 
