@@ -31,7 +31,13 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 
+	"time"
+
 	"github.com/bangumi/server/internal/dal/dao"
+
+	"go.uber.org/zap"
+	"gorm.io/gorm"
+
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
@@ -102,6 +108,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	}
 
 	return nil
+
 }
 
 func (r mysqlRepo) CountSubjectCollections(
@@ -114,11 +121,11 @@ func (r mysqlRepo) CountSubjectCollections(
 	q := r.q.SubjectCollection.WithContext(ctx).
 		Where(r.q.SubjectCollection.UserID.Eq(userID))
 
-	if subjectType != 0 {
+	if subjectType != model.SubjectTypeAll {
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
-	if collectionType != 0 {
+	if collectionType != model.CollectionTypeAll {
 		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 
@@ -146,11 +153,11 @@ func (r mysqlRepo) ListSubjectCollection(
 		Order(r.q.SubjectCollection.UpdatedAt.Desc()).
 		Where(r.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
 
-	if subjectType != 0 {
+	if subjectType != model.SubjectTypeAll {
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
-	if collectionType != 0 {
+	if collectionType != model.CollectionTypeAll {
 		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 

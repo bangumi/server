@@ -92,8 +92,8 @@ tasks:
       - ./internal/model/collection_type_string.gen.go
     cmds:
       - |
-        go run golang.org/x/tools/cmd/stringer -output ./internal/domain/collection_type_string.gen.go \
-          -type CollectionType -linecomment ./internal/domain/collection_type.go
+        go run golang.org/x/tools/cmd/stringer -output ./internal/model/collection_type_string.gen.go \
+          -type CollectionType -linecomment ./internal/model/collection_type.go
 
   "gen:generic":
     sources:

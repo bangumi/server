@@ -184,9 +184,9 @@ func main() {
 		gen.FieldRename("interest_on_hold_dateline", "OnHoldAt"),
 		gen.FieldRename("interest_dropped_dateline", "droppedAt"),
 		gen.FieldRename("interest_wish_dateline", "wishAt"),
-		gen.FieldRename("interest_lasttouch", "UpdatedAt"),
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
+		gen.FieldRename("interest_lasttouch", "UpdatedAt"),
 		gen.FieldTrimPrefix("interest_")))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",

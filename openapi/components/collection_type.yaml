@@ -1,4 +1,5 @@
 title: CollectionType
+example: 3
 enum:
   - 1
   - 2

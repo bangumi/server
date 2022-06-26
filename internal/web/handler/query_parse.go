@@ -40,8 +40,8 @@ func parseSubjectType(s string) (uint8, error) {
 	}
 
 	switch t {
-	case model.SubjectAnime, model.SubjectBook,
-		model.SubjectMusic, model.SubjectReal, model.SubjectGame:
+	case model.SubjectTypeAnime, model.SubjectTypeBook,
+		model.SubjectTypeMusic, model.SubjectTypeReal, model.SubjectTypeGame:
 		return t, nil
 	}
 
@@ -130,13 +130,14 @@ func parseCollectionType(s string) (model.CollectionType, error) {
 
 	v := model.CollectionType(t)
 	switch v {
-	case model.CollectionTypeWish,
+
+	case model.CollectionTypeAll,
+		model.CollectionTypeWish,
 		model.CollectionTypeDone,
 		model.CollectionTypeDoing,
 		model.CollectionTypeOnHold,
 		model.CollectionTypeDropped:
 		return v, nil
-	case model.CollectionTypeAll:
 	}
 
 	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")

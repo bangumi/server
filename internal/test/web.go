@@ -91,7 +91,6 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		),
 
 		MockPersonRepo(m.PersonRepo),
-		MockCollectionRepo(m.CollectionRepo),
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
@@ -105,8 +104,9 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockSessionManager(m.SessionManager),
 		MockRateLimiter(m.RateLimiter),
 
-		// don't need a default mock for this repo
+		// don't need a default mock for these repositories.
 		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
+		fx.Provide(func() domain.CollectionRepo { return m.CollectionRepo }),
 
 		fx.Invoke(web.ResistRouter),
 
@@ -171,16 +171,6 @@ func MockSessionManager(repo session.Manager) fx.Option {
 	}
 
 	return fx.Provide(func() session.Manager { return repo })
-}
-
-func MockCollectionRepo(repo domain.CollectionRepo) fx.Option {
-	if repo == nil {
-		mocker := &mocks.CollectionRepo{}
-
-		repo = mocker
-	}
-
-	return fx.Provide(func() domain.CollectionRepo { return repo })
 }
 
 func MockCaptchaManager(repo captcha.Manager) fx.Option {

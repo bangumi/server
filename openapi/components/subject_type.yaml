@@ -1,4 +1,5 @@
 title: SubjectType
+example: 2
 enum:
   - 1
   - 2
