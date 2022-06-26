@@ -130,13 +130,13 @@ func parseCollectionType(s string) (model.CollectionType, error) {
 
 	v := model.CollectionType(t)
 	switch v {
-	case model.CollectionTypeWish,
+	case model.CollectionTypeAll,
+		model.CollectionTypeWish,
 		model.CollectionTypeDone,
 		model.CollectionTypeDoing,
 		model.CollectionTypeOnHold,
 		model.CollectionTypeDropped:
 		return v, nil
-	case model.CollectionTypeAll:
 	}
 
 	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")
