@@ -15,34 +15,14 @@
 package req
 
 import (
-	"github.com/volatiletech/null/v9"
-
-	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
-type NullCollectionType = null.Uint8
-
-type PutEpisodeCollection struct {
-	ID   model.EpisodeID    `json:"id"`
-	Type NullCollectionType `json:"type"`
-}
-
-type PutSubjectCollection struct {
-	Comment   string               `json:"comment"`
-	Tags      []string             `json:"tags"`
-	EpStatus  uint32               `json:"ep_status"`
-	VolStatus uint32               `json:"vol_status"`
-	Type      model.CollectionType `json:"type" validate:"max=5,min=1"`
-	Rate      uint8                `json:"rate" validate:"max=10,min=1"`
-	Private   bool                 `json:"private"`
-}
-
 type PatchSubjectCollection struct {
-	Comment   null.String        `json:"comment"`
-	Tags      []string           `json:"tags"`
-	EpStatus  uint32             `json:"ep_status"`
-	VolStatus uint32             `json:"vol_status"`
-	Type      NullCollectionType `json:"type"`
-	Rate      null.Uint8         `json:"rate"`
-	Private   null.Bool          `json:"private"`
+	Comment   null.String `json:"comment"`
+	Tags      []string    `json:"tags"`
+	EpStatus  null.Uint32 `json:"ep_status"`
+	VolStatus null.Uint32 `json:"vol_status"`
+	Type      null.Uint8  `json:"type" validate:"lte=5,gte=1,omitempty"`
+	Private   null.Bool   `json:"private"`
 }

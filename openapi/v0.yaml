@@ -785,12 +785,15 @@ paths:
         - OptionalHTTPBearer: []
 
   "/v0/users/-/collections/{subject_id}":
-    put:
+    patch:
       tags:
         - 收藏
       summary: 更新用户条目收藏状态
-      description: 获取对应用户的收藏，查看私有收藏需要access token。
-      operationId: putUserCollection
+      description: |
+        获取对应用户的收藏，查看私有收藏需要access token。
+
+        暂时无法创建收藏和修改评分，请使用网页修改评分
+      operationId: patchUserCollection
       parameters:
         - *path_subject_id
       requestBody:
@@ -799,7 +802,7 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/PutSubjectCollection"
+              "$ref": "#/components/schemas/PatchSubjectCollection"
       responses:
         "200":
           description: Successful Response
@@ -1145,8 +1148,8 @@ components:
       $ref: "./components/avatar.yaml"
     UserGroup:
       $ref: "./components/user_group.yaml"
-    PutSubjectCollection:
-      $ref: "./components/put_subject_collection.yaml"
+    PatchSubjectCollection:
+      $ref: "./components/patch_subject_collection.yaml"
     BloodType:
       title: BloodType
       enum:

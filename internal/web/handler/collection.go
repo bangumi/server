@@ -17,7 +17,6 @@ package handler
 import (
 	"errors"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -26,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -71,13 +69,13 @@ func (h Handler) listCollection(
 	c *fiber.Ctx,
 	u model.User,
 	subjectType model.SubjectType,
-	collectionType uint8,
+	collectionType model.CollectionType,
 	page pageQuery,
 	showPrivate bool,
 ) error {
-	count, err := h.collect.CountCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
+	count, err := h.collect.CountSubjectCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
-		return errgo.Wrap(err, "user.CountCollections")
+		return errgo.Wrap(err, "user.CountSubjectCollections")
 	}
 
 	if count == 0 {
@@ -88,28 +86,15 @@ func (h Handler) listCollection(
 		return err
 	}
 
-	collections, err := h.collect.ListCollections(c.Context(),
+	collections, err := h.collect.ListSubjectCollection(c.Context(),
 		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
-		return errgo.Wrap(err, "user.ListCollections")
+		return errgo.Wrap(err, "user.ListSubjectCollection")
 	}
 
 	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
-		c := res.SubjectCollection{
-			SubjectID:   collection.SubjectID,
-			SubjectType: collection.SubjectType,
-			Rate:        collection.Rate,
-			Type:        collection.Type,
-			Tags:        collection.Tags,
-			EpStatus:    collection.EpStatus,
-			VolStatus:   collection.VolStatus,
-			UpdatedAt:   collection.UpdatedAt,
-			Private:     collection.Private,
-			Comment:     nilString(collection.Comment),
-		}
-
-		data[i] = c
+		data[i] = convertModelSubjectCollection(collection)
 	}
 
 	return c.JSON(res.Paged{
@@ -118,24 +103,6 @@ func (h Handler) listCollection(
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	})
-}
-
-func parseCollectionType(s string) (uint8, error) {
-	if s == "" {
-		return 0, nil
-	}
-
-	t, err := strparse.Uint8(s)
-	if err != nil {
-		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
-	}
-
-	switch t {
-	case 1, 2, 3, 4, 5: //nolint:gomnd
-		return t, nil
-	}
-
-	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")
 }
 
 func (h Handler) GetCollection(c *fiber.Ctx) error {
@@ -167,34 +134,25 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 
 	var showPrivate = u.ID == v.ID
 
-	collection, err := h.collect.GetCollection(c.Context(), u.ID, subjectID)
+	collection, err := h.collect.GetSubjectCollection(c.Context(), u.ID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound(notFoundMessage)
 		}
 
-		return errgo.Wrap(err, "user.GetCollection")
+		return errgo.Wrap(err, "collection.GetSubjectCollection")
 	}
 
 	if !showPrivate && collection.Private {
 		return res.NotFound(notFoundMessage)
 	}
 
-	return res.JSON(c, res.SubjectCollection{
-		SubjectID:   collection.SubjectID,
-		SubjectType: collection.SubjectType,
-		Rate:        collection.Rate,
-		Type:        collection.Type,
-		Tags:        collection.Tags,
-		EpStatus:    collection.EpStatus,
-		VolStatus:   collection.VolStatus,
-		UpdatedAt:   collection.UpdatedAt,
-		Private:     collection.Private,
-		Comment:     nilString(collection.Comment),
-	})
+	return res.JSON(c, convertModelSubjectCollection(collection))
 }
 
-func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
+const subjectNotFoundMessage = "subject not found"
+
+func (h Handler) PatchSubjectCollection(c *fiber.Ctx) error {
 	h.log.Info("called")
 	v := h.getHTTPAccessor(c)
 	if !v.login {
@@ -206,63 +164,67 @@ func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	var input req.PutSubjectCollection
+	var input req.PatchSubjectCollection
 	if err = json.UnmarshalNoEscape(c.Body(), &input); err != nil {
 		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
 	}
-
-	return h.putSubjectCollection(c, v.ID, subjectID, input)
-}
-
-func (h Handler) putSubjectCollection(
-	c *fiber.Ctx, userID model.UserID, subjectID model.SubjectID, input req.PutSubjectCollection,
-) error {
-	const notFoundMessage = "subject is not found"
 
 	s, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get subject info")
 	}
-
-	if !ok {
-		return res.NotFound("subject not found, maybe locked")
+	if !ok || s.Redirect != 0 {
+		return res.NotFound(subjectNotFoundMessage)
 	}
 
-	_, err = h.collect.GetCollection(c.Context(), userID, subjectID)
+	if s.TypeID != model.SubjectBook && input.VolStatus.HasValue() {
+		return res.BadRequest("subject is not book, you can't add `vol_status` key to request body")
+	}
+
+	return h.patchSubjectCollection(c, v.ID, s, input)
+}
+
+func (h Handler) patchSubjectCollection(
+	c *fiber.Ctx, userID model.UserID, s res.SubjectV0, input req.PatchSubjectCollection,
+) error {
+	collection, err := h.collect.GetSubjectCollection(c.Context(), userID, s.ID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound(notFoundMessage)
+			return res.NotFound(subjectNotFoundMessage)
 		}
 
-		return errgo.Wrap(err, "user.GetCollection")
+		return errgo.Wrap(err, "user.GetSubjectCollection")
 	}
 
-	if s.TypeID != model.SubjectBook && input.VolStatus != 0 {
-		return res.BadRequest("subject is not book, you can't update `vol_status`")
-	}
-
-	var update = model.SubjectCollectionUpdate{
+	update := model.SubjectCollectionUpdate{
 		UpdatedAt:   time.Now(),
 		SubjectType: s.TypeID,
-		Comment:     input.Comment,
-		Tags:        input.Tags,
-		VolStatus:   input.VolStatus,
-		EpStatus:    input.EpStatus,
-		Rate:        input.Rate,
-		Type:        input.Type,
-		Private:     input.Private,
+		Rate:        collection.Rate,
+		Comment:     input.Comment.Default(collection.Comment),
+		VolStatus:   input.VolStatus.Default(collection.VolStatus),
+		EpStatus:    input.EpStatus.Default(collection.EpStatus),
+		Type:        model.CollectionType(input.Type.Default(uint8(collection.Type))),
+		Private:     input.Private.Default(collection.Private),
 	}
 
-	if err = h.collect.UpdateCollection(c.Context(), userID, subjectID, update); err != nil {
+	if input.Tags != nil {
+		update.Tags = input.Tags
+	}
+
+	if err = h.collect.UpdateSubjectCollection(c.Context(), userID, s.ID, update); err != nil {
 		return h.InternalError(c, err, "failed to update subject collection")
 	}
 
-	collection, err := h.collect.GetCollection(c.Context(), userID, subjectID)
+	collection, err = h.collect.GetSubjectCollection(c.Context(), userID, s.ID)
 	if err != nil {
-		return errgo.Wrap(err, "user.GetCollection")
+		return errgo.Wrap(err, "user.GetSubjectCollection")
 	}
 
-	return res.JSON(c, res.SubjectCollection{
+	return res.JSON(c, convertModelSubjectCollection(collection))
+}
+
+func convertModelSubjectCollection(collection model.SubjectCollection) res.SubjectCollection {
+	return res.SubjectCollection{
 		SubjectID:   collection.SubjectID,
 		SubjectType: collection.SubjectType,
 		Rate:        collection.Rate,
@@ -273,5 +235,5 @@ func (h Handler) putSubjectCollection(
 		UpdatedAt:   collection.UpdatedAt,
 		Private:     collection.Private,
 		Comment:     nilString(collection.Comment),
-	})
+	}
 }

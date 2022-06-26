@@ -32,6 +32,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/oauth"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/rate"
@@ -121,6 +122,9 @@ type Handler struct {
 
 func getValidator() (*validator.Validate, ut.Translator, error) {
 	validate := validator.New()
+
+	validate.RegisterCustomTypeFunc(null.Validator, null.AllTypes()...)
+
 	uni := ut.New(en.New(), zh.New())
 
 	// this is usually know or extracted from http 'Accept-Language' header

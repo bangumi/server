@@ -12,19 +12,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package null
 
 import (
-	"context"
-
-	"github.com/bangumi/server/internal/model"
+	"database/sql/driver"
 )
 
-type UserRepo interface {
-	// GetByID find a user by uid.
-	GetByID(ctx context.Context, userID model.UserID) (model.User, error)
-	// GetByName find a user by username.
-	GetByName(ctx context.Context, username string) (model.User, error)
+// stub for template
 
-	GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error)
+var nilBytes = []byte("null") //nolint:gochecknoglobals
+
+type GenericType interface{}
+
+func convertToDriverValue(s GenericType) driver.Value {
+	return nil
 }

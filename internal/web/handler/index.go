@@ -138,7 +138,7 @@ func (h Handler) getIndexSubjects(
 ) error {
 	count, err := h.i.CountSubjects(c.Context(), id, subjectType)
 	if err != nil {
-		return errgo.Wrap(err, "Index.CountSubjects")
+		return errgo.Wrap(err, "Index.CountSubjectCollections")
 	}
 
 	if count == 0 {
@@ -156,7 +156,7 @@ func (h Handler) getIndexSubjects(
 
 	subjects, err := h.i.ListSubjects(c.Context(), id, subjectType, page.Limit, page.Offset)
 	if err != nil {
-		return errgo.Wrap(err, "Index.ListSubjects")
+		return errgo.Wrap(err, "Index.ListSubjectCollection")
 	}
 
 	var data = make([]res.SlimSubjectV0, len(subjects))

@@ -22,6 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 )
 
@@ -31,12 +32,13 @@ go test ./internal/web/req -run '^TestPutSubjectCollection_validation$'
 func TestPutSubjectCollection_validation(t *testing.T) {
 	t.Parallel()
 	v := validator.New()
-	tests := []req.PutSubjectCollection{
-		{Rate: 1, Type: model.CollectionWish},
+	tests := []req.PatchSubjectCollection{
+		{},
+		{Type: null.NewUint8(uint8(model.CollectionTypeDone))},
 	}
 
 	for _, s := range tests {
-		t.Run(fmt.Sprintf("type=%d,rate=%d", s.Type, s.Rate), func(t *testing.T) {
+		t.Run(fmt.Sprintf("type=%d", s.Type.Uint8), func(t *testing.T) {
 			t.Parallel()
 			err := v.Struct(s)
 			require.NoError(t, err)
@@ -50,15 +52,16 @@ go test ./internal/web/req -run '^TestPutSubjectCollection_validation_error$'
 func TestPutSubjectCollection_validation_error(t *testing.T) {
 	t.Parallel()
 	v := validator.New()
-	tests := []req.PutSubjectCollection{
-		{Rate: 11, Type: model.CollectionWish},
-		{Rate: 0, Type: model.CollectionWish},
-		{Rate: 5, Type: 6},
-		{Rate: 5, Type: 0},
+	v.RegisterCustomTypeFunc(null.Validator, null.Uint8{})
+
+	tests := []req.PatchSubjectCollection{
+		{Type: null.NewUint8(0)},
+		{Type: null.NewUint8(6)},
+		{Type: null.NewUint8(11)},
 	}
 
 	for _, s := range tests {
-		t.Run(fmt.Sprintf("type=%d,rate=%d", s.Type, s.Rate), func(t *testing.T) {
+		t.Run(fmt.Sprintf("type=%d", s.Type.Uint8), func(t *testing.T) {
 			t.Parallel()
 			err := v.Struct(s)
 			require.Error(t, err)

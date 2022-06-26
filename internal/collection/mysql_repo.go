@@ -18,10 +18,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/elliotchance/phpserialize"
+	ms "github.com/mitchellh/mapstructure"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -35,6 +39,8 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strutil"
 )
+
+var _ domain.CollectionRepo = mysqlRepo{}
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CollectionRepo, error) {
 	columns, err := getAllNonIndexFields(dao.SubjectCollection{})
@@ -55,7 +61,7 @@ type mysqlRepo struct {
 	subjectUpsert clause.OnConflict
 }
 
-func (m mysqlRepo) UpdateCollection(
+func (r mysqlRepo) UpdateSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
 ) error {
 	var d = &dao.SubjectCollection{
@@ -74,21 +80,21 @@ func (m mysqlRepo) UpdateCollection(
 	}
 
 	switch data.Type {
-	case model.CollectionWish:
+	case model.CollectionTypeWish:
 		d.WishAt = d.UpdatedAt
-	case model.CollectionDone:
+	case model.CollectionTypeDone:
 		d.DoneAt = d.UpdatedAt
-	case model.CollectionDoing:
+	case model.CollectionTypeDoing:
 		d.DoingAt = d.UpdatedAt
-	case model.CollectionOnHold:
+	case model.CollectionTypeOnHold:
 		d.OnHoldAt = d.UpdatedAt
-	case model.CollectionDropped:
+	case model.CollectionTypeDropped:
 		d.DroppedAt = d.UpdatedAt
 	}
 
-	err := m.q.SubjectCollection.WithContext(ctx).Clauses(m.subjectUpsert).Create(d)
+	err := r.q.SubjectCollection.WithContext(ctx).Clauses(r.subjectUpsert).Create(d)
 	if err != nil {
-		m.log.Error("unexpected error happened when updating subject collection", zap.Error(err),
+		r.log.Error("unexpected error happened when updating subject collection", zap.Error(err),
 			log.UserID(userID), log.SubjectID(subjectID), zap.Reflect("dao", d), zap.Reflect("data", data))
 		return errgo.Wrap(err, "dal")
 	}
@@ -96,26 +102,26 @@ func (m mysqlRepo) UpdateCollection(
 	return nil
 }
 
-func (m mysqlRepo) CountCollections(
+func (r mysqlRepo) CountSubjectCollections(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType uint8,
+	collectionType model.CollectionType,
 	showPrivate bool,
 ) (int64, error) {
-	q := m.q.SubjectCollection.WithContext(ctx).
-		Where(m.q.SubjectCollection.UserID.Eq(userID))
+	q := r.q.SubjectCollection.WithContext(ctx).
+		Where(r.q.SubjectCollection.UserID.Eq(userID))
 
 	if subjectType != 0 {
-		q = q.Where(m.q.SubjectCollection.SubjectType.Eq(subjectType))
+		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
 	if collectionType != 0 {
-		q = q.Where(m.q.SubjectCollection.Type.Eq(collectionType))
+		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 
 	if !showPrivate {
-		q = q.Where(m.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
+		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
 	}
 
 	c, err := q.Count()
@@ -126,33 +132,33 @@ func (m mysqlRepo) CountCollections(
 	return c, nil
 }
 
-func (m mysqlRepo) ListCollections(
+func (r mysqlRepo) ListSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType uint8,
+	collectionType model.CollectionType,
 	showPrivate bool,
 	limit, offset int,
 ) ([]model.SubjectCollection, error) {
-	q := m.q.SubjectCollection.WithContext(ctx).
-		Order(m.q.SubjectCollection.UpdatedAt.Desc()).
-		Where(m.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
+	q := r.q.SubjectCollection.WithContext(ctx).
+		Order(r.q.SubjectCollection.UpdatedAt.Desc()).
+		Where(r.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
 
 	if subjectType != 0 {
-		q = q.Where(m.q.SubjectCollection.SubjectType.Eq(subjectType))
+		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
 	if collectionType != 0 {
-		q = q.Where(m.q.SubjectCollection.Type.Eq(collectionType))
+		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 
 	if !showPrivate {
-		q = q.Where(m.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
+		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
 	}
 
 	collections, err := q.Find()
 	if err != nil {
-		m.log.Error("unexpected error happened", zap.Error(err))
+		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -175,17 +181,17 @@ func (m mysqlRepo) ListCollections(
 	return results, nil
 }
 
-func (m mysqlRepo) GetCollection(
+func (r mysqlRepo) GetSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 ) (model.SubjectCollection, error) {
-	c, err := m.q.SubjectCollection.WithContext(ctx).
-		Where(m.q.SubjectCollection.UserID.Eq(userID), m.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
+	c, err := r.q.SubjectCollection.WithContext(ctx).
+		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.SubjectCollection{}, domain.ErrNotFound
 		}
 
-		m.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		r.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
 		return model.SubjectCollection{}, errgo.Wrap(err, "dal")
 	}
 
@@ -221,4 +227,84 @@ func getAllNonIndexFields(v interface{}) ([]string, error) {
 	}
 
 	return s, nil
+}
+
+func (r mysqlRepo) GetEpisodeCollection(
+	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
+) (model.EpisodeCollection, error) {
+	d, err := r.q.EpCollection.WithContext(ctx).
+		Where(r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrNotFound
+		}
+
+		r.log.Error("failed to get episode collection record", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	e, err := deserializePhpEpStatus(d.Status)
+	if err != nil {
+		r.log.Error("failed to deserialize php-serialized bytes to go data",
+			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, err
+	}
+
+	var result = make(model.EpisodeCollection, len(e))
+	for id, item := range e {
+		result[id] = model.EpisodeCollectionItem{
+			ID:   item.EpisodeID,
+			Type: item.Type,
+		}
+	}
+
+	return result, nil
+}
+
+type epCollectionItem struct {
+	EpisodeID model.EpisodeID      `ms:"eid"`
+	Type      model.CollectionType `ms:"type"`
+}
+
+var errEpisodeInvalid = errors.New("number is not valid as episode ID")
+
+type epCollection = map[model.EpisodeID]epCollectionItem
+
+func deserializePhpEpStatus(phpSerialized []byte) (epCollection, error) {
+	var e map[interface{}]interface{}
+	if err := phpserialize.Unmarshal(phpSerialized, &e); err != nil {
+		return nil, errgo.Wrap(err, "php deserialize")
+	}
+
+	var ep = make(epCollection, len(e))
+	for key, value := range e {
+		iKey, ok := key.(int64)
+		if !ok {
+			return nil, fmt.Errorf("failed to convert type %s to int64, value %v", reflect.TypeOf(key).String(), key)
+		}
+		if iKey <= 0 || iKey > math.MaxUint32 {
+			return nil, errgo.Wrap(errEpisodeInvalid, strconv.FormatInt(iKey, 10))
+		}
+
+		var e epCollectionItem
+		decoder, err := ms.NewDecoder(&ms.DecoderConfig{
+			ErrorUnused:          true,
+			ErrorUnset:           true,
+			WeaklyTypedInput:     true,
+			Result:               &e,
+			TagName:              "ms",
+			IgnoreUntaggedFields: true,
+		})
+		if err != nil {
+			return nil, errgo.Wrap(err, "mapstructure.MewDecoder")
+		}
+
+		if err = decoder.Decode(value); err != nil {
+			return nil, errgo.Wrap(err, "mapstructure.Decode")
+		}
+
+		ep[model.EpisodeID(iKey)] = e
+	}
+
+	return ep, nil
 }

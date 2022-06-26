@@ -179,6 +179,8 @@ linters-settings:
         alias: ut
       - pkg: "github.com/go-playground/validator/v10/translations/zh"
         alias: zh_translations
+      - pkg: "github.com/mitchellh/mapstructure"
+        alias: ms
 
   lll:
     # max line length, lines longer will be reported. Default is 120.

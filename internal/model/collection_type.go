@@ -19,9 +19,10 @@ package model
 type CollectionType uint8
 
 const (
-	CollectionWish    CollectionType = 1 // 想看
-	CollectionDone    CollectionType = 2 // 看过
-	CollectionDoing   CollectionType = 3 // 在看
-	CollectionOnHold  CollectionType = 4 // 搁置
-	CollectionDropped CollectionType = 5 // 抛弃
+	CollectionTypeAll     CollectionType = 0 // 全部
+	CollectionTypeWish    CollectionType = 1 // 想看
+	CollectionTypeDone    CollectionType = 2 // 看过
+	CollectionTypeDoing   CollectionType = 3 // 在看
+	CollectionTypeOnHold  CollectionType = 4 // 搁置
+	CollectionTypeDropped CollectionType = 5 // 抛弃
 )

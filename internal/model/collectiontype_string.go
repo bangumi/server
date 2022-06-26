@@ -8,11 +8,11 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[CollectionWish-1]
-	_ = x[CollectionDone-2]
-	_ = x[CollectionDoing-3]
-	_ = x[CollectionOnHold-4]
-	_ = x[CollectionDropped-5]
+	_ = x[CollectionTypeWish-1]
+	_ = x[CollectionTypeDone-2]
+	_ = x[CollectionTypeDoing-3]
+	_ = x[CollectionTypeOnHold-4]
+	_ = x[CollectionTypeDropped-5]
 }
 
 const _CollectionType_name = "想看看过在看搁置抛弃"

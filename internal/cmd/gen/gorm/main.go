@@ -271,6 +271,16 @@ func main() {
 		}),
 	))
 
+	g.ApplyBasic(g.GenerateModelAs("chii_ep_status", "EpCollection",
+		gen.FieldTrimPrefix("ep_stt"),
+		gen.FieldType("ep_stt_sid", subjectIDTypeString),
+		gen.FieldRename("ep_stt_sid", "SubjectID"),
+		gen.FieldType("ep_stt_uid", userIDTypeString),
+		gen.FieldRename("ep_stt_uid", "userID"),
+		gen.FieldRename("ep_stt_lasttouch", "UpdatedAt"),
+		gen.FieldType("ep_stt_status", "[]byte"),
+	))
+
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_relations", "SubjectRelation",
 		// gen.FieldTrimPrefix("field_"),
 		gen.FieldTrimPrefix("rlt_"),

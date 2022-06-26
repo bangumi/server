@@ -62,3 +62,10 @@ type SubjectCollectionUpdate struct {
 	Type        CollectionType
 	Private     bool
 }
+
+type EpisodeCollectionItem struct {
+	ID   EpisodeID
+	Type CollectionType
+}
+
+type EpisodeCollection map[EpisodeID]EpisodeCollectionItem

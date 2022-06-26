@@ -39,6 +39,7 @@ func getRepo(t *testing.T) (domain.CollectionRepo, *query.Query) {
 	return repo, q
 }
 
+// $ task test-all -- -run TestMysqlRepo_GetCollections
 func TestMysqlRepo_GetCollection(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
@@ -61,13 +62,13 @@ func TestMysqlRepo_GetCollection(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	c, err := repo.GetCollection(context.Background(), id, subjectID)
+	c, err := repo.GetSubjectCollection(context.Background(), id, subjectID)
 	require.NoError(t, err)
 
 	require.Equal(t, uint8(2), c.Rate)
 }
 
-// env TEST_MYSQL=1 go test ./internal/collection -run TestMysqlRepo_UpdateCollection_Create
+// $ task test-all -- -run TestMysqlRepo_UpdateCollection_Create
 func TestMysqlRepo_UpdateCollection_Create(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
@@ -84,46 +85,35 @@ func TestMysqlRepo_UpdateCollection_Create(t *testing.T) {
 	})
 
 	now := time.Now()
-	err := repo.UpdateCollection(context.Background(), userID, subjectID, model.SubjectCollectionUpdate{
+	err := repo.UpdateSubjectCollection(context.Background(), userID, subjectID, model.SubjectCollectionUpdate{
 		UpdatedAt: time.Now(),
 	})
 	require.NoError(t, err)
 
-	c, err := repo.GetCollection(context.Background(), userID, subjectID)
+	c, err := repo.GetSubjectCollection(context.Background(), userID, subjectID)
 	require.NoError(t, err)
 
 	require.Equal(t, now.Unix(), c.UpdatedAt.Unix())
 }
 
-// env TEST_MYSQL=1 go test ./internal/collection -run TestMysqlRepo_UpdateCollection_Update
-func TestMysqlRepo_UpdateCollection_Update(t *testing.T) {
+// $ task test-all -- -run TestMysqlRepo_GetEpisodeCollection
+func TestMysqlRepo_GetEpisodeCollection(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const userID model.UserID = 382951
-	const subjectID model.SubjectID = 888990
+	const userID model.UserID = 287622
+	const subjectID model.SubjectID = 372487
 
-	repo, q := getRepo(t)
+	repo, _ := getRepo(t)
 
-	test.RunAndCleanup(t, func() {
-		_, err := q.SubjectCollection.WithContext(context.Background()).
-			Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(userID)).Delete()
-		require.NoError(t, err)
-	})
-
-	err := repo.UpdateCollection(context.Background(), userID, subjectID, model.SubjectCollectionUpdate{
-		UpdatedAt: time.Now(),
-		Comment:   "ccc",
-	})
+	ep, err := repo.GetEpisodeCollection(context.Background(), userID, subjectID)
 	require.NoError(t, err)
 
-	err = repo.UpdateCollection(context.Background(), userID, subjectID, model.SubjectCollectionUpdate{
-		Comment: "qqq",
-	})
-	require.NoError(t, err)
+	require.NotZero(t, len(ep))
 
-	c, err := repo.GetCollection(context.Background(), userID, subjectID)
-	require.NoError(t, err)
-
-	require.Equal(t, "qqq", c.Comment)
+	for id, item := range ep {
+		require.NotZero(t, id)
+		require.NotZero(t, item.ID)
+		require.NotZero(t, item.Type)
+	}
 }

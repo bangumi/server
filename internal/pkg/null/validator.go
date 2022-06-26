@@ -12,19 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package null
 
 import (
-	"context"
+	"reflect"
 
-	"github.com/bangumi/server/internal/model"
+	"github.com/go-playground/validator/v10"
 )
 
-type UserRepo interface {
-	// GetByID find a user by uid.
-	GetByID(ctx context.Context, userID model.UserID) (model.User, error)
-	// GetByName find a user by username.
-	GetByName(ctx context.Context, username string) (model.User, error)
+var _ validator.CustomTypeFunc = Validator
 
-	GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error)
+// Validator implements validator.CustomTypeFunc
+func Validator(field reflect.Value) interface{} {
+	if valuer, ok := field.Interface().(interface{ Interface() interface{} }); ok {
+		return valuer.Interface()
+	}
+
+	return nil
 }
