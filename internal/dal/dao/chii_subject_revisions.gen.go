@@ -12,20 +12,20 @@ const TableNameSubjectRevision = "chii_subject_revisions"
 
 // SubjectRevision mapped from table <chii_subject_revisions>
 type SubjectRevision struct {
-	ID           uint32          `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true;index:rev_creator,priority:2" json:"rev_id"`
-	Type         uint8           `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;index:rev_type,priority:1;default:1" json:"rev_type"` // 修订类型
-	SubjectID    model.SubjectID `gorm:"column:rev_subject_id;type:mediumint(8) unsigned;not null;index:rev_subject_id,priority:1" json:"rev_subject_id"`
-	TypeID       uint16          `gorm:"column:rev_type_id;type:smallint(6) unsigned;not null" json:"rev_type_id"`
-	CreatorID    model.UserID    `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null;index:rev_subject_id,priority:2;index:rev_creator,priority:1" json:"rev_creator"`
-	Dateline     uint32          `gorm:"column:rev_dateline;type:int(10) unsigned;not null;index:rev_dateline,priority:1" json:"rev_dateline"`
-	Name         string          `gorm:"column:rev_name;type:varchar(80);not null" json:"rev_name"`
-	NameCN       string          `gorm:"column:rev_name_cn;type:varchar(80);not null" json:"rev_name_cn"`
-	FieldInfobox string          `gorm:"column:rev_field_infobox;type:mediumtext;not null" json:"rev_field_infobox"`
-	FieldSummary string          `gorm:"column:rev_field_summary;type:mediumtext;not null" json:"rev_field_summary"`
-	VoteField    string          `gorm:"column:rev_vote_field;type:mediumtext;not null" json:"rev_vote_field"`
-	FieldEps     uint32          `gorm:"column:rev_field_eps;type:mediumint(8) unsigned;not null" json:"rev_field_eps"`
-	EditSummary  string          `gorm:"column:rev_edit_summary;type:varchar(200);not null" json:"rev_edit_summary"`
-	Platform     uint16          `gorm:"column:rev_platform;type:smallint(6) unsigned;not null" json:"rev_platform"`
+	ID           uint32          `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true;index:rev_creator,priority:2"`
+	Type         uint8           `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;index:rev_type,priority:1;default:1"` // 修订类型
+	SubjectID    model.SubjectID `gorm:"column:rev_subject_id;type:mediumint(8) unsigned;not null;index:rev_subject_id,priority:1"`
+	TypeID       uint16          `gorm:"column:rev_type_id;type:smallint(6) unsigned;not null"`
+	CreatorID    model.UserID    `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null;index:rev_subject_id,priority:2;index:rev_creator,priority:1"`
+	Dateline     uint32          `gorm:"column:rev_dateline;type:int(10) unsigned;not null;index:rev_dateline,priority:1"`
+	Name         string          `gorm:"column:rev_name;type:varchar(80);not null"`
+	NameCN       string          `gorm:"column:rev_name_cn;type:varchar(80);not null"`
+	FieldInfobox string          `gorm:"column:rev_field_infobox;type:mediumtext;not null"`
+	FieldSummary string          `gorm:"column:rev_field_summary;type:mediumtext;not null"`
+	VoteField    string          `gorm:"column:rev_vote_field;type:mediumtext;not null"`
+	FieldEps     uint32          `gorm:"column:rev_field_eps;type:mediumint(8) unsigned;not null"`
+	EditSummary  string          `gorm:"column:rev_edit_summary;type:varchar(200);not null"`
+	Platform     uint16          `gorm:"column:rev_platform;type:smallint(6) unsigned;not null"`
 	Subject      Subject         `gorm:"foreignKey:rev_subject_id;references:subject_id" json:"subject"`
 }
 

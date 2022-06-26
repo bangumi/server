@@ -14,6 +14,10 @@
 
 package res
 
+func EmptySlice() []int {
+	return []int{}
+}
+
 type Paged struct {
 	Data   interface{} `json:"data"`
 	Total  int64       `json:"total"`

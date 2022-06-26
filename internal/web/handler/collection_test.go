@@ -28,7 +28,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 func TestHandler_GetCollection(t *testing.T) {
@@ -46,12 +45,12 @@ func TestHandler_GetCollection(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c})
 
 	var r res.SubjectCollection
-	test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
+	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
 		Execute(app).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
 
-	require.Equal(t, subjectID, r.SubjectID)
+	require.Equal(t, subjectID, r.SubjectID, resp.BodyString())
 }
 
 func TestHandler_GetCollection_other_user(t *testing.T) {
@@ -75,5 +74,5 @@ func TestHandler_GetCollection_other_user(t *testing.T) {
 		Header(fiber.HeaderAuthorization, "Bearer v").
 		Execute(app)
 
-	require.Equal(t, code.NotFound, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusNotFound, resp.StatusCode, resp.BodyString())
 }

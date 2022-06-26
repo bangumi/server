@@ -67,7 +67,7 @@ func TestService_GetByTokenWithCache(t *testing.T) {
 func TestService_GetByTokenWithCache_cached(t *testing.T) {
 	t.Parallel()
 
-	var c = mocks.NewGeneric(t)
+	var c = mocks.NewCache(t)
 	c.EXPECT().Get(mock.Anything, cachekey.Auth(test.TreeHoleAccessToken), mock.Anything).
 		Run(func(ctx context.Context, key string, value interface{}) {
 			vOut := reflect.ValueOf(value).Elem()

@@ -29,7 +29,6 @@ import (
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 func (h Handler) ListCollection(c *fiber.Ctx) error {
@@ -41,23 +40,23 @@ func (h Handler) ListCollection(c *fiber.Ctx) error {
 
 	username := c.Params("username")
 	if username == "" {
-		return fiber.NewError(http.StatusBadRequest, "missing require parameters `username`")
+		return res.BadRequest("missing require parameters `username`")
 	}
 
 	subjectType, err := parseSubjectType(c.Query("subject_type"))
 	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, err.Error())
+		return res.BadRequest(err.Error())
 	}
 
 	collectionType, err := parseCollectionType(c.Query("type"))
 	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, "bad query 'type': "+err.Error())
+		return err
 	}
 
 	u, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.NewError(http.StatusNotFound, "user doesn't exist or has been removed")
+			return res.NotFound("user doesn't exist or has been removed")
 		}
 
 		return errgo.Wrap(err, "user.GetByName")
@@ -128,7 +127,7 @@ func parseCollectionType(s string) (uint8, error) {
 
 	t, err := strparse.Uint8(s)
 	if err != nil {
-		return 0, fiber.NewError(http.StatusBadRequest, "bad collection type: "+strconv.Quote(s))
+		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
 	}
 
 	switch t {
@@ -136,13 +135,13 @@ func parseCollectionType(s string) (uint8, error) {
 		return t, nil
 	}
 
-	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+"is not a valid collection type")
+	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")
 }
 
 func (h Handler) GetCollection(c *fiber.Ctx) error {
 	username := c.Params("username")
 	if username == "" {
-		return res.HTTPError(c, code.BadRequest, "missing require parameters `username`")
+		return res.BadRequest("missing require parameters `username`")
 	}
 
 	subjectID, err := parseSubjectID(c.Params("subject_id"))
@@ -160,7 +159,7 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 	u, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.NewError(code.NotFound, "user doesn't exist or has been removed")
+			return res.NotFound("user doesn't exist or has been removed")
 		}
 
 		return errgo.Wrap(err, "user.GetByName")
@@ -171,14 +170,14 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 	collection, err := h.collect.GetCollection(c.Context(), u.ID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.HTTPError(c, code.NotFound, notFoundMessage)
+			return res.NotFound(notFoundMessage)
 		}
 
 		return errgo.Wrap(err, "user.GetCollection")
 	}
 
 	if !showPrivate && collection.Private {
-		return res.HTTPError(c, code.NotFound, notFoundMessage)
+		return res.NotFound(notFoundMessage)
 	}
 
 	return res.JSON(c, res.SubjectCollection{
@@ -199,7 +198,7 @@ func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
 	h.log.Info("called")
 	v := h.getHTTPAccessor(c)
 	if !v.login {
-		return res.Unauthorized(c, res.DefaultUnauthorizedMessage)
+		return res.Unauthorized(res.DefaultUnauthorizedMessage)
 	}
 
 	subjectID, err := parseSubjectID(c.Params("subject_id"))
@@ -209,7 +208,7 @@ func (h Handler) PutSubjectCollection(c *fiber.Ctx) error {
 
 	var input req.PutSubjectCollection
 	if err = json.UnmarshalNoEscape(c.Body(), &input); err != nil {
-		return res.WithError(c, err, code.UnprocessableEntity, "can't decode request body as json")
+		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
 	}
 
 	return h.putSubjectCollection(c, v.ID, subjectID, input)
@@ -222,24 +221,24 @@ func (h Handler) putSubjectCollection(
 
 	s, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
 	if err != nil {
-		return h.InternalServerError(c, err, "failed to get subject info")
+		return h.InternalError(c, err, "failed to get subject info")
 	}
 
 	if !ok {
-		return res.NotFound(c, "subject not found, maybe locked")
+		return res.NotFound("subject not found, maybe locked")
 	}
 
 	_, err = h.collect.GetCollection(c.Context(), userID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.HTTPError(c, code.NotFound, notFoundMessage)
+			return res.NotFound(notFoundMessage)
 		}
 
 		return errgo.Wrap(err, "user.GetCollection")
 	}
 
 	if s.TypeID != model.SubjectBook && input.VolStatus != 0 {
-		return res.HTTPError(c, code.BadRequest, "subject is not book, you can't update `vol_status`")
+		return res.BadRequest("subject is not book, you can't update `vol_status`")
 	}
 
 	var update = model.SubjectCollectionUpdate{
@@ -255,7 +254,7 @@ func (h Handler) putSubjectCollection(
 	}
 
 	if err = h.collect.UpdateCollection(c.Context(), userID, subjectID, update); err != nil {
-		return h.InternalServerError(c, err, "failed to update subject collection")
+		return h.InternalError(c, err, "failed to update subject collection")
 	}
 
 	collection, err := h.collect.GetCollection(c.Context(), userID, subjectID)

@@ -20,14 +20,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 var jsonType = []byte(fiber.MIMEApplicationJSON) //nolint:gochecknoglobals
 
 func JSON(c *fiber.Ctx) error {
 	if !bytes.Equal(c.Request().Header.ContentType(), jsonType) {
-		return res.HTTPError(c, code.BadRequest, "need content-type to be 'application/json'")
+		return res.BadRequest("need content-type to be 'application/json'")
 	}
 
 	return c.Next()

@@ -16,6 +16,7 @@ package dal
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -48,7 +49,7 @@ func (l metricsLog) Trace(
 	l.h.RecordDuration(time.Since(begin))
 }
 
-func setupMetrics(db *gorm.DB, scope tally.Scope, register prometheus.Registerer) error {
+func setupMetrics(db *gorm.DB, conn *sql.DB, scope tally.Scope, register prometheus.Registerer) error {
 	db.Logger = newMetricsLog(db.Logger, scope)
 
 	var DatabaseQuery = prometheus.NewCounterVec(
@@ -69,6 +70,15 @@ func setupMetrics(db *gorm.DB, scope tally.Scope, register prometheus.Registerer
 	}
 
 	register.MustRegister(DatabaseQuery)
+
+	dbConnCount := scope.Gauge("db_open_connections_total")
+	go func() {
+		for {
+			s := conn.Stats()
+			dbConnCount.Update(float64(s.OpenConnections))
+			time.Sleep(time.Second * 15)
+		}
+	}()
 
 	return nil
 }

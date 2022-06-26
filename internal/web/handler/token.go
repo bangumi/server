@@ -21,12 +21,13 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gookit/goutil/timex"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
@@ -37,20 +38,16 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 
 	var r req.CreatePersonalAccessToken
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
-		return res.WithError(c, err, code.UnprocessableEntity, "can't parse request body as JSON")
+		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
 	}
 
 	if err := h.v.Struct(r); err != nil {
-		return res.JSON(c.Status(code.BadRequest), res.Error{
-			Title:       http.StatusText(code.BadRequest),
-			Description: "can't validate request body",
-			Details:     h.translationValidationError(err),
-		})
+		return h.ValidationError(c, err)
 	}
 
 	token, err := h.a.CreateAccessToken(c.Context(), v.ID, r.Name, timex.OneDay*time.Duration(r.DurationDays))
 	if err != nil {
-		return res.InternalError(c, err, "failed to create token")
+		return h.InternalError(c, err, "failed to create token", log.UserID(v.ID), zap.String("token_name", r.Name))
 	}
 
 	return c.JSON(token)
@@ -64,33 +61,32 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 
 	var r req.DeletePersonalAccessToken
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
-		return res.WithError(c, err, code.UnprocessableEntity, "can't parse request body as JSON")
+		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
 	}
-
 	if err := h.v.Struct(r); err != nil {
-		return res.JSON(c.Status(code.BadRequest), res.Error{
-			Title:       http.StatusText(code.BadRequest),
-			Description: "can't validate request body",
-			Details:     h.translationValidationError(err),
-		})
+		return h.ValidationError(c, err)
 	}
 
 	token, err := h.a.GetTokenByID(c.Context(), r.ID)
-	if err != nil && !errors.Is(err, domain.ErrNotFound) {
-		return res.InternalError(c, err, "failed to get token info")
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.BadRequest("token not exist")
+		}
+
+		return h.InternalError(c, err, "failed to get token info", zap.Uint32("token_id", r.ID))
 	}
 
 	if token.UserID != v.ID {
-		return res.HTTPError(c, code.Unauthorized, "you don't have this token")
+		return res.Unauthorized("you don't have this token")
 	}
 
 	ok, err := h.a.DeleteAccessToken(c.Context(), r.ID)
 	if err != nil {
-		return res.InternalError(c, err, "failed to create token")
+		return h.InternalError(c, err, "failed to delete token", zap.Uint32("token_id", r.ID), log.UserID(v.ID))
 	}
 
 	if !ok {
-		return c.SendStatus(code.NotFound)
+		return c.SendStatus(http.StatusNotFound)
 	}
 
 	return c.SendStatus(http.StatusNoContent)

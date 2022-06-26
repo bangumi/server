@@ -1,3 +1,5 @@
+## 项目结构
+
 项目整体分为 web，service 和 repository 三层。
 
 web 相关的组件和 handler 在[internal/web/](../internal/web) 文件夹中。
@@ -87,3 +89,47 @@ func TestMysqlRepo_GetByToken(t *testing.T) {
 	// then write your tests
 }
 ```
+
+## Code Style
+
+[Uber Go Style Guide](https://github.com/uber-go/guide/blob/master/style.md)
+
+例外：
+
+## 99 character line length
+
+120。
+
+每个 tab 计 2 个字符宽。
+
+### Local Variable Declarations
+
+使用 `var` 或者 `:=` 均可。
+
+只有初始化变量为零值的时候应该用 `var`
+
+#### bad
+
+```golang
+var v = uint32(0)
+```
+
+#### good
+
+```golang
+var v uint32
+```
+
+### Import Group Ordering
+
+import 应该分为 std, external, internal 三部分。
+
+### Import Aliasing
+
+go mod 在 v2 以上的版本会自动添加大版本后缀，不需要针对此情况添加 alias。
+
+### nil is a valid slice
+
+JSON encoder 不会把 `nil` 序列化为空数组，所以在 web 响应空数组时时不应该使用 `nil`。
+
+其他情况则应该使用 `nil` 代替返回空数组。

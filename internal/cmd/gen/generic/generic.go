@@ -67,7 +67,7 @@ func {{ index $s 1 }}ToValuerSlice(a []{{.}}) []driver.Valuer {
 
 func main() {
 	var types = []string{
-		"model.SubjectID", "model.PersonID", "model.UserID", "model.CharacterID", "model.EpisodeID",
+		"model.SubjectID", "model.PersonID", "model.UserID", "model.CharacterID", "model.EpisodeID", "model.GroupID",
 	}
 
 	t := template.Must(template.New("queue").Funcs(sprig.HermeticTxtFuncMap()).Parse(queueTemplate))

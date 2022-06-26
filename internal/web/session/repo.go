@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
-	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -29,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 const Key = "sessionID"

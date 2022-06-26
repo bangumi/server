@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gookit/goutil/timex"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/dal/dao"
@@ -27,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/internal/web/session"
 )

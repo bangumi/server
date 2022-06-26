@@ -60,7 +60,6 @@ func TestManager_Get(t *testing.T) {
 	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
 	require.NoError(t, err)
 	require.Equal(t, uid, s.UserID)
-
 }
 
 func TestManager_Revoke(t *testing.T) {

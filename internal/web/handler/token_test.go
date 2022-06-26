@@ -15,16 +15,17 @@
 package handler_test
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gookit/goutil/timex"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -52,7 +53,7 @@ func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 		"duration_days": 1,
 	}).Cookie(session.Key, "session key").Execute(app)
 
-	require.Equal(t, fiber.StatusOK, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
 }
 
 func TestHandler_DeletePersonalAccessToken_401(t *testing.T) {
@@ -77,5 +78,5 @@ func TestHandler_DeletePersonalAccessToken_401(t *testing.T) {
 	resp := test.New(t).Delete("/p/access-tokens").JSON(fiber.Map{"id": tokenID}).
 		Cookie(session.Key, "session key").Execute(app)
 
-	require.Equal(t, fiber.StatusUnauthorized, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusUnauthorized, resp.StatusCode, resp.BodyString())
 }

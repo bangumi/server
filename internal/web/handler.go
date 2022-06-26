@@ -22,10 +22,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/utils"
-	"github.com/gookit/goutil/timex"
 	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/middleware/origin"
@@ -33,7 +33,6 @@ import (
 	"github.com/bangumi/server/internal/web/middleware/ua"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 	"github.com/bangumi/server/internal/web/util"
 )
 
@@ -105,6 +104,8 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
 	private.Get("/me", addMetrics(h.GetCurrentUser))
+	private.Get("/groups/:name", addMetrics(h.GetGroupProfileByNamePrivate))
+	private.Get("/groups/:name/members", addMetrics(h.ListGroupMembersPrivate))
 
 	// un-documented
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))
@@ -127,10 +128,10 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
-		return res.JSON(c.Status(code.NotFound), res.Error{
+		return res.JSON(c.Status(http.StatusNotFound), res.Error{
 			Title:       "Not Found",
-			Description: "This is default response, if you see this response, please check your request path",
-			Details:     util.DetailFromRequest(c),
+			Description: "This is default response, if you see this response, please check your request",
+			Details:     util.Detail(c),
 		})
 	})
 }

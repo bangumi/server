@@ -1,35 +1,24 @@
-# Created by .ignore support plugin (hsz.mobi)
 .idea
 .vscode
-ics
+
 env
 .env
 .envrc
+
 source.sh
-.scrapy
-a.html
-*.py[cod]
-.mypy_cache
-.pytest_cache
-docs/build
-docs/source/openapi.json
-*.egg-info
-.venv/
 dev-env/
-.coverage
-*.pyc.*
-/data/
-tmp/
 *.exe
-dist/
-bin/
 .air.toml
-.env
-.envrc
 coverage.out
 .bin/
-/gen/
-pnpm-lock.yaml
+bin/
+dist/
+tmp/
 
-/index.html
+# bug of idea openapi plugin, see https://youtrack.jetbrains.com/issue/IDEA-285879
+/gen/
+
 node_modules/
+pnpm-lock.yaml
+yarn.lock
+.task/

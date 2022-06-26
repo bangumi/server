@@ -22,6 +22,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
@@ -29,12 +30,11 @@ import (
 	"github.com/bangumi/server/internal/strutil"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/handler/ctxkey"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/session"
 	"github.com/bangumi/server/internal/web/util"
 )
-
-const HeaderCFRay = "Cf-Ray"
 
 var accessorPool = sync.Pool{New: func() interface{} { return &accessor{} }} //nolint:gochecknoglobals
 
@@ -53,14 +53,13 @@ func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 				return c.Next()
 			}
 
-			h.log.Error("get session", zap.Error(err), a.LogRequestID())
-			return res.InternalError(c, err, "failed to read session, please try clear browser cookies and re-try")
+			h.log.Error("failed to get session", zap.Error(err), a.LogRequestID())
+			return res.InternalError(c, err, "failed to read session, please try clear your browser cookies and re-try")
 		}
 
 		auth, err := h.a.GetByIDWithCache(c.Context(), s.UserID)
 		if err != nil {
-			h.log.Error("failed to get permission", zap.Error(err), a.LogRequestID(), log.UserID(s.UserID))
-			return res.InternalError(c, err, "failed to get permission of user group")
+			return h.InternalError(c, err, "failed to user with permission", a.LogRequestID(), log.UserID(s.UserID))
 		}
 
 		a.fillAuth(auth)
@@ -89,7 +88,7 @@ func (h Handler) AccessTokenAuthMiddleware(ctx *fiber.Ctx) error {
 	if authorization != "" {
 		key, token := strutil.Partition(authorization, ' ')
 		if key != "Bearer" {
-			return res.HTTPError(ctx, fiber.StatusUnauthorized, "http Authorization header has wrong scope")
+			return res.Unauthorized("http Authorization header has wrong scope")
 		}
 
 		var auth domain.Auth
@@ -97,7 +96,7 @@ func (h Handler) AccessTokenAuthMiddleware(ctx *fiber.Ctx) error {
 		if auth, err = h.a.GetByTokenWithCache(ctx.Context(), token); err != nil {
 			if errors.Is(err, domain.ErrNotFound) || errors.Is(err, session.ErrExpired) {
 				cookie.Clear(ctx, session.Key)
-				return res.HTTPError(ctx, fiber.StatusUnauthorized, "access token has been expired or doesn't exist")
+				return res.Unauthorized("access token has been expired or doesn't exist")
 			}
 
 			return errgo.Wrap(err, "auth.GetByTokenWithCache")
@@ -132,7 +131,7 @@ func (a *accessor) AllowNSFW() bool {
 
 func (a *accessor) fillBasicInfo(c *fiber.Ctx) {
 	a.login = false
-	a.cfRay = c.Get(HeaderCFRay)
+	a.cfRay = c.Get(req.HeaderCFRay)
 	a.ip = util.RequestIP(c)
 }
 
@@ -142,7 +141,16 @@ func (a *accessor) fillAuth(auth domain.Auth) {
 }
 
 func (a accessor) LogRequestID() zap.Field {
-	return zap.String("request_id", a.cfRay)
+	return zap.Object("request", a)
+}
+
+func (a accessor) MarshalLogObject(encoder zapcore.ObjectEncoder) error {
+	encoder.AddString("id", a.cfRay)
+	encoder.AddString("ip", a.ip.String())
+	if a.login {
+		encoder.AddUint32("user_id", uint32(a.Auth.ID))
+	}
+	return nil
 }
 
 // reset struct to zero value before put it back to pool.

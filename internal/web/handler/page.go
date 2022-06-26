@@ -18,6 +18,8 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/bangumi/server/internal/web/res"
 )
 
 const defaultPageLimit = 30
@@ -30,7 +32,7 @@ type pageQuery struct {
 
 func (q pageQuery) check(count int64) error {
 	if q.Offset > int(count) {
-		return fiber.NewError(fiber.StatusBadRequest, "offset should less equal than "+strconv.FormatInt(count, 10))
+		return res.BadRequest("offset should be less than or equal to " + strconv.FormatInt(count, 10))
 	}
 
 	return nil
@@ -44,14 +46,14 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 	if raw != "" {
 		q.Limit, err = strconv.Atoi(raw)
 		if err != nil {
-			return q, fiber.NewError(fiber.StatusBadRequest, "can't parse query args limit as int: "+strconv.Quote(raw))
+			return q, res.BadRequest("can't parse query args limit as int: " + strconv.Quote(raw))
 		}
 
 		if q.Limit > maxLimit {
-			return q, fiber.NewError(fiber.StatusBadRequest, "limit should less equal than "+strconv.Itoa(maxLimit))
+			return q, res.BadRequest("limit should less equal than " + strconv.Itoa(maxLimit))
 		}
 		if q.Limit <= 0 {
-			return q, fiber.NewError(fiber.StatusBadRequest, "limit should greater equal zero")
+			return q, res.BadRequest("limit should be greater than zero")
 		}
 	}
 
@@ -59,11 +61,11 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 	if raw != "" {
 		q.Offset, err = strconv.Atoi(raw)
 		if err != nil {
-			return q, fiber.NewError(fiber.StatusBadRequest, "can't parse query args offset as int: "+strconv.Quote(raw))
+			return q, res.BadRequest("can't parse query args offset as int: " + strconv.Quote(raw))
 		}
 
 		if q.Offset < 0 {
-			return q, fiber.NewError(fiber.StatusBadRequest, "offset should greater than 0")
+			return q, res.BadRequest("offset should be greater than or equal to 0")
 		}
 	}
 

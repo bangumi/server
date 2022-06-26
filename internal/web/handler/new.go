@@ -23,7 +23,7 @@ import (
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	zh_translations "github.com/go-playground/validator/v10/translations/zh" //nolint:importas
+	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
@@ -49,6 +49,7 @@ func New(
 	e domain.EpisodeRepo,
 	collect domain.CollectionRepo,
 	r domain.RevisionRepo,
+	g domain.GroupRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
 	cache cache.Generic,
@@ -59,7 +60,6 @@ func New(
 	engine frontend.TemplateEngine,
 	oauth oauth.Manager,
 ) (Handler, error) {
-
 	validate, trans, err := getValidator()
 	if err != nil {
 		return Handler{}, err
@@ -83,6 +83,7 @@ func New(
 		i:                    index,
 		r:                    r,
 		captcha:              captcha,
+		g:                    g,
 		v:                    validate,
 		validatorTranslation: trans,
 
@@ -108,6 +109,7 @@ type Handler struct {
 	cache                cache.Generic
 	i                    domain.IndexRepo
 	r                    domain.RevisionRepo
+	g                    domain.GroupRepo
 	buffPool             buffer.Pool
 	oauth                oauth.Manager
 	log                  *zap.Logger

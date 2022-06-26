@@ -58,7 +58,6 @@ type mysqlRepo struct {
 func (m mysqlRepo) UpdateCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
 ) error {
-
 	var d = &dao.SubjectCollection{
 		UserID:      userID,
 		SubjectID:   subjectID,

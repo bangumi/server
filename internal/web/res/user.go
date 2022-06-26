@@ -24,7 +24,7 @@ type Avatar struct {
 	Small  string `json:"small"`
 }
 
-func (a Avatar) Fill(s string) Avatar {
+func UserAvatar(s string) Avatar {
 	if s == "" {
 		s = "icon.jpg"
 	}

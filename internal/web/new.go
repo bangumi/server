@@ -15,7 +15,9 @@
 package web
 
 import (
+	"errors"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -36,8 +38,8 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/random"
-	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/middleware/recovery"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/util"
 )
@@ -51,7 +53,7 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 		StrictRouting:         true,
 		CaseSensitive:         true,
 		ErrorHandler:          getDefaultErrorHandler(),
-		JSONEncoder:           json.MarshalNoEscape,
+		JSONEncoder:           json.Marshal,
 	})
 
 	count := scope.Counter("request_count_total")
@@ -73,14 +75,14 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 	if config.Development {
 		app.Use(func(c *fiber.Ctx) error {
 			devRequestID := "fake-ray-" + random.Base62String(10)
-			c.Request().Header.Set(handler.HeaderCFRay, devRequestID)
-			c.Set(handler.HeaderCFRay, devRequestID)
+			c.Request().Header.Set(req.HeaderCFRay, devRequestID)
+			c.Set(req.HeaderCFRay, devRequestID)
 
 			return c.Next()
 		})
 		app.Use(cors.New(cors.Config{
 			MaxAge:        timex.OneWeekSec,
-			ExposeHeaders: strings.Join([]string{headerProcessTime, headerServerVersion, handler.HeaderCFRay}, ","),
+			ExposeHeaders: strings.Join([]string{headerProcessTime, headerServerVersion, req.HeaderCFRay}, ","),
 		}))
 	}
 
@@ -91,56 +93,55 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 }
 
 func Start(c config.AppConfig, app *fiber.App) error {
-	logger.Infoln("start http server at port", c.HTTPPort)
-	addr := fmt.Sprintf(":%d", c.HTTPPort)
-	if config.Development {
-		addr = "127.0.0.1" + addr
-	}
+	addr := fmt.Sprintf("127.0.0.1:%d", c.HTTPPort)
+	logger.Infoln("http server listening at", addr)
 
 	return errgo.Wrap(app.Listen(addr), "fiber.App.Listen")
 }
 
-func getDefaultErrorHandler() func(c *fiber.Ctx, err error) error {
-	var log = logger.Named("http.err").WithOptions(zap.AddStacktrace(zapcore.PanicLevel))
+func getDefaultErrorHandler() func(*fiber.Ctx, error) error {
+	var log = logger.Named("http.err").
+		WithOptions(zap.AddStacktrace(zapcore.PanicLevel), zap.WithCaller(false))
 
 	return func(ctx *fiber.Ctx, err error) error {
-		// Default 500 status code
-		code := fiber.StatusInternalServerError
-		title := "Internal Server Error"
-		description := "Unexpected Internal Server Error"
-
-		// router will return an un-wrapped error, so just check it like this.
-		// DO NOT rewrite it to errors.Is.
-		if e, ok := err.(*fiber.Error); ok { //nolint:errorlint
-			code = e.Code
-			switch e.Code {
-			case fiber.StatusInternalServerError:
-				break
-			case fiber.StatusNotFound:
-				description = "resource can't be found in the database or has been removed"
-				title = utils.StatusMessage(code)
-			default:
-				description = e.Error()
-				title = utils.StatusMessage(code)
-			}
-		} else {
-			log.Error("unexpected error",
-				zap.Error(err),
-				zap.String("path", ctx.Path()),
-				zap.ByteString("query", ctx.Request().URI().QueryString()),
-				zap.String("cf-ray", ctx.Get(handler.HeaderCFRay)),
-			)
+		var e res.HTTPError
+		if errors.As(err, &e) {
+			// handle expected http error
+			return res.JSON(ctx.Status(e.Code), res.Error{
+				Title:       utils.StatusMessage(e.Code),
+				Description: e.Msg,
+				Details:     util.Detail(ctx),
+			})
 		}
 
-		return ctx.Status(code).JSON(res.Error{
-			Title:       title,
-			Description: description,
-			Details: util.Detail{
-				Error:       err.Error(),
-				Path:        ctx.Path(),
-				Method:      ctx.Method(),
-				QueryString: utils.UnsafeString(ctx.Request().URI().QueryString()),
-			},
+		//nolint:forbidigo,errorlint
+		if fErr, ok := err.(*fiber.Error); ok {
+			log.Error("unexpected fiber error",
+				zap.Int("code", fErr.Code),
+				zap.String("message", fErr.Message),
+				zap.String("path", ctx.Path()),
+				zap.ByteString("query", ctx.Request().URI().QueryString()),
+				zap.String("cf-ray", ctx.Get(req.HeaderCFRay)),
+			)
+
+			return res.JSON(ctx.Status(http.StatusInternalServerError), res.Error{
+				Title:       utils.StatusMessage(fErr.Code),
+				Description: fErr.Message,
+				Details:     util.DetailWithErr(ctx, err),
+			})
+		}
+
+		log.Error("unexpected error",
+			zap.Error(err),
+			zap.String("path", ctx.Path()),
+			zap.ByteString("query", ctx.Request().URI().QueryString()),
+			zap.String("cf-ray", ctx.Get(req.HeaderCFRay)),
+		)
+		// unexpected error, return internal server error
+		return res.JSON(ctx.Status(http.StatusInternalServerError), res.Error{
+			Title:       "Internal Server Error",
+			Description: "Unexpected Internal Server Error",
+			Details:     util.DetailWithErr(ctx, err),
 		})
 	}
 }

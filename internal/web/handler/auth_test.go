@@ -22,13 +22,13 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gookit/goutil/timex"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -63,7 +63,7 @@ func TestHandler_PrivateLogin(t *testing.T) {
 		"h-captcha-response": "req",
 	}).Execute(app, 3000)
 
-	require.Equal(t, fiber.StatusOK, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
 
 	_, ok := resp.Header[fiber.HeaderSetCookie]
 	require.True(t, ok, "response should set cookies")
@@ -77,7 +77,7 @@ func TestHandler_PrivateLogin_content_type(t *testing.T) {
 
 	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").Execute(app)
 
-	require.Equal(t, fiber.StatusBadRequest, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
 }
 
 func TestHandler_PrivateLogout(t *testing.T) {
@@ -95,7 +95,7 @@ func TestHandler_PrivateLogout(t *testing.T) {
 
 	resp := test.New(t).Post("/p/logout").Cookie(session.Key, "req").Execute(app)
 
-	require.Equal(t, fiber.StatusNoContent, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusNoContent, resp.StatusCode, resp.BodyString())
 
 	var found bool
 	for _, cookie := range resp.Cookies() {

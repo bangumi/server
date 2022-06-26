@@ -20,7 +20,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 var _ fiber.Handler = DisableDefaultHTTPLibrary
@@ -32,18 +31,24 @@ const forbiddenMessage = "using HTTP request library's default User-Agent is for
 func DisableDefaultHTTPLibrary(c *fiber.Ctx) error {
 	u := c.Get(fiber.HeaderUserAgent)
 	if u == "" {
-		return res.HTTPError(c, code.Forbidden, "Please set a 'User-Agent'")
+		return res.Forbidden("Please set a 'User-Agent'")
 	}
 
-	if strings.HasPrefix(u, "python-requests/") ||
-		strings.HasPrefix(u, "okhttp/") ||
-		strings.HasPrefix(u, "axios/") ||
-		strings.HasPrefix(u, "Faraday v") ||
-		strings.HasPrefix(u, "Apache-HttpClient/") ||
-		strings.HasPrefix(u, "Java/") ||
-		strings.HasPrefix(u, "node-fetch/") {
-		return res.HTTPError(c, code.Forbidden, forbiddenMessage)
+	if isDefaultUA(u) {
+		return res.Forbidden(forbiddenMessage)
 	}
 
 	return c.Next()
+}
+
+func isDefaultUA(u string) bool {
+	return strings.HasPrefix(u, "Java/") ||
+		strings.HasPrefix(u, "axios/") ||
+		strings.HasPrefix(u, "okhttp/") ||
+		strings.HasPrefix(u, "Faraday v") ||
+		strings.HasPrefix(u, "node-fetch/") ||
+		strings.HasPrefix(u, "Apache-HttpClient/") ||
+		strings.HasPrefix(u, "python-requests/") ||
+		u == "node-fetch" ||
+		u == "database"
 }

@@ -16,8 +16,6 @@ package test
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // RunAndCleanup will run a function immediately and add it to t.Cleanup.
@@ -26,15 +24,4 @@ func RunAndCleanup(tb testing.TB, f func()) {
 
 	f()
 	tb.Cleanup(f)
-}
-
-// RunAndCleanupE will run a function immediately and add it to t.Cleanup.
-// will also assert function return no error.
-func RunAndCleanupE(tb testing.TB, f func() error) {
-	tb.Helper()
-
-	require.NoError(tb, f())
-	tb.Cleanup(func() {
-		require.NoError(tb, f())
-	})
 }
