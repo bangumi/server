@@ -20,11 +20,11 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
-	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"

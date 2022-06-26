@@ -22,9 +22,9 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/gookit/goutil/timex"
 
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 const defaultAllowPerHour = 5

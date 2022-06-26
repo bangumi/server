@@ -17,7 +17,6 @@ require (
 	github.com/goccy/go-json v0.9.7
 	github.com/gofiber/adaptor/v2 v2.1.24
 	github.com/gofiber/fiber/v2 v2.34.1
-	github.com/gookit/goutil v0.5.4
 	github.com/haveyoudebuggedit/gotestfmt/v2 v2.3.2
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/mattn/go-colorable v0.1.12
@@ -49,7 +48,6 @@ require (
 	github.com/gofiber/utils v0.1.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
-	github.com/gookit/color v1.5.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/huandu/xstrings v1.3.1 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
@@ -85,7 +83,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.37.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/dig v1.14.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect

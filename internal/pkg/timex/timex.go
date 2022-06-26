@@ -12,11 +12,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build tools
+package timex
 
-package tools
+import "time"
 
-import (
-	_ "github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt"
-	_ "github.com/vektra/mockery/v2"
+const (
+	OneMinSec  = 60
+	OneHourSec = 3600
+	OneDaySec  = 86400
+	OneWeekSec = 7 * 86400
+
+	OneDay  = 24 * time.Hour
+	OneWeek = 7 * 24 * time.Hour
 )

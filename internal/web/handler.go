@@ -22,10 +22,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/utils"
-	"github.com/gookit/goutil/timex"
 	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/middleware/origin"

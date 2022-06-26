@@ -19,13 +19,13 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gookit/goutil/timex"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/internal/web/session"
 )

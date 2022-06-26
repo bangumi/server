@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gookit/goutil/timex"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
@@ -28,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/test"
 )
 
