@@ -19,7 +19,7 @@ properties:
   subject_type:
     "$ref": "./subject_type.yaml"
   rate:
-    example: 8
+    example: 4
     title: Rate
     type: integer
   type:
