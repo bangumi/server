@@ -17,12 +17,12 @@ package model
 type SubjectType = uint8
 
 const (
-	SubjectBook SubjectType = iota + 1
-	SubjectAnime
-	SubjectMusic
-	SubjectGame
-	_
-	SubjectReal
+	SubjectTypeAll   SubjectType = 0
+	SubjectTypeBook  SubjectType = 1 // 书籍
+	SubjectTypeAnime SubjectType = 2 // 动画
+	SubjectTypeMusic SubjectType = 3 // 音乐
+	SubjectTypeGame  SubjectType = 4 // 游戏
+	SubjectTypeReal  SubjectType = 6 // 三次元
 )
 
 const (
@@ -35,15 +35,15 @@ const (
 
 func SubjectTypeString(s uint8) string {
 	switch s {
-	case SubjectBook:
+	case SubjectTypeBook:
 		return textSubjectBook
-	case SubjectAnime:
+	case SubjectTypeAnime:
 		return textSubjectAnime
-	case SubjectMusic:
+	case SubjectTypeMusic:
 		return textSubjectMusic
-	case SubjectGame:
+	case SubjectTypeGame:
 		return textSubjectGame
-	case SubjectReal:
+	case SubjectTypeReal:
 		return textSubjectReal
 	default:
 		return "unknown repository type"

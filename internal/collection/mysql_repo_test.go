@@ -38,7 +38,6 @@ func getRepo(t *testing.T) (domain.CollectionRepo, *query.Query) {
 	return repo, q
 }
 
-// $ task test-all -- -run TestMysqlRepo_GetCollections
 func TestMysqlRepo_GetCollection(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
@@ -65,4 +64,32 @@ func TestMysqlRepo_GetCollection(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, uint8(2), c.Rate)
+}
+
+func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const id model.UserID = 382951
+
+	repo, _ := getRepo(t)
+
+	count, err := repo.CountSubjectCollections(context.Background(), id,
+		model.SubjectTypeAll, model.CollectionTypeAll, true)
+	require.NoError(t, err)
+	require.EqualValues(t, 5, count)
+}
+
+func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const id model.UserID = 382951
+
+	repo, _ := getRepo(t)
+
+	data, err := repo.ListSubjectCollection(context.Background(), id,
+		model.SubjectTypeGame, model.CollectionTypeAll, true, 5, 0)
+	require.NoError(t, err)
+	require.Len(t, data, 2)
 }

@@ -54,11 +54,11 @@ func (r mysqlRepo) CountSubjectCollections(
 	q := r.q.SubjectCollection.WithContext(ctx).
 		Where(r.q.SubjectCollection.UserID.Eq(userID))
 
-	if subjectType != 0 {
+	if subjectType != model.SubjectTypeAll {
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
-	if collectionType != 0 {
+	if collectionType != model.CollectionTypeAll {
 		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 
@@ -86,11 +86,11 @@ func (r mysqlRepo) ListSubjectCollection(
 		Order(r.q.SubjectCollection.UpdatedAt.Desc()).
 		Where(r.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
 
-	if subjectType != 0 {
+	if subjectType != model.SubjectTypeAll {
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
-	if collectionType != 0 {
+	if collectionType != model.CollectionTypeAll {
 		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 

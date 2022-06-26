@@ -40,8 +40,8 @@ func parseSubjectType(s string) (uint8, error) {
 	}
 
 	switch t {
-	case model.SubjectAnime, model.SubjectBook,
-		model.SubjectMusic, model.SubjectReal, model.SubjectGame:
+	case model.SubjectTypeAnime, model.SubjectTypeBook,
+		model.SubjectTypeMusic, model.SubjectTypeReal, model.SubjectTypeGame:
 		return t, nil
 	}
 
