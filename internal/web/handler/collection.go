@@ -138,7 +138,8 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 			return res.NotFound(notFoundMessage)
 		}
 
-		return h.InternalError(c, err, "failed to get user's subject collection", log.UserID(u.ID), log.SubjectID(subjectID))
+		return h.InternalError(c, err, "failed to get user's subject collection",
+			log.UserID(u.ID), log.SubjectID(subjectID))
 	}
 
 	if !showPrivate && collection.Private {
