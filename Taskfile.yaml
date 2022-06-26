@@ -87,9 +87,9 @@ tasks:
 
   "gen:stringer":
     sources:
-      - ./internal/domain/collection_type.go
+      - ./internal/model/collection_type.go
     generates:
-      - ./internal/domain/collection_type_string.gen.go
+      - ./internal/model/collection_type_string.gen.go
     cmds:
       - |
         go run golang.org/x/tools/cmd/stringer -output ./internal/domain/collection_type_string.gen.go \
