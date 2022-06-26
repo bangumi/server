@@ -81,6 +81,12 @@ tasks:
     deps:
       - gorm
       - mock
+    sources:
+      - ./internal/cmd/gen/generic/generic.go
+    generates:
+      - ./internal/model/generic/valuer.go
+    cmds:
+      - go run internal/cmd/gen/generic/generic.go
 
   mock:
     desc: Generate Mocks.

@@ -41,6 +41,7 @@ var personIDTypeString = "model.PersonID"       // reflect.TypeOf(new(model.Pers
 var characterIDTypeString = "model.CharacterID" // reflect.TypeOf(new(model.CharacterID)).Elem().Name()
 var episodeIDTypeString = "model.EpisodeID"     // reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
 var subjectIDTypeString = "model.SubjectID"     // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
+var groupIDTypeString = "model." + reflect.TypeOf(new(model.GroupID)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
@@ -350,6 +351,27 @@ func main() {
 		gen.FieldRename("rev_dateline", "CreatedAt"),
 		gen.FieldRename("rev_creator", "CreatorID"),
 		gen.FieldType("rev_creator", userIDTypeString),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_groups", "Group",
+		gen.FieldTrimPrefix("grp_"),
+		gen.FieldType("grp_id", groupIDTypeString),
+		gen.FieldType("grp_creator", userIDTypeString),
+		gen.FieldRename("grp_creator", "CreatorID"),
+		gen.FieldRename("grp_desc", "Description"),
+		gen.FieldRename("grp_builddate", "CreatedAt"),
+		gen.FieldRename("grp_lastpost", "LastPostedAt"),
+		gen.FieldNewTag("grp_lastpost", "doc:always 0"),
+		// gen.FieldIgnore("grp_lastpost", "grp_posts"), // always 0
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_group_members", "GroupMember",
+		gen.FieldTrimPrefix("gmb_"),
+		gen.FieldRename("gmb_uid", "UserID"),
+		gen.FieldType("gmb_uid", userIDTypeString),
+		gen.FieldType("gmb_gid", groupIDTypeString),
+		gen.FieldRename("gmb_gid", "GroupID"),
+		gen.FieldRename("gmb_dateline", "CreatedAt"),
 	))
 
 	// execute the action of code generation

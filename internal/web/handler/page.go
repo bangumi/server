@@ -32,7 +32,7 @@ type pageQuery struct {
 
 func (q pageQuery) check(count int64) error {
 	if q.Offset > int(count) {
-		return res.BadRequest("offset should less equal than " + strconv.FormatInt(count, 10))
+		return res.BadRequest("offset should be less than or equal to " + strconv.FormatInt(count, 10))
 	}
 
 	return nil

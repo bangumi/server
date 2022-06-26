@@ -298,7 +298,7 @@ issues:
   exclude-use-default: true
   exclude-rules:
     - path: '.*_test\.go'
-      linters: [gocritic, gochecknoglobals]
+      linters: [gocritic, gochecknoglobals, godot]
 
     - source: "var log"
       linters: [gochecknoglobals]

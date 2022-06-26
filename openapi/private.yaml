@@ -7,6 +7,30 @@ servers:
   - url: https://next.bgm.tv
     description: Production server
 
+x-parameters:
+  default_query_limit: &default_query_limit
+    required: false
+    schema:
+      title: Limit
+      maximum: 50
+      minimum: 1
+      type: integer
+      default: 30
+    name: limit
+    description: 分页参数
+    in: query
+
+  default_query_offset: &default_query_offset
+    required: false
+    schema:
+      title: Offset
+      minimum: 0
+      type: integer
+      default: 0
+    description: 分页参数
+    name: offset
+    in: query
+
 tags:
   - name: Auth
 
@@ -147,14 +171,101 @@ paths:
         "401":
           description: 用户未登录或者 session 已失效
 
+  "/p/groups/{name}":
+    get:
+      tags:
+        - 小组
+      summary: 获取小组首页信息
+      operationId: getGroupProfileByName
+      parameters:
+        - name: name
+          in: path
+          schema:
+            type: string
+          description: "小组名，类似于 `https://bgm.tv/groups/boring` 的 `boring`"
+          required: true
+      responses:
+        "200":
+          description: "返回当前用户"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "404":
+          description: 小组不存在
+
+  "/p/groups/{name}/members":
+    get:
+      tags:
+        - 小组
+      summary: 获取小组成员信息
+      operationId: listGroupMembersByName
+      parameters:
+        - name: name
+          in: path
+          schema:
+            type: string
+          description: "小组名，类似于 `https://bgm.tv/groups/boring` 的 `boring`"
+          required: true
+        - name: type
+          in: query
+          schema:
+            type: string
+            default: "all"
+            enum:
+              - mod
+              - normal
+              - all
+          description: 成员类型，默认为 `all`
+          required: true
+        - *default_query_limit
+        - *default_query_offset
+      responses:
+        "200":
+          description: "列出用户"
+          content:
+            application/json:
+              schema:
+                title: Paged[GroupMember]
+                allOf:
+                  - $ref: "#/components/schemas/Paged"
+                  - type: object
+                    properties:
+                      data:
+                        title: Data
+                        type: array
+                        items:
+                          "$ref": "#/components/schemas/GroupMember"
+
+        "404":
+          description: 小组不存在
+
 components:
   schemas:
     User:
       $ref: "./components/user.yaml"
+    Group:
+      $ref: "./components/private/group.yaml"
     Avatar:
       $ref: "./components/avatar.yaml"
     ErrorDetail:
       $ref: "./components/error_detail.yaml"
+    Paged:
+      type: object
+      properties:
+        total:
+          title: Total
+          type: integer
+        limit:
+          title: Limit
+          type: integer
+        offset:
+          title: Offset
+          type: integer
+    GroupMember:
+      type: array
+      items:
+        "$ref": "./components/private/group_member.yaml"
   securitySchemes:
     CookiesSession:
       name: sessionID

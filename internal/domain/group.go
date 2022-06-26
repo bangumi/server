@@ -12,15 +12,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package res
+package domain
 
-func EmptySlice() []int {
-	return []int{}
+import (
+	"context"
+
+	"github.com/bangumi/server/internal/model"
+)
+
+type GroupRepo interface {
+	GetByName(ctx context.Context, name string) (model.Group, error)
+
+	CountMembersByID(ctx context.Context, id model.GroupID, memberType GroupMemberType) (int64, error)
+	ListMembersByID(
+		ctx context.Context, id model.GroupID, memberType GroupMemberType, limit, offset int,
+	) ([]model.GroupMember, error)
 }
 
-type Paged struct {
-	Data   interface{} `json:"data"`
-	Total  int64       `json:"total"`
-	Limit  int         `json:"limit"`
-	Offset int         `json:"offset"`
-}
+type GroupMemberType uint8
+
+const (
+	GroupMemberAll GroupMemberType = 1 << iota / 2
+	GroupMemberMod
+	GroupMemberNormal
+)

@@ -223,3 +223,10 @@ func (r *Response) Cookies() []*http.Cookie {
 
 	return r.cookies
 }
+
+type PagedResponse struct {
+	Data   json.RawMessage `json:"data"`
+	Total  int64           `json:"total"`
+	Limit  int             `json:"limit"`
+	Offset int             `json:"offset"`
+}

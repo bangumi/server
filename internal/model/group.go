@@ -12,15 +12,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package res
+package model
 
-func EmptySlice() []int {
-	return []int{}
+import "time"
+
+type Group struct {
+	CreatedAt   time.Time
+	Name        string
+	Icon        string
+	Description string
+	Title       string
+	ID          GroupID
+	NSFW        bool
+	MemberCount int64
 }
 
-type Paged struct {
-	Data   interface{} `json:"data"`
-	Total  int64       `json:"total"`
-	Limit  int         `json:"limit"`
-	Offset int         `json:"offset"`
+type GroupMember struct {
+	JoinAt time.Time
+	UserID UserID
+	Mod    bool
 }

@@ -56,6 +56,7 @@ type Mock struct {
 	AuthRepo       domain.AuthRepo
 	AuthService    domain.AuthService
 	EpisodeRepo    domain.EpisodeRepo
+	GroupRepo      domain.GroupRepo
 	UserRepo       domain.UserRepo
 	IndexRepo      domain.IndexRepo
 	RevisionRepo   domain.RevisionRepo
@@ -101,6 +102,9 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCaptchaManager(m.CaptchaManager),
 		MockSessionManager(m.SessionManager),
 		MockRateLimiter(m.RateLimiter),
+
+		// don't need a default mock for this repo
+		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
 
 		fx.Invoke(web.ResistRouter),
 

@@ -30,6 +30,7 @@ tasks:
       - EpisodeRepo
       - PersonRepo
       - PersonService
+      - GroupRepo
 
   base-private-mock:
     cmds:
@@ -243,3 +244,14 @@ tasks:
         vars:
           SRC_DIR: ./internal/domain
           INTERFACE: "PersonService"
+
+  GroupRepo:
+    sources:
+      - internal/domain/group.go
+    generates:
+      - internal/mocks/GroupRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: GroupRepo

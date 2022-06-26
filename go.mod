@@ -4,7 +4,9 @@ go 1.17
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
+	github.com/danielgtaylor/huma v1.8.0
 	github.com/elliotchance/phpserialize v1.3.3
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.0
