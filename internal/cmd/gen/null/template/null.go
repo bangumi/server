@@ -14,16 +14,8 @@
 
 package null
 
-import (
-	"database/sql/driver"
-)
-
 // stub for template
 
 var nilBytes = []byte("null") //nolint:gochecknoglobals
 
 type GenericType interface{}
-
-func convertToDriverValue(s GenericType) driver.Value {
-	return nil
-}

@@ -90,6 +90,8 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		d.OnHoldAt = d.UpdatedAt
 	case model.CollectionTypeDropped:
 		d.DroppedAt = d.UpdatedAt
+	case model.CollectionTypeAll:
+		// do nothing
 	}
 
 	err := r.q.SubjectCollection.WithContext(ctx).Clauses(r.subjectUpsert).Create(d)
