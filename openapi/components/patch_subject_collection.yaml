@@ -21,10 +21,6 @@ properties:
     type: integer
   private:
     type: boolean
-  rate:
-    format: int32
-    minimum: 0
-    type: integer
   tags:
     items:
       type: string
@@ -41,6 +37,5 @@ required:
   - ep_status
   - vol_status
   - type
-  - rate
   - private
 type: object

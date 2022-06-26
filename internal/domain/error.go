@@ -18,3 +18,5 @@ import "errors"
 
 // ErrNotFound should be returned when a repo or service can't find an authorization.
 var ErrNotFound = errors.New("can't find item")
+
+var ErrInvalidInput = errors.New("invalid input")

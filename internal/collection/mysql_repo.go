@@ -91,7 +91,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	case model.CollectionTypeDropped:
 		d.DroppedAt = d.UpdatedAt
 	case model.CollectionTypeAll:
-		// do nothing
+		return fmt.Errorf("%w: can't set collection type to 0", domain.ErrInvalidInput)
 	}
 
 	err := r.q.SubjectCollection.WithContext(ctx).Clauses(r.subjectUpsert).Create(d)
