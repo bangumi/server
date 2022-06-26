@@ -71,7 +71,7 @@ func (h Handler) listCollection(
 ) error {
 	count, err := h.collect.CountSubjectCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
-		return errgo.Wrap(err, "user.CountSubjectCollections")
+		return errgo.Wrap(err, "collection.CountSubjectCollections")
 	}
 
 	if count == 0 {
@@ -85,7 +85,7 @@ func (h Handler) listCollection(
 	collections, err := h.collect.ListSubjectCollection(c.Context(),
 		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
-		return errgo.Wrap(err, "user.ListSubjectCollection")
+		return errgo.Wrap(err, "collection.ListSubjectCollection")
 	}
 
 	var data = make([]res.SubjectCollection, len(collections))
