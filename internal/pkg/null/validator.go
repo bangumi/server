@@ -22,7 +22,7 @@ import (
 
 var _ validator.CustomTypeFunc = Validator
 
-// Validator implements validator.CustomTypeFunc
+// Validator implements validator.CustomTypeFunc.
 func Validator(field reflect.Value) interface{} {
 	if valuer, ok := field.Interface().(interface{ Interface() interface{} }); ok {
 		return valuer.Interface()

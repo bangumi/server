@@ -69,7 +69,7 @@ func (h Handler) listCollection(
 	c *fiber.Ctx,
 	u model.User,
 	subjectType model.SubjectType,
-	collectionType domain.CollectionType,
+	collectionType model.CollectionType,
 	page pageQuery,
 	showPrivate bool,
 ) error {
@@ -203,7 +203,7 @@ func (h Handler) patchSubjectCollection(
 		Comment:     input.Comment.Default(collection.Comment),
 		VolStatus:   input.VolStatus.Default(collection.VolStatus),
 		EpStatus:    input.EpStatus.Default(collection.EpStatus),
-		Type:        domain.CollectionType(input.Type.Default(uint8(collection.Type))),
+		Type:        model.CollectionType(input.Type.Default(uint8(collection.Type))),
 		Private:     input.Private.Default(collection.Private),
 	}
 

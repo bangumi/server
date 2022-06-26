@@ -16,8 +16,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/bangumi/server/internal/domain"
 )
 
 // User is visible for everyone.
@@ -49,7 +47,7 @@ type SubjectCollection struct {
 	SubjectID   SubjectID
 	SubjectType uint8
 	Rate        uint8
-	Type        domain.CollectionType
+	Type        CollectionType
 	Private     bool
 }
 
@@ -61,13 +59,13 @@ type SubjectCollectionUpdate struct {
 	EpStatus    uint32
 	SubjectType SubjectType
 	Rate        uint8
-	Type        domain.CollectionType
+	Type        CollectionType
 	Private     bool
 }
 
 type EpisodeCollectionItem struct {
 	ID   EpisodeID
-	Type domain.CollectionType
+	Type CollectionType
 }
 
 type EpisodeCollection map[EpisodeID]EpisodeCollectionItem

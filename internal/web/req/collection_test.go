@@ -21,7 +21,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 )
@@ -34,7 +34,7 @@ func TestPutSubjectCollection_validation(t *testing.T) {
 	v := validator.New()
 	tests := []req.PatchSubjectCollection{
 		{},
-		{Type: null.NewUint8(uint8(domain.CollectionTypeDone))},
+		{Type: null.NewUint8(uint8(model.CollectionTypeDone))},
 	}
 
 	for _, s := range tests {
