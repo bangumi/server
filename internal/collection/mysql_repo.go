@@ -282,6 +282,7 @@ func deserializePhpEpStatus(phpSerialized []byte) (epCollection, error) {
 	for key, value := range e {
 		iKey, ok := key.(int64)
 		if !ok {
+			//nolint:goerr113
 			return nil, fmt.Errorf("failed to convert type %s to int64, value %v", reflect.TypeOf(key).String(), key)
 		}
 		if iKey <= 0 || iKey > math.MaxUint32 {
