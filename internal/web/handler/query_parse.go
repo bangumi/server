@@ -130,7 +130,6 @@ func parseCollectionType(s string) (model.CollectionType, error) {
 
 	v := model.CollectionType(t)
 	switch v {
-
 	case model.CollectionTypeAll,
 		model.CollectionTypeWish,
 		model.CollectionTypeDone,

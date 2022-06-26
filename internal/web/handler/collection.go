@@ -77,7 +77,6 @@ func (h Handler) listCollection(
 ) error {
 	count, err := h.collect.CountSubjectCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
-
 		return h.InternalError(c, err, "failed to count user's subject collections", log.UserID(u.ID))
 	}
 

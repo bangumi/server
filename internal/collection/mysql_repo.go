@@ -32,7 +32,6 @@ import (
 	"gorm.io/gorm/schema"
 
 	"github.com/bangumi/server/internal/dal/dao"
-
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
@@ -52,7 +51,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CollectionRepo, error
 	return mysqlRepo{
 		q:   q,
 		log: log.Named("collection.mysqlRepo"),
-		
+
 		subjectUpsert: clause.OnConflict{DoUpdates: clause.AssignmentColumns(columns)},
 	}, nil
 }
@@ -105,7 +104,6 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	}
 
 	return nil
-
 }
 
 func (r mysqlRepo) CountSubjectCollections(
