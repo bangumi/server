@@ -1107,8 +1107,6 @@ components:
       $ref: "./components/avatar.yaml"
     UserGroup:
       $ref: "./components/user_group.yaml"
-    PatchSubjectCollection:
-      $ref: "./components/patch_subject_collection.yaml"
     BloodType:
       title: BloodType
       enum:
