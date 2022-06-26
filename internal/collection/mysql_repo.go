@@ -31,12 +31,7 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 
-	"time"
-
 	"github.com/bangumi/server/internal/dal/dao"
-
-	"go.uber.org/zap"
-	"gorm.io/gorm"
 
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
@@ -55,15 +50,17 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CollectionRepo, error
 	}
 
 	return mysqlRepo{
-		q:             q,
-		log:           log.Named("collection.mysqlRepo"),
+		q:   q,
+		log: log.Named("collection.mysqlRepo"),
+		
 		subjectUpsert: clause.OnConflict{DoUpdates: clause.AssignmentColumns(columns)},
 	}, nil
 }
 
 type mysqlRepo struct {
-	q             *query.Query
-	log           *zap.Logger
+	q   *query.Query
+	log *zap.Logger
+
 	subjectUpsert clause.OnConflict
 }
 
