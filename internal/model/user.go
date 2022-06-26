@@ -50,15 +50,3 @@ type SubjectCollection struct {
 	Type        CollectionType
 	Private     bool
 }
-
-type SubjectCollectionUpdate struct {
-	UpdatedAt   time.Time
-	Comment     string
-	Tags        []string
-	VolStatus   uint32
-	EpStatus    uint32
-	SubjectType SubjectType
-	Rate        uint8
-	Type        CollectionType
-	Private     bool
-}
