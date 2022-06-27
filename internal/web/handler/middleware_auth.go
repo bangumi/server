@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger/log"
-	"github.com/bangumi/server/internal/strutil"
+	"github.com/bangumi/server/internal/pkg/strutil"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/handler/ctxkey"
 	"github.com/bangumi/server/internal/web/req"
