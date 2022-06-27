@@ -121,7 +121,6 @@ type Handler struct {
 
 func getValidator() (*validator.Validate, ut.Translator, error) {
 	validate := validator.New()
-
 	uni := ut.New(en.New(), zh.New())
 
 	// this is usually know or extracted from http 'Accept-Language' header
