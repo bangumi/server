@@ -96,8 +96,7 @@ func New(
 }
 
 type Handler struct {
-	validatorTranslation ut.Translator
-	rateLimit            rate.Manager
+	oauth                oauth.Manager
 	s                    domain.SubjectService
 	p                    domain.PersonService
 	a                    domain.AuthService
@@ -107,16 +106,17 @@ type Handler struct {
 	e                    domain.EpisodeRepo
 	c                    domain.CharacterService
 	u                    domain.UserRepo
-	cache                cache.Generic
+	rateLimit            rate.Manager
 	i                    domain.IndexRepo
 	r                    domain.RevisionRepo
 	g                    domain.GroupRepo
-	buffPool             buffer.Pool
-	oauth                oauth.Manager
+	cache                cache.Generic
+	validatorTranslation ut.Translator
 	log                  *zap.Logger
 	skip1Log             *zap.Logger
 	v                    *validator.Validate
 	template             frontend.TemplateEngine
+	buffPool             buffer.Pool
 	cfg                  config.AppConfig
 }
 

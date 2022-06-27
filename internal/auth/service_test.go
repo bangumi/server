@@ -24,7 +24,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -68,7 +67,7 @@ func TestService_GetByTokenWithCache_cached(t *testing.T) {
 	t.Parallel()
 
 	var c = mocks.NewCache(t)
-	c.EXPECT().Get(mock.Anything, cachekey.Auth(test.TreeHoleAccessToken), mock.Anything).
+	c.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).
 		Run(func(ctx context.Context, key string, value interface{}) {
 			vOut := reflect.ValueOf(value).Elem()
 			vOut.Set(reflect.ValueOf(domain.Auth{GroupID: 2}))

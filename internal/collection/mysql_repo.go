@@ -37,7 +37,7 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strutil"
+	"github.com/bangumi/server/internal/pkg/strutil"
 )
 
 var _ domain.CollectionRepo = mysqlRepo{}

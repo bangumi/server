@@ -17,14 +17,12 @@ package handler_test
 import (
 	"context"
 	"net/http"
+	"reflect"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/test"
@@ -57,9 +55,10 @@ func TestHandler_GetPerson_Redirect(t *testing.T) {
 
 func TestHandler_GetPerson_Redirect_cached(t *testing.T) {
 	t.Parallel()
-	c := cache.NewMemoryCache()
-	require.NoError(t,
-		c.Set(context.Background(), cachekey.Person(7), res.PersonV0{Redirect: 8}, time.Hour))
+	c := mocks.NewCache(t)
+	c.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Run(func(_ context.Context, _ string, value interface{}) {
+		reflect.ValueOf(value).Elem().Set(reflect.ValueOf(res.PersonV0{Redirect: 8}))
+	}).Return(true, nil)
 
 	app := test.GetWebApp(t, test.Mock{Cache: c})
 	resp := test.New(t).Get("/v0/persons/7").Execute(app)
