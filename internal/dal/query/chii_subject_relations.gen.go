@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -25,10 +27,10 @@ func newSubjectRelation(db *gorm.DB) subjectRelation {
 
 	tableName := _subjectRelation.subjectRelationDo.TableName()
 	_subjectRelation.ALL = field.NewField(tableName, "*")
-	_subjectRelation.SubjectID = field.NewUint32(tableName, "rlt_subject_id")
+	_subjectRelation.SubjectID = field.NewField(tableName, "rlt_subject_id")
 	_subjectRelation.SubjectTypeID = field.NewUint8(tableName, "rlt_subject_type_id")
 	_subjectRelation.RelationType = field.NewUint16(tableName, "rlt_relation_type")
-	_subjectRelation.RelatedSubjectID = field.NewUint32(tableName, "rlt_related_subject_id")
+	_subjectRelation.RelatedSubjectID = field.NewField(tableName, "rlt_related_subject_id")
 	_subjectRelation.RelatedSubjectTypeID = field.NewUint8(tableName, "rlt_related_subject_type_id")
 	_subjectRelation.ViceVersa = field.NewBool(tableName, "rlt_vice_versa")
 	_subjectRelation.Order = field.NewUint8(tableName, "rlt_order")
@@ -52,10 +54,10 @@ type subjectRelation struct {
 	subjectRelationDo subjectRelationDo
 
 	ALL                  field.Field
-	SubjectID            field.Uint32
+	SubjectID            field.Field
 	SubjectTypeID        field.Uint8
 	RelationType         field.Uint16
-	RelatedSubjectID     field.Uint32
+	RelatedSubjectID     field.Field
 	RelatedSubjectTypeID field.Uint8
 	ViceVersa            field.Bool
 	Order                field.Uint8
@@ -76,10 +78,10 @@ func (s subjectRelation) As(alias string) *subjectRelation {
 
 func (s *subjectRelation) updateTableName(table string) *subjectRelation {
 	s.ALL = field.NewField(table, "*")
-	s.SubjectID = field.NewUint32(table, "rlt_subject_id")
+	s.SubjectID = field.NewField(table, "rlt_subject_id")
 	s.SubjectTypeID = field.NewUint8(table, "rlt_subject_type_id")
 	s.RelationType = field.NewUint16(table, "rlt_relation_type")
-	s.RelatedSubjectID = field.NewUint32(table, "rlt_related_subject_id")
+	s.RelatedSubjectID = field.NewField(table, "rlt_related_subject_id")
 	s.RelatedSubjectTypeID = field.NewUint8(table, "rlt_related_subject_type_id")
 	s.ViceVersa = field.NewBool(table, "rlt_vice_versa")
 	s.Order = field.NewUint8(table, "rlt_order")
@@ -201,6 +203,14 @@ func (s subjectRelationDo) Debug() *subjectRelationDo {
 
 func (s subjectRelationDo) WithContext(ctx context.Context) *subjectRelationDo {
 	return s.withDO(s.DO.WithContext(ctx))
+}
+
+func (s subjectRelationDo) ReadDB(ctx context.Context) *subjectRelationDo {
+	return s.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (s subjectRelationDo) WriteDB(ctx context.Context) *subjectRelationDo {
+	return s.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (s subjectRelationDo) Clauses(conds ...clause.Expression) *subjectRelationDo {

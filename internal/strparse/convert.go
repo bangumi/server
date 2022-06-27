@@ -47,31 +47,41 @@ func uint32NonZero(s string) (uint32, error) {
 	return v, nil
 }
 
-func UserID(s string) (model.UIDType, error) {
+func UserID(s string) (model.UserID, error) {
+	v, err := uint32NonZero(s)
+
+	return model.UserID(v), err
+}
+
+func SubjectID(s string) (model.SubjectID, error) {
+	v, err := uint32NonZero(s)
+
+	return model.SubjectID(v), err
+}
+
+func PersonID(s string) (model.PersonID, error) {
+	v, err := uint32NonZero(s)
+
+	return model.PersonID(v), err
+}
+
+func CharacterID(s string) (model.CharacterID, error) {
+	v, err := uint32NonZero(s)
+
+	return model.CharacterID(v), err
+}
+
+func EpisodeID(s string) (model.EpisodeID, error) {
+	v, err := uint32NonZero(s)
+
+	return model.EpisodeID(v), err
+}
+
+func IndexID(s string) (model.IndexID, error) {
 	return uint32NonZero(s)
 }
 
-func SubjectID(s string) (model.PersonIDType, error) {
-	return uint32NonZero(s)
-}
-
-func PersonID(s string) (model.PersonIDType, error) {
-	return uint32NonZero(s)
-}
-
-func CharacterID(s string) (model.PersonIDType, error) {
-	return uint32NonZero(s)
-}
-
-func EpisodeID(s string) (model.PersonIDType, error) {
-	return uint32NonZero(s)
-}
-
-func IndexID(s string) (model.IndexIDType, error) {
-	return uint32NonZero(s)
-}
-
-func TopicID(s string) (model.TopicIDType, error) {
+func TopicID(s string) (model.TopicID, error) {
 	return uint32NonZero(s)
 }
 

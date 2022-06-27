@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -26,9 +28,9 @@ func newPersonSubjects(db *gorm.DB) personSubjects {
 	tableName := _personSubjects.personSubjectsDo.TableName()
 	_personSubjects.ALL = field.NewField(tableName, "*")
 	_personSubjects.PrsnType = field.NewString(tableName, "prsn_type")
-	_personSubjects.PersonID = field.NewUint32(tableName, "prsn_id")
+	_personSubjects.PersonID = field.NewField(tableName, "prsn_id")
 	_personSubjects.PrsnPosition = field.NewUint16(tableName, "prsn_position")
-	_personSubjects.SubjectID = field.NewUint32(tableName, "subject_id")
+	_personSubjects.SubjectID = field.NewField(tableName, "subject_id")
 	_personSubjects.SubjectTypeID = field.NewUint8(tableName, "subject_type_id")
 	_personSubjects.Summary = field.NewString(tableName, "summary")
 	_personSubjects.PrsnAppearEps = field.NewString(tableName, "prsn_appear_eps")
@@ -64,9 +66,9 @@ type personSubjects struct {
 
 	ALL           field.Field
 	PrsnType      field.String
-	PersonID      field.Uint32
+	PersonID      field.Field
 	PrsnPosition  field.Uint16
-	SubjectID     field.Uint32
+	SubjectID     field.Field
 	SubjectTypeID field.Uint8
 	Summary       field.String
 	PrsnAppearEps field.String
@@ -90,9 +92,9 @@ func (p personSubjects) As(alias string) *personSubjects {
 func (p *personSubjects) updateTableName(table string) *personSubjects {
 	p.ALL = field.NewField(table, "*")
 	p.PrsnType = field.NewString(table, "prsn_type")
-	p.PersonID = field.NewUint32(table, "prsn_id")
+	p.PersonID = field.NewField(table, "prsn_id")
 	p.PrsnPosition = field.NewUint16(table, "prsn_position")
-	p.SubjectID = field.NewUint32(table, "subject_id")
+	p.SubjectID = field.NewField(table, "subject_id")
 	p.SubjectTypeID = field.NewUint8(table, "subject_type_id")
 	p.Summary = field.NewString(table, "summary")
 	p.PrsnAppearEps = field.NewString(table, "prsn_appear_eps")
@@ -284,6 +286,14 @@ func (p personSubjectsDo) Debug() *personSubjectsDo {
 
 func (p personSubjectsDo) WithContext(ctx context.Context) *personSubjectsDo {
 	return p.withDO(p.DO.WithContext(ctx))
+}
+
+func (p personSubjectsDo) ReadDB(ctx context.Context) *personSubjectsDo {
+	return p.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (p personSubjectsDo) WriteDB(ctx context.Context) *personSubjectsDo {
+	return p.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (p personSubjectsDo) Clauses(conds ...clause.Expression) *personSubjectsDo {

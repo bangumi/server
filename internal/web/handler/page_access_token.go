@@ -18,8 +18,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/res"
 )
 
 // PageListAccessToken 直接调用了 `query.Query`。
@@ -32,17 +32,17 @@ func (h Handler) PageListAccessToken(c *fiber.Ctx) error {
 
 	u, err := h.u.GetByID(c.Context(), v.ID)
 	if err != nil {
-		return h.InternalServerError(c, err, "failed to get current user")
+		return h.InternalError(c, err, "failed to get current user", log.UserID(v.ID))
 	}
 
 	tokens, err := h.a.ListAccessToken(c.Context(), v.ID)
 	if err != nil {
-		return h.InternalServerError(c, err, "failed to fetch access tokens")
+		return h.InternalError(c, err, "failed to fetch access tokens", log.UserID(v.ID))
 	}
 
 	clients, err := h.oauth.GetClientByID(c.Context(), clientIDs(tokens)...)
 	if err != nil {
-		return h.InternalServerError(c, err, "failed to fetch access tokens")
+		return h.InternalError(c, err, "failed to fetch access tokens", log.UserID(v.ID))
 	}
 
 	return h.render(c, frontend.TplListAccessToken, frontend.ListAccessToken{Tokens: tokens, User: u, Clients: clients})
@@ -56,7 +56,7 @@ func (h Handler) PageCreateAccessToken(c *fiber.Ctx) error {
 
 	u, err := h.u.GetByID(c.Context(), v.ID)
 	if err != nil {
-		return res.InternalError(c, err, "failed to get current user")
+		return h.InternalError(c, err, "failed to get current user", log.UserID(v.ID))
 	}
 
 	return h.render(c, frontend.TplCreateAccessToken, frontend.CreateAccessToken{User: u})

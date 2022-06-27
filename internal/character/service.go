@@ -32,12 +32,12 @@ type service struct {
 	p    domain.PersonRepo
 }
 
-func (s service) Get(ctx context.Context, id uint32) (model.Character, error) {
+func (s service) Get(ctx context.Context, id model.CharacterID) (model.Character, error) {
 	return s.repo.Get(ctx, id) //nolint:wrapcheck
 }
 
 func (s service) GetPersonRelated(
-	ctx context.Context, personID model.PersonIDType,
+	ctx context.Context, personID model.PersonID,
 ) ([]model.PersonCharacterRelation, error) {
 	relations, err := s.repo.GetPersonRelated(ctx, personID)
 	if err != nil {
@@ -48,8 +48,8 @@ func (s service) GetPersonRelated(
 		return []model.PersonCharacterRelation{}, nil
 	}
 
-	var characterIDs = make([]model.CharacterIDType, len(relations))
-	var subjectIDs = make([]model.SubjectIDType, len(relations))
+	var characterIDs = make([]model.CharacterID, len(relations))
+	var subjectIDs = make([]model.SubjectID, len(relations))
 	for i, relation := range relations {
 		characterIDs[i] = relation.CharacterID
 		subjectIDs[i] = relation.SubjectID
@@ -83,14 +83,14 @@ func (s service) GetPersonRelated(
 }
 
 func (s service) GetSubjectRelated(
-	ctx context.Context, subjectID model.SubjectIDType,
+	ctx context.Context, subjectID model.SubjectID,
 ) ([]model.SubjectCharacterRelation, error) {
 	relations, err := s.repo.GetSubjectRelated(ctx, subjectID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
 	}
 
-	var characterIDs = make([]model.CharacterIDType, len(relations))
+	var characterIDs = make([]model.CharacterID, len(relations))
 	for i, relation := range relations {
 		characterIDs[i] = relation.CharacterID
 	}

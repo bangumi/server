@@ -54,9 +54,9 @@ func main() {
 
 var ctx = context.Background() //nolint:gochecknoglobals
 
-var maxSubjectID model.SubjectIDType     //nolint:gochecknoglobals
-var maxCharacterID model.CharacterIDType //nolint:gochecknoglobals
-var maxPersonID model.PersonIDType       //nolint:gochecknoglobals
+var maxSubjectID model.SubjectID     //nolint:gochecknoglobals
+var maxCharacterID model.CharacterID //nolint:gochecknoglobals
+var maxPersonID model.PersonID       //nolint:gochecknoglobals
 
 func start(out string) {
 	var q *query.Query
@@ -137,18 +137,18 @@ func getMaxID(q *query.Query) {
 }
 
 type Subject struct {
-	ID       model.SubjectIDType `json:"id"`
-	Type     model.SubjectType   `json:"type"`
-	Name     string              `json:"name"`
-	NameCN   string              `json:"name_cn"`
-	Infobox  string              `json:"infobox"`
-	Platform uint16              `json:"platform"`
-	Summary  string              `json:"summary"`
-	Nsfw     bool                `json:"nsfw"`
+	ID       model.SubjectID   `json:"id"`
+	Type     model.SubjectType `json:"type"`
+	Name     string            `json:"name"`
+	NameCN   string            `json:"name_cn"`
+	Infobox  string            `json:"infobox"`
+	Platform uint16            `json:"platform"`
+	Summary  string            `json:"summary"`
+	Nsfw     bool              `json:"nsfw"`
 }
 
 func exportSubjects(q *query.Query, w io.Writer) {
-	for i := model.SubjectIDType(0); i < maxSubjectID; i += defaultStep {
+	for i := model.SubjectID(0); i < maxSubjectID; i += defaultStep {
 		subjects, err := q.WithContext(ctx).Subject.
 			Where(q.Subject.ID.Gt(i), q.Subject.ID.Lte(i+defaultStep), q.Subject.Ban.Eq(0)).Find()
 		if err != nil {
@@ -171,16 +171,16 @@ func exportSubjects(q *query.Query, w io.Writer) {
 }
 
 type Person struct {
-	ID      model.PersonIDType `json:"id"`
-	Name    string             `json:"name"`
-	Type    uint8              `json:"type"`
-	Career  []string           `json:"career"`
-	Infobox string             `json:"infobox"`
-	Summary string             `json:"summary"`
+	ID      model.PersonID `json:"id"`
+	Name    string         `json:"name"`
+	Type    uint8          `json:"type"`
+	Career  []string       `json:"career"`
+	Infobox string         `json:"infobox"`
+	Summary string         `json:"summary"`
 }
 
 func exportPersons(q *query.Query, w io.Writer) {
-	for i := model.PersonIDType(0); i < maxPersonID; i += defaultStep {
+	for i := model.PersonID(0); i < maxPersonID; i += defaultStep {
 		persons, err := q.WithContext(context.Background()).Person.
 			Where(q.Person.ID.Gt(i), q.Person.ID.Lte(i+defaultStep)).Find()
 		if err != nil {
@@ -239,14 +239,14 @@ func careers(p *dao.Person) []string {
 }
 
 type Character struct {
-	ID      model.CharacterIDType `json:"id"`
-	Role    uint8                 `json:"name"`
-	Infobox string                `json:"infobox"`
-	Summary string                `json:"summary"`
+	ID      model.CharacterID `json:"id"`
+	Role    uint8             `json:"name"`
+	Infobox string            `json:"infobox"`
+	Summary string            `json:"summary"`
 }
 
 func exportCharacters(q *query.Query, w io.Writer) {
-	for i := model.CharacterIDType(0); i < maxCharacterID; i += defaultStep {
+	for i := model.CharacterID(0); i < maxCharacterID; i += defaultStep {
 		characters, err := q.WithContext(context.Background()).Character.
 			Where(q.Character.ID.Gt(i), q.Character.ID.Lte(i+defaultStep)).Find()
 		if err != nil {
@@ -265,15 +265,15 @@ func exportCharacters(q *query.Query, w io.Writer) {
 }
 
 type Episode struct {
-	ID          model.EpisodeIDType `json:"id"`
-	Name        string              `json:"name"`
-	NameCn      string              `json:"name_cn"`
-	Description string              `json:"description"`
-	AirDate     string              `json:"airdate"`
-	Disc        uint8               `json:"disc"`
-	SubjectID   model.SubjectIDType `json:"subject_id"`
-	Sort        float32             `json:"sort"`
-	Type        model.EpTypeType    `json:"type"`
+	ID          model.EpisodeID `json:"id"`
+	Name        string          `json:"name"`
+	NameCn      string          `json:"name_cn"`
+	Description string          `json:"description"`
+	AirDate     string          `json:"airdate"`
+	Disc        uint8           `json:"disc"`
+	SubjectID   model.SubjectID `json:"subject_id"`
+	Sort        float32         `json:"sort"`
+	Type        model.EpType    `json:"type"`
 }
 
 func exportEpisodes(q *query.Query, w io.Writer) {
@@ -281,7 +281,7 @@ func exportEpisodes(q *query.Query, w io.Writer) {
 	if err != nil {
 		panic(err)
 	}
-	for i := model.EpisodeIDType(0); i < lastEpisode.ID; i += defaultStep {
+	for i := model.EpisodeID(0); i < lastEpisode.ID; i += defaultStep {
 		episodes, err := q.WithContext(context.Background()).Episode.
 			Where(q.Episode.ID.Gt(i), q.Episode.ID.Lte(i+defaultStep), q.Episode.Ban.Eq(0)).Find()
 		if err != nil {
@@ -305,14 +305,14 @@ func exportEpisodes(q *query.Query, w io.Writer) {
 }
 
 type SubjectRelation struct {
-	SubjectID        model.SubjectIDType `json:"subject_id"`
-	RelationType     uint16              `json:"relation_type"`
-	RelatedSubjectID model.SubjectIDType `json:"related_subject_id"`
-	Order            uint8               `json:"order"`
+	SubjectID        model.SubjectID `json:"subject_id"`
+	RelationType     uint16          `json:"relation_type"`
+	RelatedSubjectID model.SubjectID `json:"related_subject_id"`
+	Order            uint8           `json:"order"`
 }
 
 func exportSubjectRelations(q *query.Query, w io.Writer) {
-	for i := model.SubjectIDType(0); i < maxSubjectID; i += defaultStep {
+	for i := model.SubjectID(0); i < maxSubjectID; i += defaultStep {
 		relations, err := q.WithContext(context.Background()).SubjectRelation.
 			Order(q.SubjectRelation.SubjectID, q.SubjectRelation.SubjectID).
 			Where(q.SubjectRelation.SubjectID.Gt(i), q.SubjectRelation.SubjectID.Lte(i+defaultStep)).Find()
@@ -332,13 +332,13 @@ func exportSubjectRelations(q *query.Query, w io.Writer) {
 }
 
 type SubjectPerson struct {
-	PersonID  model.PersonIDType  `json:"person_id"`
-	SubjectID model.SubjectIDType `json:"subject_id"`
-	Position  uint16              `json:"position"`
+	PersonID  model.PersonID  `json:"person_id"`
+	SubjectID model.SubjectID `json:"subject_id"`
+	Position  uint16          `json:"position"`
 }
 
 func exportSubjectPersonRelations(q *query.Query, w io.Writer) {
-	for i := model.SubjectIDType(0); i < maxSubjectID; i += defaultStep {
+	for i := model.SubjectID(0); i < maxSubjectID; i += defaultStep {
 		relations, err := q.WithContext(context.Background()).PersonSubjects.
 			Order(q.PersonSubjects.SubjectID, q.PersonSubjects.PersonID).
 			Where(q.PersonSubjects.SubjectID.Gt(i), q.PersonSubjects.SubjectID.Lte(i+defaultStep)).Find()
@@ -357,14 +357,14 @@ func exportSubjectPersonRelations(q *query.Query, w io.Writer) {
 }
 
 type SubjectCharacter struct {
-	CharacterID model.CharacterIDType `json:"character_id"`
-	SubjectID   model.SubjectIDType   `json:"subject_id"`
-	Type        uint8                 `json:"type"`
-	Order       uint8                 `json:"order"`
+	CharacterID model.CharacterID `json:"character_id"`
+	SubjectID   model.SubjectID   `json:"subject_id"`
+	Type        uint8             `json:"type"`
+	Order       uint8             `json:"order"`
 }
 
 func exportSubjectCharacterRelations(q *query.Query, w io.Writer) {
-	for i := model.SubjectIDType(0); i < maxSubjectID; i += defaultStep {
+	for i := model.SubjectID(0); i < maxSubjectID; i += defaultStep {
 		relations, err := q.WithContext(context.Background()).CharacterSubjects.
 			Order(q.CharacterSubjects.SubjectID, q.CharacterSubjects.CrtOrder).
 			Where(q.CharacterSubjects.SubjectID.Gt(i), q.CharacterSubjects.SubjectID.Lte(i+defaultStep)).Find()
@@ -384,14 +384,14 @@ func exportSubjectCharacterRelations(q *query.Query, w io.Writer) {
 }
 
 type PersonCharacter struct {
-	PersonID    model.PersonIDType    `json:"person_id"`
-	SubjectID   model.SubjectIDType   `json:"subject_id"`
-	CharacterID model.CharacterIDType `json:"character_id"`
-	Summary     string                `json:"summary"`
+	PersonID    model.PersonID    `json:"person_id"`
+	SubjectID   model.SubjectID   `json:"subject_id"`
+	CharacterID model.CharacterID `json:"character_id"`
+	Summary     string            `json:"summary"`
 }
 
 func exportPersonCharacterRelations(q *query.Query, w io.Writer) {
-	for i := model.PersonIDType(0); i < maxPersonID; i += defaultStep {
+	for i := model.PersonID(0); i < maxPersonID; i += defaultStep {
 		relations, err := q.WithContext(context.Background()).Cast.
 			Order(q.Cast.PersonID, q.Cast.CharacterID).
 			Where(q.Cast.PersonID.Gt(i), q.Cast.PersonID.Lte(i+defaultStep)).Find()

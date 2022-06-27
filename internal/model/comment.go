@@ -19,9 +19,9 @@ import "time"
 type Comment struct {
 	CreatedAt   time.Time
 	Content     string
-	UID         uint32
+	UID         UserID
 	Related     uint32
 	State       uint32
-	ID          CommentIDType
+	ID          CommentID
 	MentionedID uint32
 }

@@ -8,10 +8,10 @@ const TableNameUserGroup = "chii_usergroup"
 
 // UserGroup mapped from table <chii_usergroup>
 type UserGroup struct {
-	ID       uint8  `gorm:"column:usr_grp_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:"usr_grp_id"`
-	Name     string `gorm:"column:usr_grp_name;type:varchar(255);not null" json:"usr_grp_name"`
-	Perm     []byte `gorm:"column:usr_grp_perm;type:mediumtext;not null" json:"usr_grp_perm"`
-	Dateline uint32 `gorm:"column:usr_grp_dateline;type:int(10) unsigned;not null" json:"usr_grp_dateline"`
+	ID       uint8  `gorm:"column:usr_grp_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
+	Name     string `gorm:"column:usr_grp_name;type:varchar(255);not null"`
+	Perm     []byte `gorm:"column:usr_grp_perm;type:mediumtext;not null"`
+	Dateline uint32 `gorm:"column:usr_grp_dateline;type:int(10) unsigned;not null"`
 }
 
 // TableName UserGroup's table name

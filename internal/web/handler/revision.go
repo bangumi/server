@@ -17,9 +17,11 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
@@ -41,7 +43,7 @@ func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
 	return h.listPersonRevision(c, personID, page)
 }
 
-func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonIDType, page pageQuery) error {
+func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page pageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -63,40 +65,42 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonIDType, p
 	response.Total = count
 
 	revisions, err := h.r.ListPersonRelated(c.Context(), personID, page.Limit, page.Offset)
-
 	if err != nil {
 		return errgo.Wrap(err, "revision.ListPersonRelated")
 	}
 
 	data := make([]res.PersonRevision, len(revisions))
 
-	creatorIDs := make([]model.UIDType, 0, len(revisions))
+	creatorIDs := make([]model.UserID, 0, len(revisions))
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
 
+	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
+
 	for i := range revisions {
 		data[i] = convertModelPersonRevision(&revisions[i], creatorMap)
 	}
 	response.Data = data
+
 	return c.JSON(response)
 }
 
 func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id <= 0 {
-		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad param id: %s", c.Params("id")))
+		return res.BadRequest(fmt.Sprintf("bad param id: %s", c.Params("id")))
 	}
 	r, err := h.r.GetPersonRelated(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.ErrNotFound
+			return res.ErrNotFound
 		}
-		return fiber.ErrInternalServerError
+
+		return h.InternalError(c, err, "failed to get person related revision", zap.Uint32("rev_id", id))
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
@@ -121,7 +125,7 @@ func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
 	return h.listCharacterRevision(c, characterID, page)
 }
 
-func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.CharacterIDType, page pageQuery) error {
+func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.CharacterID, page pageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -148,7 +152,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 		return errgo.Wrap(err, "revision.ListCharacterRelated")
 	}
 
-	creatorIDs := make([]model.UIDType, 0, len(revisions))
+	creatorIDs := make([]model.UserID, 0, len(revisions))
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
@@ -169,17 +173,18 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id <= 0 {
-		return fiber.NewError(
-			fiber.StatusBadRequest,
+		return res.NewError(
+			http.StatusBadRequest,
 			fmt.Sprintf("bad param id: %s", strconv.Quote(c.Params("id"))),
 		)
 	}
 	r, err := h.r.GetCharacterRelated(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.ErrNotFound
+			return res.ErrNotFound
 		}
-		return fiber.ErrInternalServerError
+
+		return h.InternalError(c, err, "failed to get character related revision", zap.Uint32("rev_id", id))
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
@@ -195,15 +200,15 @@ func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	subjectID, err := strparse.SubjectID(c.Query("subject_id"))
-	if err != nil || subjectID <= 0 {
-		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("bad query subject_id: %s", c.Query("subject_id")))
+	subjectID, err := parseSubjectID(c.Query("subject_id"))
+	if err != nil {
+		return err
 	}
 
 	return h.listSubjectRevision(c, subjectID, page)
 }
 
-func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectIDType, page pageQuery) error {
+func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, page pageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -232,7 +237,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectIDType
 
 	data := make([]res.SubjectRevision, len(revisions))
 
-	creatorIDs := make([]model.UIDType, 0, len(revisions))
+	creatorIDs := make([]model.UserID, 0, len(revisions))
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
@@ -251,14 +256,15 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectIDType
 func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	id, err := strparse.Uint32(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(fiber.StatusBadRequest, "bad param id: "+strconv.Quote(c.Params("id")))
+		return res.BadRequest("bad param id: " + strconv.Quote(c.Params("id")))
 	}
 	r, err := h.r.GetSubjectRelated(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.ErrNotFound
+			return res.ErrNotFound
 		}
-		return fiber.ErrInternalServerError
+
+		return h.InternalError(c, err, "failed to get subject related revision", zap.Uint32("rev_id", id))
 	}
 
 	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
@@ -269,9 +275,9 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	return c.JSON(convertModelSubjectRevision(&r, creatorMap))
 }
 
-func dedupeUIDs(uids ...model.UIDType) []model.UIDType {
-	m := make(map[model.UIDType]bool, len(uids))
-	ret := make([]model.UIDType, 0, len(uids))
+func dedupeUIDs(uids ...model.UserID) []model.UserID {
+	m := make(map[model.UserID]bool, len(uids))
+	ret := make([]model.UserID, 0, len(uids))
 	for _, r := range uids {
 		if _, ok := m[r]; !ok {
 			m[r] = true
@@ -281,7 +287,7 @@ func dedupeUIDs(uids ...model.UIDType) []model.UIDType {
 	return ret
 }
 
-func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UIDType]model.User) res.PersonRevision {
+func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UserID]model.User) res.PersonRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.PersonRevision{
 		ID:      r.ID,
@@ -319,7 +325,7 @@ func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UI
 }
 
 func convertModelSubjectRevision(
-	r *model.SubjectRevision, creatorMap map[model.UIDType]model.User,
+	r *model.SubjectRevision, creatorMap map[model.UserID]model.User,
 ) res.SubjectRevision {
 	creator := creatorMap[r.CreatorID]
 	var data *res.SubjectRevisionData
@@ -352,7 +358,7 @@ func convertModelSubjectRevision(
 }
 
 func convertModelCharacterRevision(
-	r *model.CharacterRevision, creatorMap map[model.UIDType]model.User,
+	r *model.CharacterRevision, creatorMap map[model.UserID]model.User,
 ) res.CharacterRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.CharacterRevision{

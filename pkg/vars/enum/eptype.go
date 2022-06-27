@@ -16,7 +16,7 @@ package enum
 
 import "github.com/bangumi/server/internal/model"
 
-type EpType = model.EpTypeType
+type EpType = model.EpType
 
 const (
 	EpTypeNormal  EpType = 0

@@ -17,7 +17,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -30,7 +29,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/vars/enum"
 )
 
@@ -48,10 +46,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	s, ok, err := h.getSubjectWithCache(c.Context(), e.SubjectID)
@@ -59,10 +54,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 		return err
 	}
 	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return c.JSON(e)
@@ -82,10 +74,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	s, ok, err := h.getSubjectWithCache(c.Context(), e.SubjectID)
@@ -94,13 +83,10 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 	}
 
 	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentEpisode, id)
+	pagedComments, err := h.listComments(c, domain.CommentEpisode, uint32(id))
 	if err != nil {
 		return err
 	}
@@ -109,7 +95,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
-func (h Handler) getEpisodeWithCache(ctx context.Context, id uint32) (res.Episode, bool, error) {
+func (h Handler) getEpisodeWithCache(ctx context.Context, id model.EpisodeID) (res.Episode, bool, error) {
 	var key = cachekey.Episode(id)
 	// try to read from cache
 	var r res.Episode
@@ -128,7 +114,7 @@ func (h Handler) getEpisodeWithCache(ctx context.Context, id uint32) (res.Episod
 			return res.Episode{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "repo.episode.Set")
+		return r, ok, errgo.Wrap(err, "EpisodeRepo.Get")
 	}
 
 	r = convertModelEpisode(s)
@@ -178,7 +164,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return err
 	}
 	if subjectID == 0 {
-		return fiber.NewError(http.StatusBadRequest, "missing required query `subject_id`")
+		return res.BadRequest("missing required query `subject_id`")
 	}
 
 	subject, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
@@ -187,10 +173,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 	}
 
 	if !ok || subject.Redirect != 0 || (subject.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return h.listEpisode(c, subjectID, page, epType)
@@ -198,7 +181,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 
 func (h Handler) listEpisode(
 	c *fiber.Ctx,
-	subjectID model.SubjectIDType,
+	subjectID model.SubjectID,
 	page pageQuery,
 	epType enum.EpType,
 ) error {
@@ -227,7 +210,7 @@ func (h Handler) listEpisode(
 	}
 
 	if int64(page.Offset) >= count {
-		return fiber.NewError(http.StatusBadRequest, "offset if greater than count")
+		return res.BadRequest("offset if greater than count")
 	}
 
 	response.Total = count
@@ -254,17 +237,17 @@ func (h Handler) listEpisode(
 	return c.JSON(response)
 }
 
-func parseEpType(s string) (model.EpTypeType, error) {
+func parseEpType(s string) (model.EpType, error) {
 	if s == "" {
 		return -1, nil
 	}
 
 	v, err := strparse.Uint8(s)
 	if err != nil {
-		return -1, fiber.NewError(http.StatusBadRequest, "wrong value for query `type`")
+		return -1, res.BadRequest("wrong value for query `type`")
 	}
 
-	e := model.EpTypeType(v)
+	e := model.EpType(v)
 	switch e {
 	case enum.EpTypeNormal, enum.EpTypeSpecial,
 		enum.EpTypeOpening, enum.EpTypeEnding,
@@ -272,5 +255,5 @@ func parseEpType(s string) (model.EpTypeType, error) {
 		return e, nil
 	}
 
-	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+" is not valid episode type")
+	return 0, res.BadRequest(strconv.Quote(s) + " is not valid episode type")
 }

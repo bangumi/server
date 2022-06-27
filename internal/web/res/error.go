@@ -16,12 +16,15 @@ package res
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 
-	"github.com/bangumi/server/internal/web/res/code"
 	"github.com/bangumi/server/internal/web/util"
 )
+
+var ErrNotFound = NewError(http.StatusNotFound, "resource can't be found in the database or has been removed")
 
 // Error default error response.
 type Error struct {
@@ -30,25 +33,49 @@ type Error struct {
 	Description string      `json:"description"`
 }
 
-func WithError(c *fiber.Ctx, err error, code int, message string) error {
-	return JSON(c.Status(code), Error{
-		Title:       http.StatusText(code),
-		Description: message,
-		Details:     util.ErrDetail(c, err),
-	})
+var _ error = HTTPError{}
+
+type HTTPError struct {
+	Msg  string
+	Code int
 }
 
-func HTTPError(c *fiber.Ctx, code int, message string) error {
+func NewError(code int, message string) error {
+	return HTTPError{Code: code, Msg: message}
+}
+
+func (e HTTPError) Error() string {
+	return strconv.Itoa(e.Code) + ": " + e.Msg
+}
+
+func FromError(c *fiber.Ctx, err error, code int, message string) error {
 	return JSON(c.Status(code), Error{
-		Title:       http.StatusText(code),
+		Title:       utils.StatusMessage(code),
 		Description: message,
+		Details:     util.DetailWithErr(c, err),
 	})
 }
 
 func InternalError(c *fiber.Ctx, err error, message string) error {
-	return JSON(c.Status(code.InternalServerError), Error{
+	return JSON(c.Status(http.StatusInternalServerError), Error{
 		Title:       "Internal Server Error",
 		Description: message,
-		Details:     err.Error(),
+		Details:     util.DetailWithErr(c, err),
 	})
+}
+
+func BadRequest(message string) error {
+	return NewError(http.StatusBadRequest, message)
+}
+
+func NotFound(message string) error {
+	return NewError(http.StatusNotFound, message)
+}
+
+func Unauthorized(message string) error {
+	return NewError(http.StatusUnauthorized, message)
+}
+
+func Forbidden(message string) error {
+	return NewError(http.StatusForbidden, message)
 }

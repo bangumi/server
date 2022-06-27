@@ -17,7 +17,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -29,10 +28,9 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -51,10 +49,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	if r.Redirect != 0 {
@@ -62,10 +57,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	}
 
 	if r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return c.JSON(r)
@@ -75,7 +67,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 // return data, database record existence and error.
 func (h Handler) getSubjectWithCache(
 	ctx context.Context,
-	id model.SubjectIDType,
+	id model.SubjectID,
 ) (res.SubjectV0, bool, error) {
 	var key = cachekey.Subject(id)
 
@@ -96,7 +88,7 @@ func (h Handler) getSubjectWithCache(
 			return res.SubjectV0{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "repo.subject.Set")
+		return r, ok, errgo.Wrap(err, "SubjectService.Get")
 	}
 
 	r = convertModelSubject(s)
@@ -116,7 +108,7 @@ func platformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
 	if !ok && s.TypeID != 0 {
 		logger.Warn("unknown platform",
-			zap.Uint32("subject_id", s.ID),
+			log.SubjectID(s.ID),
 			zap.Uint8("type", s.TypeID),
 			zap.Uint16("platform", s.PlatformID),
 		)
@@ -134,7 +126,7 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+c.Params("id"))
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -143,15 +135,12 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
-	l, ok := res.SelectSubjectImageURL(r.Image, c.Query("type"))
+	l, ok := r.Image.Select(c.Query("type"))
 	if !ok {
-		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+		return res.BadRequest("bad image type: " + c.Query("type"))
 	}
 
 	if l == "" {
@@ -166,7 +155,7 @@ func (h Handler) GetSubjectTopics(c *fiber.Ctx) error {
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, err.Error())
+		return res.BadRequest(err.Error())
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -175,13 +164,10 @@ func (h Handler) GetSubjectTopics(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
-	return h.listTopics(c, domain.TopicTypeSubject, id)
+	return h.listTopics(c, domain.TopicTypeSubject, uint32(id))
 }
 
 func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
@@ -207,24 +193,18 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
 }
 
-func getExpectSubjectID(c *fiber.Ctx, topic model.Topic) (model.SubjectIDType, error) {
+func getExpectSubjectID(c *fiber.Ctx, topic model.Topic) (model.SubjectID, error) {
 	subjectID, err := parseSubjectID(c.Params("id"))
 	if err != nil || subjectID == 0 {
-		subjectID = topic.ObjectID
-	} else if subjectID != topic.ObjectID {
-		return subjectID, c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		subjectID = model.SubjectID(topic.ObjectID)
+	} else if subjectID != model.SubjectID(topic.ObjectID) {
+		return model.SubjectID(0), res.ErrNotFound
 	}
 	return subjectID, nil
 }
@@ -234,7 +214,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, err.Error())
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -243,10 +223,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	relations, err := h.p.GetSubjectRelated(c.Context(), id)
@@ -272,7 +249,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 func convertModelSubject(s model.Subject) res.SubjectV0 {
 	tags, err := compat.ParseTags(s.CompatRawTags)
 	if err != nil {
-		logger.Warn("failed to parse tags", zap.Uint32("subject_id", s.ID))
+		logger.Warn("failed to parse tags", log.SubjectID(s.ID))
 	}
 
 	var date *string
@@ -326,9 +303,9 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := strparse.SubjectID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	id, err := parseSubjectID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -337,10 +314,7 @@ func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.NotFound("subject not found")
 	}
 
 	relations, err := h.s.GetSubjectRelated(c.Context(), id)
@@ -374,9 +348,9 @@ func readableRelation(destSubjectType model.SubjectType, relation uint16) string
 
 func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := strparse.SubjectID(c.Params("id"))
-	if err != nil || id == 0 {
-		return fiber.NewError(http.StatusBadRequest, "bad id: "+strconv.Quote(c.Params("id")))
+	id, err := parseSubjectID(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
 	r, ok, err := h.getSubjectWithCache(c.Context(), id)
@@ -385,27 +359,24 @@ func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return h.getSubjectRelatedCharacters(c, id)
 }
 
-func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID model.SubjectIDType) error {
+func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID model.SubjectID) error {
 	relations, err := h.c.GetSubjectRelated(c.Context(), subjectID)
 	if err != nil {
 		return errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
 	}
 
-	var characterIDs = make([]model.PersonIDType, len(relations))
+	var characterIDs = make([]model.CharacterID, len(relations))
 	for i, rel := range relations {
 		characterIDs[i] = rel.Character.ID
 	}
 
-	var actors map[model.CharacterIDType][]model.Person
+	var actors map[model.CharacterID][]model.Person
 	if len(characterIDs) != 0 {
 		actors, err = h.s.GetActors(c.Context(), subjectID, characterIDs...)
 		if err != nil {

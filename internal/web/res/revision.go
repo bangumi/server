@@ -52,16 +52,16 @@ type PersonRevision struct {
 }
 
 type SubjectRevisionData struct {
-	Name         string              `json:"name"`
-	NameCN       string              `json:"name_cn"`
-	VoteField    string              `json:"vote_field"`
-	FieldInfobox string              `json:"field_infobox"`
-	FieldSummary string              `json:"field_summary"`
-	Platform     uint16              `json:"platform"`
-	TypeID       uint16              `json:"type_id"`
-	SubjectID    model.SubjectIDType `json:"subject_id"`
-	FieldEps     uint32              `json:"field_eps"`
-	Type         uint8               `json:"type"`
+	Name         string          `json:"name"`
+	NameCN       string          `json:"name_cn"`
+	VoteField    string          `json:"vote_field"`
+	FieldInfobox string          `json:"field_infobox"`
+	FieldSummary string          `json:"field_summary"`
+	Platform     uint16          `json:"platform"`
+	TypeID       uint16          `json:"type_id"`
+	SubjectID    model.SubjectID `json:"subject_id"`
+	FieldEps     uint32          `json:"field_eps"`
+	Type         uint8           `json:"type"`
 }
 
 type SubjectRevision struct {

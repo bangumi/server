@@ -16,17 +16,15 @@ package handler
 
 import (
 	"errors"
-	"net/http"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 func (h Handler) ListCollection(c *fiber.Ctx) error {
@@ -38,23 +36,23 @@ func (h Handler) ListCollection(c *fiber.Ctx) error {
 
 	username := c.Params("username")
 	if username == "" {
-		return fiber.NewError(http.StatusBadRequest, "missing require parameters `username`")
+		return res.BadRequest("missing require parameters `username`")
 	}
 
 	subjectType, err := parseSubjectType(c.Query("subject_type"))
 	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, err.Error())
+		return res.BadRequest(err.Error())
 	}
 
 	collectionType, err := parseCollectionType(c.Query("type"))
 	if err != nil {
-		return fiber.NewError(http.StatusBadRequest, "bad query 'type': "+err.Error())
+		return err
 	}
 
 	u, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.NewError(http.StatusNotFound, "user doesn't exist or has been removed")
+			return res.NotFound("user doesn't exist or has been removed")
 		}
 
 		return errgo.Wrap(err, "user.GetByName")
@@ -69,13 +67,13 @@ func (h Handler) listCollection(
 	c *fiber.Ctx,
 	u model.User,
 	subjectType model.SubjectType,
-	collectionType uint8,
+	collectionType model.CollectionType,
 	page pageQuery,
 	showPrivate bool,
 ) error {
-	count, err := h.u.CountCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
+	count, err := h.collect.CountSubjectCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
-		return errgo.Wrap(err, "user.CountCollections")
+		return h.InternalError(c, err, "failed to count user's subject collections", log.UserID(u.ID))
 	}
 
 	if count == 0 {
@@ -86,28 +84,15 @@ func (h Handler) listCollection(
 		return err
 	}
 
-	collections, err := h.u.ListCollections(c.Context(),
+	collections, err := h.collect.ListSubjectCollection(c.Context(),
 		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
-		return errgo.Wrap(err, "user.ListCollections")
+		return h.InternalError(c, err, "failed to list user's subject collections", log.UserID(u.ID))
 	}
 
-	var data = make([]res.Collection, len(collections))
+	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
-		c := res.Collection{
-			SubjectID:   collection.SubjectID,
-			SubjectType: collection.SubjectType,
-			Rate:        collection.Rate,
-			Type:        collection.Type,
-			Tags:        collection.Tags,
-			EpStatus:    collection.EpStatus,
-			VolStatus:   collection.VolStatus,
-			UpdatedAt:   collection.UpdatedAt,
-			Private:     collection.Private,
-			Comment:     nilString(collection.Comment),
-		}
-
-		data[i] = c
+		data[i] = convertModelSubjectCollection(collection)
 	}
 
 	return c.JSON(res.Paged{
@@ -118,28 +103,10 @@ func (h Handler) listCollection(
 	})
 }
 
-func parseCollectionType(s string) (uint8, error) {
-	if s == "" {
-		return 0, nil
-	}
-
-	t, err := strparse.Uint8(s)
-	if err != nil {
-		return 0, fiber.NewError(http.StatusBadRequest, "bad collection type: "+strconv.Quote(s))
-	}
-
-	switch t {
-	case 1, 2, 3, 4, 5: //nolint:gomnd
-		return t, nil
-	}
-
-	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+"is not a valid collection type")
-}
-
 func (h Handler) GetCollection(c *fiber.Ctx) error {
 	username := c.Params("username")
 	if username == "" {
-		return res.HTTPError(c, code.BadRequest, "missing require parameters `username`")
+		return res.BadRequest("missing require parameters `username`")
 	}
 
 	subjectID, err := parseSubjectID(c.Params("subject_id"))
@@ -150,35 +117,40 @@ func (h Handler) GetCollection(c *fiber.Ctx) error {
 	return h.getCollection(c, username, subjectID)
 }
 
-func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.SubjectIDType) error {
+func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.SubjectID) error {
 	const notFoundMessage = "subject is not collected by user"
 	v := h.getHTTPAccessor(c)
 
 	u, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return fiber.NewError(code.NotFound, "user doesn't exist or has been removed")
+			return res.NotFound("user doesn't exist or has been removed")
 		}
 
-		return errgo.Wrap(err, "user.GetByName")
+		return h.InternalError(c, err, "failed to get user by name", zap.String("name", username))
 	}
 
 	var showPrivate = u.ID == v.ID
 
-	collection, err := h.u.GetCollection(c.Context(), u.ID, subjectID)
+	collection, err := h.collect.GetSubjectCollection(c.Context(), u.ID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.HTTPError(c, code.NotFound, notFoundMessage)
+			return res.NotFound(notFoundMessage)
 		}
 
-		return errgo.Wrap(err, "user.GetCollection")
+		return h.InternalError(c, err, "failed to get user's subject collection",
+			log.UserID(u.ID), log.SubjectID(subjectID))
 	}
 
 	if !showPrivate && collection.Private {
-		return res.HTTPError(c, code.NotFound, notFoundMessage)
+		return res.NotFound(notFoundMessage)
 	}
 
-	return res.JSON(c, res.Collection{
+	return res.JSON(c, convertModelSubjectCollection(collection))
+}
+
+func convertModelSubjectCollection(collection model.SubjectCollection) res.SubjectCollection {
+	return res.SubjectCollection{
 		SubjectID:   collection.SubjectID,
 		SubjectType: collection.SubjectType,
 		Rate:        collection.Rate,
@@ -189,5 +161,5 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 		UpdatedAt:   collection.UpdatedAt,
 		Private:     collection.Private,
 		Comment:     nilString(collection.Comment),
-	})
+	}
 }

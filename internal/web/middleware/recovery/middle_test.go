@@ -15,6 +15,7 @@
 package recovery_test
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -37,9 +38,9 @@ func TestPanicMiddleware(t *testing.T) {
 	req := httptest.NewRequest("GET", "/", nil)
 
 	resp, err := app.Test(req)
-
 	require.Nil(t, err, "panic should be caught")
+	defer resp.Body.Close()
 
-	require.Equal(t, fiber.StatusInternalServerError,
+	require.Equal(t, http.StatusInternalServerError,
 		resp.StatusCode, "middleware should catch internal error")
 }

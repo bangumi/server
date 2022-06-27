@@ -21,27 +21,27 @@ import (
 )
 
 type RevisionRepo interface {
-	CountPersonRelated(ctx context.Context, personID model.PersonIDType) (int64, error)
+	CountPersonRelated(ctx context.Context, personID model.PersonID) (int64, error)
 
 	ListPersonRelated(
-		ctx context.Context, personID model.PersonIDType, limit int, offset int,
+		ctx context.Context, personID model.PersonID, limit int, offset int,
 	) ([]model.PersonRevision, error)
 
-	GetPersonRelated(ctx context.Context, id model.UIDType) (model.PersonRevision, error)
+	GetPersonRelated(ctx context.Context, id model.RevisionID) (model.PersonRevision, error)
 
-	CountSubjectRelated(ctx context.Context, id model.SubjectIDType) (int64, error)
+	CountSubjectRelated(ctx context.Context, id model.SubjectID) (int64, error)
 
 	ListSubjectRelated(
-		ctx context.Context, id model.SubjectIDType, limit int, offset int,
+		ctx context.Context, id model.SubjectID, limit int, offset int,
 	) ([]model.SubjectRevision, error)
 
-	GetSubjectRelated(ctx context.Context, id model.UIDType) (model.SubjectRevision, error)
+	GetSubjectRelated(ctx context.Context, id model.RevisionID) (model.SubjectRevision, error)
 
-	CountCharacterRelated(ctx context.Context, characterID model.CharacterIDType) (int64, error)
+	CountCharacterRelated(ctx context.Context, characterID model.CharacterID) (int64, error)
 
 	ListCharacterRelated(
-		ctx context.Context, characterID model.CharacterIDType, limit int, offset int,
+		ctx context.Context, characterID model.CharacterID, limit int, offset int,
 	) ([]model.CharacterRevision, error)
 
-	GetCharacterRelated(ctx context.Context, id model.UIDType) (model.CharacterRevision, error)
+	GetCharacterRelated(ctx context.Context, id model.RevisionID) (model.CharacterRevision, error)
 }

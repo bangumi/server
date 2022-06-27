@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -30,7 +32,7 @@ func newRevisionHistory(db *gorm.DB) revisionHistory {
 	_revisionHistory.Mid = field.NewUint32(tableName, "rev_mid")
 	_revisionHistory.TextID = field.NewUint32(tableName, "rev_text_id")
 	_revisionHistory.CreatedAt = field.NewUint32(tableName, "rev_dateline")
-	_revisionHistory.CreatorID = field.NewUint32(tableName, "rev_creator")
+	_revisionHistory.CreatorID = field.NewField(tableName, "rev_creator")
 	_revisionHistory.Summary = field.NewString(tableName, "rev_edit_summary")
 
 	_revisionHistory.fillFieldMap()
@@ -47,7 +49,7 @@ type revisionHistory struct {
 	Mid       field.Uint32
 	TextID    field.Uint32
 	CreatedAt field.Uint32
-	CreatorID field.Uint32
+	CreatorID field.Field
 	Summary   field.String
 
 	fieldMap map[string]field.Expr
@@ -70,7 +72,7 @@ func (r *revisionHistory) updateTableName(table string) *revisionHistory {
 	r.Mid = field.NewUint32(table, "rev_mid")
 	r.TextID = field.NewUint32(table, "rev_text_id")
 	r.CreatedAt = field.NewUint32(table, "rev_dateline")
-	r.CreatorID = field.NewUint32(table, "rev_creator")
+	r.CreatorID = field.NewField(table, "rev_creator")
 	r.Summary = field.NewString(table, "rev_edit_summary")
 
 	r.fillFieldMap()
@@ -119,6 +121,14 @@ func (r revisionHistoryDo) Debug() *revisionHistoryDo {
 
 func (r revisionHistoryDo) WithContext(ctx context.Context) *revisionHistoryDo {
 	return r.withDO(r.DO.WithContext(ctx))
+}
+
+func (r revisionHistoryDo) ReadDB(ctx context.Context) *revisionHistoryDo {
+	return r.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (r revisionHistoryDo) WriteDB(ctx context.Context) *revisionHistoryDo {
+	return r.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (r revisionHistoryDo) Clauses(conds ...clause.Expression) *revisionHistoryDo {

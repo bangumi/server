@@ -20,14 +20,18 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-func UserID(id model.UIDType) zap.Field {
-	return zap.Uint32("user_id", id)
+func UserID(id model.UserID) zap.Field {
+	return zap.Uint32("user_id", uint32(id))
+}
+
+func UserGroup(id model.UserGroupID) zap.Field {
+	return zap.Uint8("user_group_id", id)
+}
+
+func SubjectID(id model.SubjectID) zap.Field {
+	return zap.Uint32("subject_id", uint32(id))
 }
 
 func GroupID(id model.GroupID) zap.Field {
-	return zap.Uint8("group_id", id)
-}
-
-func SubjectID(id model.SubjectIDType) zap.Field {
-	return zap.Uint32("subject_id", id)
+	return zap.Uint16("group_id", uint16(id))
 }

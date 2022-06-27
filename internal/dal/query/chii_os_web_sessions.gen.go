@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -26,7 +28,7 @@ func newWebSession(db *gorm.DB) webSession {
 	tableName := _webSession.webSessionDo.TableName()
 	_webSession.ALL = field.NewField(tableName, "*")
 	_webSession.Key = field.NewString(tableName, "key")
-	_webSession.UserID = field.NewUint32(tableName, "user_id")
+	_webSession.UserID = field.NewField(tableName, "user_id")
 	_webSession.Value = field.NewField(tableName, "value")
 	_webSession.CreatedAt = field.NewInt64(tableName, "created_at")
 	_webSession.ExpiredAt = field.NewInt64(tableName, "expired_at")
@@ -41,7 +43,7 @@ type webSession struct {
 
 	ALL       field.Field
 	Key       field.String
-	UserID    field.Uint32
+	UserID    field.Field
 	Value     field.Field
 	CreatedAt field.Int64
 	ExpiredAt field.Int64
@@ -62,7 +64,7 @@ func (w webSession) As(alias string) *webSession {
 func (w *webSession) updateTableName(table string) *webSession {
 	w.ALL = field.NewField(table, "*")
 	w.Key = field.NewString(table, "key")
-	w.UserID = field.NewUint32(table, "user_id")
+	w.UserID = field.NewField(table, "user_id")
 	w.Value = field.NewField(table, "value")
 	w.CreatedAt = field.NewInt64(table, "created_at")
 	w.ExpiredAt = field.NewInt64(table, "expired_at")
@@ -111,6 +113,14 @@ func (w webSessionDo) Debug() *webSessionDo {
 
 func (w webSessionDo) WithContext(ctx context.Context) *webSessionDo {
 	return w.withDO(w.DO.WithContext(ctx))
+}
+
+func (w webSessionDo) ReadDB(ctx context.Context) *webSessionDo {
+	return w.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (w webSessionDo) WriteDB(ctx context.Context) *webSessionDo {
+	return w.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (w webSessionDo) Clauses(conds ...clause.Expression) *webSessionDo {

@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gookit/goutil/timex"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
@@ -28,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/test"
 )
 
@@ -58,7 +58,7 @@ func TestMysqlRepo_GetByToken(t *testing.T) {
 	u, err := repo.GetByToken(context.Background(), "a_development_access_token")
 	require.NoError(t, err)
 
-	require.Equal(t, uint32(382951), u.ID)
+	require.EqualValues(t, 382951, u.ID)
 }
 
 func TestMysqlRepo_GetByToken_expired(t *testing.T) {
@@ -92,10 +92,12 @@ func TestMysqlRepo_DeleteAccessToken(t *testing.T) {
 
 	const id = 100
 	repo, q := getRepo(t)
-	t.Cleanup(func() {
+
+	cleanup := func() {
 		_, err := q.AccessToken.WithContext(context.TODO()).Where(q.AccessToken.ID.Eq(id)).Delete()
 		require.NoError(t, err)
-	})
+	}
+	t.Cleanup(cleanup)
 
 	err := q.AccessToken.WithContext(context.Background()).Create(&dao.AccessToken{
 		ID:          id,
@@ -112,7 +114,6 @@ func TestMysqlRepo_DeleteAccessToken(t *testing.T) {
 	ok, err := repo.DeleteAccessToken(context.Background(), id)
 	require.NoError(t, err)
 	require.True(t, ok)
-
 }
 
 func TestMysqlRepo_ListAccessToken(t *testing.T) {
@@ -121,14 +122,13 @@ func TestMysqlRepo_ListAccessToken(t *testing.T) {
 
 	repo, q := getRepo(t)
 
-	t.Cleanup(func() {
+	test.RunAndCleanup(t, func() {
 		_, err := q.AccessToken.WithContext(context.TODO()).Where(q.AccessToken.UserID.Eq("3")).Delete()
 		require.NoError(t, err)
 	})
 
-	for i := 101; i < 105; i++ {
+	for i := 1; i < 5; i++ {
 		err := q.AccessToken.WithContext(context.Background()).Create(&dao.AccessToken{
-			ID:          uint32(i),
 			Type:        auth.TokenTypeAccessToken,
 			AccessToken: t.Name() + strconv.Itoa(i),
 			ClientID:    "access token",
@@ -143,5 +143,4 @@ func TestMysqlRepo_ListAccessToken(t *testing.T) {
 	tokens, err := repo.ListAccessToken(context.Background(), 3)
 	require.NoError(t, err)
 	require.Len(t, tokens, 4)
-
 }

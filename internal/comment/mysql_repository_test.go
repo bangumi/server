@@ -44,7 +44,7 @@ func TestGet(t *testing.T) {
 
 	s, err := repo.Get(context.Background(), domain.CommentIndex, 1038)
 	require.NoError(t, err)
-	require.Equal(t, model.CommentIDType(1038), s.ID)
+	require.Equal(t, model.CommentID(1038), s.ID)
 
 	_, err = repo.Get(context.Background(), domain.CommentIndex, 1)
 	require.Error(t, err)

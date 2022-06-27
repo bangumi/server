@@ -19,13 +19,13 @@ import (
 	"errors"
 	"time"
 
-	"github.com/gookit/goutil/timex"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/random"
 )
 
@@ -38,7 +38,7 @@ type Manager interface {
 	Create(ctx context.Context, a domain.Auth) (string, Session, error)
 	Get(ctx context.Context, key string) (Session, error)
 	Revoke(ctx context.Context, key string) error
-	RevokeUser(ctx context.Context, id model.UIDType) error
+	RevokeUser(ctx context.Context, id model.UserID) error
 }
 
 func New(c cache.Generic, repo Repo, log *zap.Logger) Manager {
@@ -83,7 +83,7 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 
 	ok, err := m.cache.Get(ctx, keyPrefix+key, &s)
 	if err != nil {
-		return Session{}, errgo.Wrap(err, "redis.Set")
+		return Session{}, errgo.Wrap(err, "redis.Get")
 	}
 	if ok {
 		return s, nil
@@ -121,7 +121,7 @@ func (m manager) Revoke(ctx context.Context, key string) error {
 	return errgo.Wrap(err, "redisCache.Del")
 }
 
-func (m manager) RevokeUser(ctx context.Context, id model.UIDType) error {
+func (m manager) RevokeUser(ctx context.Context, id model.UserID) error {
 	keys, err := m.repo.RevokeUser(ctx, id)
 	if err != nil {
 		return errgo.Wrap(err, "repo.Revoke")

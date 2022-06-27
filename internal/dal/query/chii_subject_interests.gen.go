@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -26,8 +28,8 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 	tableName := _subjectCollection.subjectCollectionDo.TableName()
 	_subjectCollection.ALL = field.NewField(tableName, "*")
 	_subjectCollection.ID = field.NewUint32(tableName, "interest_id")
-	_subjectCollection.UID = field.NewUint32(tableName, "interest_uid")
-	_subjectCollection.SubjectID = field.NewUint32(tableName, "interest_subject_id")
+	_subjectCollection.UserID = field.NewField(tableName, "interest_uid")
+	_subjectCollection.SubjectID = field.NewField(tableName, "interest_subject_id")
 	_subjectCollection.SubjectType = field.NewUint8(tableName, "interest_subject_type")
 	_subjectCollection.Rate = field.NewUint8(tableName, "interest_rate")
 	_subjectCollection.Type = field.NewUint8(tableName, "interest_type")
@@ -41,7 +43,7 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 	_subjectCollection.CollectDateline = field.NewUint32(tableName, "interest_collect_dateline")
 	_subjectCollection.OnHoldDateline = field.NewUint32(tableName, "interest_on_hold_dateline")
 	_subjectCollection.DroppedDateline = field.NewUint32(tableName, "interest_dropped_dateline")
-	_subjectCollection.Lasttouch = field.NewUint32(tableName, "interest_lasttouch")
+	_subjectCollection.UpdatedAt = field.NewUint32(tableName, "interest_lasttouch")
 	_subjectCollection.Private = field.NewUint8(tableName, "interest_private")
 
 	_subjectCollection.fillFieldMap()
@@ -54,8 +56,8 @@ type subjectCollection struct {
 
 	ALL             field.Field
 	ID              field.Uint32
-	UID             field.Uint32
-	SubjectID       field.Uint32
+	UserID          field.Field
+	SubjectID       field.Field
 	SubjectType     field.Uint8
 	Rate            field.Uint8
 	Type            field.Uint8
@@ -69,7 +71,7 @@ type subjectCollection struct {
 	CollectDateline field.Uint32
 	OnHoldDateline  field.Uint32
 	DroppedDateline field.Uint32
-	Lasttouch       field.Uint32
+	UpdatedAt       field.Uint32
 	Private         field.Uint8
 
 	fieldMap map[string]field.Expr
@@ -88,8 +90,8 @@ func (s subjectCollection) As(alias string) *subjectCollection {
 func (s *subjectCollection) updateTableName(table string) *subjectCollection {
 	s.ALL = field.NewField(table, "*")
 	s.ID = field.NewUint32(table, "interest_id")
-	s.UID = field.NewUint32(table, "interest_uid")
-	s.SubjectID = field.NewUint32(table, "interest_subject_id")
+	s.UserID = field.NewField(table, "interest_uid")
+	s.SubjectID = field.NewField(table, "interest_subject_id")
 	s.SubjectType = field.NewUint8(table, "interest_subject_type")
 	s.Rate = field.NewUint8(table, "interest_rate")
 	s.Type = field.NewUint8(table, "interest_type")
@@ -103,7 +105,7 @@ func (s *subjectCollection) updateTableName(table string) *subjectCollection {
 	s.CollectDateline = field.NewUint32(table, "interest_collect_dateline")
 	s.OnHoldDateline = field.NewUint32(table, "interest_on_hold_dateline")
 	s.DroppedDateline = field.NewUint32(table, "interest_dropped_dateline")
-	s.Lasttouch = field.NewUint32(table, "interest_lasttouch")
+	s.UpdatedAt = field.NewUint32(table, "interest_lasttouch")
 	s.Private = field.NewUint8(table, "interest_private")
 
 	s.fillFieldMap()
@@ -131,7 +133,7 @@ func (s *subjectCollection) GetFieldByName(fieldName string) (field.OrderExpr, b
 func (s *subjectCollection) fillFieldMap() {
 	s.fieldMap = make(map[string]field.Expr, 18)
 	s.fieldMap["interest_id"] = s.ID
-	s.fieldMap["interest_uid"] = s.UID
+	s.fieldMap["interest_uid"] = s.UserID
 	s.fieldMap["interest_subject_id"] = s.SubjectID
 	s.fieldMap["interest_subject_type"] = s.SubjectType
 	s.fieldMap["interest_rate"] = s.Rate
@@ -146,7 +148,7 @@ func (s *subjectCollection) fillFieldMap() {
 	s.fieldMap["interest_collect_dateline"] = s.CollectDateline
 	s.fieldMap["interest_on_hold_dateline"] = s.OnHoldDateline
 	s.fieldMap["interest_dropped_dateline"] = s.DroppedDateline
-	s.fieldMap["interest_lasttouch"] = s.Lasttouch
+	s.fieldMap["interest_lasttouch"] = s.UpdatedAt
 	s.fieldMap["interest_private"] = s.Private
 }
 
@@ -163,6 +165,14 @@ func (s subjectCollectionDo) Debug() *subjectCollectionDo {
 
 func (s subjectCollectionDo) WithContext(ctx context.Context) *subjectCollectionDo {
 	return s.withDO(s.DO.WithContext(ctx))
+}
+
+func (s subjectCollectionDo) ReadDB(ctx context.Context) *subjectCollectionDo {
+	return s.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (s subjectCollectionDo) WriteDB(ctx context.Context) *subjectCollectionDo {
+	return s.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (s subjectCollectionDo) Clauses(conds ...clause.Expression) *subjectCollectionDo {

@@ -22,14 +22,13 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gookit/goutil/timex"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -58,13 +57,13 @@ func TestHandler_PrivateLogin(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Post("/p/login").Header(fiber.HeaderOrigin, config.FrontendOrigin).JSON(fiber.Map{
+	resp := test.New(t).Post("/p/login").JSON(fiber.Map{
 		"email":              "a@example.com",
 		"password":           "p",
 		"h-captcha-response": "req",
-	}).Execute(app, -1)
+	}).Execute(app, 3000)
 
-	require.Equal(t, fiber.StatusOK, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
 
 	_, ok := resp.Header[fiber.HeaderSetCookie]
 	require.True(t, ok, "response should set cookies")
@@ -76,9 +75,9 @@ func TestHandler_PrivateLogin_content_type(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{})
 
-	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").Execute(app, -1)
+	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").Execute(app)
 
-	require.Equal(t, fiber.StatusBadRequest, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
 }
 
 func TestHandler_PrivateLogout(t *testing.T) {
@@ -94,10 +93,9 @@ func TestHandler_PrivateLogout(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{SessionManager: mockCaptcha})
 
-	resp := test.New(t).Post("/p/logout").Cookie(session.Key, "req").
-		Header(fiber.HeaderOrigin, config.FrontendOrigin).Execute(app, -1)
+	resp := test.New(t).Post("/p/logout").Cookie(session.Key, "req").Execute(app)
 
-	require.Equal(t, fiber.StatusNoContent, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusNoContent, resp.StatusCode, resp.BodyString())
 
 	var found bool
 	for _, cookie := range resp.Cookies() {

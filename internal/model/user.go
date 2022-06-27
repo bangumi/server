@@ -25,8 +25,8 @@ type User struct {
 	Avatar           string
 	Sign             string
 	UserName         string
-	ID               uint32
-	UserGroup        GroupID
+	ID               UserID
+	UserGroup        UserGroupID
 }
 
 const (
@@ -38,15 +38,15 @@ const (
 	CollectPrivacyBan = 2
 )
 
-type Collection struct {
+type SubjectCollection struct {
 	UpdatedAt   time.Time
 	Comment     string
 	Tags        []string
 	VolStatus   uint32
 	EpStatus    uint32
-	SubjectID   SubjectIDType
+	SubjectID   SubjectID
 	SubjectType uint8
 	Rate        uint8
-	Type        uint8
+	Type        CollectionType
 	Private     bool
 }

@@ -15,17 +15,17 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/utils"
-	"github.com/gookit/goutil/timex"
 	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/middleware/origin"
@@ -33,13 +33,12 @@ import (
 	"github.com/bangumi/server/internal/web/middleware/ua"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 	"github.com/bangumi/server/internal/web/util"
 )
 
 // ResistRouter add all router and default 404 Handler to app.
 //nolint:funlen
-func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
+func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope tally.Scope) {
 	app.Use(ua.DisableDefaultHTTPLibrary)
 
 	// add logger wrapper and metrics counter
@@ -54,11 +53,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 		}
 	}
 
-	v0 := app.Group("/v0/", cors.New(cors.Config{
-		AllowMethods: fiber.MethodGet,
-		AllowHeaders: fiber.HeaderAuthorization,
-		MaxAge:       timex.OneHourSec,
-	}), h.AccessTokenAuthMiddleware)
+	v0 := app.Group("/v0/", h.AccessTokenAuthMiddleware)
 
 	v0.Get("/subjects/:id", addMetrics(h.GetSubject))
 	v0.Get("/subjects/:id/image", addMetrics(h.GetSubjectImage))
@@ -82,6 +77,7 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	v0.Get("/users/:username/collections", addMetrics(h.ListCollection))
 	v0.Get("/users/:username/collections/:subject_id", addMetrics(h.GetCollection))
 	v0.Get("/users/:username", addMetrics(h.GetUser))
+	v0.Get("/users/:username/avatar", addMetrics(h.GetUserAvatar))
 
 	v0.Get("/indices/:id", addMetrics(h.GetIndex))
 	v0.Get("/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
@@ -95,13 +91,22 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
 
+	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.FrontendDomain))
+	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.FrontendDomain))
+
+	var CORSBlockMiddleware []fiber.Handler
+	if c.FrontendDomain != "" {
+		CORSBlockMiddleware = []fiber.Handler{originMiddleware, refererMiddleware}
+	}
+
 	// frontend private api
-	private := app.Group("/p/",
-		origin.New(config.FrontendOrigin), referer.New(config.FrontendOrigin+"/"), h.SessionAuthMiddleware)
+	private := app.Group("/p/", append(CORSBlockMiddleware, h.SessionAuthMiddleware)...)
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
 	private.Get("/me", addMetrics(h.GetCurrentUser))
+	private.Get("/groups/:name", addMetrics(h.GetGroupProfileByNamePrivate))
+	private.Get("/groups/:name/members", addMetrics(h.ListGroupMembersPrivate))
 
 	private.Get("/subjects/:id/topics", addMetrics(h.GetSubjectTopics))
 	private.Get("/subjects/:id/topics/:topic_id", addMetrics(h.GetSubjectTopic))
@@ -114,7 +119,11 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))
 	private.Delete("/access-tokens", req.JSON, addMetrics(h.DeletePersonalAccessToken))
 
-	privateHTML := app.Group("/demo/", origin.New(config.FrontendOrigin), h.SessionAuthMiddleware)
+	if c.FrontendDomain != "" {
+		CORSBlockMiddleware = []fiber.Handler{originMiddleware}
+	}
+
+	privateHTML := app.Group("/demo/", append(CORSBlockMiddleware, h.SessionAuthMiddleware)...)
 	privateHTML.Get("/login", addMetrics(h.PageLogin))
 	privateHTML.Get("/access-token", addMetrics(h.PageListAccessToken))
 	privateHTML.Get("/access-token/create", addMetrics(h.PageCreateAccessToken))
@@ -127,10 +136,10 @@ func ResistRouter(app *fiber.App, h handler.Handler, scope tally.Scope) {
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {
-		return res.JSON(c.Status(code.NotFound), res.Error{
+		return res.JSON(c.Status(http.StatusNotFound), res.Error{
 			Title:       "Not Found",
-			Description: "This is default response, if you see this response, please check your request path",
-			Details:     util.DetailFromRequest(c),
+			Description: "This is default response, if you see this response, please check your request",
+			Details:     util.Detail(c),
 		})
 	})
 }

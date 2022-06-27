@@ -53,7 +53,7 @@ type service struct {
 	log        *zap.Logger
 }
 
-func (s service) GetByID(ctx context.Context, userID model.UIDType) (domain.Auth, error) {
+func (s service) GetByID(ctx context.Context, userID model.UserID) (domain.Auth, error) {
 	u, err := s.user.GetByID(ctx, userID)
 	if err != nil {
 		return domain.Auth{}, errgo.Wrap(err, "AuthRepo.GetByToken")
@@ -72,7 +72,7 @@ func (s service) GetByID(ctx context.Context, userID model.UIDType) (domain.Auth
 	}, nil
 }
 
-func (s service) GetByIDWithCache(ctx context.Context, userID model.UIDType) (domain.Auth, error) {
+func (s service) GetByIDWithCache(ctx context.Context, userID model.UserID) (domain.Auth, error) {
 	var a domain.Auth
 
 	var cacheKey = cachekey.User(userID)
@@ -125,7 +125,6 @@ func (s service) Login(ctx context.Context, email, password string) (domain.Auth
 	a.Permission = p
 
 	return a, true, nil
-
 }
 
 // GetByTokenWithCache not sure should we cache it in service or let caller cache this.
@@ -196,7 +195,7 @@ func preProcessPassword(s string) [32]byte {
 	return md5Password
 }
 
-func (s service) GetPermission(ctx context.Context, id model.GroupID) (domain.Permission, error) {
+func (s service) GetPermission(ctx context.Context, id model.UserGroupID) (domain.Permission, error) {
 	var p domain.Permission
 	key := strconv.FormatUint(uint64(id), 10)
 	ok, err := s.localCache.Get(ctx, key, &p)
@@ -219,13 +218,13 @@ func (s service) GetPermission(ctx context.Context, id model.GroupID) (domain.Pe
 }
 
 func (s service) CreateAccessToken(
-	ctx context.Context, userID model.UIDType, name string, expiration time.Duration,
+	ctx context.Context, userID model.UserID, name string, expiration time.Duration,
 ) (string, error) {
 	token, err := s.repo.CreateAccessToken(ctx, userID, name, expiration)
 	return token, errgo.Wrap(err, "repo.CreateAccessToken")
 }
 
-func (s service) ListAccessToken(ctx context.Context, userID model.UIDType) ([]domain.AccessToken, error) {
+func (s service) ListAccessToken(ctx context.Context, userID model.UserID) ([]domain.AccessToken, error) {
 	tokens, err := s.repo.ListAccessToken(ctx, userID)
 	return tokens, errgo.Wrap(err, "repo.ListAccessToken")
 }

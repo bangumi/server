@@ -16,7 +16,6 @@ package handler
 
 import (
 	"errors"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -24,16 +23,13 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 )
 
+//nolint:gocyclo
 func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id uint32) (*res.Paged, error) {
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
-		return nil, c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return nil, res.ErrNotFound
 	}
 
 	count, err := h.m.Count(c.Context(), commentType, id)
@@ -52,39 +48,29 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 	comments, err := h.m.List(c.Context(), commentType, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return nil, c.Status(http.StatusNotFound).JSON(res.Error{
-				Title:   "Not Found",
-				Details: util.DetailFromRequest(c),
-			})
+			return nil, res.ErrNotFound
 		}
 		return nil, errgo.Wrap(err, "Comment.GetCommentsByMentionedID")
 	}
 
-	uids := make([]model.UIDType, 0)
-	commentMap := make(map[model.CommentIDType]model.Comment)
+	uids := make([]model.UserID, 0)
+
+	extIDs := make([]model.CommentID, 0)
 	for _, v := range comments {
-		commentMap[v.ID] = v
+		uids = append(uids, v.UID)
+		extIDs = append(extIDs, v.ID)
 	}
 
-	extIDs := make([]model.CommentIDType, 0)
-	for _, v := range comments {
-		if _, ok := commentMap[v.Related]; !ok && v.Related != 0 {
-			extIDs = append(extIDs, v.Related)
-		}
-	}
-
+	commentMap := make(map[model.CommentID]model.Comment)
 	if len(extIDs) != 0 {
 		relatedComments, e := h.m.GetByIDs(c.Context(), commentType, extIDs...)
 		if e != nil {
 			return nil, errgo.Wrap(e, "repo.comments.GetByIDs")
 		}
 		for _, v := range relatedComments {
+			uids = append(uids, v.UID)
 			commentMap[v.ID] = v
 		}
-	}
-
-	for _, v := range commentMap {
-		uids = append(uids, v.UID)
 	}
 
 	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(uids...)...)
@@ -101,7 +87,7 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 }
 
 func convertModelComments(
-	comments []model.Comment, cm map[model.CommentIDType]model.Comment, userMap map[uint32]model.User,
+	comments []model.Comment, cm map[model.CommentID]model.Comment, userMap map[model.UserID]model.User,
 ) []res.Comment {
 	result := make([]res.Comment, len(comments))
 	for k, v := range comments {

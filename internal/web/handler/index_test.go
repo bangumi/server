@@ -18,7 +18,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -48,5 +47,5 @@ func TestHandler_GetIndex_NSFW(t *testing.T) {
 
 	resp := test.New(t).Get("/v0/indices/7").Execute(app)
 
-	require.Equal(t, fiber.StatusNotFound, resp.StatusCode)
+	require.Equal(t, http.StatusNotFound, resp.StatusCode)
 }

@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -35,7 +37,7 @@ func newIndex(db *gorm.DB) index {
 	_index.Stats = field.NewString(tableName, "idx_stats")
 	_index.Dateline = field.NewInt32(tableName, "idx_dateline")
 	_index.Lasttouch = field.NewUint32(tableName, "idx_lasttouch")
-	_index.UID = field.NewUint32(tableName, "idx_uid")
+	_index.CreatorID = field.NewField(tableName, "idx_uid")
 	_index.Ban = field.NewBool(tableName, "idx_ban")
 
 	_index.fillFieldMap()
@@ -57,7 +59,7 @@ type index struct {
 	Stats        field.String
 	Dateline     field.Int32
 	Lasttouch    field.Uint32
-	UID          field.Uint32
+	CreatorID    field.Field
 	Ban          field.Bool
 
 	fieldMap map[string]field.Expr
@@ -85,7 +87,7 @@ func (i *index) updateTableName(table string) *index {
 	i.Stats = field.NewString(table, "idx_stats")
 	i.Dateline = field.NewInt32(table, "idx_dateline")
 	i.Lasttouch = field.NewUint32(table, "idx_lasttouch")
-	i.UID = field.NewUint32(table, "idx_uid")
+	i.CreatorID = field.NewField(table, "idx_uid")
 	i.Ban = field.NewBool(table, "idx_ban")
 
 	i.fillFieldMap()
@@ -120,7 +122,7 @@ func (i *index) fillFieldMap() {
 	i.fieldMap["idx_stats"] = i.Stats
 	i.fieldMap["idx_dateline"] = i.Dateline
 	i.fieldMap["idx_lasttouch"] = i.Lasttouch
-	i.fieldMap["idx_uid"] = i.UID
+	i.fieldMap["idx_uid"] = i.CreatorID
 	i.fieldMap["idx_ban"] = i.Ban
 }
 
@@ -137,6 +139,14 @@ func (i indexDo) Debug() *indexDo {
 
 func (i indexDo) WithContext(ctx context.Context) *indexDo {
 	return i.withDO(i.DO.WithContext(ctx))
+}
+
+func (i indexDo) ReadDB(ctx context.Context) *indexDo {
+	return i.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (i indexDo) WriteDB(ctx context.Context) *indexDo {
+	return i.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (i indexDo) Clauses(conds ...clause.Expression) *indexDo {

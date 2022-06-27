@@ -15,6 +15,7 @@
 package driver
 
 import (
+	"context"
 	"database/sql"
 	"net"
 	"sync"
@@ -54,6 +55,14 @@ func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to create sql connection pool")
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	if err = db.PingContext(ctx); err != nil {
+		return nil, errgo.Wrap(err, "db.PingContext")
+	}
+
 	db.SetMaxOpenConns(c.MySQLMaxConn)
 	// default mysql has 7 hour timeout
 	db.SetConnMaxIdleTime(maxIdleTime)

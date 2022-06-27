@@ -22,7 +22,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/res/code"
 )
 
 func New(referer string) fiber.Handler {
@@ -32,6 +31,6 @@ func New(referer string) fiber.Handler {
 			return c.Next()
 		}
 
-		return res.HTTPError(c, code.BadRequest, "bad referer, cross-site api request is not allowed")
+		return res.BadRequest("bad referer, cross-site api request is not allowed")
 	}
 }

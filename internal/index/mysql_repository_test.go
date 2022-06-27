@@ -44,7 +44,7 @@ func TestMysqlRepo_Get(t *testing.T) {
 	i, err := repo.Get(context.Background(), 15045)
 	require.NoError(t, err)
 
-	require.Equal(t, uint32(15045), i.ID)
-	require.Equal(t, uint32(14127), i.CreatorID)
+	require.EqualValues(t, 15045, i.ID)
+	require.EqualValues(t, 14127, i.CreatorID)
 	require.False(t, i.NSFW)
 }

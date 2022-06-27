@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -44,7 +46,7 @@ func newSubjectField(db *gorm.DB) subjectField {
 	_subjectField.Mon = field.NewInt8(tableName, "field_mon")
 	_subjectField.WeekDay = field.NewInt8(tableName, "field_week_day")
 	_subjectField.Date = field.NewTime(tableName, "field_date")
-	_subjectField.Redirect = field.NewUint32(tableName, "field_redirect")
+	_subjectField.Redirect = field.NewField(tableName, "field_redirect")
 
 	_subjectField.fillFieldMap()
 
@@ -74,7 +76,7 @@ type subjectField struct {
 	Mon      field.Int8
 	WeekDay  field.Int8
 	Date     field.Time
-	Redirect field.Uint32
+	Redirect field.Field
 
 	fieldMap map[string]field.Expr
 }
@@ -110,7 +112,7 @@ func (s *subjectField) updateTableName(table string) *subjectField {
 	s.Mon = field.NewInt8(table, "field_mon")
 	s.WeekDay = field.NewInt8(table, "field_week_day")
 	s.Date = field.NewTime(table, "field_date")
-	s.Redirect = field.NewUint32(table, "field_redirect")
+	s.Redirect = field.NewField(table, "field_redirect")
 
 	s.fillFieldMap()
 
@@ -171,6 +173,14 @@ func (s subjectFieldDo) Debug() *subjectFieldDo {
 
 func (s subjectFieldDo) WithContext(ctx context.Context) *subjectFieldDo {
 	return s.withDO(s.DO.WithContext(ctx))
+}
+
+func (s subjectFieldDo) ReadDB(ctx context.Context) *subjectFieldDo {
+	return s.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (s subjectFieldDo) WriteDB(ctx context.Context) *subjectFieldDo {
+	return s.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (s subjectFieldDo) Clauses(conds ...clause.Expression) *subjectFieldDo {

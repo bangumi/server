@@ -36,13 +36,14 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-var userIDTypeString = reflect.TypeOf(new(model.UIDType)).Elem().Name()
-var personIDTypeString = reflect.TypeOf(new(model.PersonIDType)).Elem().Name()
-var characterIDTypeString = reflect.TypeOf(new(model.CharacterIDType)).Elem().Name()
-var episodeIDTypeString = reflect.TypeOf(new(model.EpisodeIDType)).Elem().Name()
-var subjectIDTypeString = reflect.TypeOf(new(model.SubjectIDType)).Elem().Name()
+var userIDTypeString = "model.UserID"           // reflect.TypeOf(new(model.UserID)).Elem().Name()
+var personIDTypeString = "model.PersonID"       // reflect.TypeOf(new(model.PersonID)).Elem().Name()
+var characterIDTypeString = "model.CharacterID" // reflect.TypeOf(new(model.CharacterID)).Elem().Name()
+var episodeIDTypeString = "model.EpisodeID"     // reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
+var subjectIDTypeString = "model.SubjectID"     // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
+var groupIDTypeString = "model." + reflect.TypeOf(new(model.GroupID)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
-var episodeTypeTypeString = reflect.TypeOf(new(model.EpTypeType)).Elem().Name()
+var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
 // generate code.
 func main() {
@@ -62,6 +63,11 @@ func main() {
 		FieldWithTypeTag: true,
 		// if you need unit tests for query code, set WithUnitTest true
 		// WithUnitTest: true,
+	})
+
+	g.WithImportPkgPath("github.com/bangumi/server/internal/model")
+	g.WithJSONTagNameStrategy(func(_ string) string {
+		return ""
 	})
 
 	// reuse the database connection in Project or create a connection here
@@ -114,22 +120,26 @@ func main() {
 	g.WithDataTypeMap(dataMap)
 
 	modelField := g.GenerateModelAs("chii_memberfields", "MemberField",
-		gen.FieldType("uid", "uint32"),
+		gen.FieldType("uid", userIDTypeString),
 	)
 
 	modelMember := g.GenerateModelAs("chii_members", "Member",
-		gen.FieldType("uid", "uint32"),
+		gen.FieldRename("uid", "ID"),
+		gen.FieldType("uid", userIDTypeString),
+		gen.FieldRename("SIGN", "Sign"),
 		gen.FieldType("regdate", "int64"),
 		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
 		gen.FieldRename("SIGN", "sign"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
-			GORMTag: "foreignKey:UID;references:UID",
+			GORMTag: "foreignKey:uid;references:uid",
 		}))
 
 	g.ApplyBasic(modelMember)
 
-	g.ApplyBasic(g.GenerateModelAs("chii_os_web_sessions", "WebSession"))
+	g.ApplyBasic(g.GenerateModelAs("chii_os_web_sessions", "WebSession",
+		gen.FieldType("user_id", userIDTypeString),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_usergroup", "UserGroup",
 		gen.FieldTrimPrefix("usr_grp_"),
@@ -167,13 +177,18 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_interests", "SubjectCollection",
 		gen.FieldType("interest_subject_type", subjectTypeIDTypeString),
 		gen.FieldType("interest_type", "uint8"),
+		gen.FieldType("interest_uid", userIDTypeString),
+		gen.FieldRename("interest_uid", "UserID"),
+		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
+		gen.FieldRename("interest_lasttouch", "UpdatedAt"),
 		gen.FieldTrimPrefix("interest_")))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
 		gen.FieldTrimPrefix("idx_"),
 		gen.FieldType("idx_id", "uint32"),
-		gen.FieldType("idx_uid", "uint32"),
+		gen.FieldType("idx_uid", userIDTypeString),
+		gen.FieldRename("idx_uid", "CreatorID"),
 		gen.FieldType("idx_collects", "uint32")))
 
 	modelPersonField := g.GenerateModelAs("chii_person_fields", "PersonField",
@@ -189,6 +204,7 @@ func main() {
 
 	modelPerson := g.GenerateModelAs("chii_persons", "Person",
 		gen.FieldTrimPrefix("prsn_"),
+		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("prsn_illustrator", "bool"),
 		gen.FieldType("prsn_writer", "bool"),
 		gen.FieldType("prsn_redirect", personIDTypeString),
@@ -201,7 +217,7 @@ func main() {
 	modelCharacter := g.GenerateModelAs("chii_characters", "Character",
 		gen.FieldTrimPrefix("crt_"),
 		gen.FieldType("crt_id", characterIDTypeString),
-		gen.FieldType("crt_redirect", personIDTypeString),
+		gen.FieldType("crt_redirect", characterIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
 			GORMTag: "foreignKey:crt_id;polymorphic:Owner;polymorphicValue:crt",
 		}),
@@ -244,6 +260,7 @@ func main() {
 		gen.FieldTrimPrefix("ep_"),
 		gen.FieldType("ep_id", episodeIDTypeString),
 		gen.FieldType("ep_type", episodeTypeTypeString),
+		gen.FieldType("ep_subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:ep_subject_id;references:subject_id",
 		}),
@@ -264,6 +281,9 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_revisions", "SubjectRevision",
 		gen.FieldTrimPrefix("rev_"),
 		gen.FieldRename("rev_name_cn", "NameCN"),
+		gen.FieldRename("rev_creator", "CreatorID"),
+		gen.FieldType("rev_creator", userIDTypeString),
+		gen.FieldType("rev_subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:rev_subject_id;references:subject_id",
 		}),
@@ -272,6 +292,9 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_crt_cast_index", "Cast",
 		gen.FieldRename("prsn_id", "PersonID"),
 		gen.FieldRename("crt_id", "CharacterID"),
+		gen.FieldType("crt_id", characterIDTypeString),
+		gen.FieldType("prsn_id", personIDTypeString),
+		gen.FieldType("subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
 			GORMTag: "foreignKey:crt_id;references:crt_id",
 		}),
@@ -286,6 +309,7 @@ func main() {
 	g.ApplyBasic(
 		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
 			gen.FieldRename("crt_id", "CharacterID"),
+			gen.FieldType("crt_id", characterIDTypeString),
 			gen.FieldType("subject_id", subjectIDTypeString),
 			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 			gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
@@ -299,6 +323,7 @@ func main() {
 
 	g.ApplyBasic(g.GenerateModelAs("chii_person_cs_index", "PersonSubjects",
 		gen.FieldRename("prsn_id", "person_id"),
+		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("subject_id", subjectIDTypeString),
 		gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
@@ -327,6 +352,28 @@ func main() {
 		gen.FieldRename("rev_edit_summary", "Summary"),
 		gen.FieldRename("rev_dateline", "CreatedAt"),
 		gen.FieldRename("rev_creator", "CreatorID"),
+		gen.FieldType("rev_creator", userIDTypeString),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_groups", "Group",
+		gen.FieldTrimPrefix("grp_"),
+		gen.FieldType("grp_id", groupIDTypeString),
+		gen.FieldType("grp_creator", userIDTypeString),
+		gen.FieldRename("grp_creator", "CreatorID"),
+		gen.FieldRename("grp_desc", "Description"),
+		gen.FieldRename("grp_builddate", "CreatedAt"),
+		gen.FieldRename("grp_lastpost", "LastPostedAt"),
+		gen.FieldNewTag("grp_lastpost", "doc:always 0"),
+		// gen.FieldIgnore("grp_lastpost", "grp_posts"), // always 0
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_group_members", "GroupMember",
+		gen.FieldTrimPrefix("gmb_"),
+		gen.FieldRename("gmb_uid", "UserID"),
+		gen.FieldType("gmb_uid", userIDTypeString),
+		gen.FieldType("gmb_gid", groupIDTypeString),
+		gen.FieldRename("gmb_gid", "GroupID"),
+		gen.FieldRename("gmb_dateline", "CreatedAt"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_topics", "SubjectTopic",

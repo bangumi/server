@@ -15,8 +15,6 @@
 package res
 
 import (
-	"time"
-
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -26,7 +24,7 @@ type Avatar struct {
 	Small  string `json:"small"`
 }
 
-func (a Avatar) Fill(s string) Avatar {
+func UserAvatar(s string) Avatar {
 	if s == "" {
 		s = "icon.jpg"
 	}
@@ -38,27 +36,27 @@ func (a Avatar) Fill(s string) Avatar {
 	}
 }
 
-type User struct {
-	Avatar    Avatar `json:"avatar"`
-	Sign      string `json:"sign"`
-	URL       string `json:"url"`
-	Username  string `json:"username"`
-	Nickname  string `json:"nickname"`
-	ID        uint32 `json:"id"`
-	UserGroup uint8  `json:"user_group"`
+func (a Avatar) Select(s string) (string, bool) {
+	switch s {
+	case imageSizeLarge:
+		return a.Large, true
+	case imageSizeMedium:
+		return a.Medium, true
+	case imageSizeSmall:
+		return a.Small, true
+	default:
+		return "", false
+	}
 }
 
-type Collection struct {
-	UpdatedAt   time.Time           `json:"updated_at"`
-	Comment     *string             `json:"comment"`
-	Tags        []string            `json:"tags"`
-	SubjectID   model.SubjectIDType `json:"subject_id"`
-	EpStatus    uint32              `json:"ep_status"`
-	VolStatus   uint32              `json:"vol_status"`
-	SubjectType uint8               `json:"subject_type"`
-	Type        uint8               `json:"type"`
-	Rate        uint8               `json:"rate"`
-	Private     bool                `json:"private"`
+type User struct {
+	Avatar    Avatar       `json:"avatar"`
+	Sign      string       `json:"sign"`
+	URL       string       `json:"url"`
+	Username  string       `json:"username"`
+	Nickname  string       `json:"nickname"`
+	ID        model.UserID `json:"id"`
+	UserGroup uint8        `json:"user_group"`
 }
 
 type Creator struct {

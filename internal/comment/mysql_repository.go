@@ -40,7 +40,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CommentRepo, error) {
 }
 
 func (r mysqlRepo) Get(
-	ctx context.Context, commentType domain.CommentType, id model.CommentIDType,
+	ctx context.Context, commentType domain.CommentType, id model.CommentID,
 ) (model.Comment, error) {
 	var (
 		comment interface{}
@@ -76,11 +76,11 @@ func (r mysqlRepo) Get(
 
 //nolint:gocyclo
 func (r mysqlRepo) GetByIDs(
-	ctx context.Context, commentType domain.CommentType, ids ...model.CommentIDType,
-) (map[model.CommentIDType]model.Comment, error) {
+	ctx context.Context, commentType domain.CommentType, ids ...model.CommentID,
+) (map[model.CommentID]model.Comment, error) {
 	var (
 		rawComments interface{}
-		commentMap  = make(map[model.CommentIDType]model.Comment)
+		commentMap  = make(map[model.CommentID]model.Comment)
 		err         error
 	)
 	switch commentType {
@@ -120,11 +120,11 @@ func (r mysqlRepo) GetByIDs(
 
 //nolint:gocyclo
 func (r mysqlRepo) GetByRelateIDs(
-	ctx context.Context, commentType domain.CommentType, ids ...model.CommentIDType,
-) (map[model.CommentIDType][]model.Comment, error) {
+	ctx context.Context, commentType domain.CommentType, ids ...model.CommentID,
+) (map[model.CommentID][]model.Comment, error) {
 	var (
 		rawComments interface{}
-		commentMap  = make(map[model.CommentIDType][]model.Comment)
+		commentMap  = make(map[model.CommentID][]model.Comment)
 		err         error
 	)
 	switch commentType {
@@ -158,7 +158,7 @@ func (r mysqlRepo) GetByRelateIDs(
 	}
 	for _, v := range comments {
 		if m, ok := commentMap[v.ID]; !ok {
-			m = append(m, v)
+			commentMap[v.ID] = append(m, v)
 		} else {
 			commentMap[v.ID] = []model.Comment{v}
 		}
@@ -174,7 +174,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 		return model.Comment{
 			ID:          v.ID,
 			MentionedID: v.MentionedID,
-			UID:         v.UID,
+			UID:         model.UserID(v.UID),
 			Related:     v.Related,
 			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
@@ -183,7 +183,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 		return model.Comment{
 			ID:          v.ID,
 			MentionedID: v.MentionedID,
-			UID:         v.UID,
+			UID:         model.UserID(v.UID),
 			Related:     v.Related,
 			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
@@ -192,7 +192,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 		return model.Comment{
 			ID:          v.ID,
 			MentionedID: v.MentionedID,
-			UID:         v.UID,
+			UID:         model.UserID(v.UID),
 			Related:     v.Related,
 			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
@@ -201,7 +201,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 		return model.Comment{
 			ID:          v.ID,
 			MentionedID: v.MentionedID,
-			UID:         v.UID,
+			UID:         model.UserID(v.UID),
 			Related:     v.Related,
 			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
@@ -210,7 +210,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 		return model.Comment{
 			ID:          v.ID,
 			MentionedID: v.MentionedID,
-			UID:         v.UID,
+			UID:         model.UserID(v.UID),
 			Related:     v.Related,
 			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
@@ -219,7 +219,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 		return model.Comment{
 			ID:          v.ID,
 			MentionedID: v.MentionedID,
-			UID:         v.UID,
+			UID:         model.UserID(v.UID),
 			Related:     v.Related,
 			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
 			Content:     v.Content,
@@ -236,21 +236,28 @@ func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id
 	)
 	switch commentType {
 	case domain.CommentTypeGroupTopic:
-		count, err = r.q.GroupTopicComment.WithContext(ctx).Where(r.q.GroupTopicComment.MentionedID.Eq(id)).Count()
+		count, err = r.q.GroupTopicComment.WithContext(ctx).
+			Where(r.q.GroupTopicComment.Related.Eq(0)).
+			Where(r.q.GroupTopicComment.MentionedID.Eq(id)).Count()
 	case domain.CommentTypeSubjectTopic:
 		count, err = r.q.SubjectTopicComment.WithContext(ctx).
+			Where(r.q.SubjectTopicComment.Related.Eq(0)).
 			Where(r.q.SubjectTopicComment.MentionedID.Eq(id)).Count()
 	case domain.CommentIndex:
 		count, err = r.q.IndexComment.WithContext(ctx).
+			Where(r.q.IndexComment.Related.Eq(0)).
 			Where(r.q.IndexComment.MentionedID.Eq(id)).Count()
 	case domain.CommentCharacter:
 		count, err = r.q.CharacterComment.WithContext(ctx).
+			Where(r.q.CharacterComment.Related.Eq(0)).
 			Where(r.q.CharacterComment.MentionedID.Eq(id)).Count()
 	case domain.CommentPerson:
 		count, err = r.q.CharacterComment.WithContext(ctx).
+			Where(r.q.CharacterComment.Related.Eq(0)).
 			Where(r.q.CharacterComment.MentionedID.Eq(id)).Count()
 	case domain.CommentEpisode:
 		count, err = r.q.EpisodeComment.WithContext(ctx).
+			Where(r.q.EpisodeComment.Related.Eq(0)).
 			Where(r.q.EpisodeComment.MentionedID.Eq(id)).Count()
 	default:
 		return 0, errUnsupportCommentType

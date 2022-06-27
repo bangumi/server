@@ -26,9 +26,8 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strutil"
+	"github.com/bangumi/server/internal/model/generic"
 )
 
 func NewUserRepo(q *query.Query, log *zap.Logger) (domain.UserRepo, error) {
@@ -40,115 +39,8 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (m mysqlRepo) CountCollections(
-	ctx context.Context,
-	userID model.UIDType,
-	subjectType model.SubjectType,
-	collectionType uint8,
-	showPrivate bool,
-) (int64, error) {
-	q := m.q.SubjectCollection.WithContext(ctx).
-		Where(m.q.SubjectCollection.UID.Eq(userID))
-
-	if subjectType != 0 {
-		q = q.Where(m.q.SubjectCollection.SubjectType.Eq(subjectType))
-	}
-
-	if collectionType != 0 {
-		q = q.Where(m.q.SubjectCollection.Type.Eq(collectionType))
-	}
-
-	if !showPrivate {
-		q = q.Where(m.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
-	}
-
-	c, err := q.Count()
-	if err != nil {
-		return 0, errgo.Wrap(err, "dal")
-	}
-
-	return c, nil
-}
-
-func (m mysqlRepo) ListCollections(
-	ctx context.Context,
-	userID model.UIDType,
-	subjectType model.SubjectType,
-	collectionType uint8,
-	showPrivate bool,
-	limit, offset int,
-) ([]model.Collection, error) {
-	q := m.q.SubjectCollection.WithContext(ctx).
-		Order(m.q.SubjectCollection.Lasttouch.Desc()).
-		Where(m.q.SubjectCollection.UID.Eq(userID)).Limit(limit).Offset(offset)
-
-	if subjectType != 0 {
-		q = q.Where(m.q.SubjectCollection.SubjectType.Eq(subjectType))
-	}
-
-	if collectionType != 0 {
-		q = q.Where(m.q.SubjectCollection.Type.Eq(collectionType))
-	}
-
-	if !showPrivate {
-		q = q.Where(m.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
-	}
-
-	collections, err := q.Find()
-	if err != nil {
-		m.log.Error("unexpected error happened", zap.Error(err))
-		return nil, errgo.Wrap(err, "dal")
-	}
-
-	var results = make([]model.Collection, len(collections))
-	for i, c := range collections {
-		results[i] = model.Collection{
-			UpdatedAt:   time.Unix(int64(c.Lasttouch), 0),
-			Comment:     c.Comment,
-			Tags:        strutil.Split(c.Tag, " "),
-			SubjectType: c.SubjectType,
-			Rate:        c.Rate,
-			SubjectID:   c.SubjectID,
-			EpStatus:    c.EpStatus,
-			VolStatus:   c.VolStatus,
-			Type:        c.Type,
-			Private:     c.Private != model.CollectPrivacyNone,
-		}
-	}
-
-	return results, nil
-}
-
-func (m mysqlRepo) GetCollection(
-	ctx context.Context, userID model.UIDType, subjectID model.SubjectIDType,
-) (model.Collection, error) {
-	c, err := m.q.SubjectCollection.WithContext(ctx).
-		Where(m.q.SubjectCollection.UID.Eq(userID), m.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Collection{}, domain.ErrNotFound
-		}
-
-		m.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
-		return model.Collection{}, errgo.Wrap(err, "dal")
-	}
-
-	return model.Collection{
-		UpdatedAt:   time.Unix(int64(c.Lasttouch), 0),
-		Comment:     c.Comment,
-		Tags:        strutil.Split(c.Tag, " "),
-		SubjectType: c.SubjectType,
-		Rate:        c.Rate,
-		SubjectID:   c.SubjectID,
-		EpStatus:    c.EpStatus,
-		VolStatus:   c.VolStatus,
-		Type:        c.Type,
-		Private:     c.Private != model.CollectPrivacyNone,
-	}, nil
-}
-
-func (m mysqlRepo) GetByID(ctx context.Context, userID model.UIDType) (model.User, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.UID.Eq(userID)).First()
+func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (model.User, error) {
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(userID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.User{}, domain.ErrNotFound
@@ -175,17 +67,17 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (model.User, 
 	return fromDao(u), nil
 }
 
-func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...model.UIDType) (map[model.UIDType]model.User, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.UID.In(ids...)).Find()
+func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error) {
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(generic.UserIDToValuerSlice(ids)...)).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var r = make(map[model.UIDType]model.User, len(ids))
+	var r = make(map[model.UserID]model.User, len(ids))
 
 	for _, member := range u {
-		r[member.UID] = fromDao(member)
+		r[member.ID] = fromDao(member)
 	}
 
 	return r, nil
@@ -198,7 +90,7 @@ func fromDao(m *dao.Member) model.User {
 		UserGroup:        m.Groupid,
 		Avatar:           m.Avatar,
 		Sign:             m.Sign,
-		ID:               m.UID,
+		ID:               m.ID,
 		RegistrationTime: time.Unix(m.Regdate, 0),
 	}
 }

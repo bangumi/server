@@ -52,7 +52,7 @@ func (m mysqlRepo) GetClientByID(ctx context.Context, clientIDs ...string) (map[
 }
 
 func convertFromDao(record *dao.OAuthClient) Client {
-	var userID model.UIDType
+	var userID model.UserID
 	var err error
 	if record.UserID != "" {
 		userID, err = strparse.UserID(record.UserID)

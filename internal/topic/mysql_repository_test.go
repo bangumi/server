@@ -45,7 +45,7 @@ func TestGet(t *testing.T) {
 	s, err := repo.Get(context.Background(), domain.TopicTypeSubject, 1)
 	require.NoError(t, err)
 
-	require.Equal(t, model.TopicIDType(1), s.ID)
+	require.Equal(t, model.TopicID(1), s.ID)
 }
 
 func TestMysqlRepo_Count(t *testing.T) {

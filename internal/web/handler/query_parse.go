@@ -15,23 +15,20 @@
 package handler
 
 import (
-	"net/http"
 	"strconv"
-
-	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/strparse"
-	"github.com/bangumi/server/internal/web/res/code"
+	"github.com/bangumi/server/internal/web/res"
 )
 
 // these errors result in to 400 http response.
-var errMissingCharacterID = fiber.NewError(code.BadRequest, "character ID is required")
-var errMissingSubjectID = fiber.NewError(code.BadRequest, "subject ID is required")
-var errMissingPersonID = fiber.NewError(code.BadRequest, "person ID is required")
-var errMissingEpisodeID = fiber.NewError(code.BadRequest, "episode ID is required")
-var errMissingIndexID = fiber.NewError(code.BadRequest, "index ID is required")
-var errMissingTopicID = fiber.NewError(code.BadRequest, "topic ID is required")
+var errMissingCharacterID = res.BadRequest("character ID is required")
+var errMissingSubjectID = res.BadRequest("subject ID is required")
+var errMissingPersonID = res.BadRequest("person ID is required")
+var errMissingEpisodeID = res.BadRequest("episode ID is required")
+var errMissingIndexID = res.BadRequest("index ID is required")
+var errMissingTopicID = res.BadRequest("topic ID is required")
 
 func parseSubjectType(s string) (uint8, error) {
 	if s == "" {
@@ -40,19 +37,19 @@ func parseSubjectType(s string) (uint8, error) {
 
 	t, err := strparse.Uint8(s)
 	if err != nil {
-		return 0, fiber.NewError(http.StatusBadRequest, "bad subject type: "+strconv.Quote(s))
+		return 0, res.BadRequest("bad subject type: " + strconv.Quote(s))
 	}
 
 	switch t {
-	case model.SubjectAnime, model.SubjectBook,
-		model.SubjectMusic, model.SubjectReal, model.SubjectGame:
+	case model.SubjectTypeAnime, model.SubjectTypeBook,
+		model.SubjectTypeMusic, model.SubjectTypeReal, model.SubjectTypeGame:
 		return t, nil
 	}
 
-	return 0, fiber.NewError(http.StatusBadRequest, strconv.Quote(s)+" is not a valid subject type")
+	return 0, res.BadRequest(strconv.Quote(s) + " is not a valid subject type")
 }
 
-func parseSubjectID(s string) (model.SubjectIDType, error) {
+func parseSubjectID(s string) (model.SubjectID, error) {
 	if s == "" {
 		return 0, errMissingSubjectID
 	}
@@ -60,13 +57,13 @@ func parseSubjectID(s string) (model.SubjectIDType, error) {
 	v, err := strparse.SubjectID(s)
 
 	if err != nil {
-		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not valid subject ID")
+		return 0, res.BadRequest(strconv.Quote(s) + " is not valid subject ID")
 	}
 
 	return v, nil
 }
 
-func parseCharacterID(s string) (model.CharacterIDType, error) {
+func parseCharacterID(s string) (model.CharacterID, error) {
 	if s == "" {
 		return 0, errMissingCharacterID
 	}
@@ -74,13 +71,13 @@ func parseCharacterID(s string) (model.CharacterIDType, error) {
 	v, err := strparse.CharacterID(s)
 
 	if err != nil {
-		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not valid character ID")
+		return 0, res.BadRequest(strconv.Quote(s) + " is not valid character ID")
 	}
 
 	return v, nil
 }
 
-func parsePersonID(s string) (model.PersonIDType, error) {
+func parsePersonID(s string) (model.PersonID, error) {
 	if s == "" {
 		return 0, errMissingPersonID
 	}
@@ -88,13 +85,13 @@ func parsePersonID(s string) (model.PersonIDType, error) {
 	v, err := strparse.PersonID(s)
 
 	if err != nil {
-		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not valid person ID")
+		return 0, res.BadRequest(strconv.Quote(s) + " is not valid person ID")
 	}
 
 	return v, nil
 }
 
-func parseEpisodeID(s string) (model.EpisodeIDType, error) {
+func parseEpisodeID(s string) (model.EpisodeID, error) {
 	if s == "" {
 		return 0, errMissingEpisodeID
 	}
@@ -102,13 +99,13 @@ func parseEpisodeID(s string) (model.EpisodeIDType, error) {
 	v, err := strparse.EpisodeID(s)
 
 	if err != nil {
-		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not a valid episode ID")
+		return 0, res.BadRequest(strconv.Quote(s) + " is not a valid episode ID")
 	}
 
 	return v, nil
 }
 
-func parseIndexID(s string) (model.IndexIDType, error) {
+func parseIndexID(s string) (model.IndexID, error) {
 	if s == "" {
 		return 0, errMissingIndexID
 	}
@@ -116,13 +113,13 @@ func parseIndexID(s string) (model.IndexIDType, error) {
 	v, err := strparse.IndexID(s)
 
 	if err != nil {
-		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not a valid index ID")
+		return 0, res.BadRequest(strconv.Quote(s) + " is not a valid index ID")
 	}
 
 	return v, nil
 }
 
-func parseTopicID(s string) (model.TopicIDType, error) {
+func parseTopicID(s string) (model.TopicID, error) {
 	if s == "" {
 		return 0, errMissingTopicID
 	}
@@ -130,8 +127,32 @@ func parseTopicID(s string) (model.TopicIDType, error) {
 	v, err := strparse.TopicID(s)
 
 	if err != nil {
-		return 0, fiber.NewError(code.BadRequest, strconv.Quote(s)+" is not valid topic ID")
+		return 0, res.BadRequest(strconv.Quote(s) + " is not valid topic ID")
 	}
 
 	return v, nil
+}
+
+func parseCollectionType(s string) (model.CollectionType, error) {
+	if s == "" {
+		return model.CollectionTypeAll, nil
+	}
+
+	t, err := strparse.Uint8(s)
+	if err != nil {
+		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
+	}
+
+	v := model.CollectionType(t)
+	switch v {
+	case model.CollectionTypeAll,
+		model.CollectionTypeWish,
+		model.CollectionTypeDone,
+		model.CollectionTypeDoing,
+		model.CollectionTypeOnHold,
+		model.CollectionTypeDropped:
+		return v, nil
+	}
+
+	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")
 }

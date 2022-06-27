@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -25,7 +27,7 @@ func newPerson(db *gorm.DB) person {
 
 	tableName := _person.personDo.TableName()
 	_person.ALL = field.NewField(tableName, "*")
-	_person.ID = field.NewUint32(tableName, "prsn_id")
+	_person.ID = field.NewField(tableName, "prsn_id")
 	_person.Name = field.NewString(tableName, "prsn_name")
 	_person.Type = field.NewUint8(tableName, "prsn_type")
 	_person.Infobox = field.NewString(tableName, "prsn_infobox")
@@ -46,7 +48,7 @@ func newPerson(db *gorm.DB) person {
 	_person.Lock = field.NewInt8(tableName, "prsn_lock")
 	_person.AnidbID = field.NewUint32(tableName, "prsn_anidb_id")
 	_person.Ban = field.NewUint8(tableName, "prsn_ban")
-	_person.Redirect = field.NewUint32(tableName, "prsn_redirect")
+	_person.Redirect = field.NewField(tableName, "prsn_redirect")
 	_person.Nsfw = field.NewBool(tableName, "prsn_nsfw")
 	_person.Fields = personHasOneFields{
 		db: db.Session(&gorm.Session{}),
@@ -63,7 +65,7 @@ type person struct {
 	personDo personDo
 
 	ALL         field.Field
-	ID          field.Uint32
+	ID          field.Field
 	Name        field.String
 	Type        field.Uint8
 	Infobox     field.String
@@ -84,7 +86,7 @@ type person struct {
 	Lock        field.Int8
 	AnidbID     field.Uint32
 	Ban         field.Uint8
-	Redirect    field.Uint32
+	Redirect    field.Field
 	Nsfw        field.Bool
 	Fields      personHasOneFields
 
@@ -103,7 +105,7 @@ func (p person) As(alias string) *person {
 
 func (p *person) updateTableName(table string) *person {
 	p.ALL = field.NewField(table, "*")
-	p.ID = field.NewUint32(table, "prsn_id")
+	p.ID = field.NewField(table, "prsn_id")
 	p.Name = field.NewString(table, "prsn_name")
 	p.Type = field.NewUint8(table, "prsn_type")
 	p.Infobox = field.NewString(table, "prsn_infobox")
@@ -124,7 +126,7 @@ func (p *person) updateTableName(table string) *person {
 	p.Lock = field.NewInt8(table, "prsn_lock")
 	p.AnidbID = field.NewUint32(table, "prsn_anidb_id")
 	p.Ban = field.NewUint8(table, "prsn_ban")
-	p.Redirect = field.NewUint32(table, "prsn_redirect")
+	p.Redirect = field.NewField(table, "prsn_redirect")
 	p.Nsfw = field.NewBool(table, "prsn_nsfw")
 
 	p.fillFieldMap()
@@ -254,6 +256,14 @@ func (p personDo) Debug() *personDo {
 
 func (p personDo) WithContext(ctx context.Context) *personDo {
 	return p.withDO(p.DO.WithContext(ctx))
+}
+
+func (p personDo) ReadDB(ctx context.Context) *personDo {
+	return p.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (p personDo) WriteDB(ctx context.Context) *personDo {
+	return p.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (p personDo) Clauses(conds ...clause.Expression) *personDo {

@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -25,7 +27,7 @@ func newSubject(db *gorm.DB) subject {
 
 	tableName := _subject.subjectDo.TableName()
 	_subject.ALL = field.NewField(tableName, "*")
-	_subject.ID = field.NewUint32(tableName, "subject_id")
+	_subject.ID = field.NewField(tableName, "subject_id")
 	_subject.TypeID = field.NewUint8(tableName, "subject_type_id")
 	_subject.Name = field.NewString(tableName, "subject_name")
 	_subject.NameCN = field.NewString(tableName, "subject_name_cn")
@@ -65,7 +67,7 @@ type subject struct {
 	subjectDo subjectDo
 
 	ALL         field.Field
-	ID          field.Uint32
+	ID          field.Field
 	TypeID      field.Uint8
 	Name        field.String
 	NameCN      field.String
@@ -107,7 +109,7 @@ func (s subject) As(alias string) *subject {
 
 func (s *subject) updateTableName(table string) *subject {
 	s.ALL = field.NewField(table, "*")
-	s.ID = field.NewUint32(table, "subject_id")
+	s.ID = field.NewField(table, "subject_id")
 	s.TypeID = field.NewUint8(table, "subject_type_id")
 	s.Name = field.NewString(table, "subject_name")
 	s.NameCN = field.NewString(table, "subject_name_cn")
@@ -262,6 +264,14 @@ func (s subjectDo) Debug() *subjectDo {
 
 func (s subjectDo) WithContext(ctx context.Context) *subjectDo {
 	return s.withDO(s.DO.WithContext(ctx))
+}
+
+func (s subjectDo) ReadDB(ctx context.Context) *subjectDo {
+	return s.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (s subjectDo) WriteDB(ctx context.Context) *subjectDo {
+	return s.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (s subjectDo) Clauses(conds ...clause.Expression) *subjectDo {

@@ -58,9 +58,11 @@ type Mock struct {
 	EpisodeRepo    domain.EpisodeRepo
 	CommentRepo    domain.CommentRepo
 	TopicRepo      domain.TopicRepo
+	GroupRepo      domain.GroupRepo
 	UserRepo       domain.UserRepo
 	IndexRepo      domain.IndexRepo
 	RevisionRepo   domain.RevisionRepo
+	CollectionRepo domain.CollectionRepo
 	CaptchaManager captcha.Manager
 	SessionManager session.Manager
 	Cache          cache.Generic
@@ -69,13 +71,14 @@ type Mock struct {
 	HTTPMock       *httpmock.MockTransport
 }
 
+//nolint:funlen
 func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 	tb.Helper()
 	var f *fiber.App
 
 	httpClient := resty.New().SetJSONEscapeHTML(false)
 	httpClient.JSONUnmarshal = json.Unmarshal
-	httpClient.JSONMarshal = json.MarshalNoEscape
+	httpClient.JSONMarshal = json.Marshal
 
 	var options = []fx.Option{
 		fx.NopLogger,
@@ -105,6 +108,10 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCaptchaManager(m.CaptchaManager),
 		MockSessionManager(m.SessionManager),
 		MockRateLimiter(m.RateLimiter),
+
+		// don't need a default mock for these repositories.
+		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
+		fx.Provide(func() domain.CollectionRepo { return m.CollectionRepo }),
 
 		fx.Invoke(web.ResistRouter),
 
@@ -187,13 +194,13 @@ func MockUserRepo(repo domain.UserRepo) fx.Option {
 		mocker := &mocks.UserRepo{}
 		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(model.User{}, nil)
 		mocker.On("GetByIDs", mock.Anything, mock.Anything).
-			Return(func(ctx context.Context, ids ...uint32) map[uint32]model.User {
-				var ret = make(map[uint32]model.User, len(ids))
+			Return(func(ctx context.Context, ids ...model.UserID) map[model.UserID]model.User {
+				var ret = make(map[model.UserID]model.User, len(ids))
 				for _, id := range ids {
 					ret[id] = model.User{}
 				}
 				return ret
-			}, func(ctx context.Context, ids ...uint32) error {
+			}, func(ctx context.Context, ids ...model.UserID) error {
 				return nil
 			})
 		repo = mocker
@@ -308,7 +315,7 @@ func MockEmptyCache() fx.Option {
 }
 
 func NopCache() cache.Generic {
-	mc := &mocks.Generic{}
+	mc := &mocks.Cache{}
 	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
 	mc.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	mc.EXPECT().Del(mock.Anything, mock.Anything).Return(nil)

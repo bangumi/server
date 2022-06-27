@@ -20,9 +20,10 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-const availableCharBytes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-const availableCharLength = uint8(len(availableCharBytes))
-const maxByte = 247 // 255 - (256 % availableCharLength)
+// we may never need to change these values.
+const base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const base62CharsLength = 62                               // len(base62Chars)
+const base62MaxByte byte = 255 - (256 % base62CharsLength) //nolint:gomnd
 
 // Base62String generate a cryptographically secure base62 string in given length.
 // Will panic if it can't read from 'crypto/rand'.
@@ -35,11 +36,11 @@ func Base62String(length int) string {
 			panic("unexpected error happened when reading from 'crypto/rand'")
 		}
 		for _, rb := range r {
-			if rb > maxByte {
+			if rb > base62MaxByte {
 				// Skip this number to avoid modulo bias.
 				continue
 			}
-			b[i] = availableCharBytes[rb%availableCharLength]
+			b[i] = base62Chars[rb%base62CharsLength]
 			i++
 			if i == length {
 				return utils.UnsafeString(b)

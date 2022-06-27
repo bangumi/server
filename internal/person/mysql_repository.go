@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/model/generic"
 )
 
 type mysqlRepo struct {
@@ -37,7 +38,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) domain.PersonRepo {
 	return mysqlRepo{q: q, log: log.Named("person.mysqlRepo")}
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Person, error) {
+func (r mysqlRepo) Get(ctx context.Context, id model.PersonID) (model.Person, error) {
 	p, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).Where(r.q.Person.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -53,7 +54,7 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Person, error) {
 }
 
 func (r mysqlRepo) GetSubjectRelated(
-	ctx context.Context, subjectID model.SubjectIDType,
+	ctx context.Context, subjectID model.SubjectID,
 ) ([]domain.SubjectPersonRelation, error) {
 	relations, err := r.q.PersonSubjects.WithContext(ctx).
 		Where(r.q.PersonSubjects.SubjectID.Eq(subjectID)).Find()
@@ -75,7 +76,7 @@ func (r mysqlRepo) GetSubjectRelated(
 
 func (r mysqlRepo) GetCharacterRelated(
 	ctx context.Context,
-	characterID model.CharacterIDType,
+	characterID model.CharacterID,
 ) ([]domain.PersonCharacterRelation, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
 		Where(r.q.Cast.CharacterID.Eq(characterID)).
@@ -99,15 +100,16 @@ func (r mysqlRepo) GetCharacterRelated(
 }
 
 func (r mysqlRepo) GetByIDs(
-	ctx context.Context, ids ...model.PersonIDType,
-) (map[model.PersonIDType]model.Person, error) {
-	u, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).Where(r.q.Person.ID.In(ids...)).Find()
+	ctx context.Context, ids ...model.PersonID,
+) (map[model.PersonID]model.Person, error) {
+	u, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).
+		Where(r.q.Person.ID.In(generic.PersonIDToValuerSlice(ids)...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var result = make(map[model.PersonIDType]model.Person, len(ids))
+	var result = make(map[model.PersonID]model.Person, len(ids))
 	for _, p := range u {
 		result[p.ID] = ConvertDao(p)
 	}

@@ -17,7 +17,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -31,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/wiki"
 )
 
@@ -48,10 +46,7 @@ func (h Handler) GetCharacter(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	if r.Redirect != 0 {
@@ -59,10 +54,7 @@ func (h Handler) GetCharacter(c *fiber.Ctx) error {
 	}
 
 	if r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	return c.JSON(r)
@@ -81,13 +73,10 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentCharacter, id)
+	pagedComments, err := h.listComments(c, domain.CommentCharacter, uint32(id))
 	if err != nil {
 		return err
 	}
@@ -97,7 +86,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
 func (h Handler) getCharacterWithCache(
-	ctx context.Context, id uint32) (res.CharacterV0, bool, error) {
+	ctx context.Context, id model.CharacterID) (res.CharacterV0, bool, error) {
 	var key = cachekey.Character(id)
 
 	// try to read from cache
@@ -117,7 +106,7 @@ func (h Handler) getCharacterWithCache(
 			return res.CharacterV0{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "repo.subject.Set")
+		return r, ok, errgo.Wrap(err, "CharacterService.Get")
 	}
 
 	r = convertModelCharacter(s)
@@ -167,15 +156,12 @@ func (h Handler) GetCharacterImage(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
-	l, ok := res.SelectPersonImageURL(r.Images, c.Query("type"))
+	l, ok := r.Images.Select(c.Query("type"))
 	if !ok {
-		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+		return res.BadRequest("bad image type: " + c.Query("type"))
 	}
 
 	if l == "" {
@@ -198,10 +184,7 @@ func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || r.NSFW && !u.AllowNSFW() {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	casts, err := h.p.GetCharacterRelated(c.Context(), id)
@@ -238,10 +221,7 @@ func (h Handler) GetCharacterRelatedSubjects(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	relations, err := h.s.GetCharacterRelated(c.Context(), id)

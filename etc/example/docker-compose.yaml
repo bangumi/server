@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  chii-redis:
+    container_name: "chii-redis"
+    image: redis:7
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass "redis_password"
+    expose:
+      - 6379
+    restart: always
+    volumes:
+      - ./data/redis:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+
+  chii:
+    container_name: "chii-web-server"
+    image: ghcr.io/bangumi/chii:latest
+    restart: always
+    depends_on:
+      - chii-mysql
+      - chii-redis
+    ports:
+      - "3000:3000"
+    network_mode: host
+    environment:
+      HTTP_PORT: "3000"
+      MYSQL_HOST: "chii-mysql"
+      MYSQL_PORT: "3306"
+      MYSQL_DB: "bangumi"
+      MYSQL_USER: "mysql_user"
+      MYSQL_PASS: "mysql_password"
+      REDIS_URI: "redis://:redis_password@chii-redis:6379/0"
+      WEB_DOMAIN: "next.bgm.tv"
+      MYSQL_MAX_CONNECTION: "4"
+
+  chii-mysql:
+    # 需要从 https://github.com/bangumi/dev-env 手动导入所有的数据表定义，后端服务器不会自动初始化数据库。
+    container_name: "chii-mysql"
+    image: "mysql:5.7.33"
+    ports:
+      - "3308:3306"
+    command: mysqld --character-set-server=utf8mb4
+    environment:
+      - MYSQL_USER=mysql_user
+      - MYSQL_PASSWORD=mysql_password
+      - MYSQL_DATABASE=bangumi

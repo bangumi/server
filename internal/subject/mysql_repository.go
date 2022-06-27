@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/model/generic"
 	"github.com/bangumi/server/internal/person"
 )
 
@@ -39,7 +40,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.SubjectRepo, error) {
 	return mysqlRepo{q: q, log: log.Named("subject.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Subject, error) {
+func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID) (model.Subject, error) {
 	s, err := r.q.Subject.WithContext(ctx).Preload(r.q.Subject.Fields).Where(r.q.Subject.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -116,7 +117,7 @@ func rating(f dao.SubjectField) model.Rating {
 }
 
 func (r mysqlRepo) GetPersonRelated(
-	ctx context.Context, personID model.PersonIDType,
+	ctx context.Context, personID model.PersonID,
 ) ([]domain.SubjectPersonRelation, error) {
 	relations, err := r.q.PersonSubjects.WithContext(ctx).
 		Joins(r.q.PersonSubjects.Subject).
@@ -142,7 +143,7 @@ func (r mysqlRepo) GetPersonRelated(
 
 func (r mysqlRepo) GetCharacterRelated(
 	ctx context.Context,
-	characterID model.PersonIDType,
+	characterID model.CharacterID,
 ) ([]domain.SubjectCharacterRelation, error) {
 	relations, err := r.q.CharacterSubjects.WithContext(ctx).
 		Joins(r.q.CharacterSubjects.Subject).
@@ -166,7 +167,7 @@ func (r mysqlRepo) GetCharacterRelated(
 
 func (r mysqlRepo) GetSubjectRelated(
 	ctx context.Context,
-	subjectID model.SubjectIDType,
+	subjectID model.SubjectID,
 ) ([]domain.SubjectInternalRelation, error) {
 	relations, err := r.q.SubjectRelation.WithContext(ctx).
 		Joins(r.q.SubjectRelation.Subject).Where(r.q.SubjectRelation.SubjectID.Eq(subjectID)).
@@ -189,15 +190,16 @@ func (r mysqlRepo) GetSubjectRelated(
 }
 
 func (r mysqlRepo) GetByIDs(
-	ctx context.Context, ids ...model.SubjectIDType,
-) (map[model.SubjectIDType]model.Subject, error) {
-	records, err := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(ids...)).Find()
+	ctx context.Context, ids ...model.SubjectID,
+) (map[model.SubjectID]model.Subject, error) {
+	records, err := r.q.Subject.WithContext(ctx).
+		Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(generic.SubjectIDToValuerSlice(ids)...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var result = make(map[model.SubjectIDType]model.Subject, len(ids))
+	var result = make(map[model.SubjectID]model.Subject, len(ids))
 
 	for _, s := range records {
 		result[s.ID] = ConvertDao(s)
@@ -205,14 +207,15 @@ func (r mysqlRepo) GetByIDs(
 
 	return result, nil
 }
+
 func (r mysqlRepo) GetActors(
 	ctx context.Context,
-	subjectID model.SubjectIDType,
-	characterIDs ...model.CharacterIDType,
-) (map[model.CharacterIDType][]model.Person, error) {
+	subjectID model.SubjectID,
+	characterIDs ...model.CharacterID,
+) (map[model.CharacterID][]model.Person, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
 		Preload(r.q.Cast.Person.Fields).
-		Where(r.q.Cast.CharacterID.In(characterIDs...), r.q.Cast.SubjectID.Eq(subjectID)).
+		Where(r.q.Cast.CharacterID.In(generic.CharacterIDToValuerSlice(characterIDs)...), r.q.Cast.SubjectID.Eq(subjectID)).
 		Order(r.q.Cast.PersonID).
 		Find()
 	if err != nil {
@@ -220,7 +223,7 @@ func (r mysqlRepo) GetActors(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var results = make(map[model.CharacterIDType][]model.Person, len(relations))
+	var results = make(map[model.CharacterID][]model.Person, len(relations))
 	for _, relation := range relations {
 		// TODO: should pre-alloc a big slice and split it as results.
 		results[relation.CharacterID] = append(results[relation.CharacterID], person.ConvertDao(&relation.Person))

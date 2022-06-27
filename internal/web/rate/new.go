@@ -22,9 +22,9 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/gookit/goutil/timex"
 
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 const defaultAllowPerHour = 5
@@ -72,7 +72,6 @@ func (m manager) Allowed(ctx context.Context, ip string) (bool, int, error) {
 
 	if res.Allowed <= 0 {
 		err := m.r.Set(ctx, banKey, "1", timex.OneWeek).Err()
-
 		return false, 0, errgo.Wrap(err, "redis.Set")
 	}
 

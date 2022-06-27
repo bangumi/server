@@ -14,7 +14,11 @@
 
 package oauth
 
-import "context"
+import (
+	"context"
+
+	"github.com/bangumi/server/internal/model"
+)
 
 type Manager interface {
 	GetClientByID(ctx context.Context, clientIDs ...string) (map[string]Client, error)
@@ -27,6 +31,6 @@ type Client struct {
 	GrantTypes  string
 	Scope       string
 	AppName     string
-	UserID      uint32
+	UserID      model.UserID
 	AppID       uint32
 }

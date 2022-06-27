@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -25,7 +27,7 @@ func newMember(db *gorm.DB) member {
 
 	tableName := _member.memberDo.TableName()
 	_member.ALL = field.NewField(tableName, "*")
-	_member.UID = field.NewUint32(tableName, "uid")
+	_member.ID = field.NewField(tableName, "uid")
 	_member.Username = field.NewString(tableName, "username")
 	_member.Nickname = field.NewString(tableName, "nickname")
 	_member.Avatar = field.NewString(tableName, "avatar")
@@ -39,7 +41,7 @@ func newMember(db *gorm.DB) member {
 	_member.Timeoffset = field.NewString(tableName, "timeoffset")
 	_member.Newpm = field.NewBool(tableName, "newpm")
 	_member.NewNotify = field.NewUint16(tableName, "new_notify")
-	_member.Sign = field.NewString(tableName, "SIGN")
+	_member.Sign = field.NewString(tableName, "sign")
 	_member.PasswordCrypt = field.NewField(tableName, "password_crypt")
 	_member.Email = field.NewString(tableName, "email")
 	_member.Fields = memberHasOneFields{
@@ -57,7 +59,7 @@ type member struct {
 	memberDo memberDo
 
 	ALL           field.Field
-	UID           field.Uint32
+	ID            field.Field
 	Username      field.String
 	Nickname      field.String
 	Avatar        field.String
@@ -91,7 +93,7 @@ func (m member) As(alias string) *member {
 
 func (m *member) updateTableName(table string) *member {
 	m.ALL = field.NewField(table, "*")
-	m.UID = field.NewUint32(table, "uid")
+	m.ID = field.NewField(table, "uid")
 	m.Username = field.NewString(table, "username")
 	m.Nickname = field.NewString(table, "nickname")
 	m.Avatar = field.NewString(table, "avatar")
@@ -105,7 +107,7 @@ func (m *member) updateTableName(table string) *member {
 	m.Timeoffset = field.NewString(table, "timeoffset")
 	m.Newpm = field.NewBool(table, "newpm")
 	m.NewNotify = field.NewUint16(table, "new_notify")
-	m.Sign = field.NewString(table, "SIGN")
+	m.Sign = field.NewString(table, "sign")
 	m.PasswordCrypt = field.NewField(table, "password_crypt")
 	m.Email = field.NewString(table, "email")
 
@@ -131,7 +133,7 @@ func (m *member) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 
 func (m *member) fillFieldMap() {
 	m.fieldMap = make(map[string]field.Expr, 18)
-	m.fieldMap["uid"] = m.UID
+	m.fieldMap["uid"] = m.ID
 	m.fieldMap["username"] = m.Username
 	m.fieldMap["nickname"] = m.Nickname
 	m.fieldMap["avatar"] = m.Avatar
@@ -145,7 +147,7 @@ func (m *member) fillFieldMap() {
 	m.fieldMap["timeoffset"] = m.Timeoffset
 	m.fieldMap["newpm"] = m.Newpm
 	m.fieldMap["new_notify"] = m.NewNotify
-	m.fieldMap["SIGN"] = m.Sign
+	m.fieldMap["sign"] = m.Sign
 	m.fieldMap["password_crypt"] = m.PasswordCrypt
 	m.fieldMap["email"] = m.Email
 
@@ -230,6 +232,14 @@ func (m memberDo) Debug() *memberDo {
 
 func (m memberDo) WithContext(ctx context.Context) *memberDo {
 	return m.withDO(m.DO.WithContext(ctx))
+}
+
+func (m memberDo) ReadDB(ctx context.Context) *memberDo {
+	return m.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (m memberDo) WriteDB(ctx context.Context) *memberDo {
+	return m.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (m memberDo) Clauses(conds ...clause.Expression) *memberDo {

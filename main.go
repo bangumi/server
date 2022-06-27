@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
+	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/comment"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
@@ -31,6 +32,7 @@ import (
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
@@ -55,7 +57,6 @@ func main() {
 }
 
 func start() error {
-
 	var app *fiber.App
 	var cfg config.AppConfig
 
@@ -69,7 +70,7 @@ func start() error {
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
 				httpClient.JSONUnmarshal = json.Unmarshal
-				httpClient.JSONMarshal = json.MarshalNoEscape
+				httpClient.JSONMarshal = json.Marshal
 				return httpClient
 			},
 		),
@@ -82,10 +83,10 @@ func start() error {
 			oauth.NewMysqlRepo,
 
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
-			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo,
+			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
 			comment.NewMysqlRepo, topic.NewMysqlRepo,
 
-			auth.NewService, character.NewService, subject.NewService, person.NewService,
+			auth.NewService, character.NewService, subject.NewService, person.NewService, group.NewMysqlRepo,
 		),
 
 		fx.Provide(

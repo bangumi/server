@@ -12,6 +12,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package config
+package random
 
-const FrontendOrigin = "https://next.bgm.tv"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
+
+func TestConst(t *testing.T) {
+	t.Parallel()
+
+	require.EqualValues(t, len(base62Chars), base62CharsLength)
+	require.EqualValues(t, 255-(256%len(base62Chars)), base62MaxByte)
+}

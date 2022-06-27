@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -27,7 +29,7 @@ func newApp(db *gorm.DB) app {
 	_app.ALL = field.NewField(tableName, "*")
 	_app.ID = field.NewUint32(tableName, "app_id")
 	_app.Type = field.NewUint8(tableName, "app_type")
-	_app.Creator = field.NewUint32(tableName, "app_creator")
+	_app.Creator = field.NewField(tableName, "app_creator")
 	_app.Name = field.NewString(tableName, "app_name")
 	_app.Description = field.NewString(tableName, "app_desc")
 	_app.URL = field.NewString(tableName, "app_url")
@@ -48,7 +50,7 @@ type app struct {
 	ALL         field.Field
 	ID          field.Uint32
 	Type        field.Uint8
-	Creator     field.Uint32
+	Creator     field.Field
 	Name        field.String
 	Description field.String
 	URL         field.String
@@ -75,7 +77,7 @@ func (a *app) updateTableName(table string) *app {
 	a.ALL = field.NewField(table, "*")
 	a.ID = field.NewUint32(table, "app_id")
 	a.Type = field.NewUint8(table, "app_type")
-	a.Creator = field.NewUint32(table, "app_creator")
+	a.Creator = field.NewField(table, "app_creator")
 	a.Name = field.NewString(table, "app_name")
 	a.Description = field.NewString(table, "app_desc")
 	a.URL = field.NewString(table, "app_url")
@@ -133,6 +135,14 @@ func (a appDo) Debug() *appDo {
 
 func (a appDo) WithContext(ctx context.Context) *appDo {
 	return a.withDO(a.DO.WithContext(ctx))
+}
+
+func (a appDo) ReadDB(ctx context.Context) *appDo {
+	return a.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (a appDo) WriteDB(ctx context.Context) *appDo {
+	return a.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (a appDo) Clauses(conds ...clause.Expression) *appDo {

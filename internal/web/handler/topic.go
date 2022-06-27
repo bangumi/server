@@ -16,7 +16,6 @@ package handler
 
 import (
 	"errors"
-	"net/http"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -25,21 +24,17 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 )
 
 const canViewStateClosedTopic = -time.Hour * 24 * 180
 const canViewStateDeleteTopic = -time.Hour * 24 * 180
 
-func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.TopicIDType) (model.Topic, error) {
+func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
 	u := h.getHTTPAccessor(c)
 	topic, err := h.t.Get(c.Context(), topicType, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
-				Title:   "Not Found",
-				Details: util.DetailFromRequest(c),
-			})
+			return model.Topic{}, res.ErrNotFound
 		}
 		return model.Topic{}, errgo.Wrap(err, "Topic.Get")
 	}
@@ -48,17 +43,14 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 	case !u.Permission.ManageTopicState && topic.Status == model.TopicStatusReview,
 		topic.State == model.TopicStateClosed && !u.RegisteredTime(canViewStateClosedTopic),
 		topic.State == model.TopicStateDelete && !u.RegisteredTime(canViewStateDeleteTopic):
-		return model.Topic{}, c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return model.Topic{}, res.ErrNotFound
 	}
 
 	return topic, nil
 }
 
-func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[uint32]model.User, error) {
-	userIDs := make([]model.UIDType, 0)
+func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[model.UserID]model.User, error) {
+	userIDs := make([]model.UserID, 0)
 	for _, topic := range topics {
 		userIDs = append(userIDs, topic.UID)
 		for _, v := range topic.Comments {
@@ -76,10 +68,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	u := h.getHTTPAccessor(c)
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 	var response = res.Paged{
 		Limit:  page.Limit,

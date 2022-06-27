@@ -21,22 +21,22 @@ import (
 )
 
 type CharacterRepo interface {
-	Get(ctx context.Context, id model.CharacterIDType) (model.Character, error)
-	GetByIDs(ctx context.Context, ids ...model.CharacterIDType) (map[model.CharacterIDType]model.Character, error)
+	Get(ctx context.Context, id model.CharacterID) (model.Character, error)
+	GetByIDs(ctx context.Context, ids ...model.CharacterID) (map[model.CharacterID]model.Character, error)
 
-	GetPersonRelated(ctx context.Context, personID model.PersonIDType) ([]PersonCharacterRelation, error)
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]SubjectCharacterRelation, error)
+	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]PersonCharacterRelation, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectCharacterRelation, error)
 }
 
 type CharacterService interface {
-	Get(ctx context.Context, id uint32) (model.Character, error)
+	Get(ctx context.Context, id model.CharacterID) (model.Character, error)
 
-	GetPersonRelated(ctx context.Context, personID model.PersonIDType) ([]model.PersonCharacterRelation, error)
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectIDType) ([]model.SubjectCharacterRelation, error)
+	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]model.PersonCharacterRelation, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectCharacterRelation, error)
 }
 
 type PersonCharacterRelation struct {
-	CharacterID model.CharacterIDType
-	PersonID    model.PersonIDType
-	SubjectID   model.SubjectIDType
+	CharacterID model.CharacterID
+	PersonID    model.PersonID
+	SubjectID   model.SubjectID
 }

@@ -14,6 +14,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
+	"gorm.io/plugin/dbresolver"
+
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
@@ -26,7 +28,7 @@ func newPersonField(db *gorm.DB) personField {
 	tableName := _personField.personFieldDo.TableName()
 	_personField.ALL = field.NewField(tableName, "*")
 	_personField.OwnerType = field.NewString(tableName, "prsn_cat")
-	_personField.OwnerID = field.NewUint32(tableName, "prsn_id")
+	_personField.OwnerID = field.NewField(tableName, "prsn_id")
 	_personField.Gender = field.NewUint8(tableName, "gender")
 	_personField.Bloodtype = field.NewUint8(tableName, "bloodtype")
 	_personField.BirthYear = field.NewUint16(tableName, "birth_year")
@@ -43,7 +45,7 @@ type personField struct {
 
 	ALL       field.Field
 	OwnerType field.String
-	OwnerID   field.Uint32
+	OwnerID   field.Field
 	Gender    field.Uint8
 	Bloodtype field.Uint8
 	BirthYear field.Uint16
@@ -66,7 +68,7 @@ func (p personField) As(alias string) *personField {
 func (p *personField) updateTableName(table string) *personField {
 	p.ALL = field.NewField(table, "*")
 	p.OwnerType = field.NewString(table, "prsn_cat")
-	p.OwnerID = field.NewUint32(table, "prsn_id")
+	p.OwnerID = field.NewField(table, "prsn_id")
 	p.Gender = field.NewUint8(table, "gender")
 	p.Bloodtype = field.NewUint8(table, "bloodtype")
 	p.BirthYear = field.NewUint16(table, "birth_year")
@@ -119,6 +121,14 @@ func (p personFieldDo) Debug() *personFieldDo {
 
 func (p personFieldDo) WithContext(ctx context.Context) *personFieldDo {
 	return p.withDO(p.DO.WithContext(ctx))
+}
+
+func (p personFieldDo) ReadDB(ctx context.Context) *personFieldDo {
+	return p.WithContext(ctx).Clauses(dbresolver.Read)
+}
+
+func (p personFieldDo) WriteDB(ctx context.Context) *personFieldDo {
+	return p.WithContext(ctx).Clauses(dbresolver.Write)
 }
 
 func (p personFieldDo) Clauses(conds ...clause.Expression) *personFieldDo {

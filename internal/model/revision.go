@@ -22,8 +22,8 @@ import (
 type RevisionCommon struct {
 	CreatedAt time.Time
 	Summary   string
-	ID        uint32
-	CreatorID uint32
+	ID        RevisionID
+	CreatorID UserID
 	Type      uint8
 }
 
@@ -69,7 +69,7 @@ type SubjectRevisionData struct {
 	FieldSummary string
 	Platform     uint16
 	TypeID       uint16
-	SubjectID    SubjectIDType
+	SubjectID    SubjectID
 	FieldEps     uint32
 	Type         uint8
 }

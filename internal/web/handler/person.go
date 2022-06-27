@@ -17,7 +17,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -31,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/util"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -48,10 +46,7 @@ func (h Handler) GetPerson(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	if r.Redirect != 0 {
@@ -63,7 +58,7 @@ func (h Handler) GetPerson(c *fiber.Ctx) error {
 
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
-func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonIDType) (res.PersonV0, bool, error) {
+func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonID) (res.PersonV0, bool, error) {
 	var key = cachekey.Person(id)
 
 	// try to read from cache
@@ -83,7 +78,7 @@ func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonIDType) 
 			return res.PersonV0{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "repo.subject.Set")
+		return r, ok, errgo.Wrap(err, "personRepo.Get")
 	}
 
 	r = convertModelPerson(s)
@@ -140,13 +135,10 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentPerson, id)
+	pagedComments, err := h.listComments(c, domain.CommentPerson, uint32(id))
 	if err != nil {
 		return err
 	}
@@ -165,15 +157,12 @@ func (h Handler) GetPersonImage(c *fiber.Ctx) error {
 	}
 
 	if !ok {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
-	l, ok := res.SelectPersonImageURL(r.Images, c.Query("type"))
+	l, ok := r.Images.Select(c.Query("type"))
 	if !ok {
-		return fiber.NewError(http.StatusBadRequest, "bad image type: "+c.Query("type"))
+		return res.BadRequest("bad image type: " + c.Query("type"))
 	}
 
 	if l == "" {
@@ -195,10 +184,7 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	relations, err := h.c.GetPersonRelated(c.Context(), id)
@@ -234,10 +220,7 @@ func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 	}
 
 	if !ok || r.Redirect != 0 {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
-			Title:   "Not Found",
-			Details: util.DetailFromRequest(c),
-		})
+		return res.ErrNotFound
 	}
 
 	relations, err := h.s.GetPersonRelated(c.Context(), id)

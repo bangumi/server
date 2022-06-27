@@ -16,6 +16,7 @@ package driver
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 
@@ -32,8 +33,11 @@ func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
 
 	cli := redis.NewClient(c.RedisOptions)
 
-	if err := cli.Ping(context.Background()).Err(); err != nil {
-		return nil, errgo.Wrap(err, "failed to connect to redis")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	if err := cli.Ping(ctx).Err(); err != nil {
+		return nil, errgo.Wrap(err, "client.Ping")
 	}
 
 	return cli, nil

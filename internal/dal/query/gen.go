@@ -22,6 +22,8 @@ func Use(db *gorm.DB) *Query {
 		CharacterSubjects:   newCharacterSubjects(db),
 		Episode:             newEpisode(db),
 		EpisodeComment:      newEpisodeComment(db),
+		Group:               newGroup(db),
+		GroupMember:         newGroupMember(db),
 		GroupTopic:          newGroupTopic(db),
 		GroupTopicComment:   newGroupTopicComment(db),
 		Index:               newIndex(db),
@@ -58,6 +60,8 @@ type Query struct {
 	CharacterSubjects   characterSubjects
 	Episode             episode
 	EpisodeComment      episodeComment
+	Group               group
+	GroupMember         groupMember
 	GroupTopic          groupTopic
 	GroupTopicComment   groupTopicComment
 	Index               index
@@ -95,6 +99,8 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		CharacterSubjects:   q.CharacterSubjects.clone(db),
 		Episode:             q.Episode.clone(db),
 		EpisodeComment:      q.EpisodeComment.clone(db),
+		Group:               q.Group.clone(db),
+		GroupMember:         q.GroupMember.clone(db),
 		GroupTopic:          q.GroupTopic.clone(db),
 		GroupTopicComment:   q.GroupTopicComment.clone(db),
 		Index:               q.Index.clone(db),
@@ -129,6 +135,8 @@ type queryCtx struct {
 	CharacterSubjects   characterSubjectsDo
 	Episode             episodeDo
 	EpisodeComment      episodeCommentDo
+	Group               groupDo
+	GroupMember         groupMemberDo
 	GroupTopic          groupTopicDo
 	GroupTopicComment   groupTopicCommentDo
 	Index               indexDo
@@ -163,6 +171,8 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		CharacterSubjects:   *q.CharacterSubjects.WithContext(ctx),
 		Episode:             *q.Episode.WithContext(ctx),
 		EpisodeComment:      *q.EpisodeComment.WithContext(ctx),
+		Group:               *q.Group.WithContext(ctx),
+		GroupMember:         *q.GroupMember.WithContext(ctx),
 		GroupTopic:          *q.GroupTopic.WithContext(ctx),
 		GroupTopicComment:   *q.GroupTopicComment.WithContext(ctx),
 		Index:               *q.Index.WithContext(ctx),

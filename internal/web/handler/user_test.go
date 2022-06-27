@@ -30,7 +30,7 @@ import (
 
 func TestHandler_GetCurrentUser(t *testing.T) {
 	t.Parallel()
-	const uid model.UIDType = 7
+	const uid model.UserID = 7
 
 	u := mocks.NewUserRepo(t)
 	u.EXPECT().GetByID(mock.Anything, uid).Return(model.User{ID: uid}, nil)
@@ -51,12 +51,12 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-	require.Equal(t, uid, r.ID, resp.BodyString())
+	require.EqualValues(t, uid, r.ID, resp.BodyString())
 }
 
 func TestHandler_GetUser_200(t *testing.T) {
 	t.Parallel()
-	const uid model.UIDType = 7
+	const uid model.UserID = 7
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, "u").Return(model.User{ID: uid}, nil)
 
@@ -87,4 +87,38 @@ func TestHandler_GetUser_404(t *testing.T) {
 
 	resp := test.New(t).Get("/v0/users/u").Execute(app)
 	require.Equal(t, http.StatusNotFound, resp.StatusCode, resp.BodyString())
+}
+
+func TestHandler_GetUserAvatar_302(t *testing.T) {
+	t.Parallel()
+
+	m := mocks.NewUserRepo(t)
+	m.EXPECT().GetByName(mock.Anything, "u").Return(model.User{ID: 1, Avatar: "temp"}, nil)
+
+	app := test.GetWebApp(t, test.Mock{UserRepo: m})
+	for _, imageType := range []string{"large", "medium", "small"} {
+		t.Run(imageType, func(t *testing.T) {
+			t.Parallel()
+
+			resp := test.New(t).Get("/v0/users/u/avatar?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			expected, _ := res.UserAvatar("temp").Select(imageType)
+			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
+		})
+	}
+}
+
+func TestHandler_GetUserAvatar_400(t *testing.T) {
+	t.Parallel()
+
+	m := mocks.NewUserRepo(t)
+	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{Avatar: "temp"}, nil)
+	app := test.GetWebApp(t,
+		test.Mock{
+			UserRepo: m,
+		},
+	)
+
+	resp := test.New(t).Get("/v0/users/u/avatar").Execute(app)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
 }

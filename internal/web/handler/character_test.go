@@ -36,7 +36,7 @@ import (
 func TestHandler_GetCharacter_HappyPath(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
@@ -45,13 +45,13 @@ func TestHandler_GetCharacter_HappyPath(t *testing.T) {
 		Execute(app).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
-	require.Equal(t, uint32(7), r.ID)
+	require.EqualValues(t, 7, r.ID)
 }
 
 func TestHandler_GetCharacter_Redirect(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Character{ID: 7, Redirect: 8}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Redirect: 8}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
@@ -76,7 +76,7 @@ func TestHandler_GetCharacter_Redirect_cached(t *testing.T) {
 func TestHandler_GetCharacter_NSFW(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
-	m.EXPECT().Get(mock.Anything, model.CharacterIDType(7)).Return(model.Character{ID: 7, NSFW: true}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, NSFW: true}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
@@ -95,5 +95,42 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
-	require.Equal(t, model.CharacterIDType(7), r.ID)
+	require.Equal(t, model.CharacterID(7), r.ID)
+}
+
+func TestHandler_GetCharacterImage_200(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewCharacterRepo(t)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(8)).Return(model.Character{ID: 8}, nil)
+
+	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
+
+	for _, imageType := range []string{"large", "grid", "medium", "small"} {
+		imageType := imageType
+		t.Run(imageType, func(t *testing.T) {
+			t.Parallel()
+
+			resp := test.New(t).Get("/v0/characters/7/image?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			expected, _ := res.PersonImage("temp").Select(imageType)
+			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
+
+			// should redirect to default image
+			resp = test.New(t).Get("/v0/characters/8/image?type=" + imageType).Execute(app)
+			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
+			require.Equal(t, res.DefaultImageURL, resp.Header.Get("Location"), "should redirect to default image")
+		})
+	}
+}
+
+func TestHandler_GetCharacterImage_400(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewCharacterRepo(t)
+	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
+
+	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
+
+	resp := test.New(t).Get("/v0/characters/7/image").Execute(app)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
 }

@@ -38,7 +38,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.EpisodeRepo, error) {
 	return mysqlRepo{q: q, log: log.Named("episode.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, episodeID uint32) (model.Episode, error) {
+func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error) {
 	episode, err := r.q.Episode.WithContext(ctx).
 		Where(r.q.Episode.ID.Eq(episodeID), r.q.Episode.Ban.Eq(0)).Limit(1).First()
 	if err != nil {
@@ -59,7 +59,7 @@ func (r mysqlRepo) Get(ctx context.Context, episodeID uint32) (model.Episode, er
 	return convertDaoEpisode(episode, first), nil
 }
 
-func (r mysqlRepo) Count(ctx context.Context, subjectID uint32) (int64, error) {
+func (r mysqlRepo) Count(ctx context.Context, subjectID model.SubjectID) (int64, error) {
 	c, err := r.q.Episode.WithContext(ctx).
 		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Ban.Eq(0)).Count()
 	if err != nil {
@@ -71,8 +71,8 @@ func (r mysqlRepo) Count(ctx context.Context, subjectID uint32) (int64, error) {
 
 func (r mysqlRepo) CountByType(
 	ctx context.Context,
-	subjectID uint32,
-	epType model.EpTypeType,
+	subjectID model.SubjectID,
+	epType model.EpType,
 ) (int64, error) {
 	c, err := r.q.Episode.WithContext(ctx).
 		Where(
@@ -88,7 +88,7 @@ func (r mysqlRepo) CountByType(
 }
 
 func (r mysqlRepo) List(
-	ctx context.Context, subjectID model.SubjectIDType, limit int, offset int,
+	ctx context.Context, subjectID model.SubjectID, limit int, offset int,
 ) ([]model.Episode, error) {
 	first, err := r.firstEpisode(ctx, subjectID)
 	if err != nil {
@@ -115,7 +115,7 @@ func (r mysqlRepo) List(
 }
 
 func (r mysqlRepo) ListByType(
-	ctx context.Context, subjectID uint32, epType model.EpTypeType, limit int, offset int,
+	ctx context.Context, subjectID model.SubjectID, epType model.EpType, limit int, offset int,
 ) ([]model.Episode, error) {
 	first, err := r.firstEpisode(ctx, subjectID)
 	if err != nil {
@@ -145,7 +145,7 @@ func (r mysqlRepo) ListByType(
 	return result, nil
 }
 
-func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID uint32) (float32, error) {
+func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID model.SubjectID) (float32, error) {
 	episode, err := r.q.Episode.WithContext(ctx).
 		Where(
 			r.q.Episode.SubjectID.Eq(subjectID),
