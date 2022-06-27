@@ -61,6 +61,85 @@ type mysqlRepo struct {
 	subjectUpsert clause.OnConflict
 }
 
+func (r mysqlRepo) CountSubjectCollections(
+	ctx context.Context,
+	userID model.UserID,
+	subjectType model.SubjectType,
+	collectionType model.CollectionType,
+	showPrivate bool,
+) (int64, error) {
+	q := r.q.SubjectCollection.WithContext(ctx).
+		Where(r.q.SubjectCollection.UserID.Eq(userID))
+
+	if subjectType != model.SubjectTypeAll {
+		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
+	}
+
+	if collectionType != model.CollectionTypeAll {
+		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
+	}
+
+	if !showPrivate {
+		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
+	}
+
+	c, err := q.Count()
+	if err != nil {
+		return 0, errgo.Wrap(err, "dal")
+	}
+
+	return c, nil
+}
+
+func (r mysqlRepo) ListSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectType model.SubjectType,
+	collectionType model.CollectionType,
+	showPrivate bool,
+	limit, offset int,
+) ([]model.SubjectCollection, error) {
+	q := r.q.SubjectCollection.WithContext(ctx).
+		Order(r.q.SubjectCollection.UpdatedAt.Desc()).
+		Where(r.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
+
+	if subjectType != model.SubjectTypeAll {
+		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
+	}
+
+	if collectionType != model.CollectionTypeAll {
+		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
+	}
+
+	if !showPrivate {
+		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
+	}
+
+	collections, err := q.Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var results = make([]model.SubjectCollection, len(collections))
+	for i, c := range collections {
+		results[i] = model.SubjectCollection{
+			UpdatedAt:   time.Unix(int64(c.UpdatedAt), 0),
+			Comment:     c.Comment,
+			Tags:        strutil.Split(c.Tag, " "),
+			SubjectType: c.SubjectType,
+			Rate:        c.Rate,
+			SubjectID:   c.SubjectID,
+			EpStatus:    c.EpStatus,
+			VolStatus:   c.VolStatus,
+			Type:        model.CollectionType(c.Type),
+			Private:     c.Private != model.CollectPrivacyNone,
+		}
+	}
+
+	return results, nil
+}
+
 func (r mysqlRepo) UpdateSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
 ) error {
@@ -149,85 +228,6 @@ func updateTimeStamp(newRecord *dao.SubjectCollection, oldType, newType model.Co
 	case model.CollectionTypeAll:
 		// already checked, do nothing
 	}
-}
-
-func (r mysqlRepo) CountSubjectCollections(
-	ctx context.Context,
-	userID model.UserID,
-	subjectType model.SubjectType,
-	collectionType model.CollectionType,
-	showPrivate bool,
-) (int64, error) {
-	q := r.q.SubjectCollection.WithContext(ctx).
-		Where(r.q.SubjectCollection.UserID.Eq(userID))
-
-	if subjectType != model.SubjectTypeAll {
-		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
-	}
-
-	if collectionType != model.CollectionTypeAll {
-		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
-	}
-
-	if !showPrivate {
-		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
-	}
-
-	c, err := q.Count()
-	if err != nil {
-		return 0, errgo.Wrap(err, "dal")
-	}
-
-	return c, nil
-}
-
-func (r mysqlRepo) ListSubjectCollection(
-	ctx context.Context,
-	userID model.UserID,
-	subjectType model.SubjectType,
-	collectionType model.CollectionType,
-	showPrivate bool,
-	limit, offset int,
-) ([]model.SubjectCollection, error) {
-	q := r.q.SubjectCollection.WithContext(ctx).
-		Order(r.q.SubjectCollection.UpdatedAt.Desc()).
-		Where(r.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
-
-	if subjectType != model.SubjectTypeAll {
-		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
-	}
-
-	if collectionType != model.CollectionTypeAll {
-		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
-	}
-
-	if !showPrivate {
-		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
-	}
-
-	collections, err := q.Find()
-	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
-		return nil, errgo.Wrap(err, "dal")
-	}
-
-	var results = make([]model.SubjectCollection, len(collections))
-	for i, c := range collections {
-		results[i] = model.SubjectCollection{
-			UpdatedAt:   time.Unix(int64(c.UpdatedAt), 0),
-			Comment:     c.Comment,
-			Tags:        strutil.Split(c.Tag, " "),
-			SubjectType: c.SubjectType,
-			Rate:        c.Rate,
-			SubjectID:   c.SubjectID,
-			EpStatus:    c.EpStatus,
-			VolStatus:   c.VolStatus,
-			Type:        model.CollectionType(c.Type),
-			Private:     c.Private != model.CollectPrivacyNone,
-		}
-	}
-
-	return results, nil
 }
 
 func (r mysqlRepo) createEpisodeCollection(
