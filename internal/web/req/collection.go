@@ -19,7 +19,7 @@ import (
 )
 
 type PatchSubjectCollection struct {
-	Comment   null.String `json:"comment"`
+	Comment   null.String `json:"comment" doc:"吐槽"`
 	Tags      []string    `json:"tags"`
 	EpStatus  null.Uint32 `json:"ep_status"`
 	VolStatus null.Uint32 `json:"vol_status"`

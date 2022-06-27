@@ -156,7 +156,6 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 const subjectNotFoundMessage = "subject not found"
 
 func (h Handler) PatchSubjectCollection(c *fiber.Ctx) error {
-	h.log.Info("called")
 	v := h.getHTTPAccessor(c)
 	if !v.login {
 		return res.Unauthorized(res.DefaultUnauthorizedMessage)
@@ -167,11 +166,6 @@ func (h Handler) PatchSubjectCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	var input req.PatchSubjectCollection
-	if err = json.UnmarshalNoEscape(c.Body(), &input); err != nil {
-		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
-	}
-
 	s, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get subject info")
@@ -180,8 +174,13 @@ func (h Handler) PatchSubjectCollection(c *fiber.Ctx) error {
 		return res.NotFound(subjectNotFoundMessage)
 	}
 
-	if s.TypeID != model.SubjectTypeBook && input.VolStatus.HasValue() {
-		return res.BadRequest("subject is not book, you can't add `vol_status` key to request body")
+	var input req.PatchSubjectCollection
+	if err = json.UnmarshalNoEscape(c.Body(), &input); err != nil {
+		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
+	}
+
+	if err = validateSubjectCollectionRequest(s, input); err != nil {
+		return err
 	}
 
 	return h.patchSubjectCollection(c, v.ID, s, input)
@@ -220,10 +219,24 @@ func (h Handler) patchSubjectCollection(
 
 	collection, err = h.collect.GetSubjectCollection(c.Context(), userID, s.ID)
 	if err != nil {
-		return errgo.Wrap(err, "user.GetSubjectCollection")
+		return errgo.Wrap(err, "collection.GetSubjectCollection")
 	}
 
 	return res.JSON(c, convertModelSubjectCollection(collection))
+}
+
+func validateSubjectCollectionRequest(s res.SubjectV0, input req.PatchSubjectCollection) error {
+	if s.TypeID == model.SubjectTypeMusic {
+		if input.VolStatus.HasValue() || input.EpStatus.HasValue() {
+			return res.BadRequest("can't update `vol_status` or `ep_status` for music subject")
+		}
+	}
+
+	if s.TypeID != model.SubjectTypeBook && input.VolStatus.HasValue() {
+		return res.BadRequest("subject is not book, you can't add `vol_status` key to request body")
+	}
+
+	return nil
 }
 
 func convertModelSubjectCollection(collection model.SubjectCollection) res.SubjectCollection {
