@@ -18,15 +18,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"reflect"
 	"strings"
 	"time"
 
 	"go.uber.org/zap"
 	"gorm.io/gen"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
-	"gorm.io/gorm/schema"
 
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
@@ -41,24 +38,15 @@ import (
 var _ domain.CollectionRepo = mysqlRepo{}
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CollectionRepo, error) {
-	columns, err := getAllNonIndexFields(dao.SubjectCollection{})
-	if err != nil {
-		return nil, err
-	}
-
 	return mysqlRepo{
 		q:   q,
 		log: log.Named("collection.mysqlRepo"),
-
-		subjectUpsert: clause.OnConflict{DoUpdates: clause.AssignmentColumns(columns)},
 	}, nil
 }
 
 type mysqlRepo struct {
 	q   *query.Query
 	log *zap.Logger
-
-	subjectUpsert clause.OnConflict
 }
 
 func (r mysqlRepo) CountSubjectCollections(
@@ -379,24 +367,4 @@ func (r mysqlRepo) GetEpisodeCollection(
 	}
 
 	return result, nil
-}
-
-func getAllNonIndexFields(v interface{}) ([]string, error) {
-	rvType := reflect.TypeOf(v)
-	s := make([]string, 0, rvType.NumField())
-	for i := 0; i < rvType.NumField(); i++ {
-		cfg := schema.ParseTagSetting(rvType.Field(i).Tag.Get("gorm"), ";")
-		column := cfg[strings.ToUpper("column")]
-		if column == "" {
-			f := rvType.Field(i)
-			//nolint:goerr113
-			return nil, fmt.Errorf("failed to parse struct field %s, '%s' ,%v", f.Name, f.Tag.Get("gorm"), column)
-		}
-		if column == "interest_id" || column == "interest_uid" || column == "interest_subject_id" {
-			continue
-		}
-		s = append(s, column)
-	}
-
-	return s, nil
 }
