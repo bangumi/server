@@ -140,6 +140,34 @@ func (r mysqlRepo) ListSubjectCollection(
 	return results, nil
 }
 
+func (r mysqlRepo) GetSubjectCollection(
+	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
+) (model.SubjectCollection, error) {
+	c, err := r.q.SubjectCollection.WithContext(ctx).
+		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.SubjectCollection{}, domain.ErrNotFound
+		}
+
+		r.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return model.SubjectCollection{}, errgo.Wrap(err, "dal")
+	}
+
+	return model.SubjectCollection{
+		UpdatedAt:   time.Unix(int64(c.UpdatedAt), 0),
+		Comment:     c.Comment,
+		Tags:        strutil.Split(c.Tag, " "),
+		SubjectType: c.SubjectType,
+		Rate:        c.Rate,
+		SubjectID:   c.SubjectID,
+		EpStatus:    c.EpStatus,
+		VolStatus:   c.VolStatus,
+		Type:        model.CollectionType(c.Type),
+		Private:     c.Private != model.CollectPrivacyNone,
+	}, nil
+}
+
 func (r mysqlRepo) UpdateSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
 ) error {
@@ -319,34 +347,6 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 
 		return nil
 	})
-}
-
-func (r mysqlRepo) GetSubjectCollection(
-	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-) (model.SubjectCollection, error) {
-	c, err := r.q.SubjectCollection.WithContext(ctx).
-		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.SubjectCollection{}, domain.ErrNotFound
-		}
-
-		r.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
-		return model.SubjectCollection{}, errgo.Wrap(err, "dal")
-	}
-
-	return model.SubjectCollection{
-		UpdatedAt:   time.Unix(int64(c.UpdatedAt), 0),
-		Comment:     c.Comment,
-		Tags:        strutil.Split(c.Tag, " "),
-		SubjectType: c.SubjectType,
-		Rate:        c.Rate,
-		SubjectID:   c.SubjectID,
-		EpStatus:    c.EpStatus,
-		VolStatus:   c.VolStatus,
-		Type:        model.CollectionType(c.Type),
-		Private:     c.Private != model.CollectPrivacyNone,
-	}, nil
 }
 
 func (r mysqlRepo) GetEpisodeCollection(
