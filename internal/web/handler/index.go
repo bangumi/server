@@ -130,7 +130,11 @@ func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 		})
 	}
 
-	return h.listComments(c, domain.CommentIndex, id)
+	pagedComments, err := h.listComments(c, domain.CommentIndex, id)
+	if err != nil {
+		return err
+	}
+	return c.JSON(pagedComments)
 }
 
 func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {

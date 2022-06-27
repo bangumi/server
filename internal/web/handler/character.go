@@ -87,7 +87,11 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		})
 	}
 
-	return h.listComments(c, domain.CommentCharacter, id)
+	pagedComments, err := h.listComments(c, domain.CommentCharacter, id)
+	if err != nil {
+		return err
+	}
+	return c.JSON(pagedComments)
 }
 
 // first try to read from cache, then fallback to reading from database.

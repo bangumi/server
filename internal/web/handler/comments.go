@@ -27,10 +27,10 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
-func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id uint32) error {
+func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id uint32) (*res.Paged, error) {
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
-		return c.Status(http.StatusNotFound).JSON(res.Error{
+		return nil, c.Status(http.StatusNotFound).JSON(res.Error{
 			Title:   "Not Found",
 			Details: util.DetailFromRequest(c),
 		})
@@ -38,43 +38,87 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 
 	count, err := h.m.Count(c.Context(), commentType, id)
 	if err != nil {
-		return errgo.Wrap(err, "repo.comments.Count")
+		return nil, errgo.Wrap(err, "repo.comments.Count")
 	}
 
 	if count == 0 {
-		return c.JSON(res.Paged{Data: []res.Comment{}, Total: count, Limit: page.Limit, Offset: page.Offset})
+		return nil, c.JSON(res.Paged{Data: []res.Comment{}, Total: count, Limit: page.Limit, Offset: page.Offset})
 	}
 
 	if err = page.check(count); err != nil {
-		return err
+		return nil, err
 	}
 
 	comments, err := h.m.List(c.Context(), commentType, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return c.Status(http.StatusNotFound).JSON(res.Error{
+			return nil, c.Status(http.StatusNotFound).JSON(res.Error{
 				Title:   "Not Found",
 				Details: util.DetailFromRequest(c),
 			})
 		}
-		return errgo.Wrap(err, "Comment.GetCommentsByMentionedID")
+		return nil, errgo.Wrap(err, "Comment.GetCommentsByMentionedID")
 	}
 
-	userIDs := make([]model.UIDType, 0)
+	uids := make([]model.UIDType, 0)
+	commentMap := make(map[model.CommentIDType]model.Comment)
 	for _, v := range comments {
-		userIDs = append(userIDs, v.UID)
+		commentMap[v.ID] = v
 	}
 
-	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
+	extIDs := make([]model.CommentIDType, 0)
+	for _, v := range comments {
+		if _, ok := commentMap[v.Related]; !ok && v.Related != 0 {
+			extIDs = append(extIDs, v.Related)
+		}
+	}
+
+	if len(extIDs) != 0 {
+		relatedComments, e := h.m.GetByIDs(c.Context(), commentType, extIDs...)
+		if e != nil {
+			return nil, errgo.Wrap(e, "repo.comments.GetByIDs")
+		}
+		for _, v := range relatedComments {
+			commentMap[v.ID] = v
+		}
+	}
+
+	for _, v := range commentMap {
+		uids = append(uids, v.UID)
+	}
+
+	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(uids...)...)
 	if err != nil {
-		return errgo.Wrap(err, "user.GetByIDs")
+		return nil, errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	comments = model.ConvertModelCommentsToTree(comments, 0)
-	return c.JSON(res.Paged{
+	return &res.Paged{
 		Total:  count,
 		Limit:  page.Limit,
 		Offset: page.Offset,
-		Data:   convertModelTopicComments(comments, userMap),
-	})
+		Data:   convertModelComments(comments, commentMap, userMap),
+	}, nil
+}
+
+func convertModelComments(
+	comments []model.Comment, cm map[model.CommentIDType]model.Comment, userMap map[uint32]model.User,
+) []res.Comment {
+	result := make([]res.Comment, len(comments))
+	for k, v := range comments {
+		result[k] = res.Comment{
+			ID:        v.ID,
+			Text:      v.Content,
+			CreatedAt: v.CreatedAt,
+			Creator:   convertModelUser(userMap[v.UID]),
+		}
+		if related, ok := cm[v.Related]; ok {
+			result[k].ReplyTo = &res.Comment{
+				CreatedAt: related.CreatedAt,
+				Creator:   convertModelUser(userMap[related.UID]),
+				Text:      related.Content,
+				ID:        related.ID,
+			}
+		}
+	}
+	return result
 }

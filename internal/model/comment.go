@@ -19,23 +19,9 @@ import "time"
 type Comment struct {
 	CreatedAt   time.Time
 	Content     string
-	Replies     []Comment
 	UID         uint32
 	Related     uint32
 	State       uint32
 	ID          CommentIDType
 	MentionedID uint32
-}
-
-func ConvertModelCommentsToTree(comments []Comment, related uint32) []Comment {
-	result := make([]Comment, 0)
-	for _, v := range comments {
-		if v.Related == related {
-			if replies := ConvertModelCommentsToTree(comments, v.ID); len(replies) != 0 {
-				v.Replies = replies
-			}
-			result = append(result, v)
-		}
-	}
-	return result
 }

@@ -146,7 +146,11 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 		})
 	}
 
-	return h.listComments(c, domain.CommentPerson, id)
+	pagedComments, err := h.listComments(c, domain.CommentPerson, id)
+	if err != nil {
+		return err
+	}
+	return c.JSON(pagedComments)
 }
 
 func (h Handler) GetPersonImage(c *fiber.Ctx) error {

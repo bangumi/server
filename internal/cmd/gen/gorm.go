@@ -122,6 +122,7 @@ func main() {
 		gen.FieldType("regdate", "int64"),
 		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
+		gen.FieldRename("SIGN", "sign"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
 			GORMTag: "foreignKey:UID;references:UID",
 		}))

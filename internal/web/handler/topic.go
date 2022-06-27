@@ -125,59 +125,29 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 func (h Handler) getResTopicWithComments(
 	c *fiber.Ctx, topicType domain.TopicType, topic model.Topic,
 ) error {
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
-	if err != nil {
-		return err
-	}
-
-	userMap, err := h.getUserMapOfTopics(c, topic)
-	if err != nil {
-		return err
-	}
-
 	commentType := map[domain.TopicType]domain.CommentType{
 		domain.TopicTypeGroup:   domain.CommentTypeGroupTopic,
 		domain.TopicTypeSubject: domain.CommentTypeSubjectTopic,
 	}[topicType]
 
-	comments, err := h.m.List(c.Context(), commentType, topic.ID, page.Limit, page.Offset)
+	pagedComments, err := h.listComments(c, commentType, topic.ID)
 	if err != nil {
-		return errgo.Wrap(err, "repo.comments.GetComments")
+		return err
 	}
 
-	count, err := h.m.Count(c.Context(), commentType, topic.ID)
+	u, err := h.u.GetByIDs(c.Context(), topic.UID)
 	if err != nil {
-		return errgo.Wrap(err, "repo.comments.Count")
+		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	comments = model.ConvertModelCommentsToTree(comments, 0)
 	response := res.Topic{
 		ID:        topic.ID,
 		Title:     topic.Title,
 		CreatedAt: topic.CreatedAt,
 		UpdatedAt: topic.UpdatedAt,
-		Creator:   convertModelUser(userMap[topic.UID]),
+		Creator:   convertModelUser(u[topic.UID]),
 		Replies:   topic.Replies,
-		Comments: &res.Paged{
-			Total:  count,
-			Limit:  page.Limit,
-			Offset: page.Offset,
-			Data:   convertModelTopicComments(comments, userMap),
-		},
+		Comments:  pagedComments,
 	}
 	return c.JSON(response)
-}
-
-func convertModelTopicComments(comments []model.Comment, userMap map[uint32]model.User) []res.Comment {
-	replies := make([]res.Comment, 0)
-	for _, v := range comments {
-		replies = append(replies, res.Comment{
-			ID:        v.ID,
-			Text:      v.Content,
-			CreatedAt: v.CreatedAt,
-			Creator:   convertModelUser(userMap[v.UID]),
-			Replies:   convertModelTopicComments(v.Replies, userMap),
-		})
-	}
-	return replies
 }

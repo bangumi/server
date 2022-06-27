@@ -116,6 +116,130 @@ func (_c *CommentRepo_Get_Call) Return(_a0 model.Comment, _a1 error) *CommentRep
 	return _c
 }
 
+// GetByIDs provides a mock function with given fields: ctx, commentType, ids
+func (_m *CommentRepo) GetByIDs(ctx context.Context, commentType domain.CommentType, ids ...uint32) (map[uint32]model.Comment, error) {
+	_va := make([]interface{}, len(ids))
+	for _i := range ids {
+		_va[_i] = ids[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, commentType)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 map[uint32]model.Comment
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, ...uint32) map[uint32]model.Comment); ok {
+		r0 = rf(ctx, commentType, ids...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[uint32]model.Comment)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, ...uint32) error); ok {
+		r1 = rf(ctx, commentType, ids...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// CommentRepo_GetByIDs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByIDs'
+type CommentRepo_GetByIDs_Call struct {
+	*mock.Call
+}
+
+// GetByIDs is a helper method to define mock.On call
+//  - ctx context.Context
+//  - commentType domain.CommentType
+//  - ids ...uint32
+func (_e *CommentRepo_Expecter) GetByIDs(ctx interface{}, commentType interface{}, ids ...interface{}) *CommentRepo_GetByIDs_Call {
+	return &CommentRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs",
+		append([]interface{}{ctx, commentType}, ids...)...)}
+}
+
+func (_c *CommentRepo_GetByIDs_Call) Run(run func(ctx context.Context, commentType domain.CommentType, ids ...uint32)) *CommentRepo_GetByIDs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]uint32, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(uint32)
+			}
+		}
+		run(args[0].(context.Context), args[1].(domain.CommentType), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *CommentRepo_GetByIDs_Call) Return(_a0 map[uint32]model.Comment, _a1 error) *CommentRepo_GetByIDs_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// GetByRelateIDs provides a mock function with given fields: ctx, commentType, ids
+func (_m *CommentRepo) GetByRelateIDs(ctx context.Context, commentType domain.CommentType, ids ...uint32) (map[uint32][]model.Comment, error) {
+	_va := make([]interface{}, len(ids))
+	for _i := range ids {
+		_va[_i] = ids[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, commentType)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 map[uint32][]model.Comment
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, ...uint32) map[uint32][]model.Comment); ok {
+		r0 = rf(ctx, commentType, ids...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[uint32][]model.Comment)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, ...uint32) error); ok {
+		r1 = rf(ctx, commentType, ids...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// CommentRepo_GetByRelateIDs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByRelateIDs'
+type CommentRepo_GetByRelateIDs_Call struct {
+	*mock.Call
+}
+
+// GetByRelateIDs is a helper method to define mock.On call
+//  - ctx context.Context
+//  - commentType domain.CommentType
+//  - ids ...uint32
+func (_e *CommentRepo_Expecter) GetByRelateIDs(ctx interface{}, commentType interface{}, ids ...interface{}) *CommentRepo_GetByRelateIDs_Call {
+	return &CommentRepo_GetByRelateIDs_Call{Call: _e.mock.On("GetByRelateIDs",
+		append([]interface{}{ctx, commentType}, ids...)...)}
+}
+
+func (_c *CommentRepo_GetByRelateIDs_Call) Run(run func(ctx context.Context, commentType domain.CommentType, ids ...uint32)) *CommentRepo_GetByRelateIDs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]uint32, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(uint32)
+			}
+		}
+		run(args[0].(context.Context), args[1].(domain.CommentType), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *CommentRepo_GetByRelateIDs_Call) Return(_a0 map[uint32][]model.Comment, _a1 error) *CommentRepo_GetByRelateIDs_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // List provides a mock function with given fields: ctx, commentType, id, limit, offset
 func (_m *CommentRepo) List(ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int) ([]model.Comment, error) {
 	ret := _m.Called(ctx, commentType, id, limit, offset)
