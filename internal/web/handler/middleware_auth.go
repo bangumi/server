@@ -29,7 +29,7 @@ import (
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/pkg/strutil"
 	"github.com/bangumi/server/internal/web/cookie"
-	"github.com/bangumi/server/internal/web/handler/ctxkey"
+	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/session"
