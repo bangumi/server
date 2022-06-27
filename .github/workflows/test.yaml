@@ -8,7 +8,7 @@ on:
       - ".github/workflows/test.yaml"
       - "go.mod"
       - "go.sum"
-      - "Makefile"
+      - "Taskfile.yaml"
       - "**.go"
       - "**.go.json"
   pull_request:
@@ -18,7 +18,7 @@ on:
       - ".github/workflows/test.yaml"
       - "go.mod"
       - "go.sum"
-      - "Makefile"
+      - "Taskfile.yaml"
       - "**.go"
       - "**.go.json"
 

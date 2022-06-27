@@ -14,8 +14,5 @@
 
 package dao
 
-const FieldTypePerson = "prsn"
-const FieldTypeCharacter = "crt"
-
 // delete this after https://github.com/go-gorm/gen/issues/496 is fixed.
 type bytes = []byte

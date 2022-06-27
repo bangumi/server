@@ -14,12 +14,16 @@
 
 /*
 scripts to generate ORM struct from mysql server
+
+TODO:
+NOTICE:
+	use `gen.FieldType("...", "bytes")` to generate field with `[]byte` type
+	This is a bug of gorm/gen.
+	https://github.com/go-gorm/gen/issues/496
 */
 
 // nolint
 package main
-
-// disable lint in this package as it's only a generator
 
 import (
 	"reflect"
