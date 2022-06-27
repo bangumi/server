@@ -18,7 +18,7 @@
 ```bash
 git clone --recursive https://github.com/bangumi/server.git bangumi-server
 cd bangumi-server
-make install
+task
 ```
 
 ### 设置
