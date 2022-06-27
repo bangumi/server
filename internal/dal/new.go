@@ -22,6 +22,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/uber-go/tally/v4"
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
@@ -49,7 +50,7 @@ func NewDB(
 		)
 	} else {
 		gLog = gormLogger.New(
-			logger.Std(),
+			zap.NewStdLog(logger.Copy().WithOptions(zap.WithCaller(false), zap.AddStacktrace(zap.PanicLevel))),
 			gormLogger.Config{
 				SlowThreshold:             slowQueryTimeout,
 				LogLevel:                  gormLogger.Warn,

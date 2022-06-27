@@ -32,7 +32,7 @@ func newEpCollection(db *gorm.DB) epCollection {
 	_epCollection.SubjectID = field.NewField(tableName, "ep_stt_sid")
 	_epCollection.OnPrg = field.NewBool(tableName, "ep_stt_on_prg")
 	_epCollection.Status = field.NewBytes(tableName, "ep_stt_status")
-	_epCollection.UpdatedAt = field.NewUint32(tableName, "ep_stt_lasttouch")
+	_epCollection.UpdatedTime = field.NewUint32(tableName, "ep_stt_lasttouch")
 
 	_epCollection.fillFieldMap()
 
@@ -42,13 +42,13 @@ func newEpCollection(db *gorm.DB) epCollection {
 type epCollection struct {
 	epCollectionDo epCollectionDo
 
-	ALL       field.Field
-	ID        field.Uint32
-	UserID    field.Field
-	SubjectID field.Field
-	OnPrg     field.Bool
-	Status    field.Bytes
-	UpdatedAt field.Uint32
+	ALL         field.Field
+	ID          field.Uint32
+	UserID      field.Field
+	SubjectID   field.Field
+	OnPrg       field.Bool
+	Status      field.Bytes
+	UpdatedTime field.Uint32
 
 	fieldMap map[string]field.Expr
 }
@@ -70,7 +70,7 @@ func (e *epCollection) updateTableName(table string) *epCollection {
 	e.SubjectID = field.NewField(table, "ep_stt_sid")
 	e.OnPrg = field.NewBool(table, "ep_stt_on_prg")
 	e.Status = field.NewBytes(table, "ep_stt_status")
-	e.UpdatedAt = field.NewUint32(table, "ep_stt_lasttouch")
+	e.UpdatedTime = field.NewUint32(table, "ep_stt_lasttouch")
 
 	e.fillFieldMap()
 
@@ -101,7 +101,7 @@ func (e *epCollection) fillFieldMap() {
 	e.fieldMap["ep_stt_sid"] = e.SubjectID
 	e.fieldMap["ep_stt_on_prg"] = e.OnPrg
 	e.fieldMap["ep_stt_status"] = e.Status
-	e.fieldMap["ep_stt_lasttouch"] = e.UpdatedAt
+	e.fieldMap["ep_stt_lasttouch"] = e.UpdatedTime
 }
 
 func (e epCollection) clone(db *gorm.DB) epCollection {

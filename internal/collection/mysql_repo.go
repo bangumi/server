@@ -268,10 +268,10 @@ func (r mysqlRepo) createEpisodeCollection(
 
 	err = tx.EpCollection.WithContext(ctx).
 		Create(&dao.EpCollection{
-			UserID:    userID,
-			SubjectID: subjectID,
-			Status:    bytes,
-			UpdatedAt: uint32(time.Now().Unix()),
+			UserID:      userID,
+			SubjectID:   subjectID,
+			Status:      bytes,
+			UpdatedTime: uint32(time.Now().Unix()),
 		})
 	if err != nil {
 		return errgo.Wrap(err, "gorm.Create")
@@ -287,9 +287,9 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 	episodeID model.EpisodeID,
 	collectionType model.CollectionType,
 ) error {
+	where := []gen.Condition{r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)}
 	return r.q.Transaction(func(tx *query.Query) error {
-		d, err := tx.EpCollection.WithContext(ctx).
-			Where(r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)).First()
+		d, err := tx.EpCollection.WithContext(ctx).Where(where...).First()
 		if err != nil {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
 				r.log.Error("failed to get episode collection record",
@@ -326,11 +326,17 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 			return err
 		}
 
-		_, err = tx.EpCollection.WithContext(ctx).
-			Where(r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)).
-			UpdateColumnSimple(r.q.EpCollection.Status.Value(bytes), r.q.EpCollection.UpdatedAt.Value(timex.NowU32()))
+		_, err = tx.SubjectCollection.WithContext(ctx).
+			Where(tx.SubjectCollection.UserID.Eq(userID), tx.SubjectCollection.SubjectID.Eq(subjectID)).
+			UpdateColumnSimple(tx.SubjectCollection.VolStatus.Value(uint32(len(e))))
 		if err != nil {
-			return errgo.Wrap(err, "gorm.UpdateColumnSimple")
+			return errgo.Wrap(err, "SubjectCollection.UpdateSimple")
+		}
+
+		_, err = tx.EpCollection.WithContext(ctx).Where(where...).
+			UpdateColumnSimple(r.q.EpCollection.Status.Value(bytes), r.q.EpCollection.UpdatedTime.Value(timex.NowU32()))
+		if err != nil {
+			return errgo.Wrap(err, "EpCollection.UpdateColumnSimple")
 		}
 
 		return nil
