@@ -18,15 +18,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
 	"reflect"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/elliotchance/phpserialize"
-	ms "github.com/mitchellh/mapstructure"
 	"go.uber.org/zap"
+	"gorm.io/gen"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -38,6 +35,7 @@ import (
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/strutil"
+	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 var _ domain.CollectionRepo = mysqlRepo{}
@@ -66,44 +64,91 @@ type mysqlRepo struct {
 func (r mysqlRepo) UpdateSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
 ) error {
-	var d = &dao.SubjectCollection{
-		UserID:      userID,
-		SubjectID:   subjectID,
-		SubjectType: data.SubjectType,
-		Rate:        data.Rate,
-		Type:        uint8(data.Type),
-		HasComment:  data.Comment != "",
-		Comment:     data.Comment,
-		Tag:         strings.Join(data.Tags, " "),
-		EpStatus:    data.EpStatus,
-		VolStatus:   data.VolStatus,
-		UpdatedAt:   uint32(data.UpdatedAt.Unix()),
-		Private:     0,
-	}
-
-	switch data.Type {
-	case model.CollectionTypeWish:
-		d.WishAt = d.UpdatedAt
-	case model.CollectionTypeDone:
-		d.DoneAt = d.UpdatedAt
-	case model.CollectionTypeDoing:
-		d.DoingAt = d.UpdatedAt
-	case model.CollectionTypeOnHold:
-		d.OnHoldAt = d.UpdatedAt
-	case model.CollectionTypeDropped:
-		d.DroppedAt = d.UpdatedAt
-	case model.CollectionTypeAll:
+	if data.Type == model.CollectionTypeAll {
 		return fmt.Errorf("%w: can't set collection type to 0", domain.ErrInvalidInput)
 	}
 
-	err := r.q.SubjectCollection.WithContext(ctx).Clauses(r.subjectUpsert).Create(d)
-	if err != nil {
-		r.log.Error("unexpected error happened when updating subject collection", zap.Error(err),
-			log.UserID(userID), log.SubjectID(subjectID), zap.Reflect("dao", d), zap.Reflect("data", data))
-		return errgo.Wrap(err, "dal")
+	where := []gen.Condition{r.q.SubjectCollection.SubjectID.Eq(subjectID), r.q.SubjectCollection.UserID.Eq(userID)}
+
+	return r.q.Transaction(func(tx *query.Query) error {
+		old, err := tx.SubjectCollection.WithContext(ctx).Where(where...).First()
+		if err != nil {
+			if errors.Is(err, domain.ErrNotFound) {
+				return fmt.Errorf(
+					"%w: subject collection not found, user should add it to collection from WEB", domain.ErrInvalidInput)
+			}
+
+			return errgo.Wrap(err, "dal")
+		}
+
+		var d = &dao.SubjectCollection{
+			UserID:      userID,
+			SubjectID:   subjectID,
+			Rate:        data.Rate,
+			Type:        uint8(data.Type),
+			HasComment:  data.Comment != "",
+			Comment:     data.Comment,
+			Tag:         strings.Join(data.Tags, " "),
+			EpStatus:    data.EpStatus,
+			VolStatus:   data.VolStatus,
+			SubjectType: old.SubjectType,
+			WishAt:      old.WishAt,
+			DoingAt:     old.DoingAt,
+			DoneAt:      old.DoneAt,
+			OnHoldAt:    old.OnHoldAt,
+			DroppedAt:   old.DroppedAt,
+			UpdatedAt:   uint32(data.UpdatedAt.Unix()),
+			Private:     old.Private,
+		}
+
+		if old.Private != model.CollectPrivacyBan {
+			updatePrivate(d, data.Private)
+		}
+
+		updateTimeStamp(d, model.CollectionType(old.Type), data.Type, uint32(data.UpdatedAt.Unix()))
+
+		_, err = tx.SubjectCollection.WithContext(ctx).Debug().Omit(
+			r.q.SubjectCollection.ID, r.q.SubjectCollection.UserID,
+			r.q.SubjectCollection.SubjectID, r.q.SubjectCollection.SubjectType,
+		).Where(where...).UpdateColumns(d)
+		if err != nil {
+			r.log.Error("unexpected error happened when updating subject collection", zap.Error(err),
+				log.UserID(userID), log.SubjectID(subjectID), zap.Reflect("dao", d), zap.Reflect("data", data))
+			return errgo.Wrap(err, "dal")
+		}
+
+		return nil
+	})
+}
+
+func updatePrivate(newRecord *dao.SubjectCollection, private bool) {
+	if private {
+		newRecord.Private = model.CollectPrivacySelf
+	} else {
+		newRecord.Private = model.CollectPrivacyNone
+	}
+}
+
+// update new record timestamp base on new Type.
+func updateTimeStamp(newRecord *dao.SubjectCollection, oldType, newType model.CollectionType, updatedAt uint32) {
+	if oldType == newType {
+		return
 	}
 
-	return nil
+	switch newType {
+	case model.CollectionTypeWish:
+		newRecord.WishAt = updatedAt
+	case model.CollectionTypeDone:
+		newRecord.DoneAt = updatedAt
+	case model.CollectionTypeDoing:
+		newRecord.DoingAt = updatedAt
+	case model.CollectionTypeOnHold:
+		newRecord.OnHoldAt = updatedAt
+	case model.CollectionTypeDropped:
+		newRecord.DroppedAt = updatedAt
+	case model.CollectionTypeAll:
+		// already checked, do nothing
+	}
 }
 
 func (r mysqlRepo) CountSubjectCollections(
@@ -185,6 +230,97 @@ func (r mysqlRepo) ListSubjectCollection(
 	return results, nil
 }
 
+func (r mysqlRepo) createEpisodeCollection(
+	ctx context.Context,
+	tx *query.Query,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	episodeID model.EpisodeID,
+	collectionType model.CollectionType,
+) error {
+	var e = make(mysqlEpCollection, 1)
+
+	e[episodeID] = mysqlEpCollectionItem{
+		EpisodeID: episodeID,
+		Type:      collectionType,
+	}
+
+	bytes, err := serializePhpEpStatus(e)
+	if err != nil {
+		return err
+	}
+
+	err = tx.EpCollection.WithContext(ctx).
+		Create(&dao.EpCollection{
+			UserID:    userID,
+			SubjectID: subjectID,
+			Status:    bytes,
+			UpdatedAt: uint32(time.Now().Unix()),
+		})
+	if err != nil {
+		return errgo.Wrap(err, "gorm.Create")
+	}
+
+	return nil
+}
+
+func (r mysqlRepo) UpdateEpisodeCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	episodeID model.EpisodeID,
+	collectionType model.CollectionType,
+) error {
+	return r.q.Transaction(func(tx *query.Query) error {
+		d, err := tx.EpCollection.WithContext(ctx).
+			Where(r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)).First()
+		if err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				r.log.Error("failed to get episode collection record",
+					zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+				return errgo.Wrap(err, "dal")
+			}
+
+			err = r.createEpisodeCollection(ctx, tx, userID, subjectID, episodeID, collectionType)
+			r.log.Error("failed to create episode collection")
+			return errgo.Wrap(err, "r.createEpisodeCollection")
+		}
+
+		var e mysqlEpCollection
+		e, err = deserializePhpEpStatus(d.Status)
+		if err != nil {
+			r.log.Error("failed to deserialize php-serialized bytes to go data",
+				zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+			return err
+		}
+
+		if v, ok := e[episodeID]; ok {
+			if v.Type == collectionType {
+				return nil
+			}
+		}
+
+		e[episodeID] = mysqlEpCollectionItem{
+			EpisodeID: episodeID,
+			Type:      collectionType,
+		}
+
+		bytes, err := serializePhpEpStatus(e)
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.EpCollection.WithContext(ctx).
+			Where(r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)).
+			UpdateColumnSimple(r.q.EpCollection.Status.Value(bytes), r.q.EpCollection.UpdatedAt.Value(timex.NowU32()))
+		if err != nil {
+			return errgo.Wrap(err, "gorm.UpdateColumnSimple")
+		}
+
+		return nil
+	})
+}
+
 func (r mysqlRepo) GetSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 ) (model.SubjectCollection, error) {
@@ -211,26 +347,6 @@ func (r mysqlRepo) GetSubjectCollection(
 		Type:        model.CollectionType(c.Type),
 		Private:     c.Private != model.CollectPrivacyNone,
 	}, nil
-}
-
-func getAllNonIndexFields(v interface{}) ([]string, error) {
-	rvType := reflect.TypeOf(v)
-	s := make([]string, 0, rvType.NumField())
-	for i := 0; i < rvType.NumField(); i++ {
-		cfg := schema.ParseTagSetting(rvType.Field(i).Tag.Get("gorm"), ";")
-		column := cfg[strings.ToUpper("column")]
-		if column == "" {
-			f := rvType.Field(i)
-			//nolint:goerr113
-			return nil, fmt.Errorf("failed to parse struct field %s, '%s' ,%v", f.Name, f.Tag.Get("gorm"), column)
-		}
-		if column == "interest_id" || column == "interest_uid" || column == "interest_subject_id" {
-			continue
-		}
-		s = append(s, column)
-	}
-
-	return s, nil
 }
 
 func (r mysqlRepo) GetEpisodeCollection(
@@ -265,51 +381,22 @@ func (r mysqlRepo) GetEpisodeCollection(
 	return result, nil
 }
 
-type epCollectionItem struct {
-	EpisodeID model.EpisodeID      `ms:"eid"`
-	Type      model.CollectionType `ms:"type"`
-}
-
-var errEpisodeInvalid = errors.New("number is not valid as episode ID")
-
-type epCollection = map[model.EpisodeID]epCollectionItem
-
-func deserializePhpEpStatus(phpSerialized []byte) (epCollection, error) {
-	var e map[interface{}]interface{}
-	if err := phpserialize.Unmarshal(phpSerialized, &e); err != nil {
-		return nil, errgo.Wrap(err, "php deserialize")
-	}
-
-	var ep = make(epCollection, len(e))
-	for key, value := range e {
-		iKey, ok := key.(int64)
-		if !ok {
+func getAllNonIndexFields(v interface{}) ([]string, error) {
+	rvType := reflect.TypeOf(v)
+	s := make([]string, 0, rvType.NumField())
+	for i := 0; i < rvType.NumField(); i++ {
+		cfg := schema.ParseTagSetting(rvType.Field(i).Tag.Get("gorm"), ";")
+		column := cfg[strings.ToUpper("column")]
+		if column == "" {
+			f := rvType.Field(i)
 			//nolint:goerr113
-			return nil, fmt.Errorf("failed to convert type %s to int64, value %v", reflect.TypeOf(key).String(), key)
+			return nil, fmt.Errorf("failed to parse struct field %s, '%s' ,%v", f.Name, f.Tag.Get("gorm"), column)
 		}
-		if iKey <= 0 || iKey > math.MaxUint32 {
-			return nil, errgo.Wrap(errEpisodeInvalid, strconv.FormatInt(iKey, 10))
+		if column == "interest_id" || column == "interest_uid" || column == "interest_subject_id" {
+			continue
 		}
-
-		var e epCollectionItem
-		decoder, err := ms.NewDecoder(&ms.DecoderConfig{
-			ErrorUnused:          true,
-			ErrorUnset:           true,
-			WeaklyTypedInput:     true,
-			Result:               &e,
-			TagName:              "ms",
-			IgnoreUntaggedFields: true,
-		})
-		if err != nil {
-			return nil, errgo.Wrap(err, "mapstructure.MewDecoder")
-		}
-
-		if err = decoder.Decode(value); err != nil {
-			return nil, errgo.Wrap(err, "mapstructure.Decode")
-		}
-
-		ep[model.EpisodeID(iKey)] = e
+		s = append(s, column)
 	}
 
-	return ep, nil
+	return s, nil
 }

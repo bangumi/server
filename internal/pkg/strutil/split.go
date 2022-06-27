@@ -41,12 +41,3 @@ func Split(s string, c string) []string {
 
 	return result
 }
-
-func Map(s []string, fn func(int, string) string) []string {
-	result := make([]string, len(s))
-	for i, s2 := range s {
-		result[i] = fn(i, s2)
-	}
-
-	return result
-}

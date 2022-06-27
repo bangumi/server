@@ -2,6 +2,7 @@ module github.com/bangumi/server
 
 go 1.17
 
+
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/danielgtaylor/huma v1.8.0
@@ -25,6 +26,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.2
 	github.com/uber-go/tally/v4 v4.1.1
+	github.com/valyala/bytebufferpool v1.0.0
 	github.com/vektra/mockery/v2 v2.13.1
 	go.uber.org/fx v1.17.1
 	go.uber.org/zap v1.21.0
@@ -32,7 +34,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.3.4
 	gorm.io/gen v0.3.8
-	gorm.io/gorm v1.23.6
+	gorm.io/gorm v1.23.7-0.20220614054850-8d457146283e
 	gorm.io/plugin/dbresolver v1.2.1
 )
 
@@ -80,7 +82,6 @@ require (
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/subosito/gotenv v1.4.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.37.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect

@@ -17,7 +17,6 @@ package handler
 import (
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -155,7 +154,7 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 
 const subjectNotFoundMessage = "subject not found"
 
-func (h Handler) PatchSubjectCollection(c *fiber.Ctx) error {
+func (h Handler) PatchEpisodeCollection(c *fiber.Ctx) error {
 	v := h.getHTTPAccessor(c)
 	if !v.login {
 		return res.Unauthorized(res.DefaultUnauthorizedMessage)
@@ -174,50 +173,42 @@ func (h Handler) PatchSubjectCollection(c *fiber.Ctx) error {
 		return res.NotFound(subjectNotFoundMessage)
 	}
 
-	var input req.PatchSubjectCollection
+	var input req.PutEpisodeCollection
 	if err = json.UnmarshalNoEscape(c.Body(), &input); err != nil {
 		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
 	}
 
-	if err = validateSubjectCollectionRequest(s, input); err != nil {
+	if errs := h.v.Struct(input); errs != nil {
+		return h.ValidationError(c, errs)
+	}
+
+	if err = validateSubjectCollectionRequest(s); err != nil {
 		return err
 	}
 
-	return h.patchSubjectCollection(c, v.ID, s, input)
+	return h.putEpisodeCollection(c, v.ID, s, input)
 }
 
-func (h Handler) patchSubjectCollection(
-	c *fiber.Ctx, userID model.UserID, s res.SubjectV0, input req.PatchSubjectCollection,
+func (h Handler) putEpisodeCollection(
+	c *fiber.Ctx,
+	userID model.UserID,
+	s res.SubjectV0,
+	input req.PutEpisodeCollection,
 ) error {
-	collection, err := h.collect.GetSubjectCollection(c.Context(), userID, s.ID)
+	_, err := h.collect.GetSubjectCollection(c.Context(), userID, s.ID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound(subjectNotFoundMessage)
+			return res.NotFound("subject is not collected, please add subject to your collection first")
 		}
 
 		return errgo.Wrap(err, "user.GetSubjectCollection")
 	}
 
-	update := model.SubjectCollectionUpdate{
-		UpdatedAt:   time.Now(),
-		SubjectType: s.TypeID,
-		Rate:        collection.Rate,
-		Comment:     input.Comment.Default(collection.Comment),
-		VolStatus:   input.VolStatus.Default(collection.VolStatus),
-		EpStatus:    input.EpStatus.Default(collection.EpStatus),
-		Type:        model.CollectionType(input.Type.Default(uint8(collection.Type))),
-		Private:     input.Private.Default(collection.Private),
-	}
-
-	if input.Tags != nil {
-		update.Tags = input.Tags
-	}
-
-	if err = h.collect.UpdateSubjectCollection(c.Context(), userID, s.ID, update); err != nil {
+	if err = h.collect.UpdateEpisodeCollection(c.Context(), userID, s.ID, input.EpisodeID, input.Type); err != nil {
 		return h.InternalError(c, err, "failed to update subject collection")
 	}
 
-	collection, err = h.collect.GetSubjectCollection(c.Context(), userID, s.ID)
+	collection, err := h.collect.GetSubjectCollection(c.Context(), userID, s.ID)
 	if err != nil {
 		return errgo.Wrap(err, "collection.GetSubjectCollection")
 	}
@@ -225,18 +216,12 @@ func (h Handler) patchSubjectCollection(
 	return res.JSON(c, convertModelSubjectCollection(collection))
 }
 
-func validateSubjectCollectionRequest(s res.SubjectV0, input req.PatchSubjectCollection) error {
-	if s.TypeID == model.SubjectTypeMusic {
-		if input.VolStatus.HasValue() || input.EpStatus.HasValue() {
-			return res.BadRequest("can't update `vol_status` or `ep_status` for music subject")
-		}
+func validateSubjectCollectionRequest(s res.SubjectV0) error {
+	if s.TypeID == model.SubjectTypeAnime || s.TypeID == model.SubjectTypeReal {
+		return nil
 	}
 
-	if s.TypeID != model.SubjectTypeBook && input.VolStatus.HasValue() {
-		return res.BadRequest("subject is not book, you can't add `vol_status` key to request body")
-	}
-
-	return nil
+	return res.BadRequest("subject is not anime or real.")
 }
 
 func convertModelSubjectCollection(collection model.SubjectCollection) res.SubjectCollection {

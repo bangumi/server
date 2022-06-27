@@ -217,6 +217,47 @@ func (_c *CollectionRepo_ListSubjectCollection_Call) Return(_a0 []model.SubjectC
 	return _c
 }
 
+// UpdateEpisodeCollection provides a mock function with given fields: ctx, userID, subjectID, episodeID, collectionType
+func (_m *CollectionRepo) UpdateEpisodeCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID, episodeID model.EpisodeID, collectionType model.CollectionType) error {
+	ret := _m.Called(ctx, userID, subjectID, episodeID, collectionType)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID, model.EpisodeID, model.CollectionType) error); ok {
+		r0 = rf(ctx, userID, subjectID, episodeID, collectionType)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// CollectionRepo_UpdateEpisodeCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateEpisodeCollection'
+type CollectionRepo_UpdateEpisodeCollection_Call struct {
+	*mock.Call
+}
+
+// UpdateEpisodeCollection is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID model.UserID
+//  - subjectID model.SubjectID
+//  - episodeID model.EpisodeID
+//  - collectionType model.CollectionType
+func (_e *CollectionRepo_Expecter) UpdateEpisodeCollection(ctx interface{}, userID interface{}, subjectID interface{}, episodeID interface{}, collectionType interface{}) *CollectionRepo_UpdateEpisodeCollection_Call {
+	return &CollectionRepo_UpdateEpisodeCollection_Call{Call: _e.mock.On("UpdateEpisodeCollection", ctx, userID, subjectID, episodeID, collectionType)}
+}
+
+func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectID model.SubjectID, episodeID model.EpisodeID, collectionType model.CollectionType)) *CollectionRepo_UpdateEpisodeCollection_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.SubjectID), args[3].(model.EpisodeID), args[4].(model.CollectionType))
+	})
+	return _c
+}
+
+func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Return(_a0 error) *CollectionRepo_UpdateEpisodeCollection_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
 // UpdateSubjectCollection provides a mock function with given fields: ctx, userID, subjectID, data
 func (_m *CollectionRepo) UpdateSubjectCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate) error {
 	ret := _m.Called(ctx, userID, subjectID, data)

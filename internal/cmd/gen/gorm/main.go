@@ -128,7 +128,7 @@ func main() {
 		gen.FieldType("uid", userIDTypeString),
 		gen.FieldRename("SIGN", "Sign"),
 		gen.FieldType("regdate", "int64"),
-		gen.FieldType("password_crypt", "[]byte"),
+		gen.FieldType("password_crypt", "bytes"),
 		gen.FieldType("groupid", "uint8"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
 			GORMTag: "foreignKey:uid;references:uid",
@@ -143,7 +143,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_usergroup", "UserGroup",
 		gen.FieldTrimPrefix("usr_grp_"),
 		gen.FieldType("usr_grp_id", "uint8"),
-		gen.FieldType("usr_grp_perm", "[]byte"),
+		gen.FieldType("usr_grp_perm", "bytes"),
 	))
 
 	var oauthApp = g.GenerateModelAs("chii_apps", "App",
@@ -169,7 +169,7 @@ func main() {
 		gen.FieldType("type", "uint8"),
 		gen.FieldType("id", "uint32"),
 		gen.FieldType("scope", "*string"),
-		gen.FieldType("info", "[]byte"),
+		gen.FieldType("info", "bytes"),
 		gen.FieldRename("expires", "ExpiredAt"),
 	))
 
@@ -236,7 +236,7 @@ func main() {
 		gen.FieldType("field_airtime", "uint8"),
 		gen.FieldType("field_week_day", "int8"),
 		gen.FieldType("field_redirect", subjectIDTypeString),
-		gen.FieldType("field_tags", "[]byte"),
+		gen.FieldType("field_tags", "bytes"),
 		// gen.FieldType("field_date","string"),
 	)
 
@@ -278,7 +278,8 @@ func main() {
 		gen.FieldType("ep_stt_uid", userIDTypeString),
 		gen.FieldRename("ep_stt_uid", "userID"),
 		gen.FieldRename("ep_stt_lasttouch", "UpdatedAt"),
-		gen.FieldType("ep_stt_status", "[]byte"),
+		// replace this with `[]byte` after https://github.com/go-gorm/gen/issues/496 is fixed
+		gen.FieldType("ep_stt_status", "bytes"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_relations", "SubjectRelation",

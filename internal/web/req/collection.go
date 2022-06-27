@@ -15,14 +15,19 @@
 package req
 
 import (
-	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/model"
 )
 
-type PatchSubjectCollection struct {
-	Comment   null.String `json:"comment" doc:"吐槽"`
-	Tags      []string    `json:"tags"`
-	EpStatus  null.Uint32 `json:"ep_status"`
-	VolStatus null.Uint32 `json:"vol_status"`
-	Type      null.Uint8  `json:"type" validate:"lte=5,gte=1,omitempty"`
-	Private   null.Bool   `json:"private"`
+// type PatchEpisodeCollection struct {
+// 	Comment   null.String `json:"comment" doc:"吐槽"`
+// 	Tags      []string    `json:"tags"`
+// 	EpStatus  null.Uint32 `json:"ep_status"`
+// 	VolStatus null.Uint32 `json:"vol_status"`
+// 	Type      null.Uint8  `json:"type" validate:"lte=5,gte=1,omitempty"`
+// 	Private   null.Bool   `json:"private"`
+// }
+
+type PutEpisodeCollection struct {
+	EpisodeID model.EpisodeID      `json:"episode_id" validate:"required"`
+	Type      model.CollectionType `json:"type" validate:"lte=5,gte=1,required"`
 }

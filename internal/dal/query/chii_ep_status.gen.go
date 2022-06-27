@@ -31,7 +31,7 @@ func newEpCollection(db *gorm.DB) epCollection {
 	_epCollection.UserID = field.NewField(tableName, "ep_stt_uid")
 	_epCollection.SubjectID = field.NewField(tableName, "ep_stt_sid")
 	_epCollection.OnPrg = field.NewBool(tableName, "ep_stt_on_prg")
-	_epCollection.Status = field.NewField(tableName, "ep_stt_status")
+	_epCollection.Status = field.NewBytes(tableName, "ep_stt_status")
 	_epCollection.UpdatedAt = field.NewUint32(tableName, "ep_stt_lasttouch")
 
 	_epCollection.fillFieldMap()
@@ -47,7 +47,7 @@ type epCollection struct {
 	UserID    field.Field
 	SubjectID field.Field
 	OnPrg     field.Bool
-	Status    field.Field
+	Status    field.Bytes
 	UpdatedAt field.Uint32
 
 	fieldMap map[string]field.Expr
@@ -69,7 +69,7 @@ func (e *epCollection) updateTableName(table string) *epCollection {
 	e.UserID = field.NewField(table, "ep_stt_uid")
 	e.SubjectID = field.NewField(table, "ep_stt_sid")
 	e.OnPrg = field.NewBool(table, "ep_stt_on_prg")
-	e.Status = field.NewField(table, "ep_stt_status")
+	e.Status = field.NewBytes(table, "ep_stt_status")
 	e.UpdatedAt = field.NewUint32(table, "ep_stt_lasttouch")
 
 	e.fillFieldMap()

@@ -52,15 +52,14 @@ type SubjectCollection struct {
 }
 
 type SubjectCollectionUpdate struct {
-	UpdatedAt   time.Time
-	Comment     string
-	Tags        []string
-	VolStatus   uint32
-	EpStatus    uint32
-	SubjectType SubjectType
-	Rate        uint8
-	Type        CollectionType
-	Private     bool
+	UpdatedAt time.Time
+	Comment   string
+	Tags      []string
+	VolStatus uint32
+	EpStatus  uint32
+	Rate      uint8
+	Type      CollectionType
+	Private   bool
 }
 
 type EpisodeCollectionItem struct {

@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 )
 
@@ -32,13 +31,13 @@ go test ./internal/web/req -run '^TestPutSubjectCollection_validation$'
 func TestPutSubjectCollection_validation(t *testing.T) {
 	t.Parallel()
 	v := validator.New()
-	tests := []req.PatchSubjectCollection{
-		{},
-		{Type: null.NewUint8(uint8(model.CollectionTypeDone))},
+	tests := []req.PutEpisodeCollection{
+		{EpisodeID: 1},
+		{EpisodeID: 1, Type: model.CollectionTypeDone},
 	}
 
 	for _, s := range tests {
-		t.Run(fmt.Sprintf("type=%d", s.Type.Uint8), func(t *testing.T) {
+		t.Run(fmt.Sprintf("type=%d", s.Type), func(t *testing.T) {
 			t.Parallel()
 			err := v.Struct(s)
 			require.NoError(t, err)
@@ -52,16 +51,15 @@ go test ./internal/web/req -run '^TestPutSubjectCollection_validation_error$'
 func TestPutSubjectCollection_validation_error(t *testing.T) {
 	t.Parallel()
 	v := validator.New()
-	v.RegisterCustomTypeFunc(null.Validator, null.Uint8{})
 
-	tests := []req.PatchSubjectCollection{
-		{Type: null.NewUint8(0)},
-		{Type: null.NewUint8(6)},
-		{Type: null.NewUint8(11)},
+	tests := []req.PutEpisodeCollection{
+		{EpisodeID: 1, Type: model.CollectionType(0)},
+		{EpisodeID: 1, Type: model.CollectionType(6)},
+		{EpisodeID: 1, Type: model.CollectionType(11)},
 	}
 
 	for _, s := range tests {
-		t.Run(fmt.Sprintf("type=%d", s.Type.Uint8), func(t *testing.T) {
+		t.Run(fmt.Sprintf("type=%d", s.Type), func(t *testing.T) {
 			t.Parallel()
 			err := v.Struct(s)
 			require.Error(t, err)

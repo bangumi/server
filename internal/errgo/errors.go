@@ -23,6 +23,7 @@ func Wrap(err error, msg string) error {
 	return &wrapError{msg: msg, err: err}
 }
 
+// Msg wrap error and replace message.
 func Msg(err error, msg string) error {
 	if err == nil {
 		return nil

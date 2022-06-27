@@ -19,7 +19,7 @@ type AccessToken struct {
 	UserID      string    `gorm:"column:user_id;type:varchar(80)"`
 	ExpiredAt   time.Time `gorm:"column:expires;type:timestamp;not null;default:CURRENT_TIMESTAMP"`
 	Scope       *string   `gorm:"column:scope;type:varchar(4000)"`
-	Info        []byte    `gorm:"column:info;type:varchar(255);not null"`
+	Info        bytes     `gorm:"column:info;type:varchar(255);not null"`
 }
 
 // TableName AccessToken's table name

@@ -42,6 +42,14 @@ type CollectionRepo interface {
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 	) (model.SubjectCollection, error)
 
+	UpdateEpisodeCollection(
+		ctx context.Context,
+		userID model.UserID,
+		subjectID model.SubjectID,
+		episodeID model.EpisodeID,
+		collectionType model.CollectionType,
+	) error
+
 	UpdateSubjectCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
 	) error
@@ -49,4 +57,35 @@ type CollectionRepo interface {
 	GetEpisodeCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 	) (model.EpisodeCollection, error)
+}
+
+type CollectionService interface {
+	CountSubjectCollections(
+		ctx context.Context,
+		userID model.UserID,
+		subjectType model.SubjectType,
+		collectionType model.CollectionType,
+		showPrivate bool,
+	) (int64, error)
+
+	ListSubjectCollection(
+		ctx context.Context,
+		userID model.UserID,
+		subjectType model.SubjectType,
+		collectionType model.CollectionType,
+		showPrivate bool,
+		limit, offset int,
+	) ([]model.SubjectCollection, error)
+
+	GetSubjectCollection(
+		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
+	) (model.SubjectCollection, error)
+
+	UpdateEpisodeCollection(
+		ctx context.Context,
+		userID model.UserID,
+		subjectID model.SubjectID,
+		episodeID model.EpisodeID,
+		collectionType model.CollectionType,
+	) error
 }

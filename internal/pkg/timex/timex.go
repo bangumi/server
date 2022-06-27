@@ -25,3 +25,7 @@ const (
 	OneDay  = 24 * time.Hour
 	OneWeek = 7 * 24 * time.Hour
 )
+
+func NowU32() uint32 {
+	return uint32(time.Now().Unix())
+}

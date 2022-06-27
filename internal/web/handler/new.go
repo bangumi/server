@@ -32,7 +32,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/oauth"
-	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/rate"
@@ -48,7 +47,7 @@ func New(
 	p domain.PersonService,
 	a domain.AuthService,
 	e domain.EpisodeRepo,
-	collect domain.CollectionRepo,
+	collect domain.CollectionService,
 	r domain.RevisionRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
@@ -100,7 +99,7 @@ type Handler struct {
 	s                    domain.SubjectService
 	p                    domain.PersonService
 	a                    domain.AuthService
-	collect              domain.CollectionRepo
+	collect              domain.CollectionService
 	session              session.Manager
 	captcha              captcha.Manager
 	e                    domain.EpisodeRepo
@@ -122,8 +121,6 @@ type Handler struct {
 
 func getValidator() (*validator.Validate, ut.Translator, error) {
 	validate := validator.New()
-
-	validate.RegisterCustomTypeFunc(null.Validator, null.AllTypes()...)
 
 	uni := ut.New(en.New(), zh.New())
 
