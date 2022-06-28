@@ -187,12 +187,12 @@ func (r mysqlRepo) UpdateSubjectCollection(
 			EpStatus:    data.EpStatus,
 			VolStatus:   data.VolStatus,
 			SubjectType: old.SubjectType,
-			WishAt:      old.WishAt,
-			DoingAt:     old.DoingAt,
-			DoneAt:      old.DoneAt,
-			OnHoldAt:    old.OnHoldAt,
-			DroppedAt:   old.DroppedAt,
-			UpdatedAt:   uint32(data.UpdatedAt.Unix()),
+			WishTime:    old.WishTime,
+			DoingTime:   old.DoingTime,
+			DoneTime:    old.DoneTime,
+			OnHoldTime:  old.OnHoldTime,
+			DroppedTime: old.DroppedTime,
+			UpdatedTime: uint32(data.UpdatedAt.Unix()),
 			Private:     old.Private,
 		}
 
@@ -232,15 +232,15 @@ func updateTimeStamp(newRecord *dao.SubjectCollection, oldType, newType model.Co
 
 	switch newType {
 	case model.CollectionTypeWish:
-		newRecord.WishAt = updatedAt
+		newRecord.WishTime = updatedAt
 	case model.CollectionTypeDone:
-		newRecord.DoneAt = updatedAt
+		newRecord.DoneTime = updatedAt
 	case model.CollectionTypeDoing:
-		newRecord.DoingAt = updatedAt
+		newRecord.DoingTime = updatedAt
 	case model.CollectionTypeOnHold:
-		newRecord.OnHoldAt = updatedAt
+		newRecord.OnHoldTime = updatedAt
 	case model.CollectionTypeDropped:
-		newRecord.DroppedAt = updatedAt
+		newRecord.DroppedTime = updatedAt
 	case model.CollectionTypeAll:
 		// already checked, do nothing
 	}

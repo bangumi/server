@@ -86,7 +86,7 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 			UserID:      id,
 			SubjectID:   model.SubjectID(i + 100),
 			SubjectType: model.SubjectTypeAnime,
-			UpdatedAt:   timex.NowU32(),
+			UpdatedTime: timex.NowU32(),
 		})
 		require.NoError(t, err)
 	}
@@ -132,8 +132,8 @@ func TestMysqlRepo_UpdateCollection(t *testing.T) {
 		SubjectID:   subjectID,
 		SubjectType: model.SubjectTypeReal,
 		Type:        uint8(model.CollectionTypeDone),
-		DoneAt:      uint32(createdAt.Unix()),
-		UpdatedAt:   uint32(createdAt.Unix()),
+		DoneTime:    uint32(createdAt.Unix()),
+		UpdatedTime: uint32(createdAt.Unix()),
 	}))
 
 	updatedAt := time.Now()

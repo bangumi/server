@@ -23,11 +23,11 @@ type SubjectCollection struct {
 	Tag         string          `gorm:"column:interest_tag;type:mediumtext;not null"`
 	EpStatus    uint32          `gorm:"column:interest_ep_status;type:mediumint(8) unsigned;not null"`
 	VolStatus   uint32          `gorm:"column:interest_vol_status;type:mediumint(8) unsigned;not null"` // 卷数
-	WishAt      uint32          `gorm:"column:interest_wish_dateline;type:int(10) unsigned;not null"`
-	DoingAt     uint32          `gorm:"column:interest_doing_dateline;type:int(10) unsigned;not null;index:top_subject,priority:3"`
-	DoneAt      uint32          `gorm:"column:interest_collect_dateline;type:int(10) unsigned;not null;index:interest_collect_dateline,priority:1;index:subject_collect,priority:4;index:user_collect_type,priority:5"`
-	OnHoldAt    uint32          `gorm:"column:interest_on_hold_dateline;type:int(10) unsigned;not null"`
-	DroppedAt   uint32          `gorm:"column:interest_dropped_dateline;type:int(10) unsigned;not null"`
+	WishTime    uint32          `gorm:"column:interest_wish_dateline;type:int(10) unsigned;not null"`
+	DoingTime   uint32          `gorm:"column:interest_doing_dateline;type:int(10) unsigned;not null;index:top_subject,priority:3"`
+	DoneTime    uint32          `gorm:"column:interest_collect_dateline;type:int(10) unsigned;not null;index:interest_collect_dateline,priority:1;index:subject_collect,priority:4;index:user_collect_type,priority:5"`
+	OnHoldTime  uint32          `gorm:"column:interest_on_hold_dateline;type:int(10) unsigned;not null"`
+	DroppedTime uint32          `gorm:"column:interest_dropped_dateline;type:int(10) unsigned;not null"`
 	UpdatedTime uint32          `gorm:"column:interest_lasttouch;type:int(10) unsigned;not null;index:interest_lasttouch,priority:1;index:subject_lasttouch,priority:3;index:subject_comment,priority:4;index:interest_uid_2,priority:3"`
 	Private     uint8           `gorm:"column:interest_private;type:tinyint(1) unsigned;not null;index:interest_private,priority:1;index:subject_lasttouch,priority:2;index:subject_comment,priority:3;index:subject_collect,priority:3;index:user_collect_type,priority:4;index:interest_id,priority:2;index:subject_rate,priority:3;index:user_collect_latest,priority:4;index:interest_uid_2,priority:2"`
 }
