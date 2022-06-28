@@ -23,7 +23,7 @@ type Group struct {
 	Members      uint32        `gorm:"column:grp_members;type:mediumint(8) unsigned;not null;default:1"`
 	Description  string        `gorm:"column:grp_desc;type:text;not null"`
 	LastPostedAt uint32        `gorm:"column:grp_lastpost;type:int(10) unsigned;not null" doc:always 0`
-	CreatedAt    uint32        `gorm:"column:grp_builddate;type:int(10) unsigned;not null"`
+	CreatedTime  uint32        `gorm:"column:grp_builddate;type:int(10) unsigned;not null"`
 	Accessible   bool          `gorm:"column:grp_accessible;type:tinyint(1);not null;default:1"` // 可访问性
 	Nsfw         bool          `gorm:"column:grp_nsfw;type:tinyint(1) unsigned;not null"`
 }

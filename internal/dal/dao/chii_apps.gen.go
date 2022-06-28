@@ -20,8 +20,8 @@ type App struct {
 	URL         string       `gorm:"column:app_url;type:varchar(2000);not null"`
 	Collects    int32        `gorm:"column:app_collects;type:mediumint(8);not null"`
 	Status      bool         `gorm:"column:app_status;type:tinyint(1);not null;index:app_status,priority:1"`
-	CreatedAt   int32        `gorm:"column:app_timestamp;type:int(10);not null"`
-	UpdatedAt   int32        `gorm:"column:app_lasttouch;type:int(10);not null"`
+	CreatedTime int32        `gorm:"column:app_timestamp;type:int(10);not null"`
+	UpdatedTime int32        `gorm:"column:app_lasttouch;type:int(10);not null"`
 	Ban         bool         `gorm:"column:app_ban;type:tinyint(1);not null;index:app_ban,priority:1"`
 }
 

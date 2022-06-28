@@ -43,7 +43,7 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 	_subjectCollection.CollectDateline = field.NewUint32(tableName, "interest_collect_dateline")
 	_subjectCollection.OnHoldDateline = field.NewUint32(tableName, "interest_on_hold_dateline")
 	_subjectCollection.DroppedDateline = field.NewUint32(tableName, "interest_dropped_dateline")
-	_subjectCollection.UpdatedAt = field.NewUint32(tableName, "interest_lasttouch")
+	_subjectCollection.UpdatedTime = field.NewUint32(tableName, "interest_lasttouch")
 	_subjectCollection.Private = field.NewUint8(tableName, "interest_private")
 
 	_subjectCollection.fillFieldMap()
@@ -71,7 +71,7 @@ type subjectCollection struct {
 	CollectDateline field.Uint32
 	OnHoldDateline  field.Uint32
 	DroppedDateline field.Uint32
-	UpdatedAt       field.Uint32
+	UpdatedTime     field.Uint32
 	Private         field.Uint8
 
 	fieldMap map[string]field.Expr
@@ -105,7 +105,7 @@ func (s *subjectCollection) updateTableName(table string) *subjectCollection {
 	s.CollectDateline = field.NewUint32(table, "interest_collect_dateline")
 	s.OnHoldDateline = field.NewUint32(table, "interest_on_hold_dateline")
 	s.DroppedDateline = field.NewUint32(table, "interest_dropped_dateline")
-	s.UpdatedAt = field.NewUint32(table, "interest_lasttouch")
+	s.UpdatedTime = field.NewUint32(table, "interest_lasttouch")
 	s.Private = field.NewUint8(table, "interest_private")
 
 	s.fillFieldMap()
@@ -148,7 +148,7 @@ func (s *subjectCollection) fillFieldMap() {
 	s.fieldMap["interest_collect_dateline"] = s.CollectDateline
 	s.fieldMap["interest_on_hold_dateline"] = s.OnHoldDateline
 	s.fieldMap["interest_dropped_dateline"] = s.DroppedDateline
-	s.fieldMap["interest_lasttouch"] = s.UpdatedAt
+	s.fieldMap["interest_lasttouch"] = s.UpdatedTime
 	s.fieldMap["interest_private"] = s.Private
 }
 

@@ -51,10 +51,10 @@ func prepareGroupMemberData(t *testing.T, id model.GroupID) domain.GroupRepo {
 	})
 
 	require.NoError(t, q.WithContext(context.Background()).GroupMember.CreateInBatches([]*dao.GroupMember{
-		{UserID: 1, GroupID: id, Moderator: true, CreatedAt: 1},
-		{UserID: 2, GroupID: id, Moderator: false, CreatedAt: 2},
-		{UserID: 3, GroupID: id, Moderator: true, CreatedAt: 3},
-		{UserID: 4, GroupID: id, Moderator: true, CreatedAt: 4},
+		{UserID: 1, GroupID: id, Moderator: true, CreatedTime: 1},
+		{UserID: 2, GroupID: id, Moderator: false, CreatedTime: 2},
+		{UserID: 3, GroupID: id, Moderator: true, CreatedTime: 3},
+		{UserID: 4, GroupID: id, Moderator: true, CreatedTime: 4},
 	}, 10))
 
 	return repo
@@ -159,10 +159,10 @@ func TestMysqlRepo_GetByName(t *testing.T) {
 	})
 
 	err := q.WithContext(context.Background()).Group.Create(&dao.Group{
-		ID:        groupID,
-		Name:      groupName,
-		CreatorID: 1,
-		CreatedAt: uint32(time.Now().Unix()),
+		ID:          groupID,
+		Name:        groupName,
+		CreatorID:   1,
+		CreatedTime: uint32(time.Now().Unix()),
 	})
 	require.NoError(t, err)
 
