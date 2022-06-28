@@ -186,9 +186,9 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	err := repo.UpdateEpisodeCollection(context.Background(), userID, subjectID, 5, model.CollectionTypeDone)
+	err := repo.UpdateEpisodeCollection(context.Background(), userID, subjectID, 5, model.EpisodeCollectionTypeDone)
 	require.NoError(t, err)
 
-	err = repo.UpdateEpisodeCollection(context.Background(), userID, subjectID, 4, model.CollectionTypeDone)
+	err = repo.UpdateEpisodeCollection(context.Background(), userID, subjectID, 4, model.EpisodeCollectionTypeDone)
 	require.NoError(t, err)
 }

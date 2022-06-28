@@ -31,8 +31,8 @@ import (
 )
 
 type mysqlEpCollectionItem struct {
-	EpisodeID model.EpisodeID      `ms:"eid" php:"eid"`
-	Type      model.CollectionType `ms:"type" php:"type"`
+	EpisodeID model.EpisodeID             `ms:"eid" php:"eid"`
+	Type      model.EpisodeCollectionType `ms:"type" php:"type"`
 }
 
 var errEpisodeInvalid = errors.New("number is not valid as episode ID")

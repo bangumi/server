@@ -42,13 +42,7 @@ type CollectionRepo interface {
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 	) (model.SubjectCollection, error)
 
-	UpdateEpisodeCollection(
-		ctx context.Context,
-		userID model.UserID,
-		subjectID model.SubjectID,
-		episodeID model.EpisodeID,
-		collectionType model.CollectionType,
-	) error
+	UpdateEpisodeCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID, episodeID model.EpisodeID, collectionType model.EpisodeCollectionType) error
 
 	UpdateSubjectCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
@@ -86,6 +80,6 @@ type CollectionService interface {
 		userID model.UserID,
 		subjectID model.SubjectID,
 		episodeID model.EpisodeID,
-		collectionType model.CollectionType,
+		collectionType model.EpisodeCollectionType,
 	) error
 }

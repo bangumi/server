@@ -64,7 +64,7 @@ type SubjectCollectionUpdate struct {
 
 type EpisodeCollectionItem struct {
 	ID   EpisodeID
-	Type CollectionType
+	Type EpisodeCollectionType
 }
 
 type EpisodeCollection map[EpisodeID]EpisodeCollectionItem

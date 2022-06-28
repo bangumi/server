@@ -73,7 +73,7 @@ func (s service) UpdateEpisodeCollection(
 	userID model.UserID,
 	subjectID model.SubjectID,
 	episodeID model.EpisodeID,
-	collectionType model.CollectionType,
+	collectionType model.EpisodeCollectionType,
 ) error {
 	_, err := s.subject.Get(ctx, subjectID)
 	if err != nil {

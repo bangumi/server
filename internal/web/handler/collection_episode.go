@@ -154,7 +154,7 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 
 const subjectNotFoundMessage = "subject not found"
 
-func (h Handler) PatchEpisodeCollection(c *fiber.Ctx) error {
+func (h Handler) PutEpisodeCollection(c *fiber.Ctx) error {
 	v := h.getHTTPAccessor(c)
 	if !v.login {
 		return res.Unauthorized(res.DefaultUnauthorizedMessage)

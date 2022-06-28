@@ -12,13 +12,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package req
+package model
 
-import (
-	"github.com/bangumi/server/internal/model"
+type EpisodeCollectionType uint8
+
+const (
+	EpisodeCollectionTypeAll     EpisodeCollectionType = 0 // 全部
+	EpisodeCollectionTypeWish    EpisodeCollectionType = 1 // 想看
+	EpisodeCollectionTypeDone    EpisodeCollectionType = 2 // 看过
+	EpisodeCollectionTypeDropped EpisodeCollectionType = 3 // 抛弃
 )
-
-type PutEpisodeCollection struct {
-	EpisodeID model.EpisodeID             `json:"episode_id" validate:"required"`
-	Type      model.EpisodeCollectionType `json:"type" validate:"lte=5,gte=1,required"`
-}

@@ -1,0 +1,22 @@
+title: EpisodeCollectionType
+example: 3
+enum:
+  - 1
+  - 2
+  - 5
+type: integer
+description: |-
+  - `1`: 想看
+  - `2`: 看过
+  - `5`: 抛弃
+x-ms-enum:
+  name: EpisodeCollectionType
+  modelAsString: false
+  values:
+    - Wish
+    - Done
+    - Dropped
+x-enum-varNames:
+  - Wish
+  - Done
+  - Dropped

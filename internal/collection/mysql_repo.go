@@ -252,7 +252,7 @@ func (r mysqlRepo) createEpisodeCollection(
 	userID model.UserID,
 	subjectID model.SubjectID,
 	episodeID model.EpisodeID,
-	collectionType model.CollectionType,
+	collectionType model.EpisodeCollectionType,
 ) error {
 	var e = make(mysqlEpCollection, 1)
 
@@ -280,13 +280,7 @@ func (r mysqlRepo) createEpisodeCollection(
 	return nil
 }
 
-func (r mysqlRepo) UpdateEpisodeCollection(
-	ctx context.Context,
-	userID model.UserID,
-	subjectID model.SubjectID,
-	episodeID model.EpisodeID,
-	collectionType model.CollectionType,
-) error {
+func (r mysqlRepo) UpdateEpisodeCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID, episodeID model.EpisodeID, collectionType model.EpisodeCollectionType) error {
 	where := []gen.Condition{r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)}
 	return r.q.Transaction(func(tx *query.Query) error {
 		d, err := tx.EpCollection.WithContext(ctx).Where(where...).First()
