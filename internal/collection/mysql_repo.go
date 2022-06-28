@@ -280,7 +280,13 @@ func (r mysqlRepo) createEpisodeCollection(
 	return nil
 }
 
-func (r mysqlRepo) UpdateEpisodeCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID, episodeID model.EpisodeID, collectionType model.EpisodeCollectionType) error {
+func (r mysqlRepo) UpdateEpisodeCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	episodeID model.EpisodeID,
+	collectionType model.EpisodeCollectionType,
+) error {
 	where := []gen.Condition{r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)}
 	return r.q.Transaction(func(tx *query.Query) error {
 		d, err := tx.EpCollection.WithContext(ctx).Where(where...).First()
@@ -322,7 +328,9 @@ func (r mysqlRepo) UpdateEpisodeCollection(ctx context.Context, userID model.Use
 
 		_, err = tx.SubjectCollection.WithContext(ctx).
 			Where(tx.SubjectCollection.UserID.Eq(userID), tx.SubjectCollection.SubjectID.Eq(subjectID)).
-			UpdateColumnSimple(tx.SubjectCollection.VolStatus.Value(uint32(len(e))))
+			UpdateColumnSimple(
+				tx.SubjectCollection.VolStatus.Value(uint32(len(e))), tx.SubjectCollection.UpdatedTime.Value(timex.NowU32()),
+			)
 		if err != nil {
 			return errgo.Wrap(err, "SubjectCollection.UpdateSimple")
 		}

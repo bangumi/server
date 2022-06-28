@@ -19,6 +19,5 @@ import (
 )
 
 type PutEpisodeCollection struct {
-	EpisodeID model.EpisodeID             `json:"episode_id" validate:"required"`
-	Type      model.EpisodeCollectionType `json:"type" validate:"episode-collection,required"`
+	Type model.EpisodeCollectionType `json:"type" validate:"episode-collection,required"`
 }

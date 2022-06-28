@@ -165,6 +165,11 @@ func (h Handler) PutEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
+	episodeID, err := parseEpisodeID(c.Params("episode_id"))
+	if err != nil {
+		return err
+	}
+
 	s, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get subject info")
@@ -186,12 +191,13 @@ func (h Handler) PutEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	return h.putEpisodeCollection(c, v.ID, s, input)
+	return h.putEpisodeCollection(c, v.ID, episodeID, s, input)
 }
 
 func (h Handler) putEpisodeCollection(
 	c *fiber.Ctx,
 	userID model.UserID,
+	episodeID model.EpisodeID,
 	s res.SubjectV0,
 	input req.PutEpisodeCollection,
 ) error {
@@ -204,16 +210,12 @@ func (h Handler) putEpisodeCollection(
 		return errgo.Wrap(err, "user.GetSubjectCollection")
 	}
 
-	if err = h.collect.UpdateEpisodeCollection(c.Context(), userID, s.ID, input.EpisodeID, input.Type); err != nil {
+	if err = h.collect.UpdateEpisodeCollection(c.Context(), userID, s.ID, episodeID, input.Type); err != nil {
 		return h.InternalError(c, err, "failed to update subject collection")
 	}
 
-	collection, err := h.collect.GetSubjectCollection(c.Context(), userID, s.ID)
-	if err != nil {
-		return errgo.Wrap(err, "collection.GetSubjectCollection")
-	}
-
-	return res.JSON(c, convertModelSubjectCollection(collection))
+	c.Status(http.StatusNoContent)
+	return nil
 }
 
 func validateSubjectCollectionRequest(s res.SubjectV0) error {
