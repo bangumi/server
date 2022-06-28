@@ -25,7 +25,7 @@ const EpisodeCollectionTagName = "episode-collection"
 func EpisodeCollection(fl validator.FieldLevel) bool {
 	// TODO: replace with fl.Field().CanUint()
 	// add in go 1.18
-	switch fl.Field().Kind() {
+	switch fl.Field().Kind() { //nolint:exhaustive
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		v := fl.Field().Uint()
 		return v >= 1 && v <= 3
