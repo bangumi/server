@@ -57,20 +57,16 @@ tasks:
 
   test-all:
     desc: Run all tests, need mysql and redis, except hCaptcha tests, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
-    deps:
-      - gotestfmt
     cmds:
-      - go test -timeout 3s -json -tags test -race {{.CLI_ARGS}} ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+      - task: test
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
 
   test-all-with-http:
-    desc: Run all tests, need mysql and redis, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
-    deps:
-      - gotestfmt
+    desc: Run all tests, need mysql and redis, alias for `TEST_MYSQL=1 TEST_REDIS=1 TEST_HTTP=1 task test`
     cmds:
-      - go test -timeout 3s -json -tags test -race {{.CLI_ARGS}} ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+      - task: test
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
