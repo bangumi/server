@@ -76,6 +76,10 @@ func (s service) UpdateEpisodeCollection(
 	episodeID model.EpisodeID,
 	collectionType model.EpisodeCollectionType,
 ) error {
+	if collectionType == model.EpisodeCollectionAll {
+		return fmt.Errorf("%w: %d is not valid episode collection type", domain.ErrInvalidInput, collectionType)
+	}
+
 	_, err := s.subject.Get(ctx, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {

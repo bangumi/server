@@ -690,7 +690,7 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/User"
-        "403":
+        "401":
           description: unauthorized
           content:
             application/json:
@@ -784,44 +784,59 @@ paths:
       security:
         - OptionalHTTPBearer: []
 
-  "/v0/users/-/collections/{subject_id}":
-    patch:
+  "/v0/users/-/collections/episodes/{episode_id}":
+    put:
       tags:
         - 收藏
-      summary: 更新用户条目收藏状态
+      summary: 更新用户章节收藏状态
       description: |
-        获取对应用户的收藏，查看私有收藏需要access token。
+        修改章节收藏状况
 
-        暂时无法创建收藏和修改评分，请使用网页修改评分
-      operationId: patchUserCollection
+        ## 限制
+
+        只能修改已收藏的条目。
+
+        只能修改动画和三次元的章节情况。
+      operationId: putUserEpisodesCollection
       parameters:
-        - *path_subject_id
+        - *path_episode_id
       requestBody:
-        description: 收藏信息
         required: true
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/PatchSubjectCollection"
+              $ref: "./components/put-user-episodes-collection.yaml"
       responses:
-        "200":
+        "204":
           description: Successful Response
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/UserSubjectCollection"
         "400":
           description: Validation Error
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
-        "404":
-          description: 用户不存在或者条目未收藏，或者条目为私有收藏
+
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
+
+        "404":
+          description: 条目不存在或者已经被移除
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+
+        "422":
+          description: 请求不是 JSON 或者无法以 JSON 解析请求体。
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+
       security:
         - HTTPBearer: []
 
@@ -1148,8 +1163,6 @@ components:
       $ref: "./components/avatar.yaml"
     UserGroup:
       $ref: "./components/user_group.yaml"
-    PatchSubjectCollection:
-      $ref: "./components/patch_subject_collection.yaml"
     BloodType:
       title: BloodType
       enum:

@@ -1,14 +1,14 @@
 title: EpisodeCollectionType
-example: 3
+example: 2
 enum:
   - 1
   - 2
-  - 5
+  - 3
 type: integer
 description: |-
   - `1`: 想看
   - `2`: 看过
-  - `5`: 抛弃
+  - `3`: 抛弃
 x-ms-enum:
   name: EpisodeCollectionType
   modelAsString: false

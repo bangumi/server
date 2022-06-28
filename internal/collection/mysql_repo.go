@@ -309,10 +309,8 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 			return err
 		}
 
-		if v, ok := e[episodeID]; ok {
-			if v.Type == collectionType {
-				return nil
-			}
+		if v, ok := e[episodeID]; ok && v.Type == collectionType {
+			return nil
 		}
 
 		e[episodeID] = mysqlEpCollectionItem{EpisodeID: episodeID, Type: collectionType}
@@ -322,10 +320,9 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 		}
 
 		_, err = tx.SubjectCollection.WithContext(ctx).
-			Where(tx.SubjectCollection.UserID.Eq(userID), tx.SubjectCollection.SubjectID.Eq(subjectID)).
-			UpdateColumnSimple(
-				tx.SubjectCollection.VolStatus.Value(uint32(len(e))), tx.SubjectCollection.UpdatedTime.Value(updateTime),
-			)
+			Where(tx.SubjectCollection.UserID.Eq(userID), tx.SubjectCollection.SubjectID.Eq(subjectID)).UpdateColumnSimple(
+			tx.SubjectCollection.VolStatus.Value(countWatchedEp(e)), tx.SubjectCollection.UpdatedTime.Value(updateTime),
+		)
 		if err != nil {
 			return errgo.Wrap(err, "SubjectCollection.UpdateSimple")
 		}
@@ -338,6 +335,17 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 
 		return nil
 	})
+}
+
+func countWatchedEp(m mysqlEpCollection) uint32 {
+	var count uint32
+	for _, item := range m {
+		if item.Type == model.EpisodeCollectionDone {
+			count++
+		}
+	}
+
+	return count
 }
 
 func (r mysqlRepo) GetEpisodeCollection(
