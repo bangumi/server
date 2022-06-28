@@ -30,7 +30,7 @@ func newGroupMember(db *gorm.DB) groupMember {
 	_groupMember.UserID = field.NewField(tableName, "gmb_uid")
 	_groupMember.GroupID = field.NewField(tableName, "gmb_gid")
 	_groupMember.Moderator = field.NewBool(tableName, "gmb_moderator")
-	_groupMember.CreatedAt = field.NewUint32(tableName, "gmb_dateline")
+	_groupMember.CreatedTime = field.NewUint32(tableName, "gmb_dateline")
 
 	_groupMember.fillFieldMap()
 
@@ -40,11 +40,11 @@ func newGroupMember(db *gorm.DB) groupMember {
 type groupMember struct {
 	groupMemberDo groupMemberDo
 
-	ALL       field.Field
-	UserID    field.Field
-	GroupID   field.Field
-	Moderator field.Bool
-	CreatedAt field.Uint32
+	ALL         field.Field
+	UserID      field.Field
+	GroupID     field.Field
+	Moderator   field.Bool
+	CreatedTime field.Uint32
 
 	fieldMap map[string]field.Expr
 }
@@ -64,7 +64,7 @@ func (g *groupMember) updateTableName(table string) *groupMember {
 	g.UserID = field.NewField(table, "gmb_uid")
 	g.GroupID = field.NewField(table, "gmb_gid")
 	g.Moderator = field.NewBool(table, "gmb_moderator")
-	g.CreatedAt = field.NewUint32(table, "gmb_dateline")
+	g.CreatedTime = field.NewUint32(table, "gmb_dateline")
 
 	g.fillFieldMap()
 
@@ -93,7 +93,7 @@ func (g *groupMember) fillFieldMap() {
 	g.fieldMap["gmb_uid"] = g.UserID
 	g.fieldMap["gmb_gid"] = g.GroupID
 	g.fieldMap["gmb_moderator"] = g.Moderator
-	g.fieldMap["gmb_dateline"] = g.CreatedAt
+	g.fieldMap["gmb_dateline"] = g.CreatedTime
 }
 
 func (g groupMember) clone(db *gorm.DB) groupMember {

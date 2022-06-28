@@ -35,8 +35,8 @@ func newApp(db *gorm.DB) app {
 	_app.URL = field.NewString(tableName, "app_url")
 	_app.Collects = field.NewInt32(tableName, "app_collects")
 	_app.Status = field.NewBool(tableName, "app_status")
-	_app.CreatedAt = field.NewInt32(tableName, "app_timestamp")
-	_app.UpdatedAt = field.NewInt32(tableName, "app_lasttouch")
+	_app.CreatedTime = field.NewInt32(tableName, "app_timestamp")
+	_app.UpdatedTime = field.NewInt32(tableName, "app_lasttouch")
 	_app.Ban = field.NewBool(tableName, "app_ban")
 
 	_app.fillFieldMap()
@@ -56,8 +56,8 @@ type app struct {
 	URL         field.String
 	Collects    field.Int32
 	Status      field.Bool
-	CreatedAt   field.Int32
-	UpdatedAt   field.Int32
+	CreatedTime field.Int32
+	UpdatedTime field.Int32
 	Ban         field.Bool
 
 	fieldMap map[string]field.Expr
@@ -83,8 +83,8 @@ func (a *app) updateTableName(table string) *app {
 	a.URL = field.NewString(table, "app_url")
 	a.Collects = field.NewInt32(table, "app_collects")
 	a.Status = field.NewBool(table, "app_status")
-	a.CreatedAt = field.NewInt32(table, "app_timestamp")
-	a.UpdatedAt = field.NewInt32(table, "app_lasttouch")
+	a.CreatedTime = field.NewInt32(table, "app_timestamp")
+	a.UpdatedTime = field.NewInt32(table, "app_lasttouch")
 	a.Ban = field.NewBool(table, "app_ban")
 
 	a.fillFieldMap()
@@ -117,8 +117,8 @@ func (a *app) fillFieldMap() {
 	a.fieldMap["app_url"] = a.URL
 	a.fieldMap["app_collects"] = a.Collects
 	a.fieldMap["app_status"] = a.Status
-	a.fieldMap["app_timestamp"] = a.CreatedAt
-	a.fieldMap["app_lasttouch"] = a.UpdatedAt
+	a.fieldMap["app_timestamp"] = a.CreatedTime
+	a.fieldMap["app_lasttouch"] = a.UpdatedTime
 	a.fieldMap["app_ban"] = a.Ban
 }
 

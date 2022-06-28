@@ -297,7 +297,7 @@ func convertPersonRevisionDao(r *dao.RevisionHistory, text *dao.RevisionText) mo
 			Type:      r.Type,
 			Summary:   r.Summary,
 			CreatorID: r.CreatorID,
-			CreatedAt: time.Unix(int64(r.CreatedAt), 0),
+			CreatedAt: time.Unix(int64(r.CreatedTime), 0),
 		},
 		Data: data,
 	}
@@ -315,7 +315,7 @@ func convertCharacterRevisionDao(r *dao.RevisionHistory, text *dao.RevisionText)
 			Type:      r.Type,
 			Summary:   r.Summary,
 			CreatorID: r.CreatorID,
-			CreatedAt: time.Unix(int64(r.CreatedAt), 0),
+			CreatedAt: time.Unix(int64(r.CreatedTime), 0),
 		},
 		Data: data,
 	}

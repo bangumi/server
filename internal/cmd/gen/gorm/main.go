@@ -15,6 +15,10 @@
 /*
 scripts to generate ORM struct from mysql server
 
+NOTICE:
+	Don't use `UpdatedAt` and `CreatedAt` as field name, gorm may change these fields unexpectedly.
+	Use `UpdatedTime` and `CreatedTime` instead.
+
 TODO:
 NOTICE:
 	use `gen.FieldType("...", "bytes")` to generate field with `[]byte` type
@@ -155,8 +159,8 @@ func main() {
 		gen.FieldType("app_id", "uint32"),
 		gen.FieldRename("app_desc", "description"),
 		gen.FieldType("app_type", "uint8"),
-		gen.FieldRename("app_lasttouch", "UpdatedAt"),
-		gen.FieldRename("app_timestamp", "CreatedAt"),
+		gen.FieldRename("app_lasttouch", "UpdatedTime"),
+		gen.FieldRename("app_timestamp", "CreatedTime"),
 		gen.FieldType("app_creator", userIDTypeString),
 	)
 
@@ -190,7 +194,7 @@ func main() {
 		gen.FieldRename("interest_wish_dateline", "wishAt"),
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
-		gen.FieldRename("interest_lasttouch", "UpdatedAt"),
+		gen.FieldRename("interest_lasttouch", "UpdatedTime"),
 		gen.FieldTrimPrefix("interest_")))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
@@ -370,7 +374,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_rev_history", "RevisionHistory",
 		gen.FieldTrimPrefix("rev_"),
 		gen.FieldRename("rev_edit_summary", "Summary"),
-		gen.FieldRename("rev_dateline", "CreatedAt"),
+		gen.FieldRename("rev_dateline", "CreatedTime"),
 		gen.FieldRename("rev_creator", "CreatorID"),
 		gen.FieldType("rev_creator", userIDTypeString),
 	))
@@ -381,7 +385,7 @@ func main() {
 		gen.FieldType("grp_creator", userIDTypeString),
 		gen.FieldRename("grp_creator", "CreatorID"),
 		gen.FieldRename("grp_desc", "Description"),
-		gen.FieldRename("grp_builddate", "CreatedAt"),
+		gen.FieldRename("grp_builddate", "CreatedTime"),
 		gen.FieldRename("grp_lastpost", "LastPostedAt"),
 		gen.FieldNewTag("grp_lastpost", "doc:always 0"),
 		// gen.FieldIgnore("grp_lastpost", "grp_posts"), // always 0
@@ -393,7 +397,7 @@ func main() {
 		gen.FieldType("gmb_uid", userIDTypeString),
 		gen.FieldType("gmb_gid", groupIDTypeString),
 		gen.FieldRename("gmb_gid", "GroupID"),
-		gen.FieldRename("gmb_dateline", "CreatedAt"),
+		gen.FieldRename("gmb_dateline", "CreatedTime"),
 	))
 
 	// execute the action of code generation
