@@ -847,13 +847,6 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
 
-        "422":
-          description: 请求不是 JSON 或者无法以 JSON 解析请求体。
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ErrorDetail"
-
       security:
         - HTTPBearer: []
 
