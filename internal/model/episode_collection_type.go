@@ -17,8 +17,8 @@ package model
 type EpisodeCollectionType uint8
 
 const (
-	EpisodeCollectionTypeAll     EpisodeCollectionType = 0 // 全部
-	EpisodeCollectionTypeWish    EpisodeCollectionType = 1 // 想看
-	EpisodeCollectionTypeDone    EpisodeCollectionType = 2 // 看过
-	EpisodeCollectionTypeDropped EpisodeCollectionType = 3 // 抛弃
+	EpisodeCollectionAll     EpisodeCollectionType = 0 // 全部
+	EpisodeCollectionWish    EpisodeCollectionType = 1 // 想看
+	EpisodeCollectionDone    EpisodeCollectionType = 2 // 看过
+	EpisodeCollectionDropped EpisodeCollectionType = 3 // 抛弃
 )

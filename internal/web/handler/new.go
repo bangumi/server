@@ -35,6 +35,7 @@ import (
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/rate"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -123,6 +124,12 @@ func getValidator() (*validator.Validate, ut.Translator, error) {
 	validate := validator.New()
 	uni := ut.New(en.New(), zh.New())
 
+	err := validate.RegisterValidation(req.EpisodeCollectionTagName, req.EpisodeCollection)
+
+	if err != nil {
+		return nil, nil, errgo.Wrap(err, "validate.RegisterValidation")
+	}
+
 	// this is usually know or extracted from http 'Accept-Language' header
 	// also see uni.FindTranslator(...)
 	trans, found := uni.GetTranslator(zh.New().Locale())
@@ -130,7 +137,7 @@ func getValidator() (*validator.Validate, ut.Translator, error) {
 		return nil, nil, errTranslationNotFound
 	}
 
-	err := zh_translations.RegisterDefaultTranslations(validate, trans)
+	err = zh_translations.RegisterDefaultTranslations(validate, trans)
 	if err != nil {
 		return nil, nil, errgo.Wrap(err, "failed to register translation")
 	}

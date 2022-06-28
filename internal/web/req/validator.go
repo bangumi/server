@@ -14,11 +14,14 @@
 
 package req
 
-import (
-	"github.com/bangumi/server/internal/model"
-)
+import "github.com/go-playground/validator/v10"
 
-type PutEpisodeCollection struct {
-	EpisodeID model.EpisodeID             `json:"episode_id" validate:"required"`
-	Type      model.EpisodeCollectionType `json:"type" validate:"episode-collection,required"`
+const EpisodeCollectionTagName = "episode-collection"
+
+func EpisodeCollection(fl validator.FieldLevel) bool {
+	if !fl.Field().CanUint() {
+		return false
+	}
+	v := fl.Field().Uint()
+	return v >= 1 && v <= 3
 }
