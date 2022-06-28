@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
@@ -97,6 +98,6 @@ func (s service) UpdateEpisodeCollection(
 		return fmt.Errorf("%w: episode(%d) is not belong to subject(%d)", domain.ErrInvalidInput, episodeID, subjectID)
 	}
 
-	err = s.repo.UpdateEpisodeCollection(ctx, userID, subjectID, episodeID, collectionType)
+	err = s.repo.UpdateEpisodeCollection(ctx, userID, subjectID, episodeID, collectionType, time.Now())
 	return errgo.Wrap(err, "collectionRepo.UpdateEpisodeCollection")
 }

@@ -32,7 +32,6 @@ import (
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/strutil"
-	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 var _ domain.CollectionRepo = mysqlRepo{}
@@ -253,13 +252,11 @@ func (r mysqlRepo) createEpisodeCollection(
 	subjectID model.SubjectID,
 	episodeID model.EpisodeID,
 	collectionType model.EpisodeCollectionType,
+	updatedAt time.Time,
 ) error {
 	var e = make(mysqlEpCollection, 1)
 
-	e[episodeID] = mysqlEpCollectionItem{
-		EpisodeID: episodeID,
-		Type:      collectionType,
-	}
+	e[episodeID] = mysqlEpCollectionItem{EpisodeID: episodeID, Type: collectionType}
 
 	bytes, err := serializePhpEpStatus(e)
 	if err != nil {
@@ -271,7 +268,7 @@ func (r mysqlRepo) createEpisodeCollection(
 			UserID:      userID,
 			SubjectID:   subjectID,
 			Status:      bytes,
-			UpdatedTime: uint32(time.Now().Unix()),
+			UpdatedTime: uint32(updatedAt.Unix()),
 		})
 	if err != nil {
 		return errgo.Wrap(err, "gorm.Create")
@@ -286,7 +283,9 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 	subjectID model.SubjectID,
 	episodeID model.EpisodeID,
 	collectionType model.EpisodeCollectionType,
+	updatedAt time.Time,
 ) error {
+	updateTime := uint32(updatedAt.Unix())
 	where := []gen.Condition{r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)}
 	return r.q.Transaction(func(tx *query.Query) error {
 		d, err := tx.EpCollection.WithContext(ctx).Where(where...).First()
@@ -297,7 +296,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 				return errgo.Wrap(err, "dal")
 			}
 
-			err = r.createEpisodeCollection(ctx, tx, userID, subjectID, episodeID, collectionType)
+			err = r.createEpisodeCollection(ctx, tx, userID, subjectID, episodeID, collectionType, updatedAt)
 			r.log.Error("failed to create episode collection")
 			return errgo.Wrap(err, "r.createEpisodeCollection")
 		}
@@ -316,11 +315,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 			}
 		}
 
-		e[episodeID] = mysqlEpCollectionItem{
-			EpisodeID: episodeID,
-			Type:      collectionType,
-		}
-
+		e[episodeID] = mysqlEpCollectionItem{EpisodeID: episodeID, Type: collectionType}
 		bytes, err := serializePhpEpStatus(e)
 		if err != nil {
 			return err
@@ -329,14 +324,14 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 		_, err = tx.SubjectCollection.WithContext(ctx).
 			Where(tx.SubjectCollection.UserID.Eq(userID), tx.SubjectCollection.SubjectID.Eq(subjectID)).
 			UpdateColumnSimple(
-				tx.SubjectCollection.VolStatus.Value(uint32(len(e))), tx.SubjectCollection.UpdatedTime.Value(timex.NowU32()),
+				tx.SubjectCollection.VolStatus.Value(uint32(len(e))), tx.SubjectCollection.UpdatedTime.Value(updateTime),
 			)
 		if err != nil {
 			return errgo.Wrap(err, "SubjectCollection.UpdateSimple")
 		}
 
 		_, err = tx.EpCollection.WithContext(ctx).Where(where...).
-			UpdateColumnSimple(r.q.EpCollection.Status.Value(bytes), r.q.EpCollection.UpdatedTime.Value(timex.NowU32()))
+			UpdateColumnSimple(r.q.EpCollection.Status.Value(bytes), r.q.EpCollection.UpdatedTime.Value(updateTime))
 		if err != nil {
 			return errgo.Wrap(err, "EpCollection.UpdateColumnSimple")
 		}

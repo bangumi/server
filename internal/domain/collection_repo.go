@@ -16,6 +16,7 @@ package domain
 
 import (
 	"context"
+	"time"
 
 	"github.com/bangumi/server/internal/model"
 )
@@ -35,7 +36,7 @@ type CollectionRepo interface {
 		subjectType model.SubjectType,
 		collectionType model.CollectionType,
 		showPrivate bool,
-		limit, offset int,
+		limit, offsets int,
 	) ([]model.SubjectCollection, error)
 
 	GetSubjectCollection(
@@ -47,7 +48,7 @@ type CollectionRepo interface {
 		userID model.UserID,
 		subjectID model.SubjectID,
 		episodeID model.EpisodeID,
-		collectionType model.EpisodeCollectionType,
+		collectionType model.EpisodeCollectionType, updatedAt time.Time,
 	) error
 
 	UpdateSubjectCollection(
