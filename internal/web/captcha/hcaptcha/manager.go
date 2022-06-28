@@ -49,11 +49,11 @@ func (m manager) Verify(ctx context.Context, response string) (bool, error) {
 	}
 
 	var d hCaptcha
-	if err := json.Unmarshal(resp.Body(), &d); err != nil {
+	if err := json.UnmarshalNoEscape(resp.Body(), &d); err != nil {
 		return false, errgo.Wrap(err, "json.Unmarshal")
 	}
 
-	return true, nil
+	return d.Success, nil
 }
 
 type hCaptcha struct {

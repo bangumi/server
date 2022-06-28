@@ -68,7 +68,8 @@ func NewAppConfig() AppConfig {
 		Debug:         debug,
 		HTTPPort:      httpPort,
 
-		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", ""),
+		HCaptchaSiteKey:   getEnv("HCAPTCHA_SITE_KEY", "10000000-ffff-ffff-ffff-000000000001"),
+		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", "0x0000000000000000000000000000000000000000"),
 		FrontendDomain:    getEnv("WEB_DOMAIN", ""),
 	}
 }
@@ -82,6 +83,7 @@ type AppConfig struct {
 	MySQLPassword     string
 	MySQLDatabase     string
 	HCaptchaSecretKey string
+	HCaptchaSiteKey   string
 	FrontendDomain    string // new frontend web page domain, like next.bgm.tv
 	MySQLMaxConn      int
 	HTTPPort          int
