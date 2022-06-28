@@ -58,6 +58,16 @@ func FromError(c *fiber.Ctx, err error, code int, message string) error {
 	})
 }
 
+func JSONError(c *fiber.Ctx, err error) error {
+	c.Status(http.StatusUnprocessableEntity)
+
+	return JSON(c, Error{
+		Title:       "JSON Syntax Error",
+		Description: "can't decode request body as json",
+		Details:     util.DetailWithErr(c, err),
+	})
+}
+
 func InternalError(c *fiber.Ctx, err error, message string) error {
 	return JSON(c.Status(http.StatusInternalServerError), Error{
 		Title:       "Internal Server Error",

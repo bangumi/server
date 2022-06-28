@@ -34,7 +34,7 @@ import (
 func (h Handler) RevokeSession(c *fiber.Ctx) error {
 	var r req.RevokeSession
 	if err := json.UnmarshalNoEscape(c.Body(), r); err != nil {
-		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
+		return res.JSONError(c, err)
 	}
 
 	if err := h.v.Struct(r); err != nil {
@@ -47,11 +47,24 @@ func (h Handler) RevokeSession(c *fiber.Ctx) error {
 func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	var r req.UserLogin
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
-		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
+		return res.JSONError(c, err)
 	}
 
 	if err := h.v.Struct(r); err != nil {
 		return h.ValidationError(c, err)
+	}
+
+	ok, err := h.captcha.Verify(c.Context(), r.HCaptchaResponse)
+	if err != nil {
+		return res.FromError(c, err, http.StatusBadGateway, "Failed to connect to hCaptcha server")
+	}
+
+	if !ok {
+		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
+			Title:       utils.StatusMessage(http.StatusBadRequest),
+			Description: "can't validate request body",
+			Details:     []string{"未通过hCaptcha验证"},
+		})
 	}
 
 	a := h.getHTTPAccessor(c)
@@ -62,19 +75,6 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 
 	if !allowed {
 		return res.NewError(http.StatusTooManyRequests, "Too many requests, you are not allowed to log in for a while.")
-	}
-
-	ok, err := h.captcha.Verify(c.Context(), r.HCaptchaResponse)
-	if err != nil {
-		return res.FromError(c, err, http.StatusBadGateway, "Captcha verify http request error")
-	}
-
-	if !ok {
-		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
-			Title:       utils.StatusMessage(http.StatusBadRequest),
-			Description: "can't validate request body",
-			Details:     []string{"未通过hCaptcha验证"},
-		})
 	}
 
 	return h.privateLogin(c, a, r, remain)

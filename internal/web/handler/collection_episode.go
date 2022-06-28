@@ -180,7 +180,7 @@ func (h Handler) PutEpisodeCollection(c *fiber.Ctx) error {
 
 	var input req.PutEpisodeCollection
 	if err = json.UnmarshalNoEscape(c.Body(), &input); err != nil {
-		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't decode request body as json")
+		return res.JSONError(c, err)
 	}
 
 	if errs := h.v.Struct(input); errs != nil {
