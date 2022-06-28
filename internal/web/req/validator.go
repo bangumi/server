@@ -14,14 +14,25 @@
 
 package req
 
-import "github.com/go-playground/validator/v10"
+import (
+	"reflect"
+
+	"github.com/go-playground/validator/v10"
+)
 
 const EpisodeCollectionTagName = "episode-collection"
 
 func EpisodeCollection(fl validator.FieldLevel) bool {
-	if !fl.Field().CanUint() {
-		return false
+	// TODO: replace with fl.Field().CanUint()
+	// add in go 1.18
+	switch fl.Field().Kind() {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		v := fl.Field().Uint()
+		return v >= 1 && v <= 3
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		v := fl.Field().Int()
+		return v >= 1 && v <= 3
 	}
-	v := fl.Field().Uint()
-	return v >= 1 && v <= 3
+
+	return false
 }
