@@ -242,6 +242,7 @@ linters-settings:
       - "func github.com/bangumi/server/internal/web/res.NewError("
       - "func github.com/bangumi/server/internal/web/res.Response("
       - "func github.com/bangumi/server/internal/web/res.FromError("
+      - "func github.com/bangumi/server/internal/web/res.JSONError("
       - "func github.com/bangumi/server/internal/web/res.InternalError("
       - "func github.com/bangumi/server/internal/web/res.Forbidden("
       - "func github.com/bangumi/server/internal/web/res.NotFound("

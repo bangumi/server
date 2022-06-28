@@ -15,18 +15,21 @@
 package req
 
 import (
-	"bytes"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/web/res"
 )
 
-var jsonType = []byte(fiber.MIMEApplicationJSON) //nolint:gochecknoglobals
-
 func JSON(c *fiber.Ctx) error {
-	if !bytes.Equal(c.Request().Header.ContentType(), jsonType) {
-		return res.BadRequest("need content-type to be 'application/json'")
+	if string(c.Request().Header.ContentType()) != fiber.MIMEApplicationJSON {
+		return res.JSON(c.Status(http.StatusUnsupportedMediaType),
+			res.Error{
+				Title:       "Unsupported Media Type",
+				Description: `request with body must set "content-type" header to "application/json"`,
+			},
+		)
 	}
 
 	return c.Next()

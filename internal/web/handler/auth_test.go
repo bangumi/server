@@ -77,7 +77,7 @@ func TestHandler_PrivateLogin_content_type(t *testing.T) {
 
 	resp := test.New(t).Post("/p/login").Form("email", "abc@exmaple.com").Execute(app)
 
-	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
+	require.Equal(t, http.StatusUnsupportedMediaType, resp.StatusCode, resp.BodyString())
 }
 
 func TestHandler_PrivateLogout(t *testing.T) {

@@ -38,7 +38,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 
 	var r req.CreatePersonalAccessToken
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
-		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
+		return res.JSONError(c, err)
 	}
 
 	if err := h.v.Struct(r); err != nil {
@@ -61,7 +61,7 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 
 	var r req.DeletePersonalAccessToken
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
-		return res.FromError(c, err, http.StatusUnprocessableEntity, "can't parse request body as JSON")
+		return res.JSONError(c, err)
 	}
 	if err := h.v.Struct(r); err != nil {
 		return h.ValidationError(c, err)
