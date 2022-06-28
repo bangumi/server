@@ -809,6 +809,7 @@ paths:
       responses:
         "204":
           description: Successful Response
+
         "400":
           description: Validation Error
           content:
