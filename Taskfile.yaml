@@ -56,6 +56,16 @@ tasks:
       - go test -bench=. -benchmem ./pkg/wiki
 
   test-all:
+    desc: Run all tests, need mysql and redis, except hCaptcha tests, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
+    deps:
+      - gotestfmt
+    cmds:
+      - go test -timeout 3s -json -tags test -race {{.CLI_ARGS}} ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+    env:
+      TEST_MYSQL: "1"
+      TEST_REDIS: "1"
+
+  test-all-with-http:
     desc: Run all tests, need mysql and redis, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
     deps:
       - gotestfmt
@@ -64,6 +74,7 @@ tasks:
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
+      TEST_HTTP: "1"
 
   coverage:
     desc: Run tests with coverage report, used in CI.
@@ -74,6 +85,7 @@ tasks:
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
+      TEST_HTTP: "1"
 
   # generated files
   gen:

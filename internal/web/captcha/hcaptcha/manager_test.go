@@ -22,17 +22,17 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/internal/web/captcha/hcaptcha"
 )
 
 func TestManager_Verify(t *testing.T) {
 	t.Parallel()
+	test.RequireEnv(t, test.EnvExternalHTTP)
 	// testing key, checkout https://docs.hcaptcha.com/#integration-testing-test-keys
-	httpClient := resty.New()
 	manager := hcaptcha.New(config.AppConfig{
-		HCaptchaSiteKey:   "10000000-ffff-ffff-ffff-000000000001",
 		HCaptchaSecretKey: "0x0000000000000000000000000000000000000000",
-	}, httpClient)
+	}, resty.New())
 
 	ok, err := manager.Verify(context.Background(), "10000000-aaaa-bbbb-cccc-000000000001")
 	if err != nil {
@@ -44,12 +44,11 @@ func TestManager_Verify(t *testing.T) {
 
 func TestManager_Verify_fail(t *testing.T) {
 	t.Parallel()
+	test.RequireEnv(t, test.EnvExternalHTTP)
 	// testing key, checkout https://docs.hcaptcha.com/#integration-testing-test-keys
-	httpClient := resty.New()
 	manager := hcaptcha.New(config.AppConfig{
-		HCaptchaSiteKey:   "10000000-ffff-ffff-ffff-000000000001",
 		HCaptchaSecretKey: "0x0000000000000000000000000000000000000000",
-	}, httpClient)
+	}, resty.New())
 
 	ok, err := manager.Verify(context.Background(), "10000000-aaaa-bbbb-cccc-000000000002")
 	if err != nil {
