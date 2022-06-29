@@ -37,7 +37,7 @@ type Topic struct {
 
 type Comment struct {
 	CreatedAt time.Time `json:"created_at"`
-	ReplyTo   *Comment  `json:"reply_to,omitempty"`
+	Replies   []Comment `json:"replies"`
 	Text      string    `json:"text"`
 	Creator   User      `json:"creator"`
 	ID        uint32    `json:"id"`

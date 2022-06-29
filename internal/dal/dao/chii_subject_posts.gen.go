@@ -14,7 +14,7 @@ type SubjectTopicComment struct {
 	Related     uint32 `gorm:"column:sbj_pst_related;type:mediumint(8) unsigned;not null;index:sbj_pst_related,priority:1"`
 	Content     string `gorm:"column:sbj_pst_content;type:mediumtext;not null"`
 	State       uint8  `gorm:"column:sbj_pst_state;type:tinyint(1) unsigned;not null"`
-	CreatedAt   uint32 `gorm:"column:sbj_pst_dateline;type:int(10) unsigned;not null"`
+	CreatedTime uint32 `gorm:"column:sbj_pst_dateline;type:int(10) unsigned;not null"`
 }
 
 // TableName SubjectTopicComment's table name

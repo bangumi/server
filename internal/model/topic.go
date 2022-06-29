@@ -17,16 +17,16 @@ package model
 import "time"
 
 type Topic struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Title     string
-	Comments  []Comment
-	ID        TopicID
-	UID       UserID
-	Replies   uint32
-	ObjectID  uint32
-	State     TopicState
-	Status    TopicStatus
+	CreatedTime time.Time
+	UpdatedTime time.Time
+	Title       string
+	Comments    []Comment
+	ID          TopicID
+	UID         UserID
+	Replies     uint32
+	ObjectID    uint32
+	State       TopicState
+	Status      TopicStatus
 }
 
 type TopicState uint8

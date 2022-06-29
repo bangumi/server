@@ -158,9 +158,9 @@ func (r mysqlRepo) GetByRelateIDs(
 	}
 	for _, v := range comments {
 		if m, ok := commentMap[v.ID]; !ok {
-			commentMap[v.ID] = append(m, v)
+			commentMap[v.Related] = append(m, v)
 		} else {
-			commentMap[v.ID] = []model.Comment{v}
+			commentMap[v.Related] = []model.Comment{v}
 		}
 	}
 	return commentMap, nil
@@ -176,7 +176,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         model.UserID(v.UID),
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
 			Content:     v.Content,
 		}, nil
 	case *dao.GroupTopicComment:
@@ -185,7 +185,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         model.UserID(v.UID),
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
 			Content:     v.Content,
 		}, nil
 	case *dao.IndexComment:
@@ -194,7 +194,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         model.UserID(v.UID),
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
 			Content:     v.Content,
 		}, nil
 	case *dao.EpisodeComment:
@@ -203,7 +203,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         model.UserID(v.UID),
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
 			Content:     v.Content,
 		}, nil
 	case *dao.CharacterComment:
@@ -212,7 +212,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         model.UserID(v.UID),
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
 			Content:     v.Content,
 		}, nil
 	case *dao.PersonComment:
@@ -221,7 +221,7 @@ func convertDao(in interface{}) (model.Comment, error) {
 			MentionedID: v.MentionedID,
 			UID:         model.UserID(v.UID),
 			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedAt), 0),
+			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
 			Content:     v.Content,
 		}, nil
 	default:

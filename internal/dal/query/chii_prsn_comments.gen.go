@@ -31,7 +31,7 @@ func newPersonComment(db *gorm.DB) personComment {
 	_personComment.MentionedID = field.NewUint32(tableName, "prsn_pst_mid")
 	_personComment.UID = field.NewUint32(tableName, "prsn_pst_uid")
 	_personComment.Related = field.NewUint32(tableName, "prsn_pst_related")
-	_personComment.CreatedAt = field.NewUint32(tableName, "prsn_pst_dateline")
+	_personComment.CreatedTime = field.NewUint32(tableName, "prsn_pst_dateline")
 	_personComment.Content = field.NewString(tableName, "prsn_pst_content")
 
 	_personComment.fillFieldMap()
@@ -47,7 +47,7 @@ type personComment struct {
 	MentionedID field.Uint32
 	UID         field.Uint32
 	Related     field.Uint32
-	CreatedAt   field.Uint32
+	CreatedTime field.Uint32
 	Content     field.String
 
 	fieldMap map[string]field.Expr
@@ -69,7 +69,7 @@ func (p *personComment) updateTableName(table string) *personComment {
 	p.MentionedID = field.NewUint32(table, "prsn_pst_mid")
 	p.UID = field.NewUint32(table, "prsn_pst_uid")
 	p.Related = field.NewUint32(table, "prsn_pst_related")
-	p.CreatedAt = field.NewUint32(table, "prsn_pst_dateline")
+	p.CreatedTime = field.NewUint32(table, "prsn_pst_dateline")
 	p.Content = field.NewString(table, "prsn_pst_content")
 
 	p.fillFieldMap()
@@ -100,7 +100,7 @@ func (p *personComment) fillFieldMap() {
 	p.fieldMap["prsn_pst_mid"] = p.MentionedID
 	p.fieldMap["prsn_pst_uid"] = p.UID
 	p.fieldMap["prsn_pst_related"] = p.Related
-	p.fieldMap["prsn_pst_dateline"] = p.CreatedAt
+	p.fieldMap["prsn_pst_dateline"] = p.CreatedTime
 	p.fieldMap["prsn_pst_content"] = p.Content
 }
 

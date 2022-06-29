@@ -101,8 +101,8 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		data[i] = res.Topic{
 			ID:        topic.ID,
 			Title:     topic.Title,
-			CreatedAt: topic.CreatedAt,
-			UpdatedAt: topic.UpdatedAt,
+			CreatedAt: topic.CreatedTime,
+			UpdatedAt: topic.UpdatedTime,
 			Creator:   convertModelUser(userMap[topic.UID]),
 			Replies:   topic.Replies,
 		}
@@ -132,8 +132,8 @@ func (h Handler) getResTopicWithComments(
 	response := res.Topic{
 		ID:        topic.ID,
 		Title:     topic.Title,
-		CreatedAt: topic.CreatedAt,
-		UpdatedAt: topic.UpdatedAt,
+		CreatedAt: topic.CreatedTime,
+		UpdatedAt: topic.UpdatedTime,
 		Creator:   convertModelUser(u[topic.UID]),
 		Replies:   topic.Replies,
 		Comments:  pagedComments,

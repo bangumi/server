@@ -33,7 +33,7 @@ func newGroupTopicComment(db *gorm.DB) groupTopicComment {
 	_groupTopicComment.Related = field.NewUint32(tableName, "grp_pst_related")
 	_groupTopicComment.Content = field.NewString(tableName, "grp_pst_content")
 	_groupTopicComment.State = field.NewUint8(tableName, "grp_pst_state")
-	_groupTopicComment.CreatedAt = field.NewUint32(tableName, "grp_pst_dateline")
+	_groupTopicComment.CreatedTime = field.NewUint32(tableName, "grp_pst_dateline")
 
 	_groupTopicComment.fillFieldMap()
 
@@ -50,7 +50,7 @@ type groupTopicComment struct {
 	Related     field.Uint32
 	Content     field.String
 	State       field.Uint8
-	CreatedAt   field.Uint32
+	CreatedTime field.Uint32
 
 	fieldMap map[string]field.Expr
 }
@@ -73,7 +73,7 @@ func (g *groupTopicComment) updateTableName(table string) *groupTopicComment {
 	g.Related = field.NewUint32(table, "grp_pst_related")
 	g.Content = field.NewString(table, "grp_pst_content")
 	g.State = field.NewUint8(table, "grp_pst_state")
-	g.CreatedAt = field.NewUint32(table, "grp_pst_dateline")
+	g.CreatedTime = field.NewUint32(table, "grp_pst_dateline")
 
 	g.fillFieldMap()
 
@@ -105,7 +105,7 @@ func (g *groupTopicComment) fillFieldMap() {
 	g.fieldMap["grp_pst_related"] = g.Related
 	g.fieldMap["grp_pst_content"] = g.Content
 	g.fieldMap["grp_pst_state"] = g.State
-	g.fieldMap["grp_pst_dateline"] = g.CreatedAt
+	g.fieldMap["grp_pst_dateline"] = g.CreatedTime
 }
 
 func (g groupTopicComment) clone(db *gorm.DB) groupTopicComment {

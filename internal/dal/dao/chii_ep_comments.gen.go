@@ -12,7 +12,7 @@ type EpisodeComment struct {
 	MentionedID uint32 `gorm:"column:ep_pst_mid;type:mediumint(8) unsigned;not null;index:ep_cmt_crt_id,priority:1"`
 	UID         uint32 `gorm:"column:ep_pst_uid;type:mediumint(8) unsigned;not null;index:ep_pst_uid,priority:1"`
 	Related     uint32 `gorm:"column:ep_pst_related;type:mediumint(8) unsigned;not null;index:ep_pst_related,priority:1"`
-	CreatedAt   uint32 `gorm:"column:ep_pst_dateline;type:int(10) unsigned;not null"`
+	CreatedTime uint32 `gorm:"column:ep_pst_dateline;type:int(10) unsigned;not null"`
 	Content     string `gorm:"column:ep_pst_content;type:mediumtext;not null"`
 }
 

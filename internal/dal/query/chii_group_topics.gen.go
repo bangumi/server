@@ -31,8 +31,8 @@ func newGroupTopic(db *gorm.DB) groupTopic {
 	_groupTopic.GroupID = field.NewUint32(tableName, "grp_tpc_gid")
 	_groupTopic.UID = field.NewUint32(tableName, "grp_tpc_uid")
 	_groupTopic.Title = field.NewString(tableName, "grp_tpc_title")
-	_groupTopic.CreatedAt = field.NewUint32(tableName, "grp_tpc_dateline")
-	_groupTopic.UpdatedAt = field.NewUint32(tableName, "grp_tpc_lastpost")
+	_groupTopic.CreatedTime = field.NewUint32(tableName, "grp_tpc_dateline")
+	_groupTopic.UpdatedTime = field.NewUint32(tableName, "grp_tpc_lastpost")
 	_groupTopic.Replies = field.NewUint32(tableName, "grp_tpc_replies")
 	_groupTopic.State = field.NewUint8(tableName, "grp_tpc_state")
 	_groupTopic.Status = field.NewUint8(tableName, "grp_tpc_display")
@@ -45,16 +45,16 @@ func newGroupTopic(db *gorm.DB) groupTopic {
 type groupTopic struct {
 	groupTopicDo groupTopicDo
 
-	ALL       field.Field
-	ID        field.Uint32
-	GroupID   field.Uint32
-	UID       field.Uint32
-	Title     field.String
-	CreatedAt field.Uint32
-	UpdatedAt field.Uint32
-	Replies   field.Uint32
-	State     field.Uint8
-	Status    field.Uint8
+	ALL         field.Field
+	ID          field.Uint32
+	GroupID     field.Uint32
+	UID         field.Uint32
+	Title       field.String
+	CreatedTime field.Uint32
+	UpdatedTime field.Uint32
+	Replies     field.Uint32
+	State       field.Uint8
+	Status      field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -75,8 +75,8 @@ func (g *groupTopic) updateTableName(table string) *groupTopic {
 	g.GroupID = field.NewUint32(table, "grp_tpc_gid")
 	g.UID = field.NewUint32(table, "grp_tpc_uid")
 	g.Title = field.NewString(table, "grp_tpc_title")
-	g.CreatedAt = field.NewUint32(table, "grp_tpc_dateline")
-	g.UpdatedAt = field.NewUint32(table, "grp_tpc_lastpost")
+	g.CreatedTime = field.NewUint32(table, "grp_tpc_dateline")
+	g.UpdatedTime = field.NewUint32(table, "grp_tpc_lastpost")
 	g.Replies = field.NewUint32(table, "grp_tpc_replies")
 	g.State = field.NewUint8(table, "grp_tpc_state")
 	g.Status = field.NewUint8(table, "grp_tpc_display")
@@ -109,8 +109,8 @@ func (g *groupTopic) fillFieldMap() {
 	g.fieldMap["grp_tpc_gid"] = g.GroupID
 	g.fieldMap["grp_tpc_uid"] = g.UID
 	g.fieldMap["grp_tpc_title"] = g.Title
-	g.fieldMap["grp_tpc_dateline"] = g.CreatedAt
-	g.fieldMap["grp_tpc_lastpost"] = g.UpdatedAt
+	g.fieldMap["grp_tpc_dateline"] = g.CreatedTime
+	g.fieldMap["grp_tpc_lastpost"] = g.UpdatedTime
 	g.fieldMap["grp_tpc_replies"] = g.Replies
 	g.fieldMap["grp_tpc_state"] = g.State
 	g.fieldMap["grp_tpc_display"] = g.Status

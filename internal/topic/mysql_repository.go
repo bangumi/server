@@ -105,11 +105,11 @@ func (r mysqlRepo) List(
 	case domain.TopicTypeGroup:
 		topics, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
 			Where(r.q.GroupTopic.Status.In(convertToUint8Status(statuses)...)).
-			Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedAt.Desc()).Find()
+			Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedTime.Desc()).Find()
 	case domain.TopicTypeSubject:
 		topics, err = r.q.SubjectTopic.WithContext(ctx).
 			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Where(r.q.SubjectTopic.Status.In(convertToUint8Status(statuses)...)).
-			Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedAt.Desc()).Find()
+			Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedTime.Desc()).Find()
 	default:
 		return nil, errUnsupportTopicType
 	}
@@ -149,27 +149,27 @@ func convertDao(in interface{}) (model.Topic, error) {
 	switch v := in.(type) {
 	case *dao.GroupTopic:
 		return model.Topic{
-			ID:        v.ID,
-			ObjectID:  v.GroupID,
-			UID:       model.UserID(v.UID),
-			Title:     v.Title,
-			CreatedAt: time.Unix(int64(v.CreatedAt), 0),
-			UpdatedAt: time.Unix(int64(v.UpdatedAt), 0),
-			Replies:   v.Replies,
-			State:     model.TopicState(v.State),
-			Status:    model.TopicStatus(v.Status),
+			ID:          v.ID,
+			ObjectID:    v.GroupID,
+			UID:         model.UserID(v.UID),
+			Title:       v.Title,
+			CreatedTime: time.Unix(int64(v.CreatedTime), 0),
+			UpdatedTime: time.Unix(int64(v.UpdatedTime), 0),
+			Replies:     v.Replies,
+			State:       model.TopicState(v.State),
+			Status:      model.TopicStatus(v.Status),
 		}, nil
 	case *dao.SubjectTopic:
 		return model.Topic{
-			ID:        v.ID,
-			ObjectID:  v.SubjectID,
-			UID:       model.UserID(v.UID),
-			Title:     v.Title,
-			CreatedAt: time.Unix(int64(v.CreatedAt), 0),
-			UpdatedAt: time.Unix(int64(v.UpdatedAt), 0),
-			Replies:   v.Replies,
-			State:     model.TopicState(v.State),
-			Status:    model.TopicStatus(v.Status),
+			ID:          v.ID,
+			ObjectID:    v.SubjectID,
+			UID:         model.UserID(v.UID),
+			Title:       v.Title,
+			CreatedTime: time.Unix(int64(v.CreatedTime), 0),
+			UpdatedTime: time.Unix(int64(v.UpdatedTime), 0),
+			Replies:     v.Replies,
+			State:       model.TopicState(v.State),
+			Status:      model.TopicStatus(v.Status),
 		}, nil
 	default:
 		return model.Topic{}, errUnsupportTopicType

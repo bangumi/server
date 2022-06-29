@@ -31,8 +31,8 @@ func newSubjectTopic(db *gorm.DB) subjectTopic {
 	_subjectTopic.SubjectID = field.NewUint32(tableName, "sbj_tpc_subject_id")
 	_subjectTopic.UID = field.NewUint32(tableName, "sbj_tpc_uid")
 	_subjectTopic.Title = field.NewString(tableName, "sbj_tpc_title")
-	_subjectTopic.CreatedAt = field.NewUint32(tableName, "sbj_tpc_dateline")
-	_subjectTopic.UpdatedAt = field.NewUint32(tableName, "sbj_tpc_lastpost")
+	_subjectTopic.CreatedTime = field.NewUint32(tableName, "sbj_tpc_dateline")
+	_subjectTopic.UpdatedTime = field.NewUint32(tableName, "sbj_tpc_lastpost")
 	_subjectTopic.Replies = field.NewUint32(tableName, "sbj_tpc_replies")
 	_subjectTopic.State = field.NewUint8(tableName, "sbj_tpc_state")
 	_subjectTopic.Status = field.NewUint8(tableName, "sbj_tpc_display")
@@ -45,16 +45,16 @@ func newSubjectTopic(db *gorm.DB) subjectTopic {
 type subjectTopic struct {
 	subjectTopicDo subjectTopicDo
 
-	ALL       field.Field
-	ID        field.Uint32
-	SubjectID field.Uint32
-	UID       field.Uint32
-	Title     field.String
-	CreatedAt field.Uint32
-	UpdatedAt field.Uint32
-	Replies   field.Uint32
-	State     field.Uint8
-	Status    field.Uint8
+	ALL         field.Field
+	ID          field.Uint32
+	SubjectID   field.Uint32
+	UID         field.Uint32
+	Title       field.String
+	CreatedTime field.Uint32
+	UpdatedTime field.Uint32
+	Replies     field.Uint32
+	State       field.Uint8
+	Status      field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -75,8 +75,8 @@ func (s *subjectTopic) updateTableName(table string) *subjectTopic {
 	s.SubjectID = field.NewUint32(table, "sbj_tpc_subject_id")
 	s.UID = field.NewUint32(table, "sbj_tpc_uid")
 	s.Title = field.NewString(table, "sbj_tpc_title")
-	s.CreatedAt = field.NewUint32(table, "sbj_tpc_dateline")
-	s.UpdatedAt = field.NewUint32(table, "sbj_tpc_lastpost")
+	s.CreatedTime = field.NewUint32(table, "sbj_tpc_dateline")
+	s.UpdatedTime = field.NewUint32(table, "sbj_tpc_lastpost")
 	s.Replies = field.NewUint32(table, "sbj_tpc_replies")
 	s.State = field.NewUint8(table, "sbj_tpc_state")
 	s.Status = field.NewUint8(table, "sbj_tpc_display")
@@ -109,8 +109,8 @@ func (s *subjectTopic) fillFieldMap() {
 	s.fieldMap["sbj_tpc_subject_id"] = s.SubjectID
 	s.fieldMap["sbj_tpc_uid"] = s.UID
 	s.fieldMap["sbj_tpc_title"] = s.Title
-	s.fieldMap["sbj_tpc_dateline"] = s.CreatedAt
-	s.fieldMap["sbj_tpc_lastpost"] = s.UpdatedAt
+	s.fieldMap["sbj_tpc_dateline"] = s.CreatedTime
+	s.fieldMap["sbj_tpc_lastpost"] = s.UpdatedTime
 	s.fieldMap["sbj_tpc_replies"] = s.Replies
 	s.fieldMap["sbj_tpc_state"] = s.State
 	s.fieldMap["sbj_tpc_display"] = s.Status

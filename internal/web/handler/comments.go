@@ -61,15 +61,16 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 		extIDs = append(extIDs, v.ID)
 	}
 
-	commentMap := make(map[model.CommentID]model.Comment)
+	var relatedComments map[model.CommentID][]model.Comment
 	if len(extIDs) != 0 {
-		relatedComments, e := h.m.GetByIDs(c.Context(), commentType, extIDs...)
-		if e != nil {
-			return nil, errgo.Wrap(e, "repo.comments.GetByIDs")
+		relatedComments, err = h.m.GetByRelateIDs(c.Context(), commentType, extIDs...)
+		if err != nil {
+			return nil, errgo.Wrap(err, "repo.comments.GetByIDs")
 		}
 		for _, v := range relatedComments {
-			uids = append(uids, v.UID)
-			commentMap[v.ID] = v
+			for _, vv := range v {
+				uids = append(uids, vv.UID)
+			}
 		}
 	}
 
@@ -82,12 +83,12 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 		Total:  count,
 		Limit:  page.Limit,
 		Offset: page.Offset,
-		Data:   convertModelComments(comments, commentMap, userMap),
+		Data:   convertModelComments(comments, relatedComments, userMap),
 	}, nil
 }
 
 func convertModelComments(
-	comments []model.Comment, cm map[model.CommentID]model.Comment, userMap map[model.UserID]model.User,
+	comments []model.Comment, cm map[model.CommentID][]model.Comment, userMap map[model.UserID]model.User,
 ) []res.Comment {
 	result := make([]res.Comment, len(comments))
 	for k, v := range comments {
@@ -97,12 +98,15 @@ func convertModelComments(
 			CreatedAt: v.CreatedAt,
 			Creator:   convertModelUser(userMap[v.UID]),
 		}
-		if related, ok := cm[v.Related]; ok {
-			result[k].ReplyTo = &res.Comment{
-				CreatedAt: related.CreatedAt,
-				Creator:   convertModelUser(userMap[related.UID]),
-				Text:      related.Content,
-				ID:        related.ID,
+		if relateds, ok := cm[v.ID]; ok {
+			result[k].Replies = make([]res.Comment, len(relateds))
+			for i, related := range relateds {
+				result[k].Replies[i] = res.Comment{
+					CreatedAt: related.CreatedAt,
+					Creator:   convertModelUser(userMap[related.UID]),
+					Text:      related.Content,
+					ID:        related.ID,
+				}
 			}
 		}
 	}

@@ -224,8 +224,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
-      security:
-        - OptionalHTTPBearer: []
   "/p/subjects/{subject_id}/topics/{topic_id}":
     get:
       tags:
@@ -285,8 +283,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
-      security:
-        - OptionalHTTPBearer: []
   "/p/indices/{index_id}/comments":
     get:
       tags:
@@ -338,8 +334,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
-      security:
-        - OptionalHTTPBearer: []
   "/p/episodes/{episode_id}/comments":
     get:
       tags:
@@ -391,8 +385,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
-      security:
-        - OptionalHTTPBearer: []
   "/p/characters/{character_id}/comments":
     get:
       tags:
@@ -444,8 +436,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
-      security:
-        - OptionalHTTPBearer: []
   "/p/persons/{person_id}/comments":
     get:
       tags:
@@ -497,8 +487,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
-      security:
-        - OptionalHTTPBearer: []
 
   "/p/groups/{name}":
     get:
@@ -650,7 +638,7 @@ components:
           default: []
         total:
           title: Total
-          type: int
+          type: integer
         limit:
           title: Limit
           type: integer
@@ -678,6 +666,19 @@ components:
           title: Created At
           type: string
           format: date-time
+    
+    Paged:
+      type: object
+      properties:
+        total:
+          title: Total
+          type: integer
+        limit:
+          title: Limit
+          type: integer
+        offset:
+          title: Offset
+          type: integer
     GroupMember:
       type: array
       items:
