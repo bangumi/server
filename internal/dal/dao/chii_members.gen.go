@@ -27,7 +27,7 @@ type Member struct {
 	Newpm         bool         `gorm:"column:newpm;type:tinyint(1);not null"`
 	NewNotify     uint16       `gorm:"column:new_notify;type:smallint(6) unsigned;not null"` // 新提醒
 	Sign          string       `gorm:"column:sign;type:varchar(255);not null"`
-	PasswordCrypt []byte       `gorm:"column:password_crypt;type:char(64);not null"`
+	PasswordCrypt bytes        `gorm:"column:password_crypt;type:char(64);not null"`
 	Email         string       `gorm:"column:email;type:char(50);not null"`
 	Fields        MemberField  `gorm:"foreignKey:uid;references:uid" json:"fields"`
 }

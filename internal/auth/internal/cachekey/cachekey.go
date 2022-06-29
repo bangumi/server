@@ -12,25 +12,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package req
+package cachekey
 
 import (
-	"net/http"
+	"strconv"
 
-	"github.com/gofiber/fiber/v2"
-
-	"github.com/bangumi/server/internal/web/res"
+	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/model"
 )
 
-func JSON(c *fiber.Ctx) error {
-	if string(c.Request().Header.ContentType()) != fiber.MIMEApplicationJSON {
-		return res.JSON(c.Status(http.StatusUnsupportedMediaType),
-			res.Error{
-				Title:       "Unsupported Media Type",
-				Description: `request with body must set "content-type" header to "application/json"`,
-			},
-		)
-	}
+func User(userID model.UserID) string {
+	return config.RedisKeyPrefix + "service:user:" + strconv.FormatUint(uint64(userID), 10)
+}
 
-	return c.Next()
+func Auth(token string) string {
+	return config.RedisKeyPrefix + "auth:access-token:" + token
 }

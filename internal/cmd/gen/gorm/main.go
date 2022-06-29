@@ -14,12 +14,20 @@
 
 /*
 scripts to generate ORM struct from mysql server
+
+NOTICE:
+	Don't use `UpdatedAt` and `CreatedAt` as field name, gorm may change these fields unexpectedly.
+	Use `UpdatedTime` and `CreatedTime` instead.
+
+TODO:
+NOTICE:
+	use `gen.FieldType("...", "bytes")` to generate field with `[]byte` type
+	This is a bug of gorm/gen.
+	https://github.com/go-gorm/gen/issues/496
 */
 
 // nolint
 package main
-
-// disable lint in this package as it's only a generator
 
 import (
 	"reflect"
@@ -128,7 +136,7 @@ func main() {
 		gen.FieldType("uid", userIDTypeString),
 		gen.FieldRename("SIGN", "Sign"),
 		gen.FieldType("regdate", "int64"),
-		gen.FieldType("password_crypt", "[]byte"),
+		gen.FieldType("password_crypt", "bytes"),
 		gen.FieldType("groupid", "uint8"),
 		gen.FieldRename("SIGN", "sign"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
@@ -144,7 +152,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_usergroup", "UserGroup",
 		gen.FieldTrimPrefix("usr_grp_"),
 		gen.FieldType("usr_grp_id", "uint8"),
-		gen.FieldType("usr_grp_perm", "[]byte"),
+		gen.FieldType("usr_grp_perm", "bytes"),
 	))
 
 	var oauthApp = g.GenerateModelAs("chii_apps", "App",
@@ -152,8 +160,8 @@ func main() {
 		gen.FieldType("app_id", "uint32"),
 		gen.FieldRename("app_desc", "description"),
 		gen.FieldType("app_type", "uint8"),
-		gen.FieldRename("app_lasttouch", "UpdatedAt"),
-		gen.FieldRename("app_timestamp", "CreatedAt"),
+		gen.FieldRename("app_lasttouch", "UpdatedTime"),
+		gen.FieldRename("app_timestamp", "CreatedTime"),
 		gen.FieldType("app_creator", userIDTypeString),
 	)
 
@@ -170,7 +178,7 @@ func main() {
 		gen.FieldType("type", "uint8"),
 		gen.FieldType("id", "uint32"),
 		gen.FieldType("scope", "*string"),
-		gen.FieldType("info", "[]byte"),
+		gen.FieldType("info", "bytes"),
 		gen.FieldRename("expires", "ExpiredAt"),
 	))
 
@@ -181,7 +189,7 @@ func main() {
 		gen.FieldRename("interest_uid", "UserID"),
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
-		gen.FieldRename("interest_lasttouch", "UpdatedAt"),
+		gen.FieldRename("interest_lasttouch", "UpdatedTime"),
 		gen.FieldTrimPrefix("interest_")))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
@@ -231,7 +239,7 @@ func main() {
 		gen.FieldType("field_airtime", "uint8"),
 		gen.FieldType("field_week_day", "int8"),
 		gen.FieldType("field_redirect", subjectIDTypeString),
-		gen.FieldType("field_tags", "[]byte"),
+		gen.FieldType("field_tags", "bytes"),
 		// gen.FieldType("field_date","string"),
 	)
 
@@ -350,7 +358,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_rev_history", "RevisionHistory",
 		gen.FieldTrimPrefix("rev_"),
 		gen.FieldRename("rev_edit_summary", "Summary"),
-		gen.FieldRename("rev_dateline", "CreatedAt"),
+		gen.FieldRename("rev_dateline", "CreatedTime"),
 		gen.FieldRename("rev_creator", "CreatorID"),
 		gen.FieldType("rev_creator", userIDTypeString),
 	))
@@ -361,7 +369,7 @@ func main() {
 		gen.FieldType("grp_creator", userIDTypeString),
 		gen.FieldRename("grp_creator", "CreatorID"),
 		gen.FieldRename("grp_desc", "Description"),
-		gen.FieldRename("grp_builddate", "CreatedAt"),
+		gen.FieldRename("grp_builddate", "CreatedTime"),
 		gen.FieldRename("grp_lastpost", "LastPostedAt"),
 		gen.FieldNewTag("grp_lastpost", "doc:always 0"),
 		// gen.FieldIgnore("grp_lastpost", "grp_posts"), // always 0
@@ -373,7 +381,7 @@ func main() {
 		gen.FieldType("gmb_uid", userIDTypeString),
 		gen.FieldType("gmb_gid", groupIDTypeString),
 		gen.FieldRename("gmb_gid", "GroupID"),
-		gen.FieldRename("gmb_dateline", "CreatedAt"),
+		gen.FieldRename("gmb_dateline", "CreatedTime"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_topics", "SubjectTopic",

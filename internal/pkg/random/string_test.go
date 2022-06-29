@@ -19,7 +19,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/random"
+	"github.com/bangumi/server/internal/pkg/random"
 )
 
 func TestSecureRandomString(t *testing.T) {

@@ -23,6 +23,7 @@ import (
 
 const EnvMysql = "mysql"
 const EnvRedis = "redis"
+const EnvExternalHTTP = "http" // external http server like hCaptcha
 
 const TreeHoleAccessToken = "a_development_access_token"
 

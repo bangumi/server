@@ -132,8 +132,11 @@ paths:
                         type: integer
                         description: 剩余可用登录次数。
 
+        "415":
+          description: "content-type 不是 `application/json`"
+
         "422":
-          description: "无法以 JSON 格式解析请求"
+          description: "JSON 语法错误"
 
         "502":
           description: hCaptcha HTTP 请求失败

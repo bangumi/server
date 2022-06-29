@@ -42,7 +42,7 @@ func newMember(db *gorm.DB) member {
 	_member.Newpm = field.NewBool(tableName, "newpm")
 	_member.NewNotify = field.NewUint16(tableName, "new_notify")
 	_member.Sign = field.NewString(tableName, "sign")
-	_member.PasswordCrypt = field.NewField(tableName, "password_crypt")
+	_member.PasswordCrypt = field.NewBytes(tableName, "password_crypt")
 	_member.Email = field.NewString(tableName, "email")
 	_member.Fields = memberHasOneFields{
 		db: db.Session(&gorm.Session{}),
@@ -74,7 +74,7 @@ type member struct {
 	Newpm         field.Bool
 	NewNotify     field.Uint16
 	Sign          field.String
-	PasswordCrypt field.Field
+	PasswordCrypt field.Bytes
 	Email         field.String
 	Fields        memberHasOneFields
 
@@ -108,7 +108,7 @@ func (m *member) updateTableName(table string) *member {
 	m.Newpm = field.NewBool(table, "newpm")
 	m.NewNotify = field.NewUint16(table, "new_notify")
 	m.Sign = field.NewString(table, "sign")
-	m.PasswordCrypt = field.NewField(table, "password_crypt")
+	m.PasswordCrypt = field.NewBytes(table, "password_crypt")
 	m.Email = field.NewString(table, "email")
 
 	m.fillFieldMap()

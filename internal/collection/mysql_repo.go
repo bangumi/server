@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strutil"
+	"github.com/bangumi/server/internal/pkg/strutil"
 )
 
 var _ domain.CollectionRepo = mysqlRepo{}
@@ -83,7 +83,7 @@ func (r mysqlRepo) ListSubjectCollection(
 	limit, offset int,
 ) ([]model.SubjectCollection, error) {
 	q := r.q.SubjectCollection.WithContext(ctx).
-		Order(r.q.SubjectCollection.UpdatedAt.Desc()).
+		Order(r.q.SubjectCollection.UpdatedTime.Desc()).
 		Where(r.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
 
 	if subjectType != model.SubjectTypeAll {
@@ -107,7 +107,7 @@ func (r mysqlRepo) ListSubjectCollection(
 	var results = make([]model.SubjectCollection, len(collections))
 	for i, c := range collections {
 		results[i] = model.SubjectCollection{
-			UpdatedAt:   time.Unix(int64(c.UpdatedAt), 0),
+			UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
 			Comment:     c.Comment,
 			Tags:        strutil.Split(c.Tag, " "),
 			SubjectType: c.SubjectType,
@@ -138,7 +138,7 @@ func (r mysqlRepo) GetSubjectCollection(
 	}
 
 	return model.SubjectCollection{
-		UpdatedAt:   time.Unix(int64(c.UpdatedAt), 0),
+		UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
 		Comment:     c.Comment,
 		Tags:        strutil.Split(c.Tag, " "),
 		SubjectType: c.SubjectType,

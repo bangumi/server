@@ -12,10 +12,10 @@ const TableNameGroupMember = "chii_group_members"
 
 // GroupMember mapped from table <chii_group_members>
 type GroupMember struct {
-	UserID    model.UserID  `gorm:"column:gmb_uid;type:mediumint(8);primaryKey"`
-	GroupID   model.GroupID `gorm:"column:gmb_gid;type:smallint(6);primaryKey"`
-	Moderator bool          `gorm:"column:gmb_moderator;type:tinyint(1);not null"`
-	CreatedAt uint32        `gorm:"column:gmb_dateline;type:int(10) unsigned;not null"`
+	UserID      model.UserID  `gorm:"column:gmb_uid;type:mediumint(8);primaryKey"`
+	GroupID     model.GroupID `gorm:"column:gmb_gid;type:smallint(6);primaryKey"`
+	Moderator   bool          `gorm:"column:gmb_moderator;type:tinyint(1);not null"`
+	CreatedTime uint32        `gorm:"column:gmb_dateline;type:int(10) unsigned;not null"`
 }
 
 // TableName GroupMember's table name

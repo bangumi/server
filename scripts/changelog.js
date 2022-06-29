@@ -28,6 +28,12 @@ const s = conventionalChangelog(
         return false;
       }
 
+      if (commit.scope) {
+        if (["internal", "dal"].includes(commit.scope)) {
+          return false;
+        }
+      }
+
       if (!["feat", "fix", "perf", "revert"].includes(commit.type)) {
         return false;
       }

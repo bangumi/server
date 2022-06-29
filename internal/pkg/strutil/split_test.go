@@ -19,7 +19,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/strutil"
+	"github.com/bangumi/server/internal/pkg/strutil"
 )
 
 func TestPartition(t *testing.T) {

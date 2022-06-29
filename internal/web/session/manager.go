@@ -25,8 +25,8 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/random"
 	"github.com/bangumi/server/internal/pkg/timex"
-	"github.com/bangumi/server/internal/random"
 )
 
 const keyLength = 32

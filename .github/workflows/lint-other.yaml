@@ -7,6 +7,7 @@ on:
     paths:
       - "**.md"
       - "**.py"
+      - "**.js"
       - "**.yaml"
       - "**.yml"
       - "**.html"
@@ -18,6 +19,7 @@ on:
     paths:
       - "**.md"
       - "**.py"
+      - "**.js"
       - "**.yaml"
       - "**.yml"
       - "**.html"

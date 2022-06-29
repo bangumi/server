@@ -34,7 +34,7 @@ func newAccessToken(db *gorm.DB) accessToken {
 	_accessToken.UserID = field.NewString(tableName, "user_id")
 	_accessToken.ExpiredAt = field.NewTime(tableName, "expires")
 	_accessToken.Scope = field.NewString(tableName, "scope")
-	_accessToken.Info = field.NewField(tableName, "info")
+	_accessToken.Info = field.NewBytes(tableName, "info")
 
 	_accessToken.fillFieldMap()
 
@@ -52,7 +52,7 @@ type accessToken struct {
 	UserID      field.String
 	ExpiredAt   field.Time
 	Scope       field.String
-	Info        field.Field
+	Info        field.Bytes
 
 	fieldMap map[string]field.Expr
 }
@@ -76,7 +76,7 @@ func (a *accessToken) updateTableName(table string) *accessToken {
 	a.UserID = field.NewString(table, "user_id")
 	a.ExpiredAt = field.NewTime(table, "expires")
 	a.Scope = field.NewString(table, "scope")
-	a.Info = field.NewField(table, "info")
+	a.Info = field.NewBytes(table, "info")
 
 	a.fillFieldMap()
 

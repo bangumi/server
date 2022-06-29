@@ -116,7 +116,7 @@ func (r mysqlRepo) listMembersByID(
 		// do nothing
 	}
 
-	c, err := q.Limit(limit).Offset(offset).Order(r.q.GroupMember.CreatedAt.Desc()).Find()
+	c, err := q.Limit(limit).Offset(offset).Order(r.q.GroupMember.CreatedTime.Desc()).Find()
 	if err != nil {
 		r.log.Error("un-expected error when counting group member", zap.Error(err), log.GroupID(id))
 		return nil, errgo.Wrap(err, "dal")
@@ -162,7 +162,7 @@ func convertDao(g *dao.Group) model.Group {
 		Icon:        g.Icon,
 		MemberCount: int64(g.Members),
 		Title:       g.Title,
-		CreatedAt:   time.Unix(int64(g.CreatedAt), 0),
+		CreatedAt:   time.Unix(int64(g.CreatedTime), 0),
 	}
 }
 
@@ -170,6 +170,6 @@ func convertMember(m *dao.GroupMember) model.GroupMember {
 	return model.GroupMember{
 		UserID: m.UserID,
 		Mod:    m.Moderator,
-		JoinAt: time.Unix(int64(m.CreatedAt), 0),
+		JoinAt: time.Unix(int64(m.CreatedTime), 0),
 	}
 }

@@ -68,7 +68,7 @@ func NewAppConfig() AppConfig {
 		Debug:         debug,
 		HTTPPort:      httpPort,
 
-		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", ""),
+		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", "0x0000000000000000000000000000000000000000"),
 		FrontendDomain:    getEnv("WEB_DOMAIN", ""),
 	}
 }

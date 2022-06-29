@@ -18,7 +18,7 @@
 ```bash
 git clone --recursive https://github.com/bangumi/server.git bangumi-server
 cd bangumi-server
-make install
+task
 ```
 
 ### 设置
@@ -74,11 +74,13 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 task test
 ```
 
-运行全部测试，需要数据库环境。
+运行 hCaptcha 以外的的全部测试，需要数据库环境。
 
 ```
 task test-all
 ```
+
+使用 `task test-all-with-http` 或者 `task coverage` 来运行所有测试。
 
 ## 代码风格
 

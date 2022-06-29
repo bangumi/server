@@ -23,12 +23,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"

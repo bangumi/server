@@ -21,33 +21,28 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-// Put version in cache key to avoid model changes.
-const globalPrefix = "chii:" + config.Version + ":res:"
+const resPrefix = config.RedisKeyPrefix + "res:"
 
 func Character(id model.CharacterID) string {
-	return globalPrefix + "character:" + strconv.FormatUint(uint64(id), 10)
+	return resPrefix + "character:" + strconv.FormatUint(uint64(id), 10)
 }
 
 func Person(id model.PersonID) string {
-	return globalPrefix + "person:" + strconv.FormatUint(uint64(id), 10)
+	return resPrefix + "person:" + strconv.FormatUint(uint64(id), 10)
 }
 
 func Subject(id model.SubjectID) string {
-	return globalPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
+	return resPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
 }
 
 func Episode(id model.EpisodeID) string {
-	return globalPrefix + "episode:" + strconv.FormatUint(uint64(id), 10)
+	return resPrefix + "episode:" + strconv.FormatUint(uint64(id), 10)
 }
 
 func Index(id model.IndexID) string {
-	return globalPrefix + "index:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func Auth(token string) string {
-	return "chii:" + config.Version + ":auth:access-token:" + token
+	return resPrefix + "index:" + strconv.FormatUint(uint64(id), 10)
 }
 
 func User(id model.UserID) string {
-	return globalPrefix + "user:" + strconv.FormatUint(uint64(id), 10)
+	return resPrefix + "user:" + strconv.FormatUint(uint64(id), 10)
 }

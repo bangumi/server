@@ -31,7 +31,7 @@ func newRevisionHistory(db *gorm.DB) revisionHistory {
 	_revisionHistory.Type = field.NewUint8(tableName, "rev_type")
 	_revisionHistory.Mid = field.NewUint32(tableName, "rev_mid")
 	_revisionHistory.TextID = field.NewUint32(tableName, "rev_text_id")
-	_revisionHistory.CreatedAt = field.NewUint32(tableName, "rev_dateline")
+	_revisionHistory.CreatedTime = field.NewUint32(tableName, "rev_dateline")
 	_revisionHistory.CreatorID = field.NewField(tableName, "rev_creator")
 	_revisionHistory.Summary = field.NewString(tableName, "rev_edit_summary")
 
@@ -43,14 +43,14 @@ func newRevisionHistory(db *gorm.DB) revisionHistory {
 type revisionHistory struct {
 	revisionHistoryDo revisionHistoryDo
 
-	ALL       field.Field
-	ID        field.Uint32
-	Type      field.Uint8
-	Mid       field.Uint32
-	TextID    field.Uint32
-	CreatedAt field.Uint32
-	CreatorID field.Field
-	Summary   field.String
+	ALL         field.Field
+	ID          field.Uint32
+	Type        field.Uint8
+	Mid         field.Uint32
+	TextID      field.Uint32
+	CreatedTime field.Uint32
+	CreatorID   field.Field
+	Summary     field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -71,7 +71,7 @@ func (r *revisionHistory) updateTableName(table string) *revisionHistory {
 	r.Type = field.NewUint8(table, "rev_type")
 	r.Mid = field.NewUint32(table, "rev_mid")
 	r.TextID = field.NewUint32(table, "rev_text_id")
-	r.CreatedAt = field.NewUint32(table, "rev_dateline")
+	r.CreatedTime = field.NewUint32(table, "rev_dateline")
 	r.CreatorID = field.NewField(table, "rev_creator")
 	r.Summary = field.NewString(table, "rev_edit_summary")
 
@@ -103,7 +103,7 @@ func (r *revisionHistory) fillFieldMap() {
 	r.fieldMap["rev_type"] = r.Type
 	r.fieldMap["rev_mid"] = r.Mid
 	r.fieldMap["rev_text_id"] = r.TextID
-	r.fieldMap["rev_dateline"] = r.CreatedAt
+	r.fieldMap["rev_dateline"] = r.CreatedTime
 	r.fieldMap["rev_creator"] = r.CreatorID
 	r.fieldMap["rev_edit_summary"] = r.Summary
 }
