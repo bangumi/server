@@ -17,8 +17,6 @@ package collection
 import (
 	"context"
 	"errors"
-	"fmt"
-	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -153,92 +151,6 @@ func (r mysqlRepo) GetSubjectCollection(
 		Type:        model.SubjectCollectionType(c.Type),
 		Private:     c.Private != model.CollectPrivacyNone,
 	}, nil
-}
-
-func (r mysqlRepo) UpdateSubjectCollection(
-	ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
-) error {
-	where := []gen.Condition{r.q.SubjectCollection.SubjectID.Eq(subjectID), r.q.SubjectCollection.UserID.Eq(userID)}
-
-	return r.q.Transaction(func(tx *query.Query) error {
-		old, err := tx.SubjectCollection.WithContext(ctx).Where(where...).First()
-		if err != nil {
-			if errors.Is(err, domain.ErrNotFound) {
-				return fmt.Errorf(
-					"%w: subject collection not found, user should add it to collection from WEB", domain.ErrInvalidInput)
-			}
-
-			return errgo.Wrap(err, "dal")
-		}
-
-		var d = &dao.SubjectCollection{
-			UserID:      userID,
-			SubjectID:   subjectID,
-			Rate:        data.Rate,
-			Type:        uint8(data.Type),
-			HasComment:  data.Comment != "",
-			Comment:     data.Comment,
-			Tag:         strings.Join(data.Tags, " "),
-			EpStatus:    data.EpStatus,
-			VolStatus:   data.VolStatus,
-			SubjectType: old.SubjectType,
-			WishTime:    old.WishTime,
-			DoingTime:   old.DoingTime,
-			DoneTime:    old.DoneTime,
-			OnHoldTime:  old.OnHoldTime,
-			DroppedTime: old.DroppedTime,
-			UpdatedTime: uint32(data.UpdatedAt.Unix()),
-			Private:     old.Private,
-		}
-
-		if old.Private != model.CollectPrivacyBan {
-			updatePrivate(d, data.Private)
-		}
-
-		updateTimeStamp(d, model.SubjectCollectionType(old.Type), data.Type, uint32(data.UpdatedAt.Unix()))
-
-		_, err = tx.SubjectCollection.WithContext(ctx).Debug().Omit(
-			r.q.SubjectCollection.ID, r.q.SubjectCollection.UserID,
-			r.q.SubjectCollection.SubjectID, r.q.SubjectCollection.SubjectType,
-		).Where(where...).UpdateColumns(d)
-		if err != nil {
-			r.log.Error("unexpected error happened when updating subject collection", zap.Error(err),
-				log.UserID(userID), log.SubjectID(subjectID), zap.Reflect("dao", d), zap.Reflect("data", data))
-			return errgo.Wrap(err, "dal")
-		}
-
-		return nil
-	})
-}
-
-func updatePrivate(newRecord *dao.SubjectCollection, private bool) {
-	if private {
-		newRecord.Private = model.CollectPrivacySelf
-	} else {
-		newRecord.Private = model.CollectPrivacyNone
-	}
-}
-
-// update new record timestamp base on new Type.
-func updateTimeStamp(newRecord *dao.SubjectCollection, oldType, newType model.SubjectCollectionType, updatedAt uint32) {
-	if oldType == newType {
-		return
-	}
-
-	switch newType {
-	case model.SubjectCollectionWish:
-		newRecord.WishTime = updatedAt
-	case model.SubjectCollectionDone:
-		newRecord.DoneTime = updatedAt
-	case model.SubjectCollectionDoing:
-		newRecord.DoingTime = updatedAt
-	case model.SubjectCollectionOnHold:
-		newRecord.OnHoldTime = updatedAt
-	case model.SubjectCollectionDropped:
-		newRecord.DroppedTime = updatedAt
-	case model.SubjectCollectionAll:
-		// already checked, do nothing
-	}
 }
 
 func (r mysqlRepo) createEpisodeCollection(

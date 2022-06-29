@@ -51,9 +51,9 @@ type CollectionRepo interface {
 		collectionType model.EpisodeCollectionType, updatedAt time.Time,
 	) error
 
-	UpdateSubjectCollection(
-		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
-	) error
+	// UpdateSubjectCollection(
+	// 	ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
+	// ) error
 
 	GetEpisodeCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,

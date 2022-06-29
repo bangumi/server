@@ -261,46 +261,6 @@ func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Return(_a0 error) *Collec
 	return _c
 }
 
-// UpdateSubjectCollection provides a mock function with given fields: ctx, userID, subjectID, data
-func (_m *CollectionRepo) UpdateSubjectCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate) error {
-	ret := _m.Called(ctx, userID, subjectID, data)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID, model.SubjectCollectionUpdate) error); ok {
-		r0 = rf(ctx, userID, subjectID, data)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// CollectionRepo_UpdateSubjectCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateSubjectCollection'
-type CollectionRepo_UpdateSubjectCollection_Call struct {
-	*mock.Call
-}
-
-// UpdateSubjectCollection is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - subjectID model.SubjectID
-//  - data model.SubjectCollectionUpdate
-func (_e *CollectionRepo_Expecter) UpdateSubjectCollection(ctx interface{}, userID interface{}, subjectID interface{}, data interface{}) *CollectionRepo_UpdateSubjectCollection_Call {
-	return &CollectionRepo_UpdateSubjectCollection_Call{Call: _e.mock.On("UpdateSubjectCollection", ctx, userID, subjectID, data)}
-}
-
-func (_c *CollectionRepo_UpdateSubjectCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate)) *CollectionRepo_UpdateSubjectCollection_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.SubjectID), args[3].(model.SubjectCollectionUpdate))
-	})
-	return _c
-}
-
-func (_c *CollectionRepo_UpdateSubjectCollection_Call) Return(_a0 error) *CollectionRepo_UpdateSubjectCollection_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
 type mockConstructorTestingTNewCollectionRepo interface {
 	mock.TestingT
 	Cleanup(func())
