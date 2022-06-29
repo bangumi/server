@@ -20,6 +20,8 @@ run:
 
   skip-files: []
 
+  go: "1.18"
+
 # output configuration options
 output:
   # colored-line-number|line-number|json|tab|checkstyle|code-climate|junit-xml|github-actions
@@ -161,7 +163,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
+    go: "1.18"
     # https://staticcheck.io/docs/options#checks
     checks: ["all"]
 
@@ -195,13 +197,13 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
+    go: "1.18"
     # https://staticcheck.io/docs/options#checks
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
+    go: "1.18"
 
   testpackage:
     # regexp pattern to skip files
@@ -209,7 +211,7 @@ linters-settings:
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
+    go: "1.18"
 
   exhaustive:
     # check switch statements in generated files also
@@ -275,6 +277,8 @@ linters:
   enable-all: true
   disable:
     - ireturn
+    - contextcheck
+    - bodyclose
     - wsl # noisy
     - varnamelen # noisy
     - exhaustivestruct # too noisy, default zero value is a good thing.
@@ -291,6 +295,16 @@ linters:
     - nlreturn
     - godox
     - execinquery
+    # 1.18
+    - wastedassign
+    - unparam
+    - tparallel
+    - structcheck
+    - sqlclosecheck
+    - rowserrcheck
+    - noctx
+    - nilerr
+
   fast: false
 
 issues:
