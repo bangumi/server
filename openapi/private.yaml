@@ -182,6 +182,7 @@ paths:
       operationId: getSubjectTopicsById
       parameters:
         - required: true
+          description: 条目ID
           schema:
             title: Subject ID
             minimum: 0
@@ -189,6 +190,7 @@ paths:
           name: subject_id
           in: path
         - required: true
+          description: 条目 Limit
           schema:
             title: Limit
             maximum: 100
@@ -198,6 +200,7 @@ paths:
           name: limit
           in: query
         - required: true
+          description: 条目 Offset
           schema:
             title: Offset
             minimum: 0
@@ -229,11 +232,11 @@ paths:
       tags:
         - 条目
         - 讨论
-      summary: 分页获取条目讨论列表，按照时间顺序分页
+      summary: 分页获取条目讨论回复列表，对顶级回复分页，展示所有顶级回复关联的二级回复
       operationId: getSubjectTopicById
       parameters:
         - required: true
-          description: 可以填`-`
+          description: 条目ID 可以填`-`
           schema:
             title: Subject ID
             minimum: 0
@@ -241,6 +244,7 @@ paths:
           name: subject_id
           in: path
         - required: true
+          description: 条目讨论ID
           schema:
             title: Topic ID
             minimum: 0
@@ -248,6 +252,7 @@ paths:
           name: topic_id
           in: path
         - required: false
+          description: 条目讨论回复 Limit
           schema:
             title: Limit
             maximum: 100
@@ -257,6 +262,123 @@ paths:
           name: limit
           in: query
         - required: false
+          description: 条目讨论回复 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Topic"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+  "/p/groups/{group_id}/topics":
+    get:
+      tags:
+        - 小组
+        - 讨论
+      summary: 分页获取小组讨论列表，使用时间更新时间倒序分页
+      operationId: getGroupTopicsById
+      parameters:
+        - required: true
+          description: 小组ID
+          schema:
+            title: Group ID
+            minimum: 0
+            type: integer
+          name: group_id
+          in: path
+        - required: true
+          description: 小组 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: true
+          description: 小组 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Paged_Topic"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+  "/p/groups/{group_id}/topics/{topic_id}":
+    get:
+      tags:
+        - 小组
+        - 讨论
+      summary: 分页获取小组讨论回复列表，对顶级回复分页，展示所有顶级回复关联的二级回复
+      operationId: getGroupTopicById
+      parameters:
+        - required: true
+          description: 小组ID 可以填`-`
+          schema:
+            title: Group ID
+            minimum: 0
+            type: integer
+          name: group_id
+          in: path
+        - required: true
+          description: 小组讨论ID
+          schema:
+            title: Topic ID
+            minimum: 0
+            type: integer
+          name: topic_id
+          in: path
+        - required: false
+          description: 小组讨论回复 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          description: 小组讨论回复 Offset
           schema:
             title: Offset
             minimum: 0
@@ -292,6 +414,7 @@ paths:
       operationId: getIndexCommentsById
       parameters:
         - required: true
+          description: 目录ID
           schema:
             title: Index ID
             minimum: 0
@@ -299,6 +422,7 @@ paths:
           name: index_id
           in: path
         - required: false
+          description: 目录 Limit
           schema:
             title: Limit
             maximum: 100
@@ -308,6 +432,7 @@ paths:
           name: limit
           in: query
         - required: false
+          description: 目录 Offset
           schema:
             title: Offset
             minimum: 0
@@ -343,6 +468,7 @@ paths:
       operationId: getEpisodeCommentsById
       parameters:
         - required: true
+          description: 章节ID
           schema:
             title: Episode ID
             minimum: 0
@@ -350,6 +476,7 @@ paths:
           name: episode_id
           in: path
         - required: false
+          description: 章节 Limit
           schema:
             title: Limit
             maximum: 100
@@ -359,6 +486,7 @@ paths:
           name: limit
           in: query
         - required: false
+          description: 章节 Offset
           schema:
             title: Offset
             minimum: 0
@@ -394,6 +522,7 @@ paths:
       operationId: getCharacterCommentsById
       parameters:
         - required: true
+          description: 角色ID
           schema:
             title: Character ID
             minimum: 0
@@ -401,6 +530,7 @@ paths:
           name: character_id
           in: path
         - required: false
+          description: 角色 Limit
           schema:
             title: Limit
             maximum: 100
@@ -410,6 +540,7 @@ paths:
           name: limit
           in: query
         - required: false
+          description: 角色 Offset
           schema:
             title: Offset
             minimum: 0
@@ -445,6 +576,7 @@ paths:
       operationId: getPersonCommentsById
       parameters:
         - required: true
+          description: 人物ID
           schema:
             title: Persoon ID
             minimum: 0
@@ -452,6 +584,7 @@ paths:
           name: person_id
           in: path
         - required: false
+          description: 人物 Limit
           schema:
             title: Limit
             maximum: 100
@@ -461,6 +594,7 @@ paths:
           name: limit
           in: query
         - required: false
+          description: 人物 Offset
           schema:
             title: Offset
             minimum: 0
@@ -666,7 +800,6 @@ components:
           title: Created At
           type: string
           format: date-time
-    
     Paged:
       type: object
       properties:

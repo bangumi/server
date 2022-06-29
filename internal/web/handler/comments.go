@@ -98,9 +98,9 @@ func convertModelComments(
 			CreatedAt: v.CreatedAt,
 			Creator:   convertModelUser(userMap[v.UID]),
 		}
-		if relateds, ok := cm[v.ID]; ok {
-			result[k].Replies = make([]res.Comment, len(relateds))
-			for i, related := range relateds {
+		if relates, ok := cm[v.ID]; ok {
+			result[k].Replies = make([]res.Comment, len(relates))
+			for i, related := range relates {
 				result[k].Replies[i] = res.Comment{
 					CreatedAt: related.CreatedAt,
 					Creator:   convertModelUser(userMap[related.UID]),

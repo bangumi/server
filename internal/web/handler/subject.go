@@ -150,7 +150,7 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	return c.Redirect(l)
 }
 
-func (h Handler) GetSubjectTopics(c *fiber.Ctx) error {
+func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
 	id, err := parseSubjectID(c.Params("id"))
