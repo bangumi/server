@@ -1,6 +1,6 @@
 ## 项目结构
 
-项目整体分为 web，app，service 和 repository 三层。
+项目整体分为 web，app，service 和 repository 四层。
 
 web 相关的组件和 handler 在[internal/web/](../internal/web) 文件夹中。
 
