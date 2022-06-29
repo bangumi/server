@@ -841,7 +841,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
 
         "404":
-          description: 条目不存在或者已经被移除
+          description: 条目，章节不存在或者已经被移除
           content:
             application/json:
               schema:
