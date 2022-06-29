@@ -28,13 +28,22 @@
 
 package model
 
-type CollectionType uint8
+type SubjectCollectionType uint8
 
 const (
-	CollectionTypeAll     CollectionType = 0 // 全部
-	CollectionTypeWish    CollectionType = 1 // 想看
-	CollectionTypeDone    CollectionType = 2 // 看过
-	CollectionTypeDoing   CollectionType = 3 // 在看
-	CollectionTypeOnHold  CollectionType = 4 // 搁置
-	CollectionTypeDropped CollectionType = 5 // 抛弃
+	SubjectCollectionAll     SubjectCollectionType = 0 // 全部
+	SubjectCollectionWish    SubjectCollectionType = 1 // 想看
+	SubjectCollectionDone    SubjectCollectionType = 2 // 看过
+	SubjectCollectionDoing   SubjectCollectionType = 3 // 在看
+	SubjectCollectionOnHold  SubjectCollectionType = 4 // 搁置
+	SubjectCollectionDropped SubjectCollectionType = 5 // 抛弃
+)
+
+type EpisodeCollectionType uint8
+
+const (
+	EpisodeCollectionAll     EpisodeCollectionType = 0 // 全部
+	EpisodeCollectionWish    EpisodeCollectionType = 1 // 想看
+	EpisodeCollectionDone    EpisodeCollectionType = 2 // 看过
+	EpisodeCollectionDropped EpisodeCollectionType = 3 // 抛弃
 )

@@ -47,7 +47,7 @@ type SubjectCollection struct {
 	SubjectID   SubjectID
 	SubjectType uint8
 	Rate        uint8
-	Type        CollectionType
+	Type        SubjectCollectionType
 	Private     bool
 }
 
@@ -58,7 +58,7 @@ type SubjectCollectionUpdate struct {
 	VolStatus uint32
 	EpStatus  uint32
 	Rate      uint8
-	Type      CollectionType
+	Type      SubjectCollectionType
 	Private   bool
 }
 

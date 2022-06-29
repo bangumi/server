@@ -52,7 +52,7 @@ func (r mysqlRepo) CountSubjectCollections(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType model.CollectionType,
+	collectionType model.SubjectCollectionType,
 	showPrivate bool,
 ) (int64, error) {
 	q := r.q.SubjectCollection.WithContext(ctx).
@@ -62,7 +62,7 @@ func (r mysqlRepo) CountSubjectCollections(
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
-	if collectionType != model.CollectionTypeAll {
+	if collectionType != model.SubjectCollectionAll {
 		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 
@@ -82,7 +82,7 @@ func (r mysqlRepo) ListSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType model.CollectionType,
+	collectionType model.SubjectCollectionType,
 	showPrivate bool,
 	limit, offset int,
 ) ([]model.SubjectCollection, error) {
@@ -94,7 +94,7 @@ func (r mysqlRepo) ListSubjectCollection(
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
-	if collectionType != model.CollectionTypeAll {
+	if collectionType != model.SubjectCollectionAll {
 		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 
@@ -119,7 +119,7 @@ func (r mysqlRepo) ListSubjectCollection(
 			SubjectID:   c.SubjectID,
 			EpStatus:    c.EpStatus,
 			VolStatus:   c.VolStatus,
-			Type:        model.CollectionType(c.Type),
+			Type:        model.SubjectCollectionType(c.Type),
 			Private:     c.Private != model.CollectPrivacyNone,
 		}
 	}
@@ -150,7 +150,7 @@ func (r mysqlRepo) GetSubjectCollection(
 		SubjectID:   c.SubjectID,
 		EpStatus:    c.EpStatus,
 		VolStatus:   c.VolStatus,
-		Type:        model.CollectionType(c.Type),
+		Type:        model.SubjectCollectionType(c.Type),
 		Private:     c.Private != model.CollectPrivacyNone,
 	}, nil
 }
@@ -158,7 +158,7 @@ func (r mysqlRepo) GetSubjectCollection(
 func (r mysqlRepo) UpdateSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
 ) error {
-	if data.Type == model.CollectionTypeAll {
+	if data.Type == model.SubjectCollectionAll {
 		return fmt.Errorf("%w: can't set collection type to 0", domain.ErrInvalidInput)
 	}
 
@@ -199,7 +199,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 			updatePrivate(d, data.Private)
 		}
 
-		updateTimeStamp(d, model.CollectionType(old.Type), data.Type, uint32(data.UpdatedAt.Unix()))
+		updateTimeStamp(d, model.SubjectCollectionType(old.Type), data.Type, uint32(data.UpdatedAt.Unix()))
 
 		_, err = tx.SubjectCollection.WithContext(ctx).Debug().Omit(
 			r.q.SubjectCollection.ID, r.q.SubjectCollection.UserID,
@@ -224,23 +224,23 @@ func updatePrivate(newRecord *dao.SubjectCollection, private bool) {
 }
 
 // update new record timestamp base on new Type.
-func updateTimeStamp(newRecord *dao.SubjectCollection, oldType, newType model.CollectionType, updatedAt uint32) {
+func updateTimeStamp(newRecord *dao.SubjectCollection, oldType, newType model.SubjectCollectionType, updatedAt uint32) {
 	if oldType == newType {
 		return
 	}
 
 	switch newType {
-	case model.CollectionTypeWish:
+	case model.SubjectCollectionWish:
 		newRecord.WishTime = updatedAt
-	case model.CollectionTypeDone:
+	case model.SubjectCollectionDone:
 		newRecord.DoneTime = updatedAt
-	case model.CollectionTypeDoing:
+	case model.SubjectCollectionDoing:
 		newRecord.DoingTime = updatedAt
-	case model.CollectionTypeOnHold:
+	case model.SubjectCollectionOnHold:
 		newRecord.OnHoldTime = updatedAt
-	case model.CollectionTypeDropped:
+	case model.SubjectCollectionDropped:
 		newRecord.DroppedTime = updatedAt
-	case model.CollectionTypeAll:
+	case model.SubjectCollectionAll:
 		// already checked, do nothing
 	}
 }

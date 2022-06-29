@@ -82,28 +82,6 @@ tasks:
       - gorm
       - mock
       - "gen:generic"
-      - "gen:stringer:CollectionType"
-      - "gen:stringer:EpisodeCollectionType"
-
-  "gen:stringer:CollectionType":
-    sources:
-      - ./internal/model/collection_type.go
-    generates:
-      - ./internal/model/collection_type_string.gen.go
-    cmds:
-      - |
-        go run golang.org/x/tools/cmd/stringer -output ./internal/model/collection_type_string.gen.go \
-          -type CollectionType -linecomment ./internal/model/collection_type.go
-
-  "gen:stringer:EpisodeCollectionType":
-    sources:
-      - ./internal/model/episode_collection_type.go
-    generates:
-      - ./internal/model/episode_collection_type_string.gen.go
-    cmds:
-      - |
-        go run golang.org/x/tools/cmd/stringer -output ./internal/model/episode_collection_type_string.gen.go \
-          -type EpisodeCollectionType -linecomment ./internal/model/episode_collection_type.go
 
   "gen:generic":
     sources:

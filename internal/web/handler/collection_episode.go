@@ -70,7 +70,7 @@ func (h Handler) listCollection(
 	c *fiber.Ctx,
 	u model.User,
 	subjectType model.SubjectType,
-	collectionType model.CollectionType,
+	collectionType model.SubjectCollectionType,
 	page pageQuery,
 	showPrivate bool,
 ) error {

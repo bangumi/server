@@ -118,9 +118,9 @@ func parseIndexID(s string) (model.IndexID, error) {
 	return v, nil
 }
 
-func parseCollectionType(s string) (model.CollectionType, error) {
+func parseCollectionType(s string) (model.SubjectCollectionType, error) {
 	if s == "" {
-		return model.CollectionTypeAll, nil
+		return model.SubjectCollectionAll, nil
 	}
 
 	t, err := strparse.Uint8(s)
@@ -128,14 +128,14 @@ func parseCollectionType(s string) (model.CollectionType, error) {
 		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
 	}
 
-	v := model.CollectionType(t)
+	v := model.SubjectCollectionType(t)
 	switch v {
-	case model.CollectionTypeAll,
-		model.CollectionTypeWish,
-		model.CollectionTypeDone,
-		model.CollectionTypeDoing,
-		model.CollectionTypeOnHold,
-		model.CollectionTypeDropped:
+	case model.SubjectCollectionAll,
+		model.SubjectCollectionWish,
+		model.SubjectCollectionDone,
+		model.SubjectCollectionDoing,
+		model.SubjectCollectionOnHold,
+		model.SubjectCollectionDropped:
 		return v, nil
 	}
 

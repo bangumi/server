@@ -92,7 +92,7 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 	}
 
 	count, err := repo.CountSubjectCollections(context.Background(), id,
-		model.SubjectTypeAll, model.CollectionTypeAll, true)
+		model.SubjectTypeAll, model.SubjectCollectionAll, true)
 	require.NoError(t, err)
 	require.EqualValues(t, 5, count)
 }
@@ -106,7 +106,7 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 	repo, _ := getRepo(t)
 
 	data, err := repo.ListSubjectCollection(context.Background(), id,
-		model.SubjectTypeGame, model.CollectionTypeAll, true, 5, 0)
+		model.SubjectTypeGame, model.SubjectCollectionAll, true, 5, 0)
 	require.NoError(t, err)
 	require.Len(t, data, 2)
 }
@@ -131,14 +131,14 @@ func TestMysqlRepo_UpdateCollection(t *testing.T) {
 		UserID:      userID,
 		SubjectID:   subjectID,
 		SubjectType: model.SubjectTypeReal,
-		Type:        uint8(model.CollectionTypeDone),
+		Type:        uint8(model.SubjectCollectionDone),
 		DoneTime:    uint32(createdAt.Unix()),
 		UpdatedTime: uint32(createdAt.Unix()),
 	}))
 
 	updatedAt := time.Now()
 	err := repo.UpdateSubjectCollection(context.Background(), userID, subjectID, model.SubjectCollectionUpdate{
-		Type:      model.CollectionTypeDoing,
+		Type:      model.SubjectCollectionDoing,
 		UpdatedAt: updatedAt,
 	})
 	require.NoError(t, err)
