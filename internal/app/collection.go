@@ -51,7 +51,7 @@ func (app App) UpdateEpisodeCollection(
 	}
 
 	if s.Redirect != 0 {
-		return fmt.Errorf("%w: subject is removed", domain.ErrSubjectNotFound)
+		return domain.ErrSubjectNotFound
 	}
 
 	if err = validateSubjectCollectionRequest(s); err != nil {

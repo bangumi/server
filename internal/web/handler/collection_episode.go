@@ -174,19 +174,14 @@ func (h Handler) PutEpisodeCollection(c *fiber.Ctx) error {
 
 	// now call app command
 	if err = h.app.UpdateEpisodeCollection(c.Context(), v.ID, episodeID, input.Type); err != nil {
-		if errors.Is(err, domain.ErrInvalidInput) {
+		switch {
+		case errors.Is(err, domain.ErrInvalidInput):
 			return res.FromError(c, err, http.StatusBadRequest, "failed to update episode collection")
-		}
-
-		if errors.Is(err, domain.ErrEpisodeNotFound) {
+		case errors.Is(err, domain.ErrEpisodeNotFound):
 			return res.NotFound("episode not found")
-		}
-
-		if errors.Is(err, domain.ErrSubjectNotFound) {
+		case errors.Is(err, domain.ErrSubjectNotFound):
 			return res.NotFound("subject not exist or has been removed")
-		}
-
-		if errors.Is(err, domain.ErrSubjectNotCollected) {
+		case errors.Is(err, domain.ErrSubjectNotCollected):
 			return res.BadRequest("subject is not collected, please add subject to your collection first")
 		}
 
