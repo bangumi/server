@@ -158,10 +158,6 @@ func (r mysqlRepo) GetSubjectCollection(
 func (r mysqlRepo) UpdateSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID, data model.SubjectCollectionUpdate,
 ) error {
-	if data.Type == model.SubjectCollectionAll {
-		return fmt.Errorf("%w: can't set collection type to 0", domain.ErrInvalidInput)
-	}
-
 	where := []gen.Condition{r.q.SubjectCollection.SubjectID.Eq(subjectID), r.q.SubjectCollection.UserID.Eq(userID)}
 
 	return r.q.Transaction(func(tx *query.Query) error {
