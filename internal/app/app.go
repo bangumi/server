@@ -12,19 +12,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package app
 
 import (
-	"errors"
+	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/domain"
 )
 
-// ErrNotFound should be returned when a repo or service can't find an authorization.
-var ErrNotFound = errors.New("can't find item")
+func New(
+	s domain.SubjectService,
+	e domain.EpisodeRepo,
+	log *zap.Logger,
+) (App, error) {
+	return App{
+		subject: s,
+		episode: e,
+		log:     log.Named("App"),
+	}, nil
+}
 
-var ErrEpisodeNotFound = errgo.Msg(ErrNotFound, "episode not found")
-var ErrSubjectNotFound = errgo.Msg(ErrNotFound, "subject not found")
-var ErrSubjectNotCollected = errgo.Msg(ErrNotFound, "subject not found")
-
-var ErrInvalidInput = errors.New("invalid input")
+type App struct {
+	subject domain.SubjectService
+	collect domain.CollectionRepo
+	episode domain.EpisodeRepo
+	log     *zap.Logger
+}

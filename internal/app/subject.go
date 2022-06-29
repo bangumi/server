@@ -12,19 +12,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package app
 
-import (
-	"errors"
-
-	"github.com/bangumi/server/internal/errgo"
-)
-
-// ErrNotFound should be returned when a repo or service can't find an authorization.
-var ErrNotFound = errors.New("can't find item")
-
-var ErrEpisodeNotFound = errgo.Msg(ErrNotFound, "episode not found")
-var ErrSubjectNotFound = errgo.Msg(ErrNotFound, "subject not found")
-var ErrSubjectNotCollected = errgo.Msg(ErrNotFound, "subject not found")
-
-var ErrInvalidInput = errors.New("invalid input")
+//
+// func GetSubject(ctx context.Context, subjectID model.SubjectID) (model.Subject, error) {
+//
+// }

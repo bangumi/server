@@ -27,6 +27,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
+	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/domain"
@@ -48,7 +49,7 @@ func New(
 	p domain.PersonService,
 	a domain.AuthService,
 	e domain.EpisodeRepo,
-	collect domain.CollectionService,
+	collect domain.CollectionRepo,
 	r domain.RevisionRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
@@ -60,6 +61,7 @@ func New(
 	log *zap.Logger,
 	engine frontend.TemplateEngine,
 	oauth oauth.Manager,
+	app app.App,
 ) (Handler, error) {
 	validate, trans, err := getValidator()
 	if err != nil {
@@ -87,36 +89,37 @@ func New(
 		g:                    g,
 		v:                    validate,
 		validatorTranslation: trans,
-
-		skip1Log: log.WithOptions(zap.AddCallerSkip(1)),
-		oauth:    oauth,
-		template: engine,
-		buffPool: buffer.NewPool(),
+		app:                  app,
+		skip1Log:             log.WithOptions(zap.AddCallerSkip(1)),
+		oauth:                oauth,
+		template:             engine,
+		buffPool:             buffer.NewPool(),
 	}, nil
 }
 
 type Handler struct {
-	oauth                oauth.Manager
-	s                    domain.SubjectService
+	app                  app.App
+	validatorTranslation ut.Translator
 	p                    domain.PersonService
 	a                    domain.AuthService
-	collect              domain.CollectionService
+	collect              domain.CollectionRepo
 	session              session.Manager
 	captcha              captcha.Manager
 	e                    domain.EpisodeRepo
 	c                    domain.CharacterService
 	u                    domain.UserRepo
 	rateLimit            rate.Manager
-	i                    domain.IndexRepo
+	s                    domain.SubjectService
 	r                    domain.RevisionRepo
 	g                    domain.GroupRepo
 	cache                cache.Generic
-	validatorTranslation ut.Translator
-	log                  *zap.Logger
+	i                    domain.IndexRepo
+	oauth                oauth.Manager
 	skip1Log             *zap.Logger
 	v                    *validator.Validate
 	template             frontend.TemplateEngine
 	buffPool             buffer.Pool
+	log                  *zap.Logger
 	cfg                  config.AppConfig
 }
 

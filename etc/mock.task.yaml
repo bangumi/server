@@ -32,7 +32,6 @@ tasks:
       - PersonService
       - GroupRepo
       - CollectionRepo
-      - CollectionService
 
   base-private-mock:
     cmds:
@@ -268,14 +267,3 @@ tasks:
         vars:
           SRC_DIR: ./internal/domain
           INTERFACE: CollectionRepo
-
-  CollectionService:
-    sources:
-      - internal/domain/collection_service.go
-    generates:
-      - internal/mocks/CollectionRepo.go
-    cmds:
-      - task: base-mock
-        vars:
-          SRC_DIR: ./internal/domain
-          INTERFACE: CollectionService

@@ -152,30 +152,15 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 	return res.JSON(c, convertModelSubjectCollection(collection))
 }
 
-const subjectNotFoundMessage = "subject not found"
-
 func (h Handler) PutEpisodeCollection(c *fiber.Ctx) error {
 	v := h.getHTTPAccessor(c)
 	if !v.login {
 		return res.Unauthorized(res.DefaultUnauthorizedMessage)
 	}
 
-	subjectID, err := parseSubjectID(c.Params("subject_id"))
-	if err != nil {
-		return err
-	}
-
 	episodeID, err := parseEpisodeID(c.Params("episode_id"))
 	if err != nil {
 		return err
-	}
-
-	s, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
-	if err != nil {
-		return h.InternalError(c, err, "failed to get subject info")
-	}
-	if !ok || s.Redirect != 0 {
-		return res.NotFound(subjectNotFoundMessage)
 	}
 
 	var input req.PutEpisodeCollection
@@ -187,43 +172,30 @@ func (h Handler) PutEpisodeCollection(c *fiber.Ctx) error {
 		return h.ValidationError(c, errs)
 	}
 
-	if err = validateSubjectCollectionRequest(s); err != nil {
-		return err
-	}
-
-	return h.putEpisodeCollection(c, v.ID, episodeID, s, input)
-}
-
-func (h Handler) putEpisodeCollection(
-	c *fiber.Ctx,
-	userID model.UserID,
-	episodeID model.EpisodeID,
-	s res.SubjectV0,
-	input req.PutEpisodeCollection,
-) error {
-	_, err := h.collect.GetSubjectCollection(c.Context(), userID, s.ID)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound("subject is not collected, please add subject to your collection first")
+	// now call app command
+	if err = h.app.UpdateEpisodeCollection(c.Context(), v.ID, episodeID, input.Type); err != nil {
+		if errors.Is(err, domain.ErrInvalidInput) {
+			return res.FromError(c, err, http.StatusBadRequest, "failed to update episode collection")
 		}
 
-		return errgo.Wrap(err, "user.GetSubjectCollection")
-	}
+		if errors.Is(err, domain.ErrEpisodeNotFound) {
+			return res.NotFound("episode not found")
+		}
 
-	if err = h.collect.UpdateEpisodeCollection(c.Context(), userID, s.ID, episodeID, input.Type); err != nil {
-		return h.InternalError(c, err, "failed to update subject collection")
+		if errors.Is(err, domain.ErrSubjectNotFound) {
+			return res.NotFound("subject not exist or has been removed")
+		}
+
+		if errors.Is(err, domain.ErrSubjectNotCollected) {
+			return res.BadRequest("subject is not collected, please add subject to your collection first")
+		}
+
+		return h.InternalError(c, err, "failed to update episode collection",
+			log.UserID(v.ID), log.EpisodeID(episodeID))
 	}
 
 	c.Status(http.StatusNoContent)
 	return nil
-}
-
-func validateSubjectCollectionRequest(s res.SubjectV0) error {
-	if s.TypeID == model.SubjectTypeAnime || s.TypeID == model.SubjectTypeReal {
-		return nil
-	}
-
-	return res.BadRequest("subject is not anime or real.")
 }
 
 func convertModelSubjectCollection(collection model.SubjectCollection) res.SubjectCollection {
