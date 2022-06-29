@@ -27,6 +27,7 @@ import (
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
 
+	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
@@ -87,7 +88,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 		fx.Provide(
 			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
-			person.NewService, frontend.NewTemplateEngine,
+			person.NewService, frontend.NewTemplateEngine, app.New,
 		),
 
 		MockPersonRepo(m.PersonRepo),
@@ -119,10 +120,11 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		options = append(options, MockCache(m.Cache))
 	}
 
-	app := fx.New(options...)
+	fxApp := fx.New(options...)
 
-	if app.Err() != nil {
-		tb.Fatal("can't create web app", app.Err())
+	if fxApp.Err() != nil {
+		tb.Fatal("can't create web app", fxApp.Err())
+		tb.FailNow()
 	}
 
 	if m.HTTPMock != nil {
