@@ -229,7 +229,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 
 		_, err = tx.SubjectCollection.WithContext(ctx).
 			Where(tx.SubjectCollection.UserID.Eq(userID), tx.SubjectCollection.SubjectID.Eq(subjectID)).UpdateColumnSimple(
-			tx.SubjectCollection.VolStatus.Value(countWatchedEp(e)), tx.SubjectCollection.UpdatedTime.Value(updateTime),
+			tx.SubjectCollection.EpStatus.Value(countWatchedEp(e)), tx.SubjectCollection.UpdatedTime.Value(updateTime),
 		)
 		if err != nil {
 			return errgo.Wrap(err, "SubjectCollection.UpdateSimple")
