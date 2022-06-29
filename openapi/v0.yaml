@@ -827,7 +827,7 @@ paths:
           description: Successful Response
 
         "400":
-          description: Validation Error
+          description: Bad Request
           content:
             application/json:
               schema:
