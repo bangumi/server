@@ -36,7 +36,7 @@ type CollectionRepo interface {
 		subjectType model.SubjectType,
 		collectionType model.CollectionType,
 		showPrivate bool,
-		limit, offsets int,
+		limit, offset int,
 	) ([]model.SubjectCollection, error)
 
 	GetSubjectCollection(
