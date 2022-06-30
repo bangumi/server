@@ -75,50 +75,6 @@ func (r mysqlRepo) Get(
 }
 
 //nolint:gocyclo
-func (r mysqlRepo) GetByIDs(
-	ctx context.Context, commentType domain.CommentType, ids ...model.CommentID,
-) (map[model.CommentID]model.Comment, error) {
-	var (
-		rawComments interface{}
-		commentMap  = make(map[model.CommentID]model.Comment)
-		err         error
-	)
-	switch commentType {
-	case domain.CommentTypeGroupTopic:
-		rawComments, err = r.q.GroupTopicComment.WithContext(ctx).Where(r.q.GroupTopicComment.ID.In(ids...)).Find()
-	case domain.CommentTypeSubjectTopic:
-		rawComments, err = r.q.SubjectTopicComment.WithContext(ctx).Where(r.q.SubjectTopicComment.ID.In(ids...)).Find()
-	case domain.CommentIndex:
-		rawComments, err = r.q.IndexComment.WithContext(ctx).Where(r.q.IndexComment.ID.In(ids...)).Find()
-	case domain.CommentCharacter:
-		rawComments, err = r.q.CharacterComment.WithContext(ctx).Where(r.q.CharacterComment.ID.In(ids...)).Find()
-	case domain.CommentPerson:
-		rawComments, err = r.q.CharacterComment.WithContext(ctx).Where(r.q.CharacterComment.ID.In(ids...)).Find()
-	case domain.CommentEpisode:
-		rawComments, err = r.q.EpisodeComment.WithContext(ctx).Where(r.q.EpisodeComment.ID.In(ids...)).Find()
-	default:
-		return nil, errUnsupportCommentType
-	}
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, domain.ErrNotFound
-		}
-
-		r.log.Error("unexpected error happened", zap.Error(err))
-		return nil, errgo.Wrap(err, "dal")
-	}
-
-	comments, err := convertModelComments(rawComments)
-	if err != nil {
-		return nil, err
-	}
-	for _, v := range comments {
-		commentMap[v.ID] = v
-	}
-	return commentMap, nil
-}
-
-//nolint:gocyclo
 func (r mysqlRepo) GetByRelateIDs(
 	ctx context.Context, commentType domain.CommentType, ids ...model.CommentID,
 ) (map[model.CommentID][]model.Comment, error) {

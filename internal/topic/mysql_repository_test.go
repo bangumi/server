@@ -36,7 +36,7 @@ func getRepo(t *testing.T) domain.TopicRepo {
 	return repo
 }
 
-func TestGet(t *testing.T) {
+func TestMysqlRepo_Get(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
@@ -61,7 +61,7 @@ func TestMysqlRepo_Count(t *testing.T) {
 	require.Equal(t, count, int64(1))
 }
 
-func TestMysqlRepo_GetTopics(t *testing.T) {
+func TestMysqlRepo_List(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 

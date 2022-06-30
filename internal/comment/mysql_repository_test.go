@@ -50,7 +50,31 @@ func TestGet(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestMysqlRepo_GetComments(t *testing.T) {
+func TestMysqlRepo_GetByRelateIDs(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	s, err := repo.GetByRelateIDs(context.Background(), domain.CommentTypeSubjectTopic, 47948)
+	require.NoError(t, err)
+
+	require.True(t, len(s) == 4, "fetch related comments")
+}
+
+func TestMysqlRepo_Count(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	s, err := repo.Count(context.Background(), domain.CommentTypeSubjectTopic, 1)
+	require.NoError(t, err)
+
+	require.True(t, s == 60, "count top comments")
+}
+
+func TestMysqlRepo_List(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
@@ -59,5 +83,5 @@ func TestMysqlRepo_GetComments(t *testing.T) {
 	s, err := repo.List(context.Background(), domain.CommentTypeSubjectTopic, 1, 0, 0)
 	require.NoError(t, err)
 
-	require.True(t, len(s) != 0, "cannot fetch comments")
+	require.True(t, len(s) != 0, "fetch top comments")
 }
