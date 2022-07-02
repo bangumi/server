@@ -410,7 +410,7 @@ func exportPersonCharacterRelations(q *query.Query, w io.Writer) {
 	}
 }
 
-func encode(w io.Writer, object interface{}) {
+func encode(w io.Writer, object any) {
 	if err := json.NewEncoder(w).Encode(object); err != nil {
 		panic(err)
 	}

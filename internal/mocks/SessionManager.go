@@ -62,7 +62,7 @@ type SessionManager_Create_Call struct {
 // Create is a helper method to define mock.On call
 //  - ctx context.Context
 //  - a domain.Auth
-func (_e *SessionManager_Expecter) Create(ctx interface{}, a interface{}) *SessionManager_Create_Call {
+func (_e *SessionManager_Expecter) Create(ctx any, a any) *SessionManager_Create_Call {
 	return &SessionManager_Create_Call{Call: _e.mock.On("Create", ctx, a)}
 }
 
@@ -107,7 +107,7 @@ type SessionManager_Get_Call struct {
 // Get is a helper method to define mock.On call
 //  - ctx context.Context
 //  - key string
-func (_e *SessionManager_Expecter) Get(ctx interface{}, key interface{}) *SessionManager_Get_Call {
+func (_e *SessionManager_Expecter) Get(ctx any, key any) *SessionManager_Get_Call {
 	return &SessionManager_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
@@ -145,7 +145,7 @@ type SessionManager_Revoke_Call struct {
 // Revoke is a helper method to define mock.On call
 //  - ctx context.Context
 //  - key string
-func (_e *SessionManager_Expecter) Revoke(ctx interface{}, key interface{}) *SessionManager_Revoke_Call {
+func (_e *SessionManager_Expecter) Revoke(ctx any, key any) *SessionManager_Revoke_Call {
 	return &SessionManager_Revoke_Call{Call: _e.mock.On("Revoke", ctx, key)}
 }
 
@@ -183,7 +183,7 @@ type SessionManager_RevokeUser_Call struct {
 // RevokeUser is a helper method to define mock.On call
 //  - ctx context.Context
 //  - id model.UserID
-func (_e *SessionManager_Expecter) RevokeUser(ctx interface{}, id interface{}) *SessionManager_RevokeUser_Call {
+func (_e *SessionManager_Expecter) RevokeUser(ctx any, id any) *SessionManager_RevokeUser_Call {
 	return &SessionManager_RevokeUser_Call{Call: _e.mock.On("RevokeUser", ctx, id)}
 }
 

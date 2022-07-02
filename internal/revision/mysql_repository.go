@@ -205,7 +205,7 @@ func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.RevisionID) (
 	return convertSubjectRevisionDao(revision, true), nil
 }
 
-func toValidJSON(data interface{}) interface{} {
+func toValidJSON(data any) any {
 	if data == nil {
 		return nil
 	}
@@ -213,15 +213,15 @@ func toValidJSON(data interface{}) interface{} {
 	switch t {
 	case reflect.Array:
 	case reflect.Slice:
-		if arr, ok := data.([]interface{}); ok {
+		if arr, ok := data.([]any); ok {
 			for i, val := range arr {
 				arr[i] = toValidJSON(val)
 			}
 			return arr
 		}
 	case reflect.Map:
-		if m, ok := data.(map[interface{}]interface{}); ok {
-			ret := map[string]interface{}{}
+		if m, ok := data.(map[any]any); ok {
+			ret := map[string]any{}
 			for k, v := range m {
 				ret[fmt.Sprint(k)] = toValidJSON(v)
 			}
@@ -232,7 +232,7 @@ func toValidJSON(data interface{}) interface{} {
 	return data
 }
 
-func convertRevisionText(text []byte) map[string]interface{} {
+func convertRevisionText(text []byte) map[string]any {
 	gr := flate.NewReader(bytes.NewBuffer(text))
 	defer gr.Close()
 	b, err := io.ReadAll(gr)
@@ -243,20 +243,20 @@ func convertRevisionText(text []byte) map[string]interface{} {
 	if err != nil {
 		return nil
 	}
-	if d, ok := toValidJSON(result).(map[string]interface{}); ok {
+	if d, ok := toValidJSON(result).(map[string]any); ok {
 		return d
 	}
 	return nil
 }
 
-func safeDecodeExtra(k1 reflect.Type, k2 reflect.Type, input interface{}) (interface{}, error) {
+func safeDecodeExtra(k1 reflect.Type, k2 reflect.Type, input any) (any, error) {
 	if k2.Name() == "Extra" && k1.Kind() != reflect.Map {
 		return map[string]string{}, nil
 	}
 	return input, nil
 }
 
-func castCharacterData(raw map[string]interface{}) model.CharacterRevisionData {
+func castCharacterData(raw map[string]any) model.CharacterRevisionData {
 	if raw == nil {
 		return nil
 	}
@@ -271,7 +271,7 @@ func castCharacterData(raw map[string]interface{}) model.CharacterRevisionData {
 	return result
 }
 
-func castPersonData(raw map[string]interface{}) model.PersonRevisionData {
+func castPersonData(raw map[string]any) model.PersonRevisionData {
 	if raw == nil {
 		return nil
 	}

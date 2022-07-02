@@ -68,7 +68,7 @@ func TestService_GetByTokenWithCache_cached(t *testing.T) {
 
 	var c = mocks.NewCache(t)
 	c.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).
-		Run(func(ctx context.Context, key string, value interface{}) {
+		Run(func(ctx context.Context, key string, value any) {
 			vOut := reflect.ValueOf(value).Elem()
 			vOut.Set(reflect.ValueOf(domain.Auth{GroupID: 2}))
 		}).Return(true, nil)

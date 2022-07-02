@@ -22,7 +22,7 @@ import (
 	"github.com/bangumi/server/pkg/wiki"
 )
 
-type v0wiki = []interface{}
+type v0wiki = []any
 
 type SubjectV0 struct {
 	Date          *string               `json:"date"`

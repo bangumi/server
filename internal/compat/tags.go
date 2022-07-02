@@ -45,10 +45,10 @@ func ParseTags(s []byte) ([]Tag, error) {
 	var t = make([]Tag, 0, len(in))
 
 	for _, tag := range in {
-		v, ok := tag.(map[interface{}]interface{})
+		v, ok := tag.(map[any]any)
 		if !ok {
 			return nil, errgo.Msg(ErrTypeCast,
-				fmt.Sprintf("failed to cast %v to map[interface{}]interface{} ", tag))
+				fmt.Sprintf("failed to cast %v to map[any]any ", tag))
 		}
 
 		name, ok := v["tag_name"].(string)

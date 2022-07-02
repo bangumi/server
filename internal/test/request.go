@@ -125,7 +125,7 @@ func (r *Request) Form(key, value string) *Request {
 	return r
 }
 
-func (r *Request) JSON(v interface{}) *Request {
+func (r *Request) JSON(v any) *Request {
 	r.t.Helper()
 	require.Empty(r.t, r.contentType, "content-type should not be empty")
 
@@ -196,7 +196,7 @@ type Response struct {
 	StatusCode int
 }
 
-func (r *Response) JSON(v interface{}) *Response {
+func (r *Response) JSON(v any) *Response {
 	r.t.Helper()
 
 	if strings.HasPrefix(r.Header.Get(fiber.HeaderContentType), fiber.MIMEApplicationJSON) {

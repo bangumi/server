@@ -36,7 +36,7 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
-var accessorPool = sync.Pool{New: func() interface{} { return &accessor{} }} //nolint:gochecknoglobals
+var accessorPool = sync.Pool{New: func() any { return &accessor{} }} //nolint:gochecknoglobals
 
 func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 	var a = accessorPool.Get().(*accessor) //nolint:forcetypeassert

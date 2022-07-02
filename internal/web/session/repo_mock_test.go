@@ -55,7 +55,7 @@ type MockRepo_Create_Call struct {
 //  - key string
 //  - userID model.UserID
 //  - regTime time.Time
-func (_e *MockRepo_Expecter) Create(ctx interface{}, key interface{}, userID interface{}, regTime interface{}) *MockRepo_Create_Call {
+func (_e *MockRepo_Expecter) Create(ctx any, key any, userID any, regTime any) *MockRepo_Create_Call {
 	return &MockRepo_Create_Call{Call: _e.mock.On("Create", ctx, key, userID, regTime)}
 }
 
@@ -100,7 +100,7 @@ type MockRepo_Get_Call struct {
 // Get is a helper method to define mock.On call
 //  - ctx context.Context
 //  - key string
-func (_e *MockRepo_Expecter) Get(ctx interface{}, key interface{}) *MockRepo_Get_Call {
+func (_e *MockRepo_Expecter) Get(ctx any, key any) *MockRepo_Get_Call {
 	return &MockRepo_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
@@ -138,7 +138,7 @@ type MockRepo_Revoke_Call struct {
 // Revoke is a helper method to define mock.On call
 //  - ctx context.Context
 //  - key string
-func (_e *MockRepo_Expecter) Revoke(ctx interface{}, key interface{}) *MockRepo_Revoke_Call {
+func (_e *MockRepo_Expecter) Revoke(ctx any, key any) *MockRepo_Revoke_Call {
 	return &MockRepo_Revoke_Call{Call: _e.mock.On("Revoke", ctx, key)}
 }
 
@@ -185,7 +185,7 @@ type MockRepo_RevokeUser_Call struct {
 // RevokeUser is a helper method to define mock.On call
 //  - ctx context.Context
 //  - userID model.UserID
-func (_e *MockRepo_Expecter) RevokeUser(ctx interface{}, userID interface{}) *MockRepo_RevokeUser_Call {
+func (_e *MockRepo_Expecter) RevokeUser(ctx any, userID any) *MockRepo_RevokeUser_Call {
 	return &MockRepo_RevokeUser_Call{Call: _e.mock.On("RevokeUser", ctx, userID)}
 }
 

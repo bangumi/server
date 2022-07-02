@@ -40,7 +40,7 @@ func TestCompat_v0wiki(t *testing.T) {
 		},
 	}
 
-	var expected = []interface{}{
+	var expected = []any{
 		wikiValue{Key: "简体中文名", Value: "水树奈奈"},
 		wikiValues{Key: "别名", Value: []kv{
 			{Key: "罗马字", Value: "Mizuki Nana"},

@@ -44,7 +44,7 @@ func TestHandler_ListPersonRevision_HappyPath(t *testing.T) {
 	resp := test.New(t).Get("/v0/revisions/persons?person_id=9").Execute(app).JSON(&r)
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	result, ok := r.Data.([]interface{})[0].(map[string]interface{})
+	result, ok := r.Data.([]any)[0].(map[string]any)
 	require.True(t, ok)
 
 	id, ok := result["id"].(float64)
@@ -101,7 +101,7 @@ func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	result, ok := r.Data.([]interface{})[0].(map[string]interface{})
+	result, ok := r.Data.([]any)[0].(map[string]any)
 	require.Equal(t, true, ok)
 
 	id, ok := result["id"].(float64)
@@ -164,11 +164,11 @@ func TestHandler_ListCharacterRevision_HappyPath(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	rdms, ok := r.Data.([]interface{}) // rdm: r.Data.Maps
+	rdms, ok := r.Data.([]any) // rdm: r.Data.Maps
 	require.True(t, ok)
 	require.GreaterOrEqual(t, len(rdms), 1)
 
-	rdm, ok := rdms[0].(map[string]interface{})
+	rdm, ok := rdms[0].(map[string]any)
 	require.True(t, ok)
 
 	id, ok := rdm["id"].(float64)

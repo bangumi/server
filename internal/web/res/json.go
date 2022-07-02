@@ -21,7 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func JSON(c *fiber.Ctx, v interface{}) error {
+func JSON(c *fiber.Ctx, v any) error {
 	data, err := json.Marshal(v)
 	if err != nil {
 		c.Status(http.StatusInternalServerError).Context().SetBodyString("failed to encode json body: " + err.Error())

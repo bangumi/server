@@ -57,11 +57,11 @@ func (m manager) Verify(ctx context.Context, response string) (bool, error) {
 }
 
 type hCaptcha struct {
-	ChallengeTS time.Time     `json:"challenge_ts"`
-	Hostname    string        `json:"hostname"`
-	ErrorCodes  []string      `json:"error-codes"`
-	ScoreReason []interface{} `json:"score_reason"`
-	Score       float64       `json:"score"`
-	Credit      bool          `json:"credit"`
-	Success     bool          `json:"success"`
+	ChallengeTS time.Time `json:"challenge_ts"`
+	Hostname    string    `json:"hostname"`
+	ErrorCodes  []string  `json:"error-codes"`
+	ScoreReason []any     `json:"score_reason"`
+	Score       float64   `json:"score"`
+	Credit      bool      `json:"credit"`
+	Success     bool      `json:"success"`
 }

@@ -52,7 +52,7 @@ type RevisionRepo_CountCharacterRelated_Call struct {
 // CountCharacterRelated is a helper method to define mock.On call
 //  - ctx context.Context
 //  - characterID model.CharacterID
-func (_e *RevisionRepo_Expecter) CountCharacterRelated(ctx interface{}, characterID interface{}) *RevisionRepo_CountCharacterRelated_Call {
+func (_e *RevisionRepo_Expecter) CountCharacterRelated(ctx any, characterID any) *RevisionRepo_CountCharacterRelated_Call {
 	return &RevisionRepo_CountCharacterRelated_Call{Call: _e.mock.On("CountCharacterRelated", ctx, characterID)}
 }
 
@@ -97,7 +97,7 @@ type RevisionRepo_CountPersonRelated_Call struct {
 // CountPersonRelated is a helper method to define mock.On call
 //  - ctx context.Context
 //  - personID model.PersonID
-func (_e *RevisionRepo_Expecter) CountPersonRelated(ctx interface{}, personID interface{}) *RevisionRepo_CountPersonRelated_Call {
+func (_e *RevisionRepo_Expecter) CountPersonRelated(ctx any, personID any) *RevisionRepo_CountPersonRelated_Call {
 	return &RevisionRepo_CountPersonRelated_Call{Call: _e.mock.On("CountPersonRelated", ctx, personID)}
 }
 
@@ -142,7 +142,7 @@ type RevisionRepo_CountSubjectRelated_Call struct {
 // CountSubjectRelated is a helper method to define mock.On call
 //  - ctx context.Context
 //  - id model.SubjectID
-func (_e *RevisionRepo_Expecter) CountSubjectRelated(ctx interface{}, id interface{}) *RevisionRepo_CountSubjectRelated_Call {
+func (_e *RevisionRepo_Expecter) CountSubjectRelated(ctx any, id any) *RevisionRepo_CountSubjectRelated_Call {
 	return &RevisionRepo_CountSubjectRelated_Call{Call: _e.mock.On("CountSubjectRelated", ctx, id)}
 }
 
@@ -187,7 +187,7 @@ type RevisionRepo_GetCharacterRelated_Call struct {
 // GetCharacterRelated is a helper method to define mock.On call
 //  - ctx context.Context
 //  - id uint32
-func (_e *RevisionRepo_Expecter) GetCharacterRelated(ctx interface{}, id interface{}) *RevisionRepo_GetCharacterRelated_Call {
+func (_e *RevisionRepo_Expecter) GetCharacterRelated(ctx any, id any) *RevisionRepo_GetCharacterRelated_Call {
 	return &RevisionRepo_GetCharacterRelated_Call{Call: _e.mock.On("GetCharacterRelated", ctx, id)}
 }
 
@@ -232,7 +232,7 @@ type RevisionRepo_GetPersonRelated_Call struct {
 // GetPersonRelated is a helper method to define mock.On call
 //  - ctx context.Context
 //  - id uint32
-func (_e *RevisionRepo_Expecter) GetPersonRelated(ctx interface{}, id interface{}) *RevisionRepo_GetPersonRelated_Call {
+func (_e *RevisionRepo_Expecter) GetPersonRelated(ctx any, id any) *RevisionRepo_GetPersonRelated_Call {
 	return &RevisionRepo_GetPersonRelated_Call{Call: _e.mock.On("GetPersonRelated", ctx, id)}
 }
 
@@ -277,7 +277,7 @@ type RevisionRepo_GetSubjectRelated_Call struct {
 // GetSubjectRelated is a helper method to define mock.On call
 //  - ctx context.Context
 //  - id uint32
-func (_e *RevisionRepo_Expecter) GetSubjectRelated(ctx interface{}, id interface{}) *RevisionRepo_GetSubjectRelated_Call {
+func (_e *RevisionRepo_Expecter) GetSubjectRelated(ctx any, id any) *RevisionRepo_GetSubjectRelated_Call {
 	return &RevisionRepo_GetSubjectRelated_Call{Call: _e.mock.On("GetSubjectRelated", ctx, id)}
 }
 
@@ -326,7 +326,7 @@ type RevisionRepo_ListCharacterRelated_Call struct {
 //  - characterID model.CharacterID
 //  - limit int
 //  - offset int
-func (_e *RevisionRepo_Expecter) ListCharacterRelated(ctx interface{}, characterID interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListCharacterRelated_Call {
+func (_e *RevisionRepo_Expecter) ListCharacterRelated(ctx any, characterID any, limit any, offset any) *RevisionRepo_ListCharacterRelated_Call {
 	return &RevisionRepo_ListCharacterRelated_Call{Call: _e.mock.On("ListCharacterRelated", ctx, characterID, limit, offset)}
 }
 
@@ -375,7 +375,7 @@ type RevisionRepo_ListPersonRelated_Call struct {
 //  - personID model.PersonID
 //  - limit int
 //  - offset int
-func (_e *RevisionRepo_Expecter) ListPersonRelated(ctx interface{}, personID interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListPersonRelated_Call {
+func (_e *RevisionRepo_Expecter) ListPersonRelated(ctx any, personID any, limit any, offset any) *RevisionRepo_ListPersonRelated_Call {
 	return &RevisionRepo_ListPersonRelated_Call{Call: _e.mock.On("ListPersonRelated", ctx, personID, limit, offset)}
 }
 
@@ -424,7 +424,7 @@ type RevisionRepo_ListSubjectRelated_Call struct {
 //  - id model.SubjectID
 //  - limit int
 //  - offset int
-func (_e *RevisionRepo_Expecter) ListSubjectRelated(ctx interface{}, id interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListSubjectRelated_Call {
+func (_e *RevisionRepo_Expecter) ListSubjectRelated(ctx any, id any, limit any, offset any) *RevisionRepo_ListSubjectRelated_Call {
 	return &RevisionRepo_ListSubjectRelated_Call{Call: _e.mock.On("ListSubjectRelated", ctx, id, limit, offset)}
 }
 

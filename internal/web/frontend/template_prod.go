@@ -41,6 +41,6 @@ func NewTemplateEngine() (TemplateEngine, error) {
 	return TemplateEngine{t: t}, nil
 }
 
-func (e TemplateEngine) Execute(w io.Writer, name string, data interface{}) error {
+func (e TemplateEngine) Execute(w io.Writer, name string, data any) error {
 	return e.t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
 }

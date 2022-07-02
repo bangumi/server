@@ -53,6 +53,6 @@ func main() {
 }
 
 type WithExampleValue struct {
-	Example interface{} `json:"example"`
+	Example any `json:"example"`
 	*schema.Schema
 }

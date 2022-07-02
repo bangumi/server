@@ -24,11 +24,11 @@ func (_m *OAuthManger) EXPECT() *OAuthManger_Expecter {
 
 // GetClientByID provides a mock function with given fields: ctx, clientIDs
 func (_m *OAuthManger) GetClientByID(ctx context.Context, clientIDs ...string) (map[string]oauth.Client, error) {
-	_va := make([]interface{}, len(clientIDs))
+	_va := make([]any, len(clientIDs))
 	for _i := range clientIDs {
 		_va[_i] = clientIDs[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
@@ -60,9 +60,9 @@ type OAuthManger_GetClientByID_Call struct {
 // GetClientByID is a helper method to define mock.On call
 //  - ctx context.Context
 //  - clientIDs ...string
-func (_e *OAuthManger_Expecter) GetClientByID(ctx interface{}, clientIDs ...interface{}) *OAuthManger_GetClientByID_Call {
+func (_e *OAuthManger_Expecter) GetClientByID(ctx any, clientIDs ...any) *OAuthManger_GetClientByID_Call {
 	return &OAuthManger_GetClientByID_Call{Call: _e.mock.On("GetClientByID",
-		append([]interface{}{ctx}, clientIDs...)...)}
+		append([]any{ctx}, clientIDs...)...)}
 }
 
 func (_c *OAuthManger_GetClientByID_Call) Run(run func(ctx context.Context, clientIDs ...string)) *OAuthManger_GetClientByID_Call {
