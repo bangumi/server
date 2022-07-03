@@ -2,6 +2,10 @@ module github.com/bangumi/server
 
 go 1.18
 
+retract (
+	[v1.12.8, v1.12.10]
+)
+
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/danielgtaylor/huma v1.8.0
