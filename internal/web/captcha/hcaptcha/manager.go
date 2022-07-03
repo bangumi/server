@@ -24,21 +24,20 @@ import (
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/web/captcha"
 )
 
 const VerifyURL = "https://hcaptcha.com/siteverify"
 
-type manager struct {
+type Manager struct {
 	http   *resty.Client
 	secret string
 }
 
-func New(cfg config.AppConfig, http *resty.Client) captcha.Manager {
-	return manager{secret: cfg.HCaptchaSecretKey, http: http}
+func New(cfg config.AppConfig, http *resty.Client) Manager {
+	return Manager{secret: cfg.HCaptchaSecretKey, http: http}
 }
 
-func (m manager) Verify(ctx context.Context, response string) (bool, error) {
+func (m Manager) Verify(ctx context.Context, response string) (bool, error) {
 	resp, err := m.http.R().SetFormData(map[string]string{
 		"response": response,
 		"secret":   m.secret,

@@ -41,7 +41,7 @@ import (
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web"
-	"github.com/bangumi/server/internal/web/captcha/hcaptcha"
+	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/rate"
@@ -87,7 +87,7 @@ func start() error {
 		),
 
 		fx.Provide(
-			session.NewMysqlRepo, rate.New, hcaptcha.New, session.New, handler.New, web.New, frontend.NewTemplateEngine,
+			session.NewMysqlRepo, rate.New, captcha.New, session.New, handler.New, web.New, frontend.NewTemplateEngine,
 		),
 
 		fx.Invoke(web.ResistRouter),
