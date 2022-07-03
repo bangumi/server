@@ -25,7 +25,7 @@ import (
 	"github.com/ghodss/yaml"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/web/res"
 )
 

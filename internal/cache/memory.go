@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 // NewMemoryCache return an in-memory cache.

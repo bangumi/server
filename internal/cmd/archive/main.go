@@ -32,9 +32,9 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 const defaultStep = 50

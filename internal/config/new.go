@@ -23,7 +23,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 const defaultMaxMysqlConnection = 4

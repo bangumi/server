@@ -18,7 +18,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 var (

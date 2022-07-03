@@ -23,7 +23,7 @@ import (
 	"github.com/goccy/go-json"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 const VerifyURL = "https://hcaptcha.com/siteverify"

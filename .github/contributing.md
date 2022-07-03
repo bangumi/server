@@ -49,7 +49,7 @@ import (
 	"testing"
 
 	"github.com/bangumi/server/internal/mocks"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 func TestHandler_Mock_Example(t *testing.T) {
@@ -79,7 +79,7 @@ package auth_test
 import (
 	"testing"
 
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 

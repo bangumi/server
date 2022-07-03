@@ -23,7 +23,7 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 //go:embed static

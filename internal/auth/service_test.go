@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 func getService() domain.AuthService {

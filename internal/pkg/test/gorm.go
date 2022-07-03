@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func GetQuery(tb testing.TB) *query.Query {

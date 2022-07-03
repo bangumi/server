@@ -22,7 +22,7 @@ import (
 
 	"github.com/elliotchance/phpserialize"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 type Tag struct {

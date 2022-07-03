@@ -25,9 +25,9 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/model/generic"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func NewUserRepo(q *query.Query, log *zap.Logger) (domain.UserRepo, error) {

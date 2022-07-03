@@ -25,8 +25,8 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/strutil"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"

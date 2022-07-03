@@ -12,33 +12,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+//nolint:goerr113
+package errgo_test
 
 import (
+	"errors"
 	"testing"
 
-	"github.com/bangumi/server/internal/mocks"
-	"github.com/bangumi/server/internal/test"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func TestGetWebApp(t *testing.T) {
+func TestWrap(t *testing.T) {
 	t.Parallel()
-
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: mocks.NewSubjectRepo(t),
-			AuthRepo:    mocks.NewAuthRepo(t),
-			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			Cache:       mocks.NewCache(t),
-		},
-	)
-
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: mocks.NewSubjectRepo(t),
-			AuthRepo:    mocks.NewAuthRepo(t),
-			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			Cache:       mocks.NewCache(t),
-		},
-	)
+	err := errors.New("raw")
+	require.Equal(t, "wrap: raw", errgo.Wrap(err, "wrap").Error())
 }

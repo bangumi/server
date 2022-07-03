@@ -28,8 +28,8 @@ import (
 	"github.com/bangumi/server/internal/auth/internal/cachekey"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 const TokenTypeOauthToken = 0

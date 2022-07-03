@@ -12,37 +12,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+package logger
 
 import (
-	"net/http"
-	"testing"
+	"path/filepath"
+	"runtime"
+	"strings"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/internal/test"
+	"go.uber.org/zap/zapcore"
 )
 
-type res struct {
-	Q string `json:"q"`
-	I int    `json:"i"`
-}
+func getCallerEncoder() zapcore.CallerEncoder {
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		return zapcore.FullCallerEncoder
+	}
 
-func TestClientFullExample(t *testing.T) {
-	t.Parallel()
-	app := fiber.New()
+	prefix := filepath.ToSlash(filepath.Join(file, "../../../..")) + "/"
 
-	app.Get("/test", func(c *fiber.Ctx) error {
-		return c.JSON(res{I: 5, Q: c.Query("q")})
-	})
-
-	var r res
-	test.New(t).Get("/test").Query("q", "v").
-		Execute(app).
-		JSON(&r).
-		ExpectCode(http.StatusOK)
-
-	require.Equal(t, 5, r.I)
-	require.Equal(t, "v", r.Q)
+	return func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(strings.TrimPrefix(caller.String(), prefix))
+	}
 }

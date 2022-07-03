@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/web/captcha/hcaptcha"
 )
 

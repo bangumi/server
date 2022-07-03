@@ -33,9 +33,9 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/random"
 	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/middleware/recovery"

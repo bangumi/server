@@ -22,8 +22,8 @@ import (
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 // NewRedisCache create a redis backed cache.

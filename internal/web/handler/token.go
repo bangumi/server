@@ -24,7 +24,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"

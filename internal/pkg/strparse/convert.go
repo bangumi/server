@@ -18,8 +18,8 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func Uint8(s string) (uint8, error) {
