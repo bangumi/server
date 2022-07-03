@@ -19,7 +19,6 @@ import "strconv"
 var _ interface {
 	Error() string
 	Unwrap() error
-	Is(error) bool
 } = (*parseError)(nil)
 
 type parseError struct {
@@ -29,15 +28,11 @@ type parseError struct {
 }
 
 func (p *parseError) Error() string {
-	return p.err.Error() + "\nline: " + strconv.Itoa(p.lino) + " " + strconv.Quote(p.line)
+	return p.err.Error() + " line: " + strconv.Itoa(p.lino) + " " + strconv.Quote(p.line)
 }
 
 func (p *parseError) Unwrap() error {
 	return p.err
-}
-
-func (p *parseError) Is(err error) bool {
-	return p.err == err // nolint: goerr113,errorlint
 }
 
 func wrapError(err error, lino int, line string) error {
