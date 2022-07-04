@@ -19,27 +19,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/goccy/go-json"
-	"go.uber.org/zap"
-	"gorm.io/gorm"
-
-	"github.com/bangumi/server/internal/dal/dao"
-	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 const defaultRetry = 5
-
-type persistSession struct {
-	CreatedAt time.Time
-	ExpiredAt time.Time
-	Key       string
-	Value     Session
-	UserID    model.UserID
-}
 
 var errTooManyRetry = errors.New("too many reties with key conflict")
 
@@ -47,121 +30,7 @@ type Repo interface {
 	Create(
 		ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string,
 	) (key string, s Session, err error)
-	Get(ctx context.Context, key string) (persistSession, error)
+	Get(ctx context.Context, key string) (Session, error)
 	RevokeUser(ctx context.Context, userID model.UserID) (keys []string, err error)
 	Revoke(ctx context.Context, key string) error
-}
-
-func NewMysqlRepo(q *query.Query, logger *zap.Logger) Repo {
-	return mysqlRepo{q: q, log: logger.Named("session.mysqlRepo")}
-}
-
-type mysqlRepo struct {
-	q   *query.Query
-	log *zap.Logger
-}
-
-func (r mysqlRepo) Create(
-	ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string,
-) (string, Session, error) {
-	createdAt := time.Now().Unix()
-	expiredAt := createdAt + timex.OneWeekSec
-	s := Session{RegTime: regTime, UserID: userID, ExpiredAt: expiredAt}
-	encodedJSON, err := json.MarshalWithOption(s, json.DisableHTMLEscape(), json.DisableNormalizeUTF8())
-	if err != nil {
-		return "", Session{}, errgo.Wrap(err, "json.MarshalWithOption")
-	}
-
-	tx := r.q.Begin()
-	for i := 0; i < defaultRetry; i++ {
-		key := keyGen()
-
-		c, err := tx.WithContext(ctx).WebSession.Where(tx.WebSession.Key.Eq(key)).Count()
-		if err != nil {
-			return "", Session{}, errgo.Wrap(err, "tx.WebSession.Count")
-		}
-
-		if c != 0 {
-			// session id conflict, re-generate key
-			continue
-		}
-
-		webSession := dao.WebSession{
-			Key:       key,
-			UserID:    userID,
-			Value:     encodedJSON,
-			CreatedAt: createdAt,
-			ExpiredAt: expiredAt,
-		}
-
-		err = tx.WebSession.WithContext(ctx).Create(&webSession)
-		if err != nil {
-			return "", Session{}, errgo.Wrap(err, "orm.Tx.Create")
-		}
-
-		err = tx.Commit()
-		if err != nil {
-			return "", Session{}, errgo.Wrap(err, "tx.Commit")
-		}
-
-		return key, s, nil
-	}
-
-	return "", Session{}, errTooManyRetry
-}
-
-func (r mysqlRepo) Get(ctx context.Context, key string) (persistSession, error) {
-	s, err := r.q.WithContext(ctx).WebSession.
-		Where(r.q.WebSession.Key.Eq(key), r.q.WebSession.ExpiredAt.Gte(time.Now().Unix())).First()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return persistSession{}, domain.ErrNotFound
-		}
-
-		return persistSession{}, errgo.Wrap(err, "orm.Tx.Where.First")
-	}
-
-	var v Session
-	if err = json.Unmarshal(s.Value, &v); err != nil {
-		return persistSession{}, errgo.Wrap(err, "json.Unmarshal")
-	}
-
-	return persistSession{
-		Key:       s.Key,
-		Value:     v,
-		CreatedAt: time.Unix(s.CreatedAt, 0),
-		ExpiredAt: time.Unix(s.ExpiredAt, 0),
-		UserID:    s.UserID,
-	}, nil
-}
-
-func (r mysqlRepo) Revoke(ctx context.Context, key string) error {
-	_, err := r.q.WithContext(ctx).WebSession.Where(r.q.WebSession.Key.Eq(key)).
-		UpdateSimple(r.q.WebSession.ExpiredAt.Value(time.Now().Unix()))
-	if err != nil {
-		r.log.Error("unexpected error", zap.Error(err))
-		return errgo.Wrap(err, "gorm.UpdateSimple")
-	}
-
-	return nil
-}
-
-func (r mysqlRepo) RevokeUser(ctx context.Context, userID model.UserID) ([]string, error) {
-	s, err := r.q.WithContext(ctx).WebSession.Where(r.q.WebSession.UserID.Eq(userID)).Find()
-	if err != nil {
-		r.log.Error("unexpected error", zap.Error(err))
-		return nil, errgo.Wrap(err, "gorm.Find")
-	}
-
-	_, err = r.q.WithContext(ctx).WebSession.Where(r.q.WebSession.UserID.Eq(userID)).
-		UpdateSimple(r.q.WebSession.ExpiredAt.Value(time.Now().Unix()))
-	if err != nil {
-		return nil, errgo.Wrap(err, "dal.UpdateSimple")
-	}
-
-	var keys = make([]string, len(s))
-	for i, session := range s {
-		keys[i] = session.Key
-	}
-	return keys, nil
 }

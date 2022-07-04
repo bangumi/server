@@ -123,7 +123,6 @@ func TestMysqlRepo_Get_ok(t *testing.T) {
 	ws, err := r.Get(ctx, key)
 	require.NoError(t, err)
 
-	require.Equal(t, key, ws.Key)
 	require.Equal(t, uid, ws.UserID)
 }
 

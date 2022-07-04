@@ -23,5 +23,6 @@ import (
 type Session struct {
 	RegTime   time.Time    `json:"reg_time"`
 	UserID    model.UserID `json:"user_id"`
+	CreatedAt int64        `json:"created_at"`
 	ExpiredAt int64        `json:"expired_at"`
 }

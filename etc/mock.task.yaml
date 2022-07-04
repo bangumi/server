@@ -33,12 +33,6 @@ tasks:
       - GroupRepo
       - CollectionRepo
 
-  base-private-mock:
-    cmds:
-      - ./.bin/mockery.exe --inpackage --dir {{.DIR}} --testonly --name {{.NAME}} --filename {{.OUT_FILE}} --structname {{.OUT_STRUCT}} --with-expecter;
-    deps:
-      - mockery
-
   base-mock:
     cmds:
       - cmd: ./.bin/mockery.exe --dir {{.SRC_DIR}} --filename '{{.MOCK_STRUCT|default .INTERFACE}}.go' --name '{{.INTERFACE | default "Manager"}}' --structname {{.MOCK_STRUCT|default .INTERFACE}} --output ./internal/mocks --with-expecter
@@ -47,20 +41,19 @@ tasks:
 
   session-repo:
     generates:
-      - internal/web/session/repo_mock_test.go
+      - internal/mocks/SessionRepo.go
     sources:
       - internal/web/session/repo.go
     cmds:
-      - task: base-private-mock
+      - task: base-mock
         vars:
-          DIR: ./internal/web/session
-          NAME: Repo
-          OUT_FILE: repo_mock_test.go
-          OUT_STRUCT: MockRepo
+          SRC_DIR: ./internal/web/session
+          INTERFACE: Repo
+          MOCK_STRUCT: "SessionRepo"
 
   cache:
     generates:
-      - internal/cache/interface.go
+      - internal/mocks/Cache.go
     sources:
       - internal/cache/interface.go
     cmds:
@@ -82,9 +75,9 @@ tasks:
           SRC_DIR: ./internal/web/session
 
   captcha-manager:
-    generates:
-      - internal/web/captcha/manager.go
     sources:
+      - internal/web/captcha/manager.go
+    generates:
       - internal/mocks/CaptchaManager.go
     cmds:
       - task: base-mock

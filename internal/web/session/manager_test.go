@@ -22,6 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -32,7 +33,7 @@ func TestManager_Create(t *testing.T) {
 	t.Parallel()
 	const uid model.UserID = 1
 
-	m := session.NewMockRepo(t)
+	m := mocks.NewSessionRepo(t)
 	m.EXPECT().Create(mock.Anything, uid, mock.Anything, mock.Anything).
 		Return("", session.Session{UserID: uid}, nil)
 
@@ -46,7 +47,7 @@ func TestManager_Create(t *testing.T) {
 func TestManager_Get(t *testing.T) {
 	t.Parallel()
 	const uid model.UserID = 1
-	m := session.NewMockRepo(t)
+	m := mocks.NewSessionRepo(t)
 	m.EXPECT().Create(mock.Anything, uid, mock.Anything, mock.Anything).
 		Return("", session.Session{UserID: uid}, nil)
 
@@ -61,7 +62,7 @@ func TestManager_Revoke(t *testing.T) {
 	t.Parallel()
 
 	const uid model.UserID = 1
-	m := session.NewMockRepo(t)
+	m := mocks.NewSessionRepo(t)
 	m.EXPECT().Create(mock.Anything, uid, mock.Anything, mock.Anything).
 		Return("", session.Session{UserID: uid}, nil)
 

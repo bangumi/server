@@ -12,25 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package timex
+package generic
 
-import "time"
-
-const (
-	OneMinSec  = 60
-	OneHourSec = 3600
-	OneDaySec  = 86400
-	OneWeekSec = 7 * 86400
-
-	OneDay  = 24 * time.Hour
-	OneWeek = 7 * 24 * time.Hour
-)
-
-type numberT interface {
-	int8 | int16 | int32 | int | int64
+type Number interface {
+	Integer | Float
 }
 
-// Second convert an integer N to time.Duration present N seconds.
-func Second[T numberT](second T) time.Duration {
-	return time.Duration(second) * time.Second
+type Signed interface {
+	int8 | int16 | int32 | int64 | int
+}
+
+type Unsigned interface {
+	uint8 | uint16 | uint32 | uint64 | uint
+}
+
+type Integer interface {
+	Signed | Unsigned
+}
+
+type Float interface {
+	float32 | float64
+}
+
+func Min[T Number](a, b T) T {
+	if a < b {
+		return a
+	}
+
+	return b
 }

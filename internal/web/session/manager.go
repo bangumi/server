@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic"
 	"github.com/bangumi/server/internal/pkg/random"
 	"github.com/bangumi/server/internal/pkg/timex"
 )
@@ -82,23 +83,19 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 		return s, nil
 	}
 
-	ws, err := m.repo.Get(ctx, key)
+	s, err = m.repo.Get(ctx, key)
 	if err != nil {
 		return Session{}, errgo.Wrap(err, "mysqlRepo.Get")
 	}
 
-	now := time.Now()
-	if now.After(ws.ExpiredAt) {
+	if s.ExpiredAt <= time.Now().Unix() {
 		return Session{}, ErrExpired
 	}
 
-	s = ws.Value
-	s.ExpiredAt = ws.ExpiredAt.Unix()
-
 	// 缓存3天或缓存者到token失效
-	ttl := minDur(timex.OneDay*3, ws.ExpiredAt.Sub(now))
+	ttl := generic.Min(timex.OneDaySec*3, s.ExpiredAt)
 
-	if err := m.cache.Set(ctx, redisKeyPrefix+key, s, ttl); err != nil {
+	if err := m.cache.Set(ctx, redisKeyPrefix+key, s, timex.Second(ttl)); err != nil {
 		m.log.Panic("failed to set cache")
 	}
 
@@ -126,11 +123,4 @@ func (m manager) RevokeUser(ctx context.Context, id model.UserID) error {
 
 	err = m.cache.Del(ctx, keys...)
 	return errgo.Wrap(err, "redisCache.Del")
-}
-
-func minDur(a, b time.Duration) time.Duration {
-	if a < b {
-		return a
-	}
-	return b
 }
