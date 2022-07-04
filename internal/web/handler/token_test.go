@@ -51,7 +51,7 @@ func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 	resp := test.New(t).Post("/p/access-tokens").JSON(fiber.Map{
 		"name":          "token name",
 		"duration_days": 1,
-	}).Cookie(session.Key, "session key").Execute(app)
+	}).Cookie(session.CookieKey, "session key").Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
 }
@@ -76,7 +76,7 @@ func TestHandler_DeletePersonalAccessToken_401(t *testing.T) {
 	)
 
 	resp := test.New(t).Delete("/p/access-tokens").JSON(fiber.Map{"id": tokenID}).
-		Cookie(session.Key, "session key").Execute(app)
+		Cookie(session.CookieKey, "session key").Execute(app)
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode, resp.BodyString())
 }

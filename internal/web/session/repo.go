@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/timex"
 )
 
-const Key = "sessionID"
+const defaultRetry = 5
 
 type persistSession struct {
 	CreatedAt time.Time
@@ -41,8 +41,12 @@ type persistSession struct {
 	UserID    model.UserID
 }
 
+var errTooManyRetry = errors.New("too many reties with key conflict")
+
 type Repo interface {
-	Create(ctx context.Context, key string, userID model.UserID, regTime time.Time) (Session, error)
+	Create(
+		ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string,
+	) (key string, s Session, err error)
 	Get(ctx context.Context, key string) (persistSession, error)
 	RevokeUser(ctx context.Context, userID model.UserID) (keys []string, err error)
 	Revoke(ctx context.Context, key string) error
@@ -52,53 +56,58 @@ func NewMysqlRepo(q *query.Query, logger *zap.Logger) Repo {
 	return mysqlRepo{q: q, log: logger.Named("session.mysqlRepo")}
 }
 
-var ErrKeyConflict = errors.New("conflict key in database")
-
 type mysqlRepo struct {
 	q   *query.Query
 	log *zap.Logger
 }
 
-func (r mysqlRepo) Create(ctx context.Context, key string, userID model.UserID, regTime time.Time) (Session, error) {
-	tx := r.q.Begin()
-
-	_, err := tx.WithContext(ctx).WebSession.Where(tx.WebSession.Key.Eq(key)).First()
-	if err == nil {
-		return Session{}, ErrKeyConflict
-	}
-
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return Session{}, errgo.Wrap(err, "orm.Tx.Where.First")
-	}
-
+func (r mysqlRepo) Create(
+	ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string,
+) (string, Session, error) {
 	createdAt := time.Now().Unix()
 	expiredAt := createdAt + timex.OneWeekSec
 	s := Session{RegTime: regTime, UserID: userID, ExpiredAt: expiredAt}
-
-	encodedJSON, err := json.Marshal(s)
+	encodedJSON, err := json.MarshalWithOption(s, json.DisableHTMLEscape(), json.DisableNormalizeUTF8())
 	if err != nil {
-		return Session{}, errgo.Wrap(err, "json.Marshal")
+		return "", Session{}, errgo.Wrap(err, "json.MarshalWithOption")
 	}
 
-	webSession := dao.WebSession{
-		Key:       key,
-		UserID:    userID,
-		Value:     encodedJSON,
-		CreatedAt: createdAt,
-		ExpiredAt: expiredAt,
+	tx := r.q.Begin()
+	for i := 0; i < defaultRetry; i++ {
+		key := keyGen()
+
+		c, err := tx.WithContext(ctx).WebSession.Where(tx.WebSession.Key.Eq(key)).Count()
+		if err != nil {
+			return "", Session{}, errgo.Wrap(err, "tx.WebSession.Count")
+		}
+
+		if c != 0 {
+			// session id conflict, re-generate key
+			continue
+		}
+
+		webSession := dao.WebSession{
+			Key:       key,
+			UserID:    userID,
+			Value:     encodedJSON,
+			CreatedAt: createdAt,
+			ExpiredAt: expiredAt,
+		}
+
+		err = tx.WebSession.WithContext(ctx).Create(&webSession)
+		if err != nil {
+			return "", Session{}, errgo.Wrap(err, "orm.Tx.Create")
+		}
+
+		err = tx.Commit()
+		if err != nil {
+			return "", Session{}, errgo.Wrap(err, "tx.Commit")
+		}
+
+		return key, s, nil
 	}
 
-	err = tx.WebSession.WithContext(ctx).Create(&webSession)
-	if err != nil {
-		return Session{}, errgo.Wrap(err, "orm.Tx.Create")
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return Session{}, errgo.Wrap(err, "tx.Commit")
-	}
-
-	return s, nil
+	return "", Session{}, errTooManyRetry
 }
 
 func (r mysqlRepo) Get(ctx context.Context, key string) (persistSession, error) {

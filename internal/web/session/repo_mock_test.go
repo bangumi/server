@@ -24,25 +24,32 @@ func (_m *MockRepo) EXPECT() *MockRepo_Expecter {
 	return &MockRepo_Expecter{mock: &_m.Mock}
 }
 
-// Create provides a mock function with given fields: ctx, key, userID, regTime
-func (_m *MockRepo) Create(ctx context.Context, key string, userID model.UserID, regTime time.Time) (Session, error) {
-	ret := _m.Called(ctx, key, userID, regTime)
+// Create provides a mock function with given fields: ctx, userID, regTime, keyGen
+func (_m *MockRepo) Create(ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string) (string, Session, error) {
+	ret := _m.Called(ctx, userID, regTime, keyGen)
 
-	var r0 Session
-	if rf, ok := ret.Get(0).(func(context.Context, string, model.UserID, time.Time) Session); ok {
-		r0 = rf(ctx, key, userID, regTime)
+	var r0 string
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, time.Time, func() string) string); ok {
+		r0 = rf(ctx, userID, regTime, keyGen)
 	} else {
-		r0 = ret.Get(0).(Session)
+		r0 = ret.Get(0).(string)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, model.UserID, time.Time) error); ok {
-		r1 = rf(ctx, key, userID, regTime)
+	var r1 Session
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, time.Time, func() string) Session); ok {
+		r1 = rf(ctx, userID, regTime, keyGen)
 	} else {
-		r1 = ret.Error(1)
+		r1 = ret.Get(1).(Session)
 	}
 
-	return r0, r1
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, model.UserID, time.Time, func() string) error); ok {
+		r2 = rf(ctx, userID, regTime, keyGen)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 // MockRepo_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
@@ -52,22 +59,22 @@ type MockRepo_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //  - ctx context.Context
-//  - key string
 //  - userID model.UserID
 //  - regTime time.Time
-func (_e *MockRepo_Expecter) Create(ctx any, key any, userID any, regTime any) *MockRepo_Create_Call {
-	return &MockRepo_Create_Call{Call: _e.mock.On("Create", ctx, key, userID, regTime)}
+//  - keyGen func() string
+func (_e *MockRepo_Expecter) Create(ctx interface{}, userID interface{}, regTime interface{}, keyGen interface{}) *MockRepo_Create_Call {
+	return &MockRepo_Create_Call{Call: _e.mock.On("Create", ctx, userID, regTime, keyGen)}
 }
 
-func (_c *MockRepo_Create_Call) Run(run func(ctx context.Context, key string, userID model.UserID, regTime time.Time)) *MockRepo_Create_Call {
+func (_c *MockRepo_Create_Call) Run(run func(ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string)) *MockRepo_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(model.UserID), args[3].(time.Time))
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(time.Time), args[3].(func() string))
 	})
 	return _c
 }
 
-func (_c *MockRepo_Create_Call) Return(_a0 Session, _a1 error) *MockRepo_Create_Call {
-	_c.Call.Return(_a0, _a1)
+func (_c *MockRepo_Create_Call) Return(key string, s Session, err error) *MockRepo_Create_Call {
+	_c.Call.Return(key, s, err)
 	return _c
 }
 
@@ -100,7 +107,7 @@ type MockRepo_Get_Call struct {
 // Get is a helper method to define mock.On call
 //  - ctx context.Context
 //  - key string
-func (_e *MockRepo_Expecter) Get(ctx any, key any) *MockRepo_Get_Call {
+func (_e *MockRepo_Expecter) Get(ctx interface{}, key interface{}) *MockRepo_Get_Call {
 	return &MockRepo_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
@@ -138,7 +145,7 @@ type MockRepo_Revoke_Call struct {
 // Revoke is a helper method to define mock.On call
 //  - ctx context.Context
 //  - key string
-func (_e *MockRepo_Expecter) Revoke(ctx any, key any) *MockRepo_Revoke_Call {
+func (_e *MockRepo_Expecter) Revoke(ctx interface{}, key interface{}) *MockRepo_Revoke_Call {
 	return &MockRepo_Revoke_Call{Call: _e.mock.On("Revoke", ctx, key)}
 }
 
@@ -185,7 +192,7 @@ type MockRepo_RevokeUser_Call struct {
 // RevokeUser is a helper method to define mock.On call
 //  - ctx context.Context
 //  - userID model.UserID
-func (_e *MockRepo_Expecter) RevokeUser(ctx any, userID any) *MockRepo_RevokeUser_Call {
+func (_e *MockRepo_Expecter) RevokeUser(ctx interface{}, userID interface{}) *MockRepo_RevokeUser_Call {
 	return &MockRepo_RevokeUser_Call{Call: _e.mock.On("RevokeUser", ctx, userID)}
 }
 

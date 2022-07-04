@@ -48,44 +48,53 @@ func TestMysqlRepo_Create(t *testing.T) {
 	r, q := getRepo(t)
 	var key = "a random key " + t.Name()
 
-	_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		_, err = q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
 		require.NoError(t, err)
 	})
 
-	_, err = r.Create(ctx, key, 1, time.Now())
-	require.NoError(t, err, session.ErrKeyConflict)
+	rk, _, err := r.Create(ctx, 1, time.Now(), func() string {
+		return key
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, key, rk)
 }
 
 func TestMysqlRepo_Create_conflict(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
-	ctx := context.Background()
-	r, q := getRepo(t)
 	var key = "a random key " + t.Name()
 
-	_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
-	require.NoError(t, err)
+	ctx := context.Background()
+	r, q := getRepo(t)
 
-	err = q.WithContext(ctx).WebSession.Create(&dao.WebSession{
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := q.WithContext(ctx).WebSession.Create(&dao.WebSession{
 		Key:       key,
 		UserID:    1,
 		Value:     []byte(`{}`),
 		CreatedAt: 2,
-		ExpiredAt: 1,
+		ExpiredAt: time.Now().Unix() + timex.OneWeekSec,
 	})
 	require.NoError(t, err)
 
-	t.Cleanup(func() {
-		_, err = q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
-		require.NoError(t, err)
+	var i int
+	k, _, err := r.Create(ctx, 1, time.Now(), func() string {
+		i++
+		if i < 2 {
+			return key
+		}
+		return t.Name() + "q"
 	})
 
-	_, err = r.Create(ctx, key, 1, time.Now())
-	require.ErrorIs(t, err, session.ErrKeyConflict)
+	require.NoError(t, err)
+	require.Equal(t, t.Name()+"q", k)
 }
 
 func TestMysqlRepo_Get_ok(t *testing.T) {
@@ -97,10 +106,12 @@ func TestMysqlRepo_Get_ok(t *testing.T) {
 	r, q := getRepo(t)
 	var key = "a random key " + t.Name()
 
-	_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
-	require.NoError(t, err)
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
+		require.NoError(t, err)
+	})
 
-	err = q.WithContext(ctx).WebSession.Create(&dao.WebSession{
+	err := q.WithContext(ctx).WebSession.Create(&dao.WebSession{
 		Key:       key,
 		UserID:    uid,
 		Value:     []byte(`{}`),
@@ -108,11 +119,6 @@ func TestMysqlRepo_Get_ok(t *testing.T) {
 		ExpiredAt: time.Now().Unix() + timex.OneWeekSec,
 	})
 	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		_, err = q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
-		require.NoError(t, err)
-	})
 
 	ws, err := r.Get(ctx, key)
 	require.NoError(t, err)
@@ -140,13 +146,13 @@ func TestMysqlRepo_Revoke(t *testing.T) {
 	r, q := getRepo(t)
 	var key = "a random key " + t.Name()
 
-	err := q.WithContext(ctx).WebSession.Create(&dao.WebSession{Key: key, Value: []byte(`{}`)})
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		_, err = q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
 		require.NoError(t, err)
 	})
+
+	err := q.WithContext(ctx).WebSession.Create(&dao.WebSession{Key: key, Value: []byte(`{}`)})
+	require.NoError(t, err)
 
 	start := time.Now()
 	err = r.Revoke(ctx, key)

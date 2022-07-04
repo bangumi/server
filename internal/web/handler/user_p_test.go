@@ -47,7 +47,7 @@ func TestHandler_GetCurrentUser_private(t *testing.T) {
 	)
 
 	var r res.User
-	resp := test.New(t).Get("/p/me").Cookie(session.Key, sessionID).
+	resp := test.New(t).Get("/p/me").Cookie(session.CookieKey, sessionID).
 		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
