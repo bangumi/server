@@ -22,23 +22,23 @@ var _ interface {
 } = (*SyntaxError)(nil)
 
 type SyntaxError struct {
-	err  error
-	line string
-	lino int
+	Err  error
+	Line string
+	Lino int
 }
 
 func (p *SyntaxError) Error() string {
-	return p.err.Error() + " line: " + strconv.Itoa(p.lino) + " " + strconv.Quote(p.line)
+	return p.Err.Error() + " line: " + strconv.Itoa(p.Lino) + " " + strconv.Quote(p.Line)
 }
 
 func (p *SyntaxError) Unwrap() error {
-	return p.err
+	return p.Err
 }
 
 func wrapError(err error, lino int, line string) error {
 	return &SyntaxError{
-		line: line,
-		lino: lino,
-		err:  err,
+		Line: line,
+		Lino: lino,
+		Err:  err,
 	}
 }
