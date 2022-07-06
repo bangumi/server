@@ -13,7 +13,7 @@ const TableNamePersonField = "chii_person_fields"
 // PersonField mapped from table <chii_person_fields>
 type PersonField struct {
 	OwnerType string         `gorm:"column:prsn_cat;type:enum('prsn','crt');primaryKey"`
-	OwnerID   model.PersonID `gorm:"column:prsn_id;type:int(8) unsigned;primaryKey;index:prsn_id,priority:1"`
+	OwnerID   model.PersonID `gorm:"column:prsn_id;type:int(8) unsigned;primaryKey"`
 	Gender    uint8          `gorm:"column:gender;type:tinyint(4) unsigned;not null"`
 	Bloodtype uint8          `gorm:"column:bloodtype;type:tinyint(4) unsigned;not null"`
 	BirthYear uint16         `gorm:"column:birth_year;type:year(4);not null"`

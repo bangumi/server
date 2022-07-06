@@ -18,12 +18,6 @@ scripts to generate ORM struct from mysql server
 NOTICE:
 	Don't use `UpdatedAt` and `CreatedAt` as field name, gorm may change these fields unexpectedly.
 	Use `UpdatedTime` and `CreatedTime` instead.
-
-TODO:
-NOTICE:
-	use `gen.FieldType("...", "bytes")` to generate field with `[]byte` type
-	This is a bug of gorm/gen.
-	https://github.com/go-gorm/gen/issues/496
 */
 
 // nolint
@@ -136,7 +130,7 @@ func main() {
 		gen.FieldType("uid", userIDTypeString),
 		gen.FieldRename("SIGN", "Sign"),
 		gen.FieldType("regdate", "int64"),
-		gen.FieldType("password_crypt", "bytes"),
+		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
 			GORMTag: "foreignKey:uid;references:uid",
@@ -151,7 +145,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_usergroup", "UserGroup",
 		gen.FieldTrimPrefix("usr_grp_"),
 		gen.FieldType("usr_grp_id", "uint8"),
-		gen.FieldType("usr_grp_perm", "bytes"),
+		gen.FieldType("usr_grp_perm", "[]byte"),
 	))
 
 	var oauthApp = g.GenerateModelAs("chii_apps", "App",
@@ -177,7 +171,7 @@ func main() {
 		gen.FieldType("type", "uint8"),
 		gen.FieldType("id", "uint32"),
 		gen.FieldType("scope", "*string"),
-		gen.FieldType("info", "bytes"),
+		gen.FieldType("info", "[]byte"),
 		gen.FieldRename("expires", "ExpiredAt"),
 	))
 
@@ -238,7 +232,7 @@ func main() {
 		gen.FieldType("field_airtime", "uint8"),
 		gen.FieldType("field_week_day", "int8"),
 		gen.FieldType("field_redirect", subjectIDTypeString),
-		gen.FieldType("field_tags", "bytes"),
+		gen.FieldType("field_tags", "[]byte"),
 		// gen.FieldType("field_date","string"),
 	)
 

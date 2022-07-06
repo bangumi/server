@@ -164,7 +164,7 @@ func (a subjectRelationHasOneSubjectTx) Find() (result *dao.Subject, err error) 
 }
 
 func (a subjectRelationHasOneSubjectTx) Append(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -172,7 +172,7 @@ func (a subjectRelationHasOneSubjectTx) Append(values ...*dao.Subject) (err erro
 }
 
 func (a subjectRelationHasOneSubjectTx) Replace(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -180,7 +180,7 @@ func (a subjectRelationHasOneSubjectTx) Replace(values ...*dao.Subject) (err err
 }
 
 func (a subjectRelationHasOneSubjectTx) Delete(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -205,19 +205,19 @@ func (s subjectRelationDo) WithContext(ctx context.Context) *subjectRelationDo {
 	return s.withDO(s.DO.WithContext(ctx))
 }
 
-func (s subjectRelationDo) ReadDB(ctx context.Context) *subjectRelationDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Read)
+func (s subjectRelationDo) ReadDB() *subjectRelationDo {
+	return s.Clauses(dbresolver.Read)
 }
 
-func (s subjectRelationDo) WriteDB(ctx context.Context) *subjectRelationDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Write)
+func (s subjectRelationDo) WriteDB() *subjectRelationDo {
+	return s.Clauses(dbresolver.Write)
 }
 
 func (s subjectRelationDo) Clauses(conds ...clause.Expression) *subjectRelationDo {
 	return s.withDO(s.DO.Clauses(conds...))
 }
 
-func (s subjectRelationDo) Returning(value interface{}, columns ...string) *subjectRelationDo {
+func (s subjectRelationDo) Returning(value any, columns ...string) *subjectRelationDo {
 	return s.withDO(s.DO.Returning(value, columns...))
 }
 
@@ -404,7 +404,7 @@ func (s subjectRelationDo) FindByPage(offset int, limit int) (result []*dao.Subj
 	return
 }
 
-func (s subjectRelationDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (s subjectRelationDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = s.Count()
 	if err != nil {
 		return
@@ -412,6 +412,10 @@ func (s subjectRelationDo) ScanByPage(result interface{}, offset int, limit int)
 
 	err = s.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (s subjectRelationDo) Scan(result any) (err error) {
+	return s.DO.Scan(result)
 }
 
 func (s *subjectRelationDo) withDO(do gen.Dao) *subjectRelationDo {

@@ -9,7 +9,7 @@ const TableNameOAuthClient = "chii_oauth_clients"
 // OAuthClient mapped from table <chii_oauth_clients>
 type OAuthClient struct {
 	AppID        uint32 `gorm:"column:app_id;type:mediumint(8);primaryKey"`
-	ClientID     string `gorm:"column:client_id;type:varchar(80);not null;index:client_id,priority:1"`
+	ClientID     string `gorm:"column:client_id;type:varchar(80);not null"`
 	ClientSecret string `gorm:"column:client_secret;type:varchar(80)"`
 	RedirectURI  string `gorm:"column:redirect_uri;type:varchar(2000)"`
 	GrantTypes   string `gorm:"column:grant_types;type:varchar(80)"`

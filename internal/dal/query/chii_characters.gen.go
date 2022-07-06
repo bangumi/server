@@ -191,7 +191,7 @@ func (a characterHasOneFieldsTx) Find() (result *dao.PersonField, err error) {
 }
 
 func (a characterHasOneFieldsTx) Append(values ...*dao.PersonField) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -199,7 +199,7 @@ func (a characterHasOneFieldsTx) Append(values ...*dao.PersonField) (err error) 
 }
 
 func (a characterHasOneFieldsTx) Replace(values ...*dao.PersonField) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -207,7 +207,7 @@ func (a characterHasOneFieldsTx) Replace(values ...*dao.PersonField) (err error)
 }
 
 func (a characterHasOneFieldsTx) Delete(values ...*dao.PersonField) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -232,19 +232,19 @@ func (c characterDo) WithContext(ctx context.Context) *characterDo {
 	return c.withDO(c.DO.WithContext(ctx))
 }
 
-func (c characterDo) ReadDB(ctx context.Context) *characterDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Read)
+func (c characterDo) ReadDB() *characterDo {
+	return c.Clauses(dbresolver.Read)
 }
 
-func (c characterDo) WriteDB(ctx context.Context) *characterDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Write)
+func (c characterDo) WriteDB() *characterDo {
+	return c.Clauses(dbresolver.Write)
 }
 
 func (c characterDo) Clauses(conds ...clause.Expression) *characterDo {
 	return c.withDO(c.DO.Clauses(conds...))
 }
 
-func (c characterDo) Returning(value interface{}, columns ...string) *characterDo {
+func (c characterDo) Returning(value any, columns ...string) *characterDo {
 	return c.withDO(c.DO.Returning(value, columns...))
 }
 
@@ -431,7 +431,7 @@ func (c characterDo) FindByPage(offset int, limit int) (result []*dao.Character,
 	return
 }
 
-func (c characterDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (c characterDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = c.Count()
 	if err != nil {
 		return
@@ -439,6 +439,10 @@ func (c characterDo) ScanByPage(result interface{}, offset int, limit int) (coun
 
 	err = c.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (c characterDo) Scan(result any) (err error) {
+	return c.DO.Scan(result)
 }
 
 func (c *characterDo) withDO(do gen.Dao) *characterDo {

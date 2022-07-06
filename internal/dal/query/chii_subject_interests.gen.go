@@ -167,19 +167,19 @@ func (s subjectCollectionDo) WithContext(ctx context.Context) *subjectCollection
 	return s.withDO(s.DO.WithContext(ctx))
 }
 
-func (s subjectCollectionDo) ReadDB(ctx context.Context) *subjectCollectionDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Read)
+func (s subjectCollectionDo) ReadDB() *subjectCollectionDo {
+	return s.Clauses(dbresolver.Read)
 }
 
-func (s subjectCollectionDo) WriteDB(ctx context.Context) *subjectCollectionDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Write)
+func (s subjectCollectionDo) WriteDB() *subjectCollectionDo {
+	return s.Clauses(dbresolver.Write)
 }
 
 func (s subjectCollectionDo) Clauses(conds ...clause.Expression) *subjectCollectionDo {
 	return s.withDO(s.DO.Clauses(conds...))
 }
 
-func (s subjectCollectionDo) Returning(value interface{}, columns ...string) *subjectCollectionDo {
+func (s subjectCollectionDo) Returning(value any, columns ...string) *subjectCollectionDo {
 	return s.withDO(s.DO.Returning(value, columns...))
 }
 
@@ -366,7 +366,7 @@ func (s subjectCollectionDo) FindByPage(offset int, limit int) (result []*dao.Su
 	return
 }
 
-func (s subjectCollectionDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (s subjectCollectionDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = s.Count()
 	if err != nil {
 		return
@@ -374,6 +374,10 @@ func (s subjectCollectionDo) ScanByPage(result interface{}, offset int, limit in
 
 	err = s.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (s subjectCollectionDo) Scan(result any) (err error) {
+	return s.DO.Scan(result)
 }
 
 func (s *subjectCollectionDo) withDO(do gen.Dao) *subjectCollectionDo {

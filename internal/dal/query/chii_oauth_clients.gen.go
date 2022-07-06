@@ -155,7 +155,7 @@ func (a oAuthClientBelongsToAppTx) Find() (result *dao.App, err error) {
 }
 
 func (a oAuthClientBelongsToAppTx) Append(values ...*dao.App) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -163,7 +163,7 @@ func (a oAuthClientBelongsToAppTx) Append(values ...*dao.App) (err error) {
 }
 
 func (a oAuthClientBelongsToAppTx) Replace(values ...*dao.App) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -171,7 +171,7 @@ func (a oAuthClientBelongsToAppTx) Replace(values ...*dao.App) (err error) {
 }
 
 func (a oAuthClientBelongsToAppTx) Delete(values ...*dao.App) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -196,19 +196,19 @@ func (o oAuthClientDo) WithContext(ctx context.Context) *oAuthClientDo {
 	return o.withDO(o.DO.WithContext(ctx))
 }
 
-func (o oAuthClientDo) ReadDB(ctx context.Context) *oAuthClientDo {
-	return o.WithContext(ctx).Clauses(dbresolver.Read)
+func (o oAuthClientDo) ReadDB() *oAuthClientDo {
+	return o.Clauses(dbresolver.Read)
 }
 
-func (o oAuthClientDo) WriteDB(ctx context.Context) *oAuthClientDo {
-	return o.WithContext(ctx).Clauses(dbresolver.Write)
+func (o oAuthClientDo) WriteDB() *oAuthClientDo {
+	return o.Clauses(dbresolver.Write)
 }
 
 func (o oAuthClientDo) Clauses(conds ...clause.Expression) *oAuthClientDo {
 	return o.withDO(o.DO.Clauses(conds...))
 }
 
-func (o oAuthClientDo) Returning(value interface{}, columns ...string) *oAuthClientDo {
+func (o oAuthClientDo) Returning(value any, columns ...string) *oAuthClientDo {
 	return o.withDO(o.DO.Returning(value, columns...))
 }
 
@@ -395,7 +395,7 @@ func (o oAuthClientDo) FindByPage(offset int, limit int) (result []*dao.OAuthCli
 	return
 }
 
-func (o oAuthClientDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (o oAuthClientDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = o.Count()
 	if err != nil {
 		return
@@ -403,6 +403,10 @@ func (o oAuthClientDo) ScanByPage(result interface{}, offset int, limit int) (co
 
 	err = o.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (o oAuthClientDo) Scan(result any) (err error) {
+	return o.DO.Scan(result)
 }
 
 func (o *oAuthClientDo) withDO(do gen.Dao) *oAuthClientDo {

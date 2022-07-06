@@ -12,12 +12,12 @@ const TableNameSubjectRevision = "chii_subject_revisions"
 
 // SubjectRevision mapped from table <chii_subject_revisions>
 type SubjectRevision struct {
-	ID           uint32          `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true;index:rev_creator,priority:2"`
-	Type         uint8           `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;index:rev_type,priority:1;default:1"` // 修订类型
-	SubjectID    model.SubjectID `gorm:"column:rev_subject_id;type:mediumint(8) unsigned;not null;index:rev_subject_id,priority:1"`
+	ID           uint32          `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
+	Type         uint8           `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;default:1"` // 修订类型
+	SubjectID    model.SubjectID `gorm:"column:rev_subject_id;type:mediumint(8) unsigned;not null"`
 	TypeID       uint16          `gorm:"column:rev_type_id;type:smallint(6) unsigned;not null"`
-	CreatorID    model.UserID    `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null;index:rev_subject_id,priority:2;index:rev_creator,priority:1"`
-	Dateline     uint32          `gorm:"column:rev_dateline;type:int(10) unsigned;not null;index:rev_dateline,priority:1"`
+	CreatorID    model.UserID    `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null"`
+	Dateline     uint32          `gorm:"column:rev_dateline;type:int(10) unsigned;not null"`
 	Name         string          `gorm:"column:rev_name;type:varchar(80);not null"`
 	NameCN       string          `gorm:"column:rev_name_cn;type:varchar(80);not null"`
 	FieldInfobox string          `gorm:"column:rev_field_infobox;type:mediumtext;not null"`

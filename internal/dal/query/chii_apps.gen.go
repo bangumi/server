@@ -137,19 +137,19 @@ func (a appDo) WithContext(ctx context.Context) *appDo {
 	return a.withDO(a.DO.WithContext(ctx))
 }
 
-func (a appDo) ReadDB(ctx context.Context) *appDo {
-	return a.WithContext(ctx).Clauses(dbresolver.Read)
+func (a appDo) ReadDB() *appDo {
+	return a.Clauses(dbresolver.Read)
 }
 
-func (a appDo) WriteDB(ctx context.Context) *appDo {
-	return a.WithContext(ctx).Clauses(dbresolver.Write)
+func (a appDo) WriteDB() *appDo {
+	return a.Clauses(dbresolver.Write)
 }
 
 func (a appDo) Clauses(conds ...clause.Expression) *appDo {
 	return a.withDO(a.DO.Clauses(conds...))
 }
 
-func (a appDo) Returning(value interface{}, columns ...string) *appDo {
+func (a appDo) Returning(value any, columns ...string) *appDo {
 	return a.withDO(a.DO.Returning(value, columns...))
 }
 
@@ -336,7 +336,7 @@ func (a appDo) FindByPage(offset int, limit int) (result []*dao.App, count int64
 	return
 }
 
-func (a appDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (a appDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = a.Count()
 	if err != nil {
 		return
@@ -344,6 +344,10 @@ func (a appDo) ScanByPage(result interface{}, offset int, limit int) (count int6
 
 	err = a.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (a appDo) Scan(result any) (err error) {
+	return a.DO.Scan(result)
 }
 
 func (a *appDo) withDO(do gen.Dao) *appDo {

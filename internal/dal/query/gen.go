@@ -103,58 +103,58 @@ func (q *Query) clone(db *gorm.DB) *Query {
 }
 
 type queryCtx struct {
-	AccessToken       accessTokenDo
-	App               appDo
-	Cast              castDo
-	Character         characterDo
-	CharacterSubjects characterSubjectsDo
-	Episode           episodeDo
-	Group             groupDo
-	GroupMember       groupMemberDo
-	Index             indexDo
-	IndexSubject      indexSubjectDo
-	Member            memberDo
-	OAuthClient       oAuthClientDo
-	Person            personDo
-	PersonField       personFieldDo
-	PersonSubjects    personSubjectsDo
-	RevisionHistory   revisionHistoryDo
-	RevisionText      revisionTextDo
-	Subject           subjectDo
-	SubjectCollection subjectCollectionDo
-	SubjectField      subjectFieldDo
-	SubjectRelation   subjectRelationDo
-	SubjectRevision   subjectRevisionDo
-	UserGroup         userGroupDo
-	WebSession        webSessionDo
+	AccessToken       *accessTokenDo
+	App               *appDo
+	Cast              *castDo
+	Character         *characterDo
+	CharacterSubjects *characterSubjectsDo
+	Episode           *episodeDo
+	Group             *groupDo
+	GroupMember       *groupMemberDo
+	Index             *indexDo
+	IndexSubject      *indexSubjectDo
+	Member            *memberDo
+	OAuthClient       *oAuthClientDo
+	Person            *personDo
+	PersonField       *personFieldDo
+	PersonSubjects    *personSubjectsDo
+	RevisionHistory   *revisionHistoryDo
+	RevisionText      *revisionTextDo
+	Subject           *subjectDo
+	SubjectCollection *subjectCollectionDo
+	SubjectField      *subjectFieldDo
+	SubjectRelation   *subjectRelationDo
+	SubjectRevision   *subjectRevisionDo
+	UserGroup         *userGroupDo
+	WebSession        *webSessionDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		AccessToken:       *q.AccessToken.WithContext(ctx),
-		App:               *q.App.WithContext(ctx),
-		Cast:              *q.Cast.WithContext(ctx),
-		Character:         *q.Character.WithContext(ctx),
-		CharacterSubjects: *q.CharacterSubjects.WithContext(ctx),
-		Episode:           *q.Episode.WithContext(ctx),
-		Group:             *q.Group.WithContext(ctx),
-		GroupMember:       *q.GroupMember.WithContext(ctx),
-		Index:             *q.Index.WithContext(ctx),
-		IndexSubject:      *q.IndexSubject.WithContext(ctx),
-		Member:            *q.Member.WithContext(ctx),
-		OAuthClient:       *q.OAuthClient.WithContext(ctx),
-		Person:            *q.Person.WithContext(ctx),
-		PersonField:       *q.PersonField.WithContext(ctx),
-		PersonSubjects:    *q.PersonSubjects.WithContext(ctx),
-		RevisionHistory:   *q.RevisionHistory.WithContext(ctx),
-		RevisionText:      *q.RevisionText.WithContext(ctx),
-		Subject:           *q.Subject.WithContext(ctx),
-		SubjectCollection: *q.SubjectCollection.WithContext(ctx),
-		SubjectField:      *q.SubjectField.WithContext(ctx),
-		SubjectRelation:   *q.SubjectRelation.WithContext(ctx),
-		SubjectRevision:   *q.SubjectRevision.WithContext(ctx),
-		UserGroup:         *q.UserGroup.WithContext(ctx),
-		WebSession:        *q.WebSession.WithContext(ctx),
+		AccessToken:       q.AccessToken.WithContext(ctx),
+		App:               q.App.WithContext(ctx),
+		Cast:              q.Cast.WithContext(ctx),
+		Character:         q.Character.WithContext(ctx),
+		CharacterSubjects: q.CharacterSubjects.WithContext(ctx),
+		Episode:           q.Episode.WithContext(ctx),
+		Group:             q.Group.WithContext(ctx),
+		GroupMember:       q.GroupMember.WithContext(ctx),
+		Index:             q.Index.WithContext(ctx),
+		IndexSubject:      q.IndexSubject.WithContext(ctx),
+		Member:            q.Member.WithContext(ctx),
+		OAuthClient:       q.OAuthClient.WithContext(ctx),
+		Person:            q.Person.WithContext(ctx),
+		PersonField:       q.PersonField.WithContext(ctx),
+		PersonSubjects:    q.PersonSubjects.WithContext(ctx),
+		RevisionHistory:   q.RevisionHistory.WithContext(ctx),
+		RevisionText:      q.RevisionText.WithContext(ctx),
+		Subject:           q.Subject.WithContext(ctx),
+		SubjectCollection: q.SubjectCollection.WithContext(ctx),
+		SubjectField:      q.SubjectField.WithContext(ctx),
+		SubjectRelation:   q.SubjectRelation.WithContext(ctx),
+		SubjectRevision:   q.SubjectRevision.WithContext(ctx),
+		UserGroup:         q.UserGroup.WithContext(ctx),
+		WebSession:        q.WebSession.WithContext(ctx),
 	}
 }
 

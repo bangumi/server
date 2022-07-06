@@ -180,7 +180,7 @@ func (a castHasOneCharacterTx) Find() (result *dao.Character, err error) {
 }
 
 func (a castHasOneCharacterTx) Append(values ...*dao.Character) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -188,7 +188,7 @@ func (a castHasOneCharacterTx) Append(values ...*dao.Character) (err error) {
 }
 
 func (a castHasOneCharacterTx) Replace(values ...*dao.Character) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -196,7 +196,7 @@ func (a castHasOneCharacterTx) Replace(values ...*dao.Character) (err error) {
 }
 
 func (a castHasOneCharacterTx) Delete(values ...*dao.Character) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -250,7 +250,7 @@ func (a castHasOneSubjectTx) Find() (result *dao.Subject, err error) {
 }
 
 func (a castHasOneSubjectTx) Append(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -258,7 +258,7 @@ func (a castHasOneSubjectTx) Append(values ...*dao.Subject) (err error) {
 }
 
 func (a castHasOneSubjectTx) Replace(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -266,7 +266,7 @@ func (a castHasOneSubjectTx) Replace(values ...*dao.Subject) (err error) {
 }
 
 func (a castHasOneSubjectTx) Delete(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -320,7 +320,7 @@ func (a castHasOnePersonTx) Find() (result *dao.Person, err error) {
 }
 
 func (a castHasOnePersonTx) Append(values ...*dao.Person) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -328,7 +328,7 @@ func (a castHasOnePersonTx) Append(values ...*dao.Person) (err error) {
 }
 
 func (a castHasOnePersonTx) Replace(values ...*dao.Person) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -336,7 +336,7 @@ func (a castHasOnePersonTx) Replace(values ...*dao.Person) (err error) {
 }
 
 func (a castHasOnePersonTx) Delete(values ...*dao.Person) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -361,19 +361,19 @@ func (c castDo) WithContext(ctx context.Context) *castDo {
 	return c.withDO(c.DO.WithContext(ctx))
 }
 
-func (c castDo) ReadDB(ctx context.Context) *castDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Read)
+func (c castDo) ReadDB() *castDo {
+	return c.Clauses(dbresolver.Read)
 }
 
-func (c castDo) WriteDB(ctx context.Context) *castDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Write)
+func (c castDo) WriteDB() *castDo {
+	return c.Clauses(dbresolver.Write)
 }
 
 func (c castDo) Clauses(conds ...clause.Expression) *castDo {
 	return c.withDO(c.DO.Clauses(conds...))
 }
 
-func (c castDo) Returning(value interface{}, columns ...string) *castDo {
+func (c castDo) Returning(value any, columns ...string) *castDo {
 	return c.withDO(c.DO.Returning(value, columns...))
 }
 
@@ -560,7 +560,7 @@ func (c castDo) FindByPage(offset int, limit int) (result []*dao.Cast, count int
 	return
 }
 
-func (c castDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (c castDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = c.Count()
 	if err != nil {
 		return
@@ -568,6 +568,10 @@ func (c castDo) ScanByPage(result interface{}, offset int, limit int) (count int
 
 	err = c.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (c castDo) Scan(result any) (err error) {
+	return c.DO.Scan(result)
 }
 
 func (c *castDo) withDO(do gen.Dao) *castDo {

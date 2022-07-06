@@ -175,19 +175,19 @@ func (s subjectFieldDo) WithContext(ctx context.Context) *subjectFieldDo {
 	return s.withDO(s.DO.WithContext(ctx))
 }
 
-func (s subjectFieldDo) ReadDB(ctx context.Context) *subjectFieldDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Read)
+func (s subjectFieldDo) ReadDB() *subjectFieldDo {
+	return s.Clauses(dbresolver.Read)
 }
 
-func (s subjectFieldDo) WriteDB(ctx context.Context) *subjectFieldDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Write)
+func (s subjectFieldDo) WriteDB() *subjectFieldDo {
+	return s.Clauses(dbresolver.Write)
 }
 
 func (s subjectFieldDo) Clauses(conds ...clause.Expression) *subjectFieldDo {
 	return s.withDO(s.DO.Clauses(conds...))
 }
 
-func (s subjectFieldDo) Returning(value interface{}, columns ...string) *subjectFieldDo {
+func (s subjectFieldDo) Returning(value any, columns ...string) *subjectFieldDo {
 	return s.withDO(s.DO.Returning(value, columns...))
 }
 
@@ -374,7 +374,7 @@ func (s subjectFieldDo) FindByPage(offset int, limit int) (result []*dao.Subject
 	return
 }
 
-func (s subjectFieldDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (s subjectFieldDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = s.Count()
 	if err != nil {
 		return
@@ -382,6 +382,10 @@ func (s subjectFieldDo) ScanByPage(result interface{}, offset int, limit int) (c
 
 	err = s.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (s subjectFieldDo) Scan(result any) (err error) {
+	return s.DO.Scan(result)
 }
 
 func (s *subjectFieldDo) withDO(do gen.Dao) *subjectFieldDo {

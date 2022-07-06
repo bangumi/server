@@ -193,7 +193,7 @@ func (a memberHasOneFieldsTx) Find() (result *dao.MemberField, err error) {
 }
 
 func (a memberHasOneFieldsTx) Append(values ...*dao.MemberField) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -201,7 +201,7 @@ func (a memberHasOneFieldsTx) Append(values ...*dao.MemberField) (err error) {
 }
 
 func (a memberHasOneFieldsTx) Replace(values ...*dao.MemberField) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -209,7 +209,7 @@ func (a memberHasOneFieldsTx) Replace(values ...*dao.MemberField) (err error) {
 }
 
 func (a memberHasOneFieldsTx) Delete(values ...*dao.MemberField) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -234,19 +234,19 @@ func (m memberDo) WithContext(ctx context.Context) *memberDo {
 	return m.withDO(m.DO.WithContext(ctx))
 }
 
-func (m memberDo) ReadDB(ctx context.Context) *memberDo {
-	return m.WithContext(ctx).Clauses(dbresolver.Read)
+func (m memberDo) ReadDB() *memberDo {
+	return m.Clauses(dbresolver.Read)
 }
 
-func (m memberDo) WriteDB(ctx context.Context) *memberDo {
-	return m.WithContext(ctx).Clauses(dbresolver.Write)
+func (m memberDo) WriteDB() *memberDo {
+	return m.Clauses(dbresolver.Write)
 }
 
 func (m memberDo) Clauses(conds ...clause.Expression) *memberDo {
 	return m.withDO(m.DO.Clauses(conds...))
 }
 
-func (m memberDo) Returning(value interface{}, columns ...string) *memberDo {
+func (m memberDo) Returning(value any, columns ...string) *memberDo {
 	return m.withDO(m.DO.Returning(value, columns...))
 }
 
@@ -433,7 +433,7 @@ func (m memberDo) FindByPage(offset int, limit int) (result []*dao.Member, count
 	return
 }
 
-func (m memberDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (m memberDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = m.Count()
 	if err != nil {
 		return
@@ -441,6 +441,10 @@ func (m memberDo) ScanByPage(result interface{}, offset int, limit int) (count i
 
 	err = m.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (m memberDo) Scan(result any) (err error) {
+	return m.DO.Scan(result)
 }
 
 func (m *memberDo) withDO(do gen.Dao) *memberDo {

@@ -127,19 +127,19 @@ func (a accessTokenDo) WithContext(ctx context.Context) *accessTokenDo {
 	return a.withDO(a.DO.WithContext(ctx))
 }
 
-func (a accessTokenDo) ReadDB(ctx context.Context) *accessTokenDo {
-	return a.WithContext(ctx).Clauses(dbresolver.Read)
+func (a accessTokenDo) ReadDB() *accessTokenDo {
+	return a.Clauses(dbresolver.Read)
 }
 
-func (a accessTokenDo) WriteDB(ctx context.Context) *accessTokenDo {
-	return a.WithContext(ctx).Clauses(dbresolver.Write)
+func (a accessTokenDo) WriteDB() *accessTokenDo {
+	return a.Clauses(dbresolver.Write)
 }
 
 func (a accessTokenDo) Clauses(conds ...clause.Expression) *accessTokenDo {
 	return a.withDO(a.DO.Clauses(conds...))
 }
 
-func (a accessTokenDo) Returning(value interface{}, columns ...string) *accessTokenDo {
+func (a accessTokenDo) Returning(value any, columns ...string) *accessTokenDo {
 	return a.withDO(a.DO.Returning(value, columns...))
 }
 
@@ -326,7 +326,7 @@ func (a accessTokenDo) FindByPage(offset int, limit int) (result []*dao.AccessTo
 	return
 }
 
-func (a accessTokenDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (a accessTokenDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = a.Count()
 	if err != nil {
 		return
@@ -334,6 +334,10 @@ func (a accessTokenDo) ScanByPage(result interface{}, offset int, limit int) (co
 
 	err = a.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (a accessTokenDo) Scan(result any) (err error) {
+	return a.DO.Scan(result)
 }
 
 func (a *accessTokenDo) withDO(do gen.Dao) *accessTokenDo {

@@ -173,7 +173,7 @@ func (a characterSubjectsHasOneCharacterTx) Find() (result *dao.Character, err e
 }
 
 func (a characterSubjectsHasOneCharacterTx) Append(values ...*dao.Character) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -181,7 +181,7 @@ func (a characterSubjectsHasOneCharacterTx) Append(values ...*dao.Character) (er
 }
 
 func (a characterSubjectsHasOneCharacterTx) Replace(values ...*dao.Character) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -189,7 +189,7 @@ func (a characterSubjectsHasOneCharacterTx) Replace(values ...*dao.Character) (e
 }
 
 func (a characterSubjectsHasOneCharacterTx) Delete(values ...*dao.Character) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -243,7 +243,7 @@ func (a characterSubjectsHasOneSubjectTx) Find() (result *dao.Subject, err error
 }
 
 func (a characterSubjectsHasOneSubjectTx) Append(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -251,7 +251,7 @@ func (a characterSubjectsHasOneSubjectTx) Append(values ...*dao.Subject) (err er
 }
 
 func (a characterSubjectsHasOneSubjectTx) Replace(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -259,7 +259,7 @@ func (a characterSubjectsHasOneSubjectTx) Replace(values ...*dao.Subject) (err e
 }
 
 func (a characterSubjectsHasOneSubjectTx) Delete(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -284,19 +284,19 @@ func (c characterSubjectsDo) WithContext(ctx context.Context) *characterSubjects
 	return c.withDO(c.DO.WithContext(ctx))
 }
 
-func (c characterSubjectsDo) ReadDB(ctx context.Context) *characterSubjectsDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Read)
+func (c characterSubjectsDo) ReadDB() *characterSubjectsDo {
+	return c.Clauses(dbresolver.Read)
 }
 
-func (c characterSubjectsDo) WriteDB(ctx context.Context) *characterSubjectsDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Write)
+func (c characterSubjectsDo) WriteDB() *characterSubjectsDo {
+	return c.Clauses(dbresolver.Write)
 }
 
 func (c characterSubjectsDo) Clauses(conds ...clause.Expression) *characterSubjectsDo {
 	return c.withDO(c.DO.Clauses(conds...))
 }
 
-func (c characterSubjectsDo) Returning(value interface{}, columns ...string) *characterSubjectsDo {
+func (c characterSubjectsDo) Returning(value any, columns ...string) *characterSubjectsDo {
 	return c.withDO(c.DO.Returning(value, columns...))
 }
 
@@ -483,7 +483,7 @@ func (c characterSubjectsDo) FindByPage(offset int, limit int) (result []*dao.Ch
 	return
 }
 
-func (c characterSubjectsDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (c characterSubjectsDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = c.Count()
 	if err != nil {
 		return
@@ -491,6 +491,10 @@ func (c characterSubjectsDo) ScanByPage(result interface{}, offset int, limit in
 
 	err = c.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (c characterSubjectsDo) Scan(result any) (err error) {
+	return c.DO.Scan(result)
 }
 
 func (c *characterSubjectsDo) withDO(do gen.Dao) *characterSubjectsDo {

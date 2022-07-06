@@ -206,7 +206,7 @@ func (a episodeBelongsToSubjectTx) Find() (result *dao.Subject, err error) {
 }
 
 func (a episodeBelongsToSubjectTx) Append(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -214,7 +214,7 @@ func (a episodeBelongsToSubjectTx) Append(values ...*dao.Subject) (err error) {
 }
 
 func (a episodeBelongsToSubjectTx) Replace(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -222,7 +222,7 @@ func (a episodeBelongsToSubjectTx) Replace(values ...*dao.Subject) (err error) {
 }
 
 func (a episodeBelongsToSubjectTx) Delete(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -247,19 +247,19 @@ func (e episodeDo) WithContext(ctx context.Context) *episodeDo {
 	return e.withDO(e.DO.WithContext(ctx))
 }
 
-func (e episodeDo) ReadDB(ctx context.Context) *episodeDo {
-	return e.WithContext(ctx).Clauses(dbresolver.Read)
+func (e episodeDo) ReadDB() *episodeDo {
+	return e.Clauses(dbresolver.Read)
 }
 
-func (e episodeDo) WriteDB(ctx context.Context) *episodeDo {
-	return e.WithContext(ctx).Clauses(dbresolver.Write)
+func (e episodeDo) WriteDB() *episodeDo {
+	return e.Clauses(dbresolver.Write)
 }
 
 func (e episodeDo) Clauses(conds ...clause.Expression) *episodeDo {
 	return e.withDO(e.DO.Clauses(conds...))
 }
 
-func (e episodeDo) Returning(value interface{}, columns ...string) *episodeDo {
+func (e episodeDo) Returning(value any, columns ...string) *episodeDo {
 	return e.withDO(e.DO.Returning(value, columns...))
 }
 
@@ -446,7 +446,7 @@ func (e episodeDo) FindByPage(offset int, limit int) (result []*dao.Episode, cou
 	return
 }
 
-func (e episodeDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (e episodeDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = e.Count()
 	if err != nil {
 		return
@@ -454,6 +454,10 @@ func (e episodeDo) ScanByPage(result interface{}, offset int, limit int) (count 
 
 	err = e.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (e episodeDo) Scan(result any) (err error) {
+	return e.DO.Scan(result)
 }
 
 func (e *episodeDo) withDO(do gen.Dao) *episodeDo {

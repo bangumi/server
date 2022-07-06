@@ -124,6 +124,7 @@ tasks:
       - go.mod
     cmds:
       - go run ./internal/cmd/gen/gorm/main.go
+      - gofmt -w -r 'interface{} -> any' ./internal/dal/
 
   # binary tools
   gotestfmt:

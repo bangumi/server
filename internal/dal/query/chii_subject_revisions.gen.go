@@ -192,7 +192,7 @@ func (a subjectRevisionBelongsToSubjectTx) Find() (result *dao.Subject, err erro
 }
 
 func (a subjectRevisionBelongsToSubjectTx) Append(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -200,7 +200,7 @@ func (a subjectRevisionBelongsToSubjectTx) Append(values ...*dao.Subject) (err e
 }
 
 func (a subjectRevisionBelongsToSubjectTx) Replace(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -208,7 +208,7 @@ func (a subjectRevisionBelongsToSubjectTx) Replace(values ...*dao.Subject) (err 
 }
 
 func (a subjectRevisionBelongsToSubjectTx) Delete(values ...*dao.Subject) (err error) {
-	targetValues := make([]interface{}, len(values))
+	targetValues := make([]any, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -233,19 +233,19 @@ func (s subjectRevisionDo) WithContext(ctx context.Context) *subjectRevisionDo {
 	return s.withDO(s.DO.WithContext(ctx))
 }
 
-func (s subjectRevisionDo) ReadDB(ctx context.Context) *subjectRevisionDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Read)
+func (s subjectRevisionDo) ReadDB() *subjectRevisionDo {
+	return s.Clauses(dbresolver.Read)
 }
 
-func (s subjectRevisionDo) WriteDB(ctx context.Context) *subjectRevisionDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Write)
+func (s subjectRevisionDo) WriteDB() *subjectRevisionDo {
+	return s.Clauses(dbresolver.Write)
 }
 
 func (s subjectRevisionDo) Clauses(conds ...clause.Expression) *subjectRevisionDo {
 	return s.withDO(s.DO.Clauses(conds...))
 }
 
-func (s subjectRevisionDo) Returning(value interface{}, columns ...string) *subjectRevisionDo {
+func (s subjectRevisionDo) Returning(value any, columns ...string) *subjectRevisionDo {
 	return s.withDO(s.DO.Returning(value, columns...))
 }
 
@@ -432,7 +432,7 @@ func (s subjectRevisionDo) FindByPage(offset int, limit int) (result []*dao.Subj
 	return
 }
 
-func (s subjectRevisionDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (s subjectRevisionDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = s.Count()
 	if err != nil {
 		return
@@ -440,6 +440,10 @@ func (s subjectRevisionDo) ScanByPage(result interface{}, offset int, limit int)
 
 	err = s.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (s subjectRevisionDo) Scan(result any) (err error) {
+	return s.DO.Scan(result)
 }
 
 func (s *subjectRevisionDo) withDO(do gen.Dao) *subjectRevisionDo {

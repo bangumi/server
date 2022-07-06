@@ -123,19 +123,19 @@ func (p personFieldDo) WithContext(ctx context.Context) *personFieldDo {
 	return p.withDO(p.DO.WithContext(ctx))
 }
 
-func (p personFieldDo) ReadDB(ctx context.Context) *personFieldDo {
-	return p.WithContext(ctx).Clauses(dbresolver.Read)
+func (p personFieldDo) ReadDB() *personFieldDo {
+	return p.Clauses(dbresolver.Read)
 }
 
-func (p personFieldDo) WriteDB(ctx context.Context) *personFieldDo {
-	return p.WithContext(ctx).Clauses(dbresolver.Write)
+func (p personFieldDo) WriteDB() *personFieldDo {
+	return p.Clauses(dbresolver.Write)
 }
 
 func (p personFieldDo) Clauses(conds ...clause.Expression) *personFieldDo {
 	return p.withDO(p.DO.Clauses(conds...))
 }
 
-func (p personFieldDo) Returning(value interface{}, columns ...string) *personFieldDo {
+func (p personFieldDo) Returning(value any, columns ...string) *personFieldDo {
 	return p.withDO(p.DO.Returning(value, columns...))
 }
 
@@ -322,7 +322,7 @@ func (p personFieldDo) FindByPage(offset int, limit int) (result []*dao.PersonFi
 	return
 }
 
-func (p personFieldDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (p personFieldDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = p.Count()
 	if err != nil {
 		return
@@ -330,6 +330,10 @@ func (p personFieldDo) ScanByPage(result interface{}, offset int, limit int) (co
 
 	err = p.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (p personFieldDo) Scan(result any) (err error) {
+	return p.DO.Scan(result)
 }
 
 func (p *personFieldDo) withDO(do gen.Dao) *personFieldDo {

@@ -28,7 +28,7 @@ func newRevisionText(db *gorm.DB) revisionText {
 	tableName := _revisionText.revisionTextDo.TableName()
 	_revisionText.ALL = field.NewField(tableName, "*")
 	_revisionText.TextID = field.NewUint32(tableName, "rev_text_id")
-	_revisionText.Text = field.NewField(tableName, "rev_text")
+	_revisionText.Text = field.NewBytes(tableName, "rev_text")
 
 	_revisionText.fillFieldMap()
 
@@ -40,7 +40,7 @@ type revisionText struct {
 
 	ALL    field.Field
 	TextID field.Uint32
-	Text   field.Field
+	Text   field.Bytes
 
 	fieldMap map[string]field.Expr
 }
@@ -58,7 +58,7 @@ func (r revisionText) As(alias string) *revisionText {
 func (r *revisionText) updateTableName(table string) *revisionText {
 	r.ALL = field.NewField(table, "*")
 	r.TextID = field.NewUint32(table, "rev_text_id")
-	r.Text = field.NewField(table, "rev_text")
+	r.Text = field.NewBytes(table, "rev_text")
 
 	r.fillFieldMap()
 
@@ -103,19 +103,19 @@ func (r revisionTextDo) WithContext(ctx context.Context) *revisionTextDo {
 	return r.withDO(r.DO.WithContext(ctx))
 }
 
-func (r revisionTextDo) ReadDB(ctx context.Context) *revisionTextDo {
-	return r.WithContext(ctx).Clauses(dbresolver.Read)
+func (r revisionTextDo) ReadDB() *revisionTextDo {
+	return r.Clauses(dbresolver.Read)
 }
 
-func (r revisionTextDo) WriteDB(ctx context.Context) *revisionTextDo {
-	return r.WithContext(ctx).Clauses(dbresolver.Write)
+func (r revisionTextDo) WriteDB() *revisionTextDo {
+	return r.Clauses(dbresolver.Write)
 }
 
 func (r revisionTextDo) Clauses(conds ...clause.Expression) *revisionTextDo {
 	return r.withDO(r.DO.Clauses(conds...))
 }
 
-func (r revisionTextDo) Returning(value interface{}, columns ...string) *revisionTextDo {
+func (r revisionTextDo) Returning(value any, columns ...string) *revisionTextDo {
 	return r.withDO(r.DO.Returning(value, columns...))
 }
 
@@ -302,7 +302,7 @@ func (r revisionTextDo) FindByPage(offset int, limit int) (result []*dao.Revisio
 	return
 }
 
-func (r revisionTextDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (r revisionTextDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
 	count, err = r.Count()
 	if err != nil {
 		return
@@ -310,6 +310,10 @@ func (r revisionTextDo) ScanByPage(result interface{}, offset int, limit int) (c
 
 	err = r.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (r revisionTextDo) Scan(result any) (err error) {
+	return r.DO.Scan(result)
 }
 
 func (r *revisionTextDo) withDO(do gen.Dao) *revisionTextDo {
