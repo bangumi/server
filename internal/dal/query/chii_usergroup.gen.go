@@ -123,7 +123,7 @@ func (u userGroupDo) Clauses(conds ...clause.Expression) *userGroupDo {
 	return u.withDO(u.DO.Clauses(conds...))
 }
 
-func (u userGroupDo) Returning(value any, columns ...string) *userGroupDo {
+func (u userGroupDo) Returning(value interface{}, columns ...string) *userGroupDo {
 	return u.withDO(u.DO.Returning(value, columns...))
 }
 
@@ -310,7 +310,7 @@ func (u userGroupDo) FindByPage(offset int, limit int) (result []*dao.UserGroup,
 	return
 }
 
-func (u userGroupDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (u userGroupDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = u.Count()
 	if err != nil {
 		return
@@ -320,7 +320,7 @@ func (u userGroupDo) ScanByPage(result any, offset int, limit int) (count int64,
 	return
 }
 
-func (u userGroupDo) Scan(result any) (err error) {
+func (u userGroupDo) Scan(result interface{}) (err error) {
 	return u.DO.Scan(result)
 }
 

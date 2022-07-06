@@ -225,7 +225,7 @@ func (a subjectHasOneFieldsTx) Find() (result *dao.SubjectField, err error) {
 }
 
 func (a subjectHasOneFieldsTx) Append(values ...*dao.SubjectField) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -233,7 +233,7 @@ func (a subjectHasOneFieldsTx) Append(values ...*dao.SubjectField) (err error) {
 }
 
 func (a subjectHasOneFieldsTx) Replace(values ...*dao.SubjectField) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -241,7 +241,7 @@ func (a subjectHasOneFieldsTx) Replace(values ...*dao.SubjectField) (err error) 
 }
 
 func (a subjectHasOneFieldsTx) Delete(values ...*dao.SubjectField) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -278,7 +278,7 @@ func (s subjectDo) Clauses(conds ...clause.Expression) *subjectDo {
 	return s.withDO(s.DO.Clauses(conds...))
 }
 
-func (s subjectDo) Returning(value any, columns ...string) *subjectDo {
+func (s subjectDo) Returning(value interface{}, columns ...string) *subjectDo {
 	return s.withDO(s.DO.Returning(value, columns...))
 }
 
@@ -465,7 +465,7 @@ func (s subjectDo) FindByPage(offset int, limit int) (result []*dao.Subject, cou
 	return
 }
 
-func (s subjectDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (s subjectDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = s.Count()
 	if err != nil {
 		return
@@ -475,7 +475,7 @@ func (s subjectDo) ScanByPage(result any, offset int, limit int) (count int64, e
 	return
 }
 
-func (s subjectDo) Scan(result any) (err error) {
+func (s subjectDo) Scan(result interface{}) (err error) {
 	return s.DO.Scan(result)
 }
 

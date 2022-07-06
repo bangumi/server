@@ -155,7 +155,7 @@ func (a oAuthClientBelongsToAppTx) Find() (result *dao.App, err error) {
 }
 
 func (a oAuthClientBelongsToAppTx) Append(values ...*dao.App) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -163,7 +163,7 @@ func (a oAuthClientBelongsToAppTx) Append(values ...*dao.App) (err error) {
 }
 
 func (a oAuthClientBelongsToAppTx) Replace(values ...*dao.App) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -171,7 +171,7 @@ func (a oAuthClientBelongsToAppTx) Replace(values ...*dao.App) (err error) {
 }
 
 func (a oAuthClientBelongsToAppTx) Delete(values ...*dao.App) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -208,7 +208,7 @@ func (o oAuthClientDo) Clauses(conds ...clause.Expression) *oAuthClientDo {
 	return o.withDO(o.DO.Clauses(conds...))
 }
 
-func (o oAuthClientDo) Returning(value any, columns ...string) *oAuthClientDo {
+func (o oAuthClientDo) Returning(value interface{}, columns ...string) *oAuthClientDo {
 	return o.withDO(o.DO.Returning(value, columns...))
 }
 
@@ -395,7 +395,7 @@ func (o oAuthClientDo) FindByPage(offset int, limit int) (result []*dao.OAuthCli
 	return
 }
 
-func (o oAuthClientDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (o oAuthClientDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = o.Count()
 	if err != nil {
 		return
@@ -405,7 +405,7 @@ func (o oAuthClientDo) ScanByPage(result any, offset int, limit int) (count int6
 	return
 }
 
-func (o oAuthClientDo) Scan(result any) (err error) {
+func (o oAuthClientDo) Scan(result interface{}) (err error) {
 	return o.DO.Scan(result)
 }
 

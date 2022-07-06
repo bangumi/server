@@ -57,7 +57,7 @@ type AuthRepo_CreateAccessToken_Call struct {
 //  - userID model.UserID
 //  - name string
 //  - expiration time.Duration
-func (_e *AuthRepo_Expecter) CreateAccessToken(ctx any, userID any, name any, expiration any) *AuthRepo_CreateAccessToken_Call {
+func (_e *AuthRepo_Expecter) CreateAccessToken(ctx interface{}, userID interface{}, name interface{}, expiration interface{}) *AuthRepo_CreateAccessToken_Call {
 	return &AuthRepo_CreateAccessToken_Call{Call: _e.mock.On("CreateAccessToken", ctx, userID, name, expiration)}
 }
 
@@ -102,7 +102,7 @@ type AuthRepo_DeleteAccessToken_Call struct {
 // DeleteAccessToken is a helper method to define mock.On call
 //  - ctx context.Context
 //  - tokenID uint32
-func (_e *AuthRepo_Expecter) DeleteAccessToken(ctx any, tokenID any) *AuthRepo_DeleteAccessToken_Call {
+func (_e *AuthRepo_Expecter) DeleteAccessToken(ctx interface{}, tokenID interface{}) *AuthRepo_DeleteAccessToken_Call {
 	return &AuthRepo_DeleteAccessToken_Call{Call: _e.mock.On("DeleteAccessToken", ctx, tokenID)}
 }
 
@@ -156,7 +156,7 @@ type AuthRepo_GetByEmail_Call struct {
 // GetByEmail is a helper method to define mock.On call
 //  - ctx context.Context
 //  - email string
-func (_e *AuthRepo_Expecter) GetByEmail(ctx any, email any) *AuthRepo_GetByEmail_Call {
+func (_e *AuthRepo_Expecter) GetByEmail(ctx interface{}, email interface{}) *AuthRepo_GetByEmail_Call {
 	return &AuthRepo_GetByEmail_Call{Call: _e.mock.On("GetByEmail", ctx, email)}
 }
 
@@ -201,7 +201,7 @@ type AuthRepo_GetByToken_Call struct {
 // GetByToken is a helper method to define mock.On call
 //  - ctx context.Context
 //  - token string
-func (_e *AuthRepo_Expecter) GetByToken(ctx any, token any) *AuthRepo_GetByToken_Call {
+func (_e *AuthRepo_Expecter) GetByToken(ctx interface{}, token interface{}) *AuthRepo_GetByToken_Call {
 	return &AuthRepo_GetByToken_Call{Call: _e.mock.On("GetByToken", ctx, token)}
 }
 
@@ -246,7 +246,7 @@ type AuthRepo_GetPermission_Call struct {
 // GetPermission is a helper method to define mock.On call
 //  - ctx context.Context
 //  - groupID uint8
-func (_e *AuthRepo_Expecter) GetPermission(ctx any, groupID any) *AuthRepo_GetPermission_Call {
+func (_e *AuthRepo_Expecter) GetPermission(ctx interface{}, groupID interface{}) *AuthRepo_GetPermission_Call {
 	return &AuthRepo_GetPermission_Call{Call: _e.mock.On("GetPermission", ctx, groupID)}
 }
 
@@ -291,7 +291,7 @@ type AuthRepo_GetTokenByID_Call struct {
 // GetTokenByID is a helper method to define mock.On call
 //  - ctx context.Context
 //  - id uint32
-func (_e *AuthRepo_Expecter) GetTokenByID(ctx any, id any) *AuthRepo_GetTokenByID_Call {
+func (_e *AuthRepo_Expecter) GetTokenByID(ctx interface{}, id interface{}) *AuthRepo_GetTokenByID_Call {
 	return &AuthRepo_GetTokenByID_Call{Call: _e.mock.On("GetTokenByID", ctx, id)}
 }
 
@@ -338,7 +338,7 @@ type AuthRepo_ListAccessToken_Call struct {
 // ListAccessToken is a helper method to define mock.On call
 //  - ctx context.Context
 //  - userID model.UserID
-func (_e *AuthRepo_Expecter) ListAccessToken(ctx any, userID any) *AuthRepo_ListAccessToken_Call {
+func (_e *AuthRepo_Expecter) ListAccessToken(ctx interface{}, userID interface{}) *AuthRepo_ListAccessToken_Call {
 	return &AuthRepo_ListAccessToken_Call{Call: _e.mock.On("ListAccessToken", ctx, userID)}
 }
 

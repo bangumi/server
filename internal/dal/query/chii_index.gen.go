@@ -153,7 +153,7 @@ func (i indexDo) Clauses(conds ...clause.Expression) *indexDo {
 	return i.withDO(i.DO.Clauses(conds...))
 }
 
-func (i indexDo) Returning(value any, columns ...string) *indexDo {
+func (i indexDo) Returning(value interface{}, columns ...string) *indexDo {
 	return i.withDO(i.DO.Returning(value, columns...))
 }
 
@@ -340,7 +340,7 @@ func (i indexDo) FindByPage(offset int, limit int) (result []*dao.Index, count i
 	return
 }
 
-func (i indexDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (i indexDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = i.Count()
 	if err != nil {
 		return
@@ -350,7 +350,7 @@ func (i indexDo) ScanByPage(result any, offset int, limit int) (count int64, err
 	return
 }
 
-func (i indexDo) Scan(result any) (err error) {
+func (i indexDo) Scan(result interface{}) (err error) {
 	return i.DO.Scan(result)
 }
 

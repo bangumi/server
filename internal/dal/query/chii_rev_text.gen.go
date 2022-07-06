@@ -115,7 +115,7 @@ func (r revisionTextDo) Clauses(conds ...clause.Expression) *revisionTextDo {
 	return r.withDO(r.DO.Clauses(conds...))
 }
 
-func (r revisionTextDo) Returning(value any, columns ...string) *revisionTextDo {
+func (r revisionTextDo) Returning(value interface{}, columns ...string) *revisionTextDo {
 	return r.withDO(r.DO.Returning(value, columns...))
 }
 
@@ -302,7 +302,7 @@ func (r revisionTextDo) FindByPage(offset int, limit int) (result []*dao.Revisio
 	return
 }
 
-func (r revisionTextDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (r revisionTextDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = r.Count()
 	if err != nil {
 		return
@@ -312,7 +312,7 @@ func (r revisionTextDo) ScanByPage(result any, offset int, limit int) (count int
 	return
 }
 
-func (r revisionTextDo) Scan(result any) (err error) {
+func (r revisionTextDo) Scan(result interface{}) (err error) {
 	return r.DO.Scan(result)
 }
 

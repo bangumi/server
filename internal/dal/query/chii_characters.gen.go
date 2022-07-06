@@ -191,7 +191,7 @@ func (a characterHasOneFieldsTx) Find() (result *dao.PersonField, err error) {
 }
 
 func (a characterHasOneFieldsTx) Append(values ...*dao.PersonField) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -199,7 +199,7 @@ func (a characterHasOneFieldsTx) Append(values ...*dao.PersonField) (err error) 
 }
 
 func (a characterHasOneFieldsTx) Replace(values ...*dao.PersonField) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -207,7 +207,7 @@ func (a characterHasOneFieldsTx) Replace(values ...*dao.PersonField) (err error)
 }
 
 func (a characterHasOneFieldsTx) Delete(values ...*dao.PersonField) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -244,7 +244,7 @@ func (c characterDo) Clauses(conds ...clause.Expression) *characterDo {
 	return c.withDO(c.DO.Clauses(conds...))
 }
 
-func (c characterDo) Returning(value any, columns ...string) *characterDo {
+func (c characterDo) Returning(value interface{}, columns ...string) *characterDo {
 	return c.withDO(c.DO.Returning(value, columns...))
 }
 
@@ -431,7 +431,7 @@ func (c characterDo) FindByPage(offset int, limit int) (result []*dao.Character,
 	return
 }
 
-func (c characterDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (c characterDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = c.Count()
 	if err != nil {
 		return
@@ -441,7 +441,7 @@ func (c characterDo) ScanByPage(result any, offset int, limit int) (count int64,
 	return
 }
 
-func (c characterDo) Scan(result any) (err error) {
+func (c characterDo) Scan(result interface{}) (err error) {
 	return c.DO.Scan(result)
 }
 

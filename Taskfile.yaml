@@ -124,17 +124,16 @@ tasks:
       - go.mod
     cmds:
       - go run ./internal/cmd/gen/gorm/main.go
-      - gofmt -w -r 'interface{} -> any' ./internal/dal/
 
   # binary tools
   gotestfmt:
     silent: true
     sources:
-      - go.mod
+      - ./internal/pkg/tools/go.mod
     generates:
       - .bin/gotestfmt.exe
     cmds:
-      - go build -o .bin/gotestfmt.exe github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt
+      - cd ./internal/pkg/tools; go build -o ../../../.bin/gotestfmt.exe github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt
 
   clean:
     cmds:

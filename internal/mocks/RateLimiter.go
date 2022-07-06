@@ -57,7 +57,7 @@ type RateLimiter_Allowed_Call struct {
 // Allowed is a helper method to define mock.On call
 //  - ctx context.Context
 //  - ip string
-func (_e *RateLimiter_Expecter) Allowed(ctx any, ip any) *RateLimiter_Allowed_Call {
+func (_e *RateLimiter_Expecter) Allowed(ctx interface{}, ip interface{}) *RateLimiter_Allowed_Call {
 	return &RateLimiter_Allowed_Call{Call: _e.mock.On("Allowed", ctx, ip)}
 }
 
@@ -95,7 +95,7 @@ type RateLimiter_Reset_Call struct {
 // Reset is a helper method to define mock.On call
 //  - ctx context.Context
 //  - ip string
-func (_e *RateLimiter_Expecter) Reset(ctx any, ip any) *RateLimiter_Reset_Call {
+func (_e *RateLimiter_Expecter) Reset(ctx interface{}, ip interface{}) *RateLimiter_Reset_Call {
 	return &RateLimiter_Reset_Call{Call: _e.mock.On("Reset", ctx, ip)}
 }
 

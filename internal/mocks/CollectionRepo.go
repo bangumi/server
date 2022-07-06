@@ -55,7 +55,7 @@ type CollectionRepo_CountSubjectCollections_Call struct {
 //  - subjectType uint8
 //  - collectionType model.CollectionType
 //  - showPrivate bool
-func (_e *CollectionRepo_Expecter) CountSubjectCollections(ctx any, userID any, subjectType any, collectionType any, showPrivate any) *CollectionRepo_CountSubjectCollections_Call {
+func (_e *CollectionRepo_Expecter) CountSubjectCollections(ctx interface{}, userID interface{}, subjectType interface{}, collectionType interface{}, showPrivate interface{}) *CollectionRepo_CountSubjectCollections_Call {
 	return &CollectionRepo_CountSubjectCollections_Call{Call: _e.mock.On("CountSubjectCollections", ctx, userID, subjectType, collectionType, showPrivate)}
 }
 
@@ -101,7 +101,7 @@ type CollectionRepo_GetSubjectCollection_Call struct {
 //  - ctx context.Context
 //  - userID model.UserID
 //  - subjectID model.SubjectID
-func (_e *CollectionRepo_Expecter) GetSubjectCollection(ctx any, userID any, subjectID any) *CollectionRepo_GetSubjectCollection_Call {
+func (_e *CollectionRepo_Expecter) GetSubjectCollection(ctx interface{}, userID interface{}, subjectID interface{}) *CollectionRepo_GetSubjectCollection_Call {
 	return &CollectionRepo_GetSubjectCollection_Call{Call: _e.mock.On("GetSubjectCollection", ctx, userID, subjectID)}
 }
 
@@ -153,7 +153,7 @@ type CollectionRepo_ListSubjectCollection_Call struct {
 //  - showPrivate bool
 //  - limit int
 //  - offset int
-func (_e *CollectionRepo_Expecter) ListSubjectCollection(ctx any, userID any, subjectType any, collectionType any, showPrivate any, limit any, offset any) *CollectionRepo_ListSubjectCollection_Call {
+func (_e *CollectionRepo_Expecter) ListSubjectCollection(ctx interface{}, userID interface{}, subjectType interface{}, collectionType interface{}, showPrivate interface{}, limit interface{}, offset interface{}) *CollectionRepo_ListSubjectCollection_Call {
 	return &CollectionRepo_ListSubjectCollection_Call{Call: _e.mock.On("ListSubjectCollection", ctx, userID, subjectType, collectionType, showPrivate, limit, offset)}
 }
 

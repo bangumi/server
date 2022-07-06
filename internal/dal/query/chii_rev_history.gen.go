@@ -135,7 +135,7 @@ func (r revisionHistoryDo) Clauses(conds ...clause.Expression) *revisionHistoryD
 	return r.withDO(r.DO.Clauses(conds...))
 }
 
-func (r revisionHistoryDo) Returning(value any, columns ...string) *revisionHistoryDo {
+func (r revisionHistoryDo) Returning(value interface{}, columns ...string) *revisionHistoryDo {
 	return r.withDO(r.DO.Returning(value, columns...))
 }
 
@@ -322,7 +322,7 @@ func (r revisionHistoryDo) FindByPage(offset int, limit int) (result []*dao.Revi
 	return
 }
 
-func (r revisionHistoryDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (r revisionHistoryDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = r.Count()
 	if err != nil {
 		return
@@ -332,7 +332,7 @@ func (r revisionHistoryDo) ScanByPage(result any, offset int, limit int) (count 
 	return
 }
 
-func (r revisionHistoryDo) Scan(result any) (err error) {
+func (r revisionHistoryDo) Scan(result interface{}) (err error) {
 	return r.DO.Scan(result)
 }
 

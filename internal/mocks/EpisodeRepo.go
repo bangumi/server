@@ -52,7 +52,7 @@ type EpisodeRepo_Count_Call struct {
 // Count is a helper method to define mock.On call
 //  - ctx context.Context
 //  - subjectID model.SubjectID
-func (_e *EpisodeRepo_Expecter) Count(ctx any, subjectID any) *EpisodeRepo_Count_Call {
+func (_e *EpisodeRepo_Expecter) Count(ctx interface{}, subjectID interface{}) *EpisodeRepo_Count_Call {
 	return &EpisodeRepo_Count_Call{Call: _e.mock.On("Count", ctx, subjectID)}
 }
 
@@ -98,7 +98,7 @@ type EpisodeRepo_CountByType_Call struct {
 //  - ctx context.Context
 //  - subjectID model.SubjectID
 //  - epType int16
-func (_e *EpisodeRepo_Expecter) CountByType(ctx any, subjectID any, epType any) *EpisodeRepo_CountByType_Call {
+func (_e *EpisodeRepo_Expecter) CountByType(ctx interface{}, subjectID interface{}, epType interface{}) *EpisodeRepo_CountByType_Call {
 	return &EpisodeRepo_CountByType_Call{Call: _e.mock.On("CountByType", ctx, subjectID, epType)}
 }
 
@@ -143,7 +143,7 @@ type EpisodeRepo_Get_Call struct {
 // Get is a helper method to define mock.On call
 //  - ctx context.Context
 //  - episodeID model.EpisodeID
-func (_e *EpisodeRepo_Expecter) Get(ctx any, episodeID any) *EpisodeRepo_Get_Call {
+func (_e *EpisodeRepo_Expecter) Get(ctx interface{}, episodeID interface{}) *EpisodeRepo_Get_Call {
 	return &EpisodeRepo_Get_Call{Call: _e.mock.On("Get", ctx, episodeID)}
 }
 
@@ -192,7 +192,7 @@ type EpisodeRepo_List_Call struct {
 //  - subjectID model.SubjectID
 //  - limit int
 //  - offset int
-func (_e *EpisodeRepo_Expecter) List(ctx any, subjectID any, limit any, offset any) *EpisodeRepo_List_Call {
+func (_e *EpisodeRepo_Expecter) List(ctx interface{}, subjectID interface{}, limit interface{}, offset interface{}) *EpisodeRepo_List_Call {
 	return &EpisodeRepo_List_Call{Call: _e.mock.On("List", ctx, subjectID, limit, offset)}
 }
 
@@ -242,7 +242,7 @@ type EpisodeRepo_ListByType_Call struct {
 //  - epType int16
 //  - limit int
 //  - offset int
-func (_e *EpisodeRepo_Expecter) ListByType(ctx any, subjectID any, epType any, limit any, offset any) *EpisodeRepo_ListByType_Call {
+func (_e *EpisodeRepo_Expecter) ListByType(ctx interface{}, subjectID interface{}, epType interface{}, limit interface{}, offset interface{}) *EpisodeRepo_ListByType_Call {
 	return &EpisodeRepo_ListByType_Call{Call: _e.mock.On("ListByType", ctx, subjectID, epType, limit, offset)}
 }
 

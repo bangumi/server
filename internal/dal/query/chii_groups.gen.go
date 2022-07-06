@@ -37,7 +37,7 @@ func newGroup(db *gorm.DB) group {
 	_group.Posts = field.NewUint32(tableName, "grp_posts")
 	_group.Members = field.NewUint32(tableName, "grp_members")
 	_group.Description = field.NewString(tableName, "grp_desc")
-	_group.LastPostedAt = field.NewUint32(tableName, "grp_lastpost")
+	_group.LastPostedTime = field.NewUint32(tableName, "grp_lastpost")
 	_group.CreatedTime = field.NewUint32(tableName, "grp_builddate")
 	_group.Accessible = field.NewBool(tableName, "grp_accessible")
 	_group.Nsfw = field.NewBool(tableName, "grp_nsfw")
@@ -50,21 +50,21 @@ func newGroup(db *gorm.DB) group {
 type group struct {
 	groupDo groupDo
 
-	ALL          field.Field
-	ID           field.Field
-	Cat          field.Uint16
-	Name         field.String
-	Title        field.String
-	Icon         field.String
-	CreatorID    field.Field
-	Topics       field.Uint32
-	Posts        field.Uint32
-	Members      field.Uint32
-	Description  field.String
-	LastPostedAt field.Uint32
-	CreatedTime  field.Uint32
-	Accessible   field.Bool
-	Nsfw         field.Bool
+	ALL            field.Field
+	ID             field.Field
+	Cat            field.Uint16
+	Name           field.String
+	Title          field.String
+	Icon           field.String
+	CreatorID      field.Field
+	Topics         field.Uint32
+	Posts          field.Uint32
+	Members        field.Uint32
+	Description    field.String
+	LastPostedTime field.Uint32
+	CreatedTime    field.Uint32
+	Accessible     field.Bool
+	Nsfw           field.Bool
 
 	fieldMap map[string]field.Expr
 }
@@ -91,7 +91,7 @@ func (g *group) updateTableName(table string) *group {
 	g.Posts = field.NewUint32(table, "grp_posts")
 	g.Members = field.NewUint32(table, "grp_members")
 	g.Description = field.NewString(table, "grp_desc")
-	g.LastPostedAt = field.NewUint32(table, "grp_lastpost")
+	g.LastPostedTime = field.NewUint32(table, "grp_lastpost")
 	g.CreatedTime = field.NewUint32(table, "grp_builddate")
 	g.Accessible = field.NewBool(table, "grp_accessible")
 	g.Nsfw = field.NewBool(table, "grp_nsfw")
@@ -128,7 +128,7 @@ func (g *group) fillFieldMap() {
 	g.fieldMap["grp_posts"] = g.Posts
 	g.fieldMap["grp_members"] = g.Members
 	g.fieldMap["grp_desc"] = g.Description
-	g.fieldMap["grp_lastpost"] = g.LastPostedAt
+	g.fieldMap["grp_lastpost"] = g.LastPostedTime
 	g.fieldMap["grp_builddate"] = g.CreatedTime
 	g.fieldMap["grp_accessible"] = g.Accessible
 	g.fieldMap["grp_nsfw"] = g.Nsfw
@@ -161,7 +161,7 @@ func (g groupDo) Clauses(conds ...clause.Expression) *groupDo {
 	return g.withDO(g.DO.Clauses(conds...))
 }
 
-func (g groupDo) Returning(value any, columns ...string) *groupDo {
+func (g groupDo) Returning(value interface{}, columns ...string) *groupDo {
 	return g.withDO(g.DO.Returning(value, columns...))
 }
 
@@ -348,7 +348,7 @@ func (g groupDo) FindByPage(offset int, limit int) (result []*dao.Group, count i
 	return
 }
 
-func (g groupDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (g groupDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = g.Count()
 	if err != nil {
 		return
@@ -358,7 +358,7 @@ func (g groupDo) ScanByPage(result any, offset int, limit int) (count int64, err
 	return
 }
 
-func (g groupDo) Scan(result any) (err error) {
+func (g groupDo) Scan(result interface{}) (err error) {
 	return g.DO.Scan(result)
 }
 

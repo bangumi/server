@@ -363,9 +363,8 @@ func main() {
 		gen.FieldRename("grp_creator", "CreatorID"),
 		gen.FieldRename("grp_desc", "Description"),
 		gen.FieldRename("grp_builddate", "CreatedTime"),
-		gen.FieldRename("grp_lastpost", "LastPostedAt"),
-		gen.FieldNewTag("grp_lastpost", "doc:always 0"),
-		// gen.FieldIgnore("grp_lastpost", "grp_posts"), // always 0
+		gen.FieldRename("grp_lastpost", "LastPostedTime"),
+		gen.FieldComment("grp_lastpost", "目前永远是0"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_group_members", "GroupMember",

@@ -177,7 +177,7 @@ func (a personSubjectsHasOneSubjectTx) Find() (result *dao.Subject, err error) {
 }
 
 func (a personSubjectsHasOneSubjectTx) Append(values ...*dao.Subject) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -185,7 +185,7 @@ func (a personSubjectsHasOneSubjectTx) Append(values ...*dao.Subject) (err error
 }
 
 func (a personSubjectsHasOneSubjectTx) Replace(values ...*dao.Subject) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -193,7 +193,7 @@ func (a personSubjectsHasOneSubjectTx) Replace(values ...*dao.Subject) (err erro
 }
 
 func (a personSubjectsHasOneSubjectTx) Delete(values ...*dao.Subject) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -247,7 +247,7 @@ func (a personSubjectsHasOnePersonTx) Find() (result *dao.Person, err error) {
 }
 
 func (a personSubjectsHasOnePersonTx) Append(values ...*dao.Person) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -255,7 +255,7 @@ func (a personSubjectsHasOnePersonTx) Append(values ...*dao.Person) (err error) 
 }
 
 func (a personSubjectsHasOnePersonTx) Replace(values ...*dao.Person) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -263,7 +263,7 @@ func (a personSubjectsHasOnePersonTx) Replace(values ...*dao.Person) (err error)
 }
 
 func (a personSubjectsHasOnePersonTx) Delete(values ...*dao.Person) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -300,7 +300,7 @@ func (p personSubjectsDo) Clauses(conds ...clause.Expression) *personSubjectsDo 
 	return p.withDO(p.DO.Clauses(conds...))
 }
 
-func (p personSubjectsDo) Returning(value any, columns ...string) *personSubjectsDo {
+func (p personSubjectsDo) Returning(value interface{}, columns ...string) *personSubjectsDo {
 	return p.withDO(p.DO.Returning(value, columns...))
 }
 
@@ -487,7 +487,7 @@ func (p personSubjectsDo) FindByPage(offset int, limit int) (result []*dao.Perso
 	return
 }
 
-func (p personSubjectsDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (p personSubjectsDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = p.Count()
 	if err != nil {
 		return
@@ -497,7 +497,7 @@ func (p personSubjectsDo) ScanByPage(result any, offset int, limit int) (count i
 	return
 }
 
-func (p personSubjectsDo) Scan(result any) (err error) {
+func (p personSubjectsDo) Scan(result interface{}) (err error) {
 	return p.DO.Scan(result)
 }
 

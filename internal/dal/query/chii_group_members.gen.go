@@ -123,7 +123,7 @@ func (g groupMemberDo) Clauses(conds ...clause.Expression) *groupMemberDo {
 	return g.withDO(g.DO.Clauses(conds...))
 }
 
-func (g groupMemberDo) Returning(value any, columns ...string) *groupMemberDo {
+func (g groupMemberDo) Returning(value interface{}, columns ...string) *groupMemberDo {
 	return g.withDO(g.DO.Returning(value, columns...))
 }
 
@@ -310,7 +310,7 @@ func (g groupMemberDo) FindByPage(offset int, limit int) (result []*dao.GroupMem
 	return
 }
 
-func (g groupMemberDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (g groupMemberDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = g.Count()
 	if err != nil {
 		return
@@ -320,7 +320,7 @@ func (g groupMemberDo) ScanByPage(result any, offset int, limit int) (count int6
 	return
 }
 
-func (g groupMemberDo) Scan(result any) (err error) {
+func (g groupMemberDo) Scan(result interface{}) (err error) {
 	return g.DO.Scan(result)
 }
 

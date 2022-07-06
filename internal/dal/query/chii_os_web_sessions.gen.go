@@ -127,7 +127,7 @@ func (w webSessionDo) Clauses(conds ...clause.Expression) *webSessionDo {
 	return w.withDO(w.DO.Clauses(conds...))
 }
 
-func (w webSessionDo) Returning(value any, columns ...string) *webSessionDo {
+func (w webSessionDo) Returning(value interface{}, columns ...string) *webSessionDo {
 	return w.withDO(w.DO.Returning(value, columns...))
 }
 
@@ -314,7 +314,7 @@ func (w webSessionDo) FindByPage(offset int, limit int) (result []*dao.WebSessio
 	return
 }
 
-func (w webSessionDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (w webSessionDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = w.Count()
 	if err != nil {
 		return
@@ -324,7 +324,7 @@ func (w webSessionDo) ScanByPage(result any, offset int, limit int) (count int64
 	return
 }
 
-func (w webSessionDo) Scan(result any) (err error) {
+func (w webSessionDo) Scan(result interface{}) (err error) {
 	return w.DO.Scan(result)
 }
 

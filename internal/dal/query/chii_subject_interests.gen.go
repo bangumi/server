@@ -179,7 +179,7 @@ func (s subjectCollectionDo) Clauses(conds ...clause.Expression) *subjectCollect
 	return s.withDO(s.DO.Clauses(conds...))
 }
 
-func (s subjectCollectionDo) Returning(value any, columns ...string) *subjectCollectionDo {
+func (s subjectCollectionDo) Returning(value interface{}, columns ...string) *subjectCollectionDo {
 	return s.withDO(s.DO.Returning(value, columns...))
 }
 
@@ -366,7 +366,7 @@ func (s subjectCollectionDo) FindByPage(offset int, limit int) (result []*dao.Su
 	return
 }
 
-func (s subjectCollectionDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (s subjectCollectionDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = s.Count()
 	if err != nil {
 		return
@@ -376,7 +376,7 @@ func (s subjectCollectionDo) ScanByPage(result any, offset int, limit int) (coun
 	return
 }
 
-func (s subjectCollectionDo) Scan(result any) (err error) {
+func (s subjectCollectionDo) Scan(result interface{}) (err error) {
 	return s.DO.Scan(result)
 }
 

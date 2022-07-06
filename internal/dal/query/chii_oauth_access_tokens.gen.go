@@ -139,7 +139,7 @@ func (a accessTokenDo) Clauses(conds ...clause.Expression) *accessTokenDo {
 	return a.withDO(a.DO.Clauses(conds...))
 }
 
-func (a accessTokenDo) Returning(value any, columns ...string) *accessTokenDo {
+func (a accessTokenDo) Returning(value interface{}, columns ...string) *accessTokenDo {
 	return a.withDO(a.DO.Returning(value, columns...))
 }
 
@@ -326,7 +326,7 @@ func (a accessTokenDo) FindByPage(offset int, limit int) (result []*dao.AccessTo
 	return
 }
 
-func (a accessTokenDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (a accessTokenDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = a.Count()
 	if err != nil {
 		return
@@ -336,7 +336,7 @@ func (a accessTokenDo) ScanByPage(result any, offset int, limit int) (count int6
 	return
 }
 
-func (a accessTokenDo) Scan(result any) (err error) {
+func (a accessTokenDo) Scan(result interface{}) (err error) {
 	return a.DO.Scan(result)
 }
 

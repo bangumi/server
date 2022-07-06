@@ -24,11 +24,11 @@ func (_m *Cache) EXPECT() *Cache_Expecter {
 
 // Del provides a mock function with given fields: ctx, keys
 func (_m *Cache) Del(ctx context.Context, keys ...string) error {
-	_va := make([]any, len(keys))
+	_va := make([]interface{}, len(keys))
 	for _i := range keys {
 		_va[_i] = keys[_i]
 	}
-	var _ca []any
+	var _ca []interface{}
 	_ca = append(_ca, ctx)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
@@ -51,9 +51,9 @@ type Cache_Del_Call struct {
 // Del is a helper method to define mock.On call
 //  - ctx context.Context
 //  - keys ...string
-func (_e *Cache_Expecter) Del(ctx any, keys ...any) *Cache_Del_Call {
+func (_e *Cache_Expecter) Del(ctx interface{}, keys ...interface{}) *Cache_Del_Call {
 	return &Cache_Del_Call{Call: _e.mock.On("Del",
-		append([]any{ctx}, keys...)...)}
+		append([]interface{}{ctx}, keys...)...)}
 }
 
 func (_c *Cache_Del_Call) Run(run func(ctx context.Context, keys ...string)) *Cache_Del_Call {
@@ -75,18 +75,18 @@ func (_c *Cache_Del_Call) Return(_a0 error) *Cache_Del_Call {
 }
 
 // Get provides a mock function with given fields: ctx, key, value
-func (_m *Cache) Get(ctx context.Context, key string, value any) (bool, error) {
+func (_m *Cache) Get(ctx context.Context, key string, value interface{}) (bool, error) {
 	ret := _m.Called(ctx, key, value)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(context.Context, string, any) bool); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, interface{}) bool); ok {
 		r0 = rf(ctx, key, value)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, any) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, interface{}) error); ok {
 		r1 = rf(ctx, key, value)
 	} else {
 		r1 = ret.Error(1)
@@ -104,13 +104,13 @@ type Cache_Get_Call struct {
 //  - ctx context.Context
 //  - key string
 //  - value interface{}
-func (_e *Cache_Expecter) Get(ctx any, key any, value any) *Cache_Get_Call {
+func (_e *Cache_Expecter) Get(ctx interface{}, key interface{}, value interface{}) *Cache_Get_Call {
 	return &Cache_Get_Call{Call: _e.mock.On("Get", ctx, key, value)}
 }
 
-func (_c *Cache_Get_Call) Run(run func(ctx context.Context, key string, value any)) *Cache_Get_Call {
+func (_c *Cache_Get_Call) Run(run func(ctx context.Context, key string, value interface{})) *Cache_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(any))
+		run(args[0].(context.Context), args[1].(string), args[2].(interface{}))
 	})
 	return _c
 }
@@ -121,11 +121,11 @@ func (_c *Cache_Get_Call) Return(_a0 bool, _a1 error) *Cache_Get_Call {
 }
 
 // Set provides a mock function with given fields: ctx, key, value, ttl
-func (_m *Cache) Set(ctx context.Context, key string, value any, ttl time.Duration) error {
+func (_m *Cache) Set(ctx context.Context, key string, value interface{}, ttl time.Duration) error {
 	ret := _m.Called(ctx, key, value, ttl)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, any, time.Duration) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, interface{}, time.Duration) error); ok {
 		r0 = rf(ctx, key, value, ttl)
 	} else {
 		r0 = ret.Error(0)
@@ -144,13 +144,13 @@ type Cache_Set_Call struct {
 //  - key string
 //  - value interface{}
 //  - ttl time.Duration
-func (_e *Cache_Expecter) Set(ctx any, key any, value any, ttl any) *Cache_Set_Call {
+func (_e *Cache_Expecter) Set(ctx interface{}, key interface{}, value interface{}, ttl interface{}) *Cache_Set_Call {
 	return &Cache_Set_Call{Call: _e.mock.On("Set", ctx, key, value, ttl)}
 }
 
-func (_c *Cache_Set_Call) Run(run func(ctx context.Context, key string, value any, ttl time.Duration)) *Cache_Set_Call {
+func (_c *Cache_Set_Call) Run(run func(ctx context.Context, key string, value interface{}, ttl time.Duration)) *Cache_Set_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(any), args[3].(time.Duration))
+		run(args[0].(context.Context), args[1].(string), args[2].(interface{}), args[3].(time.Duration))
 	})
 	return _c
 }

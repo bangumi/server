@@ -164,7 +164,7 @@ func (a subjectRelationHasOneSubjectTx) Find() (result *dao.Subject, err error) 
 }
 
 func (a subjectRelationHasOneSubjectTx) Append(values ...*dao.Subject) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -172,7 +172,7 @@ func (a subjectRelationHasOneSubjectTx) Append(values ...*dao.Subject) (err erro
 }
 
 func (a subjectRelationHasOneSubjectTx) Replace(values ...*dao.Subject) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -180,7 +180,7 @@ func (a subjectRelationHasOneSubjectTx) Replace(values ...*dao.Subject) (err err
 }
 
 func (a subjectRelationHasOneSubjectTx) Delete(values ...*dao.Subject) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -217,7 +217,7 @@ func (s subjectRelationDo) Clauses(conds ...clause.Expression) *subjectRelationD
 	return s.withDO(s.DO.Clauses(conds...))
 }
 
-func (s subjectRelationDo) Returning(value any, columns ...string) *subjectRelationDo {
+func (s subjectRelationDo) Returning(value interface{}, columns ...string) *subjectRelationDo {
 	return s.withDO(s.DO.Returning(value, columns...))
 }
 
@@ -404,7 +404,7 @@ func (s subjectRelationDo) FindByPage(offset int, limit int) (result []*dao.Subj
 	return
 }
 
-func (s subjectRelationDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (s subjectRelationDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = s.Count()
 	if err != nil {
 		return
@@ -414,7 +414,7 @@ func (s subjectRelationDo) ScanByPage(result any, offset int, limit int) (count 
 	return
 }
 
-func (s subjectRelationDo) Scan(result any) (err error) {
+func (s subjectRelationDo) Scan(result interface{}) (err error) {
 	return s.DO.Scan(result)
 }
 

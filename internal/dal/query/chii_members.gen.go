@@ -193,7 +193,7 @@ func (a memberHasOneFieldsTx) Find() (result *dao.MemberField, err error) {
 }
 
 func (a memberHasOneFieldsTx) Append(values ...*dao.MemberField) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -201,7 +201,7 @@ func (a memberHasOneFieldsTx) Append(values ...*dao.MemberField) (err error) {
 }
 
 func (a memberHasOneFieldsTx) Replace(values ...*dao.MemberField) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -209,7 +209,7 @@ func (a memberHasOneFieldsTx) Replace(values ...*dao.MemberField) (err error) {
 }
 
 func (a memberHasOneFieldsTx) Delete(values ...*dao.MemberField) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -246,7 +246,7 @@ func (m memberDo) Clauses(conds ...clause.Expression) *memberDo {
 	return m.withDO(m.DO.Clauses(conds...))
 }
 
-func (m memberDo) Returning(value any, columns ...string) *memberDo {
+func (m memberDo) Returning(value interface{}, columns ...string) *memberDo {
 	return m.withDO(m.DO.Returning(value, columns...))
 }
 
@@ -433,7 +433,7 @@ func (m memberDo) FindByPage(offset int, limit int) (result []*dao.Member, count
 	return
 }
 
-func (m memberDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (m memberDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = m.Count()
 	if err != nil {
 		return
@@ -443,7 +443,7 @@ func (m memberDo) ScanByPage(result any, offset int, limit int) (count int64, er
 	return
 }
 
-func (m memberDo) Scan(result any) (err error) {
+func (m memberDo) Scan(result interface{}) (err error) {
 	return m.DO.Scan(result)
 }
 

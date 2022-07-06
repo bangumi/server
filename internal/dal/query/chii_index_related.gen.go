@@ -168,7 +168,7 @@ func (a indexSubjectBelongsToSubjectTx) Find() (result *dao.Subject, err error) 
 }
 
 func (a indexSubjectBelongsToSubjectTx) Append(values ...*dao.Subject) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -176,7 +176,7 @@ func (a indexSubjectBelongsToSubjectTx) Append(values ...*dao.Subject) (err erro
 }
 
 func (a indexSubjectBelongsToSubjectTx) Replace(values ...*dao.Subject) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -184,7 +184,7 @@ func (a indexSubjectBelongsToSubjectTx) Replace(values ...*dao.Subject) (err err
 }
 
 func (a indexSubjectBelongsToSubjectTx) Delete(values ...*dao.Subject) (err error) {
-	targetValues := make([]any, len(values))
+	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
 	}
@@ -221,7 +221,7 @@ func (i indexSubjectDo) Clauses(conds ...clause.Expression) *indexSubjectDo {
 	return i.withDO(i.DO.Clauses(conds...))
 }
 
-func (i indexSubjectDo) Returning(value any, columns ...string) *indexSubjectDo {
+func (i indexSubjectDo) Returning(value interface{}, columns ...string) *indexSubjectDo {
 	return i.withDO(i.DO.Returning(value, columns...))
 }
 
@@ -408,7 +408,7 @@ func (i indexSubjectDo) FindByPage(offset int, limit int) (result []*dao.IndexSu
 	return
 }
 
-func (i indexSubjectDo) ScanByPage(result any, offset int, limit int) (count int64, err error) {
+func (i indexSubjectDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = i.Count()
 	if err != nil {
 		return
@@ -418,7 +418,7 @@ func (i indexSubjectDo) ScanByPage(result any, offset int, limit int) (count int
 	return
 }
 
-func (i indexSubjectDo) Scan(result any) (err error) {
+func (i indexSubjectDo) Scan(result interface{}) (err error) {
 	return i.DO.Scan(result)
 }
 

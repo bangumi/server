@@ -52,7 +52,7 @@ type UserRepo_GetByID_Call struct {
 // GetByID is a helper method to define mock.On call
 //  - ctx context.Context
 //  - userID model.UserID
-func (_e *UserRepo_Expecter) GetByID(ctx any, userID any) *UserRepo_GetByID_Call {
+func (_e *UserRepo_Expecter) GetByID(ctx interface{}, userID interface{}) *UserRepo_GetByID_Call {
 	return &UserRepo_GetByID_Call{Call: _e.mock.On("GetByID", ctx, userID)}
 }
 
@@ -70,11 +70,11 @@ func (_c *UserRepo_GetByID_Call) Return(_a0 model.User, _a1 error) *UserRepo_Get
 
 // GetByIDs provides a mock function with given fields: ctx, ids
 func (_m *UserRepo) GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error) {
-	_va := make([]any, len(ids))
+	_va := make([]interface{}, len(ids))
 	for _i := range ids {
 		_va[_i] = ids[_i]
 	}
-	var _ca []any
+	var _ca []interface{}
 	_ca = append(_ca, ctx)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
@@ -106,9 +106,9 @@ type UserRepo_GetByIDs_Call struct {
 // GetByIDs is a helper method to define mock.On call
 //  - ctx context.Context
 //  - ids ...model.UserID
-func (_e *UserRepo_Expecter) GetByIDs(ctx any, ids ...any) *UserRepo_GetByIDs_Call {
+func (_e *UserRepo_Expecter) GetByIDs(ctx interface{}, ids ...interface{}) *UserRepo_GetByIDs_Call {
 	return &UserRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs",
-		append([]any{ctx}, ids...)...)}
+		append([]interface{}{ctx}, ids...)...)}
 }
 
 func (_c *UserRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids ...model.UserID)) *UserRepo_GetByIDs_Call {
@@ -158,7 +158,7 @@ type UserRepo_GetByName_Call struct {
 // GetByName is a helper method to define mock.On call
 //  - ctx context.Context
 //  - username string
-func (_e *UserRepo_Expecter) GetByName(ctx any, username any) *UserRepo_GetByName_Call {
+func (_e *UserRepo_Expecter) GetByName(ctx interface{}, username interface{}) *UserRepo_GetByName_Call {
 	return &UserRepo_GetByName_Call{Call: _e.mock.On("GetByName", ctx, username)}
 }
 
