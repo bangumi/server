@@ -13,10 +13,10 @@ const TableNameEpisode = "chii_episodes"
 // Episode mapped from table <chii_episodes>
 type Episode struct {
 	ID        model.EpisodeID `gorm:"column:ep_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	SubjectID model.SubjectID `gorm:"column:ep_subject_id;type:mediumint(8) unsigned;not null;index:ep_subject_id,priority:1;index:ep_subject_id_2,priority:1"`
-	Sort      float32         `gorm:"column:ep_sort;type:float unsigned;not null;index:ep_sort,priority:1;index:ep_subject_id_2,priority:3"`
+	SubjectID model.SubjectID `gorm:"column:ep_subject_id;type:mediumint(8) unsigned;not null"`
+	Sort      float32         `gorm:"column:ep_sort;type:float unsigned;not null"`
 	Type      int16           `gorm:"column:ep_type;type:tinyint(1) unsigned;not null"`
-	Disc      uint8           `gorm:"column:ep_disc;type:tinyint(3) unsigned;not null;index:ep_disc,priority:1"` // 碟片数
+	Disc      uint8           `gorm:"column:ep_disc;type:tinyint(3) unsigned;not null"` // 碟片数
 	Name      string          `gorm:"column:ep_name;type:varchar(80);not null"`
 	NameCn    string          `gorm:"column:ep_name_cn;type:varchar(80);not null"`
 	Rate      int8            `gorm:"column:ep_rate;type:tinyint(3);not null"`
@@ -27,9 +27,9 @@ type Episode struct {
 	Resources uint32          `gorm:"column:ep_resources;type:mediumint(8) unsigned;not null"`
 	Desc      string          `gorm:"column:ep_desc;type:mediumtext;not null"`
 	Dateline  uint32          `gorm:"column:ep_dateline;type:int(10) unsigned;not null"`
-	Lastpost  uint32          `gorm:"column:ep_lastpost;type:int(10) unsigned;not null;index:ep_lastpost,priority:1"`
+	Lastpost  uint32          `gorm:"column:ep_lastpost;type:int(10) unsigned;not null"`
 	Lock      uint8           `gorm:"column:ep_lock;type:tinyint(3) unsigned;not null"`
-	Ban       uint8           `gorm:"column:ep_ban;type:tinyint(3) unsigned;not null;index:ep_ban,priority:1;index:ep_subject_id_2,priority:2"`
+	Ban       uint8           `gorm:"column:ep_ban;type:tinyint(3) unsigned;not null"`
 	Subject   Subject         `gorm:"foreignKey:ep_subject_id;references:subject_id" json:"subject"`
 }
 

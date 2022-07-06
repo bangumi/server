@@ -123,12 +123,12 @@ func (r revisionHistoryDo) WithContext(ctx context.Context) *revisionHistoryDo {
 	return r.withDO(r.DO.WithContext(ctx))
 }
 
-func (r revisionHistoryDo) ReadDB(ctx context.Context) *revisionHistoryDo {
-	return r.WithContext(ctx).Clauses(dbresolver.Read)
+func (r revisionHistoryDo) ReadDB() *revisionHistoryDo {
+	return r.Clauses(dbresolver.Read)
 }
 
-func (r revisionHistoryDo) WriteDB(ctx context.Context) *revisionHistoryDo {
-	return r.WithContext(ctx).Clauses(dbresolver.Write)
+func (r revisionHistoryDo) WriteDB() *revisionHistoryDo {
+	return r.Clauses(dbresolver.Write)
 }
 
 func (r revisionHistoryDo) Clauses(conds ...clause.Expression) *revisionHistoryDo {
@@ -330,6 +330,10 @@ func (r revisionHistoryDo) ScanByPage(result interface{}, offset int, limit int)
 
 	err = r.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (r revisionHistoryDo) Scan(result interface{}) (err error) {
+	return r.DO.Scan(result)
 }
 
 func (r *revisionHistoryDo) withDO(do gen.Dao) *revisionHistoryDo {

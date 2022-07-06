@@ -209,12 +209,12 @@ func (i indexSubjectDo) WithContext(ctx context.Context) *indexSubjectDo {
 	return i.withDO(i.DO.WithContext(ctx))
 }
 
-func (i indexSubjectDo) ReadDB(ctx context.Context) *indexSubjectDo {
-	return i.WithContext(ctx).Clauses(dbresolver.Read)
+func (i indexSubjectDo) ReadDB() *indexSubjectDo {
+	return i.Clauses(dbresolver.Read)
 }
 
-func (i indexSubjectDo) WriteDB(ctx context.Context) *indexSubjectDo {
-	return i.WithContext(ctx).Clauses(dbresolver.Write)
+func (i indexSubjectDo) WriteDB() *indexSubjectDo {
+	return i.Clauses(dbresolver.Write)
 }
 
 func (i indexSubjectDo) Clauses(conds ...clause.Expression) *indexSubjectDo {
@@ -416,6 +416,10 @@ func (i indexSubjectDo) ScanByPage(result interface{}, offset int, limit int) (c
 
 	err = i.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (i indexSubjectDo) Scan(result interface{}) (err error) {
+	return i.DO.Scan(result)
 }
 
 func (i *indexSubjectDo) withDO(do gen.Dao) *indexSubjectDo {

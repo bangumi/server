@@ -361,12 +361,12 @@ func (c castDo) WithContext(ctx context.Context) *castDo {
 	return c.withDO(c.DO.WithContext(ctx))
 }
 
-func (c castDo) ReadDB(ctx context.Context) *castDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Read)
+func (c castDo) ReadDB() *castDo {
+	return c.Clauses(dbresolver.Read)
 }
 
-func (c castDo) WriteDB(ctx context.Context) *castDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Write)
+func (c castDo) WriteDB() *castDo {
+	return c.Clauses(dbresolver.Write)
 }
 
 func (c castDo) Clauses(conds ...clause.Expression) *castDo {
@@ -568,6 +568,10 @@ func (c castDo) ScanByPage(result interface{}, offset int, limit int) (count int
 
 	err = c.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (c castDo) Scan(result interface{}) (err error) {
+	return c.DO.Scan(result)
 }
 
 func (c *castDo) withDO(do gen.Dao) *castDo {

@@ -10,7 +10,7 @@ const TableNameUserGroup = "chii_usergroup"
 type UserGroup struct {
 	ID       uint8  `gorm:"column:usr_grp_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
 	Name     string `gorm:"column:usr_grp_name;type:varchar(255);not null"`
-	Perm     bytes  `gorm:"column:usr_grp_perm;type:mediumtext;not null"`
+	Perm     []byte `gorm:"column:usr_grp_perm;type:mediumtext;not null"`
 	Dateline uint32 `gorm:"column:usr_grp_dateline;type:int(10) unsigned;not null"`
 }
 
