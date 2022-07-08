@@ -48,12 +48,11 @@ func main() {
 
 	fmt.Println("dumping data with args:", os.Args)
 
-	out := pflag.String("out", "archive.zip", "zip file output location")
-	if out == nil {
-		*out = "archive.zip"
-	}
+	var out string
+	pflag.StringVar(&out, "out", "archive.zip", "zip file output location")
+	pflag.Parse()
 
-	start(*out)
+	start(out)
 }
 
 var ctx = context.Background() //nolint:gochecknoglobals
