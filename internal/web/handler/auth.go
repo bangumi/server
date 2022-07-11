@@ -23,7 +23,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/req"
@@ -104,7 +104,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain
 	}
 
 	c.Cookie(&fiber.Cookie{
-		Name:     session.Key,
+		Name:     session.CookieKey,
 		Value:    key,
 		MaxAge:   timex.OneWeekSec * 2,
 		Secure:   !config.Development,
@@ -135,12 +135,12 @@ func (h Handler) PrivateLogout(c *fiber.Ctx) error {
 		return res.Unauthorized("you are not logged-in")
 	}
 
-	sessionID := utils.UnsafeString(c.Context().Request.Header.Cookie(session.Key))
+	sessionID := utils.UnsafeString(c.Context().Request.Header.Cookie(session.CookieKey))
 	if err := h.session.Revoke(c.Context(), sessionID); err != nil {
 		return h.InternalError(c, err, "failed to revoke session", zap.String("session_id", sessionID))
 	}
 
-	cookie.Clear(c, session.Key)
+	cookie.Clear(c, session.CookieKey)
 	c.Status(http.StatusNoContent)
 
 	return nil

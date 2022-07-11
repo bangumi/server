@@ -18,7 +18,7 @@ import (
 	"strconv"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
+	"github.com/bangumi/server/internal/pkg/strparse"
 	"github.com/bangumi/server/internal/web/res"
 )
 

@@ -12,25 +12,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package logger
+//nolint:goerr113
+package errgo_test
 
 import (
-	"path/filepath"
-	"runtime"
-	"strings"
+	"errors"
+	"testing"
 
-	"go.uber.org/zap/zapcore"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func getCallerEncoder() zapcore.CallerEncoder {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		return zapcore.FullCallerEncoder
-	}
-
-	prefix := filepath.ToSlash(filepath.Join(file, "../../..")) + "/"
-
-	return func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(strings.TrimPrefix(caller.String(), prefix))
-	}
+func TestWrap(t *testing.T) {
+	t.Parallel()
+	err := errors.New("raw")
+	require.Equal(t, "wrap: raw", errgo.Wrap(err, "wrap").Error())
 }

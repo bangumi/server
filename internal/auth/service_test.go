@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 func getService() domain.AuthService {
@@ -68,7 +68,7 @@ func TestService_GetByTokenWithCache_cached(t *testing.T) {
 
 	var c = mocks.NewCache(t)
 	c.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).
-		Run(func(ctx context.Context, key string, value interface{}) {
+		Run(func(ctx context.Context, key string, value any) {
 			vOut := reflect.ValueOf(value).Elem()
 			vOut.Set(reflect.ValueOf(domain.Auth{GroupID: 2}))
 		}).Return(true, nil)

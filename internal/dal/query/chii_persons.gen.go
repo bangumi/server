@@ -258,12 +258,12 @@ func (p personDo) WithContext(ctx context.Context) *personDo {
 	return p.withDO(p.DO.WithContext(ctx))
 }
 
-func (p personDo) ReadDB(ctx context.Context) *personDo {
-	return p.WithContext(ctx).Clauses(dbresolver.Read)
+func (p personDo) ReadDB() *personDo {
+	return p.Clauses(dbresolver.Read)
 }
 
-func (p personDo) WriteDB(ctx context.Context) *personDo {
-	return p.WithContext(ctx).Clauses(dbresolver.Write)
+func (p personDo) WriteDB() *personDo {
+	return p.Clauses(dbresolver.Write)
 }
 
 func (p personDo) Clauses(conds ...clause.Expression) *personDo {
@@ -465,6 +465,10 @@ func (p personDo) ScanByPage(result interface{}, offset int, limit int) (count i
 
 	err = p.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (p personDo) Scan(result interface{}) (err error) {
+	return p.DO.Scan(result)
 }
 
 func (p *personDo) withDO(do gen.Dao) *personDo {

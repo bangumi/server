@@ -233,12 +233,12 @@ func (s subjectRevisionDo) WithContext(ctx context.Context) *subjectRevisionDo {
 	return s.withDO(s.DO.WithContext(ctx))
 }
 
-func (s subjectRevisionDo) ReadDB(ctx context.Context) *subjectRevisionDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Read)
+func (s subjectRevisionDo) ReadDB() *subjectRevisionDo {
+	return s.Clauses(dbresolver.Read)
 }
 
-func (s subjectRevisionDo) WriteDB(ctx context.Context) *subjectRevisionDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Write)
+func (s subjectRevisionDo) WriteDB() *subjectRevisionDo {
+	return s.Clauses(dbresolver.Write)
 }
 
 func (s subjectRevisionDo) Clauses(conds ...clause.Expression) *subjectRevisionDo {
@@ -440,6 +440,10 @@ func (s subjectRevisionDo) ScanByPage(result interface{}, offset int, limit int)
 
 	err = s.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (s subjectRevisionDo) Scan(result interface{}) (err error) {
+	return s.DO.Scan(result)
 }
 
 func (s *subjectRevisionDo) withDO(do gen.Dao) *subjectRevisionDo {

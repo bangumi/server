@@ -25,3 +25,12 @@ const (
 	OneDay  = 24 * time.Hour
 	OneWeek = 7 * 24 * time.Hour
 )
+
+type numberT interface {
+	int8 | int16 | int32 | int | int64
+}
+
+// Second convert an integer N to time.Duration present N seconds.
+func Second[T numberT](second T) time.Duration {
+	return time.Duration(second) * time.Second
+}

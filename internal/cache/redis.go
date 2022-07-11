@@ -22,8 +22,8 @@ import (
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 // NewRedisCache create a redis backed cache.
@@ -36,7 +36,7 @@ type redisCache struct {
 }
 
 func (c redisCache) Get(
-	ctx context.Context, key string, value interface{}) (bool, error) {
+	ctx context.Context, key string, value any) (bool, error) {
 	raw, err := c.r.Get(ctx, key).Bytes()
 	if err != nil {
 		if err == redis.Nil {
@@ -58,7 +58,7 @@ func (c redisCache) Get(
 }
 
 func (c redisCache) Set(
-	ctx context.Context, key string, value interface{}, ttl time.Duration) error {
+	ctx context.Context, key string, value any, ttl time.Duration) error {
 	b, err := json.MarshalWithOption(value, json.DisableHTMLEscape())
 	if err != nil {
 		return errgo.Wrap(err, "json")

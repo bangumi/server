@@ -119,12 +119,12 @@ func (i indexCommentDo) WithContext(ctx context.Context) *indexCommentDo {
 	return i.withDO(i.DO.WithContext(ctx))
 }
 
-func (i indexCommentDo) ReadDB(ctx context.Context) *indexCommentDo {
-	return i.WithContext(ctx).Clauses(dbresolver.Read)
+func (i indexCommentDo) ReadDB() *indexCommentDo {
+	return i.Clauses(dbresolver.Read)
 }
 
-func (i indexCommentDo) WriteDB(ctx context.Context) *indexCommentDo {
-	return i.WithContext(ctx).Clauses(dbresolver.Write)
+func (i indexCommentDo) WriteDB() *indexCommentDo {
+	return i.Clauses(dbresolver.Write)
 }
 
 func (i indexCommentDo) Clauses(conds ...clause.Expression) *indexCommentDo {
@@ -326,6 +326,10 @@ func (i indexCommentDo) ScanByPage(result interface{}, offset int, limit int) (c
 
 	err = i.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (i indexCommentDo) Scan(result interface{}) (err error) {
+	return i.DO.Scan(result)
 }
 
 func (i *indexCommentDo) withDO(do gen.Dao) *indexCommentDo {

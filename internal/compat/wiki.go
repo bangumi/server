@@ -18,8 +18,8 @@ import (
 	"github.com/bangumi/server/pkg/wiki"
 )
 
-func V0Wiki(s wiki.Wiki) []interface{} {
-	r := make([]interface{}, len(s.Fields))
+func V0Wiki(s wiki.Wiki) []any {
+	r := make([]any, len(s.Fields))
 
 	var valuesCount int
 	for _, field := range s.Fields {

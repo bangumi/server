@@ -29,8 +29,8 @@ const TplLogin = "login.gohtml"
 const TplListAccessToken = "list-access-token.gohtml"
 const TplCreateAccessToken = "create-access-token.gohtml"
 
-func filters() map[string]interface{} {
-	return map[string]interface{}{
+func filters() map[string]any {
+	return map[string]any{
 		"RandInt": func() int {
 			return rand.Intn(6) //nolint:gomnd,gosec
 		},
@@ -45,7 +45,7 @@ type TemplateEngine struct {
 }
 
 var _ interface {
-	Execute(w io.Writer, name string, data interface{}) error
+	Execute(w io.Writer, name string, data any) error
 } = TemplateEngine{}
 
 type Login struct {

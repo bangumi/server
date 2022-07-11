@@ -23,22 +23,21 @@ import (
 	"github.com/goccy/go-json"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/web/captcha"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 const VerifyURL = "https://hcaptcha.com/siteverify"
 
-type manager struct {
+type Manager struct {
 	http   *resty.Client
 	secret string
 }
 
-func New(cfg config.AppConfig, http *resty.Client) captcha.Manager {
-	return manager{secret: cfg.HCaptchaSecretKey, http: http}
+func New(cfg config.AppConfig, http *resty.Client) Manager {
+	return Manager{secret: cfg.HCaptchaSecretKey, http: http}
 }
 
-func (m manager) Verify(ctx context.Context, response string) (bool, error) {
+func (m Manager) Verify(ctx context.Context, response string) (bool, error) {
 	resp, err := m.http.R().SetFormData(map[string]string{
 		"response": response,
 		"secret":   m.secret,
@@ -57,11 +56,11 @@ func (m manager) Verify(ctx context.Context, response string) (bool, error) {
 }
 
 type hCaptcha struct {
-	ChallengeTS time.Time     `json:"challenge_ts"`
-	Hostname    string        `json:"hostname"`
-	ErrorCodes  []string      `json:"error-codes"`
-	ScoreReason []interface{} `json:"score_reason"`
-	Score       float64       `json:"score"`
-	Credit      bool          `json:"credit"`
-	Success     bool          `json:"success"`
+	ChallengeTS time.Time `json:"challenge_ts"`
+	Hostname    string    `json:"hostname"`
+	ErrorCodes  []string  `json:"error-codes"`
+	ScoreReason []any     `json:"score_reason"`
+	Score       float64   `json:"score"`
+	Credit      bool      `json:"credit"`
+	Success     bool      `json:"success"`
 }

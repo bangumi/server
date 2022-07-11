@@ -29,7 +29,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 func getRepo(t *testing.T) (domain.GroupRepo, *query.Query) {

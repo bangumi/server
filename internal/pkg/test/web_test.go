@@ -15,34 +15,32 @@
 package test_test
 
 import (
-	"net/http"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
-type res struct {
-	Q string `json:"q"`
-	I int    `json:"i"`
-}
-
-func TestClientFullExample(t *testing.T) {
+func TestGetWebApp(t *testing.T) {
 	t.Parallel()
-	app := fiber.New()
 
-	app.Get("/test", func(c *fiber.Ctx) error {
-		return c.JSON(res{I: 5, Q: c.Query("q")})
-	})
+	test.GetWebApp(t,
+		test.Mock{
+			SubjectRepo: mocks.NewSubjectRepo(t),
+			AuthRepo:    mocks.NewAuthRepo(t),
+			EpisodeRepo: mocks.NewEpisodeRepo(t),
+			CommentRepo: mocks.NewCommentRepo(t),
+			TopicRepo:   mocks.NewTopicRepo(t),
+			Cache:       mocks.NewCache(t),
+		},
+	)
 
-	var r res
-	test.New(t).Get("/test").Query("q", "v").
-		Execute(app).
-		JSON(&r).
-		ExpectCode(http.StatusOK)
-
-	require.Equal(t, 5, r.I)
-	require.Equal(t, "v", r.Q)
+	test.GetWebApp(t,
+		test.Mock{
+			SubjectRepo: mocks.NewSubjectRepo(t),
+			AuthRepo:    mocks.NewAuthRepo(t),
+			EpisodeRepo: mocks.NewEpisodeRepo(t),
+			Cache:       mocks.NewCache(t),
+		},
+	)
 }

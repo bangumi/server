@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 type RedisCacheTestItem struct {

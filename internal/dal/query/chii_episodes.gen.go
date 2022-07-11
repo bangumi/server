@@ -247,12 +247,12 @@ func (e episodeDo) WithContext(ctx context.Context) *episodeDo {
 	return e.withDO(e.DO.WithContext(ctx))
 }
 
-func (e episodeDo) ReadDB(ctx context.Context) *episodeDo {
-	return e.WithContext(ctx).Clauses(dbresolver.Read)
+func (e episodeDo) ReadDB() *episodeDo {
+	return e.Clauses(dbresolver.Read)
 }
 
-func (e episodeDo) WriteDB(ctx context.Context) *episodeDo {
-	return e.WithContext(ctx).Clauses(dbresolver.Write)
+func (e episodeDo) WriteDB() *episodeDo {
+	return e.Clauses(dbresolver.Write)
 }
 
 func (e episodeDo) Clauses(conds ...clause.Expression) *episodeDo {
@@ -454,6 +454,10 @@ func (e episodeDo) ScanByPage(result interface{}, offset int, limit int) (count 
 
 	err = e.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (e episodeDo) Scan(result interface{}) (err error) {
+	return e.DO.Scan(result)
 }
 
 func (e *episodeDo) withDO(do gen.Dao) *episodeDo {

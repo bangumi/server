@@ -123,12 +123,12 @@ func (s subjectTopicCommentDo) WithContext(ctx context.Context) *subjectTopicCom
 	return s.withDO(s.DO.WithContext(ctx))
 }
 
-func (s subjectTopicCommentDo) ReadDB(ctx context.Context) *subjectTopicCommentDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Read)
+func (s subjectTopicCommentDo) ReadDB() *subjectTopicCommentDo {
+	return s.Clauses(dbresolver.Read)
 }
 
-func (s subjectTopicCommentDo) WriteDB(ctx context.Context) *subjectTopicCommentDo {
-	return s.WithContext(ctx).Clauses(dbresolver.Write)
+func (s subjectTopicCommentDo) WriteDB() *subjectTopicCommentDo {
+	return s.Clauses(dbresolver.Write)
 }
 
 func (s subjectTopicCommentDo) Clauses(conds ...clause.Expression) *subjectTopicCommentDo {
@@ -330,6 +330,10 @@ func (s subjectTopicCommentDo) ScanByPage(result interface{}, offset int, limit 
 
 	err = s.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (s subjectTopicCommentDo) Scan(result interface{}) (err error) {
+	return s.DO.Scan(result)
 }
 
 func (s *subjectTopicCommentDo) withDO(do gen.Dao) *subjectTopicCommentDo {

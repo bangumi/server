@@ -25,8 +25,8 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/strutil"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"
@@ -36,7 +36,7 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
-var accessorPool = sync.Pool{New: func() interface{} { return &accessor{} }} //nolint:gochecknoglobals
+var accessorPool = sync.Pool{New: func() any { return &accessor{} }} //nolint:gochecknoglobals
 
 func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 	var a = accessorPool.Get().(*accessor) //nolint:forcetypeassert
@@ -44,12 +44,12 @@ func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 	defer a.reset()
 	a.fillBasicInfo(c)
 
-	value := utils.UnsafeString(c.Context().Request.Header.Cookie(session.Key))
+	value := utils.UnsafeString(c.Context().Request.Header.Cookie(session.CookieKey))
 	if value != "" {
 		s, err := h.getSession(c, value)
 		if err != nil {
 			if errors.Is(err, session.ErrExpired) || errors.Is(err, domain.ErrNotFound) {
-				cookie.Clear(c, session.Key)
+				cookie.Clear(c, session.CookieKey)
 				return c.Next()
 			}
 
@@ -95,7 +95,7 @@ func (h Handler) AccessTokenAuthMiddleware(ctx *fiber.Ctx) error {
 		var err error
 		if auth, err = h.a.GetByTokenWithCache(ctx.Context(), token); err != nil {
 			if errors.Is(err, domain.ErrNotFound) || errors.Is(err, session.ErrExpired) {
-				cookie.Clear(ctx, session.Key)
+				cookie.Clear(ctx, session.CookieKey)
 				return res.Unauthorized("access token has been expired or doesn't exist")
 			}
 

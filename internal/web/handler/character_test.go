@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -62,7 +62,7 @@ func TestHandler_GetCharacter_Redirect(t *testing.T) {
 func TestHandler_GetCharacter_Redirect_cached(t *testing.T) {
 	t.Parallel()
 	c := mocks.NewCache(t)
-	c.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Run(func(_ context.Context, _ string, value interface{}) {
+	c.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Run(func(_ context.Context, _ string, value any) {
 		reflect.ValueOf(value).Elem().Set(reflect.ValueOf(res.CharacterV0{Redirect: 8}))
 	}).Return(true, nil)
 

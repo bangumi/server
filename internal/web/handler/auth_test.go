@@ -28,8 +28,8 @@ import (
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/pkg/timex"
-	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -93,13 +93,13 @@ func TestHandler_PrivateLogout(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{SessionManager: mockCaptcha})
 
-	resp := test.New(t).Post("/p/logout").Cookie(session.Key, "req").Execute(app)
+	resp := test.New(t).Post("/p/logout").Cookie(session.CookieKey, "req").Execute(app)
 
 	require.Equal(t, http.StatusNoContent, resp.StatusCode, resp.BodyString())
 
 	var found bool
 	for _, cookie := range resp.Cookies() {
-		if cookie.Name == session.Key {
+		if cookie.Name == session.CookieKey {
 			found = true
 			require.Equal(t, "", cookie.Value)
 		}

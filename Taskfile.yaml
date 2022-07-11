@@ -58,7 +58,7 @@ tasks:
   test-all:
     desc: Run all tests, need mysql and redis, except hCaptcha tests, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
     cmds:
-      - task: test
+      - go test -timeout 3s -json -tags test {{.CLI_ARGS}} ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
@@ -66,7 +66,7 @@ tasks:
   test-all-with-http:
     desc: Run all tests, need mysql and redis, alias for `TEST_MYSQL=1 TEST_REDIS=1 TEST_HTTP=1 task test`
     cmds:
-      - task: test
+      - go test -timeout 3s -json -tags test {{.CLI_ARGS}} ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
@@ -129,11 +129,11 @@ tasks:
   gotestfmt:
     silent: true
     sources:
-      - go.mod
+      - ./internal/pkg/tools/go.mod
     generates:
       - .bin/gotestfmt.exe
     cmds:
-      - go build -o .bin/gotestfmt.exe github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt
+      - cd ./internal/pkg/tools; go build -o ../../../.bin/gotestfmt.exe github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt
 
   clean:
     cmds:

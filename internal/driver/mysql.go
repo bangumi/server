@@ -25,8 +25,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 var setLoggerMutex = sync.Mutex{} //nolint:gochecknoglobals

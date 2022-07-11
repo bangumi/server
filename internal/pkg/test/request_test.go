@@ -12,20 +12,37 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//nolint:goerr113
-package errgo_test
+package test_test
 
 import (
-	"errors"
+	"net/http"
 	"testing"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func TestWrap(t *testing.T) {
+type res struct {
+	Q string `json:"q"`
+	I int    `json:"i"`
+}
+
+func TestClientFullExample(t *testing.T) {
 	t.Parallel()
-	err := errors.New("raw")
-	require.Equal(t, "wrap: raw", errgo.Wrap(err, "wrap").Error())
+	app := fiber.New()
+
+	app.Get("/test", func(c *fiber.Ctx) error {
+		return c.JSON(res{I: 5, Q: c.Query("q")})
+	})
+
+	var r res
+	test.New(t).Get("/test").Query("q", "v").
+		Execute(app).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
+
+	require.Equal(t, 5, r.I)
+	require.Equal(t, "v", r.Q)
 }

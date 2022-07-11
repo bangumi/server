@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
+	"github.com/bangumi/server/internal/pkg/strparse"
 )
 
 func TestUserID(t *testing.T) {

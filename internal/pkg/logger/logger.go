@@ -77,7 +77,7 @@ func Info(msg string, fields ...zapcore.Field) {
 }
 
 // Infoln log as info level with fmt.Sprintln.
-func Infoln(args ...interface{}) {
+func Infoln(args ...any) {
 	// remove \n from msg.
 	msg := fmt.Sprintln(args...)
 	log.Info(msg[:len(msg)-1])

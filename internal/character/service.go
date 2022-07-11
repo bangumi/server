@@ -18,8 +18,8 @@ import (
 	"context"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func NewService(c domain.CharacterRepo, s domain.SubjectRepo, p domain.PersonRepo) domain.CharacterService {

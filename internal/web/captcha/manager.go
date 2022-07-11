@@ -14,8 +14,23 @@
 
 package captcha
 
-import "context"
+import (
+	"context"
+
+	"github.com/go-resty/resty/v2"
+
+	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/web/captcha/hcaptcha"
+)
 
 type Manager interface {
 	Verify(ctx context.Context, response string) (bool, error)
+}
+
+func New(cfg config.AppConfig, http *resty.Client) (Manager, error) {
+	if cfg.HCaptchaSecretKey == "0x0000000000000000000000000000000000000000" {
+		return nopeManager{}, nil
+	}
+
+	return hcaptcha.New(cfg, http), nil
 }

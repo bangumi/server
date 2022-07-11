@@ -12,35 +12,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+package logger
 
 import (
-	"testing"
+	"path/filepath"
+	"runtime"
+	"strings"
 
-	"github.com/bangumi/server/internal/mocks"
-	"github.com/bangumi/server/internal/test"
+	"go.uber.org/zap/zapcore"
 )
 
-func TestGetWebApp(t *testing.T) {
-	t.Parallel()
+func getCallerEncoder() zapcore.CallerEncoder {
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		return zapcore.FullCallerEncoder
+	}
 
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: mocks.NewSubjectRepo(t),
-			AuthRepo:    mocks.NewAuthRepo(t),
-			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			CommentRepo: mocks.NewCommentRepo(t),
-			TopicRepo:   mocks.NewTopicRepo(t),
-			Cache:       mocks.NewCache(t),
-		},
-	)
+	prefix := filepath.ToSlash(filepath.Join(file, "../../../..")) + "/"
 
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: mocks.NewSubjectRepo(t),
-			AuthRepo:    mocks.NewAuthRepo(t),
-			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			Cache:       mocks.NewCache(t),
-		},
-	)
+	return func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(strings.TrimPrefix(caller.String(), prefix))
+	}
 }

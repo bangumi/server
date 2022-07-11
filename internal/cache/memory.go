@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 // NewMemoryCache return an in-memory cache.
@@ -40,11 +40,11 @@ type memCache struct {
 }
 
 type cacheItem struct {
-	Value interface{}
+	Value any
 	Dead  time.Time
 }
 
-func (c *memCache) Get(_ context.Context, key string, value interface{}) (bool, error) {
+func (c *memCache) Get(_ context.Context, key string, value any) (bool, error) {
 	v, ok := c.m.Load(key)
 	if !ok {
 		return ok, nil
@@ -77,7 +77,7 @@ func (c *memCache) Get(_ context.Context, key string, value interface{}) (bool, 
 	return true, nil
 }
 
-func (c *memCache) Set(_ context.Context, key string, value interface{}, ttl time.Duration) error {
+func (c *memCache) Set(_ context.Context, key string, value any, ttl time.Duration) error {
 	c.m.Store(key, cacheItem{
 		Value: value,
 		Dead:  time.Now().Add(ttl),

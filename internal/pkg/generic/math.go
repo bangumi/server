@@ -12,7 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dao
+package generic
 
-// delete this after https://github.com/go-gorm/gen/issues/496 is fixed.
-type bytes = []byte
+type Number interface {
+	Integer | Float
+}
+
+type Signed interface {
+	int8 | int16 | int32 | int64 | int
+}
+
+type Unsigned interface {
+	uint8 | uint16 | uint32 | uint64 | uint
+}
+
+type Integer interface {
+	Signed | Unsigned
+}
+
+type Float interface {
+	float32 | float64
+}
+
+func Min[T Number](a, b T) T {
+	if a < b {
+		return a
+	}
+
+	return b
+}

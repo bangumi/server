@@ -119,12 +119,12 @@ func (c characterCommentDo) WithContext(ctx context.Context) *characterCommentDo
 	return c.withDO(c.DO.WithContext(ctx))
 }
 
-func (c characterCommentDo) ReadDB(ctx context.Context) *characterCommentDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Read)
+func (c characterCommentDo) ReadDB() *characterCommentDo {
+	return c.Clauses(dbresolver.Read)
 }
 
-func (c characterCommentDo) WriteDB(ctx context.Context) *characterCommentDo {
-	return c.WithContext(ctx).Clauses(dbresolver.Write)
+func (c characterCommentDo) WriteDB() *characterCommentDo {
+	return c.Clauses(dbresolver.Write)
 }
 
 func (c characterCommentDo) Clauses(conds ...clause.Expression) *characterCommentDo {
@@ -326,6 +326,10 @@ func (c characterCommentDo) ScanByPage(result interface{}, offset int, limit int
 
 	err = c.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (c characterCommentDo) Scan(result interface{}) (err error) {
+	return c.DO.Scan(result)
 }
 
 func (c *characterCommentDo) withDO(do gen.Dao) *characterCommentDo {

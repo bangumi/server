@@ -23,7 +23,7 @@ import (
 
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 func TestHandler_GetIndex_HappyPath(t *testing.T) {

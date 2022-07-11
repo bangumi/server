@@ -23,7 +23,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 var errInternal = errors.New("internal server error")

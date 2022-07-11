@@ -18,12 +18,6 @@ scripts to generate ORM struct from mysql server
 NOTICE:
 	Don't use `UpdatedAt` and `CreatedAt` as field name, gorm may change these fields unexpectedly.
 	Use `UpdatedTime` and `CreatedTime` instead.
-
-TODO:
-NOTICE:
-	use `gen.FieldType("...", "bytes")` to generate field with `[]byte` type
-	This is a bug of gorm/gen.
-	https://github.com/go-gorm/gen/issues/496
 */
 
 // nolint
@@ -59,14 +53,11 @@ func main() {
 	// ### if you want to query without context constrain, set mode gen.WithoutContext ###
 	const dalBase = "./internal/dal"
 	g := gen.NewGenerator(gen.Config{
-		OutPath:       dalBase + "/query",
-		OutFile:       dalBase + "/query/gen.go",
-		ModelPkgPath:  dalBase + "/dao",
-		FieldNullable: false,
+		OutPath:      dalBase + "/query",
+		OutFile:      dalBase + "/query/gen.go",
+		ModelPkgPath: dalBase + "/dao",
 		// if you want the nullable field generation property to be pointer type, set FieldNullable true
-		/* FieldNullable: true,*/
-		// if you want to generate index tags from database, set FieldWithIndexTag true
-		FieldWithIndexTag: true,
+		FieldNullable: false,
 		// if you want to generate type tags from database, set FieldWithTypeTag true
 		FieldWithTypeTag: true,
 		// if you need unit tests for query code, set WithUnitTest true
@@ -136,7 +127,7 @@ func main() {
 		gen.FieldType("uid", userIDTypeString),
 		gen.FieldRename("SIGN", "Sign"),
 		gen.FieldType("regdate", "int64"),
-		gen.FieldType("password_crypt", "bytes"),
+		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
 		gen.FieldRename("SIGN", "sign"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
@@ -152,7 +143,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_usergroup", "UserGroup",
 		gen.FieldTrimPrefix("usr_grp_"),
 		gen.FieldType("usr_grp_id", "uint8"),
-		gen.FieldType("usr_grp_perm", "bytes"),
+		gen.FieldType("usr_grp_perm", "[]byte"),
 	))
 
 	var oauthApp = g.GenerateModelAs("chii_apps", "App",
@@ -178,7 +169,7 @@ func main() {
 		gen.FieldType("type", "uint8"),
 		gen.FieldType("id", "uint32"),
 		gen.FieldType("scope", "*string"),
-		gen.FieldType("info", "bytes"),
+		gen.FieldType("info", "[]byte"),
 		gen.FieldRename("expires", "ExpiredAt"),
 	))
 
@@ -239,7 +230,7 @@ func main() {
 		gen.FieldType("field_airtime", "uint8"),
 		gen.FieldType("field_week_day", "int8"),
 		gen.FieldType("field_redirect", subjectIDTypeString),
-		gen.FieldType("field_tags", "bytes"),
+		gen.FieldType("field_tags", "[]byte"),
 		// gen.FieldType("field_date","string"),
 	)
 
@@ -370,9 +361,8 @@ func main() {
 		gen.FieldRename("grp_creator", "CreatorID"),
 		gen.FieldRename("grp_desc", "Description"),
 		gen.FieldRename("grp_builddate", "CreatedTime"),
-		gen.FieldRename("grp_lastpost", "LastPostedAt"),
-		gen.FieldNewTag("grp_lastpost", "doc:always 0"),
-		// gen.FieldIgnore("grp_lastpost", "grp_posts"), // always 0
+		gen.FieldRename("grp_lastpost", "LastPostedTime"),
+		gen.FieldComment("grp_lastpost", "目前永远是0"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_group_members", "GroupMember",

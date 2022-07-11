@@ -31,19 +31,19 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
-	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web"
-	"github.com/bangumi/server/internal/web/captcha/hcaptcha"
+	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/rate"
@@ -90,7 +90,7 @@ func start() error {
 		),
 
 		fx.Provide(
-			session.NewMysqlRepo, rate.New, hcaptcha.New, session.New, handler.New, web.New, frontend.NewTemplateEngine,
+			session.NewMysqlRepo, rate.New, captcha.New, session.New, handler.New, web.New, frontend.NewTemplateEngine,
 		),
 
 		fx.Invoke(web.ResistRouter),

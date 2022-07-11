@@ -9,9 +9,9 @@ const TableNamePersonComment = "chii_prsn_comments"
 // PersonComment mapped from table <chii_prsn_comments>
 type PersonComment struct {
 	ID          uint32 `gorm:"column:prsn_pst_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	MentionedID uint32 `gorm:"column:prsn_pst_mid;type:mediumint(8) unsigned;not null;index:cmt_prsn_id,priority:1"` // 关联人物ID
-	UID         uint32 `gorm:"column:prsn_pst_uid;type:mediumint(8) unsigned;not null;index:prsn_pst_uid,priority:1"`
-	Related     uint32 `gorm:"column:prsn_pst_related;type:mediumint(8) unsigned;not null;index:prsn_pst_related,priority:1"`
+	MentionedID uint32 `gorm:"column:prsn_pst_mid;type:mediumint(8) unsigned;not null"` // 关联人物ID
+	UID         uint32 `gorm:"column:prsn_pst_uid;type:mediumint(8) unsigned;not null"`
+	Related     uint32 `gorm:"column:prsn_pst_related;type:mediumint(8) unsigned;not null"`
 	CreatedTime uint32 `gorm:"column:prsn_pst_dateline;type:int(10) unsigned;not null"`
 	Content     string `gorm:"column:prsn_pst_content;type:mediumtext;not null"`
 }

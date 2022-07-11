@@ -6,6 +6,10 @@ web 相关的组件和 handler 在[internal/web/](../internal/web) 文件夹中�
 
 service 和 repository 在[internal/domain/](../internal/domain)定义为 interface，在各个子文件夹(如[internal/subject/](internal/subject)) 中实现。
 
+## 数据库
+
+`bangumi/dev-env` 仓库仅导出了部分表和数据。如果对应表定义和数据缺失请联系 @Trim21 进行导出。
+
 ## 依赖注入
 
 项目使用 https://github.com/uber-go/fx 进行依赖注入。
@@ -49,7 +53,7 @@ import (
 	"testing"
 
 	"github.com/bangumi/server/internal/mocks"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 func TestHandler_Mock_Example(t *testing.T) {
@@ -79,7 +83,7 @@ package auth_test
 import (
 	"testing"
 
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 
