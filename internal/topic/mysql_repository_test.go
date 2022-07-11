@@ -24,7 +24,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/topic"
 )
 
