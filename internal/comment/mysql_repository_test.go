@@ -59,7 +59,7 @@ func TestMysqlRepo_GetByRelateIDs(t *testing.T) {
 	s, err := repo.GetByRelateIDs(context.Background(), domain.CommentTypeSubjectTopic, 47948)
 	require.NoError(t, err)
 
-	require.True(t, len(s) == 4, "fetch related comments")
+	require.Len(t, s, 1, "fetch related comments")
 }
 
 func TestMysqlRepo_Count(t *testing.T) {
