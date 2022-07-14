@@ -19,7 +19,6 @@ import (
 
 	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/pkg/wiki"
 )
 
 type v0wiki = []any
@@ -43,29 +42,6 @@ type SubjectV0 struct {
 	Locked        bool                  `json:"locked"`
 	NSFW          bool                  `json:"nsfw"`
 	TypeID        model.SubjectType     `json:"type"`
-}
-
-type Subject struct {
-	Image        SubjectImages         `json:"images"`
-	Infobox      string                `json:"infobox"`
-	Name         string                `json:"name"`
-	NameCN       string                `json:"name_cn"`
-	Summary      string                `json:"summary"`
-	PlatformText string                `json:"platform_text"`
-	TypeText     string                `json:"type_text"`
-	Wiki         wiki.Wiki             `json:"wiki"`
-	Tags         []compat.Tag          `json:"tags"`
-	Rating       Rating                `json:"rating"`
-	Collection   SubjectCollectionStat `json:"collection"`
-	Volumes      uint32                `json:"volumes"`
-	Eps          uint32                `json:"eps"`
-	ID           model.SubjectID       `json:"id"`
-	Redirect     uint32                `json:"-"`
-	Platform     uint16                `json:"platform_id"`
-	Airtime      uint8                 `json:"air_time"`
-	Locked       bool                  `json:"locked"`
-	NSFW         bool                  `json:"nsfw"`
-	TypeID       model.SubjectType     `json:"type_id"`
 }
 
 type SubjectCollectionStat struct {

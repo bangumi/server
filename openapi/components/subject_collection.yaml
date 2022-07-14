@@ -50,3 +50,5 @@ properties:
   private:
     title: Private
     type: boolean
+  subject:
+    $ref: "./subject_v0.yaml"
