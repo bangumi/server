@@ -97,8 +97,10 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
-		MockTopicRepo(m.TopicRepo),
-		MockCommentRepo(m.CommentRepo),
+		fx.Provide(
+			func() domain.CommentRepo { return m.CommentRepo },
+			func() domain.TopicRepo { return m.TopicRepo },
+		),
 		MockAuthRepo(m.AuthRepo),
 		MockOAuthManager(m.OAuthManager),
 		MockAuthService(m.AuthService),
