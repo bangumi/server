@@ -34,6 +34,10 @@ func (s service) Get(ctx context.Context, id model.SubjectID) (model.Subject, er
 	return s.repo.Get(ctx, id) //nolint:wrapcheck
 }
 
+func (s service) GetByIDs(ctx context.Context, ids ...model.SubjectID) (map[model.SubjectID]model.Subject, error) {
+	return s.repo.GetByIDs(ctx, ids...) //nolint:wrapcheck
+}
+
 func (s service) GetPersonRelated(
 	ctx context.Context, personID model.PersonID,
 ) ([]model.SubjectPersonRelation, error) {

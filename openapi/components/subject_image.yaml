@@ -1,0 +1,24 @@
+title: Images
+required:
+  - large
+  - common
+  - medium
+  - small
+  - grid
+type: object
+properties:
+  large:
+    title: Large
+    type: string
+  common:
+    title: Common
+    type: string
+  medium:
+    title: Medium
+    type: string
+  small:
+    title: Small
+    type: string
+  grid:
+    title: Grid
+    type: string

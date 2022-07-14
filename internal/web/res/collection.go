@@ -31,4 +31,5 @@ type SubjectCollection struct {
 	Type        model.CollectionType `json:"type"`
 	Rate        uint8                `json:"rate"`
 	Private     bool                 `json:"private"`
+	Subject     SubjectV0            `json:"subject"`
 }
