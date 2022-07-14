@@ -50,17 +50,7 @@ properties:
   images:
     $ref: "./subject_image.yaml"
   infobox:
-    title: Infobox
-    type: array
-    items:
-      title: V
-      required:
-        - v
-      type: object
-      properties:
-        v:
-          title: V
-          type: string
+    $ref: "./wiki_v0.yaml"
   volumes:
     title: Volumes
     type: integer
