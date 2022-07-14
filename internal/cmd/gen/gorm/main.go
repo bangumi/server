@@ -125,11 +125,9 @@ func main() {
 	modelMember := g.GenerateModelAs("chii_members", "Member",
 		gen.FieldRename("uid", "ID"),
 		gen.FieldType("uid", userIDTypeString),
-		gen.FieldRename("SIGN", "Sign"),
 		gen.FieldType("regdate", "int64"),
 		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
-		gen.FieldRename("SIGN", "sign"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
 			GORMTag: "foreignKey:uid;references:uid",
 		}))
