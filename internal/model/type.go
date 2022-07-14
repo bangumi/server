@@ -38,8 +38,6 @@ var _ driver.Valuer = CharacterID(0)
 var _ driver.Valuer = SubjectID(0)
 var _ driver.Valuer = EpisodeID(0)
 var _ driver.Valuer = GroupID(0)
-var _ driver.Valuer = CommentID(0)
-var _ driver.Valuer = TopicID(0)
 
 func (v UserID) Value() (driver.Value, error) {
 	return int64(v), nil
@@ -63,12 +61,4 @@ func (v EpisodeID) Value() (driver.Value, error) {
 
 func (v GroupID) Value() (driver.Value, error) {
 	return int64(v), nil
-}
-
-func (c CommentID) Value() (driver.Value, error) {
-	return int64(c), nil
-}
-
-func (c TopicID) Value() (driver.Value, error) {
-	return int64(c), nil
 }
