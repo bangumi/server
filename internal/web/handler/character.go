@@ -80,7 +80,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(pagedComments)
+	return res.JSON(c, pagedComments)
 }
 
 // first try to read from cache, then fallback to reading from database.

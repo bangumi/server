@@ -76,11 +76,10 @@ func (r mysqlRepo) Get(ctx context.Context, commentType domain.CommentType, id m
 	}, nil
 }
 
-//nolint:gocyclo
 func (r mysqlRepo) GetByRelateIDs(
 	ctx context.Context, commentType domain.CommentType, ids ...model.CommentID,
 ) (map[model.CommentID][]model.Comment, error) {
-	return nil, nil
+	return map[model.CommentID][]model.Comment{}, nil
 	// var (
 	// 	rawComments []model.Commenter
 	// 	err         error

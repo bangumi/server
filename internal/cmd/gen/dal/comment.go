@@ -81,7 +81,7 @@ func (c *TypeComment) statStub() uint8 {
 		content = strings.ReplaceAll(content, "TypeComment", name)
 
 		fileName := t.Name + ".go"
-		err := ioutil.WriteFile(filepath.Join("./internal/dal/dao/", fileName), []byte(content), 0600)
+		err := ioutil.WriteFile(filepath.Join("./internal/dal/dao/", fileName), []byte(content), 0600) //nolint:gomnd
 		if err != nil {
 			panic(err)
 		}

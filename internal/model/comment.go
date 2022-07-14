@@ -19,10 +19,10 @@ import "time"
 type Comment struct {
 	CreatedAt   time.Time
 	Content     string
-	CreatorID   UserID
-	State       uint8
-	ID          CommentID
 	SubComments []SubComment
+	CreatorID   UserID
+	ID          CommentID
+	State       uint8
 }
 
 type SubComment struct {

@@ -21,6 +21,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
@@ -57,7 +58,7 @@ func main() {
 }
 
 func start() error {
-	var app *fiber.App
+	var fiberApp *fiber.App
 	var cfg config.AppConfig
 
 	err := fx.New(
@@ -74,6 +75,8 @@ func start() error {
 				return httpClient
 			},
 		),
+
+		app.Module,
 
 		fx.Provide(
 			config.NewAppConfig, logger.Copy, metrics.NewScope,
@@ -95,12 +98,12 @@ func start() error {
 
 		fx.Invoke(web.ResistRouter),
 
-		fx.Populate(&app, &cfg),
+		fx.Populate(&fiberApp, &cfg),
 	).Err()
 
 	if err != nil {
 		return errgo.Wrap(err, "fx")
 	}
 
-	return errgo.Wrap(web.Start(cfg, app), "failed to start app")
+	return errgo.Wrap(web.Start(cfg, fiberApp), "failed to start fiberApp")
 }
