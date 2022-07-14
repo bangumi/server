@@ -60,7 +60,7 @@ func (h Handler) GetUser(c *fiber.Ctx) error {
 	user, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound("can't find user with username " + strconv.Quote(username))
+			return res.NotFound("can'topic find user with username " + strconv.Quote(username))
 		}
 
 		return h.InternalError(c, err, "failed to get user by username", zap.String("username", username))
@@ -82,7 +82,7 @@ func (h Handler) GetUserAvatar(c *fiber.Ctx) error {
 	user, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound("can't find user with username " + strconv.Quote(username))
+			return res.NotFound("can'topic find user with username " + strconv.Quote(username))
 		}
 
 		return h.InternalError(c, err, "failed to get user by username")

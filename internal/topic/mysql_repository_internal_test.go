@@ -29,7 +29,7 @@ func TestMysqlRepo_convertDao(t *testing.T) {
 
 	tests := []struct {
 		in interface{}
-		id uint32
+		id model.TopicID
 	}{
 		{
 			in: &dao.GroupTopic{ID: 1},

@@ -76,48 +76,6 @@ func (r mysqlRepo) Get(ctx context.Context, commentType domain.CommentType, id m
 	}, nil
 }
 
-func (r mysqlRepo) GetByRelateIDs(
-	ctx context.Context, commentType domain.CommentType, ids ...model.CommentID,
-) (map[model.CommentID][]model.Comment, error) {
-	return map[model.CommentID][]model.Comment{}, nil
-	// var (
-	// 	rawComments []model.Commenter
-	// 	err         error
-	// )
-	// switch commentType {
-	// case domain.CommentTypeGroupTopic:
-	// 	rawComments, err = wrapCommentDao(r.q.GroupTopicComment.WithContext(ctx).
-	// 		Where(r.q.GroupTopicComment.Related.In(ids...)).Find())
-	// case domain.CommentTypeSubjectTopic:
-	// 	rawComments, err = wrapCommentDao(r.q.SubjectTopicComment.WithContext(ctx).
-	// 		Where(r.q.SubjectTopicComment.Related.In(ids...)).Find())
-	// case domain.CommentIndex:
-	// 	rawComments, err = wrapCommentDao(r.q.IndexComment.WithContext(ctx).
-	// 		Where(r.q.IndexComment.Related.In(ids...)).Find())
-	// case domain.CommentCharacter:
-	// 	rawComments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
-	// 		Where(r.q.CharacterComment.Related.In(ids...)).Find())
-	// case domain.CommentPerson:
-	// 	rawComments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
-	// 		Where(r.q.CharacterComment.Related.In(ids...)).Find())
-	// case domain.CommentEpisode:
-	// 	rawComments, err = wrapCommentDao(r.q.EpisodeComment.WithContext(ctx).
-	// 		Where(r.q.EpisodeComment.Related.In(ids...)).Find())
-	// default:
-	// 	return nil, errUnsupportCommentType
-	// }
-	// if err != nil {
-	// 	if errors.Is(err, gorm.ErrRecordNotFound) {
-	// 		return nil, domain.ErrNotFound
-	// 	}
-	//
-	// 	r.log.Error("unexpected error happened", zap.Error(err))
-	// 	return nil, errgo.Wrap(err, "dal")
-	// }
-	//
-	// return convertModelComments(rawComments), nil
-}
-
 var errUnsupportCommentType = errors.New("comment type not support")
 
 func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id model.TopicID) (int64, error) {
@@ -154,6 +112,77 @@ func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id
 func (r mysqlRepo) List(
 	ctx context.Context, commentType domain.CommentType, id model.TopicID, limit int, offset int,
 ) ([]model.Comment, error) {
+	commentMap, err := r.getParentComments(ctx, commentType, id, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	var commentIDs = generic.MapIter(commentMap, func(k model.CommentID, item model.Comment) uint32 {
+		return uint32(item.ID)
+	})
+
+	var comments []model.Commenter
+	switch commentType {
+	case domain.CommentTypeGroupTopic:
+		comments, err = wrapCommentDao(r.q.GroupTopicComment.WithContext(ctx).
+			Where(r.q.GroupTopicComment.Related.In(commentIDs...), r.q.GroupTopicComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.GroupTopicComment.Related, r.q.GroupTopicComment.CreatedTime).Find())
+	case domain.CommentTypeSubjectTopic:
+		comments, err = wrapCommentDao(r.q.SubjectTopicComment.WithContext(ctx).
+			Where(r.q.SubjectTopicComment.Related.In(commentIDs...), r.q.SubjectTopicComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.SubjectTopicComment.Related, r.q.SubjectTopicComment.CreatedTime).Find())
+	case domain.CommentIndex:
+		comments, err = wrapCommentDao(r.q.IndexComment.WithContext(ctx).
+			Where(r.q.IndexComment.Related.In(commentIDs...), r.q.IndexComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.IndexComment.Related, r.q.IndexComment.CreatedTime).Find())
+	case domain.CommentCharacter:
+		comments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
+			Where(r.q.CharacterComment.Related.In(commentIDs...), r.q.CharacterComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.CharacterComment.Related, r.q.CharacterComment.CreatedTime).Find())
+	case domain.CommentPerson:
+		comments, err = wrapCommentDao(r.q.PersonComment.WithContext(ctx).
+			Where(r.q.PersonComment.Related.In(commentIDs...), r.q.PersonComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.PersonComment.Related, r.q.PersonComment.CreatedTime).Find())
+	case domain.CommentEpisode:
+		comments, err = wrapCommentDao(r.q.EpisodeComment.WithContext(ctx).
+			Where(r.q.EpisodeComment.Related.In(commentIDs...), r.q.EpisodeComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.EpisodeComment.Related, r.q.EpisodeComment.CreatedTime).Find())
+	default:
+		return nil, errUnsupportCommentType
+	}
+
+	if err != nil {
+		r.log.Error("failed to get sub replies")
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	for _, comment := range comments {
+		parent := commentMap[comment.RelatedTo()]
+
+		parent.SubComments = append(parent.SubComments, model.SubComment{
+			ID:          comment.CommentID(),
+			CreatorID:   comment.CreatorID(),
+			CreatedAt:   comment.CreateAt(),
+			Content:     comment.GetContent(),
+			Related:     comment.RelatedTo(),
+			State:       comment.GetState(),
+			MentionedID: comment.GetMentionedID(),
+		})
+
+		commentMap[parent.ID] = parent
+	}
+
+	data := generic.MapValues(commentMap)
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].CreatedAt.Before(data[j].CreatedAt)
+	})
+
+	return data, nil
+}
+
+func (r mysqlRepo) getParentComments(
+	ctx context.Context, commentType domain.CommentType, id model.TopicID, limit int, offset int,
+) (map[model.CommentID]model.Comment, error) {
 	var comments []model.Commenter
 	var err error
 
@@ -191,17 +220,8 @@ func (r mysqlRepo) List(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	return convertModelComments(comments), nil
-}
-
-func convertModelComments(in []model.Commenter) []model.Comment {
-	commentMap := map[model.CommentID]model.Comment{}
-	for _, comment := range in {
-		if comment.IsSubComment() {
-			continue
-		}
-
-		commentMap[comment.CommentID()] = model.Comment{
+	parents := generic.SliceMap(comments, func(comment model.Commenter) model.Comment {
+		return model.Comment{
 			CreatedAt:   comment.CreateAt(),
 			Content:     comment.GetContent(),
 			CreatorID:   comment.CreatorID(),
@@ -209,33 +229,9 @@ func convertModelComments(in []model.Commenter) []model.Comment {
 			ID:          comment.CommentID(),
 			SubComments: make([]model.SubComment, 0, 4),
 		}
-	}
-
-	for _, comment := range in {
-		if !comment.IsSubComment() {
-			continue
-		}
-
-		parent := commentMap[comment.RelatedTo()]
-
-		parent.SubComments = append(parent.SubComments, model.SubComment{
-			CreatedAt:   comment.CreateAt(),
-			Content:     comment.GetContent(),
-			CreatorID:   comment.CreatorID(),
-			Related:     comment.RelatedTo(),
-			State:       comment.GetState(),
-			ID:          comment.CommentID(),
-			MentionedID: comment.GetMentionedID(),
-		})
-
-		commentMap[comment.RelatedTo()] = parent
-	}
-
-	comments := generic.MapValues(commentMap)
-
-	sort.Slice(comments, func(i, j int) bool {
-		return comments[i].CreatedAt.Before(comments[j].CreatedAt)
 	})
 
-	return comments
+	return generic.SliceToMap(parents, func(item model.Comment) model.CommentID {
+		return item.ID
+	}), nil
 }

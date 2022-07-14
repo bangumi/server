@@ -12,30 +12,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package generic
 
-import (
-	"context"
+func SliceMap[T any, K any](in []T, fn func(item T) K) []K {
+	var s = make([]K, len(in))
+	for i, t := range in {
+		s[i] = fn(t)
+	}
 
-	"github.com/bangumi/server/internal/model"
-)
-
-type TopicRepo interface {
-	Get(ctx context.Context, topicType TopicType, id model.TopicID) (model.Topic, error)
-
-	// Count all topic for a subject/group.
-	Count(ctx context.Context, topicType TopicType, id uint32, statuses []model.TopicStatus) (int64, error)
-
-	// List return paged topic list of a subject/group.
-	List(
-		ctx context.Context, topicType TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int,
-	) ([]model.Topic, error)
+	return s
 }
 
-type TopicType uint32
+func SliceToMap[K comparable, T any](in []T, fn func(item T) K) map[K]T {
+	var s = make(map[K]T, len(in))
+	for _, t := range in {
+		s[fn(t)] = t
+	}
 
-const (
-	TopicTypeUnknown TopicType = iota
-	TopicTypeSubject
-	TopicTypeGroup
-)
+	return s
+}

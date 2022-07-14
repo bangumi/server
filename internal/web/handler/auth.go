@@ -62,7 +62,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	if !ok {
 		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
 			Title:       utils.StatusMessage(http.StatusBadRequest),
-			Description: "can't validate request body",
+			Description: "can'topic validate request body",
 			Details:     []string{"未通过hCaptcha验证"},
 		})
 	}

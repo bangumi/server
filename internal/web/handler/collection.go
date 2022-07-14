@@ -52,7 +52,7 @@ func (h Handler) ListCollection(c *fiber.Ctx) error {
 	u, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound("user doesn't exist or has been removed")
+			return res.NotFound("user doesn'topic exist or has been removed")
 		}
 
 		return errgo.Wrap(err, "user.GetByName")
@@ -124,7 +124,7 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 	u, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound("user doesn't exist or has been removed")
+			return res.NotFound("user doesn'topic exist or has been removed")
 		}
 
 		return h.InternalError(c, err, "failed to get user by name", zap.String("name", username))

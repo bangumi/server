@@ -31,7 +31,7 @@ const canViewStateDeleteTopic = -time.Hour * 24 * 180
 
 func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
 	u := h.getHTTPAccessor(c)
-	topic, err := h.t.Get(c.Context(), topicType, id)
+	topic, err := h.topic.Get(c.Context(), topicType, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return model.Topic{}, res.ErrNotFound
@@ -80,7 +80,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		statuses = append(statuses, model.TopicStatusReview)
 	}
 
-	topics, err := h.t.List(c.Context(), topicType, id, statuses, page.Limit, page.Offset)
+	topics, err := h.topic.List(c.Context(), topicType, id, statuses, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "repo.topic.GetTopics")
 	}
@@ -90,7 +90,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	count, err := h.t.Count(c.Context(), topicType, id, statuses)
+	count, err := h.topic.Count(c.Context(), topicType, id, statuses)
 	if err != nil {
 		return errgo.Wrap(err, "repo.topic.Count")
 	}

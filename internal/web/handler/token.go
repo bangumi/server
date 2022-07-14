@@ -77,7 +77,7 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 	}
 
 	if token.UserID != v.ID {
-		return res.Unauthorized("you don't have this token")
+		return res.Unauthorized("you don'topic have this token")
 	}
 
 	ok, err := h.a.DeleteAccessToken(c.Context(), r.ID)

@@ -23,9 +23,9 @@ import (
 type CommentRepo interface {
 	Get(ctx context.Context, commentType CommentType, id model.CommentID) (model.Comment, error)
 
-	GetByRelateIDs(
-		ctx context.Context, commentType CommentType, ids ...model.CommentID,
-	) (map[model.CommentID][]model.Comment, error)
+	// GetByRelateIDs(
+	// 	ctx context.Context, commentType CommentType, ids ...model.CommentID,
+	// ) (map[model.CommentID][]model.Comment, error)
 
 	// Count top comments for a topic/index/character/person/episode.
 	// 一级回复

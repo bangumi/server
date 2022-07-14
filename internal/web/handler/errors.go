@@ -49,7 +49,7 @@ func (h Handler) InternalError(c *fiber.Ctx, err error, message string, logField
 func (h Handler) ValidationError(c *fiber.Ctx, err error) error {
 	return res.JSON(c.Status(http.StatusUnprocessableEntity), res.Error{
 		Title:       utils.StatusMessage(http.StatusUnprocessableEntity),
-		Description: "can't validate request body",
+		Description: "can'topic validate request body",
 		Details:     h.translationValidationError(err),
 	})
 }

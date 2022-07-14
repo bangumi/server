@@ -24,3 +24,10 @@ type Paged struct {
 	Limit  int   `json:"limit"`
 	Offset int   `json:"offset"`
 }
+
+type PagedG[T any] struct {
+	Data   []T   `json:"data"`
+	Total  int64 `json:"total"`
+	Limit  int   `json:"limit"`
+	Offset int   `json:"offset"`
+}

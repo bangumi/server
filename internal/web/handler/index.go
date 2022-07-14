@@ -77,7 +77,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 	}
 
 	if e := h.cache.Set(c, key, r, time.Hour); e != nil {
-		h.log.Error("can't set response to cache", zap.Error(e))
+		h.log.Error("can'topic set response to cache", zap.Error(e))
 	}
 
 	return r, true, nil

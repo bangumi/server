@@ -49,8 +49,8 @@ func New(
 	e domain.EpisodeRepo,
 	collect domain.CollectionRepo,
 	r domain.RevisionRepo,
-	t domain.TopicRepo,
-	m domain.CommentRepo,
+	topic domain.TopicRepo,
+	comment domain.CommentRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
@@ -84,8 +84,8 @@ func New(
 		collect:              collect,
 		i:                    index,
 		r:                    r,
-		t:                    t,
-		comment:              m,
+		topic:                topic,
+		comment:              comment,
 		captcha:              captcha,
 		g:                    g,
 		v:                    validate,
@@ -112,8 +112,8 @@ type Handler struct {
 	rateLimit            rate.Manager
 	i                    domain.IndexRepo
 	r                    domain.RevisionRepo
+	topic                domain.TopicRepo
 	comment              domain.CommentRepo
-	t                    domain.TopicRepo
 	g                    domain.GroupRepo
 	cache                cache.Generic
 	validatorTranslation ut.Translator

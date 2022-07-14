@@ -50,19 +50,6 @@ func TestGet(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestMysqlRepo_GetByRelateIDs(t *testing.T) {
-	t.Skip()
-	test.RequireEnv(t, test.EnvMysql)
-	t.Parallel()
-
-	repo := getRepo(t)
-
-	s, err := repo.GetByRelateIDs(context.Background(), domain.CommentTypeSubjectTopic, 47948)
-	require.NoError(t, err)
-
-	require.Len(t, s, 1, "fetch related comments")
-}
-
 func TestMysqlRepo_Count(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()

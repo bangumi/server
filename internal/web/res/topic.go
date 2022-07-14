@@ -28,18 +28,25 @@ type Topics struct {
 }
 
 type Topic struct {
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
-	Comments  *Paged        `json:"comments,omitempty"`
-	Title     string        `json:"title"`
-	Creator   User          `json:"creator"`
-	ID        model.TopicID `json:"id"`
-	Replies   uint32        `json:"replies"`
+	CreatedAt time.Time       `json:"created_at"`
+	UpdatedAt time.Time       `json:"updated_at"`
+	Title     string          `json:"title"`
+	Creator   User            `json:"creator"`
+	Comments  PagedG[Comment] `json:"comments,omitempty"`
+	ID        model.TopicID   `json:"id"`
+	Replies   uint32          `json:"replies"`
 }
 
 type Comment struct {
 	CreatedAt time.Time       `json:"created_at"`
-	Replies   []Comment       `json:"replies"`
+	Replies   []SubComment    `json:"replies"`
+	Text      string          `json:"text"`
+	Creator   User            `json:"creator"`
+	ID        model.CommentID `json:"id"`
+}
+
+type SubComment struct {
+	CreatedAt time.Time       `json:"created_at"`
 	Text      string          `json:"text"`
 	Creator   User            `json:"creator"`
 	ID        model.CommentID `json:"id"`
