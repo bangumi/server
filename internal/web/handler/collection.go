@@ -107,8 +107,7 @@ func (h Handler) listCollection(
 
 	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
-		s := convertModelSubject(subjectMap[collection.SubjectID])
-		s.TotalEpisodes = episodeCount[collection.SubjectID]
+		s := convertModelSubject(subjectMap[collection.SubjectID], episodeCount[collection.SubjectID])
 		data[i] = convertModelSubjectCollection(collection, s)
 	}
 

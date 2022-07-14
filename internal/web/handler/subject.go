@@ -91,11 +91,12 @@ func (h Handler) getSubjectWithCache(
 		return r, ok, errgo.Wrap(err, "SubjectService.Get")
 	}
 
-	r = convertModelSubject(s)
-	r.TotalEpisodes, err = h.e.Count(ctx, id)
+	totalEpisode, err := h.e.Count(ctx, id)
 	if err != nil {
 		return r, false, errgo.Wrap(err, "repo.episode.Count")
 	}
+
+	r = convertModelSubject(s, totalEpisode)
 
 	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
 		h.log.Error("can't set response to cache", zap.Error(e))
@@ -187,7 +188,7 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func convertModelSubject(s model.Subject) res.SubjectV0 {
+func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {
 	tags, err := compat.ParseTags(s.CompatRawTags)
 	if err != nil {
 		logger.Warn("failed to parse tags", log.SubjectID(s.ID))
@@ -199,20 +200,19 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 	}
 
 	return res.SubjectV0{
-		TotalEpisodes: -1,
-
-		ID:       s.ID,
-		Image:    res.SubjectImage(s.Image),
-		Summary:  s.Summary,
-		Name:     s.Name,
-		Platform: platformString(s),
-		NameCN:   s.NameCN,
-		Date:     date,
-		Infobox:  compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
-		Volumes:  s.Volumes,
-		Redirect: s.Redirect,
-		Eps:      s.Eps,
-		Tags:     tags,
+		TotalEpisodes: totalEpisode,
+		ID:            s.ID,
+		Image:         res.SubjectImage(s.Image),
+		Summary:       s.Summary,
+		Name:          s.Name,
+		Platform:      platformString(s),
+		NameCN:        s.NameCN,
+		Date:          date,
+		Infobox:       compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
+		Volumes:       s.Volumes,
+		Redirect:      s.Redirect,
+		Eps:           s.Eps,
+		Tags:          tags,
 		Collection: res.SubjectCollectionStat{
 			OnHold:  s.OnHold,
 			Wish:    s.Wish,
