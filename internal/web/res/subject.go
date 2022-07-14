@@ -17,11 +17,15 @@ package res
 import (
 	"time"
 
-	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/model"
 )
 
 type v0wiki = []any
+
+type SubjectTag struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}
 
 type SubjectV0 struct {
 	Date          *string               `json:"date"`
@@ -30,7 +34,7 @@ type SubjectV0 struct {
 	Summary       string                `json:"summary"`
 	Name          string                `json:"name"`
 	NameCN        string                `json:"name_cn"`
-	Tags          []compat.Tag          `json:"tags"`
+	Tags          []SubjectTag          `json:"tags"`
 	Infobox       v0wiki                `json:"infobox"`
 	Rating        Rating                `json:"rating"`
 	TotalEpisodes int64                 `json:"total_episodes"`

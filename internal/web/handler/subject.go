@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
@@ -189,16 +190,6 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 }
 
 func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {
-	tags, err := compat.ParseTags(s.CompatRawTags)
-	if err != nil {
-		logger.Warn("failed to parse tags", log.SubjectID(s.ID))
-	}
-
-	var date *string
-	if s.Date != "" {
-		date = &s.Date
-	}
-
 	return res.SubjectV0{
 		TotalEpisodes: totalEpisode,
 		ID:            s.ID,
@@ -207,12 +198,17 @@ func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {
 		Name:          s.Name,
 		Platform:      platformString(s),
 		NameCN:        s.NameCN,
-		Date:          date,
+		Date:          nilString(s.Date),
 		Infobox:       compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
 		Volumes:       s.Volumes,
 		Redirect:      s.Redirect,
 		Eps:           s.Eps,
-		Tags:          tags,
+		Tags: slice.Map(s.Tags, func(tag model.Tag) res.SubjectTag {
+			return res.SubjectTag{
+				Name:  tag.Name,
+				Count: tag.Count,
+			}
+		}),
 		Collection: res.SubjectCollectionStat{
 			OnHold:  s.OnHold,
 			Wish:    s.Wish,

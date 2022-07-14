@@ -23,6 +23,7 @@ require (
 	github.com/prometheus/client_golang v1.12.2
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
+	github.com/trim21/go-phpserialize v0.0.12
 	github.com/uber-go/tally/v4 v4.1.2
 	go.uber.org/fx v1.17.1
 	go.uber.org/zap v1.21.0

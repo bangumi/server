@@ -23,7 +23,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -91,7 +91,7 @@ func (h Handler) listCollection(
 		return h.InternalError(c, err, "failed to list user's subject collections", log.UserID(u.ID))
 	}
 
-	subjectIDs := generic.SliceMap(collections, func(item model.SubjectCollection) model.SubjectID {
+	subjectIDs := slice.Map(collections, func(item model.SubjectCollection) model.SubjectID {
 		return item.SubjectID
 	})
 

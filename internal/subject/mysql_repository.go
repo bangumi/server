@@ -51,39 +51,44 @@ func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID) (model.Subject, 
 		return model.Subject{}, errgo.Wrap(err, "dal")
 	}
 
-	return ConvertDao(s), nil
+	return ConvertDao(s)
 }
 
-func ConvertDao(s *dao.Subject) model.Subject {
+func ConvertDao(s *dao.Subject) (model.Subject, error) {
 	var date string
 	if !s.Fields.Date.IsZero() {
 		date = s.Fields.Date.Format("2006-01-02")
 	}
 
-	return model.Subject{
-		Redirect:      s.Fields.Redirect,
-		Date:          date,
-		ID:            s.ID,
-		Name:          s.Name,
-		NameCN:        s.NameCN,
-		TypeID:        s.TypeID,
-		Image:         s.Image,
-		PlatformID:    s.Platform,
-		Infobox:       s.Infobox,
-		Summary:       s.Summary,
-		Volumes:       s.Volumes,
-		Eps:           s.Eps,
-		Wish:          s.Wish,
-		Collect:       s.Collect,
-		Doing:         s.Doing,
-		OnHold:        s.OnHold,
-		CompatRawTags: s.Fields.Tags,
-		Dropped:       s.Dropped,
-		Airtime:       s.Airtime,
-		NSFW:          s.Nsfw,
-		Ban:           s.Ban,
-		Rating:        rating(s.Fields),
+	tags, err := parseTags(s.Fields.Tags)
+	if err != nil {
+		return model.Subject{}, err
 	}
+
+	return model.Subject{
+		Redirect:   s.Fields.Redirect,
+		Date:       date,
+		ID:         s.ID,
+		Name:       s.Name,
+		NameCN:     s.NameCN,
+		TypeID:     s.TypeID,
+		Image:      s.Image,
+		PlatformID: s.Platform,
+		Infobox:    s.Infobox,
+		Summary:    s.Summary,
+		Volumes:    s.Volumes,
+		Eps:        s.Eps,
+		Wish:       s.Wish,
+		Collect:    s.Collect,
+		Doing:      s.Doing,
+		OnHold:     s.OnHold,
+		Tags:       tags,
+		Dropped:    s.Dropped,
+		Airtime:    s.Airtime,
+		NSFW:       s.Nsfw,
+		Ban:        s.Ban,
+		Rating:     rating(s.Fields),
+	}, nil
 }
 
 func rating(f dao.SubjectField) model.Rating {
@@ -202,7 +207,10 @@ func (r mysqlRepo) GetByIDs(
 	var result = make(map[model.SubjectID]model.Subject, len(ids))
 
 	for _, s := range records {
-		result[s.ID] = ConvertDao(s)
+		result[s.ID], err = ConvertDao(s)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return result, nil
