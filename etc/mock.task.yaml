@@ -36,6 +36,8 @@ tasks:
       - PersonService
       - GroupRepo
       - CollectionRepo
+      - CommentRepo
+      - TopicRepo
 
   base-mock:
     deps:
@@ -284,3 +286,27 @@ tasks:
         vars:
           SRC_DIR: ./internal/domain
           INTERFACE: CollectionRepo
+
+  CommentRepo:
+    sources:
+      - internal/domain/CommentRepo.go
+      - ./internal/pkg/tools/go.mod
+    generates:
+      - internal/mocks/CommentRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: CommentRepo
+
+  TopicRepo:
+    sources:
+      - internal/domain/TopicRepo.go
+      - ./internal/pkg/tools/go.mod
+    generates:
+      - internal/mocks/TopicRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: TopicRepo

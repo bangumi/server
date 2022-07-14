@@ -12,36 +12,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package dao
 
-import "time"
-
-type Comment struct {
-	CreatedAt   time.Time
-	Content     string
-	CreatorID   UserID
-	State       uint8
-	ID          CommentID
-	SubComments []SubComment
-}
-
-type SubComment struct {
-	CreatedAt   time.Time
-	Content     string
-	CreatorID   UserID
+type TypeComment struct {
+	ID          uint32
+	MentionedID uint32
+	UID         uint32
 	Related     uint32
-	State       uint8
-	ID          CommentID
-	MentionedID UserID
+	CreatedTime uint32
+	Content     string
 }
 
-type Commenter interface {
-	CommentID() CommentID
-	CreatorID() UserID
-	IsSubComment() bool
-	CreateAt() time.Time
-	GetContent() string
-	GetState() uint8
-	RelatedTo() CommentID
-	GetMentionedID() UserID
+func (c TypeComment) statStub() uint8 {
+	return 0
 }

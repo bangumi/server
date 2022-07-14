@@ -12,36 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package comment
 
-import "time"
+import (
+	"github.com/bangumi/server/internal/model"
+)
 
-type Comment struct {
-	CreatedAt   time.Time
-	Content     string
-	CreatorID   UserID
-	State       uint8
-	ID          CommentID
-	SubComments []SubComment
-}
+func wrapCommentDao[T model.Commenter](data []T, err error) ([]model.Commenter, error) {
+	if err != nil {
+		return nil, err
+	}
 
-type SubComment struct {
-	CreatedAt   time.Time
-	Content     string
-	CreatorID   UserID
-	Related     uint32
-	State       uint8
-	ID          CommentID
-	MentionedID UserID
-}
+	var s = make([]model.Commenter, len(data))
+	for i, item := range data {
+		s[i] = item
+	}
 
-type Commenter interface {
-	CommentID() CommentID
-	CreatorID() UserID
-	IsSubComment() bool
-	CreateAt() time.Time
-	GetContent() string
-	GetState() uint8
-	RelatedTo() CommentID
-	GetMentionedID() UserID
+	return s, nil
 }

@@ -12,36 +12,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package generic
 
-import "time"
+func MapValues[K comparable, V any](m map[K]V) []V {
+	var s = make([]V, 0, len(m))
+	for _, v := range m {
+		s = append(s, v)
+	}
 
-type Comment struct {
-	CreatedAt   time.Time
-	Content     string
-	CreatorID   UserID
-	State       uint8
-	ID          CommentID
-	SubComments []SubComment
-}
-
-type SubComment struct {
-	CreatedAt   time.Time
-	Content     string
-	CreatorID   UserID
-	Related     uint32
-	State       uint8
-	ID          CommentID
-	MentionedID UserID
-}
-
-type Commenter interface {
-	CommentID() CommentID
-	CreatorID() UserID
-	IsSubComment() bool
-	CreateAt() time.Time
-	GetContent() string
-	GetState() uint8
-	RelatedTo() CommentID
-	GetMentionedID() UserID
+	return s
 }

@@ -17,17 +17,16 @@ package comment
 import (
 	"context"
 	"errors"
-	"reflect"
-	"time"
+	"sort"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic"
 )
 
 type mysqlRepo struct {
@@ -39,13 +38,9 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CommentRepo, error) {
 	return mysqlRepo{q: q, log: log.Named("comment.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Get(
-	ctx context.Context, commentType domain.CommentType, id model.CommentID,
-) (model.Comment, error) {
-	var (
-		comment interface{}
-		err     error
-	)
+func (r mysqlRepo) Get(ctx context.Context, commentType domain.CommentType, id model.CommentID) (model.Comment, error) {
+	var comment model.Commenter
+	var err error
 	switch commentType {
 	case domain.CommentTypeGroupTopic:
 		comment, err = r.q.GroupTopicComment.WithContext(ctx).Where(r.q.GroupTopicComment.ID.Eq(id)).First()
@@ -71,150 +66,83 @@ func (r mysqlRepo) Get(
 		return model.Comment{}, errgo.Wrap(err, "dal")
 	}
 
-	return convertDao(comment)
+	return model.Comment{
+		CreatedAt:   comment.CreateAt(),
+		Content:     comment.GetContent(),
+		CreatorID:   comment.CreatorID(),
+		State:       comment.GetState(),
+		ID:          comment.CommentID(),
+		SubComments: nil,
+	}, nil
 }
 
 //nolint:gocyclo
 func (r mysqlRepo) GetByRelateIDs(
 	ctx context.Context, commentType domain.CommentType, ids ...model.CommentID,
 ) (map[model.CommentID][]model.Comment, error) {
-	var (
-		rawComments interface{}
-		commentMap  = make(map[model.CommentID][]model.Comment)
-		err         error
-	)
-	switch commentType {
-	case domain.CommentTypeGroupTopic:
-		rawComments, err = r.q.GroupTopicComment.WithContext(ctx).Where(r.q.GroupTopicComment.Related.In(ids...)).Find()
-	case domain.CommentTypeSubjectTopic:
-		rawComments, err = r.q.SubjectTopicComment.WithContext(ctx).Where(r.q.SubjectTopicComment.Related.In(ids...)).Find()
-	case domain.CommentIndex:
-		rawComments, err = r.q.IndexComment.WithContext(ctx).Where(r.q.IndexComment.Related.In(ids...)).Find()
-	case domain.CommentCharacter:
-		rawComments, err = r.q.CharacterComment.WithContext(ctx).Where(r.q.CharacterComment.Related.In(ids...)).Find()
-	case domain.CommentPerson:
-		rawComments, err = r.q.CharacterComment.WithContext(ctx).Where(r.q.CharacterComment.Related.In(ids...)).Find()
-	case domain.CommentEpisode:
-		rawComments, err = r.q.EpisodeComment.WithContext(ctx).Where(r.q.EpisodeComment.Related.In(ids...)).Find()
-	default:
-		return nil, errUnsupportCommentType
-	}
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, domain.ErrNotFound
-		}
-
-		r.log.Error("unexpected error happened", zap.Error(err))
-		return nil, errgo.Wrap(err, "dal")
-	}
-
-	comments, err := convertModelComments(rawComments)
-	if err != nil {
-		return nil, err
-	}
-	for _, v := range comments {
-		if m, ok := commentMap[v.ID]; !ok {
-			commentMap[v.Related] = append(m, v)
-		} else {
-			commentMap[v.Related] = []model.Comment{v}
-		}
-	}
-	return commentMap, nil
+	return nil, nil
+	// var (
+	// 	rawComments []model.Commenter
+	// 	err         error
+	// )
+	// switch commentType {
+	// case domain.CommentTypeGroupTopic:
+	// 	rawComments, err = wrapCommentDao(r.q.GroupTopicComment.WithContext(ctx).
+	// 		Where(r.q.GroupTopicComment.Related.In(ids...)).Find())
+	// case domain.CommentTypeSubjectTopic:
+	// 	rawComments, err = wrapCommentDao(r.q.SubjectTopicComment.WithContext(ctx).
+	// 		Where(r.q.SubjectTopicComment.Related.In(ids...)).Find())
+	// case domain.CommentIndex:
+	// 	rawComments, err = wrapCommentDao(r.q.IndexComment.WithContext(ctx).
+	// 		Where(r.q.IndexComment.Related.In(ids...)).Find())
+	// case domain.CommentCharacter:
+	// 	rawComments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
+	// 		Where(r.q.CharacterComment.Related.In(ids...)).Find())
+	// case domain.CommentPerson:
+	// 	rawComments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
+	// 		Where(r.q.CharacterComment.Related.In(ids...)).Find())
+	// case domain.CommentEpisode:
+	// 	rawComments, err = wrapCommentDao(r.q.EpisodeComment.WithContext(ctx).
+	// 		Where(r.q.EpisodeComment.Related.In(ids...)).Find())
+	// default:
+	// 	return nil, errUnsupportCommentType
+	// }
+	// if err != nil {
+	// 	if errors.Is(err, gorm.ErrRecordNotFound) {
+	// 		return nil, domain.ErrNotFound
+	// 	}
+	//
+	// 	r.log.Error("unexpected error happened", zap.Error(err))
+	// 	return nil, errgo.Wrap(err, "dal")
+	// }
+	//
+	// return convertModelComments(rawComments), nil
 }
 
 var errUnsupportCommentType = errors.New("comment type not support")
 
-func convertDao(in interface{}) (model.Comment, error) {
-	switch v := in.(type) {
-	case *dao.SubjectTopicComment:
-		return model.Comment{
-			ID:          v.ID,
-			MentionedID: v.MentionedID,
-			UID:         model.UserID(v.UID),
-			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
-			Content:     v.Content,
-		}, nil
-	case *dao.GroupTopicComment:
-		return model.Comment{
-			ID:          v.ID,
-			MentionedID: v.MentionedID,
-			UID:         model.UserID(v.UID),
-			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
-			Content:     v.Content,
-		}, nil
-	case *dao.IndexComment:
-		return model.Comment{
-			ID:          v.ID,
-			MentionedID: v.MentionedID,
-			UID:         model.UserID(v.UID),
-			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
-			Content:     v.Content,
-		}, nil
-	case *dao.EpisodeComment:
-		return model.Comment{
-			ID:          v.ID,
-			MentionedID: v.MentionedID,
-			UID:         model.UserID(v.UID),
-			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
-			Content:     v.Content,
-		}, nil
-	case *dao.CharacterComment:
-		return model.Comment{
-			ID:          v.ID,
-			MentionedID: v.MentionedID,
-			UID:         model.UserID(v.UID),
-			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
-			Content:     v.Content,
-		}, nil
-	case *dao.PersonComment:
-		return model.Comment{
-			ID:          v.ID,
-			MentionedID: v.MentionedID,
-			UID:         model.UserID(v.UID),
-			Related:     v.Related,
-			CreatedAt:   time.Unix(int64(v.CreatedTime), 0),
-			Content:     v.Content,
-		}, nil
-	default:
-		return model.Comment{}, errUnsupportCommentType
-	}
-}
-
 func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id uint32) (int64, error) {
-	var (
-		count int64
-		err   error
-	)
+	var count int64
+	var err error
 	switch commentType {
 	case domain.CommentTypeGroupTopic:
 		count, err = r.q.GroupTopicComment.WithContext(ctx).
-			Where(r.q.GroupTopicComment.Related.Eq(0)).
-			Where(r.q.GroupTopicComment.MentionedID.Eq(id)).Count()
+			Where(r.q.GroupTopicComment.Related.Eq(0), r.q.GroupTopicComment.MentionedID.Eq(id)).Count()
 	case domain.CommentTypeSubjectTopic:
 		count, err = r.q.SubjectTopicComment.WithContext(ctx).
-			Where(r.q.SubjectTopicComment.Related.Eq(0)).
-			Where(r.q.SubjectTopicComment.MentionedID.Eq(id)).Count()
+			Where(r.q.SubjectTopicComment.Related.Eq(0), r.q.SubjectTopicComment.MentionedID.Eq(id)).Count()
 	case domain.CommentIndex:
 		count, err = r.q.IndexComment.WithContext(ctx).
-			Where(r.q.IndexComment.Related.Eq(0)).
-			Where(r.q.IndexComment.MentionedID.Eq(id)).Count()
+			Where(r.q.IndexComment.Related.Eq(0), r.q.IndexComment.MentionedID.Eq(id)).Count()
 	case domain.CommentCharacter:
 		count, err = r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.Related.Eq(0)).
-			Where(r.q.CharacterComment.MentionedID.Eq(id)).Count()
+			Where(r.q.CharacterComment.Related.Eq(0), r.q.CharacterComment.MentionedID.Eq(id)).Count()
 	case domain.CommentPerson:
 		count, err = r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.Related.Eq(0)).
-			Where(r.q.CharacterComment.MentionedID.Eq(id)).Count()
+			Where(r.q.CharacterComment.Related.Eq(0), r.q.CharacterComment.MentionedID.Eq(id)).Count()
 	case domain.CommentEpisode:
 		count, err = r.q.EpisodeComment.WithContext(ctx).
-			Where(r.q.EpisodeComment.Related.Eq(0)).
-			Where(r.q.EpisodeComment.MentionedID.Eq(id)).Count()
+			Where(r.q.EpisodeComment.Related.Eq(0), r.q.EpisodeComment.MentionedID.Eq(id)).Count()
 	default:
 		return 0, errUnsupportCommentType
 	}
@@ -225,73 +153,90 @@ func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id
 }
 
 func (r mysqlRepo) List(
-	ctx context.Context, commentType domain.CommentType, id uint32, limit int, offset int,
+	ctx context.Context, commentType domain.CommentType, topicID uint32, limit int, offset int,
 ) ([]model.Comment, error) {
-	var (
-		comments interface{}
-		err      error
-	)
+	var comments []model.Commenter
+	var err error
+
 	switch commentType {
 	case domain.CommentTypeGroupTopic:
-		comments, err = r.q.GroupTopicComment.WithContext(ctx).
-			Where(r.q.GroupTopicComment.Related.Eq(0)).
-			Where(r.q.GroupTopicComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
+		comments, err = wrapCommentDao(r.q.GroupTopicComment.WithContext(ctx).
+			Where(r.q.GroupTopicComment.Related.Eq(0), r.q.GroupTopicComment.MentionedID.Eq(topicID)).
+			Offset(offset).Limit(limit).Order(r.q.GroupTopicComment.CreatedTime, r.q.GroupTopicComment.ID).Find())
 	case domain.CommentTypeSubjectTopic:
-		comments, err = r.q.SubjectTopicComment.WithContext(ctx).
-			Where(r.q.SubjectTopicComment.Related.Eq(0)).
-			Where(r.q.SubjectTopicComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
+		comments, err = wrapCommentDao(r.q.SubjectTopicComment.WithContext(ctx).
+			Where(r.q.SubjectTopicComment.Related.Eq(0), r.q.SubjectTopicComment.MentionedID.Eq(topicID)).
+			Offset(offset).Limit(limit).Order(r.q.SubjectTopicComment.CreatedTime, r.q.SubjectTopicComment.ID).Find())
 	case domain.CommentIndex:
-		comments, err = r.q.IndexComment.WithContext(ctx).
-			Where(r.q.IndexComment.Related.Eq(0)).
-			Where(r.q.IndexComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
+		comments, err = wrapCommentDao(r.q.IndexComment.WithContext(ctx).
+			Where(r.q.IndexComment.Related.Eq(0), r.q.IndexComment.MentionedID.Eq(topicID)).
+			Offset(offset).Limit(limit).Order(r.q.IndexComment.CreatedTime, r.q.IndexComment.ID).Find())
 	case domain.CommentCharacter:
-		comments, err = r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.Related.Eq(0)).
-			Where(r.q.CharacterComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
+		comments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
+			Where(r.q.CharacterComment.Related.Eq(0), r.q.CharacterComment.MentionedID.Eq(topicID)).
+			Offset(offset).Limit(limit).Order(r.q.CharacterComment.CreatedTime, r.q.CharacterComment.ID).Find())
 	case domain.CommentPerson:
-		comments, err = r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.Related.Eq(0)).
-			Where(r.q.CharacterComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
+		comments, err = wrapCommentDao(r.q.PersonComment.WithContext(ctx).
+			Where(r.q.PersonComment.Related.Eq(0), r.q.PersonComment.MentionedID.Eq(topicID)).
+			Offset(offset).Limit(limit).Order(r.q.PersonComment.CreatedTime, r.q.PersonComment.ID).Find())
 	case domain.CommentEpisode:
-		comments, err = r.q.EpisodeComment.WithContext(ctx).
-			Where(r.q.EpisodeComment.Related.Eq(0)).
-			Where(r.q.EpisodeComment.MentionedID.Eq(id)).Offset(offset).Limit(limit).Find()
+		comments, err = wrapCommentDao(r.q.EpisodeComment.WithContext(ctx).
+			Where(r.q.EpisodeComment.Related.Eq(0), r.q.EpisodeComment.MentionedID.Eq(topicID)).
+			Offset(offset).Limit(limit).Order(r.q.EpisodeComment.CreatedTime, r.q.EpisodeComment.ID).Find())
 	default:
 		return nil, errUnsupportCommentType
 	}
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, domain.ErrNotFound
-		}
 
+	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
-	result, err := convertModelComments(comments)
-	if err != nil {
-		return nil, errgo.Wrap(err, "convert user")
-	}
-	return result, nil
+
+	return convertModelComments(comments), nil
 }
 
-var errInputNilComments = errors.New("input nil comments")
-var errInputInvalidComments = errors.New("input invalid comments")
-
-func convertModelComments(in interface{}) ([]model.Comment, error) {
-	if !reflect.ValueOf(in).IsValid() {
-		return nil, errInputNilComments
-	}
-	if reflect.TypeOf(in).Kind() == reflect.Slice {
-		s := reflect.ValueOf(in)
-		comments := make([]model.Comment, s.Len())
-		for i := 0; i < s.Len(); i++ {
-			if comment, err := convertDao(s.Index(i).Interface()); err == nil {
-				comments[i] = comment
-			} else {
-				return comments, err
-			}
+func convertModelComments(in []model.Commenter) []model.Comment {
+	commentMap := map[model.CommentID]model.Comment{}
+	for _, comment := range in {
+		if comment.IsSubComment() {
+			continue
 		}
-		return comments, nil
+
+		commentMap[comment.CommentID()] = model.Comment{
+			CreatedAt:   comment.CreateAt(),
+			Content:     comment.GetContent(),
+			CreatorID:   comment.CreatorID(),
+			State:       comment.GetState(),
+			ID:          comment.CommentID(),
+			SubComments: make([]model.SubComment, 0, 4),
+		}
 	}
-	return nil, errInputInvalidComments
+
+	for _, comment := range in {
+		if !comment.IsSubComment() {
+			continue
+		}
+
+		parent := commentMap[comment.RelatedTo()]
+
+		parent.SubComments = append(parent.SubComments, model.SubComment{
+			CreatedAt:   comment.CreateAt(),
+			Content:     comment.GetContent(),
+			CreatorID:   comment.CreatorID(),
+			Related:     comment.RelatedTo(),
+			State:       comment.GetState(),
+			ID:          comment.CommentID(),
+			MentionedID: comment.GetMentionedID(),
+		})
+
+		commentMap[comment.RelatedTo()] = parent
+	}
+
+	comments := generic.MapValues(commentMap)
+
+	sort.Slice(comments, func(i, j int) bool {
+		return comments[i].CreatedAt.Before(comments[j].CreatedAt)
+	})
+
+	return comments
 }

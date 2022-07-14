@@ -57,7 +57,7 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 
 	extIDs := make([]model.CommentID, 0)
 	for _, v := range comments {
-		uids = append(uids, v.UID)
+		uids = append(uids, v.CreatorID)
 		extIDs = append(extIDs, v.ID)
 	}
 
@@ -69,7 +69,7 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 		}
 		for _, v := range relatedComments {
 			for _, vv := range v {
-				uids = append(uids, vv.UID)
+				uids = append(uids, vv.CreatorID)
 			}
 		}
 	}
@@ -96,14 +96,14 @@ func convertModelComments(
 			ID:        v.ID,
 			Text:      v.Content,
 			CreatedAt: v.CreatedAt,
-			Creator:   convertModelUser(userMap[v.UID]),
+			Creator:   convertModelUser(userMap[v.CreatorID]),
 		}
 		if relates, ok := cm[v.ID]; ok {
 			result[k].Replies = make([]res.Comment, len(relates))
 			for i, related := range relates {
 				result[k].Replies[i] = res.Comment{
 					CreatedAt: related.CreatedAt,
-					Creator:   convertModelUser(userMap[related.UID]),
+					Creator:   convertModelUser(userMap[related.CreatorID]),
 					Text:      related.Content,
 					ID:        related.ID,
 				}

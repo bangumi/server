@@ -51,6 +51,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestMysqlRepo_GetByRelateIDs(t *testing.T) {
+	t.Skip()
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 

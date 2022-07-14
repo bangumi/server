@@ -28,18 +28,28 @@ type CommentRepo interface {
 	) (map[model.CommentID][]model.Comment, error)
 
 	// Count top comments for a topic/index/character/person/episode.
+	// 一级回复
 	Count(ctx context.Context, commentType CommentType, id uint32) (int64, error)
 
-	// List return paged top comment list of a topic/index/character/person/episode.
+	// List return paged top comment tree.
+	//
+	//  []model.Comment{
+	//    一级回复
+	// 		{
+	//  	  一级回复对应的 **全部** 二级回复
+	//	 		SubComments: []model.SubComments{}
+	// 		}
+	// }
 	List(
-		ctx context.Context, commentType CommentType, id uint32, limit int, offset int,
+		ctx context.Context, commentType CommentType, topicID uint32, limit int, offset int,
 	) ([]model.Comment, error)
 }
 
 type CommentType uint32
 
 const (
-	CommentTypeSubjectTopic CommentType = iota + 1
+	CommentTypeUnknown CommentType = iota
+	CommentTypeSubjectTopic
 	CommentTypeGroupTopic
 	CommentIndex
 	CommentCharacter

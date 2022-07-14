@@ -54,7 +54,7 @@ func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[mo
 	for _, topic := range topics {
 		userIDs = append(userIDs, topic.UID)
 		for _, v := range topic.Comments {
-			userIDs = append(userIDs, v.UID)
+			userIDs = append(userIDs, v.CreatorID)
 		}
 	}
 	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
