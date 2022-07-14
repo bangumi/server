@@ -25,6 +25,7 @@ import (
 //go:embed template/comments.go
 var template string
 
+//nolint:funlen
 func main() {
 	for _, t := range []struct {
 		Value        string

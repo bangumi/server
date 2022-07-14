@@ -117,43 +117,10 @@ func (r mysqlRepo) List(
 		return nil, err
 	}
 
-	var commentIDs = generic.MapIter(commentMap, func(k model.CommentID, item model.Comment) uint32 {
-		return uint32(item.ID)
-	})
-
-	var comments []model.Commenter
-	switch commentType {
-	case domain.CommentTypeGroupTopic:
-		comments, err = wrapCommentDao(r.q.GroupTopicComment.WithContext(ctx).
-			Where(r.q.GroupTopicComment.Related.In(commentIDs...), r.q.GroupTopicComment.MentionedID.Eq(uint32(id))).
-			Order(r.q.GroupTopicComment.Related, r.q.GroupTopicComment.CreatedTime).Find())
-	case domain.CommentTypeSubjectTopic:
-		comments, err = wrapCommentDao(r.q.SubjectTopicComment.WithContext(ctx).
-			Where(r.q.SubjectTopicComment.Related.In(commentIDs...), r.q.SubjectTopicComment.MentionedID.Eq(uint32(id))).
-			Order(r.q.SubjectTopicComment.Related, r.q.SubjectTopicComment.CreatedTime).Find())
-	case domain.CommentIndex:
-		comments, err = wrapCommentDao(r.q.IndexComment.WithContext(ctx).
-			Where(r.q.IndexComment.Related.In(commentIDs...), r.q.IndexComment.MentionedID.Eq(uint32(id))).
-			Order(r.q.IndexComment.Related, r.q.IndexComment.CreatedTime).Find())
-	case domain.CommentCharacter:
-		comments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.Related.In(commentIDs...), r.q.CharacterComment.MentionedID.Eq(uint32(id))).
-			Order(r.q.CharacterComment.Related, r.q.CharacterComment.CreatedTime).Find())
-	case domain.CommentPerson:
-		comments, err = wrapCommentDao(r.q.PersonComment.WithContext(ctx).
-			Where(r.q.PersonComment.Related.In(commentIDs...), r.q.PersonComment.MentionedID.Eq(uint32(id))).
-			Order(r.q.PersonComment.Related, r.q.PersonComment.CreatedTime).Find())
-	case domain.CommentEpisode:
-		comments, err = wrapCommentDao(r.q.EpisodeComment.WithContext(ctx).
-			Where(r.q.EpisodeComment.Related.In(commentIDs...), r.q.EpisodeComment.MentionedID.Eq(uint32(id))).
-			Order(r.q.EpisodeComment.Related, r.q.EpisodeComment.CreatedTime).Find())
-	default:
-		return nil, errUnsupportCommentType
-	}
-
+	comments, err := r.getSubComments(ctx, commentType, id, generic.MapKeys(commentMap)...)
 	if err != nil {
 		r.log.Error("failed to get sub replies")
-		return nil, errgo.Wrap(err, "dal")
+		return nil, err
 	}
 
 	for _, comment := range comments {
@@ -234,4 +201,50 @@ func (r mysqlRepo) getParentComments(
 	return generic.SliceToMap(parents, func(item model.Comment) model.CommentID {
 		return item.ID
 	}), nil
+}
+
+func (r mysqlRepo) getSubComments(
+	ctx context.Context, commentType domain.CommentType, id model.TopicID, ids ...model.CommentID,
+) ([]model.Commenter, error) {
+	commentIDs := generic.SliceMap(ids, func(item model.CommentID) uint32 {
+		return uint32(item)
+	})
+
+	var comments []model.Commenter
+	var err error
+	switch commentType {
+	case domain.CommentTypeGroupTopic:
+		comments, err = wrapCommentDao(r.q.GroupTopicComment.WithContext(ctx).
+			Where(r.q.GroupTopicComment.Related.In(commentIDs...), r.q.GroupTopicComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.GroupTopicComment.Related, r.q.GroupTopicComment.CreatedTime).Find())
+	case domain.CommentTypeSubjectTopic:
+		comments, err = wrapCommentDao(r.q.SubjectTopicComment.WithContext(ctx).
+			Where(r.q.SubjectTopicComment.Related.In(commentIDs...), r.q.SubjectTopicComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.SubjectTopicComment.Related, r.q.SubjectTopicComment.CreatedTime).Find())
+	case domain.CommentIndex:
+		comments, err = wrapCommentDao(r.q.IndexComment.WithContext(ctx).
+			Where(r.q.IndexComment.Related.In(commentIDs...), r.q.IndexComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.IndexComment.Related, r.q.IndexComment.CreatedTime).Find())
+	case domain.CommentCharacter:
+		comments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
+			Where(r.q.CharacterComment.Related.In(commentIDs...), r.q.CharacterComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.CharacterComment.Related, r.q.CharacterComment.CreatedTime).Find())
+	case domain.CommentPerson:
+		comments, err = wrapCommentDao(r.q.PersonComment.WithContext(ctx).
+			Where(r.q.PersonComment.Related.In(commentIDs...), r.q.PersonComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.PersonComment.Related, r.q.PersonComment.CreatedTime).Find())
+	case domain.CommentEpisode:
+		comments, err = wrapCommentDao(r.q.EpisodeComment.WithContext(ctx).
+			Where(r.q.EpisodeComment.Related.In(commentIDs...), r.q.EpisodeComment.MentionedID.Eq(uint32(id))).
+			Order(r.q.EpisodeComment.Related, r.q.EpisodeComment.CreatedTime).Find())
+	default:
+		return nil, errUnsupportCommentType
+	}
+
+	if err != nil {
+		r.log.Error("failed to get sub replies")
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	return comments, nil
 }

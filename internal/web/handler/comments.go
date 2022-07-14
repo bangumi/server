@@ -26,7 +26,9 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id model.TopicID) (res.PagedG[res.Comment], error) {
+func (h Handler) listComments(
+	c *fiber.Ctx, commentType domain.CommentType, id model.TopicID,
+) (res.PagedG[res.Comment], error) {
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return res.PagedG[res.Comment]{}, res.ErrNotFound
