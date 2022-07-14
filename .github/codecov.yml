@@ -4,4 +4,8 @@ ignore:
   - "**/*.gen.go"
   - "internal/dal/query/gen.go"
   - "internal/mocks/"
-  - "internal/cmd/gen/"
+  - "internal/cmd/"
+
+coverage:
+  status:
+    patch: off
