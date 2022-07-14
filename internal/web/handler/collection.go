@@ -102,7 +102,7 @@ func (h Handler) listCollection(
 
 	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
-		data[i] = convertModelSubjectCollection(collection, subjectMap)
+		data[i] = convertModelSubjectCollection(collection, convertModelSubject(subjectMap[collection.SubjectID]))
 	}
 
 	return c.JSON(res.Paged{
@@ -156,11 +156,16 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 		return res.NotFound(notFoundMessage)
 	}
 
-	return res.JSON(c, convertModelSubjectCollection(collection, nil))
+	s, _, err := h.getSubjectWithCache(c.Context(), subjectID)
+	if err != nil {
+		return h.InternalError(c, err, "failed to subject info", log.SubjectID(subjectID))
+	}
+
+	return res.JSON(c, convertModelSubjectCollection(collection, s))
 }
 
 func convertModelSubjectCollection(
-	collection model.SubjectCollection, subjectMap map[model.SubjectID]model.Subject,
+	collection model.SubjectCollection, subject res.SubjectV0,
 ) res.SubjectCollection {
 	return res.SubjectCollection{
 		SubjectID:   collection.SubjectID,
@@ -173,6 +178,6 @@ func convertModelSubjectCollection(
 		UpdatedAt:   collection.UpdatedAt,
 		Private:     collection.Private,
 		Comment:     nilString(collection.Comment),
-		Subject:     convertModelSubject(subjectMap[collection.SubjectID]),
+		Subject:     subject,
 	}
 }
