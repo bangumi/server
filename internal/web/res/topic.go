@@ -16,6 +16,8 @@ package res
 
 import (
 	"time"
+
+	"github.com/bangumi/server/internal/model"
 )
 
 type Topics struct {
@@ -26,19 +28,19 @@ type Topics struct {
 }
 
 type Topic struct {
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Comments  *Paged    `json:"comments,omitempty"`
-	Title     string    `json:"title"`
-	Creator   User      `json:"creator"`
-	ID        uint32    `json:"id"`
-	Replies   uint32    `json:"replies"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
+	Comments  *Paged        `json:"comments,omitempty"`
+	Title     string        `json:"title"`
+	Creator   User          `json:"creator"`
+	ID        model.TopicID `json:"id"`
+	Replies   uint32        `json:"replies"`
 }
 
 type Comment struct {
-	CreatedAt time.Time `json:"created_at"`
-	Replies   []Comment `json:"replies"`
-	Text      string    `json:"text"`
-	Creator   User      `json:"creator"`
-	ID        uint32    `json:"id"`
+	CreatedAt time.Time       `json:"created_at"`
+	Replies   []Comment       `json:"replies"`
+	Text      string          `json:"text"`
+	Creator   User            `json:"creator"`
+	ID        model.CommentID `json:"id"`
 }

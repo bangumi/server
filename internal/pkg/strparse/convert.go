@@ -82,7 +82,9 @@ func IndexID(s string) (model.IndexID, error) {
 }
 
 func TopicID(s string) (model.TopicID, error) {
-	return uint32NonZero(s)
+	v, err := uint32NonZero(s)
+
+	return model.TopicID(v), err
 }
 
 var errZeroValue = errors.New("can't use 0 as ID")

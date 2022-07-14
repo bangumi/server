@@ -85,7 +85,7 @@ func New(
 		i:                    index,
 		r:                    r,
 		t:                    t,
-		m:                    m,
+		comment:              m,
 		captcha:              captcha,
 		g:                    g,
 		v:                    validate,
@@ -112,7 +112,7 @@ type Handler struct {
 	rateLimit            rate.Manager
 	i                    domain.IndexRepo
 	r                    domain.RevisionRepo
-	m                    domain.CommentRepo
+	comment              domain.CommentRepo
 	t                    domain.TopicRepo
 	g                    domain.GroupRepo
 	cache                cache.Generic

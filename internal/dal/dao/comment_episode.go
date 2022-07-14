@@ -29,7 +29,7 @@ func (c *EpisodeComment) IsSubComment() bool {
 }
 
 func (c *EpisodeComment) CommentID() model.CommentID {
-	return c.ID
+	return model.CommentID(c.ID)
 }
 
 func (c *EpisodeComment) CreateAt() time.Time {
@@ -41,11 +41,11 @@ func (c *EpisodeComment) GetState() uint8 {
 }
 
 func (c *EpisodeComment) RelatedTo() model.CommentID {
-	return c.Related
+	return model.CommentID(c.Related)
 }
 
 func (c *EpisodeComment) GetID() model.CommentID {
-	return c.ID
+	return model.CommentID(c.ID)
 }
 
 func (c *EpisodeComment) GetContent() string {

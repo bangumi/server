@@ -45,9 +45,9 @@ func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model
 	)
 	switch topicType {
 	case domain.TopicTypeGroup:
-		topic, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.ID.Eq(id)).First()
+		topic, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.ID.Eq(uint32(id))).First()
 	case domain.TopicTypeSubject:
-		topic, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.ID.Eq(id)).First()
+		topic, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.ID.Eq(uint32(id))).First()
 	default:
 		return model.Topic{}, errUnsupportTopicType
 	}
@@ -149,7 +149,7 @@ func convertDao(in interface{}) (model.Topic, error) {
 	switch v := in.(type) {
 	case *dao.GroupTopic:
 		return model.Topic{
-			ID:          v.ID,
+			ID:          model.TopicID(v.ID),
 			ObjectID:    v.GroupID,
 			UID:         model.UserID(v.UID),
 			Title:       v.Title,
@@ -161,7 +161,7 @@ func convertDao(in interface{}) (model.Topic, error) {
 		}, nil
 	case *dao.SubjectTopic:
 		return model.Topic{
-			ID:          v.ID,
+			ID:          model.TopicID(v.ID),
 			ObjectID:    v.SubjectID,
 			UID:         model.UserID(v.UID),
 			Title:       v.Title,

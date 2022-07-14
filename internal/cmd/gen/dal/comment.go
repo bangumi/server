@@ -19,10 +19,7 @@ import (
 	_ "embed"
 	"io/ioutil"
 	"path/filepath"
-	"reflect"
 	"strings"
-
-	"github.com/bangumi/server/internal/dal/dao"
 )
 
 //go:embed template/comments.go
@@ -30,41 +27,44 @@ var template string
 
 func main() {
 	for _, t := range []struct {
-		Value any
-		Name  string
+		Value        string
+		Name         string
+		GenStateStub bool
 	}{
 		{
-			Value: dao.PersonComment{},
-			Name:  "comment_person",
+			Value:        "PersonComment",
+			Name:         "comment_person",
+			GenStateStub: true,
 		},
 		{
-			Value: dao.CharacterComment{},
-			Name:  "comment_characters",
+			Value:        "CharacterComment",
+			Name:         "comment_characters",
+			GenStateStub: true,
 		},
 		{
-			Value: dao.GroupTopicComment{},
+			Value: "GroupTopicComment",
 			Name:  "comment_group",
 		},
 		{
-			Value: dao.SubjectTopicComment{},
+			Value: "SubjectTopicComment",
 			Name:  "comment_subject",
 		},
 		{
-			Value: dao.EpisodeComment{},
-			Name:  "comment_episode",
+			Value:        "EpisodeComment",
+			Name:         "comment_episode",
+			GenStateStub: true,
 		},
 		{
-			Value: dao.IndexComment{},
-			Name:  "comment_index",
+			Value:        "IndexComment",
+			Name:         "comment_index",
+			GenStateStub: true,
 		},
 	} {
-		rt := reflect.TypeOf(t.Value)
-		name := rt.Name()
+		name := t.Value
 
 		content := template
 
-		_, ok := rt.FieldByName("State")
-		if !ok {
+		if t.GenStateStub {
 			content += `
 func (c *TypeComment) statStub() uint8 {
 	return 0

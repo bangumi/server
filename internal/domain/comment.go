@@ -29,7 +29,7 @@ type CommentRepo interface {
 
 	// Count top comments for a topic/index/character/person/episode.
 	// 一级回复
-	Count(ctx context.Context, commentType CommentType, id uint32) (int64, error)
+	Count(ctx context.Context, commentType CommentType, id model.TopicID) (int64, error)
 
 	// List return paged top comment tree.
 	//
@@ -41,7 +41,7 @@ type CommentRepo interface {
 	// 		}
 	// }
 	List(
-		ctx context.Context, commentType CommentType, topicID uint32, limit int, offset int,
+		ctx context.Context, commentType CommentType, id model.TopicID, limit int, offset int,
 	) ([]model.Comment, error)
 }
 

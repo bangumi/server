@@ -120,7 +120,7 @@ func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 		return res.ErrNotFound
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentIndex, id)
+	pagedComments, err := h.listComments(c, domain.CommentIndex, model.TopicID(id))
 	if err != nil {
 		return err
 	}

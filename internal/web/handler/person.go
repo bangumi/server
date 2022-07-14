@@ -138,7 +138,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 		return res.ErrNotFound
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentPerson, uint32(id))
+	pagedComments, err := h.listComments(c, domain.CommentPerson, model.TopicID(id))
 	if err != nil {
 		return err
 	}

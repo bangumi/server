@@ -26,13 +26,13 @@ import (
 )
 
 //nolint:gocyclo
-func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id uint32) (*res.Paged, error) {
+func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id model.TopicID) (*res.Paged, error) {
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return nil, res.ErrNotFound
 	}
 
-	count, err := h.m.Count(c.Context(), commentType, id)
+	count, err := h.comment.Count(c.Context(), commentType, id)
 	if err != nil {
 		return nil, errgo.Wrap(err, "repo.comments.Count")
 	}
@@ -45,7 +45,7 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 		return nil, err
 	}
 
-	comments, err := h.m.List(c.Context(), commentType, id, page.Limit, page.Offset)
+	comments, err := h.comment.List(c.Context(), commentType, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, res.ErrNotFound
@@ -63,7 +63,7 @@ func (h Handler) listComments(c *fiber.Ctx, commentType domain.CommentType, id u
 
 	var relatedComments map[model.CommentID][]model.Comment
 	if len(extIDs) != 0 {
-		relatedComments, err = h.m.GetByRelateIDs(c.Context(), commentType, extIDs...)
+		relatedComments, err = h.comment.GetByRelateIDs(c.Context(), commentType, extIDs...)
 		if err != nil {
 			return nil, errgo.Wrap(err, "repo.comments.GetByIDs")
 		}

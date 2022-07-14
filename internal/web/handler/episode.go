@@ -86,7 +86,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return res.ErrNotFound
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentEpisode, uint32(id))
+	pagedComments, err := h.listComments(c, domain.CommentEpisode, model.TopicID(id))
 	if err != nil {
 		return err
 	}

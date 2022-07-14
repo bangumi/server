@@ -29,7 +29,7 @@ type SubComment struct {
 	CreatedAt   time.Time
 	Content     string
 	CreatorID   UserID
-	Related     uint32
+	Related     CommentID
 	State       uint8
 	ID          CommentID
 	MentionedID UserID

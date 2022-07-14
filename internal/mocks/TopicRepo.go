@@ -72,18 +72,18 @@ func (_c *TopicRepo_Count_Call) Return(_a0 int64, _a1 error) *TopicRepo_Count_Ca
 }
 
 // Get provides a mock function with given fields: ctx, topicType, id
-func (_m *TopicRepo) Get(ctx context.Context, topicType domain.TopicType, id uint32) (model.Topic, error) {
+func (_m *TopicRepo) Get(ctx context.Context, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
 	ret := _m.Called(ctx, topicType, id)
 
 	var r0 model.Topic
-	if rf, ok := ret.Get(0).(func(context.Context, domain.TopicType, uint32) model.Topic); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.TopicType, model.TopicID) model.Topic); ok {
 		r0 = rf(ctx, topicType, id)
 	} else {
 		r0 = ret.Get(0).(model.Topic)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.TopicType, uint32) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.TopicType, model.TopicID) error); ok {
 		r1 = rf(ctx, topicType, id)
 	} else {
 		r1 = ret.Error(1)
@@ -100,14 +100,14 @@ type TopicRepo_Get_Call struct {
 // Get is a helper method to define mock.On call
 //  - ctx context.Context
 //  - topicType domain.TopicType
-//  - id uint32
+//  - id model.TopicID
 func (_e *TopicRepo_Expecter) Get(ctx interface{}, topicType interface{}, id interface{}) *TopicRepo_Get_Call {
 	return &TopicRepo_Get_Call{Call: _e.mock.On("Get", ctx, topicType, id)}
 }
 
-func (_c *TopicRepo_Get_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id uint32)) *TopicRepo_Get_Call {
+func (_c *TopicRepo_Get_Call) Run(run func(ctx context.Context, topicType domain.TopicType, id model.TopicID)) *TopicRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(domain.TopicType), args[2].(uint32))
+		run(args[0].(context.Context), args[1].(domain.TopicType), args[2].(model.TopicID))
 	})
 	return _c
 }

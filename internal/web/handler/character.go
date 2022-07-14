@@ -76,7 +76,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return res.ErrNotFound
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentCharacter, uint32(id))
+	pagedComments, err := h.listComments(c, domain.CommentCharacter, model.TopicID(id))
 	if err != nil {
 		return err
 	}
