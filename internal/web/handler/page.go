@@ -46,7 +46,7 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 	if raw != "" {
 		q.Limit, err = strconv.Atoi(raw)
 		if err != nil {
-			return q, res.BadRequest("can'topic parse query args limit as int: " + strconv.Quote(raw))
+			return q, res.BadRequest("can't parse query args limit as int: " + strconv.Quote(raw))
 		}
 
 		if q.Limit > maxLimit {
@@ -61,7 +61,7 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 	if raw != "" {
 		q.Offset, err = strconv.Atoi(raw)
 		if err != nil {
-			return q, res.BadRequest("can'topic parse query args offset as int: " + strconv.Quote(raw))
+			return q, res.BadRequest("can't parse query args offset as int: " + strconv.Quote(raw))
 		}
 
 		if q.Offset < 0 {

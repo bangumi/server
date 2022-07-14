@@ -112,7 +112,7 @@ func (h Handler) getCharacterWithCache(
 	r = convertModelCharacter(s)
 
 	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
-		logger.Error("can'topic set response to cache", zap.Error(e))
+		logger.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return r, true, nil

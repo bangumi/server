@@ -120,7 +120,7 @@ func (h Handler) getEpisodeWithCache(ctx context.Context, id model.EpisodeID) (r
 	r = convertModelEpisode(s)
 
 	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
-		h.log.Error("can'topic set response to cache", zap.Error(e))
+		h.log.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return r, true, nil

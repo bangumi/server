@@ -112,7 +112,7 @@ func (h Handler) AccessTokenAuthMiddleware(ctx *fiber.Ctx) error {
 func (h Handler) getHTTPAccessor(c *fiber.Ctx) *accessor {
 	u, ok := c.Context().UserValue(ctxkey.User).(*accessor) // get visitor
 	if !ok {
-		panic("can'topic convert type")
+		panic("can't convert type")
 	}
 
 	return u
