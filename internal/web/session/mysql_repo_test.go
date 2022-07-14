@@ -66,12 +66,13 @@ func TestMysqlRepo_Create_conflict(t *testing.T) {
 	t.Parallel()
 
 	var key = "a random key " + t.Name()
+	var realKey = t.Name() + "q"
 
 	ctx := context.Background()
 	r, q := getRepo(t)
 
 	test.RunAndCleanup(t, func() {
-		_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Delete()
+		_, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Or(q.WebSession.Key.Eq(realKey)).Delete()
 		require.NoError(t, err)
 	})
 
@@ -90,7 +91,7 @@ func TestMysqlRepo_Create_conflict(t *testing.T) {
 		if i < 2 {
 			return key
 		}
-		return t.Name() + "q"
+		return realKey
 	})
 
 	require.NoError(t, err)
