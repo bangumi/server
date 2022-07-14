@@ -1,41 +1,40 @@
 title: Infobox
 type: array
 items:
-  Item:
-    title: Item
-    required:
-      - key
-      - value
-    type: object
-    properties:
-      key:
-        title: Key
-        type: string
-      value:
-        title: Value
-        type: object
-        anyOf:
-          - type: string
-          - type: array
-            items:
-              anyOf:
-                - title: KV
-                  required:
-                    - k
-                    - v
-                  type: object
-                  properties:
-                    k:
-                      title: K
-                      type: string
-                    v:
-                      title: V
-                      type: string
-                - title: V
-                  required:
-                    - v
-                  type: object
-                  properties:
-                    v:
-                      title: V
-                      type: string
+  title: Item
+  required:
+    - key
+    - value
+  type: object
+  properties:
+    key:
+      title: Key
+      type: string
+    value:
+      title: Value
+      type: object
+      anyOf:
+        - type: string
+        - type: array
+          items:
+            anyOf:
+              - title: KV
+                required:
+                  - k
+                  - v
+                type: object
+                properties:
+                  k:
+                    title: K
+                    type: string
+                  v:
+                    title: V
+                    type: string
+              - title: V
+                required:
+                  - v
+                type: object
+                properties:
+                  v:
+                    title: V
+                    type: string
