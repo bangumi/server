@@ -24,12 +24,12 @@ type SubjectCollection struct {
 	UpdatedAt   time.Time            `json:"updated_at"`
 	Comment     *string              `json:"comment"`
 	Tags        []string             `json:"tags"`
+	Subject     SubjectV0            `json:"subject"`
 	SubjectID   model.SubjectID      `json:"subject_id"`
-	EpStatus    uint32               `json:"ep_status"`
 	VolStatus   uint32               `json:"vol_status"`
+	EpStatus    uint32               `json:"ep_status"`
 	SubjectType uint8                `json:"subject_type"`
 	Type        model.CollectionType `json:"type"`
 	Rate        uint8                `json:"rate"`
 	Private     bool                 `json:"private"`
-	Subject     SubjectV0            `json:"subject"`
 }
