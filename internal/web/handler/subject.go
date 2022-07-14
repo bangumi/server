@@ -199,6 +199,8 @@ func convertModelSubject(s model.Subject) res.SubjectV0 {
 	}
 
 	return res.SubjectV0{
+		TotalEpisodes: -1,
+
 		ID:       s.ID,
 		Image:    res.SubjectImage(s.Image),
 		Summary:  s.Summary,

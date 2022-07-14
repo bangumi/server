@@ -114,6 +114,67 @@ func (_c *EpisodeRepo_CountByType_Call) Return(_a0 int64, _a1 error) *EpisodeRep
 	return _c
 }
 
+// CountsBySubjectID provides a mock function with given fields: ctx, subjectID
+func (_m *EpisodeRepo) CountsBySubjectID(ctx context.Context, subjectID ...model.SubjectID) (map[model.SubjectID]int64, error) {
+	_va := make([]interface{}, len(subjectID))
+	for _i := range subjectID {
+		_va[_i] = subjectID[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 map[model.SubjectID]int64
+	if rf, ok := ret.Get(0).(func(context.Context, ...model.SubjectID) map[model.SubjectID]int64); ok {
+		r0 = rf(ctx, subjectID...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[model.SubjectID]int64)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, ...model.SubjectID) error); ok {
+		r1 = rf(ctx, subjectID...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// EpisodeRepo_CountsBySubjectID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountsBySubjectID'
+type EpisodeRepo_CountsBySubjectID_Call struct {
+	*mock.Call
+}
+
+// CountsBySubjectID is a helper method to define mock.On call
+//  - ctx context.Context
+//  - subjectID ...model.SubjectID
+func (_e *EpisodeRepo_Expecter) CountsBySubjectID(ctx interface{}, subjectID ...interface{}) *EpisodeRepo_CountsBySubjectID_Call {
+	return &EpisodeRepo_CountsBySubjectID_Call{Call: _e.mock.On("CountsBySubjectID",
+		append([]interface{}{ctx}, subjectID...)...)}
+}
+
+func (_c *EpisodeRepo_CountsBySubjectID_Call) Run(run func(ctx context.Context, subjectID ...model.SubjectID)) *EpisodeRepo_CountsBySubjectID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]model.SubjectID, len(args)-1)
+		for i, a := range args[1:] {
+			if a != nil {
+				variadicArgs[i] = a.(model.SubjectID)
+			}
+		}
+		run(args[0].(context.Context), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *EpisodeRepo_CountsBySubjectID_Call) Return(_a0 map[model.SubjectID]int64, _a1 error) *EpisodeRepo_CountsBySubjectID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, episodeID
 func (_m *EpisodeRepo) Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error) {
 	ret := _m.Called(ctx, episodeID)

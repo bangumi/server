@@ -100,9 +100,16 @@ func (h Handler) listCollection(
 		return h.InternalError(c, err, "failed to get subjects")
 	}
 
+	episodeCount, err := h.e.CountsBySubjectID(c.Context(), subjectIDs...)
+	if err != nil {
+		return h.InternalError(c, err, "failed to get episode count")
+	}
+
 	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
-		data[i] = convertModelSubjectCollection(collection, convertModelSubject(subjectMap[collection.SubjectID]))
+		s := convertModelSubject(subjectMap[collection.SubjectID])
+		s.TotalEpisodes = episodeCount[collection.SubjectID]
+		data[i] = convertModelSubjectCollection(collection, s)
 	}
 
 	return c.JSON(res.Paged{

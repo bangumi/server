@@ -39,6 +39,7 @@ func TestHandler_ListCollection(t *testing.T) {
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
+
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().ListSubjectCollection(mock.Anything, userID, mock.Anything, mock.Anything, mock.Anything, 10, 0).
 		Return([]model.SubjectCollection{{SubjectID: subjectID}}, nil)
@@ -50,7 +51,10 @@ func TestHandler_ListCollection(t *testing.T) {
 		subjectID: {Name: "v"},
 	}, nil)
 
-	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, SubjectRepo: s})
+	e := mocks.NewEpisodeRepo(t)
+	e.EXPECT().CountsBySubjectID(mock.Anything, mock.Anything).Return(map[model.SubjectID]int64{subjectID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, SubjectRepo: s, EpisodeRepo: e})
 
 	var r test.PagedResponse
 	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections", username)).Query("limit", "10").
