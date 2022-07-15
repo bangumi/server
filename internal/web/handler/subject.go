@@ -152,55 +152,6 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	return c.Redirect(l)
 }
 
-func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
-	u := h.getHTTPAccessor(c)
-
-	id, err := parseSubjectID(c.Params("id"))
-	if err != nil || id == 0 {
-		return res.BadRequest(err.Error())
-	}
-
-	r, ok, err := h.getSubjectWithCache(c.Context(), id)
-	if err != nil {
-		return err
-	}
-
-	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
-	}
-
-	return h.listTopics(c, domain.TopicTypeSubject, uint32(id))
-}
-
-func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
-	u := h.getHTTPAccessor(c)
-
-	topicID, err := parseTopicID(c.Params("topic_id"))
-	if err != nil || topicID == 0 {
-		return errMissingTopicID
-	}
-
-	topic, err := h.getTopic(c, domain.TopicTypeSubject, topicID)
-	if err != nil {
-		return err
-	}
-
-	subjectID, err := getExpectSubjectID(c, topic)
-	if err != nil {
-		return err
-	}
-	r, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
-	if err != nil {
-		return err
-	}
-
-	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
-	}
-
-	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
-}
-
 func getExpectSubjectID(c *fiber.Ctx, topic model.Topic) (model.SubjectID, error) {
 	subjectID, err := parseSubjectID(c.Params("id"))
 	if err != nil || subjectID == 0 {

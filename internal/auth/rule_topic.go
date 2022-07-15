@@ -19,7 +19,9 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-func TopicStatuses(u domain.Auth) []model.TopicStatus {
+// 目前列表是根据 display(status) 来判断是否能看到标题，state 决定是否能查看内容。
+
+func sTopicStatuses(u domain.Auth) []model.TopicStatus {
 	if u.ID == 0 {
 		return []model.TopicStatus{model.TopicStatusNormal}
 	}
@@ -28,8 +30,8 @@ func TopicStatuses(u domain.Auth) []model.TopicStatus {
 		return []model.TopicStatus{model.TopicStatusBan, model.TopicStatusNormal, model.TopicStatusReview}
 	}
 
-	var s = make([]model.TopicStatus, 0, 2)
-	s = append(s, model.TopicStatusNormal)
+	var s = make([]model.TopicStatus, 0, 3)
+	s = append(s, model.TopicStatusBan, model.TopicStatusNormal)
 
 	if u.Permission.BanPost {
 		s = append(s, model.TopicStatusReview)
@@ -38,7 +40,7 @@ func TopicStatuses(u domain.Auth) []model.TopicStatus {
 	return s
 }
 
-func CanViewTopic(u domain.Auth, topic model.Topic) bool {
+func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {
 	if u.ID == 0 {
 		return topic.State == model.TopicStateNone
 	}

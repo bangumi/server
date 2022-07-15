@@ -37,7 +37,7 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 		return model.Topic{}, errgo.Wrap(err, "Topic.Get")
 	}
 
-	if !auth.CanViewTopic(u.Auth, topic) {
+	if !auth.CanViewTopicContent(u.Auth, topic) {
 		return model.Topic{}, res.ErrNotFound
 	}
 
