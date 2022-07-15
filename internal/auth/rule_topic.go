@@ -21,7 +21,7 @@ import (
 
 // 目前列表是根据 display(status) 来判断是否能看到标题，state 决定是否能查看内容。
 
-func sTopicStatuses(u domain.Auth) []model.TopicStatus {
+func TopicStatuses(u domain.Auth) []model.TopicStatus {
 	if u.ID == 0 {
 		return []model.TopicStatus{model.TopicStatusNormal}
 	}

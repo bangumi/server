@@ -318,9 +318,6 @@ issues:
     - source: "var log"
       linters: [gochecknoglobals]
 
-    - source: 'var Module = fx\.Module\('
-      linters: [gochecknoglobals]
-
     - linters: [goerr113, errorlint]
       source: "if err == redis.Nil {"
 
