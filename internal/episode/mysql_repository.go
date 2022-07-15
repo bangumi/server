@@ -25,8 +25,8 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/model/generic"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/pkg/vars/enum"
 )
 
@@ -197,7 +197,7 @@ func (r mysqlRepo) CountsBySubjectID(
 
 	err := r.q.Episode.WithContext(ctx).
 		Select(r.q.Episode.SubjectID.As("SubjectID"), r.q.Episode.ID.Count().As("Total")).Group(r.q.Episode.SubjectID).
-		Where(r.q.Episode.SubjectID.In(generic.SubjectIDToValuerSlice(subjectID)...)).Scan(&count)
+		Where(r.q.Episode.SubjectID.In(slice.ToValuer(subjectID)...)).Scan(&count)
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal.select.count.group")
 	}

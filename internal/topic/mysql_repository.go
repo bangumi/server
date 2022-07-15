@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 var errUnSupportTopicType = errors.New("topic type not support")
@@ -81,10 +82,10 @@ func (r mysqlRepo) Count(
 	switch topicType {
 	case domain.TopicTypeGroup:
 		count, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
-			Where(r.q.GroupTopic.Status.In(convertToUint8Status(statuses)...)).Count()
+			Where(r.q.GroupTopic.Status.In(slice.ToUint8(statuses)...)).Count()
 	case domain.TopicTypeSubject:
 		count, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).
-			Where(r.q.SubjectTopic.Status.In(convertToUint8Status(statuses)...)).Count()
+			Where(r.q.SubjectTopic.Status.In(slice.ToUint8(statuses)...)).Count()
 	default:
 		return 0, errUnSupportTopicType
 	}
@@ -92,14 +93,6 @@ func (r mysqlRepo) Count(
 		return 0, errgo.Wrap(err, "dal")
 	}
 	return count, nil
-}
-
-func convertToUint8Status(statuses []model.TopicStatus) []uint8 {
-	s := make([]uint8, len(statuses))
-	for i, v := range statuses {
-		s[i] = uint8(v)
-	}
-	return s
 }
 
 func (r mysqlRepo) List(
@@ -112,11 +105,11 @@ func (r mysqlRepo) List(
 	switch topicType {
 	case domain.TopicTypeGroup:
 		topics, err = wrapDao(r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
-			Where(r.q.GroupTopic.Status.In(convertToUint8Status(statuses)...)).
+			Where(r.q.GroupTopic.Status.In(slice.ToUint8(statuses)...)).
 			Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedTime.Desc()).Find())
 	case domain.TopicTypeSubject:
 		topics, err = wrapDao(r.q.SubjectTopic.WithContext(ctx).
-			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Where(r.q.SubjectTopic.Status.In(convertToUint8Status(statuses)...)).
+			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Where(r.q.SubjectTopic.Status.In(slice.ToUint8(statuses)...)).
 			Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedTime.Desc()).Find())
 	default:
 		return nil, errUnSupportTopicType

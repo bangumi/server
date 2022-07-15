@@ -26,8 +26,8 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/model/generic"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 func NewUserRepo(q *query.Query, log *zap.Logger) (domain.UserRepo, error) {
@@ -68,7 +68,7 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (model.User, 
 }
 
 func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(generic.UserIDToValuerSlice(ids)...)).Find()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(slice.ToValuer(ids)...)).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")

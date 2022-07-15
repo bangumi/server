@@ -14,6 +14,8 @@
 
 package slice
 
+import "database/sql/driver"
+
 func Map[T any, K any](in []T, fn func(item T) K) []K {
 	var s = make([]K, len(in))
 	for i, t := range in {
@@ -39,6 +41,33 @@ func ToMap[K comparable, T any](in []T, fn func(item T) K) map[K]T {
 	var s = make(map[K]T, len(in))
 	for _, t := range in {
 		s[fn(t)] = t
+	}
+
+	return s
+}
+
+func ToUint8[T interface{ ~uint8 }](in []T) []uint8 {
+	var s = make([]uint8, len(in))
+	for i, t := range in {
+		s[i] = uint8(t)
+	}
+
+	return s
+}
+
+func ToUint32[T interface{ ~uint32 }](in []T) []uint32 {
+	var s = make([]uint32, len(in))
+	for i, t := range in {
+		s[i] = uint32(t)
+	}
+
+	return s
+}
+
+func ToValuer[T driver.Valuer](in []T) []driver.Valuer {
+	var s = make([]driver.Valuer, len(in))
+	for i, t := range in {
+		s[i] = t
 	}
 
 	return s
