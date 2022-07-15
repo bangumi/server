@@ -32,20 +32,20 @@ type Topic struct {
 type TopicState uint8
 
 const (
-	TopicStateNone TopicState = iota
-	TopicStateClosed
-	TopicStateReopen
-	TopicStatePin
-	TopicStateMerge
-	TopicStateSilent
-	TopicStateDelete
-	TopicStatePrivate
+	TopicStateNone    TopicState = 0 // 正常
+	TopicStateClosed  TopicState = 1 // 关闭
+	TopicStateReopen  TopicState = 2 // 重开
+	TopicStatePin     TopicState = 3 // 置顶
+	TopicStateMerge   TopicState = 4 // 合并
+	TopicStateSilent  TopicState = 5 // 下沉
+	TopicStateDelete  TopicState = 6 // 自行删除
+	TopicStatePrivate TopicState = 7 // 管理员删除
 )
 
 type TopicStatus uint8
 
 const (
-	TopicStatusBan TopicStatus = iota
-	TopicStatusNormal
-	TopicStatusReview
+	TopicStatusBan    TopicStatus = 0
+	TopicStatusNormal TopicStatus = 1
+	TopicStatusReview TopicStatus = 2
 )

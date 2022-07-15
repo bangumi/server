@@ -41,8 +41,8 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 
 	switch {
 	case !u.Permission.ManageTopicState && topic.Status == model.TopicStatusReview,
-		topic.State == model.TopicStateClosed && !u.RegisteredTime(canViewStateClosedTopic),
-		topic.State == model.TopicStateDelete && !u.RegisteredTime(canViewStateDeleteTopic):
+		topic.State == model.TopicStateClosed && !u.RegisteredLongerThan(canViewStateClosedTopic),
+		topic.State == model.TopicStateDelete && !u.RegisteredLongerThan(canViewStateDeleteTopic):
 		return model.Topic{}, res.ErrNotFound
 	}
 
