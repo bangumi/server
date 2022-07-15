@@ -33,7 +33,7 @@ func TestMysqlRepo_CountReplies(t *testing.T) {
 	s, err := repo.CountReplies(context.Background(), domain.CommentTypeSubjectTopic, 1)
 	require.NoError(t, err)
 
-	require.True(t, s == 60, "count top comments")
+	require.Equal(t, 60, s, "count top comments")
 }
 
 func TestMysqlRepo_ListReplies(t *testing.T) {
@@ -45,5 +45,5 @@ func TestMysqlRepo_ListReplies(t *testing.T) {
 	s, err := repo.ListReplies(context.Background(), domain.CommentTypeSubjectTopic, 1, 0, 0)
 	require.NoError(t, err)
 
-	require.True(t, len(s) != 0, "fetch top comments")
+	require.NotEqual(t, 0, len(s), "fetch top comments")
 }

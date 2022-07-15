@@ -103,10 +103,15 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 func (h Handler) getResTopicWithComments(
 	c *fiber.Ctx, topicType domain.TopicType, topic model.Topic,
 ) error {
-	commentType := map[domain.TopicType]domain.CommentType{
-		domain.TopicTypeGroup:   domain.CommentTypeGroupTopic,
-		domain.TopicTypeSubject: domain.CommentTypeSubjectTopic,
-	}[topicType]
+	var commentType domain.CommentType
+	switch topicType {
+	case domain.TopicTypeGroup:
+		commentType = domain.CommentTypeGroupTopic
+	case domain.TopicTypeSubject:
+		commentType = domain.CommentTypeSubjectTopic
+	default:
+		return errors.New("unknown topic type")
+	}
 
 	pagedComments, err := h.listComments(c, commentType, topic.ID)
 	if err != nil {
