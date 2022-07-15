@@ -113,6 +113,7 @@ type Permission struct {
 	MonoLock           bool
 	MonoMerge          bool
 	MonoErase          bool
+	BanPost            bool
 	EpEdit             bool
 	EpMove             bool
 	EpMerge            bool
