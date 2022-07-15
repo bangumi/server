@@ -51,4 +51,4 @@ properties:
     title: Private
     type: boolean
   subject:
-    $ref: "./subject_v0.yaml"
+    $ref: "./subject_v0_slim.yaml"

@@ -100,15 +100,10 @@ func (h Handler) listCollection(
 		return h.InternalError(c, err, "failed to get subjects")
 	}
 
-	episodeCount, err := h.e.CountsBySubjectID(c.Context(), subjectIDs...)
-	if err != nil {
-		return h.InternalError(c, err, "failed to get episode count")
-	}
-
 	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
-		s := convertModelSubject(subjectMap[collection.SubjectID], episodeCount[collection.SubjectID])
-		data[i] = convertModelSubjectCollection(collection, s)
+		s := subjectMap[collection.SubjectID]
+		data[i] = convertModelSubjectCollection(collection, res.ToSlimSubjectV0(s))
 	}
 
 	return c.JSON(res.Paged{
@@ -167,23 +162,21 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 		return h.InternalError(c, err, "failed to subject info", log.SubjectID(subjectID))
 	}
 
-	return res.JSON(c, convertModelSubjectCollection(collection, s))
+	return res.JSON(c, convertModelSubjectCollection(collection, s.Slim()))
 }
 
-func convertModelSubjectCollection(
-	collection model.SubjectCollection, subject res.SubjectV0,
-) res.SubjectCollection {
+func convertModelSubjectCollection(c model.SubjectCollection, subject res.SlimSubjectV0) res.SubjectCollection {
 	return res.SubjectCollection{
-		SubjectID:   collection.SubjectID,
-		SubjectType: collection.SubjectType,
-		Rate:        collection.Rate,
-		Type:        collection.Type,
-		Tags:        collection.Tags,
-		EpStatus:    collection.EpStatus,
-		VolStatus:   collection.VolStatus,
-		UpdatedAt:   collection.UpdatedAt,
-		Private:     collection.Private,
-		Comment:     nilString(collection.Comment),
+		SubjectID:   c.SubjectID,
+		SubjectType: c.SubjectType,
+		Rate:        c.Rate,
+		Type:        c.Type,
+		Tags:        c.Tags,
+		EpStatus:    c.EpStatus,
+		VolStatus:   c.VolStatus,
+		UpdatedAt:   c.UpdatedAt,
+		Private:     c.Private,
+		Comment:     nilString(c.Comment),
 		Subject:     subject,
 	}
 }

@@ -27,8 +27,6 @@ type EpisodeRepo interface {
 	// Count all episode for a subject.
 	Count(ctx context.Context, subjectID model.SubjectID) (int64, error)
 
-	CountsBySubjectID(ctx context.Context, subjectID ...model.SubjectID) (map[model.SubjectID]int64, error)
-
 	// CountByType count episode for a subject and filter by type.
 	// This is because 0 means episode type normal.
 	CountByType(ctx context.Context, subjectID model.SubjectID, epType model.EpType) (int64, error)
