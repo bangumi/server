@@ -44,15 +44,15 @@ func wrapDao[T mysqlTopic](data []T, err error) ([]model.Topic, error) {
 	var s = make([]model.Topic, len(data))
 	for i, item := range data {
 		s[i] = model.Topic{
-			CreatedTime: item.GetCreateTime(),
-			UpdatedTime: item.GetUpdateTime(),
-			Title:       item.GetTitle(),
-			ID:          model.TopicID(item.GetID()),
-			CreatorID:   model.UserID(item.GetCreatorID()),
-			State:       model.TopicState(item.GetState()),
-			Replies:     item.GetReplies(),
-			ObjectID:    item.GetObjectID(),
-			Status:      model.TopicStatus(item.GetStatus()),
+			CreatedAt: item.GetCreateTime(),
+			UpdatedAt: item.GetUpdateTime(),
+			Title:     item.GetTitle(),
+			ID:        model.TopicID(item.GetID()),
+			CreatorID: model.UserID(item.GetCreatorID()),
+			State:     model.TopicState(item.GetState()),
+			Replies:   item.GetReplies(),
+			ObjectID:  item.GetObjectID(),
+			Status:    model.TopicStatus(item.GetStatus()),
 		}
 	}
 

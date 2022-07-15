@@ -17,10 +17,9 @@ package model
 import "time"
 
 type Topic struct {
-	CreatedTime time.Time
-	UpdatedTime time.Time
-	Title       string
-	// Comments    []Comment
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Title     string
 	ID        TopicID
 	CreatorID UserID
 	Replies   uint32

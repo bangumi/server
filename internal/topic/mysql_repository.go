@@ -60,15 +60,15 @@ func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model
 	}
 
 	return model.Topic{
-		CreatedTime: topic.GetCreateTime(),
-		UpdatedTime: topic.GetUpdateTime(),
-		Title:       topic.GetTitle(),
-		ID:          model.TopicID(topic.GetID()),
-		CreatorID:   model.UserID(topic.GetCreatorID()),
-		State:       model.TopicState(topic.GetState()),
-		Replies:     topic.GetReplies(),
-		ObjectID:    topic.GetObjectID(),
-		Status:      model.TopicStatus(topic.GetStatus()),
+		CreatedAt: topic.GetCreateTime(),
+		UpdatedAt: topic.GetUpdateTime(),
+		Title:     topic.GetTitle(),
+		ID:        model.TopicID(topic.GetID()),
+		CreatorID: model.UserID(topic.GetCreatorID()),
+		State:     model.TopicState(topic.GetState()),
+		Replies:   topic.GetReplies(),
+		ObjectID:  topic.GetObjectID(),
+		Status:    model.TopicStatus(topic.GetStatus()),
 	}, nil
 }
 

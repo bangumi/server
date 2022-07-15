@@ -16,19 +16,16 @@ package handler
 
 import (
 	"errors"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/web/res"
 )
-
-const canViewStateClosedTopic = -time.Hour * 24 * 180
-const canViewStateDeleteTopic = -time.Hour * 24 * 180
 
 func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
 	u := h.getHTTPAccessor(c)
@@ -40,10 +37,7 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 		return model.Topic{}, errgo.Wrap(err, "Topic.Get")
 	}
 
-	switch {
-	case !u.Permission.ManageTopicState && topic.Status == model.TopicStatusReview,
-		topic.State == model.TopicStateClosed && !u.RegisteredLongerThan(canViewStateClosedTopic),
-		topic.State == model.TopicStateDelete && !u.RegisteredLongerThan(canViewStateDeleteTopic):
+	if !auth.CanViewTopic(u.Auth, topic) {
 		return model.Topic{}, res.ErrNotFound
 	}
 
@@ -62,7 +56,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		Offset: page.Offset,
 	}
 
-	statuses := u.TopicStatuses()
+	statuses := auth.TopicStatuses(u.Auth)
 
 	count, err := h.topic.Count(c.Context(), topicType, id, statuses)
 	if err != nil {
@@ -96,8 +90,8 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		data[i] = res.Topic{
 			ID:        topic.ID,
 			Title:     topic.Title,
-			CreatedAt: topic.CreatedTime,
-			UpdatedAt: topic.UpdatedTime,
+			CreatedAt: topic.CreatedAt,
+			UpdatedAt: topic.UpdatedAt,
 			Creator:   convertModelUser(userMap[topic.CreatorID]),
 			Replies:   topic.Replies,
 		}
@@ -127,8 +121,8 @@ func (h Handler) getResTopicWithComments(
 	response := res.Topic{
 		ID:        topic.ID,
 		Title:     topic.Title,
-		CreatedAt: topic.CreatedTime,
-		UpdatedAt: topic.UpdatedTime,
+		CreatedAt: topic.CreatedAt,
+		UpdatedAt: topic.UpdatedAt,
 		Creator:   convertModelUser(u[topic.CreatorID]),
 		Replies:   topic.Replies,
 		Comments:  pagedComments,
