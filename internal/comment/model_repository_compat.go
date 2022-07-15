@@ -17,6 +17,7 @@ package comment
 import (
 	"time"
 
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -43,3 +44,9 @@ type mysqlComment interface {
 	RelatedTo() model.CommentID
 	GetMentionedID() model.UserID
 }
+
+var _ mysqlComment = (*dao.SubjectTopicComment)(nil)
+var _ mysqlComment = (*dao.GroupTopicComment)(nil)
+var _ mysqlComment = (*dao.EpisodeComment)(nil)
+var _ mysqlComment = (*dao.CharacterComment)(nil)
+var _ mysqlComment = (*dao.PersonComment)(nil)
