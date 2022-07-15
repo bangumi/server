@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 type v0wiki = []any
@@ -46,6 +47,68 @@ type SubjectV0 struct {
 	Locked        bool                  `json:"locked"`
 	NSFW          bool                  `json:"nsfw"`
 	TypeID        model.SubjectType     `json:"type"`
+}
+
+func (s SubjectV0) Slim() SlimSubjectV0 {
+	return SlimSubjectV0{
+		ID:              s.ID,
+		Name:            s.Name,
+		NameCN:          s.Name,
+		Date:            s.Date,
+		Tags:            slice.First(s.Tags, 10),
+		Summary:         s.Summary,
+		Image:           s.Image,
+		Eps:             s.Eps,
+		Volumes:         s.Volumes,
+		CollectionTotal: s.Rating.Total,
+		Rank:            s.Rating.Rank,
+		Score:           s.Rating.Score,
+		Type:            s.TypeID,
+	}
+}
+
+type SlimSubjectV0 struct {
+	Date            *string           `json:"date"`
+	Image           SubjectImages     `json:"images"`
+	Name            string            `json:"name"`
+	NameCN          string            `json:"name_cn"`
+	Summary         string            `json:"summary"`
+	Tags            []SubjectTag      `json:"tags"`
+	Score           float64           `json:"score"`
+	Type            model.SubjectType `json:"type"`
+	ID              model.SubjectID   `json:"id"`
+	Eps             uint32            `json:"eps"`
+	Volumes         uint32            `json:"volumes"`
+	CollectionTotal uint32            `json:"collection_total"`
+	Rank            uint32            `json:"rank"`
+}
+
+func ToSlimSubjectV0(s model.Subject) SlimSubjectV0 {
+	var date *string
+	if s.Date != "" {
+		v := s.Date
+		date = &v
+	}
+	return SlimSubjectV0{
+		ID:     s.ID,
+		Name:   s.Name,
+		NameCN: s.Name,
+		Date:   date,
+		Tags: slice.Map(slice.First(s.Tags, 10), func(item model.Tag) SubjectTag {
+			return SubjectTag{
+				Name:  item.Name,
+				Count: item.Count,
+			}
+		}),
+		Summary:         s.Summary,
+		Image:           SubjectImage(s.Image),
+		Eps:             s.Eps,
+		Volumes:         s.Volumes,
+		CollectionTotal: s.Rating.Total,
+		Rank:            s.Rating.Rank,
+		Score:           s.Rating.Score,
+		Type:            s.TypeID,
+	}
 }
 
 type SubjectCollectionStat struct {
@@ -149,7 +212,7 @@ type Actor struct {
 	Locked       bool           `json:"locked"`
 }
 
-type SlimSubjectV0 struct {
+type IndexSubjectV0 struct {
 	AddedAt time.Time         `json:"added_at"`
 	Date    *string           `json:"date"`
 	Image   SubjectImages     `json:"images"`

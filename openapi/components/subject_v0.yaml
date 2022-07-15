@@ -12,6 +12,7 @@ required:
   - eps
   - total_episodes
   - rating
+  - images
   - collection
   - tags
 type: object

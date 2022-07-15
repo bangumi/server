@@ -34,3 +34,13 @@ func MapFilter[T any, K any](in []T, fn func(item T) (k K, ok bool)) []K {
 
 	return s
 }
+
+func First[T any](in []T, end int) []T {
+	if len(in) < end {
+		end = len(in)
+	}
+
+	out := make([]T, end)
+	copy(out, in)
+	return out
+}

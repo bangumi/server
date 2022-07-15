@@ -159,9 +159,9 @@ func (h Handler) getIndexSubjects(
 		return errgo.Wrap(err, "Index.ListSubjects")
 	}
 
-	var data = make([]res.SlimSubjectV0, len(subjects))
+	var data = make([]res.IndexSubjectV0, len(subjects))
 	for i, s := range subjects {
-		data[i] = res.SlimSubjectV0{
+		data[i] = res.IndexSubjectV0{
 			AddedAt: s.AddedAt,
 			Date:    nilString(s.Subject.Date),
 			Image:   res.SubjectImage(s.Subject.Image),
