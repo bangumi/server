@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package comment
+package topic
 
 import (
 	"context"
@@ -20,9 +20,7 @@ import (
 	"sort"
 
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -30,56 +28,11 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-type mysqlRepo struct {
-	q   *query.Query
-	log *zap.Logger
-}
+var errUnsupportedCommentType = errors.New("comment type not support")
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CommentRepo, error) {
-	return mysqlRepo{q: q, log: log.Named("comment.mysqlRepo")}, nil
-}
+func (r mysqlRepo) CountReplies(ctx context.Context, commentType domain.CommentType, id model.TopicID) (int64, error) {
+	// 第一个回复是楼主的发帖，后续的才是回复。
 
-func (r mysqlRepo) Get(ctx context.Context, commentType domain.CommentType, id model.CommentID) (model.Comment, error) {
-	var comment mysqlComment
-	var err error
-	switch commentType {
-	case domain.CommentTypeGroupTopic:
-		comment, err = r.q.GroupTopicComment.WithContext(ctx).Where(r.q.GroupTopicComment.ID.Eq(uint32(id))).First()
-	case domain.CommentTypeSubjectTopic:
-		comment, err = r.q.SubjectTopicComment.WithContext(ctx).Where(r.q.SubjectTopicComment.ID.Eq(uint32(id))).First()
-	case domain.CommentIndex:
-		comment, err = r.q.IndexComment.WithContext(ctx).Where(r.q.IndexComment.ID.Eq(uint32(id))).First()
-	case domain.CommentCharacter:
-		comment, err = r.q.CharacterComment.WithContext(ctx).Where(r.q.CharacterComment.ID.Eq(uint32(id))).First()
-	case domain.CommentPerson:
-		comment, err = r.q.CharacterComment.WithContext(ctx).Where(r.q.CharacterComment.ID.Eq(uint32(id))).First()
-	case domain.CommentEpisode:
-		comment, err = r.q.EpisodeComment.WithContext(ctx).Where(r.q.EpisodeComment.ID.Eq(uint32(id))).First()
-	default:
-		return model.Comment{}, errUnsupportCommentType
-	}
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Comment{}, domain.ErrNotFound
-		}
-
-		r.log.Error("unexpected error happened", zap.Error(err))
-		return model.Comment{}, errgo.Wrap(err, "dal")
-	}
-
-	return model.Comment{
-		CreatedAt:   comment.CreateAt(),
-		Content:     comment.GetContent(),
-		CreatorID:   comment.CreatorID(),
-		State:       comment.GetState(),
-		ID:          comment.CommentID(),
-		SubComments: nil,
-	}, nil
-}
-
-var errUnsupportCommentType = errors.New("comment type not support")
-
-func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id model.TopicID) (int64, error) {
 	var count int64
 	var err error
 	switch commentType {
@@ -102,15 +55,15 @@ func (r mysqlRepo) Count(ctx context.Context, commentType domain.CommentType, id
 		count, err = r.q.EpisodeComment.WithContext(ctx).
 			Where(r.q.EpisodeComment.Related.Eq(0), r.q.EpisodeComment.MentionedID.Eq(uint32(id))).Count()
 	default:
-		return 0, errUnsupportCommentType
+		return 0, errUnsupportedCommentType
 	}
 	if err != nil {
-		return count, errgo.Wrap(err, "dal")
+		return 0, errgo.Wrap(err, "dal")
 	}
-	return count, nil
+	return count - 1, nil
 }
 
-func (r mysqlRepo) List(
+func (r mysqlRepo) ListReplies(
 	ctx context.Context, commentType domain.CommentType, id model.TopicID, limit int, offset int,
 ) ([]model.Comment, error) {
 	commentMap, err := r.getParentComments(ctx, commentType, id, limit, offset)
@@ -180,7 +133,7 @@ func (r mysqlRepo) getParentComments(
 			Where(r.q.EpisodeComment.Related.Eq(0), r.q.EpisodeComment.MentionedID.Eq(uint32(id))).
 			Offset(offset).Limit(limit).Order(r.q.EpisodeComment.CreatedTime, r.q.EpisodeComment.ID).Find())
 	default:
-		return nil, errUnsupportCommentType
+		return nil, errUnsupportedCommentType
 	}
 
 	if err != nil {
@@ -239,7 +192,7 @@ func (r mysqlRepo) getSubComments(
 			Where(r.q.EpisodeComment.Related.In(commentIDs...), r.q.EpisodeComment.MentionedID.Eq(uint32(id))).
 			Order(r.q.EpisodeComment.Related, r.q.EpisodeComment.CreatedTime).Find())
 	default:
-		return nil, errUnsupportCommentType
+		return nil, errUnsupportedCommentType
 	}
 
 	if err != nil {

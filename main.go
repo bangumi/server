@@ -25,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collection"
-	"github.com/bangumi/server/internal/comment"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dal/query"
@@ -84,7 +83,7 @@ func start() error {
 
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
-			comment.NewMysqlRepo, topic.NewMysqlRepo,
+			topic.NewMysqlRepo,
 
 			auth.NewService, character.NewService, subject.NewService, person.NewService, group.NewMysqlRepo,
 		),

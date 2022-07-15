@@ -50,7 +50,6 @@ func New(
 	collect domain.CollectionRepo,
 	r domain.RevisionRepo,
 	topic domain.TopicRepo,
-	comment domain.CommentRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
@@ -85,7 +84,6 @@ func New(
 		i:                    index,
 		r:                    r,
 		topic:                topic,
-		comment:              comment,
 		captcha:              captcha,
 		g:                    g,
 		v:                    validate,
@@ -113,7 +111,6 @@ type Handler struct {
 	i                    domain.IndexRepo
 	r                    domain.RevisionRepo
 	topic                domain.TopicRepo
-	comment              domain.CommentRepo
 	g                    domain.GroupRepo
 	cache                cache.Generic
 	validatorTranslation ut.Translator

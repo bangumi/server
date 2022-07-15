@@ -71,6 +71,52 @@ func (_c *TopicRepo_Count_Call) Return(_a0 int64, _a1 error) *TopicRepo_Count_Ca
 	return _c
 }
 
+// CountReplies provides a mock function with given fields: ctx, commentType, id
+func (_m *TopicRepo) CountReplies(ctx context.Context, commentType domain.CommentType, id model.TopicID) (int64, error) {
+	ret := _m.Called(ctx, commentType, id)
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, model.TopicID) int64); ok {
+		r0 = rf(ctx, commentType, id)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, model.TopicID) error); ok {
+		r1 = rf(ctx, commentType, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// TopicRepo_CountReplies_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountReplies'
+type TopicRepo_CountReplies_Call struct {
+	*mock.Call
+}
+
+// CountReplies is a helper method to define mock.On call
+//  - ctx context.Context
+//  - commentType domain.CommentType
+//  - id model.TopicID
+func (_e *TopicRepo_Expecter) CountReplies(ctx interface{}, commentType interface{}, id interface{}) *TopicRepo_CountReplies_Call {
+	return &TopicRepo_CountReplies_Call{Call: _e.mock.On("CountReplies", ctx, commentType, id)}
+}
+
+func (_c *TopicRepo_CountReplies_Call) Run(run func(ctx context.Context, commentType domain.CommentType, id model.TopicID)) *TopicRepo_CountReplies_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(domain.CommentType), args[2].(model.TopicID))
+	})
+	return _c
+}
+
+func (_c *TopicRepo_CountReplies_Call) Return(_a0 int64, _a1 error) *TopicRepo_CountReplies_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, topicType, id
 func (_m *TopicRepo) Get(ctx context.Context, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
 	ret := _m.Called(ctx, topicType, id)
@@ -164,6 +210,56 @@ func (_c *TopicRepo_List_Call) Run(run func(ctx context.Context, topicType domai
 }
 
 func (_c *TopicRepo_List_Call) Return(_a0 []model.Topic, _a1 error) *TopicRepo_List_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// ListReplies provides a mock function with given fields: ctx, commentType, id, limit, offset
+func (_m *TopicRepo) ListReplies(ctx context.Context, commentType domain.CommentType, id model.TopicID, limit int, offset int) ([]model.Comment, error) {
+	ret := _m.Called(ctx, commentType, id, limit, offset)
+
+	var r0 []model.Comment
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, model.TopicID, int, int) []model.Comment); ok {
+		r0 = rf(ctx, commentType, id, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Comment)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, model.TopicID, int, int) error); ok {
+		r1 = rf(ctx, commentType, id, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// TopicRepo_ListReplies_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListReplies'
+type TopicRepo_ListReplies_Call struct {
+	*mock.Call
+}
+
+// ListReplies is a helper method to define mock.On call
+//  - ctx context.Context
+//  - commentType domain.CommentType
+//  - id model.TopicID
+//  - limit int
+//  - offset int
+func (_e *TopicRepo_Expecter) ListReplies(ctx interface{}, commentType interface{}, id interface{}, limit interface{}, offset interface{}) *TopicRepo_ListReplies_Call {
+	return &TopicRepo_ListReplies_Call{Call: _e.mock.On("ListReplies", ctx, commentType, id, limit, offset)}
+}
+
+func (_c *TopicRepo_ListReplies_Call) Run(run func(ctx context.Context, commentType domain.CommentType, id model.TopicID, limit int, offset int)) *TopicRepo_ListReplies_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(domain.CommentType), args[2].(model.TopicID), args[3].(int), args[4].(int))
+	})
+	return _c
+}
+
+func (_c *TopicRepo_ListReplies_Call) Return(_a0 []model.Comment, _a1 error) *TopicRepo_ListReplies_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

@@ -12,34 +12,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+package topic
 
 import (
-	"testing"
+	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/mocks"
-	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/domain"
 )
 
-func TestGetWebApp(t *testing.T) {
-	t.Parallel()
+type mysqlRepo struct {
+	q   *query.Query
+	log *zap.Logger
+}
 
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: mocks.NewSubjectRepo(t),
-			AuthRepo:    mocks.NewAuthRepo(t),
-			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			TopicRepo:   mocks.NewTopicRepo(t),
-			Cache:       mocks.NewCache(t),
-		},
-	)
-
-	test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: mocks.NewSubjectRepo(t),
-			AuthRepo:    mocks.NewAuthRepo(t),
-			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			Cache:       mocks.NewCache(t),
-		},
-	)
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TopicRepo, error) {
+	return mysqlRepo{q: q, log: log.Named("subject.mysqlRepo")}, nil
 }

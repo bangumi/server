@@ -34,7 +34,7 @@ func (h Handler) listComments(
 		return res.PagedComment{}, res.ErrNotFound
 	}
 
-	count, err := h.comment.Count(c.Context(), commentType, id)
+	count, err := h.topic.CountReplies(c.Context(), commentType, id)
 	if err != nil {
 		return res.PagedComment{}, errgo.Wrap(err, "repo.comments.Count")
 	}
@@ -49,7 +49,7 @@ func (h Handler) listComments(
 		return res.PagedComment{}, err
 	}
 
-	comments, err := h.comment.List(c.Context(), commentType, id, page.Limit, page.Offset)
+	comments, err := h.topic.ListReplies(c.Context(), commentType, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.PagedComment{}, res.ErrNotFound

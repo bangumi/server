@@ -15,7 +15,6 @@
 package topic_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -23,7 +22,6 @@ import (
 
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/topic"
 )
@@ -34,41 +32,4 @@ func getRepo(t *testing.T) domain.TopicRepo {
 	require.NoError(t, err)
 
 	return repo
-}
-
-func TestMysqlRepo_Get(t *testing.T) {
-	test.RequireEnv(t, test.EnvMysql)
-	t.Parallel()
-
-	repo := getRepo(t)
-
-	s, err := repo.Get(context.Background(), domain.TopicTypeSubject, 1)
-	require.NoError(t, err)
-
-	require.Equal(t, model.TopicID(1), s.ID)
-}
-
-func TestMysqlRepo_Count(t *testing.T) {
-	test.RequireEnv(t, test.EnvMysql)
-	t.Parallel()
-
-	repo := getRepo(t)
-
-	count, err := repo.Count(context.Background(), domain.TopicTypeSubject, 1, []model.TopicStatus{
-		model.TopicStatusNormal,
-	})
-	require.NoError(t, err)
-	require.Equal(t, count, int64(1))
-}
-
-func TestMysqlRepo_List(t *testing.T) {
-	test.RequireEnv(t, test.EnvMysql)
-	t.Parallel()
-
-	repo := getRepo(t)
-
-	_, err := repo.List(context.Background(), domain.TopicTypeSubject, 2, []model.TopicStatus{
-		model.TopicStatusNormal,
-	}, 0, 0)
-	require.NoError(t, err)
 }

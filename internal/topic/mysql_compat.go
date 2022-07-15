@@ -58,3 +58,33 @@ func wrapDao[T mysqlTopic](data []T, err error) ([]model.Topic, error) {
 
 	return s, err
 }
+
+type mysqlComment interface {
+	CommentID() model.CommentID
+	CreatorID() model.UserID
+	IsSubComment() bool
+	CreateAt() time.Time
+	GetContent() string
+	GetState() uint8
+	RelatedTo() model.CommentID
+	GetMentionedID() model.UserID
+}
+
+func wrapCommentDao[T mysqlComment](data []T, err error) ([]mysqlComment, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var s = make([]mysqlComment, len(data))
+	for i, item := range data {
+		s[i] = item
+	}
+
+	return s, nil
+}
+
+var _ mysqlComment = (*dao.SubjectTopicComment)(nil)
+var _ mysqlComment = (*dao.GroupTopicComment)(nil)
+var _ mysqlComment = (*dao.EpisodeComment)(nil)
+var _ mysqlComment = (*dao.CharacterComment)(nil)
+var _ mysqlComment = (*dao.PersonComment)(nil)

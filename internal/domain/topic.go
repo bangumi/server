@@ -35,6 +35,23 @@ type TopicRepo interface {
 		statuses []model.TopicStatus,
 		limit int, offset int,
 	) ([]model.Topic, error)
+
+	// CountReplies top comments for a topic/index/character/person/episode.
+	// 一级回复
+	CountReplies(ctx context.Context, commentType CommentType, id model.TopicID) (int64, error)
+
+	// ListReplies return paged top comment tree.
+	//
+	//  []model.Comment{
+	//    一级回复
+	// 		{
+	//  	  一级回复对应的 **全部** 二级回复
+	//	 		SubComments: []model.SubComments{}
+	// 		}
+	// }
+	ListReplies(
+		ctx context.Context, commentType CommentType, id model.TopicID, limit int, offset int,
+	) ([]model.Comment, error)
 }
 
 type TopicType uint32
@@ -43,4 +60,16 @@ const (
 	TopicTypeUnknown TopicType = iota
 	TopicTypeSubject
 	TopicTypeGroup
+)
+
+type CommentType uint32
+
+const (
+	CommentTypeUnknown CommentType = iota
+	CommentTypeSubjectTopic
+	CommentTypeGroupTopic
+	CommentIndex
+	CommentCharacter
+	CommentPerson
+	CommentEpisode
 )

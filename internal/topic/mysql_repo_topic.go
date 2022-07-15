@@ -21,7 +21,6 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -29,15 +28,6 @@ import (
 )
 
 var errUnSupportTopicType = errors.New("topic type not support")
-
-type mysqlRepo struct {
-	q   *query.Query
-	log *zap.Logger
-}
-
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TopicRepo, error) {
-	return mysqlRepo{q: q, log: log.Named("subject.mysqlRepo")}, nil
-}
 
 func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
 	var topic mysqlTopic
