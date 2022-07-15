@@ -104,6 +104,7 @@ func (r mysqlRepo) ListReplies(
 func (r mysqlRepo) getParentComments(
 	ctx context.Context, commentType domain.CommentType, id model.TopicID, limit int, offset int,
 ) (map[model.CommentID]model.Comment, error) {
+	offset++
 	var comments []mysqlComment
 	var err error
 
