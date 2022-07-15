@@ -16,7 +16,7 @@ package domain
 
 import "github.com/bangumi/server/internal/model"
 
-func (u Auth) Topic() []model.TopicStatus {
+func (u Auth) TopicStatuses() []model.TopicStatus {
 	if u.ID == 0 {
 		return []model.TopicStatus{model.TopicStatusNormal}
 	}

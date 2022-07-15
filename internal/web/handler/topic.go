@@ -23,6 +23,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -49,35 +50,31 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 	return topic, nil
 }
 
-func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[model.UserID]model.User, error) {
-	userIDs := make([]model.UserID, 0)
-	for _, topic := range topics {
-		userIDs = append(userIDs, topic.CreatorID)
-		// for _, v := range topic.Comments {
-		// 	userIDs = append(userIDs, v.CreatorID)
-		// }
-	}
-	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
-	if err != nil {
-		return nil, errgo.Wrap(err, "user.GetByIDs")
-	}
-	return userMap, nil
-}
-
 func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32) error {
 	u := h.getHTTPAccessor(c)
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
-		return res.ErrNotFound
+		return err
 	}
 	var response = res.Paged{
+		Data:   res.EmptySlice(),
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	}
 
-	statuses := []model.TopicStatus{model.TopicStatusNormal}
-	if u.Permission.ManageTopicState {
-		statuses = append(statuses, model.TopicStatusReview)
+	statuses := u.TopicStatuses()
+
+	count, err := h.topic.Count(c.Context(), topicType, id, statuses)
+	if err != nil {
+		return errgo.Wrap(err, "repo.topic.Count")
+	}
+
+	if count == 0 {
+		return res.JSON(c, response)
+	}
+
+	if err = page.check(count); err != nil {
+		return err
 	}
 
 	topics, err := h.topic.List(c.Context(), topicType, id, statuses, page.Limit, page.Offset)
@@ -85,14 +82,12 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		return errgo.Wrap(err, "repo.topic.GetTopics")
 	}
 
-	userMap, err := h.getUserMapOfTopics(c, topics...)
+	userIDs := slice.Map(topics, func(item model.Topic) model.UserID {
+		return item.CreatorID
+	})
+	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
-	}
-
-	count, err := h.topic.Count(c.Context(), topicType, id, statuses)
-	if err != nil {
-		return errgo.Wrap(err, "repo.topic.Count")
 	}
 
 	response.Total = count
@@ -108,7 +103,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		}
 	}
 	response.Data = data
-	return c.JSON(response)
+	return res.JSON(c, response)
 }
 
 func (h Handler) getResTopicWithComments(

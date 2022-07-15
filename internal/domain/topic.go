@@ -27,8 +27,13 @@ type TopicRepo interface {
 	Count(ctx context.Context, topicType TopicType, id uint32, statuses []model.TopicStatus) (int64, error)
 
 	// List return paged topic list of a subject/group.
+	// userID should not be filtered
 	List(
-		ctx context.Context, topicType TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int,
+		ctx context.Context,
+		topicType TopicType,
+		id uint32,
+		statuses []model.TopicStatus,
+		limit int, offset int,
 	) ([]model.Topic, error)
 }
 

@@ -116,75 +116,13 @@ func (_c *CommentRepo_Get_Call) Return(_a0 model.Comment, _a1 error) *CommentRep
 	return _c
 }
 
-// GetByRelateIDs provides a mock function with given fields: ctx, commentType, ids
-func (_m *CommentRepo) GetByRelateIDs(ctx context.Context, commentType domain.CommentType, ids ...model.CommentID) (map[model.CommentID][]model.Comment, error) {
-	_va := make([]interface{}, len(ids))
-	for _i := range ids {
-		_va[_i] = ids[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx, commentType)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	var r0 map[model.CommentID][]model.Comment
-	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, ...model.CommentID) map[model.CommentID][]model.Comment); ok {
-		r0 = rf(ctx, commentType, ids...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[model.CommentID][]model.Comment)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, ...model.CommentID) error); ok {
-		r1 = rf(ctx, commentType, ids...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// CommentRepo_GetByRelateIDs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByRelateIDs'
-type CommentRepo_GetByRelateIDs_Call struct {
-	*mock.Call
-}
-
-// GetByRelateIDs is a helper method to define mock.On call
-//  - ctx context.Context
-//  - commentType domain.CommentType
-//  - ids ...model.CommentID
-func (_e *CommentRepo_Expecter) GetByRelateIDs(ctx interface{}, commentType interface{}, ids ...interface{}) *CommentRepo_GetByRelateIDs_Call {
-	return &CommentRepo_GetByRelateIDs_Call{Call: _e.mock.On("GetByRelateIDs",
-		append([]interface{}{ctx, commentType}, ids...)...)}
-}
-
-func (_c *CommentRepo_GetByRelateIDs_Call) Run(run func(ctx context.Context, commentType domain.CommentType, ids ...model.CommentID)) *CommentRepo_GetByRelateIDs_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]model.CommentID, len(args)-2)
-		for i, a := range args[2:] {
-			if a != nil {
-				variadicArgs[i] = a.(model.CommentID)
-			}
-		}
-		run(args[0].(context.Context), args[1].(domain.CommentType), variadicArgs...)
-	})
-	return _c
-}
-
-func (_c *CommentRepo_GetByRelateIDs_Call) Return(_a0 map[model.CommentID][]model.Comment, _a1 error) *CommentRepo_GetByRelateIDs_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-// List provides a mock function with given fields: ctx, commentType, topicID, limit, offset
-func (_m *CommentRepo) List(ctx context.Context, commentType domain.CommentType, topicID model.TopicID, limit int, offset int) ([]model.Comment, error) {
-	ret := _m.Called(ctx, commentType, topicID, limit, offset)
+// List provides a mock function with given fields: ctx, commentType, id, limit, offset
+func (_m *CommentRepo) List(ctx context.Context, commentType domain.CommentType, id model.TopicID, limit int, offset int) ([]model.Comment, error) {
+	ret := _m.Called(ctx, commentType, id, limit, offset)
 
 	var r0 []model.Comment
 	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, model.TopicID, int, int) []model.Comment); ok {
-		r0 = rf(ctx, commentType, topicID, limit, offset)
+		r0 = rf(ctx, commentType, id, limit, offset)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]model.Comment)
@@ -193,7 +131,7 @@ func (_m *CommentRepo) List(ctx context.Context, commentType domain.CommentType,
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, model.TopicID, int, int) error); ok {
-		r1 = rf(ctx, commentType, topicID, limit, offset)
+		r1 = rf(ctx, commentType, id, limit, offset)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -209,14 +147,14 @@ type CommentRepo_List_Call struct {
 // List is a helper method to define mock.On call
 //  - ctx context.Context
 //  - commentType domain.CommentType
-//  - topicID model.TopicID
+//  - id model.TopicID
 //  - limit int
 //  - offset int
-func (_e *CommentRepo_Expecter) List(ctx interface{}, commentType interface{}, topicID interface{}, limit interface{}, offset interface{}) *CommentRepo_List_Call {
-	return &CommentRepo_List_Call{Call: _e.mock.On("List", ctx, commentType, topicID, limit, offset)}
+func (_e *CommentRepo_Expecter) List(ctx interface{}, commentType interface{}, id interface{}, limit interface{}, offset interface{}) *CommentRepo_List_Call {
+	return &CommentRepo_List_Call{Call: _e.mock.On("List", ctx, commentType, id, limit, offset)}
 }
 
-func (_c *CommentRepo_List_Call) Run(run func(ctx context.Context, commentType domain.CommentType, topicID model.TopicID, limit int, offset int)) *CommentRepo_List_Call {
+func (_c *CommentRepo_List_Call) Run(run func(ctx context.Context, commentType domain.CommentType, id model.TopicID, limit int, offset int)) *CommentRepo_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(domain.CommentType), args[2].(model.TopicID), args[3].(int), args[4].(int))
 	})
