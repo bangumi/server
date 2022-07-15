@@ -2096,6 +2096,8 @@ components:
           type: integer
     Subject:
       $ref: "./components/subject_v0.yaml"
+    SlimSubject:
+      $ref: "./components/subject_v0_slim.yaml"
     SubjectType:
       $ref: "./components/subject_type.yaml"
     UserSubjectCollection:

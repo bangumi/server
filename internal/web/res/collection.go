@@ -24,7 +24,7 @@ type SubjectCollection struct {
 	UpdatedAt   time.Time            `json:"updated_at"`
 	Comment     *string              `json:"comment"`
 	Tags        []string             `json:"tags"`
-	Subject     SubjectV0            `json:"subject"`
+	Subject     SlimSubjectV0        `json:"subject"`
 	SubjectID   model.SubjectID      `json:"subject_id"`
 	VolStatus   uint32               `json:"vol_status"`
 	EpStatus    uint32               `json:"ep_status"`

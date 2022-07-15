@@ -64,6 +64,16 @@ func ToUint32[T interface{ ~uint32 }](in []T) []uint32 {
 	return s
 }
 
+func First[T any](in []T, end int) []T {
+	if len(in) < end {
+		end = len(in)
+	}
+
+	out := make([]T, end)
+	copy(out, in)
+	return out
+}
+
 func ToValuer[T driver.Valuer](in []T) []driver.Valuer {
 	var s = make([]driver.Valuer, len(in))
 	for i, t := range in {
