@@ -31,3 +31,5 @@ type PagedG[T any] struct {
 	Limit  int   `json:"limit"`
 	Offset int   `json:"offset"`
 }
+
+type PagedComment = PagedG[Comment]

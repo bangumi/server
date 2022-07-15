@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic"
+	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
@@ -118,7 +118,7 @@ func (r mysqlRepo) List(
 		return nil, err
 	}
 
-	comments, err := r.getSubComments(ctx, commentType, id, generic.MapKeys(commentMap)...)
+	comments, err := r.getSubComments(ctx, commentType, id, gmap.Keys(commentMap)...)
 	if err != nil {
 		r.log.Error("failed to get sub replies")
 		return nil, err
@@ -140,7 +140,7 @@ func (r mysqlRepo) List(
 		commentMap[parent.ID] = parent
 	}
 
-	data := generic.MapValues(commentMap)
+	data := gmap.Values(commentMap)
 	sort.Slice(data, func(i, j int) bool {
 		return data[i].CreatedAt.Before(data[j].CreatedAt)
 	})

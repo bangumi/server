@@ -22,37 +22,37 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic"
+	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Handler) listComments(
 	c *fiber.Ctx, commentType domain.CommentType, id model.TopicID,
-) (res.PagedG[res.Comment], error) {
+) (res.PagedComment, error) {
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
-		return res.PagedG[res.Comment]{}, res.ErrNotFound
+		return res.PagedComment{}, res.ErrNotFound
 	}
 
 	count, err := h.comment.Count(c.Context(), commentType, id)
 	if err != nil {
-		return res.PagedG[res.Comment]{}, errgo.Wrap(err, "repo.comments.Count")
+		return res.PagedComment{}, errgo.Wrap(err, "repo.comments.Count")
 	}
 
 	if count == 0 {
-		return res.PagedG[res.Comment]{}, res.JSON(
-			c, res.PagedG[res.Comment]{Data: []res.Comment{}, Total: count, Limit: page.Limit, Offset: page.Offset},
+		return res.PagedComment{}, res.JSON(
+			c, res.PagedComment{Data: []res.Comment{}, Total: count, Limit: page.Limit, Offset: page.Offset},
 		)
 	}
 
 	if err = page.check(count); err != nil {
-		return res.PagedG[res.Comment]{}, err
+		return res.PagedComment{}, err
 	}
 
 	comments, err := h.comment.List(c.Context(), commentType, id, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.PagedG[res.Comment]{}, res.ErrNotFound
+			return res.PagedComment{}, res.ErrNotFound
 		}
 		return res.PagedG[res.Comment]{}, errgo.Wrap(err, "Comment.GetCommentsByMentionedID")
 	}
@@ -65,12 +65,12 @@ func (h Handler) listComments(
 		}
 	}
 
-	userMap, err := h.u.GetByIDs(c.Context(), generic.MapKeys(uidMap)...)
+	userMap, err := h.u.GetByIDs(c.Context(), gmap.Keys(uidMap)...)
 	if err != nil {
-		return res.PagedG[res.Comment]{}, errgo.Wrap(err, "user.GetByIDs")
+		return res.PagedComment{}, errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	return res.PagedG[res.Comment]{
+	return res.PagedComment{
 		Total:  count,
 		Limit:  page.Limit,
 		Offset: page.Offset,
