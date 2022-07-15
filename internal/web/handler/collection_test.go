@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -29,6 +30,46 @@ import (
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/web/res"
 )
+
+func TestHandler_ListCollection(t *testing.T) {
+	t.Parallel()
+	const username = "ni"
+	const userID model.UserID = 7
+	const subjectID model.SubjectID = 9
+
+	m := mocks.NewUserRepo(t)
+	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
+
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().ListSubjectCollection(mock.Anything, userID, mock.Anything, mock.Anything, mock.Anything, 10, 0).
+		Return([]model.SubjectCollection{{SubjectID: subjectID}}, nil)
+	c.EXPECT().CountSubjectCollections(mock.Anything, userID, mock.Anything, mock.Anything, mock.Anything).
+		Return(1, nil)
+
+	s := mocks.NewSubjectRepo(t)
+	s.EXPECT().GetByIDs(mock.Anything, mock.Anything).Return(map[model.SubjectID]model.Subject{
+		subjectID: {Name: "v"},
+	}, nil)
+
+	e := mocks.NewEpisodeRepo(t)
+	e.EXPECT().CountsBySubjectID(mock.Anything, mock.Anything).Return(map[model.SubjectID]int64{subjectID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, SubjectRepo: s, EpisodeRepo: e})
+
+	var r test.PagedResponse
+	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections", username)).Query("limit", "10").
+		Execute(app).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
+
+	var data []res.SubjectCollection
+	require.NoError(t, json.Unmarshal(r.Data, &data))
+
+	require.Len(t, data, 1)
+
+	require.Equal(t, subjectID, data[0].SubjectID, resp.BodyString())
+	require.Equal(t, "v", data[0].Subject.Name, resp.BodyString())
+}
 
 func TestHandler_GetCollection(t *testing.T) {
 	t.Parallel()
@@ -42,7 +83,12 @@ func TestHandler_GetCollection(t *testing.T) {
 	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).
 		Return(model.SubjectCollection{SubjectID: subjectID}, nil)
 
-	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c})
+	s := mocks.NewSubjectRepo(t)
+	s.EXPECT().Get(mock.Anything, subjectID).Return(model.Subject{
+		Name: "v",
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, SubjectRepo: s})
 
 	var r res.SubjectCollection
 	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
@@ -51,6 +97,7 @@ func TestHandler_GetCollection(t *testing.T) {
 		ExpectCode(http.StatusOK)
 
 	require.Equal(t, subjectID, r.SubjectID, resp.BodyString())
+	require.Equal(t, "v", r.Subject.Name, resp.BodyString())
 }
 
 func TestHandler_GetCollection_other_user(t *testing.T) {
@@ -64,6 +111,7 @@ func TestHandler_GetCollection_other_user(t *testing.T) {
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
+
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).
 		Return(model.SubjectCollection{SubjectID: subjectID, Private: true}, nil)

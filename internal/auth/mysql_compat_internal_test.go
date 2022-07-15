@@ -12,22 +12,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package generic
+package auth
 
-func SliceMap[T any, K any](in []T, fn func(item T) K) []K {
-	var s = make([]K, len(in))
-	for i, t := range in {
-		s[i] = fn(t)
-	}
+import (
+	"testing"
 
-	return s
-}
+	"github.com/stretchr/testify/require"
+)
 
-func SliceToMap[K comparable, T any](in []T, fn func(item T) K) map[K]T {
-	var s = make(map[K]T, len(in))
-	for _, t := range in {
-		s[fn(t)] = t
-	}
-
-	return s
+func TestUnmarshalPHP(t *testing.T) {
+	t.Parallel()
+	raw := "a:2:{s:15:\"user_wiki_apply\";s:1:\"1\";s:6:\"report\";s:1:\"1\";}"
+	p, err := parsePhpSerializedPermission([]byte(raw))
+	require.NoError(t, err)
+	require.True(t, p.Report)
+	require.False(t, p.ManageReport)
+	require.False(t, p.SubjectEdit)
 }

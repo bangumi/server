@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/model/generic"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/pkg/vars/enum"
 )
@@ -184,4 +185,27 @@ func convertDaoEpisode(e *dao.Episode, firstEpisode float32) model.Episode {
 		Disc:        e.Disc,
 		ID:          e.ID,
 	}
+}
+
+func (r mysqlRepo) CountsBySubjectID(
+	ctx context.Context, subjectID ...model.SubjectID,
+) (map[model.SubjectID]int64, error) {
+	var count []struct {
+		SubjectID model.SubjectID
+		Total     int64
+	}
+
+	err := r.q.Episode.WithContext(ctx).
+		Select(r.q.Episode.SubjectID.As("SubjectID"), r.q.Episode.ID.Count().As("Total")).Group(r.q.Episode.SubjectID).
+		Where(r.q.Episode.SubjectID.In(generic.SubjectIDToValuerSlice(subjectID)...)).Scan(&count)
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal.select.count.group")
+	}
+
+	var m = make(map[model.SubjectID]int64, len(count))
+	for _, s := range count {
+		m[s.SubjectID] = s.Total
+	}
+
+	return m, nil
 }

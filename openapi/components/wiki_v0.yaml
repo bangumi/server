@@ -1,0 +1,65 @@
+title: Infobox
+type: array
+items:
+  title: Item
+  required:
+    - key
+    - value
+  type: object
+  properties:
+    key:
+      title: Key
+      type: string
+    value:
+      title: Value
+      type: object
+      anyOf:
+        - type: string
+        - type: array
+          items:
+            anyOf:
+              - title: KV
+                required:
+                  - k
+                  - v
+                type: object
+                properties:
+                  k:
+                    title: K
+                    type: string
+                  v:
+                    title: V
+                    type: string
+              - title: V
+                required:
+                  - v
+                type: object
+                properties:
+                  v:
+                    title: V
+                    type: string
+example:
+  [
+    { "key": "简体中文名", "value": "鲁路修·兰佩路基" },
+    {
+      "key": "别名",
+      "value":
+        [
+          { "v": "L.L." },
+          { "v": "勒鲁什" },
+          { "v": "鲁鲁修" },
+          { "v": "ゼロ" },
+          { "v": "Zero" },
+          { "k": "英文名", "v": "Lelouch Lamperouge" },
+          { "k": "第二中文名", "v": "鲁路修·冯·布里塔尼亚" },
+          { "k": "英文名二", "v": "Lelouch Vie Britannia" },
+          { "k": "日文名", "v": "ルルーシュ・ヴィ・ブリタニア" },
+        ],
+    },
+    { "key": "性别", "value": "男" },
+    { "key": "生日", "value": "12月5日" },
+    { "key": "血型", "value": "A型" },
+    { "key": "身高", "value": "178cm→181cm" },
+    { "key": "体重", "value": "54kg" },
+    { "key": "引用来源", "value": "Wikipedia" },
+  ]

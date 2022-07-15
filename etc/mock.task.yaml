@@ -121,7 +121,7 @@ tasks:
 
   "AuthRepo":
     sources:
-      - internal/domain/auth.go.go
+      - internal/domain/auth.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/AuthRepo.go
@@ -133,7 +133,7 @@ tasks:
 
   "AuthService":
     sources:
-      - internal/domain/auth.go.go
+      - internal/domain/auth.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/AuthService.go
@@ -145,7 +145,7 @@ tasks:
 
   "CharacterRepo":
     sources:
-      - internal/domain/character.go.go
+      - internal/domain/character.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/CharacterRepo.go
@@ -157,7 +157,7 @@ tasks:
 
   "CharacterService":
     sources:
-      - internal/domain/character.go.go
+      - internal/domain/character.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/CharacterService.go
@@ -169,7 +169,7 @@ tasks:
 
   "IndexRepo":
     sources:
-      - internal/domain/index.go.go
+      - internal/domain/index.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/IndexRepo.go
@@ -181,7 +181,7 @@ tasks:
 
   "RevisionRepo":
     sources:
-      - internal/domain/revision.go.go
+      - internal/domain/revision.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/RevisionRepo.go
@@ -193,7 +193,7 @@ tasks:
 
   "SubjectRepo":
     sources:
-      - internal/domain/subject.go.go
+      - internal/domain/subject.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/SubjectRepo.go
@@ -205,7 +205,7 @@ tasks:
 
   "SubjectService":
     sources:
-      - internal/domain/subject.go.go
+      - internal/domain/subject.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/SubjectService.go
@@ -217,7 +217,7 @@ tasks:
 
   "UserRepo":
     sources:
-      - internal/domain/user.go.go
+      - internal/domain/user.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/UserRepo.go
@@ -229,7 +229,7 @@ tasks:
 
   "EpisodeRepo":
     sources:
-      - internal/domain/episode.go.go
+      - internal/domain/episode.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/EpisodeRepo.go
@@ -241,7 +241,7 @@ tasks:
 
   "PersonRepo":
     sources:
-      - internal/domain/person.go.go
+      - internal/domain/person.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/PersonRepo.go
@@ -253,7 +253,7 @@ tasks:
 
   "PersonService":
     sources:
-      - internal/domain/person.go.go
+      - internal/domain/person.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/PersonService.go

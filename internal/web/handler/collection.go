@@ -23,6 +23,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -90,9 +91,24 @@ func (h Handler) listCollection(
 		return h.InternalError(c, err, "failed to list user's subject collections", log.UserID(u.ID))
 	}
 
+	subjectIDs := slice.Map(collections, func(item model.SubjectCollection) model.SubjectID {
+		return item.SubjectID
+	})
+
+	subjectMap, err := h.s.GetByIDs(c.Context(), subjectIDs...)
+	if err != nil {
+		return h.InternalError(c, err, "failed to get subjects")
+	}
+
+	episodeCount, err := h.e.CountsBySubjectID(c.Context(), subjectIDs...)
+	if err != nil {
+		return h.InternalError(c, err, "failed to get episode count")
+	}
+
 	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
-		data[i] = convertModelSubjectCollection(collection)
+		s := convertModelSubject(subjectMap[collection.SubjectID], episodeCount[collection.SubjectID])
+		data[i] = convertModelSubjectCollection(collection, s)
 	}
 
 	return c.JSON(res.Paged{
@@ -146,10 +162,17 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 		return res.NotFound(notFoundMessage)
 	}
 
-	return res.JSON(c, convertModelSubjectCollection(collection))
+	s, _, err := h.getSubjectWithCache(c.Context(), subjectID)
+	if err != nil {
+		return h.InternalError(c, err, "failed to subject info", log.SubjectID(subjectID))
+	}
+
+	return res.JSON(c, convertModelSubjectCollection(collection, s))
 }
 
-func convertModelSubjectCollection(collection model.SubjectCollection) res.SubjectCollection {
+func convertModelSubjectCollection(
+	collection model.SubjectCollection, subject res.SubjectV0,
+) res.SubjectCollection {
 	return res.SubjectCollection{
 		SubjectID:   collection.SubjectID,
 		SubjectType: collection.SubjectType,
@@ -161,5 +184,6 @@ func convertModelSubjectCollection(collection model.SubjectCollection) res.Subje
 		UpdatedAt:   collection.UpdatedAt,
 		Private:     collection.Private,
 		Comment:     nilString(collection.Comment),
+		Subject:     subject,
 	}
 }

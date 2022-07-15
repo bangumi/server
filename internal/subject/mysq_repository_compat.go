@@ -12,24 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package res
+package subject
 
 import (
-	"time"
+	"github.com/trim21/go-phpserialize"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-type SubjectCollection struct {
-	UpdatedAt   time.Time            `json:"updated_at"`
-	Comment     *string              `json:"comment"`
-	Tags        []string             `json:"tags"`
-	Subject     SubjectV0            `json:"subject"`
-	SubjectID   model.SubjectID      `json:"subject_id"`
-	VolStatus   uint32               `json:"vol_status"`
-	EpStatus    uint32               `json:"ep_status"`
-	SubjectType uint8                `json:"subject_type"`
-	Type        model.CollectionType `json:"type"`
-	Rate        uint8                `json:"rate"`
-	Private     bool                 `json:"private"`
+type Tag struct {
+	Name  *string `php:"tag_name"`
+	Count int     `php:"result,string"`
+}
+
+func parseTags(b []byte) ([]model.Tag, error) {
+	var tags []Tag
+	err := phpserialize.Unmarshal(b, &tags)
+	if err != nil {
+		return nil, errgo.Wrap(err, "parseTags: phpserialize.Unmarshal")
+	}
+
+	return slice.MapFilter(tags, func(item Tag) (model.Tag, bool) {
+		if item.Name == nil {
+			return model.Tag{}, false
+		}
+		return model.Tag{Name: *item.Name, Count: item.Count}, true
+	}), nil
 }

@@ -130,6 +130,67 @@ func (_c *SubjectService_GetActors_Call) Return(_a0 map[model.CharacterID][]mode
 	return _c
 }
 
+// GetByIDs provides a mock function with given fields: ctx, ids
+func (_m *SubjectService) GetByIDs(ctx context.Context, ids ...model.SubjectID) (map[model.SubjectID]model.Subject, error) {
+	_va := make([]interface{}, len(ids))
+	for _i := range ids {
+		_va[_i] = ids[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 map[model.SubjectID]model.Subject
+	if rf, ok := ret.Get(0).(func(context.Context, ...model.SubjectID) map[model.SubjectID]model.Subject); ok {
+		r0 = rf(ctx, ids...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[model.SubjectID]model.Subject)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, ...model.SubjectID) error); ok {
+		r1 = rf(ctx, ids...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SubjectService_GetByIDs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByIDs'
+type SubjectService_GetByIDs_Call struct {
+	*mock.Call
+}
+
+// GetByIDs is a helper method to define mock.On call
+//  - ctx context.Context
+//  - ids ...model.SubjectID
+func (_e *SubjectService_Expecter) GetByIDs(ctx interface{}, ids ...interface{}) *SubjectService_GetByIDs_Call {
+	return &SubjectService_GetByIDs_Call{Call: _e.mock.On("GetByIDs",
+		append([]interface{}{ctx}, ids...)...)}
+}
+
+func (_c *SubjectService_GetByIDs_Call) Run(run func(ctx context.Context, ids ...model.SubjectID)) *SubjectService_GetByIDs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]model.SubjectID, len(args)-1)
+		for i, a := range args[1:] {
+			if a != nil {
+				variadicArgs[i] = a.(model.SubjectID)
+			}
+		}
+		run(args[0].(context.Context), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *SubjectService_GetByIDs_Call) Return(_a0 map[model.SubjectID]model.Subject, _a1 error) *SubjectService_GetByIDs_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // GetCharacterRelated provides a mock function with given fields: ctx, characterID
 func (_m *SubjectService) GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]model.SubjectCharacterRelation, error) {
 	ret := _m.Called(ctx, characterID)

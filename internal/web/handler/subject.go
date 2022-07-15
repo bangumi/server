@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
@@ -91,11 +92,12 @@ func (h Handler) getSubjectWithCache(
 		return r, ok, errgo.Wrap(err, "SubjectService.Get")
 	}
 
-	r = convertModelSubject(s)
-	r.TotalEpisodes, err = h.e.Count(ctx, id)
+	totalEpisode, err := h.e.Count(ctx, id)
 	if err != nil {
 		return r, false, errgo.Wrap(err, "repo.episode.Count")
 	}
+
+	r = convertModelSubject(s, totalEpisode)
 
 	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
 		h.log.Error("can't set response to cache", zap.Error(e))
@@ -246,30 +248,26 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func convertModelSubject(s model.Subject) res.SubjectV0 {
-	tags, err := compat.ParseTags(s.CompatRawTags)
-	if err != nil {
-		logger.Warn("failed to parse tags", log.SubjectID(s.ID))
-	}
-
-	var date *string
-	if s.Date != "" {
-		date = &s.Date
-	}
-
+func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {
 	return res.SubjectV0{
-		ID:       s.ID,
-		Image:    res.SubjectImage(s.Image),
-		Summary:  s.Summary,
-		Name:     s.Name,
-		Platform: platformString(s),
-		NameCN:   s.NameCN,
-		Date:     date,
-		Infobox:  compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
-		Volumes:  s.Volumes,
-		Redirect: s.Redirect,
-		Eps:      s.Eps,
-		Tags:     tags,
+		TotalEpisodes: totalEpisode,
+		ID:            s.ID,
+		Image:         res.SubjectImage(s.Image),
+		Summary:       s.Summary,
+		Name:          s.Name,
+		Platform:      platformString(s),
+		NameCN:        s.NameCN,
+		Date:          nilString(s.Date),
+		Infobox:       compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
+		Volumes:       s.Volumes,
+		Redirect:      s.Redirect,
+		Eps:           s.Eps,
+		Tags: slice.Map(s.Tags, func(tag model.Tag) res.SubjectTag {
+			return res.SubjectTag{
+				Name:  tag.Name,
+				Count: tag.Count,
+			}
+		}),
 		Collection: res.SubjectCollectionStat{
 			OnHold:  s.OnHold,
 			Wish:    s.Wish,

@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 type mysqlRepo struct {
@@ -187,7 +188,7 @@ func (r mysqlRepo) getParentComments(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	parents := generic.SliceMap(comments, func(comment mysqlComment) model.Comment {
+	parents := slice.Map(comments, func(comment mysqlComment) model.Comment {
 		return model.Comment{
 			CreatedAt:   comment.CreateAt(),
 			Content:     comment.GetContent(),
@@ -198,7 +199,7 @@ func (r mysqlRepo) getParentComments(
 		}
 	})
 
-	return generic.SliceToMap(parents, func(item model.Comment) model.CommentID {
+	return slice.ToMap(parents, func(item model.Comment) model.CommentID {
 		return item.ID
 	}), nil
 }
@@ -206,7 +207,7 @@ func (r mysqlRepo) getParentComments(
 func (r mysqlRepo) getSubComments(
 	ctx context.Context, commentType domain.CommentType, id model.TopicID, ids ...model.CommentID,
 ) ([]mysqlComment, error) {
-	commentIDs := generic.SliceMap(ids, func(item model.CommentID) uint32 {
+	commentIDs := slice.Map(ids, func(item model.CommentID) uint32 {
 		return uint32(item)
 	})
 
