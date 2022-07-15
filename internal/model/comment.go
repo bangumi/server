@@ -34,14 +34,3 @@ type SubComment struct {
 	ID          CommentID
 	MentionedID UserID
 }
-
-type Commenter interface {
-	CommentID() CommentID
-	CreatorID() UserID
-	IsSubComment() bool
-	CreateAt() time.Time
-	GetContent() string
-	GetState() uint8
-	RelatedTo() CommentID
-	GetMentionedID() UserID
-}

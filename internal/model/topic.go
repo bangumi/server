@@ -20,13 +20,13 @@ type Topic struct {
 	CreatedTime time.Time
 	UpdatedTime time.Time
 	Title       string
-	Comments    []Comment
-	ID          TopicID
-	UID         UserID
-	Replies     uint32
-	ObjectID    uint32
-	State       TopicState
-	Status      TopicStatus
+	// Comments    []Comment
+	ID        TopicID
+	CreatorID UserID
+	Replies   uint32
+	ObjectID  uint32
+	State     TopicState
+	Status    TopicStatus
 }
 
 type TopicState uint8

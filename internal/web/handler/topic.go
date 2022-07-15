@@ -52,10 +52,10 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 func (h Handler) getUserMapOfTopics(c *fiber.Ctx, topics ...model.Topic) (map[model.UserID]model.User, error) {
 	userIDs := make([]model.UserID, 0)
 	for _, topic := range topics {
-		userIDs = append(userIDs, topic.UID)
-		for _, v := range topic.Comments {
-			userIDs = append(userIDs, v.CreatorID)
-		}
+		userIDs = append(userIDs, topic.CreatorID)
+		// for _, v := range topic.Comments {
+		// 	userIDs = append(userIDs, v.CreatorID)
+		// }
 	}
 	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
 	if err != nil {
@@ -103,7 +103,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 			Title:     topic.Title,
 			CreatedAt: topic.CreatedTime,
 			UpdatedAt: topic.UpdatedTime,
-			Creator:   convertModelUser(userMap[topic.UID]),
+			Creator:   convertModelUser(userMap[topic.CreatorID]),
 			Replies:   topic.Replies,
 		}
 	}
@@ -124,7 +124,7 @@ func (h Handler) getResTopicWithComments(
 		return err
 	}
 
-	u, err := h.u.GetByIDs(c.Context(), topic.UID)
+	u, err := h.u.GetByIDs(c.Context(), topic.CreatorID)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -134,7 +134,7 @@ func (h Handler) getResTopicWithComments(
 		Title:     topic.Title,
 		CreatedAt: topic.CreatedTime,
 		UpdatedAt: topic.UpdatedTime,
-		Creator:   convertModelUser(u[topic.UID]),
+		Creator:   convertModelUser(u[topic.CreatorID]),
 		Replies:   topic.Replies,
 		Comments:  pagedComments,
 	}

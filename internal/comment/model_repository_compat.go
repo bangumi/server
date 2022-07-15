@@ -15,18 +15,31 @@
 package comment
 
 import (
+	"time"
+
 	"github.com/bangumi/server/internal/model"
 )
 
-func wrapCommentDao[T model.Commenter](data []T, err error) ([]model.Commenter, error) {
+func wrapCommentDao[T mysqlComment](data []T, err error) ([]mysqlComment, error) {
 	if err != nil {
 		return nil, err
 	}
 
-	var s = make([]model.Commenter, len(data))
+	var s = make([]mysqlComment, len(data))
 	for i, item := range data {
 		s[i] = item
 	}
 
 	return s, nil
+}
+
+type mysqlComment interface {
+	CommentID() model.CommentID
+	CreatorID() model.UserID
+	IsSubComment() bool
+	CreateAt() time.Time
+	GetContent() string
+	GetState() uint8
+	RelatedTo() model.CommentID
+	GetMentionedID() model.UserID
 }

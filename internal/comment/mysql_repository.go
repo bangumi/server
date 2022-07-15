@@ -39,7 +39,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CommentRepo, error) {
 }
 
 func (r mysqlRepo) Get(ctx context.Context, commentType domain.CommentType, id model.CommentID) (model.Comment, error) {
-	var comment model.Commenter
+	var comment mysqlComment
 	var err error
 	switch commentType {
 	case domain.CommentTypeGroupTopic:
@@ -150,7 +150,7 @@ func (r mysqlRepo) List(
 func (r mysqlRepo) getParentComments(
 	ctx context.Context, commentType domain.CommentType, id model.TopicID, limit int, offset int,
 ) (map[model.CommentID]model.Comment, error) {
-	var comments []model.Commenter
+	var comments []mysqlComment
 	var err error
 
 	switch commentType {
@@ -187,7 +187,7 @@ func (r mysqlRepo) getParentComments(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	parents := generic.SliceMap(comments, func(comment model.Commenter) model.Comment {
+	parents := generic.SliceMap(comments, func(comment mysqlComment) model.Comment {
 		return model.Comment{
 			CreatedAt:   comment.CreateAt(),
 			Content:     comment.GetContent(),
@@ -205,12 +205,12 @@ func (r mysqlRepo) getParentComments(
 
 func (r mysqlRepo) getSubComments(
 	ctx context.Context, commentType domain.CommentType, id model.TopicID, ids ...model.CommentID,
-) ([]model.Commenter, error) {
+) ([]mysqlComment, error) {
 	commentIDs := generic.SliceMap(ids, func(item model.CommentID) uint32 {
 		return uint32(item)
 	})
 
-	var comments []model.Commenter
+	var comments []mysqlComment
 	var err error
 	switch commentType {
 	case domain.CommentTypeGroupTopic:

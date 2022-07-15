@@ -17,17 +17,17 @@ package topic
 import (
 	"context"
 	"errors"
-	"time"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
+
+var errUnSupportTopicType = errors.New("topic type not support")
 
 type mysqlRepo struct {
 	q   *query.Query
@@ -39,17 +39,15 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TopicRepo, error) {
 }
 
 func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
-	var (
-		topic interface{}
-		err   error
-	)
+	var topic mysqlTopic
+	var err error
 	switch topicType {
 	case domain.TopicTypeGroup:
 		topic, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.ID.Eq(uint32(id))).First()
 	case domain.TopicTypeSubject:
 		topic, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.ID.Eq(uint32(id))).First()
 	default:
-		return model.Topic{}, errUnsupportTopicType
+		return model.Topic{}, errUnSupportTopicType
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -60,7 +58,17 @@ func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model
 		return model.Topic{}, errgo.Wrap(err, "dal")
 	}
 
-	return convertDao(topic)
+	return model.Topic{
+		CreatedTime: topic.GetCreateTime(),
+		UpdatedTime: topic.GetUpdateTime(),
+		Title:       topic.GetTitle(),
+		ID:          model.TopicID(topic.GetID()),
+		CreatorID:   model.UserID(topic.GetCreatorID()),
+		State:       model.TopicState(topic.GetState()),
+		Replies:     topic.GetReplies(),
+		ObjectID:    topic.GetObjectID(),
+		Status:      model.TopicStatus(topic.GetStatus()),
+	}, nil
 }
 
 func (r mysqlRepo) Count(
@@ -78,7 +86,7 @@ func (r mysqlRepo) Count(
 		count, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).
 			Where(r.q.SubjectTopic.Status.In(convertToUint8Status(statuses)...)).Count()
 	default:
-		return 0, errUnsupportTopicType
+		return 0, errUnSupportTopicType
 	}
 	if err != nil {
 		return 0, errgo.Wrap(err, "dal")
@@ -98,20 +106,20 @@ func (r mysqlRepo) List(
 	ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int,
 ) ([]model.Topic, error) {
 	var (
-		topics interface{}
+		topics []model.Topic
 		err    error
 	)
 	switch topicType {
 	case domain.TopicTypeGroup:
-		topics, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
+		topics, err = wrapDao(r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
 			Where(r.q.GroupTopic.Status.In(convertToUint8Status(statuses)...)).
-			Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedTime.Desc()).Find()
+			Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedTime.Desc()).Find())
 	case domain.TopicTypeSubject:
-		topics, err = r.q.SubjectTopic.WithContext(ctx).
+		topics, err = wrapDao(r.q.SubjectTopic.WithContext(ctx).
 			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Where(r.q.SubjectTopic.Status.In(convertToUint8Status(statuses)...)).
-			Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedTime.Desc()).Find()
+			Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedTime.Desc()).Find())
 	default:
-		return nil, errUnsupportTopicType
+		return nil, errUnSupportTopicType
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -121,57 +129,6 @@ func (r mysqlRepo) List(
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
-	return convertModelTopics(topics), nil
-}
 
-var errUnsupportTopicType = errors.New("topic type not support")
-
-func convertModelTopics(in interface{}) []model.Topic {
-	topics := make([]model.Topic, 0)
-	switch list := in.(type) {
-	case []*dao.SubjectTopic:
-		for _, v := range list {
-			if topic, e := convertDao(v); e == nil {
-				topics = append(topics, topic)
-			}
-		}
-	case []*dao.GroupTopic:
-		for _, v := range list {
-			if topic, e := convertDao(v); e == nil {
-				topics = append(topics, topic)
-			}
-		}
-	}
-	return topics
-}
-
-func convertDao(in interface{}) (model.Topic, error) {
-	switch v := in.(type) {
-	case *dao.GroupTopic:
-		return model.Topic{
-			ID:          model.TopicID(v.ID),
-			ObjectID:    v.GroupID,
-			UID:         model.UserID(v.UID),
-			Title:       v.Title,
-			CreatedTime: time.Unix(int64(v.CreatedTime), 0),
-			UpdatedTime: time.Unix(int64(v.UpdatedTime), 0),
-			Replies:     v.Replies,
-			State:       model.TopicState(v.State),
-			Status:      model.TopicStatus(v.Status),
-		}, nil
-	case *dao.SubjectTopic:
-		return model.Topic{
-			ID:          model.TopicID(v.ID),
-			ObjectID:    v.SubjectID,
-			UID:         model.UserID(v.UID),
-			Title:       v.Title,
-			CreatedTime: time.Unix(int64(v.CreatedTime), 0),
-			UpdatedTime: time.Unix(int64(v.UpdatedTime), 0),
-			Replies:     v.Replies,
-			State:       model.TopicState(v.State),
-			Status:      model.TopicStatus(v.Status),
-		}, nil
-	default:
-		return model.Topic{}, errUnsupportTopicType
-	}
+	return topics, nil
 }
