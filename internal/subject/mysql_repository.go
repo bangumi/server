@@ -26,9 +26,9 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/model/generic"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 type mysqlRepo struct {
@@ -198,7 +198,7 @@ func (r mysqlRepo) GetByIDs(
 	ctx context.Context, ids ...model.SubjectID,
 ) (map[model.SubjectID]model.Subject, error) {
 	records, err := r.q.Subject.WithContext(ctx).
-		Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(generic.SubjectIDToValuerSlice(ids)...)).Find()
+		Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(slice.ToValuer(ids)...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
@@ -223,7 +223,7 @@ func (r mysqlRepo) GetActors(
 ) (map[model.CharacterID][]model.Person, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
 		Preload(r.q.Cast.Person.Fields).
-		Where(r.q.Cast.CharacterID.In(generic.CharacterIDToValuerSlice(characterIDs)...), r.q.Cast.SubjectID.Eq(subjectID)).
+		Where(r.q.Cast.CharacterID.In(slice.ToValuer(characterIDs)...), r.q.Cast.SubjectID.Eq(subjectID)).
 		Order(r.q.Cast.PersonID).
 		Find()
 	if err != nil {

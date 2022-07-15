@@ -14,6 +14,8 @@
 
 package slice
 
+import "database/sql/driver"
+
 func Map[T any, K any](in []T, fn func(item T) K) []K {
 	var s = make([]K, len(in))
 	for i, t := range in {
@@ -43,4 +45,13 @@ func First[T any](in []T, end int) []T {
 	out := make([]T, end)
 	copy(out, in)
 	return out
+}
+
+func ToValuer[T driver.Valuer](in []T) []driver.Valuer {
+	var s = make([]driver.Valuer, len(in))
+	for i, t := range in {
+		s[i] = t
+	}
+
+	return s
 }
