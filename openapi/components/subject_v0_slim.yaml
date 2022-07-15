@@ -3,7 +3,7 @@ required:
   - images
   - name
   - name_cn
-  - summary
+  - short_summary
   - tags
   - score
   - type
@@ -28,9 +28,10 @@ properties:
   name_cn:
     title: Name Cn
     type: string
-  summary:
+  short_summary:
     title: Summary
     type: string
+    description: 截短后的条目描述。
   date:
     title: Date
     type: string

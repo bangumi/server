@@ -19,7 +19,10 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/gstr"
 )
+
+const defaultShortSummaryLength = 120
 
 type v0wiki = []any
 
@@ -56,7 +59,7 @@ func (s SubjectV0) Slim() SlimSubjectV0 {
 		NameCN:          s.Name,
 		Date:            s.Date,
 		Tags:            slice.First(s.Tags, 10),
-		Summary:         s.Summary,
+		ShortSummary:    gstr.First(s.Summary, defaultShortSummaryLength),
 		Image:           s.Image,
 		Eps:             s.Eps,
 		Volumes:         s.Volumes,
@@ -72,7 +75,7 @@ type SlimSubjectV0 struct {
 	Image           SubjectImages     `json:"images"`
 	Name            string            `json:"name"`
 	NameCN          string            `json:"name_cn"`
-	Summary         string            `json:"summary"`
+	ShortSummary    string            `json:"short_summary"`
 	Tags            []SubjectTag      `json:"tags"`
 	Score           float64           `json:"score"`
 	Type            model.SubjectType `json:"type"`
@@ -100,7 +103,7 @@ func ToSlimSubjectV0(s model.Subject) SlimSubjectV0 {
 				Count: item.Count,
 			}
 		}),
-		Summary:         s.Summary,
+		ShortSummary:    gstr.First(s.Summary, defaultShortSummaryLength),
 		Image:           SubjectImage(s.Image),
 		Eps:             s.Eps,
 		Volumes:         s.Volumes,
