@@ -123,28 +123,6 @@ var genderMap = map[uint8]string{
 	2: "female",
 }
 
-func (h Handler) GetPersonComments(c *fiber.Ctx) error {
-	id, err := parsePersonID(c.Params("id"))
-	if err != nil {
-		return err
-	}
-
-	r, ok, err := h.getPersonWithCache(c.Context(), id)
-	if err != nil {
-		return err
-	}
-
-	if !ok || r.Redirect != 0 {
-		return res.ErrNotFound
-	}
-
-	pagedComments, err := h.listComments(c, domain.CommentPerson, model.TopicID(id))
-	if err != nil {
-		return err
-	}
-	return c.JSON(pagedComments)
-}
-
 func (h Handler) GetPersonImage(c *fiber.Ctx) error {
 	id, err := parsePersonID(c.Params("id"))
 	if err != nil {

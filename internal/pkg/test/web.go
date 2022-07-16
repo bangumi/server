@@ -68,7 +68,7 @@ type Mock struct {
 	HTTPMock       *httpmock.MockTransport
 }
 
-//nolint:funlen
+
 func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 	tb.Helper()
 	var f *fiber.App

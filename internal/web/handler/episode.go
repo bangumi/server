@@ -60,39 +60,6 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 	return c.JSON(e)
 }
 
-func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
-	u := h.getHTTPAccessor(c)
-
-	id, err := parseEpisodeID(c.Params("id"))
-	if err != nil {
-		return err
-	}
-
-	e, ok, err := h.getEpisodeWithCache(c.Context(), id)
-	if err != nil {
-		return err
-	}
-
-	if !ok {
-		return res.ErrNotFound
-	}
-
-	s, ok, err := h.getSubjectWithCache(c.Context(), e.SubjectID)
-	if err != nil {
-		return err
-	}
-
-	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
-	}
-
-	pagedComments, err := h.listComments(c, domain.CommentEpisode, model.TopicID(id))
-	if err != nil {
-		return err
-	}
-	return c.JSON(pagedComments)
-}
-
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
 func (h Handler) getEpisodeWithCache(ctx context.Context, id model.EpisodeID) (res.Episode, bool, error) {
