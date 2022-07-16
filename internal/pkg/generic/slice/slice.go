@@ -16,7 +16,7 @@ package slice
 
 import "database/sql/driver"
 
-func Map[T any, K any](in []T, fn func(item T) K) []K {
+func Map[T any, K any, F func(item T) K](in []T, fn F) []K {
 	var s = make([]K, len(in))
 	for i, t := range in {
 		s[i] = fn(t)
@@ -25,19 +25,7 @@ func Map[T any, K any](in []T, fn func(item T) K) []K {
 	return s
 }
 
-func MapFilter[T any, K any](in []T, fn func(item T) (k K, ok bool)) []K {
-	var s = make([]K, 0, len(in))
-	for _, t := range in {
-		v, ok := fn(t)
-		if ok {
-			s = append(s, v)
-		}
-	}
-
-	return s
-}
-
-func ToMap[K comparable, T any](in []T, fn func(item T) K) map[K]T {
+func ToMap[K comparable, T any, F func(item T) K](in []T, fn F) map[K]T {
 	var s = make(map[K]T, len(in))
 	for _, t := range in {
 		s[fn(t)] = t
