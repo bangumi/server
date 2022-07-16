@@ -56,14 +56,14 @@ func (s SubjectV0) Slim() SlimSubjectV0 {
 	return SlimSubjectV0{
 		ID:              s.ID,
 		Name:            s.Name,
-		NameCN:          s.Name,
+		NameCN:          s.NameCN,
 		Date:            s.Date,
 		Tags:            slice.First(s.Tags, 10),
 		ShortSummary:    gstr.First(s.Summary, defaultShortSummaryLength),
 		Image:           s.Image,
 		Eps:             s.Eps,
 		Volumes:         s.Volumes,
-		CollectionTotal: s.Rating.Total,
+		CollectionTotal: s.Collection.Sum(),
 		Rank:            s.Rating.Rank,
 		Score:           s.Rating.Score,
 		Type:            s.TypeID,
@@ -107,7 +107,7 @@ func ToSlimSubjectV0(s model.Subject) SlimSubjectV0 {
 		Image:           SubjectImage(s.Image),
 		Eps:             s.Eps,
 		Volumes:         s.Volumes,
-		CollectionTotal: s.Rating.Total,
+		CollectionTotal: s.Collect + s.Doing + s.OnHold + s.Dropped + s.Wish,
 		Rank:            s.Rating.Rank,
 		Score:           s.Rating.Score,
 		Type:            s.TypeID,
@@ -120,6 +120,10 @@ type SubjectCollectionStat struct {
 	Wish    uint32 `json:"wish"`
 	Collect uint32 `json:"collect"`
 	Doing   uint32 `json:"doing"`
+}
+
+func (s SubjectCollectionStat) Sum() uint32 {
+	return s.OnHold + s.Dropped + s.Wish + s.Collect + s.Doing
 }
 
 type Count struct {

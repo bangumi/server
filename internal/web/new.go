@@ -29,7 +29,6 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
-	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -39,28 +38,10 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/random"
 	"github.com/bangumi/server/internal/pkg/timex"
-	"github.com/bangumi/server/internal/web/captcha"
-	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/middleware/recovery"
-	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/internal/web/session"
 	"github.com/bangumi/server/internal/web/util"
-)
-
-var Module = fx.Module("web",
-	fx.Invoke(ResistRouter),
-	fx.Provide(
-		New,
-		captcha.New,
-		frontend.NewTemplateEngine,
-		handler.New,
-		rate.New,
-		session.New,
-		session.NewMysqlRepo,
-	),
 )
 
 const headerProcessTime = "x-process-time-ms"

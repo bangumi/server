@@ -56,7 +56,6 @@ func start() error {
 	err := fx.New(
 		logger.FxLogger(),
 		// driver and connector
-		dal.Module,
 		fx.Provide(
 			driver.NewRedisClient,         // redis
 			driver.NewMysqlConnectionPool, // mysql
@@ -68,10 +67,10 @@ func start() error {
 			},
 		),
 
-		fx.Provide(
-			config.NewAppConfig, logger.Copy, metrics.NewScope,
+		dal.Module,
 
-			cache.NewRedisCache,
+		fx.Provide(
+			config.NewAppConfig, logger.Copy, metrics.NewScope, cache.NewRedisCache,
 
 			oauth.NewMysqlRepo,
 
