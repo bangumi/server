@@ -25,6 +25,18 @@ func Map[T any, K any, F func(item T) K](in []T, fn F) []K {
 	return s
 }
 
+func MapFilter[T any, K any, F func(item T) (k K, ok bool)](in []T, fn F) []K {
+	var s = make([]K, 0, len(in))
+	for _, t := range in {
+		v, ok := fn(t)
+		if ok {
+			s = append(s, v)
+		}
+	}
+
+	return s
+}
+
 func ToMap[K comparable, T any, F func(item T) K](in []T, fn F) map[K]T {
 	var s = make(map[K]T, len(in))
 	for _, t := range in {
