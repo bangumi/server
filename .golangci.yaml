@@ -315,6 +315,9 @@ issues:
     - path: '.*_test\.go'
       linters: [gocritic, gochecknoglobals, godot]
 
+    - source: 'var Module = fx\.Module\('
+      linters: [gochecknoglobals]
+
     - source: "var log"
       linters: [gochecknoglobals]
 

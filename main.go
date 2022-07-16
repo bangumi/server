@@ -27,7 +27,6 @@ import (
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/group"
@@ -41,11 +40,6 @@ import (
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web"
-	"github.com/bangumi/server/internal/web/captcha"
-	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler"
-	"github.com/bangumi/server/internal/web/rate"
-	"github.com/bangumi/server/internal/web/session"
 )
 
 func main() {
@@ -64,7 +58,6 @@ func start() error {
 		fx.Provide(
 			driver.NewRedisClient,         // redis
 			driver.NewMysqlConnectionPool, // mysql
-			dal.NewDB,
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
 				httpClient.JSONUnmarshal = json.Unmarshal
@@ -73,10 +66,10 @@ func start() error {
 			},
 		),
 
-		fx.Provide(
-			config.NewAppConfig, logger.Copy, metrics.NewScope,
+		dal.Module,
 
-			query.Use, cache.NewRedisCache,
+		fx.Provide(
+			config.NewAppConfig, logger.Copy, metrics.NewScope, cache.NewRedisCache,
 
 			oauth.NewMysqlRepo,
 
@@ -86,11 +79,7 @@ func start() error {
 			auth.NewService, character.NewService, subject.NewService, person.NewService, group.NewMysqlRepo,
 		),
 
-		fx.Provide(
-			session.NewMysqlRepo, rate.New, captcha.New, session.New, handler.New, web.New, frontend.NewTemplateEngine,
-		),
-
-		fx.Invoke(web.ResistRouter),
+		web.Module,
 
 		fx.Populate(&app, &cfg),
 	).Err()
