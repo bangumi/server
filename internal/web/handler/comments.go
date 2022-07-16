@@ -57,11 +57,11 @@ func (h Handler) listComments(
 		return res.PagedG[res.Comment]{}, errgo.Wrap(err, "Comment.GetCommentsByMentionedID")
 	}
 
-	uidMap := make(map[model.UserID]bool, len(comments))
+	uidMap := make(map[model.UserID]struct{}, len(comments))
 	for _, comment := range comments {
-		uidMap[comment.CreatorID] = true
+		uidMap[comment.CreatorID] = struct{}{}
 		for _, sub := range comment.SubComments {
-			uidMap[sub.CreatorID] = true
+			uidMap[sub.CreatorID] = struct{}{}
 		}
 	}
 

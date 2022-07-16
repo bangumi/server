@@ -22,16 +22,20 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/uber-go/tally/v4"
+	"go.uber.org/fx"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 const slowQueryTimeout = time.Millisecond * 200
+
+var Module = fx.Module("dal", fx.Provide(NewDB, query.Use))
 
 func NewDB(
 	conn *sql.DB, c config.AppConfig, scope tally.Scope, register prometheus.Registerer,

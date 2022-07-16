@@ -32,9 +32,7 @@ import (
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/oauth"
@@ -122,10 +120,8 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		options = append(options, MockCache(m.Cache))
 	}
 
-	app := fx.New(options...)
-
-	if app.Err() != nil {
-		tb.Fatal("can't create web app", app.Err())
+	if err := fx.New(options...).Err(); err != nil {
+		tb.Fatal("can't create web app", err)
 	}
 
 	if m.HTTPMock != nil {
@@ -294,16 +290,4 @@ func NopCache() cache.Generic {
 	mc.EXPECT().Del(mock.Anything, mock.Anything).Return(nil)
 
 	return mc
-}
-
-func FxE2E(t *testing.T) fx.Option {
-	t.Helper()
-
-	return fx.Provide(
-		query.Use,
-		driver.NewRedisClient,
-		auth.NewMysqlRepo,
-		subject.NewMysqlRepo,
-		driver.NewMysqlConnectionPool,
-	)
 }

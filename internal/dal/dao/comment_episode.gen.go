@@ -54,8 +54,8 @@ func (c *EpisodeComment) GetContent() string {
 	return c.Content
 }
 
-func (c *EpisodeComment) GetMentionedID() model.UserID {
-	return model.UserID(c.MentionedID)
+func (c *EpisodeComment) GetObjectID() model.UserID {
+	return model.UserID(c.ObjectID)
 }
 
 func (c *EpisodeComment) statStub() uint8 {

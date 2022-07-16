@@ -9,7 +9,7 @@ const TableNameIndexComment = "chii_index_comments"
 // IndexComment mapped from table <chii_index_comments>
 type IndexComment struct {
 	ID          uint32 `gorm:"column:idx_pst_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	MentionedID uint32 `gorm:"column:idx_pst_mid;type:mediumint(8) unsigned;not null"`
+	ObjectID    uint32 `gorm:"column:idx_pst_mid;type:mediumint(8) unsigned;not null"`
 	UID         uint32 `gorm:"column:idx_pst_uid;type:mediumint(8) unsigned;not null"`
 	Related     uint32 `gorm:"column:idx_pst_related;type:mediumint(8) unsigned;not null"`
 	CreatedTime uint32 `gorm:"column:idx_pst_dateline;type:int(10) unsigned;not null"`

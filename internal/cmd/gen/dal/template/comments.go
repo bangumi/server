@@ -52,6 +52,6 @@ func (c *TypeComment) GetContent() string {
 	return c.Content
 }
 
-func (c *TypeComment) GetMentionedID() model.UserID {
-	return model.UserID(c.MentionedID)
+func (c *TypeComment) GetObjectID() model.UserID {
+	return model.UserID(c.ObjectID)
 }

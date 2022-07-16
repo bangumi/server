@@ -100,9 +100,9 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	return res.JSON(c, response)
 }
 
-func (h Handler) getResTopicWithComments(
-	c *fiber.Ctx, topicType domain.TopicType, topic model.Topic,
-) error {
+var errUnknownTopicType = errors.New("unknown topic type")
+
+func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicType, topic model.Topic) error {
 	var commentType domain.CommentType
 	switch topicType {
 	case domain.TopicTypeGroup:
@@ -110,7 +110,7 @@ func (h Handler) getResTopicWithComments(
 	case domain.TopicTypeSubject:
 		commentType = domain.CommentTypeSubjectTopic
 	default:
-		return errors.New("unknown topic type")
+		return errUnknownTopicType
 	}
 
 	pagedComments, err := h.listComments(c, commentType, topic.ID)

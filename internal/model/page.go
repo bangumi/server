@@ -12,17 +12,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dao
+package model
 
-type TypeComment struct {
-	Content     string
-	ID          uint32
-	ObjectID    uint32
-	UID         uint32
-	Related     uint32
-	CreatedTime uint32
-}
-
-func (c TypeComment) statStub() uint8 {
-	return 0
+type Page struct {
+	Total  int64
+	Offset int64
+	Limit  int64
 }

@@ -9,7 +9,7 @@ const TableNameGroupTopicComment = "chii_group_posts"
 // GroupTopicComment mapped from table <chii_group_posts>
 type GroupTopicComment struct {
 	ID          uint32 `gorm:"column:grp_pst_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	MentionedID uint32 `gorm:"column:grp_pst_mid;type:mediumint(8) unsigned;not null"`
+	ObjectID    uint32 `gorm:"column:grp_pst_mid;type:mediumint(8) unsigned;not null"`
 	UID         uint32 `gorm:"column:grp_pst_uid;type:mediumint(8) unsigned;not null"`
 	Related     uint32 `gorm:"column:grp_pst_related;type:mediumint(8) unsigned;not null"` // 关联回复ID
 	Content     string `gorm:"column:grp_pst_content;type:mediumtext;not null"`

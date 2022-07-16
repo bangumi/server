@@ -26,11 +26,11 @@ type Comment struct {
 }
 
 type SubComment struct {
-	CreatedAt   time.Time
-	Content     string
-	CreatorID   UserID
-	Related     CommentID
-	State       uint8
-	ID          CommentID
-	MentionedID UserID
+	CreatedAt time.Time
+	Content   string
+	CreatorID UserID
+	Related   CommentID
+	State     uint8
+	ID        CommentID
+	ObjectID  UserID
 }

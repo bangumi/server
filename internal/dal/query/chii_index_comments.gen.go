@@ -28,7 +28,7 @@ func newIndexComment(db *gorm.DB) indexComment {
 	tableName := _indexComment.indexCommentDo.TableName()
 	_indexComment.ALL = field.NewField(tableName, "*")
 	_indexComment.ID = field.NewUint32(tableName, "idx_pst_id")
-	_indexComment.MentionedID = field.NewUint32(tableName, "idx_pst_mid")
+	_indexComment.ObjectID = field.NewUint32(tableName, "idx_pst_mid")
 	_indexComment.UID = field.NewUint32(tableName, "idx_pst_uid")
 	_indexComment.Related = field.NewUint32(tableName, "idx_pst_related")
 	_indexComment.CreatedTime = field.NewUint32(tableName, "idx_pst_dateline")
@@ -44,7 +44,7 @@ type indexComment struct {
 
 	ALL         field.Field
 	ID          field.Uint32
-	MentionedID field.Uint32
+	ObjectID    field.Uint32
 	UID         field.Uint32
 	Related     field.Uint32
 	CreatedTime field.Uint32
@@ -66,7 +66,7 @@ func (i indexComment) As(alias string) *indexComment {
 func (i *indexComment) updateTableName(table string) *indexComment {
 	i.ALL = field.NewField(table, "*")
 	i.ID = field.NewUint32(table, "idx_pst_id")
-	i.MentionedID = field.NewUint32(table, "idx_pst_mid")
+	i.ObjectID = field.NewUint32(table, "idx_pst_mid")
 	i.UID = field.NewUint32(table, "idx_pst_uid")
 	i.Related = field.NewUint32(table, "idx_pst_related")
 	i.CreatedTime = field.NewUint32(table, "idx_pst_dateline")
@@ -97,7 +97,7 @@ func (i *indexComment) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 func (i *indexComment) fillFieldMap() {
 	i.fieldMap = make(map[string]field.Expr, 6)
 	i.fieldMap["idx_pst_id"] = i.ID
-	i.fieldMap["idx_pst_mid"] = i.MentionedID
+	i.fieldMap["idx_pst_mid"] = i.ObjectID
 	i.fieldMap["idx_pst_uid"] = i.UID
 	i.fieldMap["idx_pst_related"] = i.Related
 	i.fieldMap["idx_pst_dateline"] = i.CreatedTime

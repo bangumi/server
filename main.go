@@ -27,7 +27,6 @@ import (
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/group"
@@ -42,11 +41,6 @@ import (
 	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web"
-	"github.com/bangumi/server/internal/web/captcha"
-	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler"
-	"github.com/bangumi/server/internal/web/rate"
-	"github.com/bangumi/server/internal/web/session"
 )
 
 func main() {
@@ -56,16 +50,16 @@ func main() {
 }
 
 func start() error {
-	var app *fiber.App
+	var fiberApp *fiber.App
 	var cfg config.AppConfig
 
 	err := fx.New(
 		logger.FxLogger(),
 		// driver and connector
+		dal.Module,
 		fx.Provide(
 			driver.NewRedisClient,         // redis
 			driver.NewMysqlConnectionPool, // mysql
-			dal.NewDB,
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
 				httpClient.JSONUnmarshal = json.Unmarshal
@@ -77,7 +71,7 @@ func start() error {
 		fx.Provide(
 			config.NewAppConfig, logger.Copy, metrics.NewScope,
 
-			query.Use, cache.NewRedisCache,
+			cache.NewRedisCache,
 
 			oauth.NewMysqlRepo,
 
@@ -88,18 +82,14 @@ func start() error {
 			auth.NewService, character.NewService, subject.NewService, person.NewService, group.NewMysqlRepo,
 		),
 
-		fx.Provide(
-			session.NewMysqlRepo, rate.New, captcha.New, session.New, handler.New, web.New, frontend.NewTemplateEngine,
-		),
+		web.Module,
 
-		fx.Invoke(web.ResistRouter),
-
-		fx.Populate(&app, &cfg),
+		fx.Populate(&fiberApp, &cfg),
 	).Err()
 
 	if err != nil {
 		return errgo.Wrap(err, "fx")
 	}
 
-	return errgo.Wrap(web.Start(cfg, app), "failed to start app")
+	return errgo.Wrap(web.Start(cfg, fiberApp), "failed to start fiberApp")
 }

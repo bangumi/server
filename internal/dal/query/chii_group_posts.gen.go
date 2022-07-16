@@ -28,7 +28,7 @@ func newGroupTopicComment(db *gorm.DB) groupTopicComment {
 	tableName := _groupTopicComment.groupTopicCommentDo.TableName()
 	_groupTopicComment.ALL = field.NewField(tableName, "*")
 	_groupTopicComment.ID = field.NewUint32(tableName, "grp_pst_id")
-	_groupTopicComment.MentionedID = field.NewUint32(tableName, "grp_pst_mid")
+	_groupTopicComment.ObjectID = field.NewUint32(tableName, "grp_pst_mid")
 	_groupTopicComment.UID = field.NewUint32(tableName, "grp_pst_uid")
 	_groupTopicComment.Related = field.NewUint32(tableName, "grp_pst_related")
 	_groupTopicComment.Content = field.NewString(tableName, "grp_pst_content")
@@ -45,7 +45,7 @@ type groupTopicComment struct {
 
 	ALL         field.Field
 	ID          field.Uint32
-	MentionedID field.Uint32
+	ObjectID    field.Uint32
 	UID         field.Uint32
 	Related     field.Uint32
 	Content     field.String
@@ -68,7 +68,7 @@ func (g groupTopicComment) As(alias string) *groupTopicComment {
 func (g *groupTopicComment) updateTableName(table string) *groupTopicComment {
 	g.ALL = field.NewField(table, "*")
 	g.ID = field.NewUint32(table, "grp_pst_id")
-	g.MentionedID = field.NewUint32(table, "grp_pst_mid")
+	g.ObjectID = field.NewUint32(table, "grp_pst_mid")
 	g.UID = field.NewUint32(table, "grp_pst_uid")
 	g.Related = field.NewUint32(table, "grp_pst_related")
 	g.Content = field.NewString(table, "grp_pst_content")
@@ -100,7 +100,7 @@ func (g *groupTopicComment) GetFieldByName(fieldName string) (field.OrderExpr, b
 func (g *groupTopicComment) fillFieldMap() {
 	g.fieldMap = make(map[string]field.Expr, 7)
 	g.fieldMap["grp_pst_id"] = g.ID
-	g.fieldMap["grp_pst_mid"] = g.MentionedID
+	g.fieldMap["grp_pst_mid"] = g.ObjectID
 	g.fieldMap["grp_pst_uid"] = g.UID
 	g.fieldMap["grp_pst_related"] = g.Related
 	g.fieldMap["grp_pst_content"] = g.Content

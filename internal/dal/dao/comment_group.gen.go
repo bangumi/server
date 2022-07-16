@@ -54,8 +54,8 @@ func (c *GroupTopicComment) GetContent() string {
 	return c.Content
 }
 
-func (c *GroupTopicComment) GetMentionedID() model.UserID {
-	return model.UserID(c.MentionedID)
+func (c *GroupTopicComment) GetObjectID() model.UserID {
+	return model.UserID(c.ObjectID)
 }
 
 func (c *GroupTopicComment) statStub() uint8 {
