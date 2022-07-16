@@ -50,7 +50,7 @@ func main() {
 }
 
 func start() error {
-	var fiberApp *fiber.App
+	var app *fiber.App
 	var cfg config.AppConfig
 
 	err := fx.New(
@@ -84,12 +84,12 @@ func start() error {
 
 		web.Module,
 
-		fx.Populate(&fiberApp, &cfg),
+		fx.Populate(&app, &cfg),
 	).Err()
 
 	if err != nil {
 		return errgo.Wrap(err, "fx")
 	}
 
-	return errgo.Wrap(web.Start(cfg, fiberApp), "failed to start fiberApp")
+	return errgo.Wrap(web.Start(cfg, app), "failed to start app")
 }
