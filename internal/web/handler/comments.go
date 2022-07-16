@@ -54,7 +54,7 @@ func (h Handler) listComments(
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.PagedComment{}, res.ErrNotFound
 		}
-		return res.PagedG[res.Comment]{}, errgo.Wrap(err, "Comment.GetCommentsByMentionedID")
+		return res.PagedG[res.Comment]{}, errgo.Wrap(err, "topic.ListReplies")
 	}
 
 	uidMap := make(map[model.UserID]struct{}, len(comments))
