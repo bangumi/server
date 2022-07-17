@@ -77,7 +77,8 @@ func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {
 	}
 
 	switch topic.State {
-	case model.CommentStateNone, model.CommentStateReopen, model.CommentStateMerge, model.CommentStatePin, model.CommentStateSilent:
+	case model.CommentStateNone, model.CommentStateReopen,
+		model.CommentStateMerge, model.CommentStatePin, model.CommentStateSilent:
 		return true
 	case model.CommentStateClosed:
 		return CanViewClosedTopic(u)
