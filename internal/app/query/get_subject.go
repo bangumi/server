@@ -35,7 +35,7 @@ func (q Query) GetSubject(ctx context.Context, user domain.Auth, subjectID model
 		return model.Subject{}, err
 	}
 
-	if !auth.AllowSubject(user, subject) {
+	if !auth.AllowReadSubject(user, subject) {
 		return model.Subject{}, domain.ErrSubjectNotFound
 	}
 

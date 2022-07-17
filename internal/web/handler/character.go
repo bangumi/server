@@ -85,8 +85,8 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
-func (h Handler) getCharacterWithCache(
-	ctx context.Context, id model.CharacterID) (res.CharacterV0, bool, error) {
+// Deprecated: use h.app.Query.GetCharacter.
+func (h Handler) getCharacterWithCache(ctx context.Context, id model.CharacterID) (res.CharacterV0, bool, error) {
 	var key = cachekey.Character(id)
 
 	// try to read from cache
@@ -215,17 +215,11 @@ func (h Handler) GetCharacterRelatedSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	_, relations, err := h.app.Query.GetCharacterRelatedSubjects(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
-	}
-
-	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
-	}
-
-	relations, err := h.s.GetCharacterRelated(c.Context(), id)
-	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
 		return errgo.Wrap(err, "repo.GetCharacterRelated")
 	}
 

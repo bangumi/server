@@ -19,7 +19,6 @@ import (
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func NewService(s domain.SubjectRepo, p domain.PersonRepo) domain.SubjectService {
@@ -36,89 +35,6 @@ func (s service) Get(ctx context.Context, id model.SubjectID) (model.Subject, er
 
 func (s service) GetByIDs(ctx context.Context, ids ...model.SubjectID) (map[model.SubjectID]model.Subject, error) {
 	return s.repo.GetByIDs(ctx, ids...) //nolint:wrapcheck
-}
-
-func (s service) GetPersonRelated(
-	ctx context.Context, personID model.PersonID,
-) ([]model.SubjectPersonRelation, error) {
-	relations, err := s.repo.GetPersonRelated(ctx, personID)
-	if err != nil {
-		return nil, errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
-	}
-
-	var subjectIDs = make([]model.SubjectID, len(relations))
-	var results = make([]model.SubjectPersonRelation, len(relations))
-	for i, relation := range relations {
-		subjectIDs[i] = relation.SubjectID
-	}
-
-	subjects, err := s.repo.GetByIDs(ctx, subjectIDs...)
-	if err != nil {
-		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
-	}
-
-	for i, rel := range relations {
-		results[i].Subject = subjects[rel.SubjectID]
-		results[i].TypeID = rel.TypeID
-	}
-
-	return results, nil
-}
-
-func (s service) GetCharacterRelated(
-	ctx context.Context, characterID model.CharacterID,
-) ([]model.SubjectCharacterRelation, error) {
-	relations, err := s.repo.GetCharacterRelated(ctx, characterID)
-	if err != nil {
-		return nil, errgo.Wrap(err, "SubjectRepo.GetCharacterRelated")
-	}
-
-	var subjectIDs = make([]model.SubjectID, len(relations))
-	for i, relation := range relations {
-		subjectIDs[i] = relation.SubjectID
-	}
-
-	subjects, err := s.repo.GetByIDs(ctx, subjectIDs...)
-	if err != nil {
-		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
-	}
-
-	var results = make([]model.SubjectCharacterRelation, len(relations))
-	for i, rel := range relations {
-		results[i] = model.SubjectCharacterRelation{
-			Subject: subjects[rel.SubjectID],
-			TypeID:  rel.TypeID,
-		}
-	}
-
-	return results, nil
-}
-
-func (s service) GetSubjectRelated(
-	ctx context.Context, subjectID model.SubjectID,
-) ([]model.SubjectInternalRelation, error) {
-	relations, err := s.repo.GetSubjectRelated(ctx, subjectID)
-	if err != nil {
-		return nil, errgo.Wrap(err, "SubjectRepo.GetSubjectRelated")
-	}
-
-	var subjectIDs = make([]model.SubjectID, len(relations))
-	var results = make([]model.SubjectInternalRelation, len(relations))
-	for i, relation := range relations {
-		subjectIDs[i] = relation.DestinationID
-	}
-
-	subjects, err := s.repo.GetByIDs(ctx, subjectIDs...)
-	if err != nil {
-		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
-	}
-
-	for i, rel := range relations {
-		results[i].Destination = subjects[rel.DestinationID]
-		results[i].TypeID = rel.TypeID
-	}
-
-	return results, nil
 }
 
 func (s service) GetActors(
