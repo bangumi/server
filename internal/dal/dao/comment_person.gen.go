@@ -54,8 +54,8 @@ func (c *PersonComment) GetContent() string {
 	return c.Content
 }
 
-func (c *PersonComment) GetObjectID() uint32 {
-	return c.ObjectID
+func (c *PersonComment) GetTopicID() uint32 {
+	return c.TopicID
 }
 
 func (c *PersonComment) statStub() uint8 {

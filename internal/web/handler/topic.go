@@ -113,6 +113,11 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 		return errUnknownTopicType
 	}
 
+	content, err := h.topic.GetTopicContent(c.Context(), topicType, topic.ID)
+	if err != nil {
+		return h.InternalError(c, err, "failed to get topic content")
+	}
+
 	pagedComments, err := h.listComments(c, commentType, topic.ID)
 	if err != nil {
 		return err
@@ -123,7 +128,7 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	response := res.Topic{
+	response := res.TopicDetail{
 		ID:        topic.ID,
 		Title:     topic.Title,
 		CreatedAt: topic.CreatedAt,
@@ -131,6 +136,7 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 		Creator:   convertModelUser(u[topic.CreatorID]),
 		Replies:   topic.Replies,
 		Comments:  pagedComments,
+		Text:      content.Content,
 	}
 	return c.JSON(response)
 }

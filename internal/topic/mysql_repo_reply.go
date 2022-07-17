@@ -38,24 +38,24 @@ func (r mysqlRepo) CountReplies(ctx context.Context, commentType domain.CommentT
 	switch commentType {
 	case domain.CommentTypeGroupTopic:
 		count, err = r.q.GroupTopicComment.WithContext(ctx).
-			Where(r.q.GroupTopicComment.Related.Eq(0), r.q.GroupTopicComment.ObjectID.Eq(uint32(id))).Count()
+			Where(r.q.GroupTopicComment.Related.Eq(0), r.q.GroupTopicComment.TopicID.Eq(uint32(id))).Count()
 		count--
 	case domain.CommentTypeSubjectTopic:
 		count, err = r.q.SubjectTopicComment.WithContext(ctx).
-			Where(r.q.SubjectTopicComment.Related.Eq(0), r.q.SubjectTopicComment.ObjectID.Eq(uint32(id))).Count()
+			Where(r.q.SubjectTopicComment.Related.Eq(0), r.q.SubjectTopicComment.TopicID.Eq(uint32(id))).Count()
 		count--
 	case domain.CommentIndex:
 		count, err = r.q.IndexComment.WithContext(ctx).
-			Where(r.q.IndexComment.Related.Eq(0), r.q.IndexComment.ObjectID.Eq(uint32(id))).Count()
+			Where(r.q.IndexComment.Related.Eq(0), r.q.IndexComment.TopicID.Eq(uint32(id))).Count()
 	case domain.CommentCharacter:
 		count, err = r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.Related.Eq(0), r.q.CharacterComment.ObjectID.Eq(uint32(id))).Count()
+			Where(r.q.CharacterComment.Related.Eq(0), r.q.CharacterComment.TopicID.Eq(uint32(id))).Count()
 	case domain.CommentPerson:
 		count, err = r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.Related.Eq(0), r.q.CharacterComment.ObjectID.Eq(uint32(id))).Count()
+			Where(r.q.CharacterComment.Related.Eq(0), r.q.CharacterComment.TopicID.Eq(uint32(id))).Count()
 	case domain.CommentEpisode:
 		count, err = r.q.EpisodeComment.WithContext(ctx).
-			Where(r.q.EpisodeComment.Related.Eq(0), r.q.EpisodeComment.ObjectID.Eq(uint32(id))).Count()
+			Where(r.q.EpisodeComment.Related.Eq(0), r.q.EpisodeComment.TopicID.Eq(uint32(id))).Count()
 	default:
 		return 0, errUnsupportedCommentType
 	}
@@ -89,7 +89,7 @@ func (r mysqlRepo) ListReplies(
 			Content:   comment.GetContent(),
 			Related:   comment.RelatedTo(),
 			State:     comment.GetState(),
-			ObjectID:  comment.GetObjectID(),
+			// TopicID:  comment.GetTopicID(),
 		})
 
 		commentMap[parent.ID] = parent
@@ -113,28 +113,28 @@ func (r mysqlRepo) getParentComments(
 	case domain.CommentTypeGroupTopic:
 		offset++
 		comments, err = wrapCommentDao(r.q.GroupTopicComment.WithContext(ctx).
-			Where(r.q.GroupTopicComment.Related.Eq(0), r.q.GroupTopicComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.GroupTopicComment.Related.Eq(0), r.q.GroupTopicComment.TopicID.Eq(uint32(id))).
 			Offset(offset).Limit(limit).Order(r.q.GroupTopicComment.CreatedTime, r.q.GroupTopicComment.ID).Find())
 	case domain.CommentTypeSubjectTopic:
 		offset++
 		comments, err = wrapCommentDao(r.q.SubjectTopicComment.WithContext(ctx).
-			Where(r.q.SubjectTopicComment.Related.Eq(0), r.q.SubjectTopicComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.SubjectTopicComment.Related.Eq(0), r.q.SubjectTopicComment.TopicID.Eq(uint32(id))).
 			Offset(offset).Limit(limit).Order(r.q.SubjectTopicComment.CreatedTime, r.q.SubjectTopicComment.ID).Find())
 	case domain.CommentIndex:
 		comments, err = wrapCommentDao(r.q.IndexComment.WithContext(ctx).
-			Where(r.q.IndexComment.Related.Eq(0), r.q.IndexComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.IndexComment.Related.Eq(0), r.q.IndexComment.TopicID.Eq(uint32(id))).
 			Offset(offset).Limit(limit).Order(r.q.IndexComment.CreatedTime, r.q.IndexComment.ID).Find())
 	case domain.CommentCharacter:
 		comments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.Related.Eq(0), r.q.CharacterComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.CharacterComment.Related.Eq(0), r.q.CharacterComment.TopicID.Eq(uint32(id))).
 			Offset(offset).Limit(limit).Order(r.q.CharacterComment.CreatedTime, r.q.CharacterComment.ID).Find())
 	case domain.CommentPerson:
 		comments, err = wrapCommentDao(r.q.PersonComment.WithContext(ctx).
-			Where(r.q.PersonComment.Related.Eq(0), r.q.PersonComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.PersonComment.Related.Eq(0), r.q.PersonComment.TopicID.Eq(uint32(id))).
 			Offset(offset).Limit(limit).Order(r.q.PersonComment.CreatedTime, r.q.PersonComment.ID).Find())
 	case domain.CommentEpisode:
 		comments, err = wrapCommentDao(r.q.EpisodeComment.WithContext(ctx).
-			Where(r.q.EpisodeComment.Related.Eq(0), r.q.EpisodeComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.EpisodeComment.Related.Eq(0), r.q.EpisodeComment.TopicID.Eq(uint32(id))).
 			Offset(offset).Limit(limit).Order(r.q.EpisodeComment.CreatedTime, r.q.EpisodeComment.ID).Find())
 	default:
 		return nil, errUnsupportedCommentType
@@ -173,27 +173,27 @@ func (r mysqlRepo) getSubComments(
 	switch commentType {
 	case domain.CommentTypeGroupTopic:
 		comments, err = wrapCommentDao(r.q.GroupTopicComment.WithContext(ctx).
-			Where(r.q.GroupTopicComment.Related.In(commentIDs...), r.q.GroupTopicComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.GroupTopicComment.Related.In(commentIDs...), r.q.GroupTopicComment.TopicID.Eq(uint32(id))).
 			Order(r.q.GroupTopicComment.Related, r.q.GroupTopicComment.CreatedTime).Find())
 	case domain.CommentTypeSubjectTopic:
 		comments, err = wrapCommentDao(r.q.SubjectTopicComment.WithContext(ctx).
-			Where(r.q.SubjectTopicComment.Related.In(commentIDs...), r.q.SubjectTopicComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.SubjectTopicComment.Related.In(commentIDs...), r.q.SubjectTopicComment.TopicID.Eq(uint32(id))).
 			Order(r.q.SubjectTopicComment.Related, r.q.SubjectTopicComment.CreatedTime).Find())
 	case domain.CommentIndex:
 		comments, err = wrapCommentDao(r.q.IndexComment.WithContext(ctx).
-			Where(r.q.IndexComment.Related.In(commentIDs...), r.q.IndexComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.IndexComment.Related.In(commentIDs...), r.q.IndexComment.TopicID.Eq(uint32(id))).
 			Order(r.q.IndexComment.Related, r.q.IndexComment.CreatedTime).Find())
 	case domain.CommentCharacter:
 		comments, err = wrapCommentDao(r.q.CharacterComment.WithContext(ctx).
-			Where(r.q.CharacterComment.Related.In(commentIDs...), r.q.CharacterComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.CharacterComment.Related.In(commentIDs...), r.q.CharacterComment.TopicID.Eq(uint32(id))).
 			Order(r.q.CharacterComment.Related, r.q.CharacterComment.CreatedTime).Find())
 	case domain.CommentPerson:
 		comments, err = wrapCommentDao(r.q.PersonComment.WithContext(ctx).
-			Where(r.q.PersonComment.Related.In(commentIDs...), r.q.PersonComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.PersonComment.Related.In(commentIDs...), r.q.PersonComment.TopicID.Eq(uint32(id))).
 			Order(r.q.PersonComment.Related, r.q.PersonComment.CreatedTime).Find())
 	case domain.CommentEpisode:
 		comments, err = wrapCommentDao(r.q.EpisodeComment.WithContext(ctx).
-			Where(r.q.EpisodeComment.Related.In(commentIDs...), r.q.EpisodeComment.ObjectID.Eq(uint32(id))).
+			Where(r.q.EpisodeComment.Related.In(commentIDs...), r.q.EpisodeComment.TopicID.Eq(uint32(id))).
 			Order(r.q.EpisodeComment.Related, r.q.EpisodeComment.CreatedTime).Find())
 	default:
 		return nil, errUnsupportedCommentType

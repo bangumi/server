@@ -32,5 +32,5 @@ type SubComment struct {
 	Related   CommentID
 	State     uint8
 	ID        CommentID
-	ObjectID  uint32
+	ObjectID  TopicID
 }

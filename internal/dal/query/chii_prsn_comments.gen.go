@@ -28,7 +28,7 @@ func newPersonComment(db *gorm.DB) personComment {
 	tableName := _personComment.personCommentDo.TableName()
 	_personComment.ALL = field.NewField(tableName, "*")
 	_personComment.ID = field.NewUint32(tableName, "prsn_pst_id")
-	_personComment.ObjectID = field.NewUint32(tableName, "prsn_pst_mid")
+	_personComment.TopicID = field.NewUint32(tableName, "prsn_pst_mid")
 	_personComment.UID = field.NewUint32(tableName, "prsn_pst_uid")
 	_personComment.Related = field.NewUint32(tableName, "prsn_pst_related")
 	_personComment.CreatedTime = field.NewUint32(tableName, "prsn_pst_dateline")
@@ -44,7 +44,7 @@ type personComment struct {
 
 	ALL         field.Field
 	ID          field.Uint32
-	ObjectID    field.Uint32
+	TopicID     field.Uint32
 	UID         field.Uint32
 	Related     field.Uint32
 	CreatedTime field.Uint32
@@ -66,7 +66,7 @@ func (p personComment) As(alias string) *personComment {
 func (p *personComment) updateTableName(table string) *personComment {
 	p.ALL = field.NewField(table, "*")
 	p.ID = field.NewUint32(table, "prsn_pst_id")
-	p.ObjectID = field.NewUint32(table, "prsn_pst_mid")
+	p.TopicID = field.NewUint32(table, "prsn_pst_mid")
 	p.UID = field.NewUint32(table, "prsn_pst_uid")
 	p.Related = field.NewUint32(table, "prsn_pst_related")
 	p.CreatedTime = field.NewUint32(table, "prsn_pst_dateline")
@@ -97,7 +97,7 @@ func (p *personComment) GetFieldByName(fieldName string) (field.OrderExpr, bool)
 func (p *personComment) fillFieldMap() {
 	p.fieldMap = make(map[string]field.Expr, 6)
 	p.fieldMap["prsn_pst_id"] = p.ID
-	p.fieldMap["prsn_pst_mid"] = p.ObjectID
+	p.fieldMap["prsn_pst_mid"] = p.TopicID
 	p.fieldMap["prsn_pst_uid"] = p.UID
 	p.fieldMap["prsn_pst_related"] = p.Related
 	p.fieldMap["prsn_pst_dateline"] = p.CreatedTime

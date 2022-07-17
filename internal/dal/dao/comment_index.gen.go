@@ -54,8 +54,8 @@ func (c *IndexComment) GetContent() string {
 	return c.Content
 }
 
-func (c *IndexComment) GetObjectID() uint32 {
-	return c.ObjectID
+func (c *IndexComment) GetTopicID() uint32 {
+	return c.TopicID
 }
 
 func (c *IndexComment) statStub() uint8 {

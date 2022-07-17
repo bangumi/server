@@ -115,3 +115,32 @@ func (r mysqlRepo) List(
 
 	return topics, nil
 }
+
+func (r mysqlRepo) GetTopicContent(
+	ctx context.Context, topicType domain.TopicType, id model.TopicID,
+) (model.Comment, error) {
+	var comment mysqlComment
+	var err error
+	switch topicType {
+	case domain.TopicTypeGroup:
+		comment, err = r.q.GroupTopicComment.WithContext(ctx).
+			Where(r.q.GroupTopicComment.Related.Eq(0), r.q.GroupTopicComment.TopicID.Eq(uint32(id))).First()
+	case domain.TopicTypeSubject:
+		comment, err = r.q.SubjectTopicComment.WithContext(ctx).
+			Where(r.q.SubjectTopicComment.Related.Eq(0), r.q.SubjectTopicComment.TopicID.Eq(uint32(id))).First()
+	default:
+		return model.Comment{}, errUnSupportTopicType
+	}
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return model.Comment{}, errgo.Wrap(err, "dal")
+	}
+
+	return model.Comment{
+		CreatedAt: comment.CreateAt(),
+		Content:   comment.GetContent(),
+		CreatorID: comment.CreatorID(),
+		ID:        comment.CommentID(),
+		State:     comment.GetState(),
+	}, nil
+}

@@ -20,18 +20,21 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type Topics struct {
-	Data    []Topic `json:"data"`
-	HasMore bool    `json:"has_more"`
-	Limit   uint32  `json:"limit"`
-	Offset  uint32  `json:"offset"`
+type Topic struct {
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
+	Title     string        `json:"title"`
+	Creator   User          `json:"creator"`
+	ID        model.TopicID `json:"id"`
+	Replies   uint32        `json:"replies"`
 }
 
-type Topic struct {
+type TopicDetail struct {
 	CreatedAt time.Time       `json:"created_at"`
 	UpdatedAt time.Time       `json:"updated_at"`
 	Title     string          `json:"title"`
 	Creator   User            `json:"creator"`
+	Text      string          `json:"text"`
 	Comments  PagedG[Comment] `json:"comments,omitempty"`
 	ID        model.TopicID   `json:"id"`
 	Replies   uint32          `json:"replies"`

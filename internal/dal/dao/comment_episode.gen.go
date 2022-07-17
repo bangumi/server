@@ -54,8 +54,8 @@ func (c *EpisodeComment) GetContent() string {
 	return c.Content
 }
 
-func (c *EpisodeComment) GetObjectID() uint32 {
-	return c.ObjectID
+func (c *EpisodeComment) GetTopicID() uint32 {
+	return c.TopicID
 }
 
 func (c *EpisodeComment) statStub() uint8 {

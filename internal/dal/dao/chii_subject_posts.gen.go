@@ -9,7 +9,7 @@ const TableNameSubjectTopicComment = "chii_subject_posts"
 // SubjectTopicComment mapped from table <chii_subject_posts>
 type SubjectTopicComment struct {
 	ID          uint32 `gorm:"column:sbj_pst_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	ObjectID    uint32 `gorm:"column:sbj_pst_mid;type:mediumint(8) unsigned;not null"`
+	TopicID     uint32 `gorm:"column:sbj_pst_mid;type:mediumint(8) unsigned;not null"`
 	UID         uint32 `gorm:"column:sbj_pst_uid;type:mediumint(8) unsigned;not null"`
 	Related     uint32 `gorm:"column:sbj_pst_related;type:mediumint(8) unsigned;not null"`
 	Content     string `gorm:"column:sbj_pst_content;type:mediumtext;not null"`

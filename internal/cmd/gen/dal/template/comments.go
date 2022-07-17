@@ -52,6 +52,6 @@ func (c *TypeComment) GetContent() string {
 	return c.Content
 }
 
-func (c *TypeComment) GetObjectID() uint32 {
-	return c.ObjectID
+func (c *TypeComment) GetTopicID() uint32 {
+	return c.TopicID
 }

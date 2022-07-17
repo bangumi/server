@@ -28,7 +28,7 @@ func newCharacterComment(db *gorm.DB) characterComment {
 	tableName := _characterComment.characterCommentDo.TableName()
 	_characterComment.ALL = field.NewField(tableName, "*")
 	_characterComment.ID = field.NewUint32(tableName, "crt_pst_id")
-	_characterComment.ObjectID = field.NewUint32(tableName, "crt_pst_mid")
+	_characterComment.TopicID = field.NewUint32(tableName, "crt_pst_mid")
 	_characterComment.UID = field.NewUint32(tableName, "crt_pst_uid")
 	_characterComment.Related = field.NewUint32(tableName, "crt_pst_related")
 	_characterComment.CreatedTime = field.NewUint32(tableName, "crt_pst_dateline")
@@ -44,7 +44,7 @@ type characterComment struct {
 
 	ALL         field.Field
 	ID          field.Uint32
-	ObjectID    field.Uint32
+	TopicID     field.Uint32
 	UID         field.Uint32
 	Related     field.Uint32
 	CreatedTime field.Uint32
@@ -66,7 +66,7 @@ func (c characterComment) As(alias string) *characterComment {
 func (c *characterComment) updateTableName(table string) *characterComment {
 	c.ALL = field.NewField(table, "*")
 	c.ID = field.NewUint32(table, "crt_pst_id")
-	c.ObjectID = field.NewUint32(table, "crt_pst_mid")
+	c.TopicID = field.NewUint32(table, "crt_pst_mid")
 	c.UID = field.NewUint32(table, "crt_pst_uid")
 	c.Related = field.NewUint32(table, "crt_pst_related")
 	c.CreatedTime = field.NewUint32(table, "crt_pst_dateline")
@@ -97,7 +97,7 @@ func (c *characterComment) GetFieldByName(fieldName string) (field.OrderExpr, bo
 func (c *characterComment) fillFieldMap() {
 	c.fieldMap = make(map[string]field.Expr, 6)
 	c.fieldMap["crt_pst_id"] = c.ID
-	c.fieldMap["crt_pst_mid"] = c.ObjectID
+	c.fieldMap["crt_pst_mid"] = c.TopicID
 	c.fieldMap["crt_pst_uid"] = c.UID
 	c.fieldMap["crt_pst_related"] = c.Related
 	c.fieldMap["crt_pst_dateline"] = c.CreatedTime

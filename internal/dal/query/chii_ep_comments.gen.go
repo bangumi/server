@@ -28,7 +28,7 @@ func newEpisodeComment(db *gorm.DB) episodeComment {
 	tableName := _episodeComment.episodeCommentDo.TableName()
 	_episodeComment.ALL = field.NewField(tableName, "*")
 	_episodeComment.ID = field.NewUint32(tableName, "ep_pst_id")
-	_episodeComment.ObjectID = field.NewUint32(tableName, "ep_pst_mid")
+	_episodeComment.TopicID = field.NewUint32(tableName, "ep_pst_mid")
 	_episodeComment.UID = field.NewUint32(tableName, "ep_pst_uid")
 	_episodeComment.Related = field.NewUint32(tableName, "ep_pst_related")
 	_episodeComment.CreatedTime = field.NewUint32(tableName, "ep_pst_dateline")
@@ -44,7 +44,7 @@ type episodeComment struct {
 
 	ALL         field.Field
 	ID          field.Uint32
-	ObjectID    field.Uint32
+	TopicID     field.Uint32
 	UID         field.Uint32
 	Related     field.Uint32
 	CreatedTime field.Uint32
@@ -66,7 +66,7 @@ func (e episodeComment) As(alias string) *episodeComment {
 func (e *episodeComment) updateTableName(table string) *episodeComment {
 	e.ALL = field.NewField(table, "*")
 	e.ID = field.NewUint32(table, "ep_pst_id")
-	e.ObjectID = field.NewUint32(table, "ep_pst_mid")
+	e.TopicID = field.NewUint32(table, "ep_pst_mid")
 	e.UID = field.NewUint32(table, "ep_pst_uid")
 	e.Related = field.NewUint32(table, "ep_pst_related")
 	e.CreatedTime = field.NewUint32(table, "ep_pst_dateline")
@@ -97,7 +97,7 @@ func (e *episodeComment) GetFieldByName(fieldName string) (field.OrderExpr, bool
 func (e *episodeComment) fillFieldMap() {
 	e.fieldMap = make(map[string]field.Expr, 6)
 	e.fieldMap["ep_pst_id"] = e.ID
-	e.fieldMap["ep_pst_mid"] = e.ObjectID
+	e.fieldMap["ep_pst_mid"] = e.TopicID
 	e.fieldMap["ep_pst_uid"] = e.UID
 	e.fieldMap["ep_pst_related"] = e.Related
 	e.fieldMap["ep_pst_dateline"] = e.CreatedTime

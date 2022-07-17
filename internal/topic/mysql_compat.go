@@ -67,7 +67,7 @@ type mysqlComment interface {
 	GetContent() string
 	GetState() uint8
 	RelatedTo() model.CommentID
-	GetObjectID() uint32
+	// GetObjectID() uint32
 }
 
 func wrapCommentDao[T mysqlComment](data []T, err error) ([]mysqlComment, error) {

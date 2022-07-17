@@ -28,7 +28,7 @@ func newSubjectTopicComment(db *gorm.DB) subjectTopicComment {
 	tableName := _subjectTopicComment.subjectTopicCommentDo.TableName()
 	_subjectTopicComment.ALL = field.NewField(tableName, "*")
 	_subjectTopicComment.ID = field.NewUint32(tableName, "sbj_pst_id")
-	_subjectTopicComment.ObjectID = field.NewUint32(tableName, "sbj_pst_mid")
+	_subjectTopicComment.TopicID = field.NewUint32(tableName, "sbj_pst_mid")
 	_subjectTopicComment.UID = field.NewUint32(tableName, "sbj_pst_uid")
 	_subjectTopicComment.Related = field.NewUint32(tableName, "sbj_pst_related")
 	_subjectTopicComment.Content = field.NewString(tableName, "sbj_pst_content")
@@ -45,7 +45,7 @@ type subjectTopicComment struct {
 
 	ALL         field.Field
 	ID          field.Uint32
-	ObjectID    field.Uint32
+	TopicID     field.Uint32
 	UID         field.Uint32
 	Related     field.Uint32
 	Content     field.String
@@ -68,7 +68,7 @@ func (s subjectTopicComment) As(alias string) *subjectTopicComment {
 func (s *subjectTopicComment) updateTableName(table string) *subjectTopicComment {
 	s.ALL = field.NewField(table, "*")
 	s.ID = field.NewUint32(table, "sbj_pst_id")
-	s.ObjectID = field.NewUint32(table, "sbj_pst_mid")
+	s.TopicID = field.NewUint32(table, "sbj_pst_mid")
 	s.UID = field.NewUint32(table, "sbj_pst_uid")
 	s.Related = field.NewUint32(table, "sbj_pst_related")
 	s.Content = field.NewString(table, "sbj_pst_content")
@@ -100,7 +100,7 @@ func (s *subjectTopicComment) GetFieldByName(fieldName string) (field.OrderExpr,
 func (s *subjectTopicComment) fillFieldMap() {
 	s.fieldMap = make(map[string]field.Expr, 7)
 	s.fieldMap["sbj_pst_id"] = s.ID
-	s.fieldMap["sbj_pst_mid"] = s.ObjectID
+	s.fieldMap["sbj_pst_mid"] = s.TopicID
 	s.fieldMap["sbj_pst_uid"] = s.UID
 	s.fieldMap["sbj_pst_related"] = s.Related
 	s.fieldMap["sbj_pst_content"] = s.Content

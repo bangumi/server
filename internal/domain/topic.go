@@ -36,6 +36,8 @@ type TopicRepo interface {
 		limit int, offset int,
 	) ([]model.Topic, error)
 
+	GetTopicContent(ctx context.Context, topicType TopicType, id model.TopicID) (model.Comment, error)
+
 	// CountReplies top comments for a topic/index/character/person/episode.
 	// 一级回复
 	CountReplies(ctx context.Context, commentType CommentType, id model.TopicID) (int64, error)

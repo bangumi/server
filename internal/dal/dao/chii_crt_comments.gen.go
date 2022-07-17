@@ -9,7 +9,7 @@ const TableNameCharacterComment = "chii_crt_comments"
 // CharacterComment mapped from table <chii_crt_comments>
 type CharacterComment struct {
 	ID          uint32 `gorm:"column:crt_pst_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	ObjectID    uint32 `gorm:"column:crt_pst_mid;type:mediumint(8) unsigned;not null"` // 关联人物ID
+	TopicID     uint32 `gorm:"column:crt_pst_mid;type:mediumint(8) unsigned;not null"` // 关联人物ID
 	UID         uint32 `gorm:"column:crt_pst_uid;type:mediumint(8) unsigned;not null"`
 	Related     uint32 `gorm:"column:crt_pst_related;type:mediumint(8) unsigned;not null"`
 	CreatedTime uint32 `gorm:"column:crt_pst_dateline;type:int(10) unsigned;not null"`

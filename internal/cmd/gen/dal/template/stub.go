@@ -17,7 +17,7 @@ package dao
 type TypeComment struct {
 	Content     string
 	ID          uint32
-	ObjectID    uint32
+	TopicID     uint32
 	UID         uint32
 	Related     uint32
 	CreatedTime uint32
