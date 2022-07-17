@@ -2,7 +2,6 @@ title: Creator
 required:
   - username
   - nickname
-  - avatar
 type: object
 properties:
   username:
@@ -11,6 +10,4 @@ properties:
   nickname:
     title: Nickname
     type: string
-  avatar:
-    $ref: "./avatar.yaml"
 description: 意义同<a href="#model-Me">Me</a>
