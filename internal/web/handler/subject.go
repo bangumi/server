@@ -251,25 +251,24 @@ func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {
 }
 
 func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
-	u := h.getHTTPAccessor(c)
-
 	id, err := parseSubjectID(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	r, ok, err := h.getSubjectWithCache(c.Context(), id)
-	if err != nil {
-		return err
-	}
+	u := h.getHTTPAccessor(c)
 
-	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return res.NotFound("subject not found")
-	}
-
-	relations, err := h.s.GetSubjectRelated(c.Context(), id)
+	s, relations, err := h.app.Query.GetSubjectRelatedSubjects(c.Context(), u.Auth, id)
 	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
 		return errgo.Wrap(err, "repo")
+	}
+
+	if s.Redirect != 0 {
+		return res.ErrNotFound
 	}
 
 	var response = make([]res.SubjectRelatedSubject, len(relations))

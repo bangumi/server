@@ -40,7 +40,6 @@ type SubjectService interface {
 	GetByIDs(ctx context.Context, ids ...model.SubjectID) (map[model.SubjectID]model.Subject, error)
 
 	GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]model.SubjectCharacterRelation, error)
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectInternalRelation, error)
 
 	GetActors(
 		ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
@@ -70,4 +69,12 @@ type SubjectInternalRelation struct {
 
 	SourceID      model.SubjectID
 	DestinationID model.SubjectID
+}
+
+func (s SubjectInternalRelation) GetSourceID() model.SubjectID {
+	return s.SourceID
+}
+
+func (s SubjectInternalRelation) GetDestinationID() model.SubjectID {
+	return s.DestinationID
 }

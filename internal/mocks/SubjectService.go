@@ -238,53 +238,6 @@ func (_c *SubjectService_GetCharacterRelated_Call) Return(_a0 []model.SubjectCha
 	return _c
 }
 
-// GetSubjectRelated provides a mock function with given fields: ctx, subjectID
-func (_m *SubjectService) GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectInternalRelation, error) {
-	ret := _m.Called(ctx, subjectID)
-
-	var r0 []model.SubjectInternalRelation
-	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID) []model.SubjectInternalRelation); ok {
-		r0 = rf(ctx, subjectID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.SubjectInternalRelation)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID) error); ok {
-		r1 = rf(ctx, subjectID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// SubjectService_GetSubjectRelated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSubjectRelated'
-type SubjectService_GetSubjectRelated_Call struct {
-	*mock.Call
-}
-
-// GetSubjectRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - subjectID model.SubjectID
-func (_e *SubjectService_Expecter) GetSubjectRelated(ctx interface{}, subjectID interface{}) *SubjectService_GetSubjectRelated_Call {
-	return &SubjectService_GetSubjectRelated_Call{Call: _e.mock.On("GetSubjectRelated", ctx, subjectID)}
-}
-
-func (_c *SubjectService_GetSubjectRelated_Call) Run(run func(ctx context.Context, subjectID model.SubjectID)) *SubjectService_GetSubjectRelated_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID))
-	})
-	return _c
-}
-
-func (_c *SubjectService_GetSubjectRelated_Call) Return(_a0 []model.SubjectInternalRelation, _a1 error) *SubjectService_GetSubjectRelated_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
 type mockConstructorTestingTNewSubjectService interface {
 	mock.TestingT
 	Cleanup(func())
