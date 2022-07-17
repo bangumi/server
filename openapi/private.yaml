@@ -6,6 +6,8 @@ info:
 servers:
   - url: https://next.bgm.tv
     description: Production server
+  - url: https://dev.bgm38.com/
+    description: 开发用服务器
 
 x-parameters:
   default_query_limit: &default_query_limit
@@ -232,7 +234,8 @@ paths:
       tags:
         - 条目
         - 讨论
-      summary: 分页获取条目讨论回复列表，对顶级回复分页，展示所有顶级回复关联的二级回复
+      summary: 分页获取条目讨论回复列表
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
       operationId: getSubjectTopicById
       parameters:
         - required: true
@@ -411,6 +414,7 @@ paths:
         - 目录
         - 讨论
       summary: 分页获取目录讨论列表，按照时间顺序分页
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
       operationId: getIndexCommentsById
       parameters:
         - required: true
@@ -465,6 +469,7 @@ paths:
         - 章节
         - 讨论
       summary: 分页获取章节讨论列表，按照时间顺序分页
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
       operationId: getEpisodeCommentsById
       parameters:
         - required: true
@@ -519,6 +524,7 @@ paths:
         - 角色
         - 讨论
       summary: 分页获取角色讨论列表，按照时间顺序分页
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
       operationId: getCharacterCommentsById
       parameters:
         - required: true
@@ -573,6 +579,7 @@ paths:
         - 人物
         - 讨论
       summary: 分页获取人物讨论列表，按照时间顺序分页
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
       operationId: getPersonCommentsById
       parameters:
         - required: true
