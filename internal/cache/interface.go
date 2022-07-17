@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-type Generic interface {
+type Cache interface {
 	Get(ctx context.Context, key string, value any) (bool, error)
 	Set(ctx context.Context, key string, value any, ttl time.Duration) error
 	Del(ctx context.Context, keys ...string) error

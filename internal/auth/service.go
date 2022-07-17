@@ -35,7 +35,7 @@ import (
 const TokenTypeOauthToken = 0
 const TokenTypeAccessToken = 1
 
-func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.Generic) domain.AuthService {
+func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.Cache) domain.AuthService {
 	return service{
 		localCache: cache.NewMemoryCache(),
 		cache:      c,
@@ -46,8 +46,8 @@ func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, 
 }
 
 type service struct {
-	localCache cache.Generic
-	cache      cache.Generic
+	localCache cache.Cache
+	cache      cache.Cache
 	repo       domain.AuthRepo
 	user       domain.UserRepo
 	log        *zap.Logger

@@ -67,7 +67,7 @@ tasks:
       - task: base-mock
         vars:
           SRC_DIR: ./internal/cache
-          INTERFACE: "Generic"
+          INTERFACE: "Cache"
           MOCK_STRUCT: Cache
 
   session-manager:

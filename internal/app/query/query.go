@@ -23,7 +23,7 @@ import (
 
 func New(
 	episode domain.EpisodeRepo,
-	cache cache.Generic,
+	cache cache.Cache,
 	subject domain.SubjectRepo,
 	log *zap.Logger,
 ) Query {
@@ -36,7 +36,7 @@ func New(
 }
 
 type Query struct {
-	cache   cache.Generic
+	cache   cache.Cache
 	episode domain.EpisodeRepo
 	subject domain.SubjectRepo
 	log     *zap.Logger

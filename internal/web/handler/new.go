@@ -53,7 +53,7 @@ func New(
 	g domain.GroupRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
-	cache cache.Generic,
+	cache cache.Cache,
 	app app.App,
 	captcha captcha.Manager,
 	session session.Manager,
@@ -112,7 +112,7 @@ type Handler struct {
 	s                    domain.SubjectService
 	topic                domain.TopicRepo
 	g                    domain.GroupRepo
-	cache                cache.Generic
+	cache                cache.Cache
 	r                    domain.RevisionRepo
 	oauth                oauth.Manager
 	skip1Log             *zap.Logger

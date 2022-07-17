@@ -27,7 +27,7 @@ import (
 )
 
 // NewRedisCache create a redis backed cache.
-func NewRedisCache(cli *redis.Client) Generic {
+func NewRedisCache(cli *redis.Client) Cache {
 	return redisCache{r: cli}
 }
 

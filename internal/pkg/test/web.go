@@ -63,7 +63,7 @@ type Mock struct {
 	CollectionRepo domain.CollectionRepo
 	CaptchaManager captcha.Manager
 	SessionManager session.Manager
-	Cache          cache.Generic
+	Cache          cache.Cache
 	RateLimiter    rate.Manager
 	OAuthManager   oauth.Manager
 	HTTPMock       *httpmock.MockTransport
@@ -278,15 +278,15 @@ func MockSubjectRepo(m domain.SubjectRepo) fx.Option {
 	return fx.Supply(fx.Annotate(m, fx.As(new(domain.SubjectRepo))))
 }
 
-func MockCache(mock cache.Generic) fx.Option {
-	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.Generic))))
+func MockCache(mock cache.Cache) fx.Option {
+	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.Cache))))
 }
 
 func MockEmptyCache() fx.Option {
 	return fx.Provide(NopCache)
 }
 
-func NopCache() cache.Generic {
+func NopCache() cache.Cache {
 	mc := &mocks.Cache{}
 	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
 	mc.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)

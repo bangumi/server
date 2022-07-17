@@ -21,7 +21,7 @@ import (
 )
 
 func New(
-	cache cache.Generic,
+	cache cache.Cache,
 	log *zap.Logger,
 ) Command {
 	return Command{
@@ -31,6 +31,6 @@ func New(
 }
 
 type Command struct {
-	cache cache.Generic
+	cache cache.Cache
 	log   *zap.Logger
 }
