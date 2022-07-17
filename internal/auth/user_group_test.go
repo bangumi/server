@@ -12,36 +12,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package enum
+package auth_test
 
-const (
-	// UserGroupAdmin
-	// Deprecated.
-	UserGroupAdmin uint8 = iota + 1
-	// UserGroupBangumiAdmin
-	// Deprecated.
-	UserGroupBangumiAdmin
-	// UserGroupWindowAdmin
-	// Deprecated.
-	UserGroupWindowAdmin
-	// UserGroupQuite
-	// Deprecated.
-	UserGroupQuite
-	// UserGroupBanned
-	// Deprecated.
-	UserGroupBanned
-	_
-	_
-	// UserGroupCharacterAdmin
-	// Deprecated.
-	UserGroupCharacterAdmin
-	// UserGroupWikiAdmin
-	// Deprecated.
-	UserGroupWikiAdmin
-	// UserGroupNormal
-	// Deprecated.
-	UserGroupNormal
-	// UserGroupWikiEditor
-	// Deprecated.
-	UserGroupWikiEditor
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/auth"
 )
+
+func TestValue(t *testing.T) {
+	t.Parallel()
+
+	require.Equal(t, uint8(1), auth.UserGroupAdmin)
+	require.Equal(t, uint8(2), auth.UserGroupBangumiAdmin)
+	require.Equal(t, uint8(3), auth.UserGroupWindowAdmin)
+	require.Equal(t, uint8(4), auth.UserGroupQuite)
+	require.Equal(t, uint8(5), auth.UserGroupBanned)
+	require.Equal(t, uint8(8), auth.UserGroupCharacterAdmin)
+	require.Equal(t, uint8(9), auth.UserGroupWikiAdmin)
+	require.Equal(t, uint8(10), auth.UserGroupNormal)
+	require.Equal(t, uint8(11), auth.UserGroupWikiEditor)
+}

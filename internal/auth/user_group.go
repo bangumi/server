@@ -12,36 +12,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package enum
+package auth
 
 const (
-	// UserGroupAdmin
-	// Deprecated.
+	// UserGroupAdmin Deprecated.
 	UserGroupAdmin uint8 = iota + 1
-	// UserGroupBangumiAdmin
-	// Deprecated.
+	// UserGroupBangumiAdmin Deprecated.
 	UserGroupBangumiAdmin
-	// UserGroupWindowAdmin
-	// Deprecated.
+	// UserGroupWindowAdmin Deprecated.
 	UserGroupWindowAdmin
-	// UserGroupQuite
-	// Deprecated.
+	// UserGroupQuite Deprecated.
 	UserGroupQuite
-	// UserGroupBanned
-	// Deprecated.
+	// UserGroupBanned Deprecated.
 	UserGroupBanned
 	_
 	_
-	// UserGroupCharacterAdmin
-	// Deprecated.
+	// UserGroupCharacterAdmin Deprecated.
 	UserGroupCharacterAdmin
-	// UserGroupWikiAdmin
-	// Deprecated.
+	// UserGroupWikiAdmin Deprecated.
 	UserGroupWikiAdmin
-	// UserGroupNormal
-	// Deprecated.
+	// UserGroupNormal Deprecated.
 	UserGroupNormal
-	// UserGroupWikiEditor
-	// Deprecated.
+	// UserGroupWikiEditor Deprecated.
 	UserGroupWikiEditor
 )

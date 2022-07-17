@@ -12,36 +12,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package enum
+package app
 
-const (
-	// UserGroupAdmin
-	// Deprecated.
-	UserGroupAdmin uint8 = iota + 1
-	// UserGroupBangumiAdmin
-	// Deprecated.
-	UserGroupBangumiAdmin
-	// UserGroupWindowAdmin
-	// Deprecated.
-	UserGroupWindowAdmin
-	// UserGroupQuite
-	// Deprecated.
-	UserGroupQuite
-	// UserGroupBanned
-	// Deprecated.
-	UserGroupBanned
-	_
-	_
-	// UserGroupCharacterAdmin
-	// Deprecated.
-	UserGroupCharacterAdmin
-	// UserGroupWikiAdmin
-	// Deprecated.
-	UserGroupWikiAdmin
-	// UserGroupNormal
-	// Deprecated.
-	UserGroupNormal
-	// UserGroupWikiEditor
-	// Deprecated.
-	UserGroupWikiEditor
+import (
+	"go.uber.org/fx"
+
+	"github.com/bangumi/server/internal/app/command"
+	"github.com/bangumi/server/internal/app/query"
+)
+
+var Module = fx.Module("app",
+	fx.Provide(
+		New,
+		command.New,
+		query.New,
+	),
 )

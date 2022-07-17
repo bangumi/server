@@ -92,7 +92,7 @@ func (h Handler) getSubjectWithCache(
 		return r, ok, errgo.Wrap(err, "SubjectService.Get")
 	}
 
-	totalEpisode, err := h.e.Count(ctx, id)
+	totalEpisode, err := h.app.Query.CountEpisode(ctx, id, nil)
 	if err != nil {
 		return r, false, errgo.Wrap(err, "repo.episode.Count")
 	}

@@ -29,7 +29,6 @@ type CommentID uint32
 type IndexID = uint32
 type RevisionID = uint32
 type UserGroupID = uint8
-type EpType = int16
 type RevisionType = uint8
 
 var _ driver.Valuer = UserID(0)

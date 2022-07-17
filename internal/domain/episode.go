@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/pkg/vars/enum"
 )
 
 type EpisodeRepo interface {
@@ -36,6 +35,6 @@ type EpisodeRepo interface {
 
 	// ListByType return episodes filtered by episode type.
 	ListByType(
-		ctx context.Context, subjectID model.SubjectID, epType enum.EpType, limit int, offset int,
+		ctx context.Context, subjectID model.SubjectID, epType model.EpType, limit int, offset int,
 	) ([]model.Episode, error)
 }

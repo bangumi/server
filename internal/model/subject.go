@@ -88,18 +88,3 @@ func (p Platform) String() string {
 
 	return p.Type
 }
-
-type Episode struct {
-	Airdate     string
-	Name        string
-	NameCN      string
-	Duration    string
-	Description string
-	Ep          float32
-	SubjectID   SubjectID
-	Sort        float32
-	Comment     uint32
-	ID          EpisodeID
-	Type        EpType
-	Disc        uint8
-}

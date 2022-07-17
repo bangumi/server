@@ -12,36 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package enum
+package query
 
-const (
-	// UserGroupAdmin
-	// Deprecated.
-	UserGroupAdmin uint8 = iota + 1
-	// UserGroupBangumiAdmin
-	// Deprecated.
-	UserGroupBangumiAdmin
-	// UserGroupWindowAdmin
-	// Deprecated.
-	UserGroupWindowAdmin
-	// UserGroupQuite
-	// Deprecated.
-	UserGroupQuite
-	// UserGroupBanned
-	// Deprecated.
-	UserGroupBanned
-	_
-	_
-	// UserGroupCharacterAdmin
-	// Deprecated.
-	UserGroupCharacterAdmin
-	// UserGroupWikiAdmin
-	// Deprecated.
-	UserGroupWikiAdmin
-	// UserGroupNormal
-	// Deprecated.
-	UserGroupNormal
-	// UserGroupWikiEditor
-	// Deprecated.
-	UserGroupWikiEditor
+import (
+	"go.uber.org/zap"
+
+	"github.com/bangumi/server/internal/cache"
+	"github.com/bangumi/server/internal/domain"
 )
+
+func New(
+	episode domain.EpisodeRepo,
+	cache cache.Generic,
+	subject domain.SubjectRepo,
+	log *zap.Logger,
+) Query {
+	return Query{
+		log:     log.Named("app.query"),
+		cache:   cache,
+		subject: subject,
+		episode: episode,
+	}
+}
+
+type Query struct {
+	cache   cache.Generic
+	episode domain.EpisodeRepo
+	subject domain.SubjectRepo
+	log     *zap.Logger
+}

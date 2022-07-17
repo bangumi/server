@@ -12,36 +12,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package enum
+package query
 
-const (
-	// UserGroupAdmin
-	// Deprecated.
-	UserGroupAdmin uint8 = iota + 1
-	// UserGroupBangumiAdmin
-	// Deprecated.
-	UserGroupBangumiAdmin
-	// UserGroupWindowAdmin
-	// Deprecated.
-	UserGroupWindowAdmin
-	// UserGroupQuite
-	// Deprecated.
-	UserGroupQuite
-	// UserGroupBanned
-	// Deprecated.
-	UserGroupBanned
-	_
-	_
-	// UserGroupCharacterAdmin
-	// Deprecated.
-	UserGroupCharacterAdmin
-	// UserGroupWikiAdmin
-	// Deprecated.
-	UserGroupWikiAdmin
-	// UserGroupNormal
-	// Deprecated.
-	UserGroupNormal
-	// UserGroupWikiEditor
-	// Deprecated.
-	UserGroupWikiEditor
-)
+import "errors"
+
+var ErrOffsetTooBig = errors.New("limit too big")

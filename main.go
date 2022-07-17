@@ -21,6 +21,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
@@ -50,7 +51,7 @@ func main() {
 }
 
 func start() error {
-	var app *fiber.App
+	var f *fiber.App
 	var cfg config.AppConfig
 
 	err := fx.New(
@@ -81,14 +82,15 @@ func start() error {
 			auth.NewService, character.NewService, subject.NewService, person.NewService, group.NewMysqlRepo,
 		),
 
+		app.Module,
 		web.Module,
 
-		fx.Populate(&app, &cfg),
+		fx.Populate(&f, &cfg),
 	).Err()
 
 	if err != nil {
 		return errgo.Wrap(err, "fx")
 	}
 
-	return errgo.Wrap(web.Start(cfg, app), "failed to start app")
+	return errgo.Wrap(web.Start(cfg, f), "failed to start app")
 }

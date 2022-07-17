@@ -12,26 +12,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package enum_test
+package model
 
-import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/pkg/vars/enum"
-)
-
-func TestValue(t *testing.T) {
-	t.Parallel()
-
-	require.Equal(t, uint8(1), enum.UserGroupAdmin)
-	require.Equal(t, uint8(2), enum.UserGroupBangumiAdmin)
-	require.Equal(t, uint8(3), enum.UserGroupWindowAdmin)
-	require.Equal(t, uint8(4), enum.UserGroupQuite)
-	require.Equal(t, uint8(5), enum.UserGroupBanned)
-	require.Equal(t, uint8(8), enum.UserGroupCharacterAdmin)
-	require.Equal(t, uint8(9), enum.UserGroupWikiAdmin)
-	require.Equal(t, uint8(10), enum.UserGroupNormal)
-	require.Equal(t, uint8(11), enum.UserGroupWikiEditor)
+type Episode struct {
+	Airdate     string
+	Name        string
+	NameCN      string
+	Duration    string
+	Description string
+	Ep          float32
+	SubjectID   SubjectID
+	Sort        float32
+	Comment     uint32
+	ID          EpisodeID
+	Type        EpType
+	Disc        uint8
 }
+
+type EpType = uint8
+
+const (
+	EpTypeNormal  EpType = 0
+	EpTypeSpecial EpType = 1
+	EpTypeOpening EpType = 2
+	EpTypeEnding  EpType = 3
+	EpTypeMad     EpType = 4
+	EpTypeOther   EpType = 6
+)

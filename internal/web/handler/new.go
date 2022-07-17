@@ -27,6 +27,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
+	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/domain"
@@ -46,7 +47,6 @@ func New(
 	c domain.CharacterService,
 	p domain.PersonService,
 	a domain.AuthService,
-	e domain.EpisodeRepo,
 	collect domain.CollectionRepo,
 	r domain.RevisionRepo,
 	topic domain.TopicRepo,
@@ -54,6 +54,7 @@ func New(
 	index domain.IndexRepo,
 	user domain.UserRepo,
 	cache cache.Generic,
+	app app.App,
 	captcha captcha.Manager,
 	session session.Manager,
 	rateLimit rate.Manager,
@@ -69,6 +70,7 @@ func New(
 	log = log.Named("web.handler")
 
 	return Handler{
+		app:                  app,
 		cfg:                  cfg,
 		cache:                cache,
 		log:                  log,
@@ -78,7 +80,6 @@ func New(
 		s:                    s,
 		a:                    a,
 		u:                    user,
-		e:                    e,
 		c:                    c,
 		collect:              collect,
 		i:                    index,
@@ -97,28 +98,28 @@ func New(
 }
 
 type Handler struct {
-	oauth                oauth.Manager
-	s                    domain.SubjectService
+	app                  app.App
+	validatorTranslation ut.Translator
 	p                    domain.PersonService
 	a                    domain.AuthService
 	collect              domain.CollectionRepo
 	session              session.Manager
 	captcha              captcha.Manager
-	e                    domain.EpisodeRepo
 	c                    domain.CharacterService
 	u                    domain.UserRepo
 	rateLimit            rate.Manager
 	i                    domain.IndexRepo
-	r                    domain.RevisionRepo
+	s                    domain.SubjectService
 	topic                domain.TopicRepo
 	g                    domain.GroupRepo
 	cache                cache.Generic
-	validatorTranslation ut.Translator
-	log                  *zap.Logger
+	r                    domain.RevisionRepo
+	oauth                oauth.Manager
 	skip1Log             *zap.Logger
 	v                    *validator.Validate
 	template             frontend.TemplateEngine
 	buffPool             buffer.Pool
+	log                  *zap.Logger
 	cfg                  config.AppConfig
 }
 

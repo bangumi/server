@@ -27,6 +27,7 @@ import (
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
 
+	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
@@ -68,6 +69,7 @@ type Mock struct {
 	HTTPMock       *httpmock.MockTransport
 }
 
+//nolint:funlen
 func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 	tb.Helper()
 	var f *fiber.App
@@ -78,6 +80,8 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 	var options = []fx.Option{
 		fx.NopLogger,
+
+		app.Module,
 
 		fx.Supply(fx.Annotate(tally.NoopScope, fx.As(new(tally.Scope)))),
 		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}), fx.As(new(promreporter.Reporter)))),
