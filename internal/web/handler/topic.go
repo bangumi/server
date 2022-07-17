@@ -136,7 +136,7 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 		Creator:    convertModelUser(u[topic.CreatorID]),
 		ReplyCount: topic.Replies,
 		Comments:   pagedComments,
-		Text:       content.Content,
+		Text:       auth.RewriteCommit(content).Content,
 	}
 	return c.JSON(response)
 }
