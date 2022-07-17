@@ -49,7 +49,7 @@ func wrapDao[T mysqlTopic](data []T, err error) ([]model.Topic, error) {
 			Title:     item.GetTitle(),
 			ID:        model.TopicID(item.GetID()),
 			CreatorID: model.UserID(item.GetCreatorID()),
-			State:     model.TopicState(item.GetState()),
+			State:     model.CommentState(item.GetState()),
 			Replies:   item.GetReplies(),
 			ObjectID:  item.GetObjectID(),
 			Status:    model.TopicStatus(item.GetStatus()),

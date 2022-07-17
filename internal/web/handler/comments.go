@@ -19,6 +19,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -86,20 +87,25 @@ func convertModelComments(
 		var replies = make([]res.SubComment, len(comment.SubComments))
 
 		for i, subComment := range comment.SubComments {
+			subComment = auth.RewriteSubCommit(subComment)
+
 			replies[i] = res.SubComment{
 				CreatedAt: subComment.CreatedAt,
 				Text:      subComment.Content,
 				Creator:   convertModelUser(userMap[subComment.CreatorID]),
 				ID:        subComment.ID,
+				State:     res.ToCommentState(subComment.State),
 			}
 		}
 
+		comment = auth.RewriteCommit(comment)
 		result[k] = res.Comment{
 			ID:        comment.ID,
 			Text:      comment.Content,
 			CreatedAt: comment.CreatedAt,
 			Creator:   convertModelUser(userMap[comment.CreatorID]),
 			Replies:   replies,
+			State:     res.ToCommentState(comment.State),
 		}
 	}
 

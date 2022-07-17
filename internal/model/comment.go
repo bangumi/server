@@ -22,7 +22,7 @@ type Comment struct {
 	SubComments []SubComment
 	CreatorID   UserID
 	ID          CommentID
-	State       uint8
+	State       CommentState
 }
 
 type SubComment struct {
@@ -30,7 +30,7 @@ type SubComment struct {
 	Content   string
 	CreatorID UserID
 	Related   CommentID
-	State     uint8
+	State     CommentState
 	ID        CommentID
 	ObjectID  TopicID
 }

@@ -17,6 +17,7 @@ package auth
 import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 // 目前列表是根据 display(status) 来判断是否能看到标题，state 决定是否能查看内容。
@@ -40,32 +41,57 @@ func TopicStatuses(u domain.Auth) []model.TopicStatus {
 	return s
 }
 
-func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {
-	if u.ID == 0 {
-		return topic.State == model.TopicStateNone
+func RewriteSubCommit(t model.SubComment) model.SubComment {
+	switch t.State {
+	case model.CommentStateDelete, model.CommentStatePrivate:
+		t.Content = ""
+	default:
+		return t
 	}
 
-	if u.Permission.ManageTopicState {
+	return t
+}
+
+func RewriteCommit(t model.Comment) model.Comment {
+	switch t.State {
+	case model.CommentStateDelete, model.CommentStatePrivate:
+		t.Content = ""
+	default:
+		return t
+	}
+
+	return t
+}
+
+func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {
+	if u.ID == 0 {
+		return topic.State == model.CommentStateNone
+	}
+
+	if u.Permission.ManageTopicState || u.Permission.BanPost {
 		return true
 	}
 
 	if u.ID == topic.CreatorID {
-		return topic.State != model.TopicStateDelete
+		return topic.State != model.CommentStateDelete
 	}
 
 	switch topic.State {
-	case model.TopicStateNone, model.TopicStateReopen, model.TopicStateMerge, model.TopicStatePin, model.TopicStateSilent:
+	case model.CommentStateNone, model.CommentStateReopen, model.CommentStateMerge, model.CommentStatePin, model.CommentStateSilent:
 		return true
-	case model.TopicStateClosed:
+	case model.CommentStateClosed:
 		return CanViewClosedTopic(u)
-	case model.TopicStateDelete:
+	case model.CommentStateDelete:
 		return CanViewDeleteTopic(u)
-	case model.TopicStatePrivate:
+	case model.CommentStatePrivate:
 		return false
 	}
 
 	return false
 }
+
+const CanViewStateClosedTopic = timex.OneDay * 180
+const CanViewStateDeleteTopic = timex.OneDay * 365
 
 func CanViewDeleteTopic(a domain.Auth) bool {
 	return a.RegisteredLongerThan(CanViewStateDeleteTopic)

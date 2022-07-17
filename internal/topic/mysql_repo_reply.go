@@ -88,7 +88,7 @@ func (r mysqlRepo) ListReplies(
 			CreatedAt: comment.CreateAt(),
 			Content:   comment.GetContent(),
 			Related:   comment.RelatedTo(),
-			State:     comment.GetState(),
+			State:     model.CommentState(comment.GetState()),
 			// TopicID:  comment.GetTopicID(),
 		})
 
@@ -150,7 +150,7 @@ func (r mysqlRepo) getParentComments(
 			CreatedAt:   comment.CreateAt(),
 			Content:     comment.GetContent(),
 			CreatorID:   comment.CreatorID(),
-			State:       comment.GetState(),
+			State:       model.CommentState(comment.GetState()),
 			ID:          comment.CommentID(),
 			SubComments: make([]model.SubComment, 0, 4),
 		}

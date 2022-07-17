@@ -45,6 +45,7 @@ type Comment struct {
 	Replies   []SubComment    `json:"replies"`
 	Text      string          `json:"text"`
 	Creator   User            `json:"creator"`
+	State     CommentState    `json:"state"`
 	ID        model.CommentID `json:"id"`
 }
 
@@ -52,5 +53,25 @@ type SubComment struct {
 	CreatedAt time.Time       `json:"created_at"`
 	Text      string          `json:"text"`
 	Creator   User            `json:"creator"`
+	State     CommentState    `json:"state"`
 	ID        model.CommentID `json:"id"`
+}
+
+type CommentState uint8
+
+const (
+	CommentNormal         CommentState = 0
+	CommentDeletedByUser  CommentState = 1
+	CommentDeletedByAdmin CommentState = 2
+)
+
+func ToCommentState(i model.CommentState) CommentState {
+	switch i {
+	case model.CommentStateDelete:
+		return CommentDeletedByUser
+	case model.CommentStatePrivate:
+		return CommentDeletedByAdmin
+	default:
+		return CommentNormal
+	}
 }

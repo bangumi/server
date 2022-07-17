@@ -24,21 +24,21 @@ type Topic struct {
 	CreatorID UserID
 	Replies   uint32
 	ObjectID  uint32
-	State     TopicState
+	State     CommentState
 	Status    TopicStatus
 }
 
-type TopicState uint8
+type CommentState uint8
 
 const (
-	TopicStateNone    TopicState = 0 // 正常
-	TopicStateClosed  TopicState = 1 // 关闭
-	TopicStateReopen  TopicState = 2 // 重开
-	TopicStatePin     TopicState = 3 // 置顶
-	TopicStateMerge   TopicState = 4 // 合并
-	TopicStateSilent  TopicState = 5 // 下沉
-	TopicStateDelete  TopicState = 6 // 自行删除
-	TopicStatePrivate TopicState = 7 // 管理员删除
+	CommentStateNone    CommentState = 0 // 正常
+	CommentStateClosed  CommentState = 1 // 关闭
+	CommentStateReopen  CommentState = 2 // 重开
+	CommentStatePin     CommentState = 3 // 置顶
+	CommentStateMerge   CommentState = 4 // 合并
+	CommentStateSilent  CommentState = 5 // 下沉
+	CommentStateDelete  CommentState = 6 // 自行删除
+	CommentStatePrivate CommentState = 7 // 管理员删除
 )
 
 type TopicStatus uint8

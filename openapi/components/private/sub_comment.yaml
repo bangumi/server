@@ -16,3 +16,6 @@ properties:
   text:
     type: string
     example: '[quote][b]15www[/b] 说: 檞寄生+1 我的明菁 T-T[/quote]\n挖墳黨喪心病狂！'
+    description: 如果 `state` 不为 `0`，内容为空
+  state:
+    $ref: "./comment_state.yaml"

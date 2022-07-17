@@ -55,7 +55,7 @@ func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model
 		Title:     topic.GetTitle(),
 		ID:        model.TopicID(topic.GetID()),
 		CreatorID: model.UserID(topic.GetCreatorID()),
-		State:     model.TopicState(topic.GetState()),
+		State:     model.CommentState(topic.GetState()),
 		Replies:   topic.GetReplies(),
 		ObjectID:  topic.GetObjectID(),
 		Status:    model.TopicStatus(topic.GetStatus()),
@@ -141,6 +141,6 @@ func (r mysqlRepo) GetTopicContent(
 		Content:   comment.GetContent(),
 		CreatorID: comment.CreatorID(),
 		ID:        comment.CommentID(),
-		State:     comment.GetState(),
+		State:     model.CommentState(comment.GetState()),
 	}, nil
 }
