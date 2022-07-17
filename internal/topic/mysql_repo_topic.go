@@ -98,7 +98,8 @@ func (r mysqlRepo) List(
 		).Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedTime.Desc()).Find())
 	case domain.TopicTypeSubject:
 		topics, err = wrapDao(r.q.SubjectTopic.WithContext(ctx).Where(
-			r.q.SubjectTopic.SubjectID.Eq(id), r.q.SubjectTopic.Status.In(slice.ToUint8(statuses)...),
+			r.q.SubjectTopic.SubjectID.Eq(id),
+			r.q.SubjectTopic.Status.In(slice.ToUint8(statuses)...),
 		).Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedTime.Desc()).Find())
 	default:
 		return nil, errUnSupportTopicType

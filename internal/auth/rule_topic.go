@@ -27,18 +27,11 @@ func TopicStatuses(u domain.Auth) []model.TopicStatus {
 		return []model.TopicStatus{model.TopicStatusNormal}
 	}
 
-	if u.Permission.ManageTopicState {
+	if u.Permission.ManageTopicState || u.Permission.BanPost {
 		return []model.TopicStatus{model.TopicStatusBan, model.TopicStatusNormal, model.TopicStatusReview}
 	}
 
-	var s = make([]model.TopicStatus, 0, 3)
-	s = append(s, model.TopicStatusBan, model.TopicStatusNormal)
-
-	if u.Permission.BanPost {
-		s = append(s, model.TopicStatusReview)
-	}
-
-	return s
+	return []model.TopicStatus{model.TopicStatusNormal}
 }
 
 func RewriteSubCommit(t model.SubComment) model.SubComment {

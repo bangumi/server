@@ -128,7 +128,7 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	response := res.TopicDetail{
+	return res.JSON(c, res.TopicDetail{
 		ID:         topic.ID,
 		Title:      topic.Title,
 		CreatedAt:  topic.CreatedAt,
@@ -137,6 +137,5 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 		ReplyCount: topic.Replies,
 		Comments:   pagedComments,
 		Text:       auth.RewriteCommit(content).Content,
-	}
-	return c.JSON(response)
+	})
 }

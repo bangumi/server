@@ -31,12 +31,14 @@ type Topic struct {
 type CommentState uint8
 
 const (
-	CommentStateNone    CommentState = 0 // 正常
-	CommentStateClosed  CommentState = 1 // 关闭
-	CommentStateReopen  CommentState = 2 // 重开
-	CommentStatePin     CommentState = 3 // 置顶
-	CommentStateMerge   CommentState = 4 // 合并
-	CommentStateSilent  CommentState = 5 // 下沉
+	CommentStateNone CommentState = 0 // 正常
+	// CommentStateClosed 管理员关闭主题 https://bgm.tv/subject/topic/12629#post_108127
+	CommentStateClosed CommentState = 1 // 关闭
+	CommentStateReopen CommentState = 2 // 重开
+	CommentStatePin    CommentState = 3 // 置顶
+	CommentStateMerge  CommentState = 4 // 合并
+	// CommentStateSilent 管理员下沉 https://bgm.tv/subject/topic/18784#post_160402
+	CommentStateSilent  CommentState = 5
 	CommentStateDelete  CommentState = 6 // 自行删除
 	CommentStatePrivate CommentState = 7 // 管理员删除
 )
