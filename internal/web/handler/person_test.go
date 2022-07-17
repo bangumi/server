@@ -15,9 +15,7 @@
 package handler_test
 
 import (
-	"context"
 	"net/http"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -51,20 +49,6 @@ func TestHandler_GetPerson_Redirect(t *testing.T) {
 	resp := test.New(t).Get("/v0/persons/7").Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-}
-
-func TestHandler_GetPerson_Redirect_cached(t *testing.T) {
-	t.Parallel()
-	c := mocks.NewCache(t)
-	c.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Run(func(_ context.Context, _ string, value any) {
-		reflect.ValueOf(value).Elem().Set(reflect.ValueOf(res.PersonV0{Redirect: 8}))
-	}).Return(true, nil)
-
-	app := test.GetWebApp(t, test.Mock{Cache: c})
-	resp := test.New(t).Get("/v0/persons/7").Execute(app)
-
-	require.Equal(t, http.StatusFound, resp.StatusCode)
-	require.Equal(t, "/v0/persons/8", resp.Header.Get("Location"))
 }
 
 func TestHandler_GetPersonImage_302(t *testing.T) {

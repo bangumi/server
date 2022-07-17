@@ -66,6 +66,7 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
+// Deprecated.
 func (h Handler) getSubjectWithCache(
 	ctx context.Context,
 	id model.SubjectID,

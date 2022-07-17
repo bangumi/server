@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/gmap"
 )
 
 func (q Query) GetSubject(ctx context.Context, user domain.Auth, subjectID model.SubjectID) (model.Subject, error) {
@@ -39,6 +40,45 @@ func (q Query) GetSubject(ctx context.Context, user domain.Auth, subjectID model
 	}
 
 	return subject, nil
+}
+
+func (q Query) GetSubjectByIDs(
+	ctx context.Context,
+	subjectIDs ...model.SubjectID,
+) (map[model.SubjectID]model.Subject, error) {
+	var notCached = make([]model.SubjectID, 0, len(subjectIDs))
+
+	var result = make(map[model.SubjectID]model.Subject, len(subjectIDs))
+	for _, subjectID := range subjectIDs {
+		key := cachekey.Subject(subjectID)
+		var s model.Subject
+		ok, err := q.cache.Get(ctx, key, &s)
+		if err != nil {
+			return nil, errgo.Wrap(err, "cache.Get")
+		}
+
+		if ok {
+			result[subjectID] = s
+		} else {
+			notCached = append(notCached, subjectID)
+		}
+	}
+
+	newSubjectMap, err := q.subject.GetByIDs(ctx, notCached...)
+	if err != nil {
+		return nil, errgo.Wrap(err, "failed to get subjects")
+	}
+
+	for subjectID, subject := range newSubjectMap {
+		err = q.cache.Set(ctx, cachekey.Subject(subjectID), subject, time.Minute)
+		if err != nil {
+			q.log.Error("failed to set subject cache")
+		}
+	}
+
+	gmap.Copy(result, newSubjectMap)
+
+	return result, nil
 }
 
 func (q Query) getSubject(ctx context.Context, id model.SubjectID) (model.Subject, error) {

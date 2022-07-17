@@ -95,7 +95,7 @@ func (h Handler) listCollection(
 		return item.SubjectID
 	})
 
-	subjectMap, err := h.s.GetByIDs(c.Context(), subjectIDs...)
+	subjectMap, err := h.app.Query.GetSubjectByIDs(c.Context(), subjectIDs...)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get subjects")
 	}
@@ -157,12 +157,12 @@ func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.Su
 		return res.NotFound(notFoundMessage)
 	}
 
-	s, _, err := h.getSubjectWithCache(c.Context(), subjectID)
+	s, err := h.app.Query.GetSubject(c.Context(), v.Auth, subjectID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to subject info", log.SubjectID(subjectID))
 	}
 
-	return res.JSON(c, convertModelSubjectCollection(collection, s.Slim()))
+	return res.JSON(c, convertModelSubjectCollection(collection, res.ToSlimSubjectV0(s)))
 }
 
 func convertModelSubjectCollection(c model.SubjectCollection, subject res.SlimSubjectV0) res.SubjectCollection {

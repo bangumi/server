@@ -25,12 +25,14 @@ func New(
 	episode domain.EpisodeRepo,
 	cache cache.Cache,
 	subject domain.SubjectRepo,
+	person domain.PersonRepo,
 	log *zap.Logger,
 ) Query {
 	return Query{
 		log:     log.Named("app.query"),
 		cache:   cache,
 		subject: subject,
+		person:  person,
 		episode: episode,
 	}
 }
@@ -39,5 +41,6 @@ type Query struct {
 	cache   cache.Cache
 	episode domain.EpisodeRepo
 	subject domain.SubjectRepo
+	person  domain.PersonRepo
 	log     *zap.Logger
 }

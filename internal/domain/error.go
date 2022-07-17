@@ -24,4 +24,5 @@ import (
 var ErrNotFound = errors.New("can't find item")
 
 var ErrSubjectNotFound = errgo.Msg(ErrNotFound, "subject not found")
+var ErrPersonNotFound = errgo.Msg(ErrNotFound, "person not found")
 var ErrEpisodeNotFound = errgo.Msg(ErrNotFound, "episode not found")

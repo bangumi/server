@@ -21,14 +21,11 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
@@ -58,36 +55,18 @@ func (h Handler) GetPerson(c *fiber.Ctx) error {
 
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
+// Deprecated: use h.app.Query.GetPerson.
 func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonID) (res.PersonV0, bool, error) {
-	var key = cachekey.Person(id)
-
-	// try to read from cache
-	var r res.PersonV0
-	ok, err := h.cache.Get(ctx, key, &r)
+	var s, err = h.app.Query.GetPerson(ctx, id)
 	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
-	}
-
-	if ok {
-		return r, ok, nil
-	}
-
-	s, err := h.p.Get(ctx, id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, domain.ErrPersonNotFound) {
 			return res.PersonV0{}, false, nil
 		}
 
-		return r, ok, errgo.Wrap(err, "personRepo.Get")
+		return res.PersonV0{}, false, errgo.Wrap(err, "Query.GetPerson")
 	}
 
-	r = convertModelPerson(s)
-
-	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
-		logger.Error("can't set response to cache", zap.Error(e))
-	}
-
-	return r, true, nil
+	return convertModelPerson(s), true, nil
 }
 
 func convertModelPerson(s model.Person) res.PersonV0 {
@@ -201,7 +180,7 @@ func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 		return res.ErrNotFound
 	}
 
-	relations, err := h.s.GetPersonRelated(c.Context(), id)
+	relations, err := h.app.Query.GetPersonRelated(c.Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}

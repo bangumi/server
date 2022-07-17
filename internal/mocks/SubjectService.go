@@ -238,53 +238,6 @@ func (_c *SubjectService_GetCharacterRelated_Call) Return(_a0 []model.SubjectCha
 	return _c
 }
 
-// GetPersonRelated provides a mock function with given fields: ctx, personID
-func (_m *SubjectService) GetPersonRelated(ctx context.Context, personID model.PersonID) ([]model.SubjectPersonRelation, error) {
-	ret := _m.Called(ctx, personID)
-
-	var r0 []model.SubjectPersonRelation
-	if rf, ok := ret.Get(0).(func(context.Context, model.PersonID) []model.SubjectPersonRelation); ok {
-		r0 = rf(ctx, personID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.SubjectPersonRelation)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.PersonID) error); ok {
-		r1 = rf(ctx, personID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// SubjectService_GetPersonRelated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPersonRelated'
-type SubjectService_GetPersonRelated_Call struct {
-	*mock.Call
-}
-
-// GetPersonRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - personID model.PersonID
-func (_e *SubjectService_Expecter) GetPersonRelated(ctx interface{}, personID interface{}) *SubjectService_GetPersonRelated_Call {
-	return &SubjectService_GetPersonRelated_Call{Call: _e.mock.On("GetPersonRelated", ctx, personID)}
-}
-
-func (_c *SubjectService_GetPersonRelated_Call) Run(run func(ctx context.Context, personID model.PersonID)) *SubjectService_GetPersonRelated_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.PersonID))
-	})
-	return _c
-}
-
-func (_c *SubjectService_GetPersonRelated_Call) Return(_a0 []model.SubjectPersonRelation, _a1 error) *SubjectService_GetPersonRelated_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
 // GetSubjectRelated provides a mock function with given fields: ctx, subjectID
 func (_m *SubjectService) GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectInternalRelation, error) {
 	ret := _m.Called(ctx, subjectID)
