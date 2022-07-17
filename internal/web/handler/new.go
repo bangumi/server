@@ -24,6 +24,7 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"
+	"github.com/uber-go/tally/v4"
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
@@ -61,6 +62,8 @@ func New(
 	log *zap.Logger,
 	engine frontend.TemplateEngine,
 	oauth oauth.Manager,
+	metric tally.Scope,
+
 ) (Handler, error) {
 	validate, trans, err := getValidator()
 	if err != nil {
@@ -90,16 +93,18 @@ func New(
 		v:                    validate,
 		validatorTranslation: trans,
 
-		skip1Log: log.WithOptions(zap.AddCallerSkip(1)),
-		oauth:    oauth,
-		template: engine,
-		buffPool: buffer.NewPool(),
+		skip1Log:         log.WithOptions(zap.AddCallerSkip(1)),
+		oauth:            oauth,
+		template:         engine,
+		buffPool:         buffer.NewPool(),
+		subjectCached:    metric.Counter("handler_subject_cached_count"),
+		subjectNotCached: metric.Counter("handler_subject_not_cached_count"),
 	}, nil
 }
 
 type Handler struct {
 	app                  app.App
-	validatorTranslation ut.Translator
+	subjectCached        tally.Counter
 	p                    domain.PersonService
 	a                    domain.AuthService
 	collect              domain.CollectionRepo
@@ -110,16 +115,18 @@ type Handler struct {
 	rateLimit            rate.Manager
 	i                    domain.IndexRepo
 	s                    domain.SubjectService
-	topic                domain.TopicRepo
+	validatorTranslation ut.Translator
 	g                    domain.GroupRepo
 	cache                cache.Cache
 	r                    domain.RevisionRepo
 	oauth                oauth.Manager
-	skip1Log             *zap.Logger
-	v                    *validator.Validate
+	topic                domain.TopicRepo
+	subjectNotCached     tally.Counter
 	template             frontend.TemplateEngine
 	buffPool             buffer.Pool
 	log                  *zap.Logger
+	skip1Log             *zap.Logger
+	v                    *validator.Validate
 	cfg                  config.AppConfig
 }
 

@@ -81,9 +81,11 @@ func (h Handler) getSubjectWithCache(
 	}
 
 	if ok {
+		h.subjectCached.Inc(1)
 		return r, ok, nil
 	}
 
+	h.subjectNotCached.Inc(1)
 	s, err := h.s.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {

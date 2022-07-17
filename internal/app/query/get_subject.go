@@ -58,12 +58,14 @@ func (q Query) GetSubjectByIDs(
 		}
 
 		if ok {
+			q.subjectCached.Inc(1)
 			result[subjectID] = s
 		} else {
 			notCached = append(notCached, subjectID)
 		}
 	}
 
+	q.subjectNotCached.Inc(int64(len(notCached)))
 	newSubjectMap, err := q.subject.GetByIDs(ctx, notCached...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get subjects")
@@ -92,9 +94,11 @@ func (q Query) getSubject(ctx context.Context, id model.SubjectID) (model.Subjec
 	}
 
 	if ok {
+		q.subjectCached.Inc(1)
 		return r, nil
 	}
 
+	q.subjectNotCached.Inc(1)
 	r, err = q.subject.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {

@@ -15,6 +15,7 @@
 package query
 
 import (
+	"github.com/uber-go/tally/v4"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/cache"
@@ -27,6 +28,7 @@ func New(
 	subject domain.SubjectRepo,
 	person domain.PersonRepo,
 	character domain.CharacterRepo,
+	metric tally.Scope,
 	log *zap.Logger,
 ) Query {
 	return Query{
@@ -36,14 +38,19 @@ func New(
 		person:    person,
 		episode:   episode,
 		character: character,
+
+		subjectCached:    metric.Counter("app_subject_cached_count"),
+		subjectNotCached: metric.Counter("app_subject_not_cached_count"),
 	}
 }
 
 type Query struct {
-	cache     cache.Cache
-	episode   domain.EpisodeRepo
-	subject   domain.SubjectRepo
-	person    domain.PersonRepo
-	character domain.CharacterRepo
-	log       *zap.Logger
+	cache            cache.Cache
+	episode          domain.EpisodeRepo
+	subject          domain.SubjectRepo
+	person           domain.PersonRepo
+	character        domain.CharacterRepo
+	subjectCached    tally.Counter
+	subjectNotCached tally.Counter
+	log              *zap.Logger
 }

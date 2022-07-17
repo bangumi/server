@@ -28,7 +28,7 @@ import (
 func (q Query) CountEpisode(ctx context.Context, subjectID model.SubjectID, epType *model.EpType) (int64, error) {
 	key := cachekey.EpisodeCount(subjectID, epType)
 	var count int64
-	ok, err := q.cache.Get(ctx, key, &ctx)
+	ok, err := q.cache.Get(ctx, key, &count)
 	if err != nil {
 		return 0, errgo.Wrap(err, "cache.Get")
 	}
