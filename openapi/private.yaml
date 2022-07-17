@@ -276,7 +276,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Topic"
+                "$ref": "#/components/schemas/TopicDetail"
         "400":
           description: Validation Error
           content:
@@ -392,7 +392,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Topic"
+                "$ref": "#/components/schemas/TopicDetail"
         "400":
           description: Validation Error
           content:
@@ -701,121 +701,51 @@ components:
       $ref: "./components/avatar.yaml"
     ErrorDetail:
       $ref: "./components/error_detail.yaml"
-    Paged_Topic:
-      title: Paged[Topic]
-      type: object
-      properties:
-        total:
-          title: Total
-          type: integer
-          default: 0
-        limit:
-          title: Limit
-          type: integer
-          default: 0
-        offset:
-          title: Offset
-          type: integer
-          default: 0
-        data:
-          title: Data
-          type: array
-          items:
-            "$ref": "#/components/schemas/Topic"
-          default: []
+    TopicDetail:
+      $ref: "./components/private/topic_detail.yaml"
     Topic:
-      title: Topic
-      required:
-        - id
-        - replies
-        - title
-        - created_at
-        - updated_at
-        - creator
-      type: object
-      properties:
-        id:
-          title: ID
-          type: integer
-        replies:
-          title: Replies Count
-          type: integer
-        title:
-          title: Title
-          type: string
-        creator:
-          "$ref": "#/components/schemas/User"
-        created_at:
-          title: Created At
-          type: string
-          format: date-time
-        updated_at:
-          title: Updated At
-          type: string
-          format: date-time
-        comments:
-          "$ref": "#/components/schemas/Paged_Comment"
-    Paged_Comment:
-      title: Paged[Comment]
-      required:
-        - data
-        - total
-        - limit
-        - offset
-      type: object
-      properties:
-        data:
-          title: Comment Array
-          type: array
-          items:
-            "$ref": "#/components/schemas/Comment"
-          default: []
-        total:
-          title: Total
-          type: integer
-        limit:
-          title: Limit
-          type: integer
-        offset:
-          title: Offset
-          type: integer
+      $ref: "./components/private/topic.yaml"
     Comment:
-      title: Comment
-      required:
-        - id
-        - text
-        - created_at
-        - creator
-      type: object
-      properties:
-        id:
-          title: ID
-          type: integer
-        text:
-          title: Content Text
-          type: string
-        creator:
-          "$ref": "#/components/schemas/User"
-        created_at:
-          title: Created At
-          type: string
-          format: date-time
-    Paged:
-      type: object
-      properties:
-        total:
-          title: Total
-          type: integer
-        limit:
-          title: Limit
-          type: integer
-        offset:
-          title: Offset
-          type: integer
+      $ref: "./components/private/comment.yaml"
     GroupMember:
       type: array
       items:
         "$ref": "./components/private/group_member.yaml"
+    Paged:
+      $ref: "./components/page.yaml"
+    Paged_GroupMember:
+      title: Paged[GroupMember]
+      allOf:
+        - $ref: "#/components/schemas/Paged"
+        - type: object
+          properties:
+            data:
+              title: Data
+              type: array
+              items:
+                "$ref": "#/components/schemas/GroupMember"
+    Paged_Topic:
+      title: Paged[Topic]
+      allOf:
+        - $ref: "#/components/schemas/Paged"
+        - type: object
+          properties:
+            data:
+              title: Data
+              type: array
+              items:
+                "$ref": "#/components/schemas/Topic"
+    Paged_Comment:
+      title: Paged[Comment]
+      allOf:
+        - $ref: "#/components/schemas/Paged"
+        - type: object
+          properties:
+            data:
+              title: Comment Array
+              type: array
+              items:
+                "$ref": "#/components/schemas/Comment"
   securitySchemes:
     CookiesSession:
       name: sessionID

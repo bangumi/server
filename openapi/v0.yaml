@@ -1272,19 +1272,7 @@ components:
     CollectionType:
       $ref: "./components/collection_type.yaml"
     Creator:
-      title: Creator
-      required:
-        - username
-        - nickname
-      type: object
-      properties:
-        username:
-          title: Username
-          type: string
-        nickname:
-          title: Nickname
-          type: string
-      description: 意义同<a href="#model-Me">Me</a>
+      $ref: "./components/creator.yaml"
     DetailedRevision:
       title: DetailedRevision
       required:

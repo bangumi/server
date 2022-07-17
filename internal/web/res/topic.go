@@ -21,23 +21,23 @@ import (
 )
 
 type Topic struct {
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
-	Title     string        `json:"title"`
-	Creator   User          `json:"creator"`
-	ID        model.TopicID `json:"id"`
-	Replies   uint32        `json:"replies"`
+	CreatedAt  time.Time     `json:"created_at"`
+	UpdatedAt  time.Time     `json:"updated_at"`
+	Title      string        `json:"title"`
+	Creator    User          `json:"creator"`
+	ID         model.TopicID `json:"id"`
+	ReplyCount uint32        `json:"reply_count"`
 }
 
 type TopicDetail struct {
-	CreatedAt time.Time       `json:"created_at"`
-	UpdatedAt time.Time       `json:"updated_at"`
-	Title     string          `json:"title"`
-	Creator   User            `json:"creator"`
-	Text      string          `json:"text"`
-	Comments  PagedG[Comment] `json:"comments,omitempty"`
-	ID        model.TopicID   `json:"id"`
-	Replies   uint32          `json:"replies"`
+	CreatedAt  time.Time       `json:"created_at"`
+	UpdatedAt  time.Time       `json:"updated_at"`
+	Title      string          `json:"title"`
+	Creator    User            `json:"creator"`
+	Text       string          `json:"text"`
+	Comments   PagedG[Comment] `json:"comments,omitempty"`
+	ID         model.TopicID   `json:"id"`
+	ReplyCount uint32          `json:"reply_count"`
 }
 
 type Comment struct {

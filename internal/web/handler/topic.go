@@ -88,12 +88,12 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	var data = make([]res.Topic, len(topics))
 	for i, topic := range topics {
 		data[i] = res.Topic{
-			ID:        topic.ID,
-			Title:     topic.Title,
-			CreatedAt: topic.CreatedAt,
-			UpdatedAt: topic.UpdatedAt,
-			Creator:   convertModelUser(userMap[topic.CreatorID]),
-			Replies:   topic.Replies,
+			ID:         topic.ID,
+			Title:      topic.Title,
+			CreatedAt:  topic.CreatedAt,
+			UpdatedAt:  topic.UpdatedAt,
+			Creator:    convertModelUser(userMap[topic.CreatorID]),
+			ReplyCount: topic.Replies,
 		}
 	}
 	response.Data = data
@@ -129,14 +129,14 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 	}
 
 	response := res.TopicDetail{
-		ID:        topic.ID,
-		Title:     topic.Title,
-		CreatedAt: topic.CreatedAt,
-		UpdatedAt: topic.UpdatedAt,
-		Creator:   convertModelUser(u[topic.CreatorID]),
-		Replies:   topic.Replies,
-		Comments:  pagedComments,
-		Text:      content.Content,
+		ID:         topic.ID,
+		Title:      topic.Title,
+		CreatedAt:  topic.CreatedAt,
+		UpdatedAt:  topic.UpdatedAt,
+		Creator:    convertModelUser(u[topic.CreatorID]),
+		ReplyCount: topic.Replies,
+		Comments:   pagedComments,
+		Text:       content.Content,
 	}
 	return c.JSON(response)
 }
