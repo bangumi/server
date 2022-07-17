@@ -22,6 +22,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -65,15 +66,8 @@ func (h Handler) GetUser(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get user by username", zap.String("username", username))
 	}
 
-	return res.JSON(c, res.User{
-		ID:        user.ID,
-		URL:       "https://bgm.tv/user/" + user.UserName,
-		Username:  user.UserName,
-		Nickname:  user.NickName,
-		UserGroup: user.UserGroup,
-		Avatar:    res.UserAvatar(user.Avatar),
-		Sign:      user.Sign,
-	})
+	var r = convertModelUser(user)
+	return res.JSON(c, r)
 }
 
 func (h Handler) GetUserAvatar(c *fiber.Ctx) error {
@@ -100,4 +94,16 @@ func (h Handler) GetUserAvatar(c *fiber.Ctx) error {
 	}
 
 	return c.Redirect(l)
+}
+
+func convertModelUser(u model.User) res.User {
+	return res.User{
+		ID:        u.ID,
+		URL:       "https://bgm.tv/user/" + u.UserName,
+		Username:  u.UserName,
+		Nickname:  u.NickName,
+		UserGroup: u.UserGroup,
+		Avatar:    res.UserAvatar(u.Avatar),
+		Sign:      u.Sign,
+	}
 }

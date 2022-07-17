@@ -152,6 +152,16 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	return c.Redirect(l)
 }
 
+func getExpectSubjectID(c *fiber.Ctx, topic model.Topic) (model.SubjectID, error) {
+	subjectID, err := parseSubjectID(c.Params("id"))
+	if err != nil || subjectID == 0 {
+		subjectID = model.SubjectID(topic.ObjectID)
+	} else if subjectID != model.SubjectID(topic.ObjectID) {
+		return model.SubjectID(0), res.ErrNotFound
+	}
+	return subjectID, nil
+}
+
 func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 

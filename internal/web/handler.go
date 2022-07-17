@@ -57,6 +57,8 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 
 	v0.Get("/subjects/:id", addMetrics(h.GetSubject))
 	v0.Get("/subjects/:id/image", addMetrics(h.GetSubjectImage))
+	// v0.Get("/subjects/:id/topics", addMetrics(h.GetSubjectTopics))
+	// v0.Get("/subjects/:id/topics/:topic_id", addMetrics(h.GetSubjectTopic))
 	v0.Get("/subjects/:id/persons", addMetrics(h.GetSubjectRelatedPersons))
 	v0.Get("/subjects/:id/subjects", addMetrics(h.GetSubjectRelatedSubjects))
 	v0.Get("/subjects/:id/characters", addMetrics(h.GetSubjectRelatedCharacters))
@@ -105,6 +107,16 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 	private.Get("/me", addMetrics(h.GetCurrentUser))
 	private.Get("/groups/:name", addMetrics(h.GetGroupProfileByNamePrivate))
 	private.Get("/groups/:name/members", addMetrics(h.ListGroupMembersPrivate))
+
+	private.Get("/groups/:name/topics", addMetrics(h.ListGroupTopics))
+	private.Get("/subjects/:id/topics", addMetrics(h.ListSubjectTopics))
+
+	private.Get("/groups/:name/topics/:topic_id", addMetrics(h.GetGroupTopic))
+	private.Get("/subjects/:id/topics/:topic_id", addMetrics(h.GetSubjectTopic))
+	private.Get("/indices/:id/comments", addMetrics(h.GetIndexComments))
+	private.Get("/episodes/:id/comments", addMetrics(h.GetEpisodeComments))
+	private.Get("/characters/:id/comments", addMetrics(h.GetCharacterComments))
+	private.Get("/persons/:id/comments", addMetrics(h.GetPersonComments))
 
 	// un-documented
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))

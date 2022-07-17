@@ -28,6 +28,7 @@ var errMissingSubjectID = res.BadRequest("subject ID is required")
 var errMissingPersonID = res.BadRequest("person ID is required")
 var errMissingEpisodeID = res.BadRequest("episode ID is required")
 var errMissingIndexID = res.BadRequest("index ID is required")
+var errMissingTopicID = res.BadRequest("topic ID is required")
 
 func parseSubjectType(s string) (uint8, error) {
 	if s == "" {
@@ -113,6 +114,20 @@ func parseIndexID(s string) (model.IndexID, error) {
 
 	if err != nil {
 		return 0, res.BadRequest(strconv.Quote(s) + " is not a valid index ID")
+	}
+
+	return v, nil
+}
+
+func parseTopicID(s string) (model.TopicID, error) {
+	if s == "" {
+		return 0, errMissingTopicID
+	}
+
+	v, err := strparse.TopicID(s)
+
+	if err != nil {
+		return 0, res.BadRequest(strconv.Quote(s) + " is not valid topic ID")
 	}
 
 	return v, nil

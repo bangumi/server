@@ -12,4 +12,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package generic
+package topic_test
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+
+	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/topic"
+)
+
+func getRepo(t *testing.T) domain.TopicRepo {
+	t.Helper()
+	repo, err := topic.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
+	require.NoError(t, err)
+
+	return repo
+}

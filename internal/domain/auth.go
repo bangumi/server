@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 // AuthRepo presents an authorization.
@@ -47,15 +48,19 @@ type Auth struct {
 	Permission Permission `json:"-"` // disable cache for this field.
 }
 
-const nsfwThreshold = -time.Hour * 24 * 60
+const nsfwThreshold = timex.OneDay * 60
 
 // AllowNSFW return if current user is allowed to see NSFW resource.
 func (u Auth) AllowNSFW() bool {
+	return u.RegisteredLongerThan(nsfwThreshold)
+}
+
+func (u Auth) RegisteredLongerThan(t time.Duration) bool {
 	if u.ID == 0 {
 		return false
 	}
 
-	return u.RegTime.Add(nsfwThreshold).Before(time.Now())
+	return time.Since(u.RegTime) >= t
 }
 
 type AuthService interface {

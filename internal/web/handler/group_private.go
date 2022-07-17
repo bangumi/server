@@ -183,3 +183,35 @@ func parseGroupMemberType(c *fiber.Ctx) (domain.GroupMemberType, error) {
 
 	return memberType, nil
 }
+
+func (h Handler) ListGroupTopics(c *fiber.Ctx) error {
+	groupName := c.Params("name")
+	if groupName == "" {
+		return res.BadRequest("group name is required")
+	}
+
+	g, err := h.g.GetByName(c.Context(), groupName)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.NotFound("group not found")
+		}
+
+		return h.InternalError(c, err, "failed to get group", zap.String("group_name", groupName))
+	}
+
+	return h.listTopics(c, domain.TopicTypeGroup, uint32(g.ID))
+}
+
+func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
+	topicID, err := parseTopicID(c.Params("topic_id"))
+	if err != nil || topicID == 0 {
+		return errMissingTopicID
+	}
+
+	topic, err := h.getTopic(c, domain.TopicTypeGroup, topicID)
+	if err != nil {
+		return err
+	}
+
+	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
+}

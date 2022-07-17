@@ -36,6 +36,7 @@ tasks:
       - PersonService
       - GroupRepo
       - CollectionRepo
+      - TopicRepo
 
   base-mock:
     deps:
@@ -284,3 +285,15 @@ tasks:
         vars:
           SRC_DIR: ./internal/domain
           INTERFACE: CollectionRepo
+
+  TopicRepo:
+    sources:
+      - internal/domain/topic.go
+      - ./internal/pkg/tools/go.mod
+    generates:
+      - internal/mocks/TopicRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: TopicRepo

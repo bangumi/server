@@ -60,6 +60,29 @@ func (h Handler) GetCharacter(c *fiber.Ctx) error {
 	return c.JSON(r)
 }
 
+func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
+	u := h.getHTTPAccessor(c)
+	id, err := parseCharacterID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	if !ok || r.Redirect != 0 || r.NSFW && !u.AllowNSFW() {
+		return res.ErrNotFound
+	}
+
+	pagedComments, err := h.listComments(c, domain.CommentCharacter, model.TopicID(id))
+	if err != nil {
+		return err
+	}
+	return res.JSON(c, pagedComments)
+}
+
 // first try to read from cache, then fallback to reading from database.
 // return data, database record existence and error.
 func (h Handler) getCharacterWithCache(

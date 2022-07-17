@@ -32,9 +32,7 @@ import (
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/oauth"
@@ -56,6 +54,7 @@ type Mock struct {
 	AuthRepo       domain.AuthRepo
 	AuthService    domain.AuthService
 	EpisodeRepo    domain.EpisodeRepo
+	TopicRepo      domain.TopicRepo
 	GroupRepo      domain.GroupRepo
 	UserRepo       domain.UserRepo
 	IndexRepo      domain.IndexRepo
@@ -94,6 +93,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
+		fx.Provide(func() domain.TopicRepo { return m.TopicRepo }),
 		MockAuthRepo(m.AuthRepo),
 		MockOAuthManager(m.OAuthManager),
 		MockAuthService(m.AuthService),
@@ -119,10 +119,8 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		options = append(options, MockCache(m.Cache))
 	}
 
-	app := fx.New(options...)
-
-	if app.Err() != nil {
-		tb.Fatal("can't create web app", app.Err())
+	if err := fx.New(options...).Err(); err != nil {
+		tb.Fatal("can't create web app", err)
 	}
 
 	if m.HTTPMock != nil {
@@ -291,16 +289,4 @@ func NopCache() cache.Generic {
 	mc.EXPECT().Del(mock.Anything, mock.Anything).Return(nil)
 
 	return mc
-}
-
-func FxE2E(t *testing.T) fx.Option {
-	t.Helper()
-
-	return fx.Provide(
-		query.Use,
-		driver.NewRedisClient,
-		auth.NewMysqlRepo,
-		subject.NewMysqlRepo,
-		driver.NewMysqlConnectionPool,
-	)
 }

@@ -38,6 +38,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web"
 )
@@ -75,6 +76,7 @@ func start() error {
 
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
+			topic.NewMysqlRepo,
 
 			auth.NewService, character.NewService, subject.NewService, person.NewService, group.NewMysqlRepo,
 		),
