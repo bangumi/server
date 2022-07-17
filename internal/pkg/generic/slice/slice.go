@@ -55,15 +55,6 @@ func ToUint8[T interface{ ~uint8 }](in []T) []uint8 {
 	return s
 }
 
-func ToUint32[T interface{ ~uint32 }](in []T) []uint32 {
-	var s = make([]uint32, len(in))
-	for i, t := range in {
-		s[i] = uint32(t)
-	}
-
-	return s
-}
-
 func First[T any](in []T, end int) []T {
 	if len(in) < end {
 		end = len(in)

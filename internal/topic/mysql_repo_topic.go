@@ -88,27 +88,22 @@ func (r mysqlRepo) Count(
 func (r mysqlRepo) List(
 	ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int,
 ) ([]model.Topic, error) {
-	var (
-		topics []model.Topic
-		err    error
-	)
+	var topics []model.Topic
+	var err error
 	switch topicType {
 	case domain.TopicTypeGroup:
-		topics, err = wrapDao(r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
-			Where(r.q.GroupTopic.Status.In(slice.ToUint8(statuses)...)).
-			Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedTime.Desc()).Find())
+		topics, err = wrapDao(r.q.GroupTopic.WithContext(ctx).Where(
+			r.q.GroupTopic.GroupID.Eq(id),
+			r.q.GroupTopic.Status.In(slice.ToUint8(statuses)...),
+		).Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedTime.Desc()).Find())
 	case domain.TopicTypeSubject:
-		topics, err = wrapDao(r.q.SubjectTopic.WithContext(ctx).
-			Where(r.q.SubjectTopic.SubjectID.Eq(id)).Where(r.q.SubjectTopic.Status.In(slice.ToUint8(statuses)...)).
-			Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedTime.Desc()).Find())
+		topics, err = wrapDao(r.q.SubjectTopic.WithContext(ctx).Where(
+			r.q.SubjectTopic.SubjectID.Eq(id), r.q.SubjectTopic.Status.In(slice.ToUint8(statuses)...),
+		).Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedTime.Desc()).Find())
 	default:
 		return nil, errUnSupportTopicType
 	}
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, domain.ErrNotFound
-		}
-
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
