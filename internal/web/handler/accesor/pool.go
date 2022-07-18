@@ -12,4 +12,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package accesor
+
+import "sync"
+
+var accessorPool = sync.Pool{New: func() any { return &Accessor{} }} //nolint:gochecknoglobals
+
+func Get() *Accessor {
+	return accessorPool.Get().(*Accessor) //nolint:forcetypeassert
+}
+
+func Put(a *Accessor) {
+	a.reset()
+	accessorPool.Put(a)
+}

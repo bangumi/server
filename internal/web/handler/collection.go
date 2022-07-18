@@ -25,12 +25,13 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Handler) ListCollection(c *fiber.Ctx) error {
-	v := h.getHTTPAccessor(c)
+	v := h.GetHTTPAccessor(c)
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return err
@@ -131,7 +132,7 @@ func (h Handler) GetCollection(c *fiber.Ctx) error {
 
 func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.SubjectID) error {
 	const notFoundMessage = "subject is not collected by user"
-	v := h.getHTTPAccessor(c)
+	v := h.GetHTTPAccessor(c)
 
 	u, err := h.u.GetByName(c.Context(), username)
 	if err != nil {
@@ -177,7 +178,7 @@ func convertModelSubjectCollection(c model.SubjectCollection, subject res.SlimSu
 		VolStatus:   c.VolStatus,
 		UpdatedAt:   c.UpdatedAt,
 		Private:     c.Private,
-		Comment:     nilString(c.Comment),
+		Comment:     null.NilString(c.Comment),
 		Subject:     subject,
 	}
 }

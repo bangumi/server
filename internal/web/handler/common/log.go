@@ -12,37 +12,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package common
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (h Handler) GetIndexComments(c *fiber.Ctx) error {
-	user := h.GetHTTPAccessor(c)
-
-	id, err := req.ParseIndexID(c.Params("id"))
-	if err != nil {
-		return err
-	}
-
-	r, ok, err := h.getIndexWithCache(c.Context(), id)
-	if err != nil {
-		return err
-	}
-
-	if !ok || r.NSFW && !user.AllowNSFW() {
-		return res.ErrNotFound
-	}
-
-	pagedComments, err := h.listComments(c, domain.CommentIndex, model.TopicID(id))
-	if err != nil {
-		return err
-	}
-	return c.JSON(pagedComments)
+func (h Common) InternalError(c *fiber.Ctx, err error, message string, logFields ...zap.Field) error {
+	h.skip1Log.Error(message, append(logFields, zap.Error(err))...)
+	return res.InternalError(c, err, message)
 }

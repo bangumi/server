@@ -12,37 +12,47 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package subject
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (h Handler) GetIndexComments(c *fiber.Ctx) error {
-	user := h.GetHTTPAccessor(c)
-
-	id, err := req.ParseIndexID(c.Params("id"))
+func (h Subject) GetRelatedSubjects(c *fiber.Ctx) error {
+	id, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.Context(), id)
+	u := h.GetHTTPAccessor(c)
+
+	_, relations, err := h.app.Query.GetSubjectRelatedSubjects(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return errgo.Wrap(err, "repo")
 	}
 
-	if !ok || r.NSFW && !user.AllowNSFW() {
-		return res.ErrNotFound
+	var response = make([]res.SubjectRelatedSubject, len(relations))
+	for i, relation := range relations {
+		response[i] = res.SubjectRelatedSubject{
+			Images:    res.SubjectImage(relation.Destination.Image),
+			Name:      relation.Destination.Name,
+			NameCn:    relation.Destination.NameCN,
+			Relation:  readableRelation(relation.Destination.TypeID, relation.TypeID),
+			Type:      relation.Destination.TypeID,
+			SubjectID: relation.Destination.ID,
+		}
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentIndex, model.TopicID(id))
-	if err != nil {
-		return err
-	}
-	return c.JSON(pagedComments)
+	return c.JSON(response)
 }

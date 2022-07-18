@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/vars"
@@ -66,11 +67,11 @@ func convertModelPerson(s model.Person) res.PersonV0 {
 		Summary:      s.Summary,
 		LastModified: time.Time{},
 		Infobox:      compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
-		Gender:       nilString(genderMap[s.FieldGender]),
-		BloodType:    nilUint8(s.FieldBloodType),
-		BirthYear:    nilUint16(s.FieldBirthYear),
-		BirthMon:     nilUint8(s.FieldBirthMon),
-		BirthDay:     nilUint8(s.FieldBirthDay),
+		Gender:       null.NilString(genderMap[s.FieldGender]),
+		BloodType:    null.NilUint8(s.FieldBloodType),
+		BirthYear:    null.NilUint16(s.FieldBirthYear),
+		BirthMon:     null.NilUint8(s.FieldBirthMon),
+		BirthDay:     null.NilUint8(s.FieldBirthDay),
 		Stat: res.Stat{
 			Comments: s.CommentCount,
 			Collects: s.CollectCount,

@@ -27,9 +27,9 @@ import (
 )
 
 func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
-	u := h.getHTTPAccessor(c)
-	if !u.login || u.ID == 0 {
-		return res.Unauthorized("need login")
+	u := h.GetHTTPAccessor(c)
+	if !u.Login || u.ID == 0 {
+		return res.Unauthorized("need Login")
 	}
 
 	user, err := h.u.GetByID(c.Context(), u.ID)

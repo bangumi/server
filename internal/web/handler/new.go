@@ -24,7 +24,6 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"
-	"github.com/uber-go/tally/v4"
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
@@ -36,6 +35,8 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
+	"github.com/bangumi/server/internal/web/handler/common"
+	"github.com/bangumi/server/internal/web/handler/subject"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -43,6 +44,7 @@ import (
 var errTranslationNotFound = errors.New("failed to find translation for zh")
 
 func New(
+	common common.Common,
 	cfg config.AppConfig,
 	c domain.CharacterService,
 	p domain.PersonService,
@@ -61,21 +63,18 @@ func New(
 	log *zap.Logger,
 	engine frontend.TemplateEngine,
 	oauth oauth.Manager,
-	metric tally.Scope,
-
 ) (Handler, error) {
 	validate, trans, err := getValidator()
 	if err != nil {
 		return Handler{}, err
 	}
 
-	log = log.Named("web.handler")
-
 	return Handler{
+		Common:               common,
 		app:                  app,
 		cfg:                  cfg,
 		cache:                cache,
-		log:                  log,
+		log:                  log.Named("web.handler"),
 		rateLimit:            rateLimit,
 		session:              session,
 		p:                    p,
@@ -91,7 +90,6 @@ func New(
 		v:                    validate,
 		validatorTranslation: trans,
 
-		skip1Log: log.WithOptions(zap.AddCallerSkip(1)),
 		oauth:    oauth,
 		template: engine,
 		buffPool: buffer.NewPool(),
@@ -99,6 +97,8 @@ func New(
 }
 
 type Handler struct {
+	common.Common
+	Subject              subject.Subject
 	app                  app.App
 	p                    domain.PersonService
 	a                    domain.AuthService
@@ -118,7 +118,6 @@ type Handler struct {
 	template             frontend.TemplateEngine
 	buffPool             buffer.Pool
 	log                  *zap.Logger
-	skip1Log             *zap.Logger
 	v                    *validator.Validate
 	cfg                  config.AppConfig
 }

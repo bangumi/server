@@ -21,7 +21,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -39,11 +38,6 @@ func (h Handler) translationValidationError(err error) []string {
 	}
 
 	return []string{err.Error()}
-}
-
-func (h Handler) InternalError(c *fiber.Ctx, err error, message string, logFields ...zap.Field) error {
-	h.skip1Log.Error(message, append(logFields, zap.Error(err))...)
-	return res.InternalError(c, err, message)
 }
 
 func (h Handler) ValidationError(c *fiber.Ctx, err error) error {

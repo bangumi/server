@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -85,7 +86,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 }
 
 func (h Handler) GetIndex(c *fiber.Ctx) error {
-	user := h.getHTTPAccessor(c)
+	user := h.GetHTTPAccessor(c)
 
 	id, err := req.ParseIndexID(c.Params("id"))
 	if err != nil {
@@ -105,7 +106,7 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 }
 
 func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
-	user := h.getHTTPAccessor(c)
+	user := h.GetHTTPAccessor(c)
 
 	id, err := req.ParseIndexID(c.Params("id"))
 	if err != nil {
@@ -164,7 +165,7 @@ func (h Handler) getIndexSubjects(
 	for i, s := range subjects {
 		data[i] = res.IndexSubjectV0{
 			AddedAt: s.AddedAt,
-			Date:    nilString(s.Subject.Date),
+			Date:    null.NilString(s.Subject.Date),
 			Image:   res.SubjectImage(s.Subject.Image),
 			Name:    s.Subject.Name,
 			NameCN:  s.Subject.NameCN,

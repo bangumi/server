@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package subject
 
 import (
 	"errors"
@@ -20,42 +20,45 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
+	"github.com/bangumi/server/pkg/vars"
 )
 
-func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
+func (h Subject) GetRelatedPersons(c *fiber.Ctx) error {
 	u := h.GetHTTPAccessor(c)
 
-	id, err := req.ParseEpisodeID(c.Params("id"))
-	if err != nil {
+	id, err := req.ParseSubjectID(c.Params("id"))
+	if err != nil || id == 0 {
 		return err
 	}
 
-	e, err := h.app.Query.GetEpisode(c.Context(), id)
+	r, err := h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-
-		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
+		return h.InternalError(c, err, "failed to get subject", log.SubjectID(id))
 	}
 
-	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, e.SubjectID)
+	relations, err := h.p.GetSubjectRelated(c.Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.ErrNotFound
+		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
+	}
+
+	var response = make([]res.SubjectRelatedPerson, len(relations))
+	for i, rel := range relations {
+		response[i] = res.SubjectRelatedPerson{
+			Images:   res.PersonImage(rel.Person.Image),
+			Name:     rel.Person.Name,
+			Relation: vars.StaffMap[r.TypeID][rel.TypeID].String(),
+			Career:   rel.Person.Careers(),
+			Type:     rel.Person.Type,
+			ID:       rel.Person.ID,
 		}
-
-		return h.InternalError(c, err, "failed to get subject of episode", log.SubjectID(e.SubjectID))
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentEpisode, model.TopicID(id))
-	if err != nil {
-		return h.InternalError(c, err, "failed to get comments", log.SubjectID(e.SubjectID))
-	}
-
-	return c.JSON(pagedComments)
+	return c.JSON(response)
 }

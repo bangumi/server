@@ -31,9 +31,9 @@ import (
 )
 
 func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
-	v := h.getHTTPAccessor(c)
-	if !v.login {
-		return c.Redirect("/demo/login")
+	v := h.GetHTTPAccessor(c)
+	if !v.Login {
+		return c.Redirect("/demo/Login")
 	}
 
 	var r req.CreatePersonalAccessToken
@@ -54,9 +54,9 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 }
 
 func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
-	v := h.getHTTPAccessor(c)
-	if !v.login {
-		return c.Redirect("/demo/login")
+	v := h.GetHTTPAccessor(c)
+	if !v.Login {
+		return c.Redirect("/demo/Login")
 	}
 
 	var r req.DeletePersonalAccessToken

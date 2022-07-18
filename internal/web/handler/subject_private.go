@@ -20,13 +20,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
-	u := h.getHTTPAccessor(c)
+	u := h.GetHTTPAccessor(c)
 
 	topicID, err := req.ParseTopicID(c.Params("topic_id"))
 	if err != nil {
@@ -55,7 +56,7 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 }
 
 func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
-	u := h.getHTTPAccessor(c)
+	u := h.GetHTTPAccessor(c)
 
 	id, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
@@ -71,4 +72,14 @@ func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 	}
 
 	return h.listTopics(c, domain.TopicTypeSubject, uint32(id))
+}
+
+func getExpectSubjectID(c *fiber.Ctx, topic model.Topic) (model.SubjectID, error) {
+	subjectID, err := req.ParseSubjectID(c.Params("id"))
+	if err != nil || subjectID == 0 {
+		subjectID = model.SubjectID(topic.ObjectID)
+	} else if subjectID != model.SubjectID(topic.ObjectID) {
+		return model.SubjectID(0), res.ErrNotFound
+	}
+	return subjectID, nil
 }

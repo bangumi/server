@@ -251,6 +251,7 @@ linters-settings:
       - "func github.com/bangumi/server/internal/web/res.Unauthorized("
       - "func github.com/bangumi/server/internal/web/res.BadRequest("
       - "func github.com/bangumi/server/internal/web/res.JSON("
+      - "func (github.com/bangumi/server/internal/web/handler/common.Common).InternalError("
     ignoreSigRegexps:
       - 'func github.com/bangumi/server/internal/web/req\.Parse.*\('
 

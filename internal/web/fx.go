@@ -20,11 +20,17 @@ import (
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
+	"github.com/bangumi/server/internal/web/handler/common"
+	"github.com/bangumi/server/internal/web/handler/subject"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/session"
 )
 
 var Module = fx.Module("web",
+	fx.Provide(
+		common.New,
+		subject.New,
+	),
 	fx.Provide(
 		New,
 		session.NewMysqlRepo,

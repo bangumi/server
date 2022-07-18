@@ -28,7 +28,7 @@ import (
 )
 
 func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
-	u := h.getHTTPAccessor(c)
+	u := h.GetHTTPAccessor(c)
 	topic, err := h.topic.Get(c.Context(), topicType, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -45,7 +45,7 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 }
 
 func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32) error {
-	u := h.getHTTPAccessor(c)
+	u := h.GetHTTPAccessor(c)
 	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
 	if err != nil {
 		return err

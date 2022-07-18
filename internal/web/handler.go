@@ -53,15 +53,13 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 		}
 	}
 
-	v0 := app.Group("/v0/", h.AccessTokenAuthMiddleware)
+	v0 := app.Group("/v0/", h.MiddlewareAccessTokenAuth)
 
-	v0.Get("/subjects/:id", addMetrics(h.GetSubject))
-	v0.Get("/subjects/:id/image", addMetrics(h.GetSubjectImage))
-	// v0.Get("/subjects/:id/topics", addMetrics(h.GetSubjectTopics))
-	// v0.Get("/subjects/:id/topics/:topic_id", addMetrics(h.GetSubjectTopic))
-	v0.Get("/subjects/:id/persons", addMetrics(h.GetSubjectRelatedPersons))
-	v0.Get("/subjects/:id/subjects", addMetrics(h.GetSubjectRelatedSubjects))
-	v0.Get("/subjects/:id/characters", addMetrics(h.GetSubjectRelatedCharacters))
+	v0.Get("/subjects/:id", addMetrics(h.Subject.Get))
+	v0.Get("/subjects/:id/image", addMetrics(h.Subject.GetImage))
+	v0.Get("/subjects/:id/persons", addMetrics(h.Subject.GetRelatedPersons))
+	v0.Get("/subjects/:id/subjects", addMetrics(h.Subject.GetRelatedSubjects))
+	v0.Get("/subjects/:id/characters", addMetrics(h.Subject.GetRelatedCharacters))
 	v0.Get("/persons/:id", addMetrics(h.GetPerson))
 	v0.Get("/persons/:id/image", addMetrics(h.GetPersonImage))
 	v0.Get("/persons/:id/subjects", addMetrics(h.GetPersonRelatedSubjects))
@@ -100,7 +98,7 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 	}
 
 	// frontend private api
-	private := app.Group("/p/", append(CORSBlockMiddleware, h.SessionAuthMiddleware)...)
+	private := app.Group("/p/", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
@@ -126,7 +124,7 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 		CORSBlockMiddleware = []fiber.Handler{originMiddleware}
 	}
 
-	privateHTML := app.Group("/demo/", append(CORSBlockMiddleware, h.SessionAuthMiddleware)...)
+	privateHTML := app.Group("/demo/", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
 	privateHTML.Get("/login", addMetrics(h.PageLogin))
 	privateHTML.Get("/access-token", addMetrics(h.PageListAccessToken))
 	privateHTML.Get("/access-token/create", addMetrics(h.PageCreateAccessToken))
