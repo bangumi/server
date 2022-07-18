@@ -43,7 +43,6 @@ import (
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
-	"github.com/bangumi/server/internal/web/handler/common"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -81,16 +80,16 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 	var options = []fx.Option{
 		fx.NopLogger,
 
-		app.Module,
+		handler.Module, app.Module,
 
-		fx.Supply(fx.Annotate(tally.NoopScope, fx.As(new(tally.Scope)))),
+		fx.Provide(func() tally.Scope { return tally.NoopScope }),
 		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}), fx.As(new(promreporter.Reporter)))),
 
 		fx.Supply(httpClient),
 
 		fx.Provide(
-			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService,
-			person.NewService, frontend.NewTemplateEngine, common.New,
+			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, character.NewService,
+			person.NewService, frontend.NewTemplateEngine,
 		),
 
 		MockPersonRepo(m.PersonRepo),

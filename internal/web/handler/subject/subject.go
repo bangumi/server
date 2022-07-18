@@ -26,7 +26,7 @@ import (
 type Subject struct {
 	common.Common
 	app       app.App
-	p         domain.PersonService
+	person    domain.PersonService
 	collect   domain.CollectionRepo
 	character domain.CharacterService
 	topic     domain.TopicRepo
@@ -46,7 +46,7 @@ func New(
 	return Subject{
 		Common:    common,
 		app:       app,
-		p:         p,
+		person:    p,
 		collect:   collect,
 		character: c,
 		topic:     topic,

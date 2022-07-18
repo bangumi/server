@@ -61,6 +61,7 @@ func New(
 	session session.Manager,
 	rateLimit rate.Manager,
 	log *zap.Logger,
+	subject subject.Subject,
 	engine frontend.TemplateEngine,
 	oauth oauth.Manager,
 ) (Handler, error) {
@@ -70,6 +71,7 @@ func New(
 	}
 
 	return Handler{
+		Subject:              subject,
 		Common:               common,
 		app:                  app,
 		cfg:                  cfg,

@@ -43,7 +43,7 @@ func (h Subject) GetRelatedPersons(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get subject", log.SubjectID(id))
 	}
 
-	relations, err := h.p.GetSubjectRelated(c.Context(), id)
+	relations, err := h.person.GetSubjectRelated(c.Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}

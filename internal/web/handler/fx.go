@@ -12,27 +12,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package web
+package handler
 
 import (
 	"go.uber.org/fx"
 
-	"github.com/bangumi/server/internal/web/captcha"
-	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler"
-	"github.com/bangumi/server/internal/web/rate"
-	"github.com/bangumi/server/internal/web/session"
+	"github.com/bangumi/server/internal/web/handler/common"
+	"github.com/bangumi/server/internal/web/handler/subject"
 )
 
-var Module = fx.Module("web",
-	handler.Module,
+var Module = fx.Module("handler",
 	fx.Provide(
 		New,
-		session.NewMysqlRepo,
-		rate.New,
-		captcha.New,
-		session.New,
-		frontend.NewTemplateEngine,
+		common.New,
+		subject.New,
 	),
-	fx.Invoke(ResistRouter),
 )
