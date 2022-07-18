@@ -22,42 +22,30 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Subject) GetRelatedCharacters(c *fiber.Ctx) error {
 	u := h.GetHTTPAccessor(c)
-	id, err := req.ParseSubjectID(c.Params("id"))
+	subjectID, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, id)
+	_, relations, err := h.app.Query.GetSubjectRelatedCharacters(c.Context(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-		return h.InternalError(c, err, "failed to get subject", log.SubjectID(id))
-	}
-
-	return h.getRelatedCharacters(c, id)
-}
-
-func (h Subject) getRelatedCharacters(c *fiber.Ctx, subjectID model.SubjectID) error {
-	relations, err := h.character.GetSubjectRelated(c.Context(), subjectID)
-	if err != nil {
 		return errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
 	}
 
-	var characterIDs = make([]model.CharacterID, len(relations))
-	for i, rel := range relations {
-		characterIDs[i] = rel.Character.ID
-	}
-
 	var actors map[model.CharacterID][]model.Person
-	if len(characterIDs) != 0 {
+	if len(relations) != 0 {
+		var characterIDs = slice.Map(relations,
+			func(item model.SubjectCharacterRelation) model.CharacterID { return item.Character.ID })
 		actors, err = h.app.Query.GetActors(c.Context(), subjectID, characterIDs...)
 		if err != nil {
 			return errgo.Wrap(err, "query.GetActors")

@@ -15,21 +15,17 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"strconv"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/null"
-	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/wiki"
@@ -42,24 +38,20 @@ func (h Handler) GetCharacter(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	r, err := h.app.Query.GetCharacter(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
-	}
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
 
-	if !ok {
-		return res.ErrNotFound
+		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
 	}
 
 	if r.Redirect != 0 {
 		return c.Redirect("/v0/characters/" + strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
-	if r.NSFW && !u.AllowNSFW() {
-		return res.ErrNotFound
-	}
-
-	return c.JSON(r)
+	return res.JSON(c, convertModelCharacter(r))
 }
 
 func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
@@ -69,13 +61,13 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	_, err = h.app.Query.GetCharacterNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
-	}
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
 
-	if !ok || r.Redirect != 0 || r.NSFW && !u.AllowNSFW() {
-		return res.ErrNotFound
+		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
 	}
 
 	pagedComments, err := h.listComments(c, domain.CommentCharacter, model.TopicID(id))
@@ -83,41 +75,6 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return err
 	}
 	return res.JSON(c, pagedComments)
-}
-
-// first try to read from cache, then fallback to reading from database.
-// return data, database record existence and error.
-// Deprecated: use h.app.Query.GetCharacter.
-func (h Handler) getCharacterWithCache(ctx context.Context, id model.CharacterID) (res.CharacterV0, bool, error) {
-	var key = cachekey.Character(id)
-
-	// try to read from cache
-	var r res.CharacterV0
-	ok, err := h.cache.Get(ctx, key, &r)
-	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
-	}
-
-	if ok {
-		return r, ok, nil
-	}
-
-	s, err := h.c.Get(ctx, id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.CharacterV0{}, false, nil
-		}
-
-		return r, ok, errgo.Wrap(err, "CharacterService.Get")
-	}
-
-	r = convertModelCharacter(s)
-
-	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
-		logger.Error("can't set response to cache", zap.Error(e))
-	}
-
-	return r, true, nil
 }
 
 func convertModelCharacter(s model.Character) res.CharacterV0 {
@@ -152,16 +109,15 @@ func (h Handler) GetCharacterImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	p, err := h.app.Query.GetCharacterNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
 	}
 
-	if !ok || r.NSFW && !u.AllowNSFW() {
-		return res.ErrNotFound
-	}
-
-	l, ok := r.Images.Select(c.Query("type"))
+	l, ok := res.PersonImage(p.Image).Select(c.Query("type"))
 	if !ok {
 		return res.BadRequest("bad image type: " + c.Query("type"))
 	}
@@ -180,13 +136,12 @@ func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getCharacterWithCache(c.Context(), id)
+	_, err = h.app.Query.GetCharacterNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
-	}
-
-	if !ok || r.Redirect != 0 || r.NSFW && !u.AllowNSFW() {
-		return res.ErrNotFound
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
 	}
 
 	casts, err := h.p.GetCharacterRelated(c.Context(), id)

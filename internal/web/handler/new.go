@@ -46,7 +46,7 @@ var errTranslationNotFound = errors.New("failed to find translation for zh")
 func New(
 	common common.Common,
 	cfg config.AppConfig,
-	c domain.CharacterService,
+	c domain.CharacterRepo,
 	p domain.PersonService,
 	a domain.AuthService,
 	collect domain.CollectionRepo,
@@ -82,7 +82,6 @@ func New(
 		p:                    p,
 		a:                    a,
 		u:                    user,
-		c:                    c,
 		collect:              collect,
 		i:                    index,
 		r:                    r,
@@ -107,7 +106,6 @@ type Handler struct {
 	collect              domain.CollectionRepo
 	session              session.Manager
 	captcha              captcha.Manager
-	c                    domain.CharacterService
 	u                    domain.UserRepo
 	rateLimit            rate.Manager
 	i                    domain.IndexRepo

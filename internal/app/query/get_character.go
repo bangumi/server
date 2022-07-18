@@ -41,6 +41,21 @@ func (q Query) GetCharacter(ctx context.Context, user domain.Auth, id model.Char
 	return character, nil
 }
 
+func (q Query) GetCharacterNoRedirect(
+	ctx context.Context, user domain.Auth, id model.CharacterID,
+) (model.Character, error) {
+	character, err := q.GetCharacter(ctx, user, id)
+	if err != nil {
+		return model.Character{}, err
+	}
+
+	if character.Redirect != 0 {
+		return model.Character{}, domain.ErrCharacterNotFound
+	}
+
+	return character, nil
+}
+
 func (q Query) getCharacter(ctx context.Context, id model.CharacterID) (model.Character, error) {
 	var key = cachekey.Character(id)
 

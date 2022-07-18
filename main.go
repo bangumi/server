@@ -79,7 +79,7 @@ func start() error {
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
 			topic.NewMysqlRepo,
 
-			auth.NewService, character.NewService, person.NewService, group.NewMysqlRepo,
+			auth.NewService, person.NewService, group.NewMysqlRepo,
 		),
 
 		app.Module,

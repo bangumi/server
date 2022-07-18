@@ -25,7 +25,6 @@ tasks:
       - AuthRepo
       - AuthService
       - CharacterRepo
-      - CharacterService
       - IndexRepo
       - RevisionRepo
       - SubjectRepo
@@ -152,18 +151,6 @@ tasks:
         vars:
           SRC_DIR: ./internal/domain
           INTERFACE: "CharacterRepo"
-
-  "CharacterService":
-    sources:
-      - internal/domain/character.go
-      - ./internal/pkg/tools/go.mod
-    generates:
-      - internal/mocks/CharacterService.go
-    cmds:
-      - task: base-mock
-        vars:
-          SRC_DIR: ./internal/domain
-          INTERFACE: "CharacterService"
 
   "IndexRepo":
     sources:

@@ -25,18 +25,16 @@ import (
 
 type Subject struct {
 	common.Common
-	app       app.App
-	person    domain.PersonService
-	collect   domain.CollectionRepo
-	character domain.CharacterService
-	topic     domain.TopicRepo
-	log       *zap.Logger
-	cfg       config.AppConfig
+	app     app.App
+	person  domain.PersonService
+	collect domain.CollectionRepo
+	topic   domain.TopicRepo
+	log     *zap.Logger
+	cfg     config.AppConfig
 }
 
 func New(
 	common common.Common,
-	c domain.CharacterService,
 	p domain.PersonService,
 	collect domain.CollectionRepo,
 	topic domain.TopicRepo,
@@ -44,13 +42,12 @@ func New(
 	log *zap.Logger,
 ) (Subject, error) {
 	return Subject{
-		Common:    common,
-		app:       app,
-		person:    p,
-		collect:   collect,
-		character: c,
-		topic:     topic,
-		log:       log.Named("handler.Subject"),
-		cfg:       config.AppConfig{},
+		Common:  common,
+		app:     app,
+		person:  p,
+		collect: collect,
+		topic:   topic,
+		log:     log.Named("handler.Subject"),
+		cfg:     config.AppConfig{},
 	}, nil
 }

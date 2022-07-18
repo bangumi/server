@@ -134,7 +134,7 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 		return res.ErrNotFound
 	}
 
-	relations, err := h.c.GetPersonRelated(c.Context(), id)
+	relations, err := h.app.Query.GetPersonRelatedCharacters(c.Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}

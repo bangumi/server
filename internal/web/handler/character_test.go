@@ -15,9 +15,7 @@
 package handler_test
 
 import (
-	"context"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
@@ -53,20 +51,6 @@ func TestHandler_GetCharacter_Redirect(t *testing.T) {
 	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Redirect: 8}, nil)
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
-
-	resp := test.New(t).Get("/v0/characters/7").Execute(app).ExpectCode(http.StatusFound)
-
-	require.Equal(t, "/v0/characters/8", resp.Header.Get("Location"))
-}
-
-func TestHandler_GetCharacter_Redirect_cached(t *testing.T) {
-	t.Parallel()
-	c := mocks.NewCache(t)
-	c.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Run(func(_ context.Context, _ string, value any) {
-		reflect.ValueOf(value).Elem().Set(reflect.ValueOf(res.CharacterV0{Redirect: 8}))
-	}).Return(true, nil)
-
-	app := test.GetWebApp(t, test.Mock{Cache: c})
 
 	resp := test.New(t).Get("/v0/characters/7").Execute(app).ExpectCode(http.StatusFound)
 
