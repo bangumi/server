@@ -29,13 +29,14 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/wiki"
 )
 
 func (h Handler) GetCharacter(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := parseCharacterID(c.Params("id"))
+	id, err := req.ParseCharacterID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -62,7 +63,7 @@ func (h Handler) GetCharacter(c *fiber.Ctx) error {
 
 func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := parseCharacterID(c.Params("id"))
+	id, err := req.ParseCharacterID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -145,7 +146,7 @@ func convertModelCharacter(s model.Character) res.CharacterV0 {
 
 func (h Handler) GetCharacterImage(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := parseCharacterID(c.Params("id"))
+	id, err := req.ParseCharacterID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -173,7 +174,7 @@ func (h Handler) GetCharacterImage(c *fiber.Ctx) error {
 
 func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := parseCharacterID(c.Params("id"))
+	id, err := req.ParseCharacterID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -210,7 +211,7 @@ func (h Handler) GetCharacterRelatedPersons(c *fiber.Ctx) error {
 
 func (h Handler) GetCharacterRelatedSubjects(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := parseCharacterID(c.Params("id"))
+	id, err := req.ParseCharacterID(c.Params("id"))
 	if err != nil {
 		return err
 	}

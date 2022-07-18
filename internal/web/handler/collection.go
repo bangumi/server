@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -40,12 +41,12 @@ func (h Handler) ListCollection(c *fiber.Ctx) error {
 		return res.BadRequest("missing require parameters `username`")
 	}
 
-	subjectType, err := parseSubjectType(c.Query("subject_type"))
+	subjectType, err := req.ParseSubjectType(c.Query("subject_type"))
 	if err != nil {
 		return res.BadRequest(err.Error())
 	}
 
-	collectionType, err := parseCollectionType(c.Query("type"))
+	collectionType, err := req.ParseCollectionType(c.Query("type"))
 	if err != nil {
 		return err
 	}
@@ -120,7 +121,7 @@ func (h Handler) GetCollection(c *fiber.Ctx) error {
 		return res.BadRequest("missing require parameters `username`")
 	}
 
-	subjectID, err := parseSubjectID(c.Params("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
 	if err != nil {
 		return err
 	}

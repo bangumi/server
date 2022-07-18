@@ -12,30 +12,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package req
 
 import (
 	"strconv"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/strparse"
+	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 // these errors result in to 400 http response.
-var errMissingCharacterID = res.BadRequest("character ID is required")
 var errMissingSubjectID = res.BadRequest("subject ID is required")
+var errMissingCharacterID = res.BadRequest("character ID is required")
 var errMissingPersonID = res.BadRequest("person ID is required")
 var errMissingEpisodeID = res.BadRequest("episode ID is required")
 var errMissingIndexID = res.BadRequest("index ID is required")
 var errMissingTopicID = res.BadRequest("topic ID is required")
 
-func parseSubjectType(s string) (uint8, error) {
+func ParseSubjectType(s string) (model.SubjectType, error) {
 	if s == "" {
 		return 0, nil
 	}
 
-	t, err := strparse.Uint8(s)
+	t, err := gstr.ParseUint8(s)
 	if err != nil {
 		return 0, res.BadRequest("bad subject type: " + strconv.Quote(s))
 	}
@@ -49,96 +49,96 @@ func parseSubjectType(s string) (uint8, error) {
 	return 0, res.BadRequest(strconv.Quote(s) + " is not a valid subject type")
 }
 
-func parseSubjectID(s string) (model.SubjectID, error) {
+func ParseSubjectID(s string) (model.SubjectID, error) {
 	if s == "" {
 		return 0, errMissingSubjectID
 	}
 
-	v, err := strparse.SubjectID(s)
+	v, err := gstr.ParseUint32(s)
 
-	if err != nil {
+	if err != nil || v == 0 {
 		return 0, res.BadRequest(strconv.Quote(s) + " is not valid subject ID")
 	}
 
-	return v, nil
+	return model.SubjectID(v), nil
 }
 
-func parseCharacterID(s string) (model.CharacterID, error) {
+func ParseCharacterID(s string) (model.CharacterID, error) {
 	if s == "" {
 		return 0, errMissingCharacterID
 	}
 
-	v, err := strparse.CharacterID(s)
+	v, err := gstr.ParseUint32(s)
 
-	if err != nil {
+	if err != nil || v == 0 {
 		return 0, res.BadRequest(strconv.Quote(s) + " is not valid character ID")
 	}
 
-	return v, nil
+	return model.CharacterID(v), nil
 }
 
-func parsePersonID(s string) (model.PersonID, error) {
+func ParsePersonID(s string) (model.PersonID, error) {
 	if s == "" {
 		return 0, errMissingPersonID
 	}
 
-	v, err := strparse.PersonID(s)
+	v, err := gstr.ParseUint32(s)
 
-	if err != nil {
+	if err != nil || v == 0 {
 		return 0, res.BadRequest(strconv.Quote(s) + " is not valid person ID")
 	}
 
-	return v, nil
+	return model.PersonID(v), nil
 }
 
-func parseEpisodeID(s string) (model.EpisodeID, error) {
+func ParseEpisodeID(s string) (model.EpisodeID, error) {
 	if s == "" {
 		return 0, errMissingEpisodeID
 	}
 
-	v, err := strparse.EpisodeID(s)
+	v, err := gstr.ParseUint32(s)
 
-	if err != nil {
+	if err != nil || v == 0 {
 		return 0, res.BadRequest(strconv.Quote(s) + " is not a valid episode ID")
 	}
 
-	return v, nil
+	return model.EpisodeID(v), nil
 }
 
-func parseIndexID(s string) (model.IndexID, error) {
+func ParseIndexID(s string) (model.IndexID, error) {
 	if s == "" {
 		return 0, errMissingIndexID
 	}
 
-	v, err := strparse.IndexID(s)
+	v, err := gstr.ParseUint32(s)
 
-	if err != nil {
+	if err != nil || v == 0 {
 		return 0, res.BadRequest(strconv.Quote(s) + " is not a valid index ID")
 	}
 
 	return v, nil
 }
 
-func parseTopicID(s string) (model.TopicID, error) {
+func ParseTopicID(s string) (model.TopicID, error) {
 	if s == "" {
 		return 0, errMissingTopicID
 	}
 
-	v, err := strparse.TopicID(s)
+	v, err := gstr.ParseUint32(s)
 
-	if err != nil {
+	if err != nil || v == 0 {
 		return 0, res.BadRequest(strconv.Quote(s) + " is not valid topic ID")
 	}
 
-	return v, nil
+	return model.TopicID(v), nil
 }
 
-func parseCollectionType(s string) (model.CollectionType, error) {
+func ParseCollectionType(s string) (model.CollectionType, error) {
 	if s == "" {
 		return model.CollectionTypeAll, nil
 	}
 
-	t, err := strparse.Uint8(s)
+	t, err := gstr.ParseUint8(s)
 	if err != nil {
 		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
 	}

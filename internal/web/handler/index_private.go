@@ -19,13 +19,14 @@ import (
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 	user := h.getHTTPAccessor(c)
 
-	id, err := parseIndexID(c.Params("id"))
+	id, err := req.ParseIndexID(c.Params("id"))
 	if err != nil {
 		return err
 	}

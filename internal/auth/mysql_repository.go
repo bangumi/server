@@ -29,10 +29,10 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/random"
-	"github.com/bangumi/server/internal/pkg/strparse"
 )
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) domain.AuthRepo {
@@ -76,13 +76,13 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, e
 		return domain.Auth{}, errgo.Wrap(err, "gorm")
 	}
 
-	id, err := strparse.UserID(access.UserID)
-	if err != nil {
+	id, err := gstr.ParseUint32(access.UserID)
+	if err != nil || id == 0 {
 		m.log.Error("wrong UserID in OAuth Access table", zap.String("user_id", access.UserID))
 		return domain.Auth{}, errgo.Wrap(err, "parsing user id")
 	}
 
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(id)).First()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(model.UserID(id))).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			m.log.Error("can't find user of access token",

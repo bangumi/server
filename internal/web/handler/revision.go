@@ -26,7 +26,8 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/strparse"
+	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -35,7 +36,7 @@ func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	personID, err := parsePersonID(c.Query("person_id"))
+	personID, err := req.ParsePersonID(c.Query("person_id"))
 	if err != nil {
 		return err
 	}
@@ -90,7 +91,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 }
 
 func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := gstr.ParseUint32(c.Params("id"))
 	if err != nil || id <= 0 {
 		return res.BadRequest(fmt.Sprintf("bad param id: %s", c.Params("id")))
 	}
@@ -117,7 +118,7 @@ func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
 		return err
 	}
 
-	characterID, err := parseCharacterID(c.Query("character_id"))
+	characterID, err := req.ParseCharacterID(c.Query("character_id"))
 	if err != nil {
 		return err
 	}
@@ -171,7 +172,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 }
 
 func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := gstr.ParseUint32(c.Params("id"))
 	if err != nil || id <= 0 {
 		return res.NewError(
 			http.StatusBadRequest,
@@ -200,7 +201,7 @@ func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	subjectID, err := parseSubjectID(c.Query("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.Query("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -254,7 +255,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 }
 
 func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
-	id, err := strparse.Uint32(c.Params("id"))
+	id, err := gstr.ParseUint32(c.Params("id"))
 	if err != nil || id == 0 {
 		return res.BadRequest("bad param id: " + strconv.Quote(c.Params("id")))
 	}

@@ -26,13 +26,14 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 )
 
 func (h Handler) GetPerson(c *fiber.Ctx) error {
-	id, err := parsePersonID(c.Params("id"))
+	id, err := req.ParsePersonID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -103,7 +104,7 @@ var genderMap = map[uint8]string{
 }
 
 func (h Handler) GetPersonImage(c *fiber.Ctx) error {
-	id, err := parsePersonID(c.Params("id"))
+	id, err := req.ParsePersonID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -130,7 +131,7 @@ func (h Handler) GetPersonImage(c *fiber.Ctx) error {
 }
 
 func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
-	id, err := parsePersonID(c.Params("id"))
+	id, err := req.ParsePersonID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -166,7 +167,7 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 }
 
 func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
-	id, err := parsePersonID(c.Params("id"))
+	id, err := req.ParsePersonID(c.Params("id"))
 	if err != nil {
 		return err
 	}

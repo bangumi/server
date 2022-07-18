@@ -12,32 +12,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-// Package strutil provide some functions to manipulation string.
-package strutil
+package gstr
 
-import "strings"
+import (
+	"strconv"
 
-// Partition split string in 2 part.
-//   Partition("1=2", '=') => "1", "2"
-//   Partition("123", '=') => "123", ""
-func Partition(s string, c byte) (string, string) {
-	i := strings.IndexByte(s, c)
-	if i == -1 {
-		return s, ""
-	}
+	"github.com/bangumi/server/internal/pkg/errgo"
+)
 
-	return s[:i], s[i+1:]
+func ParseUint8(s string) (uint8, error) {
+	v, err := strconv.ParseUint(s, 10, 8)
+
+	return uint8(v), errgo.Wrap(err, "strconv")
 }
 
-func Split(s string, c string) []string {
-	split := strings.Split(s, c)
+func ParseUint32(s string) (uint32, error) {
+	v, err := strconv.ParseUint(s, 10, 32)
 
-	result := make([]string, 0, len(split))
-	for _, s2 := range split {
-		if s2 != "" {
-			result = append(result, s2)
-		}
-	}
-
-	return result
+	return uint32(v), errgo.Wrap(err, "strconv")
 }

@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -86,7 +87,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 func (h Handler) GetIndex(c *fiber.Ctx) error {
 	user := h.getHTTPAccessor(c)
 
-	id, err := parseIndexID(c.Params("id"))
+	id, err := req.ParseIndexID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -106,12 +107,12 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 	user := h.getHTTPAccessor(c)
 
-	id, err := parseIndexID(c.Params("id"))
+	id, err := req.ParseIndexID(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	subjectType, err := parseSubjectType(c.Query("type"))
+	subjectType, err := req.ParseSubjectType(c.Query("type"))
 	if err != nil {
 		return errgo.Wrap(err, "invalid query `type` for subject type")
 	}

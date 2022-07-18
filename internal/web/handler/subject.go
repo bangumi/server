@@ -31,6 +31,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
@@ -39,7 +40,7 @@ import (
 func (h Handler) GetSubject(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := parseSubjectID(c.Params("id"))
+	id, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -129,7 +130,7 @@ func platformString(s model.Subject) *string {
 func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := parseSubjectID(c.Params("id"))
+	id, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
 		return err
 	}
@@ -156,7 +157,7 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 }
 
 func getExpectSubjectID(c *fiber.Ctx, topic model.Topic) (model.SubjectID, error) {
-	subjectID, err := parseSubjectID(c.Params("id"))
+	subjectID, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil || subjectID == 0 {
 		subjectID = model.SubjectID(topic.ObjectID)
 	} else if subjectID != model.SubjectID(topic.ObjectID) {
@@ -168,7 +169,7 @@ func getExpectSubjectID(c *fiber.Ctx, topic model.Topic) (model.SubjectID, error
 func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := parseSubjectID(c.Params("id"))
+	id, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
 		return err
 	}
@@ -253,7 +254,7 @@ func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {
 }
 
 func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
-	id, err := parseSubjectID(c.Params("id"))
+	id, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -299,7 +300,7 @@ func readableRelation(destSubjectType model.SubjectType, relation uint16) string
 
 func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
-	id, err := parseSubjectID(c.Params("id"))
+	id, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil {
 		return err
 	}

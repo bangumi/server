@@ -25,14 +25,15 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/strparse"
+	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Handler) GetEpisode(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := parseEpisodeID(c.Params("id"))
+	id, err := req.ParseEpisodeID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -105,7 +106,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return err
 	}
 
-	subjectID, err := parseSubjectID(c.Query("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.Query("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -147,7 +148,7 @@ func parseEpTypeOptional(s string) (*model.EpType, error) {
 		return nil, nil //nolint:nilnil
 	}
 
-	v, err := strparse.Uint8(s)
+	v, err := gstr.ParseUint8(s)
 	if err != nil {
 		return nil, res.BadRequest("wrong value for query `type`")
 	}

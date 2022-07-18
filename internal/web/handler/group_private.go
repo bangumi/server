@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -203,9 +204,9 @@ func (h Handler) ListGroupTopics(c *fiber.Ctx) error {
 }
 
 func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
-	topicID, err := parseTopicID(c.Params("topic_id"))
-	if err != nil || topicID == 0 {
-		return errMissingTopicID
+	topicID, err := req.ParseTopicID(c.Params("topic_id"))
+	if err != nil {
+		return err
 	}
 
 	topic, err := h.getTopic(c, domain.TopicTypeGroup, topicID)

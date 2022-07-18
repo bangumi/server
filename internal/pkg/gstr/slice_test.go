@@ -12,35 +12,31 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package gstr_test
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"testing"
 
-	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/web/req"
-	"github.com/bangumi/server/internal/web/res"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/pkg/gstr"
 )
 
-func (h Handler) GetPersonComments(c *fiber.Ctx) error {
-	id, err := req.ParsePersonID(c.Params("id"))
-	if err != nil {
-		return err
-	}
+func TestFirst(t *testing.T) {
+	t.Parallel()
 
-	r, ok, err := h.getPersonWithCache(c.Context(), id)
-	if err != nil {
-		return err
-	}
+	var s = "关于我们社区指导原则"
 
-	if !ok || r.Redirect != 0 {
-		return res.ErrNotFound
-	}
+	require.Equal(t, "", gstr.First(s, 0))
+	require.Equal(t, "关于", gstr.First(s, 2))
+	require.Equal(t, "关于我们社区指导原", gstr.First(s, 9))
+	require.Equal(t, s, gstr.First(s, 10))
+	require.Equal(t, s, gstr.First(s, 11))
+	require.Equal(t, s, gstr.First(s, 20))
 
-	pagedComments, err := h.listComments(c, domain.CommentPerson, model.TopicID(id))
-	if err != nil {
-		return err
-	}
-	return c.JSON(pagedComments)
+	var s2 = "👩👩👩"
+	require.Equal(t, "👩👩", gstr.First(s2, 2))
+
+	var s3 = "abcd"
+	require.Equal(t, "ab", gstr.First(s3, 2))
 }

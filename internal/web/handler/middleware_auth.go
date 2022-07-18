@@ -26,8 +26,8 @@ import (
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/logger/log"
-	"github.com/bangumi/server/internal/pkg/strutil"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"
 	"github.com/bangumi/server/internal/web/req"
@@ -86,7 +86,7 @@ func (h Handler) AccessTokenAuthMiddleware(ctx *fiber.Ctx) error {
 
 	authorization := ctx.Get(fiber.HeaderAuthorization)
 	if authorization != "" {
-		key, token := strutil.Partition(authorization, ' ')
+		key, token := gstr.Partition(authorization, ' ')
 		if key != "Bearer" {
 			return res.Unauthorized("http Authorization header has wrong scope")
 		}

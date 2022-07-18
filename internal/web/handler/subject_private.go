@@ -18,13 +18,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	topicID, err := parseTopicID(c.Params("topic_id"))
+	topicID, err := req.ParseTopicID(c.Params("topic_id"))
 	if err != nil {
 		return err
 	}
@@ -53,7 +54,7 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 	u := h.getHTTPAccessor(c)
 
-	id, err := parseSubjectID(c.Params("id"))
+	id, err := req.ParseSubjectID(c.Params("id"))
 	if err != nil || id == 0 {
 		return res.BadRequest(err.Error())
 	}

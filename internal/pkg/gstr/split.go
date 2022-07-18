@@ -14,12 +14,29 @@
 
 package gstr
 
-func First(s string, end int) string {
-	r := []rune(s)
+import "strings"
 
-	if len(r) <= end {
-		return s
+// Partition split string in 2 part.
+//   Partition("1=2", '=') => "1", "2"
+//   Partition("123", '=') => "123", ""
+func Partition(s string, c byte) (string, string) {
+	i := strings.IndexByte(s, c)
+	if i == -1 {
+		return s, ""
 	}
 
-	return string(r[:end])
+	return s[:i], s[i+1:]
+}
+
+func Split(s string, c string) []string {
+	split := strings.Split(s, c)
+
+	result := make([]string, 0, len(split))
+	for _, s2 := range split {
+		if s2 != "" {
+			result = append(result, s2)
+		}
+	}
+
+	return result
 }
