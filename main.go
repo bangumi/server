@@ -31,13 +31,13 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
-	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/user"
@@ -56,7 +56,7 @@ func main() {
 }
 
 func start() error {
-	var fiberApp *fiber.App
+	var f *fiber.App
 	var cfg config.AppConfig
 
 	err := fx.New(
@@ -85,7 +85,7 @@ func start() error {
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
 			group.NewMysqlRepo,
 
-			auth.NewService, character.NewService, subject.NewService, person.NewService,
+			auth.NewService, person.NewService,
 		),
 
 		fx.Provide(
@@ -95,12 +95,12 @@ func start() error {
 
 		fx.Invoke(web.ResistRouter),
 
-		fx.Populate(&fiberApp, &cfg),
+		fx.Populate(&f, &cfg),
 	).Err()
 
 	if err != nil {
 		return errgo.Wrap(err, "fx")
 	}
 
-	return errgo.Wrap(web.Start(cfg, fiberApp), "failed to start fiberApp")
+	return errgo.Wrap(web.Start(cfg, f), "failed to start fiber App")
 }

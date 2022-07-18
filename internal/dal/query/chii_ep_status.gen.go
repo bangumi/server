@@ -119,12 +119,12 @@ func (e epCollectionDo) WithContext(ctx context.Context) *epCollectionDo {
 	return e.withDO(e.DO.WithContext(ctx))
 }
 
-func (e epCollectionDo) ReadDB(ctx context.Context) *epCollectionDo {
-	return e.WithContext(ctx).Clauses(dbresolver.Read)
+func (e epCollectionDo) ReadDB() *epCollectionDo {
+	return e.Clauses(dbresolver.Read)
 }
 
-func (e epCollectionDo) WriteDB(ctx context.Context) *epCollectionDo {
-	return e.WithContext(ctx).Clauses(dbresolver.Write)
+func (e epCollectionDo) WriteDB() *epCollectionDo {
+	return e.Clauses(dbresolver.Write)
 }
 
 func (e epCollectionDo) Clauses(conds ...clause.Expression) *epCollectionDo {
@@ -326,6 +326,10 @@ func (e epCollectionDo) ScanByPage(result interface{}, offset int, limit int) (c
 
 	err = e.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (e epCollectionDo) Scan(result interface{}) (err error) {
+	return e.DO.Scan(result)
 }
 
 func (e *epCollectionDo) withDO(do gen.Dao) *epCollectionDo {

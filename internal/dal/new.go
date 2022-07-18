@@ -27,8 +27,8 @@ import (
 	gormLogger "gorm.io/gorm/logger"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 const slowQueryTimeout = time.Millisecond * 200

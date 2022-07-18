@@ -1,0 +1,23 @@
+title: "Comment"
+type: object
+properties:
+  created_at:
+    type: string
+    format: date-time
+    example: 2008-07-14T15:38:35+08:00
+  creator:
+    $ref: "../user.yaml"
+  id:
+    type: integer
+    format: int32
+    example: 2
+  replies:
+    type: array
+    items:
+      $ref: "./sub_comment.yaml"
+  text:
+    type: string
+    example: 你是猪 ... 鉴定完毕 ...
+    description: 如果 `state` 不为 `0`，内容为空
+  state:
+    $ref: "./comment_state.yaml"

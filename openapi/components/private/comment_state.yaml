@@ -1,0 +1,12 @@
+title: CommentState
+example: 2
+enum:
+  - 0
+  - 1
+  - 2
+type: integer
+description: |-
+  评论状态
+  - `0` 正常
+  - `1` 被用户删除
+  - `2` 违反社区指导原则，已被删除

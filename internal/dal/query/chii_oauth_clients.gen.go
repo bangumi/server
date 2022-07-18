@@ -196,12 +196,12 @@ func (o oAuthClientDo) WithContext(ctx context.Context) *oAuthClientDo {
 	return o.withDO(o.DO.WithContext(ctx))
 }
 
-func (o oAuthClientDo) ReadDB(ctx context.Context) *oAuthClientDo {
-	return o.WithContext(ctx).Clauses(dbresolver.Read)
+func (o oAuthClientDo) ReadDB() *oAuthClientDo {
+	return o.Clauses(dbresolver.Read)
 }
 
-func (o oAuthClientDo) WriteDB(ctx context.Context) *oAuthClientDo {
-	return o.WithContext(ctx).Clauses(dbresolver.Write)
+func (o oAuthClientDo) WriteDB() *oAuthClientDo {
+	return o.Clauses(dbresolver.Write)
 }
 
 func (o oAuthClientDo) Clauses(conds ...clause.Expression) *oAuthClientDo {
@@ -403,6 +403,10 @@ func (o oAuthClientDo) ScanByPage(result interface{}, offset int, limit int) (co
 
 	err = o.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (o oAuthClientDo) Scan(result interface{}) (err error) {
+	return o.DO.Scan(result)
 }
 
 func (o *oAuthClientDo) withDO(do gen.Dao) *oAuthClientDo {

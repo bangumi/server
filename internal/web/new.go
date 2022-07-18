@@ -33,9 +33,9 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/random"
 	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/middleware/recovery"
@@ -92,7 +92,7 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 }
 
 func Start(c config.AppConfig, app *fiber.App) error {
-	addr := fmt.Sprintf("127.0.0.1:%d", c.HTTPPort)
+	addr := fmt.Sprintf("%s:%d", c.HTTPHost, c.HTTPPort)
 	logger.Infoln("http server listening at", addr)
 
 	return errgo.Wrap(app.Listen(addr), "fiber.App.Listen")

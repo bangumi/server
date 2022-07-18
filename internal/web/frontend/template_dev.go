@@ -32,7 +32,7 @@ func NewTemplateEngine() (TemplateEngine, error) {
 	return TemplateEngine{}, nil
 }
 
-func (e TemplateEngine) Execute(w io.Writer, name string, data interface{}) error {
+func (e TemplateEngine) Execute(w io.Writer, name string, data any) error {
 	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).
 		ParseGlob("./internal/web/frontend/templates/**.gohtml")
 	if err != nil {

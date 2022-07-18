@@ -16,7 +16,6 @@ package auth_test
 
 import (
 	"context"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -27,7 +26,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 func getService() domain.AuthService {
@@ -45,41 +44,18 @@ func TestService_ComparePassword(t *testing.T) {
 	require.True(t, eq)
 }
 
-func TestService_GetByTokenWithCache(t *testing.T) {
+func TestService_GetByToken(t *testing.T) {
 	t.Parallel()
 
 	var m = mocks.NewAuthRepo(t)
-	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(domain.Auth{GroupID: 2}, nil)
+	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(domain.AuthUserInfo{GroupID: 2}, nil)
 	m.EXPECT().GetPermission(mock.Anything, model.UserGroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
 
 	var u = mocks.NewUserRepo(t)
 
 	s := auth.NewService(m, u, zap.NewNop(), test.NopCache())
 
-	a, err := s.GetByTokenWithCache(context.Background(), test.TreeHoleAccessToken)
-	require.NoError(t, err)
-
-	require.Equal(t, model.UserGroupID(2), a.GroupID)
-	require.True(t, a.Permission.EpEdit)
-}
-
-func TestService_GetByTokenWithCache_cached(t *testing.T) {
-	t.Parallel()
-
-	var c = mocks.NewCache(t)
-	c.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).
-		Run(func(ctx context.Context, key string, value interface{}) {
-			vOut := reflect.ValueOf(value).Elem()
-			vOut.Set(reflect.ValueOf(domain.Auth{GroupID: 2}))
-		}).Return(true, nil)
-
-	var m = mocks.NewAuthRepo(t)
-	m.EXPECT().GetPermission(mock.Anything, model.UserGroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
-	var u = mocks.NewUserRepo(t)
-
-	s := auth.NewService(m, u, zap.NewNop(), c)
-
-	a, err := s.GetByTokenWithCache(context.Background(), test.TreeHoleAccessToken)
+	a, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
 	require.NoError(t, err)
 
 	require.Equal(t, model.UserGroupID(2), a.GroupID)

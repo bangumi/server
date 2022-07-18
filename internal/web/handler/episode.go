@@ -15,82 +15,48 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"strconv"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/app/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/strparse"
-	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/pkg/vars/enum"
 )
 
 func (h Handler) GetEpisode(c *fiber.Ctx) error {
-	u := h.getHTTPAccessor(c)
+	u := h.GetHTTPAccessor(c)
 
-	id, err := parseEpisodeID(c.Params("id"))
+	id, err := req.ParseEpisodeID(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	e, ok, err := h.getEpisodeWithCache(c.Context(), id)
-	if err != nil {
-		return err
-	}
-
-	if !ok {
-		return res.ErrNotFound
-	}
-
-	s, ok, err := h.getSubjectWithCache(c.Context(), e.SubjectID)
-	if err != nil {
-		return err
-	}
-	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
-	}
-
-	return c.JSON(e)
-}
-
-// first try to read from cache, then fallback to reading from database.
-// return data, database record existence and error.
-func (h Handler) getEpisodeWithCache(ctx context.Context, id model.EpisodeID) (res.Episode, bool, error) {
-	var key = cachekey.Episode(id)
-	// try to read from cache
-	var r res.Episode
-	ok, err := h.cache.Get(ctx, key, &r)
-	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
-	}
-
-	if ok {
-		return r, ok, nil
-	}
-
-	s, err := h.e.Get(ctx, id)
+	e, err := h.app.Query.GetEpisode(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.Episode{}, false, nil
+			return res.ErrNotFound
 		}
 
-		return r, ok, errgo.Wrap(err, "EpisodeRepo.Get")
+		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
 	}
 
-	r = convertModelEpisode(s)
+	_, err = h.app.Query.GetSubject(c.Context(), u.Auth, e.SubjectID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
 
-	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
-		h.log.Error("can't set response to cache", zap.Error(e))
+		return h.InternalError(c, err, "failed to find subject of episode", log.SubjectID(e.SubjectID))
 	}
 
-	return r, true, nil
+	return res.JSON(c, e)
 }
 
 func convertModelEpisode(s model.Episode) res.Episode {
@@ -114,19 +80,19 @@ const episodeDefaultLimit = 100
 const episodeMaxLimit = 200
 
 func (h Handler) ListEpisode(c *fiber.Ctx) error {
-	u := h.getHTTPAccessor(c)
+	u := h.GetHTTPAccessor(c)
 
-	page, err := getPageQuery(c, episodeDefaultLimit, episodeMaxLimit)
+	page, err := req.GetPageQuery(c, episodeDefaultLimit, episodeMaxLimit)
 	if err != nil {
 		return err
 	}
 
-	epType, err := parseEpType(c.Query("type"))
+	epType, err := parseEpTypeOptional(c.Query("type"))
 	if err != nil {
 		return err
 	}
 
-	subjectID, err := parseSubjectID(c.Query("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.Query("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -134,93 +100,51 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return res.BadRequest("missing required query `subject_id`")
 	}
 
-	subject, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
+	_, err = h.app.Query.GetSubject(c.Context(), u.Auth, subjectID)
 	if err != nil {
-		return err
-	}
-
-	if !ok || subject.Redirect != 0 || (subject.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
-	}
-
-	return h.listEpisode(c, subjectID, page, epType)
-}
-
-func (h Handler) listEpisode(
-	c *fiber.Ctx,
-	subjectID model.SubjectID,
-	page pageQuery,
-	epType enum.EpType,
-) error {
-	var response = res.Paged{
-		Limit:  page.Limit,
-		Offset: page.Offset,
-	}
-
-	var count int64
-	var err error
-	if epType < 0 {
-		count, err = h.e.Count(c.Context(), subjectID)
-		if err != nil {
-			return errgo.Wrap(err, "episode.Count")
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
 		}
-	} else {
-		count, err = h.e.CountByType(c.Context(), subjectID, epType)
-		if err != nil {
-			return errgo.Wrap(err, "episode.CountByType")
-		}
+		return h.InternalError(c, err, "failed to get subject")
 	}
 
-	if count == 0 {
-		response.Data = []int{}
-		return c.JSON(response)
-	}
-
-	if int64(page.Offset) >= count {
-		return res.BadRequest("offset if greater than count")
-	}
-
-	response.Total = count
-
-	var episodes []model.Episode
-	if epType < 0 {
-		episodes, err = h.e.List(c.Context(), subjectID, page.Limit, page.Offset)
-		if err != nil {
-			return errgo.Wrap(err, "episode.List")
+	episodes, count, err := h.app.Query.ListEpisode(c.Context(), subjectID, epType, page.Limit, page.Offset)
+	if err != nil {
+		if errors.Is(err, query.ErrOffsetTooBig) {
+			return res.BadRequest("offset should be less than or equal to " + strconv.FormatInt(count, 10))
 		}
-	} else {
-		episodes, err = h.e.ListByType(c.Context(), subjectID, epType, page.Limit, page.Offset)
-		if err != nil {
-			return errgo.Wrap(err, "episode.ListByType")
-		}
+		return h.InternalError(c, err, "failed to list episode")
 	}
 
 	var data = make([]res.Episode, len(episodes))
 	for i, episode := range episodes {
 		data[i] = convertModelEpisode(episode)
 	}
-	response.Data = data
 
-	return c.JSON(response)
+	return c.JSON(res.PagedG[res.Episode]{
+		Limit:  page.Limit,
+		Offset: page.Offset,
+		Data:   slice.Map(episodes, convertModelEpisode),
+		Total:  count,
+	})
 }
 
-func parseEpType(s string) (model.EpType, error) {
+func parseEpTypeOptional(s string) (*model.EpType, error) {
 	if s == "" {
-		return -1, nil
+		return nil, nil //nolint:nilnil
 	}
 
-	v, err := strparse.Uint8(s)
+	v, err := gstr.ParseUint8(s)
 	if err != nil {
-		return -1, res.BadRequest("wrong value for query `type`")
+		return nil, res.BadRequest("wrong value for query `type`")
 	}
 
-	e := model.EpType(v)
-	switch e {
-	case enum.EpTypeNormal, enum.EpTypeSpecial,
-		enum.EpTypeOpening, enum.EpTypeEnding,
-		enum.EpTypeMad, enum.EpTypeOther:
-		return e, nil
+	switch v {
+	case model.EpTypeNormal, model.EpTypeSpecial,
+		model.EpTypeOpening, model.EpTypeEnding,
+		model.EpTypeMad, model.EpTypeOther:
+		return &v, nil
 	}
 
-	return 0, res.BadRequest(strconv.Quote(s) + " is not valid episode type")
+	return nil, res.BadRequest(strconv.Quote(s) + " is not valid episode type")
 }

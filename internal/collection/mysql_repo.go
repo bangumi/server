@@ -26,10 +26,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/strutil"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
 var _ domain.CollectionRepo = mysqlRepo{}
@@ -111,7 +111,7 @@ func (r mysqlRepo) ListSubjectCollection(
 		results[i] = model.SubjectCollection{
 			UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
 			Comment:     c.Comment,
-			Tags:        strutil.Split(c.Tag, " "),
+			Tags:        gstr.Split(c.Tag, " "),
 			SubjectType: c.SubjectType,
 			Rate:        c.Rate,
 			SubjectID:   c.SubjectID,
@@ -142,7 +142,7 @@ func (r mysqlRepo) GetSubjectCollection(
 	return model.SubjectCollection{
 		UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
 		Comment:     c.Comment,
-		Tags:        strutil.Split(c.Tag, " "),
+		Tags:        gstr.Split(c.Tag, " "),
 		SubjectType: c.SubjectType,
 		Rate:        c.Rate,
 		SubjectID:   c.SubjectID,

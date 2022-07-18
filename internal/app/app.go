@@ -15,26 +15,21 @@
 package app
 
 import (
-	"go.uber.org/zap"
-
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/app/command"
+	"github.com/bangumi/server/internal/app/query"
 )
 
 func New(
-	s domain.SubjectService,
-	e domain.EpisodeRepo,
-	log *zap.Logger,
-) (App, error) {
+	query query.Query,
+	command command.Command,
+) App {
 	return App{
-		subject: s,
-		episode: e,
-		log:     log.Named("App"),
-	}, nil
+		Query:   query,
+		Command: command,
+	}
 }
 
 type App struct {
-	subject domain.SubjectService
-	collect domain.CollectionRepo
-	episode domain.EpisodeRepo
-	log     *zap.Logger
+	Query   query.Query
+	Command command.Command
 }

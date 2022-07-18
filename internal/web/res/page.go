@@ -19,8 +19,17 @@ func EmptySlice() []int {
 }
 
 type Paged struct {
-	Data   interface{} `json:"data"`
-	Total  int64       `json:"total"`
-	Limit  int         `json:"limit"`
-	Offset int         `json:"offset"`
+	Data   any   `json:"data"`
+	Total  int64 `json:"total"`
+	Limit  int   `json:"limit"`
+	Offset int   `json:"offset"`
 }
+
+type PagedG[T any] struct {
+	Data   []T   `json:"data"`
+	Total  int64 `json:"total"`
+	Limit  int   `json:"limit"`
+	Offset int   `json:"offset"`
+}
+
+type PagedComment = PagedG[Comment]

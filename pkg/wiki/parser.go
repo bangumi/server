@@ -18,7 +18,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 var (
@@ -53,11 +53,11 @@ func Parse(s string) (Wiki, error) {
 		return Wiki{}, ErrGlobalPrefix
 	}
 
+	eolCount := strings.Count(s, "\n")
+
 	if !strings.HasSuffix(s, suffix) {
 		return Wiki{}, ErrGlobalSuffix
 	}
-
-	eolCount := strings.Count(s, "\n")
 
 	w.Type = readType(s)
 	w.Fields = make([]Field, 0) // make zero value in json '[]', no alloc with cap 0

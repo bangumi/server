@@ -27,8 +27,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/timex"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 func getRepo(t *testing.T) (domain.CollectionRepo, *query.Query) {
@@ -86,7 +85,7 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 			UserID:      id,
 			SubjectID:   model.SubjectID(i + 100),
 			SubjectType: model.SubjectTypeAnime,
-			UpdatedTime: timex.NowU32(),
+			UpdatedTime: uint32(time.Now().Unix()),
 		})
 		require.NoError(t, err)
 	}

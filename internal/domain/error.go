@@ -17,14 +17,16 @@ package domain
 import (
 	"errors"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 // ErrNotFound should be returned when a repo or service can't find an authorization.
 var ErrNotFound = errors.New("can't find item")
 
-var ErrEpisodeNotFound = errgo.Msg(ErrNotFound, "episode not found")
 var ErrSubjectNotFound = errgo.Msg(ErrNotFound, "subject not found")
-var ErrSubjectNotCollected = errgo.Msg(ErrNotFound, "subject not found")
+var ErrPersonNotFound = errgo.Msg(ErrNotFound, "person not found")
+var ErrCharacterNotFound = errgo.Msg(ErrNotFound, "character not found")
+var ErrEpisodeNotFound = errgo.Msg(ErrNotFound, "episode not found")
+var ErrSubjectNotCollected = errgo.Msg(ErrNotFound, "episode is not collected by user")
 
-var ErrInvalidInput = errors.New("invalid input")
+var ErrInvalidInput = errors.New("input is not valid")

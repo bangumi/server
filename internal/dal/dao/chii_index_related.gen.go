@@ -9,11 +9,11 @@ const TableNameIndexSubject = "chii_index_related"
 // IndexSubject mapped from table <chii_index_related>
 type IndexSubject struct {
 	ID       uint32  `gorm:"column:idx_rlt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	Cat      int8    `gorm:"column:idx_rlt_cat;type:tinyint(3);not null;index:idx_rlt_cat,priority:1;index:idx_order,priority:2"`
-	Rid      uint32  `gorm:"column:idx_rlt_rid;type:mediumint(8) unsigned;not null;index:idx_rlt_rid,priority:1;index:idx_rlt_sid,priority:1;index:idx_order,priority:1"`   // 关联目录
-	Type     uint8   `gorm:"column:idx_rlt_type;type:smallint(6) unsigned;not null;index:idx_rlt_rid,priority:2"`                                                           // 关联条目类型
-	Sid      uint32  `gorm:"column:idx_rlt_sid;type:mediumint(8) unsigned;not null;index:idx_rlt_sid,priority:2;index:idx_rlt_sid_2,priority:1;index:idx_order,priority:4"` // 关联条目ID
-	Order    uint32  `gorm:"column:idx_rlt_order;type:mediumint(8) unsigned;not null;index:idx_order,priority:3"`
+	Cat      int8    `gorm:"column:idx_rlt_cat;type:tinyint(3);not null"`
+	Rid      uint32  `gorm:"column:idx_rlt_rid;type:mediumint(8) unsigned;not null"` // 关联目录
+	Type     uint8   `gorm:"column:idx_rlt_type;type:smallint(6) unsigned;not null"` // 关联条目类型
+	Sid      uint32  `gorm:"column:idx_rlt_sid;type:mediumint(8) unsigned;not null"` // 关联条目ID
+	Order    uint32  `gorm:"column:idx_rlt_order;type:mediumint(8) unsigned;not null"`
 	Comment  string  `gorm:"column:idx_rlt_comment;type:mediumtext;not null"`
 	Dateline uint32  `gorm:"column:idx_rlt_dateline;type:int(10) unsigned;not null"`
 	Subject  Subject `gorm:"foreignKey:idx_rlt_sid;references:subject_id" json:"subject"`

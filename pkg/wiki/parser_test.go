@@ -179,3 +179,17 @@ func TestTypeNoLineBreak(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "Crt", w.Type)
 }
+
+func TestErrorMissingPrefix(t *testing.T) {
+	t.Parallel()
+
+	_, err := wiki.Parse("\n\nNotPrefix Crt\n}}")
+	require.ErrorIs(t, err, wiki.ErrGlobalPrefix)
+}
+
+func TestErrorMissingSuffix(t *testing.T) {
+	t.Parallel()
+
+	_, err := wiki.Parse("\n\n{{Infobox Crt\n\n\n")
+	require.ErrorIs(t, err, wiki.ErrGlobalSuffix)
+}

@@ -24,8 +24,8 @@ import (
 
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/subject"
 )
 
@@ -116,10 +116,15 @@ func (r mysqlRepo) ListSubjects(
 
 	var results = make([]domain.IndexSubject, len(d))
 	for i, s := range d {
+		sub, err := subject.ConvertDao(&s.Subject)
+		if err != nil {
+			return nil, errgo.Wrap(err, "subject.ConvertDao")
+		}
+
 		results[i] = domain.IndexSubject{
 			AddedAt: time.Unix(int64(s.Dateline), 0),
 			Comment: s.Comment,
-			Subject: subject.ConvertDao(&s.Subject),
+			Subject: sub,
 		}
 	}
 

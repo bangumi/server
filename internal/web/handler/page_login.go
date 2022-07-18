@@ -17,15 +17,15 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/frontend"
 )
 
 func (h Handler) PageLogin(c *fiber.Ctx) error {
-	v := h.getHTTPAccessor(c)
+	v := h.GetHTTPAccessor(c)
 	var u model.User
-	if v.login {
+	if v.Login {
 		var err error
 		u, err = h.u.GetByID(c.Context(), v.ID)
 

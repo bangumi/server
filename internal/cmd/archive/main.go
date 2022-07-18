@@ -12,14 +12,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//nolint:govet
+//nolint:govet,forbidigo,funlen
 package main
 
 import (
 	"archive/zip"
 	"context"
+	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/goccy/go-json"
@@ -32,9 +34,9 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/logger"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 const defaultStep = 50
@@ -44,12 +46,13 @@ func main() {
 		logger.Panic("can't replace mysql driver's errLog", zap.Error(err))
 	}
 
-	out := pflag.String("out", "archive.zip", "zip file output location")
-	if out == nil {
-		*out = "archive.zip"
-	}
+	fmt.Println("dumping data with args:", os.Args)
 
-	start(*out)
+	var out string
+	pflag.StringVar(&out, "out", "archive.zip", "zip file output location")
+	pflag.Parse()
+
+	start(out)
 }
 
 var ctx = context.Background() //nolint:gochecknoglobals
@@ -79,12 +82,32 @@ func start(out string) {
 
 	getMaxID(q)
 
-	f, err := os.Create(out)
+	abs, err := filepath.Abs(out)
 	if err != nil {
 		panic(err)
 	}
 
+	fmt.Println(abs)
+
+	f, err := os.Create(abs)
+	if err != nil {
+		panic(err)
+	}
+
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			logger.Err(err, "failed to close of tile")
+		}
+	}(f)
+
 	z := zip.NewWriter(f)
+	defer func(z *zip.Writer) {
+		err := z.Close()
+		if err != nil {
+			logger.Err(err, "failed to close zip writter")
+		}
+	}(z)
 
 	for _, s := range []struct {
 		FileName string
@@ -107,13 +130,7 @@ func start(out string) {
 		s.Fn(q, w)
 	}
 
-	if err = z.Close(); err != nil {
-		panic(err)
-	}
-
-	if err = f.Close(); err != nil {
-		panic(err)
-	}
+	fmt.Println("finish exporting")
 }
 
 func getMaxID(q *query.Query) {
@@ -410,7 +427,7 @@ func exportPersonCharacterRelations(q *query.Query, w io.Writer) {
 	}
 }
 
-func encode(w io.Writer, object interface{}) {
+func encode(w io.Writer, object any) {
 	if err := json.NewEncoder(w).Encode(object); err != nil {
 		panic(err)
 	}

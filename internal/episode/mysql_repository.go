@@ -24,9 +24,8 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/pkg/vars/enum"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 type mysqlRepo struct {
@@ -50,7 +49,7 @@ func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (model.Ep
 	}
 
 	var first float32
-	if episode.Type == enum.EpTypeNormal {
+	if episode.Type == model.EpTypeNormal {
 		if first, err = r.firstEpisode(ctx, episode.SubjectID); err != nil {
 			return model.Episode{}, err
 		}
@@ -149,7 +148,7 @@ func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID model.SubjectID) 
 	episode, err := r.q.Episode.WithContext(ctx).
 		Where(
 			r.q.Episode.SubjectID.Eq(subjectID),
-			r.q.Episode.Type.Eq(enum.EpTypeNormal),
+			r.q.Episode.Type.Eq(model.EpTypeNormal),
 			r.q.Episode.Ban.Eq(0),
 		).
 		Order(r.q.Episode.Disc, r.q.Episode.Sort).Limit(1).First()
@@ -166,7 +165,7 @@ func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID model.SubjectID) 
 
 func convertDaoEpisode(e *dao.Episode, firstEpisode float32) model.Episode {
 	var ep float32
-	if e.Type == enum.EpTypeNormal {
+	if e.Type == model.EpTypeNormal {
 		ep = e.Sort - firstEpisode + 1
 	}
 

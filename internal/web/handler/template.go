@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (h Handler) render(c *fiber.Ctx, templateName string, data interface{}) error {
+func (h Handler) render(c *fiber.Ctx, templateName string, data any) error {
 	var buf = h.buffPool.Get()
 	defer buf.Free()
 

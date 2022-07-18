@@ -20,6 +20,8 @@ run:
 
   skip-files: []
 
+  go: "1.18"
+
 # output configuration options
 output:
   # colored-line-number|line-number|json|tab|checkstyle|code-climate|junit-xml|github-actions
@@ -161,7 +163,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
+    go: "1.18"
     # https://staticcheck.io/docs/options#checks
     checks: ["all"]
 
@@ -197,13 +199,13 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
+    go: "1.18"
     # https://staticcheck.io/docs/options#checks
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
+    go: "1.18"
 
   testpackage:
     # regexp pattern to skip files
@@ -211,7 +213,7 @@ linters-settings:
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
+    go: "1.18"
 
   exhaustive:
     # check switch statements in generated files also
@@ -241,6 +243,8 @@ linters-settings:
       - "func (*github.com/gofiber/fiber/v2.Ctx).JSON("
       - "func os.Open(name string)"
       - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
+      - "func github.com/bangumi/server/internal/web/req.GetPageQuery("
+      - "func (github.com/bangumi/server/internal/web/req.PageQuery).Check("
       - "func github.com/bangumi/server/internal/web/res.NewError("
       - "func github.com/bangumi/server/internal/web/res.Response("
       - "func github.com/bangumi/server/internal/web/res.FromError("
@@ -251,7 +255,10 @@ linters-settings:
       - "func github.com/bangumi/server/internal/web/res.Unauthorized("
       - "func github.com/bangumi/server/internal/web/res.BadRequest("
       - "func github.com/bangumi/server/internal/web/res.JSON("
+      - "func (github.com/bangumi/server/internal/web/handler/common.Common)."
       - "func (*github.com/bangumi/server/internal/dal/query.Query).Transaction("
+    ignoreSigRegexps:
+      - 'func github.com/bangumi/server/internal/web/req\.Parse.*\('
 
   nlreturn:
     block-size: 3
@@ -278,6 +285,8 @@ linters:
   enable-all: true
   disable:
     - ireturn
+    - contextcheck
+    - bodyclose
     - wsl # noisy
     - varnamelen # noisy
     - exhaustivestruct # too noisy, default zero value is a good thing.
@@ -294,6 +303,16 @@ linters:
     - nlreturn
     - godox
     - execinquery
+    # 1.18
+    - wastedassign
+    - unparam
+    - tparallel
+    - structcheck
+    - sqlclosecheck
+    - rowserrcheck
+    - noctx
+    - nilerr
+
   fast: false
 
 issues:
@@ -303,6 +322,9 @@ issues:
   exclude-rules:
     - path: '.*_test\.go'
       linters: [gocritic, gochecknoglobals, godot]
+
+    - source: 'var Module = fx\.Module\('
+      linters: [gochecknoglobals]
 
     - source: "var log"
       linters: [gochecknoglobals]

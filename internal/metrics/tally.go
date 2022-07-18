@@ -23,7 +23,7 @@ import (
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func SQLTimeBucket() tally.Buckets {

@@ -24,10 +24,12 @@ import (
 
 	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
-	"github.com/bangumi/server/internal/logger/log"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -84,9 +86,9 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 }
 
 func (h Handler) GetIndex(c *fiber.Ctx) error {
-	user := h.getHTTPAccessor(c)
+	user := h.GetHTTPAccessor(c)
 
-	id, err := parseIndexID(c.Params("id"))
+	id, err := req.ParseIndexID(c.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -104,19 +106,19 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 }
 
 func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
-	user := h.getHTTPAccessor(c)
+	user := h.GetHTTPAccessor(c)
 
-	id, err := parseIndexID(c.Params("id"))
+	id, err := req.ParseIndexID(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	subjectType, err := parseSubjectType(c.Query("type"))
+	subjectType, err := req.ParseSubjectType(c.Query("type"))
 	if err != nil {
 		return errgo.Wrap(err, "invalid query `type` for subject type")
 	}
 
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -134,7 +136,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 }
 
 func (h Handler) getIndexSubjects(
-	c *fiber.Ctx, id model.IndexID, subjectType uint8, page pageQuery,
+	c *fiber.Ctx, id model.IndexID, subjectType uint8, page req.PageQuery,
 ) error {
 	count, err := h.i.CountSubjects(c.Context(), id, subjectType)
 	if err != nil {
@@ -150,7 +152,7 @@ func (h Handler) getIndexSubjects(
 		})
 	}
 
-	if err = page.check(count); err != nil {
+	if err = page.Check(count); err != nil {
 		return err
 	}
 
@@ -159,11 +161,11 @@ func (h Handler) getIndexSubjects(
 		return errgo.Wrap(err, "Index.ListSubjects")
 	}
 
-	var data = make([]res.SlimSubjectV0, len(subjects))
+	var data = make([]res.IndexSubjectV0, len(subjects))
 	for i, s := range subjects {
-		data[i] = res.SlimSubjectV0{
+		data[i] = res.IndexSubjectV0{
 			AddedAt: s.AddedAt,
-			Date:    nilString(s.Subject.Date),
+			Date:    null.NilString(s.Subject.Date),
 			Image:   res.SubjectImage(s.Subject.Image),
 			Name:    s.Subject.Name,
 			NameCN:  s.Subject.NameCN,

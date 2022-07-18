@@ -24,9 +24,9 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/model/generic"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 type mysqlRepo struct {
@@ -56,7 +56,7 @@ func (r mysqlRepo) GetByIDs(
 	ctx context.Context, ids ...model.CharacterID,
 ) (map[model.CharacterID]model.Character, error) {
 	records, err := r.q.Character.WithContext(ctx).Preload(r.q.Character.Fields).
-		Where(r.q.Character.ID.In(generic.CharacterIDToValuerSlice(ids)...)).Find()
+		Where(r.q.Character.ID.In(slice.ToValuer(ids)...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")

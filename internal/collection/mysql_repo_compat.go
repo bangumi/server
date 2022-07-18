@@ -26,8 +26,8 @@ import (
 	"github.com/elliotchance/phpserialize"
 	ms "github.com/mitchellh/mapstructure"
 
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 type mysqlEpCollectionItem struct {

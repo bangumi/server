@@ -24,8 +24,8 @@ import (
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/metrics"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func newMetricsLog(log gormLogger.Interface, scope tally.Scope) gormLogger.Interface {

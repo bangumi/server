@@ -23,9 +23,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/cookie"
+	"github.com/bangumi/server/internal/web/handler/accesor"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/session"
@@ -37,7 +38,7 @@ func (h Handler) RevokeSession(c *fiber.Ctx) error {
 		return res.JSONError(c, err)
 	}
 
-	if err := h.v.Struct(r); err != nil {
+	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
 
@@ -50,7 +51,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return res.JSONError(c, err)
 	}
 
-	if err := h.v.Struct(r); err != nil {
+	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
 
@@ -67,8 +68,8 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	a := h.getHTTPAccessor(c)
-	allowed, remain, err := h.rateLimit.Allowed(c.Context(), a.ip.String())
+	a := h.GetHTTPAccessor(c)
+	allowed, remain, err := h.rateLimit.Allowed(c.Context(), a.IP.String())
 	if err != nil {
 		return h.InternalError(c, err, "failed to apply rate limit", a.LogRequestID())
 	}
@@ -80,7 +81,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	return h.privateLogin(c, a, r, remain)
 }
 
-func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain int) error {
+func (h Handler) privateLogin(c *fiber.Ctx, a *accesor.Accessor, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
 		return h.InternalError(c, err, "Unexpected error when logging in")
@@ -100,11 +101,11 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain
 	}
 
 	if err = h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
-		h.log.Error("failed to reset login rate limit", zap.Error(err), a.LogRequestID())
+		h.log.Error("failed to reset Login rate limit", zap.Error(err), a.LogRequestID())
 	}
 
 	c.Cookie(&fiber.Cookie{
-		Name:     session.Key,
+		Name:     session.CookieKey,
 		Value:    key,
 		MaxAge:   timex.OneWeekSec * 2,
 		Secure:   !config.Development,
@@ -117,7 +118,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain
 		return h.InternalError(c, err, "failed to get user by user id", a.LogRequestID())
 	}
 
-	h.log.Info("user login", log.UserID(user.ID))
+	h.log.Info("user Login", log.UserID(user.ID))
 
 	return res.JSON(c, res.User{
 		ID:        user.ID,
@@ -131,16 +132,16 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor, r req.UserLogin, remain
 }
 
 func (h Handler) PrivateLogout(c *fiber.Ctx) error {
-	if a := h.getHTTPAccessor(c); !a.login {
+	if a := h.GetHTTPAccessor(c); !a.Login {
 		return res.Unauthorized("you are not logged-in")
 	}
 
-	sessionID := utils.UnsafeString(c.Context().Request.Header.Cookie(session.Key))
+	sessionID := utils.UnsafeString(c.Context().Request.Header.Cookie(session.CookieKey))
 	if err := h.session.Revoke(c.Context(), sessionID); err != nil {
 		return h.InternalError(c, err, "failed to revoke session", zap.String("session_id", sessionID))
 	}
 
-	cookie.Clear(c, session.Key)
+	cookie.Clear(c, session.CookieKey)
 	c.Status(http.StatusNoContent)
 
 	return nil

@@ -19,31 +19,26 @@ import "strconv"
 var _ interface {
 	Error() string
 	Unwrap() error
-	Is(error) bool
-} = (*parseError)(nil)
+} = (*SyntaxError)(nil)
 
-type parseError struct {
-	err  error
-	line string
-	lino int
+type SyntaxError struct {
+	Err  error
+	Line string
+	Lino int
 }
 
-func (p *parseError) Error() string {
-	return p.err.Error() + "\nline: " + strconv.Itoa(p.lino) + " " + strconv.Quote(p.line)
+func (p *SyntaxError) Error() string {
+	return p.Err.Error() + " line: " + strconv.Itoa(p.Lino) + " " + strconv.Quote(p.Line)
 }
 
-func (p *parseError) Unwrap() error {
-	return p.err
-}
-
-func (p *parseError) Is(err error) bool {
-	return p.err == err // nolint: goerr113,errorlint
+func (p *SyntaxError) Unwrap() error {
+	return p.Err
 }
 
 func wrapError(err error, lino int, line string) error {
-	return &parseError{
-		line: line,
-		lino: lino,
-		err:  err,
+	return &SyntaxError{
+		Line: line,
+		Lino: lino,
+		Err:  err,
 	}
 }

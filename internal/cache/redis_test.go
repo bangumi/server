@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
 type RedisCacheTestItem struct {
@@ -36,7 +36,7 @@ type RedisCacheTestItem struct {
 
 const key = "news_redis_cache"
 
-func mockedCache() (cache.Generic, redismock.ClientMock) {
+func mockedCache() (cache.Cache, redismock.ClientMock) {
 	db, mock := redismock.NewClientMock()
 	c := cache.NewRedisCache(db)
 

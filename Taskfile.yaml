@@ -56,14 +56,21 @@ tasks:
       - go test -bench=. -benchmem ./pkg/wiki
 
   test-all:
-    desc: Run all tests, need mysql and redis, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
-    deps:
-      - gotestfmt
+    desc: Run all tests, need mysql and redis, except hCaptcha tests, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
     cmds:
-      - go test -timeout 3s -json -tags test -race {{.CLI_ARGS}} ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+      - go test -timeout 3s -json -tags test {{.CLI_ARGS}} ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
+
+  test-all-with-http:
+    desc: Run all tests, need mysql and redis, alias for `TEST_MYSQL=1 TEST_REDIS=1 TEST_HTTP=1 task test`
+    cmds:
+      - go test -timeout 3s -json -tags test {{.CLI_ARGS}} ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
+    env:
+      TEST_MYSQL: "1"
+      TEST_REDIS: "1"
+      TEST_HTTP: "1"
 
   coverage:
     desc: Run tests with coverage report, used in CI.
@@ -74,6 +81,7 @@ tasks:
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
+      TEST_HTTP: "1"
 
   # generated files
   gen:
@@ -82,14 +90,6 @@ tasks:
       - gorm
       - mock
       - "gen:generic"
-
-  "gen:generic":
-    sources:
-      - ./internal/cmd/gen/generic/generic.go
-    generates:
-      - ./internal/model/generic/valuer.go
-    cmds:
-      - go run internal/cmd/gen/generic/generic.go
 
   mock:
     desc: Generate Mocks.
@@ -110,11 +110,11 @@ tasks:
   gotestfmt:
     silent: true
     sources:
-      - go.mod
+      - ./internal/pkg/tools/go.mod
     generates:
       - .bin/gotestfmt.exe
     cmds:
-      - go build -o .bin/gotestfmt.exe github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt
+      - cd ./internal/pkg/tools; go build -o ../../../.bin/gotestfmt.exe github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt
 
   clean:
     cmds:

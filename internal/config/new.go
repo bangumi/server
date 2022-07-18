@@ -23,7 +23,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 const defaultMaxMysqlConnection = 4
@@ -68,8 +68,9 @@ func NewAppConfig() AppConfig {
 		Debug:         debug,
 		HTTPPort:      httpPort,
 
-		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", ""),
+		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", "0x0000000000000000000000000000000000000000"),
 		FrontendDomain:    getEnv("WEB_DOMAIN", ""),
+		HTTPHost:          getEnv("HTTP_HOST", "127.0.0.1"),
 	}
 }
 
@@ -83,8 +84,9 @@ type AppConfig struct {
 	MySQLDatabase     string
 	HCaptchaSecretKey string
 	FrontendDomain    string // new frontend web page domain, like next.bgm.tv
-	MySQLMaxConn      int
+	HTTPHost          string
 	HTTPPort          int
+	MySQLMaxConn      int
 }
 
 func getEnv(n, v string) string {

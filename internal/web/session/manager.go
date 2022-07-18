@@ -23,14 +23,16 @@ import (
 
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/errgo"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic"
 	"github.com/bangumi/server/internal/pkg/random"
 	"github.com/bangumi/server/internal/pkg/timex"
 )
 
-const keyLength = 32
-const keyPrefix = "chii:web:session:"
+const defaultKeyLength = 32
+const CookieKey = "sessionID"
+const redisKeyPrefix = "chii:web:session:"
 
 var ErrExpired = errors.New("your session has been expired")
 
@@ -41,37 +43,29 @@ type Manager interface {
 	RevokeUser(ctx context.Context, id model.UserID) error
 }
 
-func New(c cache.Generic, repo Repo, log *zap.Logger) Manager {
+func New(c cache.Cache, repo Repo, log *zap.Logger) Manager {
 	return manager{cache: c, repo: repo, log: log.Named("web.Session.Manager")}
 }
 
 type manager struct {
 	repo  Repo
-	cache cache.Generic
+	cache cache.Cache
 	log   *zap.Logger
 }
 
+func defaultKeyGenerator() string {
+	return random.Base62String(defaultKeyLength)
+}
+
 func (m manager) Create(ctx context.Context, a domain.Auth) (string, Session, error) {
-	var key string
-	var s Session
-	var err error
+	key, s, err := m.repo.Create(ctx, a.ID, a.RegTime, defaultKeyGenerator)
 
-	for i := 0; i < 5; i++ {
-		key = random.Base62String(keyLength)
-		s, err = m.repo.Create(ctx, key, a.ID, a.RegTime)
-		if err != nil {
-			if errors.Is(err, ErrKeyConflict) {
-				// key conflict, re-generate new key and retry
-				key = random.Base62String(keyLength)
-				continue
-			}
-
-			m.log.Error("un-expected error when creating session", zap.Error(err))
-			return "", Session{}, errgo.Wrap(err, "un-expected error when creating session")
-		}
+	if err != nil {
+		m.log.Error("un-expected error when creating session", zap.Error(err))
+		return "", Session{}, errgo.Wrap(err, "un-expected error when creating session")
 	}
 
-	if err := m.cache.Set(ctx, keyPrefix+key, s, timex.OneWeek); err != nil {
+	if err := m.cache.Set(ctx, redisKeyPrefix+key, s, timex.OneWeek); err != nil {
 		return "", Session{}, errgo.Wrap(err, "redis.Set")
 	}
 
@@ -81,7 +75,7 @@ func (m manager) Create(ctx context.Context, a domain.Auth) (string, Session, er
 func (m manager) Get(ctx context.Context, key string) (Session, error) {
 	var s Session
 
-	ok, err := m.cache.Get(ctx, keyPrefix+key, &s)
+	ok, err := m.cache.Get(ctx, redisKeyPrefix+key, &s)
 	if err != nil {
 		return Session{}, errgo.Wrap(err, "redis.Get")
 	}
@@ -89,23 +83,19 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 		return s, nil
 	}
 
-	ws, err := m.repo.Get(ctx, key)
+	s, err = m.repo.Get(ctx, key)
 	if err != nil {
 		return Session{}, errgo.Wrap(err, "mysqlRepo.Get")
 	}
 
-	now := time.Now()
-	if now.After(ws.ExpiredAt) {
+	if s.ExpiredAt <= time.Now().Unix() {
 		return Session{}, ErrExpired
 	}
 
-	s = ws.Value
-	s.ExpiredAt = ws.ExpiredAt.Unix()
-
 	// 缓存3天或缓存者到token失效
-	ttl := minDur(timex.OneDay*3, ws.ExpiredAt.Sub(now))
+	ttl := generic.Min(timex.OneDaySec*3, s.ExpiredAt)
 
-	if err := m.cache.Set(ctx, keyPrefix+key, s, ttl); err != nil {
+	if err := m.cache.Set(ctx, redisKeyPrefix+key, s, timex.Second(ttl)); err != nil {
 		m.log.Panic("failed to set cache")
 	}
 
@@ -117,7 +107,7 @@ func (m manager) Revoke(ctx context.Context, key string) error {
 		return errgo.Wrap(err, "repo.Revoke")
 	}
 
-	err := m.cache.Del(ctx, keyPrefix+key)
+	err := m.cache.Del(ctx, redisKeyPrefix+key)
 	return errgo.Wrap(err, "redisCache.Del")
 }
 
@@ -128,16 +118,9 @@ func (m manager) RevokeUser(ctx context.Context, id model.UserID) error {
 	}
 
 	for i, key := range keys {
-		keys[i] = keyPrefix + key
+		keys[i] = redisKeyPrefix + key
 	}
 
 	err = m.cache.Del(ctx, keys...)
 	return errgo.Wrap(err, "redisCache.Del")
-}
-
-func minDur(a, b time.Duration) time.Duration {
-	if a < b {
-		return a
-	}
-	return b
 }

@@ -1,0 +1,150 @@
+title: Subject
+required:
+  - id
+  - type
+  - name
+  - name_cn
+  - summary
+  - nsfw
+  - locked
+  - platform
+  - volumes
+  - eps
+  - total_episodes
+  - rating
+  - images
+  - collection
+  - tags
+type: object
+properties:
+  id:
+    title: ID
+    type: integer
+  type:
+    title: Type
+    type: integer
+    allOf:
+      - "$ref": "./subject_type.yaml"
+  name:
+    title: Name
+    type: string
+  name_cn:
+    title: Name Cn
+    type: string
+  summary:
+    title: Summary
+    type: string
+  nsfw:
+    title: Nsfw
+    type: boolean
+  locked:
+    title: Locked
+    type: boolean
+  date:
+    title: Date
+    type: string
+    description: air date in `YYYY-MM-DD` format
+  platform:
+    title: Platform
+    type: string
+    description: TV, Web, 欧美剧, PS4...
+  images:
+    $ref: "./subject_image.yaml"
+  infobox:
+    $ref: "./wiki_v0.yaml"
+  volumes:
+    title: Volumes
+    type: integer
+    description: 书籍条目的册数，由旧服务端从wiki中解析
+  eps:
+    title: Eps
+    type: integer
+    description: 由旧服务端从wiki中解析，对于书籍条目为`话数`
+  total_episodes:
+    title: Total Episodes
+    type: integer
+    description: 数据库中的章节数量
+  rating:
+    title: Rating
+    required:
+      - rank
+      - total
+      - count
+      - score
+    type: object
+    properties:
+      rank:
+        title: Rank
+        type: integer
+      total:
+        title: Total
+        type: integer
+      count:
+        title: Count
+        type: object
+        properties:
+          "1":
+            type: integer
+          "2":
+            type: integer
+          "3":
+            type: integer
+          "4":
+            type: integer
+          "5":
+            type: integer
+          "6":
+            type: integer
+          "7":
+            type: integer
+          "8":
+            type: integer
+          "9":
+            type: integer
+          "10":
+            type: integer
+      score:
+        title: Score
+        type: number
+
+  collection:
+    title: Collection
+    required:
+      - wish
+      - collect
+      - doing
+      - on_hold
+      - dropped
+    type: object
+    properties:
+      wish:
+        title: Wish
+        type: integer
+      collect:
+        title: Collect
+        type: integer
+      doing:
+        title: Doing
+        type: integer
+      on_hold:
+        title: On Hold
+        type: integer
+      dropped:
+        title: Dropped
+        type: integer
+  tags:
+    title: Tags
+    type: array
+    items:
+      title: Tag
+      required:
+        - name
+        - count
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+        count:
+          title: Count
+          type: integer

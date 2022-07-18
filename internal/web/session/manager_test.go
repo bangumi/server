@@ -17,15 +17,15 @@ package session_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/logger"
+	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/test"
+	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -33,11 +33,9 @@ func TestManager_Create(t *testing.T) {
 	t.Parallel()
 	const uid model.UserID = 1
 
-	m := session.NewMockRepo(t)
-	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.Anything).
-		Run(func(ctx context.Context, key string, userID model.UserID, regTime time.Time) {
-			require.Equal(t, uid, userID)
-		}).Return(session.Session{UserID: uid}, nil)
+	m := mocks.NewSessionRepo(t)
+	m.EXPECT().Create(mock.Anything, uid, mock.Anything, mock.Anything).
+		Return("", session.Session{UserID: uid}, nil)
 
 	manager := session.New(test.NopCache(), m, logger.Copy())
 
@@ -49,11 +47,9 @@ func TestManager_Create(t *testing.T) {
 func TestManager_Get(t *testing.T) {
 	t.Parallel()
 	const uid model.UserID = 1
-	m := session.NewMockRepo(t)
-	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.Anything).
-		Run(func(ctx context.Context, key string, userID model.UserID, regTime time.Time) {
-			require.Equal(t, uid, userID)
-		}).Return(session.Session{UserID: uid}, nil)
+	m := mocks.NewSessionRepo(t)
+	m.EXPECT().Create(mock.Anything, uid, mock.Anything, mock.Anything).
+		Return("", session.Session{UserID: uid}, nil)
 
 	manager := session.New(test.NopCache(), m, logger.Copy())
 
@@ -66,11 +62,9 @@ func TestManager_Revoke(t *testing.T) {
 	t.Parallel()
 
 	const uid model.UserID = 1
-	m := session.NewMockRepo(t)
-	m.EXPECT().Create(mock.Anything, mock.Anything, uid, mock.Anything).
-		Run(func(ctx context.Context, key string, userID model.UserID, regTime time.Time) {
-			require.Equal(t, uid, userID)
-		}).Return(session.Session{UserID: uid}, nil)
+	m := mocks.NewSessionRepo(t)
+	m.EXPECT().Create(mock.Anything, uid, mock.Anything, mock.Anything).
+		Return("", session.Session{UserID: uid}, nil)
 
 	manager := session.New(test.NopCache(), m, logger.Copy())
 

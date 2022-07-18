@@ -12,12 +12,12 @@ const TableNameRevisionHistory = "chii_rev_history"
 
 // RevisionHistory mapped from table <chii_rev_history>
 type RevisionHistory struct {
-	ID          uint32       `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true;index:rev_id,priority:1"`
-	Type        uint8        `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;index:rev_crt_id,priority:1;index:rev_id,priority:2"` // 条目，角色，人物
-	Mid         uint32       `gorm:"column:rev_mid;type:mediumint(8) unsigned;not null;index:rev_crt_id,priority:2"`                        // 对应条目，人物的ID
+	ID          uint32       `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
+	Type        uint8        `gorm:"column:rev_type;type:tinyint(3) unsigned;not null"`  // 条目，角色，人物
+	Mid         uint32       `gorm:"column:rev_mid;type:mediumint(8) unsigned;not null"` // 对应条目，人物的ID
 	TextID      uint32       `gorm:"column:rev_text_id;type:mediumint(9) unsigned;not null"`
 	CreatedTime uint32       `gorm:"column:rev_dateline;type:int(10) unsigned;not null"`
-	CreatorID   model.UserID `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null;index:rev_crt_creator,priority:1;index:rev_id,priority:3"`
+	CreatorID   model.UserID `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null"`
 	Summary     string       `gorm:"column:rev_edit_summary;type:varchar(200);not null"`
 }
 

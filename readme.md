@@ -5,7 +5,7 @@
 
 ## Requirements
 
-- [Go 1.17+](https://go.dev/)
+- [Go 1.18+](https://go.dev/)
 - [go-task](https://taskfile.dev/installation/)
 - [golangci-lint](https://golangci-lint.run/)
 
@@ -60,6 +60,10 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 如果你不使用 docker ，请自行启动 mysql 和 redis 并导入 `bangumi/dev-env` 仓库内的数据。
 
+### 贡献指南
+
+更多的细节介绍请查看[贡献指南](./.github/contributing.md)。
+
 ## 提交 Pull Request
 
 如果你的 PR 是新功能，最好先发个 issue 讨论一下要不要实现，避免 PR 提交之后新功能本身被否决的问题。
@@ -74,11 +78,13 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 task test
 ```
 
-运行全部测试，需要数据库环境。
+运行 hCaptcha 以外的的全部测试，需要数据库环境。
 
 ```
 task test-all
 ```
+
+使用 `task test-all-with-http` 或者 `task coverage` 来运行所有测试。
 
 ## 代码风格
 
@@ -96,10 +102,6 @@ task lint
 你不应当导入 `github.com/bangumi/server/pkg` 以外的任何路径。
 
 具体可用的包见 [pkg/readme.md](./pkg)
-
-## Contributing
-
-见 [contributing.md](./.github/contributing.md)
 
 ## License
 

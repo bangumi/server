@@ -18,16 +18,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/logger/log"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/frontend"
 )
 
 // PageListAccessToken 直接调用了 `query.Query`。
 // 因为这只是个demo网页，在后续重构为 api 的时候仍然应该替换为 service 。
 func (h Handler) PageListAccessToken(c *fiber.Ctx) error {
-	v := h.getHTTPAccessor(c)
-	if !v.login {
-		return c.Redirect("/demo/login")
+	v := h.GetHTTPAccessor(c)
+	if !v.Login {
+		return c.Redirect("/demo/Login")
 	}
 
 	u, err := h.u.GetByID(c.Context(), v.ID)
@@ -49,9 +49,9 @@ func (h Handler) PageListAccessToken(c *fiber.Ctx) error {
 }
 
 func (h Handler) PageCreateAccessToken(c *fiber.Ctx) error {
-	v := h.getHTTPAccessor(c)
-	if !v.login {
-		return c.Redirect("/demo/login")
+	v := h.GetHTTPAccessor(c)
+	if !v.Login {
+		return c.Redirect("/demo/Login")
 	}
 
 	u, err := h.u.GetByID(c.Context(), v.ID)

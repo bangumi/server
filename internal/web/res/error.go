@@ -30,9 +30,9 @@ var ErrNotFound = NewError(http.StatusNotFound, "resource can't be found in the 
 
 // Error default error response.
 type Error struct {
-	Title       string      `json:"title"`
-	Details     interface{} `json:"details,omitempty"`
-	Description string      `json:"description"`
+	Title       string `json:"title"`
+	Details     any    `json:"details,omitempty"`
+	Description string `json:"description"`
 }
 
 var _ error = HTTPError{}

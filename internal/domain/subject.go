@@ -31,20 +31,7 @@ type SubjectRepo interface {
 
 	GetActors(
 		ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
-	) (map[model.CharacterID][]model.Person, error)
-}
-
-type SubjectService interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id model.SubjectID) (model.Subject, error)
-
-	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]model.SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]model.SubjectCharacterRelation, error)
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectInternalRelation, error)
-
-	GetActors(
-		ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
-	) (map[model.CharacterID][]model.Person, error)
+	) (map[model.CharacterID][]model.PersonID, error)
 }
 
 type SubjectPersonRelation struct {
@@ -52,6 +39,10 @@ type SubjectPersonRelation struct {
 
 	PersonID  model.PersonID
 	SubjectID model.SubjectID
+}
+
+func (r SubjectPersonRelation) GetSubjectID() model.SubjectID {
+	return r.SubjectID
 }
 
 type SubjectCharacterRelation struct {
@@ -66,4 +57,12 @@ type SubjectInternalRelation struct {
 
 	SourceID      model.SubjectID
 	DestinationID model.SubjectID
+}
+
+func (s SubjectInternalRelation) GetSourceID() model.SubjectID {
+	return s.SourceID
+}
+
+func (s SubjectInternalRelation) GetDestinationID() model.SubjectID {
+	return s.DestinationID
 }

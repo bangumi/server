@@ -23,7 +23,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
-	"github.com/bangumi/server/internal/errgo"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/timex"
 )
 
@@ -92,7 +92,7 @@ func (m manager) allow(
 ) (Result, error) {
 	now := time.Now()
 	var keys = []string{RedisRateKeyPrefix + ip, RedisBanKeyPrefix + ip}
-	var values = []interface{}{
+	var values = []any{
 		limit.Burst, limit.Rate, limit.Period.Seconds(), now.Unix(), now.Nanosecond() / 1000, timex.OneWeekSec,
 	}
 	v, err := allowScript.Run(ctx, m.r, keys, values...).Result()
@@ -100,7 +100,7 @@ func (m manager) allow(
 		return Result{}, errgo.Wrap(err, "luaScript.Run")
 	}
 
-	values, ok := v.([]interface{})
+	values, ok := v.([]any)
 	if !ok {
 		panic("failed to cast redis lua result type")
 	}

@@ -30,7 +30,7 @@ func newEpisode(db *gorm.DB) episode {
 	_episode.ID = field.NewField(tableName, "ep_id")
 	_episode.SubjectID = field.NewField(tableName, "ep_subject_id")
 	_episode.Sort = field.NewFloat32(tableName, "ep_sort")
-	_episode.Type = field.NewInt16(tableName, "ep_type")
+	_episode.Type = field.NewUint8(tableName, "ep_type")
 	_episode.Disc = field.NewUint8(tableName, "ep_disc")
 	_episode.Name = field.NewString(tableName, "ep_name")
 	_episode.NameCn = field.NewString(tableName, "ep_name_cn")
@@ -68,7 +68,7 @@ type episode struct {
 	ID        field.Field
 	SubjectID field.Field
 	Sort      field.Float32
-	Type      field.Int16
+	Type      field.Uint8
 	Disc      field.Uint8
 	Name      field.String
 	NameCn    field.String
@@ -103,7 +103,7 @@ func (e *episode) updateTableName(table string) *episode {
 	e.ID = field.NewField(table, "ep_id")
 	e.SubjectID = field.NewField(table, "ep_subject_id")
 	e.Sort = field.NewFloat32(table, "ep_sort")
-	e.Type = field.NewInt16(table, "ep_type")
+	e.Type = field.NewUint8(table, "ep_type")
 	e.Disc = field.NewUint8(table, "ep_disc")
 	e.Name = field.NewString(table, "ep_name")
 	e.NameCn = field.NewString(table, "ep_name_cn")
@@ -247,12 +247,12 @@ func (e episodeDo) WithContext(ctx context.Context) *episodeDo {
 	return e.withDO(e.DO.WithContext(ctx))
 }
 
-func (e episodeDo) ReadDB(ctx context.Context) *episodeDo {
-	return e.WithContext(ctx).Clauses(dbresolver.Read)
+func (e episodeDo) ReadDB() *episodeDo {
+	return e.Clauses(dbresolver.Read)
 }
 
-func (e episodeDo) WriteDB(ctx context.Context) *episodeDo {
-	return e.WithContext(ctx).Clauses(dbresolver.Write)
+func (e episodeDo) WriteDB() *episodeDo {
+	return e.Clauses(dbresolver.Write)
 }
 
 func (e episodeDo) Clauses(conds ...clause.Expression) *episodeDo {
@@ -454,6 +454,10 @@ func (e episodeDo) ScanByPage(result interface{}, offset int, limit int) (count 
 
 	err = e.Offset(offset).Limit(limit).Scan(result)
 	return
+}
+
+func (e episodeDo) Scan(result interface{}) (err error) {
+	return e.DO.Scan(result)
 }
 
 func (e *episodeDo) withDO(do gen.Dao) *episodeDo {

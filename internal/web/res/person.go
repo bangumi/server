@@ -17,7 +17,10 @@ package res
 import (
 	"time"
 
+	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/pkg/wiki"
 )
 
 type PersonV0 struct {
@@ -38,4 +41,31 @@ type PersonV0 struct {
 	ID           model.PersonID `json:"id"`
 	Locked       bool           `json:"locked"`
 	Type         uint8          `json:"type"`
+}
+
+func ConvertModelPerson(s model.Person) PersonV0 {
+	img := PersonImage(s.Image)
+
+	return PersonV0{
+		ID:           s.ID,
+		Type:         s.Type,
+		Name:         s.Name,
+		Career:       s.Careers(),
+		Images:       img,
+		Summary:      s.Summary,
+		LastModified: time.Time{},
+		Infobox:      compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
+		Gender:       null.NilString(GenderMap[s.FieldGender]),
+		BloodType:    null.NilUint8(s.FieldBloodType),
+		BirthYear:    null.NilUint16(s.FieldBirthYear),
+		BirthMon:     null.NilUint8(s.FieldBirthMon),
+		BirthDay:     null.NilUint8(s.FieldBirthDay),
+		Stat: Stat{
+			Comments: s.CommentCount,
+			Collects: s.CollectCount,
+		},
+		Img:      img.Large,
+		Redirect: s.Redirect,
+		Locked:   s.Locked,
+	}
 }

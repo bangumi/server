@@ -25,8 +25,8 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/pkg/timex"
-	"github.com/bangumi/server/internal/test"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -36,7 +36,7 @@ func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().CreateAccessToken(mock.Anything, userID, "token name", timex.OneDay).Return("ttt", nil)
-	mockAuth.EXPECT().GetByIDWithCache(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
 
 	mockSession := mocks.NewSessionManager(t)
 	mockSession.EXPECT().Get(mock.Anything, "session key").Return(session.Session{UserID: userID}, nil)
@@ -51,7 +51,7 @@ func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 	resp := test.New(t).Post("/p/access-tokens").JSON(fiber.Map{
 		"name":          "token name",
 		"duration_days": 1,
-	}).Cookie(session.Key, "session key").Execute(app)
+	}).Cookie(session.CookieKey, "session key").Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
 }
@@ -63,7 +63,7 @@ func TestHandler_DeletePersonalAccessToken_401(t *testing.T) {
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetTokenByID(mock.Anything, tokenID).Return(domain.AccessToken{UserID: 2, ID: tokenID}, nil)
-	mockAuth.EXPECT().GetByIDWithCache(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
 
 	mockSession := mocks.NewSessionManager(t)
 	mockSession.EXPECT().Get(mock.Anything, "session key").Return(session.Session{UserID: userID}, nil)
@@ -76,7 +76,7 @@ func TestHandler_DeletePersonalAccessToken_401(t *testing.T) {
 	)
 
 	resp := test.New(t).Delete("/p/access-tokens").JSON(fiber.Map{"id": tokenID}).
-		Cookie(session.Key, "session key").Execute(app)
+		Cookie(session.CookieKey, "session key").Execute(app)
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode, resp.BodyString())
 }

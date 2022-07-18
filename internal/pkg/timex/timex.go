@@ -26,6 +26,11 @@ const (
 	OneWeek = 7 * 24 * time.Hour
 )
 
-func NowU32() uint32 {
-	return uint32(time.Now().Unix())
+type numberT interface {
+	int8 | int16 | int32 | int | int64
+}
+
+// Second convert an integer N to time.Duration present N seconds.
+func Second[T numberT](second T) time.Duration {
+	return time.Duration(second) * time.Second
 }

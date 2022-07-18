@@ -14,15 +14,27 @@
 
 package enum
 
-import "github.com/bangumi/server/internal/model"
-
-type EpType = model.EpType
+// EpType
+// Deprecated.
+type EpType = int16
 
 const (
-	EpTypeNormal  EpType = 0
+	// EpTypeNormal
+	// Deprecated.
+	EpTypeNormal EpType = 0
+	// EpTypeSpecial
+	// Deprecated.
 	EpTypeSpecial EpType = 1
+	// EpTypeOpening
+	// Deprecated.
 	EpTypeOpening EpType = 2
-	EpTypeEnding  EpType = 3
-	EpTypeMad     EpType = 4
-	EpTypeOther   EpType = 6
+	// EpTypeEnding
+	// Deprecated.
+	EpTypeEnding EpType = 3
+	// EpTypeMad
+	// Deprecated.
+	EpTypeMad EpType = 4
+	// EpTypeOther
+	// Deprecated.
+	EpTypeOther EpType = 6
 )
