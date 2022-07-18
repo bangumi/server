@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler_test
+package subject_test
 
 import (
 	"net/http"
@@ -30,7 +30,7 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func TestHappyPath(t *testing.T) {
+func TestSubject_Get(t *testing.T) {
 	t.Parallel()
 	var subjectID model.SubjectID = 7
 
@@ -62,7 +62,24 @@ func TestHappyPath(t *testing.T) {
 	require.EqualValues(t, 7, r.ID)
 }
 
-func TestNSFW_200(t *testing.T) {
+func TestSubject_Get_Redirect(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewSubjectRepo(t)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(8)).Return(model.Subject{Redirect: 2}, nil)
+
+	app := test.GetWebApp(t,
+		test.Mock{
+			SubjectRepo: m,
+		},
+	)
+
+	resp := test.New(t).Get("/v0/subjects/8").Execute(app)
+
+	require.Equal(t, http.StatusFound, resp.StatusCode, "302 for redirect repository")
+	require.Equal(t, "/v0/subjects/2", resp.Header.Get("location"))
+}
+
+func TestSubject_Get_NSFW_200(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewSubjectRepo(t)
@@ -87,7 +104,7 @@ func TestNSFW_200(t *testing.T) {
 	require.Equal(t, http.StatusOK, resp.StatusCode, "200 for authorized user")
 }
 
-func TestNSFW_404(t *testing.T) {
+func TestSubject_Get_NSFW_404(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewSubjectRepo(t)
@@ -111,24 +128,7 @@ func TestNSFW_404(t *testing.T) {
 	require.Equal(t, http.StatusNotFound, resp.StatusCode, "404 for unauthorized user")
 }
 
-func Test_web_subject_Redirect(t *testing.T) {
-	t.Parallel()
-	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, model.SubjectID(8)).Return(model.Subject{Redirect: 2}, nil)
-
-	app := test.GetWebApp(t,
-		test.Mock{
-			SubjectRepo: m,
-		},
-	)
-
-	resp := test.New(t).Get("/v0/subjects/8").Execute(app)
-
-	require.Equal(t, http.StatusFound, resp.StatusCode, "302 for redirect repository")
-	require.Equal(t, "/v0/subjects/2", resp.Header.Get("location"))
-}
-
-func Test_web_subject_bad_id(t *testing.T) {
+func TestSubject_Get_bad_id(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
 
@@ -145,7 +145,7 @@ func Test_web_subject_bad_id(t *testing.T) {
 	}
 }
 
-func TestHandler_GetSubjectImage_302(t *testing.T) {
+func TestSubject_GetImage_302(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, model.SubjectID(1)).Return(model.Subject{ID: 1, Image: "temp"}, nil)
@@ -170,7 +170,7 @@ func TestHandler_GetSubjectImage_302(t *testing.T) {
 	}
 }
 
-func TestHandler_GetSubjectImage_400(t *testing.T) {
+func TestSubject_GetImage_400(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{Image: "temp"}, nil)
