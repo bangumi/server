@@ -16,9 +16,7 @@ package user
 
 import (
 	"errors"
-	"net/http"
 
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
@@ -128,45 +126,4 @@ func (h User) GetCollection(c *fiber.Ctx) error {
 	}
 
 	return h.getCollection(c, username, subjectID)
-}
-
-func (h User) PutEpisodeCollection(c *fiber.Ctx) error {
-	v := h.GetHTTPAccessor(c)
-	if !v.Login {
-		return res.Unauthorized(res.DefaultUnauthorizedMessage)
-	}
-
-	episodeID, err := req.ParseEpisodeID(c.Params("episode_id"))
-	if err != nil {
-		return err
-	}
-
-	var input req.PutEpisodeCollection
-	if err = json.UnmarshalNoEscape(c.Body(), &input); err != nil {
-		return res.JSONError(c, err)
-	}
-
-	if errs := h.Common.V.Struct(input); errs != nil {
-		return h.ValidationError(c, errs)
-	}
-
-	// now call app command
-	if err = h.app.Command.UpdateEpisodeCollection(c.Context(), v.ID, episodeID, input.Type); err != nil {
-		switch {
-		case errors.Is(err, domain.ErrInvalidInput):
-			return res.FromError(c, err, http.StatusBadRequest, "failed to update episode collection")
-		case errors.Is(err, domain.ErrEpisodeNotFound):
-			return res.NotFound("episode not found")
-		case errors.Is(err, domain.ErrSubjectNotFound):
-			return res.NotFound("subject not exist or has been removed")
-		case errors.Is(err, domain.ErrSubjectNotCollected):
-			return res.BadRequest("subject is not collected, please add subject to your collection first")
-		}
-
-		return h.InternalError(c, err, "failed to update episode collection",
-			log.UserID(v.ID), log.EpisodeID(episodeID))
-	}
-
-	c.Status(http.StatusNoContent)
-	return nil
 }

@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package user
 
 import (
 	"errors"
@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (h Handler) PutEpisodeCollection(c *fiber.Ctx) error {
+func (h User) PutEpisodeCollection(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
 	if !v.Login {
 		return res.Unauthorized(res.DefaultUnauthorizedMessage)
