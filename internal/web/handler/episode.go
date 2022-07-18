@@ -23,6 +23,7 @@ import (
 	"github.com/bangumi/server/internal/app/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
@@ -120,10 +121,10 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		data[i] = convertModelEpisode(episode)
 	}
 
-	return c.JSON(res.PagedG[model.Episode]{
+	return c.JSON(res.PagedG[res.Episode]{
 		Limit:  page.Limit,
 		Offset: page.Offset,
-		Data:   episodes,
+		Data:   slice.Map(episodes, convertModelEpisode),
 		Total:  count,
 	})
 }
