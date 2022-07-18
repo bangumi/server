@@ -32,25 +32,29 @@ func New(
 	log *zap.Logger,
 ) Query {
 	return Query{
-		log:       log.Named("app.query"),
-		cache:     cache,
-		subject:   subject,
-		person:    person,
-		episode:   episode,
-		character: character,
-
-		subjectCached:    metric.Counter("app_subject_cached_count"),
-		subjectNotCached: metric.Counter("app_subject_not_cached_count"),
+		cache:                     cache,
+		episode:                   episode,
+		subject:                   subject,
+		person:                    person,
+		character:                 character,
+		metricSubjectQueryCached:  metric.Counter("app_subject_query_cached_count"),
+		metricSubjectQueryCount:   metric.Counter("app_subject_query_count"),
+		metricsEpisodeQueryCount:  metric.Counter("app_episode_query_count"),
+		metricsEpisodeQueryCached: metric.Counter("app_subject_query_cached_count"),
+		log:                       log.Named("app.query"),
 	}
 }
 
 type Query struct {
-	cache            cache.Cache
-	episode          domain.EpisodeRepo
-	subject          domain.SubjectRepo
-	person           domain.PersonRepo
-	character        domain.CharacterRepo
-	subjectCached    tally.Counter
-	subjectNotCached tally.Counter
-	log              *zap.Logger
+	cache                    cache.Cache
+	episode                  domain.EpisodeRepo
+	subject                  domain.SubjectRepo
+	person                   domain.PersonRepo
+	character                domain.CharacterRepo
+	metricSubjectQueryCached tally.Counter
+	metricSubjectQueryCount  tally.Counter
+
+	metricsEpisodeQueryCount  tally.Counter
+	metricsEpisodeQueryCached tally.Counter
+	log                       *zap.Logger
 }

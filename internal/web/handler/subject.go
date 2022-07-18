@@ -45,24 +45,25 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getSubjectWithCache(c.Context(), id)
+	s, err := h.app.Query.GetSubject(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to get subject", log.SubjectID(id))
 	}
 
-	if !ok {
-		return res.ErrNotFound
+	if s.Redirect != 0 {
+		return c.Redirect("/v0/subjects/" + strconv.FormatUint(uint64(s.Redirect), 10))
 	}
 
-	if r.Redirect != 0 {
-		return c.Redirect("/v0/subjects/" + strconv.FormatUint(uint64(r.Redirect), 10))
+	totalEpisode, err := h.app.Query.CountEpisode(c.Context(), id, nil)
+	if err != nil {
+		return h.InternalError(c, err, "failed to count episodes of subject", log.SubjectID(id))
 	}
 
-	if r.NSFW && !u.AllowNSFW() {
-		return res.ErrNotFound
-	}
-
-	return c.JSON(r)
+	return res.JSON(c, convertModelSubject(s, totalEpisode))
 }
 
 // first try to read from cache, then fallback to reading from database.

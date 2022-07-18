@@ -15,7 +15,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"strconv"
 
@@ -24,8 +23,8 @@ import (
 	"github.com/bangumi/server/internal/app/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -38,39 +37,25 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, ok, err := h.getEpisodeWithCache(c.Context(), id)
-	if err != nil {
-		return err
-	}
-
-	if !ok {
-		return res.ErrNotFound
-	}
-
-	s, ok, err := h.getSubjectWithCache(c.Context(), e.SubjectID)
-	if err != nil {
-		return err
-	}
-	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
-	}
-
-	return c.JSON(e)
-}
-
-// first try to read from cache, then fallback to reading from database.
-// return data, database record existence and error.
-func (h Handler) getEpisodeWithCache(ctx context.Context, id model.EpisodeID) (res.Episode, bool, error) {
-	e, err := h.app.Query.GetEpisode(ctx, id)
+	e, err := h.app.Query.GetEpisode(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.Episode{}, false, nil
+			return res.ErrNotFound
 		}
 
-		return res.Episode{}, false, errgo.Wrap(err, "app.Query.GetEpisode")
+		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
 	}
 
-	return convertModelEpisode(e), true, nil
+	_, err = h.app.Query.GetSubject(c.Context(), u.Auth, e.SubjectID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to find subject of episode", log.SubjectID(e.SubjectID))
+	}
+
+	return res.JSON(c, e)
 }
 
 func convertModelEpisode(s model.Episode) res.Episode {

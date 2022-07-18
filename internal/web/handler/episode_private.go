@@ -15,10 +15,13 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -31,27 +34,32 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, ok, err := h.getEpisodeWithCache(c.Context(), id)
+	e, err := h.app.Query.GetEpisode(c.Context(), id)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
 	}
 
-	if !ok {
-		return res.ErrNotFound
-	}
-
-	s, ok, err := h.getSubjectWithCache(c.Context(), e.SubjectID)
+	s, err := h.app.Query.GetSubject(c.Context(), u.Auth, e.SubjectID)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to get subject of episode", log.SubjectID(e.SubjectID))
 	}
 
-	if !ok || s.Redirect != 0 || (s.NSFW && !u.AllowNSFW()) {
+	if s.Redirect != 0 {
 		return res.ErrNotFound
 	}
 
 	pagedComments, err := h.listComments(c, domain.CommentEpisode, model.TopicID(id))
 	if err != nil {
-		return err
+		return h.InternalError(c, err, "failed to get comments", log.SubjectID(e.SubjectID))
 	}
+
 	return c.JSON(pagedComments)
 }
