@@ -15,7 +15,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"strconv"
 	"time"
@@ -26,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/vars"
@@ -38,36 +38,20 @@ func (h Handler) GetPerson(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	r, err := h.app.Query.GetPerson(c.Context(), id)
 	if err != nil {
-		return err
-	}
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
 
-	if !ok {
-		return res.ErrNotFound
+		return h.InternalError(c, err, "failed to get person", log.PersonID(id))
 	}
 
 	if r.Redirect != 0 {
 		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
-	return c.JSON(r)
-}
-
-// first try to read from cache, then fallback to reading from database.
-// return data, database record existence and error.
-// Deprecated: use h.app.Query.GetPerson.
-func (h Handler) getPersonWithCache(ctx context.Context, id model.PersonID) (res.PersonV0, bool, error) {
-	var s, err = h.app.Query.GetPerson(ctx, id)
-	if err != nil {
-		if errors.Is(err, domain.ErrPersonNotFound) {
-			return res.PersonV0{}, false, nil
-		}
-
-		return res.PersonV0{}, false, errgo.Wrap(err, "Query.GetPerson")
-	}
-
-	return convertModelPerson(s), true, nil
+	return res.JSON(c, convertModelPerson(r))
 }
 
 func convertModelPerson(s model.Person) res.PersonV0 {
@@ -109,16 +93,16 @@ func (h Handler) GetPersonImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	r, err := h.app.Query.GetPerson(c.Context(), id)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to get person", log.PersonID(id))
 	}
 
-	if !ok {
-		return res.ErrNotFound
-	}
-
-	l, ok := r.Images.Select(c.Query("type"))
+	l, ok := res.PersonImage(r.Image).Select(c.Query("type"))
 	if !ok {
 		return res.BadRequest("bad image type: " + c.Query("type"))
 	}
@@ -136,12 +120,16 @@ func (h Handler) GetPersonRelatedCharacters(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	r, err := h.app.Query.GetPerson(c.Context(), id)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to get person", log.PersonID(id))
 	}
 
-	if !ok || r.Redirect != 0 {
+	if r.Redirect != 0 {
 		return res.ErrNotFound
 	}
 
@@ -172,12 +160,16 @@ func (h Handler) GetPersonRelatedSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	r, err := h.app.Query.GetPerson(c.Context(), id)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to get person", log.PersonID(id))
 	}
 
-	if !ok || r.Redirect != 0 {
+	if r.Redirect != 0 {
 		return res.ErrNotFound
 	}
 

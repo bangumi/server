@@ -15,10 +15,13 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -29,12 +32,16 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getPersonWithCache(c.Context(), id)
+	r, err := h.app.Query.GetPerson(c.Context(), id)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to get person", log.PersonID(id))
 	}
 
-	if !ok || r.Redirect != 0 {
+	if r.Redirect != 0 {
 		return res.ErrNotFound
 	}
 
