@@ -93,18 +93,15 @@ func New(
 		v:                    validate,
 		validatorTranslation: trans,
 
-		skip1Log:         log.WithOptions(zap.AddCallerSkip(1)),
-		oauth:            oauth,
-		template:         engine,
-		buffPool:         buffer.NewPool(),
-		subjectCached:    metric.Counter("handler_subject_cached_count"),
-		subjectNotCached: metric.Counter("handler_subject_not_cached_count"),
+		skip1Log: log.WithOptions(zap.AddCallerSkip(1)),
+		oauth:    oauth,
+		template: engine,
+		buffPool: buffer.NewPool(),
 	}, nil
 }
 
 type Handler struct {
 	app                  app.App
-	subjectCached        tally.Counter
 	p                    domain.PersonService
 	a                    domain.AuthService
 	collect              domain.CollectionRepo
@@ -121,7 +118,6 @@ type Handler struct {
 	r                    domain.RevisionRepo
 	oauth                oauth.Manager
 	topic                domain.TopicRepo
-	subjectNotCached     tally.Counter
 	template             frontend.TemplateEngine
 	buffPool             buffer.Pool
 	log                  *zap.Logger

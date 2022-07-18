@@ -43,17 +43,13 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
 	}
 
-	s, err := h.app.Query.GetSubject(c.Context(), u.Auth, e.SubjectID)
+	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, e.SubjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
 		return h.InternalError(c, err, "failed to get subject of episode", log.SubjectID(e.SubjectID))
-	}
-
-	if s.Redirect != 0 {
-		return res.ErrNotFound
 	}
 
 	pagedComments, err := h.listComments(c, domain.CommentEpisode, model.TopicID(id))

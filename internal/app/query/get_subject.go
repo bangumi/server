@@ -42,6 +42,27 @@ func (q Query) GetSubject(ctx context.Context, user domain.Auth, subjectID model
 	return subject, nil
 }
 
+func (q Query) GetSubjectNoRedirect(
+	ctx context.Context,
+	user domain.Auth,
+	subjectID model.SubjectID,
+) (model.Subject, error) {
+	subject, err := q.getSubject(ctx, subjectID)
+	if err != nil {
+		return model.Subject{}, err
+	}
+
+	if subject.Redirect != 0 {
+		return model.Subject{}, domain.ErrSubjectNotFound
+	}
+
+	if !auth.AllowReadSubject(user, subject) {
+		return model.Subject{}, domain.ErrSubjectNotFound
+	}
+
+	return subject, nil
+}
+
 func (q Query) GetSubjectByIDs(
 	ctx context.Context,
 	subjectIDs ...model.SubjectID,

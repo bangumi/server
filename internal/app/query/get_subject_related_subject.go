@@ -28,7 +28,7 @@ func (q Query) GetSubjectRelatedSubjects(
 	user domain.Auth,
 	subjectID model.SubjectID,
 ) (model.Subject, []model.SubjectInternalRelation, error) {
-	s, err := q.GetSubject(ctx, user, subjectID)
+	s, err := q.GetSubjectNoRedirect(ctx, user, subjectID)
 	if err != nil {
 		return model.Subject{}, nil, err
 	}

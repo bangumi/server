@@ -15,10 +15,8 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"strconv"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
@@ -30,7 +28,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/logger/log"
-	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/vars"
@@ -66,51 +63,6 @@ func (h Handler) GetSubject(c *fiber.Ctx) error {
 	return res.JSON(c, convertModelSubject(s, totalEpisode))
 }
 
-// first try to read from cache, then fallback to reading from database.
-// return data, database record existence and error.
-// Deprecated.
-func (h Handler) getSubjectWithCache(
-	ctx context.Context,
-	id model.SubjectID,
-) (res.SubjectV0, bool, error) {
-	var key = cachekey.Subject(id)
-
-	// try to read from cache
-	var r res.SubjectV0
-	ok, err := h.cache.Get(ctx, key, &r)
-	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
-	}
-
-	if ok {
-		h.subjectCached.Inc(1)
-		return r, ok, nil
-	}
-
-	h.subjectNotCached.Inc(1)
-	s, err := h.s.Get(ctx, id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.SubjectV0{}, false, nil
-		}
-
-		return r, ok, errgo.Wrap(err, "SubjectService.Get")
-	}
-
-	totalEpisode, err := h.app.Query.CountEpisode(ctx, id, nil)
-	if err != nil {
-		return r, false, errgo.Wrap(err, "repo.episode.Count")
-	}
-
-	r = convertModelSubject(s, totalEpisode)
-
-	if e := h.cache.Set(ctx, key, r, time.Minute); e != nil {
-		h.log.Error("can't set response to cache", zap.Error(e))
-	}
-
-	return r, true, nil
-}
-
 func platformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
 	if !ok && s.TypeID != 0 {
@@ -136,16 +88,15 @@ func (h Handler) GetSubjectImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getSubjectWithCache(c.Context(), id)
+	r, err := h.app.Query.GetSubject(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return h.InternalError(c, err, "failed to get subject", log.SubjectID(id))
 	}
 
-	if !ok || r.NSFW && !u.AllowNSFW() {
-		return res.ErrNotFound
-	}
-
-	l, ok := r.Image.Select(c.Query("type"))
+	l, ok := res.SubjectImage(r.Image).Select(c.Query("type"))
 	if !ok {
 		return res.BadRequest("bad image type: " + c.Query("type"))
 	}
@@ -175,13 +126,12 @@ func (h Handler) GetSubjectRelatedPersons(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getSubjectWithCache(c.Context(), id)
+	r, err := h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
-	}
-
-	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return h.InternalError(c, err, "failed to get subject", log.SubjectID(id))
 	}
 
 	relations, err := h.p.GetSubjectRelated(c.Context(), id)
@@ -262,17 +212,13 @@ func (h Handler) GetSubjectRelatedSubjects(c *fiber.Ctx) error {
 
 	u := h.getHTTPAccessor(c)
 
-	s, relations, err := h.app.Query.GetSubjectRelatedSubjects(c.Context(), u.Auth, id)
+	_, relations, err := h.app.Query.GetSubjectRelatedSubjects(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
 		return errgo.Wrap(err, "repo")
-	}
-
-	if s.Redirect != 0 {
-		return res.ErrNotFound
 	}
 
 	var response = make([]res.SubjectRelatedSubject, len(relations))
@@ -306,13 +252,12 @@ func (h Handler) GetSubjectRelatedCharacters(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getSubjectWithCache(c.Context(), id)
+	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
-	}
-
-	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return h.InternalError(c, err, "failed to get subject", log.SubjectID(id))
 	}
 
 	return h.getSubjectRelatedCharacters(c, id)

@@ -15,9 +15,12 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -39,13 +42,13 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	r, ok, err := h.getSubjectWithCache(c.Context(), subjectID)
-	if err != nil {
-		return err
-	}
 
-	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
+	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, subjectID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return h.InternalError(c, err, "failed to subject", log.SubjectID(subjectID))
 	}
 
 	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
@@ -59,13 +62,12 @@ func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 		return res.BadRequest(err.Error())
 	}
 
-	r, ok, err := h.getSubjectWithCache(c.Context(), id)
+	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
-		return err
-	}
-
-	if !ok || r.Redirect != 0 || (r.NSFW && !u.AllowNSFW()) {
-		return res.ErrNotFound
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return h.InternalError(c, err, "failed to subject", log.SubjectID(id))
 	}
 
 	return h.listTopics(c, domain.TopicTypeSubject, uint32(id))
