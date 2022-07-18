@@ -67,3 +67,15 @@ type Creator struct {
 type LoginRemain struct {
 	Remain int `json:"remain"`
 }
+
+func ConvertModelUser(u model.User) User {
+	return User{
+		ID:        u.ID,
+		URL:       "https://bgm.tv/user/" + u.UserName,
+		Username:  u.UserName,
+		Nickname:  u.NickName,
+		UserGroup: u.UserGroup,
+		Avatar:    UserAvatar(u.Avatar),
+		Sign:      u.Sign,
+	}
+}

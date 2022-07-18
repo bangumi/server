@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -46,7 +47,7 @@ func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.Top
 
 func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32) error {
 	u := h.GetHTTPAccessor(c)
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -67,7 +68,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		return res.JSON(c, response)
 	}
 
-	if err = page.check(count); err != nil {
+	if err = page.Check(count); err != nil {
 		return err
 	}
 
@@ -92,7 +93,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 			Title:      topic.Title,
 			CreatedAt:  topic.CreatedAt,
 			UpdatedAt:  topic.UpdatedAt,
-			Creator:    convertModelUser(userMap[topic.CreatorID]),
+			Creator:    res.ConvertModelUser(userMap[topic.CreatorID]),
 			ReplyCount: topic.Replies,
 		}
 	}
@@ -133,7 +134,7 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 		Title:      topic.Title,
 		CreatedAt:  topic.CreatedAt,
 		UpdatedAt:  topic.UpdatedAt,
-		Creator:    convertModelUser(u[topic.CreatorID]),
+		Creator:    res.ConvertModelUser(u[topic.CreatorID]),
 		ReplyCount: topic.Replies,
 		Comments:   pagedComments,
 		Text:       auth.RewriteCommit(content).Content,

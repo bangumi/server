@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package req
 
 import (
 	"strconv"
@@ -22,15 +22,12 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-const defaultPageLimit = 30
-const defaultMaxPageLimit = 100
-
-type pageQuery struct {
+type PageQuery struct {
 	Limit  int
 	Offset int
 }
 
-func (q pageQuery) check(count int64) error {
+func (q PageQuery) Check(count int64) error {
 	if q.Offset > int(count) {
 		return res.BadRequest("offset should be less than or equal to " + strconv.FormatInt(count, 10))
 	}
@@ -38,8 +35,8 @@ func (q pageQuery) check(count int64) error {
 	return nil
 }
 
-func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, error) {
-	q := pageQuery{Limit: defaultLimit}
+func GetPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (PageQuery, error) {
+	q := PageQuery{Limit: defaultLimit}
 	var err error
 
 	raw := c.Query("limit")
@@ -71,3 +68,6 @@ func getPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (pageQuery, erro
 
 	return q, nil
 }
+
+const DefaultPageLimit = 30
+const DefaultMaxPageLimit = 100

@@ -82,7 +82,7 @@ const episodeMaxLimit = 200
 func (h Handler) ListEpisode(c *fiber.Ctx) error {
 	u := h.GetHTTPAccessor(c)
 
-	page, err := getPageQuery(c, episodeDefaultLimit, episodeMaxLimit)
+	page, err := req.GetPageQuery(c, episodeDefaultLimit, episodeMaxLimit)
 	if err != nil {
 		return err
 	}

@@ -12,27 +12,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package user
 
 import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger/log"
-	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (h Handler) ListCollection(c *fiber.Ctx) error {
+func (h User) ListSubjectCollection(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -52,7 +50,7 @@ func (h Handler) ListCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	u, err := h.u.GetByName(c.Context(), username)
+	u, err := h.user.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("user doesn't exist or has been removed")
@@ -66,12 +64,12 @@ func (h Handler) ListCollection(c *fiber.Ctx) error {
 	return h.listCollection(c, u, subjectType, collectionType, page, showPrivate)
 }
 
-func (h Handler) listCollection(
+func (h User) listCollection(
 	c *fiber.Ctx,
 	u model.User,
 	subjectType model.SubjectType,
 	collectionType model.CollectionType,
-	page pageQuery,
+	page req.PageQuery,
 	showPrivate bool,
 ) error {
 	count, err := h.collect.CountSubjectCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
@@ -83,7 +81,7 @@ func (h Handler) listCollection(
 		return c.JSON(res.Paged{Data: []int{}, Total: count, Limit: page.Limit, Offset: page.Offset})
 	}
 
-	if err = page.check(count); err != nil {
+	if err = page.Check(count); err != nil {
 		return err
 	}
 
@@ -105,7 +103,7 @@ func (h Handler) listCollection(
 	var data = make([]res.SubjectCollection, len(collections))
 	for i, collection := range collections {
 		s := subjectMap[collection.SubjectID]
-		data[i] = convertModelSubjectCollection(collection, res.ToSlimSubjectV0(s))
+		data[i] = res.ConvertModelSubjectCollection(collection, res.ToSlimSubjectV0(s))
 	}
 
 	return c.JSON(res.Paged{
@@ -114,71 +112,4 @@ func (h Handler) listCollection(
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	})
-}
-
-func (h Handler) GetCollection(c *fiber.Ctx) error {
-	username := c.Params("username")
-	if username == "" {
-		return res.BadRequest("missing require parameters `username`")
-	}
-
-	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
-	if err != nil {
-		return err
-	}
-
-	return h.getCollection(c, username, subjectID)
-}
-
-func (h Handler) getCollection(c *fiber.Ctx, username string, subjectID model.SubjectID) error {
-	const notFoundMessage = "subject is not collected by user"
-	v := h.GetHTTPAccessor(c)
-
-	u, err := h.u.GetByName(c.Context(), username)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound("user doesn't exist or has been removed")
-		}
-
-		return h.InternalError(c, err, "failed to get user by name", zap.String("name", username))
-	}
-
-	var showPrivate = u.ID == v.ID
-
-	collection, err := h.collect.GetSubjectCollection(c.Context(), u.ID, subjectID)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound(notFoundMessage)
-		}
-
-		return h.InternalError(c, err, "failed to get user's subject collection",
-			log.UserID(u.ID), log.SubjectID(subjectID))
-	}
-
-	if !showPrivate && collection.Private {
-		return res.NotFound(notFoundMessage)
-	}
-
-	s, err := h.app.Query.GetSubject(c.Context(), v.Auth, subjectID)
-	if err != nil {
-		return h.InternalError(c, err, "failed to subject info", log.SubjectID(subjectID))
-	}
-
-	return res.JSON(c, convertModelSubjectCollection(collection, res.ToSlimSubjectV0(s)))
-}
-
-func convertModelSubjectCollection(c model.SubjectCollection, subject res.SlimSubjectV0) res.SubjectCollection {
-	return res.SubjectCollection{
-		SubjectID:   c.SubjectID,
-		SubjectType: c.SubjectType,
-		Rate:        c.Rate,
-		Type:        c.Type,
-		Tags:        c.Tags,
-		EpStatus:    c.EpStatus,
-		VolStatus:   c.VolStatus,
-		UpdatedAt:   c.UpdatedAt,
-		Private:     c.Private,
-		Comment:     null.NilString(c.Comment),
-		Subject:     subject,
-	}
 }

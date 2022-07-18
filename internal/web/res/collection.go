@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
 type SubjectCollection struct {
@@ -32,4 +33,20 @@ type SubjectCollection struct {
 	Type        model.CollectionType `json:"type"`
 	Rate        uint8                `json:"rate"`
 	Private     bool                 `json:"private"`
+}
+
+func ConvertModelSubjectCollection(c model.SubjectCollection, subject SlimSubjectV0) SubjectCollection {
+	return SubjectCollection{
+		SubjectID:   c.SubjectID,
+		SubjectType: c.SubjectType,
+		Rate:        c.Rate,
+		Type:        c.Type,
+		Tags:        c.Tags,
+		EpStatus:    c.EpStatus,
+		VolStatus:   c.VolStatus,
+		UpdatedAt:   c.UpdatedAt,
+		Private:     c.Private,
+		Comment:     null.NilString(c.Comment),
+		Subject:     subject,
+	}
 }

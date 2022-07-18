@@ -12,23 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package user
 
 import (
-	"go.uber.org/fx"
+	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/web/handler/character"
-	"github.com/bangumi/server/internal/web/handler/common"
-	"github.com/bangumi/server/internal/web/handler/subject"
-	"github.com/bangumi/server/internal/web/handler/user"
+	"github.com/bangumi/server/internal/web/res"
 )
 
-var Module = fx.Module("handler",
-	fx.Provide(
-		New,
-		common.New,
-		user.New,
-		subject.New,
-		character.New,
-	),
-)
+func (h User) GetCurrent(c *fiber.Ctx) error {
+	u := h.GetHTTPAccessor(c)
+	if !u.Login || u.ID == 0 {
+		return res.Unauthorized("need Login")
+	}
+
+	user, err := h.user.GetByID(c.Context(), u.ID)
+	if err != nil {
+		return h.InternalError(c, err, "failed to get user")
+	}
+
+	return res.JSON(c, res.User{
+		ID:        user.ID,
+		URL:       "https://bgm.tv/user/" + user.UserName,
+		Username:  user.UserName,
+		Nickname:  user.NickName,
+		UserGroup: user.UserGroup,
+		Avatar:    res.UserAvatar(user.Avatar),
+		Sign:      user.Sign,
+	})
+}

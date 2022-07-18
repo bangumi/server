@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package subject
+package user
 
 import (
 	"go.uber.org/zap"
@@ -23,28 +23,34 @@ import (
 	"github.com/bangumi/server/internal/web/handler/common"
 )
 
-type Subject struct {
+type User struct {
 	common.Common
-	app    app.App
-	person domain.PersonService
-	topic  domain.TopicRepo
-	log    *zap.Logger
-	cfg    config.AppConfig
+	app     app.App
+	person  domain.PersonService
+	topic   domain.TopicRepo
+	collect domain.CollectionRepo
+	log     *zap.Logger
+	user    domain.UserRepo
+	cfg     config.AppConfig
 }
 
 func New(
 	common common.Common,
 	p domain.PersonService,
+	user domain.UserRepo,
 	topic domain.TopicRepo,
 	app app.App,
+	collect domain.CollectionRepo,
 	log *zap.Logger,
-) (Subject, error) {
-	return Subject{
-		Common: common,
-		app:    app,
-		person: p,
-		topic:  topic,
-		log:    log.Named("handler.Subject"),
-		cfg:    config.AppConfig{},
+) (User, error) {
+	return User{
+		Common:  common,
+		app:     app,
+		collect: collect,
+		user:    user,
+		person:  p,
+		topic:   topic,
+		log:     log.Named("handler.User"),
+		cfg:     config.AppConfig{},
 	}, nil
 }

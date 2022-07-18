@@ -118,7 +118,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "invalid query `type` for subject type")
 	}
 
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -136,7 +136,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 }
 
 func (h Handler) getIndexSubjects(
-	c *fiber.Ctx, id model.IndexID, subjectType uint8, page pageQuery,
+	c *fiber.Ctx, id model.IndexID, subjectType uint8, page req.PageQuery,
 ) error {
 	count, err := h.i.CountSubjects(c.Context(), id, subjectType)
 	if err != nil {
@@ -152,7 +152,7 @@ func (h Handler) getIndexSubjects(
 		})
 	}
 
-	if err = page.check(count); err != nil {
+	if err = page.Check(count); err != nil {
 		return err
 	}
 

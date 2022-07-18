@@ -71,7 +71,7 @@ func (h Handler) ListGroupMembersPrivate(c *fiber.Ctx) error {
 		return res.BadRequest("group name is required")
 	}
 
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (h Handler) ListGroupMembersPrivate(c *fiber.Ctx) error {
 func (h Handler) listGroupMembersPrivate(
 	c *fiber.Ctx,
 	groupName string,
-	page pageQuery,
+	page req.PageQuery,
 	memberType domain.GroupMemberType,
 ) error {
 	g, err := h.g.GetByName(c.Context(), groupName)
@@ -110,7 +110,7 @@ func (h Handler) listGroupMembersPrivate(
 		return res.JSON(c, res.Paged{Data: res.EmptySlice(), Limit: page.Limit, Offset: page.Offset})
 	}
 
-	if err = page.check(memberCount); err != nil {
+	if err = page.Check(memberCount); err != nil {
 		return err
 	}
 

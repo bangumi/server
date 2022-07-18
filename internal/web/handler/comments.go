@@ -24,13 +24,14 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 func (h Handler) listComments(
 	c *fiber.Ctx, commentType domain.CommentType, id model.TopicID,
 ) (res.PagedComment, error) {
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return res.PagedComment{}, res.ErrNotFound
 	}
@@ -46,7 +47,7 @@ func (h Handler) listComments(
 		)
 	}
 
-	if err = page.check(count); err != nil {
+	if err = page.Check(count); err != nil {
 		return res.PagedComment{}, err
 	}
 
@@ -92,7 +93,7 @@ func convertModelComments(
 			replies[i] = res.SubComment{
 				CreatedAt: subComment.CreatedAt,
 				Text:      subComment.Content,
-				Creator:   convertModelUser(userMap[subComment.CreatorID]),
+				Creator:   res.ConvertModelUser(userMap[subComment.CreatorID]),
 				ID:        subComment.ID,
 				State:     res.ToCommentState(subComment.State),
 			}
@@ -103,7 +104,7 @@ func convertModelComments(
 			ID:        comment.ID,
 			Text:      comment.Content,
 			CreatedAt: comment.CreatedAt,
-			Creator:   convertModelUser(userMap[comment.CreatorID]),
+			Creator:   res.ConvertModelUser(userMap[comment.CreatorID]),
 			Replies:   replies,
 			State:     res.ToCommentState(comment.State),
 		}

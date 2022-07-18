@@ -30,30 +30,27 @@ import (
 
 type Character struct {
 	common.Common
-	app     app.App
-	person  domain.PersonService
-	collect domain.CollectionRepo
-	topic   domain.TopicRepo
-	log     *zap.Logger
-	cfg     config.AppConfig
+	app    app.App
+	person domain.PersonService
+	topic  domain.TopicRepo
+	log    *zap.Logger
+	cfg    config.AppConfig
 }
 
 func New(
 	common common.Common,
 	p domain.PersonService,
-	collect domain.CollectionRepo,
 	topic domain.TopicRepo,
 	app app.App,
 	log *zap.Logger,
 ) (Character, error) {
 	return Character{
-		Common:  common,
-		app:     app,
-		person:  p,
-		collect: collect,
-		topic:   topic,
-		log:     log.Named("handler.Character"),
-		cfg:     config.AppConfig{},
+		Common: common,
+		app:    app,
+		person: p,
+		topic:  topic,
+		log:    log.Named("handler.Character"),
+		cfg:    config.AppConfig{},
 	}, nil
 }
 

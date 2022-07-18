@@ -38,6 +38,7 @@ import (
 	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/common"
 	"github.com/bangumi/server/internal/web/handler/subject"
+	"github.com/bangumi/server/internal/web/handler/user"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -47,10 +48,8 @@ var errTranslationNotFound = errors.New("failed to find translation for zh")
 func New(
 	common common.Common,
 	cfg config.AppConfig,
-	c domain.CharacterRepo,
 	p domain.PersonService,
 	a domain.AuthService,
-	collect domain.CollectionRepo,
 	r domain.RevisionRepo,
 	topic domain.TopicRepo,
 	g domain.GroupRepo,
@@ -61,6 +60,7 @@ func New(
 	captcha captcha.Manager,
 	session session.Manager,
 	rateLimit rate.Manager,
+	userHandler user.User,
 	log *zap.Logger,
 	subject subject.Subject,
 	engine frontend.TemplateEngine,
@@ -76,6 +76,7 @@ func New(
 		Subject:              subject,
 		Common:               common,
 		app:                  app,
+		User:                 userHandler,
 		Character:            character,
 		cfg:                  cfg,
 		cache:                cache,
@@ -85,7 +86,6 @@ func New(
 		p:                    p,
 		a:                    a,
 		u:                    user,
-		collect:              collect,
 		i:                    index,
 		r:                    r,
 		topic:                topic,
@@ -105,9 +105,9 @@ type Handler struct {
 	Subject              subject.Subject
 	Character            character.Character
 	app                  app.App
+	User                 user.User
 	p                    domain.PersonService
 	a                    domain.AuthService
-	collect              domain.CollectionRepo
 	session              session.Manager
 	captcha              captcha.Manager
 	u                    domain.UserRepo

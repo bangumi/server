@@ -71,11 +71,11 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 	v0.Get("/episodes/:id", addMetrics(h.GetEpisode))
 	v0.Get("/episodes", addMetrics(h.ListEpisode))
 
-	v0.Get("/me", addMetrics(h.GetCurrentUser))
-	v0.Get("/users/:username/collections", addMetrics(h.ListCollection))
-	v0.Get("/users/:username/collections/:subject_id", addMetrics(h.GetCollection))
-	v0.Get("/users/:username", addMetrics(h.GetUser))
-	v0.Get("/users/:username/avatar", addMetrics(h.GetUserAvatar))
+	v0.Get("/me", addMetrics(h.User.GetCurrent))
+	v0.Get("/users/:username", addMetrics(h.User.Get))
+	v0.Get("/users/:username/collections", addMetrics(h.User.ListSubjectCollection))
+	v0.Get("/users/:username/collections/:subject_id", addMetrics(h.User.GetSubjectCollection))
+	v0.Get("/users/:username/avatar", addMetrics(h.User.GetAvatar))
 
 	v0.Get("/indices/:id", addMetrics(h.GetIndex))
 	v0.Get("/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
@@ -102,7 +102,7 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
-	private.Get("/me", addMetrics(h.GetCurrentUser))
+	private.Get("/me", addMetrics(h.User.GetCurrent))
 	private.Get("/groups/:name", addMetrics(h.GetGroupProfileByNamePrivate))
 	private.Get("/groups/:name/members", addMetrics(h.ListGroupMembersPrivate))
 

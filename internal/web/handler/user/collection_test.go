@@ -12,7 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler_test
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>
+
+package user_test
 
 import (
 	"fmt"
@@ -31,7 +45,7 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func TestHandler_ListCollection(t *testing.T) {
+func TestUser_ListCollection(t *testing.T) {
 	t.Parallel()
 	const username = "ni"
 	const userID model.UserID = 7
@@ -68,7 +82,7 @@ func TestHandler_ListCollection(t *testing.T) {
 	require.Equal(t, "v", data[0].Subject.Name, resp.BodyString())
 }
 
-func TestHandler_GetCollection(t *testing.T) {
+func TestUser_GetSubjectCollection(t *testing.T) {
 	t.Parallel()
 	const username = "ni"
 	const userID model.UserID = 7
@@ -97,7 +111,7 @@ func TestHandler_GetCollection(t *testing.T) {
 	require.Equal(t, "v", r.Subject.Name, resp.BodyString())
 }
 
-func TestHandler_GetCollection_other_user(t *testing.T) {
+func TestUser_ListSubjectCollection_other_user(t *testing.T) {
 	t.Parallel()
 	const username = "ni"
 	const userID model.UserID = 7

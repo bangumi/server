@@ -241,6 +241,8 @@ linters-settings:
       - "func (*github.com/gofiber/fiber/v2.Ctx).JSON("
       - "func os.Open(name string)"
       - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
+      - "func github.com/bangumi/server/internal/web/req.GetPageQuery("
+      - "func (github.com/bangumi/server/internal/web/req.PageQuery).Check("
       - "func github.com/bangumi/server/internal/web/res.NewError("
       - "func github.com/bangumi/server/internal/web/res.Response("
       - "func github.com/bangumi/server/internal/web/res.FromError("

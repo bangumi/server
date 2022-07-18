@@ -32,7 +32,7 @@ import (
 )
 
 func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
 	return h.listPersonRevision(c, personID, page)
 }
 
-func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page pageQuery) error {
+func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -59,7 +59,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 		return c.JSON(response)
 	}
 
-	if err = page.check(count); err != nil {
+	if err = page.Check(count); err != nil {
 		return err
 	}
 
@@ -113,7 +113,7 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 }
 
 func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
 	return h.listCharacterRevision(c, characterID, page)
 }
 
-func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.CharacterID, page pageQuery) error {
+func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.CharacterID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -141,7 +141,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 		return c.JSON(response)
 	}
 
-	if err = page.check(count); err != nil {
+	if err = page.Check(count); err != nil {
 		return err
 	}
 
@@ -197,7 +197,7 @@ func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
 }
 
 func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -209,7 +209,7 @@ func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
 	return h.listSubjectRevision(c, subjectID, page)
 }
 
-func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, page pageQuery) error {
+func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -224,7 +224,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 		return c.JSON(response)
 	}
 
-	if err = page.check(count); err != nil {
+	if err = page.Check(count); err != nil {
 		return err
 	}
 
