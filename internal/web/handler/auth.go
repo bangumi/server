@@ -25,8 +25,8 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/timex"
+	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/cookie"
-	"github.com/bangumi/server/internal/web/handler/accesor"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/session"
@@ -81,7 +81,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	return h.privateLogin(c, a, r, remain)
 }
 
-func (h Handler) privateLogin(c *fiber.Ctx, a *accesor.Accessor, r req.UserLogin, remain int) error {
+func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
 		return h.InternalError(c, err, "Unexpected error when logging in")

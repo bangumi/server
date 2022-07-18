@@ -24,16 +24,16 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/cookie"
-	"github.com/bangumi/server/internal/web/handler/accesor"
 	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/session"
 )
 
 func (h Common) MiddlewareSessionAuth(c *fiber.Ctx) error {
-	var a = accesor.Get()
-	defer accesor.Put(a)
+	var a = accessor.Get()
+	defer accessor.Put(a)
 	a.FillBasicInfo(c)
 
 	value := utils.UnsafeString(c.Context().Request.Header.Cookie(session.CookieKey))
