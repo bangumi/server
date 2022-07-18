@@ -41,7 +41,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 		return res.JSONError(c, err)
 	}
 
-	if err := h.v.Struct(r); err != nil {
+	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
 
@@ -63,7 +63,7 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
-	if err := h.v.Struct(r); err != nil {
+	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
 

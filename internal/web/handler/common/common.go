@@ -15,6 +15,8 @@
 package common
 
 import (
+	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
@@ -29,21 +31,29 @@ func New(
 	auth domain.AuthService,
 	session session.Manager,
 ) (Common, error) {
-	log = log.Named("handler.Common")
+	validate, trans, err := getValidator()
+	if err != nil {
+		return Common{}, err
+	}
 
+	log = log.Named("handler.Common")
 	return Common{
-		session:  session,
-		auth:     auth,
-		log:      log,
-		skip1Log: log.WithOptions(zap.AddCallerSkip(1)),
+		session:              session,
+		auth:                 auth,
+		log:                  log,
+		skip1Log:             log.WithOptions(zap.AddCallerSkip(1)),
+		V:                    validate,
+		validatorTranslation: trans,
 	}, nil
 }
 
 type Common struct {
-	auth     domain.AuthService
-	skip1Log *zap.Logger
-	log      *zap.Logger
-	session  session.Manager
+	auth                 domain.AuthService
+	skip1Log             *zap.Logger
+	log                  *zap.Logger
+	session              session.Manager
+	V                    *validator.Validate
+	validatorTranslation ut.Translator
 }
 
 func (h Common) GetHTTPAccessor(c *fiber.Ctx) *accesor.Accessor {

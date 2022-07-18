@@ -38,7 +38,7 @@ func (h Handler) RevokeSession(c *fiber.Ctx) error {
 		return res.JSONError(c, err)
 	}
 
-	if err := h.v.Struct(r); err != nil {
+	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
 
@@ -51,7 +51,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return res.JSONError(c, err)
 	}
 
-	if err := h.v.Struct(r); err != nil {
+	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
 
