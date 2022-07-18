@@ -12,7 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler_test
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>
+
+package character_test
 
 import (
 	"net/http"
@@ -30,7 +44,7 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func TestHandler_GetCharacter_HappyPath(t *testing.T) {
+func TestCharacter_Get(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
 	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7}, nil)
@@ -45,7 +59,7 @@ func TestHandler_GetCharacter_HappyPath(t *testing.T) {
 	require.EqualValues(t, 7, r.ID)
 }
 
-func TestHandler_GetCharacter_Redirect(t *testing.T) {
+func TestCharacter_Get_redirect(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
 	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Redirect: 8}, nil)
@@ -57,7 +71,7 @@ func TestHandler_GetCharacter_Redirect(t *testing.T) {
 	require.Equal(t, "/v0/characters/8", resp.Header.Get("Location"))
 }
 
-func TestHandler_GetCharacter_NSFW(t *testing.T) {
+func TestCharacter_Get_NSFW(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
 	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, NSFW: true}, nil)
@@ -82,7 +96,7 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 	require.Equal(t, model.CharacterID(7), r.ID)
 }
 
-func TestHandler_GetCharacterImage_200(t *testing.T) {
+func TestCharacter_GetImage(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
 	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)
@@ -108,7 +122,7 @@ func TestHandler_GetCharacterImage_200(t *testing.T) {
 	}
 }
 
-func TestHandler_GetCharacterImage_400(t *testing.T) {
+func TestCharacter_GetImage_400(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewCharacterRepo(t)
 	m.EXPECT().Get(mock.Anything, model.CharacterID(7)).Return(model.Character{ID: 7, Image: "temp"}, nil)

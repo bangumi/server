@@ -17,6 +17,7 @@ package handler
 import (
 	"go.uber.org/fx"
 
+	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/common"
 	"github.com/bangumi/server/internal/web/handler/subject"
 )
@@ -26,5 +27,6 @@ var Module = fx.Module("handler",
 		New,
 		common.New,
 		subject.New,
+		character.New,
 	),
 )

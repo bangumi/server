@@ -67,7 +67,7 @@ func convertModelPerson(s model.Person) res.PersonV0 {
 		Summary:      s.Summary,
 		LastModified: time.Time{},
 		Infobox:      compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
-		Gender:       null.NilString(genderMap[s.FieldGender]),
+		Gender:       null.NilString(res.GenderMap[s.FieldGender]),
 		BloodType:    null.NilUint8(s.FieldBloodType),
 		BirthYear:    null.NilUint16(s.FieldBirthYear),
 		BirthMon:     null.NilUint8(s.FieldBirthMon),
@@ -80,12 +80,6 @@ func convertModelPerson(s model.Person) res.PersonV0 {
 		Redirect: s.Redirect,
 		Locked:   s.Locked,
 	}
-}
-
-//nolint:gochecknoglobals
-var genderMap = map[uint8]string{
-	1: "male",
-	2: "female",
 }
 
 func (h Handler) GetPersonImage(c *fiber.Ctx) error {

@@ -35,6 +35,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
+	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/common"
 	"github.com/bangumi/server/internal/web/handler/subject"
 	"github.com/bangumi/server/internal/web/rate"
@@ -63,6 +64,7 @@ func New(
 	log *zap.Logger,
 	subject subject.Subject,
 	engine frontend.TemplateEngine,
+	character character.Character,
 	oauth oauth.Manager,
 ) (Handler, error) {
 	validate, trans, err := getValidator()
@@ -74,6 +76,7 @@ func New(
 		Subject:              subject,
 		Common:               common,
 		app:                  app,
+		Character:            character,
 		cfg:                  cfg,
 		cache:                cache,
 		log:                  log.Named("web.handler"),
@@ -100,6 +103,7 @@ func New(
 type Handler struct {
 	common.Common
 	Subject              subject.Subject
+	Character            character.Character
 	app                  app.App
 	p                    domain.PersonService
 	a                    domain.AuthService

@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package character
 
 import (
 	"errors"
@@ -20,13 +20,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
+func (h Character) GetRelatedPersons(c *fiber.Ctx) error {
 	u := h.GetHTTPAccessor(c)
 	id, err := req.ParseCharacterID(c.Params("id"))
 	if err != nil {
@@ -38,13 +38,26 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-
 		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentCharacter, model.TopicID(id))
+	casts, err := h.person.GetCharacterRelated(c.Context(), id)
 	if err != nil {
-		return err
+		return errgo.Wrap(err, "repo.GetCharacterRelated")
 	}
-	return res.JSON(c, pagedComments)
+
+	var response = make([]res.CharacterRelatedPerson, len(casts))
+	for i, cast := range casts {
+		response[i] = res.CharacterRelatedPerson{
+			ID:            cast.Person.ID,
+			Name:          cast.Person.Name,
+			Type:          cast.Person.Type,
+			Images:        res.PersonImage(cast.Subject.Image),
+			SubjectID:     cast.Subject.ID,
+			SubjectName:   cast.Subject.Name,
+			SubjectNameCn: cast.Subject.NameCN,
+		}
+	}
+
+	return c.JSON(response)
 }

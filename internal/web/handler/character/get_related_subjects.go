@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package character
 
 import (
 	"errors"
@@ -20,31 +20,50 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
+func (h Character) GetRelatedSubjects(c *fiber.Ctx) error {
 	u := h.GetHTTPAccessor(c)
 	id, err := req.ParseCharacterID(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	_, err = h.app.Query.GetCharacterNoRedirect(c.Context(), u.Auth, id)
+	_, relations, err := h.app.Query.GetCharacterRelatedSubjects(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-
-		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
+		return errgo.Wrap(err, "repo.GetCharacterRelated")
 	}
 
-	pagedComments, err := h.listComments(c, domain.CommentCharacter, model.TopicID(id))
-	if err != nil {
-		return err
+	var response = make([]res.CharacterRelatedSubject, len(relations))
+	for i, relation := range relations {
+		subject := relation.Subject
+		response[i] = res.CharacterRelatedSubject{
+			ID:     subject.ID,
+			Name:   subject.Name,
+			NameCn: subject.NameCN,
+			Staff:  characterStaffString(relation.TypeID),
+			Image:  res.SubjectImage(subject.Image).Large,
+		}
 	}
-	return res.JSON(c, pagedComments)
+
+	return c.JSON(response)
+}
+
+func characterStaffString(i uint8) string {
+	switch i {
+	case 1:
+		return "主角"
+	case 2:
+		return "配角"
+	case 3:
+		return "客串"
+	}
+
+	return ""
 }

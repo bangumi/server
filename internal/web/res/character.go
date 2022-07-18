@@ -33,3 +33,9 @@ type CharacterV0 struct {
 	Type      uint8             `json:"type"`
 	NSFW      bool              `json:"nsfw"`
 }
+
+//nolint:gochecknoglobals
+var GenderMap = map[uint8]string{
+	1: "male",
+	2: "female",
+}
