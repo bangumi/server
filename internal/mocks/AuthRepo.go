@@ -119,14 +119,14 @@ func (_c *AuthRepo_DeleteAccessToken_Call) Return(_a0 bool, _a1 error) *AuthRepo
 }
 
 // GetByEmail provides a mock function with given fields: ctx, email
-func (_m *AuthRepo) GetByEmail(ctx context.Context, email string) (domain.Auth, []byte, error) {
+func (_m *AuthRepo) GetByEmail(ctx context.Context, email string) (domain.AuthUserInfo, []byte, error) {
 	ret := _m.Called(ctx, email)
 
-	var r0 domain.Auth
-	if rf, ok := ret.Get(0).(func(context.Context, string) domain.Auth); ok {
+	var r0 domain.AuthUserInfo
+	if rf, ok := ret.Get(0).(func(context.Context, string) domain.AuthUserInfo); ok {
 		r0 = rf(ctx, email)
 	} else {
-		r0 = ret.Get(0).(domain.Auth)
+		r0 = ret.Get(0).(domain.AuthUserInfo)
 	}
 
 	var r1 []byte
@@ -167,20 +167,20 @@ func (_c *AuthRepo_GetByEmail_Call) Run(run func(ctx context.Context, email stri
 	return _c
 }
 
-func (_c *AuthRepo_GetByEmail_Call) Return(_a0 domain.Auth, _a1 []byte, _a2 error) *AuthRepo_GetByEmail_Call {
+func (_c *AuthRepo_GetByEmail_Call) Return(_a0 domain.AuthUserInfo, _a1 []byte, _a2 error) *AuthRepo_GetByEmail_Call {
 	_c.Call.Return(_a0, _a1, _a2)
 	return _c
 }
 
 // GetByToken provides a mock function with given fields: ctx, token
-func (_m *AuthRepo) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
+func (_m *AuthRepo) GetByToken(ctx context.Context, token string) (domain.AuthUserInfo, error) {
 	ret := _m.Called(ctx, token)
 
-	var r0 domain.Auth
-	if rf, ok := ret.Get(0).(func(context.Context, string) domain.Auth); ok {
+	var r0 domain.AuthUserInfo
+	if rf, ok := ret.Get(0).(func(context.Context, string) domain.AuthUserInfo); ok {
 		r0 = rf(ctx, token)
 	} else {
-		r0 = ret.Get(0).(domain.Auth)
+		r0 = ret.Get(0).(domain.AuthUserInfo)
 	}
 
 	var r1 error
@@ -212,7 +212,7 @@ func (_c *AuthRepo_GetByToken_Call) Run(run func(ctx context.Context, token stri
 	return _c
 }
 
-func (_c *AuthRepo_GetByToken_Call) Return(_a0 domain.Auth, _a1 error) *AuthRepo_GetByToken_Call {
+func (_c *AuthRepo_GetByToken_Call) Return(_a0 domain.AuthUserInfo, _a1 error) *AuthRepo_GetByToken_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

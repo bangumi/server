@@ -241,7 +241,7 @@ func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 func MockAuthRepo(m domain.AuthRepo) fx.Option {
 	if m == nil {
 		mocker := &mocks.AuthRepo{}
-		mocker.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
+		mocker.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.AuthUserInfo{}, nil)
 		mocker.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(domain.Permission{}, nil)
 
 		m = mocker

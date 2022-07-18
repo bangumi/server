@@ -25,7 +25,7 @@ import (
 // AuthRepo presents an authorization.
 type AuthRepo interface {
 	// GetByToken return an authorized user by a valid access token.
-	GetByToken(ctx context.Context, token string) (Auth, error)
+	GetByToken(ctx context.Context, token string) (AuthUserInfo, error)
 	GetPermission(ctx context.Context, groupID uint8) (Permission, error)
 
 	CreateAccessToken(
@@ -36,8 +36,14 @@ type AuthRepo interface {
 	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
 
 	// GetByEmail return (Auth, HashedPassword, error)
-	GetByEmail(ctx context.Context, email string) (Auth, []byte, error)
+	GetByEmail(ctx context.Context, email string) (AuthUserInfo, []byte, error)
 	GetTokenByID(ctx context.Context, id uint32) (AccessToken, error)
+}
+
+type AuthUserInfo struct {
+	RegTime time.Time
+	ID      model.UserID
+	GroupID model.UserGroupID
 }
 
 // Auth is the basic authorization represent a user.
@@ -64,11 +70,8 @@ func (u Auth) RegisteredLongerThan(t time.Duration) bool {
 }
 
 type AuthService interface {
-	GetByID(ctx context.Context, userID model.UserID) (Auth, error)
 	GetByToken(ctx context.Context, token string) (Auth, error)
-
-	GetByTokenWithCache(ctx context.Context, token string) (Auth, error)
-	GetByIDWithCache(ctx context.Context, userID model.UserID) (Auth, error)
+	GetByID(ctx context.Context, userID model.UserID) (Auth, error)
 
 	ComparePassword(hashed []byte, password string) (bool, error)
 
@@ -81,7 +84,7 @@ type AuthService interface {
 	ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error)
 	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
 
-	GetPermission(ctx context.Context, id model.UserGroupID) (Permission, error)
+	// GetPermission(ctx context.Context, id model.UserGroupID) (Permission, error)
 }
 
 type AccessToken struct {

@@ -104,7 +104,7 @@ func TestHandler_GetCollection_other_user(t *testing.T) {
 	const subjectID model.SubjectID = 9
 
 	a := mocks.NewAuthService(t)
-	a.EXPECT().GetByTokenWithCache(mock.Anything, "v").Return(domain.Auth{ID: userID + 1}, nil)
+	a.EXPECT().GetByToken(mock.Anything, "v").Return(domain.Auth{ID: userID + 1}, nil)
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)

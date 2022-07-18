@@ -57,7 +57,7 @@ func (h Handler) SessionAuthMiddleware(c *fiber.Ctx) error {
 			return res.InternalError(c, err, "failed to read session, please try clear your browser cookies and re-try")
 		}
 
-		auth, err := h.a.GetByIDWithCache(c.Context(), s.UserID)
+		auth, err := h.a.GetByID(c.Context(), s.UserID)
 		if err != nil {
 			return h.InternalError(c, err, "failed to user with permission", a.LogRequestID(), log.UserID(s.UserID))
 		}
@@ -93,13 +93,13 @@ func (h Handler) AccessTokenAuthMiddleware(ctx *fiber.Ctx) error {
 
 		var auth domain.Auth
 		var err error
-		if auth, err = h.a.GetByTokenWithCache(ctx.Context(), token); err != nil {
+		if auth, err = h.a.GetByToken(ctx.Context(), token); err != nil {
 			if errors.Is(err, domain.ErrNotFound) || errors.Is(err, session.ErrExpired) {
 				cookie.Clear(ctx, session.CookieKey)
 				return res.Unauthorized("access token has been expired or doesn't exist")
 			}
 
-			return errgo.Wrap(err, "auth.GetByTokenWithCache")
+			return errgo.Wrap(err, "auth.GetByToken")
 		}
 
 		a.fillAuth(auth)

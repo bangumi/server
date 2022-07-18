@@ -80,7 +80,7 @@ func TestHandler_GetCharacter_NSFW(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.Auth{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
+		Return(domain.AuthUserInfo{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
 		Return(domain.Permission{}, nil)
 

@@ -36,7 +36,7 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 	u.EXPECT().GetByID(mock.Anything, uid).Return(model.User{ID: uid}, nil)
 
 	a := mocks.NewAuthRepo(t)
-	a.EXPECT().GetByToken(mock.Anything, "token").Return(domain.Auth{ID: uid}, nil)
+	a.EXPECT().GetByToken(mock.Anything, "token").Return(domain.AuthUserInfo{ID: uid}, nil)
 	a.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(domain.Permission{}, nil)
 
 	app := test.GetWebApp(t,

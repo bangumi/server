@@ -44,42 +44,42 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (domain.Auth, []byte, error) {
+func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (domain.AuthUserInfo, []byte, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Email.Eq(email)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.Auth{}, nil, domain.ErrNotFound
+			return domain.AuthUserInfo{}, nil, domain.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
-		return domain.Auth{}, nil, errgo.Wrap(err, "gorm")
+		return domain.AuthUserInfo{}, nil, errgo.Wrap(err, "gorm")
 	}
 
-	return domain.Auth{
+	return domain.AuthUserInfo{
 		RegTime: time.Unix(u.Regdate, 0),
 		ID:      u.ID,
 		GroupID: u.Groupid,
 	}, u.PasswordCrypt, nil
 }
 
-func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
+func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.AuthUserInfo, error) {
 	access, err := m.q.AccessToken.WithContext(ctx).
 		Where(m.q.AccessToken.AccessToken.Eq(token), m.q.AccessToken.ExpiredAt.Gte(time.Now())).
 		First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.Auth{}, domain.ErrNotFound
+			return domain.AuthUserInfo{}, domain.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
 
-		return domain.Auth{}, errgo.Wrap(err, "gorm")
+		return domain.AuthUserInfo{}, errgo.Wrap(err, "gorm")
 	}
 
 	id, err := gstr.ParseUint32(access.UserID)
 	if err != nil || id == 0 {
 		m.log.Error("wrong UserID in OAuth Access table", zap.String("user_id", access.UserID))
-		return domain.Auth{}, errgo.Wrap(err, "parsing user id")
+		return domain.AuthUserInfo{}, errgo.Wrap(err, "parsing user id")
 	}
 
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(model.UserID(id))).First()
@@ -88,15 +88,15 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.Auth, e
 			m.log.Error("can't find user of access token",
 				zap.String("token", token), zap.String("uid", access.UserID))
 
-			return domain.Auth{}, domain.ErrNotFound
+			return domain.AuthUserInfo{}, domain.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
 
-		return domain.Auth{}, errgo.Wrap(err, "gorm")
+		return domain.AuthUserInfo{}, errgo.Wrap(err, "gorm")
 	}
 
-	return domain.Auth{
+	return domain.AuthUserInfo{
 		RegTime: time.Unix(u.Regdate, 0),
 		ID:      u.ID,
 		GroupID: u.Groupid,

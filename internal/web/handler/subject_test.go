@@ -39,7 +39,7 @@ func TestHappyPath(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.Auth{RegTime: time.Unix(1e10, 0)}, nil)
+		Return(domain.AuthUserInfo{RegTime: time.Unix(1e10, 0)}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
 		Return(domain.Permission{}, nil)
 
@@ -70,7 +70,7 @@ func TestNSFW_200(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.Auth{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
+		Return(domain.AuthUserInfo{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
 		Return(domain.Permission{}, nil)
 
@@ -94,7 +94,7 @@ func TestNSFW_404(t *testing.T) {
 	m.EXPECT().Get(mock.Anything, model.SubjectID(7)).Return(model.Subject{NSFW: true}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.AuthUserInfo{}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
 		Return(domain.Permission{}, nil)
 
