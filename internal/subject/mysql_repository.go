@@ -26,7 +26,6 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
@@ -220,9 +219,8 @@ func (r mysqlRepo) GetActors(
 	ctx context.Context,
 	subjectID model.SubjectID,
 	characterIDs ...model.CharacterID,
-) (map[model.CharacterID][]model.Person, error) {
+) (map[model.CharacterID][]model.PersonID, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
-		Preload(r.q.Cast.Person.Fields).
 		Where(r.q.Cast.CharacterID.In(slice.ToValuer(characterIDs)...), r.q.Cast.SubjectID.Eq(subjectID)).
 		Order(r.q.Cast.PersonID).
 		Find()
@@ -231,10 +229,10 @@ func (r mysqlRepo) GetActors(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var results = make(map[model.CharacterID][]model.Person, len(relations))
+	var results = make(map[model.CharacterID][]model.PersonID, len(relations))
 	for _, relation := range relations {
 		// TODO: should pre-alloc a big slice and split it as results.
-		results[relation.CharacterID] = append(results[relation.CharacterID], person.ConvertDao(&relation.Person))
+		results[relation.CharacterID] = append(results[relation.CharacterID], relation.PersonID)
 	}
 
 	return results, nil

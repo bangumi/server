@@ -44,7 +44,6 @@ var errTranslationNotFound = errors.New("failed to find translation for zh")
 
 func New(
 	cfg config.AppConfig,
-	s domain.SubjectService,
 	c domain.CharacterService,
 	p domain.PersonService,
 	a domain.AuthService,
@@ -80,7 +79,6 @@ func New(
 		rateLimit:            rateLimit,
 		session:              session,
 		p:                    p,
-		s:                    s,
 		a:                    a,
 		u:                    user,
 		c:                    c,
@@ -111,7 +109,6 @@ type Handler struct {
 	u                    domain.UserRepo
 	rateLimit            rate.Manager
 	i                    domain.IndexRepo
-	s                    domain.SubjectService
 	validatorTranslation ut.Translator
 	g                    domain.GroupRepo
 	cache                cache.Cache

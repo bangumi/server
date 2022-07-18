@@ -73,3 +73,32 @@ func ToValuer[T driver.Valuer](in []T) []driver.Valuer {
 
 	return s
 }
+
+func Reduce[T any](in [][]T) []T {
+	var c int
+	for _, ts := range in {
+		c += len(ts)
+	}
+
+	var out = make([]T, 0, c)
+	for _, ts := range in {
+		out = append(out, ts...)
+	}
+
+	return out
+}
+
+func Unique[T comparable](in []T) []T {
+	var m = make(map[T]struct{}, len(in))
+
+	for _, t := range in {
+		m[t] = struct{}{}
+	}
+
+	var out = make([]T, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+
+	return out
+}

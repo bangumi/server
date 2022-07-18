@@ -276,9 +276,9 @@ func (h Handler) getSubjectRelatedCharacters(c *fiber.Ctx, subjectID model.Subje
 
 	var actors map[model.CharacterID][]model.Person
 	if len(characterIDs) != 0 {
-		actors, err = h.s.GetActors(c.Context(), subjectID, characterIDs...)
+		actors, err = h.app.Query.GetActors(c.Context(), subjectID, characterIDs...)
 		if err != nil {
-			return errgo.Wrap(err, "PersonRepo.GetActors")
+			return errgo.Wrap(err, "query.GetActors")
 		}
 	}
 

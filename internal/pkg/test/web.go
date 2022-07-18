@@ -39,7 +39,6 @@ import (
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
@@ -89,7 +88,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		fx.Supply(httpClient),
 
 		fx.Provide(
-			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
+			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService,
 			person.NewService, frontend.NewTemplateEngine,
 		),
 

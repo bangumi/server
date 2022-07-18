@@ -31,19 +31,7 @@ type SubjectRepo interface {
 
 	GetActors(
 		ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
-	) (map[model.CharacterID][]model.Person, error)
-}
-
-type SubjectService interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id model.SubjectID) (model.Subject, error)
-	GetByIDs(ctx context.Context, ids ...model.SubjectID) (map[model.SubjectID]model.Subject, error)
-
-	// GetActors ...
-	// Deprecated: move this to app/query.Query
-	GetActors(
-		ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
-	) (map[model.CharacterID][]model.Person, error)
+	) (map[model.CharacterID][]model.PersonID, error)
 }
 
 type SubjectPersonRelation struct {

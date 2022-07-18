@@ -126,7 +126,7 @@ func (q Query) getSubject(ctx context.Context, id model.SubjectID) (model.Subjec
 			return r, domain.ErrSubjectNotFound
 		}
 
-		return r, errgo.Wrap(err, "SubjectService.Get")
+		return r, errgo.Wrap(err, "SubjectRepo.Get")
 	}
 
 	if e := q.cache.Set(ctx, key, r, time.Minute); e != nil {

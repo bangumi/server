@@ -29,7 +29,6 @@ tasks:
       - IndexRepo
       - RevisionRepo
       - SubjectRepo
-      - SubjectService
       - UserRepo
       - EpisodeRepo
       - PersonRepo
@@ -201,18 +200,6 @@ tasks:
         vars:
           SRC_DIR: ./internal/domain
           INTERFACE: "SubjectRepo"
-
-  "SubjectService":
-    sources:
-      - internal/domain/subject.go
-      - ./internal/pkg/tools/go.mod
-    generates:
-      - internal/mocks/SubjectService.go
-    cmds:
-      - task: base-mock
-        vars:
-          SRC_DIR: ./internal/domain
-          INTERFACE: "SubjectService"
 
   "UserRepo":
     sources:
