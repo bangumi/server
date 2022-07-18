@@ -37,6 +37,7 @@ import (
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/common"
+	"github.com/bangumi/server/internal/web/handler/person"
 	"github.com/bangumi/server/internal/web/handler/subject"
 	"github.com/bangumi/server/internal/web/handler/user"
 	"github.com/bangumi/server/internal/web/rate"
@@ -61,6 +62,7 @@ func New(
 	session session.Manager,
 	rateLimit rate.Manager,
 	userHandler user.User,
+	personHandler person.Person,
 	log *zap.Logger,
 	subject subject.Subject,
 	engine frontend.TemplateEngine,
@@ -78,6 +80,7 @@ func New(
 		app:                  app,
 		User:                 userHandler,
 		Character:            character,
+		Person:               personHandler,
 		cfg:                  cfg,
 		cache:                cache,
 		log:                  log.Named("web.handler"),
@@ -93,10 +96,9 @@ func New(
 		g:                    g,
 		v:                    validate,
 		validatorTranslation: trans,
-
-		oauth:    oauth,
-		template: engine,
-		buffPool: buffer.NewPool(),
+		oauth:                oauth,
+		template:             engine,
+		buffPool:             buffer.NewPool(),
 	}, nil
 }
 
@@ -104,6 +106,7 @@ type Handler struct {
 	common.Common
 	Subject              subject.Subject
 	Character            character.Character
+	Person               person.Person
 	app                  app.App
 	User                 user.User
 	p                    domain.PersonService

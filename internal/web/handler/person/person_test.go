@@ -12,7 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler_test
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>
+
+package person_test
 
 import (
 	"net/http"
@@ -27,7 +41,7 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func TestHandler_GetPerson_HappyPath(t *testing.T) {
+func TestPerson_Get(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPersonRepo(t)
 	m.EXPECT().Get(mock.Anything, model.PersonID(7)).Return(model.Person{ID: 7}, nil)
@@ -39,7 +53,7 @@ func TestHandler_GetPerson_HappyPath(t *testing.T) {
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
-func TestHandler_GetPerson_Redirect(t *testing.T) {
+func TestPerson_Get_Redirect(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPersonRepo(t)
 	m.EXPECT().Get(mock.Anything, model.PersonID(7)).Return(model.Person{ID: 7}, nil)
@@ -51,7 +65,7 @@ func TestHandler_GetPerson_Redirect(t *testing.T) {
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
-func TestHandler_GetPersonImage_302(t *testing.T) {
+func TestPerson_GetImage(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPersonRepo(t)
 	m.EXPECT().Get(mock.Anything, model.PersonID(1)).Return(model.Person{ID: 1, Image: "temp"}, nil)
@@ -76,7 +90,7 @@ func TestHandler_GetPersonImage_302(t *testing.T) {
 	}
 }
 
-func TestHandler_GetPersonImage_400(t *testing.T) {
+func TestPerson_GetImage_400(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPersonRepo(t)
 	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Person{Image: "temp"}, nil)
