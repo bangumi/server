@@ -276,7 +276,6 @@ func main() {
 		gen.FieldType("ep_stt_uid", userIDTypeString),
 		gen.FieldRename("ep_stt_uid", "userID"),
 		gen.FieldRename("ep_stt_lasttouch", "UpdatedTime"),
-		// replace this with `[]byte` after https://github.com/go-gorm/gen/issues/496 is fixed
 		gen.FieldType("ep_stt_status", "[]byte"),
 	))
 
