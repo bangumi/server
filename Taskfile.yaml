@@ -89,7 +89,6 @@ tasks:
     deps:
       - gorm
       - mock
-      - "gen:generic"
 
   mock:
     desc: Generate Mocks.
