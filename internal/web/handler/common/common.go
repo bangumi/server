@@ -21,7 +21,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/web/handler/accesor"
+	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -56,8 +56,8 @@ type Common struct {
 	validatorTranslation ut.Translator
 }
 
-func (h Common) GetHTTPAccessor(c *fiber.Ctx) *accesor.Accessor {
-	u, ok := c.Context().UserValue(ctxkey.User).(*accesor.Accessor)
+func (h Common) GetHTTPAccessor(c *fiber.Ctx) *accessor.Accessor {
+	u, ok := c.Context().UserValue(ctxkey.User).(*accessor.Accessor)
 	if !ok {
 		h.log.Error(
 			"failed to get http accessor, expecting *accessor got another type instead",

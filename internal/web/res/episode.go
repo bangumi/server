@@ -32,3 +32,20 @@ type Episode struct {
 	Type        model.EpType    `json:"type"`
 	Disc        uint8           `json:"disc"`
 }
+
+func ConvertModelEpisode(s model.Episode) Episode {
+	return Episode{
+		ID:          s.ID,
+		Name:        s.Name,
+		NameCN:      s.NameCN,
+		Ep:          s.Ep,
+		Sort:        s.Sort,
+		Duration:    s.Duration,
+		Airdate:     s.Airdate,
+		SubjectID:   s.SubjectID,
+		Description: s.Description,
+		Comment:     s.Comment,
+		Type:        s.Type,
+		Disc:        s.Disc,
+	}
+}

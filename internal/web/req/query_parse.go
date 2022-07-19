@@ -156,3 +156,23 @@ func ParseCollectionType(s string) (model.SubjectCollection, error) {
 
 	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")
 }
+
+func ParseEpTypeOptional(s string) (*model.EpType, error) {
+	if s == "" {
+		return nil, nil //nolint:nilnil
+	}
+
+	v, err := gstr.ParseUint8(s)
+	if err != nil {
+		return nil, res.BadRequest("wrong value for query `type`")
+	}
+
+	switch v {
+	case model.EpTypeNormal, model.EpTypeSpecial,
+		model.EpTypeOpening, model.EpTypeEnding,
+		model.EpTypeMad, model.EpTypeOther:
+		return &v, nil
+	}
+
+	return nil, res.BadRequest(strconv.Quote(s) + " is not valid episode type")
+}
