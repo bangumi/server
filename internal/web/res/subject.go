@@ -52,24 +52,6 @@ type SubjectV0 struct {
 	TypeID        model.SubjectType     `json:"type"`
 }
 
-func (s SubjectV0) Slim() SlimSubjectV0 {
-	return SlimSubjectV0{
-		ID:              s.ID,
-		Name:            s.Name,
-		NameCN:          s.NameCN,
-		Date:            s.Date,
-		Tags:            slice.First(s.Tags, 10),
-		ShortSummary:    gstr.First(s.Summary, defaultShortSummaryLength),
-		Image:           s.Image,
-		Eps:             s.Eps,
-		Volumes:         s.Volumes,
-		CollectionTotal: s.Collection.Sum(),
-		Rank:            s.Rating.Rank,
-		Score:           s.Rating.Score,
-		Type:            s.TypeID,
-	}
-}
-
 type SlimSubjectV0 struct {
 	Date            *string           `json:"date"`
 	Image           SubjectImages     `json:"images"`
@@ -95,7 +77,7 @@ func ToSlimSubjectV0(s model.Subject) SlimSubjectV0 {
 	return SlimSubjectV0{
 		ID:     s.ID,
 		Name:   s.Name,
-		NameCN: s.Name,
+		NameCN: s.NameCN,
 		Date:   date,
 		Tags: slice.Map(slice.First(s.Tags, 10), func(item model.Tag) SubjectTag {
 			return SubjectTag{
