@@ -43,7 +43,7 @@ func (c Command) UpdateEpisodeCollection(
 	ctx context.Context,
 	userID model.UserID,
 	episodeID model.EpisodeID,
-	collectionType model.EpisodeCollectionType,
+	collectionType model.EpisodeCollection,
 ) error {
 	episode, err := c.episode.Get(ctx, episodeID)
 	if err != nil {

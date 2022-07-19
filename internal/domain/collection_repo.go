@@ -26,7 +26,7 @@ type CollectionRepo interface {
 		ctx context.Context,
 		userID model.UserID,
 		subjectType model.SubjectType,
-		collectionType model.SubjectCollectionType,
+		collectionType model.SubjectCollection,
 		showPrivate bool,
 	) (int64, error)
 
@@ -34,21 +34,21 @@ type CollectionRepo interface {
 		ctx context.Context,
 		userID model.UserID,
 		subjectType model.SubjectType,
-		collectionType model.SubjectCollectionType,
+		collectionType model.SubjectCollection,
 		showPrivate bool,
 		limit, offset int,
-	) ([]model.SubjectCollection, error)
+	) ([]model.UserSubjectCollection, error)
 
 	GetSubjectCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-	) (model.SubjectCollection, error)
+	) (model.UserSubjectCollection, error)
 
 	UpdateEpisodeCollection(
 		ctx context.Context,
 		userID model.UserID,
 		subjectID model.SubjectID,
 		episodeID model.EpisodeID,
-		collectionType model.EpisodeCollectionType, updatedAt time.Time,
+		collectionType model.EpisodeCollection, updatedAt time.Time,
 	) error
 
 	// UpdateSubjectCollection(
@@ -57,5 +57,5 @@ type CollectionRepo interface {
 
 	GetEpisodeCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-	) (model.EpisodeCollection, error)
+	) (model.UserEpisodeCollection, error)
 }

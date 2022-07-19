@@ -17,8 +17,6 @@ package collection
 // handle php serialization
 
 import (
-	"errors"
-
 	"github.com/trim21/go-phpserialize"
 
 	"github.com/bangumi/server/internal/model"
@@ -26,11 +24,9 @@ import (
 )
 
 type mysqlEpCollectionItem struct {
-	EpisodeID model.EpisodeID             `php:"eid,string"`
-	Type      model.EpisodeCollectionType `php:"type"`
+	EpisodeID model.EpisodeID         `php:"eid,string"`
+	Type      model.EpisodeCollection `php:"type"`
 }
-
-var errEpisodeInvalid = errors.New("number is not valid as episode ID")
 
 type mysqlEpCollection = map[model.EpisodeID]mysqlEpCollectionItem
 

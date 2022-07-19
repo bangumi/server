@@ -30,8 +30,8 @@ func TestEpisodeCollection(t *testing.T) {
 
 	require.NoError(t, v.RegisterValidation(req.EpisodeCollectionTagName, req.EpisodeCollection))
 
-	require.Error(t, v.Var(model.EpisodeCollectionType(4), req.EpisodeCollectionTagName))
-	require.Error(t, v.Var(model.EpisodeCollectionType(0), req.EpisodeCollectionTagName+",required"))
+	require.Error(t, v.Var(model.EpisodeCollection(4), req.EpisodeCollectionTagName))
+	require.Error(t, v.Var(model.EpisodeCollection(0), req.EpisodeCollectionTagName+",required"))
 	require.NoError(t, v.Var(model.EpisodeCollectionDone, req.EpisodeCollectionTagName))
 	require.NoError(t, v.Var(model.EpisodeCollectionDropped, req.EpisodeCollectionTagName))
 	require.NoError(t, v.Var(model.EpisodeCollectionWish, req.EpisodeCollectionTagName))

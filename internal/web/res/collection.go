@@ -22,20 +22,20 @@ import (
 )
 
 type SubjectCollection struct {
-	UpdatedAt   time.Time                   `json:"updated_at"`
-	Comment     *string                     `json:"comment"`
-	Tags        []string                    `json:"tags"`
-	Subject     SlimSubjectV0               `json:"subject"`
-	SubjectID   model.SubjectID             `json:"subject_id"`
-	VolStatus   uint32                      `json:"vol_status"`
-	EpStatus    uint32                      `json:"ep_status"`
-	SubjectType uint8                       `json:"subject_type"`
-	Type        model.SubjectCollectionType `json:"type"`
-	Rate        uint8                       `json:"rate"`
-	Private     bool                        `json:"private"`
+	UpdatedAt   time.Time               `json:"updated_at"`
+	Comment     *string                 `json:"comment"`
+	Tags        []string                `json:"tags"`
+	Subject     SlimSubjectV0           `json:"subject"`
+	SubjectID   model.SubjectID         `json:"subject_id"`
+	VolStatus   uint32                  `json:"vol_status"`
+	EpStatus    uint32                  `json:"ep_status"`
+	SubjectType uint8                   `json:"subject_type"`
+	Type        model.SubjectCollection `json:"type"`
+	Rate        uint8                   `json:"rate"`
+	Private     bool                    `json:"private"`
 }
 
-func ConvertModelSubjectCollection(c model.SubjectCollection, subject SlimSubjectV0) SubjectCollection {
+func ConvertModelSubjectCollection(c model.UserSubjectCollection, subject SlimSubjectV0) SubjectCollection {
 	return SubjectCollection{
 		SubjectID:   c.SubjectID,
 		SubjectType: c.SubjectType,

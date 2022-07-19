@@ -56,7 +56,7 @@ func TestUser_ListCollection(t *testing.T) {
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().ListSubjectCollection(mock.Anything, userID, mock.Anything, mock.Anything, mock.Anything, 10, 0).
-		Return([]model.SubjectCollection{{SubjectID: subjectID}}, nil)
+		Return([]model.UserSubjectCollection{{SubjectID: subjectID}}, nil)
 	c.EXPECT().CountSubjectCollections(mock.Anything, userID, mock.Anything, mock.Anything, mock.Anything).
 		Return(1, nil)
 
@@ -92,7 +92,7 @@ func TestUser_GetSubjectCollection(t *testing.T) {
 	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).
-		Return(model.SubjectCollection{SubjectID: subjectID}, nil)
+		Return(model.UserSubjectCollection{SubjectID: subjectID}, nil)
 
 	s := mocks.NewSubjectRepo(t)
 	s.EXPECT().Get(mock.Anything, subjectID).Return(model.Subject{
@@ -125,7 +125,7 @@ func TestUser_ListSubjectCollection_other_user(t *testing.T) {
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).
-		Return(model.SubjectCollection{SubjectID: subjectID, Private: true}, nil)
+		Return(model.UserSubjectCollection{SubjectID: subjectID, Private: true}, nil)
 
 	app := test.GetWebApp(t, test.Mock{UserRepo: m, AuthService: a, CollectionRepo: c})
 

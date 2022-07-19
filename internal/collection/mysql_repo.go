@@ -50,7 +50,7 @@ func (r mysqlRepo) CountSubjectCollections(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType model.SubjectCollectionType,
+	collectionType model.SubjectCollection,
 	showPrivate bool,
 ) (int64, error) {
 	q := r.q.SubjectCollection.WithContext(ctx).
@@ -80,10 +80,10 @@ func (r mysqlRepo) ListSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType model.SubjectCollectionType,
+	collectionType model.SubjectCollection,
 	showPrivate bool,
 	limit, offset int,
-) ([]model.SubjectCollection, error) {
+) ([]model.UserSubjectCollection, error) {
 	q := r.q.SubjectCollection.WithContext(ctx).
 		Order(r.q.SubjectCollection.UpdatedTime.Desc()).
 		Where(r.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
@@ -106,9 +106,9 @@ func (r mysqlRepo) ListSubjectCollection(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var results = make([]model.SubjectCollection, len(collections))
+	var results = make([]model.UserSubjectCollection, len(collections))
 	for i, c := range collections {
-		results[i] = model.SubjectCollection{
+		results[i] = model.UserSubjectCollection{
 			UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
 			Comment:     c.Comment,
 			Tags:        gstr.Split(c.Tag, " "),
@@ -117,7 +117,7 @@ func (r mysqlRepo) ListSubjectCollection(
 			SubjectID:   c.SubjectID,
 			EpStatus:    c.EpStatus,
 			VolStatus:   c.VolStatus,
-			Type:        model.SubjectCollectionType(c.Type),
+			Type:        model.SubjectCollection(c.Type),
 			Private:     c.Private != model.CollectPrivacyNone,
 		}
 	}
@@ -127,19 +127,19 @@ func (r mysqlRepo) ListSubjectCollection(
 
 func (r mysqlRepo) GetSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-) (model.SubjectCollection, error) {
+) (model.UserSubjectCollection, error) {
 	c, err := r.q.SubjectCollection.WithContext(ctx).
 		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.SubjectCollection{}, domain.ErrNotFound
+			return model.UserSubjectCollection{}, domain.ErrNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
-		return model.SubjectCollection{}, errgo.Wrap(err, "dal")
+		return model.UserSubjectCollection{}, errgo.Wrap(err, "dal")
 	}
 
-	return model.SubjectCollection{
+	return model.UserSubjectCollection{
 		UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
 		Comment:     c.Comment,
 		Tags:        gstr.Split(c.Tag, " "),
@@ -148,7 +148,7 @@ func (r mysqlRepo) GetSubjectCollection(
 		SubjectID:   c.SubjectID,
 		EpStatus:    c.EpStatus,
 		VolStatus:   c.VolStatus,
-		Type:        model.SubjectCollectionType(c.Type),
+		Type:        model.SubjectCollection(c.Type),
 		Private:     c.Private != model.CollectPrivacyNone,
 	}, nil
 }
@@ -159,7 +159,7 @@ func (r mysqlRepo) createEpisodeCollection(
 	userID model.UserID,
 	subjectID model.SubjectID,
 	episodeID model.EpisodeID,
-	collectionType model.EpisodeCollectionType,
+	collectionType model.EpisodeCollection,
 	updatedAt time.Time,
 ) error {
 	var e = make(mysqlEpCollection, 1)
@@ -190,7 +190,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 	userID model.UserID,
 	subjectID model.SubjectID,
 	episodeID model.EpisodeID,
-	collectionType model.EpisodeCollectionType,
+	collectionType model.EpisodeCollection,
 	updatedAt time.Time,
 ) error {
 	updateTime := uint32(updatedAt.Unix())
@@ -232,7 +232,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 			tx.SubjectCollection.EpStatus.Value(countWatchedEp(e)), tx.SubjectCollection.UpdatedTime.Value(updateTime),
 		)
 		if err != nil {
-			return errgo.Wrap(err, "SubjectCollection.UpdateSimple")
+			return errgo.Wrap(err, "UserSubjectCollection.UpdateSimple")
 		}
 
 		_, err = tx.EpCollection.WithContext(ctx).Where(where...).
@@ -258,7 +258,7 @@ func countWatchedEp(m mysqlEpCollection) uint32 {
 
 func (r mysqlRepo) GetEpisodeCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-) (model.EpisodeCollection, error) {
+) (model.UserEpisodeCollection, error) {
 	d, err := r.q.EpCollection.WithContext(ctx).
 		Where(r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)).First()
 	if err != nil {
@@ -277,7 +277,7 @@ func (r mysqlRepo) GetEpisodeCollection(
 		return nil, err
 	}
 
-	var result = make(model.EpisodeCollection, len(e))
+	var result = make(model.UserEpisodeCollection, len(e))
 	for id, item := range e {
 		result[id] = model.EpisodeCollectionItem{
 			ID:   item.EpisodeID,

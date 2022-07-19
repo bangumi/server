@@ -38,7 +38,7 @@ const (
 	CollectPrivacyBan = 2
 )
 
-type SubjectCollection struct {
+type UserSubjectCollection struct {
 	UpdatedAt   time.Time
 	Comment     string
 	Tags        []string
@@ -47,13 +47,13 @@ type SubjectCollection struct {
 	SubjectID   SubjectID
 	SubjectType uint8
 	Rate        uint8
-	Type        SubjectCollectionType
+	Type        SubjectCollection
 	Private     bool
 }
 
 type EpisodeCollectionItem struct {
 	ID   EpisodeID
-	Type EpisodeCollectionType
+	Type EpisodeCollection
 }
 
-type EpisodeCollection map[EpisodeID]EpisodeCollectionItem
+type UserEpisodeCollection map[EpisodeID]EpisodeCollectionItem
