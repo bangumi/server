@@ -4,7 +4,7 @@
 # options for analysis running
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 2m
+  timeout: 5m
 
   # exit code when at least one issue was found, default is 1
   issues-exit-code: 1
@@ -180,7 +180,7 @@ linters-settings:
       - pkg: "github.com/go-playground/universal-translator"
         alias: ut
       - pkg: "github.com/go-playground/validator/v10/translations/zh"
-        alias: zh_translations
+        alias: zhTranslations
 
   lll:
     # max line length, lines longer will be reported. Default is 120.
@@ -254,6 +254,7 @@ linters-settings:
       - "func github.com/bangumi/server/internal/web/res.BadRequest("
       - "func github.com/bangumi/server/internal/web/res.JSON("
       - "func (github.com/bangumi/server/internal/web/handler/common.Common)."
+      - "func (*github.com/bangumi/server/internal/dal/query.Query).Transaction("
     ignoreSigRegexps:
       - 'func github.com/bangumi/server/internal/web/req\.Parse.*\('
 
@@ -318,7 +319,7 @@ issues:
   exclude-use-default: true
   exclude-rules:
     - path: '.*_test\.go'
-      linters: [gocritic, gochecknoglobals, godot]
+      linters: [gocritic, gochecknoglobals, godot, nosnakecase]
 
     - source: 'var Module = fx\.Module\('
       linters: [gochecknoglobals]

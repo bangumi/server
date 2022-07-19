@@ -60,6 +60,7 @@ func TestPerson_GetImage(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{PersonRepo: m})
 
 	for _, imageType := range []string{"small", "grid", "large", "medium"} {
+		imageType := imageType
 		t.Run(imageType, func(t *testing.T) {
 			t.Parallel()
 
