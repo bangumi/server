@@ -22,9 +22,7 @@ import (
 
 	"github.com/bangumi/server/internal/app/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
-	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -56,24 +54,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to find subject of episode", log.SubjectID(e.SubjectID))
 	}
 
-	return res.JSON(c, e)
-}
-
-func convertModelEpisode(s model.Episode) res.Episode {
-	return res.Episode{
-		ID:          s.ID,
-		Name:        s.Name,
-		NameCN:      s.NameCN,
-		Ep:          s.Ep,
-		Sort:        s.Sort,
-		Duration:    s.Duration,
-		Airdate:     s.Airdate,
-		SubjectID:   s.SubjectID,
-		Description: s.Description,
-		Comment:     s.Comment,
-		Type:        s.Type,
-		Disc:        s.Disc,
-	}
+	return res.JSON(c, res.ConvertModelEpisode(e))
 }
 
 const episodeDefaultLimit = 100
@@ -87,7 +68,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return err
 	}
 
-	epType, err := parseEpTypeOptional(c.Query("type"))
+	epType, err := req.ParseEpTypeOptional(c.Query("type"))
 	if err != nil {
 		return err
 	}
@@ -118,33 +99,13 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 
 	var data = make([]res.Episode, len(episodes))
 	for i, episode := range episodes {
-		data[i] = convertModelEpisode(episode)
+		data[i] = res.ConvertModelEpisode(episode)
 	}
 
 	return c.JSON(res.PagedG[res.Episode]{
 		Limit:  page.Limit,
 		Offset: page.Offset,
-		Data:   slice.Map(episodes, convertModelEpisode),
+		Data:   slice.Map(episodes, res.ConvertModelEpisode),
 		Total:  count,
 	})
-}
-
-func parseEpTypeOptional(s string) (*model.EpType, error) {
-	if s == "" {
-		return nil, nil //nolint:nilnil
-	}
-
-	v, err := gstr.ParseUint8(s)
-	if err != nil {
-		return nil, res.BadRequest("wrong value for query `type`")
-	}
-
-	switch v {
-	case model.EpTypeNormal, model.EpTypeSpecial,
-		model.EpTypeOpening, model.EpTypeEnding,
-		model.EpTypeMad, model.EpTypeOther:
-		return &v, nil
-	}
-
-	return nil, res.BadRequest(strconv.Quote(s) + " is not valid episode type")
 }
