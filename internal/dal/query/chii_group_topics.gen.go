@@ -344,6 +344,10 @@ func (g groupTopicDo) Scan(result interface{}) (err error) {
 	return g.DO.Scan(result)
 }
 
+func (g groupTopicDo) Delete(models ...*dao.GroupTopic) (result gen.ResultInfo, err error) {
+	return g.DO.Delete(models)
+}
+
 func (g *groupTopicDo) withDO(do gen.Dao) *groupTopicDo {
 	g.DO = *do.(*gen.DO)
 	return g

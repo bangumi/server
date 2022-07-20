@@ -409,6 +409,10 @@ func (o oAuthClientDo) Scan(result interface{}) (err error) {
 	return o.DO.Scan(result)
 }
 
+func (o oAuthClientDo) Delete(models ...*dao.OAuthClient) (result gen.ResultInfo, err error) {
+	return o.DO.Delete(models)
+}
+
 func (o *oAuthClientDo) withDO(do gen.Dao) *oAuthClientDo {
 	o.DO = *do.(*gen.DO)
 	return o

@@ -460,6 +460,10 @@ func (e episodeDo) Scan(result interface{}) (err error) {
 	return e.DO.Scan(result)
 }
 
+func (e episodeDo) Delete(models ...*dao.Episode) (result gen.ResultInfo, err error) {
+	return e.DO.Delete(models)
+}
+
 func (e *episodeDo) withDO(do gen.Dao) *episodeDo {
 	e.DO = *do.(*gen.DO)
 	return e

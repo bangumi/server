@@ -336,6 +336,10 @@ func (p personFieldDo) Scan(result interface{}) (err error) {
 	return p.DO.Scan(result)
 }
 
+func (p personFieldDo) Delete(models ...*dao.PersonField) (result gen.ResultInfo, err error) {
+	return p.DO.Delete(models)
+}
+
 func (p *personFieldDo) withDO(do gen.Dao) *personFieldDo {
 	p.DO = *do.(*gen.DO)
 	return p

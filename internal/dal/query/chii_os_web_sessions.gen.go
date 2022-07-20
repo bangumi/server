@@ -328,6 +328,10 @@ func (w webSessionDo) Scan(result interface{}) (err error) {
 	return w.DO.Scan(result)
 }
 
+func (w webSessionDo) Delete(models ...*dao.WebSession) (result gen.ResultInfo, err error) {
+	return w.DO.Delete(models)
+}
+
 func (w *webSessionDo) withDO(do gen.Dao) *webSessionDo {
 	w.DO = *do.(*gen.DO)
 	return w
