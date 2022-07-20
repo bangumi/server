@@ -324,6 +324,10 @@ func (g groupMemberDo) Scan(result interface{}) (err error) {
 	return g.DO.Scan(result)
 }
 
+func (g groupMemberDo) Delete(models ...*dao.GroupMember) (result gen.ResultInfo, err error) {
+	return g.DO.Delete(models)
+}
+
 func (g *groupMemberDo) withDO(do gen.Dao) *groupMemberDo {
 	g.DO = *do.(*gen.DO)
 	return g

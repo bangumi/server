@@ -447,6 +447,10 @@ func (m memberDo) Scan(result interface{}) (err error) {
 	return m.DO.Scan(result)
 }
 
+func (m memberDo) Delete(models ...*dao.Member) (result gen.ResultInfo, err error) {
+	return m.DO.Delete(models)
+}
+
 func (m *memberDo) withDO(do gen.Dao) *memberDo {
 	m.DO = *do.(*gen.DO)
 	return m

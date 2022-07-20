@@ -316,6 +316,10 @@ func (r revisionTextDo) Scan(result interface{}) (err error) {
 	return r.DO.Scan(result)
 }
 
+func (r revisionTextDo) Delete(models ...*dao.RevisionText) (result gen.ResultInfo, err error) {
+	return r.DO.Delete(models)
+}
+
 func (r *revisionTextDo) withDO(do gen.Dao) *revisionTextDo {
 	r.DO = *do.(*gen.DO)
 	return r

@@ -354,6 +354,10 @@ func (i indexDo) Scan(result interface{}) (err error) {
 	return i.DO.Scan(result)
 }
 
+func (i indexDo) Delete(models ...*dao.Index) (result gen.ResultInfo, err error) {
+	return i.DO.Delete(models)
+}
+
 func (i *indexDo) withDO(do gen.Dao) *indexDo {
 	i.DO = *do.(*gen.DO)
 	return i

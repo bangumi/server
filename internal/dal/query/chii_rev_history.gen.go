@@ -336,6 +336,10 @@ func (r revisionHistoryDo) Scan(result interface{}) (err error) {
 	return r.DO.Scan(result)
 }
 
+func (r revisionHistoryDo) Delete(models ...*dao.RevisionHistory) (result gen.ResultInfo, err error) {
+	return r.DO.Delete(models)
+}
+
 func (r *revisionHistoryDo) withDO(do gen.Dao) *revisionHistoryDo {
 	r.DO = *do.(*gen.DO)
 	return r

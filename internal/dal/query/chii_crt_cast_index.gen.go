@@ -574,6 +574,10 @@ func (c castDo) Scan(result interface{}) (err error) {
 	return c.DO.Scan(result)
 }
 
+func (c castDo) Delete(models ...*dao.Cast) (result gen.ResultInfo, err error) {
+	return c.DO.Delete(models)
+}
+
 func (c *castDo) withDO(do gen.Dao) *castDo {
 	c.DO = *do.(*gen.DO)
 	return c

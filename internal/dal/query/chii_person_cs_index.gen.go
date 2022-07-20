@@ -501,6 +501,10 @@ func (p personSubjectsDo) Scan(result interface{}) (err error) {
 	return p.DO.Scan(result)
 }
 
+func (p personSubjectsDo) Delete(models ...*dao.PersonSubjects) (result gen.ResultInfo, err error) {
+	return p.DO.Delete(models)
+}
+
 func (p *personSubjectsDo) withDO(do gen.Dao) *personSubjectsDo {
 	p.DO = *do.(*gen.DO)
 	return p

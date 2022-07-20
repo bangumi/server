@@ -340,6 +340,10 @@ func (a accessTokenDo) Scan(result interface{}) (err error) {
 	return a.DO.Scan(result)
 }
 
+func (a accessTokenDo) Delete(models ...*dao.AccessToken) (result gen.ResultInfo, err error) {
+	return a.DO.Delete(models)
+}
+
 func (a *accessTokenDo) withDO(do gen.Dao) *accessTokenDo {
 	a.DO = *do.(*gen.DO)
 	return a
