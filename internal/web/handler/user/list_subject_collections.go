@@ -68,7 +68,7 @@ func (h User) listCollection(
 	c *fiber.Ctx,
 	u model.User,
 	subjectType model.SubjectType,
-	collectionType model.CollectionType,
+	collectionType model.SubjectCollection,
 	page req.PageQuery,
 	showPrivate bool,
 ) error {
@@ -91,7 +91,7 @@ func (h User) listCollection(
 		return h.InternalError(c, err, "failed to list user's subject collections", log.UserID(u.ID))
 	}
 
-	subjectIDs := slice.Map(collections, func(item model.SubjectCollection) model.SubjectID {
+	subjectIDs := slice.Map(collections, func(item model.UserSubjectCollection) model.SubjectID {
 		return item.SubjectID
 	})
 
@@ -112,4 +112,18 @@ func (h User) listCollection(
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	})
+}
+
+func (h User) GetCollection(c *fiber.Ctx) error {
+	username := c.Params("username")
+	if username == "" {
+		return res.BadRequest("missing require parameters `username`")
+	}
+
+	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	if err != nil {
+		return err
+	}
+
+	return h.getCollection(c, username, subjectID)
 }

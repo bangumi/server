@@ -12,15 +12,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package cache
+package req
 
 import (
-	"context"
-	"time"
+	"reflect"
+
+	"github.com/go-playground/validator/v10"
 )
 
-type Cache interface {
-	Get(ctx context.Context, key string, value any) (bool, error)
-	Set(ctx context.Context, key string, value any, ttl time.Duration) error
-	Del(ctx context.Context, keys ...string) error
+const EpisodeCollectionTagName = "episode-collection"
+
+func EpisodeCollection(fl validator.FieldLevel) bool {
+	// TODO: replace with fl.Field().CanUint()
+	// add in go 1.18
+	switch fl.Field().Kind() { //nolint:exhaustive
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		v := fl.Field().Uint()
+		return v >= 1 && v <= 3
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		v := fl.Field().Int()
+		return v >= 1 && v <= 3
+	}
+
+	return false
 }

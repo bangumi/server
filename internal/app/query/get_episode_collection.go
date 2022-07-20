@@ -12,21 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package query
 
 import (
-	"errors"
+	"context"
 
+	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-// ErrNotFound should be returned when a repo or service can't find an authorization.
-var ErrNotFound = errors.New("can't find item")
+func (q Query) GetUserEpisodeCollection(
+	ctx context.Context, user domain.Auth, episodeID model.EpisodeID) (model.UserEpisodeCollection, model.Episode, error) {
+	e, err := q.GetEpisode(ctx, episodeID)
+	if err != nil {
+		return model.UserEpisodeCollection{}, e, err
+	}
 
-var ErrSubjectNotFound = errgo.Msg(ErrNotFound, "subject not found")
-var ErrPersonNotFound = errgo.Msg(ErrNotFound, "person not found")
-var ErrCharacterNotFound = errgo.Msg(ErrNotFound, "character not found")
-var ErrEpisodeNotFound = errgo.Msg(ErrNotFound, "episode not found")
-var ErrSubjectNotCollected = errgo.Msg(ErrNotFound, "subject is not collected by user")
+	m, err := q.collection.GetSubjectEpisodesCollection(ctx, user.ID, e.SubjectID)
+	if err != nil {
+		return model.UserEpisodeCollection{}, e, errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
+	}
 
-var ErrInvalidInput = errors.New("input is not valid")
+	ec, ok := m[episodeID]
+	if ok {
+		return ec, e, nil
+	}
+
+	return model.UserEpisodeCollection{ID: episodeID}, e, nil
+}

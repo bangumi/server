@@ -250,7 +250,7 @@ tasks:
 
   CollectionRepo:
     sources:
-      - internal/domain/collection.go
+      - internal/domain/collection_repo.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/CollectionRepo.go

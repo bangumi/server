@@ -27,12 +27,16 @@ func New(
 	cache cache.Cache,
 	subject domain.SubjectRepo,
 	person domain.PersonRepo,
+	user domain.UserRepo,
 	character domain.CharacterRepo,
+	collection domain.CollectionRepo,
 	metric tally.Scope,
 	log *zap.Logger,
 ) Query {
 	return Query{
 		cache:                     cache,
+		user:                      user,
+		collection:                collection,
 		episode:                   episode,
 		subject:                   subject,
 		person:                    person,
@@ -48,6 +52,8 @@ func New(
 type Query struct {
 	cache                    cache.Cache
 	episode                  domain.EpisodeRepo
+	collection               domain.CollectionRepo
+	user                     domain.UserRepo
 	subject                  domain.SubjectRepo
 	person                   domain.PersonRepo
 	character                domain.CharacterRepo

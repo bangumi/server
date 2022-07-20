@@ -12,33 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package req
 
 import (
-	"context"
-
 	"github.com/bangumi/server/internal/model"
 )
 
-type CollectionRepo interface {
-	CountSubjectCollections(
-		ctx context.Context,
-		userID model.UserID,
-		subjectType model.SubjectType,
-		collectionType model.CollectionType,
-		showPrivate bool,
-	) (int64, error)
-
-	ListSubjectCollection(
-		ctx context.Context,
-		userID model.UserID,
-		subjectType model.SubjectType,
-		collectionType model.CollectionType,
-		showPrivate bool,
-		limit, offset int,
-	) ([]model.SubjectCollection, error)
-
-	GetSubjectCollection(
-		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-	) (model.SubjectCollection, error)
+type PutEpisodeCollection struct {
+	Type model.EpisodeCollection `json:"type" validate:"episode-collection,required"`
 }

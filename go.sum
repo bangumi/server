@@ -580,8 +580,8 @@ github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PK
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/tent/http-link-go v0.0.0-20130702225549-ac974c61c2f9/go.mod h1:RHkNRtSLfOK7qBTHaeSX1D6BNpI3qw7NTxsmNr4RvN8=
-github.com/trim21/go-phpserialize v0.0.13 h1:EjjwR7x1KjAiLXwRG+SqO7zHS5l5XAq286knWLm7E3o=
-github.com/trim21/go-phpserialize v0.0.13/go.mod h1:R7t7nV6K+hFpz4DsNsh+/aoT5AqYn2tmpmXpe1tTQwg=
+github.com/trim21/go-phpserialize v0.0.14 h1:RBTrp6u/2BR4XJWJ08bmFquBGXLv+PL61wDNG6UM/Yo=
+github.com/trim21/go-phpserialize v0.0.14/go.mod h1:P8ULk1Go0OQQLb2+LGihbE5cqkiX+yOUV3SZ5CoGfuI=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
 github.com/twmb/murmur3 v1.1.5/go.mod h1:Qq/R7NUyOfr65zD+6Q5IHKsJLwP7exErjN6lyyq3OSQ=
 github.com/twmb/murmur3 v1.1.6 h1:mqrRot1BRxm+Yct+vavLMou2/iJt0tNVTTC0QoIjaZg=

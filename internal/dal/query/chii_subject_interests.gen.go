@@ -38,11 +38,11 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 	_subjectCollection.Tag = field.NewString(tableName, "interest_tag")
 	_subjectCollection.EpStatus = field.NewUint32(tableName, "interest_ep_status")
 	_subjectCollection.VolStatus = field.NewUint32(tableName, "interest_vol_status")
-	_subjectCollection.WishDateline = field.NewUint32(tableName, "interest_wish_dateline")
-	_subjectCollection.DoingDateline = field.NewUint32(tableName, "interest_doing_dateline")
-	_subjectCollection.CollectDateline = field.NewUint32(tableName, "interest_collect_dateline")
-	_subjectCollection.OnHoldDateline = field.NewUint32(tableName, "interest_on_hold_dateline")
-	_subjectCollection.DroppedDateline = field.NewUint32(tableName, "interest_dropped_dateline")
+	_subjectCollection.WishTime = field.NewUint32(tableName, "interest_wish_dateline")
+	_subjectCollection.DoingTime = field.NewUint32(tableName, "interest_doing_dateline")
+	_subjectCollection.DoneTime = field.NewUint32(tableName, "interest_collect_dateline")
+	_subjectCollection.OnHoldTime = field.NewUint32(tableName, "interest_on_hold_dateline")
+	_subjectCollection.DroppedTime = field.NewUint32(tableName, "interest_dropped_dateline")
 	_subjectCollection.UpdatedTime = field.NewUint32(tableName, "interest_lasttouch")
 	_subjectCollection.Private = field.NewUint8(tableName, "interest_private")
 
@@ -54,25 +54,25 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 type subjectCollection struct {
 	subjectCollectionDo subjectCollectionDo
 
-	ALL             field.Field
-	ID              field.Uint32
-	UserID          field.Field
-	SubjectID       field.Field
-	SubjectType     field.Uint8
-	Rate            field.Uint8
-	Type            field.Uint8
-	HasComment      field.Bool
-	Comment         field.String
-	Tag             field.String
-	EpStatus        field.Uint32
-	VolStatus       field.Uint32
-	WishDateline    field.Uint32
-	DoingDateline   field.Uint32
-	CollectDateline field.Uint32
-	OnHoldDateline  field.Uint32
-	DroppedDateline field.Uint32
-	UpdatedTime     field.Uint32
-	Private         field.Uint8
+	ALL         field.Field
+	ID          field.Uint32
+	UserID      field.Field
+	SubjectID   field.Field
+	SubjectType field.Uint8
+	Rate        field.Uint8
+	Type        field.Uint8
+	HasComment  field.Bool
+	Comment     field.String
+	Tag         field.String
+	EpStatus    field.Uint32
+	VolStatus   field.Uint32
+	WishTime    field.Uint32
+	DoingTime   field.Uint32
+	DoneTime    field.Uint32
+	OnHoldTime  field.Uint32
+	DroppedTime field.Uint32
+	UpdatedTime field.Uint32
+	Private     field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -100,11 +100,11 @@ func (s *subjectCollection) updateTableName(table string) *subjectCollection {
 	s.Tag = field.NewString(table, "interest_tag")
 	s.EpStatus = field.NewUint32(table, "interest_ep_status")
 	s.VolStatus = field.NewUint32(table, "interest_vol_status")
-	s.WishDateline = field.NewUint32(table, "interest_wish_dateline")
-	s.DoingDateline = field.NewUint32(table, "interest_doing_dateline")
-	s.CollectDateline = field.NewUint32(table, "interest_collect_dateline")
-	s.OnHoldDateline = field.NewUint32(table, "interest_on_hold_dateline")
-	s.DroppedDateline = field.NewUint32(table, "interest_dropped_dateline")
+	s.WishTime = field.NewUint32(table, "interest_wish_dateline")
+	s.DoingTime = field.NewUint32(table, "interest_doing_dateline")
+	s.DoneTime = field.NewUint32(table, "interest_collect_dateline")
+	s.OnHoldTime = field.NewUint32(table, "interest_on_hold_dateline")
+	s.DroppedTime = field.NewUint32(table, "interest_dropped_dateline")
 	s.UpdatedTime = field.NewUint32(table, "interest_lasttouch")
 	s.Private = field.NewUint8(table, "interest_private")
 
@@ -143,11 +143,11 @@ func (s *subjectCollection) fillFieldMap() {
 	s.fieldMap["interest_tag"] = s.Tag
 	s.fieldMap["interest_ep_status"] = s.EpStatus
 	s.fieldMap["interest_vol_status"] = s.VolStatus
-	s.fieldMap["interest_wish_dateline"] = s.WishDateline
-	s.fieldMap["interest_doing_dateline"] = s.DoingDateline
-	s.fieldMap["interest_collect_dateline"] = s.CollectDateline
-	s.fieldMap["interest_on_hold_dateline"] = s.OnHoldDateline
-	s.fieldMap["interest_dropped_dateline"] = s.DroppedDateline
+	s.fieldMap["interest_wish_dateline"] = s.WishTime
+	s.fieldMap["interest_doing_dateline"] = s.DoingTime
+	s.fieldMap["interest_collect_dateline"] = s.DoneTime
+	s.fieldMap["interest_on_hold_dateline"] = s.OnHoldTime
+	s.fieldMap["interest_dropped_dateline"] = s.DroppedTime
 	s.fieldMap["interest_lasttouch"] = s.UpdatedTime
 	s.fieldMap["interest_private"] = s.Private
 }

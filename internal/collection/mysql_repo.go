@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 )
@@ -48,7 +49,7 @@ func (r mysqlRepo) CountSubjectCollections(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType model.CollectionType,
+	collectionType model.SubjectCollection,
 	showPrivate bool,
 ) (int64, error) {
 	q := r.q.SubjectCollection.WithContext(ctx).
@@ -58,7 +59,7 @@ func (r mysqlRepo) CountSubjectCollections(
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
-	if collectionType != model.CollectionTypeAll {
+	if collectionType != model.SubjectCollectionAll {
 		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 
@@ -78,10 +79,10 @@ func (r mysqlRepo) ListSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
 	subjectType model.SubjectType,
-	collectionType model.CollectionType,
+	collectionType model.SubjectCollection,
 	showPrivate bool,
 	limit, offset int,
-) ([]model.SubjectCollection, error) {
+) ([]model.UserSubjectCollection, error) {
 	q := r.q.SubjectCollection.WithContext(ctx).
 		Order(r.q.SubjectCollection.UpdatedTime.Desc()).
 		Where(r.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
@@ -90,7 +91,7 @@ func (r mysqlRepo) ListSubjectCollection(
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
 	}
 
-	if collectionType != model.CollectionTypeAll {
+	if collectionType != model.SubjectCollectionAll {
 		q = q.Where(r.q.SubjectCollection.Type.Eq(uint8(collectionType)))
 	}
 
@@ -104,9 +105,9 @@ func (r mysqlRepo) ListSubjectCollection(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var results = make([]model.SubjectCollection, len(collections))
+	var results = make([]model.UserSubjectCollection, len(collections))
 	for i, c := range collections {
-		results[i] = model.SubjectCollection{
+		results[i] = model.UserSubjectCollection{
 			UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
 			Comment:     c.Comment,
 			Tags:        gstr.Split(c.Tag, " "),
@@ -115,7 +116,7 @@ func (r mysqlRepo) ListSubjectCollection(
 			SubjectID:   c.SubjectID,
 			EpStatus:    c.EpStatus,
 			VolStatus:   c.VolStatus,
-			Type:        model.CollectionType(c.Type),
+			Type:        model.SubjectCollection(c.Type),
 			Private:     c.Private != model.CollectPrivacyNone,
 		}
 	}
@@ -125,19 +126,19 @@ func (r mysqlRepo) ListSubjectCollection(
 
 func (r mysqlRepo) GetSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-) (model.SubjectCollection, error) {
+) (model.UserSubjectCollection, error) {
 	c, err := r.q.SubjectCollection.WithContext(ctx).
 		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.SubjectCollection{}, domain.ErrNotFound
+			return model.UserSubjectCollection{}, domain.ErrSubjectNotCollected
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
-		return model.SubjectCollection{}, errgo.Wrap(err, "dal")
+		return model.UserSubjectCollection{}, errgo.Wrap(err, "dal")
 	}
 
-	return model.SubjectCollection{
+	return model.UserSubjectCollection{
 		UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
 		Comment:     c.Comment,
 		Tags:        gstr.Split(c.Tag, " "),
@@ -146,7 +147,75 @@ func (r mysqlRepo) GetSubjectCollection(
 		SubjectID:   c.SubjectID,
 		EpStatus:    c.EpStatus,
 		VolStatus:   c.VolStatus,
-		Type:        model.CollectionType(c.Type),
+		Type:        model.SubjectCollection(c.Type),
 		Private:     c.Private != model.CollectPrivacyNone,
 	}, nil
+}
+
+func (r mysqlRepo) GetSubjectEpisodesCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+) (model.UserSubjectEpisodesCollection, error) {
+	d, err := r.q.EpCollection.WithContext(ctx).Where(
+		r.q.EpCollection.UserID.Eq(userID),
+		r.q.EpCollection.SubjectID.Eq(subjectID),
+	).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.UserSubjectEpisodesCollection{}, nil
+		}
+
+		r.log.Error("failed to create episode collection")
+		return nil, errgo.Wrap(err, "r.createEpisodeCollection")
+	}
+
+	var e mysqlEpCollection
+	e, err = deserializePhpEpStatus(d.Status)
+	if err != nil {
+		r.log.Error("failed to deserialize php-serialized bytes to go data",
+			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, err
+	}
+
+	result := gmap.Map(e, func(id model.EpisodeID, item mysqlEpCollectionItem) (model.EpisodeID, model.UserEpisodeCollection) {
+		return id, model.UserEpisodeCollection{
+			ID:   item.EpisodeID,
+			Type: item.Type,
+		}
+	})
+
+	return result, nil
+}
+
+func (r mysqlRepo) GetEpisodeCollection(
+	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
+) (model.UserSubjectEpisodesCollection, error) {
+	d, err := r.q.EpCollection.WithContext(ctx).
+		Where(r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrNotFound
+		}
+
+		r.log.Error("failed to get episode collection record", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	e, err := deserializePhpEpStatus(d.Status)
+	if err != nil {
+		r.log.Error("failed to deserialize php-serialized bytes to go data",
+			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, err
+	}
+
+	var result = make(model.UserSubjectEpisodesCollection, len(e))
+	for id, item := range e {
+		result[id] = model.UserEpisodeCollection{
+			ID:   item.EpisodeID,
+			Type: item.Type,
+		}
+	}
+
+	return result, nil
 }
