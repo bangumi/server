@@ -706,7 +706,7 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/User"
-        "401":
+        "403":
           description: unauthorized
           content:
             application/json:
@@ -799,56 +799,6 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
-
-  "/v0/users/-/collections/episodes/{episode_id}":
-    put:
-      tags:
-        - 收藏
-      summary: 更新用户章节收藏状态
-      description: |
-        修改章节收藏状况
-
-        ## 限制
-
-        只能修改已收藏的条目。
-
-        只能修改动画和三次元的章节情况。
-      operationId: putUserEpisodesCollection
-      parameters:
-        - *path_episode_id
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "./components/put-user-episodes-collection.yaml"
-      responses:
-        "204":
-          description: Successful Response
-
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ErrorDetail"
-
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ErrorDetail"
-
-        "404":
-          description: 条目，章节不存在或者已经被移除
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ErrorDetail"
-
-      security:
-        - HTTPBearer: []
 
   "/v0/revisions/persons":
     get:

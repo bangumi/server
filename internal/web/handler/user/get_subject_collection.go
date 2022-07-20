@@ -38,10 +38,10 @@ func (h User) GetSubjectCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	return h.getCollection(c, username, subjectID)
+	return h.getSubjectCollection(c, username, subjectID)
 }
 
-func (h User) getCollection(c *fiber.Ctx, username string, subjectID model.SubjectID) error {
+func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID model.SubjectID) error {
 	const notFoundMessage = "subject is not collected by user"
 	v := h.GetHTTPAccessor(c)
 

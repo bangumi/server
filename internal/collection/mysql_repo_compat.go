@@ -38,8 +38,3 @@ func deserializePhpEpStatus(phpSerialized []byte) (mysqlEpCollection, error) {
 
 	return e, nil
 }
-
-func serializePhpEpStatus(data mysqlEpCollection) ([]byte, error) {
-	b, err := phpserialize.Marshal(data)
-	return b, errgo.Wrap(err, "php serialize")
-}

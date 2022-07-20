@@ -28,5 +28,3 @@ var ErrPersonNotFound = errgo.Msg(ErrNotFound, "person not found")
 var ErrCharacterNotFound = errgo.Msg(ErrNotFound, "character not found")
 var ErrEpisodeNotFound = errgo.Msg(ErrNotFound, "episode not found")
 var ErrSubjectNotCollected = errgo.Msg(ErrNotFound, "subject is not collected by user")
-
-var ErrInvalidInput = errors.New("input is not valid")
