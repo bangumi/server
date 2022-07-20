@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/goccy/go-json"
 	"github.com/trim21/go-phpserialize"
 )
 
@@ -94,16 +93,16 @@ func (m *TimeLineProgressMemo) Bytes() ([]byte, error) {
 	if m == nil {
 		return nil, ErrEmptyMemo
 	}
-	result, err := phpserialize.Marshal(*m)
-	return result, errgo.Wrap(err, "phpserialize.Marshal(m)")
+	result, err := phpserialize.Marshal(m)
+	return result, errgo.Wrap(err, "phpserialize.Marshal")
 }
 
 func (m *TimeLineProgressMemo) FromBytes(b []byte) error {
 	if m == nil {
 		return ErrNilMemo
 	}
-	if err := decodeBytes(b, m); err != nil {
-		return errgo.Wrap(err, "decodeBytes")
+	if err := phpserialize.Unmarshal(b, m); err != nil {
+		return errgo.Wrap(err, "phpserialize.Unmarshal")
 	}
 	return nil
 }
@@ -120,12 +119,11 @@ type TimeLineImage struct {
 	Images    *string `json:"images,omitempty" php:"images,omitempty"`
 }
 
-func (i TimeLineImage) Bytes() ([]byte, error) {
-	dict, err := reMarshal(i)
-	if err != nil {
-		return nil, errgo.Wrap(err, "reMarshal")
+func (i *TimeLineImage) Bytes() ([]byte, error) {
+	if i == nil {
+		return nil, ErrEmptyMemo
 	}
-	result, err := phpserialize.Marshal(dict)
+	result, err := phpserialize.Marshal(i)
 	return result, errgo.Wrap(err, "phpserialize.Marshal")
 }
 
@@ -139,33 +137,6 @@ func (is TimeLineImages) Bytes() ([]byte, error) {
 		return is[0].Bytes()
 	}
 
-	dict, err := reMarshal(is)
-	if err != nil {
-		return nil, errgo.Wrap(err, "reMarshal")
-	}
-	result, err := phpserialize.Marshal(dict)
+	result, err := phpserialize.Marshal(is)
 	return result, errgo.Wrap(err, "phpserialize.Marshal")
-}
-
-func decodeBytes(b []byte, output interface{}) error {
-	err := phpserialize.Unmarshal(b, output)
-	if err != nil {
-		return fmt.Errorf("phpserialize.Unmarshal: %w: %s", err, string(b))
-	}
-	return nil
-}
-
-// reMarshal turns an arbitrary struct/slice into plain object for phpserialize
-// uses kinda expensive json hax here, looking for a grace approach.
-func reMarshal(m interface{}) (interface{}, error) {
-	j, err := json.Marshal(m)
-	if err != nil {
-		return nil, errgo.Wrap(err, "json.Marshal")
-	}
-
-	var result interface{}
-	if err = json.Unmarshal(j, &result); err != nil {
-		return nil, errgo.Wrap(err, "json.Unmarshal")
-	}
-	return result, nil
 }
