@@ -332,6 +332,10 @@ func (e epCollectionDo) Scan(result interface{}) (err error) {
 	return e.DO.Scan(result)
 }
 
+func (e epCollectionDo) Delete(models ...*dao.EpCollection) (result gen.ResultInfo, err error) {
+	return e.DO.Delete(models)
+}
+
 func (e *epCollectionDo) withDO(do gen.Dao) *epCollectionDo {
 	e.DO = *do.(*gen.DO)
 	return e
