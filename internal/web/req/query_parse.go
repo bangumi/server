@@ -133,9 +133,9 @@ func ParseTopicID(s string) (model.TopicID, error) {
 	return model.TopicID(v), nil
 }
 
-func ParseCollectionType(s string) (model.CollectionType, error) {
+func ParseCollectionType(s string) (model.SubjectCollection, error) {
 	if s == "" {
-		return model.CollectionTypeAll, nil
+		return model.SubjectCollectionAll, nil
 	}
 
 	t, err := gstr.ParseUint8(s)
@@ -143,14 +143,14 @@ func ParseCollectionType(s string) (model.CollectionType, error) {
 		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
 	}
 
-	v := model.CollectionType(t)
+	v := model.SubjectCollection(t)
 	switch v {
-	case model.CollectionTypeAll,
-		model.CollectionTypeWish,
-		model.CollectionTypeDone,
-		model.CollectionTypeDoing,
-		model.CollectionTypeOnHold,
-		model.CollectionTypeDropped:
+	case model.SubjectCollectionAll,
+		model.SubjectCollectionWish,
+		model.SubjectCollectionDone,
+		model.SubjectCollectionDoing,
+		model.SubjectCollectionOnHold,
+		model.SubjectCollectionDropped:
 		return v, nil
 	}
 
