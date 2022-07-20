@@ -18,17 +18,35 @@ import (
 	"time"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
 type SubjectCollection struct {
 	UpdatedAt   time.Time            `json:"updated_at"`
 	Comment     *string              `json:"comment"`
 	Tags        []string             `json:"tags"`
+	Subject     SlimSubjectV0        `json:"subject"`
 	SubjectID   model.SubjectID      `json:"subject_id"`
-	EpStatus    uint32               `json:"ep_status"`
 	VolStatus   uint32               `json:"vol_status"`
+	EpStatus    uint32               `json:"ep_status"`
 	SubjectType uint8                `json:"subject_type"`
 	Type        model.CollectionType `json:"type"`
 	Rate        uint8                `json:"rate"`
 	Private     bool                 `json:"private"`
+}
+
+func ConvertModelSubjectCollection(c model.SubjectCollection, subject SlimSubjectV0) SubjectCollection {
+	return SubjectCollection{
+		SubjectID:   c.SubjectID,
+		SubjectType: c.SubjectType,
+		Rate:        c.Rate,
+		Type:        c.Type,
+		Tags:        c.Tags,
+		EpStatus:    c.EpStatus,
+		VolStatus:   c.VolStatus,
+		UpdatedAt:   c.UpdatedAt,
+		Private:     c.Private,
+		Comment:     null.NilString(c.Comment),
+		Subject:     subject,
+	}
 }

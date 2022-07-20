@@ -25,8 +25,8 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/model/generic"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 type mysqlRepo struct {
@@ -50,7 +50,7 @@ func (r mysqlRepo) Get(ctx context.Context, id model.PersonID) (model.Person, er
 		return model.Person{}, errgo.Wrap(err, "dal")
 	}
 
-	return ConvertDao(p), nil
+	return convertDao(p), nil
 }
 
 func (r mysqlRepo) GetSubjectRelated(
@@ -103,7 +103,7 @@ func (r mysqlRepo) GetByIDs(
 	ctx context.Context, ids ...model.PersonID,
 ) (map[model.PersonID]model.Person, error) {
 	u, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).
-		Where(r.q.Person.ID.In(generic.PersonIDToValuerSlice(ids)...)).Find()
+		Where(r.q.Person.ID.In(slice.ToValuer(ids)...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
@@ -111,13 +111,13 @@ func (r mysqlRepo) GetByIDs(
 
 	var result = make(map[model.PersonID]model.Person, len(ids))
 	for _, p := range u {
-		result[p.ID] = ConvertDao(p)
+		result[p.ID] = convertDao(p)
 	}
 
 	return result, nil
 }
 
-func ConvertDao(p *dao.Person) model.Person {
+func convertDao(p *dao.Person) model.Person {
 	return model.Person{
 		Redirect:     p.Redirect,
 		Type:         p.Type,

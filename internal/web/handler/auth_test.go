@@ -44,7 +44,8 @@ func TestHandler_PrivateLogin(t *testing.T) {
 	require.NoError(t, err)
 
 	mockAuth := mocks.NewAuthRepo(t)
-	mockAuth.EXPECT().GetByEmail(mock.Anything, "a@example.com").Return(domain.Auth{GroupID: 1}, passwordInDB, nil)
+	mockAuth.EXPECT().GetByEmail(mock.Anything, "a@example.com").
+		Return(domain.AuthUserInfo{GroupID: 1}, passwordInDB, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, uint8(1)).Return(domain.Permission{}, nil)
 
 	mockCaptcha := mocks.NewCaptchaManager(t)

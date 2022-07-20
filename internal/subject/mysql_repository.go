@@ -26,9 +26,8 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/model/generic"
-	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 type mysqlRepo struct {
@@ -51,39 +50,44 @@ func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID) (model.Subject, 
 		return model.Subject{}, errgo.Wrap(err, "dal")
 	}
 
-	return ConvertDao(s), nil
+	return ConvertDao(s)
 }
 
-func ConvertDao(s *dao.Subject) model.Subject {
+func ConvertDao(s *dao.Subject) (model.Subject, error) {
 	var date string
 	if !s.Fields.Date.IsZero() {
 		date = s.Fields.Date.Format("2006-01-02")
 	}
 
-	return model.Subject{
-		Redirect:      s.Fields.Redirect,
-		Date:          date,
-		ID:            s.ID,
-		Name:          s.Name,
-		NameCN:        s.NameCN,
-		TypeID:        s.TypeID,
-		Image:         s.Image,
-		PlatformID:    s.Platform,
-		Infobox:       s.Infobox,
-		Summary:       s.Summary,
-		Volumes:       s.Volumes,
-		Eps:           s.Eps,
-		Wish:          s.Wish,
-		Collect:       s.Collect,
-		Doing:         s.Doing,
-		OnHold:        s.OnHold,
-		CompatRawTags: s.Fields.Tags,
-		Dropped:       s.Dropped,
-		Airtime:       s.Airtime,
-		NSFW:          s.Nsfw,
-		Ban:           s.Ban,
-		Rating:        rating(s.Fields),
+	tags, err := parseTags(s.Fields.Tags)
+	if err != nil {
+		return model.Subject{}, err
 	}
+
+	return model.Subject{
+		Redirect:   s.Fields.Redirect,
+		Date:       date,
+		ID:         s.ID,
+		Name:       s.Name,
+		NameCN:     s.NameCN,
+		TypeID:     s.TypeID,
+		Image:      s.Image,
+		PlatformID: s.Platform,
+		Infobox:    s.Infobox,
+		Summary:    s.Summary,
+		Volumes:    s.Volumes,
+		Eps:        s.Eps,
+		Wish:       s.Wish,
+		Collect:    s.Collect,
+		Doing:      s.Doing,
+		OnHold:     s.OnHold,
+		Tags:       tags,
+		Dropped:    s.Dropped,
+		Airtime:    s.Airtime,
+		NSFW:       s.Nsfw,
+		Ban:        s.Ban,
+		Rating:     rating(s.Fields),
+	}, nil
 }
 
 func rating(f dao.SubjectField) model.Rating {
@@ -193,7 +197,7 @@ func (r mysqlRepo) GetByIDs(
 	ctx context.Context, ids ...model.SubjectID,
 ) (map[model.SubjectID]model.Subject, error) {
 	records, err := r.q.Subject.WithContext(ctx).
-		Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(generic.SubjectIDToValuerSlice(ids)...)).Find()
+		Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(slice.ToValuer(ids)...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
@@ -202,7 +206,10 @@ func (r mysqlRepo) GetByIDs(
 	var result = make(map[model.SubjectID]model.Subject, len(ids))
 
 	for _, s := range records {
-		result[s.ID] = ConvertDao(s)
+		result[s.ID], err = ConvertDao(s)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return result, nil
@@ -212,10 +219,9 @@ func (r mysqlRepo) GetActors(
 	ctx context.Context,
 	subjectID model.SubjectID,
 	characterIDs ...model.CharacterID,
-) (map[model.CharacterID][]model.Person, error) {
+) (map[model.CharacterID][]model.PersonID, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
-		Preload(r.q.Cast.Person.Fields).
-		Where(r.q.Cast.CharacterID.In(generic.CharacterIDToValuerSlice(characterIDs)...), r.q.Cast.SubjectID.Eq(subjectID)).
+		Where(r.q.Cast.CharacterID.In(slice.ToValuer(characterIDs)...), r.q.Cast.SubjectID.Eq(subjectID)).
 		Order(r.q.Cast.PersonID).
 		Find()
 	if err != nil {
@@ -223,10 +229,10 @@ func (r mysqlRepo) GetActors(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var results = make(map[model.CharacterID][]model.Person, len(relations))
+	var results = make(map[model.CharacterID][]model.PersonID, len(relations))
 	for _, relation := range relations {
 		// TODO: should pre-alloc a big slice and split it as results.
-		results[relation.CharacterID] = append(results[relation.CharacterID], person.ConvertDao(&relation.Person))
+		results[relation.CharacterID] = append(results[relation.CharacterID], relation.PersonID)
 	}
 
 	return results, nil

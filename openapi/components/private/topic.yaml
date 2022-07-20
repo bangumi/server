@@ -1,0 +1,32 @@
+title: Topic
+type: object
+required:
+  - created_at
+  - updated_at
+  - title
+  - creator
+  - id
+  - reply_count
+properties:
+  created_at:
+    type: string
+    format: date-time
+    example: 2008-07-14T15:34:07+08:00
+  creator:
+    $ref: "../user.yaml"
+  id:
+    type: integer
+    format: int32
+    example: 1
+  reply_count:
+    description: 全部回复，包括二级回复
+    type: integer
+    format: int32
+    example: 76
+  title:
+    type: string
+    example: 拿这个来测试
+  updated_at:
+    type: string
+    format: date-time
+    example: 2021-12-20T19:18:49+08:00

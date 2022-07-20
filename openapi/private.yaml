@@ -6,6 +6,8 @@ info:
 servers:
   - url: https://next.bgm.tv
     description: Production server
+  - url: https://dev.bgm38.com/
+    description: 开发用服务器
 
 x-parameters:
   default_query_limit: &default_query_limit
@@ -173,6 +175,459 @@ paths:
                 $ref: "#/components/schemas/User"
         "401":
           description: 用户未登录或者 session 已失效
+  "/p/subjects/{subject_id}/topics":
+    get:
+      tags:
+        - 条目
+        - 讨论
+      summary: 分页获取条目讨论列表，使用时间更新时间倒序分页
+      operationId: getSubjectTopicsById
+      parameters:
+        - required: true
+          description: 条目ID
+          schema:
+            title: Subject ID
+            minimum: 0
+            type: integer
+          name: subject_id
+          in: path
+        - required: true
+          description: 条目 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: true
+          description: 条目 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Paged_Topic"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+  "/p/subjects/{subject_id}/topics/{topic_id}":
+    get:
+      tags:
+        - 条目
+        - 讨论
+      summary: 分页获取条目讨论回复列表
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
+      operationId: getSubjectTopicById
+      parameters:
+        - required: true
+          description: 条目ID 可以填`-`
+          schema:
+            title: Subject ID
+            minimum: 0
+            type: integer
+          name: subject_id
+          in: path
+        - required: true
+          description: 条目讨论ID
+          schema:
+            title: Topic ID
+            minimum: 0
+            type: integer
+          name: topic_id
+          in: path
+        - required: false
+          description: 条目讨论回复 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          description: 条目讨论回复 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TopicDetail"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+  "/p/groups/{group_id}/topics":
+    get:
+      tags:
+        - 小组
+        - 讨论
+      summary: 分页获取小组讨论列表，使用时间更新时间倒序分页
+      operationId: getGroupTopicsById
+      parameters:
+        - required: true
+          description: 小组ID
+          schema:
+            title: Group ID
+            minimum: 0
+            type: integer
+          name: group_id
+          in: path
+        - required: true
+          description: 小组 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: true
+          description: 小组 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Paged_Topic"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+  "/p/groups/{group_id}/topics/{topic_id}":
+    get:
+      tags:
+        - 小组
+        - 讨论
+      summary: 分页获取小组讨论回复列表，对顶级回复分页，展示所有顶级回复关联的二级回复
+      operationId: getGroupTopicById
+      parameters:
+        - required: true
+          description: 小组ID 可以填`-`
+          schema:
+            title: Group ID
+            minimum: 0
+            type: integer
+          name: group_id
+          in: path
+        - required: true
+          description: 小组讨论ID
+          schema:
+            title: Topic ID
+            minimum: 0
+            type: integer
+          name: topic_id
+          in: path
+        - required: false
+          description: 小组讨论回复 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          description: 小组讨论回复 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TopicDetail"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+  "/p/indices/{index_id}/comments":
+    get:
+      tags:
+        - 目录
+        - 讨论
+      summary: 分页获取目录讨论列表，按照时间顺序分页
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
+      operationId: getIndexCommentsById
+      parameters:
+        - required: true
+          description: 目录ID
+          schema:
+            title: Index ID
+            minimum: 0
+            type: integer
+          name: index_id
+          in: path
+        - required: false
+          description: 目录 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          description: 目录 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Paged_Comment"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+  "/p/episodes/{episode_id}/comments":
+    get:
+      tags:
+        - 章节
+        - 讨论
+      summary: 分页获取章节讨论列表，按照时间顺序分页
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
+      operationId: getEpisodeCommentsById
+      parameters:
+        - required: true
+          description: 章节ID
+          schema:
+            title: Episode ID
+            minimum: 0
+            type: integer
+          name: episode_id
+          in: path
+        - required: false
+          description: 章节 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          description: 章节 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Paged_Comment"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+  "/p/characters/{character_id}/comments":
+    get:
+      tags:
+        - 角色
+        - 讨论
+      summary: 分页获取角色讨论列表，按照时间顺序分页
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
+      operationId: getCharacterCommentsById
+      parameters:
+        - required: true
+          description: 角色ID
+          schema:
+            title: Character ID
+            minimum: 0
+            type: integer
+          name: character_id
+          in: path
+        - required: false
+          description: 角色 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          description: 角色 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Paged_Comment"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+  "/p/persons/{person_id}/comments":
+    get:
+      tags:
+        - 人物
+        - 讨论
+      summary: 分页获取人物讨论列表，按照时间顺序分页
+      description: 对顶级回复分页，展示所有顶级回复关联的二级回复
+      operationId: getPersonCommentsById
+      parameters:
+        - required: true
+          description: 人物ID
+          schema:
+            title: Persoon ID
+            minimum: 0
+            type: integer
+          name: person_id
+          in: path
+        - required: false
+          description: 人物 Limit
+          schema:
+            title: Limit
+            maximum: 100
+            minimum: 0
+            type: integer
+            default: 30
+          name: limit
+          in: query
+        - required: false
+          description: 人物 Offset
+          schema:
+            title: Offset
+            minimum: 0
+            type: integer
+            default: 0
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Paged_Comment"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
 
   "/p/groups/{name}":
     get:
@@ -253,22 +708,51 @@ components:
       $ref: "./components/avatar.yaml"
     ErrorDetail:
       $ref: "./components/error_detail.yaml"
-    Paged:
-      type: object
-      properties:
-        total:
-          title: Total
-          type: integer
-        limit:
-          title: Limit
-          type: integer
-        offset:
-          title: Offset
-          type: integer
+    TopicDetail:
+      $ref: "./components/private/topic_detail.yaml"
+    Topic:
+      $ref: "./components/private/topic.yaml"
+    Comment:
+      $ref: "./components/private/comment.yaml"
     GroupMember:
       type: array
       items:
         "$ref": "./components/private/group_member.yaml"
+    Paged:
+      $ref: "./components/page.yaml"
+    Paged_GroupMember:
+      title: Paged[GroupMember]
+      allOf:
+        - $ref: "#/components/schemas/Paged"
+        - type: object
+          properties:
+            data:
+              title: Data
+              type: array
+              items:
+                "$ref": "#/components/schemas/GroupMember"
+    Paged_Topic:
+      title: Paged[Topic]
+      allOf:
+        - $ref: "#/components/schemas/Paged"
+        - type: object
+          properties:
+            data:
+              title: Data
+              type: array
+              items:
+                "$ref": "#/components/schemas/Topic"
+    Paged_Comment:
+      title: Paged[Comment]
+      allOf:
+        - $ref: "#/components/schemas/Paged"
+        - type: object
+          properties:
+            data:
+              title: Comment Array
+              type: array
+              items:
+                "$ref": "#/components/schemas/Comment"
   securitySchemes:
     CookiesSession:
       name: sessionID

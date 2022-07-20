@@ -35,7 +35,7 @@ import (
 const TokenTypeOauthToken = 0
 const TokenTypeAccessToken = 1
 
-func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.Generic) domain.AuthService {
+func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.Cache) domain.AuthService {
 	return service{
 		localCache: cache.NewMemoryCache(),
 		cache:      c,
@@ -46,57 +46,49 @@ func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, 
 }
 
 type service struct {
-	localCache cache.Generic
-	cache      cache.Generic
+	localCache cache.Cache
+	cache      cache.Cache
 	repo       domain.AuthRepo
 	user       domain.UserRepo
 	log        *zap.Logger
 }
 
 func (s service) GetByID(ctx context.Context, userID model.UserID) (domain.Auth, error) {
-	u, err := s.user.GetByID(ctx, userID)
+	var cacheKey = cachekey.User(userID)
+
+	var a domain.AuthUserInfo
+	ok, err := s.cache.Get(ctx, cacheKey, &a)
 	if err != nil {
-		return domain.Auth{}, errgo.Wrap(err, "AuthRepo.GetByToken")
+		return domain.Auth{}, errgo.Wrap(err, "cache.Get")
 	}
 
-	p, err := s.GetPermission(ctx, u.UserGroup)
+	if !ok {
+		var u model.User
+		u, err = s.user.GetByID(ctx, userID)
+		if err != nil {
+			return domain.Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
+		}
+
+		a = domain.AuthUserInfo{
+			RegTime: u.RegistrationTime,
+			ID:      u.ID,
+			GroupID: u.UserGroup,
+		}
+
+		_ = s.cache.Set(ctx, cacheKey, a, time.Hour)
+	}
+
+	permission, err := s.getPermission(ctx, a.GroupID)
 	if err != nil {
 		return domain.Auth{}, err
 	}
 
 	return domain.Auth{
-		RegTime:    u.RegistrationTime,
-		ID:         u.ID,
-		GroupID:    u.UserGroup,
-		Permission: p,
+		RegTime:    a.RegTime,
+		ID:         a.ID,
+		GroupID:    a.GroupID,
+		Permission: permission,
 	}, nil
-}
-
-func (s service) GetByIDWithCache(ctx context.Context, userID model.UserID) (domain.Auth, error) {
-	var a domain.Auth
-
-	var cacheKey = cachekey.User(userID)
-
-	ok, err := s.cache.Get(ctx, cacheKey, &a)
-	if err != nil {
-		return domain.Auth{}, errgo.Wrap(err, "cache.Get")
-	}
-	if ok {
-		if a.Permission, err = s.GetPermission(ctx, a.GroupID); err != nil {
-			return domain.Auth{}, err
-		}
-
-		return a, nil
-	}
-
-	a, err = s.GetByID(ctx, userID)
-	if err != nil {
-		return domain.Auth{}, err
-	}
-
-	_ = s.cache.Set(ctx, cacheKey, a, time.Hour)
-
-	return a, nil
 }
 
 func (s service) Login(ctx context.Context, email, password string) (domain.Auth, bool, error) {
@@ -118,57 +110,48 @@ func (s service) Login(ctx context.Context, email, password string) (domain.Auth
 		return domain.Auth{}, false, nil
 	}
 
-	p, err := s.GetPermission(ctx, a.GroupID)
+	p, err := s.getPermission(ctx, a.GroupID)
 	if err != nil {
 		return domain.Auth{}, false, err
 	}
-	a.Permission = p
 
-	return a, true, nil
+	return domain.Auth{
+		RegTime:    a.RegTime,
+		ID:         a.ID,
+		GroupID:    a.GroupID,
+		Permission: p,
+	}, true, nil
 }
 
-// GetByTokenWithCache not sure should we cache it in service or let caller cache this.
-func (s service) GetByTokenWithCache(ctx context.Context, token string) (domain.Auth, error) {
-	var a domain.Auth
-
+func (s service) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
+	var a domain.AuthUserInfo
 	var cacheKey = cachekey.Auth(token)
 
 	ok, err := s.cache.Get(ctx, cacheKey, &a)
 	if err != nil {
 		return domain.Auth{}, errgo.Wrap(err, "cache.Get")
 	}
-	if ok {
-		if a.Permission, err = s.GetPermission(ctx, a.GroupID); err != nil {
-			return domain.Auth{}, err
+
+	if !ok {
+		a, err = s.repo.GetByToken(ctx, token)
+		if err != nil {
+			return domain.Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
 		}
 
-		return a, nil
+		_ = s.cache.Set(ctx, cacheKey, a, time.Hour)
 	}
 
-	a, err = s.GetByToken(ctx, token)
+	permission, err := s.getPermission(ctx, a.GroupID)
 	if err != nil {
 		return domain.Auth{}, err
 	}
 
-	_ = s.cache.Set(ctx, cacheKey, a, time.Hour)
-
-	return a, nil
-}
-
-func (s service) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
-	a, err := s.repo.GetByToken(ctx, token)
-	if err != nil {
-		return domain.Auth{}, errgo.Wrap(err, "AuthRepo.GetByToken")
-	}
-
-	p, err := s.GetPermission(ctx, a.GroupID)
-	if err != nil {
-		return domain.Auth{}, err
-	}
-
-	a.Permission = p
-
-	return a, nil
+	return domain.Auth{
+		RegTime:    a.RegTime,
+		ID:         a.ID,
+		GroupID:    a.GroupID,
+		Permission: permission,
+	}, nil
 }
 
 func (s service) ComparePassword(hashed []byte, password string) (bool, error) {
@@ -195,7 +178,7 @@ func preProcessPassword(s string) [32]byte {
 	return md5Password
 }
 
-func (s service) GetPermission(ctx context.Context, id model.UserGroupID) (domain.Permission, error) {
+func (s service) getPermission(ctx context.Context, id model.UserGroupID) (domain.Permission, error) {
 	var p domain.Permission
 	key := strconv.FormatUint(uint64(id), 10)
 	ok, err := s.localCache.Get(ctx, key, &p)

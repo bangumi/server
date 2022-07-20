@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -70,7 +71,7 @@ func (h Handler) ListGroupMembersPrivate(c *fiber.Ctx) error {
 		return res.BadRequest("group name is required")
 	}
 
-	page, err := getPageQuery(c, defaultPageLimit, defaultMaxPageLimit)
+	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -88,7 +89,7 @@ func (h Handler) ListGroupMembersPrivate(c *fiber.Ctx) error {
 func (h Handler) listGroupMembersPrivate(
 	c *fiber.Ctx,
 	groupName string,
-	page pageQuery,
+	page req.PageQuery,
 	memberType domain.GroupMemberType,
 ) error {
 	g, err := h.g.GetByName(c.Context(), groupName)
@@ -109,7 +110,7 @@ func (h Handler) listGroupMembersPrivate(
 		return res.JSON(c, res.Paged{Data: res.EmptySlice(), Limit: page.Limit, Offset: page.Offset})
 	}
 
-	if err = page.check(memberCount); err != nil {
+	if err = page.Check(memberCount); err != nil {
 		return err
 	}
 
@@ -182,4 +183,36 @@ func parseGroupMemberType(c *fiber.Ctx) (domain.GroupMemberType, error) {
 	}
 
 	return memberType, nil
+}
+
+func (h Handler) ListGroupTopics(c *fiber.Ctx) error {
+	groupName := c.Params("name")
+	if groupName == "" {
+		return res.BadRequest("group name is required")
+	}
+
+	g, err := h.g.GetByName(c.Context(), groupName)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.NotFound("group not found")
+		}
+
+		return h.InternalError(c, err, "failed to get group", zap.String("group_name", groupName))
+	}
+
+	return h.listTopics(c, domain.TopicTypeGroup, uint32(g.ID))
+}
+
+func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
+	topicID, err := req.ParseTopicID(c.Params("topic_id"))
+	if err != nil {
+		return err
+	}
+
+	topic, err := h.getTopic(c, domain.TopicTypeGroup, topicID)
+	if err != nil {
+		return err
+	}
+
+	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
 }

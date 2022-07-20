@@ -53,29 +53,29 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 		}
 	}
 
-	v0 := app.Group("/v0/", h.AccessTokenAuthMiddleware)
+	v0 := app.Group("/v0/", h.MiddlewareAccessTokenAuth)
 
-	v0.Get("/subjects/:id", addMetrics(h.GetSubject))
-	v0.Get("/subjects/:id/image", addMetrics(h.GetSubjectImage))
-	v0.Get("/subjects/:id/persons", addMetrics(h.GetSubjectRelatedPersons))
-	v0.Get("/subjects/:id/subjects", addMetrics(h.GetSubjectRelatedSubjects))
-	v0.Get("/subjects/:id/characters", addMetrics(h.GetSubjectRelatedCharacters))
-	v0.Get("/persons/:id", addMetrics(h.GetPerson))
-	v0.Get("/persons/:id/image", addMetrics(h.GetPersonImage))
-	v0.Get("/persons/:id/subjects", addMetrics(h.GetPersonRelatedSubjects))
-	v0.Get("/persons/:id/characters", addMetrics(h.GetPersonRelatedCharacters))
-	v0.Get("/characters/:id", addMetrics(h.GetCharacter))
-	v0.Get("/characters/:id/image", addMetrics(h.GetCharacterImage))
-	v0.Get("/characters/:id/subjects", addMetrics(h.GetCharacterRelatedSubjects))
-	v0.Get("/characters/:id/persons", addMetrics(h.GetCharacterRelatedPersons))
+	v0.Get("/subjects/:id", addMetrics(h.Subject.Get))
+	v0.Get("/subjects/:id/image", addMetrics(h.Subject.GetImage))
+	v0.Get("/subjects/:id/persons", addMetrics(h.Subject.GetRelatedPersons))
+	v0.Get("/subjects/:id/subjects", addMetrics(h.Subject.GetRelatedSubjects))
+	v0.Get("/subjects/:id/characters", addMetrics(h.Subject.GetRelatedCharacters))
+	v0.Get("/persons/:id", addMetrics(h.Person.Get))
+	v0.Get("/persons/:id/image", addMetrics(h.Person.GetImage))
+	v0.Get("/persons/:id/subjects", addMetrics(h.Person.GetRelatedSubjects))
+	v0.Get("/persons/:id/characters", addMetrics(h.Person.GetRelatedCharacters))
+	v0.Get("/characters/:id", addMetrics(h.Character.Get))
+	v0.Get("/characters/:id/image", addMetrics(h.Character.GetImage))
+	v0.Get("/characters/:id/subjects", addMetrics(h.Character.GetRelatedSubjects))
+	v0.Get("/characters/:id/persons", addMetrics(h.Character.GetRelatedPersons))
 	v0.Get("/episodes/:id", addMetrics(h.GetEpisode))
 	v0.Get("/episodes", addMetrics(h.ListEpisode))
 
-	v0.Get("/me", addMetrics(h.GetCurrentUser))
-	v0.Get("/users/:username/collections", addMetrics(h.ListCollection))
-	v0.Get("/users/:username/collections/:subject_id", addMetrics(h.GetCollection))
-	v0.Get("/users/:username", addMetrics(h.GetUser))
-	v0.Get("/users/:username/avatar", addMetrics(h.GetUserAvatar))
+	v0.Get("/me", addMetrics(h.User.GetCurrent))
+	v0.Get("/users/:username", addMetrics(h.User.Get))
+	v0.Get("/users/:username/collections", addMetrics(h.User.ListSubjectCollection))
+	v0.Get("/users/:username/collections/:subject_id", addMetrics(h.User.GetSubjectCollection))
+	v0.Get("/users/:username/avatar", addMetrics(h.User.GetAvatar))
 
 	v0.Get("/indices/:id", addMetrics(h.GetIndex))
 	v0.Get("/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
@@ -98,13 +98,23 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 	}
 
 	// frontend private api
-	private := app.Group("/p/", append(CORSBlockMiddleware, h.SessionAuthMiddleware)...)
+	private := app.Group("/p/", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
 
 	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
 	private.Post("/logout", addMetrics(h.PrivateLogout))
-	private.Get("/me", addMetrics(h.GetCurrentUser))
+	private.Get("/me", addMetrics(h.User.GetCurrent))
 	private.Get("/groups/:name", addMetrics(h.GetGroupProfileByNamePrivate))
 	private.Get("/groups/:name/members", addMetrics(h.ListGroupMembersPrivate))
+
+	private.Get("/groups/:name/topics", addMetrics(h.ListGroupTopics))
+	private.Get("/subjects/:id/topics", addMetrics(h.ListSubjectTopics))
+
+	private.Get("/groups/:name/topics/:topic_id", addMetrics(h.GetGroupTopic))
+	private.Get("/subjects/:id/topics/:topic_id", addMetrics(h.GetSubjectTopic))
+	private.Get("/indices/:id/comments", addMetrics(h.GetIndexComments))
+	private.Get("/episodes/:id/comments", addMetrics(h.GetEpisodeComments))
+	private.Get("/characters/:id/comments", addMetrics(h.GetCharacterComments))
+	private.Get("/persons/:id/comments", addMetrics(h.GetPersonComments))
 
 	// un-documented
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))
@@ -114,7 +124,7 @@ func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope t
 		CORSBlockMiddleware = []fiber.Handler{originMiddleware}
 	}
 
-	privateHTML := app.Group("/demo/", append(CORSBlockMiddleware, h.SessionAuthMiddleware)...)
+	privateHTML := app.Group("/demo/", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
 	privateHTML.Get("/login", addMetrics(h.PageLogin))
 	privateHTML.Get("/access-token", addMetrics(h.PageListAccessToken))
 	privateHTML.Get("/access-token/create", addMetrics(h.PageCreateAccessToken))

@@ -15,144 +15,92 @@
 package handler
 
 import (
-	"errors"
-	"reflect"
-	"strings"
-
-	"github.com/go-playground/locales/en"
-	"github.com/go-playground/locales/zh"
-	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
-	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
+	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/oauth"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
+	"github.com/bangumi/server/internal/web/handler/character"
+	"github.com/bangumi/server/internal/web/handler/common"
+	"github.com/bangumi/server/internal/web/handler/person"
+	"github.com/bangumi/server/internal/web/handler/subject"
+	"github.com/bangumi/server/internal/web/handler/user"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/session"
 )
 
-var errTranslationNotFound = errors.New("failed to find translation for zh")
-
 func New(
+	common common.Common,
 	cfg config.AppConfig,
-	s domain.SubjectService,
-	c domain.CharacterService,
-	p domain.PersonService,
 	a domain.AuthService,
-	e domain.EpisodeRepo,
-	collect domain.CollectionRepo,
 	r domain.RevisionRepo,
+	topic domain.TopicRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
-	cache cache.Generic,
+	cache cache.Cache,
+	app app.App,
 	captcha captcha.Manager,
 	session session.Manager,
 	rateLimit rate.Manager,
+	userHandler user.User,
+	personHandler person.Person,
 	log *zap.Logger,
+	subject subject.Subject,
 	engine frontend.TemplateEngine,
+	character character.Character,
 	oauth oauth.Manager,
 ) (Handler, error) {
-	validate, trans, err := getValidator()
-	if err != nil {
-		return Handler{}, err
-	}
-
-	log = log.Named("web.handler")
-
 	return Handler{
-		cfg:                  cfg,
-		cache:                cache,
-		log:                  log,
-		rateLimit:            rateLimit,
-		session:              session,
-		p:                    p,
-		s:                    s,
-		a:                    a,
-		u:                    user,
-		e:                    e,
-		c:                    c,
-		collect:              collect,
-		i:                    index,
-		r:                    r,
-		captcha:              captcha,
-		g:                    g,
-		v:                    validate,
-		validatorTranslation: trans,
-
-		skip1Log: log.WithOptions(zap.AddCallerSkip(1)),
-		oauth:    oauth,
-		template: engine,
-		buffPool: buffer.NewPool(),
+		Subject:   subject,
+		Common:    common,
+		app:       app,
+		User:      userHandler,
+		Character: character,
+		Person:    personHandler,
+		cfg:       cfg,
+		cache:     cache,
+		log:       log.Named("web.handler"),
+		rateLimit: rateLimit,
+		session:   session,
+		a:         a,
+		u:         user,
+		i:         index,
+		r:         r,
+		topic:     topic,
+		captcha:   captcha,
+		g:         g,
+		oauth:     oauth,
+		template:  engine,
+		buffPool:  buffer.NewPool(),
 	}, nil
 }
 
 type Handler struct {
-	oauth                oauth.Manager
-	s                    domain.SubjectService
-	p                    domain.PersonService
-	a                    domain.AuthService
-	collect              domain.CollectionRepo
-	session              session.Manager
-	captcha              captcha.Manager
-	e                    domain.EpisodeRepo
-	c                    domain.CharacterService
-	u                    domain.UserRepo
-	rateLimit            rate.Manager
-	i                    domain.IndexRepo
-	r                    domain.RevisionRepo
-	g                    domain.GroupRepo
-	cache                cache.Generic
-	validatorTranslation ut.Translator
-	log                  *zap.Logger
-	skip1Log             *zap.Logger
-	v                    *validator.Validate
-	template             frontend.TemplateEngine
-	buffPool             buffer.Pool
-	cfg                  config.AppConfig
-}
-
-func getValidator() (*validator.Validate, ut.Translator, error) {
-	validate := validator.New()
-	uni := ut.New(en.New(), zh.New())
-
-	// this is usually know or extracted from http 'Accept-Language' header
-	// also see uni.FindTranslator(...)
-	trans, found := uni.GetTranslator(zh.New().Locale())
-	if !found {
-		return nil, nil, errTranslationNotFound
-	}
-
-	err := zh_translations.RegisterDefaultTranslations(validate, trans)
-	if err != nil {
-		return nil, nil, errgo.Wrap(err, "failed to register translation")
-	}
-
-	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
-		docName := field.Tag.Get("validateName")
-		if docName != "" {
-			return docName
-		}
-
-		tag := field.Tag.Get("json")
-		if tag == "" {
-			return field.Name
-		}
-
-		name := strings.SplitN(tag, ",", 2)[0]
-		if name == "-" {
-			return ""
-		}
-
-		return name
-	})
-
-	return validate, trans, nil
+	common.Common
+	Subject   subject.Subject
+	Character character.Character
+	Person    person.Person
+	app       app.App
+	User      user.User
+	a         domain.AuthService
+	session   session.Manager
+	captcha   captcha.Manager
+	u         domain.UserRepo
+	rateLimit rate.Manager
+	i         domain.IndexRepo
+	g         domain.GroupRepo
+	cache     cache.Cache
+	r         domain.RevisionRepo
+	oauth     oauth.Manager
+	topic     domain.TopicRepo
+	template  frontend.TemplateEngine
+	buffPool  buffer.Pool
+	log       *zap.Logger
+	cfg       config.AppConfig
 }

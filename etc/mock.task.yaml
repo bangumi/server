@@ -25,17 +25,16 @@ tasks:
       - AuthRepo
       - AuthService
       - CharacterRepo
-      - CharacterService
       - IndexRepo
       - RevisionRepo
       - SubjectRepo
-      - SubjectService
       - UserRepo
       - EpisodeRepo
       - PersonRepo
       - PersonService
       - GroupRepo
       - CollectionRepo
+      - TopicRepo
 
   base-mock:
     deps:
@@ -66,7 +65,7 @@ tasks:
       - task: base-mock
         vars:
           SRC_DIR: ./internal/cache
-          INTERFACE: "Generic"
+          INTERFACE: "Cache"
           MOCK_STRUCT: Cache
 
   session-manager:
@@ -119,7 +118,7 @@ tasks:
 
   "AuthRepo":
     sources:
-      - internal/domain/auth.go.go
+      - internal/domain/auth.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/AuthRepo.go
@@ -131,7 +130,7 @@ tasks:
 
   "AuthService":
     sources:
-      - internal/domain/auth.go.go
+      - internal/domain/auth.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/AuthService.go
@@ -143,7 +142,7 @@ tasks:
 
   "CharacterRepo":
     sources:
-      - internal/domain/character.go.go
+      - internal/domain/character.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/CharacterRepo.go
@@ -153,21 +152,9 @@ tasks:
           SRC_DIR: ./internal/domain
           INTERFACE: "CharacterRepo"
 
-  "CharacterService":
-    sources:
-      - internal/domain/character.go.go
-      - ./internal/pkg/tools/go.mod
-    generates:
-      - internal/mocks/CharacterService.go
-    cmds:
-      - task: base-mock
-        vars:
-          SRC_DIR: ./internal/domain
-          INTERFACE: "CharacterService"
-
   "IndexRepo":
     sources:
-      - internal/domain/index.go.go
+      - internal/domain/index.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/IndexRepo.go
@@ -179,7 +166,7 @@ tasks:
 
   "RevisionRepo":
     sources:
-      - internal/domain/revision.go.go
+      - internal/domain/revision.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/RevisionRepo.go
@@ -191,7 +178,7 @@ tasks:
 
   "SubjectRepo":
     sources:
-      - internal/domain/subject.go.go
+      - internal/domain/subject.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/SubjectRepo.go
@@ -201,21 +188,9 @@ tasks:
           SRC_DIR: ./internal/domain
           INTERFACE: "SubjectRepo"
 
-  "SubjectService":
-    sources:
-      - internal/domain/subject.go.go
-      - ./internal/pkg/tools/go.mod
-    generates:
-      - internal/mocks/SubjectService.go
-    cmds:
-      - task: base-mock
-        vars:
-          SRC_DIR: ./internal/domain
-          INTERFACE: "SubjectService"
-
   "UserRepo":
     sources:
-      - internal/domain/user.go.go
+      - internal/domain/user.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/UserRepo.go
@@ -227,7 +202,7 @@ tasks:
 
   "EpisodeRepo":
     sources:
-      - internal/domain/episode.go.go
+      - internal/domain/episode.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/EpisodeRepo.go
@@ -239,7 +214,7 @@ tasks:
 
   "PersonRepo":
     sources:
-      - internal/domain/person.go.go
+      - internal/domain/person.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/PersonRepo.go
@@ -251,7 +226,7 @@ tasks:
 
   "PersonService":
     sources:
-      - internal/domain/person.go.go
+      - internal/domain/person.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/PersonService.go
@@ -284,3 +259,15 @@ tasks:
         vars:
           SRC_DIR: ./internal/domain
           INTERFACE: CollectionRepo
+
+  TopicRepo:
+    sources:
+      - internal/domain/topic.go
+      - ./internal/pkg/tools/go.mod
+    generates:
+      - internal/mocks/TopicRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: TopicRepo

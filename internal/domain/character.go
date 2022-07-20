@@ -28,13 +28,6 @@ type CharacterRepo interface {
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectCharacterRelation, error)
 }
 
-type CharacterService interface {
-	Get(ctx context.Context, id model.CharacterID) (model.Character, error)
-
-	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]model.PersonCharacterRelation, error)
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectCharacterRelation, error)
-}
-
 type PersonCharacterRelation struct {
 	CharacterID model.CharacterID
 	PersonID    model.PersonID

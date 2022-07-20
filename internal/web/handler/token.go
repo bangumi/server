@@ -31,9 +31,9 @@ import (
 )
 
 func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
-	v := h.getHTTPAccessor(c)
-	if !v.login {
-		return c.Redirect("/demo/login")
+	v := h.GetHTTPAccessor(c)
+	if !v.Login {
+		return c.Redirect("/demo/Login")
 	}
 
 	var r req.CreatePersonalAccessToken
@@ -41,7 +41,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 		return res.JSONError(c, err)
 	}
 
-	if err := h.v.Struct(r); err != nil {
+	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
 
@@ -54,16 +54,16 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 }
 
 func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
-	v := h.getHTTPAccessor(c)
-	if !v.login {
-		return c.Redirect("/demo/login")
+	v := h.GetHTTPAccessor(c)
+	if !v.Login {
+		return c.Redirect("/demo/Login")
 	}
 
 	var r req.DeletePersonalAccessToken
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
-	if err := h.v.Struct(r); err != nil {
+	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
 

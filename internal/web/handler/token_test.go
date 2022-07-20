@@ -36,7 +36,7 @@ func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().CreateAccessToken(mock.Anything, userID, "token name", timex.OneDay).Return("ttt", nil)
-	mockAuth.EXPECT().GetByIDWithCache(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
 
 	mockSession := mocks.NewSessionManager(t)
 	mockSession.EXPECT().Get(mock.Anything, "session key").Return(session.Session{UserID: userID}, nil)
@@ -63,7 +63,7 @@ func TestHandler_DeletePersonalAccessToken_401(t *testing.T) {
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetTokenByID(mock.Anything, tokenID).Return(domain.AccessToken{UserID: 2, ID: tokenID}, nil)
-	mockAuth.EXPECT().GetByIDWithCache(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
 
 	mockSession := mocks.NewSessionManager(t)
 	mockSession.EXPECT().Get(mock.Anything, "session key").Return(session.Session{UserID: userID}, nil)

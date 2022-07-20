@@ -16,6 +16,11 @@ package model
 
 const subjectLocked = 2
 
+type Tag struct {
+	Name  string
+	Count int
+}
+
 type Subject struct {
 	Image         string
 	Summary       string
@@ -24,6 +29,7 @@ type Subject struct {
 	NameCN        string
 	Infobox       string
 	CompatRawTags []byte // compat field for old tags
+	Tags          []Tag
 	OnHold        uint32
 	Dropped       uint32
 	Volumes       uint32
@@ -81,19 +87,4 @@ func (p Platform) String() string {
 	}
 
 	return p.Type
-}
-
-type Episode struct {
-	Airdate     string
-	Name        string
-	NameCN      string
-	Duration    string
-	Description string
-	Ep          float32
-	SubjectID   SubjectID
-	Sort        float32
-	Comment     uint32
-	ID          EpisodeID
-	Type        EpType
-	Disc        uint8
 }

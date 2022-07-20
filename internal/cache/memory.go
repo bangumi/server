@@ -27,7 +27,7 @@ import (
 
 // NewMemoryCache return an in-memory cache.
 // This cache backend should be used to cache limited-sized entries like user group permission rule.
-func NewMemoryCache() Generic {
+func NewMemoryCache() Cache {
 	return &memCache{}
 }
 

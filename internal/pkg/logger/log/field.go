@@ -32,6 +32,18 @@ func SubjectID(id model.SubjectID) zap.Field {
 	return zap.Uint32("subject_id", uint32(id))
 }
 
+func EpisodeID(id model.EpisodeID) zap.Field {
+	return zap.Uint32("episode_id", uint32(id))
+}
+
 func GroupID(id model.GroupID) zap.Field {
 	return zap.Uint16("group_id", uint16(id))
+}
+
+func PersonID(id model.PersonID) zap.Field {
+	return zap.Uint32("person_id", uint32(id))
+}
+
+func CharacterID(id model.CharacterID) zap.Field {
+	return zap.Uint32("character_id", uint32(id))
 }

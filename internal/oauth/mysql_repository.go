@@ -23,8 +23,8 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/pkg/strparse"
 )
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (Manager, error) {
@@ -53,12 +53,12 @@ func (m mysqlRepo) GetClientByID(ctx context.Context, clientIDs ...string) (map[
 
 func convertFromDao(record *dao.OAuthClient) Client {
 	var userID model.UserID
-	var err error
 	if record.UserID != "" {
-		userID, err = strparse.UserID(record.UserID)
-		if err != nil {
+		uid, err := gstr.ParseUint32(record.UserID)
+		if err != nil || uid == 0 {
 			logger.Fatal("unexpected error when parsing userID", zap.Error(err), zap.String("raw", record.UserID))
 		}
+		userID = model.UserID(uid)
 	}
 
 	return Client{

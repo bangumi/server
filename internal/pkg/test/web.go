@@ -27,20 +27,17 @@ import (
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
 
+	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
@@ -56,6 +53,7 @@ type Mock struct {
 	AuthRepo       domain.AuthRepo
 	AuthService    domain.AuthService
 	EpisodeRepo    domain.EpisodeRepo
+	TopicRepo      domain.TopicRepo
 	GroupRepo      domain.GroupRepo
 	UserRepo       domain.UserRepo
 	IndexRepo      domain.IndexRepo
@@ -63,12 +61,13 @@ type Mock struct {
 	CollectionRepo domain.CollectionRepo
 	CaptchaManager captcha.Manager
 	SessionManager session.Manager
-	Cache          cache.Generic
+	Cache          cache.Cache
 	RateLimiter    rate.Manager
 	OAuthManager   oauth.Manager
 	HTTPMock       *httpmock.MockTransport
 }
 
+//nolint:funlen
 func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 	tb.Helper()
 	var f *fiber.App
@@ -80,13 +79,15 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 	var options = []fx.Option{
 		fx.NopLogger,
 
-		fx.Supply(fx.Annotate(tally.NoopScope, fx.As(new(tally.Scope)))),
+		handler.Module, app.Module,
+
+		fx.Provide(func() tally.Scope { return tally.NoopScope }),
 		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}), fx.As(new(promreporter.Reporter)))),
 
 		fx.Supply(httpClient),
 
 		fx.Provide(
-			logger.Copy, config.NewAppConfig, dal.NewDB, web.New, handler.New, character.NewService, subject.NewService,
+			logger.Copy, config.NewAppConfig, dal.NewDB, web.New,
 			person.NewService, frontend.NewTemplateEngine,
 		),
 
@@ -94,6 +95,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
+		fx.Provide(func() domain.TopicRepo { return m.TopicRepo }),
 		MockAuthRepo(m.AuthRepo),
 		MockOAuthManager(m.OAuthManager),
 		MockAuthService(m.AuthService),
@@ -119,10 +121,8 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		options = append(options, MockCache(m.Cache))
 	}
 
-	app := fx.New(options...)
-
-	if app.Err() != nil {
-		tb.Fatal("can't create web app", app.Err())
+	if err := fx.New(options...).Err(); err != nil {
+		tb.Fatal("can't create web app", err)
 	}
 
 	if m.HTTPMock != nil {
@@ -240,7 +240,7 @@ func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 func MockAuthRepo(m domain.AuthRepo) fx.Option {
 	if m == nil {
 		mocker := &mocks.AuthRepo{}
-		mocker.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{}, nil)
+		mocker.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.AuthUserInfo{}, nil)
 		mocker.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(domain.Permission{}, nil)
 
 		m = mocker
@@ -276,31 +276,19 @@ func MockSubjectRepo(m domain.SubjectRepo) fx.Option {
 	return fx.Supply(fx.Annotate(m, fx.As(new(domain.SubjectRepo))))
 }
 
-func MockCache(mock cache.Generic) fx.Option {
-	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.Generic))))
+func MockCache(mock cache.Cache) fx.Option {
+	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.Cache))))
 }
 
 func MockEmptyCache() fx.Option {
 	return fx.Provide(NopCache)
 }
 
-func NopCache() cache.Generic {
+func NopCache() cache.Cache {
 	mc := &mocks.Cache{}
 	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
 	mc.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	mc.EXPECT().Del(mock.Anything, mock.Anything).Return(nil)
 
 	return mc
-}
-
-func FxE2E(t *testing.T) fx.Option {
-	t.Helper()
-
-	return fx.Provide(
-		query.Use,
-		driver.NewRedisClient,
-		auth.NewMysqlRepo,
-		subject.NewMysqlRepo,
-		driver.NewMysqlConnectionPool,
-	)
 }

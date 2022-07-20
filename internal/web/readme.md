@@ -54,3 +54,7 @@ func (h Handler) GetCurrentUser(c *fiber.Ctx) error {
 	return res.JSON(c, data)
 }
 ```
+
+# frontend
+
+前端 Demo <https://next.bgm.tv/demo/login>

@@ -15,15 +15,33 @@
 package enum
 
 const (
+	// UserGroupAdmin
+	// Deprecated.
 	UserGroupAdmin uint8 = iota + 1
+	// UserGroupBangumiAdmin
+	// Deprecated.
 	UserGroupBangumiAdmin
+	// UserGroupWindowAdmin
+	// Deprecated.
 	UserGroupWindowAdmin
+	// UserGroupQuite
+	// Deprecated.
 	UserGroupQuite
+	// UserGroupBanned
+	// Deprecated.
 	UserGroupBanned
 	_
 	_
+	// UserGroupCharacterAdmin
+	// Deprecated.
 	UserGroupCharacterAdmin
+	// UserGroupWikiAdmin
+	// Deprecated.
 	UserGroupWikiAdmin
+	// UserGroupNormal
+	// Deprecated.
 	UserGroupNormal
+	// UserGroupWikiEditor
+	// Deprecated.
 	UserGroupWikiEditor
 )
