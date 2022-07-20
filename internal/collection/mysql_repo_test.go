@@ -93,7 +93,7 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 	count, err := repo.CountSubjectCollections(context.Background(), id,
 		model.SubjectTypeAll, model.SubjectCollectionAll, true)
 	require.NoError(t, err)
-	require.EqualValues(t, 25, count)
+	require.EqualValues(t, 5, count)
 }
 
 func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
@@ -114,7 +114,7 @@ func TestMysqlRepo_GetEpisodeCollection(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const userID model.UserID = 287622
+	const userID model.UserID = 382951
 	const subjectID model.SubjectID = 372487
 
 	repo, _ := getRepo(t)
