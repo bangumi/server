@@ -75,7 +75,7 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 	repo, _ := getRepo(t)
 
 	count, err := repo.CountSubjectCollections(context.Background(), id,
-		model.SubjectTypeAll, model.CollectionTypeAll, true)
+		model.SubjectTypeAll, model.SubjectCollectionAll, true)
 	require.NoError(t, err)
 	require.EqualValues(t, 5, count)
 }
@@ -89,7 +89,7 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 	repo, _ := getRepo(t)
 
 	data, err := repo.ListSubjectCollection(context.Background(), id,
-		model.SubjectTypeGame, model.CollectionTypeAll, true, 5, 0)
+		model.SubjectTypeGame, model.SubjectCollectionAll, true, 5, 0)
 	require.NoError(t, err)
 	require.Len(t, data, 2)
 }
