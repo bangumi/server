@@ -178,12 +178,13 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 		return nil, err
 	}
 
-	result := gmap.Map(e, func(id model.EpisodeID, item mysqlEpCollectionItem) (model.EpisodeID, model.UserEpisodeCollection) {
-		return id, model.UserEpisodeCollection{
-			ID:   item.EpisodeID,
-			Type: item.Type,
-		}
-	})
+	result := gmap.Map(e,
+		func(id model.EpisodeID, item mysqlEpCollectionItem) (model.EpisodeID, model.UserEpisodeCollection) {
+			return id, model.UserEpisodeCollection{
+				ID:   item.EpisodeID,
+				Type: item.Type,
+			}
+		})
 
 	return result, nil
 }

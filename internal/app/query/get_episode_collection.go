@@ -23,7 +23,10 @@ import (
 )
 
 func (q Query) GetUserEpisodeCollection(
-	ctx context.Context, user domain.Auth, episodeID model.EpisodeID) (model.UserEpisodeCollection, model.Episode, error) {
+	ctx context.Context,
+	user domain.Auth,
+	episodeID model.EpisodeID,
+) (model.UserEpisodeCollection, model.Episode, error) {
 	e, err := q.GetEpisode(ctx, episodeID)
 	if err != nil {
 		return model.UserEpisodeCollection{}, e, err
