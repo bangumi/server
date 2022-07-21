@@ -26,7 +26,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 )
@@ -170,23 +169,14 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 		return nil, errgo.Wrap(err, "r.createEpisodeCollection")
 	}
 
-	var e mysqlEpCollection
-	e, err = deserializePhpEpStatus(d.Status)
+	e, err := deserializePhpEpStatus(d.Status)
 	if err != nil {
 		r.log.Error("failed to deserialize php-serialized bytes to go data",
 			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
 		return nil, err
 	}
 
-	result := gmap.Map(e,
-		func(id model.EpisodeID, item mysqlEpCollectionItem) (model.EpisodeID, model.UserEpisodeCollection) {
-			return id, model.UserEpisodeCollection{
-				ID:   item.EpisodeID,
-				Type: item.Type,
-			}
-		})
-
-	return result, nil
+	return e.toModel(), nil
 }
 
 func (r mysqlRepo) GetEpisodeCollection(
@@ -210,13 +200,5 @@ func (r mysqlRepo) GetEpisodeCollection(
 		return nil, err
 	}
 
-	var result = make(model.UserSubjectEpisodesCollection, len(e))
-	for id, item := range e {
-		result[id] = model.UserEpisodeCollection{
-			ID:   item.EpisodeID,
-			Type: item.Type,
-		}
-	}
-
-	return result, nil
+	return e.toModel(), nil
 }

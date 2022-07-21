@@ -47,8 +47,6 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 			return res.NotFound("subject not exist or has been removed")
 		case errors.Is(err, domain.ErrSubjectNotCollected):
 			return res.BadRequest("subject is not collected, please add subject to your collection first")
-			// case errors.Is(err, domain.ErrNotFound):
-			// 	return res.ErrNotFound
 		}
 
 		return h.InternalError(c, err, "failed to get episode collection", log.UserID(v.ID), log.EpisodeID(episodeID))

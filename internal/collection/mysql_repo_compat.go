@@ -28,7 +28,7 @@ type mysqlEpCollectionItem struct {
 	Type      model.EpisodeCollection `php:"type"`
 }
 
-type mysqlEpCollection = map[model.EpisodeID]mysqlEpCollectionItem
+type mysqlEpCollection map[model.EpisodeID]mysqlEpCollectionItem
 
 func deserializePhpEpStatus(phpSerialized []byte) (mysqlEpCollection, error) {
 	var e map[model.EpisodeID]mysqlEpCollectionItem
@@ -37,4 +37,16 @@ func deserializePhpEpStatus(phpSerialized []byte) (mysqlEpCollection, error) {
 	}
 
 	return e, nil
+}
+
+func (c mysqlEpCollection) toModel() model.UserSubjectEpisodesCollection {
+	var d = make(model.UserSubjectEpisodesCollection, len(c))
+	for key, value := range c {
+		d[key] = model.UserEpisodeCollection{
+			ID:   value.EpisodeID,
+			Type: value.Type,
+		}
+	}
+
+	return d
 }
