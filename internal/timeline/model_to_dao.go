@@ -57,6 +57,6 @@ func memoToDAO(tl *model.TimeLine) ([]byte, error) {
 		result, err := marshalSayMemo(tl)
 		return result, errgo.Wrap(err, "sayMemoToBytes")
 	default:
-		return nil, fmt.Errorf("unexpected cat: %v type: %d", tl.Cat, tl.Type)
+		return nil, errgo.Wrap(ErrUnexpectedType, fmt.Sprintf("(cat: %v, type: %v)", tl.Cat, tl.Type))
 	}
 }

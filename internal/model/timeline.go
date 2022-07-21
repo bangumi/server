@@ -30,18 +30,19 @@ const (
 )
 
 type TimeLine struct {
+	Related string
+	Memo    TimeLineContent
+	Image   TimeLineImages
+
 	ID   TimeLineID
 	UID  UserID
 	Cat  uint16 // Category
 	Type TimeLineType
 
-	Memo     TimeLineContent
-	Image    TimeLineImages
-	Related  string
-	Replies  uint32
-	Dateline uint32
 	Batch    uint8
 	Source   uint8
+	Replies  uint32
+	Dateline uint32
 }
 
 type TimeLineContent struct {

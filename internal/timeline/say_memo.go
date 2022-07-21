@@ -29,7 +29,7 @@ func (m *SayMemo) ToModel() *model.TimeLineSay {
 }
 
 // SayMemo2 cat=5, type=2
-// TODO: looking for a better name kk
+// TODO: looking for a better name kk.
 type SayMemo2 struct {
 	Before string `php:"before"`
 	After  string `php:"after"`
@@ -80,9 +80,8 @@ func marshalSayMemo(tl *model.TimeLine) ([]byte, error) {
 	if tl.Type == 2 {
 		var m SayMemo2
 		m.FromModel(memo.TimeLineSayEdit)
-		return phpserialize.Marshal(m)
-	} else {
-		var m SayMemo
-		return []byte(m), nil
+		result, err := phpserialize.Marshal(m)
+		return result, errgo.Wrap(err, "phpserialize.Marshal")
 	}
+	return []byte(*memo.TimeLineSay), nil
 }

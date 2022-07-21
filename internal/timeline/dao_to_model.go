@@ -26,6 +26,8 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
+var ErrUnexpectedType = fmt.Errorf("unexpected type")
+
 func daoToModel(tl *dao.TimeLine) (model.TimeLine, error) {
 	memo, err := memoToModel(tl)
 	if err != nil {
@@ -52,6 +54,7 @@ func daoToModel(tl *dao.TimeLine) (model.TimeLine, error) {
 	}, nil
 }
 
+//nolint:gomnd,gocyclo
 func memoToModel(tl *dao.TimeLine) (model.TimeLineContent, error) {
 	var memo model.TimeLineContent
 	var err error
@@ -78,47 +81,9 @@ func memoToModel(tl *dao.TimeLine) (model.TimeLineContent, error) {
 	case tl.Cat == 9: // doujin
 		memo, err = parseDoujinMemo(tl.Memo)
 	default:
-		err = fmt.Errorf("unexpected cat:%d type:%d", tl.Cat, tl.Type)
+		err = errgo.Wrap(ErrUnexpectedType, fmt.Sprintf("(cat: %v, type: %v)", tl.Cat, tl.Type))
 	}
 	return memo, err
-}
-
-func imageToModel(b []byte) (model.TimeLineImages, error) {
-	if len(b) == 0 {
-		return model.TimeLineImages{}, nil
-	}
-
-	data, err := phpserialize.UnmarshalAssociativeArray(b)
-	if err != nil {
-		return nil, fmt.Errorf("phpserialize.UnmarshalAssociativeArray: %w: %s", err, string(b))
-	}
-
-	var o model.TimeLineImage
-	err = decodeMap(data, &o)
-
-	return model.TimeLineImages{o}, err
-}
-
-func imagesToModel(b []byte) (model.TimeLineImages, error) {
-	if len(b) == 0 {
-		return model.TimeLineImages{}, nil
-	}
-
-	data, err := phpserialize.UnmarshalAssociativeArray(b)
-	if err != nil {
-		return model.TimeLineImages{}, fmt.Errorf("phpserialize.UnmarshalAssociativeArray: %w: %s", err, string(b))
-	}
-
-	var result = make(model.TimeLineImages, 0, len(data))
-	for _, d := range data {
-		var o model.TimeLineImage
-		if err = decodeMap(d, &o); err != nil {
-			return nil, errgo.Wrap(err, "decodeMap")
-		}
-		result = append(result, o)
-	}
-
-	return result, nil
 }
 
 func parseWikiMemo(b []byte) (model.TimeLineContent, error) {
@@ -178,27 +143,6 @@ func parseDoujinMemo(b []byte) (model.TimeLineContent, error) {
 	return model.TimeLineContent{}, err
 }
 
-func parseDoujinMemoBatch(b []byte) ([]DoujinMemo, error) {
-	data, err := phpserialize.UnmarshalAssociativeArray(b)
-	if err != nil {
-		return nil, fmt.Errorf("phpserialize.UnmarshalAssociativeArray: %w: %s", err, string(b))
-	}
-
-	var r = make([]DoujinMemo, 0, len(data))
-
-	for _, d := range data {
-		var o DoujinMemo
-		err = decodeMap(d, &o)
-		if err != nil {
-			return nil, err
-		}
-
-		r = append(r, o)
-	}
-
-	return r, err
-}
-
 func decodeBytes(b []byte, output interface{}) error {
 	data, err := phpserialize.UnmarshalAssociativeArray(b)
 	if err != nil {
@@ -219,28 +163,6 @@ func decodeBytes(b []byte, output interface{}) error {
 	}
 
 	err = decoder.Decode(data)
-	if err != nil {
-		return errgo.Wrap(err, "mapstructure.Decode: "+reflect.TypeOf(output).String())
-	}
-
-	return nil
-}
-
-func decodeMap(m interface{}, output interface{}) error {
-	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		ErrorUnused:          true,
-		ErrorUnset:           false,
-		WeaklyTypedInput:     true,
-		Result:               output,
-		TagName:              "json",
-		IgnoreUntaggedFields: true,
-	})
-
-	if err != nil {
-		return errgo.Wrap(err, "mapstructure.NewDecoder")
-	}
-
-	err = decoder.Decode(m)
 	if err != nil {
 		return errgo.Wrap(err, "mapstructure.Decode: "+reflect.TypeOf(output).String())
 	}

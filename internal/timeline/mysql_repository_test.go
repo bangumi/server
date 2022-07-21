@@ -76,5 +76,4 @@ func Test_mysqlRepo_Create(t *testing.T) {
 	newTLModel, err := repo.GetByID(ctx, newTLID)
 	require.NoError(t, err)
 	require.Equal(t, tlModel, newTLModel)
-
 }
