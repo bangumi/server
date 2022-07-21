@@ -30,7 +30,7 @@ func newTimeLine(db *gorm.DB) timeLine {
 	_timeLine.ID = field.NewField(tableName, "tml_id")
 	_timeLine.UID = field.NewField(tableName, "tml_uid")
 	_timeLine.Cat = field.NewUint16(tableName, "tml_cat")
-	_timeLine.Type = field.NewField(tableName, "tml_type")
+	_timeLine.Type = field.NewUint16(tableName, "tml_type")
 	_timeLine.Related = field.NewString(tableName, "tml_related")
 	_timeLine.Memo = field.NewBytes(tableName, "tml_memo")
 	_timeLine.Img = field.NewBytes(tableName, "tml_img")
@@ -52,7 +52,7 @@ type timeLine struct {
 	ID       field.Field
 	UID      field.Field
 	Cat      field.Uint16
-	Type     field.Field
+	Type     field.Uint16
 	Related  field.String
 	Memo     field.Bytes
 	Img      field.Bytes
@@ -80,7 +80,7 @@ func (t *timeLine) updateTableName(table string) *timeLine {
 	t.ID = field.NewField(table, "tml_id")
 	t.UID = field.NewField(table, "tml_uid")
 	t.Cat = field.NewUint16(table, "tml_cat")
-	t.Type = field.NewField(table, "tml_type")
+	t.Type = field.NewUint16(table, "tml_type")
 	t.Related = field.NewString(table, "tml_related")
 	t.Memo = field.NewBytes(table, "tml_memo")
 	t.Img = field.NewBytes(table, "tml_img")

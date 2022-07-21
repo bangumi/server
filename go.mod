@@ -2,8 +2,6 @@ module github.com/bangumi/server
 
 go 1.18
 
-replace github.com/trim21/go-phpserialize => ../go-phpserialize
-
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/danielgtaylor/huma v1.8.0

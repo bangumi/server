@@ -45,7 +45,7 @@ var episodeIDTypeString = "model.EpisodeID"     // reflect.TypeOf(new(model.Epis
 var subjectIDTypeString = "model.SubjectID"     // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
 var groupIDTypeString = "model." + reflect.TypeOf(new(model.GroupID)).Elem().Name()
 var timelineIDTypeString = "model." + reflect.TypeOf(new(model.TimeLineID)).Elem().Name()
-var timelineTypeTypeString = "model." + reflect.TypeOf(new(model.TimeLineType)).Elem().Name()
+var timelineTypeTypeString = reflect.TypeOf(new(model.TimeLineType)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 

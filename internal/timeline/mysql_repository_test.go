@@ -37,7 +37,7 @@ func getRepo(t *testing.T) (domain.TimeLineRepo, *query.Query) {
 	return repo, q
 }
 
-func Test_modelToDAO(t *testing.T) {
+func Test_mysqlRepo_GetByID(t *testing.T) {
 	var tlID model.TimeLineID = 28979826
 
 	test.RequireEnv(t, test.EnvMysql)
@@ -45,11 +45,36 @@ func Test_modelToDAO(t *testing.T) {
 	repo, q := getRepo(t)
 	ctx := context.Background()
 
-	tl, err := repo.GetByID(ctx, tlID)
+	tlModel, err := repo.GetByID(ctx, tlID)
 	require.NoError(t, err)
 	tlDAO, err := q.TimeLine.WithContext(ctx).Where(q.TimeLine.ID.Eq(tlID)).First()
 	require.NoError(t, err)
-	reDAO, err := timeline.ModelToDAO(tl)
+
+	require.Equal(t, tlModel.ID, tlDAO.ID)
+	require.Equal(t, tlModel.UID, tlDAO.UID)
+	require.Equal(t, tlModel.Cat, tlDAO.Cat)
+	require.Equal(t, tlModel.Type, tlDAO.Type)
+}
+
+func Test_mysqlRepo_Create(t *testing.T) {
+	var tlID model.TimeLineID = 28979826
+	var newTLID model.TimeLineID = 987654321
+
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+	repo, q := getRepo(t)
+	ctx := context.Background()
+
+	_, err := q.WithContext(ctx).TimeLine.Where(q.TimeLine.ID.Eq(newTLID)).Delete()
 	require.NoError(t, err)
-	require.Equal(t, len(tlDAO.Memo), len(reDAO.Memo))
+
+	tlModel, err := repo.GetByID(ctx, tlID)
+	require.NoError(t, err)
+	tlModel.ID = newTLID
+	_, err = repo.Create(ctx, tlModel)
+	require.NoError(t, err)
+	newTLModel, err := repo.GetByID(ctx, newTLID)
+	require.NoError(t, err)
+	require.Equal(t, tlModel, newTLModel)
+
 }

@@ -1,5 +1,3 @@
-// Copyright (c) 2022 TWT <TWT2333@outlook.com>
-//
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // This program is free software: you can redistribute it and/or modify
@@ -28,16 +26,15 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-//nolint:gomnd
 func daoToModel(tl *dao.TimeLine) (model.TimeLine, error) {
 	memo, err := memoToModel(tl)
 	if err != nil {
-		return model.TimeLine{}, err
+		return model.TimeLine{}, errgo.Wrap(err, "memoToModel")
 	}
 
-	img, err := imageToModel(tl.Img)
+	img, err := unpackImages(tl.Img)
 	if err != nil {
-		return model.TimeLine{}, err
+		return model.TimeLine{}, errgo.Wrap(err, "unpackImages")
 	}
 
 	return model.TimeLine{
@@ -69,11 +66,9 @@ func memoToModel(tl *dao.TimeLine) (model.TimeLineContent, error) {
 	case tl.Cat == 3: // Subject
 		memo, err = parseSubjectMemo(tl.Memo)
 	case tl.Cat == 4: // progress
-		memo.TimeLineProgressMemo = &model.TimeLineProgressMemo{}
-		err = memo.TimeLineProgressMemo.FromBytes(tl.Memo)
+		memo, err = unpackProgressMemo(tl)
 	case tl.Cat == 5: // say
-		memo.TimeLineSayMemo = (*model.TimeLineSayMemo)(new(string))
-		err = memo.TimeLineSayMemo.FromBytes(tl.Memo)
+		memo, err = unpackSayMemo(tl)
 	case tl.Cat == 6: // blog
 		memo, err = parseBlogMemo(tl.Memo)
 	case tl.Cat == 7: // index

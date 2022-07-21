@@ -14,13 +14,6 @@
 
 package model
 
-import (
-	"fmt"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/trim21/go-phpserialize"
-)
-
 const (
 	TimeLineTypeAll TimeLineType = iota
 	TimeLineTypeSubject
@@ -35,9 +28,6 @@ const (
 	TimeLineTypeDoujin
 	TimeLineTypeReplies
 )
-
-var ErrEmptyMemo = fmt.Errorf("empty")
-var ErrNilMemo = fmt.Errorf("nil")
 
 type TimeLine struct {
 	ID   TimeLineID
@@ -59,84 +49,41 @@ type TimeLineContent struct {
 	*TimeLineProgressMemo
 }
 
-type TimeLineSayMemo string
-
-func (m *TimeLineSayMemo) FromBytes(bytes []byte) error {
-	if m == nil {
-		return ErrNilMemo
-	}
-	*m = TimeLineSayMemo(bytes)
-	return nil
+type TimeLineSayMemo struct {
+	*TimeLineSay
+	*TimeLineSayEdit
 }
 
-func (m *TimeLineSayMemo) Bytes() ([]byte, error) {
-	if m == nil {
-		return nil, ErrEmptyMemo
-	}
-	return []byte(*m), nil
+type TimeLineSay string
+
+type TimeLineSayEdit struct {
+	Before string
+	After  string
 }
 
 type TimeLineProgressMemo struct {
-	EpName        *string      `json:"ep_name,omitempty" php:"ep_name,omitempty"`
-	VolsTotal     *string      `json:"vols_total,omitempty" php:"vols_total,omitempty"`
-	SubjectName   *string      `json:"subject_name,omitempty" php:"subject_name,omitempty"`
-	EpsUpdate     *int         `json:"eps_update,omitempty" php:"eps_update,omitempty,string"`
-	VolsUpdate    *int         `json:"vols_update,omitempty" php:"vols_update,omitempty,string"`
-	EpsTotal      *int         `json:"eps_total,omitempty" php:"eps_total,omitempty,string"`
-	EpSort        *int         `json:"ep_sort,omitempty" php:"ep_sort,omitempty,string"`
-	EpID          *EpisodeID   `json:"ep_id,omitempty" php:"ep_id,omitempty,string"`
-	SubjectID     *SubjectID   `json:"subject_id,omitempty" php:"subject_id,omitempty,string"`
-	SubjectTypeID *SubjectType `json:"subject_type_id,omitempty" php:"subject_type_id,omitempty,string"`
-}
-
-func (m *TimeLineProgressMemo) Bytes() ([]byte, error) {
-	if m == nil {
-		return nil, ErrEmptyMemo
-	}
-	result, err := phpserialize.Marshal(m)
-	return result, errgo.Wrap(err, "phpserialize.Marshal")
-}
-
-func (m *TimeLineProgressMemo) FromBytes(b []byte) error {
-	if m == nil {
-		return ErrNilMemo
-	}
-	if err := phpserialize.Unmarshal(b, m); err != nil {
-		return errgo.Wrap(err, "phpserialize.Unmarshal")
-	}
-	return nil
+	EpName        *string
+	VolsTotal     *string
+	SubjectName   *string
+	EpsUpdate     *int
+	VolsUpdate    *int
+	EpsTotal      *int
+	EpSort        *int
+	EpID          *EpisodeID
+	SubjectID     *SubjectID
+	SubjectTypeID *SubjectType
 }
 
 type TimeLineImage struct {
-	Cat       *int64  `json:"cat,omitempty" php:"cat,omitempty"`
-	GroupID   *string `json:"grp_id,omitempty" php:"grp_id,omitempty"`
-	GroupName *string `json:"grp_name,omitempty" php:"grp_name,omitempty"`
-	Name      *string `json:"name,omitempty" php:"name,omitempty"`
-	Title     *string `json:"title,omitempty" php:"title,omitempty"`
-	ID        *string `json:"id,omitempty" php:"id,omitempty"`
-	UserID    *string `json:"uid,omitempty" php:"uid,omitempty"`
-	SubjectID *string `json:"subject_id,omitempty" php:"subject_id,omitempty"`
-	Images    *string `json:"images,omitempty" php:"images,omitempty"`
-}
-
-func (i *TimeLineImage) Bytes() ([]byte, error) {
-	if i == nil {
-		return nil, ErrEmptyMemo
-	}
-	result, err := phpserialize.Marshal(i)
-	return result, errgo.Wrap(err, "phpserialize.Marshal")
+	Cat       *int64
+	GroupID   *string
+	GroupName *string
+	Name      *string
+	Title     *string
+	ID        *string
+	UserID    *string
+	SubjectID *string
+	Images    *string
 }
 
 type TimeLineImages []TimeLineImage
-
-func (is TimeLineImages) Bytes() ([]byte, error) {
-	if len(is) == 0 {
-		return nil, ErrEmptyMemo
-	}
-	if len(is) == 1 {
-		return is[0].Bytes()
-	}
-
-	result, err := phpserialize.Marshal(is)
-	return result, errgo.Wrap(err, "phpserialize.Marshal")
-}

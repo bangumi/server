@@ -22,12 +22,12 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func ModelToDAO(tl model.TimeLine) (*dao.TimeLine, error) {
-	img, err := tl.Image.Bytes()
+func convertModelToDAO(tl *model.TimeLine) (*dao.TimeLine, error) {
+	img, err := marshalImages(tl)
 	if err != nil {
 		return nil, errgo.Wrap(err, "modelImageToDAO")
 	}
-	memo, err := memoToDAO(&tl)
+	memo, err := memoToDAO(tl)
 	if err != nil {
 		return nil, errgo.Wrap(err, "memoToDAO")
 	}
@@ -51,10 +51,10 @@ func ModelToDAO(tl model.TimeLine) (*dao.TimeLine, error) {
 func memoToDAO(tl *model.TimeLine) ([]byte, error) {
 	switch {
 	case tl.Cat == 4: // Progress
-		result, err := tl.Memo.TimeLineProgressMemo.Bytes()
-		return result, errgo.Wrap(err, "progressMemoToDAO")
+		result, err := marshalProgressMemo(tl)
+		return result, errgo.Wrap(err, "marshalProgressMemo")
 	case tl.Cat == 5: // Say
-		result, err := tl.Memo.TimeLineSayMemo.Bytes()
+		result, err := marshalSayMemo(tl)
 		return result, errgo.Wrap(err, "sayMemoToBytes")
 	default:
 		return nil, fmt.Errorf("unexpected cat: %v type: %d", tl.Cat, tl.Type)

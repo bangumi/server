@@ -78,23 +78,23 @@ func (m mysqlRepo) ListByUID(
 }
 
 func (m mysqlRepo) Create(ctx context.Context, tls ...model.TimeLine) ([]model.TimeLine, error) {
-	daoTLs := make([]*dao.TimeLine, 0, len(tls))
+	daos := make([]*dao.TimeLine, 0, len(tls))
 	convertMap := make(map[*dao.TimeLine]int, len(tls)) // record map dao->tls for id insert after create
-	for i, tl := range tls {
-		d, err := ModelToDAO(tl)
+	for i := range tls {
+		d, err := convertModelToDAO(&tls[i])
 		if err != nil {
 			return nil, errgo.Wrap(err, "modelToDAO")
 		}
-		daoTLs = append(daoTLs, d)
+		daos = append(daos, d)
 		convertMap[d] = i
 	}
 
-	if err := m.q.TimeLine.WithContext(ctx).Create(daoTLs...); err != nil {
+	if err := m.q.TimeLine.WithContext(ctx).Create(daos...); err != nil {
 		return nil, errgo.Wrap(err, "dal")
 	}
 
 	// reuse tls to avoid daoToModel
-	for _, d := range daoTLs {
+	for _, d := range daos {
 		tls[convertMap[d]].ID = d.ID
 	}
 	return tls, nil
