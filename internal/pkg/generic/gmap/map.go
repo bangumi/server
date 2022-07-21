@@ -38,14 +38,3 @@ func Copy[M1 ~map[K]V, M2 ~map[K]V, K comparable, V any](dst M1, src M2) {
 		dst[k] = v
 	}
 }
-
-func Map[K1, K2 comparable, V1, V2 any, M1 ~map[K1]V1, M2 map[K2]V2, F func(K1, V1) (K2, V2)](src M1, fn F) M2 {
-	var m = make(M2, len(src))
-
-	for k, v := range src {
-		key, value := fn(k, v)
-		m[key] = value
-	}
-
-	return m
-}
