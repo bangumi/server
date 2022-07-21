@@ -26,7 +26,7 @@ type ProgressMemo struct {
 	EpName        *string            `php:"ep_name,omitempty"`
 	VolsTotal     *string            `php:"vols_total,omitempty"`
 	SubjectName   *string            `php:"subject_name,omitempty"`
-	EpsUpdate     *int               `php:"eps_update,omitempty,string"`
+	EpsUpdate     *int               `php:"eps_update,omitempty"`
 	VolsUpdate    *int               `php:"vols_update,omitempty,string"`
 	EpsTotal      *int               `php:"eps_total,omitempty,string"`
 	EpSort        *int               `php:"ep_sort,omitempty,string"`

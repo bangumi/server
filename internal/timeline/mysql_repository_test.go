@@ -56,9 +56,34 @@ func Test_mysqlRepo_GetByID(t *testing.T) {
 	require.Equal(t, tlModel.Type, tlDAO.Type)
 }
 
+func Test_mysqlRepo_ListByUID(t *testing.T) {
+	var (
+		uid   model.UserID = 287622
+		limit              = -1
+		since model.TimeLineID
+	)
+
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+	repo, q := getRepo(t)
+	ctx := context.Background()
+
+	tls, err := repo.ListByUID(ctx, uid, limit, since)
+	require.NoError(t, err)
+	daos, err := q.TimeLine.WithContext(ctx).
+		Where(q.TimeLine.UID.Eq(uid), q.TimeLine.ID.Gt(since)).
+		Order(q.TimeLine.Dateline).
+		Limit(limit).
+		Find()
+	require.NoError(t, err)
+	require.Equal(t, len(daos), len(tls))
+}
+
 func Test_mysqlRepo_Create(t *testing.T) {
-	var tlID model.TimeLineID = 28979826
-	var newTLID model.TimeLineID = 987654321
+	var (
+		tlID    model.TimeLineID = 28682920
+		newTLID model.TimeLineID = 987654321
+	)
 
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
