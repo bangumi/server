@@ -83,6 +83,20 @@ func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...model.UserID) (map[model
 	return r, nil
 }
 
+func (m mysqlRepo) GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]struct{}, error) {
+	friends, err := m.q.Friend.WithContext(ctx).Where(m.q.Friend.UserID.Eq(userID)).Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "friend.Select.Find")
+	}
+
+	var r = make(map[model.UserID]struct{}, len(friends))
+	for _, friend := range friends {
+		r[friend.FriendID] = struct{}{}
+	}
+
+	return r, nil
+}
+
 func fromDao(m *dao.Member) model.User {
 	return model.User{
 		UserName:         m.Username,
