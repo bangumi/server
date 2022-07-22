@@ -38,6 +38,7 @@ type PrivateTopicDetail struct {
 	Comments   []PrivateComment `json:"comments"`
 	ID         model.TopicID    `json:"id"`
 	IsFriend   bool             `json:"is_friend"`
+	State      CommentState     `json:"state"`
 	ReplyCount uint32           `json:"reply_count"`
 }
 
@@ -67,11 +68,11 @@ type PrivateSubComment struct {
 type CommentState uint8
 
 const (
-	CommentNormal           CommentState = 0
-	CommentAdminCloseTopic  CommentState = 1
-	CommentAdminSilentTopic CommentState = 5
-	CommentDeletedByUser    CommentState = 6
-	CommentDeletedByAdmin   CommentState = 7
+	CommentNormal           = CommentState(model.CommentStateNone)
+	CommentAdminCloseTopic  = CommentState(model.CommentStateAdminCloseTopic)
+	CommentAdminSilentTopic = CommentState(model.CommentStateAdminSilentTopic)
+	CommentDeletedByUser    = CommentState(model.CommentStateUserDelete)
+	CommentDeletedByAdmin   = CommentState(model.CommentStateAdminDelete)
 )
 
 func ToCommentState(i model.CommentState) CommentState {

@@ -7,9 +7,12 @@ allOf:
       - reply_count
       - text
       - title
+      - state
       - updated_at
       - is_friend
     properties:
+      state:
+        $ref: "./comment_state.yaml"
       is_friend:
         type: boolean
         description: 发帖人是否好友

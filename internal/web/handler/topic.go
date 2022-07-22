@@ -150,6 +150,7 @@ func (h Handler) getResTopicWithComments(
 		UpdatedAt:  topic.UpdatedAt,
 		Creator:    res.ConvertModelUser(poster),
 		ReplyCount: topic.Replies,
+		State:      res.ToCommentState(topic.State),
 		Comments:   comments,
 		Text:       auth.RewriteCommit(content).Content,
 	})
