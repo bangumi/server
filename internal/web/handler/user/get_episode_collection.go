@@ -27,8 +27,7 @@ import (
 )
 
 type ResUserEpisodeCollection struct {
-	Episode res.Episode             `json:"episode"`
-	Type    model.EpisodeCollection `json:"type"`
+	Type model.EpisodeCollection `json:"type"`
 }
 
 func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
@@ -38,7 +37,7 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	ec, episode, err := h.app.Query.GetUserEpisodeCollection(c.Context(), v.Auth, episodeID)
+	ec, _, err := h.app.Query.GetUserEpisodeCollection(c.Context(), v.Auth, episodeID)
 	if err != nil {
 		switch {
 		case errors.Is(err, domain.ErrEpisodeNotFound):
@@ -53,7 +52,6 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 	}
 
 	return res.JSON(c, ResUserEpisodeCollection{
-		Episode: res.ConvertModelEpisode(episode),
-		Type:    ec.Type,
+		Type: ec.Type,
 	})
 }
