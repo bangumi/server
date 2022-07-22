@@ -27,4 +27,8 @@ type UserRepo interface {
 	GetByName(ctx context.Context, username string) (model.User, error)
 
 	GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error)
+
+	GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]FriendItem, error)
 }
+
+type FriendItem struct{}
