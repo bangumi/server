@@ -310,6 +310,54 @@ func (_c *TopicRepo_ListReplies_Call) Return(_a0 []model.Comment, _a1 error) *To
 	return _c
 }
 
+// ListRepliesAll provides a mock function with given fields: ctx, commentType, id
+func (_m *TopicRepo) ListRepliesAll(ctx context.Context, commentType domain.CommentType, id model.TopicID) ([]model.Comment, error) {
+	ret := _m.Called(ctx, commentType, id)
+
+	var r0 []model.Comment
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CommentType, model.TopicID) []model.Comment); ok {
+		r0 = rf(ctx, commentType, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Comment)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, domain.CommentType, model.TopicID) error); ok {
+		r1 = rf(ctx, commentType, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// TopicRepo_ListRepliesAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRepliesAll'
+type TopicRepo_ListRepliesAll_Call struct {
+	*mock.Call
+}
+
+// ListRepliesAll is a helper method to define mock.On call
+//  - ctx context.Context
+//  - commentType domain.CommentType
+//  - id model.TopicID
+func (_e *TopicRepo_Expecter) ListRepliesAll(ctx interface{}, commentType interface{}, id interface{}) *TopicRepo_ListRepliesAll_Call {
+	return &TopicRepo_ListRepliesAll_Call{Call: _e.mock.On("ListRepliesAll", ctx, commentType, id)}
+}
+
+func (_c *TopicRepo_ListRepliesAll_Call) Run(run func(ctx context.Context, commentType domain.CommentType, id model.TopicID)) *TopicRepo_ListRepliesAll_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(domain.CommentType), args[2].(model.TopicID))
+	})
+	return _c
+}
+
+func (_c *TopicRepo_ListRepliesAll_Call) Return(_a0 []model.Comment, _a1 error) *TopicRepo_ListRepliesAll_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 type mockConstructorTestingTNewTopicRepo interface {
 	mock.TestingT
 	Cleanup(func())

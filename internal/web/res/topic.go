@@ -20,7 +20,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type Topic struct {
+type PrivateTopic struct {
 	CreatedAt  time.Time     `json:"created_at"`
 	UpdatedAt  time.Time     `json:"updated_at"`
 	Title      string        `json:"title"`
@@ -29,30 +29,37 @@ type Topic struct {
 	ReplyCount uint32        `json:"reply_count"`
 }
 
-type TopicDetail struct {
-	CreatedAt  time.Time       `json:"created_at"`
-	UpdatedAt  time.Time       `json:"updated_at"`
-	Title      string          `json:"title"`
-	Creator    User            `json:"creator"`
-	Text       string          `json:"text"`
-	Comments   PagedG[Comment] `json:"comments,omitempty"`
-	ID         model.TopicID   `json:"id"`
-	ReplyCount uint32          `json:"reply_count"`
+type PrivateTopicDetail struct {
+	CreatedAt  time.Time        `json:"created_at"`
+	UpdatedAt  time.Time        `json:"updated_at"`
+	Title      string           `json:"title"`
+	Creator    User             `json:"creator"`
+	Text       string           `json:"text"`
+	Comments   []PrivateComment `json:"comments"`
+	ID         model.TopicID    `json:"id"`
+	IsFriend   bool             `json:"is_friend"`
+	ReplyCount uint32           `json:"reply_count"`
 }
 
-type Comment struct {
-	CreatedAt time.Time       `json:"created_at"`
-	Replies   []SubComment    `json:"replies"`
-	Text      string          `json:"text"`
-	Creator   User            `json:"creator"`
-	State     CommentState    `json:"state"`
-	ID        model.CommentID `json:"id"`
+type PrivateComments struct {
+	Comments []PrivateComment `json:"comments"`
 }
 
-type SubComment struct {
+type PrivateComment struct {
+	CreatedAt time.Time           `json:"created_at"`
+	Text      string              `json:"text"`
+	Creator   User                `json:"creator"`
+	Replies   []PrivateSubComment `json:"replies"`
+	ID        model.CommentID     `json:"id"`
+	IsFriend  bool                `json:"is_friend"`
+	State     CommentState        `json:"state"`
+}
+
+type PrivateSubComment struct {
 	CreatedAt time.Time       `json:"created_at"`
 	Text      string          `json:"text"`
 	Creator   User            `json:"creator"`
+	IsFriend  bool            `json:"is_friend"`
 	State     CommentState    `json:"state"`
 	ID        model.CommentID `json:"id"`
 }
@@ -60,17 +67,25 @@ type SubComment struct {
 type CommentState uint8
 
 const (
-	CommentNormal         CommentState = 0
-	CommentDeletedByUser  CommentState = 1
-	CommentDeletedByAdmin CommentState = 2
+	CommentNormal           CommentState = 0
+	CommentAdminCloseTopic  CommentState = 1
+	CommentAdminSilentTopic CommentState = 5
+	CommentDeletedByUser    CommentState = 6
+	CommentDeletedByAdmin   CommentState = 7
 )
 
 func ToCommentState(i model.CommentState) CommentState {
 	switch i {
-	case model.CommentStateDelete:
-		return CommentDeletedByUser
-	case model.CommentStatePrivate:
+	case model.CommentStateNone:
+		return CommentNormal
+	case model.CommentStateAdminDelete:
 		return CommentDeletedByAdmin
+	case model.CommentStateAdminCloseTopic:
+		return CommentAdminCloseTopic
+	case model.CommentStateUserDelete:
+		return CommentDeletedByUser
+	case model.CommentStateAdminSilentTopic:
+		return CommentAdminSilentTopic
 	default:
 		return CommentNormal
 	}

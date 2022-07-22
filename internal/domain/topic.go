@@ -40,6 +40,7 @@ type TopicRepo interface {
 
 	// CountReplies top comments for a topic/index/character/person/episode.
 	// 一级回复
+	// 小组和条目帖子会去除楼主发帖
 	CountReplies(ctx context.Context, commentType CommentType, id model.TopicID) (int64, error)
 
 	// ListReplies return paged top comment tree.
@@ -54,6 +55,10 @@ type TopicRepo interface {
 	ListReplies(
 		ctx context.Context, commentType CommentType, id model.TopicID, limit int, offset int,
 	) ([]model.Comment, error)
+
+	// CreateTopic()
+	// CreateComment
+	// CreateSubComment
 }
 
 type TopicType uint32
