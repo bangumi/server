@@ -800,6 +800,42 @@ paths:
       security:
         - OptionalHTTPBearer: []
 
+  "/users/-/collections/-/episodes/{episode_id}":
+    get:
+      tags:
+        - 收藏
+      summary: 章节收藏信息
+      operationId: getUserEpisodeCollection
+      parameters:
+        - *path_episode_id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserEpisodeCollection"
+        "400":
+          description: episode ID not valid
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: episode not exists
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - HTTPBearer: []
+
   "/v0/revisions/persons":
     get:
       tags:
@@ -2090,6 +2126,8 @@ components:
       $ref: "./components/subject_type.yaml"
     UserSubjectCollection:
       $ref: "./components/subject_collection.yaml"
+    UserEpisodeCollection:
+      $ref: "./components/get-user-episodes-collection.yaml"
     v0_RelatedSubject:
       title: RelatedSubject
       required:
