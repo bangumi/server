@@ -30,7 +30,9 @@ package image
 
 import (
 	"fmt"
+	"strconv"
 
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/trim21/go-phpserialize"
 
 	"github.com/bangumi/server/internal/model"
@@ -44,7 +46,7 @@ type Image struct {
 	GroupName *string `php:"grp_name,omitempty"`
 	Name      *string `php:"name,omitempty"`
 	Title     *string `php:"title,omitempty"`
-	ID        *string `php:"id,omitempty"`
+	ID        *int    `php:"id,omitempty"`
 	UserID    *string `php:"uid,omitempty"`
 	SubjectID *string `php:"subject_id,omitempty"`
 	Images    *string `php:"images,omitempty"`
@@ -56,15 +58,103 @@ func (i *Image) ToModel() *model.TimeLineImage {
 	return result
 }
 
+func (i *Image) UnmarshalPHP(b []byte) error {
+	m := make(map[string]interface{})
+	if err := phpserialize.Unmarshal(b, &m); err != nil {
+		return errgo.Wrap(err, "phpserialize.Unmarshal")
+	}
+
+	i.Cat = extract[int64](m, "cat")
+	i.GroupID = extract[string](m, "grp_id")
+	i.GroupName = extract[string](m, "grp_name")
+	i.Name = extract[string](m, "name")
+	i.Title = extract[string](m, "title")
+	i.UserID = extract[string](m, "uid")
+	i.SubjectID = extract[string](m, "subject_id")
+	i.Images = extract[string](m, "images")
+
+	i.ID = extract[int](m, "id")
+	if i.ID == nil {
+		// for some cases, the ID is stored as string in db, here try to extract as string if int failed
+		i.ID = strPtrToIntPtr(extract[string](m, "id"))
+	}
+	return nil
+}
+
+func extract[typ interface{ int64 | string | int }](m map[string]interface{}, key string) *typ {
+	d, ok := m[key]
+	if !ok {
+		return nil
+	}
+	d2, ok := d.(typ)
+	if !ok {
+		return nil
+	}
+	return &d2
+}
+
+func strPtrToIntPtr(s *string) *int {
+	if s == nil {
+		return nil
+	}
+	result, err := strconv.Atoi(*s)
+	if err != nil {
+		return nil
+	}
+	return &result
+}
+
+func intPtrToStrPtr(i *int) *string {
+	if i == nil {
+		return nil
+	}
+	result := strconv.Itoa(*i)
+	return &result
+}
+
 func (i *Image) FromModel(image *model.TimeLineImage) {
 	util.CopySameNameField(i, image)
 }
 
-func marshalImage(image *model.TimeLineImage) ([]byte, error) {
+func imageToMap(image *model.TimeLineImage, cat uint16) map[string]interface{} {
 	var i Image
 	i.FromModel(image)
-	result, err := phpserialize.Marshal(i)
-	return result, errgo.Wrap(err, "phpserialize.marshal")
+
+	m := make(map[string]interface{})
+	if i.Cat != nil {
+		m["cat"] = i.Cat
+	}
+	if i.GroupID != nil {
+		m["grp_id"] = i.GroupID
+	}
+	if i.GroupName != nil {
+		m["grp_name"] = i.GroupName
+	}
+	if i.Name != nil {
+		m["name"] = i.Name
+	}
+	if i.Title != nil {
+		m["title"] = i.Title
+	}
+	if i.UserID != nil {
+		m["uid"] = i.UserID
+	}
+	if i.SubjectID != nil {
+		m["subject_id"] = i.SubjectID
+	}
+	if i.Images != nil {
+		m["images"] = i.Images
+	}
+
+	if i.ID != nil {
+		if cat == 9 {
+			// yes, the cat 9 is the case that image id is stored as string
+			m["id"] = intPtrToStrPtr(i.ID)
+		} else {
+			m["id"] = i.ID
+		}
+	}
+	return m
 }
 
 type Images []Image
@@ -80,21 +170,23 @@ func (is Images) ToModel() model.TimeLineImages {
 	return images
 }
 
-func DAOToModel(b []byte) (model.TimeLineImages, error) {
+func DAOToModel(tl *dao.TimeLine) (model.TimeLineImages, error) {
+	b := tl.Img
+
 	// the image []byte in db is in the type: Union[Image, Images]
 	// handle the single-Image case first, fast path
-	var image Image
-	var errImage error
-	if errImage = phpserialize.Unmarshal(b, &image); errImage == nil {
-		return model.TimeLineImages{*image.ToModel()}, nil
+	var resultFP Image // result fast path
+	errFP := phpserialize.Unmarshal(b, &resultFP)
+	if errFP == nil {
+		return []model.TimeLineImage{*resultFP.ToModel()}, nil
 	}
 
 	// unmarshal Image errors, try the Images unmarshalling path
-	// wraps error raised in Image handling path
+	// wraps error raised in single-Image handling path
 	var images Images
 	if err := phpserialize.Unmarshal(b, &images); err != nil {
 		return nil, errgo.Wrap(err,
-			fmt.Sprintf("phpserialize.unmarshal(with unmarshal as Image failed too with error: %v)", errImage),
+			fmt.Sprintf("phpserialize.unmarshal(with unmarshal as single-Image failed too with error: %v)", errFP),
 		)
 	}
 	return images.ToModel(), nil
@@ -105,15 +197,13 @@ func ModelToDAO(tl *model.TimeLine) ([]byte, error) {
 
 	// handle the single-Image case first, fast path
 	if len(images) == 1 {
-		result, err := marshalImage(&images[0])
-		return result, errgo.Wrap(err, "marshalImage")
+		result, err := phpserialize.Marshal(imageToMap(&images[0], tl.Cat))
+		return result, errgo.Wrap(err, "phpserialize.Marshal")
 	}
 
-	var is Images
+	var is []map[string]interface{}
 	for i := range images {
-		var img Image
-		img.FromModel(&images[i])
-		is = append(is, img)
+		is = append(is, imageToMap(&images[i], tl.Cat))
 	}
 	result, err := phpserialize.Marshal(is)
 	return result, errgo.Wrap(err, "phpserialize.marshal")

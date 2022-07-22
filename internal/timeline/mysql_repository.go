@@ -108,7 +108,7 @@ func daoToModel(tl *dao.TimeLine) (model.TimeLine, error) {
 		return model.TimeLine{}, errgo.Wrap(err, "DAOToModel")
 	}
 
-	img, err := image.DAOToModel(tl.Img)
+	img, err := image.DAOToModel(tl)
 	if err != nil {
 		return model.TimeLine{}, errgo.Wrap(err, "DAOToModel")
 	}

@@ -142,7 +142,7 @@ type TimeLineImage struct {
 	GroupName *string
 	Name      *string
 	Title     *string
-	ID        *string
+	ID        *int
 	UserID    *string
 	SubjectID *string
 	Images    *string

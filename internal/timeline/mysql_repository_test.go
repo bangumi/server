@@ -91,7 +91,7 @@ func Test_mysqlRepo_Create(t *testing.T) {
 			28683198, // cat=5, type=1
 			28684975, // cat=6
 			28684740, // cat=7
-			// 28685042, // cat=8
+			28685042, // cat=8
 			28523860, // cat=9
 		}
 	)
