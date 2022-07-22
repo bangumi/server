@@ -257,7 +257,8 @@ func careers(p *dao.Person) []string {
 
 type Character struct {
 	ID      model.CharacterID `json:"id"`
-	Role    uint8             `json:"name"`
+	Role    uint8             `json:"role"`
+	Name    string            `json:"name"`
 	Infobox string            `json:"infobox"`
 	Summary string            `json:"summary"`
 }
@@ -273,6 +274,7 @@ func exportCharacters(q *query.Query, w io.Writer) {
 		for _, c := range characters {
 			encode(w, Character{
 				ID:      c.ID,
+				Name:    c.Name,
 				Role:    c.Role,
 				Infobox: c.Infobox,
 				Summary: c.Summary,
