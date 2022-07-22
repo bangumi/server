@@ -388,6 +388,10 @@ func (s subjectFieldDo) Scan(result interface{}) (err error) {
 	return s.DO.Scan(result)
 }
 
+func (s subjectFieldDo) Delete(models ...*dao.SubjectField) (result gen.ResultInfo, err error) {
+	return s.DO.Delete(models)
+}
+
 func (s *subjectFieldDo) withDO(do gen.Dao) *subjectFieldDo {
 	s.DO = *do.(*gen.DO)
 	return s

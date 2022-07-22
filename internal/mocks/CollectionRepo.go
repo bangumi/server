@@ -24,18 +24,18 @@ func (_m *CollectionRepo) EXPECT() *CollectionRepo_Expecter {
 }
 
 // CountSubjectCollections provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate
-func (_m *CollectionRepo) CountSubjectCollections(ctx context.Context, userID model.UserID, subjectType uint8, collectionType model.CollectionType, showPrivate bool) (int64, error) {
+func (_m *CollectionRepo) CountSubjectCollections(ctx context.Context, userID model.UserID, subjectType uint8, collectionType model.SubjectCollection, showPrivate bool) (int64, error) {
 	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate)
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, uint8, model.CollectionType, bool) int64); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, uint8, model.SubjectCollection, bool) int64); ok {
 		r0 = rf(ctx, userID, subjectType, collectionType, showPrivate)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, uint8, model.CollectionType, bool) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, uint8, model.SubjectCollection, bool) error); ok {
 		r1 = rf(ctx, userID, subjectType, collectionType, showPrivate)
 	} else {
 		r1 = ret.Error(1)
@@ -53,15 +53,15 @@ type CollectionRepo_CountSubjectCollections_Call struct {
 //  - ctx context.Context
 //  - userID model.UserID
 //  - subjectType uint8
-//  - collectionType model.CollectionType
+//  - collectionType model.SubjectCollection
 //  - showPrivate bool
 func (_e *CollectionRepo_Expecter) CountSubjectCollections(ctx interface{}, userID interface{}, subjectType interface{}, collectionType interface{}, showPrivate interface{}) *CollectionRepo_CountSubjectCollections_Call {
 	return &CollectionRepo_CountSubjectCollections_Call{Call: _e.mock.On("CountSubjectCollections", ctx, userID, subjectType, collectionType, showPrivate)}
 }
 
-func (_c *CollectionRepo_CountSubjectCollections_Call) Run(run func(ctx context.Context, userID model.UserID, subjectType uint8, collectionType model.CollectionType, showPrivate bool)) *CollectionRepo_CountSubjectCollections_Call {
+func (_c *CollectionRepo_CountSubjectCollections_Call) Run(run func(ctx context.Context, userID model.UserID, subjectType uint8, collectionType model.SubjectCollection, showPrivate bool)) *CollectionRepo_CountSubjectCollections_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID), args[2].(uint8), args[3].(model.CollectionType), args[4].(bool))
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(uint8), args[3].(model.SubjectCollection), args[4].(bool))
 	})
 	return _c
 }
@@ -72,14 +72,14 @@ func (_c *CollectionRepo_CountSubjectCollections_Call) Return(_a0 int64, _a1 err
 }
 
 // GetSubjectCollection provides a mock function with given fields: ctx, userID, subjectID
-func (_m *CollectionRepo) GetSubjectCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) (model.SubjectCollection, error) {
+func (_m *CollectionRepo) GetSubjectCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) (model.UserSubjectCollection, error) {
 	ret := _m.Called(ctx, userID, subjectID)
 
-	var r0 model.SubjectCollection
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID) model.SubjectCollection); ok {
+	var r0 model.UserSubjectCollection
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID) model.UserSubjectCollection); ok {
 		r0 = rf(ctx, userID, subjectID)
 	} else {
-		r0 = ret.Get(0).(model.SubjectCollection)
+		r0 = ret.Get(0).(model.UserSubjectCollection)
 	}
 
 	var r1 error
@@ -112,26 +112,26 @@ func (_c *CollectionRepo_GetSubjectCollection_Call) Run(run func(ctx context.Con
 	return _c
 }
 
-func (_c *CollectionRepo_GetSubjectCollection_Call) Return(_a0 model.SubjectCollection, _a1 error) *CollectionRepo_GetSubjectCollection_Call {
+func (_c *CollectionRepo_GetSubjectCollection_Call) Return(_a0 model.UserSubjectCollection, _a1 error) *CollectionRepo_GetSubjectCollection_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
 // ListSubjectCollection provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate, limit, offset
-func (_m *CollectionRepo) ListSubjectCollection(ctx context.Context, userID model.UserID, subjectType uint8, collectionType model.CollectionType, showPrivate bool, limit int, offset int) ([]model.SubjectCollection, error) {
+func (_m *CollectionRepo) ListSubjectCollection(ctx context.Context, userID model.UserID, subjectType uint8, collectionType model.SubjectCollection, showPrivate bool, limit int, offset int) ([]model.UserSubjectCollection, error) {
 	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
 
-	var r0 []model.SubjectCollection
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, uint8, model.CollectionType, bool, int, int) []model.SubjectCollection); ok {
+	var r0 []model.UserSubjectCollection
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, uint8, model.SubjectCollection, bool, int, int) []model.UserSubjectCollection); ok {
 		r0 = rf(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.SubjectCollection)
+			r0 = ret.Get(0).([]model.UserSubjectCollection)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, uint8, model.CollectionType, bool, int, int) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, uint8, model.SubjectCollection, bool, int, int) error); ok {
 		r1 = rf(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)
 	} else {
 		r1 = ret.Error(1)
@@ -149,7 +149,7 @@ type CollectionRepo_ListSubjectCollection_Call struct {
 //  - ctx context.Context
 //  - userID model.UserID
 //  - subjectType uint8
-//  - collectionType model.CollectionType
+//  - collectionType model.SubjectCollection
 //  - showPrivate bool
 //  - limit int
 //  - offset int
@@ -157,14 +157,14 @@ func (_e *CollectionRepo_Expecter) ListSubjectCollection(ctx interface{}, userID
 	return &CollectionRepo_ListSubjectCollection_Call{Call: _e.mock.On("ListSubjectCollection", ctx, userID, subjectType, collectionType, showPrivate, limit, offset)}
 }
 
-func (_c *CollectionRepo_ListSubjectCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectType uint8, collectionType model.CollectionType, showPrivate bool, limit int, offset int)) *CollectionRepo_ListSubjectCollection_Call {
+func (_c *CollectionRepo_ListSubjectCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectType uint8, collectionType model.SubjectCollection, showPrivate bool, limit int, offset int)) *CollectionRepo_ListSubjectCollection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID), args[2].(uint8), args[3].(model.CollectionType), args[4].(bool), args[5].(int), args[6].(int))
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(uint8), args[3].(model.SubjectCollection), args[4].(bool), args[5].(int), args[6].(int))
 	})
 	return _c
 }
 
-func (_c *CollectionRepo_ListSubjectCollection_Call) Return(_a0 []model.SubjectCollection, _a1 error) *CollectionRepo_ListSubjectCollection_Call {
+func (_c *CollectionRepo_ListSubjectCollection_Call) Return(_a0 []model.UserSubjectCollection, _a1 error) *CollectionRepo_ListSubjectCollection_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

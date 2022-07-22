@@ -25,7 +25,7 @@ type CollectionRepo interface {
 		ctx context.Context,
 		userID model.UserID,
 		subjectType model.SubjectType,
-		collectionType model.CollectionType,
+		collectionType model.SubjectCollection,
 		showPrivate bool,
 	) (int64, error)
 
@@ -33,12 +33,12 @@ type CollectionRepo interface {
 		ctx context.Context,
 		userID model.UserID,
 		subjectType model.SubjectType,
-		collectionType model.CollectionType,
+		collectionType model.SubjectCollection,
 		showPrivate bool,
 		limit, offset int,
-	) ([]model.SubjectCollection, error)
+	) ([]model.UserSubjectCollection, error)
 
 	GetSubjectCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-	) (model.SubjectCollection, error)
+	) (model.UserSubjectCollection, error)
 }

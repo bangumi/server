@@ -446,6 +446,10 @@ func (s subjectRevisionDo) Scan(result interface{}) (err error) {
 	return s.DO.Scan(result)
 }
 
+func (s subjectRevisionDo) Delete(models ...*dao.SubjectRevision) (result gen.ResultInfo, err error) {
+	return s.DO.Delete(models)
+}
+
 func (s *subjectRevisionDo) withDO(do gen.Dao) *subjectRevisionDo {
 	s.DO = *do.(*gen.DO)
 	return s

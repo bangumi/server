@@ -497,6 +497,10 @@ func (c characterSubjectsDo) Scan(result interface{}) (err error) {
 	return c.DO.Scan(result)
 }
 
+func (c characterSubjectsDo) Delete(models ...*dao.CharacterSubjects) (result gen.ResultInfo, err error) {
+	return c.DO.Delete(models)
+}
+
 func (c *characterSubjectsDo) withDO(do gen.Dao) *characterSubjectsDo {
 	c.DO = *do.(*gen.DO)
 	return c

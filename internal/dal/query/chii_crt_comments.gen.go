@@ -332,6 +332,10 @@ func (c characterCommentDo) Scan(result interface{}) (err error) {
 	return c.DO.Scan(result)
 }
 
+func (c characterCommentDo) Delete(models ...*dao.CharacterComment) (result gen.ResultInfo, err error) {
+	return c.DO.Delete(models)
+}
+
 func (c *characterCommentDo) withDO(do gen.Dao) *characterCommentDo {
 	c.DO = *do.(*gen.DO)
 	return c

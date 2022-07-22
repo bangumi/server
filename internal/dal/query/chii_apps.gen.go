@@ -350,6 +350,10 @@ func (a appDo) Scan(result interface{}) (err error) {
 	return a.DO.Scan(result)
 }
 
+func (a appDo) Delete(models ...*dao.App) (result gen.ResultInfo, err error) {
+	return a.DO.Delete(models)
+}
+
 func (a *appDo) withDO(do gen.Dao) *appDo {
 	a.DO = *do.(*gen.DO)
 	return a
