@@ -74,6 +74,11 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
+	episodeType, err := req.ParseEpTypeOptional(c.Query("episode_type"))
+	if err != nil {
+		return err
+	}
+
 	_, err = h.app.Query.GetSubject(c.Context(), v.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -91,7 +96,7 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 
-	episodes, count, err := h.app.Query.ListEpisode(c.Context(), subjectID, nil, page.Limit, page.Offset)
+	episodes, count, err := h.app.Query.ListEpisode(c.Context(), subjectID, episodeType, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "query.ListEpisode")
 	}

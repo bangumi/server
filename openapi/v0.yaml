@@ -819,7 +819,12 @@ paths:
           name: limit
           description: 分页参数
           in: query
-
+        - required: false
+          schema:
+            "$ref": "#/components/schemas/EpType"
+          in: query
+          name: episode_type
+          description: 章节类型，不传则不按照章节进行筛选
       responses:
         "200":
           description: Successful Response
