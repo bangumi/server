@@ -107,7 +107,6 @@ func (h Handler) getResTopicWithComments(
 	c *fiber.Ctx,
 	topicType domain.TopicType,
 	topic model.Topic,
-	page req.PageQuery,
 ) error {
 	var commentType domain.CommentType
 	switch topicType {
@@ -128,7 +127,7 @@ func (h Handler) getResTopicWithComments(
 	}
 
 	a := h.GetHTTPAccessor(c)
-	pagedComments, err := h.listComments(c, a.Auth, commentType, topic.ID, page)
+	comments, friends, err := h.listComments(c, a.Auth, commentType, topic.ID)
 	if err != nil {
 		return err
 	}
@@ -138,14 +137,20 @@ func (h Handler) getResTopicWithComments(
 		return errgo.Wrap(err, "get user")
 	}
 
+	var isFriend bool
+	if a.ID != 0 {
+		_, isFriend = friends[a.ID]
+	}
+
 	return res.JSON(c, res.PrivateTopicDetail{
 		ID:         topic.ID,
 		Title:      topic.Title,
+		IsFriend:   isFriend,
 		CreatedAt:  topic.CreatedAt,
 		UpdatedAt:  topic.UpdatedAt,
 		Creator:    res.ConvertModelUser(poster),
 		ReplyCount: topic.Replies,
-		Comments:   pagedComments,
+		Comments:   comments,
 		Text:       auth.RewriteCommit(content).Content,
 	})
 }

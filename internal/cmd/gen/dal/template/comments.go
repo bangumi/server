@@ -25,7 +25,7 @@ func (c *TypeComment) CreatorID() model.UserID {
 }
 
 func (c *TypeComment) IsSubComment() bool {
-	return c.Related == 0
+	return c.Related != 0
 }
 
 func (c *TypeComment) CommentID() model.CommentID {

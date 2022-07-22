@@ -32,15 +32,15 @@ type CommentState uint8
 
 const (
 	CommentStateNone CommentState = 0 // 正常
-	// CommentStateClosed 管理员关闭主题 https://bgm.tv/subject/topic/12629#post_108127
-	CommentStateClosed CommentState = 1 // 关闭
-	CommentStateReopen CommentState = 2 // 重开
-	CommentStatePin    CommentState = 3 // 置顶
-	CommentStateMerge  CommentState = 4 // 合并
-	// CommentStateSilent 管理员下沉 https://bgm.tv/subject/topic/18784#post_160402
-	CommentStateSilent  CommentState = 5
-	CommentStateDelete  CommentState = 6 // 自行删除
-	CommentStatePrivate CommentState = 7 // 管理员删除
+	// CommentStateAdminCloseTopic 管理员关闭主题 https://bgm.tv/subject/topic/12629#post_108127
+	CommentStateAdminCloseTopic CommentState = 1 // 关闭
+	CommentStateAdminReopen     CommentState = 2 // 重开
+	CommentStateAdminPin        CommentState = 3 // 置顶
+	CommentStateAdminMerge      CommentState = 4 // 合并
+	// CommentStateAdminSilentTopic 管理员下沉 https://bgm.tv/subject/topic/18784#post_160402
+	CommentStateAdminSilentTopic CommentState = 5 // 下沉
+	CommentStateUserDelete       CommentState = 6 // 自行删除
+	CommentStateAdminDelete      CommentState = 7 // 管理员删除
 )
 
 type TopicStatus uint8

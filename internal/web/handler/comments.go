@@ -37,11 +37,6 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
-	if err != nil {
-		return err
-	}
-
 	topic, err := h.getTopic(c, domain.TopicTypeSubject, topicID)
 	if err != nil {
 		return err
@@ -60,7 +55,7 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to subject", log.SubjectID(subjectID))
 	}
 
-	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic, page)
+	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
 }
 
 func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
@@ -90,11 +85,6 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
-	if err != nil {
-		return err
-	}
-
 	e, err := h.app.Query.GetEpisode(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -113,20 +103,16 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get subject of episode", log.SubjectID(e.SubjectID))
 	}
 
-	pagedComments, err := h.listComments(c, u.Auth, domain.CommentEpisode, model.TopicID(id), page)
+	pagedComments, _, err := h.listComments(c, u.Auth, domain.CommentEpisode, model.TopicID(id))
 	if err != nil {
 		return h.InternalError(c, err, "failed to get comments", log.SubjectID(e.SubjectID))
 	}
 
-	return c.JSON(pagedComments)
+	return res.JSON(c, res.PrivateComments{Comments: pagedComments})
 }
 
 func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 	id, err := req.ParsePersonID(c.Params("id"))
-	if err != nil {
-		return err
-	}
-	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -145,21 +131,16 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	pagedComments, err := h.listComments(c, u.Auth, domain.CommentPerson, model.TopicID(id), page)
+	pagedComments, _, err := h.listComments(c, u.Auth, domain.CommentPerson, model.TopicID(id))
 	if err != nil {
 		return err
 	}
-	return c.JSON(pagedComments)
+	return res.JSON(c, res.PrivateComments{Comments: pagedComments})
 }
 
 func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 	u := h.GetHTTPAccessor(c)
 	id, err := req.ParseCharacterID(c.Params("id"))
-	if err != nil {
-		return err
-	}
-
-	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -173,22 +154,17 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
 	}
 
-	pagedComments, err := h.listComments(c, u.Auth, domain.CommentCharacter, model.TopicID(id), page)
+	pagedComments, _, err := h.listComments(c, u.Auth, domain.CommentCharacter, model.TopicID(id))
 	if err != nil {
 		return err
 	}
-	return res.JSON(c, pagedComments)
+	return res.JSON(c, res.PrivateComments{Comments: pagedComments})
 }
 
 func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 	user := h.GetHTTPAccessor(c)
 
 	id, err := req.ParseIndexID(c.Params("id"))
-	if err != nil {
-		return err
-	}
-
-	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
@@ -203,11 +179,11 @@ func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	pagedComments, err := h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id), page)
+	pagedComments, _, err := h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
 	if err != nil {
 		return err
 	}
-	return c.JSON(pagedComments)
+	return res.JSON(c, res.PrivateComments{Comments: pagedComments})
 }
 
 func (h Handler) listComments(
@@ -215,45 +191,27 @@ func (h Handler) listComments(
 	u domain.Auth,
 	commentType domain.CommentType,
 	id model.TopicID,
-	page req.PageQuery,
-) (res.PagedComment, error) {
-	count, err := h.topic.CountReplies(c.Context(), commentType, id)
+) ([]res.PrivateComment, map[model.UserID]domain.FriendItem, error) {
+	// a noop limit to fetch all comments
+	comments, err := h.topic.ListReplies(c.Context(), commentType, id, 100000, 0) //nolint:gomnd
 	if err != nil {
-		return res.PagedComment{}, errgo.Wrap(err, "repo.comments.Count")
-	}
-
-	if count == 0 {
-		return res.PagedComment{Data: []res.PrivateComment{}, Total: count, Limit: page.Limit, Offset: page.Offset}, nil
-	}
-
-	if err = page.Check(count); err != nil {
-		return res.PagedComment{}, err
-	}
-
-	comments, err := h.topic.ListReplies(c.Context(), commentType, id, page.Limit, page.Offset)
-	if err != nil {
-		return res.PagedComment{}, errgo.Wrap(err, "topic.ListReplies")
+		return nil, nil, errgo.Wrap(err, "topic.ListRepliesAll")
 	}
 
 	userMap, err := h.app.Query.GetUsersByIDs(c.Context(), commentsToUserIDs(comments)...)
 	if err != nil {
-		return res.PagedComment{}, errgo.Wrap(err, "user.GetByIDs")
+		return nil, nil, errgo.Wrap(err, "query.GetUsersByIDs")
 	}
 
 	var friends map[model.UserID]domain.FriendItem
 	if u.ID != 0 {
 		friends, err = h.u.GetFriends(c.Context(), u.ID)
 		if err != nil {
-			return res.PagedComment{}, errgo.Wrap(err, "failed to get friends")
+			return nil, nil, errgo.Wrap(err, "userRepo.GetFriends")
 		}
 	}
 
-	return res.PagedComment{
-		Total:  count,
-		Limit:  page.Limit,
-		Offset: page.Offset,
-		Data:   convertModelComments(comments, userMap, friends),
-	}, nil
+	return convertModelComments(comments, userMap, friends), friends, nil
 }
 
 func commentsToUserIDs(comments []model.Comment) []model.UserID {
@@ -282,7 +240,7 @@ func convertModelComments(
 			_, ok := friends[subComment.CreatorID]
 
 			replies[i] = res.PrivateSubComment{
-				Friend:    ok,
+				IsFriend:  ok,
 				CreatedAt: subComment.CreatedAt,
 				Text:      subComment.Content,
 				Creator:   res.ConvertModelUser(userMap[subComment.CreatorID]),
@@ -297,7 +255,7 @@ func convertModelComments(
 		result[k] = res.PrivateComment{
 			ID:        comment.ID,
 			Text:      comment.Content,
-			Friend:    ok,
+			IsFriend:  ok,
 			CreatedAt: comment.CreatedAt,
 			Creator:   res.ConvertModelUser(userMap[comment.CreatorID]),
 			Replies:   replies,

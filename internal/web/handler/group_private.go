@@ -209,15 +209,10 @@ func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
-	if err != nil {
-		return err
-	}
-
 	topic, err := h.getTopic(c, domain.TopicTypeGroup, topicID)
 	if err != nil {
 		return err
 	}
 
-	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic, page)
+	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
 }
