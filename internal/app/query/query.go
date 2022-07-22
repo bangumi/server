@@ -27,10 +27,10 @@ func New(
 	cache cache.Cache,
 	subject domain.SubjectRepo,
 	person domain.PersonRepo,
-	user domain.UserRepo,
 	character domain.CharacterRepo,
 	collection domain.CollectionRepo,
 	metric tally.Scope,
+	user domain.UserRepo,
 	topic domain.TopicRepo,
 	log *zap.Logger,
 ) Query {
