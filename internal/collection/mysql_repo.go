@@ -165,32 +165,9 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 			return model.UserSubjectEpisodesCollection{}, nil
 		}
 
-		r.log.Error("failed to create episode collection")
-		return nil, errgo.Wrap(err, "r.createEpisodeCollection")
-	}
-
-	e, err := deserializePhpEpStatus(d.Status)
-	if err != nil {
-		r.log.Error("failed to deserialize php-serialized bytes to go data",
-			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
-		return nil, err
-	}
-
-	return e.toModel(), nil
-}
-
-func (r mysqlRepo) GetEpisodeCollection(
-	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-) (model.UserSubjectEpisodesCollection, error) {
-	d, err := r.q.EpCollection.WithContext(ctx).
-		Where(r.q.EpCollection.UserID.Eq(userID), r.q.EpCollection.SubjectID.Eq(subjectID)).First()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, domain.ErrNotFound
-		}
-
-		r.log.Error("failed to get episode collection record", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
-		return nil, errgo.Wrap(err, "dal")
+		r.log.Error("failed to get episode collection record", zap.Error(err),
+			log.UserID(userID), log.SubjectID(subjectID))
+		return nil, errgo.Wrap(err, "query.EpCollection.Find")
 	}
 
 	e, err := deserializePhpEpStatus(d.Status)
