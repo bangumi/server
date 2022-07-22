@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/bangumi/server/internal/timeline/image"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -26,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/timeline/memo"
 )
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TimeLineRepo, error) {
@@ -81,7 +83,7 @@ func (m mysqlRepo) Create(ctx context.Context, tls ...model.TimeLine) ([]model.T
 	daos := make([]*dao.TimeLine, 0, len(tls))
 	convertMap := make(map[*dao.TimeLine]int, len(tls)) // record map dao->tls for id insert after create
 	for i := range tls {
-		d, err := convertModelToDAO(&tls[i])
+		d, err := modelToDAO(&tls[i])
 		if err != nil {
 			return nil, errgo.Wrap(err, "modelToDAO")
 		}
@@ -98,4 +100,56 @@ func (m mysqlRepo) Create(ctx context.Context, tls ...model.TimeLine) ([]model.T
 		tls[convertMap[d]].ID = d.ID
 	}
 	return tls, nil
+}
+
+func daoToModel(tl *dao.TimeLine) (model.TimeLine, error) {
+	mm, err := memo.DAOToModel(tl)
+	if err != nil {
+		return model.TimeLine{}, errgo.Wrap(err, "DAOToModel")
+	}
+
+	img, err := image.DAOToModel(tl.Img)
+	if err != nil {
+		return model.TimeLine{}, errgo.Wrap(err, "DAOToModel")
+	}
+
+	return model.TimeLine{
+		ID:       tl.ID,
+		Related:  tl.Related,
+		Memo:     *mm,
+		Image:    img,
+		UID:      tl.UID,
+		Replies:  tl.Replies,
+		Dateline: tl.Dateline,
+		Cat:      tl.Cat,
+		Type:     tl.Type,
+		Batch:    tl.Batch,
+		Source:   tl.Source,
+	}, nil
+}
+
+func modelToDAO(tl *model.TimeLine) (*dao.TimeLine, error) {
+	img, err := image.ModelToDAO(tl)
+	if err != nil {
+		return nil, errgo.Wrap(err, "modelImageToDAO")
+	}
+
+	mm, err := memo.ModelToDAO(tl)
+	if err != nil {
+		return nil, errgo.Wrap(err, "ModelToDAO")
+	}
+
+	return &dao.TimeLine{
+		ID:       tl.ID,
+		Related:  tl.Related,
+		Img:      img,
+		Memo:     mm,
+		UID:      tl.UID,
+		Replies:  tl.Replies,
+		Dateline: tl.Dateline,
+		Cat:      tl.Cat,
+		Type:     tl.Type,
+		Batch:    tl.Batch,
+		Source:   tl.Source,
+	}, nil
 }

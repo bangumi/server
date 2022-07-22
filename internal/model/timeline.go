@@ -31,7 +31,7 @@ const (
 
 type TimeLine struct {
 	Related string
-	Memo    TimeLineContent
+	Memo    TimeLineMemo
 	Image   TimeLineImages
 
 	ID   TimeLineID
@@ -45,9 +45,70 @@ type TimeLine struct {
 	Dateline uint32
 }
 
-type TimeLineContent struct {
+type TimeLineMemo struct {
+	*TimeLineDoujinMemo
+	*TimeLineMonoMemo
+	*TimeLineRelationMemo
+	*TimeLineIndexMemo
+	*TimeLineSubjectMemo
+	*TimeLineWikiMemo
+	*TimeLineBlogMemo
+	*TimeLineGroupMemo
 	*TimeLineSayMemo
 	*TimeLineProgressMemo
+}
+
+type TimeLineDoujinMemo struct {
+	ID    string
+	Name  string
+	Title string
+}
+
+type TimeLineMonoMemo struct {
+	Name string `php:"name"`
+	Cat  int    `php:"cat"`
+	ID   int    `php:"id"`
+}
+
+type TimeLineRelationMemo struct {
+	UserID   string
+	Username string
+	Nickname string
+}
+
+type TimeLineIndexMemo struct {
+	ID          string
+	Title       string
+	Description string
+}
+
+type TimeLineSubjectMemo struct {
+	ID             string
+	TypeID         string
+	Name           string
+	NameCN         string
+	Series         string
+	CollectComment string
+	CollectRate    int
+}
+
+type TimeLineWikiMemo struct {
+	SubjectName   string
+	SubjectNameCN string
+	SubjectID     int
+}
+
+type TimeLineBlogMemo struct {
+	EntryTitle       string
+	EntryDescription string
+	EntryID          int
+}
+
+type TimeLineGroupMemo struct {
+	ID    string
+	Name  string
+	Title string
+	Desc  string
 }
 
 type TimeLineSayMemo struct {
