@@ -32,9 +32,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/trim21/go-phpserialize"
 
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/util"
@@ -116,6 +116,7 @@ func (i *Image) FromModel(image *model.TimeLineImage) {
 	util.CopySameNameField(i, image)
 }
 
+//nolint:gocyclo
 func imageToMap(image *model.TimeLineImage, cat uint16) map[string]interface{} {
 	var i Image
 	i.FromModel(image)
