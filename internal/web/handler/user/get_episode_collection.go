@@ -61,7 +61,7 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 	})
 }
 
-// GetSubjectEpisodeCollection return all collected info
+// GetSubjectEpisodeCollection return all collected info.
 func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
 	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
@@ -81,20 +81,11 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		}
 
 		h.log.Error("failed to fetch subject", zap.Error(err), log.SubjectID(subjectID), v.Log())
-		return err
+		return errgo.Wrap(err, "query.GetSubject")
 	}
 
 	ec, err := h.collect.GetSubjectEpisodesCollection(c.Context(), v.ID, subjectID)
 	if err != nil {
-		switch {
-		case errors.Is(err, domain.ErrEpisodeNotFound):
-			return res.NotFound("episode not found")
-		case errors.Is(err, domain.ErrSubjectNotFound):
-			return res.NotFound("subject not exist or has been removed")
-		case errors.Is(err, domain.ErrSubjectNotCollected):
-			return res.BadRequest("subject is not collected, please add subject to your collection first")
-		}
-
 		h.log.Error("unexpected error to fetch user subject collections",
 			zap.Error(err), log.UserID(v.ID), log.SubjectID(subjectID))
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
