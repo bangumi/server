@@ -32,4 +32,4 @@ type PagedG[T any] struct {
 	Offset int   `json:"offset"`
 }
 
-type PagedComment = PagedG[Comment]
+type PagedComment = PagedG[PrivateComment]

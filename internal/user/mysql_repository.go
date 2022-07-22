@@ -83,13 +83,13 @@ func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...model.UserID) (map[model
 	return r, nil
 }
 
-func (m mysqlRepo) GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]struct{}, error) {
+func (m mysqlRepo) GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]domain.FriendItem, error) {
 	friends, err := m.q.Friend.WithContext(ctx).Where(m.q.Friend.UserID.Eq(userID)).Find()
 	if err != nil {
 		return nil, errgo.Wrap(err, "friend.Select.Find")
 	}
 
-	var r = make(map[model.UserID]struct{}, len(friends))
+	var r = make(map[model.UserID]domain.FriendItem, len(friends))
 	for _, friend := range friends {
 		r[friend.FriendID] = struct{}{}
 	}

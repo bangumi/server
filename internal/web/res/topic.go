@@ -20,7 +20,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type Topic struct {
+type PrivateTopic struct {
 	CreatedAt  time.Time     `json:"created_at"`
 	UpdatedAt  time.Time     `json:"updated_at"`
 	Title      string        `json:"title"`
@@ -29,30 +29,33 @@ type Topic struct {
 	ReplyCount uint32        `json:"reply_count"`
 }
 
-type TopicDetail struct {
-	CreatedAt  time.Time       `json:"created_at"`
-	UpdatedAt  time.Time       `json:"updated_at"`
-	Title      string          `json:"title"`
-	Creator    User            `json:"creator"`
-	Text       string          `json:"text"`
-	Comments   PagedG[Comment] `json:"comments,omitempty"`
-	ID         model.TopicID   `json:"id"`
-	ReplyCount uint32          `json:"reply_count"`
+type PrivateTopicDetail struct {
+	CreatedAt  time.Time              `json:"created_at"`
+	UpdatedAt  time.Time              `json:"updated_at"`
+	Title      string                 `json:"title"`
+	Creator    User                   `json:"creator"`
+	Text       string                 `json:"text"`
+	Comments   PagedG[PrivateComment] `json:"comments,omitempty"`
+	ID         model.TopicID          `json:"id"`
+	Friend     bool                   `json:"friend"`
+	ReplyCount uint32                 `json:"reply_count"`
 }
 
-type Comment struct {
-	CreatedAt time.Time       `json:"created_at"`
-	Replies   []SubComment    `json:"replies"`
-	Text      string          `json:"text"`
-	Creator   User            `json:"creator"`
-	State     CommentState    `json:"state"`
-	ID        model.CommentID `json:"id"`
+type PrivateComment struct {
+	CreatedAt time.Time           `json:"created_at"`
+	Text      string              `json:"text"`
+	Creator   User                `json:"creator"`
+	Replies   []PrivateSubComment `json:"replies"`
+	ID        model.CommentID     `json:"id"`
+	Friend    bool                `json:"friend"`
+	State     CommentState        `json:"state"`
 }
 
-type SubComment struct {
+type PrivateSubComment struct {
 	CreatedAt time.Time       `json:"created_at"`
 	Text      string          `json:"text"`
 	Creator   User            `json:"creator"`
+	Friend    bool            `json:"friend"`
 	State     CommentState    `json:"state"`
 	ID        model.CommentID `json:"id"`
 }

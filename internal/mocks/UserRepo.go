@@ -5,6 +5,7 @@ package mocks
 import (
 	context "context"
 
+	domain "github.com/bangumi/server/internal/domain"
 	mock "github.com/stretchr/testify/mock"
 
 	model "github.com/bangumi/server/internal/model"
@@ -175,15 +176,15 @@ func (_c *UserRepo_GetByName_Call) Return(_a0 model.User, _a1 error) *UserRepo_G
 }
 
 // GetFriends provides a mock function with given fields: ctx, userID
-func (_m *UserRepo) GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]struct{}, error) {
+func (_m *UserRepo) GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]domain.FriendItem, error) {
 	ret := _m.Called(ctx, userID)
 
-	var r0 map[model.UserID]struct{}
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) map[model.UserID]struct{}); ok {
+	var r0 map[model.UserID]domain.FriendItem
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) map[model.UserID]domain.FriendItem); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[model.UserID]struct{})
+			r0 = ret.Get(0).(map[model.UserID]domain.FriendItem)
 		}
 	}
 
@@ -216,7 +217,7 @@ func (_c *UserRepo_GetFriends_Call) Run(run func(ctx context.Context, userID mod
 	return _c
 }
 
-func (_c *UserRepo_GetFriends_Call) Return(_a0 map[model.UserID]struct{}, _a1 error) *UserRepo_GetFriends_Call {
+func (_c *UserRepo_GetFriends_Call) Return(_a0 map[model.UserID]domain.FriendItem, _a1 error) *UserRepo_GetFriends_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
