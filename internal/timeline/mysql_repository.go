@@ -18,7 +18,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/bangumi/server/internal/timeline/image"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -27,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/timeline/image"
 	"github.com/bangumi/server/internal/timeline/memo"
 )
 

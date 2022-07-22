@@ -31,16 +31,17 @@ package memo
 import (
 	"fmt"
 
+	"github.com/trim21/go-phpserialize"
+
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/trim21/go-phpserialize"
 )
 
 var ErrUnexpectedType = fmt.Errorf("unexpected type")
 
 // phpSerializedMemo a glue layer between db repo data type and model
-// memo is php serialized and stored as []byte in db(tml_memo column)
+// memo is php serialized and stored as []byte in db(tml_memo column).
 type phpSerializedMemo interface {
 	// ToModel converts this glue to model,
 	// usually following php.unmarshal() that unmarshal the repo data into this glue
