@@ -71,7 +71,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	a := h.GetHTTPAccessor(c)
 	allowed, remain, err := h.rateLimit.Allowed(c.Context(), a.IP.String())
 	if err != nil {
-		return h.InternalError(c, err, "failed to apply rate limit", a.LogRequestID())
+		return h.InternalError(c, err, "failed to apply rate limit", a.Log())
 	}
 
 	if !allowed {
@@ -97,11 +97,11 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 
 	key, s, err := h.session.Create(c.Context(), login)
 	if err != nil {
-		return h.InternalError(c, err, "failed to create session", a.LogRequestID())
+		return h.InternalError(c, err, "failed to create session", a.Log())
 	}
 
 	if err = h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
-		h.log.Error("failed to reset Login rate limit", zap.Error(err), a.LogRequestID())
+		h.log.Error("failed to reset Login rate limit", zap.Error(err), a.Log())
 	}
 
 	c.Cookie(&fiber.Cookie{
@@ -115,7 +115,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 
 	user, err := h.u.GetByID(c.Context(), s.UserID)
 	if err != nil {
-		return h.InternalError(c, err, "failed to get user by user id", a.LogRequestID())
+		return h.InternalError(c, err, "failed to get user by user id", a.Log())
 	}
 
 	h.log.Info("user Login", log.UserID(user.ID))
