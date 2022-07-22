@@ -5,6 +5,7 @@ package mocks
 import (
 	context "context"
 
+	domain "github.com/bangumi/server/internal/domain"
 	mock "github.com/stretchr/testify/mock"
 
 	model "github.com/bangumi/server/internal/model"
@@ -170,6 +171,53 @@ func (_c *UserRepo_GetByName_Call) Run(run func(ctx context.Context, username st
 }
 
 func (_c *UserRepo_GetByName_Call) Return(_a0 model.User, _a1 error) *UserRepo_GetByName_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// GetFriends provides a mock function with given fields: ctx, userID
+func (_m *UserRepo) GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]domain.FriendItem, error) {
+	ret := _m.Called(ctx, userID)
+
+	var r0 map[model.UserID]domain.FriendItem
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) map[model.UserID]domain.FriendItem); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[model.UserID]domain.FriendItem)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UserRepo_GetFriends_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFriends'
+type UserRepo_GetFriends_Call struct {
+	*mock.Call
+}
+
+// GetFriends is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID model.UserID
+func (_e *UserRepo_Expecter) GetFriends(ctx interface{}, userID interface{}) *UserRepo_GetFriends_Call {
+	return &UserRepo_GetFriends_Call{Call: _e.mock.On("GetFriends", ctx, userID)}
+}
+
+func (_c *UserRepo_GetFriends_Call) Run(run func(ctx context.Context, userID model.UserID)) *UserRepo_GetFriends_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.UserID))
+	})
+	return _c
+}
+
+func (_c *UserRepo_GetFriends_Call) Return(_a0 map[model.UserID]domain.FriendItem, _a1 error) *UserRepo_GetFriends_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

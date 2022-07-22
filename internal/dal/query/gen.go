@@ -22,6 +22,7 @@ func Use(db *gorm.DB) *Query {
 		CharacterSubjects:   newCharacterSubjects(db),
 		Episode:             newEpisode(db),
 		EpisodeComment:      newEpisodeComment(db),
+		Friend:              newFriend(db),
 		Group:               newGroup(db),
 		GroupMember:         newGroupMember(db),
 		GroupTopic:          newGroupTopic(db),
@@ -60,6 +61,7 @@ type Query struct {
 	CharacterSubjects   characterSubjects
 	Episode             episode
 	EpisodeComment      episodeComment
+	Friend              friend
 	Group               group
 	GroupMember         groupMember
 	GroupTopic          groupTopic
@@ -99,6 +101,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		CharacterSubjects:   q.CharacterSubjects.clone(db),
 		Episode:             q.Episode.clone(db),
 		EpisodeComment:      q.EpisodeComment.clone(db),
+		Friend:              q.Friend.clone(db),
 		Group:               q.Group.clone(db),
 		GroupMember:         q.GroupMember.clone(db),
 		GroupTopic:          q.GroupTopic.clone(db),
@@ -135,6 +138,7 @@ type queryCtx struct {
 	CharacterSubjects   *characterSubjectsDo
 	Episode             *episodeDo
 	EpisodeComment      *episodeCommentDo
+	Friend              *friendDo
 	Group               *groupDo
 	GroupMember         *groupMemberDo
 	GroupTopic          *groupTopicDo
@@ -171,6 +175,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		CharacterSubjects:   q.CharacterSubjects.WithContext(ctx),
 		Episode:             q.Episode.WithContext(ctx),
 		EpisodeComment:      q.EpisodeComment.WithContext(ctx),
+		Friend:              q.Friend.WithContext(ctx),
 		Group:               q.Group.WithContext(ctx),
 		GroupMember:         q.GroupMember.WithContext(ctx),
 		GroupTopic:          q.GroupTopic.WithContext(ctx),
