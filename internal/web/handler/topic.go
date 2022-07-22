@@ -86,9 +86,9 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	}
 
 	response.Total = count
-	var data = make([]res.Topic, len(topics))
+	var data = make([]res.PrivateTopic, len(topics))
 	for i, topic := range topics {
-		data[i] = res.Topic{
+		data[i] = res.PrivateTopic{
 			ID:         topic.ID,
 			Title:      topic.Title,
 			CreatedAt:  topic.CreatedAt,
@@ -103,7 +103,11 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 
 var errUnknownTopicType = errors.New("unknown topic type")
 
-func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicType, topic model.Topic) error {
+func (h Handler) getResTopicWithComments(
+	c *fiber.Ctx,
+	topicType domain.TopicType,
+	topic model.Topic,
+) error {
 	var commentType domain.CommentType
 	switch topicType {
 	case domain.TopicTypeGroup:
@@ -116,27 +120,37 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 
 	content, err := h.topic.GetTopicContent(c.Context(), topicType, topic.ID)
 	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
 		return h.InternalError(c, err, "failed to get topic content")
 	}
 
-	pagedComments, err := h.listComments(c, commentType, topic.ID)
+	a := h.GetHTTPAccessor(c)
+	comments, friends, err := h.listComments(c, a.Auth, commentType, topic.ID)
 	if err != nil {
 		return err
 	}
 
-	u, err := h.u.GetByIDs(c.Context(), topic.CreatorID)
+	poster, err := h.app.Query.GetUser(c.Context(), topic.CreatorID)
 	if err != nil {
-		return errgo.Wrap(err, "user.GetByIDs")
+		return errgo.Wrap(err, "get user")
 	}
 
-	return res.JSON(c, res.TopicDetail{
+	var isFriend bool
+	if a.ID != 0 {
+		_, isFriend = friends[a.ID]
+	}
+
+	return res.JSON(c, res.PrivateTopicDetail{
 		ID:         topic.ID,
 		Title:      topic.Title,
+		IsFriend:   isFriend,
 		CreatedAt:  topic.CreatedAt,
 		UpdatedAt:  topic.UpdatedAt,
-		Creator:    res.ConvertModelUser(u[topic.CreatorID]),
+		Creator:    res.ConvertModelUser(poster),
 		ReplyCount: topic.Replies,
-		Comments:   pagedComments,
+		Comments:   comments,
 		Text:       auth.RewriteCommit(content).Content,
 	})
 }

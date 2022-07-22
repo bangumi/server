@@ -27,7 +27,7 @@ func (c *EpisodeComment) CreatorID() model.UserID {
 }
 
 func (c *EpisodeComment) IsSubComment() bool {
-	return c.Related == 0
+	return c.Related != 0
 }
 
 func (c *EpisodeComment) CommentID() model.CommentID {

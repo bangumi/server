@@ -31,36 +31,49 @@ func New(
 	character domain.CharacterRepo,
 	collection domain.CollectionRepo,
 	metric tally.Scope,
+	topic domain.TopicRepo,
 	log *zap.Logger,
 ) Query {
 	return Query{
-		cache:                     cache,
-		user:                      user,
-		collection:                collection,
-		episode:                   episode,
-		subject:                   subject,
-		person:                    person,
-		character:                 character,
-		metricSubjectQueryCached:  metric.Counter("app_subject_query_cached_count"),
-		metricSubjectQueryCount:   metric.Counter("app_subject_query_count"),
+		log:   log.Named("app.query"),
+		cache: cache,
+
+		user:       user,
+		topic:      topic,
+		person:     person,
+		episode:    episode,
+		subject:    subject,
+		collection: collection,
+		character:  character,
+
+		metricUserQueryCount:  metric.Counter("app_user_query_count"),
+		metricUserQueryCached: metric.Counter("app_user_query_cached_count"),
+
+		metricSubjectQueryCount:  metric.Counter("app_subject_query_count"),
+		metricSubjectQueryCached: metric.Counter("app_subject_query_cached_count"),
+
 		metricsEpisodeQueryCount:  metric.Counter("app_episode_query_count"),
 		metricsEpisodeQueryCached: metric.Counter("app_subject_query_cached_count"),
-		log:                       log.Named("app.query"),
 	}
 }
 
 type Query struct {
-	cache                    cache.Cache
-	episode                  domain.EpisodeRepo
-	collection               domain.CollectionRepo
-	user                     domain.UserRepo
-	subject                  domain.SubjectRepo
-	person                   domain.PersonRepo
-	character                domain.CharacterRepo
+	log   *zap.Logger
+	cache cache.Cache
+
+	user                  domain.UserRepo
+	topic                 domain.TopicRepo
+	person                domain.PersonRepo
+	episode               domain.EpisodeRepo
+	subject               domain.SubjectRepo
+	character             domain.CharacterRepo
+	collection            domain.CollectionRepo
+	metricUserQueryCached tally.Counter
+	metricUserQueryCount  tally.Counter
+
 	metricSubjectQueryCached tally.Counter
 	metricSubjectQueryCount  tally.Counter
 
 	metricsEpisodeQueryCount  tally.Counter
 	metricsEpisodeQueryCached tally.Counter
-	log                       *zap.Logger
 }
