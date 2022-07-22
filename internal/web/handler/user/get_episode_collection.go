@@ -61,7 +61,7 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 	})
 }
 
-// GetSubjectEpisodeCollection return all collected info.
+// GetSubjectEpisodeCollection return episodes with user's collection info.
 func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
 	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
