@@ -89,6 +89,15 @@ tasks:
     deps:
       - gorm
       - mock
+      - dal:comment
+
+  dal:comment:
+    sources:
+      - ./internal/cmd/gen/dal/**/*.go
+    generates:
+      - ./internal/dal/dao/comment*.gen.go
+    cmds:
+      - go run ./internal/cmd/gen/dal/comment.go
 
   mock:
     desc: Generate Mocks.
