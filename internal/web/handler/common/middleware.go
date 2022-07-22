@@ -20,7 +20,7 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-var errNeedLogin = res.Unauthorized("")
+var errNeedLogin = res.Unauthorized("this API need authorization")
 
 func (h Common) NeedLogin(c *fiber.Ctx) error {
 	if u := h.GetHTTPAccessor(c); !u.Login {
