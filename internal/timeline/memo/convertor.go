@@ -88,7 +88,9 @@ func DAOToModel(tl *dao.TimeLine) (*model.TimeLineMemo, error) {
 		} else {
 			// SayMemo is not php serialized, thus convert it directly
 			sayMemoString := string(tl.Memo)
-			result.TimeLineSayMemo.TimeLineSay = (*model.TimeLineSay)(&sayMemoString)
+			result = &model.TimeLineMemo{
+				TimeLineSayMemo: &model.TimeLineSayMemo{TimeLineSay: (*model.TimeLineSay)(&sayMemoString)},
+			}
 		}
 	case tl.Cat == 6: // blog
 		result, err = unmarshal(tl, &BlogMemo{})
