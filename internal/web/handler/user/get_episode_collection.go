@@ -18,16 +18,19 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 type ResUserEpisodeCollection struct {
-	Type model.EpisodeCollection `json:"type"`
+	Episode res.Episode             `json:"episode"`
+	Type    model.EpisodeCollection `json:"type"`
 }
 
 func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
@@ -37,7 +40,51 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	ec, _, err := h.app.Query.GetUserEpisodeCollection(c.Context(), v.Auth, episodeID)
+	e, err := h.app.Query.GetEpisode(c.Context(), episodeID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		h.log.Error("failed to get episode", log.EpisodeID(episodeID))
+		return errgo.Wrap(err, "query.GetEpisode")
+	}
+
+	m, err := h.collect.GetSubjectEpisodesCollection(c.Context(), v.ID, e.SubjectID)
+	if err != nil {
+		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
+	}
+
+	return res.JSON(c, ResUserEpisodeCollection{
+		Episode: res.ConvertModelEpisode(e),
+		Type:    m[episodeID].Type,
+	})
+}
+
+// GetSubjectEpisodeCollection return all collected info
+func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
+	v := h.GetHTTPAccessor(c)
+	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	if err != nil {
+		return err
+	}
+
+	page, err := req.GetPageQuery(c, req.EpisodeDefaultLimit, req.EpisodeMaxLimit)
+	if err != nil {
+		return err
+	}
+
+	_, err = h.app.Query.GetSubject(c.Context(), v.Auth, subjectID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		h.log.Error("failed to fetch subject", zap.Error(err), log.SubjectID(subjectID), v.Log())
+		return err
+	}
+
+	ec, err := h.collect.GetSubjectEpisodesCollection(c.Context(), v.ID, subjectID)
 	if err != nil {
 		switch {
 		case errors.Is(err, domain.ErrEpisodeNotFound):
@@ -48,10 +95,29 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 			return res.BadRequest("subject is not collected, please add subject to your collection first")
 		}
 
-		return h.InternalError(c, err, "failed to get episode collection", log.UserID(v.ID), log.EpisodeID(episodeID))
+		h.log.Error("unexpected error to fetch user subject collections",
+			zap.Error(err), log.UserID(v.ID), log.SubjectID(subjectID))
+		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 
-	return res.JSON(c, ResUserEpisodeCollection{
-		Type: ec.Type,
+	episodes, count, err := h.app.Query.ListEpisode(c.Context(), subjectID, nil, page.Limit, page.Offset)
+	if err != nil {
+		return errgo.Wrap(err, "query.ListEpisode")
+	}
+
+	var data []ResUserEpisodeCollection
+
+	for _, episode := range episodes {
+		data = append(data, ResUserEpisodeCollection{
+			Episode: res.ConvertModelEpisode(episode),
+			Type:    ec[episode.ID].Type,
+		})
+	}
+
+	return res.JSON(c, res.PagedG[ResUserEpisodeCollection]{
+		Data:   data,
+		Total:  count,
+		Limit:  page.Limit,
+		Offset: page.Offset,
 	})
 }

@@ -57,13 +57,10 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 	return res.JSON(c, res.ConvertModelEpisode(e))
 }
 
-const episodeDefaultLimit = 100
-const episodeMaxLimit = 200
-
 func (h Handler) ListEpisode(c *fiber.Ctx) error {
 	u := h.GetHTTPAccessor(c)
 
-	page, err := req.GetPageQuery(c, episodeDefaultLimit, episodeMaxLimit)
+	page, err := req.GetPageQuery(c, req.EpisodeDefaultLimit, req.EpisodeMaxLimit)
 	if err != nil {
 		return err
 	}

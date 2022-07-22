@@ -56,3 +56,21 @@ func (q Query) ListEpisode(
 
 	return episodes, count, nil
 }
+
+func (q Query) GetAllEpisodes(ctx context.Context, subjectID model.SubjectID) ([]model.Episode, error) {
+	count, err := q.CountEpisode(ctx, subjectID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if count == 0 {
+		return []model.Episode{}, nil
+	}
+
+	var episodes []model.Episode
+	episodes, err = q.episode.List(ctx, subjectID, int(count), 0)
+	if err != nil {
+		return nil, errgo.Wrap(err, "episode.List")
+	}
+	return episodes, nil
+}
