@@ -103,7 +103,10 @@ func DAOToModel(tl *dao.TimeLine) (*model.TimeLineMemo, error) {
 	default:
 		err = ErrUnexpectedType
 	}
-	return result, fmt.Errorf("unmarshal(cat: %v, type: %v): %w", tl.Cat, tl.Type, err)
+	if err != nil {
+		return result, fmt.Errorf("unmarshal(cat: %v, type: %v): %w", tl.Cat, tl.Type, err)
+	}
+	return result, nil
 }
 
 //nolint:gomnd,gocyclo
@@ -141,5 +144,8 @@ func ModelToDAO(tl *model.TimeLine) ([]byte, error) {
 	default:
 		err = ErrUnexpectedType
 	}
-	return result, fmt.Errorf("marshal(cat: %v, type: %v): %w", tl.Cat, tl.Type, err)
+	if err != nil {
+		return nil, fmt.Errorf("marshal(cat: %v, type: %v): %w", tl.Cat, tl.Type, err)
+	}
+	return result, nil
 }
