@@ -179,3 +179,27 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 
 	return e.toModel(), nil
 }
+
+func (r mysqlRepo) UpdateSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	data domain.SubjectCollectionUpdate,
+) error {
+	t := r.q.SubjectCollection
+
+	_, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(
+		// t.Tag.Value(strings.Join(data.Tags, " ")),
+		t.Type.Value(uint8(data.Type)),
+		// t.Comment.Value(data.Comment),
+		t.EpStatus.Value(data.EpStatus),
+		t.VolStatus.Value(data.VolStatus),
+		// t.HasComment.Value(data.Comment == ""),
+	)
+
+	if err != nil {
+		return errgo.Wrap(err, "SubjectCollection.Update")
+	}
+
+	return nil
+}

@@ -45,4 +45,22 @@ type CollectionRepo interface {
 	GetSubjectEpisodesCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 	) (model.UserSubjectEpisodesCollection, error)
+
+	UpdateSubjectCollection(
+		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data SubjectCollectionUpdate,
+	) error
+
+	UpdateEpisodeCollection(
+		ctx context.Context, id model.EpisodeID, collection model.EpisodeCollection,
+	)
+}
+
+type SubjectCollectionUpdate struct {
+	VolStatus uint32
+	EpStatus  uint32
+	Type      model.SubjectCollection
+	Rate      uint8
+	// Tags      []string
+	// Comment   string
+	// Private   bool
 }

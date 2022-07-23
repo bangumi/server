@@ -12,30 +12,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package command
+package null
 
-import (
-	"go.uber.org/zap"
+// stub for template
 
-	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/domain"
-)
+var nilBytes = []byte("null") //nolint:gochecknoglobals
 
-func New(
-	cache cache.Cache,
-	log *zap.Logger,
-	collection domain.CollectionRepo,
-) Command {
-	return Command{
-		log:        log.Named("app.command"),
-		cache:      cache,
-		collection: collection,
-	}
-}
-
-type Command struct {
-	cache cache.Cache
-	log   *zap.Logger
-
-	collection domain.CollectionRepo
-}
+type GenericType interface{}

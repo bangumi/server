@@ -20,38 +20,29 @@ import (
 	"github.com/goccy/go-json"
 )
 
-var nilBytes = []byte("null") //nolint:gochecknoglobals
+var _ json.Unmarshaler = (*Type)(nil)
 
-var _ json.Unmarshaler = (*Null[bool])(nil)
-
-// Null is a nullable type.
-type Null[T any] struct {
-	Value T
+// Type is a nullable type.
+type Type struct {
+	Value GenericType
 	Set   bool // if json object has this field
 	Null  bool // if json field's value is `null`
 }
 
-func New[T any](v T) Null[T] {
-	return Null[T]{
+// NewType creates a new GenericType.
+func NewType(t GenericType) Type {
+	return Type{
 		Null:  false,
-		Value: v,
+		Value: t,
 		Set:   true,
 	}
 }
 
-func (t Null[T]) HasValue() bool {
+func (t Type) HasValue() bool {
 	return t.Set && !t.Null
 }
 
-func (t Null[T]) Ptr() *T {
-	if t.Set && !t.Null {
-		return &t.Value
-	}
-
-	return nil
-}
-
-func (t Null[T]) Interface() interface{} {
+func (t Type) Ptr() *GenericType {
 	if t.Set && !t.Null {
 		return &t.Value
 	}
@@ -60,7 +51,7 @@ func (t Null[T]) Interface() interface{} {
 }
 
 // Default return default value its value is Null or not Set.
-func (t Null[T]) Default(v T) T {
+func (t Type) Default(v GenericType) GenericType {
 	if t.Null && t.Set {
 		return t.Value
 	}
@@ -69,7 +60,7 @@ func (t Null[T]) Default(v T) T {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (t *Null[T]) UnmarshalJSON(data []byte) error {
+func (t *Type) UnmarshalJSON(data []byte) error {
 	t.Set = true
 
 	if bytes.Equal(data, nilBytes) {
