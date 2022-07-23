@@ -95,7 +95,7 @@ func (h User) listCollection(
 		return item.SubjectID
 	})
 
-	subjectMap, err := h.app.Query.GetSubjectByIDs(c.Context(), subjectIDs...)
+	subjectMap, err := h.ctrl.GetSubjectByIDs(c.Context(), subjectIDs...)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get subjects")
 	}

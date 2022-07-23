@@ -12,46 +12,42 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
-	"time"
 
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app/internal/cachekey"
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
-func (q Query) CountEpisode(ctx context.Context, subjectID model.SubjectID, epType *model.EpType) (int64, error) {
-	key := cachekey.EpisodeCount(subjectID, epType)
-	var count int64
-	ok, err := q.cache.Get(ctx, key, &count)
+type UpdateCollectionRequest struct {
+	VolStatus uint32
+	EpStatus  uint32
+	Type      model.SubjectCollection
+}
+
+func (c Ctrl) UpdateCollection(
+	ctx context.Context,
+	u domain.Auth,
+	subjectID model.SubjectID,
+	req UpdateCollectionRequest,
+) error {
+	c.log.Info("try to update collection", log.SubjectID(subjectID), log.UserID(u.ID), zap.Reflect("'req", req))
+
+	err := c.collection.UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
+		VolStatus: req.VolStatus,
+		EpStatus:  req.EpStatus,
+		Type:      req.Type,
+	})
 	if err != nil {
-		return 0, errgo.Wrap(err, "cache.Get")
+		c.log.Error("failed to update user collection info", zap.Error(err))
+		return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 	}
 
-	if ok {
-		return count, nil
-	}
-
-	if epType == nil {
-		count, err = q.episode.Count(ctx, subjectID)
-		if err != nil {
-			return 0, errgo.Wrap(err, "episode.Count")
-		}
-	} else {
-		count, err = q.episode.CountByType(ctx, subjectID, *epType)
-		if err != nil {
-			return 0, errgo.Wrap(err, "episode.CountByType")
-		}
-	}
-
-	if err := q.cache.Set(ctx, key, count, time.Hour); err != nil {
-		q.log.Error("failed to set cache", zap.Error(err))
-	}
-
-	return count, nil
+	return nil
 }

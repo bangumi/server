@@ -21,12 +21,12 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/episode"
@@ -82,7 +82,7 @@ func start() error {
 			auth.NewService, person.NewService, group.NewMysqlRepo,
 		),
 
-		app.Module,
+		ctrl.Module,
 		web.Module,
 
 		fx.Populate(&f, &cfg),

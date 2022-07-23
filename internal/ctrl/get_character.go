@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
@@ -21,26 +21,46 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app/internal/cachekey"
+	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Query) GetPerson(ctx context.Context, personID model.PersonID) (model.Person, error) {
-	person, err := q.getPerson(ctx, personID)
+func (q Ctrl) GetCharacter(ctx context.Context, user domain.Auth, id model.CharacterID) (model.Character, error) {
+	character, err := q.getCharacter(ctx, id)
 	if err != nil {
-		return model.Person{}, err
+		return model.Character{}, err
 	}
 
-	return person, nil
+	if !auth.AllowReadCharacter(user, character) {
+		return model.Character{}, domain.ErrCharacterNotFound
+	}
+
+	return character, nil
 }
 
-func (q Query) getPerson(ctx context.Context, id model.PersonID) (model.Person, error) {
-	var key = cachekey.Person(id)
+func (q Ctrl) GetCharacterNoRedirect(
+	ctx context.Context, user domain.Auth, id model.CharacterID,
+) (model.Character, error) {
+	character, err := q.GetCharacter(ctx, user, id)
+	if err != nil {
+		return model.Character{}, err
+	}
+
+	if character.Redirect != 0 {
+		return model.Character{}, domain.ErrCharacterNotFound
+	}
+
+	return character, nil
+}
+
+func (q Ctrl) getCharacter(ctx context.Context, id model.CharacterID) (model.Character, error) {
+	var key = cachekey.Character(id)
 
 	// try to read from cache
-	var r model.Person
+	var r model.Character
 	ok, err := q.cache.Get(ctx, key, &r)
 	if err != nil {
 		return r, errgo.Wrap(err, "cache.Get")
@@ -50,7 +70,7 @@ func (q Query) getPerson(ctx context.Context, id model.PersonID) (model.Person, 
 		return r, nil
 	}
 
-	r, err = q.person.Get(ctx, id)
+	r, err = q.character.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return r, domain.ErrPersonNotFound

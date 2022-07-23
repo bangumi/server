@@ -20,11 +20,13 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/web/res"
 )
 
 func TestUser_GetEpisodeCollection(t *testing.T) {
@@ -50,4 +52,32 @@ func TestUser_GetEpisodeCollection(t *testing.T) {
 		Execute(app).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
+}
+
+func TestUser_GetSubjectEpisodeCollection(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthService(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 3}, nil)
+
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().GetSubjectEpisodesCollection(mock.Anything, mock.Anything, mock.Anything).
+		Return(map[model.EpisodeID]model.UserEpisodeCollection{}, nil)
+
+	episode := mocks.NewEpisodeRepo(t)
+	episode.EXPECT().Count(mock.Anything, mock.Anything).Return(20, nil)
+	episode.EXPECT().List(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]model.Episode{}, nil)
+
+	app := test.GetWebApp(t, test.Mock{AuthService: mockAuth, CollectionRepo: c, EpisodeRepo: episode})
+
+	var r res.PagedG[struct {
+		Type uint8 `json:"type"`
+	}]
+	test.New(t).Get("/v0/users/-/collections/8/episodes").
+		Header(fiber.HeaderAuthorization, "Bearer").
+		Execute(app).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
+
+	require.EqualValues(t, 20, r.Total)
 }

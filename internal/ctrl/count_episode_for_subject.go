@@ -12,47 +12,46 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
+	"time"
 
+	"go.uber.org/zap"
+
+	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Query) ListEpisode(
-	ctx context.Context,
-	subjectID model.SubjectID,
-	epType *model.EpType,
-	limit, offset int,
-) ([]model.Episode, int64, error) {
-	count, err := q.CountEpisode(ctx, subjectID, epType)
+func (q Ctrl) CountEpisode(ctx context.Context, subjectID model.SubjectID, epType *model.EpType) (int64, error) {
+	key := cachekey.EpisodeCount(subjectID, epType)
+	var count int64
+	ok, err := q.cache.Get(ctx, key, &count)
 	if err != nil {
-		return nil, 0, err
+		return 0, errgo.Wrap(err, "cache.Get")
 	}
 
-	if count == 0 {
-		return []model.Episode{}, 0, nil
-	}
-
-	if int64(offset) > count {
-		return []model.Episode{}, count, ErrOffsetTooBig
+	if ok {
+		return count, nil
 	}
 
 	if epType == nil {
-		var episodes []model.Episode
-		episodes, err = q.episode.List(ctx, subjectID, limit, offset)
+		count, err = q.episode.Count(ctx, subjectID)
 		if err != nil {
-			return nil, 0, errgo.Wrap(err, "episode.List")
+			return 0, errgo.Wrap(err, "episode.Count")
 		}
-		return episodes, count, nil
+	} else {
+		count, err = q.episode.CountByType(ctx, subjectID, *epType)
+		if err != nil {
+			return 0, errgo.Wrap(err, "episode.CountByType")
+		}
 	}
 
-	episodes, err := q.episode.ListByType(ctx, subjectID, *epType, limit, offset)
-	if err != nil {
-		return nil, 0, errgo.Wrap(err, "episode.ListByType")
+	if err := q.cache.Set(ctx, key, count, time.Hour); err != nil {
+		q.log.Error("failed to set cache", zap.Error(err))
 	}
 
-	return episodes, count, nil
+	return count, nil
 }

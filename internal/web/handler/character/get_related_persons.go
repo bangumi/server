@@ -33,7 +33,7 @@ func (h Character) GetRelatedPersons(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = h.app.Query.GetCharacterNoRedirect(c.Context(), u.Auth, id)
+	_, err = h.ctrl.GetCharacterNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

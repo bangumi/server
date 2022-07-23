@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
@@ -23,34 +23,42 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-func (q Query) GetSubjectRelatedSubjects(
+func (q Ctrl) GetCharacterRelatedSubjects(
 	ctx context.Context,
 	user domain.Auth,
-	subjectID model.SubjectID,
-) (model.Subject, []model.SubjectInternalRelation, error) {
-	s, err := q.GetSubjectNoRedirect(ctx, user, subjectID)
+	characterID model.CharacterID,
+) (model.Character, []model.SubjectCharacterRelation, error) {
+	character, err := q.GetCharacter(ctx, user, characterID)
 	if err != nil {
-		return model.Subject{}, nil, err
+		return model.Character{}, nil, err
 	}
 
-	relations, err := q.subject.GetSubjectRelated(ctx, subjectID)
-	if err != nil {
-		return s, nil, errgo.Wrap(err, "SubjectRepo.GetSubjectRelated")
+	if character.Redirect != 0 {
+		return model.Character{}, nil, domain.ErrCharacterNotFound
 	}
 
-	subjects, err := q.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectInternalRelation.GetDestinationID)...)
+	relations, err := q.subject.GetCharacterRelated(ctx, characterID)
 	if err != nil {
-		return s, nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
+		return model.Character{}, nil, errgo.Wrap(err, "SubjectRepo.GetCharacterRelated")
 	}
 
-	var results = make([]model.SubjectInternalRelation, len(relations))
+	var subjectIDs = slice.Map(relations, func(item domain.SubjectCharacterRelation) model.SubjectID {
+		return item.SubjectID
+	})
+
+	subjects, err := q.GetSubjectByIDs(ctx, subjectIDs...)
+	if err != nil {
+		return model.Character{}, nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
+	}
+
+	var results = make([]model.SubjectCharacterRelation, len(relations))
 	for i, rel := range relations {
-		results[i] = model.SubjectInternalRelation{
-			Destination: subjects[rel.DestinationID],
-			TypeID:      rel.TypeID,
-			Source:      s,
+		results[i] = model.SubjectCharacterRelation{
+			Subject:   subjects[rel.SubjectID],
+			TypeID:    rel.TypeID,
+			Character: character,
 		}
 	}
 
-	return s, results, nil
+	return character, results, nil
 }

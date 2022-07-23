@@ -1,10 +1,10 @@
 ## 项目结构
 
-项目整体分为 web，app 和 repository 三层。
+项目整体分为 web，controller 和 repository 三层。
 
 web 相关的组件和 handler 在[internal/web/](../internal/web) 文件夹中。
 
-app 相关在[internal/app/](../internal/app) 文件夹，按照读写区分。
+controller 相关在[internal/ctrl/](../internal/ctrl) 文件夹，按照读写区分。
 
 service 和 repository 在[internal/domain/](../internal/domain)定义为 interface，在各个子文件夹(如[internal/subject/](internal/subject)) 中实现。
 

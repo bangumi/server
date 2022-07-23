@@ -12,41 +12,45 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-func (q Query) GetActors(
+func (q Ctrl) GetSubjectRelatedSubjects(
 	ctx context.Context,
+	user domain.Auth,
 	subjectID model.SubjectID,
-	characterIDs ...model.CharacterID,
-) (map[model.CharacterID][]model.Person, error) {
-	actors, err := q.subject.GetActors(ctx, subjectID, characterIDs...)
+) (model.Subject, []model.SubjectInternalRelation, error) {
+	s, err := q.GetSubjectNoRedirect(ctx, user, subjectID)
 	if err != nil {
-		return nil, errgo.Wrap(err, "subjectRepo.GetActors")
+		return model.Subject{}, nil, err
 	}
 
-	vs := slice.Unique(slice.Reduce(gmap.Values(actors)))
-
-	persons, err := q.person.GetByIDs(ctx, vs...)
+	relations, err := q.subject.GetSubjectRelated(ctx, subjectID)
 	if err != nil {
-		return nil, errgo.Wrap(err, "failed to get persons")
+		return s, nil, errgo.Wrap(err, "SubjectRepo.GetSubjectRelated")
 	}
 
-	var result = make(map[model.CharacterID][]model.Person, len(actors))
-
-	for characterID, ids := range actors {
-		result[characterID] = slice.Map(ids, func(item model.PersonID) model.Person {
-			return persons[item]
-		})
+	subjects, err := q.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectInternalRelation.GetDestinationID)...)
+	if err != nil {
+		return s, nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}
 
-	return result, nil
+	var results = make([]model.SubjectInternalRelation, len(relations))
+	for i, rel := range relations {
+		results[i] = model.SubjectInternalRelation{
+			Destination: subjects[rel.DestinationID],
+			TypeID:      rel.TypeID,
+			Source:      s,
+		}
+	}
+
+	return s, results, nil
 }

@@ -12,42 +12,47 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package command
+package ctrl
 
 import (
 	"context"
 
-	"go.uber.org/zap"
-
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
-type UpdateCollectionRequest struct {
-	VolStatus uint32
-	EpStatus  uint32
-	Type      model.SubjectCollection
-}
-
-func (c Command) UpdateCollection(
+func (q Ctrl) ListEpisode(
 	ctx context.Context,
-	u domain.Auth,
 	subjectID model.SubjectID,
-	req UpdateCollectionRequest,
-) error {
-	c.log.Info("try to update collection", log.SubjectID(subjectID), log.UserID(u.ID), zap.Reflect("'req", req))
-
-	err := c.collection.UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
-		VolStatus: req.VolStatus,
-		EpStatus:  req.EpStatus,
-		Type:      req.Type,
-	})
+	epType *model.EpType,
+	limit, offset int,
+) ([]model.Episode, int64, error) {
+	count, err := q.CountEpisode(ctx, subjectID, epType)
 	if err != nil {
-		c.log.Error("failed to update user collection info", zap.Error(err))
-		return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
+		return nil, 0, err
 	}
 
-	return nil
+	if count == 0 {
+		return []model.Episode{}, 0, nil
+	}
+
+	if int64(offset) > count {
+		return []model.Episode{}, count, ErrOffsetTooBig
+	}
+
+	if epType == nil {
+		var episodes []model.Episode
+		episodes, err = q.episode.List(ctx, subjectID, limit, offset)
+		if err != nil {
+			return nil, 0, errgo.Wrap(err, "episode.List")
+		}
+		return episodes, count, nil
+	}
+
+	episodes, err := q.episode.ListByType(ctx, subjectID, *epType, limit, offset)
+	if err != nil {
+		return nil, 0, errgo.Wrap(err, "episode.ListByType")
+	}
+
+	return episodes, count, nil
 }

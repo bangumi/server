@@ -12,24 +12,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package app
+package ctrl
 
-import (
-	"github.com/bangumi/server/internal/app/command"
-	"github.com/bangumi/server/internal/app/query"
-)
+import "errors"
 
-func New(
-	query query.Query,
-	command command.Command,
-) App {
-	return App{
-		Query:   query,
-		Command: command,
-	}
-}
-
-type App struct {
-	Query   query.Query
-	Command command.Command
-}
+var ErrOffsetTooBig = errors.New("limit too big")

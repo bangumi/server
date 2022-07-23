@@ -70,7 +70,7 @@ func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID mode
 		return res.NotFound(notFoundMessage)
 	}
 
-	s, err := h.app.Query.GetSubject(c.Context(), v.Auth, subjectID)
+	s, err := h.ctrl.GetSubject(c.Context(), v.Auth, subjectID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to subject info", log.SubjectID(subjectID))
 	}

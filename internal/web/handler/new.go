@@ -18,9 +18,9 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
-	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/web/captcha"
@@ -44,7 +44,7 @@ func New(
 	index domain.IndexRepo,
 	user domain.UserRepo,
 	cache cache.Cache,
-	app app.App,
+	ctrl ctrl.Ctrl,
 	captcha captcha.Manager,
 	session session.Manager,
 	rateLimit rate.Manager,
@@ -59,7 +59,7 @@ func New(
 	return Handler{
 		Subject:   subject,
 		Common:    common,
-		app:       app,
+		ctrl:      ctrl,
 		User:      userHandler,
 		Character: character,
 		Person:    personHandler,
@@ -86,7 +86,7 @@ type Handler struct {
 	Subject   subject.Subject
 	Character character.Character
 	Person    person.Person
-	app       app.App
+	ctrl      ctrl.Ctrl
 	User      user.User
 	a         domain.AuthService
 	session   session.Manager

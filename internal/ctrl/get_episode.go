@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
@@ -21,13 +21,13 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app/internal/cachekey"
+	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Query) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episode, error) {
+func (q Ctrl) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episode, error) {
 	q.metricsEpisodeQueryCount.Inc(1)
 	var key = cachekey.Episode(id)
 	// try to read from cache

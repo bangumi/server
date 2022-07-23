@@ -800,7 +800,7 @@ paths:
       security:
         - OptionalHTTPBearer: []
 
-  "/users/-/collections/{subject_id}/episodes":
+  "/v0/users/-/collections/{subject_id}/episodes":
     get:
       tags:
         - 收藏
@@ -861,7 +861,7 @@ paths:
       security:
         - HTTPBearer: []
 
-  "/users/-/collections/-/episodes/{episode_id}":
+  "/v0/users/-/collections/-/episodes/{episode_id}":
     get:
       tags:
         - 收藏

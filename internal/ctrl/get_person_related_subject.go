@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
@@ -23,7 +23,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-func (q Query) GetPersonRelated(
+func (q Ctrl) GetPersonRelated(
 	ctx context.Context, personID model.PersonID,
 ) ([]model.SubjectPersonRelation, error) {
 	person, err := q.GetPerson(ctx, personID)

@@ -132,7 +132,7 @@ func (h Handler) getResTopicWithComments(
 		return err
 	}
 
-	poster, err := h.app.Query.GetUser(c.Context(), topic.CreatorID)
+	poster, err := h.ctrl.GetUser(c.Context(), topic.CreatorID)
 	if err != nil {
 		return errgo.Wrap(err, "get user")
 	}

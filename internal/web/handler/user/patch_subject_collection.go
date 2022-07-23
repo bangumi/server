@@ -21,7 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app/command"
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -47,7 +47,7 @@ func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	s, err := h.app.Query.GetSubject(c.Context(), u.Auth, subjectID)
+	s, err := h.ctrl.GetSubject(c.Context(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("subject not found")
@@ -75,7 +75,7 @@ func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "collectionRepo.GetSubjectCollection")
 	}
 
-	err = h.app.Command.UpdateCollection(c.Context(), u.Auth, subjectID, command.UpdateCollectionRequest{
+	err = h.ctrl.UpdateCollection(c.Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
 		VolStatus: r.VolStatus.Default(collect.VolStatus),
 		EpStatus:  r.EpStatus.Default(collect.EpStatus),
 		Type:      r.Type.Default(collect.Type),

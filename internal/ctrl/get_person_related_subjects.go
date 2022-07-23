@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
@@ -21,7 +21,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Query) GetPersonRelatedCharacters(
+func (q Ctrl) GetPersonRelatedCharacters(
 	ctx context.Context, personID model.PersonID,
 ) ([]model.PersonCharacterRelation, error) {
 	relations, err := q.character.GetPersonRelated(ctx, personID)

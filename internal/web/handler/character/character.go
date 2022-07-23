@@ -17,9 +17,9 @@ package character
 import (
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -29,8 +29,8 @@ import (
 )
 
 type Character struct {
+	ctrl ctrl.Ctrl
 	common.Common
-	app    app.App
 	person domain.PersonService
 	topic  domain.TopicRepo
 	log    *zap.Logger
@@ -41,12 +41,12 @@ func New(
 	common common.Common,
 	p domain.PersonService,
 	topic domain.TopicRepo,
-	app app.App,
+	ctrl ctrl.Ctrl,
 	log *zap.Logger,
 ) (Character, error) {
 	return Character{
 		Common: common,
-		app:    app,
+		ctrl:   ctrl,
 		person: p,
 		topic:  topic,
 		log:    log.Named("handler.Character"),
