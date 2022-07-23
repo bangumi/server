@@ -31,7 +31,7 @@ var ErrOverFlow = errors.New(
 
 var extraPattern = regexp.MustCompile(`^(\d+(:))?(\d+):(\d+)$`)
 
-// Parse a string like "01:31:41" and go default Duration.String() to time.Duration.
+// Parse a string like "01:31:41" and go default Duration.Value() to time.Duration.
 func Parse(s string) (time.Duration, error) {
 	g := extraPattern.FindStringSubmatch(s)
 	if g == nil {

@@ -14,8 +14,30 @@
 
 package null
 
-// stub for template
+import "github.com/gofiber/fiber/v2/utils"
 
-var nilBytes = []byte("null") //nolint:gochecknoglobals
+func NilUint8(i uint8) *uint8 {
+	if i == 0 {
+		return nil
+	}
 
-type GenericType interface{}
+	return &i
+}
+
+func NilUint16(i uint16) *uint16 {
+	if i == 0 {
+		return nil
+	}
+
+	return &i
+}
+
+func NilString(s string) *string {
+	if s == "" {
+		return nil
+	}
+
+	s = utils.CopyString(s)
+
+	return &s
+}
