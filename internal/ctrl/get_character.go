@@ -28,8 +28,8 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Ctrl) GetCharacter(ctx context.Context, user domain.Auth, id model.CharacterID) (model.Character, error) {
-	character, err := q.getCharacter(ctx, id)
+func (ctl Ctrl) GetCharacter(ctx context.Context, user domain.Auth, id model.CharacterID) (model.Character, error) {
+	character, err := ctl.getCharacter(ctx, id)
 	if err != nil {
 		return model.Character{}, err
 	}
@@ -41,10 +41,10 @@ func (q Ctrl) GetCharacter(ctx context.Context, user domain.Auth, id model.Chara
 	return character, nil
 }
 
-func (q Ctrl) GetCharacterNoRedirect(
+func (ctl Ctrl) GetCharacterNoRedirect(
 	ctx context.Context, user domain.Auth, id model.CharacterID,
 ) (model.Character, error) {
-	character, err := q.GetCharacter(ctx, user, id)
+	character, err := ctl.GetCharacter(ctx, user, id)
 	if err != nil {
 		return model.Character{}, err
 	}
@@ -56,12 +56,12 @@ func (q Ctrl) GetCharacterNoRedirect(
 	return character, nil
 }
 
-func (q Ctrl) getCharacter(ctx context.Context, id model.CharacterID) (model.Character, error) {
+func (ctl Ctrl) getCharacter(ctx context.Context, id model.CharacterID) (model.Character, error) {
 	var key = cachekey.Character(id)
 
 	// try to read from cache
 	var r model.Character
-	ok, err := q.cache.Get(ctx, key, &r)
+	ok, err := ctl.cache.Get(ctx, key, &r)
 	if err != nil {
 		return r, errgo.Wrap(err, "cache.Get")
 	}
@@ -70,7 +70,7 @@ func (q Ctrl) getCharacter(ctx context.Context, id model.CharacterID) (model.Cha
 		return r, nil
 	}
 
-	r, err = q.character.Get(ctx, id)
+	r, err = ctl.character.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return r, domain.ErrPersonNotFound
@@ -79,8 +79,8 @@ func (q Ctrl) getCharacter(ctx context.Context, id model.CharacterID) (model.Cha
 		return r, errgo.Wrap(err, "personRepo.Get")
 	}
 
-	if e := q.cache.Set(ctx, key, r, time.Minute); e != nil {
-		q.log.Error("can't set response to cache", zap.Error(e))
+	if e := ctl.cache.Set(ctx, key, r, time.Minute); e != nil {
+		ctl.log.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return r, nil

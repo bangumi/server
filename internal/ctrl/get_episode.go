@@ -27,22 +27,22 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Ctrl) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episode, error) {
-	q.metricsEpisodeQueryCount.Inc(1)
+func (ctl Ctrl) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episode, error) {
+	ctl.metricsEpisodeQueryCount.Inc(1)
 	var key = cachekey.Episode(id)
 	// try to read from cache
 	var e model.Episode
-	cached, err := q.cache.Get(ctx, key, &e)
+	cached, err := ctl.cache.Get(ctx, key, &e)
 	if err != nil {
 		return model.Episode{}, errgo.Wrap(err, "cache.Get")
 	}
 
 	if cached {
-		q.metricsEpisodeQueryCached.Inc(1)
+		ctl.metricsEpisodeQueryCached.Inc(1)
 		return e, nil
 	}
 
-	e, err = q.episode.Get(ctx, id)
+	e, err = ctl.episode.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return model.Episode{}, domain.ErrEpisodeNotFound
@@ -51,8 +51,8 @@ func (q Ctrl) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episode
 		return e, errgo.Wrap(err, "EpisodeRepo.Get")
 	}
 
-	if e := q.cache.Set(ctx, key, e, time.Minute); e != nil {
-		q.log.Error("can't set response to cache", zap.Error(e))
+	if e := ctl.cache.Set(ctx, key, e, time.Minute); e != nil {
+		ctl.log.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return e, nil

@@ -23,20 +23,20 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-func (q Ctrl) GetPersonRelated(
+func (ctl Ctrl) GetPersonRelated(
 	ctx context.Context, personID model.PersonID,
 ) ([]model.SubjectPersonRelation, error) {
-	person, err := q.GetPerson(ctx, personID)
+	person, err := ctl.GetPerson(ctx, personID)
 	if err != nil {
 		return nil, err
 	}
 
-	relations, err := q.subject.GetPersonRelated(ctx, personID)
+	relations, err := ctl.subject.GetPersonRelated(ctx, personID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	subjects, err := q.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectPersonRelation.GetSubjectID)...)
+	subjects, err := ctl.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectPersonRelation.GetSubjectID)...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}

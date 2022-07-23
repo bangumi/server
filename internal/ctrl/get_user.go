@@ -28,23 +28,23 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
 )
 
-func (q Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, error) {
-	q.metricUserQueryCount.Inc(1)
+func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, error) {
+	ctl.metricUserQueryCount.Inc(1)
 	var key = cachekey.User(userID)
 
 	// try to read from cache
 	var r model.User
-	ok, err := q.cache.Get(ctx, key, &r)
+	ok, err := ctl.cache.Get(ctx, key, &r)
 	if err != nil {
 		return r, errgo.Wrap(err, "cache.Get")
 	}
 
 	if ok {
-		q.metricUserQueryCached.Inc(1)
+		ctl.metricUserQueryCached.Inc(1)
 		return r, nil
 	}
 
-	r, err = q.user.GetByID(ctx, userID)
+	r, err = ctl.user.GetByID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return r, domain.ErrUserNotFound
@@ -53,22 +53,22 @@ func (q Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, err
 		return r, errgo.Wrap(err, "userRepo.Get")
 	}
 
-	if e := q.cache.Set(ctx, key, r, time.Hour); e != nil {
-		q.log.Error("can't set response to cache", zap.Error(e))
+	if e := ctl.cache.Set(ctx, key, r, time.Hour); e != nil {
+		ctl.log.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return r, nil
 }
 
-func (q Ctrl) GetUsersByIDs(ctx context.Context, userIDs ...model.UserID) (map[model.UserID]model.User, error) {
-	q.metricUserQueryCount.Inc(int64(len(userIDs)))
+func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs ...model.UserID) (map[model.UserID]model.User, error) {
+	ctl.metricUserQueryCount.Inc(int64(len(userIDs)))
 	var notCached = make([]model.UserID, 0, len(userIDs))
 
 	var result = make(map[model.UserID]model.User, len(userIDs))
 	for _, userID := range userIDs {
 		key := cachekey.User(userID)
 		var s model.User
-		ok, err := q.cache.Get(ctx, key, &s)
+		ok, err := ctl.cache.Get(ctx, key, &s)
 		if err != nil {
 			return nil, errgo.Wrap(err, "cache.Get")
 		}
@@ -80,16 +80,16 @@ func (q Ctrl) GetUsersByIDs(ctx context.Context, userIDs ...model.UserID) (map[m
 		}
 	}
 
-	q.metricUserQueryCached.Inc(int64(len(result)))
-	newUserMap, err := q.user.GetByIDs(ctx, notCached...)
+	ctl.metricUserQueryCached.Inc(int64(len(result)))
+	newUserMap, err := ctl.user.GetByIDs(ctx, notCached...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get subjects")
 	}
 
 	for userID, user := range newUserMap {
-		err := q.cache.Set(ctx, cachekey.User(userID), user, time.Hour)
+		err := ctl.cache.Set(ctx, cachekey.User(userID), user, time.Hour)
 		if err != nil {
-			q.log.Error("failed to set user cache")
+			ctl.log.Error("failed to set user cache")
 		}
 	}
 
