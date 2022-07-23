@@ -103,7 +103,7 @@ func DAOToModel(tl *dao.TimeLine) (*model.TimeLineMemo, error) {
 	default:
 		err = ErrUnexpectedType
 	}
-	return result, errgo.Wrap(err, fmt.Sprintf("(cat: %v, type: %v)", tl.Cat, tl.Type))
+	return result, errgo.Wrap(err, fmt.Sprintf("unmarshal(cat: %v, type: %v)", tl.Cat, tl.Type))
 }
 
 //nolint:gomnd,gocyclo
