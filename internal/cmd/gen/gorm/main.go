@@ -49,6 +49,8 @@ var timelineTypeTypeString = reflect.TypeOf(new(model.TimeLineType)).Elem().Name
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
+const createdTime = "CreatedTime"
+
 // generate code.
 func main() {
 	// specify the output directory (default: "./query")
@@ -152,7 +154,7 @@ func main() {
 		gen.FieldRename("app_desc", "description"),
 		gen.FieldType("app_type", "uint8"),
 		gen.FieldRename("app_lasttouch", "UpdatedTime"),
-		gen.FieldRename("app_timestamp", "CreatedTime"),
+		gen.FieldRename("app_timestamp", createdTime),
 		gen.FieldType("app_creator", userIDTypeString),
 	)
 
@@ -358,7 +360,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_rev_history", "RevisionHistory",
 		gen.FieldTrimPrefix("rev_"),
 		gen.FieldRename("rev_edit_summary", "Summary"),
-		gen.FieldRename("rev_dateline", "CreatedTime"),
+		gen.FieldRename("rev_dateline", createdTime),
 		gen.FieldRename("rev_creator", "CreatorID"),
 		gen.FieldType("rev_creator", userIDTypeString),
 	))
@@ -369,7 +371,7 @@ func main() {
 		gen.FieldType("grp_creator", userIDTypeString),
 		gen.FieldRename("grp_creator", "CreatorID"),
 		gen.FieldRename("grp_desc", "Description"),
-		gen.FieldRename("grp_builddate", "CreatedTime"),
+		gen.FieldRename("grp_builddate", createdTime),
 		gen.FieldRename("grp_lastpost", "LastPostedTime"),
 		gen.FieldComment("grp_lastpost", "目前永远是0"),
 	))
@@ -380,13 +382,13 @@ func main() {
 		gen.FieldType("gmb_uid", userIDTypeString),
 		gen.FieldType("gmb_gid", groupIDTypeString),
 		gen.FieldRename("gmb_gid", "GroupID"),
-		gen.FieldRename("gmb_dateline", "CreatedTime"),
+		gen.FieldRename("gmb_dateline", createdTime),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_topics", "SubjectTopic",
 		gen.FieldTrimPrefix("sbj_tpc_"),
 		gen.FieldRename("sbj_tpc_subject_id", "SubjectID"),
-		gen.FieldRename("sbj_tpc_dateline", "CreatedTime"),
+		gen.FieldRename("sbj_tpc_dateline", createdTime),
 		gen.FieldRename("sbj_tpc_lastpost", "UpdatedTime"),
 		gen.FieldRename("sbj_tpc_display", "Status"),
 		gen.FieldType("sbj_tpc_state", "uint8"),
@@ -396,7 +398,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_group_topics", "GroupTopic",
 		gen.FieldTrimPrefix("grp_tpc_"),
 		gen.FieldRename("grp_tpc_gid", "GroupID"),
-		gen.FieldRename("grp_tpc_dateline", "CreatedTime"),
+		gen.FieldRename("grp_tpc_dateline", createdTime),
 		gen.FieldRename("grp_tpc_lastpost", "UpdatedTime"),
 		gen.FieldRename("grp_tpc_display", "Status"),
 		gen.FieldType("grp_tpc_state", "uint8"),
@@ -407,38 +409,47 @@ func main() {
 		gen.FieldTrimPrefix("sbj_pst_"),
 		gen.FieldRename("sbj_pst_mid", "TopicID"),
 		gen.FieldType("sbj_pst_state", "uint8"),
-		gen.FieldRename("sbj_pst_dateline", "CreatedTime"),
+		gen.FieldRename("sbj_pst_dateline", createdTime),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_group_posts", "GroupTopicComment",
 		gen.FieldTrimPrefix("grp_pst_"),
 		gen.FieldRename("grp_pst_mid", "TopicID"),
 		gen.FieldType("grp_pst_state", "uint8"),
-		gen.FieldRename("grp_pst_dateline", "CreatedTime"),
+		gen.FieldRename("grp_pst_dateline", createdTime),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_ep_comments", "EpisodeComment",
 		gen.FieldTrimPrefix("ep_pst_"),
 		gen.FieldRename("ep_pst_mid", "TopicID"),
-		gen.FieldRename("ep_pst_dateline", "CreatedTime"),
+		gen.FieldRename("ep_pst_dateline", createdTime),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_crt_comments", "CharacterComment",
 		gen.FieldTrimPrefix("crt_pst_"),
 		gen.FieldRename("crt_pst_mid", "TopicID"),
-		gen.FieldRename("crt_pst_dateline", "CreatedTime"),
+		gen.FieldRename("crt_pst_dateline", createdTime),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index_comments", "IndexComment",
 		gen.FieldTrimPrefix("idx_pst_"),
 		gen.FieldRename("idx_pst_mid", "TopicID"),
-		gen.FieldRename("idx_pst_dateline", "CreatedTime"),
+		gen.FieldRename("idx_pst_dateline", createdTime),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_prsn_comments", "PersonComment",
 		gen.FieldTrimPrefix("prsn_pst_"),
 		gen.FieldRename("prsn_pst_mid", "TopicID"),
-		gen.FieldRename("prsn_pst_dateline", "CreatedTime"),
+		gen.FieldRename("prsn_pst_dateline", createdTime),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_friends", "Friend",
+		gen.FieldTrimPrefix("frd_"),
+		gen.FieldType("frd_uid", userIDTypeString),
+		gen.FieldRename("frd_uid", "UserID"),
+		gen.FieldType("frd_fid", userIDTypeString),
+		gen.FieldRename("frd_fid", "FriendID"),
+		gen.FieldRename("frd_dateline", createdTime),
 	))
 
 	// execute the action of code generation

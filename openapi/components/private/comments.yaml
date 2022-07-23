@@ -1,0 +1,8 @@
+type: object
+required:
+  - comments
+properties:
+  comments:
+    type: array
+    items:
+      $ref: ./comment.yaml

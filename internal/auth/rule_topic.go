@@ -36,7 +36,7 @@ func TopicStatuses(u domain.Auth) []model.TopicStatus {
 
 func RewriteSubCommit(t model.SubComment) model.SubComment {
 	switch t.State {
-	case model.CommentStateDelete, model.CommentStatePrivate:
+	case model.CommentStateUserDelete, model.CommentStateAdminDelete:
 		t.Content = ""
 	default:
 		return t
@@ -47,7 +47,7 @@ func RewriteSubCommit(t model.SubComment) model.SubComment {
 
 func RewriteCommit(t model.Comment) model.Comment {
 	switch t.State {
-	case model.CommentStateDelete, model.CommentStatePrivate:
+	case model.CommentStateUserDelete, model.CommentStateAdminDelete:
 		t.Content = ""
 	default:
 		return t
@@ -66,18 +66,18 @@ func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {
 	}
 
 	if u.ID == topic.CreatorID {
-		return topic.State != model.CommentStateDelete
+		return topic.State != model.CommentStateUserDelete
 	}
 
 	switch topic.State {
-	case model.CommentStateNone, model.CommentStateReopen,
-		model.CommentStateMerge, model.CommentStatePin, model.CommentStateSilent:
+	case model.CommentStateNone, model.CommentStateAdminReopen,
+		model.CommentStateAdminMerge, model.CommentStateAdminPin, model.CommentStateAdminSilentTopic:
 		return true
-	case model.CommentStateClosed:
+	case model.CommentStateAdminCloseTopic:
 		return CanViewClosedTopic(u)
-	case model.CommentStateDelete:
+	case model.CommentStateUserDelete:
 		return CanViewDeleteTopic(u)
-	case model.CommentStatePrivate:
+	case model.CommentStateAdminDelete:
 		return false
 	}
 

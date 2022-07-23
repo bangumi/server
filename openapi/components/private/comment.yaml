@@ -1,6 +1,17 @@
 title: "Comment"
 type: object
+required:
+  - created_at
+  - creator
+  - id
+  - replies
+  - text
+  - state
+  - is_friend
 properties:
+  is_friend:
+    type: boolean
+    description: 发帖人是否好友
   created_at:
     type: string
     format: date-time

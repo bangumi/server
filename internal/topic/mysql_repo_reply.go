@@ -97,6 +97,10 @@ func (r mysqlRepo) ListReplies(
 
 	data := gmap.Values(commentMap)
 	sort.Slice(data, func(i, j int) bool {
+		if data[i].CreatedAt.Equal(data[j].CreatedAt) {
+			return data[i].ID < data[j].ID
+		}
+
 		return data[i].CreatedAt.Before(data[j].CreatedAt)
 	})
 

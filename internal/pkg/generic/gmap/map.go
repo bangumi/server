@@ -15,7 +15,7 @@
 package gmap
 
 // Keys return []key of map, random ordered.
-func Keys[M map[K]V, K comparable, V any](m M) []K {
+func Keys[M ~map[K]V, K comparable, V any](m M) []K {
 	var s = make([]K, 0, len(m))
 	for k := range m {
 		s = append(s, k)

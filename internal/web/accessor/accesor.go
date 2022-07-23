@@ -48,7 +48,7 @@ func (a *Accessor) SetAuth(auth domain.Auth) {
 	a.Login = true
 }
 
-func (a Accessor) LogRequestID() zap.Field {
+func (a Accessor) Log() zap.Field {
 	return zap.Object("request", a)
 }
 

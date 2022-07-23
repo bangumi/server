@@ -27,7 +27,7 @@ func (c *GroupTopicComment) CreatorID() model.UserID {
 }
 
 func (c *GroupTopicComment) IsSubComment() bool {
-	return c.Related == 0
+	return c.Related != 0
 }
 
 func (c *GroupTopicComment) CommentID() model.CommentID {
