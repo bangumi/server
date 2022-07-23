@@ -109,7 +109,7 @@ func Test_mysqlRepo_Create(t *testing.T) {
 		tlModel, err := repo.GetByID(ctx, tlID)
 		require.NoError(t, err)
 		tlModel.ID = newTLID
-		_, err = repo.Create(ctx, tlModel)
+		err = repo.Create(ctx, tlModel)
 		require.NoError(t, err)
 		newTLModel, err := repo.GetByID(ctx, newTLID)
 		require.NoError(t, err)
