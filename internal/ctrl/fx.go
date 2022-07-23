@@ -12,25 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package command
+package ctrl
 
 import (
-	"go.uber.org/zap"
-
-	"github.com/bangumi/server/internal/cache"
+	"go.uber.org/fx"
 )
 
-func New(
-	cache cache.Cache,
-	log *zap.Logger,
-) Command {
-	return Command{
-		log:   log.Named("app.command"),
-		cache: cache,
-	}
-}
-
-type Command struct {
-	cache cache.Cache
-	log   *zap.Logger
-}
+var Module = fx.Module("controller",
+	fx.Provide(New),
+)

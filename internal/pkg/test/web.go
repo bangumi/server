@@ -27,10 +27,10 @@ import (
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
 
-	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
@@ -79,7 +79,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 	var options = []fx.Option{
 		fx.NopLogger,
 
-		handler.Module, app.Module,
+		handler.Module, ctrl.Module,
 
 		fx.Provide(func() tally.Scope { return tally.NoopScope }),
 		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}), fx.As(new(promreporter.Reporter)))),

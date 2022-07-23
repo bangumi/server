@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
@@ -21,14 +21,14 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app/internal/cachekey"
+	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
 )
 
-func (q Query) GetUser(ctx context.Context, userID model.UserID) (model.User, error) {
+func (q Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, error) {
 	q.metricUserQueryCount.Inc(1)
 	var key = cachekey.User(userID)
 
@@ -60,7 +60,7 @@ func (q Query) GetUser(ctx context.Context, userID model.UserID) (model.User, er
 	return r, nil
 }
 
-func (q Query) GetUsersByIDs(ctx context.Context, userIDs ...model.UserID) (map[model.UserID]model.User, error) {
+func (q Ctrl) GetUsersByIDs(ctx context.Context, userIDs ...model.UserID) (map[model.UserID]model.User, error) {
 	q.metricUserQueryCount.Inc(int64(len(userIDs)))
 	var notCached = make([]model.UserID, 0, len(userIDs))
 

@@ -12,48 +12,46 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app/internal/cachekey"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Query) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episode, error) {
-	q.metricsEpisodeQueryCount.Inc(1)
-	var key = cachekey.Episode(id)
-	// try to read from cache
-	var e model.Episode
-	cached, err := q.cache.Get(ctx, key, &e)
+func (q Ctrl) CountEpisode(ctx context.Context, subjectID model.SubjectID, epType *model.EpType) (int64, error) {
+	key := cachekey.EpisodeCount(subjectID, epType)
+	var count int64
+	ok, err := q.cache.Get(ctx, key, &count)
 	if err != nil {
-		return model.Episode{}, errgo.Wrap(err, "cache.Get")
+		return 0, errgo.Wrap(err, "cache.Get")
 	}
 
-	if cached {
-		q.metricsEpisodeQueryCached.Inc(1)
-		return e, nil
+	if ok {
+		return count, nil
 	}
 
-	e, err = q.episode.Get(ctx, id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return model.Episode{}, domain.ErrEpisodeNotFound
+	if epType == nil {
+		count, err = q.episode.Count(ctx, subjectID)
+		if err != nil {
+			return 0, errgo.Wrap(err, "episode.Count")
 		}
-
-		return e, errgo.Wrap(err, "EpisodeRepo.Get")
+	} else {
+		count, err = q.episode.CountByType(ctx, subjectID, *epType)
+		if err != nil {
+			return 0, errgo.Wrap(err, "episode.CountByType")
+		}
 	}
 
-	if e := q.cache.Set(ctx, key, e, time.Minute); e != nil {
-		q.log.Error("can't set response to cache", zap.Error(e))
+	if err := q.cache.Set(ctx, key, count, time.Hour); err != nil {
+		q.log.Error("failed to set cache", zap.Error(err))
 	}
 
-	return e, nil
+	return count, nil
 }

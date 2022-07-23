@@ -42,7 +42,7 @@ func (h Subject) Get(c *fiber.Ctx) error {
 		return err
 	}
 
-	s, err := h.app.Query.GetSubject(c.Context(), u.Auth, id)
+	s, err := h.ctrl.GetSubject(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -55,7 +55,7 @@ func (h Subject) Get(c *fiber.Ctx) error {
 		return c.Redirect("/v0/subjects/" + strconv.FormatUint(uint64(s.Redirect), 10))
 	}
 
-	totalEpisode, err := h.app.Query.CountEpisode(c.Context(), id, nil)
+	totalEpisode, err := h.ctrl.CountEpisode(c.Context(), id, nil)
 	if err != nil {
 		return h.InternalError(c, err, "failed to count episodes of subject", log.SubjectID(id))
 	}
@@ -88,7 +88,7 @@ func (h Subject) GetImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.app.Query.GetSubject(c.Context(), u.Auth, id)
+	r, err := h.ctrl.GetSubject(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

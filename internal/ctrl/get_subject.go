@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"context"
@@ -21,15 +21,15 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app/internal/cachekey"
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
 )
 
-func (q Query) GetSubject(ctx context.Context, user domain.Auth, subjectID model.SubjectID) (model.Subject, error) {
+func (q Ctrl) GetSubject(ctx context.Context, user domain.Auth, subjectID model.SubjectID) (model.Subject, error) {
 	subject, err := q.getSubject(ctx, subjectID)
 	if err != nil {
 		return model.Subject{}, err
@@ -42,7 +42,7 @@ func (q Query) GetSubject(ctx context.Context, user domain.Auth, subjectID model
 	return subject, nil
 }
 
-func (q Query) GetSubjectNoRedirect(
+func (q Ctrl) GetSubjectNoRedirect(
 	ctx context.Context,
 	user domain.Auth,
 	subjectID model.SubjectID,
@@ -63,7 +63,7 @@ func (q Query) GetSubjectNoRedirect(
 	return subject, nil
 }
 
-func (q Query) GetSubjectByIDs(
+func (q Ctrl) GetSubjectByIDs(
 	ctx context.Context,
 	subjectIDs ...model.SubjectID,
 ) (map[model.SubjectID]model.Subject, error) {
@@ -104,7 +104,7 @@ func (q Query) GetSubjectByIDs(
 	return result, nil
 }
 
-func (q Query) getSubject(ctx context.Context, id model.SubjectID) (model.Subject, error) {
+func (q Ctrl) getSubject(ctx context.Context, id model.SubjectID) (model.Subject, error) {
 	q.metricSubjectQueryCount.Inc(1)
 	var key = cachekey.Subject(id)
 

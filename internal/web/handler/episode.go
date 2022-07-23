@@ -20,7 +20,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/app/query"
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger/log"
@@ -36,7 +36,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, err := h.app.Query.GetEpisode(c.Context(), id)
+	e, err := h.ctrl.GetEpisode(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -45,7 +45,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
 	}
 
-	_, err = h.app.Query.GetSubject(c.Context(), u.Auth, e.SubjectID)
+	_, err = h.ctrl.GetSubject(c.Context(), u.Auth, e.SubjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -78,7 +78,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return res.BadRequest("missing required query `subject_id`")
 	}
 
-	_, err = h.app.Query.GetSubject(c.Context(), u.Auth, subjectID)
+	_, err = h.ctrl.GetSubject(c.Context(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -86,9 +86,9 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get subject")
 	}
 
-	episodes, count, err := h.app.Query.ListEpisode(c.Context(), subjectID, epType, page.Limit, page.Offset)
+	episodes, count, err := h.ctrl.ListEpisode(c.Context(), subjectID, epType, page.Limit, page.Offset)
 	if err != nil {
-		if errors.Is(err, query.ErrOffsetTooBig) {
+		if errors.Is(err, ctrl.ErrOffsetTooBig) {
 			return res.BadRequest("offset should be less than or equal to " + strconv.FormatInt(count, 10))
 		}
 		return h.InternalError(c, err, "failed to list episode")

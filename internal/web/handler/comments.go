@@ -47,7 +47,7 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, subjectID)
+	_, err = h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -66,7 +66,7 @@ func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 		return res.BadRequest(err.Error())
 	}
 
-	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, id)
+	_, err = h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -85,7 +85,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, err := h.app.Query.GetEpisode(c.Context(), id)
+	e, err := h.ctrl.GetEpisode(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -94,7 +94,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
 	}
 
-	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, e.SubjectID)
+	_, err = h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, e.SubjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -117,7 +117,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.app.Query.GetPerson(c.Context(), id)
+	r, err := h.ctrl.GetPerson(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -145,7 +145,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = h.app.Query.GetCharacterNoRedirect(c.Context(), u.Auth, id)
+	_, err = h.ctrl.GetCharacterNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -198,7 +198,7 @@ func (h Handler) listComments(
 		return nil, nil, errgo.Wrap(err, "topic.ListRepliesAll")
 	}
 
-	userMap, err := h.app.Query.GetUsersByIDs(c.Context(), commentsToUserIDs(comments)...)
+	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), commentsToUserIDs(comments)...)
 	if err != nil {
 		return nil, nil, errgo.Wrap(err, "query.GetUsersByIDs")
 	}

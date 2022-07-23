@@ -40,7 +40,7 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, err := h.app.Query.GetEpisode(c.Context(), episodeID)
+	e, err := h.ctrl.GetEpisode(c.Context(), episodeID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -79,7 +79,7 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = h.app.Query.GetSubject(c.Context(), v.Auth, subjectID)
+	_, err = h.ctrl.GetSubject(c.Context(), v.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -96,7 +96,7 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 
-	episodes, count, err := h.app.Query.ListEpisode(c.Context(), subjectID, episodeType, page.Limit, page.Offset)
+	episodes, count, err := h.ctrl.ListEpisode(c.Context(), subjectID, episodeType, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "query.ListEpisode")
 	}

@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package query
+package ctrl
 
 import (
 	"github.com/uber-go/tally/v4"
@@ -33,8 +33,8 @@ func New(
 	user domain.UserRepo,
 	topic domain.TopicRepo,
 	log *zap.Logger,
-) Query {
-	return Query{
+) Ctrl {
+	return Ctrl{
 		log:   log.Named("app.query"),
 		cache: cache,
 
@@ -57,7 +57,7 @@ func New(
 	}
 }
 
-type Query struct {
+type Ctrl struct {
 	log   *zap.Logger
 	cache cache.Cache
 
