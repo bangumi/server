@@ -354,6 +354,10 @@ func (t timeLineDo) Scan(result interface{}) (err error) {
 	return t.DO.Scan(result)
 }
 
+func (t timeLineDo) Delete(models ...*dao.TimeLine) (result gen.ResultInfo, err error) {
+	return t.DO.Delete(models)
+}
+
 func (t *timeLineDo) withDO(do gen.Dao) *timeLineDo {
 	t.DO = *do.(*gen.DO)
 	return t
