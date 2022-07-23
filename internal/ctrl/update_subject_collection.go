@@ -31,21 +31,21 @@ type UpdateCollectionRequest struct {
 	Type      model.SubjectCollection
 }
 
-func (c Ctrl) UpdateCollection(
+func (ctl Ctrl) UpdateCollection(
 	ctx context.Context,
 	u domain.Auth,
 	subjectID model.SubjectID,
 	req UpdateCollectionRequest,
 ) error {
-	c.log.Info("try to update collection", log.SubjectID(subjectID), log.UserID(u.ID), zap.Reflect("'req", req))
+	ctl.log.Info("try to update collection", log.SubjectID(subjectID), log.UserID(u.ID), zap.Reflect("'req", req))
 
-	err := c.collection.UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
+	err := ctl.collection.UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
 		VolStatus: req.VolStatus,
 		EpStatus:  req.EpStatus,
 		Type:      req.Type,
 	})
 	if err != nil {
-		c.log.Error("failed to update user collection info", zap.Error(err))
+		ctl.log.Error("failed to update user collection info", zap.Error(err))
 		return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 	}
 
