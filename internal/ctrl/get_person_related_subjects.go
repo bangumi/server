@@ -21,10 +21,10 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Ctrl) GetPersonRelatedCharacters(
+func (ctl Ctrl) GetPersonRelatedCharacters(
 	ctx context.Context, personID model.PersonID,
 ) ([]model.PersonCharacterRelation, error) {
-	relations, err := q.character.GetPersonRelated(ctx, personID)
+	relations, err := ctl.character.GetPersonRelated(ctx, personID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "CharacterRepo.GetPersonRelated")
 	}
@@ -40,17 +40,17 @@ func (q Ctrl) GetPersonRelatedCharacters(
 		subjectIDs[i] = relation.SubjectID
 	}
 
-	characters, err := q.character.GetByIDs(ctx, characterIDs...)
+	characters, err := ctl.character.GetByIDs(ctx, characterIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
 	}
 
-	subjects, err := q.subject.GetByIDs(ctx, subjectIDs...)
+	subjects, err := ctl.subject.GetByIDs(ctx, subjectIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}
 
-	person, err := q.person.Get(ctx, personID)
+	person, err := ctl.person.Get(ctx, personID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}

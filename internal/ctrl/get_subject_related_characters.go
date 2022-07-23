@@ -23,17 +23,17 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-func (q Ctrl) GetSubjectRelatedCharacters(
+func (ctl Ctrl) GetSubjectRelatedCharacters(
 	ctx context.Context,
 	user domain.Auth,
 	subjectID model.SubjectID,
 ) (model.Subject, []model.SubjectCharacterRelation, error) {
-	s, err := q.GetSubjectNoRedirect(ctx, user, subjectID)
+	s, err := ctl.GetSubjectNoRedirect(ctx, user, subjectID)
 	if err != nil {
 		return s, nil, err
 	}
 
-	relations, err := q.character.GetSubjectRelated(ctx, subjectID)
+	relations, err := ctl.character.GetSubjectRelated(ctx, subjectID)
 	if err != nil {
 		return s, nil, errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
 	}
@@ -42,7 +42,7 @@ func (q Ctrl) GetSubjectRelatedCharacters(
 		return item.CharacterID
 	})
 
-	characters, err := q.character.GetByIDs(ctx, characterIDs...)
+	characters, err := ctl.character.GetByIDs(ctx, characterIDs...)
 	if err != nil {
 		return s, nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
 	}

@@ -21,13 +21,13 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Ctrl) ListEpisode(
+func (ctl Ctrl) ListEpisode(
 	ctx context.Context,
 	subjectID model.SubjectID,
 	epType *model.EpType,
 	limit, offset int,
 ) ([]model.Episode, int64, error) {
-	count, err := q.CountEpisode(ctx, subjectID, epType)
+	count, err := ctl.CountEpisode(ctx, subjectID, epType)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -42,14 +42,14 @@ func (q Ctrl) ListEpisode(
 
 	if epType == nil {
 		var episodes []model.Episode
-		episodes, err = q.episode.List(ctx, subjectID, limit, offset)
+		episodes, err = ctl.episode.List(ctx, subjectID, limit, offset)
 		if err != nil {
 			return nil, 0, errgo.Wrap(err, "episode.List")
 		}
 		return episodes, count, nil
 	}
 
-	episodes, err := q.episode.ListByType(ctx, subjectID, *epType, limit, offset)
+	episodes, err := ctl.episode.ListByType(ctx, subjectID, *epType, limit, offset)
 	if err != nil {
 		return nil, 0, errgo.Wrap(err, "episode.ListByType")
 	}

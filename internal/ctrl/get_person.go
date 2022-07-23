@@ -27,8 +27,8 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Ctrl) GetPerson(ctx context.Context, personID model.PersonID) (model.Person, error) {
-	person, err := q.getPerson(ctx, personID)
+func (ctl Ctrl) GetPerson(ctx context.Context, personID model.PersonID) (model.Person, error) {
+	person, err := ctl.getPerson(ctx, personID)
 	if err != nil {
 		return model.Person{}, err
 	}
@@ -36,12 +36,12 @@ func (q Ctrl) GetPerson(ctx context.Context, personID model.PersonID) (model.Per
 	return person, nil
 }
 
-func (q Ctrl) getPerson(ctx context.Context, id model.PersonID) (model.Person, error) {
+func (ctl Ctrl) getPerson(ctx context.Context, id model.PersonID) (model.Person, error) {
 	var key = cachekey.Person(id)
 
 	// try to read from cache
 	var r model.Person
-	ok, err := q.cache.Get(ctx, key, &r)
+	ok, err := ctl.cache.Get(ctx, key, &r)
 	if err != nil {
 		return r, errgo.Wrap(err, "cache.Get")
 	}
@@ -50,7 +50,7 @@ func (q Ctrl) getPerson(ctx context.Context, id model.PersonID) (model.Person, e
 		return r, nil
 	}
 
-	r, err = q.person.Get(ctx, id)
+	r, err = ctl.person.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return r, domain.ErrPersonNotFound
@@ -59,8 +59,8 @@ func (q Ctrl) getPerson(ctx context.Context, id model.PersonID) (model.Person, e
 		return r, errgo.Wrap(err, "personRepo.Get")
 	}
 
-	if e := q.cache.Set(ctx, key, r, time.Minute); e != nil {
-		q.log.Error("can't set response to cache", zap.Error(e))
+	if e := ctl.cache.Set(ctx, key, r, time.Minute); e != nil {
+		ctl.log.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return r, nil

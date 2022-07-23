@@ -23,19 +23,19 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-func (q Ctrl) GetActors(
+func (ctl Ctrl) GetActors(
 	ctx context.Context,
 	subjectID model.SubjectID,
 	characterIDs ...model.CharacterID,
 ) (map[model.CharacterID][]model.Person, error) {
-	actors, err := q.subject.GetActors(ctx, subjectID, characterIDs...)
+	actors, err := ctl.subject.GetActors(ctx, subjectID, characterIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "subjectRepo.GetActors")
 	}
 
 	vs := slice.Unique(slice.Reduce(gmap.Values(actors)))
 
-	persons, err := q.person.GetByIDs(ctx, vs...)
+	persons, err := ctl.person.GetByIDs(ctx, vs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get persons")
 	}

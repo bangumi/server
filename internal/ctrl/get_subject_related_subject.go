@@ -23,22 +23,22 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-func (q Ctrl) GetSubjectRelatedSubjects(
+func (ctl Ctrl) GetSubjectRelatedSubjects(
 	ctx context.Context,
 	user domain.Auth,
 	subjectID model.SubjectID,
 ) (model.Subject, []model.SubjectInternalRelation, error) {
-	s, err := q.GetSubjectNoRedirect(ctx, user, subjectID)
+	s, err := ctl.GetSubjectNoRedirect(ctx, user, subjectID)
 	if err != nil {
 		return model.Subject{}, nil, err
 	}
 
-	relations, err := q.subject.GetSubjectRelated(ctx, subjectID)
+	relations, err := ctl.subject.GetSubjectRelated(ctx, subjectID)
 	if err != nil {
 		return s, nil, errgo.Wrap(err, "SubjectRepo.GetSubjectRelated")
 	}
 
-	subjects, err := q.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectInternalRelation.GetDestinationID)...)
+	subjects, err := ctl.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectInternalRelation.GetDestinationID)...)
 	if err != nil {
 		return s, nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}

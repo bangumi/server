@@ -25,10 +25,10 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (q Ctrl) CountEpisode(ctx context.Context, subjectID model.SubjectID, epType *model.EpType) (int64, error) {
+func (ctl Ctrl) CountEpisode(ctx context.Context, subjectID model.SubjectID, epType *model.EpType) (int64, error) {
 	key := cachekey.EpisodeCount(subjectID, epType)
 	var count int64
-	ok, err := q.cache.Get(ctx, key, &count)
+	ok, err := ctl.cache.Get(ctx, key, &count)
 	if err != nil {
 		return 0, errgo.Wrap(err, "cache.Get")
 	}
@@ -38,19 +38,19 @@ func (q Ctrl) CountEpisode(ctx context.Context, subjectID model.SubjectID, epTyp
 	}
 
 	if epType == nil {
-		count, err = q.episode.Count(ctx, subjectID)
+		count, err = ctl.episode.Count(ctx, subjectID)
 		if err != nil {
 			return 0, errgo.Wrap(err, "episode.Count")
 		}
 	} else {
-		count, err = q.episode.CountByType(ctx, subjectID, *epType)
+		count, err = ctl.episode.CountByType(ctx, subjectID, *epType)
 		if err != nil {
 			return 0, errgo.Wrap(err, "episode.CountByType")
 		}
 	}
 
-	if err := q.cache.Set(ctx, key, count, time.Hour); err != nil {
-		q.log.Error("failed to set cache", zap.Error(err))
+	if err := ctl.cache.Set(ctx, key, count, time.Hour); err != nil {
+		ctl.log.Error("failed to set cache", zap.Error(err))
 	}
 
 	return count, nil
