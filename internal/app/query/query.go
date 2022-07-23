@@ -28,6 +28,7 @@ func New(
 	subject domain.SubjectRepo,
 	person domain.PersonRepo,
 	character domain.CharacterRepo,
+	collection domain.CollectionRepo,
 	metric tally.Scope,
 	user domain.UserRepo,
 	topic domain.TopicRepo,
@@ -37,12 +38,13 @@ func New(
 		log:   log.Named("app.query"),
 		cache: cache,
 
-		user:      user,
-		topic:     topic,
-		person:    person,
-		episode:   episode,
-		subject:   subject,
-		character: character,
+		user:       user,
+		topic:      topic,
+		person:     person,
+		episode:    episode,
+		subject:    subject,
+		collection: collection,
+		character:  character,
 
 		metricUserQueryCount:  metric.Counter("app_user_query_count"),
 		metricUserQueryCached: metric.Counter("app_user_query_cached_count"),
@@ -65,6 +67,7 @@ type Query struct {
 	episode               domain.EpisodeRepo
 	subject               domain.SubjectRepo
 	character             domain.CharacterRepo
+	collection            domain.CollectionRepo
 	metricUserQueryCached tally.Counter
 	metricUserQueryCount  tally.Counter
 

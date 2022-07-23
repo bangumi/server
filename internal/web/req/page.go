@@ -71,3 +71,6 @@ func GetPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (PageQuery, erro
 
 const DefaultPageLimit = 30
 const DefaultMaxPageLimit = 100
+
+const EpisodeDefaultLimit = 100
+const EpisodeMaxLimit = 1000

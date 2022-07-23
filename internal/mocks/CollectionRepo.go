@@ -117,6 +117,54 @@ func (_c *CollectionRepo_GetSubjectCollection_Call) Return(_a0 model.UserSubject
 	return _c
 }
 
+// GetSubjectEpisodesCollection provides a mock function with given fields: ctx, userID, subjectID
+func (_m *CollectionRepo) GetSubjectEpisodesCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) (model.UserSubjectEpisodesCollection, error) {
+	ret := _m.Called(ctx, userID, subjectID)
+
+	var r0 model.UserSubjectEpisodesCollection
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID) model.UserSubjectEpisodesCollection); ok {
+		r0 = rf(ctx, userID, subjectID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(model.UserSubjectEpisodesCollection)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, model.SubjectID) error); ok {
+		r1 = rf(ctx, userID, subjectID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// CollectionRepo_GetSubjectEpisodesCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSubjectEpisodesCollection'
+type CollectionRepo_GetSubjectEpisodesCollection_Call struct {
+	*mock.Call
+}
+
+// GetSubjectEpisodesCollection is a helper method to define mock.On call
+//  - ctx context.Context
+//  - userID model.UserID
+//  - subjectID model.SubjectID
+func (_e *CollectionRepo_Expecter) GetSubjectEpisodesCollection(ctx interface{}, userID interface{}, subjectID interface{}) *CollectionRepo_GetSubjectEpisodesCollection_Call {
+	return &CollectionRepo_GetSubjectEpisodesCollection_Call{Call: _e.mock.On("GetSubjectEpisodesCollection", ctx, userID, subjectID)}
+}
+
+func (_c *CollectionRepo_GetSubjectEpisodesCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectID model.SubjectID)) *CollectionRepo_GetSubjectEpisodesCollection_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.SubjectID))
+	})
+	return _c
+}
+
+func (_c *CollectionRepo_GetSubjectEpisodesCollection_Call) Return(_a0 model.UserSubjectEpisodesCollection, _a1 error) *CollectionRepo_GetSubjectEpisodesCollection_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // ListSubjectCollection provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate, limit, offset
 func (_m *CollectionRepo) ListSubjectCollection(ctx context.Context, userID model.UserID, subjectType uint8, collectionType model.SubjectCollection, showPrivate bool, limit int, offset int) ([]model.UserSubjectCollection, error) {
 	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate, limit, offset)

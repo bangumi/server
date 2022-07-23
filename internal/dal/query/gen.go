@@ -20,6 +20,7 @@ func Use(db *gorm.DB) *Query {
 		Character:           newCharacter(db),
 		CharacterComment:    newCharacterComment(db),
 		CharacterSubjects:   newCharacterSubjects(db),
+		EpCollection:        newEpCollection(db),
 		Episode:             newEpisode(db),
 		EpisodeComment:      newEpisodeComment(db),
 		Friend:              newFriend(db),
@@ -59,6 +60,7 @@ type Query struct {
 	Character           character
 	CharacterComment    characterComment
 	CharacterSubjects   characterSubjects
+	EpCollection        epCollection
 	Episode             episode
 	EpisodeComment      episodeComment
 	Friend              friend
@@ -99,6 +101,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Character:           q.Character.clone(db),
 		CharacterComment:    q.CharacterComment.clone(db),
 		CharacterSubjects:   q.CharacterSubjects.clone(db),
+		EpCollection:        q.EpCollection.clone(db),
 		Episode:             q.Episode.clone(db),
 		EpisodeComment:      q.EpisodeComment.clone(db),
 		Friend:              q.Friend.clone(db),
@@ -136,6 +139,7 @@ type queryCtx struct {
 	Character           *characterDo
 	CharacterComment    *characterCommentDo
 	CharacterSubjects   *characterSubjectsDo
+	EpCollection        *epCollectionDo
 	Episode             *episodeDo
 	EpisodeComment      *episodeCommentDo
 	Friend              *friendDo
@@ -173,6 +177,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Character:           q.Character.WithContext(ctx),
 		CharacterComment:    q.CharacterComment.WithContext(ctx),
 		CharacterSubjects:   q.CharacterSubjects.WithContext(ctx),
+		EpCollection:        q.EpCollection.WithContext(ctx),
 		Episode:             q.Episode.WithContext(ctx),
 		EpisodeComment:      q.EpisodeComment.WithContext(ctx),
 		Friend:              q.Friend.WithContext(ctx),

@@ -12,33 +12,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package common
 
 import (
-	"context"
+	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/web/res"
 )
 
-type CollectionRepo interface {
-	CountSubjectCollections(
-		ctx context.Context,
-		userID model.UserID,
-		subjectType model.SubjectType,
-		collectionType model.SubjectCollection,
-		showPrivate bool,
-	) (int64, error)
+var errNeedLogin = res.Unauthorized("this API need authorization")
 
-	ListSubjectCollection(
-		ctx context.Context,
-		userID model.UserID,
-		subjectType model.SubjectType,
-		collectionType model.SubjectCollection,
-		showPrivate bool,
-		limit, offset int,
-	) ([]model.UserSubjectCollection, error)
+func (h Common) NeedLogin(c *fiber.Ctx) error {
+	if u := h.GetHTTPAccessor(c); !u.Login {
+		return errNeedLogin
+	}
 
-	GetSubjectCollection(
-		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-	) (model.UserSubjectCollection, error)
+	return c.Next()
 }

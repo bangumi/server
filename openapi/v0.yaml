@@ -800,6 +800,103 @@ paths:
       security:
         - OptionalHTTPBearer: []
 
+  "/users/-/collections/{subject_id}/episodes":
+    get:
+      tags:
+        - 收藏
+      summary: 章节收藏信息
+      operationId: getUserSubjectEpisodeCollection
+      parameters:
+        - *path_subject_id
+        - *default_query_offset
+        - required: false
+          schema:
+            title: Limit
+            maximum: 1000
+            minimum: 1
+            type: integer
+            default: 100
+          name: limit
+          description: 分页参数
+          in: query
+        - required: false
+          schema:
+            "$ref": "#/components/schemas/EpType"
+          in: query
+          name: episode_type
+          description: 章节类型，不传则不按照章节进行筛选
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/UserEpisodeCollection"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 条目不存在
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - HTTPBearer: []
+
+  "/users/-/collections/-/episodes/{episode_id}":
+    get:
+      tags:
+        - 收藏
+      summary: 章节收藏信息
+      operationId: getUserEpisodeCollection
+      parameters:
+        - *path_episode_id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserEpisodeCollection"
+        "400":
+          description: episode ID not valid
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 条目或者章节不存在
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - HTTPBearer: []
+
   "/v0/revisions/persons":
     get:
       tags:
@@ -993,7 +1090,16 @@ paths:
           name: episode_id
           description: 章节 ID
           in: query
-        - *default_query_limit
+        - required: false
+          schema:
+            title: Limit
+            maximum: 1000
+            minimum: 1
+            type: integer
+            default: 100
+          name: limit
+          description: 分页参数
+          in: query
         - *default_query_offset
       responses:
         "200":
@@ -1489,58 +1595,7 @@ components:
         - MAD
         - Other
     Episode:
-      title: Episode
-      required:
-        - id
-        - type
-        - name
-        - name_cn
-        - sort
-        - airdate
-        - comment
-        - duration
-        - desc
-        - disc
-      type: object
-      properties:
-        id:
-          title: ID
-          type: integer
-        type:
-          title: Type
-          type: integer
-          description: "`0` 本篇，`1` SP，`2` OP，`3` ED"
-        name:
-          title: Name
-          type: string
-        name_cn:
-          title: Name Cn
-          type: string
-        sort:
-          title: Sort
-          type: number
-          description: 同类条目的排序和集数
-        ep:
-          title: Ep
-          type: number
-          description: 条目内的集数, 从`1`开始。非本篇剧集的此字段无意义
-        airdate:
-          title: Airdate
-          type: string
-        comment:
-          title: Comment
-          type: integer
-        duration:
-          title: Duration
-          type: string
-        desc:
-          title: Desc
-          type: string
-          description: 简介
-        disc:
-          title: Disc
-          type: integer
-          description: 音乐曲目的碟片数
+      $ref: "./components/episode.yaml"
     EpisodeDetail:
       title: EpisodeDetail
       required:
@@ -1683,6 +1738,9 @@ components:
       description: 同名字段意义同<a href="#model-Subject">Subject</a>
     WikiV0:
       $ref: "./components/wiki_v0.yaml"
+
+    Page:
+      $ref: "./components/page.yaml"
 
     Paged_Episode:
       title: Paged[Episode]
@@ -2090,6 +2148,8 @@ components:
       $ref: "./components/subject_type.yaml"
     UserSubjectCollection:
       $ref: "./components/subject_collection.yaml"
+    UserEpisodeCollection:
+      $ref: "./components/get-user-episodes-collection.yaml"
     v0_RelatedSubject:
       title: RelatedSubject
       required:

@@ -17,6 +17,7 @@ package collection_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
@@ -70,14 +71,29 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const id model.UserID = 382951
+	const id model.UserID = 382951 + 1
+	// parallel problem
 
-	repo, _ := getRepo(t)
+	repo, q := getRepo(t)
+	test.RunAndCleanup(t, func() {
+		_, err := q.SubjectCollection.WithContext(context.Background()).Where(q.SubjectCollection.UserID.Eq(id)).Delete()
+		require.NoError(t, err)
+	})
+
+	for i := 0; i < 5; i++ {
+		err := q.SubjectCollection.WithContext(context.Background()).Create(&dao.SubjectCollection{
+			UserID:      id,
+			SubjectID:   model.SubjectID(i + 100),
+			SubjectType: model.SubjectTypeAnime,
+			UpdatedTime: uint32(time.Now().Unix()),
+		})
+		require.NoError(t, err)
+	}
 
 	count, err := repo.CountSubjectCollections(context.Background(), id,
 		model.SubjectTypeAll, model.SubjectCollectionAll, true)
 	require.NoError(t, err)
-	require.EqualValues(t, 25, count)
+	require.EqualValues(t, 5, count)
 }
 
 func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
@@ -92,4 +108,25 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 		model.SubjectTypeGame, model.SubjectCollectionAll, true, 5, 0)
 	require.NoError(t, err)
 	require.Len(t, data, 5)
+}
+
+func TestMysqlRepo_GetEpisodeCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const userID model.UserID = 382951
+	const subjectID model.SubjectID = 372487
+
+	repo, _ := getRepo(t)
+
+	ep, err := repo.GetSubjectEpisodesCollection(context.Background(), userID, subjectID)
+	require.NoError(t, err)
+
+	require.NotZero(t, len(ep))
+
+	for id, item := range ep {
+		require.NotZero(t, id)
+		require.NotZero(t, item.ID)
+		require.NotZero(t, item.Type)
+	}
 }

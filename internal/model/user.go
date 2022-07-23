@@ -50,3 +50,10 @@ type UserSubjectCollection struct {
 	Type        SubjectCollection
 	Private     bool
 }
+
+type UserEpisodeCollection struct {
+	ID   EpisodeID
+	Type EpisodeCollection
+}
+
+type UserSubjectEpisodesCollection map[EpisodeID]UserEpisodeCollection

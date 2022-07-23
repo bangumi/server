@@ -130,7 +130,7 @@ func (r mysqlRepo) GetSubjectCollection(
 		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.UserSubjectCollection{}, domain.ErrNotFound
+			return model.UserSubjectCollection{}, domain.ErrSubjectNotCollected
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
@@ -149,4 +149,33 @@ func (r mysqlRepo) GetSubjectCollection(
 		Type:        model.SubjectCollection(c.Type),
 		Private:     c.Private != model.CollectPrivacyNone,
 	}, nil
+}
+
+func (r mysqlRepo) GetSubjectEpisodesCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+) (model.UserSubjectEpisodesCollection, error) {
+	d, err := r.q.EpCollection.WithContext(ctx).Where(
+		r.q.EpCollection.UserID.Eq(userID),
+		r.q.EpCollection.SubjectID.Eq(subjectID),
+	).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.UserSubjectEpisodesCollection{}, nil
+		}
+
+		r.log.Error("failed to get episode collection record", zap.Error(err),
+			log.UserID(userID), log.SubjectID(subjectID))
+		return nil, errgo.Wrap(err, "query.EpCollection.Find")
+	}
+
+	e, err := deserializePhpEpStatus(d.Status)
+	if err != nil {
+		r.log.Error("failed to deserialize php-serialized bytes to go data",
+			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, err
+	}
+
+	return e.toModel(), nil
 }

@@ -178,6 +178,12 @@ func main() {
 		gen.FieldType("interest_type", "uint8"),
 		gen.FieldType("interest_uid", userIDTypeString),
 		gen.FieldRename("interest_uid", "UserID"),
+
+		gen.FieldRename("interest_collect_dateline", "DoneTime"),
+		gen.FieldRename("interest_doing_dateline", "DoingTime"),
+		gen.FieldRename("interest_on_hold_dateline", "OnHoldTime"),
+		gen.FieldRename("interest_dropped_dateline", "droppedTime"),
+		gen.FieldRename("interest_wish_dateline", "WishTime"),
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
 		gen.FieldRename("interest_lasttouch", "UpdatedTime"),
@@ -263,6 +269,16 @@ func main() {
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:ep_subject_id;references:subject_id",
 		}),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_ep_status", "EpCollection",
+		gen.FieldTrimPrefix("ep_stt"),
+		gen.FieldType("ep_stt_sid", subjectIDTypeString),
+		gen.FieldRename("ep_stt_sid", "SubjectID"),
+		gen.FieldType("ep_stt_uid", userIDTypeString),
+		gen.FieldRename("ep_stt_uid", "userID"),
+		gen.FieldRename("ep_stt_lasttouch", "UpdatedTime"),
+		gen.FieldType("ep_stt_status", "[]byte"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_relations", "SubjectRelation",
