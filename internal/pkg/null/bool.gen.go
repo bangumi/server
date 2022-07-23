@@ -54,7 +54,7 @@ func (t Bool) Ptr() *bool {
 
 // Default return default value its value is Null or not Set.
 func (t Bool) Default(v bool) bool {
-	if t.Null && t.Set {
+	if t.Set && !t.Null {
 		return t.Value
 	}
 

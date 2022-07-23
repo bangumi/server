@@ -54,7 +54,7 @@ func (t Uint16) Ptr() *uint16 {
 
 // Default return default value its value is Null or not Set.
 func (t Uint16) Default(v uint16) uint16 {
-	if t.Null && t.Set {
+	if t.Set && !t.Null {
 		return t.Value
 	}
 

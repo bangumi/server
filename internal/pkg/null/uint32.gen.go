@@ -54,7 +54,7 @@ func (t Uint32) Ptr() *uint32 {
 
 // Default return default value its value is Null or not Set.
 func (t Uint32) Default(v uint32) uint32 {
-	if t.Null && t.Set {
+	if t.Set && !t.Null {
 		return t.Value
 	}
 

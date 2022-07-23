@@ -52,7 +52,7 @@ func (t Type) Ptr() *GenericType {
 
 // Default return default value its value is Null or not Set.
 func (t Type) Default(v GenericType) GenericType {
-	if t.Null && t.Set {
+	if t.Set && !t.Null {
 		return t.Value
 	}
 
