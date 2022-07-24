@@ -19,7 +19,6 @@ import (
 	"go.uber.org/zap/buffer"
 
 	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/oauth"
@@ -36,12 +35,10 @@ import (
 
 func New(
 	common common.Common,
-	cfg config.AppConfig,
 	a domain.AuthService,
 	r domain.RevisionRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
-	user domain.UserRepo,
 	cache cache.Cache,
 	ctrl ctrl.Ctrl,
 	captcha captcha.Manager,
@@ -54,7 +51,7 @@ func New(
 	engine frontend.TemplateEngine,
 	character character.Character,
 	oauth oauth.Manager,
-) (Handler, error) {
+) Handler {
 	return Handler{
 		Subject:   subject,
 		Common:    common,
@@ -62,13 +59,11 @@ func New(
 		User:      userHandler,
 		Character: character,
 		Person:    personHandler,
-		cfg:       cfg,
 		cache:     cache,
 		log:       log.Named("web.handler"),
 		rateLimit: rateLimit,
 		session:   session,
 		a:         a,
-		u:         user,
 		i:         index,
 		r:         r,
 		captcha:   captcha,
@@ -76,28 +71,26 @@ func New(
 		oauth:     oauth,
 		template:  engine,
 		buffPool:  buffer.NewPool(),
-	}, nil
+	}
 }
 
 type Handler struct {
+	Person person.Person
+	ctrl   ctrl.Ctrl
 	common.Common
-	Subject   subject.Subject
-	Character character.Character
-	Person    person.Person
-	ctrl      ctrl.Ctrl
-	User      user.User
+	g         domain.GroupRepo
+	oauth     oauth.Manager
+	r         domain.RevisionRepo
+	cache     cache.Cache
 	a         domain.AuthService
 	session   session.Manager
 	captcha   captcha.Manager
-	u         domain.UserRepo
 	rateLimit rate.Manager
 	i         domain.IndexRepo
-	g         domain.GroupRepo
-	cache     cache.Cache
-	r         domain.RevisionRepo
-	oauth     oauth.Manager
 	template  frontend.TemplateEngine
 	buffPool  buffer.Pool
 	log       *zap.Logger
-	cfg       config.AppConfig
+	User      user.User
+	Character character.Character
+	Subject   subject.Subject
 }

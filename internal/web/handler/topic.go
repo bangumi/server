@@ -62,7 +62,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	userIDs := slice.Map(topics, func(item model.Topic) model.UserID {
 		return item.CreatorID
 	})
-	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
+	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.UniqueUnsorted(userIDs)...)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -112,7 +112,7 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 
 	var friends map[model.UserID]domain.FriendItem
 	if a.Login {
-		friends, err = h.u.GetFriends(c.Context(), a.ID)
+		friends, err = h.ctrl.GetFriends(c.Context(), a.ID)
 		if err != nil {
 			return errgo.Wrap(err, "userRepo.GetFriends")
 		}

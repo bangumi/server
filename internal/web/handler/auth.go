@@ -113,7 +113,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 		SameSite: fiber.CookieSameSiteLaxMode,
 	})
 
-	user, err := h.u.GetByID(c.Context(), s.UserID)
+	user, err := h.ctrl.GetUser(c.Context(), s.UserID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get user by user id", a.Log())
 	}

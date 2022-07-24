@@ -177,7 +177,7 @@ func (h Handler) listComments(
 
 	var friends map[model.UserID]domain.FriendItem
 	if u.ID != 0 {
-		friends, err = h.u.GetFriends(c.Context(), u.ID)
+		friends, err = h.ctrl.GetFriends(c.Context(), u.ID)
 		if err != nil {
 			return errgo.Wrap(err, "userRepo.GetFriends")
 		}

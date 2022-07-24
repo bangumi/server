@@ -97,3 +97,16 @@ func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs ...model.UserID) (map
 
 	return result, nil
 }
+
+func (ctl Ctrl) GetFriends(ctx context.Context, id model.UserID) (map[model.UserID]domain.FriendItem, error) {
+	if id == 0 {
+		return map[model.UserID]domain.FriendItem{}, nil
+	}
+
+	f, err := ctl.user.GetFriends(ctx, id)
+	if err != nil {
+		return nil, errgo.Wrap(err, "userRepo.GetFriends")
+	}
+
+	return f, nil
+}

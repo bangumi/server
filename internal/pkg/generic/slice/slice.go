@@ -88,7 +88,7 @@ func Reduce[T any](in [][]T) []T {
 	return out
 }
 
-func Unique[T comparable](in []T) []T {
+func UniqueUnsorted[T comparable](in []T) []T {
 	var m = make(map[T]struct{}, len(in))
 
 	for _, t := range in {

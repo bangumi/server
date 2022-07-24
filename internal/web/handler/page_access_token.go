@@ -30,7 +30,7 @@ func (h Handler) PageListAccessToken(c *fiber.Ctx) error {
 		return c.Redirect("/demo/Login")
 	}
 
-	u, err := h.u.GetByID(c.Context(), v.ID)
+	u, err := h.ctrl.GetUser(c.Context(), v.ID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get current user", log.UserID(v.ID))
 	}
@@ -54,7 +54,7 @@ func (h Handler) PageCreateAccessToken(c *fiber.Ctx) error {
 		return c.Redirect("/demo/Login")
 	}
 
-	u, err := h.u.GetByID(c.Context(), v.ID)
+	u, err := h.ctrl.GetUser(c.Context(), v.ID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get current user", log.UserID(v.ID))
 	}
