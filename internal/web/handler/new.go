@@ -39,7 +39,6 @@ func New(
 	cfg config.AppConfig,
 	a domain.AuthService,
 	r domain.RevisionRepo,
-	topic domain.TopicRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
 	user domain.UserRepo,
@@ -72,7 +71,6 @@ func New(
 		u:         user,
 		i:         index,
 		r:         r,
-		topic:     topic,
 		captcha:   captcha,
 		g:         g,
 		oauth:     oauth,
@@ -98,7 +96,6 @@ type Handler struct {
 	cache     cache.Cache
 	r         domain.RevisionRepo
 	oauth     oauth.Manager
-	topic     domain.TopicRepo
 	template  frontend.TemplateEngine
 	buffPool  buffer.Pool
 	log       *zap.Logger

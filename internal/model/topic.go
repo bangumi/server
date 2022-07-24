@@ -28,6 +28,12 @@ type Topic struct {
 	Status    TopicStatus
 }
 
+type TopicDetail struct {
+	Content string
+	Replies []Comment
+	Topic
+}
+
 type CommentState uint8
 
 const (

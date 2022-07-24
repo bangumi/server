@@ -30,16 +30,15 @@ type PrivateTopic struct {
 }
 
 type PrivateTopicDetail struct {
-	CreatedAt  time.Time        `json:"created_at"`
-	UpdatedAt  time.Time        `json:"updated_at"`
-	Title      string           `json:"title"`
-	Creator    User             `json:"creator"`
-	Text       string           `json:"text"`
-	Comments   []PrivateComment `json:"comments"`
-	ID         model.TopicID    `json:"id"`
-	IsFriend   bool             `json:"is_friend"`
-	State      CommentState     `json:"state"`
-	ReplyCount uint32           `json:"reply_count"`
+	CreatedAt time.Time        `json:"created_at"`
+	UpdatedAt time.Time        `json:"updated_at"`
+	Title     string           `json:"title"`
+	Creator   User             `json:"creator"`
+	Text      string           `json:"text"`
+	Comments  []PrivateComment `json:"comments"`
+	ID        model.TopicID    `json:"id"`
+	IsFriend  bool             `json:"is_friend"`
+	State     CommentState     `json:"state"`
 }
 
 type PrivateComments struct {

@@ -110,7 +110,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
 		fx.Provide(func() domain.CollectionRepo { return m.CollectionRepo }),
 
-		fx.Invoke(web.ResistRouter),
+		fx.Invoke(web.AddRouters),
 
 		fx.Populate(&f),
 	}

@@ -17,6 +17,7 @@ package auth
 import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/timex"
 )
 
@@ -54,6 +55,17 @@ func RewriteCommit(t model.Comment) model.Comment {
 	}
 
 	return t
+}
+
+func RewriteCommentTree(comments []model.Comment) []model.Comment {
+	var newComments = make([]model.Comment, len(comments))
+
+	for i, comment := range comments {
+		comment.SubComments = slice.Map(comment.SubComments, RewriteSubCommit)
+		newComments[i] = RewriteCommit(comment)
+	}
+
+	return newComments
 }
 
 func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {

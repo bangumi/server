@@ -34,5 +34,5 @@ var Module = fx.Module("web",
 		session.New,
 		frontend.NewTemplateEngine,
 	),
-	fx.Invoke(ResistRouter),
+	fx.Invoke(AddRouters),
 )

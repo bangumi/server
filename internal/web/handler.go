@@ -36,9 +36,9 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
-// ResistRouter add all router and default 404 Handler to app.
+// AddRouters add all router and default 404 Handler to app.
 //nolint:funlen
-func ResistRouter(app *fiber.App, c config.AppConfig, h handler.Handler, scope tally.Scope) {
+func AddRouters(app *fiber.App, c config.AppConfig, h handler.Handler, scope tally.Scope) {
 	app.Use(ua.DisableDefaultHTTPLibrary)
 
 	// add logger wrapper and metrics counter
