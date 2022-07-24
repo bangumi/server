@@ -24,11 +24,7 @@ import (
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/common"
-	"github.com/bangumi/server/internal/web/handler/person"
-	"github.com/bangumi/server/internal/web/handler/subject"
-	"github.com/bangumi/server/internal/web/handler/user"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -44,21 +40,13 @@ func New(
 	captcha captcha.Manager,
 	session session.Manager,
 	rateLimit rate.Manager,
-	userHandler user.User,
-	personHandler person.Person,
 	log *zap.Logger,
-	subject subject.Subject,
 	engine frontend.TemplateEngine,
-	character character.Character,
 	oauth oauth.Manager,
 ) Handler {
 	return Handler{
-		Subject:   subject,
 		Common:    common,
 		ctrl:      ctrl,
-		User:      userHandler,
-		Character: character,
-		Person:    personHandler,
 		cache:     cache,
 		log:       log.Named("web.handler"),
 		rateLimit: rateLimit,
@@ -75,8 +63,7 @@ func New(
 }
 
 type Handler struct {
-	Person person.Person
-	ctrl   ctrl.Ctrl
+	ctrl ctrl.Ctrl
 	common.Common
 	g         domain.GroupRepo
 	oauth     oauth.Manager
@@ -90,7 +77,4 @@ type Handler struct {
 	template  frontend.TemplateEngine
 	buffPool  buffer.Pool
 	log       *zap.Logger
-	User      user.User
-	Character character.Character
-	Subject   subject.Subject
 }
