@@ -27,10 +27,10 @@ import (
 func (h Handler) PageListAccessToken(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
 	if !v.Login {
-		return c.Redirect("/demo/Login")
+		return c.Redirect("/demo/login")
 	}
 
-	u, err := h.u.GetByID(c.Context(), v.ID)
+	u, err := h.ctrl.GetUser(c.Context(), v.ID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get current user", log.UserID(v.ID))
 	}
@@ -51,10 +51,10 @@ func (h Handler) PageListAccessToken(c *fiber.Ctx) error {
 func (h Handler) PageCreateAccessToken(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
 	if !v.Login {
-		return c.Redirect("/demo/Login")
+		return c.Redirect("/demo/login")
 	}
 
-	u, err := h.u.GetByID(c.Context(), v.ID)
+	u, err := h.ctrl.GetUser(c.Context(), v.ID)
 	if err != nil {
 		return h.InternalError(c, err, "failed to get current user", log.UserID(v.ID))
 	}

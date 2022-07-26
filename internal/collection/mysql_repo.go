@@ -203,8 +203,3 @@ func (r mysqlRepo) UpdateSubjectCollection(
 
 	return nil
 }
-
-func (r mysqlRepo) UpdateEpisodeCollection(ctx context.Context, id model.EpisodeID, collection model.EpisodeCollection) {
-	// TODO implement me
-	panic("implement me")
-}

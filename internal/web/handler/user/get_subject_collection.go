@@ -45,6 +45,15 @@ func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID mode
 	const notFoundMessage = "subject is not collected by user"
 	v := h.GetHTTPAccessor(c)
 
+	s, err := h.ctrl.GetSubject(c.Context(), v.Auth, subjectID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to subject info", log.SubjectID(subjectID))
+	}
+
 	u, err := h.user.GetByName(c.Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -68,11 +77,6 @@ func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID mode
 
 	if !showPrivate && collection.Private {
 		return res.NotFound(notFoundMessage)
-	}
-
-	s, err := h.ctrl.GetSubject(c.Context(), v.Auth, subjectID)
-	if err != nil {
-		return h.InternalError(c, err, "failed to subject info", log.SubjectID(subjectID))
 	}
 
 	return res.JSON(c, res.ConvertModelSubjectCollection(collection, res.ToSlimSubjectV0(s)))

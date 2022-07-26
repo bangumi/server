@@ -143,7 +143,7 @@ func (h Handler) listGroupMembers(
 	for i, member := range members {
 		userIDs[i] = member.UserID
 	}
-	userMap, err := h.u.GetByIDs(ctx, userIDs...)
+	userMap, err := h.ctrl.GetUsersByIDs(ctx, userIDs...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "userRepo.GetByIDs")
 	}
@@ -201,18 +201,4 @@ func (h Handler) ListGroupTopics(c *fiber.Ctx) error {
 	}
 
 	return h.listTopics(c, domain.TopicTypeGroup, uint32(g.ID))
-}
-
-func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
-	topicID, err := req.ParseTopicID(c.Params("topic_id"))
-	if err != nil {
-		return err
-	}
-
-	topic, err := h.getTopic(c, domain.TopicTypeGroup, topicID)
-	if err != nil {
-		return err
-	}
-
-	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
 }

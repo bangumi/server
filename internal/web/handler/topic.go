@@ -19,31 +19,15 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
-
-func (h Handler) getTopic(c *fiber.Ctx, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
-	u := h.GetHTTPAccessor(c)
-	topic, err := h.topic.Get(c.Context(), topicType, id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return model.Topic{}, res.ErrNotFound
-		}
-		return model.Topic{}, errgo.Wrap(err, "Topic.Get")
-	}
-
-	if !auth.CanViewTopicContent(u.Auth, topic) {
-		return model.Topic{}, res.ErrNotFound
-	}
-
-	return topic, nil
-}
 
 func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32) error {
 	u := h.GetHTTPAccessor(c)
@@ -57,30 +41,28 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		Offset: page.Offset,
 	}
 
-	statuses := auth.TopicStatuses(u.Auth)
-
-	count, err := h.topic.Count(c.Context(), topicType, id, statuses)
+	topics, count, err := h.ctrl.ListTopics(c.Context(), u.Auth, topicType, id, page.Limit, page.Offset)
 	if err != nil {
-		return errgo.Wrap(err, "repo.topic.Count")
+		return errgo.Wrap(err, "ctrl.ListTopics")
 	}
 
 	if count == 0 {
-		return res.JSON(c, response)
+		return res.JSON(c, res.Paged{
+			Data:   res.EmptySlice(),
+			Total:  count,
+			Limit:  page.Limit,
+			Offset: page.Offset,
+		})
 	}
 
 	if err = page.Check(count); err != nil {
 		return err
 	}
 
-	topics, err := h.topic.List(c.Context(), topicType, id, statuses, page.Limit, page.Offset)
-	if err != nil {
-		return errgo.Wrap(err, "repo.topic.GetTopics")
-	}
-
 	userIDs := slice.Map(topics, func(item model.Topic) model.UserID {
 		return item.CreatorID
 	})
-	userMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(userIDs...)...)
+	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.UniqueUnsorted(userIDs)...)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -101,57 +83,85 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	return res.JSON(c, response)
 }
 
-var errUnknownTopicType = errors.New("unknown topic type")
+func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicType, topicID model.TopicID) error {
+	a := h.GetHTTPAccessor(c)
 
-func (h Handler) getResTopicWithComments(
-	c *fiber.Ctx,
-	topicType domain.TopicType,
-	topic model.Topic,
-) error {
-	var commentType domain.CommentType
-	switch topicType {
-	case domain.TopicTypeGroup:
-		commentType = domain.CommentTypeGroupTopic
-	case domain.TopicTypeSubject:
-		commentType = domain.CommentTypeSubjectTopic
-	default:
-		return errUnknownTopicType
-	}
-
-	content, err := h.topic.GetTopicContent(c.Context(), topicType, topic.ID)
+	t, err := h.ctrl.GetTopic(c.Context(), a.Auth, topicType, topicID, 1000000, 0) //nolint:gomnd
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-		return h.InternalError(c, err, "failed to get topic content")
+
+		return h.InternalError(c, err, "failed to get topic", log.TopicID(topicID), log.TopicType(topicType))
 	}
 
-	a := h.GetHTTPAccessor(c)
-	comments, friends, err := h.listComments(c, a.Auth, commentType, topic.ID)
+	var userIDs = make(map[model.UserID]struct{}, len(t.Replies))
+	for _, reply := range t.Replies {
+		userIDs[reply.CreatorID] = struct{}{}
+		for _, comment := range reply.SubComments {
+			userIDs[comment.CreatorID] = struct{}{}
+		}
+	}
+
+	userIDs[t.CreatorID] = struct{}{}
+
+	users, err := h.ctrl.GetUsersByIDs(c.Context(), gmap.Keys(userIDs)...)
 	if err != nil {
-		return err
+		return errgo.Wrap(err, "ctrl.GetUsersByIDs")
 	}
 
-	poster, err := h.ctrl.GetUser(c.Context(), topic.CreatorID)
-	if err != nil {
-		return errgo.Wrap(err, "get user")
-	}
-
-	var isFriend bool
-	if a.ID != 0 {
-		_, isFriend = friends[a.ID]
+	var friends map[model.UserID]domain.FriendItem
+	if a.Login {
+		friends, err = h.ctrl.GetFriends(c.Context(), a.ID)
+		if err != nil {
+			return errgo.Wrap(err, "userRepo.GetFriends")
+		}
 	}
 
 	return res.JSON(c, res.PrivateTopicDetail{
-		ID:         topic.ID,
-		Title:      topic.Title,
-		IsFriend:   isFriend,
-		CreatedAt:  topic.CreatedAt,
-		UpdatedAt:  topic.UpdatedAt,
-		Creator:    res.ConvertModelUser(poster),
-		ReplyCount: topic.Replies,
-		State:      res.ToCommentState(topic.State),
-		Comments:   comments,
-		Text:       auth.RewriteCommit(content).Content,
+		ID:        t.ID,
+		Title:     t.Title,
+		IsFriend:  gmap.Has(friends, t.CreatorID),
+		CreatedAt: t.CreatedAt,
+		UpdatedAt: t.UpdatedAt,
+		Creator:   res.ConvertModelUser(users[t.CreatorID]),
+		State:     res.ToCommentState(t.State),
+		Comments:  fromModelComments(t.Replies, users, friends),
+		Text:      t.Content,
 	})
+}
+
+func fromModelComments(
+	replies []model.Comment,
+	users map[model.UserID]model.User,
+	friends map[model.UserID]domain.FriendItem,
+) []res.PrivateComment {
+	var comments = make([]res.PrivateComment, 0, len(replies))
+	for _, reply := range replies {
+		var subComments = make([]res.PrivateSubComment, 0, len(reply.SubComments))
+		for _, comment := range reply.SubComments {
+			_, f := friends[comment.CreatorID]
+			subComments = append(subComments, res.PrivateSubComment{
+				CreatedAt: comment.CreatedAt,
+				Text:      comment.Content,
+				Creator:   res.ConvertModelUser(users[comment.CreatorID]),
+				IsFriend:  f,
+				State:     res.ToCommentState(comment.State),
+				ID:        comment.ID,
+			})
+		}
+
+		_, f := friends[reply.CreatorID]
+		comments = append(comments, res.PrivateComment{
+			CreatedAt: reply.CreatedAt,
+			Text:      reply.Content,
+			Creator:   res.ConvertModelUser(users[reply.CreatorID]),
+			Replies:   subComments,
+			ID:        reply.ID,
+			IsFriend:  f,
+			State:     res.ToCommentState(reply.State),
+		})
+	}
+
+	return comments
 }

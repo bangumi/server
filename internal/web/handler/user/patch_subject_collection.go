@@ -81,5 +81,5 @@ func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
 		Type:      r.Type.Default(collect.Type),
 	})
 
-	return nil
+	return errgo.Wrap(err, "ctrl.UpdateCollection")
 }
