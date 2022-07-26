@@ -17,10 +17,13 @@ package domain
 import (
 	"context"
 
+	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/model"
 )
 
 type CollectionRepo interface {
+	// WithQuery is used to replace repo's query to txn
+	WithQuery(query *query.Query) CollectionRepo
 	CountSubjectCollections(
 		ctx context.Context,
 		userID model.UserID,

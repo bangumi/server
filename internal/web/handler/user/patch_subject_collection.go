@@ -31,8 +31,6 @@ import (
 )
 
 func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
-	u := h.GetHTTPAccessor(c)
-
 	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
 	if err != nil {
 		return err
@@ -47,6 +45,16 @@ func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
 		return err
 	}
 
+	return h.patchSubjectCollection(c, subjectID, r)
+}
+
+func (h User) patchSubjectCollection(
+	c *fiber.Ctx,
+	subjectID model.SubjectID,
+	r req.SubjectEpisodeCollectionPatch,
+) error {
+	u := h.GetHTTPAccessor(c)
+
 	s, err := h.ctrl.GetSubject(c.Context(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -58,11 +66,8 @@ func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
 	}
 
 	if s.TypeID != model.SubjectTypeBook {
-		switch {
-		case r.VolStatus.Set:
-			return res.BadRequest("can't set 'vol_status' on non-book subject")
-		case r.EpStatus.Set:
-			return res.BadRequest("can't set 'ep_status' on non-book subject")
+		if r.VolStatus.Set || r.EpStatus.Set {
+			return res.BadRequest("can't set 'vol_status' or 'ep_status' on non-book subject")
 		}
 	}
 
@@ -71,7 +76,6 @@ func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.BadRequest("subject is not collected")
 		}
-
 		return errgo.Wrap(err, "collectionRepo.GetSubjectCollection")
 	}
 

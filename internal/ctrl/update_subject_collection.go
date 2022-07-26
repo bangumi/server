@@ -19,6 +19,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -38,16 +39,19 @@ func (ctl Ctrl) UpdateCollection(
 	req UpdateCollectionRequest,
 ) error {
 	ctl.log.Info("try to update collection", log.SubjectID(subjectID), log.UserID(u.ID), zap.Reflect("'req", req))
+	err := ctl.tx.Transaction(func(tx *query.Query) error {
+		err := ctl.collection.WithQuery(tx).UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
+			VolStatus: req.VolStatus,
+			EpStatus:  req.EpStatus,
+			Type:      req.Type,
+		})
+		if err != nil {
+			ctl.log.Error("failed to update user collection info", zap.Error(err))
+			return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
+		}
 
-	err := ctl.collection.UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
-		VolStatus: req.VolStatus,
-		EpStatus:  req.EpStatus,
-		Type:      req.Type,
+		return nil
 	})
-	if err != nil {
-		ctl.log.Error("failed to update user collection info", zap.Error(err))
-		return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
-	}
 
-	return nil
+	return err
 }

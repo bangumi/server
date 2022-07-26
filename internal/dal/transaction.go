@@ -15,15 +15,35 @@
 package dal
 
 import (
-	"go.uber.org/fx"
-
 	"github.com/bangumi/server/internal/dal/query"
 )
 
-var Module = fx.Module("dal",
-	fx.Provide(
-		NewDB,
-		query.Use,
-		NewMysqlTransaction,
-	),
-)
+type Transaction interface {
+	Transaction(fc func(tx *query.Query) error) error
+}
+
+func Tx(tx Transaction, fc func(tx *query.Query) error) error {
+	return tx.Transaction(fc)
+}
+
+var _ Transaction = NoopTransaction{}
+var _ Transaction = MysqlTransaction{}
+
+func NewMysqlTransaction(q *query.Query) Transaction {
+	return MysqlTransaction{q: q}
+}
+
+type MysqlTransaction struct {
+	q *query.Query
+}
+
+func (t MysqlTransaction) Transaction(fc func(tx *query.Query) error) error {
+	return t.q.Transaction(fc)
+}
+
+type NoopTransaction struct {
+}
+
+func (t NoopTransaction) Transaction(fc func(tx *query.Query) error) error {
+	return fc(nil)
+}

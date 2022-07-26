@@ -83,6 +83,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 		fx.Provide(func() tally.Scope { return tally.NoopScope }),
 		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}), fx.As(new(promreporter.Reporter)))),
+		fx.Provide(func() dal.Transaction { return dal.NoopTransaction{} }),
 
 		fx.Supply(httpClient),
 

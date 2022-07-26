@@ -52,7 +52,5 @@ func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 		return err
 	}
 
-	fmt.Println("v")
-
 	return nil
 }
