@@ -45,8 +45,7 @@ type mysqlRepo struct {
 }
 
 func (r mysqlRepo) WithQuery(query *query.Query) domain.CollectionRepo {
-	r.q = query
-	return r
+	return mysqlRepo{q: query, log: r.log}
 }
 
 func (r mysqlRepo) CountSubjectCollections(
