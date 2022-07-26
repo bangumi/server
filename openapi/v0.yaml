@@ -13,9 +13,7 @@ info:
 
     `415`: 请求没有设置 `content-type` header，应该统一设置为 `application/json`。
 
-    `422`: 无法以 JSON 格式解析请求（跟 WebDAV 的 RFC 定义的不同）
-
-    `400`: 请求数据错误，比如请求体或者 path， query 中的数据错误。（不代表请求体一定能够正确以 JSON 格式解析）
+    `400`: 请求数据错误，如 JSON 错误，请求体或者 path，query 中的数据错误。
 
     **未用到的多余的字段会被直接忽略，不会报错。**
 
@@ -740,7 +738,7 @@ paths:
           required: false
           schema:
             allOf:
-              - "$ref": "#/components/schemas/CollectionType"
+              - "$ref": "#/components/schemas/SubjectCollectionType"
             type: integer
           name: type
           in: query
@@ -778,6 +776,68 @@ paths:
       parameters:
         - *path_username
         - *path_subject_id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserSubjectCollection"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 用户不存在或者条目未收藏，或者条目为私有收藏
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+    patch:
+      tags:
+        - 收藏
+      summary: 修改用户单个收藏
+      description: 修改条目收藏，暂时只能修改部分信息。暂不支持修改简评和标签。
+      operationId: patchUserCollection
+      parameters:
+        - *path_username
+        - *path_subject_id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 所有的字段均可选
+              properties:
+                type:
+                  description: 修改条目收藏类型
+                  allOf:
+                    - $ref: "#/components/schemas/SubjectCollectionType"
+
+                rate:
+                  description: 评分，`0` 表示删除评分
+                  type: integer
+                  maximum: 10
+                  minimum: 0
+                  exclusiveMaximum: false
+                  exclusiveMinimum: false
+
+                ep_status:
+                  description: "只能用于修改书籍条目进度"
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: false
+
+                vol_status:
+                  description: "只能用于修改书籍条目进度"
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: false
+
       responses:
         "200":
           description: Successful Response
@@ -1375,8 +1435,8 @@ components:
         - Mechanic
         - Ship
         - Organization
-    CollectionType:
-      $ref: "./components/collection_type.yaml"
+    SubjectCollectionType:
+      $ref: "./components/subject_collection_type.yaml"
     Creator:
       $ref: "./components/creator.yaml"
     DetailedRevision:
