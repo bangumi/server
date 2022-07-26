@@ -1,3 +1,19 @@
+<!--
+  ~ SPDX-License-Identifier: AGPL-3.0-only
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published
+  ~ by the Free Software Foundation, version 3.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  ~ See the GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <https://www.gnu.org/licenses/>
+  -->
+
 <!DOCTYPE html>
 <html lang="zh-Hans">
 <head>
@@ -7,6 +23,7 @@
     href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700"
     rel="stylesheet"
   />
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui.css"/>
   <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui-bundle.js"></script>
 
@@ -22,15 +39,16 @@
 
 <script>
   document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
+
   window.onload = function () {
     window.ui = SwaggerUIBundle({
-      url: "/private.json",
+      url: "./v0.yaml",
       dom_id: "#swagger-ui",
       layout: "BaseLayout",
       deepLinking: true,
       requestInterceptor: (req) => {
-        // 实际上是在 dev-server.js 转发时添加的
-        req.headers.Cookie = 'sessionID=dev-session-id';
+        // will set default token
+        req.headers.Authorization = req.headers.Authorization ?? 'Bearer a_development_access_token';
         return req;
       },
     });
