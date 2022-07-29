@@ -55,3 +55,40 @@ func (s Set[T]) Remove(item T) {
 func (s Set[T]) Len() int {
 	return len(s.m)
 }
+
+func (s Set[T]) Or(o Set[T]) Set[T] {
+	ns := Set[T]{
+		m: make(map[T]empty, len(s.m)+len(o.m)),
+	}
+
+	for e := range o.m {
+		ns.m[e] = empty{}
+	}
+
+	return ns
+}
+
+func (s Set[T]) And(o Set[T]) Set[T] {
+	l := s.Len()
+	if o.Len() > l {
+		l = len(o.m)
+	}
+
+	ns := Set[T]{
+		m: make(map[T]empty, l),
+	}
+
+	for e := range o.m {
+		if s.Has(e) {
+			ns.m[e] = empty{}
+		}
+	}
+
+	return ns
+}
+
+func (s Set[K]) Each(fn func(key K)) {
+	for k, _ := range s.m {
+		fn(k)
+	}
+}
