@@ -48,13 +48,10 @@ func TestFromSlice(t *testing.T) {
 			t.Parallel()
 			s := set.FromSlice[string](tc.input)
 
-			if len(tc.input) != s.Len() {
-				t.Fatalf("expected %d elements in set, got %d", len(tc.input), s.Len())
-			}
+			require.Equal(t, len(tc.input), s.Len())
+
 			for _, val := range tc.input {
-				if !s.Has(val) {
-					t.Fatalf("expected to find val '%s' in set but did not", val)
-				}
+				require.True(t, s.Has(val))
 			}
 		})
 	}

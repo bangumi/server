@@ -5,7 +5,6 @@ go 1.18
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/danielgtaylor/huma v1.8.0
-	github.com/deckarep/golang-set/v2 v2.1.0
 	github.com/elliotchance/phpserialize v1.3.3
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-playground/locales v0.14.0
