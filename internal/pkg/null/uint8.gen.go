@@ -61,6 +61,14 @@ func (t Uint8) Default(v uint8) uint8 {
 	return v
 }
 
+func (t Uint8) Interface() any {
+	if t.HasValue() {
+		return t.Value
+	}
+
+	return nil
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Uint8) UnmarshalJSON(data []byte) error {
 	t.Set = true

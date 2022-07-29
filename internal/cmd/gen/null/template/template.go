@@ -59,6 +59,14 @@ func (t Type) Default(v GenericType) GenericType {
 	return v
 }
 
+func (t Type) Interface() any {
+	if t.HasValue() {
+		return t.Value
+	}
+
+	return nil
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Type) UnmarshalJSON(data []byte) error {
 	t.Set = true
