@@ -82,7 +82,7 @@ func (h User) patchSubjectCollection(
 	err = h.ctrl.UpdateCollection(c.Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
 		VolStatus: r.VolStatus.Default(collect.VolStatus),
 		EpStatus:  r.EpStatus.Default(collect.EpStatus),
-		Type:      r.Type.Default(collect.Type),
+		Type:      model.SubjectCollection(r.Type.Default(uint8(collect.Type))),
 	})
 
 	return errgo.Wrap(err, "ctrl.UpdateCollection")

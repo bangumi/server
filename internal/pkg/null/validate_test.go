@@ -27,7 +27,7 @@ func TestValidateNull(t *testing.T) {
 	t.Parallel()
 
 	v := validator.New()
-	v.RegisterCustomTypeFunc(null.ValidateNull, null.Int8{})
+	v.RegisterCustomTypeFunc(null.ValidateNull, null.AllTypes()...)
 
 	var s = struct {
 		I null.Int8 `json:"i" validate:"required"`
@@ -44,7 +44,7 @@ func TestValidateNull_no_error(t *testing.T) {
 	t.Parallel()
 
 	v := validator.New()
-	v.RegisterCustomTypeFunc(null.ValidateNull, null.Int8{})
+	v.RegisterCustomTypeFunc(null.ValidateNull, null.AllTypes()...)
 
 	var s = struct {
 		I null.Int8 `json:"i" validate:"required"`
@@ -61,7 +61,7 @@ func TestValidateNull_value(t *testing.T) {
 	t.Parallel()
 
 	v := validator.New()
-	v.RegisterCustomTypeFunc(null.ValidateNull, null.Int8{})
+	v.RegisterCustomTypeFunc(null.ValidateNull, null.AllTypes()...)
 
 	var s = struct {
 		I null.Int8 `json:"i" validate:"required,lte=5"`

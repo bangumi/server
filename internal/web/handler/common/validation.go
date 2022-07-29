@@ -29,6 +29,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -91,6 +92,8 @@ func getValidator() (*validator.Validate, ut.Translator, error) {
 
 		return name
 	})
+
+	validate.RegisterCustomTypeFunc(null.ValidateNull, null.AllTypes()...)
 
 	return validate, trans, nil
 }
