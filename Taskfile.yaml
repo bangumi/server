@@ -90,6 +90,15 @@ tasks:
       - gorm
       - mock
       - dal:comment
+      - gen:null
+
+  gen:null:
+    sources:
+      - ./internal/cmd/gen/null/**/*.go
+    generates:
+      - ./internal/pkg/null/*.gen.go
+    cmds:
+      - go run ./internal/cmd/gen/null/main.go
 
   dal:comment:
     sources:

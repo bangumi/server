@@ -12,18 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dal
+package null
 
-import (
-	"go.uber.org/fx"
+// stub for template
 
-	"github.com/bangumi/server/internal/dal/query"
-)
+type iface interface {
+	HasValue() bool
+}
 
-var Module = fx.Module("dal",
-	fx.Provide(
-		NewDB,
-		query.Use,
-		NewMysqlTransaction,
-	),
-)
+type GenericType any

@@ -37,6 +37,10 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.EpisodeRepo, error) {
 	return mysqlRepo{q: q, log: log.Named("episode.mysqlRepo")}, nil
 }
 
+func (r mysqlRepo) WithQuery(query *query.Query) domain.EpisodeRepo {
+	return mysqlRepo{q: query, log: r.log}
+}
+
 func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error) {
 	episode, err := r.q.Episode.WithContext(ctx).
 		Where(r.q.Episode.ID.Eq(episodeID), r.q.Episode.Ban.Eq(0)).Limit(1).First()

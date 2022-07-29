@@ -255,7 +255,9 @@ linters-settings:
       - "func github.com/bangumi/server/internal/web/res.JSON("
       - "func (github.com/bangumi/server/internal/web/handler/common.Common)."
       - "func (*github.com/bangumi/server/internal/dal/query.Query).Transaction("
+      - "func (github.com/bangumi/server/internal/dal.Transaction).Transaction("
     ignoreSigRegexps:
+      - 'func \(github.com/bangumi/server/internal/web/req\..*\)\.Validate\('
       - 'func github.com/bangumi/server/internal/web/req\.Parse.*\('
 
   nlreturn:

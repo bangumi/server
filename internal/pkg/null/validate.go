@@ -12,18 +12,28 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dal
+package null
 
 import (
-	"go.uber.org/fx"
+	"reflect"
 
-	"github.com/bangumi/server/internal/dal/query"
+	"github.com/go-playground/validator/v10"
 )
 
-var Module = fx.Module("dal",
-	fx.Provide(
-		NewDB,
-		query.Use,
-		NewMysqlTransaction,
-	),
-)
+type iface interface {
+	HasValue() bool
+	Interface() any
+}
+
+var _ validator.CustomTypeFunc = ValidateNull
+
+// ValidateNull implements validator.CustomTypeFunc.
+func ValidateNull(field reflect.Value) any {
+	if null, ok := field.Interface().(iface); ok {
+		if null.HasValue() {
+			return null.Interface()
+		}
+	}
+
+	return nil
+}

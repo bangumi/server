@@ -12,18 +12,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dal
+package web
 
 import (
-	"go.uber.org/fx"
-
-	"github.com/bangumi/server/internal/dal/query"
+	"regexp"
 )
 
-var Module = fx.Module("dal",
-	fx.Provide(
-		NewDB,
-		query.Use,
-		NewMysqlTransaction,
-	),
-)
+// rewrite openapi path params to fiber path params
+// rewriteOpenapiPath("/users/-/collections/{subject_id}/episodes") => "/users/-/collections/:subject_id/episodes".
+func rewriteOpenapiPath(path string) string {
+	return regexp.MustCompile(`\{.*}`).ReplaceAllStringFunc(path, func(s string) string {
+		return ":" + s[1:len(s)-1]
+	})
+}

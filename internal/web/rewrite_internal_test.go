@@ -12,18 +12,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dal
+package web
 
 import (
-	"go.uber.org/fx"
+	"testing"
 
-	"github.com/bangumi/server/internal/dal/query"
+	"github.com/stretchr/testify/require"
 )
 
-var Module = fx.Module("dal",
-	fx.Provide(
-		NewDB,
-		query.Use,
-		NewMysqlTransaction,
-	),
-)
+func Test_rewrite_path(t *testing.T) {
+	t.Parallel()
+
+	require.Equal(t,
+		"/users/-/collections/:subject_id/episodes",
+		rewriteOpenapiPath("/users/-/collections/{subject_id}/episodes"),
+	)
+
+	require.Equal(t,
+		"/v0/persons/:person_id/subjects",
+		rewriteOpenapiPath("/v0/persons/{person_id}/subjects"),
+	)
+}

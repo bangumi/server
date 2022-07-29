@@ -17,10 +17,14 @@ package domain
 import (
 	"context"
 
+	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/model"
 )
 
 type EpisodeRepo interface {
+	// WithQuery is used to replace repo's query to txn
+	WithQuery(query *query.Query) EpisodeRepo
+
 	Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error)
 
 	// Count all episode for a subject.

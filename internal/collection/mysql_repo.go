@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"gorm.io/gen"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/internal/dal/query"
@@ -42,6 +43,10 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CollectionRepo, error
 type mysqlRepo struct {
 	q   *query.Query
 	log *zap.Logger
+}
+
+func (r mysqlRepo) WithQuery(query *query.Query) domain.CollectionRepo {
+	return mysqlRepo{q: query, log: r.log}
 }
 
 func (r mysqlRepo) CountSubjectCollections(
@@ -178,4 +183,103 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 	}
 
 	return e.toModel(), nil
+}
+
+func (r mysqlRepo) UpdateSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	data domain.SubjectCollectionUpdate,
+) error {
+	t := r.q.SubjectCollection
+
+	_, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(
+		// t.Tag.Value(strings.Join(data.Tags, " ")),
+		t.Type.Value(uint8(data.Type)),
+		// t.Comment.Value(data.Comment),
+		t.EpStatus.Value(data.EpStatus),
+		t.VolStatus.Value(data.VolStatus),
+		// t.HasComment.Value(data.Comment == ""),
+	)
+
+	if err != nil {
+		return errgo.Wrap(err, "SubjectCollection.Update")
+	}
+
+	return nil
+}
+
+func (r mysqlRepo) UpdateEpisodeCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	episodeIDs []model.EpisodeID,
+	collectionType model.EpisodeCollection,
+) (model.UserSubjectEpisodesCollection, error) {
+	table := r.q.EpCollection
+	where := []gen.Condition{table.UserID.Eq(userID), table.SubjectID.Eq(subjectID)}
+
+	d, err := table.WithContext(ctx).Where(where...).First()
+	if err != nil {
+		r.log.Error("failed to get episode collection record",
+			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	e, err := deserializePhpEpStatus(d.Status)
+	if err != nil {
+		r.log.Error("failed to deserialize php-serialized bytes to go data",
+			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, err
+	}
+
+	if updated := updateMysqlEpisodeCollection(e, episodeIDs, collectionType); !updated {
+		return e.toModel(), nil
+	}
+
+	bytes, err := serializePhpEpStatus(e)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = table.WithContext(ctx).Where(where...).
+		UpdateColumnSimple(table.Status.Value(bytes), table.UpdatedTime.Value(uint32(time.Now().Unix())))
+	if err != nil {
+		return nil, errgo.Wrap(err, "EpCollection.UpdateColumnSimple")
+	}
+
+	return e.toModel(), nil
+}
+
+func updateMysqlEpisodeCollection(
+	e mysqlEpCollection,
+	episodeIDs []model.EpisodeID,
+	collectionType model.EpisodeCollection,
+) bool {
+	var updated bool
+
+	if collectionType == model.EpisodeCollectionNone {
+		// remove episode collection
+		for _, episodeID := range episodeIDs {
+			_, ok := e[episodeID]
+			if !ok {
+				continue
+			}
+
+			delete(e, episodeID)
+			updated = true
+		}
+	} else {
+		for _, episodeID := range episodeIDs {
+			v, ok := e[episodeID]
+			if ok && v.Type == collectionType {
+				continue
+			}
+
+			e[episodeID] = mysqlEpCollectionItem{EpisodeID: episodeID, Type: collectionType}
+			updated = true
+		}
+	}
+
+	return updated
 }
