@@ -91,6 +91,10 @@ func AddRouters(
 	v0.Get("/users/-/collections/-/episodes/:episode_id", h.NeedLogin, addMetrics(userHandler.GetEpisodeCollection))
 	v0.Get("/users/-/collections/:subject_id/episodes", h.NeedLogin, addMetrics(userHandler.GetSubjectEpisodeCollection))
 	v0.Patch("/users/-/collections/:subject_id", req.JSON, h.NeedLogin, addMetrics(userHandler.PatchSubjectCollection))
+	v0.Post(rewriteOpenapiPath("/users/-/collections/{subject_id}/episodes"),
+		req.JSON, h.NeedLogin,
+		addMetrics(userHandler.PatchEpisodeCollectionBatch),
+	)
 	v0.Get("/users/:username/avatar", addMetrics(userHandler.GetAvatar))
 
 	v0.Get("/indices/:id", addMetrics(h.GetIndex))

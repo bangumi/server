@@ -15,12 +15,16 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/ctrl"
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -30,6 +34,10 @@ type ReqEpisodeCollectionBatch struct {
 }
 
 func (r ReqEpisodeCollectionBatch) Validate() error {
+	if len(r.EpisodeID) == 0 {
+		return res.BadRequest("episode_id is required")
+	}
+
 	switch r.Type {
 	case model.EpisodeCollectionAll,
 		model.EpisodeCollectionWish,
@@ -50,6 +58,25 @@ func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 
 	if err := r.Validate(); err != nil {
 		return err
+	}
+
+	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	if err != nil {
+		return err
+	}
+
+	u := h.GetHTTPAccessor(c)
+
+	err = h.ctrl.UpdateEpisodeCollection(c.Context(), u.Auth, subjectID, r.EpisodeID, r.Type)
+	if err != nil {
+		switch {
+		case errors.Is(err, ctrl.ErrInvalidInput):
+			return res.BadRequest(err.Error())
+		case errors.Is(err, domain.ErrNotFound):
+			return res.ErrNotFound
+		}
+
+		return h.InternalError(c, err, "failed to update episode")
 	}
 
 	return nil

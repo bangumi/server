@@ -44,6 +44,13 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
+func (r mysqlRepo) UpdateEpisodeCollection(
+	ctx context.Context, userID model.UserID, id []model.EpisodeID, collection model.EpisodeCollection,
+) (model.UserSubjectEpisodesCollection, error) {
+	// TODO implement me
+	panic("implement me")
+}
+
 func (r mysqlRepo) WithQuery(query *query.Query) domain.CollectionRepo {
 	return mysqlRepo{q: query, log: r.log}
 }
@@ -206,13 +213,4 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	}
 
 	return nil
-}
-
-func (r mysqlRepo) UpdateEpisodeCollection(
-	ctx context.Context,
-	id model.EpisodeID,
-	collection model.EpisodeCollection,
-) {
-	// TODO implement me
-	panic("implement me")
 }

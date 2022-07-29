@@ -220,9 +220,27 @@ func (_c *CollectionRepo_ListSubjectCollection_Call) Return(_a0 []model.UserSubj
 	return _c
 }
 
-// UpdateEpisodeCollection provides a mock function with given fields: ctx, id, collection
-func (_m *CollectionRepo) UpdateEpisodeCollection(ctx context.Context, id model.EpisodeID, collection model.EpisodeCollection) {
-	_m.Called(ctx, id, collection)
+// UpdateEpisodeCollection provides a mock function with given fields: ctx, userID, id, collection
+func (_m *CollectionRepo) UpdateEpisodeCollection(ctx context.Context, userID model.UserID, id []model.EpisodeID, collection model.EpisodeCollection) (model.UserSubjectEpisodesCollection, error) {
+	ret := _m.Called(ctx, userID, id, collection)
+
+	var r0 model.UserSubjectEpisodesCollection
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, []model.EpisodeID, model.EpisodeCollection) model.UserSubjectEpisodesCollection); ok {
+		r0 = rf(ctx, userID, id, collection)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(model.UserSubjectEpisodesCollection)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, []model.EpisodeID, model.EpisodeCollection) error); ok {
+		r1 = rf(ctx, userID, id, collection)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // CollectionRepo_UpdateEpisodeCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateEpisodeCollection'
@@ -232,21 +250,22 @@ type CollectionRepo_UpdateEpisodeCollection_Call struct {
 
 // UpdateEpisodeCollection is a helper method to define mock.On call
 //  - ctx context.Context
-//  - id model.EpisodeID
+//  - userID model.UserID
+//  - id []model.EpisodeID
 //  - collection model.EpisodeCollection
-func (_e *CollectionRepo_Expecter) UpdateEpisodeCollection(ctx interface{}, id interface{}, collection interface{}) *CollectionRepo_UpdateEpisodeCollection_Call {
-	return &CollectionRepo_UpdateEpisodeCollection_Call{Call: _e.mock.On("UpdateEpisodeCollection", ctx, id, collection)}
+func (_e *CollectionRepo_Expecter) UpdateEpisodeCollection(ctx interface{}, userID interface{}, id interface{}, collection interface{}) *CollectionRepo_UpdateEpisodeCollection_Call {
+	return &CollectionRepo_UpdateEpisodeCollection_Call{Call: _e.mock.On("UpdateEpisodeCollection", ctx, userID, id, collection)}
 }
 
-func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Run(run func(ctx context.Context, id model.EpisodeID, collection model.EpisodeCollection)) *CollectionRepo_UpdateEpisodeCollection_Call {
+func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Run(run func(ctx context.Context, userID model.UserID, id []model.EpisodeID, collection model.EpisodeCollection)) *CollectionRepo_UpdateEpisodeCollection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.EpisodeID), args[2].(model.EpisodeCollection))
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].([]model.EpisodeID), args[3].(model.EpisodeCollection))
 	})
 	return _c
 }
 
-func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Return() *CollectionRepo_UpdateEpisodeCollection_Call {
-	_c.Call.Return()
+func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Return(_a0 model.UserSubjectEpisodesCollection, _a1 error) *CollectionRepo_UpdateEpisodeCollection_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
