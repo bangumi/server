@@ -62,6 +62,10 @@ func (s Set[T]) Or(o Set[T]) Set[T] {
 		m: make(map[T]empty, len(s.m)+len(o.m)),
 	}
 
+	for e := range s.m {
+		ns.m[e] = empty{}
+	}
+
 	for e := range o.m {
 		ns.m[e] = empty{}
 	}

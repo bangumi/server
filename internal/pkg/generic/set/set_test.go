@@ -16,52 +16,23 @@ package set_test
 
 import (
 	"fmt"
-	"math/rand"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/pkg/generic/set"
 )
 
-func checkeq[K comparable](t *testing.T, s set.Set[K], get func(k K) bool) {
-	t.Helper()
-	s.Each(func(key K) {
-		if !get(key) {
-			t.Fatalf("value %v should be in the set", key)
-		}
-	})
-}
-
 func TestCrossCheck(t *testing.T) {
 	t.Parallel()
-	stdm := make(map[int]bool)
-	set := set.New[int]()
+	var s1 = set.FromSlice([]int{0, 1})
+	var s2 = set.FromSlice([]int{1, 2, 3})
 
-	const nops = 1000
-	for i := 0; i < nops; i++ {
-		op := rand.Intn(2)
-		switch op {
-		case 0:
-			key := rand.Int()
-			stdm[key] = true
-			set.Add(key)
-		case 1:
-			var del int
-			for k := range stdm {
-				del = k
-				break
-			}
-			delete(stdm, del)
-			set.Remove(del)
-		}
-
-		checkeq(t, set, func(k int) bool {
-			_, ok := stdm[k]
-			return ok
-		})
-	}
+	require.EqualValues(t, set.FromSlice([]int{0, 1, 2, 3}), s1.Or(s2))
+	require.EqualValues(t, set.FromSlice([]int{1}), s1.And(s2))
 }
 
-func TestOf(t *testing.T) {
+func TestFromSlice(t *testing.T) {
 	t.Parallel()
 
 	testcases := []struct {
@@ -74,6 +45,7 @@ func TestOf(t *testing.T) {
 	for _, tc := range testcases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			s := set.FromSlice[string](tc.input)
 
 			if len(tc.input) != s.Len() {
