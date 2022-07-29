@@ -33,7 +33,7 @@ import (
 func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
 	if !v.Login {
-		return c.Redirect("/demo/Login")
+		return c.Redirect("/demo/login")
 	}
 
 	var r req.CreatePersonalAccessToken
@@ -56,7 +56,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
 	if !v.Login {
-		return c.Redirect("/demo/Login")
+		return c.Redirect("/demo/login")
 	}
 
 	var r req.DeletePersonalAccessToken
