@@ -22,8 +22,9 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/set"
 )
 
-func checkeq[K comparable](set set.Set[K], get func(k K) bool, t *testing.T) {
-	set.Each(func(key K) {
+func checkeq[K comparable](t *testing.T, s set.Set[K], get func(k K) bool) {
+	t.Helper()
+	s.Each(func(key K) {
 		if !get(key) {
 			t.Fatalf("value %v should be in the set", key)
 		}
@@ -53,10 +54,10 @@ func TestCrossCheck(t *testing.T) {
 			set.Remove(del)
 		}
 
-		checkeq(set, func(k int) bool {
+		checkeq(t, set, func(k int) bool {
 			_, ok := stdm[k]
 			return ok
-		}, t)
+		})
 	}
 }
 
@@ -71,14 +72,15 @@ func TestOf(t *testing.T) {
 		{"init without values", []string{}},
 	}
 	for _, tc := range testcases {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			set := set.FromSlice[string](tc.input)
+			s := set.FromSlice[string](tc.input)
 
-			if len(tc.input) != set.Len() {
+			if len(tc.input) != s.Len() {
 				t.Fatalf("expected %d elements in set, got %d", len(tc.input), set.Len())
 			}
 			for _, val := range tc.input {
-				if !set.Has(val) {
+				if !s.Has(val) {
 					t.Fatalf("expected to find val '%s' in set but did not", val)
 				}
 			}

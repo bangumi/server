@@ -17,6 +17,11 @@ package set
 type empty struct {
 }
 
+// Set is a not thread-safe set based on built-in map.
+type Set[T comparable] struct {
+	m map[T]empty
+}
+
 func FromSlice[T comparable](in []T) Set[T] {
 	var s = Set[T]{
 		m: make(map[T]empty, len(in)),
@@ -33,10 +38,6 @@ func New[T comparable]() Set[T] {
 	return Set[T]{
 		m: map[T]empty{},
 	}
-}
-
-type Set[T comparable] struct {
-	m map[T]empty
 }
 
 func (s Set[T]) Has(item T) bool {
@@ -88,7 +89,7 @@ func (s Set[T]) And(o Set[T]) Set[T] {
 }
 
 func (s Set[K]) Each(fn func(key K)) {
-	for k, _ := range s.m {
+	for k := range s.m {
 		fn(k)
 	}
 }
