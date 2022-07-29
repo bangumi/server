@@ -28,8 +28,8 @@ func TestCrossCheck(t *testing.T) {
 	var s1 = set.FromSlice([]int{0, 1})
 	var s2 = set.FromSlice([]int{1, 2, 3})
 
-	require.EqualValues(t, set.FromSlice([]int{0, 1, 2, 3}), s1.Or(s2))
-	require.EqualValues(t, set.FromSlice([]int{1}), s1.And(s2))
+	require.EqualValues(t, set.FromSlice([]int{0, 1, 2, 3}), s1.Union(s2))
+	require.EqualValues(t, set.FromSlice([]int{1}), s1.Intersection(s2))
 }
 
 func TestFromSlice(t *testing.T) {
