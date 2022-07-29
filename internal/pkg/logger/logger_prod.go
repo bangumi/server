@@ -30,17 +30,18 @@ import (
 // production log config.
 func getLogger(level zapcore.Level) *zap.Logger {
 	prod := zapcore.EncoderConfig{
-		TimeKey:             timeKey,
-		NameKey:             nameKey,
-		MessageKey:          messageKey,
-		CallerKey:           callerKey,
-		LevelKey:            levelKey,
-		StacktraceKey:       traceKey,
-		LineEnding:          zapcore.DefaultLineEnding,
-		EncodeLevel:         zapcore.LowercaseLevelEncoder,
-		EncodeTime:          zapcore.RFC3339NanoTimeEncoder,
-		EncodeDuration:      zapcore.MillisDurationEncoder,
-		EncodeCaller:        getCallerEncoder(),
+		TimeKey:        timeKey,
+		NameKey:        nameKey,
+		MessageKey:     messageKey,
+		CallerKey:      callerKey,
+		LevelKey:       levelKey,
+		StacktraceKey:  traceKey,
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.RFC3339NanoTimeEncoder,
+		EncodeDuration: zapcore.MillisDurationEncoder,
+		EncodeCaller:   getCallerEncoder(),
+
 		NewReflectedEncoder: defaultReflectedEncoder,
 	}
 
