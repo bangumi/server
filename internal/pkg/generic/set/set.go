@@ -57,7 +57,7 @@ func (s Set[T]) Len() int {
 	return len(s.m)
 }
 
-// Union return a new set = (s1 || s2)
+// Union return a new set = (s1 | s2).
 func (s Set[T]) Union(o Set[T]) Set[T] {
 	ns := Set[T]{
 		m: make(map[T]empty, len(s.m)+len(o.m)),
@@ -74,7 +74,7 @@ func (s Set[T]) Union(o Set[T]) Set[T] {
 	return ns
 }
 
-// Intersection return a new set = (s1 && s2)
+// Intersection return a new set = (s1 & s2).
 func (s Set[T]) Intersection(o Set[T]) Set[T] {
 	l := s.Len()
 	if o.Len() > l {
