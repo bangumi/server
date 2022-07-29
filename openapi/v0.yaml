@@ -2263,7 +2263,6 @@ components:
       $ref: "./components/subject_collection.yaml"
     UserEpisodeCollection:
       $ref: "./components/get-user-episodes-collection.yaml"
-
     v0_RelatedSubject:
       title: RelatedSubject
       required:
