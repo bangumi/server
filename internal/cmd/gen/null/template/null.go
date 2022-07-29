@@ -18,4 +18,4 @@ package null
 
 var nilBytes = []byte("null") //nolint:gochecknoglobals
 
-type GenericType interface{}
+type GenericType any

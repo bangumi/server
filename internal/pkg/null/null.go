@@ -51,7 +51,7 @@ func (t Null[T]) Ptr() *T {
 	return nil
 }
 
-func (t Null[T]) Interface() interface{} {
+func (t Null[T]) Interface() any {
 	if t.Set && !t.Null {
 		return &t.Value
 	}
