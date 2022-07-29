@@ -15,12 +15,8 @@
 package null
 
 import (
-	"bytes"
-
 	"github.com/goccy/go-json"
 )
-
-var nilBytes = []byte("null") //nolint:gochecknoglobals
 
 var _ json.Unmarshaler = (*Null[bool])(nil)
 
@@ -72,7 +68,7 @@ func (t Null[T]) Default(v T) T {
 func (t *Null[T]) UnmarshalJSON(data []byte) error {
 	t.Set = true
 
-	if bytes.Equal(data, nilBytes) {
+	if string(data) == "null" {
 		t.Null = true
 		return nil
 	}

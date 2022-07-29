@@ -16,6 +16,4 @@ package null
 
 // stub for template
 
-var nilBytes = []byte("null") //nolint:gochecknoglobals
-
 type GenericType any

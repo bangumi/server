@@ -17,8 +17,6 @@
 package null
 
 import (
-	"bytes"
-
 	"github.com/goccy/go-json"
 )
 
@@ -73,7 +71,7 @@ func (t Int64) Interface() any {
 func (t *Int64) UnmarshalJSON(data []byte) error {
 	t.Set = true
 
-	if bytes.Equal(data, nilBytes) {
+	if string(data) == "null" {
 		t.Null = true
 		return nil
 	}
