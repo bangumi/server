@@ -30,7 +30,7 @@ var _ iface = Int8{}
 
 var _ validator.CustomTypeFunc = ValidateNull
 
-// ValidateNull implements validator.CustomTypeFunc
+// ValidateNull implements validator.CustomTypeFunc.
 func ValidateNull(field reflect.Value) any {
 	if null, ok := field.Interface().(iface); ok {
 		if null.HasValue() {
