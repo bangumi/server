@@ -841,7 +841,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
         "404":
-          description: 用户不存在或者条目未收藏，或者条目为私有收藏
+          description: 用户不存在或者条目未收藏
           content:
             application/json:
               schema:
@@ -2314,7 +2314,6 @@ components:
         relation:
           title: Relation
           type: string
-
   securitySchemes:
     OptionalHTTPBearer:
       type: http
