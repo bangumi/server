@@ -77,7 +77,7 @@ func TestOf(t *testing.T) {
 			s := set.FromSlice[string](tc.input)
 
 			if len(tc.input) != s.Len() {
-				t.Fatalf("expected %d elements in set, got %d", len(tc.input), set.Len())
+				t.Fatalf("expected %d elements in set, got %d", len(tc.input), s.Len())
 			}
 			for _, val := range tc.input {
 				if !s.Has(val) {
