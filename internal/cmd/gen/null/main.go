@@ -22,8 +22,6 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/valyala/bytebufferpool"
-
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
@@ -76,18 +74,10 @@ func main() {
 }
 
 func Cmd(name string, arg ...string) {
-	stdout := bytebufferpool.Get()
-	defer bytebufferpool.Put(stdout)
-	stderr := bytebufferpool.Get()
-	defer bytebufferpool.Put(stderr)
-
 	cmd := exec.Command(name, arg...)
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
 
-	if err := cmd.Run(); err != nil {
-		fmt.Println(stdout.String())
-		fmt.Println(stderr.String())
+	if out, err := cmd.CombinedOutput(); err != nil {
+		fmt.Println(string(out))
 
 		panic(err)
 	}
