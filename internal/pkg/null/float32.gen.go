@@ -21,6 +21,7 @@ import (
 )
 
 var _ json.Unmarshaler = (*Float32)(nil)
+var _ iface = Float32{}
 
 // Float32 is a nullable type.
 type Float32 struct {

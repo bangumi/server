@@ -21,6 +21,7 @@ import (
 )
 
 var _ json.Unmarshaler = (*Int32)(nil)
+var _ iface = Int32{}
 
 // Int32 is a nullable type.
 type Int32 struct {

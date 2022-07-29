@@ -29,10 +29,10 @@ type UpdateEpisodeCollection struct {
 type SubjectEpisodeCollectionPatch struct {
 	// Comment   null.String                        `json:"comment"`
 	// Tags      []string                           `json:"tags"`
-	VolStatus null.Uint32                        `json:"vol_status" doc:"只能用于书籍条目"`
-	EpStatus  null.Uint32                        `json:"ep_status" doc:"只能用于书籍条目"`
-	Type      null.Null[model.SubjectCollection] `json:"type"`
-	Rate      null.Uint8                         `json:"rate"`
+	VolStatus null.Uint32 `json:"vol_status" doc:"只能用于书籍条目"`
+	EpStatus  null.Uint32 `json:"ep_status" doc:"只能用于书籍条目"`
+	Type      null.Uint8  `json:"type"`
+	Rate      null.Uint8  `json:"rate"`
 	// Private   null.Bool                          `json:"private"`
 }
 
@@ -44,7 +44,7 @@ func (v SubjectEpisodeCollectionPatch) Validate() error {
 	}
 
 	if v.Type.Set {
-		switch v.Type.Value {
+		switch model.SubjectCollection(v.Type.Value) {
 		case model.SubjectCollectionWish, model.SubjectCollectionDone, model.SubjectCollectionDoing,
 			model.SubjectCollectionOnHold, model.SubjectCollectionDropped:
 		default:

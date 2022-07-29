@@ -21,6 +21,7 @@ import (
 )
 
 var _ json.Unmarshaler = (*Int)(nil)
+var _ iface = Int{}
 
 // Int is a nullable type.
 type Int struct {

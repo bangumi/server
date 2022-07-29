@@ -21,6 +21,7 @@ import (
 )
 
 var _ json.Unmarshaler = (*Uint64)(nil)
+var _ iface = Uint64{}
 
 // Uint64 is a nullable type.
 type Uint64 struct {

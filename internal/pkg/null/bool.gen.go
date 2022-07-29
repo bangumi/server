@@ -21,6 +21,7 @@ import (
 )
 
 var _ json.Unmarshaler = (*Bool)(nil)
+var _ iface = Bool{}
 
 // Bool is a nullable type.
 type Bool struct {

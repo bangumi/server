@@ -21,6 +21,7 @@ import (
 )
 
 var _ json.Unmarshaler = (*String)(nil)
+var _ iface = String{}
 
 // String is a nullable type.
 type String struct {

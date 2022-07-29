@@ -25,7 +25,7 @@ type iface interface {
 	Interface() any
 }
 
-var _ iface = Null[bool]{}
+var _ iface = Bool{}
 var _ iface = Int8{}
 
 var _ validator.CustomTypeFunc = ValidateNull

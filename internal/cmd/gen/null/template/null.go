@@ -16,4 +16,8 @@ package null
 
 // stub for template
 
+type iface interface {
+	HasValue() bool
+}
+
 type GenericType any
