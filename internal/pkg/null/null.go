@@ -27,14 +27,6 @@ type Null[T any] struct {
 	Null  bool // if json field's value is `null`
 }
 
-func New[T any](v T) Null[T] {
-	return Null[T]{
-		Null:  false,
-		Value: v,
-		Set:   true,
-	}
-}
-
 func (t Null[T]) HasValue() bool {
 	return t.Set && !t.Null
 }
