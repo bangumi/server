@@ -107,7 +107,7 @@ func (ctl Ctrl) updateEpisodeCollectionTx(
 			}
 		}
 
-		ec, err := collectionTx.UpdateEpisodeCollection(ctx, u.ID, episodeIDs, t)
+		ec, err := collectionTx.UpdateEpisodeCollection(ctx, u.ID, subjectID, episodeIDs, t)
 		if err != nil {
 			return errgo.Wrap(err, "UpdateEpisodeCollection")
 		}
