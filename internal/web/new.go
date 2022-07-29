@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/http/pprof"
 	"strconv"
 	"strings"
 	"time"
@@ -87,8 +88,17 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 
 	app.Use(recovery.New())
 	app.Get("/metrics", adaptor.HTTPHandler(reporter.HTTPHandler()))
+	addProfile(app)
 
 	return app
+}
+
+func addProfile(app *fiber.App) {
+	app.Get("/debug/pprof/cmdline", adaptor.HTTPHandlerFunc(pprof.Cmdline))
+	app.Get("/debug/pprof/profile", adaptor.HTTPHandlerFunc(pprof.Profile))
+	app.Get("/debug/pprof/symbol", adaptor.HTTPHandlerFunc(pprof.Symbol))
+	app.Get("/debug/pprof/trace", adaptor.HTTPHandlerFunc(pprof.Trace))
+	app.Use("/debug/pprof/", adaptor.HTTPHandlerFunc(pprof.Index))
 }
 
 func Start(c config.AppConfig, app *fiber.App) error {
