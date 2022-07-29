@@ -29,6 +29,12 @@ func FromSlice[T comparable](in []T) Set[T] {
 	return s
 }
 
+func New[T comparable]() Set[T] {
+	return Set[T]{
+		m: map[T]empty{},
+	}
+}
+
 type Set[T comparable] struct {
 	m map[T]empty
 }
@@ -36,4 +42,16 @@ type Set[T comparable] struct {
 func (s Set[T]) Has(item T) bool {
 	_, ok := s.m[item]
 	return ok
+}
+
+func (s Set[T]) Add(item T) {
+	s.m[item] = empty{}
+}
+
+func (s Set[T]) Remove(item T) {
+	delete(s.m, item)
+}
+
+func (s Set[T]) Len() int {
+	return len(s.m)
 }
