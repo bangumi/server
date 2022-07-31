@@ -29,7 +29,6 @@ func (s stack) Format(st fmt.State, verb rune) {
 		for _, pc := range s {
 			st.Write([]byte("\n"))
 			frame(pc).Format(st, 'v')
-			// fmt.Fprintf(st, "\n%+v", frame(pc))
 		}
 	}
 }
