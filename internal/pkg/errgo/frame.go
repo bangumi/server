@@ -45,30 +45,31 @@ func (f frame) src() (string, string, int) {
 
 // Format formats the frame according to the fmt.Formatter interface.
 //
-//    %s    source file
-//    %v    equivalent to %s:%d
-//
-// Format accepts flags that alter the printing of some verbs, as follows:
-//
-//    %+s   function name and path of source file relative to the compile time
-//          GOPATH separated by \n\t (<funcname>\n\t<path>)
-//    %+v   equivalent to %+s:%d
+//    %s    function name and source file
+//    %v    function name, path.Base(source file) and line
+//    %+v    function name, source file and line
 func (f frame) Format(s fmt.State, verb rune) {
 	name, file, line := f.src()
 	switch verb {
 	case 's':
-		switch {
-		case s.Flag('+'):
+		_, _ = io.WriteString(s, name)
+		_, _ = io.WriteString(s, "\t")
+		_, _ = io.WriteString(s, file)
+	case 'v':
+		if s.Flag('+') {
 			_, _ = io.WriteString(s, name)
 			_, _ = io.WriteString(s, "\n\t")
 			_, _ = io.WriteString(s, file)
-		default:
-			_, _ = io.WriteString(s, path.Base(file))
+			_, _ = io.WriteString(s, ":")
+			_, _ = io.WriteString(s, strconv.Itoa(line))
+			return
 		}
-	case 'v':
-		f.Format(s, 's')
+		_, _ = io.WriteString(s, name)
+		_, _ = io.WriteString(s, "\n\t")
+		_, _ = io.WriteString(s, path.Base(file))
 		_, _ = io.WriteString(s, ":")
 		_, _ = io.WriteString(s, strconv.Itoa(line))
+
 	default:
 		_, _ = io.WriteString(s, strconv.FormatUint(uint64(f), 10))
 	}
