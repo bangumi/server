@@ -20,39 +20,30 @@ func Wrap(err error, msg string) error {
 		return nil
 	}
 
-	return &wrapError{msg: msg, err: err}
+	if e, ok := err.(*withStackError); ok { //nolint:errorlint
+		// keep Stack
+		return &withStackError{
+			Err:   &wrapError{msg: msg, err: e.Err},
+			Stack: e.Stack,
+		}
+	}
+
+	return &withStackError{Err: &wrapError{msg: msg, err: err}, Stack: callers()}
 }
 
+// Msg replace error message.
 func Msg(err error, msg string) error {
 	if err == nil {
 		return nil
 	}
 
-	return &msgError{msg: msg, err: err}
-}
+	if e, ok := err.(*withStackError); ok { //nolint:errorlint
+		// keep traces
+		return &withStackError{
+			Err:   &msgError{msg: msg, err: e.Err},
+			Stack: e.Stack,
+		}
+	}
 
-type wrapError struct {
-	err error
-	msg string
-}
-
-func (e *wrapError) Error() string {
-	return e.msg + ": " + e.err.Error()
-}
-
-func (e *wrapError) Unwrap() error {
-	return e.err
-}
-
-type msgError struct {
-	err error
-	msg string
-}
-
-func (e *msgError) Error() string {
-	return e.msg
-}
-
-func (e *msgError) Unwrap() error {
-	return e.err
+	return &withStackError{Err: &msgError{msg: msg, err: err}, Stack: callers()}
 }

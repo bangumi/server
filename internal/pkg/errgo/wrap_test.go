@@ -17,6 +17,8 @@ package errgo_test
 
 import (
 	"errors"
+	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -28,4 +30,13 @@ func TestWrap(t *testing.T) {
 	t.Parallel()
 	err := errors.New("raw")
 	require.Equal(t, "wrap: raw", errgo.Wrap(err, "wrap").Error())
+	require.Equal(t, "e: wrap: raw", errgo.Wrap(errgo.Wrap(err, "wrap"), "e").Error())
+}
+
+func TestStackTrace(t *testing.T) {
+	t.Parallel()
+
+	err := errgo.Wrap(errors.New("a error"), "m")
+	s := fmt.Sprintf("%+v", err)
+	require.Regexp(t, regexp.MustCompile("^error: m: a error\n.*"), s)
 }
