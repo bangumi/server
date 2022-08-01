@@ -16,19 +16,18 @@ package wiki
 
 import (
 	"errors"
+	"fmt"
 	"strings"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 var (
 	ErrWikiSyntax         = errors.New("invalid wiki syntax")
-	ErrGlobalPrefix       = errgo.Wrap(ErrWikiSyntax, "missing prefix '{{Infobox' at the start")
-	ErrGlobalSuffix       = errgo.Wrap(ErrWikiSyntax, "missing '}}' at the end")
-	ErrArrayNoClose       = errgo.Wrap(ErrWikiSyntax, "array should be closed by '}'")
-	ErrArrayItemWrapped   = errgo.Wrap(ErrWikiSyntax, "array item should be wrapped by '[]'")
-	ErrExpectingNewField  = errgo.Wrap(ErrWikiSyntax, "missing '|' to start a new field")
-	ErrExpectingSignEqual = errgo.Wrap(ErrWikiSyntax, "missing '=' to separate field name and value")
+	ErrGlobalPrefix       = fmt.Errorf("%w: missing prefix '{{Infobox' at the start", ErrWikiSyntax)
+	ErrGlobalSuffix       = fmt.Errorf("%w: missing '}}' at the end", ErrWikiSyntax)
+	ErrArrayNoClose       = fmt.Errorf("%w: array should be closed by '}'", ErrWikiSyntax)
+	ErrArrayItemWrapped   = fmt.Errorf("%w: array item should be wrapped by '[]'", ErrWikiSyntax)
+	ErrExpectingNewField  = fmt.Errorf("%w: missing '|' to start a new field", ErrWikiSyntax)
+	ErrExpectingSignEqual = fmt.Errorf("%w: missing '=' to separate field name and value", ErrWikiSyntax)
 )
 
 // ParseOmitError try to parse a string as wiki, omitting error.

@@ -47,3 +47,13 @@ func Msg(err error, msg string) error {
 
 	return &withStackError{Err: &msgError{msg: msg, err: err}, Stack: callers()}
 }
+
+// MsgNoTrace replace error message without adding trace.
+// this is used to create global errors, which also avoid add trace.
+func MsgNoTrace(err error, msg string) error {
+	if err == nil {
+		return nil
+	}
+
+	return &msgError{msg: msg, err: err}
+}

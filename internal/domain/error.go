@@ -23,9 +23,9 @@ import (
 // ErrNotFound should be returned when a repo or service can't find an authorization.
 var ErrNotFound = errors.New("can't find item")
 
-var ErrSubjectNotFound = errgo.Msg(ErrNotFound, "subject not found")
-var ErrPersonNotFound = errgo.Msg(ErrNotFound, "person not found")
-var ErrCharacterNotFound = errgo.Msg(ErrNotFound, "character not found")
-var ErrEpisodeNotFound = errgo.Msg(ErrNotFound, "episode not found")
-var ErrUserNotFound = errgo.Msg(ErrNotFound, "user not found")
-var ErrSubjectNotCollected = errgo.Msg(ErrNotFound, "subject is not collected by user")
+var ErrSubjectNotFound = errgo.MsgNoTrace(ErrNotFound, "subject not found")
+var ErrPersonNotFound = errgo.MsgNoTrace(ErrNotFound, "person not found")
+var ErrCharacterNotFound = errgo.MsgNoTrace(ErrNotFound, "character not found")
+var ErrEpisodeNotFound = errgo.MsgNoTrace(ErrNotFound, "episode not found")
+var ErrUserNotFound = errgo.MsgNoTrace(ErrNotFound, "user not found")
+var ErrSubjectNotCollected = errgo.MsgNoTrace(ErrNotFound, "subject is not collected by user")
