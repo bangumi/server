@@ -12,12 +12,12 @@
       "enabled": false
     },
     {
-      "groupName": "deps",
+      "groupName": "gomod",
       "matchManagers": ["gomod"],
       "semanticCommitType": "build"
     },
     {
-      "groupName": "deps",
+      "groupName": "npm",
       "matchManagers": ["npm"],
       "enabled": true,
       "rangeStrategy": "bump",
