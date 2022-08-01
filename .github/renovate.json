@@ -15,6 +15,16 @@
       "groupName": "deps",
       "matchManagers": ["gomod"],
       "semanticCommitType": "build"
+    },
+    {
+      "groupName": "deps",
+      "matchManagers": ["npm"],
+      "enabled": true,
+      "rangeStrategy": "bump",
+      "lockFileMaintenance": {
+        "enabled": true
+      },
+      "semanticCommitType": "build"
     }
   ]
 }
