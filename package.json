@@ -6,6 +6,7 @@
     "format": "prettier -w --list-different ./",
     "test": "node openapi/test.js",
     "start": "node openapi/dev-server.js",
+    "update-web-static": "cp node_modules/bootstrap/dist/ ./internal/web/frontend/static/bootstrap/ -r && cp node_modules/jquery/dist/jquery.slim.min.js ./internal/web/frontend/static/jquery.slim.min.js",
     "version": "node scripts/bump.js"
   },
   "prettier": {
@@ -15,6 +16,7 @@
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "bootstrap": "^5.1.3",
     "conventional-changelog": "^3.1.25",
+    "jquery": "^3.6.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21"
   },
