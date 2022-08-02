@@ -12,21 +12,31 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package accessor
+package pool
 
 import (
-	"github.com/bangumi/server/internal/pkg/generic/pool"
+	"sync"
 )
 
-var accessorPool = pool.New(func() *Accessor {
-	return &Accessor{}
-})
-
-func Get() *Accessor {
-	return accessorPool.Get()
+type Pool[T any] struct {
+	pool sync.Pool
 }
 
-func Put(a *Accessor) {
-	a.reset()
-	accessorPool.Put(a)
+//nolint:forcetypeassert
+func (p *Pool[T]) Get() T {
+	return p.pool.Get().(T)
+}
+
+func (p *Pool[T]) Put(t T) {
+	p.pool.Put(t)
+}
+
+func New[T any, F func() T](fn F) *Pool[T] {
+	return &Pool[T]{
+		pool: sync.Pool{
+			New: func() any {
+				return fn()
+			},
+		},
+	}
 }

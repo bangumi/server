@@ -321,6 +321,9 @@ issues:
     - path: '.*_test\.go'
       linters: [gocritic, gochecknoglobals, godot, nosnakecase]
 
+    - source: "var .* = pool.New"
+      linters: [gochecknoglobals]
+
     - source: 'var Module = fx\.Module\('
       linters: [gochecknoglobals]
 
