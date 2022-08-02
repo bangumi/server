@@ -17,7 +17,7 @@ package main
 
 import (
 	_ "embed"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -84,7 +84,7 @@ func (c *TypeComment) statStub() uint8 {
 		content = strings.ReplaceAll(content, "TypeComment", name)
 
 		fileName := t.Name + ".gen.go"
-		err := ioutil.WriteFile(filepath.Join("./internal/dal/dao/", fileName), []byte(content), 0600) //nolint:gomnd
+		err := os.WriteFile(filepath.Join("./internal/dal/dao/", fileName), []byte(content), 0600) //nolint:gomnd
 		if err != nil {
 			panic(err)
 		}
