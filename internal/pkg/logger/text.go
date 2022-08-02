@@ -34,7 +34,7 @@ func textLogger(level zapcore.Level) *zap.Logger {
 		EncodeLevel:    zapcore.LowercaseColorLevelEncoder,
 		EncodeTime:     zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05"),
 		EncodeDuration: zapcore.MillisDurationEncoder,
-		EncodeCaller:   getCallerEncoder(),
+		EncodeCaller:   zapcore.FullCallerEncoder,
 	})
 
 	return zap.New(
