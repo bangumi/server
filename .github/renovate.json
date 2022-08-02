@@ -12,6 +12,10 @@
       "enabled": false
     },
     {
+      "matchPackageNames": ["go"],
+      "enabled": false
+    },
+    {
       "groupName": "gomod",
       "matchManagers": ["gomod"],
       "semanticCommitType": "build"
