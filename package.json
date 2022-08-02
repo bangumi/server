@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
-    "bootstrap": "^5.1.3",
+    "bootstrap": "5.1.3",
     "conventional-changelog": "^3.1.25",
-    "jquery": "^3.6.0",
+    "jquery": "3.6.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21"
   },
