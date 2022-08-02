@@ -14,7 +14,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goccy/go-json v0.9.10
 	github.com/gofiber/adaptor/v2 v2.1.24
-	github.com/gofiber/fiber/v2 v2.35.0
+	github.com/gofiber/fiber/v2 v2.36.0
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/mattn/go-colorable v0.1.12
 	github.com/mitchellh/mapstructure v1.5.0
@@ -25,10 +25,10 @@ require (
 	github.com/uber-go/tally/v4 v4.1.2
 	go.uber.org/fx v1.17.1
 	go.uber.org/zap v1.21.0
-	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.3.5
-	gorm.io/gen v0.3.13
+	gorm.io/gen v0.3.14
 	gorm.io/gorm v1.23.9-0.20220713102635-3262daf8d468
 	gorm.io/plugin/dbresolver v1.2.1
 )
