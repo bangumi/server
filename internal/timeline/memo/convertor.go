@@ -104,7 +104,7 @@ func DAOToModel(tl *dao.TimeLine) (*model.TimeLineMemo, error) {
 		err = ErrUnexpectedType
 	}
 	if err != nil {
-		return result, fmt.Errorf("unmarshal(cat: %v, type: %v): %w", tl.Cat, tl.Type, err)
+		return result, errgo.Wrap(err, fmt.Sprintf("unmarshal(cat: %v, type: %v)", tl.Cat, tl.Type))
 	}
 	return result, nil
 }
