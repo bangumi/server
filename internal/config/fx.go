@@ -16,12 +16,9 @@ package config
 
 import (
 	"go.uber.org/fx"
-
-	"github.com/bangumi/server/internal/web/handler"
 )
 
 var Module = fx.Module("config",
-	handler.Module,
 	fx.Provide(
 		NewAppConfig,
 		ReadFileConfig,
