@@ -22,3 +22,5 @@ node_modules/
 pnpm-lock.yaml
 yarn.lock
 .task/
+
+config.yaml

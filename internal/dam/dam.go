@@ -16,17 +16,20 @@ package dam
 
 import (
 	"regexp"
+	"strings"
+	"unicode"
 
+	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-type Config struct {
-	NsfwWord     string `json:"nsfw_word"`
-	DisableWords string `json:"disable_words"`
-	BannedDomain string `json:"banned_domain"`
+type Dam struct {
+	nsfwWord     *regexp.Regexp
+	disableWord  *regexp.Regexp
+	bannedDomain *regexp.Regexp
 }
 
-func (c *Config) Load() (*Dam, error) {
+func New(c config.File) (*Dam, error) {
 	var cc Dam
 	var err error
 	cc.nsfwWord, err = regexp.CompilePOSIX(c.NsfwWord)
@@ -45,4 +48,39 @@ func (c *Config) Load() (*Dam, error) {
 	}
 
 	return &cc, nil
+}
+
+func (d Dam) NeedReview(text string) bool {
+	text = strings.ToLower(text)
+	if d.disableWord.MatchString(text) {
+		return true
+	}
+	if d.bannedDomain.MatchString(text) {
+		return true
+	}
+	return false
+}
+
+func (d Dam) CensoredWords(text string) bool {
+	return false
+}
+
+func NoControlChar(text string) bool {
+	for _, c := range text {
+		if unicode.IsControl(c) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func AllPrintableChar(text string) bool {
+	for _, c := range text {
+		if !unicode.IsPrint(c) {
+			return false
+		}
+	}
+
+	return true
 }

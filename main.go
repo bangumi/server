@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/dal"
+	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/group"
@@ -56,6 +57,8 @@ func start() error {
 
 	err := fx.New(
 		logger.FxLogger(),
+		config.Module,
+
 		// driver and connector
 		fx.Provide(
 			driver.NewRedisClient,         // redis
@@ -71,13 +74,15 @@ func start() error {
 		dal.Module,
 
 		fx.Provide(
-			config.NewAppConfig, logger.Copy, metrics.NewScope, cache.NewRedisCache,
+			logger.Copy, metrics.NewScope, cache.NewRedisCache,
 
 			oauth.NewMysqlRepo,
 
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
 			topic.NewMysqlRepo,
+
+			dam.New,
 
 			auth.NewService, person.NewService, group.NewMysqlRepo,
 		),

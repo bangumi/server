@@ -20,7 +20,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -35,7 +34,6 @@ func NewAppConfig() AppConfig {
 	user := getEnv("MYSQL_USER", "user")
 	pass := getEnv("MYSQL_PASS", "password")
 	db := getEnv("MYSQL_DB", "bangumi")
-	maxConnection := getEnvInt("MYSQL_MAX_CONNECTION", defaultMaxMysqlConnection)
 
 	httpPort, err := strconv.Atoi(getEnv("HTTP_PORT", "3000"))
 	if err != nil {
@@ -51,39 +49,33 @@ func NewAppConfig() AppConfig {
 		}
 	}
 
-	redisURL := getEnv("REDIS_URI", "redis://127.0.0.1:6379/0")
-	redisOptions, err := redis.ParseURL(redisURL)
-	if err != nil {
-		logger.Fatal("failed to parse redis url", zap.String("url", redisURL))
-	}
-
 	return AppConfig{
-		RedisOptions:  redisOptions,
+		RedisURL:      getEnv("REDIS_URI", "redis://127.0.0.1:6379/0"),
 		MySQLHost:     host,
 		MySQLPort:     port,
 		MySQLUserName: user,
 		MySQLPassword: pass,
 		MySQLDatabase: db,
-		MySQLMaxConn:  maxConnection,
+		MySQLMaxConn:  getEnvInt("MYSQL_MAX_CONNECTION", defaultMaxMysqlConnection),
 		Debug:         debug,
 		HTTPPort:      httpPort,
 
 		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", "0x0000000000000000000000000000000000000000"),
-		FrontendDomain:    getEnv("WEB_DOMAIN", ""),
+		WebDomain:         getEnv("WEB_DOMAIN", ""),
 		HTTPHost:          getEnv("HTTP_HOST", "127.0.0.1"),
 	}
 }
 
 type AppConfig struct {
 	Debug             map[string]bool
-	RedisOptions      *redis.Options
+	RedisURL          string
 	MySQLHost         string
 	MySQLPort         string
 	MySQLUserName     string
 	MySQLPassword     string
 	MySQLDatabase     string
 	HCaptchaSecretKey string
-	FrontendDomain    string // new frontend web page domain, like next.bgm.tv
+	WebDomain         string // new frontend web page domain, like next.bgm.tv
 	HTTPHost          string
 	HTTPPort          int
 	MySQLMaxConn      int

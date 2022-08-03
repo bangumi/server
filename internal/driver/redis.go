@@ -19,19 +19,26 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 const defaultRedisPoolSize = 4
 
 func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
-	if c.RedisOptions.PoolSize == 0 {
-		c.RedisOptions.PoolSize = defaultRedisPoolSize
+	redisOptions, err := redis.ParseURL(c.RedisURL)
+	if err != nil {
+		logger.Fatal("failed to parse redis url", zap.String("url", c.RedisURL))
 	}
 
-	cli := redis.NewClient(c.RedisOptions)
+	if redisOptions.PoolSize == 0 {
+		redisOptions.PoolSize = defaultRedisPoolSize
+	}
+
+	cli := redis.NewClient(redisOptions)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()

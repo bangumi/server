@@ -12,51 +12,39 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dam
+package config
 
 import (
-	"regexp"
-	"strings"
-	"unicode"
+	"os"
+
+	"github.com/spf13/pflag"
+	"gopkg.in/yaml.v3"
+
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-type Dam struct {
-	nsfwWord     *regexp.Regexp
-	disableWord  *regexp.Regexp
-	bannedDomain *regexp.Regexp
+type File struct {
+	NsfwWord     string `yaml:"nsfw_word"`
+	DisableWords string `yaml:"disable_words"`
+	BannedDomain string `yaml:"banned_domain"`
 }
 
-func (d Dam) NeedReview(text string) bool {
-	text = strings.ToLower(text)
-	if d.disableWord.MatchString(text) {
-		return true
-	}
-	if d.bannedDomain.MatchString(text) {
-		return true
-	}
-	return false
-}
+func ReadFileConfig() (File, error) {
+	config := pflag.String("config", "", "")
+	pflag.Parse()
+	var cfg File
+	if *config != "" {
+		f, err := os.Open(*config)
+		if err != nil {
+			return File{}, errgo.Wrap(err, "os.Open")
+		}
+		defer f.Close()
 
-func (d Dam) CensoredWords(text string) bool {
-	return false
-}
-
-func NoControlChar(text string) bool {
-	for _, c := range text {
-		if unicode.IsControl(c) {
-			return false
+		err = yaml.NewDecoder(f).Decode(&cfg)
+		if err != nil {
+			return File{}, errgo.Wrap(err, "toml.Decode")
 		}
 	}
 
-	return true
-}
-
-func AllPrintableChar(text string) bool {
-	for _, c := range text {
-		if !unicode.IsPrint(c) {
-			return false
-		}
-	}
-
-	return true
+	return cfg, nil
 }
