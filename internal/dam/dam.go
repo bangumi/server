@@ -32,17 +32,17 @@ type Dam struct {
 func New(c config.AppConfig) (*Dam, error) {
 	var cc Dam
 	var err error
-	cc.nsfwWord, err = regexp.CompilePOSIX(c.NsfwWord)
+	cc.nsfwWord, err = regexp.Compile(c.NsfwWord)
 	if err != nil {
 		return nil, errgo.Wrap(err, "nsfw_word")
 	}
 
-	cc.disableWord, err = regexp.CompilePOSIX(c.DisableWords)
+	cc.disableWord, err = regexp.Compile(c.DisableWords)
 	if err != nil {
 		return nil, errgo.Wrap(err, "disable_words")
 	}
 
-	cc.bannedDomain, err = regexp.CompilePOSIX(c.BannedDomain)
+	cc.bannedDomain, err = regexp.Compile(c.BannedDomain)
 	if err != nil {
 		return nil, errgo.Wrap(err, "banned_domain")
 	}
@@ -52,16 +52,18 @@ func New(c config.AppConfig) (*Dam, error) {
 
 func (d Dam) NeedReview(text string) bool {
 	text = strings.ToLower(text)
-	if d.disableWord.MatchString(text) {
-		return true
-	}
-	if d.bannedDomain.MatchString(text) {
-		return true
-	}
-	return false
+
+	return d.disableWord.MatchString(text)
 }
 
 func (d Dam) CensoredWords(text string) bool {
+	switch {
+	case d.disableWord.MatchString(text):
+		return true
+	case d.bannedDomain.MatchString(text):
+		return true
+	}
+
 	return false
 }
 
