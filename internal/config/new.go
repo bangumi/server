@@ -15,12 +15,9 @@
 package config
 
 import (
-	"os"
-
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v3"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -46,12 +43,6 @@ type AppConfig struct {
 	MySQLDatabase string `yaml:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
 	MySQLMaxConn  int    `yaml:"mysql_max_connection" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
 
-	FrontendDomain string `yaml:"web_domain" env:"WEB_DOMAIN"` // new frontend web page domain
-	HTTPHost       string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
-	HTTPPort       int    `yaml:"http_port" env:"HTTP_PORT" env-default:"3000"`
-
-	HCaptchaSecretKey string `yaml:"hcaptcha_secret_key" env:"HCAPTCHA_SECRET_KEY"`
-
 	NsfwWord     string `yaml:"nsfw_word"`
 	DisableWords string `yaml:"disable_words"`
 	BannedDomain string `yaml:"banned_domain"`
@@ -74,8 +65,6 @@ func NewAppConfig() (AppConfig, error) {
 
 	// 太长了
 	cfg.HCaptchaSecretKey = setDefault(cfg.HCaptchaSecretKey, "0x0000000000000000000000000000000000000000")
-
-	yaml.NewEncoder(os.Stdout).Encode(cfg)
 
 	return cfg, nil
 }
