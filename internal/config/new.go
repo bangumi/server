@@ -46,9 +46,9 @@ type AppConfig struct {
 	MySQLDatabase string `yaml:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
 	MySQLMaxConn  int    `yaml:"mysql_max_connection" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
 
-	FrontendDomain string `yaml:"web_domain" env:"WEB_DOMAIN"` // new frontend web page domain
-	HTTPHost       string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
-	HTTPPort       int    `yaml:"http_port" env:"HTTP_PORT" env-default:"3000"`
+	WebDomain string `yaml:"web_domain" env:"WEB_DOMAIN"` // new frontend web page domain
+	HTTPHost  string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
+	HTTPPort  int    `yaml:"http_port" env:"HTTP_PORT" env-default:"3000"`
 
 	HCaptchaSecretKey string `yaml:"hcaptcha_secret_key" env:"HCAPTCHA_SECRET_KEY"`
 
