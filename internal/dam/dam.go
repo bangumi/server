@@ -67,18 +67,13 @@ func (d Dam) CensoredWords(text string) bool {
 	return false
 }
 
-func NoControlChar(text string) bool {
-	for _, c := range text {
-		if unicode.IsControl(c) {
-			return false
-		}
-	}
-
-	return true
-}
-
 func AllPrintableChar(text string) bool {
 	for _, c := range text {
+		switch c {
+		case '\n', '\t':
+			continue
+		}
+
 		if !unicode.IsPrint(c) {
 			return false
 		}
