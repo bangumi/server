@@ -21,6 +21,5 @@ import (
 var Module = fx.Module("config",
 	fx.Provide(
 		NewAppConfig,
-		ReadFileConfig,
 	),
 )

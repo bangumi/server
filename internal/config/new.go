@@ -15,9 +15,7 @@
 package config
 
 import (
-	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -26,10 +24,9 @@ import (
 	"github.com/gookit/goutil/dump"
 	"github.com/ilyakaznacheev/cleanenv"
 
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
-
-const defaultMaxMysqlConnection = 4
 
 //nolint:gochecknoglobals
 var config = pflag.String("config", "", "config file location, optional")
@@ -39,21 +36,29 @@ func init() {
 	pflag.Parse()
 }
 
-func NewAppConfig() AppConfig {
+type AppConfig struct {
+	Debug             map[string]bool
+	RedisURL          string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
+	MySQLHost         string `yaml:"mysql_host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
+	MySQLPort         string `yaml:"mysql_port" env:"MYSQL_PORT" env-default:"3306"`
+	MySQLUserName     string `yaml:"mysql_user" env:"MYSQL_USER" env-default:"user"`
+	MySQLPassword     string `yaml:"mysql_pass" env:"MYSQL_PASS" env-default:"password"`
+	MySQLDatabase     string `yaml:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
+	HCaptchaSecretKey string `yaml:"hcaptcha_secret_key" env:"HCAPTCHA_SECRET_KEY" env-default:"0x0000000000000000000000000000000000000000"`
+	FrontendDomain    string `yaml:"web_domain" env:"WEB_DOMAIN"` // new frontend web page domain, like next.bgm.tv
+	HTTPHost          string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
+	HTTPPort          int    `env:"HTTP_PORT" env-default:"3000"`
+	MySQLMaxConn      int    `yaml:"mysql_max_conn" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
+
+	NsfwWord     string `yaml:"nsfw_word"`
+	DisableWords string `yaml:"disable_words"`
+	BannedDomain string `yaml:"banned_domain"`
+}
+
+func NewAppConfig() (AppConfig, error) {
 	logger.Info("reading app config", zap.String("version", Version))
-	host := getEnv("MYSQL_HOST", "127.0.0.1")
-	port := getEnv("MYSQL_PORT", "3306")
-	user := getEnv("MYSQL_USER", "user")
-	pass := getEnv("MYSQL_PASS", "password")
-	db := getEnv("MYSQL_DB", "bangumi")
-
-	httpPort, err := strconv.Atoi(getEnv("HTTP_PORT", "3000"))
-	if err != nil {
-		logger.Fatal("can't parse http port", zap.Error(err))
-	}
-
 	var debug = make(map[string]bool)
-	if debugV := getEnv("DEBUG", ""); debugV != "" {
+	if debugV := os.Getenv("DEBUG"); debugV != "" {
 		logger.Info("enable debug: " + debugV)
 		for _, v := range strings.Split(debugV, ",") {
 			v = strings.TrimSpace(v)
@@ -62,69 +67,22 @@ func NewAppConfig() AppConfig {
 	}
 
 	var cfg AppConfig
-	if *config == "" {
-		err := cleanenv.ReadConfig(*config, &cfg)
-		if err != nil {
-			panic(err)
-		}
+	var err error
+	if *config != "" {
+		logger.Info("reading app config file", zap.Stringp("config", config))
+		err = errgo.Wrap(cleanenv.ReadConfig(*config, &cfg), "ReadConfig")
+	} else {
+		err = errgo.Wrap(cleanenv.ReadEnv(&cfg), "ReadEnv")
 	}
 
-	if err := cleanenv.ReadEnv(&cfg); err != nil {
-		panic(err)
+	if err != nil {
+		return AppConfig{}, err
 	}
 
 	dump.P(cfg)
 
-	return AppConfig{
-		RedisURL:      getEnv("REDIS_URI", "redis://127.0.0.1:6379/0"),
-		MySQLHost:     host,
-		MySQLPort:     port,
-		MySQLUserName: user,
-		MySQLPassword: pass,
-		MySQLDatabase: db,
-		MySQLMaxConn:  getEnvInt("MYSQL_MAX_CONNECTION", defaultMaxMysqlConnection),
-		Debug:         debug,
-		HTTPPort:      httpPort,
+	cfg.Debug = debug
 
-		HCaptchaSecretKey: getEnv("HCAPTCHA_SECRET_KEY", "0x0000000000000000000000000000000000000000"),
-		FrontendDomain:    getEnv("WEB_DOMAIN", ""),
-		HTTPHost:          getEnv("HTTP_HOST", "127.0.0.1"),
-	}
-}
+	return cfg, nil
 
-type AppConfig struct {
-	Debug             map[string]bool
-	RedisURL          string `json:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
-	MySQLHost         string `json:"mysql_host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
-	MySQLPort         string `json:"mysql_port" env:"MYSQL_PORT" env-default:"3306"`
-	MySQLUserName     string `json:"mysql_user" env:"MYSQL_USER" env-default:"user"`
-	MySQLPassword     string `json:"mysql_pass" env:"MYSQL_PASS" env-default:"password"`
-	MySQLDatabase     string `json:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
-	HCaptchaSecretKey string
-	FrontendDomain    string // new frontend web page domain, like next.bgm.tv
-	HTTPHost          string `json:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
-	HTTPPort          int    `env:"HTTP_PORT" env-default:"3000"`
-	MySQLMaxConn      int    `json:"mysql_max_conn" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
-}
-
-func getEnv(n, v string) string {
-	if e, ok := os.LookupEnv(n); ok {
-		return e
-	}
-
-	return v
-}
-
-func getEnvInt(name string, defaultValue int) int {
-	if raw, ok := os.LookupEnv(name); ok {
-		v, err := strconv.Atoi(raw)
-		if err != nil {
-			logger.Fatal(fmt.Sprintf("failed to read config from env, can't convert '%v' to int", raw),
-				zap.Error(err), zap.String("env_name", name))
-		}
-
-		return v
-	}
-
-	return defaultValue
 }

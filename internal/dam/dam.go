@@ -29,7 +29,7 @@ type Dam struct {
 	bannedDomain *regexp.Regexp
 }
 
-func New(c config.File) (*Dam, error) {
+func New(c config.AppConfig) (*Dam, error) {
 	var cc Dam
 	var err error
 	cc.nsfwWord, err = regexp.CompilePOSIX(c.NsfwWord)
