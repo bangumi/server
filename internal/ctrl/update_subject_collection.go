@@ -31,12 +31,12 @@ import (
 
 type UpdateCollectionRequest struct {
 	Comment   string
+	IP        string
+	Tags      []string
 	VolStatus uint32
 	EpStatus  uint32
-	Tags      []string
 	Type      model.SubjectCollection
 	Private   bool
-	IP        string
 	Rate      uint8
 }
 

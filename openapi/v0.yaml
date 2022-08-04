@@ -788,22 +788,24 @@ paths:
         - 收藏
       summary: 修改用户单个收藏
       description: |
-        修改条目收藏状态，暂时只能修改部分信息，暂不支持修改简评和标签，暂时不会生成时间线。
+        修改条目收藏状态，暂时只能修改部分信息，暂时不会生成时间线。
 
         由于直接修改剧集条目的完成度可能会引起意料之外效果，只能用于修改书籍类条目的完成度。
       operationId: patchUserCollection
       parameters:
-        - *path_username
-        - *path_subject_id
+        - $ref: "#/components/parameters/path_username"
+        - $ref: "#/components/parameters/path_subject_id"
       requestBody:
         content:
           application/json:
             schema:
+              # SubjectEpisodeCollectionPatch
               type: object
               description: 所有的字段均可选
               properties:
                 type:
                   description: 修改条目收藏类型
+                  required: false
                   allOf:
                     - $ref: "#/components/schemas/SubjectCollectionType"
 
@@ -814,18 +816,38 @@ paths:
                   minimum: 0
                   exclusiveMaximum: false
                   exclusiveMinimum: false
+                  required: false
 
                 ep_status:
                   description: "只能用于修改书籍条目进度"
                   type: integer
                   minimum: 0
                   exclusiveMinimum: false
+                  required: false
 
                 vol_status:
                   description: "只能用于修改书籍条目进度"
                   type: integer
                   minimum: 0
                   exclusiveMinimum: false
+                  required: false
+
+                comment:
+                  description: "评价"
+                  type: string
+                  required: false
+
+                private:
+                  description: "仅自己可见"
+                  type: boolean
+                  required: false
+
+                tags:
+                  description: 标签
+                  type: array
+                  required: false
+                  items:
+                    type: string
 
       responses:
         "200":
@@ -1322,16 +1344,8 @@ paths:
         - OptionalHTTPBearer: []
 components:
   parameters:
-    path_subject_id:
-      required: true
-      name: subject_id
-      description: 条目 ID
-      schema:
-        title: Subject ID
-        minimum: 1
-        description: 条目 ID
-        type: integer
-      in: path
+    path_subject_id: *path_subject_id
+    path_username: *path_username
 
   schemas:
     User:
