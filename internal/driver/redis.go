@@ -22,6 +22,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
@@ -46,6 +47,8 @@ func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
 	if err := cli.Ping(ctx).Err(); err != nil {
 		return nil, errgo.Wrap(err, "client.Ping")
 	}
+
+	cli.AddHook(metrics.RedisHook())
 
 	return cli, nil
 }
