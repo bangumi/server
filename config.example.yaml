@@ -15,6 +15,3 @@ hcaptcha_secret_key: 0x0000000000000000000000000000000000000000
 
 debug:
   gorm: true
-nsfw_word: "里番|无码|18x|エロ"
-disable_words: "办假存单|办理假证|0月租手机"
-banned_domain: "lista.cc|snapmail.cc|ashotmail.com|zoutlook.com"

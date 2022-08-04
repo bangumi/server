@@ -48,10 +48,6 @@ type AppConfig struct {
 	HTTPPort  int    `yaml:"http_port" env:"HTTP_PORT" env-default:"3000"`
 
 	HCaptchaSecretKey string `yaml:"hcaptcha_secret_key" env:"HCAPTCHA_SECRET_KEY"`
-
-	NsfwWord     string `yaml:"nsfw_word"`
-	DisableWords string `yaml:"disable_words"`
-	BannedDomain string `yaml:"banned_domain"`
 }
 
 func NewAppConfig() (AppConfig, error) {
