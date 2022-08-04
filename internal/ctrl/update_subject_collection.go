@@ -30,9 +30,14 @@ import (
 )
 
 type UpdateCollectionRequest struct {
+	Comment   string
 	VolStatus uint32
 	EpStatus  uint32
+	Tags      []string
 	Type      model.SubjectCollection
+	Private   bool
+	IP        string
+	Rate      uint8
 }
 
 func (ctl Ctrl) UpdateCollection(
@@ -42,11 +47,28 @@ func (ctl Ctrl) UpdateCollection(
 	req UpdateCollectionRequest,
 ) error {
 	ctl.log.Info("try to update collection", log.SubjectID(subjectID), log.UserID(u.ID), zap.Reflect("'req", req))
+	privacy := model.CollectPrivacyNone
+	if req.Private {
+		privacy = model.CollectPrivacySelf
+	}
+
+	if ctl.dam.NeedReview(req.Comment) {
+		privacy = model.CollectPrivacyBan
+	}
+
+	if slice.Any(req.Tags, ctl.dam.NeedReview) {
+		privacy = model.CollectPrivacyBan
+	}
+
 	err := ctl.tx.Transaction(func(tx *query.Query) error {
 		err := ctl.collection.WithQuery(tx).UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
+			Comment:   req.Comment,
+			Tags:      req.Tags,
 			VolStatus: req.VolStatus,
 			EpStatus:  req.EpStatus,
 			Type:      req.Type,
+			Rate:      req.Rate,
+			Privacy:   privacy,
 		})
 		if err != nil {
 			ctl.log.Error("failed to update user collection info", zap.Error(err))

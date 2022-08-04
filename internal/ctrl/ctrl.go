@@ -20,6 +20,7 @@ import (
 
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/dal"
+	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/domain"
 )
 
@@ -65,7 +66,8 @@ type Ctrl struct {
 	log   *zap.Logger
 	cache cache.Cache
 
-	tx dal.Transaction
+	dam dam.Dam
+	tx  dal.Transaction
 
 	user                  domain.UserRepo
 	topic                 domain.TopicRepo

@@ -79,11 +79,21 @@ func (h User) patchSubjectCollection(
 		return errgo.Wrap(err, "collectionRepo.GetSubjectCollection")
 	}
 
-	err = h.ctrl.UpdateCollection(c.Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
+	ctrlReq := ctrl.UpdateCollectionRequest{
 		VolStatus: r.VolStatus.Default(collect.VolStatus),
 		EpStatus:  r.EpStatus.Default(collect.EpStatus),
 		Type:      model.SubjectCollection(r.Type.Default(uint8(collect.Type))),
-	})
+		IP:        u.IP.String(),
+		Tags:      collect.Tags,
+		Comment:   r.Comment.Default(collect.Comment),
+		Rate:      r.Rate.Default(collect.Rate),
+	}
+
+	if r.Tags != nil {
+		ctrlReq.Tags = r.Tags
+	}
+
+	err = h.ctrl.UpdateCollection(c.Context(), u.Auth, subjectID, ctrlReq)
 
 	return errgo.Wrap(err, "ctrl.UpdateCollection")
 }

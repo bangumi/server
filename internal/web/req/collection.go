@@ -17,7 +17,9 @@ package req
 import (
 	"fmt"
 
+	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -27,13 +29,13 @@ type UpdateEpisodeCollection struct {
 }
 
 type SubjectEpisodeCollectionPatch struct {
-	// Comment   null.String                        `json:"comment"`
-	// Tags      []string                           `json:"tags"`
+	Comment   null.String `json:"comment"`
+	Tags      []string    `json:"tags"`
 	VolStatus null.Uint32 `json:"vol_status" doc:"只能用于书籍条目"`
 	EpStatus  null.Uint32 `json:"ep_status" doc:"只能用于书籍条目"`
 	Type      null.Uint8  `json:"type"`
 	Rate      null.Uint8  `json:"rate"`
-	// Private   null.Bool                          `json:"private"`
+	Private   null.Bool   `json:"private"`
 }
 
 func (v SubjectEpisodeCollectionPatch) Validate() error {
@@ -49,6 +51,12 @@ func (v SubjectEpisodeCollectionPatch) Validate() error {
 			model.SubjectCollectionOnHold, model.SubjectCollectionDropped:
 		default:
 			return res.BadRequest(fmt.Sprintf("%d is not valid subject collection type", v.Type.Value))
+		}
+	}
+
+	if len(v.Tags) > 0 {
+		if !slice.All(v.Tags, dam.AllPrintableChar) {
+			return res.BadRequest("invisible character are included in tags")
 		}
 	}
 
