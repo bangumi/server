@@ -104,11 +104,11 @@ func AddRouters(
 
 	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
 
-	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.WebDomain))
-	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.WebDomain))
+	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.FrontendDomain))
+	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.FrontendDomain))
 
 	var CORSBlockMiddleware []fiber.Handler
-	if c.WebDomain != "" {
+	if c.FrontendDomain != "" {
 		CORSBlockMiddleware = []fiber.Handler{originMiddleware, refererMiddleware}
 	}
 
@@ -135,7 +135,7 @@ func AddRouters(
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))
 	private.Delete("/access-tokens", req.JSON, addMetrics(h.DeletePersonalAccessToken))
 
-	if c.WebDomain != "" {
+	if c.FrontendDomain != "" {
 		CORSBlockMiddleware = []fiber.Handler{originMiddleware}
 	}
 
