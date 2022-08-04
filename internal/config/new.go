@@ -16,13 +16,11 @@ package config
 
 import (
 	"os"
-	"strings"
 
+	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
-
-	"github.com/gookit/goutil/dump"
-	"github.com/ilyakaznacheev/cleanenv"
+	"gopkg.in/yaml.v3"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -36,19 +34,23 @@ func init() {
 	pflag.Parse()
 }
 
+//nolint:govet
 type AppConfig struct {
-	Debug             map[string]bool
-	RedisURL          string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
-	MySQLHost         string `yaml:"mysql_host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
-	MySQLPort         string `yaml:"mysql_port" env:"MYSQL_PORT" env-default:"3306"`
-	MySQLUserName     string `yaml:"mysql_user" env:"MYSQL_USER" env-default:"user"`
-	MySQLPassword     string `yaml:"mysql_pass" env:"MYSQL_PASS" env-default:"password"`
-	MySQLDatabase     string `yaml:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
-	HCaptchaSecretKey string `yaml:"hcaptcha_secret_key" env:"HCAPTCHA_SECRET_KEY" env-default:"0x0000000000000000000000000000000000000000"`
-	FrontendDomain    string `yaml:"web_domain" env:"WEB_DOMAIN"` // new frontend web page domain, like next.bgm.tv
-	HTTPHost          string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
-	HTTPPort          int    `env:"HTTP_PORT" env-default:"3000"`
-	MySQLMaxConn      int    `yaml:"mysql_max_conn" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
+	Debug map[string]bool `yaml:"debug"`
+
+	RedisURL      string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
+	MySQLHost     string `yaml:"mysql_host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
+	MySQLPort     string `yaml:"mysql_port" env:"MYSQL_PORT" env-default:"3306"`
+	MySQLUserName string `yaml:"mysql_user" env:"MYSQL_USER" env-default:"user"`
+	MySQLPassword string `yaml:"mysql_pass" env:"MYSQL_PASS" env-default:"password"`
+	MySQLDatabase string `yaml:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
+	MySQLMaxConn  int    `yaml:"mysql_max_connection" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
+
+	FrontendDomain string `yaml:"web_domain" env:"WEB_DOMAIN"` // new frontend web page domain
+	HTTPHost       string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
+	HTTPPort       int    `yaml:"http_port" env:"HTTP_PORT" env-default:"3000"`
+
+	HCaptchaSecretKey string `yaml:"hcaptcha_secret_key" env:"HCAPTCHA_SECRET_KEY"`
 
 	NsfwWord     string `yaml:"nsfw_word"`
 	DisableWords string `yaml:"disable_words"`
@@ -57,15 +59,6 @@ type AppConfig struct {
 
 func NewAppConfig() (AppConfig, error) {
 	logger.Info("reading app config", zap.String("version", Version))
-	var debug = make(map[string]bool)
-	if debugV := os.Getenv("DEBUG"); debugV != "" {
-		logger.Info("enable debug: " + debugV)
-		for _, v := range strings.Split(debugV, ",") {
-			v = strings.TrimSpace(v)
-			debug[v] = true
-		}
-	}
-
 	var cfg AppConfig
 	var err error
 	if *config != "" {
@@ -79,10 +72,17 @@ func NewAppConfig() (AppConfig, error) {
 		return AppConfig{}, err
 	}
 
-	dump.P(cfg)
+	// 太长了
+	cfg.HCaptchaSecretKey = setDefault(cfg.HCaptchaSecretKey, "0x0000000000000000000000000000000000000000")
 
-	cfg.Debug = debug
+	yaml.NewEncoder(os.Stdout).Encode(cfg)
 
 	return cfg, nil
+}
 
+func setDefault(s string, defaultValue string) string {
+	if s == "" {
+		return defaultValue
+	}
+	return s
 }

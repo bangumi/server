@@ -73,7 +73,11 @@ func main() {
 
 	// reuse the database connection in Project or create a connection here
 	// if you want to use GenerateModel/GenerateModelAs, UseDB is necessary, otherwise it will panic
-	c := config.NewAppConfig()
+	c, err := config.NewAppConfig()
+	if err != nil {
+		panic("failed to read config: " + err.Error())
+	}
+
 	conn, err := driver.NewMysqlConnectionPool(c)
 	if err != nil {
 		panic(err)

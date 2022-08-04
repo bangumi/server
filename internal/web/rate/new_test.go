@@ -20,8 +20,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/web/rate"
 )
@@ -29,8 +27,7 @@ import (
 func TestManager_Allowed(t *testing.T) { //nolint:paralleltest
 	test.RequireEnv(t, "redis")
 
-	db, err := driver.NewRedisClient(config.NewAppConfig())
-	require.NoError(t, err)
+	db := test.GetRedis(t)
 
 	const ip = "0.0.0.-0"
 

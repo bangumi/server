@@ -1,3 +1,20 @@
+http_host: 127.0.0.1
+http_port: 3000
+web_domain: next.bgm.tv
+
+redis_url: redis://:redis-pass@192.168.1.3:6379/2
+
+mysql_max_connection: 4
+mysql_host: 192.168.1.3
+mysql_port: "3306"
+mysql_user: user
+mysql_pass: password
+mysql_db: bangumi
+
+hcaptcha_secret_key: 0x0000000000000000000000000000000000000000
+
+debug:
+  gorm: true
 nsfw_word: "里番|无码|18x|エロ"
 disable_words: "办假存单|办理假证|0月租手机"
 banned_domain: "lista.cc|snapmail.cc|ashotmail.com|zoutlook.com"
