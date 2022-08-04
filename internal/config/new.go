@@ -15,6 +15,8 @@
 package config
 
 import (
+	"os"
+
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
@@ -22,14 +24,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
-
-//nolint:gochecknoglobals
-var config = pflag.String("config", "", "config file location, optional")
-
-//nolint:gochecknoinits
-func init() {
-	pflag.Parse()
-}
 
 //nolint:govet
 type AppConfig struct {
@@ -51,6 +45,10 @@ type AppConfig struct {
 }
 
 func NewAppConfig() (AppConfig, error) {
+	cli := pflag.NewFlagSet(os.Args[0], pflag.ContinueOnError)
+	var config = cli.String("config", "", "config file location, optional")
+	_ = cli.Parse(os.Args[1:])
+
 	logger.Info("reading app config", zap.String("version", Version))
 	var cfg AppConfig
 	var err error
