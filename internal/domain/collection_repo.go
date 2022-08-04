@@ -63,11 +63,11 @@ type CollectionRepo interface {
 }
 
 type SubjectCollectionUpdate struct {
+	Comment   string
+	Tags      []string
 	VolStatus uint32
 	EpStatus  uint32
 	Type      model.SubjectCollection
 	Rate      uint8
-	// Tags      []string
-	// Comment   string
-	// Private   bool
+	Privacy   model.CollectPrivacy
 }

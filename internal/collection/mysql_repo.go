@@ -17,6 +17,7 @@ package collection
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -68,7 +69,7 @@ func (r mysqlRepo) CountSubjectCollections(
 	}
 
 	if !showPrivate {
-		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
+		q = q.Where(r.q.SubjectCollection.Private.Eq(uint8(model.CollectPrivacyNone)))
 	}
 
 	c, err := q.Count()
@@ -100,7 +101,7 @@ func (r mysqlRepo) ListSubjectCollection(
 	}
 
 	if !showPrivate {
-		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
+		q = q.Where(r.q.SubjectCollection.Private.Eq(uint8(model.CollectPrivacyNone)))
 	}
 
 	collections, err := q.Find()
@@ -121,7 +122,7 @@ func (r mysqlRepo) ListSubjectCollection(
 			EpStatus:    c.EpStatus,
 			VolStatus:   c.VolStatus,
 			Type:        model.SubjectCollection(c.Type),
-			Private:     c.Private != model.CollectPrivacyNone,
+			Private:     model.CollectPrivacy(c.Private) != model.CollectPrivacyNone,
 		}
 	}
 
@@ -152,7 +153,7 @@ func (r mysqlRepo) GetSubjectCollection(
 		EpStatus:    c.EpStatus,
 		VolStatus:   c.VolStatus,
 		Type:        model.SubjectCollection(c.Type),
-		Private:     c.Private != model.CollectPrivacyNone,
+		Private:     model.CollectPrivacy(c.Private) != model.CollectPrivacyNone,
 	}, nil
 }
 
@@ -194,12 +195,12 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	t := r.q.SubjectCollection
 
 	_, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(
-		// t.Tag.Value(strings.Join(data.Tags, " ")),
+		t.Tag.Value(strings.Join(data.Tags, " ")),
 		t.Type.Value(uint8(data.Type)),
-		// t.Comment.Value(data.Comment),
+		t.Comment.Value(data.Comment),
 		t.EpStatus.Value(data.EpStatus),
 		t.VolStatus.Value(data.VolStatus),
-		// t.HasComment.Value(data.Comment == ""),
+		t.HasComment.Value(data.Comment == ""),
 	)
 
 	if err != nil {
