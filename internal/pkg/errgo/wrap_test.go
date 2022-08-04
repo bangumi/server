@@ -40,3 +40,18 @@ func TestStackTrace(t *testing.T) {
 	s := fmt.Sprintf("%+v", err)
 	require.Regexp(t, regexp.MustCompile("^error: m: a error\n.*"), s)
 }
+
+func TestErrorIs(t *testing.T) {
+	t.Parallel()
+
+	e := errors.New("expected")
+
+	err := errgo.Wrap(e, "ctx")
+	require.True(t, errors.Is(err, e))
+
+	err = errgo.MsgNoTrace(e, "ctx")
+	require.True(t, errors.Is(err, e))
+
+	err = errgo.Msg(e, "ctx")
+	require.True(t, errors.Is(err, e))
+}

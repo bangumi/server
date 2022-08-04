@@ -24,7 +24,7 @@ import (
 	"github.com/go-redis/redis/v8"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/timex"
+	"github.com/bangumi/server/internal/pkg/gtime"
 )
 
 const defaultAllowPerHour = 5
@@ -71,7 +71,7 @@ func (m manager) Allowed(ctx context.Context, ip string) (bool, int, error) {
 	}
 
 	if res.Allowed <= 0 {
-		err := m.r.Set(ctx, banKey, "1", timex.OneWeek).Err()
+		err := m.r.Set(ctx, banKey, "1", gtime.OneWeek).Err()
 		return false, 0, errgo.Wrap(err, "redis.Set")
 	}
 
@@ -93,7 +93,7 @@ func (m manager) allow(
 	now := time.Now()
 	var keys = []string{RedisRateKeyPrefix + ip, RedisBanKeyPrefix + ip}
 	var values = []any{
-		limit.Burst, limit.Rate, limit.Period.Seconds(), now.Unix(), now.Nanosecond() / 1000, timex.OneWeekSec,
+		limit.Burst, limit.Rate, limit.Period.Seconds(), now.Unix(), now.Nanosecond() / 1000, gtime.OneWeekSec,
 	}
 	v, err := allowScript.Run(ctx, m.r, keys, values...).Result()
 	if err != nil {

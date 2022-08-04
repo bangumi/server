@@ -74,7 +74,7 @@ func ToValuer[T driver.Valuer](in []T) []driver.Valuer {
 	return s
 }
 
-func Reduce[T any](in [][]T) []T {
+func Flat[T any](in [][]T) []T {
 	var c int
 	for _, ts := range in {
 		c += len(ts)

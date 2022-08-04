@@ -27,8 +27,8 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 func getRepo(t *testing.T) (domain.AuthRepo, *query.Query) {
@@ -81,7 +81,7 @@ func TestMysqlRepo_CreateAccessToken(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	token, err := repo.CreateAccessToken(context.Background(), 1, "token name", timex.OneWeek)
+	token, err := repo.CreateAccessToken(context.Background(), 1, "token name", gtime.OneWeek)
 	require.NoError(t, err)
 	require.Len(t, token, 40)
 }
@@ -105,7 +105,7 @@ func TestMysqlRepo_DeleteAccessToken(t *testing.T) {
 		AccessToken: t.Name(),
 		ClientID:    "access token",
 		UserID:      "2",
-		ExpiredAt:   time.Now().Add(timex.OneWeek),
+		ExpiredAt:   time.Now().Add(gtime.OneWeek),
 		Scope:       nil,
 		Info:        []byte{},
 	})
@@ -133,7 +133,7 @@ func TestMysqlRepo_ListAccessToken(t *testing.T) {
 			AccessToken: t.Name() + strconv.Itoa(i),
 			ClientID:    "access token",
 			UserID:      "3",
-			ExpiredAt:   time.Now().Add(timex.OneWeek),
+			ExpiredAt:   time.Now().Add(gtime.OneWeek),
 			Scope:       nil,
 			Info:        []byte{},
 		})

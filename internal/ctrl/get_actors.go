@@ -33,7 +33,7 @@ func (ctl Ctrl) GetActors(
 		return nil, errgo.Wrap(err, "subjectRepo.GetActors")
 	}
 
-	vs := slice.UniqueUnsorted(slice.Reduce(gmap.Values(actors)))
+	vs := slice.UniqueUnsorted(slice.Flat(gmap.Values(actors)))
 
 	persons, err := ctl.person.GetByIDs(ctx, vs...)
 	if err != nil {

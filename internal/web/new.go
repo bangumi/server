@@ -36,9 +36,9 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/random"
-	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/middleware/recovery"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -81,7 +81,7 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 			return c.Next()
 		})
 		app.Use(cors.New(cors.Config{
-			MaxAge:        timex.OneWeekSec,
+			MaxAge:        gtime.OneWeekSec,
 			ExposeHeaders: strings.Join([]string{headerProcessTime, headerServerVersion, req.HeaderCFRay}, ","),
 		}))
 	}
