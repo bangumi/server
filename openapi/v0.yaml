@@ -791,6 +791,8 @@ paths:
         修改条目收藏状态，暂时不会生成时间线。
 
         由于直接修改剧集条目的完成度可能会引起意料之外效果，只能用于修改书籍类条目的完成度。
+
+        PATCH 方法的所有请求体字段均可选
       operationId: patchUserCollection
       parameters:
         - $ref: "#/components/parameters/path_username"
@@ -841,6 +843,7 @@ paths:
                   type: array
                   items:
                     type: string
+                    description: 不能包含空格
 
       responses:
         "200":
