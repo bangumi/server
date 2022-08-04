@@ -56,6 +56,8 @@ func start() error {
 
 	err := fx.New(
 		logger.FxLogger(),
+		config.Module,
+
 		// driver and connector
 		fx.Provide(
 			driver.NewRedisClient,         // redis
@@ -71,7 +73,7 @@ func start() error {
 		dal.Module,
 
 		fx.Provide(
-			config.NewAppConfig, logger.Copy, metrics.NewScope, cache.NewRedisCache,
+			logger.Copy, metrics.NewScope, cache.NewRedisCache,
 
 			oauth.NewMysqlRepo,
 

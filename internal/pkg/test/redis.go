@@ -12,40 +12,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package driver
+package test
 
 import (
-	"context"
-	"time"
+	"testing"
 
 	"github.com/go-redis/redis/v8"
-	"go.uber.org/zap"
+	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/internal/driver"
 )
 
-const defaultRedisPoolSize = 4
+func GetRedis(tb testing.TB) *redis.Client {
+	tb.Helper()
 
-func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
-	redisOptions, err := redis.ParseURL(c.RedisURL)
-	if err != nil {
-		logger.Fatal("failed to parse redis url", zap.String("url", c.RedisURL))
-	}
+	cfg, err := config.NewAppConfig()
+	require.NoError(tb, err)
+	db, err := driver.NewRedisClient(cfg)
+	require.NoError(tb, err)
 
-	if redisOptions.PoolSize == 0 {
-		redisOptions.PoolSize = defaultRedisPoolSize
-	}
-
-	cli := redis.NewClient(redisOptions)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	if err := cli.Ping(ctx).Err(); err != nil {
-		return nil, errgo.Wrap(err, "client.Ping")
-	}
-
-	return cli, nil
+	return db
 }
