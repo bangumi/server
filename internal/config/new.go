@@ -15,12 +15,9 @@
 package config
 
 import (
-	"os"
-
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v3"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -74,8 +71,6 @@ func NewAppConfig() (AppConfig, error) {
 
 	// 太长了
 	cfg.HCaptchaSecretKey = setDefault(cfg.HCaptchaSecretKey, "0x0000000000000000000000000000000000000000")
-
-	yaml.NewEncoder(os.Stdout).Encode(cfg)
 
 	return cfg, nil
 }
