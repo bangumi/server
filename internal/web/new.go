@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/http/pprof"
 	"strconv"
 	"strings"
 	"time"
@@ -35,9 +36,9 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/random"
-	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/middleware/recovery"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -80,15 +81,24 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 			return c.Next()
 		})
 		app.Use(cors.New(cors.Config{
-			MaxAge:        timex.OneWeekSec,
+			MaxAge:        gtime.OneWeekSec,
 			ExposeHeaders: strings.Join([]string{headerProcessTime, headerServerVersion, req.HeaderCFRay}, ","),
 		}))
 	}
 
 	app.Use(recovery.New())
 	app.Get("/metrics", adaptor.HTTPHandler(reporter.HTTPHandler()))
+	addProfile(app)
 
 	return app
+}
+
+func addProfile(app *fiber.App) {
+	app.Get("/debug/pprof/cmdline", adaptor.HTTPHandlerFunc(pprof.Cmdline))
+	app.Get("/debug/pprof/profile", adaptor.HTTPHandlerFunc(pprof.Profile))
+	app.Get("/debug/pprof/symbol", adaptor.HTTPHandlerFunc(pprof.Symbol))
+	app.Get("/debug/pprof/trace", adaptor.HTTPHandlerFunc(pprof.Trace))
+	app.Use("/debug/pprof/", adaptor.HTTPHandlerFunc(pprof.Index))
 }
 
 func Start(c config.AppConfig, app *fiber.App) error {

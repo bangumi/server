@@ -12,47 +12,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package errgo
+package test
 
-// Wrap add context to error message.
-func Wrap(err error, msg string) error {
-	if err == nil {
-		return nil
-	}
+import (
+	"testing"
 
-	return &wrapError{msg: msg, err: err}
-}
+	"github.com/go-redis/redis/v8"
+	"github.com/stretchr/testify/require"
 
-func Msg(err error, msg string) error {
-	if err == nil {
-		return nil
-	}
+	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/driver"
+)
 
-	return &msgError{msg: msg, err: err}
-}
+func GetRedis(tb testing.TB) *redis.Client {
+	tb.Helper()
 
-type wrapError struct {
-	err error
-	msg string
-}
+	cfg, err := config.NewAppConfig()
+	require.NoError(tb, err)
+	db, err := driver.NewRedisClient(cfg)
+	require.NoError(tb, err)
 
-func (e *wrapError) Error() string {
-	return e.msg + ": " + e.err.Error()
-}
-
-func (e *wrapError) Unwrap() error {
-	return e.err
-}
-
-type msgError struct {
-	err error
-	msg string
-}
-
-func (e *msgError) Error() string {
-	return e.msg
-}
-
-func (e *msgError) Unwrap() error {
-	return e.err
+	return db
 }

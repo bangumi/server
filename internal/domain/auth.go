@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/timex"
+	"github.com/bangumi/server/internal/pkg/gtime"
 )
 
 // AuthRepo presents an authorization.
@@ -54,7 +54,7 @@ type Auth struct {
 	Permission Permission `json:"-"` // disable cache for this field.
 }
 
-const nsfwThreshold = timex.OneDay * 60
+const nsfwThreshold = gtime.OneDay * 60
 
 // AllowNSFW return if current user is allowed to see NSFW resource.
 func (u Auth) AllowNSFW() bool {

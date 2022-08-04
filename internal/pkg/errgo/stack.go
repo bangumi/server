@@ -12,20 +12,44 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//nolint:goerr113
-package errgo_test
+package errgo
 
 import (
-	"errors"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
+	"fmt"
+	"runtime"
 )
 
-func TestWrap(t *testing.T) {
-	t.Parallel()
-	err := errors.New("raw")
-	require.Equal(t, "wrap: raw", errgo.Wrap(err, "wrap").Error())
+const unknownText = "(unknown)"
+
+// stack represents a stack of program counters.
+type stack []uintptr
+
+func (s stack) Format(st fmt.State, verb rune) {
+	if verb == 'v' && st.Flag('+') {
+		for _, pc := range s {
+			st.Write([]byte("\n"))
+			frame(pc).Format(st, 'v')
+		}
+	}
+}
+
+func toFrames(s []uintptr) []frame {
+	f := make([]frame, len(s))
+	for i, u := range s {
+		f[i] = frame(u)
+	}
+	return f
+}
+
+func callers() stack {
+	const depth = 16
+	var pcs [depth]uintptr
+	n := runtime.Callers(3, pcs[:])
+	var st stack = pcs[0:n]
+	return st
+}
+
+type encodeToJSONError struct {
+	Message string  `json:"msg"`
+	Stace   []frame `json:"stace"`
 }

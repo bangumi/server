@@ -25,7 +25,7 @@ import (
 	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/pkg/timex"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/handler/character"
@@ -109,11 +109,11 @@ func AddRouters(
 
 	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
 
-	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.FrontendDomain))
-	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.FrontendDomain))
+	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.WebDomain))
+	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.WebDomain))
 
 	var CORSBlockMiddleware []fiber.Handler
-	if c.FrontendDomain != "" {
+	if c.WebDomain != "" {
 		CORSBlockMiddleware = []fiber.Handler{originMiddleware, refererMiddleware}
 	}
 
@@ -140,7 +140,7 @@ func AddRouters(
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))
 	private.Delete("/access-tokens", req.JSON, addMetrics(h.DeletePersonalAccessToken))
 
-	if c.FrontendDomain != "" {
+	if c.WebDomain != "" {
 		CORSBlockMiddleware = []fiber.Handler{originMiddleware}
 	}
 
@@ -152,7 +152,7 @@ func AddRouters(
 	app.Use("/static/", filesystem.New(filesystem.Config{
 		PathPrefix: "static",
 		Root:       http.FS(frontend.StaticFS),
-		MaxAge:     timex.OneWeekSec,
+		MaxAge:     gtime.OneWeekSec,
 	}))
 
 	// default 404 Handler, all router should be added before this router

@@ -12,25 +12,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package logger
+package gmap_test
 
 import (
-	"path/filepath"
-	"runtime"
-	"strings"
+	"testing"
 
-	"go.uber.org/zap/zapcore"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/pkg/generic/gmap"
 )
 
-func getCallerEncoder() zapcore.CallerEncoder {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		return zapcore.FullCallerEncoder
-	}
+func TestHas(t *testing.T) {
+	t.Parallel()
 
-	prefix := filepath.ToSlash(filepath.Join(file, "../../../..")) + "/"
-
-	return func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(strings.TrimPrefix(caller.String(), prefix))
-	}
+	require.False(t, gmap.Has(map[string]int{}, ""))
+	require.True(t, gmap.Has(map[string]int{"q": 1}, "q"))
 }

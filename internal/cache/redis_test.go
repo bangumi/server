@@ -24,8 +24,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
@@ -124,8 +122,7 @@ func TestRedisCache_Real(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, "redis")
 
-	db, err := driver.NewRedisClient(config.NewAppConfig())
-	require.NoError(t, err)
+	db := test.GetRedis(t)
 	db.Del(context.TODO(), key)
 
 	c := cache.NewRedisCache(db)
@@ -146,8 +143,7 @@ func TestRedisCache_Del(t *testing.T) {
 
 	var key = "redis_test " + t.Name()
 
-	db, err := driver.NewRedisClient(config.NewAppConfig())
-	require.NoError(t, err)
+	db := test.GetRedis(t)
 	require.NoError(t, db.Set(context.Background(), key, "", 0).Err())
 
 	c := cache.NewRedisCache(db)

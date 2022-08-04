@@ -40,7 +40,7 @@ func getLogger(level zapcore.Level) *zap.Logger {
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
 		EncodeTime:     zapcore.RFC3339NanoTimeEncoder,
 		EncodeDuration: zapcore.MillisDurationEncoder,
-		EncodeCaller:   getCallerEncoder(),
+		EncodeCaller:   zapcore.FullCallerEncoder,
 
 		NewReflectedEncoder: defaultReflectedEncoder,
 	}

@@ -12,18 +12,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package auth
+package config
 
-const (
-	UserGroupAdmin uint8 = iota + 1
-	UserGroupBangumiAdmin
-	UserGroupWindowAdmin
-	UserGroupQuite
-	UserGroupBanned
-	_
-	_
-	UserGroupCharacterAdmin
-	UserGroupWikiAdmin
-	UserGroupNormal
-	UserGroupWikiEditor
+import (
+	"go.uber.org/fx"
+)
+
+var Module = fx.Module("config",
+	fx.Provide(
+		NewAppConfig,
+	),
 )

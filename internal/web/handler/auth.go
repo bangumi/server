@@ -23,8 +23,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger/log"
-	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/req"
@@ -107,7 +107,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 	c.Cookie(&fiber.Cookie{
 		Name:     session.CookieKey,
 		Value:    key,
-		MaxAge:   timex.OneWeekSec * 2,
+		MaxAge:   gtime.OneWeekSec * 2,
 		Secure:   !config.Development,
 		HTTPOnly: true,
 		SameSite: fiber.CookieSameSiteLaxMode,
