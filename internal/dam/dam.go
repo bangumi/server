@@ -29,38 +29,52 @@ type Dam struct {
 	bannedDomain *regexp.Regexp
 }
 
-func New(c config.AppConfig) (*Dam, error) {
+func New(c config.AppConfig) (Dam, error) {
 	var cc Dam
 	var err error
-	cc.nsfwWord, err = regexp.Compile(c.NsfwWord)
-	if err != nil {
-		return nil, errgo.Wrap(err, "nsfw_word")
+	if c.NsfwWord != "" {
+		cc.nsfwWord, err = regexp.Compile(c.NsfwWord)
+		if err != nil {
+			return Dam{}, errgo.Wrap(err, "nsfw_word")
+		}
 	}
 
-	cc.disableWord, err = regexp.Compile(c.DisableWords)
-	if err != nil {
-		return nil, errgo.Wrap(err, "disable_words")
+	if c.DisableWords != "" {
+		cc.disableWord, err = regexp.Compile(c.DisableWords)
+		if err != nil {
+			return Dam{}, errgo.Wrap(err, "disable_words")
+		}
 	}
 
-	cc.bannedDomain, err = regexp.Compile(c.BannedDomain)
-	if err != nil {
-		return nil, errgo.Wrap(err, "banned_domain")
+	if c.BannedDomain != "" {
+		cc.bannedDomain, err = regexp.Compile(c.BannedDomain)
+		if err != nil {
+			return Dam{}, errgo.Wrap(err, "banned_domain")
+		}
 	}
 
-	return &cc, nil
+	return cc, nil
 }
 
 func (d Dam) NeedReview(text string) bool {
+	if text == "" {
+		return false
+	}
+	if d.disableWord == nil {
+		return false
+	}
+
 	text = strings.ToLower(text)
 
 	return d.disableWord.MatchString(text)
 }
 
 func (d Dam) CensoredWords(text string) bool {
-	switch {
-	case d.disableWord.MatchString(text):
+	if d.disableWord != nil && d.disableWord.MatchString(text) {
 		return true
-	case d.bannedDomain.MatchString(text):
+	}
+
+	if d.bannedDomain != nil && d.bannedDomain.MatchString(text) {
 		return true
 	}
 
