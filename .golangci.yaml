@@ -304,6 +304,7 @@ linters:
     - nlreturn
     - godox
     - execinquery
+    - ifshort # deprecated
     # 1.18
     - wastedassign
     - unparam
