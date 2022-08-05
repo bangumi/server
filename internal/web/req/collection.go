@@ -40,7 +40,7 @@ type SubjectEpisodeCollectionPatch struct {
 
 func (v SubjectEpisodeCollectionPatch) Validate() error {
 	if v.Rate.Set {
-		if v.Rate.Value == 0 || v.Rate.Value > 10 {
+		if v.Rate.Value > 10 {
 			return res.BadRequest("rate overflow")
 		}
 	}
