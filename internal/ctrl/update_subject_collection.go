@@ -31,14 +31,15 @@ import (
 )
 
 type UpdateCollectionRequest struct {
-	IP        string
+	IP string
+
 	Comment   null.String
 	Tags      []string
 	VolStatus null.Uint32
 	EpStatus  null.Uint32
 	Type      null.Null[model.SubjectCollection]
-	Private   bool
-	Rate      uint8
+	Rate      null.Uint8
+	Private   null.Bool
 }
 
 func (ctl Ctrl) UpdateCollection(
@@ -48,19 +49,24 @@ func (ctl Ctrl) UpdateCollection(
 	req UpdateCollectionRequest,
 ) error {
 	ctl.log.Info("try to update collection", log.SubjectID(subjectID), log.UserID(u.ID), zap.Reflect("'req", req))
-	privacy := model.CollectPrivacyNone
-	if req.Private {
-		privacy = model.CollectPrivacySelf
+
+	var privacy null.Null[model.CollectPrivacy]
+	if req.Private.Set {
+		if req.Private.Value {
+			privacy = null.New(model.CollectPrivacyNone)
+		} else {
+			privacy = null.New(model.CollectPrivacySelf)
+		}
 	}
 
 	if req.Comment.HasValue() {
 		if ctl.dam.NeedReview(req.Comment.Value) {
-			privacy = model.CollectPrivacyBan
+			privacy = null.New(model.CollectPrivacyBan)
 		}
 	}
 
 	if slice.Any(req.Tags, ctl.dam.NeedReview) {
-		privacy = model.CollectPrivacyBan
+		privacy = null.New(model.CollectPrivacyBan)
 	}
 
 	err := ctl.tx.Transaction(func(tx *query.Query) error {

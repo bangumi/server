@@ -89,7 +89,7 @@ func (h User) patchSubjectCollection(
 		Type:      null.New(model.SubjectCollection(r.Type.Default(uint8(collect.Type)))),
 		Tags:      collect.Tags,
 		Comment:   r.Comment,
-		Rate:      r.Rate.Default(collect.Rate),
+		Rate:      r.Rate,
 	}
 
 	if r.Tags != nil {

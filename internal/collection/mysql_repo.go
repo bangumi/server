@@ -196,7 +196,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	t := r.q.SubjectCollection
 
 	var updater = make([]field.AssignExpr, 0, 18)
-	if data.Comment.HasValue() {
+	if data.Comment.Set {
 		updater = append(updater, t.Comment.Value(data.Comment.Value), t.HasComment.Value(true))
 	}
 
@@ -214,6 +214,10 @@ func (r mysqlRepo) UpdateSubjectCollection(
 
 	if data.VolStatus.HasValue() {
 		updater = append(updater, t.VolStatus.Value(data.VolStatus.Value))
+	}
+
+	if data.Privacy.Set {
+		updater = append(updater, t.Private.Value(uint8(data.Privacy.Value)))
 	}
 
 	_, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(updater...)

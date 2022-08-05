@@ -65,10 +65,10 @@ type CollectionRepo interface {
 
 type SubjectCollectionUpdate struct {
 	Comment   null.String
-	Tags      []string
+	Tags      []string // nil 表示无数据，[]string{} 表示清空tag
 	VolStatus null.Uint32
 	EpStatus  null.Uint32
 	Type      null.Null[model.SubjectCollection]
-	Rate      uint8
-	Privacy   model.CollectPrivacy
+	Rate      null.Uint8
+	Privacy   null.Null[model.CollectPrivacy]
 }

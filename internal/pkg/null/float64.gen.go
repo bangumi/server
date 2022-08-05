@@ -68,7 +68,6 @@ func (t Float64) Interface() any {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Float64) UnmarshalJSON(data []byte) error {
-
 	if string(data) == "null" {
 		return nil
 	}
