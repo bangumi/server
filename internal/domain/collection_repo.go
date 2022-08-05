@@ -16,6 +16,7 @@ package domain
 
 import (
 	"context"
+	"time"
 
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/model"
@@ -52,6 +53,7 @@ type CollectionRepo interface {
 
 	UpdateSubjectCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data SubjectCollectionUpdate,
+		at time.Time,
 	) error
 
 	UpdateEpisodeCollection(

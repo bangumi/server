@@ -17,6 +17,7 @@ package ctrl
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -78,7 +79,7 @@ func (ctl Ctrl) UpdateCollection(
 			Type:      req.Type,
 			Rate:      req.Rate,
 			Privacy:   privacy,
-		})
+		}, time.Now())
 		if err != nil {
 			ctl.log.Error("failed to update user collection info", zap.Error(err))
 			return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
@@ -147,7 +148,7 @@ func (ctl Ctrl) updateEpisodeCollectionTx(
 
 		err = collectionTx.UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
 			EpStatus: null.NewUint32(uint32(epStatus)),
-		})
+		}, time.Now())
 		if err != nil {
 			ctl.log.Error("failed to update user collection info", zap.Error(err))
 			return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")

@@ -192,10 +192,17 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	userID model.UserID,
 	subjectID model.SubjectID,
 	data domain.SubjectCollectionUpdate,
+	at time.Time,
 ) error {
 	t := r.q.SubjectCollection
 
+	old, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).First()
+	if err != nil {
+		return errgo.Wrap(err, "failed to get old collection record")
+	}
+
 	var updater = make([]field.AssignExpr, 0, 18)
+
 	if data.Comment.Set {
 		updater = append(updater, t.Comment.Value(data.Comment.Value), t.HasComment.Value(true))
 	}
@@ -204,15 +211,29 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		updater = append(updater, t.Tag.Value(strings.Join(data.Tags, " ")))
 	}
 
-	if data.Type.HasValue() {
+	if data.Type.Set {
 		updater = append(updater, t.Type.Value(uint8(data.Type.Value)))
+		if uint8(data.Type.Value) != old.Type {
+			switch data.Type.Value {
+			case model.SubjectCollectionWish:
+				updater = append(updater, t.WishTime.Value(uint32(at.Unix())))
+			case model.SubjectCollectionDone:
+				updater = append(updater, t.DoneTime.Value(uint32(at.Unix())))
+			case model.SubjectCollectionDoing:
+				updater = append(updater, t.DoingTime.Value(uint32(at.Unix())))
+			case model.SubjectCollectionDropped:
+				updater = append(updater, t.DroppedTime.Value(uint32(at.Unix())))
+			case model.SubjectCollectionOnHold:
+				updater = append(updater, t.OnHoldTime.Value(uint32(at.Unix())))
+			}
+		}
 	}
 
-	if data.EpStatus.HasValue() {
+	if data.EpStatus.Set {
 		updater = append(updater, t.EpStatus.Value(data.EpStatus.Value))
 	}
 
-	if data.VolStatus.HasValue() {
+	if data.VolStatus.Set {
 		updater = append(updater, t.VolStatus.Value(data.VolStatus.Value))
 	}
 
@@ -220,8 +241,9 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		updater = append(updater, t.Private.Value(uint8(data.Privacy.Value)))
 	}
 
-	_, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(updater...)
+	updater = append(updater, t.UpdatedTime.Value(uint32(at.Unix())))
 
+	_, err = t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(updater...)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectCollection.Update")
 	}

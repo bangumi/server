@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
@@ -47,8 +48,8 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	c.EXPECT().GetSubjectCollection(mock.Anything, uid, mock.Anything).
 		Return(model.UserSubjectCollection{}, nil)
 	c.EXPECT().WithQuery(mock.Anything).Return(c)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything).
-		Run(func(ctx context.Context, userID model.UserID, subjectID model.SubjectID, data domain.SubjectCollectionUpdate) {
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).
+		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data domain.SubjectCollectionUpdate, _ time.Time) {
 			call = data
 		}).Return(nil)
 
