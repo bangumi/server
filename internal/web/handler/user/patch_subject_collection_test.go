@@ -24,6 +24,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -50,19 +52,26 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 			call = data
 		}).Return(nil)
 
-	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a})
+	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
+	require.NoError(t, err)
+
+	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d})
 
 	test.New(t).
 		Header(fiber.HeaderAuthorization, "Bearer t").
 		JSON(map[string]any{
-			"type": 1,
+			"comment": "1 test_content 2",
+			"type":    1,
+			"tags":    []string{"q", "vv"},
 		}).
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 		Execute(app).
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, domain.SubjectCollectionUpdate{
-		Tags: nil,
-		Type: null.New(model.SubjectCollection(1)),
+		Comment: null.NewString("1 test_content 2"),
+		Tags:    []string{"q", "vv"},
+		Type:    null.New(model.SubjectCollection(1)),
+		Privacy: null.New(model.CollectPrivacyBan),
 	}, call)
 }

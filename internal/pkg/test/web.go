@@ -66,6 +66,7 @@ type Mock struct {
 	RateLimiter    rate.Manager
 	OAuthManager   oauth.Manager
 	HTTPMock       *httpmock.MockTransport
+	Dam            *dam.Dam
 }
 
 //nolint:funlen
@@ -90,7 +91,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 		fx.Provide(
 			logger.Copy, config.NewAppConfig, dal.NewDB, web.New,
-			person.NewService, frontend.NewTemplateEngine, dam.New,
+			person.NewService, frontend.NewTemplateEngine,
 		),
 
 		MockPersonRepo(m.PersonRepo),
@@ -115,6 +116,12 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		fx.Invoke(web.AddRouters),
 
 		fx.Populate(&f),
+	}
+
+	if m.Dam != nil {
+		options = append(options, fx.Supply(*m.Dam))
+	} else {
+		options = append(options, fx.Provide(dam.New))
 	}
 
 	if m.Cache == nil {
