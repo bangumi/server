@@ -17,6 +17,7 @@ package collection
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -195,53 +196,40 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	at time.Time,
 ) error {
 	t := r.q.SubjectCollection
-
 	old, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).First()
 	if err != nil {
 		return errgo.Wrap(err, "failed to get old collection record")
 	}
 
-	var updater = make([]field.AssignExpr, 0, 18)
+	var updater = make([]field.AssignExpr, 0, 10)
+	updater = append(updater, t.UpdatedTime.Value(uint32(at.Unix())))
 
 	if data.Comment.Set {
 		updater = append(updater, t.Comment.Value(data.Comment.Value), t.HasComment.Value(true))
 	}
-
 	if data.Tags != nil {
 		updater = append(updater, t.Tag.Value(strings.Join(data.Tags, " ")))
+	}
+	if data.EpStatus.Set {
+		updater = append(updater, t.EpStatus.Value(data.EpStatus.Value))
+	}
+	if data.VolStatus.Set {
+		updater = append(updater, t.VolStatus.Value(data.VolStatus.Value))
+	}
+	if data.Privacy.Set {
+		updater = append(updater, t.Private.Value(uint8(data.Privacy.Value)))
 	}
 
 	if data.Type.Set {
 		updater = append(updater, t.Type.Value(uint8(data.Type.Value)))
 		if uint8(data.Type.Value) != old.Type {
-			switch data.Type.Value {
-			case model.SubjectCollectionWish:
-				updater = append(updater, t.WishTime.Value(uint32(at.Unix())))
-			case model.SubjectCollectionDone:
-				updater = append(updater, t.DoneTime.Value(uint32(at.Unix())))
-			case model.SubjectCollectionDoing:
-				updater = append(updater, t.DoingTime.Value(uint32(at.Unix())))
-			case model.SubjectCollectionDropped:
-				updater = append(updater, t.DroppedTime.Value(uint32(at.Unix())))
-			case model.SubjectCollectionOnHold:
-				updater = append(updater, t.OnHoldTime.Value(uint32(at.Unix())))
+			u, e := r.subjectCollectionUpdater(data.Type.Value, at)
+			if e != nil {
+				return e
 			}
+			updater = append(updater, u)
 		}
 	}
-
-	if data.EpStatus.Set {
-		updater = append(updater, t.EpStatus.Value(data.EpStatus.Value))
-	}
-
-	if data.VolStatus.Set {
-		updater = append(updater, t.VolStatus.Value(data.VolStatus.Value))
-	}
-
-	if data.Privacy.Set {
-		updater = append(updater, t.Private.Value(uint8(data.Privacy.Value)))
-	}
-
-	updater = append(updater, t.UpdatedTime.Value(uint32(at.Unix())))
 
 	_, err = t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(updater...)
 	if err != nil {
@@ -249,6 +237,25 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	}
 
 	return nil
+}
+
+func (r mysqlRepo) subjectCollectionUpdater(t model.SubjectCollection, at time.Time) (field.AssignExpr, error) {
+	switch t {
+	case model.SubjectCollectionAll:
+		return nil, errgo.Wrap(domain.ErrInput, "can't set collection type to SubjectCollectionAll")
+	case model.SubjectCollectionWish:
+		return r.q.SubjectCollection.WishTime.Value(uint32(at.Unix())), nil
+	case model.SubjectCollectionDone:
+		return r.q.SubjectCollection.DoneTime.Value(uint32(at.Unix())), nil
+	case model.SubjectCollectionDoing:
+		return r.q.SubjectCollection.DoingTime.Value(uint32(at.Unix())), nil
+	case model.SubjectCollectionDropped:
+		return r.q.SubjectCollection.DroppedTime.Value(uint32(at.Unix())), nil
+	case model.SubjectCollectionOnHold:
+		return r.q.SubjectCollection.OnHoldTime.Value(uint32(at.Unix())), nil
+	}
+
+	return nil, errgo.Wrap(domain.ErrInput, fmt.Sprintln("invalid subject collection type", t))
 }
 
 func (r mysqlRepo) UpdateEpisodeCollection(
