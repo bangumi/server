@@ -62,9 +62,9 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, domain.SubjectCollectionUpdate{
-		Comment: null.NewString(""),
 		Tags:    nil,
 		Rate:    0,
+		Type:    null.New(model.SubjectCollection(1)),
 		Privacy: 0,
 	}, call)
 }
