@@ -27,24 +27,22 @@ var _ iface = Uint32{}
 type Uint32 struct {
 	Value uint32
 	Set   bool // if json object has this field
-	Null  bool // if json field's value is `null`
 }
 
 // NewUint32 creates a new uint32.
 func NewUint32(t uint32) Uint32 {
 	return Uint32{
-		Null:  false,
 		Value: t,
 		Set:   true,
 	}
 }
 
 func (t Uint32) HasValue() bool {
-	return t.Set && !t.Null
+	return t.Set
 }
 
 func (t Uint32) Ptr() *uint32 {
-	if t.Set && !t.Null {
+	if t.Set {
 		return &t.Value
 	}
 
@@ -53,7 +51,7 @@ func (t Uint32) Ptr() *uint32 {
 
 // Default return default value its value is Null or not Set.
 func (t Uint32) Default(v uint32) uint32 {
-	if t.Set && !t.Null {
+	if t.Set {
 		return t.Value
 	}
 
@@ -70,13 +68,12 @@ func (t Uint32) Interface() any {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Uint32) UnmarshalJSON(data []byte) error {
-	t.Set = true
 
 	if string(data) == "null" {
-		t.Null = true
 		return nil
 	}
 
+	t.Set = true
 	if err := json.UnmarshalNoEscape(data, &t.Value); err != nil {
 		return err //nolint:wrapcheck
 	}

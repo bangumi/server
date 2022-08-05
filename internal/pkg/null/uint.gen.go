@@ -27,24 +27,22 @@ var _ iface = Uint{}
 type Uint struct {
 	Value uint
 	Set   bool // if json object has this field
-	Null  bool // if json field's value is `null`
 }
 
 // NewUint creates a new uint.
 func NewUint(t uint) Uint {
 	return Uint{
-		Null:  false,
 		Value: t,
 		Set:   true,
 	}
 }
 
 func (t Uint) HasValue() bool {
-	return t.Set && !t.Null
+	return t.Set
 }
 
 func (t Uint) Ptr() *uint {
-	if t.Set && !t.Null {
+	if t.Set {
 		return &t.Value
 	}
 
@@ -53,7 +51,7 @@ func (t Uint) Ptr() *uint {
 
 // Default return default value its value is Null or not Set.
 func (t Uint) Default(v uint) uint {
-	if t.Set && !t.Null {
+	if t.Set {
 		return t.Value
 	}
 
@@ -70,13 +68,12 @@ func (t Uint) Interface() any {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Uint) UnmarshalJSON(data []byte) error {
-	t.Set = true
 
 	if string(data) == "null" {
-		t.Null = true
 		return nil
 	}
 
+	t.Set = true
 	if err := json.UnmarshalNoEscape(data, &t.Value); err != nil {
 		return err //nolint:wrapcheck
 	}

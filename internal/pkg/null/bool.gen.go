@@ -27,24 +27,22 @@ var _ iface = Bool{}
 type Bool struct {
 	Value bool
 	Set   bool // if json object has this field
-	Null  bool // if json field's value is `null`
 }
 
 // NewBool creates a new bool.
 func NewBool(t bool) Bool {
 	return Bool{
-		Null:  false,
 		Value: t,
 		Set:   true,
 	}
 }
 
 func (t Bool) HasValue() bool {
-	return t.Set && !t.Null
+	return t.Set
 }
 
 func (t Bool) Ptr() *bool {
-	if t.Set && !t.Null {
+	if t.Set {
 		return &t.Value
 	}
 
@@ -53,7 +51,7 @@ func (t Bool) Ptr() *bool {
 
 // Default return default value its value is Null or not Set.
 func (t Bool) Default(v bool) bool {
-	if t.Set && !t.Null {
+	if t.Set {
 		return t.Value
 	}
 
@@ -70,13 +68,12 @@ func (t Bool) Interface() any {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Bool) UnmarshalJSON(data []byte) error {
-	t.Set = true
 
 	if string(data) == "null" {
-		t.Null = true
 		return nil
 	}
 
+	t.Set = true
 	if err := json.UnmarshalNoEscape(data, &t.Value); err != nil {
 		return err //nolint:wrapcheck
 	}

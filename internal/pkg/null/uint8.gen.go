@@ -27,24 +27,22 @@ var _ iface = Uint8{}
 type Uint8 struct {
 	Value uint8
 	Set   bool // if json object has this field
-	Null  bool // if json field's value is `null`
 }
 
 // NewUint8 creates a new uint8.
 func NewUint8(t uint8) Uint8 {
 	return Uint8{
-		Null:  false,
 		Value: t,
 		Set:   true,
 	}
 }
 
 func (t Uint8) HasValue() bool {
-	return t.Set && !t.Null
+	return t.Set
 }
 
 func (t Uint8) Ptr() *uint8 {
-	if t.Set && !t.Null {
+	if t.Set {
 		return &t.Value
 	}
 
@@ -53,7 +51,7 @@ func (t Uint8) Ptr() *uint8 {
 
 // Default return default value its value is Null or not Set.
 func (t Uint8) Default(v uint8) uint8 {
-	if t.Set && !t.Null {
+	if t.Set {
 		return t.Value
 	}
 
@@ -70,13 +68,12 @@ func (t Uint8) Interface() any {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Uint8) UnmarshalJSON(data []byte) error {
-	t.Set = true
 
 	if string(data) == "null" {
-		t.Null = true
 		return nil
 	}
 
+	t.Set = true
 	if err := json.UnmarshalNoEscape(data, &t.Value); err != nil {
 		return err //nolint:wrapcheck
 	}

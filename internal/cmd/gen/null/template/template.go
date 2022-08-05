@@ -25,24 +25,22 @@ var _ iface = Type{}
 type Type struct {
 	Value GenericType
 	Set   bool // if json object has this field
-	Null  bool // if json field's value is `null`
 }
 
 // NewType creates a new GenericType.
 func NewType(t GenericType) Type {
 	return Type{
-		Null:  false,
 		Value: t,
 		Set:   true,
 	}
 }
 
 func (t Type) HasValue() bool {
-	return t.Set && !t.Null
+	return t.Set
 }
 
 func (t Type) Ptr() *GenericType {
-	if t.Set && !t.Null {
+	if t.Set {
 		return &t.Value
 	}
 
@@ -51,7 +49,7 @@ func (t Type) Ptr() *GenericType {
 
 // Default return default value its value is Null or not Set.
 func (t Type) Default(v GenericType) GenericType {
-	if t.Set && !t.Null {
+	if t.Set {
 		return t.Value
 	}
 
@@ -68,13 +66,12 @@ func (t Type) Interface() any {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Type) UnmarshalJSON(data []byte) error {
-	t.Set = true
 
 	if string(data) == "null" {
-		t.Null = true
 		return nil
 	}
 
+	t.Set = true
 	if err := json.UnmarshalNoEscape(data, &t.Value); err != nil {
 		return err //nolint:wrapcheck
 	}

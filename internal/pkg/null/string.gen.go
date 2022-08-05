@@ -27,24 +27,22 @@ var _ iface = String{}
 type String struct {
 	Value string
 	Set   bool // if json object has this field
-	Null  bool // if json field's value is `null`
 }
 
 // NewString creates a new string.
 func NewString(t string) String {
 	return String{
-		Null:  false,
 		Value: t,
 		Set:   true,
 	}
 }
 
 func (t String) HasValue() bool {
-	return t.Set && !t.Null
+	return t.Set
 }
 
 func (t String) Ptr() *string {
-	if t.Set && !t.Null {
+	if t.Set {
 		return &t.Value
 	}
 
@@ -53,7 +51,7 @@ func (t String) Ptr() *string {
 
 // Default return default value its value is Null or not Set.
 func (t String) Default(v string) string {
-	if t.Set && !t.Null {
+	if t.Set {
 		return t.Value
 	}
 
@@ -70,13 +68,12 @@ func (t String) Interface() any {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *String) UnmarshalJSON(data []byte) error {
-	t.Set = true
 
 	if string(data) == "null" {
-		t.Null = true
 		return nil
 	}
 
+	t.Set = true
 	if err := json.UnmarshalNoEscape(data, &t.Value); err != nil {
 		return err //nolint:wrapcheck
 	}

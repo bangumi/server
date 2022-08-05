@@ -27,24 +27,22 @@ var _ iface = Uint16{}
 type Uint16 struct {
 	Value uint16
 	Set   bool // if json object has this field
-	Null  bool // if json field's value is `null`
 }
 
 // NewUint16 creates a new uint16.
 func NewUint16(t uint16) Uint16 {
 	return Uint16{
-		Null:  false,
 		Value: t,
 		Set:   true,
 	}
 }
 
 func (t Uint16) HasValue() bool {
-	return t.Set && !t.Null
+	return t.Set
 }
 
 func (t Uint16) Ptr() *uint16 {
-	if t.Set && !t.Null {
+	if t.Set {
 		return &t.Value
 	}
 
@@ -53,7 +51,7 @@ func (t Uint16) Ptr() *uint16 {
 
 // Default return default value its value is Null or not Set.
 func (t Uint16) Default(v uint16) uint16 {
-	if t.Set && !t.Null {
+	if t.Set {
 		return t.Value
 	}
 
@@ -70,13 +68,12 @@ func (t Uint16) Interface() any {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Uint16) UnmarshalJSON(data []byte) error {
-	t.Set = true
 
 	if string(data) == "null" {
-		t.Null = true
 		return nil
 	}
 
+	t.Set = true
 	if err := json.UnmarshalNoEscape(data, &t.Value); err != nil {
 		return err //nolint:wrapcheck
 	}

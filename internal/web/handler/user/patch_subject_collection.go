@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -81,12 +82,13 @@ func (h User) patchSubjectCollection(
 	}
 
 	ctrlReq := ctrl.UpdateCollectionRequest{
-		VolStatus: r.VolStatus.Default(collect.VolStatus),
-		EpStatus:  r.EpStatus.Default(collect.EpStatus),
-		Type:      model.SubjectCollection(r.Type.Default(uint8(collect.Type))),
-		IP:        u.IP.String(),
+		IP: u.IP.String(),
+
+		VolStatus: r.VolStatus,
+		EpStatus:  r.EpStatus,
+		Type:      null.New(model.SubjectCollection(r.Type.Default(uint8(collect.Type)))),
 		Tags:      collect.Tags,
-		Comment:   r.Comment.Default(collect.Comment),
+		Comment:   r.Comment,
 		Rate:      r.Rate.Default(collect.Rate),
 	}
 

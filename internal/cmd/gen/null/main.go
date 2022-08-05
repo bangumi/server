@@ -18,8 +18,8 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"go/format"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -52,12 +52,15 @@ func main() {
 		code = strings.ReplaceAll(code, "Type", destType(s))
 
 		outPath := fmt.Sprintf("./internal/pkg/null/%s.gen.go", s)
-		err := os.WriteFile(outPath, []byte(generatedHeader+code), 0600) //nolint:gomnd
+		formatted, err := format.Source([]byte(generatedHeader + code))
 		if err != nil {
 			panic(err)
 		}
 
-		Cmd("go", "fmt", outPath)
+		err = os.WriteFile(outPath, formatted, 0600) //nolint:gomnd
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	var a = strings.Join(slice.Map(types, func(s string) string {
@@ -65,20 +68,13 @@ func main() {
 	}), " ")
 
 	outPath := "./internal/pkg/null/types.gen.go"
-	err := os.WriteFile(outPath, []byte(generatedHeader+fmt.Sprintf(fileAllTypes, a)), 0600) //nolint:gomnd
+	formatted, err := format.Source([]byte(generatedHeader + fmt.Sprintf(fileAllTypes, a)))
 	if err != nil {
 		panic(err)
 	}
 
-	Cmd("go", "fmt", outPath)
-}
-
-func Cmd(name string, arg ...string) {
-	cmd := exec.Command(name, arg...)
-
-	if out, err := cmd.CombinedOutput(); err != nil {
-		fmt.Println(string(out))
-
+	err = os.WriteFile(outPath, formatted, 0600) //nolint:gomnd
+	if err != nil {
 		panic(err)
 	}
 }

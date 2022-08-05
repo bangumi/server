@@ -27,15 +27,16 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/set"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
 type UpdateCollectionRequest struct {
-	Comment   string
 	IP        string
+	Comment   null.String
 	Tags      []string
-	VolStatus uint32
-	EpStatus  uint32
-	Type      model.SubjectCollection
+	VolStatus null.Uint32
+	EpStatus  null.Uint32
+	Type      null.Null[model.SubjectCollection]
 	Private   bool
 	Rate      uint8
 }
@@ -52,8 +53,10 @@ func (ctl Ctrl) UpdateCollection(
 		privacy = model.CollectPrivacySelf
 	}
 
-	if ctl.dam.NeedReview(req.Comment) {
-		privacy = model.CollectPrivacyBan
+	if req.Comment.HasValue() {
+		if ctl.dam.NeedReview(req.Comment.Value) {
+			privacy = model.CollectPrivacyBan
+		}
 	}
 
 	if slice.Any(req.Tags, ctl.dam.NeedReview) {
@@ -137,7 +140,7 @@ func (ctl Ctrl) updateEpisodeCollectionTx(
 		epStatus := len(ec)
 
 		err = collectionTx.UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
-			EpStatus: uint32(epStatus),
+			EpStatus: null.NewUint32(uint32(epStatus)),
 		})
 		if err != nil {
 			ctl.log.Error("failed to update user collection info", zap.Error(err))

@@ -19,6 +19,7 @@ import (
 
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
 type CollectionRepo interface {
@@ -63,11 +64,11 @@ type CollectionRepo interface {
 }
 
 type SubjectCollectionUpdate struct {
-	Comment   string
+	Comment   null.String
 	Tags      []string
-	VolStatus uint32
-	EpStatus  uint32
-	Type      model.SubjectCollection
+	VolStatus null.Uint32
+	EpStatus  null.Uint32
+	Type      null.Null[model.SubjectCollection]
 	Rate      uint8
 	Privacy   model.CollectPrivacy
 }

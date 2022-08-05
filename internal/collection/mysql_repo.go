@@ -22,6 +22,7 @@ import (
 
 	"go.uber.org/zap"
 	"gorm.io/gen"
+	"gorm.io/gen/field"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/internal/dal/query"
@@ -194,14 +195,28 @@ func (r mysqlRepo) UpdateSubjectCollection(
 ) error {
 	t := r.q.SubjectCollection
 
-	_, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(
-		t.Tag.Value(strings.Join(data.Tags, " ")),
-		t.Type.Value(uint8(data.Type)),
-		t.Comment.Value(data.Comment),
-		t.EpStatus.Value(data.EpStatus),
-		t.VolStatus.Value(data.VolStatus),
-		t.HasComment.Value(data.Comment == ""),
-	)
+	var updater = make([]field.AssignExpr, 0, 18)
+	if data.Comment.HasValue() {
+		updater = append(updater, t.Comment.Value(data.Comment.Value), t.HasComment.Value(true))
+	}
+
+	if data.Tags != nil {
+		updater = append(updater, t.Tag.Value(strings.Join(data.Tags, " ")))
+	}
+
+	if data.Type.HasValue() {
+		updater = append(updater, t.Type.Value(uint8(data.Type.Value)))
+	}
+
+	if data.EpStatus.HasValue() {
+		updater = append(updater, t.EpStatus.Value(data.EpStatus.Value))
+	}
+
+	if data.VolStatus.HasValue() {
+		updater = append(updater, t.VolStatus.Value(data.VolStatus.Value))
+	}
+
+	_, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(updater...)
 
 	if err != nil {
 		return errgo.Wrap(err, "SubjectCollection.Update")

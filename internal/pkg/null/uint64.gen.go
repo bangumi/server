@@ -27,24 +27,22 @@ var _ iface = Uint64{}
 type Uint64 struct {
 	Value uint64
 	Set   bool // if json object has this field
-	Null  bool // if json field's value is `null`
 }
 
 // NewUint64 creates a new uint64.
 func NewUint64(t uint64) Uint64 {
 	return Uint64{
-		Null:  false,
 		Value: t,
 		Set:   true,
 	}
 }
 
 func (t Uint64) HasValue() bool {
-	return t.Set && !t.Null
+	return t.Set
 }
 
 func (t Uint64) Ptr() *uint64 {
-	if t.Set && !t.Null {
+	if t.Set {
 		return &t.Value
 	}
 
@@ -53,7 +51,7 @@ func (t Uint64) Ptr() *uint64 {
 
 // Default return default value its value is Null or not Set.
 func (t Uint64) Default(v uint64) uint64 {
-	if t.Set && !t.Null {
+	if t.Set {
 		return t.Value
 	}
 
@@ -70,13 +68,12 @@ func (t Uint64) Interface() any {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (t *Uint64) UnmarshalJSON(data []byte) error {
-	t.Set = true
 
 	if string(data) == "null" {
-		t.Null = true
 		return nil
 	}
 
+	t.Set = true
 	if err := json.UnmarshalNoEscape(data, &t.Value); err != nil {
 		return err //nolint:wrapcheck
 	}
