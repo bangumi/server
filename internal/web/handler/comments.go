@@ -167,7 +167,7 @@ func (h Handler) listComments(
 	// a noop limit to fetch all comments
 	comments, _, err := h.ctrl.ListReplies(c.Context(), commentType, id, 100000, 0) //nolint:gomnd
 	if err != nil {
-		return errgo.Wrap(err, "topic.ListRepliesAll")
+		return errgo.Wrap(err, "topic.ListReplies")
 	}
 
 	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), commentsToUserIDs(comments)...)
