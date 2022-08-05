@@ -19,7 +19,6 @@ import (
 )
 
 var _ json.Unmarshaler = (*Null[any])(nil)
-var _ iface = Null[any]{}
 
 // Null is a nullable type.
 type Null[T any] struct {
