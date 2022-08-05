@@ -12,7 +12,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//nolint:forbidigo
 package main
 
 import (
@@ -47,7 +46,6 @@ func main() {
 
 	for _, s := range types {
 		var code = tpl
-		code = strings.ReplaceAll(code, "convertToDriverValue(t.Type)", valueConverter(s))
 		code = strings.ReplaceAll(code, "GenericType", s)
 		code = strings.ReplaceAll(code, "Type", destType(s))
 
@@ -77,17 +75,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func valueConverter(t string) string {
-	switch t {
-	case "uint8", "uint16", "uint32", "uint64", "int8", "int16", "int32", "int64":
-		return "int64(t.Type)"
-	case "bool", "string":
-		return "t.Type"
-	}
-
-	return "tt.Type"
 }
 
 func destType(s string) string {
