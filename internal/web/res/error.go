@@ -57,7 +57,7 @@ func FromError(c *fiber.Ctx, err error, code int, message string) error {
 }
 
 func JSONError(c *fiber.Ctx, err error) error {
-	c.Status(http.StatusUnprocessableEntity)
+	c.Status(http.StatusBadRequest)
 
 	return JSON(c, Error{
 		Title:       "JSON Syntax Error",
