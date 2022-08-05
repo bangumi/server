@@ -38,11 +38,6 @@
           dom_id: "#swagger-ui",
           layout: "BaseLayout",
           deepLinking: true,
-          requestInterceptor: (req) => {
-            // 实际上是在 dev-server.js 转发时添加的
-            req.headers.Cookie = "sessionID=dev-session-id";
-            return req;
-          },
         });
       };
     </script>

@@ -39,11 +39,6 @@
           dom_id: "#swagger-ui",
           layout: "BaseLayout",
           deepLinking: true,
-          requestInterceptor: (req) => {
-            // will set default token
-            req.headers.Authorization = req.headers.Authorization ?? "Bearer a_development_access_token";
-            return req;
-          },
         });
       };
     </script>
