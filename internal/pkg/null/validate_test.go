@@ -32,7 +32,7 @@ func TestValidateNull(t *testing.T) {
 	var s = struct {
 		I null.Int8 `json:"i" validate:"required"`
 	}{
-		I: null.Int8{Set: false, Null: true},
+		I: null.Int8{Set: false},
 	}
 
 	err := v.Struct(s)
@@ -49,7 +49,7 @@ func TestValidateNull_no_error(t *testing.T) {
 	var s = struct {
 		I null.Int8 `json:"i" validate:"required"`
 	}{
-		I: null.Int8{Value: 5, Set: true, Null: false},
+		I: null.Int8{Value: 5, Set: true},
 	}
 
 	err := v.Struct(s)
@@ -66,7 +66,7 @@ func TestValidateNull_value(t *testing.T) {
 	var s = struct {
 		I null.Int8 `json:"i" validate:"required,lte=5"`
 	}{
-		I: null.Int8{Value: 6, Set: true, Null: false},
+		I: null.Int8{Value: 6, Set: true},
 	}
 
 	err := v.Struct(s)

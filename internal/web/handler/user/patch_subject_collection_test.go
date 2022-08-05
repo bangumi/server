@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
@@ -61,12 +62,9 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, domain.SubjectCollectionUpdate{
-		Comment:   "",
-		Tags:      nil,
-		VolStatus: 0,
-		EpStatus:  0,
-		Type:      1,
-		Rate:      0,
-		Privacy:   0,
+		Comment: null.NewString(""),
+		Tags:    nil,
+		Rate:    0,
+		Privacy: 0,
 	}, call)
 }
