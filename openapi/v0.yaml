@@ -783,6 +783,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+  "/v0/users/-/collections/{subject_id}":
     patch:
       tags:
         - 收藏
@@ -795,7 +796,6 @@ paths:
         PATCH 方法的所有请求体字段均可选
       operationId: patchUserCollection
       parameters:
-        - $ref: "#/components/parameters/path_username"
         - $ref: "#/components/parameters/path_subject_id"
       requestBody:
         content:
@@ -846,14 +846,16 @@ paths:
                     description: 不能包含空格
 
       responses:
-        "200":
+        "204":
           description: Successful Response
+        "400":
+          description: Validation Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UserSubjectCollection"
-        "400":
-          description: Validation Error
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:

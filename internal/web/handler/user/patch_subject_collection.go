@@ -16,6 +16,7 @@ package user
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -94,6 +95,10 @@ func (h User) patchSubjectCollection(
 	}
 
 	err = h.ctrl.UpdateCollection(c.Context(), u.Auth, subjectID, ctrlReq)
+	if err != nil {
+		return errgo.Wrap(err, "ctrl.UpdateCollection")
+	}
 
-	return errgo.Wrap(err, "ctrl.UpdateCollection")
+	c.Status(http.StatusNoContent)
+	return nil
 }

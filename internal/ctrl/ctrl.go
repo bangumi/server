@@ -35,11 +35,14 @@ func New(
 	user domain.UserRepo,
 	topic domain.TopicRepo,
 	tx dal.Transaction,
+	dam dam.Dam,
 	log *zap.Logger,
 ) Ctrl {
 	return Ctrl{
 		log:   log.Named("app.query"),
 		cache: cache,
+
+		dam: dam,
 
 		tx: tx,
 
