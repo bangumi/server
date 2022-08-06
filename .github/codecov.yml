@@ -5,6 +5,7 @@ ignore:
   - "internal/dal/query/gen.go"
   - "internal/mocks/"
   - "internal/cmd/"
+  - "internal/pkg/test/"
 
 coverage:
   status:
