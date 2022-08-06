@@ -36,10 +36,6 @@ func NewInt32(t int32) Int32 {
 	}
 }
 
-func (t Int32) HasValue() bool {
-	return t.Set
-}
-
 func (t Int32) Ptr() *int32 {
 	if t.Set {
 		return &t.Value
@@ -58,7 +54,7 @@ func (t Int32) Default(v int32) int32 {
 }
 
 func (t Int32) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

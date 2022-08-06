@@ -36,10 +36,6 @@ func NewBool(t bool) Bool {
 	}
 }
 
-func (t Bool) HasValue() bool {
-	return t.Set
-}
-
 func (t Bool) Ptr() *bool {
 	if t.Set {
 		return &t.Value
@@ -58,7 +54,7 @@ func (t Bool) Default(v bool) bool {
 }
 
 func (t Bool) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

@@ -36,10 +36,6 @@ func NewFloat64(t float64) Float64 {
 	}
 }
 
-func (t Float64) HasValue() bool {
-	return t.Set
-}
-
 func (t Float64) Ptr() *float64 {
 	if t.Set {
 		return &t.Value
@@ -58,7 +54,7 @@ func (t Float64) Default(v float64) float64 {
 }
 
 func (t Float64) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

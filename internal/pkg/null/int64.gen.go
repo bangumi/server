@@ -36,10 +36,6 @@ func NewInt64(t int64) Int64 {
 	}
 }
 
-func (t Int64) HasValue() bool {
-	return t.Set
-}
-
 func (t Int64) Ptr() *int64 {
 	if t.Set {
 		return &t.Value
@@ -58,7 +54,7 @@ func (t Int64) Default(v int64) int64 {
 }
 
 func (t Int64) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

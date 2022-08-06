@@ -36,10 +36,6 @@ func NewUint16(t uint16) Uint16 {
 	}
 }
 
-func (t Uint16) HasValue() bool {
-	return t.Set
-}
-
 func (t Uint16) Ptr() *uint16 {
 	if t.Set {
 		return &t.Value
@@ -58,7 +54,7 @@ func (t Uint16) Default(v uint16) uint16 {
 }
 
 func (t Uint16) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

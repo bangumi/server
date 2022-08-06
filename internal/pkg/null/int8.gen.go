@@ -36,10 +36,6 @@ func NewInt8(t int8) Int8 {
 	}
 }
 
-func (t Int8) HasValue() bool {
-	return t.Set
-}
-
 func (t Int8) Ptr() *int8 {
 	if t.Set {
 		return &t.Value
@@ -58,7 +54,7 @@ func (t Int8) Default(v int8) int8 {
 }
 
 func (t Int8) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

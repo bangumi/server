@@ -36,10 +36,6 @@ func NewInt(t int) Int {
 	}
 }
 
-func (t Int) HasValue() bool {
-	return t.Set
-}
-
 func (t Int) Ptr() *int {
 	if t.Set {
 		return &t.Value
@@ -58,7 +54,7 @@ func (t Int) Default(v int) int {
 }
 
 func (t Int) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

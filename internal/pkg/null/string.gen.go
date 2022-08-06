@@ -36,10 +36,6 @@ func NewString(t string) String {
 	}
 }
 
-func (t String) HasValue() bool {
-	return t.Set
-}
-
 func (t String) Ptr() *string {
 	if t.Set {
 		return &t.Value
@@ -58,7 +54,7 @@ func (t String) Default(v string) string {
 }
 
 func (t String) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

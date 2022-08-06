@@ -34,10 +34,6 @@ func NewType(t GenericType) Type {
 	}
 }
 
-func (t Type) HasValue() bool {
-	return t.Set
-}
-
 func (t Type) Ptr() *GenericType {
 	if t.Set {
 		return &t.Value
@@ -56,7 +52,7 @@ func (t Type) Default(v GenericType) GenericType {
 }
 
 func (t Type) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

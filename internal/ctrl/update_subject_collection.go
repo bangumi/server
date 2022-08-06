@@ -60,7 +60,7 @@ func (ctl Ctrl) UpdateCollection(
 		}
 	}
 
-	if req.Comment.HasValue() {
+	if req.Comment.Set {
 		if ctl.dam.NeedReview(req.Comment.Value) {
 			privacy = null.New(model.CollectPrivacyBan)
 		}

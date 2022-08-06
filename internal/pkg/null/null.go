@@ -33,10 +33,6 @@ func New[T any](t T) Null[T] {
 	}
 }
 
-func (t Null[T]) HasValue() bool {
-	return t.Set
-}
-
 func (t Null[T]) Ptr() *T {
 	if t.Set {
 		return &t.Value
@@ -55,7 +51,7 @@ func (t Null[T]) Default(v T) T {
 }
 
 func (t Null[T]) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 

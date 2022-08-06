@@ -36,10 +36,6 @@ func NewFloat32(t float32) Float32 {
 	}
 }
 
-func (t Float32) HasValue() bool {
-	return t.Set
-}
-
 func (t Float32) Ptr() *float32 {
 	if t.Set {
 		return &t.Value
@@ -58,7 +54,7 @@ func (t Float32) Default(v float32) float32 {
 }
 
 func (t Float32) Interface() any {
-	if t.HasValue() {
+	if t.Set {
 		return t.Value
 	}
 
