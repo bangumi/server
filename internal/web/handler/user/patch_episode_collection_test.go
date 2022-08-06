@@ -44,8 +44,8 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 
 	e := mocks.NewEpisodeRepo(t)
 	e.EXPECT().WithQuery(mock.Anything).Return(e)
-	e.EXPECT().Count(mock.Anything, mock.Anything).Return(4, nil)
-	e.EXPECT().List(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]model.Episode{
+	e.EXPECT().Count(mock.Anything, mock.Anything, mock.Anything).Return(4, nil)
+	e.EXPECT().List(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]model.Episode{
 		{ID: 1},
 		{ID: 2},
 		{ID: 3},
