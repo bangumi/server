@@ -60,5 +60,11 @@ func (v SubjectEpisodeCollectionPatch) Validate() error {
 		}
 	}
 
+	if v.Comment.Set {
+		if !dam.AllPrintableChar(v.Comment.Value) {
+			return res.BadRequest("invisible character are included in comment")
+		}
+	}
+
 	return nil
 }
