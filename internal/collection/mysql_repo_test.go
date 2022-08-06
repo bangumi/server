@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
@@ -129,4 +130,42 @@ func TestMysqlRepo_GetEpisodeCollection(t *testing.T) {
 		require.NotZero(t, item.ID)
 		require.NotZero(t, item.Type)
 	}
+}
+
+func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const uid model.UserID = 382952
+	const sid model.SubjectID = 9
+
+	repo, q := getRepo(t)
+
+	test.RunAndCleanup(t, func() {
+		_, err := q.SubjectCollection.WithContext(context.Background()).
+			Where(q.SubjectCollection.SubjectID.Eq(sid), q.SubjectCollection.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := q.SubjectCollection.WithContext(context.Background()).Create(&dao.SubjectCollection{
+		UserID:    uid,
+		SubjectID: sid,
+		Type:      uint8(model.SubjectCollectionDoing),
+	})
+	require.NoError(t, err)
+
+	now := time.Now()
+
+	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, domain.SubjectCollectionUpdate{
+		Comment: null.NewString("c"),
+	}, now)
+	require.NoError(t, err)
+
+	r, err := q.SubjectCollection.WithContext(context.Background()).
+		Where(q.SubjectCollection.SubjectID.Eq(sid), q.SubjectCollection.UserID.Eq(uid)).First()
+	require.NoError(t, err)
+
+	require.EqualValues(t, now.Unix(), r.UpdatedTime)
+	require.True(t, r.HasComment)
+	require.EqualValues(t, "c", r.Comment)
 }
