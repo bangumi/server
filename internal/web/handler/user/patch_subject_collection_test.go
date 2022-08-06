@@ -17,6 +17,7 @@ package user_test
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"testing"
 	"time"
@@ -70,6 +71,8 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, domain.SubjectCollectionUpdate{
+		// TODO: replace with a test special ip
+		IP:      net.IP(nil).String(),
 		Comment: null.NewString("1 test_content 2"),
 		Tags:    []string{"q", "vv"},
 		Type:    null.New(model.SubjectCollection(1)),
