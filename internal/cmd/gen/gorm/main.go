@@ -183,6 +183,8 @@ func main() {
 		gen.FieldType("interest_uid", userIDTypeString),
 		gen.FieldRename("interest_uid", "UserID"),
 
+		gen.FieldRename("interest_create_ip", "CreateIP"),
+		gen.FieldRename("interest_lasttouch_ip", "LastUpdateIP"),
 		gen.FieldRename("interest_collect_dateline", "DoneTime"),
 		gen.FieldRename("interest_doing_dateline", "DoingTime"),
 		gen.FieldRename("interest_on_hold_dateline", "OnHoldTime"),
@@ -191,7 +193,8 @@ func main() {
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
 		gen.FieldRename("interest_lasttouch", "UpdatedTime"),
-		gen.FieldTrimPrefix("interest_")))
+		gen.FieldTrimPrefix("interest_"),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
 		gen.FieldTrimPrefix("idx_"),

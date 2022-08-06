@@ -66,6 +66,7 @@ type CollectionRepo interface {
 }
 
 type SubjectCollectionUpdate struct {
+	IP        string
 	Comment   null.String
 	Tags      []string // nil 表示无数据，[]string{} 表示清空tag
 	VolStatus null.Uint32
