@@ -17,6 +17,7 @@ package user
 import (
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -79,5 +80,6 @@ func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to update episode")
 	}
 
+	c.Status(http.StatusNoContent)
 	return nil
 }

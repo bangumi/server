@@ -929,7 +929,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - HTTPBearer: []
-    post:
+    patch:
       tags:
         - 收藏
       summary: 章节收藏信息
