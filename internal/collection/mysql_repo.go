@@ -202,7 +202,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	}
 
 	var updater = make([]field.AssignExpr, 0, 10)
-	updater = append(updater, t.UpdatedTime.Value(uint32(at.Unix())))
+	updater = append(updater, t.UpdatedTime.Value(uint32(at.Unix())), t.LastUpdateIP.Value(data.IP))
 
 	if data.Comment.Set {
 		updater = append(updater, t.Comment.Value(data.Comment.Value), t.HasComment.Value(true))

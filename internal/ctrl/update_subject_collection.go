@@ -72,6 +72,7 @@ func (ctl Ctrl) UpdateCollection(
 
 	err := ctl.tx.Transaction(func(tx *query.Query) error {
 		err := ctl.collection.WithQuery(tx).UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
+			IP:        req.IP,
 			Comment:   req.Comment,
 			Tags:      req.Tags,
 			VolStatus: req.VolStatus,
