@@ -86,11 +86,11 @@ tasks:
   # generated files
   gen:
     desc: Generate all generated GO files
-    deps:
-      - gorm
-      - mock
-      - dal:comment
-      - gen:null
+    cmds:
+      - task: gorm
+      - task: mock
+      - task: dal:comment
+      - task: gen:null
 
   gen:null:
     sources:
