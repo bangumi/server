@@ -121,6 +121,6 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 			JSON(fiber.Map{"tags": "vv qq"}).
 			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			Execute(app).
-			ExpectCode(http.StatusBadGateway)
+			ExpectCode(http.StatusBadRequest)
 	})
 }
