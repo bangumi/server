@@ -219,6 +219,9 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	if data.Privacy.Set {
 		updater = append(updater, t.Private.Value(uint8(data.Privacy.Value)))
 	}
+	if data.Rate.Set {
+		updater = append(updater, t.Rate.Value(data.Rate.Value))
+	}
 
 	if data.Type.Set {
 		updater = append(updater, t.Type.Value(uint8(data.Type.Value)))

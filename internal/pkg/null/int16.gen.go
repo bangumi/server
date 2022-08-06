@@ -29,9 +29,9 @@ type Int16 struct {
 }
 
 // NewInt16 creates a new int16.
-func NewInt16(t int16) Int16 {
+func NewInt16(v int16) Int16 {
 	return Int16{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

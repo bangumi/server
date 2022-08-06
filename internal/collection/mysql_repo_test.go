@@ -21,6 +21,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+	"gorm.io/gen/field"
 
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/dal/dao"
@@ -136,20 +137,31 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const uid model.UserID = 382953
-	const sid model.SubjectID = 9
+	const uid model.UserID = 40000
+	const sid model.SubjectID = 1000
 
 	repo, q := getRepo(t)
 
 	test.RunAndCleanup(t, func() {
 		_, err := q.SubjectCollection.WithContext(context.Background()).
-			Where(q.SubjectCollection.SubjectID.Eq(sid), q.SubjectCollection.UserID.Eq(uid)).Delete()
+			Where(field.Or(q.SubjectCollection.SubjectID.Eq(sid), q.SubjectCollection.UserID.Eq(uid))).Delete()
 		require.NoError(t, err)
 	})
 
 	err := q.SubjectCollection.WithContext(context.Background()).Create(&dao.SubjectCollection{
 		UserID:    uid,
 		SubjectID: sid,
+		Rate:      8,
+		Type:      uint8(model.SubjectCollectionDoing),
+	}, &dao.SubjectCollection{
+		UserID:    uid,
+		SubjectID: sid + 1,
+		Rate:      8,
+		Type:      uint8(model.SubjectCollectionDoing),
+	}, &dao.SubjectCollection{
+		UserID:    uid + 1,
+		SubjectID: sid,
+		Rate:      8,
 		Type:      uint8(model.SubjectCollectionDoing),
 	})
 	require.NoError(t, err)
@@ -158,6 +170,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 
 	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, domain.SubjectCollectionUpdate{
 		Comment: null.NewString("c"),
+		Rate:    null.NewUint8(1),
 	}, now)
 	require.NoError(t, err)
 
@@ -167,5 +180,18 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 
 	require.EqualValues(t, now.Unix(), r.UpdatedTime)
 	require.True(t, r.HasComment)
-	require.EqualValues(t, "c", r.Comment)
+	require.Equal(t, "c", r.Comment)
+	require.Equal(t, uint8(1), r.Rate)
+
+	r, err = q.SubjectCollection.WithContext(context.Background()).
+		Where(q.SubjectCollection.SubjectID.Eq(sid+1), q.SubjectCollection.UserID.Eq(uid)).First()
+	require.NoError(t, err)
+
+	require.EqualValues(t, 8, r.Rate)
+
+	r, err = q.SubjectCollection.WithContext(context.Background()).
+		Where(q.SubjectCollection.SubjectID.Eq(sid), q.SubjectCollection.UserID.Eq(uid+1)).First()
+	require.NoError(t, err)
+
+	require.EqualValues(t, 8, r.Rate)
 }

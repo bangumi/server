@@ -29,9 +29,9 @@ type String struct {
 }
 
 // NewString creates a new string.
-func NewString(t string) String {
+func NewString(v string) String {
 	return String{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

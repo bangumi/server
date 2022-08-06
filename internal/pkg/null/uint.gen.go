@@ -29,9 +29,9 @@ type Uint struct {
 }
 
 // NewUint creates a new uint.
-func NewUint(t uint) Uint {
+func NewUint(v uint) Uint {
 	return Uint{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

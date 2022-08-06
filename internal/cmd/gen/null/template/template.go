@@ -27,9 +27,9 @@ type Type struct {
 }
 
 // NewType creates a new GenericType.
-func NewType(t GenericType) Type {
+func NewType(v GenericType) Type {
 	return Type{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

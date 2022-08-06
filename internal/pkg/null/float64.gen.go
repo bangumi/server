@@ -29,9 +29,9 @@ type Float64 struct {
 }
 
 // NewFloat64 creates a new float64.
-func NewFloat64(t float64) Float64 {
+func NewFloat64(v float64) Float64 {
 	return Float64{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

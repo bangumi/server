@@ -29,9 +29,9 @@ type Bool struct {
 }
 
 // NewBool creates a new bool.
-func NewBool(t bool) Bool {
+func NewBool(v bool) Bool {
 	return Bool{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

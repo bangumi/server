@@ -29,9 +29,9 @@ type Uint32 struct {
 }
 
 // NewUint32 creates a new uint32.
-func NewUint32(t uint32) Uint32 {
+func NewUint32(v uint32) Uint32 {
 	return Uint32{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

@@ -29,9 +29,9 @@ type Int struct {
 }
 
 // NewInt creates a new int.
-func NewInt(t int) Int {
+func NewInt(v int) Int {
 	return Int{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

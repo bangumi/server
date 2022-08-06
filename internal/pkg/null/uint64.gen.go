@@ -29,9 +29,9 @@ type Uint64 struct {
 }
 
 // NewUint64 creates a new uint64.
-func NewUint64(t uint64) Uint64 {
+func NewUint64(v uint64) Uint64 {
 	return Uint64{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

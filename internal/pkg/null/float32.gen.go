@@ -29,9 +29,9 @@ type Float32 struct {
 }
 
 // NewFloat32 creates a new float32.
-func NewFloat32(t float32) Float32 {
+func NewFloat32(v float32) Float32 {
 	return Float32{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

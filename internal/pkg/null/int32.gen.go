@@ -29,9 +29,9 @@ type Int32 struct {
 }
 
 // NewInt32 creates a new int32.
-func NewInt32(t int32) Int32 {
+func NewInt32(v int32) Int32 {
 	return Int32{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

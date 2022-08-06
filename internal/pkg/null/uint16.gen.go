@@ -29,9 +29,9 @@ type Uint16 struct {
 }
 
 // NewUint16 creates a new uint16.
-func NewUint16(t uint16) Uint16 {
+func NewUint16(v uint16) Uint16 {
 	return Uint16{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

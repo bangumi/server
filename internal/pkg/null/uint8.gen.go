@@ -29,9 +29,9 @@ type Uint8 struct {
 }
 
 // NewUint8 creates a new uint8.
-func NewUint8(t uint8) Uint8 {
+func NewUint8(v uint8) Uint8 {
 	return Uint8{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }

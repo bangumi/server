@@ -29,9 +29,9 @@ type Int64 struct {
 }
 
 // NewInt64 creates a new int64.
-func NewInt64(t int64) Int64 {
+func NewInt64(v int64) Int64 {
 	return Int64{
-		Value: t,
+		Value: v,
 		Set:   true,
 	}
 }
