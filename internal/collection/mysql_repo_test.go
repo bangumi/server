@@ -72,7 +72,7 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const id model.UserID = 382951 + 1
+	const id model.UserID = 382952
 	// parallel problem
 
 	repo, q := getRepo(t)
@@ -136,7 +136,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const uid model.UserID = 382952
+	const uid model.UserID = 382953
 	const sid model.SubjectID = 9
 
 	repo, q := getRepo(t)
