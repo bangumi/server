@@ -51,6 +51,11 @@ func (ctl Ctrl) UpdateCollection(
 ) error {
 	ctl.log.Info("try to update collection", log.SubjectID(subjectID), log.UserID(u.ID), zap.Reflect("'req", req))
 
+	collect, err := ctl.collection.GetSubjectCollection(ctx, u.ID, subjectID)
+	if err != nil {
+		return errgo.Wrap(err, "collectionRepo.GetSubjectCollection")
+	}
+
 	var privacy null.Null[model.CollectPrivacy]
 	if req.Private.Set {
 		if req.Private.Value {
@@ -60,8 +65,8 @@ func (ctl Ctrl) UpdateCollection(
 		}
 	}
 
-	if req.Comment.Set {
-		if ctl.dam.NeedReview(req.Comment.Value) {
+	if comment := req.Comment.Default(collect.Comment); comment != "" {
+		if ctl.dam.NeedReview(comment) {
 			privacy = null.New(model.CollectPrivacyBan)
 		}
 	}
@@ -70,7 +75,7 @@ func (ctl Ctrl) UpdateCollection(
 		privacy = null.New(model.CollectPrivacyBan)
 	}
 
-	err := ctl.tx.Transaction(func(tx *query.Query) error {
+	txErr := ctl.tx.Transaction(func(tx *query.Query) error {
 		err := ctl.collection.WithQuery(tx).UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
 			IP:        req.IP,
 			Comment:   req.Comment,
@@ -89,7 +94,7 @@ func (ctl Ctrl) UpdateCollection(
 		return nil
 	})
 
-	return err
+	return txErr
 }
 
 func (ctl Ctrl) UpdateEpisodeCollection(

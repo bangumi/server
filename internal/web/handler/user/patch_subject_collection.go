@@ -27,7 +27,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
-	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -73,31 +72,24 @@ func (h User) patchSubjectCollection(
 		}
 	}
 
-	collect, err := h.collect.GetSubjectCollection(c.Context(), u.ID, subjectID)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.BadRequest("subject is not collected")
-		}
-		return errgo.Wrap(err, "collectionRepo.GetSubjectCollection")
-	}
-
-	ctrlReq := ctrl.UpdateCollectionRequest{
+	err = h.ctrl.UpdateCollection(c.Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
 		IP: u.IP.String(),
 
 		VolStatus: r.VolStatus,
 		EpStatus:  r.EpStatus,
-		Type:      null.New(model.SubjectCollection(r.Type.Default(uint8(collect.Type)))),
-		Tags:      collect.Tags,
+		Type:      r.Type,
+		Tags:      r.Tags,
 		Comment:   r.Comment,
 		Rate:      r.Rate,
-	}
-
-	if r.Tags != nil {
-		ctrlReq.Tags = r.Tags
-	}
-
-	err = h.ctrl.UpdateCollection(c.Context(), u.Auth, subjectID, ctrlReq)
+		Private:   r.Private,
+	})
 	if err != nil {
+		switch {
+		case errors.Is(err, domain.ErrSubjectNotCollected):
+			return res.NotFound("subject not collected")
+		case errors.Is(err, domain.ErrSubjectNotFound):
+			return res.NotFound("subject not found")
+		}
 		return errgo.Wrap(err, "ctrl.UpdateCollection")
 	}
 

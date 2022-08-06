@@ -63,6 +63,8 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		JSON(map[string]any{
 			"comment": "1 test_content 2",
 			"type":    1,
+			"private": true,
+			"rate":    8,
 			"tags":    []string{"q", "vv"},
 		}).
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
@@ -73,7 +75,47 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		IP:      "0.0.0.0",
 		Comment: null.NewString("1 test_content 2"),
 		Tags:    []string{"q", "vv"},
+		Rate:    null.NewUint8(8),
 		Type:    null.New(model.SubjectCollection(1)),
+		Privacy: null.New(model.CollectPrivacyBan),
+	}, call)
+}
+
+func TestUser_PatchSubjectCollection_privacy(t *testing.T) {
+	t.Parallel()
+	const sid model.SubjectID = 8
+	const uid model.UserID = 1
+
+	var call domain.SubjectCollectionUpdate
+
+	a := mocks.NewAuthService(t)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: uid}, nil)
+
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().GetSubjectCollection(mock.Anything, uid, mock.Anything).
+		Return(model.UserSubjectCollection{Comment: "办证"}, nil)
+	c.EXPECT().WithQuery(mock.Anything).Return(c)
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).
+		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data domain.SubjectCollectionUpdate, _ time.Time) {
+			call = data
+		}).Return(nil)
+
+	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "办证", BannedDomain: ""})
+	require.NoError(t, err)
+
+	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d})
+
+	test.New(t).
+		Header(fiber.HeaderAuthorization, "Bearer t").
+		JSON(map[string]any{
+			"private": false,
+		}).
+		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+		Execute(app).
+		ExpectCode(http.StatusNoContent)
+
+	require.Equal(t, domain.SubjectCollectionUpdate{
+		IP:      "0.0.0.0",
 		Privacy: null.New(model.CollectPrivacyBan),
 	}, call)
 }
