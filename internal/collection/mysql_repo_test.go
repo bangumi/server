@@ -172,6 +172,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, domain.SubjectCollectionUpdate{
 		Comment: null.NewString("c"),
 		Rate:    null.NewUint8(1),
+		Type:    null.New(model.SubjectCollectionDropped),
 	}, now)
 	require.NoError(t, err)
 
@@ -183,6 +184,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	require.True(t, r.HasComment)
 	require.Equal(t, "c", r.Comment)
 	require.Equal(t, uint8(1), r.Rate)
+	require.Equal(t, uint32(now.Unix()), r.DroppedTime)
 
 	r, err = q.SubjectCollection.WithContext(context.Background()).
 		Where(q.SubjectCollection.SubjectID.Eq(sid+1), q.SubjectCollection.UserID.Eq(uid)).First()
@@ -233,6 +235,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 		Type int `php:"type"`
 	}
 	require.NoError(t, phpserialize.Unmarshal(r.Status, &m))
+	require.Len(t, m, 2)
 	require.Contains(t, m, uint32(1))
 	require.EqualValues(t, model.EpisodeCollectionDone, m[1].Type)
 	require.Contains(t, m, uint32(2))
