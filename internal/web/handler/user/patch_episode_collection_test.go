@@ -70,7 +70,7 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 			"type":       model.EpisodeCollectionDone,
 		}).
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d/episodes", sid)).
-		Execute(app, -1).
+		Execute(app).
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, []model.EpisodeID{1, 2, 3}, eIDs)
