@@ -724,7 +724,7 @@ paths:
           required: false
           schema:
             allOf:
-              - "$ref": "#/components/schemas/CollectionType"
+              - "$ref": "#/components/schemas/SubjectCollectionType"
             type: integer
           name: type
           in: query
@@ -1359,8 +1359,8 @@ components:
         - Mechanic
         - Ship
         - Organization
-    CollectionType:
-      $ref: "./components/collection_type.yaml"
+    SubjectCollectionType:
+      $ref: "./components/subject_collection_type.yaml"
     Creator:
       $ref: "./components/creator.yaml"
     DetailedRevision:

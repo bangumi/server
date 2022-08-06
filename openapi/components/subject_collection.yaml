@@ -22,7 +22,7 @@ properties:
     title: Rate
     type: integer
   type:
-    $ref: "./collection_type.yaml"
+    $ref: "./subject_collection_type.yaml"
   comment:
     title: Comment
     type: string
