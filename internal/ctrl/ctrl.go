@@ -42,9 +42,8 @@ func New(
 		log:   log.Named("app.query"),
 		cache: cache,
 
+		tx:  tx,
 		dam: dam,
-
-		tx: tx,
 
 		user:       user,
 		topic:      topic,
@@ -69,8 +68,8 @@ type Ctrl struct {
 	log   *zap.Logger
 	cache cache.Cache
 
-	dam dam.Dam
 	tx  dal.Transaction
+	dam dam.Dam
 
 	user                  domain.UserRepo
 	topic                 domain.TopicRepo
