@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen/field"
 
@@ -194,4 +195,60 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
+}
+
+func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const uid model.UserID = 40010
+	const sid model.SubjectID = 1010
+
+	repo, q := getRepo(t)
+	table := q.EpCollection
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := table.WithContext(context.TODO()).Create(&dao.EpCollection{
+		UserID:    uid,
+		SubjectID: sid,
+		Status:    []byte("a:0:{}"),
+	})
+	require.NoError(t, err)
+
+	now := time.Now()
+
+	_, err = repo.UpdateEpisodeCollection(context.Background(),
+		uid, sid, []model.EpisodeID{1, 2}, model.EpisodeCollectionDone, now)
+	require.NoError(t, err)
+
+	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	require.NoError(t, err)
+
+	require.EqualValues(t, now.Unix(), r.UpdatedTime)
+
+	var m map[uint32]struct {
+		Type int `php:"type"`
+	}
+	require.NoError(t, phpserialize.Unmarshal(r.Status, &m))
+	require.Contains(t, m, uint32(1))
+	require.EqualValues(t, model.EpisodeCollectionDone, m[1].Type)
+	require.Contains(t, m, uint32(2))
+	require.EqualValues(t, model.EpisodeCollectionDone, m[2].Type)
+
+	// testing remove episode collection
+	_, err = repo.UpdateEpisodeCollection(context.Background(),
+		uid, sid, []model.EpisodeID{1, 2}, model.EpisodeCollectionNone, now)
+	require.NoError(t, err)
+
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	require.NoError(t, err)
+
+	var m2 map[uint32]struct {
+		Type int `php:"type"`
+	}
+	require.NoError(t, phpserialize.Unmarshal(r.Status, &m2))
+	require.Len(t, m2, 0)
 }

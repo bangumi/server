@@ -222,13 +222,13 @@ func (_c *CollectionRepo_ListSubjectCollection_Call) Return(_a0 []model.UserSubj
 	return _c
 }
 
-// UpdateEpisodeCollection provides a mock function with given fields: ctx, userID, subjectID, episodeIDs, collection
-func (_m *CollectionRepo) UpdateEpisodeCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID, episodeIDs []model.EpisodeID, collection model.EpisodeCollection) (model.UserSubjectEpisodesCollection, error) {
-	ret := _m.Called(ctx, userID, subjectID, episodeIDs, collection)
+// UpdateEpisodeCollection provides a mock function with given fields: ctx, userID, subjectID, episodeIDs, collection, at
+func (_m *CollectionRepo) UpdateEpisodeCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID, episodeIDs []model.EpisodeID, collection model.EpisodeCollection, at time.Time) (model.UserSubjectEpisodesCollection, error) {
+	ret := _m.Called(ctx, userID, subjectID, episodeIDs, collection, at)
 
 	var r0 model.UserSubjectEpisodesCollection
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID, []model.EpisodeID, model.EpisodeCollection) model.UserSubjectEpisodesCollection); ok {
-		r0 = rf(ctx, userID, subjectID, episodeIDs, collection)
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID, []model.EpisodeID, model.EpisodeCollection, time.Time) model.UserSubjectEpisodesCollection); ok {
+		r0 = rf(ctx, userID, subjectID, episodeIDs, collection, at)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(model.UserSubjectEpisodesCollection)
@@ -236,8 +236,8 @@ func (_m *CollectionRepo) UpdateEpisodeCollection(ctx context.Context, userID mo
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, model.SubjectID, []model.EpisodeID, model.EpisodeCollection) error); ok {
-		r1 = rf(ctx, userID, subjectID, episodeIDs, collection)
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, model.SubjectID, []model.EpisodeID, model.EpisodeCollection, time.Time) error); ok {
+		r1 = rf(ctx, userID, subjectID, episodeIDs, collection, at)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -256,13 +256,14 @@ type CollectionRepo_UpdateEpisodeCollection_Call struct {
 //  - subjectID model.SubjectID
 //  - episodeIDs []model.EpisodeID
 //  - collection model.EpisodeCollection
-func (_e *CollectionRepo_Expecter) UpdateEpisodeCollection(ctx interface{}, userID interface{}, subjectID interface{}, episodeIDs interface{}, collection interface{}) *CollectionRepo_UpdateEpisodeCollection_Call {
-	return &CollectionRepo_UpdateEpisodeCollection_Call{Call: _e.mock.On("UpdateEpisodeCollection", ctx, userID, subjectID, episodeIDs, collection)}
+//  - at time.Time
+func (_e *CollectionRepo_Expecter) UpdateEpisodeCollection(ctx interface{}, userID interface{}, subjectID interface{}, episodeIDs interface{}, collection interface{}, at interface{}) *CollectionRepo_UpdateEpisodeCollection_Call {
+	return &CollectionRepo_UpdateEpisodeCollection_Call{Call: _e.mock.On("UpdateEpisodeCollection", ctx, userID, subjectID, episodeIDs, collection, at)}
 }
 
-func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectID model.SubjectID, episodeIDs []model.EpisodeID, collection model.EpisodeCollection)) *CollectionRepo_UpdateEpisodeCollection_Call {
+func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectID model.SubjectID, episodeIDs []model.EpisodeID, collection model.EpisodeCollection, at time.Time)) *CollectionRepo_UpdateEpisodeCollection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.SubjectID), args[3].([]model.EpisodeID), args[4].(model.EpisodeCollection))
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.SubjectID), args[3].([]model.EpisodeID), args[4].(model.EpisodeCollection), args[5].(time.Time))
 	})
 	return _c
 }

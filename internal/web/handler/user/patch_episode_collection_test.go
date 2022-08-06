@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
@@ -53,9 +54,9 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().WithQuery(mock.Anything).Return(c)
-	c.EXPECT().UpdateEpisodeCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).
+	c.EXPECT().UpdateEpisodeCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID,
-			episodeIDs []model.EpisodeID, collection model.EpisodeCollection) {
+			episodeIDs []model.EpisodeID, collection model.EpisodeCollection, _ time.Time) {
 			eIDs = episodeIDs
 			eType = collection
 		}).Return(model.UserSubjectEpisodesCollection{}, nil)

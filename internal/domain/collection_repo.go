@@ -58,10 +58,9 @@ type CollectionRepo interface {
 
 	UpdateEpisodeCollection(
 		ctx context.Context,
-		userID model.UserID,
-		subjectID model.SubjectID,
-		episodeIDs []model.EpisodeID,
-		collection model.EpisodeCollection,
+		userID model.UserID, subjectID model.SubjectID,
+		episodeIDs []model.EpisodeID, collection model.EpisodeCollection,
+		at time.Time,
 	) (model.UserSubjectEpisodesCollection, error)
 }
 

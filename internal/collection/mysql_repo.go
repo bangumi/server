@@ -267,6 +267,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 	subjectID model.SubjectID,
 	episodeIDs []model.EpisodeID,
 	collectionType model.EpisodeCollection,
+	at time.Time,
 ) (model.UserSubjectEpisodesCollection, error) {
 	table := r.q.EpCollection
 	where := []gen.Condition{table.UserID.Eq(userID), table.SubjectID.Eq(subjectID)}
@@ -295,7 +296,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 	}
 
 	_, err = table.WithContext(ctx).Where(where...).
-		UpdateColumnSimple(table.Status.Value(bytes), table.UpdatedTime.Value(uint32(time.Now().Unix())))
+		UpdateColumnSimple(table.Status.Value(bytes), table.UpdatedTime.Value(uint32(at.Unix())))
 	if err != nil {
 		return nil, errgo.Wrap(err, "EpCollection.UpdateColumnSimple")
 	}
