@@ -44,7 +44,7 @@ func TestSubject_Get(t *testing.T) {
 		Return(domain.Permission{}, nil)
 
 	ep := mocks.NewEpisodeRepo(t)
-	ep.EXPECT().Count(mock.Anything, subjectID).Return(3, nil)
+	ep.EXPECT().Count(mock.Anything, subjectID, mock.Anything).Return(3, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{

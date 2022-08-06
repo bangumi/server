@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/episode"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
@@ -35,14 +36,39 @@ func getRepo(t *testing.T) domain.EpisodeRepo {
 	return repo
 }
 
-func TestCount(t *testing.T) {
-	test.RequireEnv(t, "mysql")
+func TestMysqlRepo_Count(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
 
-	s, err := repo.Count(context.Background(), 253)
+	s, err := repo.Count(context.Background(), 253, domain.EpisodeFilter{})
 	require.NoError(t, err)
 
 	require.Equal(t, int64(31), s)
+}
+
+func TestMysqlRepo_Get(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	const eid model.EpisodeID = 2
+
+	e, err := repo.Get(context.TODO(), eid)
+	require.NoError(t, err)
+
+	require.Equal(t, model.Episode{
+		Airdate:   "2008-07-12",
+		Name:      "ギアス 狩り",
+		NameCN:    "Geass 狩猎",
+		Duration:  "24m",
+		Ep:        14,
+		SubjectID: 8,
+		Sort:      14,
+		Comment:   11,
+		ID:        eid,
+		Type:      model.EpTypeNormal,
+	}, e)
 }

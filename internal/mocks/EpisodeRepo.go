@@ -26,20 +26,20 @@ func (_m *EpisodeRepo) EXPECT() *EpisodeRepo_Expecter {
 	return &EpisodeRepo_Expecter{mock: &_m.Mock}
 }
 
-// Count provides a mock function with given fields: ctx, subjectID
-func (_m *EpisodeRepo) Count(ctx context.Context, subjectID model.SubjectID) (int64, error) {
-	ret := _m.Called(ctx, subjectID)
+// Count provides a mock function with given fields: ctx, subjectID, filter
+func (_m *EpisodeRepo) Count(ctx context.Context, subjectID model.SubjectID, filter domain.EpisodeFilter) (int64, error) {
+	ret := _m.Called(ctx, subjectID, filter)
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID) int64); ok {
-		r0 = rf(ctx, subjectID)
+	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, domain.EpisodeFilter) int64); ok {
+		r0 = rf(ctx, subjectID, filter)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID) error); ok {
-		r1 = rf(ctx, subjectID)
+	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, domain.EpisodeFilter) error); ok {
+		r1 = rf(ctx, subjectID, filter)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -55,64 +55,19 @@ type EpisodeRepo_Count_Call struct {
 // Count is a helper method to define mock.On call
 //  - ctx context.Context
 //  - subjectID model.SubjectID
-func (_e *EpisodeRepo_Expecter) Count(ctx interface{}, subjectID interface{}) *EpisodeRepo_Count_Call {
-	return &EpisodeRepo_Count_Call{Call: _e.mock.On("Count", ctx, subjectID)}
+//  - filter domain.EpisodeFilter
+func (_e *EpisodeRepo_Expecter) Count(ctx interface{}, subjectID interface{}, filter interface{}) *EpisodeRepo_Count_Call {
+	return &EpisodeRepo_Count_Call{Call: _e.mock.On("Count", ctx, subjectID, filter)}
 }
 
-func (_c *EpisodeRepo_Count_Call) Run(run func(ctx context.Context, subjectID model.SubjectID)) *EpisodeRepo_Count_Call {
+func (_c *EpisodeRepo_Count_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, filter domain.EpisodeFilter)) *EpisodeRepo_Count_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID))
+		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(domain.EpisodeFilter))
 	})
 	return _c
 }
 
 func (_c *EpisodeRepo_Count_Call) Return(_a0 int64, _a1 error) *EpisodeRepo_Count_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-// CountByType provides a mock function with given fields: ctx, subjectID, epType
-func (_m *EpisodeRepo) CountByType(ctx context.Context, subjectID model.SubjectID, epType uint8) (int64, error) {
-	ret := _m.Called(ctx, subjectID, epType)
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, uint8) int64); ok {
-		r0 = rf(ctx, subjectID, epType)
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, uint8) error); ok {
-		r1 = rf(ctx, subjectID, epType)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// EpisodeRepo_CountByType_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountByType'
-type EpisodeRepo_CountByType_Call struct {
-	*mock.Call
-}
-
-// CountByType is a helper method to define mock.On call
-//  - ctx context.Context
-//  - subjectID model.SubjectID
-//  - epType uint8
-func (_e *EpisodeRepo_Expecter) CountByType(ctx interface{}, subjectID interface{}, epType interface{}) *EpisodeRepo_CountByType_Call {
-	return &EpisodeRepo_CountByType_Call{Call: _e.mock.On("CountByType", ctx, subjectID, epType)}
-}
-
-func (_c *EpisodeRepo_CountByType_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, epType uint8)) *EpisodeRepo_CountByType_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(uint8))
-	})
-	return _c
-}
-
-func (_c *EpisodeRepo_CountByType_Call) Return(_a0 int64, _a1 error) *EpisodeRepo_CountByType_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
@@ -162,13 +117,13 @@ func (_c *EpisodeRepo_Get_Call) Return(_a0 model.Episode, _a1 error) *EpisodeRep
 	return _c
 }
 
-// List provides a mock function with given fields: ctx, subjectID, limit, offset
-func (_m *EpisodeRepo) List(ctx context.Context, subjectID model.SubjectID, limit int, offset int) ([]model.Episode, error) {
-	ret := _m.Called(ctx, subjectID, limit, offset)
+// List provides a mock function with given fields: ctx, subjectID, filter, limit, offset
+func (_m *EpisodeRepo) List(ctx context.Context, subjectID model.SubjectID, filter domain.EpisodeFilter, limit int, offset int) ([]model.Episode, error) {
+	ret := _m.Called(ctx, subjectID, filter, limit, offset)
 
 	var r0 []model.Episode
-	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, int, int) []model.Episode); ok {
-		r0 = rf(ctx, subjectID, limit, offset)
+	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, domain.EpisodeFilter, int, int) []model.Episode); ok {
+		r0 = rf(ctx, subjectID, filter, limit, offset)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]model.Episode)
@@ -176,8 +131,8 @@ func (_m *EpisodeRepo) List(ctx context.Context, subjectID model.SubjectID, limi
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, int, int) error); ok {
-		r1 = rf(ctx, subjectID, limit, offset)
+	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, domain.EpisodeFilter, int, int) error); ok {
+		r1 = rf(ctx, subjectID, filter, limit, offset)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -193,70 +148,21 @@ type EpisodeRepo_List_Call struct {
 // List is a helper method to define mock.On call
 //  - ctx context.Context
 //  - subjectID model.SubjectID
+//  - filter domain.EpisodeFilter
 //  - limit int
 //  - offset int
-func (_e *EpisodeRepo_Expecter) List(ctx interface{}, subjectID interface{}, limit interface{}, offset interface{}) *EpisodeRepo_List_Call {
-	return &EpisodeRepo_List_Call{Call: _e.mock.On("List", ctx, subjectID, limit, offset)}
+func (_e *EpisodeRepo_Expecter) List(ctx interface{}, subjectID interface{}, filter interface{}, limit interface{}, offset interface{}) *EpisodeRepo_List_Call {
+	return &EpisodeRepo_List_Call{Call: _e.mock.On("List", ctx, subjectID, filter, limit, offset)}
 }
 
-func (_c *EpisodeRepo_List_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, limit int, offset int)) *EpisodeRepo_List_Call {
+func (_c *EpisodeRepo_List_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, filter domain.EpisodeFilter, limit int, offset int)) *EpisodeRepo_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(int), args[3].(int))
+		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(domain.EpisodeFilter), args[3].(int), args[4].(int))
 	})
 	return _c
 }
 
 func (_c *EpisodeRepo_List_Call) Return(_a0 []model.Episode, _a1 error) *EpisodeRepo_List_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-// ListByType provides a mock function with given fields: ctx, subjectID, epType, limit, offset
-func (_m *EpisodeRepo) ListByType(ctx context.Context, subjectID model.SubjectID, epType uint8, limit int, offset int) ([]model.Episode, error) {
-	ret := _m.Called(ctx, subjectID, epType, limit, offset)
-
-	var r0 []model.Episode
-	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, uint8, int, int) []model.Episode); ok {
-		r0 = rf(ctx, subjectID, epType, limit, offset)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.Episode)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, uint8, int, int) error); ok {
-		r1 = rf(ctx, subjectID, epType, limit, offset)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// EpisodeRepo_ListByType_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListByType'
-type EpisodeRepo_ListByType_Call struct {
-	*mock.Call
-}
-
-// ListByType is a helper method to define mock.On call
-//  - ctx context.Context
-//  - subjectID model.SubjectID
-//  - epType uint8
-//  - limit int
-//  - offset int
-func (_e *EpisodeRepo_Expecter) ListByType(ctx interface{}, subjectID interface{}, epType interface{}, limit interface{}, offset interface{}) *EpisodeRepo_ListByType_Call {
-	return &EpisodeRepo_ListByType_Call{Call: _e.mock.On("ListByType", ctx, subjectID, epType, limit, offset)}
-}
-
-func (_c *EpisodeRepo_ListByType_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, epType uint8, limit int, offset int)) *EpisodeRepo_ListByType_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(uint8), args[3].(int), args[4].(int))
-	})
-	return _c
-}
-
-func (_c *EpisodeRepo_ListByType_Call) Return(_a0 []model.Episode, _a1 error) *EpisodeRepo_ListByType_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

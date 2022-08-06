@@ -33,6 +33,17 @@ func New[T any](t T) Null[T] {
 	}
 }
 
+func NewFromPtr[T any](p *T) Null[T] {
+	if p == nil {
+		return Null[T]{}
+	}
+
+	return Null[T]{
+		Value: *p,
+		Set:   true,
+	}
+}
+
 func (t Null[T]) Ptr() *T {
 	if t.Set {
 		return &t.Value

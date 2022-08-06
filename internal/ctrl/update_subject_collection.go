@@ -125,12 +125,12 @@ func (ctl Ctrl) updateEpisodeCollectionTx(
 		episodeTx := ctl.episode.WithQuery(tx)
 		collectionTx := ctl.collection.WithQuery(tx)
 
-		episodeCount, err := episodeTx.Count(ctx, subjectID)
+		episodeCount, err := episodeTx.Count(ctx, subjectID, domain.EpisodeFilter{})
 		if err != nil {
 			return errgo.Wrap(err, "episodeRepo.Count")
 		}
 
-		episodes, err := episodeTx.List(ctx, subjectID, int(episodeCount), 0)
+		episodes, err := episodeTx.List(ctx, subjectID, domain.EpisodeFilter{}, int(episodeCount), 0)
 		if err != nil {
 			return errgo.Wrap(err, "episodeRepo.List")
 		}

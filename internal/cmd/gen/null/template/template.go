@@ -34,6 +34,18 @@ func NewType(v GenericType) Type {
 	}
 }
 
+// NewTypeFromPtr creates a new GenericType from *GenericType.
+func NewTypeFromPtr(p *GenericType) Type {
+	if p == nil {
+		return Type{}
+	}
+
+	return Type{
+		Value: *p,
+		Set:   true,
+	}
+}
+
 func (t Type) Ptr() *GenericType {
 	if t.Set {
 		return &t.Value
