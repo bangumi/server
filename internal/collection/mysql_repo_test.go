@@ -184,7 +184,11 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	require.True(t, r.HasComment)
 	require.Equal(t, "c", r.Comment)
 	require.Equal(t, uint8(1), r.Rate)
-	require.Equal(t, uint32(now.Unix()), r.DroppedTime)
+	require.EqualValues(t, now.Unix(), r.DroppedTime)
+	require.EqualValues(t, 0, r.WishTime)
+	require.EqualValues(t, 0, r.DoingTime)
+	require.EqualValues(t, 0, r.DoneTime)
+	require.EqualValues(t, 0, r.OnHoldTime)
 
 	r, err = q.SubjectCollection.WithContext(context.Background()).
 		Where(q.SubjectCollection.SubjectID.Eq(sid+1), q.SubjectCollection.UserID.Eq(uid)).First()
