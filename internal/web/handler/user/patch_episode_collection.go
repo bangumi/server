@@ -52,7 +52,7 @@ func (r ReqEpisodeCollectionBatch) Validate() error {
 
 func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 	var r ReqEpisodeCollectionBatch
-	if err := json.Unmarshal(c.Body(), &r); err != nil {
+	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
 

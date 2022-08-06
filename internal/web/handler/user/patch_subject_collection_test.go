@@ -76,3 +76,51 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		Privacy: null.New(model.CollectPrivacyBan),
 	}, call)
 }
+
+func TestUser_PatchSubjectCollection_bad(t *testing.T) {
+	t.Parallel()
+	const uid model.UserID = 1
+	const sid model.SubjectID = 8
+
+	a := &mocks.AuthService{}
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: uid}, nil)
+
+	t.Run("bad rate", func(t *testing.T) {
+		t.Parallel()
+
+		app := test.GetWebApp(t, test.Mock{AuthService: a})
+
+		test.New(t).
+			Header(fiber.HeaderAuthorization, "Bearer t").
+			JSON(fiber.Map{"rate": 11}).
+			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+			Execute(app).
+			ExpectCode(http.StatusBadRequest)
+	})
+
+	t.Run("bad type", func(t *testing.T) {
+		t.Parallel()
+
+		app := test.GetWebApp(t, test.Mock{AuthService: a})
+
+		test.New(t).
+			Header(fiber.HeaderAuthorization, "Bearer t").
+			JSON(fiber.Map{"type": 0}).
+			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+			Execute(app).
+			ExpectCode(http.StatusBadRequest)
+	})
+
+	t.Run("bad type", func(t *testing.T) {
+		t.Parallel()
+
+		app := test.GetWebApp(t, test.Mock{AuthService: a})
+
+		test.New(t).
+			Header(fiber.HeaderAuthorization, "Bearer t").
+			JSON(fiber.Map{"tags": "vv qq"}).
+			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+			Execute(app).
+			ExpectCode(http.StatusBadGateway)
+	})
+}
