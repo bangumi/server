@@ -68,9 +68,5 @@ func (t *Uint32) UnmarshalJSON(data []byte) error {
 	}
 
 	t.Set = true
-	if err := json.UnmarshalNoEscape(data, &t.Value); err != nil {
-		return err //nolint:wrapcheck
-	}
-
-	return nil
+	return json.UnmarshalNoEscape(data, &t.Value) //nolint:wrapcheck
 }
