@@ -65,8 +65,9 @@ func TestUser_GetSubjectEpisodeCollection(t *testing.T) {
 		Return(map[model.EpisodeID]model.UserEpisodeCollection{}, nil)
 
 	episode := mocks.NewEpisodeRepo(t)
-	episode.EXPECT().Count(mock.Anything, mock.Anything).Return(20, nil)
-	episode.EXPECT().List(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]model.Episode{}, nil)
+	episode.EXPECT().Count(mock.Anything, mock.Anything, mock.Anything).Return(20, nil)
+	episode.EXPECT().List(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return([]model.Episode{}, nil)
 
 	app := test.GetWebApp(t, test.Mock{AuthService: mockAuth, CollectionRepo: c, EpisodeRepo: episode})
 

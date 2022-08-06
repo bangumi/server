@@ -42,7 +42,7 @@ func TestMysqlRepo_Count(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.Count(context.Background(), 253)
+	s, err := repo.Count(context.Background(), 253, domain.EpisodeFilter{})
 	require.NoError(t, err)
 
 	require.Equal(t, int64(31), s)

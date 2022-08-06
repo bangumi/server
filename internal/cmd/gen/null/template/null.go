@@ -12,30 +12,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package null
 
-import (
-	"context"
+// stub for template
 
-	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/null"
-)
-
-type EpisodeRepo interface {
-	Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error)
-
-	// Count all episode for a subject.
-	Count(ctx context.Context, subjectID model.SubjectID, filter EpisodeFilter) (int64, error)
-
-	// List return all episode.
-	List(
-		ctx context.Context,
-		subjectID model.SubjectID,
-		filter EpisodeFilter,
-		limit int, offset int,
-	) ([]model.Episode, error)
-}
-
-type EpisodeFilter struct {
-	Type null.Null[model.EpType]
-}
+type GenericType any

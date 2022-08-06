@@ -12,30 +12,36 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package null_test
 
 import (
-	"context"
+	"testing"
 
-	"github.com/bangumi/server/internal/model"
+	"github.com/stretchr/testify/require"
+
 	"github.com/bangumi/server/internal/pkg/null"
 )
 
-type EpisodeRepo interface {
-	Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error)
+func TestNilUint8(t *testing.T) {
+	t.Parallel()
 
-	// Count all episode for a subject.
-	Count(ctx context.Context, subjectID model.SubjectID, filter EpisodeFilter) (int64, error)
+	require.Nil(t, null.NilUint8(0))
 
-	// List return all episode.
-	List(
-		ctx context.Context,
-		subjectID model.SubjectID,
-		filter EpisodeFilter,
-		limit int, offset int,
-	) ([]model.Episode, error)
+	require.Equal(t, uint8(3), *null.NilUint8(3))
 }
 
-type EpisodeFilter struct {
-	Type null.Null[model.EpType]
+func TestNilUint16(t *testing.T) {
+	t.Parallel()
+
+	require.Nil(t, null.NilUint16(0))
+
+	require.Equal(t, uint16(3), *null.NilUint16(3))
+}
+
+func TestNilString(t *testing.T) {
+	t.Parallel()
+
+	require.Nil(t, null.NilString(""))
+
+	require.Equal(t, "s", *null.NilString("s"))
 }

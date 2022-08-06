@@ -12,30 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package null
 
-import (
-	"context"
+import "github.com/gofiber/fiber/v2/utils"
 
-	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/null"
-)
+func NilUint8(i uint8) *uint8 {
+	if i == 0 {
+		return nil
+	}
 
-type EpisodeRepo interface {
-	Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error)
-
-	// Count all episode for a subject.
-	Count(ctx context.Context, subjectID model.SubjectID, filter EpisodeFilter) (int64, error)
-
-	// List return all episode.
-	List(
-		ctx context.Context,
-		subjectID model.SubjectID,
-		filter EpisodeFilter,
-		limit int, offset int,
-	) ([]model.Episode, error)
+	return &i
 }
 
-type EpisodeFilter struct {
-	Type null.Null[model.EpType]
+func NilUint16(i uint16) *uint16 {
+	if i == 0 {
+		return nil
+	}
+
+	return &i
+}
+
+func NilString(s string) *string {
+	if s == "" {
+		return nil
+	}
+
+	s = utils.CopyString(s)
+
+	return &s
 }

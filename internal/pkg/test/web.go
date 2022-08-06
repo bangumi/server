@@ -229,7 +229,7 @@ func MockCharacterRepo(m domain.CharacterRepo) fx.Option {
 func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 	if m == nil {
 		mocker := &mocks.EpisodeRepo{}
-		mocker.EXPECT().Count(mock.Anything, mock.Anything).Return(0, nil)
+		mocker.EXPECT().Count(mock.Anything, mock.Anything, mock.Anything).Return(0, nil)
 
 		m = mocker
 	}

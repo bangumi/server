@@ -28,6 +28,8 @@ type SubjectCollection struct {
 	DoneTime    uint32          `gorm:"column:interest_collect_dateline;type:int(10) unsigned;not null"`
 	OnHoldTime  uint32          `gorm:"column:interest_on_hold_dateline;type:int(10) unsigned;not null"`
 	DroppedTime uint32          `gorm:"column:interest_dropped_dateline;type:int(10) unsigned;not null"`
+	CreateIP    string          `gorm:"column:interest_create_ip;type:char(15);not null"`
+	LasttouchIP string          `gorm:"column:interest_lasttouch_ip;type:char(15);not null"`
 	UpdatedTime uint32          `gorm:"column:interest_lasttouch;type:int(10) unsigned;not null"`
 	Private     uint8           `gorm:"column:interest_private;type:tinyint(1) unsigned;not null"`
 }
