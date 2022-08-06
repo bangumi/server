@@ -839,7 +839,8 @@ paths:
                   type: boolean
 
                 tags:
-                  description: 标签
+                  title: 标签
+                  description: 不传或者 `null` 都会被忽略，传 `[]` 则会删除所有 tag。
                   type: array
                   items:
                     type: string
