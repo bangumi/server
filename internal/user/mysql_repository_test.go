@@ -107,3 +107,18 @@ func TestMysqlRepo_GetFriends(t *testing.T) {
 	_, ok := friends[427613]
 	require.True(t, ok, "map should contain user")
 }
+
+func TestMysqlRepo_GetByIDs(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	users, err := repo.GetByIDs(context.Background(), 1, 382951)
+	require.NoError(t, err)
+
+	require.Len(t, users, 2)
+
+	require.Equal(t, model.UserID(1), users[1].ID)
+	require.Equal(t, model.UserID(382951), users[382951].ID)
+}
