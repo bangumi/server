@@ -18,6 +18,25 @@ import (
 	"github.com/goccy/go-json"
 )
 
+type Uint8 = Null[uint8]
+type Uint16 = Null[uint16]
+type Uint32 = Null[uint32]
+type Uint64 = Null[uint64]
+type Uint = Null[uint]
+
+type Int8 = Null[int8]
+type Int16 = Null[int16]
+type Int32 = Null[int32]
+type Int64 = Null[int64]
+type Int = Null[int]
+
+type Float32 = Null[float32]
+type Float64 = Null[float64]
+
+type Bool = Null[bool]
+type String = Null[string]
+type Bytes = Null[[]byte]
+
 var _ json.Unmarshaler = (*Null[any])(nil)
 
 // Null is a nullable type.
