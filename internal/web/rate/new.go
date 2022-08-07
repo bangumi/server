@@ -23,8 +23,10 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
+	"github.com/bangumi/server/internal/web/rate/action"
 )
 
 const defaultAllowPerHour = 5
@@ -35,8 +37,15 @@ var allowLua string
 var allowScript = redis.NewScript(allowLua) //nolint:gochecknoglobals
 
 type Manager interface {
-	// Allowed 检查是否允许登录。
-	Allowed(ctx context.Context, ip string) (allowed bool, remain int, err error)
+	// Login 检查是登录限流。
+	Login(ctx context.Context, ip string) (allowed bool, remain int, err error)
+
+	AllowAction(
+		ctx context.Context,
+		u model.UserID,
+		action action.Action,
+		limit Limit,
+	) (allowed bool, remain int, err error)
 	// Reset 登录成功时应该重置计数。
 	Reset(ctx context.Context, ip string) error
 }
@@ -54,28 +63,33 @@ type manager struct {
 	r *redis.Client
 }
 
-func (m manager) Allowed(ctx context.Context, ip string) (bool, int, error) {
-	var banKey = RedisBanKeyPrefix + ip
-	result, err := m.r.Exists(ctx, banKey, "1").Result()
-	if err != nil {
-		return false, 0, errgo.Wrap(err, "redis.Exists")
-	}
+func (m manager) AllowAction(
+	ctx context.Context,
+	u model.UserID,
+	action action.Action,
+	limit Limit,
+) (bool, int, error) {
+	rateKey := fmt.Sprintf("chii:rate:%d:%d", action, u)
+	banKey := fmt.Sprintf("chii:rate:ban:%d:%d", action, u)
 
-	if result == 1 {
-		return false, 0, nil
-	}
-
-	res, err := m.allow(ctx, RedisRateKeyPrefix+ip, PerHour(defaultAllowPerHour))
+	res, err := m.allow(ctx, rateKey, banKey, limit)
 	if err != nil {
 		return false, 0, errgo.Wrap(err, "Limiter.Allow")
 	}
 
-	if res.Allowed <= 0 {
-		err := m.r.Set(ctx, banKey, "1", gtime.OneWeek).Err()
-		return false, 0, errgo.Wrap(err, "redis.Set")
+	return res.Allowed > 0, res.Remaining, nil
+}
+
+func (m manager) Login(ctx context.Context, ip string) (bool, int, error) {
+	var rateKey = RedisRateKeyPrefix + ip
+	var banKey = RedisBanKeyPrefix + ip
+
+	res, err := m.allow(ctx, rateKey, banKey, PerHour(defaultAllowPerHour))
+	if err != nil {
+		return false, 0, errgo.Wrap(err, "Limiter.Allow")
 	}
 
-	return true, res.Remaining, nil
+	return res.Allowed > 0, res.Remaining, nil
 }
 
 func (m manager) Reset(ctx context.Context, ip string) error {
@@ -87,11 +101,12 @@ func (m manager) Reset(ctx context.Context, ip string) error {
 // AllowN reports whether n events may happen at time now.
 func (m manager) allow(
 	ctx context.Context,
-	ip string,
+	rateKey string,
+	banKey string,
 	limit Limit,
 ) (Result, error) {
 	now := time.Now()
-	var keys = []string{RedisRateKeyPrefix + ip, RedisBanKeyPrefix + ip}
+	var keys = []string{rateKey, banKey}
 	var values = []any{
 		limit.Burst, limit.Rate, limit.Period.Seconds(), now.Unix(), now.Nanosecond() / 1000, gtime.OneWeekSec,
 	}
