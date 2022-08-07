@@ -29,6 +29,14 @@ type Episode struct {
 	Disc        uint8
 }
 
+func (e Episode) Less(o Episode) bool {
+	if e.Type == o.Type {
+		return e.Sort <= o.Sort
+	}
+
+	return e.Type <= o.Type
+}
+
 type EpType = uint8
 
 const (

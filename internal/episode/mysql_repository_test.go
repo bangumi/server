@@ -16,6 +16,8 @@ package episode_test
 
 import (
 	"context"
+	"fmt"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -95,6 +97,10 @@ func TestMysqlRepo_List(t *testing.T) {
 	for _, tc := range testCases {
 		episodes, err := repo.List(context.TODO(), 253, tc.filter, 100, 0)
 		require.NoError(t, err)
+
+		sorted := sort.SliceIsSorted(episodes, func(i, j int) bool { return episodes[i].Less(episodes[j]) })
+
+		require.True(t, sorted, "episode sorted by `sort` "+fmt.Sprintf("%#v", episodes))
 
 		require.Len(t, episodes, tc.len)
 	}
