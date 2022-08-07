@@ -153,7 +153,7 @@ func (ctl Ctrl) updateEpisodeCollectionTx(
 		epStatus := len(ec)
 
 		err = collectionTx.UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
-			EpStatus: null.NewUint32(uint32(epStatus)),
+			EpStatus: null.New(uint32(epStatus)),
 		}, time.Now())
 		if err != nil {
 			ctl.log.Error("failed to update user collection info", zap.Error(err))

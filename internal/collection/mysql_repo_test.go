@@ -165,8 +165,8 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	now := time.Now()
 
 	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, domain.SubjectCollectionUpdate{
-		Comment: null.NewString("c"),
-		Rate:    null.NewUint8(1),
+		Comment: null.New("c"),
+		Rate:    null.New[uint8](1),
 		Type:    null.New(model.SubjectCollectionDropped),
 	}, now)
 	require.NoError(t, err)

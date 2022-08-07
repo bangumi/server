@@ -73,9 +73,9 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 
 	require.Equal(t, domain.SubjectCollectionUpdate{
 		IP:      "0.0.0.0",
-		Comment: null.NewString("1 test_content 2"),
+		Comment: null.New("1 test_content 2"),
 		Tags:    []string{"q", "vv"},
-		Rate:    null.NewUint8(8),
+		Rate:    null.New[uint8](8),
 		Type:    null.New(model.SubjectCollection(1)),
 		Privacy: null.New(model.CollectPrivacyBan),
 	}, call)
