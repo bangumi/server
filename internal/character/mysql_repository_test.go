@@ -21,22 +21,22 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/subject"
 )
 
-func getRepo(t *testing.T) domain.SubjectRepo {
+func getRepo(t *testing.T) domain.CharacterRepo {
 	t.Helper()
-	repo, err := subject.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
+	repo, err := character.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)
 
 	return repo
 }
 
 func TestGet(t *testing.T) {
-	test.RequireEnv(t, "mysql")
+	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
@@ -47,8 +47,18 @@ func TestGet(t *testing.T) {
 	require.EqualValues(t, 1, s.ID)
 }
 
+func TestMysqlRepo_Get_err_not_found(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	_, err := repo.Get(context.Background(), 10000)
+	require.ErrorIs(t, err, domain.ErrCharacterNotFound)
+}
+
 func TestMysqlRepo_GetByIDs(t *testing.T) {
-	test.RequireEnv(t, "mysql")
+	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
