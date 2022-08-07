@@ -81,8 +81,8 @@ func (_c *RateLimiter_AllowAction_Call) Return(allowed bool, remain int, err err
 	return _c
 }
 
-// Allowed provides a mock function with given fields: ctx, ip
-func (_m *RateLimiter) Allowed(ctx context.Context, ip string) (bool, int, error) {
+// Login provides a mock function with given fields: ctx, ip
+func (_m *RateLimiter) Login(ctx context.Context, ip string) (bool, int, error) {
 	ret := _m.Called(ctx, ip)
 
 	var r0 bool
@@ -109,26 +109,26 @@ func (_m *RateLimiter) Allowed(ctx context.Context, ip string) (bool, int, error
 	return r0, r1, r2
 }
 
-// RateLimiter_Allowed_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Allowed'
-type RateLimiter_Allowed_Call struct {
+// RateLimiter_Login_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Login'
+type RateLimiter_Login_Call struct {
 	*mock.Call
 }
 
-// Allowed is a helper method to define mock.On call
+// Login is a helper method to define mock.On call
 //  - ctx context.Context
 //  - ip string
-func (_e *RateLimiter_Expecter) Allowed(ctx interface{}, ip interface{}) *RateLimiter_Allowed_Call {
-	return &RateLimiter_Allowed_Call{Call: _e.mock.On("Allowed", ctx, ip)}
+func (_e *RateLimiter_Expecter) Login(ctx interface{}, ip interface{}) *RateLimiter_Login_Call {
+	return &RateLimiter_Login_Call{Call: _e.mock.On("Login", ctx, ip)}
 }
 
-func (_c *RateLimiter_Allowed_Call) Run(run func(ctx context.Context, ip string)) *RateLimiter_Allowed_Call {
+func (_c *RateLimiter_Login_Call) Run(run func(ctx context.Context, ip string)) *RateLimiter_Login_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string))
 	})
 	return _c
 }
 
-func (_c *RateLimiter_Allowed_Call) Return(allowed bool, remain int, err error) *RateLimiter_Allowed_Call {
+func (_c *RateLimiter_Login_Call) Return(allowed bool, remain int, err error) *RateLimiter_Login_Call {
 	_c.Call.Return(allowed, remain, err)
 	return _c
 }

@@ -25,12 +25,12 @@ import (
 	"github.com/bangumi/server/internal/web/rate/action"
 )
 
-// Rate require Handler.NeedLogin before this middleware.
-func Rate(r rate.Manager, h common.Common, action action.Action, limit rate.Limit) fiber.Handler {
+// rateMiddleware require Handler.NeedLogin before this middleware.
+func rateMiddleware(r rate.Manager, h common.Common, action action.Action, limit rate.Limit) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		a := h.GetHTTPAccessor(c)
 		if !a.Login {
-			panic("Rate are handing not login-ed request")
+			panic("rateMiddleware are handing not login-ed request")
 		}
 
 		allowed, _, err := r.AllowAction(c.Context(), a.ID, action, limit)

@@ -41,7 +41,7 @@ func TestRateLimitManager_action(t *testing.T) {
 	const uid model.UserID = 6
 	r := rate.New(db)
 
-	allowed, remain, err := r.AllowAction(context.TODO(), uid, action.Login, rate.PerHour(10))
+	allowed, remain, err := r.AllowAction(context.TODO(), uid, action.Unknown, rate.PerHour(10))
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.EqualValues(t, 9, remain)
@@ -66,32 +66,32 @@ func TestRateLimitManager_Allowed(t *testing.T) {
 
 	rateLimiter := rate.New(db)
 
-	allowed, remain, err := rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err := rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 4, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 3, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 2, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 1, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 0, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.False(t, allowed)
 	require.Equal(t, 0, remain)

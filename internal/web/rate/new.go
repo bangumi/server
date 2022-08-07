@@ -37,8 +37,8 @@ var allowLua string
 var allowScript = redis.NewScript(allowLua) //nolint:gochecknoglobals
 
 type Manager interface {
-	// Allowed 检查是否允许登录。
-	Allowed(ctx context.Context, ip string) (allowed bool, remain int, err error)
+	// Login 检查是登录限流。
+	Login(ctx context.Context, ip string) (allowed bool, remain int, err error)
 
 	AllowAction(
 		ctx context.Context,
@@ -80,7 +80,7 @@ func (m manager) AllowAction(
 	return res.Allowed > 0, res.Remaining, nil
 }
 
-func (m manager) Allowed(ctx context.Context, ip string) (bool, int, error) {
+func (m manager) Login(ctx context.Context, ip string) (bool, int, error) {
 	var rateKey = RedisRateKeyPrefix + ip
 	var banKey = RedisBanKeyPrefix + ip
 

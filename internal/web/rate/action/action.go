@@ -17,7 +17,6 @@ package action
 type Action uint8
 
 const (
-	Unknown                 Action = 0
-	Login                   Action = 1
-	UpdateSubjectCollection Action = 2
+	Unknown Action = 0
+	Login   Action = 1
 )
