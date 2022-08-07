@@ -74,3 +74,33 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 	require.True(t, ok)
 	require.EqualValues(t, 2, s[2].ID)
 }
+
+func TestMysqlRepo_GetPersonRelated(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	c, err := repo.GetPersonRelated(context.TODO(), 1)
+	require.NoError(t, err)
+
+	require.Len(t, c, 272)
+}
+
+func TestMysqlRepo_GetSubjectRelated(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	c, err := repo.GetSubjectRelated(context.TODO(), 8)
+	require.NoError(t, err)
+
+	require.Len(t, c, 3)
+	require.Equal(t,
+		[]domain.SubjectCharacterRelation{
+			{TypeID: 0x1, SubjectID: 0x8, CharacterID: 0x1},
+			{TypeID: 0x1, SubjectID: 0x8, CharacterID: 0x2},
+			{TypeID: 0x1, SubjectID: 0x8, CharacterID: 0x3},
+		},
+		c,
+	)
+}
