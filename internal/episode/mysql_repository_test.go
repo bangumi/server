@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
@@ -71,4 +72,30 @@ func TestMysqlRepo_Get(t *testing.T) {
 		ID:        eid,
 		Type:      model.EpTypeNormal,
 	}, e)
+}
+
+func TestMysqlRepo_List(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	testCases := []struct {
+		filter domain.EpisodeFilter
+		len    int
+	}{
+		{filter: domain.EpisodeFilter{}, len: 31},
+		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeNormal)}, len: 26},
+		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeSpecial)}, len: 1},
+		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeOpening)}, len: 1},
+		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeEnding)}, len: 3},
+		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeMad)}, len: 0},
+	}
+
+	for _, tc := range testCases {
+		episodes, err := repo.List(context.TODO(), 253, tc.filter, 100, 0)
+		require.NoError(t, err)
+
+		require.Len(t, episodes, tc.len)
+	}
 }
