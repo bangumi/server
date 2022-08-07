@@ -33,7 +33,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v3
         with:
-          go-version: "~1.18"
+          go-version: "1.19"
 
       - name: Go Build Cache (build)
         uses: actions/cache@v3
@@ -41,10 +41,9 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg
-          key: go-cache-1-${{ hashFiles('**/go.sum') }}-build
+          key: go-cache-119-${{ hashFiles('**/go.sum') }}-build
           restore-keys: |
-            go-cache-1-${{ hashFiles('**/go.sum') }}-
-            go-cache-1-
+            go-cache-119-${{ hashFiles('**/go.sum') }}-
 
       - name: Install Task
         uses: arduino/setup-task@v1

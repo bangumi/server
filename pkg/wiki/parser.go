@@ -176,9 +176,10 @@ func readType(s string) string {
 }
 
 // read whole line as an array item, spaces are trimmed.
-//   readArrayItem("[简体中文名|鲁鲁修]") => "简体中文名", "鲁鲁修", nil
-//   readArrayItem("[简体中文名|]") => "简体中文名", "", nil
-//   readArrayItem("[鲁鲁修]") => "", "鲁鲁修", nil
+//
+//	readArrayItem("[简体中文名|鲁鲁修]") => "简体中文名", "鲁鲁修", nil
+//	readArrayItem("[简体中文名|]") => "简体中文名", "", nil
+//	readArrayItem("[鲁鲁修]") => "", "鲁鲁修", nil
 func readArrayItem(line string) (string, string, error) {
 	if line[0] != '[' || line[len(line)-1] != ']' {
 		return "", "", ErrArrayItemWrapped
@@ -195,8 +196,9 @@ func readArrayItem(line string) (string, string, error) {
 }
 
 // read line without leading '|' as key value pair, spaces are trimmed.
-//   readStartLine("播放日期 = 2017年4月16日") => 播放日期, 2017年4月16日, nil
-//   readStartLine("播放日期 = ") => 播放日期, "", nil
+//
+//	readStartLine("播放日期 = 2017年4月16日") => 播放日期, 2017年4月16日, nil
+//	readStartLine("播放日期 = ") => 播放日期, "", nil
 func readStartLine(line string) (string, string, error) {
 	i := strings.IndexByte(line, '=')
 	if i == -1 {

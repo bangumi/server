@@ -17,8 +17,9 @@ package gstr
 import "strings"
 
 // Partition split string in 2 part.
-//   Partition("1=2", '=') => "1", "2"
-//   Partition("123", '=') => "123", ""
+//
+//	Partition("1=2", '=') => "1", "2"
+//	Partition("123", '=') => "123", ""
 func Partition(s string, c byte) (string, string) {
 	i := strings.IndexByte(s, c)
 	if i == -1 {

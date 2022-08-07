@@ -20,7 +20,7 @@ NOTICE:
 	Use `UpdatedTime` and `CreatedTime` instead.
 */
 
-// nolint
+//nolint:all
 package main
 
 import (

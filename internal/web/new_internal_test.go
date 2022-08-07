@@ -35,7 +35,7 @@ func TestDefaultErrorHandler_resError(t *testing.T) {
 		return res.BadRequest("mm")
 	})
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	resp, err := app.Test(req, -1)
 	require.NoError(t, err)
 	defer resp.Body.Close()
@@ -56,7 +56,7 @@ func TestDefaultErrorHandler_internal(t *testing.T) {
 		return errors.New("mm") //nolint:goerr113
 	})
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	resp, err := app.Test(req, -1)
 	require.NoError(t, err)
 	defer resp.Body.Close()
