@@ -20,17 +20,22 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/web/handler/common"
+	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/rate/action"
+	"github.com/bangumi/server/internal/web/res"
 )
 
+type baseHandler interface {
+	GetHTTPAccessor(c *fiber.Ctx) *accessor.Accessor
+}
+
 // rateMiddleware require Handler.NeedLogin before this middleware.
-func rateMiddleware(r rate.Manager, h common.Common, action action.Action, limit rate.Limit) fiber.Handler {
+func rateMiddleware(r rate.Manager, h baseHandler, action action.Action, limit rate.Limit) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		a := h.GetHTTPAccessor(c)
 		if !a.Login {
-			panic("rateMiddleware are handing not login-ed request")
+			return res.Unauthorized("login required")
 		}
 
 		allowed, _, err := r.AllowAction(c.Context(), a.ID, action, limit)

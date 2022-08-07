@@ -152,7 +152,7 @@ func MockIndexRepo(repo domain.IndexRepo) fx.Option {
 func MockRateLimiter(repo rate.Manager) fx.Option {
 	if repo == nil {
 		mocker := &mocks.RateLimiter{}
-		mocker.EXPECT().Allowed(mock.Anything, mock.Anything).Return(true, 5, nil) //nolint:gomnd
+		mocker.EXPECT().Login(mock.Anything, mock.Anything).Return(true, 5, nil) //nolint:gomnd
 		mocker.EXPECT().Reset(mock.Anything, mock.Anything).Return(nil)
 
 		repo = mocker
