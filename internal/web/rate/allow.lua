@@ -65,7 +65,7 @@ local diff = now - allow_at
 local remaining = diff / emission_interval
 
 if remaining < 0 then
-    redis.call('SET', ban_key, "1", "EX", ban_expire) -- ban key
+    redis.call('SET', ban_key, 1, "EX", ban_expire) -- ban key
 
     local reset_after = tat - now
     local retry_after = diff * -1
