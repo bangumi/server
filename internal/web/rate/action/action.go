@@ -12,25 +12,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package timex
+package action
 
-import "time"
+type Action uint8
 
 const (
-	OneMinSec  = 60
-	OneHourSec = 3600
-	OneDaySec  = 86400
-	OneWeekSec = 7 * 86400
-
-	OneDay  = 24 * time.Hour
-	OneWeek = 7 * 24 * time.Hour
+	Unknown Action = 0
+	Login   Action = 1
 )
-
-type numberT interface {
-	int8 | int16 | int32 | int | int64
-}
-
-// Second convert an integer N to time.Duration present N seconds.
-func Second[T numberT](second T) time.Duration {
-	return time.Duration(second) * time.Second
-}

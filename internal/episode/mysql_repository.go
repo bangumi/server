@@ -37,6 +37,10 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.EpisodeRepo, error) {
 	return mysqlRepo{q: q, log: log.Named("episode.mysqlRepo")}, nil
 }
 
+func (r mysqlRepo) WithQuery(query *query.Query) domain.EpisodeRepo {
+	return mysqlRepo{q: query, log: r.log}
+}
+
 func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error) {
 	episode, err := r.q.Episode.WithContext(ctx).
 		Where(r.q.Episode.ID.Eq(episodeID), r.q.Episode.Ban.Eq(0)).Limit(1).First()
@@ -58,27 +62,18 @@ func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (model.Ep
 	return convertDaoEpisode(episode, first), nil
 }
 
-func (r mysqlRepo) Count(ctx context.Context, subjectID model.SubjectID) (int64, error) {
-	c, err := r.q.Episode.WithContext(ctx).
-		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Ban.Eq(0)).Count()
-	if err != nil {
-		return 0, errgo.Wrap(err, "dal")
-	}
-
-	return c, nil
-}
-
-func (r mysqlRepo) CountByType(
+func (r mysqlRepo) Count(
 	ctx context.Context,
 	subjectID model.SubjectID,
-	epType model.EpType,
+	filter domain.EpisodeFilter,
 ) (int64, error) {
-	c, err := r.q.Episode.WithContext(ctx).
-		Where(
-			r.q.Episode.SubjectID.Eq(subjectID),
-			r.q.Episode.Type.Eq(epType),
-			r.q.Episode.Ban.Eq(0),
-		).Count()
+	q := r.q.Episode.WithContext(ctx).Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Ban.Eq(0))
+
+	if filter.Type.Set {
+		q = q.Where(r.q.Episode.Type.Eq(filter.Type.Value))
+	}
+
+	c, err := q.Count()
 	if err != nil {
 		return 0, errgo.Wrap(err, "dal")
 	}
@@ -87,7 +82,7 @@ func (r mysqlRepo) CountByType(
 }
 
 func (r mysqlRepo) List(
-	ctx context.Context, subjectID model.SubjectID, limit int, offset int,
+	ctx context.Context, subjectID model.SubjectID, filter domain.EpisodeFilter, limit int, offset int,
 ) ([]model.Episode, error) {
 	first, err := r.firstEpisode(ctx, subjectID)
 	if err != nil {
@@ -98,40 +93,12 @@ func (r mysqlRepo) List(
 		return nil, err
 	}
 
-	episodes, err := r.q.Episode.WithContext(ctx).
-		Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Ban.Eq(0)).
-		Limit(limit).Offset(offset).Find()
-	if err != nil {
-		return nil, errgo.Wrap(err, "dal")
+	q := r.q.Episode.WithContext(ctx).Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Ban.Eq(0))
+	if filter.Type.Set {
+		q = q.Where(r.q.Episode.Type.Eq(filter.Type.Value))
 	}
 
-	var result = make([]model.Episode, len(episodes))
-	for i, episode := range episodes {
-		result[i] = convertDaoEpisode(episode, first)
-	}
-
-	return result, nil
-}
-
-func (r mysqlRepo) ListByType(
-	ctx context.Context, subjectID model.SubjectID, epType model.EpType, limit int, offset int,
-) ([]model.Episode, error) {
-	first, err := r.firstEpisode(ctx, subjectID)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return []model.Episode{}, nil
-		}
-
-		return nil, err
-	}
-
-	episodes, err := r.q.Episode.WithContext(ctx).
-		Where(
-			r.q.Episode.SubjectID.Eq(subjectID),
-			r.q.Episode.Type.Eq(epType),
-			r.q.Episode.Ban.Eq(0),
-		).
-		Limit(limit).Offset(offset).Find()
+	episodes, err := q.Limit(limit).Offset(offset).Find()
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
 	}

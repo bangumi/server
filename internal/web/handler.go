@@ -25,7 +25,7 @@ import (
 	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/pkg/timex"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/handler/character"
@@ -41,6 +41,7 @@ import (
 )
 
 // AddRouters add all router and default 404 Handler to app.
+//
 //nolint:funlen
 func AddRouters(
 	app *fiber.App,
@@ -90,6 +91,11 @@ func AddRouters(
 	v0.Get("/users/:username/collections/:subject_id", addMetrics(userHandler.GetSubjectCollection))
 	v0.Get("/users/-/collections/-/episodes/:episode_id", h.NeedLogin, addMetrics(userHandler.GetEpisodeCollection))
 	v0.Get("/users/-/collections/:subject_id/episodes", h.NeedLogin, addMetrics(userHandler.GetSubjectEpisodeCollection))
+	v0.Patch("/users/-/collections/:subject_id", req.JSON, h.NeedLogin, addMetrics(userHandler.PatchSubjectCollection))
+	v0.Patch("/users/-/collections/:subject_id/episodes",
+		req.JSON, h.NeedLogin,
+		addMetrics(userHandler.PatchEpisodeCollectionBatch),
+	)
 	v0.Get("/users/:username/avatar", addMetrics(userHandler.GetAvatar))
 
 	v0.Get("/indices/:id", addMetrics(h.GetIndex))
@@ -104,11 +110,11 @@ func AddRouters(
 
 	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
 
-	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.FrontendDomain))
-	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.FrontendDomain))
+	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.WebDomain))
+	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.WebDomain))
 
 	var CORSBlockMiddleware []fiber.Handler
-	if c.FrontendDomain != "" {
+	if c.WebDomain != "" {
 		CORSBlockMiddleware = []fiber.Handler{originMiddleware, refererMiddleware}
 	}
 
@@ -135,7 +141,7 @@ func AddRouters(
 	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))
 	private.Delete("/access-tokens", req.JSON, addMetrics(h.DeletePersonalAccessToken))
 
-	if c.FrontendDomain != "" {
+	if c.WebDomain != "" {
 		CORSBlockMiddleware = []fiber.Handler{originMiddleware}
 	}
 
@@ -147,7 +153,7 @@ func AddRouters(
 	app.Use("/static/", filesystem.New(filesystem.Config{
 		PathPrefix: "static",
 		Root:       http.FS(frontend.StaticFS),
-		MaxAge:     timex.OneWeekSec,
+		MaxAge:     gtime.OneWeekSec,
 	}))
 
 	// default 404 Handler, all router should be added before this router

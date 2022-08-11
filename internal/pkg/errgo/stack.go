@@ -12,25 +12,44 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package logger
+package errgo
 
 import (
-	"path/filepath"
+	"fmt"
 	"runtime"
-	"strings"
-
-	"go.uber.org/zap/zapcore"
 )
 
-func getCallerEncoder() zapcore.CallerEncoder {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		return zapcore.FullCallerEncoder
-	}
+const unknownText = "(unknown)"
 
-	prefix := filepath.ToSlash(filepath.Join(file, "../../../..")) + "/"
+// stack represents a stack of program counters.
+type stack []uintptr
 
-	return func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(strings.TrimPrefix(caller.String(), prefix))
+func (s stack) Format(st fmt.State, verb rune) {
+	if verb == 'v' && st.Flag('+') {
+		for _, pc := range s {
+			st.Write([]byte("\n"))
+			frame(pc).Format(st, 'v')
+		}
 	}
+}
+
+func toFrames(s []uintptr) []frame {
+	f := make([]frame, len(s))
+	for i, u := range s {
+		f[i] = frame(u)
+	}
+	return f
+}
+
+func callers() stack {
+	const depth = 16
+	var pcs [depth]uintptr
+	n := runtime.Callers(3, pcs[:])
+	var st stack = pcs[0:n]
+	return st
+}
+
+type encodeToJSONError struct {
+	Message string  `json:"msg"`
+	Stace   []frame `json:"stace"`
 }

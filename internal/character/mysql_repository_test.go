@@ -21,22 +21,22 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/subject"
 )
 
-func getRepo(t *testing.T) domain.SubjectRepo {
+func getRepo(t *testing.T) domain.CharacterRepo {
 	t.Helper()
-	repo, err := subject.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
+	repo, err := character.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)
 
 	return repo
 }
 
 func TestGet(t *testing.T) {
-	test.RequireEnv(t, "mysql")
+	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
@@ -47,8 +47,18 @@ func TestGet(t *testing.T) {
 	require.EqualValues(t, 1, s.ID)
 }
 
+func TestMysqlRepo_Get_err_not_found(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	_, err := repo.Get(context.Background(), 10000)
+	require.ErrorIs(t, err, domain.ErrCharacterNotFound)
+}
+
 func TestMysqlRepo_GetByIDs(t *testing.T) {
-	test.RequireEnv(t, "mysql")
+	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
@@ -63,4 +73,34 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 	_, ok = s[2]
 	require.True(t, ok)
 	require.EqualValues(t, 2, s[2].ID)
+}
+
+func TestMysqlRepo_GetPersonRelated(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	c, err := repo.GetPersonRelated(context.TODO(), 1)
+	require.NoError(t, err)
+
+	require.Len(t, c, 272)
+}
+
+func TestMysqlRepo_GetSubjectRelated(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	c, err := repo.GetSubjectRelated(context.TODO(), 8)
+	require.NoError(t, err)
+
+	require.Len(t, c, 3)
+	require.Equal(t,
+		[]domain.SubjectCharacterRelation{
+			{TypeID: 0x1, SubjectID: 0x8, CharacterID: 0x1},
+			{TypeID: 0x1, SubjectID: 0x8, CharacterID: 0x2},
+			{TypeID: 0x1, SubjectID: 0x8, CharacterID: 0x3},
+		},
+		c,
+	)
 }

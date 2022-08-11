@@ -32,7 +32,9 @@ import (
 
 func GetQuery(tb testing.TB) *query.Query {
 	tb.Helper()
-	db, err := newGorm(tb, config.NewAppConfig())
+	cfg, err := config.NewAppConfig()
+	require.NoError(tb, err)
+	db, err := newGorm(tb, cfg)
 	require.NoError(tb, err)
 
 	return query.Use(db)
@@ -40,7 +42,9 @@ func GetQuery(tb testing.TB) *query.Query {
 
 func GetGorm(tb testing.TB) *gorm.DB {
 	tb.Helper()
-	db, err := newGorm(tb, config.NewAppConfig())
+	cfg, err := config.NewAppConfig()
+	require.NoError(tb, err)
+	db, err := newGorm(tb, cfg)
 	require.NoError(tb, err)
 
 	return db

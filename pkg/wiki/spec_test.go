@@ -15,7 +15,6 @@
 package wiki_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -82,7 +81,7 @@ func TestAgainstInvalidSpec(t *testing.T) {
 	t.Parallel()
 	checkSubmodule(t)
 	var caseRoot = filepath.Join(testRoot, "invalid")
-	files, err := ioutil.ReadDir(caseRoot)
+	files, err := os.ReadDir(caseRoot)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +103,7 @@ func TestAgainstValidSpec(t *testing.T) {
 	t.Parallel()
 	checkSubmodule(t)
 	var caseRoot = filepath.Join(testRoot, "valid")
-	files, err := ioutil.ReadDir(caseRoot)
+	files, err := os.ReadDir(caseRoot)
 	if err != nil {
 		t.Fatal(err)
 	}

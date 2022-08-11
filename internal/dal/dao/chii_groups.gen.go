@@ -24,7 +24,7 @@ type Group struct {
 	Description    string        `gorm:"column:grp_desc;type:text;not null"`
 	LastPostedTime uint32        `gorm:"column:grp_lastpost;type:int(10) unsigned;not null"` // 目前永远是0
 	CreatedTime    uint32        `gorm:"column:grp_builddate;type:int(10) unsigned;not null"`
-	Accessible     bool          `gorm:"column:grp_accessible;type:tinyint(1);not null;default:1"` // 可访问性
+	Accessible     uint8         `gorm:"column:grp_accessible;type:tinyint(1);not null;default:1"` // 可访问性
 	Nsfw           bool          `gorm:"column:grp_nsfw;type:tinyint(1) unsigned;not null"`
 }
 

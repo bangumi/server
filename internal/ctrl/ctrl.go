@@ -19,6 +19,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/cache"
+	"github.com/bangumi/server/internal/dal"
+	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/domain"
 )
 
@@ -32,11 +34,16 @@ func New(
 	metric tally.Scope,
 	user domain.UserRepo,
 	topic domain.TopicRepo,
+	tx dal.Transaction,
+	dam dam.Dam,
 	log *zap.Logger,
 ) Ctrl {
 	return Ctrl{
 		log:   log.Named("app.query"),
 		cache: cache,
+
+		tx:  tx,
+		dam: dam,
 
 		user:       user,
 		topic:      topic,
@@ -60,6 +67,9 @@ func New(
 type Ctrl struct {
 	log   *zap.Logger
 	cache cache.Cache
+
+	tx  dal.Transaction
+	dam dam.Dam
 
 	user                  domain.UserRepo
 	topic                 domain.TopicRepo

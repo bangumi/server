@@ -12,20 +12,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//nolint:goerr113
-package errgo_test
+package metrics
 
 import (
-	"errors"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/globocom/go-redis-prometheus"
+	"github.com/go-redis/redis/v8"
 )
 
-func TestWrap(t *testing.T) {
-	t.Parallel()
-	err := errors.New("raw")
-	require.Equal(t, "wrap: raw", errgo.Wrap(err, "wrap").Error())
+func RedisHook() redis.Hook {
+	return redisprom.NewHook(
+		redisprom.WithNamespace("chii"),
+		redisprom.WithDurationBuckets([]float64{.001, .005, .01, .05, .1}),
+	)
 }

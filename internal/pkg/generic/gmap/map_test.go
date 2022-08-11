@@ -12,47 +12,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package errgo
+package gmap_test
 
-// Wrap add context to error message.
-func Wrap(err error, msg string) error {
-	if err == nil {
-		return nil
-	}
+import (
+	"testing"
 
-	return &wrapError{msg: msg, err: err}
-}
+	"github.com/stretchr/testify/require"
 
-func Msg(err error, msg string) error {
-	if err == nil {
-		return nil
-	}
+	"github.com/bangumi/server/internal/pkg/generic/gmap"
+)
 
-	return &msgError{msg: msg, err: err}
-}
+func TestHas(t *testing.T) {
+	t.Parallel()
 
-type wrapError struct {
-	err error
-	msg string
-}
-
-func (e *wrapError) Error() string {
-	return e.msg + ": " + e.err.Error()
-}
-
-func (e *wrapError) Unwrap() error {
-	return e.err
-}
-
-type msgError struct {
-	err error
-	msg string
-}
-
-func (e *msgError) Error() string {
-	return e.msg
-}
-
-func (e *msgError) Unwrap() error {
-	return e.err
+	require.False(t, gmap.Has(map[string]int{}, ""))
+	require.True(t, gmap.Has(map[string]int{"q": 1}, "q"))
 }

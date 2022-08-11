@@ -16,19 +16,18 @@ package wiki
 
 import (
 	"errors"
+	"fmt"
 	"strings"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 var (
 	ErrWikiSyntax         = errors.New("invalid wiki syntax")
-	ErrGlobalPrefix       = errgo.Wrap(ErrWikiSyntax, "missing prefix '{{Infobox' at the start")
-	ErrGlobalSuffix       = errgo.Wrap(ErrWikiSyntax, "missing '}}' at the end")
-	ErrArrayNoClose       = errgo.Wrap(ErrWikiSyntax, "array should be closed by '}'")
-	ErrArrayItemWrapped   = errgo.Wrap(ErrWikiSyntax, "array item should be wrapped by '[]'")
-	ErrExpectingNewField  = errgo.Wrap(ErrWikiSyntax, "missing '|' to start a new field")
-	ErrExpectingSignEqual = errgo.Wrap(ErrWikiSyntax, "missing '=' to separate field name and value")
+	ErrGlobalPrefix       = fmt.Errorf("%w: missing prefix '{{Infobox' at the start", ErrWikiSyntax)
+	ErrGlobalSuffix       = fmt.Errorf("%w: missing '}}' at the end", ErrWikiSyntax)
+	ErrArrayNoClose       = fmt.Errorf("%w: array should be closed by '}'", ErrWikiSyntax)
+	ErrArrayItemWrapped   = fmt.Errorf("%w: array item should be wrapped by '[]'", ErrWikiSyntax)
+	ErrExpectingNewField  = fmt.Errorf("%w: missing '|' to start a new field", ErrWikiSyntax)
+	ErrExpectingSignEqual = fmt.Errorf("%w: missing '=' to separate field name and value", ErrWikiSyntax)
 )
 
 // ParseOmitError try to parse a string as wiki, omitting error.
@@ -177,9 +176,10 @@ func readType(s string) string {
 }
 
 // read whole line as an array item, spaces are trimmed.
-//   readArrayItem("[简体中文名|鲁鲁修]") => "简体中文名", "鲁鲁修", nil
-//   readArrayItem("[简体中文名|]") => "简体中文名", "", nil
-//   readArrayItem("[鲁鲁修]") => "", "鲁鲁修", nil
+//
+//	readArrayItem("[简体中文名|鲁鲁修]") => "简体中文名", "鲁鲁修", nil
+//	readArrayItem("[简体中文名|]") => "简体中文名", "", nil
+//	readArrayItem("[鲁鲁修]") => "", "鲁鲁修", nil
 func readArrayItem(line string) (string, string, error) {
 	if line[0] != '[' || line[len(line)-1] != ']' {
 		return "", "", ErrArrayItemWrapped
@@ -196,8 +196,9 @@ func readArrayItem(line string) (string, string, error) {
 }
 
 // read line without leading '|' as key value pair, spaces are trimmed.
-//   readStartLine("播放日期 = 2017年4月16日") => 播放日期, 2017年4月16日, nil
-//   readStartLine("播放日期 = ") => 播放日期, "", nil
+//
+//	readStartLine("播放日期 = 2017年4月16日") => 播放日期, 2017年4月16日, nil
+//	readStartLine("播放日期 = ") => 播放日期, "", nil
 func readStartLine(line string) (string, string, error) {
 	i := strings.IndexByte(line, '=')
 	if i == -1 {

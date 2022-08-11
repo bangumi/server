@@ -17,9 +17,13 @@ package collection
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
+	"gorm.io/gen"
+	"gorm.io/gen/field"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/internal/dal/query"
@@ -44,6 +48,10 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
+func (r mysqlRepo) WithQuery(query *query.Query) domain.CollectionRepo {
+	return mysqlRepo{q: query, log: r.log}
+}
+
 func (r mysqlRepo) CountSubjectCollections(
 	ctx context.Context,
 	userID model.UserID,
@@ -63,7 +71,7 @@ func (r mysqlRepo) CountSubjectCollections(
 	}
 
 	if !showPrivate {
-		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
+		q = q.Where(r.q.SubjectCollection.Private.Eq(uint8(model.CollectPrivacyNone)))
 	}
 
 	c, err := q.Count()
@@ -95,7 +103,7 @@ func (r mysqlRepo) ListSubjectCollection(
 	}
 
 	if !showPrivate {
-		q = q.Where(r.q.SubjectCollection.Private.Eq(model.CollectPrivacyNone))
+		q = q.Where(r.q.SubjectCollection.Private.Eq(uint8(model.CollectPrivacyNone)))
 	}
 
 	collections, err := q.Find()
@@ -116,7 +124,7 @@ func (r mysqlRepo) ListSubjectCollection(
 			EpStatus:    c.EpStatus,
 			VolStatus:   c.VolStatus,
 			Type:        model.SubjectCollection(c.Type),
-			Private:     c.Private != model.CollectPrivacyNone,
+			Private:     model.CollectPrivacy(c.Private) != model.CollectPrivacyNone,
 		}
 	}
 
@@ -147,7 +155,7 @@ func (r mysqlRepo) GetSubjectCollection(
 		EpStatus:    c.EpStatus,
 		VolStatus:   c.VolStatus,
 		Type:        model.SubjectCollection(c.Type),
-		Private:     c.Private != model.CollectPrivacyNone,
+		Private:     model.CollectPrivacy(c.Private) != model.CollectPrivacyNone,
 	}, nil
 }
 
@@ -178,4 +186,153 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 	}
 
 	return e.toModel(), nil
+}
+
+func (r mysqlRepo) UpdateSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	data domain.SubjectCollectionUpdate,
+	at time.Time,
+) error {
+	t := r.q.SubjectCollection
+	old, err := t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).First()
+	if err != nil {
+		return errgo.Wrap(err, "failed to get old collection record")
+	}
+
+	var updater = make([]field.AssignExpr, 0, 10)
+	updater = append(updater, t.UpdatedTime.Value(uint32(at.Unix())), t.LastUpdateIP.Value(data.IP))
+
+	if data.Comment.Set {
+		updater = append(updater, t.Comment.Value(data.Comment.Value), t.HasComment.Value(true))
+	}
+	if data.Tags != nil {
+		updater = append(updater, t.Tag.Value(strings.Join(data.Tags, " ")))
+	}
+	if data.EpStatus.Set {
+		updater = append(updater, t.EpStatus.Value(data.EpStatus.Value))
+	}
+	if data.VolStatus.Set {
+		updater = append(updater, t.VolStatus.Value(data.VolStatus.Value))
+	}
+	if data.Privacy.Set {
+		updater = append(updater, t.Private.Value(uint8(data.Privacy.Value)))
+	}
+	if data.Rate.Set {
+		updater = append(updater, t.Rate.Value(data.Rate.Value))
+	}
+
+	if data.Type.Set {
+		updater = append(updater, t.Type.Value(uint8(data.Type.Value)))
+		if uint8(data.Type.Value) != old.Type {
+			u, e := r.subjectCollectionUpdater(data.Type.Value, at)
+			if e != nil {
+				return e
+			}
+			updater = append(updater, u)
+		}
+	}
+
+	_, err = t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(updater...)
+	if err != nil {
+		return errgo.Wrap(err, "SubjectCollection.Update")
+	}
+
+	return nil
+}
+
+func (r mysqlRepo) subjectCollectionUpdater(t model.SubjectCollection, at time.Time) (field.AssignExpr, error) {
+	switch t {
+	case model.SubjectCollectionAll:
+		return nil, errgo.Wrap(domain.ErrInput, "can't set collection type to SubjectCollectionAll")
+	case model.SubjectCollectionWish:
+		return r.q.SubjectCollection.WishTime.Value(uint32(at.Unix())), nil
+	case model.SubjectCollectionDone:
+		return r.q.SubjectCollection.DoneTime.Value(uint32(at.Unix())), nil
+	case model.SubjectCollectionDoing:
+		return r.q.SubjectCollection.DoingTime.Value(uint32(at.Unix())), nil
+	case model.SubjectCollectionDropped:
+		return r.q.SubjectCollection.DroppedTime.Value(uint32(at.Unix())), nil
+	case model.SubjectCollectionOnHold:
+		return r.q.SubjectCollection.OnHoldTime.Value(uint32(at.Unix())), nil
+	}
+
+	return nil, errgo.Wrap(domain.ErrInput, fmt.Sprintln("invalid subject collection type", t))
+}
+
+func (r mysqlRepo) UpdateEpisodeCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	episodeIDs []model.EpisodeID,
+	collectionType model.EpisodeCollection,
+	at time.Time,
+) (model.UserSubjectEpisodesCollection, error) {
+	table := r.q.EpCollection
+	where := []gen.Condition{table.UserID.Eq(userID), table.SubjectID.Eq(subjectID)}
+
+	d, err := table.WithContext(ctx).Where(where...).First()
+	if err != nil {
+		r.log.Error("failed to get episode collection record",
+			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	e, err := deserializePhpEpStatus(d.Status)
+	if err != nil {
+		r.log.Error("failed to deserialize php-serialized bytes to go data",
+			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		return nil, err
+	}
+
+	if updated := updateMysqlEpisodeCollection(e, episodeIDs, collectionType); !updated {
+		return e.toModel(), nil
+	}
+
+	bytes, err := serializePhpEpStatus(e)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = table.WithContext(ctx).Where(where...).
+		UpdateColumnSimple(table.Status.Value(bytes), table.UpdatedTime.Value(uint32(at.Unix())))
+	if err != nil {
+		return nil, errgo.Wrap(err, "EpCollection.UpdateColumnSimple")
+	}
+
+	return e.toModel(), nil
+}
+
+func updateMysqlEpisodeCollection(
+	e mysqlEpCollection,
+	episodeIDs []model.EpisodeID,
+	collectionType model.EpisodeCollection,
+) bool {
+	var updated bool
+
+	if collectionType == model.EpisodeCollectionNone {
+		// remove episode collection
+		for _, episodeID := range episodeIDs {
+			_, ok := e[episodeID]
+			if !ok {
+				continue
+			}
+
+			delete(e, episodeID)
+			updated = true
+		}
+	} else {
+		for _, episodeID := range episodeIDs {
+			v, ok := e[episodeID]
+			if ok && v.Type == collectionType {
+				continue
+			}
+
+			e[episodeID] = mysqlEpCollectionItem{EpisodeID: episodeID, Type: collectionType}
+			updated = true
+		}
+	}
+
+	return updated
 }

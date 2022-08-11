@@ -28,8 +28,8 @@ import (
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -86,9 +86,9 @@ func TestHandler_PrivateLogout(t *testing.T) {
 
 	mockCaptcha := mocks.NewSessionManager(t)
 	mockCaptcha.EXPECT().Get(mock.Anything, "req").Return(session.Session{
-		RegTime:   time.Now().Add(-timex.OneWeek),
+		RegTime:   time.Now().Add(-gtime.OneWeek),
 		UserID:    1,
-		ExpiredAt: time.Now().Unix() + timex.OneWeekSec,
+		ExpiredAt: time.Now().Unix() + gtime.OneWeekSec,
 	}, nil)
 	mockCaptcha.EXPECT().Revoke(mock.Anything, "req").Return(nil)
 

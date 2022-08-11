@@ -20,7 +20,7 @@ NOTICE:
 	Use `UpdatedTime` and `CreatedTime` instead.
 */
 
-// nolint
+//nolint:all
 package main
 
 import (
@@ -73,7 +73,11 @@ func main() {
 
 	// reuse the database connection in Project or create a connection here
 	// if you want to use GenerateModel/GenerateModelAs, UseDB is necessary, otherwise it will panic
-	c := config.NewAppConfig()
+	c, err := config.NewAppConfig()
+	if err != nil {
+		panic("failed to read config: " + err.Error())
+	}
+
 	conn, err := driver.NewMysqlConnectionPool(c)
 	if err != nil {
 		panic(err)
@@ -179,6 +183,8 @@ func main() {
 		gen.FieldType("interest_uid", userIDTypeString),
 		gen.FieldRename("interest_uid", "UserID"),
 
+		gen.FieldRename("interest_create_ip", "CreateIP"),
+		gen.FieldRename("interest_lasttouch_ip", "LastUpdateIP"),
 		gen.FieldRename("interest_collect_dateline", "DoneTime"),
 		gen.FieldRename("interest_doing_dateline", "DoingTime"),
 		gen.FieldRename("interest_on_hold_dateline", "OnHoldTime"),
@@ -187,7 +193,8 @@ func main() {
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
 		gen.FieldRename("interest_lasttouch", "UpdatedTime"),
-		gen.FieldTrimPrefix("interest_")))
+		gen.FieldTrimPrefix("interest_"),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
 		gen.FieldTrimPrefix("idx_"),
@@ -373,6 +380,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_groups", "Group",
 		gen.FieldTrimPrefix("grp_"),
 		gen.FieldType("grp_id", groupIDTypeString),
+		gen.FieldType("grp_accessible", "uint8"),
 		gen.FieldType("grp_creator", userIDTypeString),
 		gen.FieldRename("grp_creator", "CreatorID"),
 		gen.FieldRename("grp_desc", "Description"),

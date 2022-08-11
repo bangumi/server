@@ -28,6 +28,7 @@ const (
 type EpisodeCollection uint8
 
 const (
+	EpisodeCollectionNone    EpisodeCollection = 0 // 撤消/删除
 	EpisodeCollectionAll     EpisodeCollection = 0 // 全部
 	EpisodeCollectionWish    EpisodeCollection = 1 // 想看
 	EpisodeCollectionDone    EpisodeCollection = 2 // 看过

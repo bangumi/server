@@ -74,7 +74,7 @@ func ToValuer[T driver.Valuer](in []T) []driver.Valuer {
 	return s
 }
 
-func Reduce[T any](in [][]T) []T {
+func Flat[T any](in [][]T) []T {
 	var c int
 	for _, ts := range in {
 		c += len(ts)
@@ -101,4 +101,24 @@ func UniqueUnsorted[T comparable](in []T) []T {
 	}
 
 	return out
+}
+
+func Any[T any, F func(item T) bool](in []T, fn F) bool {
+	for _, t := range in {
+		if fn(t) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func All[T any, F func(item T) bool](in []T, fn F) bool {
+	for _, t := range in {
+		if !fn(t) {
+			return false
+		}
+	}
+
+	return true
 }
