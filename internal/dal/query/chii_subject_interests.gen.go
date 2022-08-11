@@ -44,7 +44,7 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 	_subjectCollection.OnHoldTime = field.NewUint32(tableName, "interest_on_hold_dateline")
 	_subjectCollection.DroppedTime = field.NewUint32(tableName, "interest_dropped_dateline")
 	_subjectCollection.CreateIP = field.NewString(tableName, "interest_create_ip")
-	_subjectCollection.LasttouchIP = field.NewString(tableName, "interest_lasttouch_ip")
+	_subjectCollection.LastUpdateIP = field.NewString(tableName, "interest_lasttouch_ip")
 	_subjectCollection.UpdatedTime = field.NewUint32(tableName, "interest_lasttouch")
 	_subjectCollection.Private = field.NewUint8(tableName, "interest_private")
 
@@ -56,27 +56,27 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 type subjectCollection struct {
 	subjectCollectionDo subjectCollectionDo
 
-	ALL         field.Field
-	ID          field.Uint32
-	UserID      field.Field
-	SubjectID   field.Field
-	SubjectType field.Uint8
-	Rate        field.Uint8
-	Type        field.Uint8
-	HasComment  field.Bool
-	Comment     field.String
-	Tag         field.String
-	EpStatus    field.Uint32
-	VolStatus   field.Uint32
-	WishTime    field.Uint32
-	DoingTime   field.Uint32
-	DoneTime    field.Uint32
-	OnHoldTime  field.Uint32
-	DroppedTime field.Uint32
-	CreateIP    field.String
-	LasttouchIP field.String
-	UpdatedTime field.Uint32
-	Private     field.Uint8
+	ALL          field.Field
+	ID           field.Uint32
+	UserID       field.Field
+	SubjectID    field.Field
+	SubjectType  field.Uint8
+	Rate         field.Uint8
+	Type         field.Uint8
+	HasComment   field.Bool
+	Comment      field.String
+	Tag          field.String
+	EpStatus     field.Uint32
+	VolStatus    field.Uint32
+	WishTime     field.Uint32
+	DoingTime    field.Uint32
+	DoneTime     field.Uint32
+	OnHoldTime   field.Uint32
+	DroppedTime  field.Uint32
+	CreateIP     field.String
+	LastUpdateIP field.String
+	UpdatedTime  field.Uint32
+	Private      field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -110,7 +110,7 @@ func (s *subjectCollection) updateTableName(table string) *subjectCollection {
 	s.OnHoldTime = field.NewUint32(table, "interest_on_hold_dateline")
 	s.DroppedTime = field.NewUint32(table, "interest_dropped_dateline")
 	s.CreateIP = field.NewString(table, "interest_create_ip")
-	s.LasttouchIP = field.NewString(table, "interest_lasttouch_ip")
+	s.LastUpdateIP = field.NewString(table, "interest_lasttouch_ip")
 	s.UpdatedTime = field.NewUint32(table, "interest_lasttouch")
 	s.Private = field.NewUint8(table, "interest_private")
 
@@ -155,7 +155,7 @@ func (s *subjectCollection) fillFieldMap() {
 	s.fieldMap["interest_on_hold_dateline"] = s.OnHoldTime
 	s.fieldMap["interest_dropped_dateline"] = s.DroppedTime
 	s.fieldMap["interest_create_ip"] = s.CreateIP
-	s.fieldMap["interest_lasttouch_ip"] = s.LasttouchIP
+	s.fieldMap["interest_lasttouch_ip"] = s.LastUpdateIP
 	s.fieldMap["interest_lasttouch"] = s.UpdatedTime
 	s.fieldMap["interest_private"] = s.Private
 }

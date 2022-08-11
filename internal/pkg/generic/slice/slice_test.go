@@ -57,3 +57,27 @@ func TestReduce(t *testing.T) {
 		{6},
 	}))
 }
+
+func TestAll(t *testing.T) {
+	t.Parallel()
+
+	require.True(t, slice.All([]int{1, 2, 3, 3, 6}, func(i int) bool {
+		return true
+	}))
+
+	require.False(t, slice.All([]int{0, 1, 2, 3, 4}, func(i int) bool {
+		return []bool{0: true, 1: false}[i]
+	}))
+}
+
+func TestAny(t *testing.T) {
+	t.Parallel()
+
+	require.False(t, slice.Any([]int{1, 2, 3, 3, 6}, func(i int) bool {
+		return false
+	}))
+
+	require.True(t, slice.Any([]int{0, 1, 2, 3, 4}, func(i int) bool {
+		return []bool{0: true}[i]
+	}))
+}

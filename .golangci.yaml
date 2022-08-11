@@ -98,7 +98,7 @@ linters-settings:
 
   gocyclo:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 10
+    min-complexity: 15
 
   godot:
     # comments to be checked: `declarations`, `toplevel`, or `all`
@@ -255,7 +255,9 @@ linters-settings:
       - "func github.com/bangumi/server/internal/web/res.JSON("
       - "func (github.com/bangumi/server/internal/web/handler/common.Common)."
       - "func (*github.com/bangumi/server/internal/dal/query.Query).Transaction("
+      - "func (github.com/bangumi/server/internal/dal.Transaction).Transaction("
     ignoreSigRegexps:
+      - 'func \(github.com/bangumi/server/internal/web/req\..*\)\.Validate\('
       - 'func github.com/bangumi/server/internal/web/req\.Parse.*\('
 
   nlreturn:

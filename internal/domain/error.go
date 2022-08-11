@@ -29,3 +29,5 @@ var ErrCharacterNotFound = errgo.MsgNoTrace(ErrNotFound, "character not found")
 var ErrEpisodeNotFound = errgo.MsgNoTrace(ErrNotFound, "episode not found")
 var ErrUserNotFound = errgo.MsgNoTrace(ErrNotFound, "user not found")
 var ErrSubjectNotCollected = errgo.MsgNoTrace(ErrNotFound, "subject is not collected by user")
+
+var ErrInput = errors.New("input not valid")

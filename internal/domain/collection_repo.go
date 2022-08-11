@@ -16,11 +16,16 @@ package domain
 
 import (
 	"context"
+	"time"
 
+	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
 type CollectionRepo interface {
+	// WithQuery is used to replace repo's query to txn
+	WithQuery(query *query.Query) CollectionRepo
 	CountSubjectCollections(
 		ctx context.Context,
 		userID model.UserID,
@@ -45,4 +50,28 @@ type CollectionRepo interface {
 	GetSubjectEpisodesCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 	) (model.UserSubjectEpisodesCollection, error)
+
+	UpdateSubjectCollection(
+		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data SubjectCollectionUpdate,
+		at time.Time,
+	) error
+
+	UpdateEpisodeCollection(
+		ctx context.Context,
+		userID model.UserID, subjectID model.SubjectID,
+		episodeIDs []model.EpisodeID, collection model.EpisodeCollection,
+		at time.Time,
+	) (model.UserSubjectEpisodesCollection, error)
+}
+
+type SubjectCollectionUpdate struct {
+	IP string
+
+	Comment   null.String
+	Tags      []string // nil 表示无数据，[]string{} 表示清空tag
+	VolStatus null.Uint32
+	EpStatus  null.Uint32
+	Type      null.Null[model.SubjectCollection]
+	Rate      null.Uint8
+	Privacy   null.Null[model.CollectPrivacy]
 }

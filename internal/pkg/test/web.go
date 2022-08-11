@@ -32,6 +32,7 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/dal"
+	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -65,6 +66,7 @@ type Mock struct {
 	RateLimiter    rate.Manager
 	OAuthManager   oauth.Manager
 	HTTPMock       *httpmock.MockTransport
+	Dam            *dam.Dam
 }
 
 //nolint:funlen
@@ -83,6 +85,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 		fx.Provide(func() tally.Scope { return tally.NoopScope }),
 		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}), fx.As(new(promreporter.Reporter)))),
+		fx.Provide(func() dal.Transaction { return dal.NoopTransaction{} }),
 
 		fx.Supply(httpClient),
 
@@ -110,9 +113,32 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
 		fx.Provide(func() domain.CollectionRepo { return m.CollectionRepo }),
 
+		// this will transform t.FailNow()
+		// to panic
+		// until https://github.com/gofiber/fiber/issues/1996
+		fx.Invoke(func(app *fiber.App) {
+			app.Use(func(c *fiber.Ctx) error {
+				var returned bool
+				defer func() {
+					if !returned {
+						panic("t.FailNow() called in handler")
+					}
+				}()
+
+				err := c.Next()
+				returned = true
+				return err
+			})
+		}),
 		fx.Invoke(web.AddRouters),
 
 		fx.Populate(&f),
+	}
+
+	if m.Dam != nil {
+		options = append(options, fx.Supply(*m.Dam))
+	} else {
+		options = append(options, fx.Provide(dam.New))
 	}
 
 	if m.Cache == nil {
