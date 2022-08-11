@@ -45,9 +45,9 @@ func (f frame) src() (string, string, int) {
 
 // Format formats the frame according to the fmt.Formatter interface.
 //
-//    %s    function name and source file
-//    %v    function name, path.Base(source file) and line
-//    %+v    function name, source file and line
+//	%s    function name and source file
+//	%v    function name, path.Base(source file) and line
+//	%+v    function name, source file and line
 func (f frame) Format(s fmt.State, verb rune) {
 	name, file, line := f.src()
 	switch verb {

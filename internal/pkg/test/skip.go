@@ -28,10 +28,11 @@ const EnvExternalHTTP = "http" // external http server like hCaptcha
 const TreeHoleAccessToken = "a_development_access_token"
 
 // RequireEnv
-//  func TestGet(t *testing.T) {
-//    RequireEnv(t, test.EnvRedis, test.EnvMysql)
-//    ...
-//  }
+//
+//	func TestGet(t *testing.T) {
+//	  RequireEnv(t, test.EnvRedis, test.EnvMysql)
+//	  ...
+//	}
 func RequireEnv(tb testing.TB, envs ...string) {
 	tb.Helper()
 	for _, env := range envs {

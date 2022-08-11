@@ -33,7 +33,7 @@ func New() fiber.Handler {
 	// Set default config
 	log := logger.Named("http.recovery")
 	// Return new handler
-	return func(c *fiber.Ctx) (err error) { //nolint:nonamedreturns
+	return func(c *fiber.Ctx) (err error) {
 		defer func() {
 			if r := recover(); r != nil {
 				log.Error("recovery", zap.Any("recovery", r))

@@ -41,6 +41,7 @@ import (
 )
 
 // AddRouters add all router and default 404 Handler to app.
+//
 //nolint:funlen
 func AddRouters(
 	app *fiber.App,

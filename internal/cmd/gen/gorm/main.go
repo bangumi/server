@@ -20,7 +20,7 @@ NOTICE:
 	Use `UpdatedTime` and `CreatedTime` instead.
 */
 
-// nolint
+//nolint:all
 package main
 
 import (
@@ -380,6 +380,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_groups", "Group",
 		gen.FieldTrimPrefix("grp_"),
 		gen.FieldType("grp_id", groupIDTypeString),
+		gen.FieldType("grp_accessible", "uint8"),
 		gen.FieldType("grp_creator", userIDTypeString),
 		gen.FieldRename("grp_creator", "CreatorID"),
 		gen.FieldRename("grp_desc", "Description"),

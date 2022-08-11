@@ -18,21 +18,43 @@ import (
 	"context"
 	"testing"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/web/rate"
+	"github.com/bangumi/server/internal/web/rate/action"
 )
 
-func TestManager_Allowed(t *testing.T) { //nolint:paralleltest
+func flushDB(t *testing.T, db *redis.Client) {
+	t.Helper()
+	test.RunAndCleanup(t, func() { require.NoError(t, db.FlushDB(context.Background()).Err()) })
+}
+
+//nolint:paralleltest
+func TestRateLimitManager_action(t *testing.T) {
+	test.RequireEnv(t, "redis")
+	db := test.GetRedis(t)
+	flushDB(t, db)
+
+	const uid model.UserID = 6
+	r := rate.New(db)
+
+	allowed, remain, err := r.AllowAction(context.TODO(), uid, action.Unknown, rate.PerHour(10))
+	require.NoError(t, err)
+	require.True(t, allowed)
+	require.EqualValues(t, 9, remain)
+}
+
+//nolint:paralleltest
+func TestRateLimitManager_Allowed(t *testing.T) {
 	test.RequireEnv(t, "redis")
 
 	db := test.GetRedis(t)
+	flushDB(t, db)
 
 	const ip = "0.0.0.-0"
-
-	require.NoError(t, db.FlushDB(context.Background()).Err())
-	t.Cleanup(func() { db.FlushDB(context.Background()) })
 
 	a, err := db.Exists(context.TODO(), rate.RedisRateKeyPrefix+ip).Result()
 	require.NoError(t, err)
@@ -44,32 +66,32 @@ func TestManager_Allowed(t *testing.T) { //nolint:paralleltest
 
 	rateLimiter := rate.New(db)
 
-	allowed, remain, err := rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err := rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 4, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 3, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 2, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 1, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.True(t, allowed)
 	require.Equal(t, 0, remain)
 
-	allowed, remain, err = rateLimiter.Allowed(context.TODO(), ip)
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
 	require.NoError(t, err)
 	require.False(t, allowed)
 	require.Equal(t, 0, remain)

@@ -12,8 +12,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//nolint:gochecknoglobals
 // Package vars provide some pre-defined variable from old codebase.
+//
+//nolint:gochecknoglobals
 package vars
 
 import (

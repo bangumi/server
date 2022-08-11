@@ -12,38 +12,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package action
 
-type Episode struct {
-	Airdate     string
-	Name        string
-	NameCN      string
-	Duration    string
-	Description string
-	Ep          float32
-	SubjectID   SubjectID
-	Sort        float32
-	Comment     uint32
-	ID          EpisodeID
-	Type        EpType
-	Disc        uint8
-}
-
-func (e Episode) Less(o Episode) bool {
-	if e.Type == o.Type {
-		return e.Sort <= o.Sort
-	}
-
-	return e.Type <= o.Type
-}
-
-type EpType = uint8
+type Action uint8
 
 const (
-	EpTypeNormal  EpType = 0
-	EpTypeSpecial EpType = 1
-	EpTypeOpening EpType = 2
-	EpTypeEnding  EpType = 3
-	EpTypeMad     EpType = 4
-	EpTypeOther   EpType = 6
+	Unknown Action = 0
+	Login   Action = 1
 )

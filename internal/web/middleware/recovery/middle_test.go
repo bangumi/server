@@ -35,7 +35,7 @@ func TestPanicMiddleware(t *testing.T) {
 		panic("errInternal")
 	})
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 
 	resp, err := app.Test(req)
 	require.Nil(t, err, "panic should be caught")

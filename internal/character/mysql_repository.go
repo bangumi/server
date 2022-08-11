@@ -42,14 +42,14 @@ func (r mysqlRepo) Get(ctx context.Context, id model.CharacterID) (model.Charact
 	s, err := r.q.Character.WithContext(ctx).Preload(r.q.Character.Fields).Where(r.q.Character.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Character{}, domain.ErrNotFound
+			return model.Character{}, domain.ErrCharacterNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.Character{}, errgo.Wrap(err, "dal")
 	}
 
-	return ConvertDao(s), nil
+	return convertDao(s), nil
 }
 
 func (r mysqlRepo) GetByIDs(
@@ -64,7 +64,7 @@ func (r mysqlRepo) GetByIDs(
 
 	var results = make(map[model.CharacterID]model.Character, len(records))
 	for _, s := range records {
-		results[s.ID] = ConvertDao(s)
+		results[s.ID] = convertDao(s)
 	}
 
 	return results, nil
@@ -117,7 +117,7 @@ func (r mysqlRepo) GetSubjectRelated(
 	return rel, nil
 }
 
-func ConvertDao(s *dao.Character) model.Character {
+func convertDao(s *dao.Character) model.Character {
 	return model.Character{
 		ID:           s.ID,
 		Name:         s.Name,
