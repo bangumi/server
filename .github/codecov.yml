@@ -6,7 +6,3 @@ ignore:
   - "internal/mocks/"
   - "internal/cmd/"
   - "internal/pkg/test/"
-
-coverage:
-  status:
-    patch: off
