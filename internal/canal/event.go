@@ -53,11 +53,11 @@ func eventManager(
 	session session.Manager,
 ) *event.Manager {
 	e := event.NewManager("chii")
-	// e.On(EventSubjectCreate, event.ListenerFunc(func(e event.Event) error {
-	// 	id := GetSubjectEventPayload(e)
-	// 	fmt.Println(e.Name(), id)
-	// 	return nil
-	// }))
+	e.On("subject.*", event.ListenerFunc(func(e event.Event) error {
+		id := GetSubjectEventPayload(e)
+		logger.Debug("subject change event", log.SubjectID(id))
+		return nil
+	}))
 
 	logger = logger.Named("event")
 	e.On(EventUserChangePassword, event.ListenerFunc(func(e event.Event) error {

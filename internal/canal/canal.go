@@ -274,7 +274,6 @@ func (h *BinlogHandler) userRow(e *canal.RowsEvent) error {
 	case canal.UpdateAction:
 
 	default:
-		h.log.Debug("ignore user change on insert and delete", zap.String("action", e.Action))
 		return nil
 	}
 
