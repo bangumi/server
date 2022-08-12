@@ -51,9 +51,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    env:
-      IMAGE: "bangumi/chii-archive"
-
     steps:
       - uses: actions/checkout@v3
 
