@@ -54,7 +54,15 @@ jobs:
         with:
           go-version: "1.19"
 
-      - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
+      - name: Go Build Cache (build)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg
+          key: go-cache-119-${{ hashFiles('**/go.sum') }}-build
+          restore-keys: |
+            go-cache-119-${{ hashFiles('**/go.sum') }}-
 
       - name: Install Task
         uses: arduino/setup-task@v1
