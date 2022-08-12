@@ -33,7 +33,7 @@ type AppConfig struct {
 	MySQLHost           string `yaml:"mysql_host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
 	MySQLPort           string `yaml:"mysql_port" env:"MYSQL_PORT" env-default:"3306"`
 	MySQLUserName       string `yaml:"mysql_user" env:"MYSQL_USER" env-default:"user"`
-	MySQLBinlogServerID int    `yaml:"mysql_slave_id" env:"MYSQL_SLAVE_ID" env-default:"4"`
+	MySQLBinlogServerID uint32 `yaml:"mysql_slave_id" env:"MYSQL_SLAVE_ID" env-default:"4"`
 	MySQLPassword       string `yaml:"mysql_pass" env:"MYSQL_PASS" env-default:"password"`
 	MySQLDatabase       string `yaml:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
 	MySQLMaxConn        int    `yaml:"mysql_max_connection" env:"MYSQL_MAX_CONNECTION" env-default:"4"`

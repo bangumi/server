@@ -43,7 +43,7 @@ type savedPosition struct {
 func NewEventHandler(appConfig config.AppConfig, r cache.Cache) (*MyEventHandler, error) {
 	cfg := canal.NewDefaultConfig()
 	cfg.Dump.ExecutionPath = "" // disable dump
-	cfg.ServerID = 4
+	cfg.ServerID = appConfig.MySQLBinlogServerID
 	cfg.Addr = fmt.Sprintf("%s:%s", appConfig.MySQLHost, appConfig.MySQLPort)
 	cfg.User = appConfig.MySQLUserName
 	cfg.Password = appConfig.MySQLPassword
