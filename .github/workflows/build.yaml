@@ -67,6 +67,8 @@ jobs:
       - name: Install Task
         uses: arduino/setup-task@v1
 
+      - run: go get ./...
+
       - run: task ${{ matrix.task }}
         name: Build Binary
 
