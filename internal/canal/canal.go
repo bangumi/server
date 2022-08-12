@@ -86,7 +86,13 @@ func New() (*BinlogHandler, error) {
 
 	return h, nil
 }
-func NewEventHandler(appConfig config.AppConfig, log *zap.Logger, e *event.Manager, r cache.Cache) (*BinlogHandler, error) {
+
+func NewEventHandler(
+	appConfig config.AppConfig,
+	log *zap.Logger,
+	e *event.Manager,
+	r cache.Cache,
+) (*BinlogHandler, error) {
 	cfg := canal.NewDefaultConfig()
 	cfg.Dump.ExecutionPath = "" // disable dump
 	cfg.ServerID = appConfig.MySQLBinlogServerID
@@ -113,12 +119,12 @@ func NewEventHandler(appConfig config.AppConfig, log *zap.Logger, e *event.Manag
 
 type BinlogHandler struct {
 	canal.DummyEventHandler
-	log   *zap.Logger
 	r     cache.Cache
-	pos   atomic.Value // savedPosition
+	pos   atomic.Value
+	log   *zap.Logger
 	c     *canal.Canal
-	saved mysql.Position
 	e     *event.Manager
+	saved mysql.Position
 }
 
 func (h *BinlogHandler) OnRotate(e *replication.RotateEvent) error {

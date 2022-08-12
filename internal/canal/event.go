@@ -16,7 +16,6 @@ package canal
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/gookit/event"
 	"go.uber.org/zap"
@@ -38,7 +37,7 @@ func NewUserChangePassword(userID model.UserID) event.Event {
 }
 
 func GetUserChangePasswordEventPayload(e event.Event) model.UserID {
-	return e.Data()["user_id"].(model.UserID)
+	return e.Data()["user_id"].(model.UserID) //nolint:forcetypeassert
 }
 
 func NewSubjectEvent(name string, subjectID model.SubjectID) event.Event {
@@ -46,7 +45,7 @@ func NewSubjectEvent(name string, subjectID model.SubjectID) event.Event {
 }
 
 func GetSubjectEventPayload(e event.Event) model.SubjectID {
-	return e.Data()["subject_id"].(model.SubjectID)
+	return e.Data()["subject_id"].(model.SubjectID) //nolint:forcetypeassert
 }
 
 func eventManager(
@@ -63,7 +62,7 @@ func eventManager(
 	logger = logger.Named("event")
 	e.On(EventUserChangePassword, event.ListenerFunc(func(e event.Event) error {
 		id := GetUserChangePasswordEventPayload(e)
-		fmt.Println(e.Name(), id)
+		logger.Info("user change password", log.UserID(id))
 		err := session.RevokeUser(context.Background(), id)
 		if err != nil {
 			logger.Error("failed to revoke user", log.UserID(id), zap.Error(err))
