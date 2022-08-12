@@ -50,7 +50,7 @@ func NewEventHandler(appConfig config.AppConfig, r cache.Cache) (*MyEventHandler
 
 	c, err := canal.NewCanal(cfg)
 	if err != nil {
-		return nil, err
+		return nil, errgo.Wrap(err, "canal.NewCanal")
 	}
 
 	h := &MyEventHandler{
@@ -67,17 +67,12 @@ func NewEventHandler(appConfig config.AppConfig, r cache.Cache) (*MyEventHandler
 
 type MyEventHandler struct {
 	canal.DummyEventHandler
-
-	c *canal.Canal
-
+	r             cache.Cache
+	pos           atomic.Value // savedPosition
+	c             *canal.Canal
 	subjectUpdate chan model.SubjectID
 	subjectDelete chan model.SubjectID
-
-	r cache.Cache
-
-	saved mysql.Position
-
-	pos atomic.Value // savedPosition
+	saved         mysql.Position
 }
 
 func (h *MyEventHandler) OnRotate(e *replication.RotateEvent) error {
