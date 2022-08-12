@@ -108,8 +108,6 @@ func AddRouters(
 	v0.Get("/revisions/characters/:id", addMetrics(h.GetCharacterRevision))
 	v0.Get("/revisions/characters", addMetrics(h.ListCharacterRevision))
 
-	app.Post("/_private/revoke", req.JSON, addMetrics(h.RevokeSession))
-
 	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.WebDomain))
 	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.WebDomain))
 

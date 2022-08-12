@@ -20,10 +20,6 @@ type UserLogin struct {
 	HCaptchaResponse string `json:"h-captcha-response" validate:"required"` //nolint:tagliatelle
 }
 
-type RevokeSession struct {
-	UID uint32 `validate:"required,gt=0" json:"uid"`
-}
-
 type CreatePersonalAccessToken struct {
 	Name         string `json:"name"`
 	DurationDays uint   `json:"duration_days" validate:"required,lte=365" validateName:"有效期"`

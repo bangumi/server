@@ -117,6 +117,10 @@ func (m manager) RevokeUser(ctx context.Context, id model.UserID) error {
 		return errgo.Wrap(err, "repo.Revoke")
 	}
 
+	if len(keys) == 0 {
+		return nil
+	}
+
 	for i, key := range keys {
 		keys[i] = redisKeyPrefix + key
 	}
