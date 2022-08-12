@@ -45,8 +45,6 @@ jobs:
             image: bangumi/chii-canal
             dockerfile: etc/canal.Dockerfile
 
-        job: ["archive", "canal"]
-
     name: "docker-${{ matrix.job }}"
 
     runs-on: ubuntu-latest
