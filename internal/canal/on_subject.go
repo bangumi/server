@@ -12,14 +12,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package main
+package canal
 
 import (
-	"github.com/bangumi/server/internal/canal"
+	"fmt"
 )
 
-func main() {
-	if err := canal.Main(); err != nil {
-		panic(err)
+func (h *MyEventHandler) OnSubjectUpdate() {
+	for id := range h.subjectUpdate {
+		fmt.Printf("updated subject %d\n", id)
+	}
+}
+
+func (h *MyEventHandler) OnSubjectDelete() {
+	for id := range h.subjectDelete {
+		fmt.Printf("deleted subject %d\n", id)
 	}
 }
