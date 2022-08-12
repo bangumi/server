@@ -31,15 +31,12 @@ jobs:
         include:
           - job: web
             task: "build"
-            image: bangumi/chii
             dockerfile: etc/Dockerfile
           - job: archive
             task: "build-archive"
-            image: bangumi/chii-cmd-archive
             dockerfile: etc/archive.Dockerfile
           - job: canal
             task: "build-canal"
-            image: bangumi/chii-canal
             dockerfile: etc/canal.Dockerfile
 
     name: "${{ matrix.job }}"
@@ -77,4 +74,3 @@ jobs:
         with:
           context: ./
           file: ${{ matrix.dockerfile }}
-          tags: ghcr.io/${{ matrix.image }}:latest,ghcr.io/${{ matrix.image }}:${{env.TAG}}
