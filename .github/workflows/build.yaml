@@ -25,7 +25,7 @@ on:
       - "etc/Dockerfile"
 
 jobs:
-  build:
+  web:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -54,3 +54,63 @@ jobs:
         run: task build
 
       - run: docker build -f etc/Dockerfile .
+
+  arvhice:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.19"
+
+      - name: Go Build Cache (build)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg
+          key: go-cache-119-${{ hashFiles('**/go.sum') }}-build
+          restore-keys: |
+            go-cache-119-${{ hashFiles('**/go.sum') }}-
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+
+      - run: go get ./...
+
+      - name: Build
+        run: task build-archive
+
+      - run: docker build -f etc/archive.Dockerfile .
+
+  canal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.19"
+
+      - name: Go Build Cache (build)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg
+          key: go-cache-119-${{ hashFiles('**/go.sum') }}-build
+          restore-keys: |
+            go-cache-119-${{ hashFiles('**/go.sum') }}-
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+
+      - run: go get ./...
+
+      - name: Build
+        run: task build-canal
+
+      - run: docker build -f etc/canal.Dockerfile .
