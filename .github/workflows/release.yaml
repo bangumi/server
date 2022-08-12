@@ -103,6 +103,47 @@ jobs:
           file: etc/archive.Dockerfile
           tags: ghcr.io/${{ env.IMAGE }}:latest,ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
 
+  docker-cmd-canal:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE: "bangumi/chii-canal"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.19"
+
+      - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+
+      - run: task build-canal
+
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: ./
+          file: etc/archive.Dockerfile
+          tags: ghcr.io/${{ env.IMAGE }}:latest,ghcr.io/${{ env.IMAGE }}:${{env.TAG}}
+
   openapi-v0:
     runs-on: ubuntu-latest
     steps:
