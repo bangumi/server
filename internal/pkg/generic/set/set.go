@@ -34,12 +34,6 @@ func FromSlice[T comparable](in []T) Set[T] {
 	return s
 }
 
-func NewSized[T comparable](size int) Set[T] {
-	return Set[T]{
-		m: make(map[T]empty, size),
-	}
-}
-
 func New[T comparable]() Set[T] {
 	return Set[T]{
 		m: map[T]empty{},
