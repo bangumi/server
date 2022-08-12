@@ -25,8 +25,29 @@ on:
       - "etc/Dockerfile"
 
 jobs:
-  web:
+  components:
+    strategy:
+      matrix:
+        include:
+          - job: web
+            task: "build"
+            image: bangumi/chii
+            dockerfile: etc/Dockerfile
+          - job: archive
+            task: "build-archive"
+            image: bangumi/chii-cmd-archive
+            dockerfile: etc/archive.Dockerfile
+          - job: canal
+            task: "build-canal"
+            image: bangumi/chii-canal
+            dockerfile: etc/canal.Dockerfile
+
+        job: ["archive", "canal"]
+
+    name: "docker-${{ matrix.job }}"
+
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -35,82 +56,16 @@ jobs:
         with:
           go-version: "1.19"
 
-      - name: Go Build Cache (build)
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg
-          key: go-cache-119-${{ hashFiles('**/go.sum') }}-build
-          restore-keys: |
-            go-cache-119-${{ hashFiles('**/go.sum') }}-
+      - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
       - name: Install Task
         uses: arduino/setup-task@v1
 
-      - run: go get ./...
+      - run: task ${{ matrix.task }}
 
-      - name: Build
-        run: task build
-
-      - run: docker build -f etc/Dockerfile .
-
-  arvhice:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Go
-        uses: actions/setup-go@v3
+      - name: Build and push
+        uses: docker/build-push-action@v3
         with:
-          go-version: "1.19"
-
-      - name: Go Build Cache (build)
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg
-          key: go-cache-119-${{ hashFiles('**/go.sum') }}-build
-          restore-keys: |
-            go-cache-119-${{ hashFiles('**/go.sum') }}-
-
-      - name: Install Task
-        uses: arduino/setup-task@v1
-
-      - run: go get ./...
-
-      - name: Build
-        run: task build-archive
-
-      - run: docker build -f etc/archive.Dockerfile .
-
-  canal:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: "1.19"
-
-      - name: Go Build Cache (build)
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg
-          key: go-cache-119-${{ hashFiles('**/go.sum') }}-build
-          restore-keys: |
-            go-cache-119-${{ hashFiles('**/go.sum') }}-
-
-      - name: Install Task
-        uses: arduino/setup-task@v1
-
-      - run: go get ./...
-
-      - name: Build
-        run: task build-canal
-
-      - run: docker build -f etc/canal.Dockerfile .
+          context: ./
+          file: ${{ matrix.dockerfile }}
+          tags: ghcr.io/${{ matrix.image }}:latest,ghcr.io/${{ matrix.image }}:${{env.TAG}}
