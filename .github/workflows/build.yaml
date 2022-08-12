@@ -60,8 +60,9 @@ jobs:
         uses: arduino/setup-task@v1
 
       - run: task ${{ matrix.task }}
+        name: Build Binary
 
-      - name: Build and push
+      - name: Build Docker
         uses: docker/build-push-action@v3
         with:
           context: ./

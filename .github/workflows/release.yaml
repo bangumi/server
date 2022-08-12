@@ -63,6 +63,7 @@ jobs:
         uses: arduino/setup-task@v1
 
       - run: task ${{ matrix.task }}
+        name: Build Binary
 
       - uses: docker/login-action@v2
         with:
