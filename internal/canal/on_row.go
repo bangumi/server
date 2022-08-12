@@ -32,9 +32,6 @@ func (h *EventHandler) OnRow(e *canal.RowsEvent) error {
 		replication.UPDATE_ROWS_EVENTv2,
 		replication.DELETE_ROWS_EVENTv2:
 	default:
-		// 按照 mysql 的文档，这些事件都是旧版才会有的，我们用的5.7版本只有v2
-		// https://dev.mysql.com/doc/internals/en/rows-event.html
-		h.log.Warn("unexpected event type", zap.Stringer("event_type", e.Header.EventType))
 		return nil
 	}
 
