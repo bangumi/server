@@ -279,6 +279,10 @@ func (h *BinlogHandler) userRow(e *canal.RowsEvent) error {
 	}
 
 	idColumn := e.Table.FindColumn("uid")
+	if idColumn < 0 {
+		h.log.Error("unexpected column index", zap.Int("index", idColumn))
+		return nil
+	}
 
 	column := e.Table.FindColumn("password_crypt")
 	if column < 0 {
