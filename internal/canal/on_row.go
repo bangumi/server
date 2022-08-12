@@ -15,18 +15,29 @@
 package canal
 
 import (
-	"fmt"
-	"os"
 	"reflect"
 	"time"
 
 	"github.com/go-mysql-org/go-mysql/canal"
 	"github.com/go-mysql-org/go-mysql/replication"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/generic/pool"
 )
 
-func (h *MyEventHandler) OnRow(e *canal.RowsEvent) error {
+func (h *EventHandler) OnRow(e *canal.RowsEvent) error {
+	switch e.Header.EventType {
+	case replication.WRITE_ROWS_EVENTv2,
+		replication.UPDATE_ROWS_EVENTv2,
+		replication.DELETE_ROWS_EVENTv2:
+	default:
+		// 按照 mysql 的文档，这些事件都是旧版才会有的，我们用的5.7版本只有v2
+		// https://dev.mysql.com/doc/internals/en/rows-event.html
+		h.log.Warn("unexpected event type", zap.Stringer("event_type", e.Header.EventType))
+		return nil
+	}
+
 	switch e.Table.Name {
 	case "chii_subjects":
 		err := h.onSubjectRow(e)
@@ -42,78 +53,61 @@ func (h *MyEventHandler) OnRow(e *canal.RowsEvent) error {
 		return nil
 	}
 
-	fmt.Println(e.Header.LogPos)
 	h.updatePos()
 
 	return nil
 }
 
-func (h *MyEventHandler) updatePos() {
+func (h *EventHandler) updatePos() {
 	h.pos.Store(savedPosition{
 		Pos:  h.c.SyncedPosition(),
 		Time: time.Now().Unix(),
 	})
 }
 
-func (h *MyEventHandler) onSubjectRow(e *canal.RowsEvent) error {
-	for _, row := range e.Rows {
-		for i, c := range row {
-			if e.Table.Columns[i].Name == "id" {
-				sid := model.SubjectID(reflect.ValueOf(c).Uint())
-				fmt.Println("on subject row", sid)
-				switch e.Action {
-				case canal.DeleteAction:
-					h.subjectDelete <- sid
-				case canal.InsertAction, canal.UpdateAction:
-					h.subjectUpdate <- sid
-				default:
-					panic("unexpected action " + e.Action)
-				}
-				break
-			}
-		}
-	}
-
-	return nil
+func (h *EventHandler) onSubjectRow(e *canal.RowsEvent) error {
+	const idColumn = "subject_id"
+	return h.subjectEventHandler(e, idColumn)
 }
 
-func (h *MyEventHandler) onSubjectFieldRow(e *canal.RowsEvent) error {
-	fmt.Println(e.Action)
-	fmt.Println(e.Table)
-	fmt.Println(e.Header)
-	e.Header.Dump(os.Stdout)
-	fmt.Println(len(e.Rows))
+func (h *EventHandler) onSubjectFieldRow(e *canal.RowsEvent) error {
+	const idColumn = "field_sid"
+	return h.subjectEventHandler(e, idColumn)
+}
 
-	switch e.Header.EventType {
-	case replication.DELETE_ROWS_EVENTv0:
-	case replication.DELETE_ROWS_EVENTv1:
-	case replication.DELETE_ROWS_EVENTv2:
+var idPool = pool.New(func() []model.SubjectID {
+	return make([]model.SubjectID, 0, 3)
+})
 
-	case replication.UPDATE_ROWS_EVENTv0:
-	case replication.UPDATE_ROWS_EVENTv1:
-	case replication.UPDATE_ROWS_EVENTv2:
+func (h *EventHandler) subjectEventHandler(e *canal.RowsEvent, idColumn string) error {
+	ids := idPool.Get()
+	defer func() {
+		idPool.Put(ids[:0])
+	}()
 
-	case replication.WRITE_ROWS_EVENTv0:
-	case replication.WRITE_ROWS_EVENTv1:
-	case replication.WRITE_ROWS_EVENTv2:
+	for i, column := range e.Table.Columns {
+		if column.Name == idColumn {
+			for _, row := range e.Rows {
+				c := row[i]
+				sid := model.SubjectID(reflect.ValueOf(c).Uint())
+				ids = append(ids, sid)
+			}
+			break
+		}
 	}
 
-	for _, row := range e.Rows {
-		for i, c := range row {
-			if e.Table.Columns[i].Name == "field_sid" {
-				sid := model.SubjectID(reflect.ValueOf(c).Uint())
-				fmt.Println("on subject field row", sid)
-				switch e.Action {
-				case canal.DeleteAction:
-					h.subjectDelete <- sid
-				case canal.InsertAction, canal.UpdateAction:
-					h.subjectUpdate <- sid
-				default:
-					panic("unexpected action " + e.Action)
-				}
-				break
-			}
+	switch len(ids) {
+	case 1:
+		h.subjectUpdate <- ids[0]
+	case 2:
+		if ids[0] == ids[1] {
+			h.subjectUpdate <- ids[0]
+		} else {
+			h.subjectDelete <- ids[0]
+			h.subjectUpdate <- ids[1]
 		}
+	default:
+		h.log.Warn("unexpected id length", zap.Int("len", len(ids)))
 	}
 
 	return nil

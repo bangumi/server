@@ -40,7 +40,7 @@ type savedPosition struct {
 	Time int64
 }
 
-func NewEventHandler(appConfig config.AppConfig, r cache.Cache) (*MyEventHandler, error) {
+func NewEventHandler(appConfig config.AppConfig, log *zap.Logger, r cache.Cache) (*EventHandler, error) {
 	cfg := canal.NewDefaultConfig()
 	cfg.Dump.ExecutionPath = "" // disable dump
 	cfg.ServerID = appConfig.MySQLBinlogServerID
@@ -53,8 +53,9 @@ func NewEventHandler(appConfig config.AppConfig, r cache.Cache) (*MyEventHandler
 		return nil, errgo.Wrap(err, "canal.NewCanal")
 	}
 
-	h := &MyEventHandler{
+	h := &EventHandler{
 		c:             c,
+		log:           log.Named("EventHandler"),
 		r:             r,
 		subjectUpdate: make(chan model.SubjectID),
 		subjectDelete: make(chan model.SubjectID),
@@ -65,8 +66,9 @@ func NewEventHandler(appConfig config.AppConfig, r cache.Cache) (*MyEventHandler
 	return h, nil
 }
 
-type MyEventHandler struct {
+type EventHandler struct {
 	canal.DummyEventHandler
+	log           *zap.Logger
 	r             cache.Cache
 	pos           atomic.Value // savedPosition
 	c             *canal.Canal
@@ -75,7 +77,7 @@ type MyEventHandler struct {
 	saved         mysql.Position
 }
 
-func (h *MyEventHandler) OnRotate(e *replication.RotateEvent) error {
+func (h *EventHandler) OnRotate(e *replication.RotateEvent) error {
 	h.pos.Store(savedPosition{
 		Pos: mysql.Position{
 			Name: string(e.NextLogName),
@@ -87,34 +89,34 @@ func (h *MyEventHandler) OnRotate(e *replication.RotateEvent) error {
 	return nil
 }
 
-func (h *MyEventHandler) SavePosToRedis() {
+func (h *EventHandler) SavePosToRedis() {
 	// save to redis
 	for {
 		time.Sleep(5 * time.Second)
 		i := h.pos.Load()
 		if i != nil {
-			pos := i.(savedPosition)
+			pos := i.(savedPosition) //nolint:forcetypeassert
 			if pos.Pos != h.saved {
 				if err := h.r.Set(context.TODO(), redisSaveKey, pos, gtime.OneDay); err != nil {
 					logger.Error("failed to save canal binlog position", zap.Error(err))
 					continue
 				}
-				fmt.Println("save binlog Pos to redis")
+				h.log.Info("save binlog Pos to redis")
 				h.saved = pos.Pos
 			}
 		}
 	}
 }
 
-func (h *MyEventHandler) String() string {
+func (h *EventHandler) String() string {
 	return "MyEventHandler"
 }
 
-func (h *MyEventHandler) Run() error {
+func (h *EventHandler) Run() error {
 	go h.OnSubjectUpdate()
 	go h.OnSubjectDelete()
 	go h.SavePosToRedis()
-	return h.c.Run()
+	return errgo.Wrap(h.c.Run(), "canal.Run")
 }
 
 const redisSaveKey = "canal-mysql-binlog-Pos"
@@ -129,8 +131,8 @@ func Main() error {
 	return h.Run()
 }
 
-func New() (*MyEventHandler, error) {
-	var h *MyEventHandler
+func New() (*EventHandler, error) {
+	var h *EventHandler
 
 	err := fx.New(
 		logger.FxLogger(),

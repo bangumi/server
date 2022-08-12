@@ -18,13 +18,13 @@ import (
 	"fmt"
 )
 
-func (h *MyEventHandler) OnSubjectUpdate() {
+func (h *EventHandler) OnSubjectUpdate() {
 	for id := range h.subjectUpdate {
 		fmt.Printf("updated subject %d\n", id)
 	}
 }
 
-func (h *MyEventHandler) OnSubjectDelete() {
+func (h *EventHandler) OnSubjectDelete() {
 	for id := range h.subjectDelete {
 		fmt.Printf("deleted subject %d\n", id)
 	}
