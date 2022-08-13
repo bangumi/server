@@ -15,34 +15,36 @@
 package canal
 
 import (
-	"sort"
-	"strings"
-
 	"github.com/goccy/go-json"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-func OnSubjectChange(key json.RawMessage, payload payload) {
+func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) {
 	switch payload.Op {
-	case opCreate:
-	case opReplace:
-		// fmt.Println(payload.After)
-	case opDelete:
-		// fmt.Println(payload.Before)
+	case opCreate, opReplace, opDelete:
+		return
 	case opUpdate:
 		var diff = make([]string, 0, len(payload.After))
-		for key, value := range payload.Before {
-			if string(payload.After[key]) != string(value) {
-				diff = append(diff, key)
+		for k, v := range payload.Before {
+			if string(payload.After[k]) != string(v) {
+				diff = append(diff, k)
 			}
 		}
-		sort.Slice(diff, func(i, j int) bool {
-			return strings.Compare(diff[i], diff[j]) > 0
-		})
+
+		if slice.Contain(diff, "password_crypt") {
+			var k UserKey
+			if err := json.UnmarshalNoEscape(key, &k); err != nil {
+				e.log.Error("failed to unmarshal json", zap.Error(err))
+				return
+			}
+			e.OnUserPasswordChange(k.ID)
+		}
 	}
 }
 
-type SubjectPayload struct {
-	ID model.SubjectID `json:"subject_id"`
+type UserKey struct {
+	ID model.UserID `json:"uid"`
 }

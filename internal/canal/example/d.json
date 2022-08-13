@@ -1,0 +1,313 @@
+{
+  "schema": {
+    "type": "struct",
+    "fields": [
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "idx_id"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 0,
+            "field": "idx_type"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "idx_title"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "idx_desc"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0,
+            "field": "idx_replies"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0,
+            "field": "idx_subject_total"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0,
+            "field": "idx_collects"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "idx_stats"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "idx_dateline"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "idx_lasttouch"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "idx_uid"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 0,
+            "field": "idx_ban"
+          }
+        ],
+        "optional": true,
+        "name": "chii.bangumi.chii_index.Value",
+        "field": "before"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "idx_id"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 0,
+            "field": "idx_type"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "idx_title"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "idx_desc"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0,
+            "field": "idx_replies"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0,
+            "field": "idx_subject_total"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0,
+            "field": "idx_collects"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "idx_stats"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "idx_dateline"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "idx_lasttouch"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "idx_uid"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 0,
+            "field": "idx_ban"
+          }
+        ],
+        "optional": true,
+        "name": "chii.bangumi.chii_index.Value",
+        "field": "after"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "version"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "connector"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "name"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "ts_ms"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "name": "io.debezium.data.Enum",
+            "version": 1,
+            "parameters": {
+              "allowed": "true,last,false,incremental"
+            },
+            "default": "false",
+            "field": "snapshot"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "db"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "sequence"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "table"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "server_id"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "gtid"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "file"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "pos"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "row"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "field": "thread"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "query"
+          }
+        ],
+        "optional": false,
+        "name": "io.debezium.connector.mysql.Source",
+        "field": "source"
+      },
+      {
+        "type": "string",
+        "optional": false,
+        "field": "op"
+      },
+      {
+        "type": "int64",
+        "optional": true,
+        "field": "ts_ms"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "total_order"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "data_collection_order"
+          }
+        ],
+        "optional": true,
+        "field": "transaction"
+      }
+    ],
+    "optional": false,
+    "name": "chii.bangumi.chii_index.Envelope"
+  },
+  "payload": {
+    "before": {
+      "idx_id": 15466,
+      "idx_type": 0,
+      "idx_title": "1",
+      "idx_desc": "2",
+      "idx_replies": 3,
+      "idx_subject_total": 4,
+      "idx_collects": 5,
+      "idx_stats": "6",
+      "idx_dateline": 1,
+      "idx_lasttouch": 4,
+      "idx_uid": 4,
+      "idx_ban": 4
+    },
+    "after": null,
+    "source": {
+      "version": "1.9.5.Final",
+      "connector": "mysql",
+      "name": "chii",
+      "ts_ms": 1660329303000,
+      "snapshot": "false",
+      "db": "bangumi",
+      "sequence": null,
+      "table": "chii_index",
+      "server_id": 1,
+      "gtid": null,
+      "file": "mysql-bin.000003",
+      "pos": 221371,
+      "row": 0,
+      "thread": 907,
+      "query": null
+    },
+    "op": "d",
+    "ts_ms": 1660329303235,
+    "transaction": null
+  }
+}

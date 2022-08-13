@@ -32,19 +32,6 @@ import (
 	"github.com/bangumi/server/internal/web/session"
 )
 
-func (h Handler) RevokeSession(c *fiber.Ctx) error {
-	var r req.RevokeSession
-	if err := json.UnmarshalNoEscape(c.Body(), r); err != nil {
-		return res.JSONError(c, err)
-	}
-
-	if err := h.Common.V.Struct(r); err != nil {
-		return h.ValidationError(c, err)
-	}
-
-	return c.JSON("session revoked")
-}
-
 func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	var r req.UserLogin
 	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {

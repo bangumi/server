@@ -256,6 +256,7 @@ linters-settings:
       - "func (github.com/bangumi/server/internal/web/handler/common.Common)."
       - "func (*github.com/bangumi/server/internal/dal/query.Query).Transaction("
       - "func (github.com/bangumi/server/internal/dal.Transaction).Transaction("
+      - "func (*golang.org/x/sync/errgroup.Group).Wait()"
     ignoreSigRegexps:
       - 'func \(github.com/bangumi/server/internal/web/req\..*\)\.Validate\('
       - 'func github.com/bangumi/server/internal/web/req\.Parse.*\('
@@ -314,6 +315,7 @@ linters:
     - rowserrcheck
     - noctx
     - nilerr
+    - nosnakecase # false positive for variable and const defined in other lib
 
   fast: false
 

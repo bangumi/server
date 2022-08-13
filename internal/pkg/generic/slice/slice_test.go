@@ -81,3 +81,13 @@ func TestAny(t *testing.T) {
 		return []bool{0: true}[i]
 	}))
 }
+
+func TestContain(t *testing.T) {
+	t.Parallel()
+
+	require.False(t, slice.Contain([]int{1, 0, 0, 0}, 2))
+
+	require.True(t, slice.Contain([]int{1, 0, 0, 0}, 1))
+
+	require.True(t, slice.Contain([]int{1, 2, 3, 4}, 4))
+}
