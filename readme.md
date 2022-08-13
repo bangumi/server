@@ -63,7 +63,7 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 ## 后端构架
 
 ```mermaid
-flowchart TD
+flowchart LR
   Users --> Cloudflare --> Old
 
   subgraph Old[old server]
@@ -73,7 +73,7 @@ flowchart TD
 
 
   nginx ---> |转发api.bgm.tv/v0/的请求| Nginx(nginx on new server);
-  CloudFlare --> |next.bgm.tv 直接解析到新服务器|Nginx;
+  Cloudflare --> |next.bgm.tv 直接解析到新服务器|Nginx;
 ```
 
 ```mermaid
