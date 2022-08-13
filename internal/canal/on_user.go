@@ -34,7 +34,7 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) {
 			}
 		}
 
-		if slice.Contains(diff, "password_crypt") {
+		if slice.Contain(diff, "password_crypt") {
 			var k UserKey
 			if err := json.UnmarshalNoEscape(key, &k); err != nil {
 				e.log.Error("failed to unmarshal json", zap.Error(err))
