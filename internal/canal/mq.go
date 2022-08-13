@@ -18,9 +18,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sync"
 
 	"github.com/segmentio/kafka-go"
+	"golang.org/x/sync/errgroup"
+
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 type streamReader struct {
@@ -34,17 +36,14 @@ func Main() error {
 		return err
 	}
 
-	var wg sync.WaitGroup
+	var eg errgroup.Group
 
 	for _, readerCfg := range []streamReader{
 		{Topic: "chii.bangumi.chii_subjects", handler: OnSubjectChange},
 		{Topic: "chii.bangumi.chii_members", handler: e.OnUserChange},
 	} {
 		readerCfg := readerCfg
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
+		eg.Go(func() error {
 			reader := kafka.NewReader(kafka.ReaderConfig{
 				Brokers:     []string{broker1Address},
 				GroupID:     "my-group",
@@ -56,7 +55,7 @@ func Main() error {
 			for {
 				msg, err := reader.ReadMessage(context.Background())
 				if err != nil {
-					break
+					return errgo.Wrap(err, "reader.ReadMessage")
 				}
 
 				if len(msg.Value) == 0 {
@@ -81,12 +80,10 @@ func Main() error {
 
 				readerCfg.handler(k.Payload, v.Payload)
 			}
-		}()
-
+		})
 	}
 
-	wg.Wait()
-	return nil
+	return eg.Wait()
 }
 
 const (
