@@ -122,3 +122,13 @@ func All[T any, F func(item T) bool](in []T, fn F) bool {
 
 	return true
 }
+
+func Contain[T comparable](s []T, item T) bool {
+	for _, t := range s {
+		if t == item {
+			return true
+		}
+	}
+
+	return false
+}

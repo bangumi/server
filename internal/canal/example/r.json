@@ -1,0 +1,331 @@
+{
+  "schema": {
+    "type": "struct",
+    "fields": [
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "grp_id"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0.0,
+            "field": "grp_cat"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "grp_name"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "grp_title"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "grp_icon"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0.0,
+            "field": "grp_creator"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0.0,
+            "field": "grp_topics"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0.0,
+            "field": "grp_posts"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 1.0,
+            "field": "grp_members"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "grp_desc"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "grp_lastpost"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "grp_builddate"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 1.0,
+            "field": "grp_accessible"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "field": "grp_nsfw"
+          }
+        ],
+        "optional": true,
+        "name": "chii.bangumi.chii_groups.Value",
+        "field": "before"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "grp_id"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0.0,
+            "field": "grp_cat"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "grp_name"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "grp_title"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "grp_icon"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0.0,
+            "field": "grp_creator"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0.0,
+            "field": "grp_topics"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 0.0,
+            "field": "grp_posts"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "default": 1.0,
+            "field": "grp_members"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "grp_desc"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "grp_lastpost"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "grp_builddate"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 1.0,
+            "field": "grp_accessible"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "field": "grp_nsfw"
+          }
+        ],
+        "optional": true,
+        "name": "chii.bangumi.chii_groups.Value",
+        "field": "after"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "version"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "connector"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "name"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "ts_ms"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "name": "io.debezium.data.Enum",
+            "version": 1.0,
+            "parameters": {
+              "allowed": "true,last,false,incremental"
+            },
+            "default": "false",
+            "field": "snapshot"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "db"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "sequence"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "table"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "server_id"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "gtid"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "file"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "pos"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "row"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "field": "thread"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "query"
+          }
+        ],
+        "optional": false,
+        "name": "io.debezium.connector.mysql.Source",
+        "field": "source"
+      },
+      {
+        "type": "string",
+        "optional": false,
+        "field": "op"
+      },
+      {
+        "type": "int64",
+        "optional": true,
+        "field": "ts_ms"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "total_order"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "data_collection_order"
+          }
+        ],
+        "optional": true,
+        "field": "transaction"
+      }
+    ],
+    "optional": false,
+    "name": "chii.bangumi.chii_groups.Envelope"
+  },
+  "payload": {
+    "after": {
+      "grp_id": 11.0,
+      "grp_cat": 0.0,
+      "grp_name": "a",
+      "grp_title": "～技术宅真可怕～",
+      "grp_icon": "000/00/00/11.jpg",
+      "grp_creator": 64.0,
+      "grp_topics": 3919.0,
+      "grp_posts": 0.0,
+      "grp_members": 9452.0,
+      "grp_desc": "本小组欢迎对各种技术有一定了解的人，\r\n比如像橘花热衷杀人技术……\r\n\r\n不过、本组主要谈论ＰＣ软硬件方面，\r\n想了解相关知识，结识可怕的技术宅，请进。",
+      "grp_lastpost": 0.0,
+      "grp_builddate": 1.217542289e9,
+      "grp_accessible": 1.0,
+      "grp_nsfw": 0.0
+    },
+    "source": {
+      "version": "1.9.5.Final",
+      "connector": "mysql",
+      "name": "chii",
+      "ts_ms": 1.660327799437e12,
+      "snapshot": "true",
+      "db": "bangumi",
+      "table": "chii_groups",
+      "server_id": 0.0,
+      "file": "mysql-bin.000003",
+      "pos": 220378.0,
+      "row": 0.0
+    },
+    "op": "r",
+    "ts_ms": 1.660327799437e12
+  }
+}

@@ -24,7 +24,7 @@ tasks:
       CGO_ENABLED: "0"
 
   build-archive:
-    desc: Build Web Server Binary
+    desc: Build archive binary
     sources:
       - ./**/*.go
       - go.mod
@@ -32,6 +32,18 @@ tasks:
       - ./dist/archive.exe
     cmds:
       - go build -trimpath -o ./dist/archive.exe ./internal/cmd/archive/
+    env:
+      CGO_ENABLED: "0"
+
+  build-canal:
+    desc: Build canal binary
+    sources:
+      - ./**/*.go
+      - go.mod
+    generates:
+      - ./dist/canal.exe
+    cmds:
+      - go build -trimpath -o ./dist/canal.exe ./internal/cmd/canal/
     env:
       CGO_ENABLED: "0"
 

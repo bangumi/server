@@ -25,8 +25,24 @@ on:
       - "etc/Dockerfile"
 
 jobs:
-  build:
+  components:
+    strategy:
+      matrix:
+        include:
+          - job: web
+            task: "build"
+            dockerfile: etc/Dockerfile
+          - job: archive
+            task: "build-archive"
+            dockerfile: etc/archive.Dockerfile
+          - job: canal
+            task: "build-canal"
+            dockerfile: etc/canal.Dockerfile
+
+    name: "${{ matrix.job }}"
+
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -50,7 +66,11 @@ jobs:
 
       - run: go get ./...
 
-      - name: Build
-        run: task build
+      - run: task ${{ matrix.task }}
+        name: Build Binary
 
-      - run: docker build -f etc/Dockerfile .
+      - name: Build Docker
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          file: ${{ matrix.dockerfile }}

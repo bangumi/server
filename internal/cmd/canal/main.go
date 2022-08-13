@@ -12,19 +12,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package req
+package main
 
-type UserLogin struct {
-	Email            string `json:"email" validate:"required,email"`
-	Password         string `json:"password" validate:"required"`
-	HCaptchaResponse string `json:"h-captcha-response" validate:"required"` //nolint:tagliatelle
-}
+import (
+	"github.com/bangumi/server/internal/canal"
+)
 
-type CreatePersonalAccessToken struct {
-	Name         string `json:"name"`
-	DurationDays uint   `json:"duration_days" validate:"required,lte=365" validateName:"有效期"`
-}
-
-type DeletePersonalAccessToken struct {
-	ID uint32 `json:"id" validate:"required"`
+func main() {
+	if err := canal.Main(); err != nil {
+		panic(err)
+	}
 }
