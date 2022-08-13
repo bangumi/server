@@ -18,12 +18,17 @@ package canal
 import (
 	"context"
 	"encoding/json"
+	"io"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/segmentio/kafka-go"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 type streamReader struct {
@@ -32,17 +37,50 @@ type streamReader struct {
 }
 
 func Main() error {
-	cfg, err := config.NewAppConfig()
-	if err != nil {
-		return errgo.Wrap(err, "config.NewAppConfig")
-	}
-
-	e, err := getEventHandler()
+	var eg errgroup.Group
+	closers, err := startReaders(&eg)
 	if err != nil {
 		return err
 	}
 
-	var eg errgroup.Group
+	shutdown := make(chan int)
+	sigChan := make(chan os.Signal, 1)
+	// register for interrupt (Ctrl+C) and SIGTERM (docker)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-sigChan
+		logger.Info("receive signal, shutdown")
+		for _, closer := range closers {
+			closer.Close()
+		}
+		shutdown <- 1
+	}()
+
+	errChan := make(chan error)
+	go func() {
+		errChan <- eg.Wait()
+	}()
+
+	select {
+	case err := <-errChan:
+		return err
+	case <-shutdown:
+		return nil
+	}
+}
+
+func startReaders(eg *errgroup.Group) ([]io.Closer, error) {
+	cfg, err := config.NewAppConfig()
+	if err != nil {
+		return nil, errgo.Wrap(err, "config.NewAppConfig")
+	}
+
+	e, err := getEventHandler()
+	if err != nil {
+		return nil, err
+	}
+
+	var closers = make([]io.Closer, 0)
 
 	for _, readerCfg := range []streamReader{
 		{Topic: "chii.bangumi.chii_subjects", handler: OnSubjectChange},
@@ -56,6 +94,8 @@ func Main() error {
 				GroupTopics: nil,
 				Topic:       readerCfg.Topic,
 			})
+
+			closers = append(closers, reader)
 
 			for {
 				msg, err := reader.ReadMessage(context.Background())
@@ -84,7 +124,7 @@ func Main() error {
 		})
 	}
 
-	return eg.Wait()
+	return closers, nil
 }
 
 const (
