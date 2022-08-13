@@ -64,16 +64,12 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 ```mermaid
 graph TD
-    A[Nginx] -->|HTTP Request| B[chii web]
-
-    mysql[新旧站公用的数据库] --> |binlog| kafka --> chii-canal
-
+    Nginx -->|HTTP Request| B[chii web]
+    mysql --> |binlog| kafka --> C[chii canal]
     B --> mysql
-    B --> redis
-
-    chii-canal --> redis
-
-    chii-canal --> mysql
+    B --> |缓存|redis
+    C --> |删除过期缓存| redis
+    C --> |清除数据, 如过期的session| mysql
 ```
 
 ### 贡献指南
