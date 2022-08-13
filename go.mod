@@ -6,7 +6,6 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/elliotchance/phpserialize v1.3.3
 	github.com/globocom/go-redis-prometheus v0.4.0
-	github.com/go-mysql-org/go-mysql v1.6.0
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.0
@@ -17,12 +16,12 @@ require (
 	github.com/goccy/go-json v0.9.10
 	github.com/gofiber/adaptor/v2 v2.1.24
 	github.com/gofiber/fiber/v2 v2.36.0
-	github.com/gookit/event v1.0.6
 	github.com/ilyakaznacheev/cleanenv v1.3.0
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/mattn/go-colorable v0.1.12
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.12.2
+	github.com/segmentio/kafka-go v0.4.34
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
 	github.com/trim21/go-phpserialize v0.0.15
@@ -63,17 +62,13 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
-	github.com/pingcap/errors v0.11.5-0.20201126102027-b0a155152ca3 // indirect
-	github.com/pingcap/log v0.0.0-20210317133921-96f4fcab92a4 // indirect
-	github.com/pingcap/parser v0.0.0-20210415081931-48e7f467fd74 // indirect
+	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
-	github.com/siddontang/go v0.0.0-20180604090527-bdc77568d726 // indirect
-	github.com/siddontang/go-log v0.0.0-20180807004314-8d05993dda07 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
@@ -89,7 +84,6 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.11 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gorm.io/datatypes v1.0.7 // indirect
 	gorm.io/hints v1.1.0 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect

@@ -19,64 +19,83 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/gookit/event"
+	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/cache"
+	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/dal"
+	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/driver"
+	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/session"
 )
 
-const (
-	EventUserChangePassword = "user-change-password" // 用户在旧站修改密码，吊销全部 session
-	EventSubjectCreate      = "subject.create"
-	EventSubjectUpdate      = "subject.update"
-	EventSubjectDelete      = "subject.delete"
-)
-
-func NewUserChangePassword(userID model.UserID) event.Event {
-	return event.NewBasic(EventUserChangePassword, event.M{"user_id": userID})
+type eventHandler struct {
+	log     *zap.Logger
+	q       *query.Query
+	session session.Manager
+	dryRun  bool
 }
 
-func GetUserChangePasswordEventPayload(e event.Event) model.UserID {
-	return e.Data()["user_id"].(model.UserID) //nolint:forcetypeassert
-}
-
-func NewSubjectEvent(name string, subjectID model.SubjectID) event.Event {
-	return event.NewBasic(name, event.M{"subject_id": subjectID})
-}
-
-func GetSubjectEventPayload(e event.Event) model.SubjectID {
-	return e.Data()["subject_id"].(model.SubjectID) //nolint:forcetypeassert
-}
-
-func eventManager(
-	logger *zap.Logger,
+func newEventHandler(
+	q *query.Query,
+	log *zap.Logger,
 	session session.Manager,
-) *event.Manager {
+) *eventHandler {
 	dryRun, _ := strconv.ParseBool(os.Getenv("DRY_RUN"))
 
-	e := event.NewManager("chii")
-	e.On("subject.*", event.ListenerFunc(func(e event.Event) error {
-		id := GetSubjectEventPayload(e)
-		logger.Debug("subject change event", log.SubjectID(id))
-		return nil
-	}))
+	return &eventHandler{
+		dryRun:  dryRun,
+		session: session,
+		q:       q,
+		log:     log.Named("eventHandler"),
+	}
+}
 
-	logger = logger.Named("event")
-	e.On(EventUserChangePassword, event.ListenerFunc(func(e event.Event) error {
-		id := GetUserChangePasswordEventPayload(e)
-		logger.Info("user change password", log.UserID(id))
-		if dryRun {
-			logger.Info("dry-run enabled, skip handler")
-			return nil
-		}
+func getEventHandler() (*eventHandler, error) {
+	var h *eventHandler
 
-		if err := session.RevokeUser(context.Background(), id); err != nil {
-			logger.Error("failed to revoke user", log.UserID(id), zap.Error(err))
-		}
-		return nil
-	}))
+	err := fx.New(
+		logger.FxLogger(),
+		config.Module,
 
-	return e
+		dal.Module,
+
+		// driver and connector
+		fx.Provide(
+			driver.NewMysqlConnectionPool, metrics.NewScope,
+			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
+
+			session.NewMysqlRepo, session.New,
+
+			newEventHandler,
+		),
+
+		fx.Populate(&h),
+	).Err()
+
+	if err != nil {
+		return nil, errgo.Wrap(err, "fx")
+	}
+
+	return h, nil
+
+}
+
+func (e *eventHandler) OnUserPasswordChange(id model.UserID) {
+	e.log.Info("user change password", log.UserID(id))
+	if e.dryRun {
+		e.log.Info("dry-run enabled, skip handler")
+		return
+	}
+
+	if err := e.session.RevokeUser(context.Background(), id); err != nil {
+		e.log.Error("failed to revoke user", log.UserID(id), zap.Error(err))
+	}
+	return
 }
