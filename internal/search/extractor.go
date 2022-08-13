@@ -11,7 +11,7 @@ import (
 func (c *Client) ExtractSubject(ctx context.Context, s *model.Subject) (Subject, error) {
 	tags := s.Tags
 
-	w, _ := wiki.Parse(s.Infobox)
+	w := wiki.ParseOmitError(s.Infobox)
 
 	rank := pageRank(s)
 	score := score(s)

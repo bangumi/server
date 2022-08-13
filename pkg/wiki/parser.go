@@ -32,7 +32,10 @@ var (
 
 // ParseOmitError try to parse a string as wiki, omitting error.
 func ParseOmitError(s string) Wiki {
-	w, _ := Parse(s)
+	w, err := Parse(s)
+	if err != nil {
+		return Wiki{}
+	}
 
 	return w
 }
