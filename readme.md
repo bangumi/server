@@ -60,6 +60,22 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 如果你不使用 docker ，请自行启动 mysql 和 redis 并导入 `bangumi/dev-env` 仓库内的数据。
 
+## 后端构架
+
+```mermaid
+graph TD
+    A[Nginx] -->|HTTP Request| B[chii web]
+
+    mysql[新旧站公用的数据库] --> |binlog| kafka --> chii-canal
+
+    B --> mysql
+    B --> redis
+
+    chii-canal --> redis
+
+    chii-canal --> mysql
+```
+
 ### 贡献指南
 
 更多的细节介绍请查看[贡献指南](./.github/contributing.md)。
