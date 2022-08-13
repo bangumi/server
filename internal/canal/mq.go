@@ -12,25 +12,31 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
+//nolint:depguard
 package canal
 
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/segmentio/kafka-go"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 type streamReader struct {
-	Topic   string
 	handler func(key json.RawMessage, payload payload)
+	Topic   string
 }
 
 func Main() error {
+	cfg, err := config.NewAppConfig()
+	if err != nil {
+		return errgo.Wrap(err, "config.NewAppConfig")
+	}
+
 	e, err := getEventHandler()
 	if err != nil {
 		return err
@@ -45,11 +51,10 @@ func Main() error {
 		readerCfg := readerCfg
 		eg.Go(func() error {
 			reader := kafka.NewReader(kafka.ReaderConfig{
-				Brokers:     []string{broker1Address},
+				Brokers:     []string{cfg.KafkaBroker},
 				GroupID:     "my-group",
 				GroupTopics: nil,
 				Topic:       readerCfg.Topic,
-				MaxBytes:    1024 * 10,
 			})
 
 			for {
@@ -66,15 +71,11 @@ func Main() error {
 
 				var k messageKey
 				if err := json.Unmarshal(msg.Key, &k); err != nil {
-					fmt.Println(err)
-					fmt.Println(string(msg.Key), string(msg.Value))
 					continue
 				}
 
 				var v messageValue
 				if err := json.Unmarshal(msg.Value, &v); err != nil {
-					fmt.Println(err)
-					fmt.Println(string(msg.Key), string(msg.Value))
 					continue
 				}
 
@@ -97,17 +98,17 @@ const (
 // Table 9. Overview of change event basic content
 
 type messageKey struct {
-	Schema struct {
+	Payload json.RawMessage `json:"payload"`
+	Schema  struct {
 		Type   string `json:"type"`
+		Name   string `json:"name"`
 		Fields []struct {
 			Type     string `json:"type"`
-			Optional bool   `json:"optional"`
 			Field    string `json:"field"`
+			Optional bool   `json:"optional"`
 		} `json:"fields"`
-		Optional bool   `json:"optional"`
-		Name     string `json:"name"`
+		Optional bool `json:"optional"`
 	} `json:"schema"`
-	Payload json.RawMessage `json:"payload"`
 }
 
 type messageValue struct {
@@ -119,7 +120,6 @@ type payload struct {
 	After  map[string]json.RawMessage `json:"after"`
 	Source source                     `json:"source"`
 	Op     string                     `json:"op"`
-	TsMs   float64                    `json:"ts_ms"`
 }
 
 type source struct {

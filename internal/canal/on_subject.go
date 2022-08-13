@@ -15,8 +15,6 @@
 package canal
 
 import (
-	"bytes"
-	"fmt"
 	"sort"
 	"strings"
 
@@ -26,32 +24,23 @@ import (
 )
 
 func OnSubjectChange(key json.RawMessage, payload payload) {
-	return
 	switch payload.Op {
 	case opCreate:
-		fmt.Println("===create===")
 	case opReplace:
-		fmt.Println("===replace===")
 		// fmt.Println(payload.After)
 	case opDelete:
-		fmt.Println("===delete===")
 		// fmt.Println(payload.Before)
 	case opUpdate:
-		fmt.Println("===update===")
 		var diff = make([]string, 0, len(payload.After))
 		for key, value := range payload.Before {
-			if !bytes.Equal(payload.After[key], value) {
+			if string(payload.After[key]) != string(value) {
 				diff = append(diff, key)
 			}
 		}
-
 		sort.Slice(diff, func(i, j int) bool {
 			return strings.Compare(diff[i], diff[j]) > 0
 		})
-
-		fmt.Println("updated fields", diff)
 	}
-	fmt.Println(string(key))
 }
 
 type SubjectPayload struct {

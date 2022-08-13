@@ -84,7 +84,6 @@ func getEventHandler() (*eventHandler, error) {
 	}
 
 	return h, nil
-
 }
 
 func (e *eventHandler) OnUserPasswordChange(id model.UserID) {
@@ -97,5 +96,4 @@ func (e *eventHandler) OnUserPasswordChange(id model.UserID) {
 	if err := e.session.RevokeUser(context.Background(), id); err != nil {
 		e.log.Error("failed to revoke user", log.UserID(id), zap.Error(err))
 	}
-	return
 }
