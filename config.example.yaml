@@ -11,9 +11,6 @@ mysql_user: user
 mysql_pass: password
 mysql_db: bangumi
 
-# 用于订阅 binlog
-mysql_slave_id: 4
-
 hcaptcha_secret_key: 0x0000000000000000000000000000000000000000
 
 debug:
