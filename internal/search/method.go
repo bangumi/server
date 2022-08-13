@@ -3,54 +3,44 @@ package search
 import (
 	"context"
 	"net/url"
-	"strconv"
+	"time"
 
-	"github.com/olivere/elastic/v7"
-	"github.com/pkg/errors"
+	"github.com/meilisearch/meilisearch-go"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func New(c config.AppConfig, db *gorm.DB) (*Client, error) {
-	u, err := url.Parse("")
-	if err != nil {
-		return nil, errors.Wrap(err, "url")
+	if _, err := url.Parse(c.MeiliSearchURL); err != nil {
+		return nil, errgo.Wrap(err, "url.Parse")
 	}
 
-	var options = []elastic.ClientOptionFunc{
-		elastic.SetSniff(false),
-		elastic.SetGzip(false),
-	}
-	if u.User != nil {
-		p, _ := u.User.Password()
-		options = append(options, elastic.SetBasicAuth(u.User.Username(), p))
-	}
+	client := meilisearch.NewClient(meilisearch.ClientConfig{
+		Host:    c.MeiliSearchURL,
+		APIKey:  "masterKey",
+		Timeout: time.Second * 5,
+	})
 
-	client, err := elastic.NewClient(options...)
-	if err != nil {
-		return nil, errors.Wrap(err, "init es client")
-	}
-
-	return &Client{es: client, db: db, subject: "subjects"}, nil
+	return &Client{search: client, db: db, subject: "subjects"}, nil
 }
 
 type Client struct {
-	es      *elastic.Client
+	search  *meilisearch.Client
 	db      *gorm.DB
 	subject string
 }
 
 // UpsertSubject add subject to search backend.
 func (c *Client) UpsertSubject(ctx context.Context, s Subject) error {
-	_, err := c.es.Update().Index(c.subject).Id(strconv.Itoa(int(s.Record.ID))).
-		DocAsUpsert(true).Doc(s).Do(ctx)
+	_, err := c.search.Index(c.subject).UpdateDocuments(s, "id")
 
-	return errors.Wrap(err, "es")
+	return errgo.Wrap(err, "search")
 }
 
 func (c *Client) DeleteSubject(ctx context.Context, id string) error {
-	_, err := c.es.Delete().Index(c.subject).Id(id).Do(ctx)
+	_, err := c.search.Index(c.subject).Delete(id)
 
-	return errors.Wrap(err, "delete")
+	return errgo.Wrap(err, "delete")
 }

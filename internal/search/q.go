@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"github.com/olivere/elastic/v7"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/search/syntax"
 )
@@ -14,7 +14,7 @@ import (
 func parse(s string) (*elastic.BoolQuery, error) {
 	r, err := syntax.Parse(s)
 	if err != nil {
-		return nil, errors.Wrap(err, "parse syntax")
+		return nil, errgo.Wrap(err, "parse syntax")
 	}
 
 	logger.Debug("parse search query", zap.String("input", s), zap.Any("result", r))

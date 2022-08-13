@@ -1,12 +1,12 @@
 package search
 
 import (
+	"runtime"
 	"strings"
 
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/meilisearch/meilisearch-go"
 	"github.com/olivere/elastic/v7"
-	"github.com/pkg/errors"
 
 	"github.com/bangumi/server/internal/model"
 )
@@ -15,11 +15,11 @@ type Query struct {
 	Q     string   `query:"q"`
 	Sort  string   `query:"sort"`
 	Since []string `query:"since"`
-	Limit int      `query:"limit"`
+	Limit int64    `query:"limit"`
 }
 
 func (c *Client) Handler() fiber.Handler {
-	es := c.es
+	search := c.search
 
 	return func(c *fiber.Ctx) error {
 		query := Query{}
@@ -37,70 +37,80 @@ func (c *Client) Handler() fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(err)
 		}
 
-		result, err := buildService(es, query, q).Do(c.Context())
-		if err != nil {
-			return errors.Wrap(err, "es")
-		}
+		runtime.KeepAlive(q)
+		runtime.KeepAlive(search)
 
-		res := Response{
-			Pagination: Pagination{Limit: query.Limit},
-			Data:       make([]resSubject, len(result.Hits.Hits)),
-		}
-
-		if len(result.Hits.Hits) > 0 {
-			res.Pagination.Since = result.Hits.Hits[len(result.Hits.Hits)-1].Sort
-		}
-
-		for i, hit := range result.Hits.Hits {
-			var source = Subject{}
-			err = json.Unmarshal(hit.Source, &source)
-			if err != nil {
-				return err
-			}
-
-			res.Data[i] = resSubject{
-				ID:     source.Record.ID,
-				Date:   source.Date,
-				Image:  source.Record.Image,
-				Name:   source.Record.Name,
-				NameCN: source.Record.NameCN,
-				Tags:   source.Record.Tags,
-				Score:  source.Record.Score,
-				Rank:   source.Record.Rank,
-			}
-		}
-
-		return c.JSON(res)
+		// result, err := buildService(search, query, q)
+		// if err != nil {
+		// 	return errgo.Wrap(err, "search")
+		// }
+		//
+		// res := Response{
+		// 	Pagination: Pagination{Limit: query.Limit},
+		// 	Data:       make([]resSubject, len(result.Hits.Hits)),
+		// }
+		//
+		// if len(result.Hits.Hits) > 0 {
+		// 	res.Pagination.Since = result.Hits.Hits[len(result.Hits.Hits)-1].Sort
+		// }
+		//
+		// for i, hit := range result.Hits.Hits {
+		// 	var source = Subject{}
+		// 	err = json.Unmarshal(hit.Source, &source)
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		//
+		// 	res.Data[i] = resSubject{
+		// 		ID:     source.Record.ID,
+		// 		Date:   source.Date,
+		// 		Image:  source.Record.Image,
+		// 		Name:   source.Record.Name,
+		// 		NameCN: source.Record.NameCN,
+		// 		Tags:   source.Record.Tags,
+		// 		Score:  source.Record.Score,
+		// 		Rank:   source.Record.Rank,
+		// 	}
+		// }
+		//
+		// return c.JSON(res)
+		return nil
 	}
 }
 
-func buildService(es *elastic.Client, query Query, q *elastic.BoolQuery) *elastic.SearchService {
+func buildService(es *meilisearch.Client, query Query, q *elastic.BoolQuery) *meilisearch.SearchResponse {
 	if query.Limit == 0 {
 		query.Limit = 10
 	} else if query.Limit > 50 {
 		query.Limit = 50
 	}
 
-	service := es.Search("subjects").Size(query.Limit)
-
-	switch query.Sort {
-	case "":
-		service = service.SortBy(elastic.NewFieldSort("_score").Desc(), elastic.NewFieldSort("_id"))
-	case "rank":
-		service = service.SortBy(elastic.NewFieldSort("rank").Desc(), elastic.NewFieldSort("_id"))
-	case "-rank":
-		service = service.SortBy(elastic.NewFieldSort("rank"), elastic.NewFieldSort("_id"))
-	case "airdate":
-		service = service.SortBy(elastic.NewFieldSort("date"), elastic.NewFieldSort("_id"))
-	case "-airdate":
-		service = service.SortBy(elastic.NewFieldSort("date").Desc(), elastic.NewFieldSort("_id"))
+	service, err := es.Index("subjects").Search(query.Q, &meilisearch.SearchRequest{
+		Limit: query.Limit,
+	})
+	if err != nil {
+		panic(err)
 	}
 
-	if len(query.Since) > 0 {
-		service = service.SearchAfter(toInterface(query.Since)...)
-	}
+	// switch query.Sort {
+	// case "":
+	// 	service = service.SortBy(elastic.NewFieldSort("_score").Desc(), elastic.NewFieldSort("_id"))
+	// case "rank":
+	// 	service = service.SortBy(elastic.NewFieldSort("rank").Desc(), elastic.NewFieldSort("_id"))
+	// case "-rank":
+	// 	service = service.SortBy(elastic.NewFieldSort("rank"), elastic.NewFieldSort("_id"))
+	// case "airdate":
+	// 	service = service.SortBy(elastic.NewFieldSort("date"), elastic.NewFieldSort("_id"))
+	// case "-airdate":
+	// 	service = service.SortBy(elastic.NewFieldSort("date").Desc(), elastic.NewFieldSort("_id"))
+	// }
+	//
+	// if len(query.Since) > 0 {
+	// 	service = service.SearchAfter(toInterface(query.Since)...)
+	// }
 
-	return service.Query(q)
+	// return service.Query(q)
+	return service
 }
 
 func parseQueryLine(s string) (*elastic.BoolQuery, error) {
@@ -130,7 +140,7 @@ type resSubject struct {
 
 type Pagination struct {
 	Since []interface{} `json:"since"`
-	Limit int           `json:"limit"`
+	Limit int64         `json:"limit"`
 }
 
 type Response struct {

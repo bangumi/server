@@ -1,5 +1,19 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>
+
 /*
-Copyright 2021 trim21
+Copyright 2021-2022 trim21
 Copyright 2012 Google Inc. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,9 +33,11 @@ package syntax
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"io"
 
-	"github.com/pkg/errors"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 var ErrParse = errors.New("failed to parse")
@@ -101,7 +117,7 @@ func (t tokenClassifier) addRuneClass(runes string, tokenType runeTokenClass) {
 // newDefaultClassifier creates a new classifier for ASCII characters.
 func newDefaultClassifier() tokenClassifier {
 	// initialize it out current runes count
-	var t = make(tokenClassifier, 5) //nolint:gomnd
+	var t = make(tokenClassifier, 5)
 
 	t.addRuneClass(spaceRunes, spaceRuneClass)
 	t.addRuneClass(doubleQuoteRunes, doubleQuoteRuneClass)
@@ -135,6 +151,7 @@ func NewTokenizer(r io.Reader) *Tokenizer {
 }
 
 // scanStream scans the stream for the next Token using the internal state machine.
+//
 //nolint:gocyclo,funlen,cyclop
 func (t *Tokenizer) scanStream() (*Token, error) {
 	state := startState
@@ -148,7 +165,7 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 		nextRune, _, err = t.input.ReadRune()
 		nextRuneType = t.classifier.ClassifyRune(nextRune)
 
-		if err == io.EOF { // nolint: errorlint
+		if err == io.EOF { //nolint: errorlint
 			nextRuneType = eofRuneClass
 			err = nil
 		} else if err != nil {
@@ -240,7 +257,7 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 				case eofRuneClass:
 					{
 						return &Token{tokenType: tokenType, value: string(value)},
-							errors.WithMessagef(ErrParse, "EOF found when expecting closing quote")
+							errgo.Msg(ErrParse, "EOF found when expecting closing quote")
 					}
 				case doubleQuoteRuneClass:
 					{
@@ -258,7 +275,7 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 				case eofRuneClass:
 					{
 						return &Token{tokenType: tokenType, value: string(value)},
-							errors.WithMessage(ErrParse, "EOF found when expecting closing quote")
+							errgo.Msg(ErrParse, "EOF found when expecting closing quote")
 					}
 				case singleQuoteRuneClass:
 					{
@@ -272,7 +289,7 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 			}
 		default:
 			{
-				return nil, errors.WithMessagef(ErrParse, "Unexpected state: %v", state)
+				return nil, errgo.Wrap(ErrParse, fmt.Sprintf("Unexpected state: %v", state))
 			}
 		}
 	}
