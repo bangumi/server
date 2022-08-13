@@ -64,7 +64,7 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 ```mermaid
 flowchart TD
-  Users --> CloudFlare --> Old
+  Users --> Cloudflare --> Old
 
   subgraph Old[old server]
     nginx
