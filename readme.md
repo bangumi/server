@@ -63,13 +63,57 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 ## 后端构架
 
 ```mermaid
-graph TD
-    Nginx -->|HTTP Request| B[chii web]
-    mysql[(mysql)] --> |binlog| kafka[(kafka)] --> C[chii canal]
-    B --> mysql
-    B --> |缓存|redis[(redis)]
-    C --> |删除过期缓存| redis
-    C --> |清除数据, 如过期的session| mysql
+flowchart TD
+  Users --> CloudFlare --> Old
+
+  subgraph Old[old server]
+    nginx
+    nginx --> |旧主站|php[old php server];
+  end
+
+
+  nginx ---> |转发api.bgm.tv/v0/的请求| Nginx(nginx on new server);
+  CloudFlare --> |next.bgm.tv 直接解析到新服务器|Nginx;
+```
+
+```mermaid
+flowchart TD
+  Nginx(nginx on new server);
+
+  Nginx -->|static new frontend files|FS[(file system)];
+
+  Nginx -->|HTTP API Request|B;
+  Nginx --> |HTTP Search request|meilisearch;
+
+  C --> |增量更新数据|meilisearch;
+
+  B --> mysql
+  B --> |缓存|redis
+  C --> |清除失效缓存|redis
+  C --> |清除失效数据|mysql
+  kafka --> C;
+
+
+  subgraph B
+    direction BT
+    B1[chii web];
+    B2[chii web];
+    ...
+  end
+
+  subgraph C[canal]
+    C1[chii canal];
+  end
+
+  meilisearch[(new search engine)];
+
+  subgraph Components[database]
+    direction BT
+    redis[(redis 缓存)]
+    mysql[(mysql)]
+    kafka[(kafka)]
+    mysql --> |binlog|kafka;
+  end
 ```
 
 ### 贡献指南
