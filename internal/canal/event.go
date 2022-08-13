@@ -16,6 +16,8 @@ package canal
 
 import (
 	"context"
+	"os"
+	"strconv"
 
 	"github.com/gookit/event"
 	"go.uber.org/zap"
@@ -52,6 +54,8 @@ func eventManager(
 	logger *zap.Logger,
 	session session.Manager,
 ) *event.Manager {
+	dryRun, _ := strconv.ParseBool(os.Getenv("DRY_RUN"))
+
 	e := event.NewManager("chii")
 	e.On("subject.*", event.ListenerFunc(func(e event.Event) error {
 		id := GetSubjectEventPayload(e)
@@ -63,8 +67,12 @@ func eventManager(
 	e.On(EventUserChangePassword, event.ListenerFunc(func(e event.Event) error {
 		id := GetUserChangePasswordEventPayload(e)
 		logger.Info("user change password", log.UserID(id))
-		err := session.RevokeUser(context.Background(), id)
-		if err != nil {
+		if dryRun {
+			logger.Info("dry-run enabled, skip handler")
+			return nil
+		}
+
+		if err := session.RevokeUser(context.Background(), id); err != nil {
 			logger.Error("failed to revoke user", log.UserID(id), zap.Error(err))
 		}
 		return nil
