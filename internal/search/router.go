@@ -67,7 +67,7 @@ func (c *Client) Handle(ctx *fiber.Ctx) error {
 	for i, hit := range result.Hits {
 		var source = Subject{}
 		if err := mapstructure.Decode(hit, &source); err != nil {
-			return err
+			return errgo.Wrap(err, "failed to convert from any")
 		}
 
 		res.Data[i] = resSubject{

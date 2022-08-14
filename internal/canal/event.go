@@ -38,11 +38,11 @@ import (
 )
 
 type eventHandler struct {
+	session session.Manager
 	log     *zap.Logger
 	q       *query.Query
-	session session.Manager
-	dryRun  bool
 	search  search.Client
+	dryRun  bool
 }
 
 func newEventHandler(

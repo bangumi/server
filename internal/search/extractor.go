@@ -67,13 +67,11 @@ func parseDateVal(date string) int {
 	}
 
 	// 2008-10-05 format
-	var val = 0
-
 	v, err := strconv.Atoi(date[:4])
 	if err != nil {
 		return 0
 	}
-	val = v * 10000
+	val := v * 10000
 
 	v, err = strconv.Atoi(date[5:7])
 	if err != nil {

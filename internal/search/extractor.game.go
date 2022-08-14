@@ -20,7 +20,7 @@ import (
 )
 
 // extract game field.
-func gamePlatform(s *model.Subject, w wiki.Wiki) (p []string) {
+func gamePlatform(s *model.Subject, w wiki.Wiki) []string {
 	if s.TypeID != model.SubjectTypeGame {
 		return nil
 	}

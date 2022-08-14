@@ -23,7 +23,7 @@ import (
 	"github.com/bangumi/server/internal/search/syntax"
 )
 
-// keyword, filters,  error
+// keyword, filters,  error.
 func parse(s string) (string, [][]string, error) {
 	r, err := syntax.Parse(s)
 	if err != nil {
@@ -41,7 +41,7 @@ func parse(s string) (string, [][]string, error) {
 
 		switch field {
 		case "airdate":
-			// parseDateFilter("date", values, qq)
+			filter = append(filter, parseDateFilter(values))
 		case "tag":
 			for _, value := range values {
 				filter = append(filter, []string{"tag" + op + value})
@@ -85,7 +85,7 @@ func parseDateFilter(filters []string) []string {
 		}
 	}
 
-	return nil
+	return result
 }
 
 func parseDateValOk(date string) (int, bool) {
@@ -94,17 +94,19 @@ func parseDateValOk(date string) (int, bool) {
 	}
 
 	// 2008-10-05 format
-	if !(isDigitsOnly(date[:4]) && date[4] == '-' && isDigitsOnly(date[5:7]) && date[7] == '-' && isDigitsOnly(date[8:10])) {
+	if !(isDigitsOnly(date[:4]) &&
+		date[4] == '-' &&
+		isDigitsOnly(date[5:7]) &&
+		date[7] == '-' &&
+		isDigitsOnly(date[8:10])) {
 		return 0, false
 	}
-
-	var val = 0
 
 	v, err := strconv.Atoi(date[:4])
 	if err != nil {
 		return 0, false
 	}
-	val = v * 10000
+	val := v * 10000
 
 	v, err = strconv.Atoi(date[5:7])
 	if err != nil {
