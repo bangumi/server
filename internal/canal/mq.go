@@ -45,7 +45,7 @@ func Main() error {
 	var eg errgroup.Group
 
 	for _, readerCfg := range []streamReader{
-		{Topic: "chii.bangumi.chii_subjects", handler: OnSubjectChange},
+		{Topic: "chii.bangumi.chii_subjects", handler: e.OnSubjectChange},
 		{Topic: "chii.bangumi.chii_members", handler: e.OnUserChange},
 	} {
 		readerCfg := readerCfg

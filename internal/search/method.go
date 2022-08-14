@@ -2,34 +2,70 @@ package search
 
 import (
 	"context"
+	"errors"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/meilisearch/meilisearch-go"
-	"gorm.io/gorm"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
-func New(c config.AppConfig, db *gorm.DB) (*Client, error) {
+func New(c config.AppConfig, subjectRepo domain.SubjectRepo, log *zap.Logger, query *query.Query) (*Client, error) {
 	if _, err := url.Parse(c.MeiliSearchURL); err != nil {
 		return nil, errgo.Wrap(err, "url.Parse")
 	}
 
 	client := meilisearch.NewClient(meilisearch.ClientConfig{
 		Host:    c.MeiliSearchURL,
-		APIKey:  "masterKey",
-		Timeout: time.Second * 5,
+		APIKey:  c.MeiliSearchKey,
+		Timeout: time.Second,
 	})
 
-	return &Client{search: client, db: db, subject: "subjects"}, nil
+	_, err := client.GetVersion()
+	if err != nil {
+		return nil, errgo.Wrap(err, "meilisearch")
+	}
+
+	return &Client{
+		search:      client,
+		q:           query,
+		subject:     "subjects",
+		log:         log.Named("search"),
+		subjectRepo: subjectRepo,
+	}, nil
 }
 
 type Client struct {
-	search  *meilisearch.Client
-	db      *gorm.DB
-	subject string
+	search      *meilisearch.Client
+	subject     string
+	q           *query.Query
+	subjectRepo domain.SubjectRepo
+	log         *zap.Logger
+}
+
+// OnSubjectUpdate is the hook called by canal.
+func (c *Client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
+	s, err := c.subjectRepo.Get(ctx, id)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return c.DeleteSubject(ctx, strconv.Itoa(int(id)))
+		}
+
+		c.log.Error("unexpected error get subject from mysql", zap.Error(err), log.SubjectID(id))
+		return err
+	}
+
+	extracted := c.ExtractSubject(&s)
+
+	return c.UpsertSubject(ctx, extracted)
 }
 
 // UpsertSubject add subject to search backend.

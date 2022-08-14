@@ -32,6 +32,8 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/search"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -40,6 +42,7 @@ type eventHandler struct {
 	q       *query.Query
 	session session.Manager
 	dryRun  bool
+	search  search.Client
 }
 
 func newEventHandler(
@@ -70,7 +73,8 @@ func getEventHandler() (*eventHandler, error) {
 		fx.Provide(
 			driver.NewMysqlConnectionPool, metrics.NewScope,
 			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
-
+			subject.NewMysqlRepo,
+			search.New,
 			session.NewMysqlRepo, session.New,
 
 			newEventHandler,

@@ -15,34 +15,32 @@
 package canal
 
 import (
-	"sort"
-	"strings"
+	"context"
 
 	"github.com/goccy/go-json"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
-func OnSubjectChange(key json.RawMessage, payload payload) {
+func (e *eventHandler) OnSubjectChange(key json.RawMessage, payload payload) {
 	switch payload.Op {
-	case opCreate:
-	case opReplace:
-		// fmt.Println(payload.After)
-	case opDelete:
-		// fmt.Println(payload.Before)
-	case opUpdate:
-		var diff = make([]string, 0, len(payload.After))
-		for key, value := range payload.Before {
-			if string(payload.After[key]) != string(value) {
-				diff = append(diff, key)
-			}
+	case opCreate, opUpdate, opReplace:
+		var k SubjectKey
+		if err := json.UnmarshalNoEscape(key, &k); err != nil {
+			return
 		}
-		sort.Slice(diff, func(i, j int) bool {
-			return strings.Compare(diff[i], diff[j]) > 0
-		})
+
+		if err := e.search.OnSubjectUpdate(context.TODO(), k.ID); err != nil {
+			e.log.Error("error when try to update search subject", zap.Error(err), log.SubjectID(k.ID))
+		}
+
+		return
+	case opDelete:
 	}
 }
 
-type SubjectPayload struct {
+type SubjectKey struct {
 	ID model.SubjectID `json:"subject_id"`
 }

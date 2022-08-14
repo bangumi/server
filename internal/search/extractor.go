@@ -1,14 +1,12 @@
 package search
 
 import (
-	"context"
-
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/pkg/wiki"
 )
 
 // ExtractSubject extract indexed data from db subject row.
-func (c *Client) ExtractSubject(ctx context.Context, s *model.Subject) (Subject, error) {
+func (c *Client) ExtractSubject(s *model.Subject) Subject {
 	tags := s.Tags
 
 	w := wiki.ParseOmitError(s.Infobox)
@@ -44,5 +42,5 @@ func (c *Client) ExtractSubject(ctx context.Context, s *model.Subject) (Subject,
 			Rank:   rank,
 			Score:  score,
 		},
-	}, nil
+	}
 }
