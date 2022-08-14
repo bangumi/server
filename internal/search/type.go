@@ -17,7 +17,7 @@ type Record struct {
 
 type Subject struct {
 	Summary      string   `json:"summary"`
-	Date         string   `json:"date,omitempty"`
+	Date         int      `json:"date,omitempty"`
 	Tag          []string `json:"tag,omitempty"`
 	Name         []string `json:"name"`
 	GamePlatform []string `json:"game_platform"`
@@ -30,5 +30,3 @@ type Subject struct {
 	Type         uint8    `json:"type"`
 	NSFW         bool     `json:"nsfw"`
 }
-
-type Extractor = func(s model.Subject) (map[string]interface{}, error)

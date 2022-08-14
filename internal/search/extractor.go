@@ -1,6 +1,8 @@
 package search
 
 import (
+	"strconv"
+
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -12,7 +14,7 @@ func (c *Client) ExtractSubject(s *model.Subject) Subject {
 	w := wiki.ParseOmitError(s.Infobox)
 
 	rank := pageRank(s)
-	score := score(s)
+	score := s.Rating.Score
 
 	tagNames := make([]string, len(tags))
 	for i, tag := range tags {
@@ -25,7 +27,7 @@ func (c *Client) ExtractSubject(s *model.Subject) Subject {
 		Summary:      s.Summary,
 		NSFW:         s.NSFW,
 		Type:         s.TypeID,
-		Date:         s.Date,
+		Date:         parseDateVal(s.Date),
 		Platform:     s.PlatformID,
 		GamePlatform: gamePlatform(s, w),
 		PageRank:     float64(rank),
@@ -43,4 +45,33 @@ func (c *Client) ExtractSubject(s *model.Subject) Subject {
 			Score:  score,
 		},
 	}
+}
+
+func parseDateVal(date string) int {
+	if len(date) < 10 {
+		return 0
+	}
+
+	// 2008-10-05 format
+	var val = 0
+
+	v, err := strconv.Atoi(date[:4])
+	if err != nil {
+		return 0
+	}
+	val = v * 10000
+
+	v, err = strconv.Atoi(date[5:7])
+	if err != nil {
+		return 0
+	}
+	val += v * 100
+
+	v, err = strconv.Atoi(date[8:10])
+	if err != nil {
+		return 0
+	}
+	val += v
+
+	return val
 }

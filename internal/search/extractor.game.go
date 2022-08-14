@@ -22,17 +22,3 @@ func gamePlatform(s *model.Subject, w wiki.Wiki) (p []string) {
 
 	return nil
 }
-
-func GetValues(f wiki.Field) (s []string) {
-	if f.Null {
-		return nil
-	}
-
-	if f.Array {
-		for _, value := range f.Values {
-			s = append(s, value.Value)
-		}
-	}
-
-	return []string{f.Value}
-}
