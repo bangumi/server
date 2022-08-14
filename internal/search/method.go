@@ -44,11 +44,11 @@ func New(c config.AppConfig, subjectRepo domain.SubjectRepo, log *zap.Logger, qu
 }
 
 type Client struct {
-	search      *meilisearch.Client
-	subject     string
-	q           *query.Query
 	subjectRepo domain.SubjectRepo
+	search      *meilisearch.Client
+	q           *query.Query
 	log         *zap.Logger
+	subject     string
 }
 
 // OnSubjectUpdate is the hook called by canal.

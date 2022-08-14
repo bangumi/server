@@ -1,3 +1,17 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>
+
 package search
 
 import (
@@ -5,27 +19,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/meilisearch/meilisearch-go"
-
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/search/syntax"
 )
 
-func parse(s string) (string, *meilisearch.SearchRequest, error) {
+// keyword, filters,  error
+func parse(s string) (string, [][]string, error) {
 	r, err := syntax.Parse(s)
 	if err != nil {
 		return "", nil, errgo.Wrap(err, "parse syntax")
 	}
 
-	req := &meilisearch.SearchRequest{
-		Offset: 0,
-		Limit:  0,
-		Filter: nil,
-		Sort:   nil,
-	}
-
 	var filter [][]string
-
 	for field, values := range r.Filter {
 		var op string
 		if field[0] == '-' {
@@ -48,7 +53,7 @@ func parse(s string) (string, *meilisearch.SearchRequest, error) {
 		}
 	}
 
-	return strings.Join(r.Keyword, " "), req, nil
+	return strings.Join(r.Keyword, " "), filter, nil
 }
 
 // parse date filter like `<2020-01-20`, `>=2020-01-23`.
