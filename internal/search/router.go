@@ -24,24 +24,30 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/web/req"
+	"github.com/bangumi/server/internal/web/res"
 )
 
+const defaultLimit = 50
+const maxLimit = 200
+
 type Query struct {
-	Q      string `query:"q"`
-	Sort   string `query:"sort"`
-	Offset int64  `query:"offset"`
-	Limit  int64  `query:"limit"`
+	Q    string
+	Sort string
 }
 
 func (c *Client) Handle(ctx *fiber.Ctx) error {
-	query := Query{}
-	if err := ctx.QueryParser(&query); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("invalid query string")
+	query := Query{
+		Q:    strings.TrimSpace(ctx.Query("q")),
+		Sort: ctx.Query("sort"),
 	}
-
-	query.Q = strings.TrimSpace(query.Q)
 	if query.Q == "" {
 		return ctx.SendString("empty query string")
+	}
+
+	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
+	if err != nil {
+		return err
 	}
 
 	w, filter, err := parse(query.Q)
@@ -54,16 +60,12 @@ func (c *Client) Handle(ctx *fiber.Ctx) error {
 		sort = append(sort, query.Sort)
 	}
 
-	result, err := c.doSearch(w, filter, sort, query.Limit, query.Offset)
+	result, err := c.doSearch(w, filter, sort, q.Limit, q.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "search")
 	}
 
-	res := Response{
-		Pagination: Pagination{Limit: query.Limit},
-		Data:       make([]resSubject, len(result.Hits)),
-	}
-
+	data := make([]resSubject, len(result.Hits))
 	for i, hit := range result.Hits {
 		var source = Subject{}
 
@@ -80,7 +82,7 @@ func (c *Client) Handle(ctx *fiber.Ctx) error {
 			return errgo.Wrap(err, "failed to convert from any")
 		}
 
-		res.Data[i] = resSubject{
+		data[i] = resSubject{
 			ID:     source.Record.ID,
 			Date:   intDateToString(source.Date),
 			Image:  source.Record.Image,
@@ -92,14 +94,19 @@ func (c *Client) Handle(ctx *fiber.Ctx) error {
 		}
 	}
 
-	return ctx.JSON(res)
+	return res.JSON(ctx, res.Paged{
+		Data:   data,
+		Total:  result.EstimatedTotalHits,
+		Limit:  q.Limit,
+		Offset: q.Offset,
+	})
 }
 
 func (c *Client) doSearch(
 	words string,
 	filter [][]string,
 	sort []string,
-	limit, offset int64,
+	limit, offset int,
 ) (*meilisearch.SearchResponse, error) {
 	if limit == 0 {
 		limit = 10
@@ -108,8 +115,8 @@ func (c *Client) doSearch(
 	}
 
 	response, err := c.search.Index("subjects").Search(words, &meilisearch.SearchRequest{
-		Offset: offset,
-		Limit:  limit,
+		Offset: int64(offset),
+		Limit:  int64(limit),
 		Filter: filter,
 		Sort:   sort,
 	})
@@ -133,7 +140,7 @@ type resSubject struct {
 
 type Pagination struct {
 	Since []interface{} `json:"since"`
-	Limit int64         `json:"limit"`
+	Limit int           `json:"limit"`
 }
 
 type Response struct {

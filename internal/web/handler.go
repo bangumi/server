@@ -26,6 +26,7 @@ import (
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/gtime"
+	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/handler/character"
@@ -52,6 +53,7 @@ func AddRouters(
 	personHandler person.Person,
 	characterHandler character.Character,
 	subjectHandler subject.Subject,
+	search *search.Client,
 ) {
 	app.Use(ua.DisableDefaultHTTPLibrary)
 
@@ -68,6 +70,8 @@ func AddRouters(
 	}
 
 	v0 := app.Group("/v0/", h.MiddlewareAccessTokenAuth)
+
+	v0.Get("/search/subjects", search.Handle)
 
 	v0.Get("/subjects/:id", addMetrics(subjectHandler.Get))
 	v0.Get("/subjects/:id/image", addMetrics(subjectHandler.GetImage))

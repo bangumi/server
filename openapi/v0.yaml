@@ -110,6 +110,7 @@ paths:
       tags:
         - 搜索
       summary: 条目搜索
+      operationId: searchSubjects
       description: |
         ## 实验性 API， 本 schema 和实际的 API 行为都可能随时发生改动
         搜索条件直接在包含在 `q` 中，类似 [github 搜索](https://github.com/search/advanced?q=repo%3Abangumi%2Fapi+stars%3A%3E100&type=Repositories)
