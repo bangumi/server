@@ -13,7 +13,7 @@ func (c *Client) ExtractSubject(s *model.Subject) Subject {
 
 	w := wiki.ParseOmitError(s.Infobox)
 
-	rank := pageRank(s)
+	rank := s.Rating.Total
 	score := s.Rating.Score
 
 	tagNames := make([]string, len(tags))

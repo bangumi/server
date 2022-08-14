@@ -1,6 +1,8 @@
 package search
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/meilisearch/meilisearch-go"
@@ -20,20 +22,10 @@ func parse(s string) (string, *meilisearch.SearchRequest, error) {
 	logger.Debug("parse search query", zap.String("input", s), zap.Any("result", r))
 
 	req := &meilisearch.SearchRequest{
-		Offset:                0,
-		Limit:                 0,
-		AttributesToRetrieve:  nil,
-		AttributesToCrop:      nil,
-		CropLength:            0,
-		CropMarker:            "",
-		AttributesToHighlight: nil,
-		HighlightPreTag:       "",
-		HighlightPostTag:      "",
-		Filter:                nil,
-		ShowMatchesPosition:   false,
-		Facets:                nil,
-		PlaceholderSearch:     false,
-		Sort:                  nil,
+		Offset: 0,
+		Limit:  0,
+		Filter: nil,
+		Sort:   nil,
 	}
 
 	var filter [][]string
@@ -64,21 +56,75 @@ func parse(s string) (string, *meilisearch.SearchRequest, error) {
 }
 
 // parse date filter like `<2020-01-20`, `>=2020-01-23`.
-func parseDateFilter(field string, filters []string) []string {
-	// for _, s := range filters {
-	// 	switch {
-	// 	case strings.HasPrefix(s, ">="):
-	// 		((field).Gte(s[2:]))
-	// 	case strings.HasPrefix(s, ">"):
-	// 		((field).Gt(s[1:]))
-	// 	case strings.HasPrefix(s, "<="):
-	// 		((field).Lte(s[2:]))
-	// 	case strings.HasPrefix(s, "<"):
-	// 		((field).Lt(s[1:]))
-	// 	default:
-	// 		(field, filters)
-	// 	}
-	// }
+func parseDateFilter(filters []string) []string {
+	var result = make([]string, 0, len(filters))
+
+	for _, s := range filters {
+		switch {
+		case strings.HasPrefix(s, ">="):
+			if v, ok := parseDateValOk(s[2:]); ok {
+				result = append(result, fmt.Sprintf("date >= %d", v))
+			}
+		case strings.HasPrefix(s, ">"):
+			if v, ok := parseDateValOk(s[1:]); ok {
+				result = append(result, fmt.Sprintf("date > %d", v))
+			}
+		case strings.HasPrefix(s, "<="):
+			if v, ok := parseDateValOk(s[2:]); ok {
+				result = append(result, fmt.Sprintf("date <= %d", v))
+			}
+		case strings.HasPrefix(s, "<"):
+			if v, ok := parseDateValOk(s[1:]); ok {
+				result = append(result, fmt.Sprintf("date < %d", v))
+			}
+		default:
+			if v, ok := parseDateValOk(s); ok {
+				result = append(result, fmt.Sprintf("date = %d", v))
+			}
+		}
+	}
 
 	return nil
+}
+
+func parseDateValOk(date string) (int, bool) {
+	if len(date) < 10 {
+		return 0, false
+	}
+
+	// 2008-10-05 format
+	if !(isDigitsOnly(date[:4]) && date[4] == '-' && isDigitsOnly(date[5:7]) && date[7] == '-' && isDigitsOnly(date[8:10])) {
+		return 0, false
+	}
+
+	var val = 0
+
+	v, err := strconv.Atoi(date[:4])
+	if err != nil {
+		return 0, false
+	}
+	val = v * 10000
+
+	v, err = strconv.Atoi(date[5:7])
+	if err != nil {
+		return 0, false
+	}
+	val += v * 100
+
+	v, err = strconv.Atoi(date[8:10])
+	if err != nil {
+		return 0, false
+	}
+	val += v
+
+	return val, true
+}
+
+func isDigitsOnly(s string) bool {
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			return false
+		}
+	}
+	return true
 }

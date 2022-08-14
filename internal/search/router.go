@@ -31,7 +31,7 @@ func (c *Client) Handler() fiber.Handler {
 			return c.SendString("empty query string")
 		}
 
-		w, q, err := parseQueryLine(query.Q)
+		w, q, err := parse(query.Q)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(err)
 		}
@@ -111,10 +111,6 @@ func buildService(es *meilisearch.Client, query Query) *meilisearch.SearchRespon
 
 	// return service.Query(q)
 	return service
-}
-
-func parseQueryLine(s string) (string, [][]string, error) {
-	return "", nil, nil
 }
 
 type resSubject struct {
