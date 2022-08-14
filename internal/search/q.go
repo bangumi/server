@@ -6,10 +6,8 @@ import (
 	"strings"
 
 	"github.com/meilisearch/meilisearch-go"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/search/syntax"
 )
 
@@ -18,8 +16,6 @@ func parse(s string) (string, *meilisearch.SearchRequest, error) {
 	if err != nil {
 		return "", nil, errgo.Wrap(err, "parse syntax")
 	}
-
-	logger.Debug("parse search query", zap.String("input", s), zap.Any("result", r))
 
 	req := &meilisearch.SearchRequest{
 		Offset: 0,
