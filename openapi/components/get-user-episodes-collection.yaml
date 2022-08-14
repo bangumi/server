@@ -1,0 +1,10 @@
+additionalProperties: false
+properties:
+  episode:
+    $ref: "./episode.yaml"
+  type:
+    $ref: "./episode_collection_type.yaml"
+required:
+  - episode
+  - type
+type: object

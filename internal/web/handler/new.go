@@ -18,89 +18,63 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
-	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/common"
-	"github.com/bangumi/server/internal/web/handler/person"
-	"github.com/bangumi/server/internal/web/handler/subject"
-	"github.com/bangumi/server/internal/web/handler/user"
 	"github.com/bangumi/server/internal/web/rate"
 	"github.com/bangumi/server/internal/web/session"
 )
 
 func New(
 	common common.Common,
-	cfg config.AppConfig,
 	a domain.AuthService,
 	r domain.RevisionRepo,
-	topic domain.TopicRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
-	user domain.UserRepo,
 	cache cache.Cache,
-	app app.App,
+	ctrl ctrl.Ctrl,
 	captcha captcha.Manager,
 	session session.Manager,
 	rateLimit rate.Manager,
-	userHandler user.User,
-	personHandler person.Person,
 	log *zap.Logger,
-	subject subject.Subject,
 	engine frontend.TemplateEngine,
-	character character.Character,
 	oauth oauth.Manager,
-) (Handler, error) {
+) Handler {
 	return Handler{
-		Subject:   subject,
 		Common:    common,
-		app:       app,
-		User:      userHandler,
-		Character: character,
-		Person:    personHandler,
-		cfg:       cfg,
+		ctrl:      ctrl,
 		cache:     cache,
 		log:       log.Named("web.handler"),
 		rateLimit: rateLimit,
 		session:   session,
 		a:         a,
-		u:         user,
 		i:         index,
 		r:         r,
-		topic:     topic,
 		captcha:   captcha,
 		g:         g,
 		oauth:     oauth,
 		template:  engine,
 		buffPool:  buffer.NewPool(),
-	}, nil
+	}
 }
 
 type Handler struct {
+	ctrl ctrl.Ctrl
 	common.Common
-	Subject   subject.Subject
-	Character character.Character
-	Person    person.Person
-	app       app.App
-	User      user.User
+	g         domain.GroupRepo
+	oauth     oauth.Manager
+	r         domain.RevisionRepo
+	cache     cache.Cache
 	a         domain.AuthService
 	session   session.Manager
 	captcha   captcha.Manager
-	u         domain.UserRepo
 	rateLimit rate.Manager
 	i         domain.IndexRepo
-	g         domain.GroupRepo
-	cache     cache.Cache
-	r         domain.RevisionRepo
-	oauth     oauth.Manager
-	topic     domain.TopicRepo
 	template  frontend.TemplateEngine
 	buffPool  buffer.Pool
 	log       *zap.Logger
-	cfg       config.AppConfig
 }

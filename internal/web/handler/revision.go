@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -77,7 +78,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
 
-	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.UniqueUnsorted(creatorIDs)...)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -104,7 +105,7 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get person related revision", zap.Uint32("rev_id", id))
 	}
 
-	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), r.CreatorID)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -157,7 +158,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.UniqueUnsorted(creatorIDs)...)
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -188,7 +189,7 @@ func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get character related revision", zap.Uint32("rev_id", id))
 	}
 
-	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), r.CreatorID)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -242,7 +243,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.u.GetByIDs(c.Context(), dedupeUIDs(creatorIDs...)...)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.UniqueUnsorted(creatorIDs)...)
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -268,24 +269,12 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get subject related revision", zap.Uint32("rev_id", id))
 	}
 
-	creatorMap, err := h.u.GetByIDs(c.Context(), r.CreatorID)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), r.CreatorID)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
 	return c.JSON(convertModelSubjectRevision(&r, creatorMap))
-}
-
-func dedupeUIDs(uids ...model.UserID) []model.UserID {
-	m := make(map[model.UserID]bool, len(uids))
-	ret := make([]model.UserID, 0, len(uids))
-	for _, r := range uids {
-		if _, ok := m[r]; !ok {
-			m[r] = true
-			ret = append(ret, r)
-		}
-	}
-	return ret
 }
 
 func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UserID]model.User) res.PersonRevision {

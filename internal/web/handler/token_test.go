@@ -25,8 +25,8 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -35,7 +35,7 @@ func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 	const userID model.UserID = 1
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().CreateAccessToken(mock.Anything, userID, "token name", timex.OneDay).Return("ttt", nil)
+	mockAuth.EXPECT().CreateAccessToken(mock.Anything, userID, "token name", gtime.OneDay).Return("ttt", nil)
 	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
 
 	mockSession := mocks.NewSessionManager(t)

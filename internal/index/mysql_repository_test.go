@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/index"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
@@ -36,7 +37,7 @@ func getRepo(t *testing.T) domain.IndexRepo {
 }
 
 func TestMysqlRepo_Get(t *testing.T) {
-	test.RequireEnv(t, "mysql")
+	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
@@ -47,4 +48,15 @@ func TestMysqlRepo_Get(t *testing.T) {
 	require.EqualValues(t, 15045, i.ID)
 	require.EqualValues(t, 14127, i.CreatorID)
 	require.False(t, i.NSFW)
+}
+
+func TestMysqlRepo_ListSubjects(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	subjects, err := repo.ListSubjects(context.Background(), 15045, model.SubjectTypeAll, 20, 0)
+	require.NoError(t, err)
+	require.Len(t, subjects, 20)
 }

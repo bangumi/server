@@ -27,7 +27,7 @@ func (h Handler) PageLogin(c *fiber.Ctx) error {
 	var u model.User
 	if v.Login {
 		var err error
-		u, err = h.u.GetByID(c.Context(), v.ID)
+		u, err = h.ctrl.GetUser(c.Context(), v.ID)
 
 		if err != nil {
 			return h.InternalError(c, err, "failed to get current user", log.UserID(v.ID))

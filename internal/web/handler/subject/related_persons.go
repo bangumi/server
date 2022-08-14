@@ -35,7 +35,7 @@ func (h Subject) GetRelatedPersons(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, id)
+	r, err := h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

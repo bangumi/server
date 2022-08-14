@@ -57,11 +57,11 @@ func FromError(c *fiber.Ctx, err error, code int, message string) error {
 }
 
 func JSONError(c *fiber.Ctx, err error) error {
-	c.Status(http.StatusUnprocessableEntity)
+	c.Status(http.StatusBadRequest)
 
 	return JSON(c, Error{
-		Title:       "JSON Syntax Error",
-		Description: "can't decode request body as json",
+		Title:       "JSON Error",
+		Description: "can't decode request body as json or value doesn't match expected type",
 		Details:     util.DetailWithErr(c, err),
 	})
 }

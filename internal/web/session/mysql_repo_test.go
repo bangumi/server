@@ -25,9 +25,9 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -81,7 +81,7 @@ func TestMysqlRepo_Create_conflict(t *testing.T) {
 		UserID:    1,
 		Value:     []byte(`{}`),
 		CreatedAt: 2,
-		ExpiredAt: time.Now().Unix() + timex.OneWeekSec,
+		ExpiredAt: time.Now().Unix() + gtime.OneWeekSec,
 	})
 	require.NoError(t, err)
 
@@ -117,7 +117,7 @@ func TestMysqlRepo_Get_ok(t *testing.T) {
 		UserID:    uid,
 		Value:     []byte(`{}`),
 		CreatedAt: 2,
-		ExpiredAt: time.Now().Unix() + timex.OneWeekSec,
+		ExpiredAt: time.Now().Unix() + gtime.OneWeekSec,
 	})
 	require.NoError(t, err)
 

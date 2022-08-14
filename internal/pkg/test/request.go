@@ -213,7 +213,7 @@ func (r *Response) BodyString() string {
 func (r *Response) ExpectCode(t int) *Response {
 	r.t.Helper()
 
-	require.Equalf(r.t, t, r.StatusCode, "expecting http response status code %d", t)
+	require.Equalf(r.t, t, r.StatusCode, "expecting http response status code %d %s", t, r.BodyString())
 
 	return r
 }

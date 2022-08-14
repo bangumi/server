@@ -14,12 +14,16 @@
 
 package accessor
 
-import "sync"
+import (
+	"github.com/bangumi/server/internal/pkg/generic/pool"
+)
 
-var accessorPool = sync.Pool{New: func() any { return &Accessor{} }} //nolint:gochecknoglobals
+var accessorPool = pool.New(func() *Accessor {
+	return &Accessor{}
+})
 
 func Get() *Accessor {
-	return accessorPool.Get().(*Accessor) //nolint:forcetypeassert
+	return accessorPool.Get()
 }
 
 func Put(a *Accessor) {

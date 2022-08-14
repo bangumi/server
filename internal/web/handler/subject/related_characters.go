@@ -34,7 +34,7 @@ func (h Subject) GetRelatedCharacters(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, relations, err := h.app.Query.GetSubjectRelatedCharacters(c.Context(), u.Auth, subjectID)
+	_, relations, err := h.ctrl.GetSubjectRelatedCharacters(c.Context(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -46,7 +46,7 @@ func (h Subject) GetRelatedCharacters(c *fiber.Ctx) error {
 	if len(relations) != 0 {
 		var characterIDs = slice.Map(relations,
 			func(item model.SubjectCharacterRelation) model.CharacterID { return item.Character.ID })
-		actors, err = h.app.Query.GetActors(c.Context(), subjectID, characterIDs...)
+		actors, err = h.ctrl.GetActors(c.Context(), subjectID, characterIDs...)
 		if err != nil {
 			return errgo.Wrap(err, "query.GetActors")
 		}

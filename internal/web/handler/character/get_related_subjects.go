@@ -32,7 +32,7 @@ func (h Character) GetRelatedSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, relations, err := h.app.Query.GetCharacterRelatedSubjects(c.Context(), u.Auth, id)
+	_, relations, err := h.ctrl.GetCharacterRelatedSubjects(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

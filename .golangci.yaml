@@ -98,7 +98,7 @@ linters-settings:
 
   gocyclo:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 10
+    min-complexity: 15
 
   godot:
     # comments to be checked: `declarations`, `toplevel`, or `all`
@@ -255,7 +255,10 @@ linters-settings:
       - "func github.com/bangumi/server/internal/web/res.JSON("
       - "func (github.com/bangumi/server/internal/web/handler/common.Common)."
       - "func (*github.com/bangumi/server/internal/dal/query.Query).Transaction("
+      - "func (github.com/bangumi/server/internal/dal.Transaction).Transaction("
+      - "func (*golang.org/x/sync/errgroup.Group).Wait()"
     ignoreSigRegexps:
+      - 'func \(github.com/bangumi/server/internal/web/req\..*\)\.Validate\('
       - 'func github.com/bangumi/server/internal/web/req\.Parse.*\('
 
   nlreturn:
@@ -278,6 +281,7 @@ linters-settings:
         # Any struct tag type can be used.
         # Support string case: `camel`, `pascal`, `kebab`, `snake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`
         json: snake
+        yaml: snake
 
 linters:
   enable-all: true
@@ -301,6 +305,7 @@ linters:
     - nlreturn
     - godox
     - execinquery
+    - ifshort # deprecated
     # 1.18
     - wastedassign
     - unparam
@@ -310,6 +315,7 @@ linters:
     - rowserrcheck
     - noctx
     - nilerr
+    - nosnakecase # false positive for variable and const defined in other lib
 
   fast: false
 
@@ -320,6 +326,9 @@ issues:
   exclude-rules:
     - path: '.*_test\.go'
       linters: [gocritic, gochecknoglobals, godot, nosnakecase]
+
+    - source: "var .* = pool.New"
+      linters: [gochecknoglobals]
 
     - source: 'var Module = fx\.Module\('
       linters: [gochecknoglobals]

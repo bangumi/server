@@ -2,22 +2,6 @@ openapi: 3.0.2
 info:
   title: ""
   version: ""
-  description: |
-    ## 错误处理
-
-    ### 不带有 Body 的请求：
-
-    `400`: 请求 path 或者 query 中的数据错误，如 `?subject_id=-1`，或者对应的信息缺失。
-
-    ### 带有 Body 的请求：
-
-    `415`: 请求没有设置 `content-type` header，应该统一设置为 `application/json`。
-
-    `422`: 无法以 JSON 格式解析请求（跟 WebDAV 的 RFC 定义的不同）
-
-    `400`: 请求数据错误，比如请求体或者 path， query 中的数据错误。（不代表请求体一定能够正确以 JSON 格式解析）
-
-    **未用到的多余的字段会被直接忽略，不会报错。**
 
 tags:
   - name: "条目"
@@ -740,7 +724,7 @@ paths:
           required: false
           schema:
             allOf:
-              - "$ref": "#/components/schemas/CollectionType"
+              - "$ref": "#/components/schemas/SubjectCollectionType"
             type: integer
           name: type
           in: query
@@ -799,6 +783,239 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+  "/v0/users/-/collections/{subject_id}":
+    patch:
+      tags:
+        - 收藏
+      summary: 修改用户单个收藏
+      description: |
+        修改条目收藏状态，暂时不会生成时间线。
+
+        由于直接修改剧集条目的完成度可能会引起意料之外效果，只能用于修改书籍类条目的完成度。
+
+        PATCH 方法的所有请求体字段均可选
+      operationId: patchUserCollection
+      parameters:
+        - $ref: "#/components/parameters/path_subject_id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              # SubjectEpisodeCollectionPatch
+              type: object
+              description: 所有的字段均可选
+              properties:
+                type:
+                  description: 修改条目收藏类型
+                  allOf:
+                    - $ref: "#/components/schemas/SubjectCollectionType"
+
+                rate:
+                  description: 评分，`0` 表示删除评分
+                  type: integer
+                  maximum: 10
+                  minimum: 0
+                  exclusiveMaximum: false
+                  exclusiveMinimum: false
+
+                ep_status:
+                  description: "只能用于修改书籍条目进度"
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: false
+
+                vol_status:
+                  description: "只能用于修改书籍条目进度"
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: false
+
+                comment:
+                  description: "评价"
+                  type: string
+
+                private:
+                  description: "仅自己可见"
+                  type: boolean
+
+                tags:
+                  title: 标签
+                  description: 不传或者 `null` 都会被忽略，传 `[]` 则会删除所有 tag。
+                  type: array
+                  items:
+                    type: string
+                    description: 不能包含空格
+
+      responses:
+        "204":
+          description: Successful Response
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 用户不存在或者条目未收藏
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+
+  "/v0/users/-/collections/{subject_id}/episodes":
+    get:
+      tags:
+        - 收藏
+      summary: 章节收藏信息
+      operationId: getUserSubjectEpisodeCollection
+      parameters:
+        - *path_subject_id
+        - *default_query_offset
+        - required: false
+          schema:
+            title: Limit
+            maximum: 1000
+            minimum: 1
+            type: integer
+            default: 100
+          name: limit
+          description: 分页参数
+          in: query
+        - required: false
+          schema:
+            "$ref": "#/components/schemas/EpType"
+          in: query
+          name: episode_type
+          description: 章节类型，不传则不按照章节进行筛选
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/UserEpisodeCollection"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 条目不存在
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - HTTPBearer: []
+    patch:
+      tags:
+        - 收藏
+      summary: 章节收藏信息
+      description: |
+        同时会重新计算条目的完成度
+
+        暂时不能生成时间线
+      operationId: patchUserSubjectEpisodeCollection
+      parameters:
+        - $ref: "#/components/parameters/path_subject_id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - episode_id
+                - type
+              properties:
+                episode_id:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2, 8]
+                type:
+                  $ref: "#/components/schemas/EpisodeCollectionType"
+      responses:
+        "204":
+          description: Successful Response
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 条目不存在
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - HTTPBearer: []
+
+  "/v0/users/-/collections/-/episodes/{episode_id}":
+    get:
+      tags:
+        - 收藏
+      summary: 章节收藏信息
+      operationId: getUserEpisodeCollection
+      parameters:
+        - *path_episode_id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserEpisodeCollection"
+        "400":
+          description: episode ID not valid
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 条目或者章节不存在
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - HTTPBearer: []
 
   "/v0/revisions/persons":
     get:
@@ -993,7 +1210,16 @@ paths:
           name: episode_id
           description: 章节 ID
           in: query
-        - *default_query_limit
+        - required: false
+          schema:
+            title: Limit
+            maximum: 1000
+            minimum: 1
+            type: integer
+            default: 100
+          name: limit
+          description: 分页参数
+          in: query
         - *default_query_offset
       responses:
         "200":
@@ -1116,6 +1342,10 @@ paths:
       security:
         - OptionalHTTPBearer: []
 components:
+  parameters:
+    path_subject_id: *path_subject_id
+    path_username: *path_username
+
   schemas:
     User:
       $ref: "./components/user.yaml"
@@ -1269,8 +1499,10 @@ components:
         - Mechanic
         - Ship
         - Organization
-    CollectionType:
-      $ref: "./components/collection_type.yaml"
+    SubjectCollectionType:
+      $ref: "./components/subject_collection_type.yaml"
+    EpisodeCollectionType:
+      $ref: "./components/episode_collection_type.yaml"
     Creator:
       $ref: "./components/creator.yaml"
     DetailedRevision:
@@ -1489,58 +1721,7 @@ components:
         - MAD
         - Other
     Episode:
-      title: Episode
-      required:
-        - id
-        - type
-        - name
-        - name_cn
-        - sort
-        - airdate
-        - comment
-        - duration
-        - desc
-        - disc
-      type: object
-      properties:
-        id:
-          title: ID
-          type: integer
-        type:
-          title: Type
-          type: integer
-          description: "`0` 本篇，`1` SP，`2` OP，`3` ED"
-        name:
-          title: Name
-          type: string
-        name_cn:
-          title: Name Cn
-          type: string
-        sort:
-          title: Sort
-          type: number
-          description: 同类条目的排序和集数
-        ep:
-          title: Ep
-          type: number
-          description: 条目内的集数, 从`1`开始。非本篇剧集的此字段无意义
-        airdate:
-          title: Airdate
-          type: string
-        comment:
-          title: Comment
-          type: integer
-        duration:
-          title: Duration
-          type: string
-        desc:
-          title: Desc
-          type: string
-          description: 简介
-        disc:
-          title: Disc
-          type: integer
-          description: 音乐曲目的碟片数
+      $ref: "./components/episode.yaml"
     EpisodeDetail:
       title: EpisodeDetail
       required:
@@ -1683,6 +1864,9 @@ components:
       description: 同名字段意义同<a href="#model-Subject">Subject</a>
     WikiV0:
       $ref: "./components/wiki_v0.yaml"
+
+    Page:
+      $ref: "./components/page.yaml"
 
     Paged_Episode:
       title: Paged[Episode]
@@ -2090,6 +2274,8 @@ components:
       $ref: "./components/subject_type.yaml"
     UserSubjectCollection:
       $ref: "./components/subject_collection.yaml"
+    UserEpisodeCollection:
+      $ref: "./components/get-user-episodes-collection.yaml"
     v0_RelatedSubject:
       title: RelatedSubject
       required:

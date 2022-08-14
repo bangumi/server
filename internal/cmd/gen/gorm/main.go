@@ -20,7 +20,7 @@ NOTICE:
 	Use `UpdatedTime` and `CreatedTime` instead.
 */
 
-// nolint
+//nolint:all
 package main
 
 import (
@@ -75,7 +75,11 @@ func main() {
 
 	// reuse the database connection in Project or create a connection here
 	// if you want to use GenerateModel/GenerateModelAs, UseDB is necessary, otherwise it will panic
-	c := config.NewAppConfig()
+	c, err := config.NewAppConfig()
+	if err != nil {
+		panic("failed to read config: " + err.Error())
+	}
+
 	conn, err := driver.NewMysqlConnectionPool(c)
 	if err != nil {
 		panic(err)
@@ -189,10 +193,19 @@ func main() {
 		gen.FieldType("interest_type", "uint8"),
 		gen.FieldType("interest_uid", userIDTypeString),
 		gen.FieldRename("interest_uid", "UserID"),
+
+		gen.FieldRename("interest_create_ip", "CreateIP"),
+		gen.FieldRename("interest_lasttouch_ip", "LastUpdateIP"),
+		gen.FieldRename("interest_collect_dateline", "DoneTime"),
+		gen.FieldRename("interest_doing_dateline", "DoingTime"),
+		gen.FieldRename("interest_on_hold_dateline", "OnHoldTime"),
+		gen.FieldRename("interest_dropped_dateline", "droppedTime"),
+		gen.FieldRename("interest_wish_dateline", "WishTime"),
 		gen.FieldType("interest_subject_id", subjectIDTypeString),
 		gen.FieldType("interest_private", "uint8"),
 		gen.FieldRename("interest_lasttouch", "UpdatedTime"),
-		gen.FieldTrimPrefix("interest_")))
+		gen.FieldTrimPrefix("interest_"),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
 		gen.FieldTrimPrefix("idx_"),
@@ -274,6 +287,16 @@ func main() {
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:ep_subject_id;references:subject_id",
 		}),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_ep_status", "EpCollection",
+		gen.FieldTrimPrefix("ep_stt"),
+		gen.FieldType("ep_stt_sid", subjectIDTypeString),
+		gen.FieldRename("ep_stt_sid", "SubjectID"),
+		gen.FieldType("ep_stt_uid", userIDTypeString),
+		gen.FieldRename("ep_stt_uid", "userID"),
+		gen.FieldRename("ep_stt_lasttouch", "UpdatedTime"),
+		gen.FieldType("ep_stt_status", "[]byte"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_subject_relations", "SubjectRelation",
@@ -368,6 +391,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_groups", "Group",
 		gen.FieldTrimPrefix("grp_"),
 		gen.FieldType("grp_id", groupIDTypeString),
+		gen.FieldType("grp_accessible", "uint8"),
 		gen.FieldType("grp_creator", userIDTypeString),
 		gen.FieldRename("grp_creator", "CreatorID"),
 		gen.FieldRename("grp_desc", "Description"),

@@ -28,25 +28,3 @@ type User struct {
 	ID               UserID
 	UserGroup        UserGroupID
 }
-
-const (
-	// CollectPrivacyNone 默认公开收藏。
-	CollectPrivacyNone = 0
-	// CollectPrivacySelf 私有收藏，正常计入评分。
-	CollectPrivacySelf = 1
-	// CollectPrivacyBan Shadow Ban, 显示为私有收藏，不计入评分。
-	CollectPrivacyBan = 2
-)
-
-type UserSubjectCollection struct {
-	UpdatedAt   time.Time
-	Comment     string
-	Tags        []string
-	VolStatus   uint32
-	EpStatus    uint32
-	SubjectID   SubjectID
-	SubjectType uint8
-	Rate        uint8
-	Type        SubjectCollection
-	Private     bool
-}

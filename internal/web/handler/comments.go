@@ -29,33 +29,22 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
-	u := h.GetHTTPAccessor(c)
-
+func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 	topicID, err := req.ParseTopicID(c.Params("topic_id"))
 	if err != nil {
 		return err
 	}
 
-	topic, err := h.getTopic(c, domain.TopicTypeSubject, topicID)
+	return h.getResTopicWithComments(c, domain.TopicTypeGroup, topicID)
+}
+
+func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
+	topicID, err := req.ParseTopicID(c.Params("topic_id"))
 	if err != nil {
 		return err
 	}
 
-	subjectID, err := getExpectSubjectID(c, topic)
-	if err != nil {
-		return err
-	}
-
-	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, subjectID)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.ErrNotFound
-		}
-		return h.InternalError(c, err, "failed to subject", log.SubjectID(subjectID))
-	}
-
-	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topic)
+	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topicID)
 }
 
 func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
@@ -66,7 +55,7 @@ func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 		return res.BadRequest(err.Error())
 	}
 
-	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, id)
+	_, err = h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -85,7 +74,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, err := h.app.Query.GetEpisode(c.Context(), id)
+	e, err := h.ctrl.GetEpisode(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -94,7 +83,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
 	}
 
-	_, err = h.app.Query.GetSubjectNoRedirect(c.Context(), u.Auth, e.SubjectID)
+	_, err = h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, e.SubjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -103,12 +92,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get subject of episode", log.SubjectID(e.SubjectID))
 	}
 
-	pagedComments, _, err := h.listComments(c, u.Auth, domain.CommentEpisode, model.TopicID(id))
-	if err != nil {
-		return h.InternalError(c, err, "failed to get comments", log.SubjectID(e.SubjectID))
-	}
-
-	return res.JSON(c, res.PrivateComments{Comments: pagedComments})
+	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
 }
 
 func (h Handler) GetPersonComments(c *fiber.Ctx) error {
@@ -117,7 +101,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.app.Query.GetPerson(c.Context(), id)
+	r, err := h.ctrl.GetPerson(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -131,11 +115,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	pagedComments, _, err := h.listComments(c, u.Auth, domain.CommentPerson, model.TopicID(id))
-	if err != nil {
-		return err
-	}
-	return res.JSON(c, res.PrivateComments{Comments: pagedComments})
+	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
 }
 
 func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
@@ -145,7 +125,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = h.app.Query.GetCharacterNoRedirect(c.Context(), u.Auth, id)
+	_, err = h.ctrl.GetCharacterNoRedirect(c.Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -154,11 +134,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
 	}
 
-	pagedComments, _, err := h.listComments(c, u.Auth, domain.CommentCharacter, model.TopicID(id))
-	if err != nil {
-		return err
-	}
-	return res.JSON(c, res.PrivateComments{Comments: pagedComments})
+	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
 }
 
 func (h Handler) GetIndexComments(c *fiber.Ctx) error {
@@ -179,11 +155,7 @@ func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	pagedComments, _, err := h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
-	if err != nil {
-		return err
-	}
-	return res.JSON(c, res.PrivateComments{Comments: pagedComments})
+	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
 }
 
 func (h Handler) listComments(
@@ -191,27 +163,27 @@ func (h Handler) listComments(
 	u domain.Auth,
 	commentType domain.CommentType,
 	id model.TopicID,
-) ([]res.PrivateComment, map[model.UserID]domain.FriendItem, error) {
+) error {
 	// a noop limit to fetch all comments
-	comments, err := h.topic.ListReplies(c.Context(), commentType, id, 100000, 0) //nolint:gomnd
+	comments, _, err := h.ctrl.ListReplies(c.Context(), commentType, id, 100000, 0) //nolint:gomnd
 	if err != nil {
-		return nil, nil, errgo.Wrap(err, "topic.ListRepliesAll")
+		return errgo.Wrap(err, "topic.ListReplies")
 	}
 
-	userMap, err := h.app.Query.GetUsersByIDs(c.Context(), commentsToUserIDs(comments)...)
+	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), commentsToUserIDs(comments)...)
 	if err != nil {
-		return nil, nil, errgo.Wrap(err, "query.GetUsersByIDs")
+		return errgo.Wrap(err, "query.GetUsersByIDs")
 	}
 
 	var friends map[model.UserID]domain.FriendItem
 	if u.ID != 0 {
-		friends, err = h.u.GetFriends(c.Context(), u.ID)
+		friends, err = h.ctrl.GetFriends(c.Context(), u.ID)
 		if err != nil {
-			return nil, nil, errgo.Wrap(err, "userRepo.GetFriends")
+			return errgo.Wrap(err, "userRepo.GetFriends")
 		}
 	}
 
-	return convertModelComments(comments, userMap, friends), friends, nil
+	return res.JSON(c, res.PrivateComments{Comments: convertModelComments(comments, userMap, friends)})
 }
 
 func commentsToUserIDs(comments []model.Comment) []model.UserID {

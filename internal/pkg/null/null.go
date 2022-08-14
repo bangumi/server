@@ -14,30 +14,86 @@
 
 package null
 
-import "github.com/gofiber/fiber/v2/utils"
+import (
+	"github.com/goccy/go-json"
+)
 
-func NilUint8(i uint8) *uint8 {
-	if i == 0 {
-		return nil
-	}
+type Uint8 = Null[uint8]
+type Uint16 = Null[uint16]
+type Uint32 = Null[uint32]
+type Uint64 = Null[uint64]
+type Uint = Null[uint]
 
-	return &i
+type Int8 = Null[int8]
+type Int16 = Null[int16]
+type Int32 = Null[int32]
+type Int64 = Null[int64]
+type Int = Null[int]
+
+type Float32 = Null[float32]
+type Float64 = Null[float64]
+
+type Bool = Null[bool]
+type String = Null[string]
+type Bytes = Null[[]byte]
+
+var _ json.Unmarshaler = (*Null[any])(nil)
+
+// Null is a nullable type.
+type Null[T any] struct {
+	Value T
+	Set   bool
 }
 
-func NilUint16(i uint16) *uint16 {
-	if i == 0 {
-		return nil
+func New[T any](t T) Null[T] {
+	return Null[T]{
+		Value: t,
+		Set:   true,
 	}
-
-	return &i
 }
 
-func NilString(s string) *string {
-	if s == "" {
+func NewFromPtr[T any](p *T) Null[T] {
+	if p == nil {
+		return Null[T]{}
+	}
+
+	return Null[T]{
+		Value: *p,
+		Set:   true,
+	}
+}
+
+func (t Null[T]) Ptr() *T {
+	if t.Set {
+		return &t.Value
+	}
+
+	return nil
+}
+
+// Default return default value its value is Null or not Set.
+func (t Null[T]) Default(v T) T {
+	if t.Set {
+		return t.Value
+	}
+
+	return v
+}
+
+func (t Null[T]) Interface() any {
+	if t.Set {
+		return t.Value
+	}
+
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (t *Null[T]) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
 		return nil
 	}
 
-	s = utils.CopyString(s)
-
-	return &s
+	t.Set = true
+	return json.UnmarshalNoEscape(data, &t.Value) //nolint:wrapcheck
 }

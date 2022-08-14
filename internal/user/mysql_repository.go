@@ -43,7 +43,7 @@ func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (model.User
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(userID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.User{}, domain.ErrNotFound
+			return model.User{}, domain.ErrUserNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
@@ -57,7 +57,7 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (model.User, 
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Username.Eq(username)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.User{}, domain.ErrNotFound
+			return model.User{}, domain.ErrUserNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))

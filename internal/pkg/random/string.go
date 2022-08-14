@@ -15,10 +15,16 @@
 package random
 
 import (
+	"bufio"
 	"crypto/rand"
+	"io"
 
-	"github.com/gofiber/fiber/v2/utils"
+	"github.com/bangumi/server/internal/pkg/generic/pool"
 )
+
+var p = pool.New(func() *bufio.Reader {
+	return bufio.NewReader(rand.Reader)
+})
 
 // we may never need to change these values.
 const base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -28,12 +34,21 @@ const base62MaxByte byte = 255 - (256 % base62CharsLength) //nolint:gomnd
 // Base62String generate a cryptographically secure base62 string in given length.
 // Will panic if it can't read from 'crypto/rand'.
 func Base62String(length int) string {
+	reader := p.Get()
+	defer p.Put(reader)
+
 	b := make([]byte, length)
-	r := make([]byte, length+(length/4)) //nolint:gomnd    // storage for random bytes.
+	// storage for random bytes.
+	r := make([]byte, length+(length/4)) //nolint:gomnd
 	i := 0
+
 	for {
-		if _, err := rand.Read(r); err != nil {
-			panic("unexpected error happened when reading from 'crypto/rand'")
+		n, err := io.ReadFull(reader, r)
+		if err != nil {
+			panic("unexpected error happened when reading from bufio.NewReader(crypto/rand.Reader)")
+		}
+		if n != len(r) {
+			panic("partial reads occurred when reading from bufio.NewReader(crypto/rand.Reader)")
 		}
 		for _, rb := range r {
 			if rb > base62MaxByte {
@@ -43,7 +58,7 @@ func Base62String(length int) string {
 			b[i] = base62Chars[rb%base62CharsLength]
 			i++
 			if i == length {
-				return utils.UnsafeString(b)
+				return string(b)
 			}
 		}
 	}

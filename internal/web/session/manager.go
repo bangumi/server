@@ -26,8 +26,8 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/random"
-	"github.com/bangumi/server/internal/pkg/timex"
 )
 
 const defaultKeyLength = 32
@@ -65,7 +65,7 @@ func (m manager) Create(ctx context.Context, a domain.Auth) (string, Session, er
 		return "", Session{}, errgo.Wrap(err, "un-expected error when creating session")
 	}
 
-	if err := m.cache.Set(ctx, redisKeyPrefix+key, s, timex.OneWeek); err != nil {
+	if err := m.cache.Set(ctx, redisKeyPrefix+key, s, gtime.OneWeek); err != nil {
 		return "", Session{}, errgo.Wrap(err, "redis.Set")
 	}
 
@@ -93,9 +93,9 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 	}
 
 	// 缓存3天或缓存者到token失效
-	ttl := generic.Min(timex.OneDaySec*3, s.ExpiredAt)
+	ttl := generic.Min(gtime.OneDaySec*3, s.ExpiredAt)
 
-	if err := m.cache.Set(ctx, redisKeyPrefix+key, s, timex.Second(ttl)); err != nil {
+	if err := m.cache.Set(ctx, redisKeyPrefix+key, s, gtime.Second(ttl)); err != nil {
 		m.log.Panic("failed to set cache")
 	}
 
@@ -115,6 +115,10 @@ func (m manager) RevokeUser(ctx context.Context, id model.UserID) error {
 	keys, err := m.repo.RevokeUser(ctx, id)
 	if err != nil {
 		return errgo.Wrap(err, "repo.Revoke")
+	}
+
+	if len(keys) == 0 {
+		return nil
 	}
 
 	for i, key := range keys {

@@ -24,8 +24,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger/log"
-	"github.com/bangumi/server/internal/pkg/timex"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -33,7 +33,7 @@ import (
 func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
 	if !v.Login {
-		return c.Redirect("/demo/Login")
+		return c.Redirect("/demo/login")
 	}
 
 	var r req.CreatePersonalAccessToken
@@ -45,7 +45,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 		return h.ValidationError(c, err)
 	}
 
-	token, err := h.a.CreateAccessToken(c.Context(), v.ID, r.Name, timex.OneDay*time.Duration(r.DurationDays))
+	token, err := h.a.CreateAccessToken(c.Context(), v.ID, r.Name, gtime.OneDay*time.Duration(r.DurationDays))
 	if err != nil {
 		return h.InternalError(c, err, "failed to create token", log.UserID(v.ID), zap.String("token_name", r.Name))
 	}
@@ -56,7 +56,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 	v := h.GetHTTPAccessor(c)
 	if !v.Login {
-		return c.Redirect("/demo/Login")
+		return c.Redirect("/demo/login")
 	}
 
 	var r req.DeletePersonalAccessToken

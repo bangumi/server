@@ -12,8 +12,22 @@
       "enabled": false
     },
     {
-      "groupName": "deps",
+      "matchPackageNames": ["go"],
+      "enabled": false
+    },
+    {
+      "groupName": "gomod",
       "matchManagers": ["gomod"],
+      "semanticCommitType": "build"
+    },
+    {
+      "groupName": "npm",
+      "matchManagers": ["npm"],
+      "enabled": true,
+      "rangeStrategy": "bump",
+      "lockFileMaintenance": {
+        "enabled": true
+      },
       "semanticCommitType": "build"
     }
   ]

@@ -17,24 +17,29 @@ package domain
 import (
 	"context"
 
+	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
 type EpisodeRepo interface {
+	// WithQuery is used to replace repo's query to txn
+	WithQuery(query *query.Query) EpisodeRepo
+
 	Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error)
 
 	// Count all episode for a subject.
-	Count(ctx context.Context, subjectID model.SubjectID) (int64, error)
-
-	// CountByType count episode for a subject and filter by type.
-	// This is because 0 means episode type normal.
-	CountByType(ctx context.Context, subjectID model.SubjectID, epType model.EpType) (int64, error)
+	Count(ctx context.Context, subjectID model.SubjectID, filter EpisodeFilter) (int64, error)
 
 	// List return all episode.
-	List(ctx context.Context, subjectID model.SubjectID, limit int, offset int) ([]model.Episode, error)
-
-	// ListByType return episodes filtered by episode type.
-	ListByType(
-		ctx context.Context, subjectID model.SubjectID, epType model.EpType, limit int, offset int,
+	List(
+		ctx context.Context,
+		subjectID model.SubjectID,
+		filter EpisodeFilter,
+		limit int, offset int,
 	) ([]model.Episode, error)
+}
+
+type EpisodeFilter struct {
+	Type null.Null[model.EpType]
 }

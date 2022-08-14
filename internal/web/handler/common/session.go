@@ -42,7 +42,7 @@ func (h Common) MiddlewareSessionAuth(c *fiber.Ctx) error {
 		if err != nil {
 			if errors.Is(err, session.ErrExpired) || errors.Is(err, domain.ErrNotFound) {
 				cookie.Clear(c, session.CookieKey)
-				return c.Next()
+				goto Next
 			}
 
 			h.log.Error("failed to get session", zap.Error(err), a.Log())
@@ -56,6 +56,8 @@ func (h Common) MiddlewareSessionAuth(c *fiber.Ctx) error {
 
 		a.SetAuth(auth)
 	}
+
+Next:
 
 	c.Context().SetUserValue(ctxkey.User, a)
 

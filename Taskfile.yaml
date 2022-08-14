@@ -19,19 +19,31 @@ tasks:
     generates:
       - ./dist/chii.exe
     cmds:
-      - go build -o dist/chii.exe main.go
+      - go build -trimpath -o dist/chii.exe main.go
     env:
       CGO_ENABLED: "0"
 
   build-archive:
-    desc: Build Web Server Binary
+    desc: Build archive binary
     sources:
       - ./**/*.go
       - go.mod
     generates:
       - ./dist/archive.exe
     cmds:
-      - go build -o ./dist/archive.exe ./internal/cmd/archive/
+      - go build -trimpath -o ./dist/archive.exe ./internal/cmd/archive/
+    env:
+      CGO_ENABLED: "0"
+
+  build-canal:
+    desc: Build canal binary
+    sources:
+      - ./**/*.go
+      - go.mod
+    generates:
+      - ./dist/canal.exe
+    cmds:
+      - go build -trimpath -o ./dist/canal.exe ./internal/cmd/canal/
     env:
       CGO_ENABLED: "0"
 
@@ -86,10 +98,10 @@ tasks:
   # generated files
   gen:
     desc: Generate all generated GO files
-    deps:
-      - gorm
-      - mock
-      - dal:comment
+    cmds:
+      - task: gorm
+      - task: mock
+      - task: dal:comment
 
   dal:comment:
     sources:

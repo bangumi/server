@@ -17,6 +17,7 @@ package log
 import (
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -46,4 +47,12 @@ func PersonID(id model.PersonID) zap.Field {
 
 func CharacterID(id model.CharacterID) zap.Field {
 	return zap.Uint32("character_id", uint32(id))
+}
+
+func TopicID(topicID model.TopicID) zap.Field {
+	return zap.Uint32("topic_id", uint32(topicID))
+}
+
+func TopicType(topicType domain.TopicType) zap.Field {
+	return zap.Uint32("topic_type", uint32(topicType))
 }

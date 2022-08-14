@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/timex"
+	"github.com/bangumi/server/internal/pkg/gtime"
 )
 
 func NewMysqlRepo(q *query.Query, logger *zap.Logger) Repo {
@@ -44,7 +44,7 @@ func (r mysqlRepo) Create(
 	ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string,
 ) (string, Session, error) {
 	createdAt := time.Now().Unix()
-	expiredAt := createdAt + timex.OneWeekSec
+	expiredAt := createdAt + gtime.OneWeekSec
 	s := Session{RegTime: regTime, UserID: userID, ExpiredAt: expiredAt}
 	encodedJSON, err := json.MarshalWithOption(s, json.DisableHTMLEscape(), json.DisableNormalizeUTF8())
 	if err != nil {

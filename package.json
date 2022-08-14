@@ -1,11 +1,13 @@
 {
-  "version": "0.22.5",
+  "name": "chii",
+  "version": "0.24.0",
   "description": "tools to bundle openapi spec, not used in our server",
   "private": true,
   "scripts": {
     "format": "prettier -w --list-different ./",
     "test": "node openapi/test.js",
     "start": "node openapi/dev-server.js",
+    "update-web-static": "node scripts/update_web_static.js",
     "version": "node scripts/bump.js"
   },
   "prettier": {
@@ -13,19 +15,16 @@
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
-    "@koa/router": "^10.1.1",
-    "bootstrap": "^5.1.3",
+    "bootstrap": "5.2.0",
     "conventional-changelog": "^3.1.25",
+    "jquery": "3.6.0",
     "js-yaml": "^4.1.0",
-    "koa": "^2.13.4",
-    "koa-proxy": "^1.0.0-alpha.3",
-    "livereload": "^0.9.3",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@types/conventional-changelog": "^3.1.1",
     "colors": "^1.4.0",
     "oas-validator": "^5.0.8",
-    "prettier": "^2.6.2"
+    "prettier": "^2.7.1"
   }
 }

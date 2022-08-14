@@ -11,6 +11,10 @@ npm test
 
 ## 编辑
 
-可以使用 `npm start` 来启动一个前端服务器来显示 Swagger UI.
+https://github.com/swagger-api/swagger-editor#docker
 
-这个 server 会对 openapi 定义进行一些额外的处理。包含 livereload server ，会在文件修改后自动刷新浏览器页面。
+```
+$ docker run -p 8061:8080 -v $(pwd)/openapi:/tmp -e SWAGGER_FILE=/tmp/v0.yaml swaggerapi/swagger-editor
+# or
+$ docker run -p 8061:8080 -v $(pwd)/openapi:/tmp -e SWAGGER_FILE=/tmp/private.yaml swaggerapi/swagger-editor
+```

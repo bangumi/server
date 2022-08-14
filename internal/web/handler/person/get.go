@@ -32,7 +32,7 @@ func (h Person) Get(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.app.Query.GetPerson(c.Context(), id)
+	r, err := h.ctrl.GetPerson(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -54,7 +54,7 @@ func (h Person) GetImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.app.Query.GetPerson(c.Context(), id)
+	r, err := h.ctrl.GetPerson(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

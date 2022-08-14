@@ -39,7 +39,7 @@ func newGroup(db *gorm.DB) group {
 	_group.Description = field.NewString(tableName, "grp_desc")
 	_group.LastPostedTime = field.NewUint32(tableName, "grp_lastpost")
 	_group.CreatedTime = field.NewUint32(tableName, "grp_builddate")
-	_group.Accessible = field.NewBool(tableName, "grp_accessible")
+	_group.Accessible = field.NewUint8(tableName, "grp_accessible")
 	_group.Nsfw = field.NewBool(tableName, "grp_nsfw")
 
 	_group.fillFieldMap()
@@ -63,7 +63,7 @@ type group struct {
 	Description    field.String
 	LastPostedTime field.Uint32
 	CreatedTime    field.Uint32
-	Accessible     field.Bool
+	Accessible     field.Uint8
 	Nsfw           field.Bool
 
 	fieldMap map[string]field.Expr
@@ -93,7 +93,7 @@ func (g *group) updateTableName(table string) *group {
 	g.Description = field.NewString(table, "grp_desc")
 	g.LastPostedTime = field.NewUint32(table, "grp_lastpost")
 	g.CreatedTime = field.NewUint32(table, "grp_builddate")
-	g.Accessible = field.NewBool(table, "grp_accessible")
+	g.Accessible = field.NewUint8(table, "grp_accessible")
 	g.Nsfw = field.NewBool(table, "grp_nsfw")
 
 	g.fillFieldMap()

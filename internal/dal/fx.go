@@ -24,5 +24,6 @@ var Module = fx.Module("dal",
 	fx.Provide(
 		NewDB,
 		query.Use,
+		NewMysqlTransaction,
 	),
 )

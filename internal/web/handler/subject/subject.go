@@ -17,15 +17,15 @@ package subject
 import (
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/app"
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/web/handler/common"
 )
 
 type Subject struct {
 	common.Common
-	app    app.App
+	ctrl   ctrl.Ctrl
 	person domain.PersonService
 	topic  domain.TopicRepo
 	log    *zap.Logger
@@ -36,12 +36,12 @@ func New(
 	common common.Common,
 	p domain.PersonService,
 	topic domain.TopicRepo,
-	app app.App,
+	ctrl ctrl.Ctrl,
 	log *zap.Logger,
 ) (Subject, error) {
 	return Subject{
 		Common: common,
-		app:    app,
+		ctrl:   ctrl,
 		person: p,
 		topic:  topic,
 		log:    log.Named("handler.Subject"),

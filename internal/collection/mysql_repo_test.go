@@ -17,15 +17,19 @@ package collection_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
+	"gorm.io/gen/field"
 
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
@@ -70,14 +74,29 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const id model.UserID = 382951
+	const id model.UserID = 382952
+	// parallel problem
 
-	repo, _ := getRepo(t)
+	repo, q := getRepo(t)
+	test.RunAndCleanup(t, func() {
+		_, err := q.SubjectCollection.WithContext(context.Background()).Where(q.SubjectCollection.UserID.Eq(id)).Delete()
+		require.NoError(t, err)
+	})
+
+	for i := 0; i < 5; i++ {
+		err := q.SubjectCollection.WithContext(context.Background()).Create(&dao.SubjectCollection{
+			UserID:      id,
+			SubjectID:   model.SubjectID(i + 100),
+			SubjectType: model.SubjectTypeAnime,
+			UpdatedTime: uint32(time.Now().Unix()),
+		})
+		require.NoError(t, err)
+	}
 
 	count, err := repo.CountSubjectCollections(context.Background(), id,
 		model.SubjectTypeAll, model.SubjectCollectionAll, true)
 	require.NoError(t, err)
-	require.EqualValues(t, 25, count)
+	require.EqualValues(t, 5, count)
 }
 
 func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
@@ -92,4 +111,143 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 		model.SubjectTypeGame, model.SubjectCollectionAll, true, 5, 0)
 	require.NoError(t, err)
 	require.Len(t, data, 5)
+}
+
+func TestMysqlRepo_GetEpisodeCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const userID model.UserID = 382951
+	const subjectID model.SubjectID = 372487
+
+	repo, _ := getRepo(t)
+
+	ep, err := repo.GetSubjectEpisodesCollection(context.Background(), userID, subjectID)
+	require.NoError(t, err)
+
+	require.NotZero(t, len(ep))
+
+	for id, item := range ep {
+		require.NotZero(t, id)
+		require.NotZero(t, item.ID)
+		require.NotZero(t, item.Type)
+	}
+}
+
+func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 40000
+	const sid model.SubjectID = 1000
+
+	repo, q := getRepo(t)
+	table := q.SubjectCollection
+
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete()
+		require.NoError(t, err)
+	})
+
+	err := table.WithContext(context.Background()).Create(
+		&dao.SubjectCollection{
+			UserID: uid, SubjectID: sid, Rate: 8, Type: uint8(model.SubjectCollectionDoing),
+		},
+		&dao.SubjectCollection{
+			UserID: uid, SubjectID: sid + 1, Rate: 8, Type: uint8(model.SubjectCollectionDoing),
+		},
+		&dao.SubjectCollection{
+			UserID: uid + 1, SubjectID: sid, Rate: 8, Type: uint8(model.SubjectCollectionDoing),
+		},
+	)
+	require.NoError(t, err)
+
+	now := time.Now()
+
+	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, domain.SubjectCollectionUpdate{
+		Comment: null.New("c"),
+		Rate:    null.New[uint8](1),
+		Type:    null.New(model.SubjectCollectionDropped),
+	}, now)
+	require.NoError(t, err)
+
+	r, err := table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	require.NoError(t, err)
+
+	require.EqualValues(t, now.Unix(), r.UpdatedTime)
+	require.True(t, r.HasComment)
+	require.Equal(t, "c", r.Comment)
+	require.Equal(t, uint8(1), r.Rate)
+	require.EqualValues(t, now.Unix(), r.DroppedTime)
+	require.Zero(t, r.WishTime)
+	require.Zero(t, r.DoingTime)
+	require.Zero(t, r.DoneTime)
+	require.Zero(t, r.OnHoldTime)
+
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid+1), table.UserID.Eq(uid)).First()
+	require.NoError(t, err)
+
+	require.EqualValues(t, 8, r.Rate)
+
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid+1)).First()
+	require.NoError(t, err)
+
+	require.EqualValues(t, 8, r.Rate)
+}
+
+func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 40010
+	const sid model.SubjectID = 1010
+
+	repo, q := getRepo(t)
+	table := q.EpCollection
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := table.WithContext(context.TODO()).Create(&dao.EpCollection{
+		UserID:    uid,
+		SubjectID: sid,
+		Status:    []byte("a:0:{}"),
+	})
+	require.NoError(t, err)
+
+	now := time.Now()
+
+	_, err = repo.UpdateEpisodeCollection(context.Background(),
+		uid, sid, []model.EpisodeID{1, 2}, model.EpisodeCollectionDone, now)
+	require.NoError(t, err)
+
+	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	require.NoError(t, err)
+
+	require.EqualValues(t, now.Unix(), r.UpdatedTime)
+
+	var m map[uint32]struct {
+		Type int `php:"type"`
+	}
+	require.NoError(t, phpserialize.Unmarshal(r.Status, &m))
+	require.Len(t, m, 2)
+	require.Contains(t, m, uint32(1))
+	require.EqualValues(t, model.EpisodeCollectionDone, m[1].Type)
+	require.Contains(t, m, uint32(2))
+	require.EqualValues(t, model.EpisodeCollectionDone, m[2].Type)
+
+	// testing remove episode collection
+	_, err = repo.UpdateEpisodeCollection(context.Background(),
+		uid, sid, []model.EpisodeID{1, 2}, model.EpisodeCollectionNone, now)
+	require.NoError(t, err)
+
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	require.NoError(t, err)
+
+	var m2 map[uint32]struct {
+		Type int `php:"type"`
+	}
+	require.NoError(t, phpserialize.Unmarshal(r.Status, &m2))
+	require.Len(t, m2, 0)
 }
