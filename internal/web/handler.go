@@ -53,7 +53,7 @@ func AddRouters(
 	personHandler person.Person,
 	characterHandler character.Character,
 	subjectHandler subject.Subject,
-	search *search.Client,
+	search search.Handler,
 ) {
 	app.Use(ua.DisableDefaultHTTPLibrary)
 

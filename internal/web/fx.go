@@ -17,6 +17,7 @@ package web
 import (
 	"go.uber.org/fx"
 
+	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
@@ -33,6 +34,7 @@ var Module = fx.Module("web",
 		captcha.New,
 		session.New,
 		frontend.NewTemplateEngine,
+		func(c *search.Client) search.Handler { return c },
 	),
 	fx.Invoke(AddRouters),
 )

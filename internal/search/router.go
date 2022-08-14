@@ -28,20 +28,17 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
+type Handler interface {
+	Handle(ctx *fiber.Ctx) error
+}
+
 const defaultLimit = 50
 const maxLimit = 200
 
-type Query struct {
-	Q    string
-	Sort string
-}
-
 func (c *Client) Handle(ctx *fiber.Ctx) error {
-	query := Query{
-		Q:    strings.TrimSpace(ctx.Query("q")),
-		Sort: ctx.Query("sort"),
-	}
-	if query.Q == "" {
+	query := strings.TrimSpace(ctx.Query("q"))
+	sort := ctx.Query("sort")
+	if query == "" {
 		return ctx.SendString("empty query string")
 	}
 
@@ -50,14 +47,9 @@ func (c *Client) Handle(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	w, filter, err := parse(query.Q)
+	w, filter, err := parse(query)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(err)
-	}
-
-	var sort []string
-	if query.Sort != "" {
-		sort = append(sort, query.Sort)
 	}
 
 	result, err := c.doSearch(w, filter, sort, q.Limit, q.Offset)
@@ -105,7 +97,7 @@ func (c *Client) Handle(ctx *fiber.Ctx) error {
 func (c *Client) doSearch(
 	words string,
 	filter [][]string,
-	sort []string,
+	sort string,
 	limit, offset int,
 ) (*meilisearch.SearchResponse, error) {
 	if limit == 0 {
@@ -114,11 +106,16 @@ func (c *Client) doSearch(
 		limit = 50
 	}
 
+	var sortOpt []string
+	if sort == "" {
+		sortOpt = []string{sort}
+	}
+
 	response, err := c.search.Index("subjects").Search(words, &meilisearch.SearchRequest{
 		Offset: int64(offset),
 		Limit:  int64(limit),
 		Filter: filter,
-		Sort:   sort,
+		Sort:   sortOpt,
 	})
 	if err != nil {
 		return nil, errgo.Wrap(err, "meilisearch search")
