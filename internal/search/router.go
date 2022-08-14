@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/meilisearch/meilisearch-go"
-	"github.com/olivere/elastic/v7"
 
 	"github.com/bangumi/server/internal/model"
 )
@@ -32,11 +31,12 @@ func (c *Client) Handler() fiber.Handler {
 			return c.SendString("empty query string")
 		}
 
-		q, err := parseQueryLine(query.Q)
+		w, q, err := parseQueryLine(query.Q)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(err)
 		}
 
+		runtime.KeepAlive(w)
 		runtime.KeepAlive(q)
 		runtime.KeepAlive(search)
 
@@ -78,7 +78,7 @@ func (c *Client) Handler() fiber.Handler {
 	}
 }
 
-func buildService(es *meilisearch.Client, query Query, q *elastic.BoolQuery) *meilisearch.SearchResponse {
+func buildService(es *meilisearch.Client, query Query) *meilisearch.SearchResponse {
 	if query.Limit == 0 {
 		query.Limit = 10
 	} else if query.Limit > 50 {
@@ -113,18 +113,8 @@ func buildService(es *meilisearch.Client, query Query, q *elastic.BoolQuery) *me
 	return service
 }
 
-func parseQueryLine(s string) (*elastic.BoolQuery, error) {
-	b, err := parse(s)
-	if err != nil {
-		return nil, err
-	}
-
-	b.Must(
-		elastic.NewRankFeatureQuery("heat").Boost(5),        //nolint:gomnd
-		elastic.NewRankFeatureQuery("page_rank").Boost(2.5), //nolint:gomnd
-	).MinimumShouldMatch("75%")
-
-	return b, nil
+func parseQueryLine(s string) (string, [][]string, error) {
+	return "", nil, nil
 }
 
 type resSubject struct {
