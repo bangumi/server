@@ -66,7 +66,17 @@ func (c *Client) Handle(ctx *fiber.Ctx) error {
 
 	for i, hit := range result.Hits {
 		var source = Subject{}
-		if err := mapstructure.Decode(hit, &source); err != nil {
+
+		d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+			WeaklyTypedInput: true,
+			TagName:          "json",
+			Result:           &source,
+		})
+		if err != nil {
+			return errgo.Wrap(err, "mapstruct NewDecoder")
+		}
+
+		if err := d.Decode(hit); err != nil {
 			return errgo.Wrap(err, "failed to convert from any")
 		}
 
