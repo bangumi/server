@@ -44,8 +44,8 @@ const defaultLimit = 50
 const maxLimit = 200
 
 type Req struct {
-	Filter  Filter `json:"filter"`
 	Keyword string `json:"keyword"`
+	Filter  Filter `json:"filter"`
 }
 
 type Filter struct {
@@ -65,7 +65,7 @@ func (c *Client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 	}
 
 	var query Req
-	if err := json.Unmarshal(ctx.Body(), &query); err != nil {
+	if err = json.Unmarshal(ctx.Body(), &query); err != nil {
 		return res.JSONError(ctx, err)
 	}
 

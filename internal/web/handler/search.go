@@ -19,5 +19,5 @@ import (
 )
 
 func (h Handler) Search(c *fiber.Ctx) error {
-	return h.search.Handle(c, h.GetHTTPAccessor(c))
+	return h.search.Handle(c, h.GetHTTPAccessor(c)) //nolint:wrapcheck
 }

@@ -21,7 +21,7 @@ import (
 	"github.com/bangumi/server/pkg/wiki"
 )
 
-// 是最终 meilisearch 索引的文档
+// 是最终 meilisearch 索引的文档.
 type subjectIndex struct {
 	Summary  string   `json:"summary"`
 	Tag      []string `json:"tag,omitempty"`
