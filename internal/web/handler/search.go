@@ -12,27 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package search
+package handler
 
 import (
-	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/pkg/wiki"
+	"github.com/gofiber/fiber/v2"
 )
 
-// extract game field.
-func gamePlatform(s *model.Subject, w wiki.Wiki) []string {
-	if s.TypeID != model.SubjectTypeGame {
-		return nil
-	}
-
-	for _, field := range w.Fields {
-		if field.Null {
-			continue
-		}
-		if field.Key == "平台" {
-			return GetValues(field)
-		}
-	}
-
-	return nil
+func (h Handler) Search(c *fiber.Ctx) error {
+	return h.search.Handle(c, h.GetHTTPAccessor(c))
 }

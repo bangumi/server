@@ -22,6 +22,7 @@ import (
 	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/oauth"
+	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler/common"
@@ -40,6 +41,7 @@ func New(
 	captcha captcha.Manager,
 	session session.Manager,
 	rateLimit rate.Manager,
+	search search.Handler,
 	log *zap.Logger,
 	engine frontend.TemplateEngine,
 	oauth oauth.Manager,
@@ -53,6 +55,7 @@ func New(
 		session:   session,
 		a:         a,
 		i:         index,
+		search:    search,
 		r:         r,
 		captcha:   captcha,
 		g:         g,
@@ -74,6 +77,7 @@ type Handler struct {
 	captcha   captcha.Manager
 	rateLimit rate.Manager
 	i         domain.IndexRepo
+	search    search.Handler
 	template  frontend.TemplateEngine
 	buffPool  buffer.Pool
 	log       *zap.Logger

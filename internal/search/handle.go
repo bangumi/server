@@ -16,6 +16,8 @@ package search
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -24,13 +26,15 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 type Handler interface {
-	Handle(ctx *fiber.Ctx) error
+	Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error
 }
 
 const defaultLimit = 50
@@ -42,15 +46,15 @@ type Req struct {
 }
 
 type Filter struct {
-	Type    model.SubjectType `json:"type"`
-	Tag     []string          `json:"tag"`
-	AirDate []string          `json:"air_date"`
-	Rating  string            `json:"rating"`
-	Rank    string            `json:"rank"`
-	NSFW    null.Bool         `json:"nsfw"`
+	Type    []model.SubjectType `json:"type"`     // or
+	Tag     []string            `json:"tag"`      // and
+	AirDate []string            `json:"air_date"` // and
+	Rating  []string            `json:"rating"`   // and
+	Rank    []string            `json:"rank"`     // and
+	NSFW    null.Bool           `json:"nsfw"`
 }
 
-func (c *Client) Handle(ctx *fiber.Ctx) error {
+func (c *Client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 	sort := ctx.Query("sort")
 	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
 	if err != nil {
@@ -60,6 +64,10 @@ func (c *Client) Handle(ctx *fiber.Ctx) error {
 	var query Req
 	if err := json.Unmarshal(ctx.Body(), &query); err != nil {
 		return res.JSONError(ctx, err)
+	}
+
+	if !auth.AllowNSFW() {
+		query.Filter.NSFW = null.New(false)
 	}
 
 	result, err := c.doSearch(query.Keyword, filterToMeiliFilter(query.Filter), sort, q.Limit, q.Offset)
@@ -145,20 +153,118 @@ type resSubject struct {
 	Rank   uint32          `json:"rank"`
 }
 
-type Pagination struct {
-	Since []interface{} `json:"since"`
-	Limit int           `json:"limit"`
-}
-
-type Response struct {
-	Data       []resSubject `json:"data"`
-	Pagination Pagination   `json:"pagination"`
-}
-
 func intDateToString(v int) string {
 	if v == 0 {
 		return ""
 	}
 
 	return fmt.Sprintf("%04d-%02d-%02d", v/10000, (v%10000)/100*100, v%100)
+}
+
+func filterToMeiliFilter(req Filter) [][]string {
+	var filter = make([][]string, 0, 6)
+
+	if len(req.AirDate) != 0 {
+		filter = append(filter, parseDateFilter(req.AirDate))
+	}
+
+	for _, s := range req.Tag {
+		filter = append(filter, []string{fmt.Sprintf("tag = %s", s)})
+	}
+
+	if len(req.Type) != 0 {
+		filter = append(filter, slice.Map(req.Type, func(s model.SubjectType) string {
+			return fmt.Sprintf("type = %d", s)
+		}))
+	}
+
+	if len(req.Rank) != 0 {
+		filter = append(filter, slice.Map(req.Rank, func(s string) string {
+			return "rank" + s
+		}))
+	}
+
+	if len(req.Rating) != 0 {
+		filter = append(filter, slice.Map(req.Rating, func(s string) string {
+			return "rating" + s
+		}))
+	}
+
+	return filter
+}
+
+// parse date filter like `<2020-01-20`, `>=2020-01-23`.
+func parseDateFilter(filters []string) []string {
+	var result = make([]string, 0, len(filters))
+
+	for _, s := range filters {
+		switch {
+		case strings.HasPrefix(s, ">="):
+			if v, ok := parseDateValOk(s[2:]); ok {
+				result = append(result, fmt.Sprintf("date >= %d", v))
+			}
+		case strings.HasPrefix(s, ">"):
+			if v, ok := parseDateValOk(s[1:]); ok {
+				result = append(result, fmt.Sprintf("date > %d", v))
+			}
+		case strings.HasPrefix(s, "<="):
+			if v, ok := parseDateValOk(s[2:]); ok {
+				result = append(result, fmt.Sprintf("date <= %d", v))
+			}
+		case strings.HasPrefix(s, "<"):
+			if v, ok := parseDateValOk(s[1:]); ok {
+				result = append(result, fmt.Sprintf("date < %d", v))
+			}
+		default:
+			if v, ok := parseDateValOk(s); ok {
+				result = append(result, fmt.Sprintf("date = %d", v))
+			}
+		}
+	}
+
+	return result
+}
+
+func parseDateValOk(date string) (int, bool) {
+	if len(date) < 10 {
+		return 0, false
+	}
+
+	// 2008-10-05 format
+	if !(isDigitsOnly(date[:4]) &&
+		date[4] == '-' &&
+		isDigitsOnly(date[5:7]) &&
+		date[7] == '-' &&
+		isDigitsOnly(date[8:10])) {
+		return 0, false
+	}
+
+	v, err := strconv.Atoi(date[:4])
+	if err != nil {
+		return 0, false
+	}
+	val := v * 10000
+
+	v, err = strconv.Atoi(date[5:7])
+	if err != nil {
+		return 0, false
+	}
+	val += v * 100
+
+	v, err = strconv.Atoi(date[8:10])
+	if err != nil {
+		return 0, false
+	}
+	val += v
+
+	return val, true
+}
+
+func isDigitsOnly(s string) bool {
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			return false
+		}
+	}
+	return true
 }

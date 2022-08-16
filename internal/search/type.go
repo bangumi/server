@@ -18,6 +18,22 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
+// Subject 是最终 meilisearch 索引的文档
+type Subject struct {
+	Summary  string   `json:"summary"`
+	Tag      []string `json:"tag,omitempty"`
+	Name     []string `json:"name"`
+	Record   Record   `json:"record"`
+	Date     int      `json:"date,omitempty"`
+	Score    float64  `json:"score"`
+	PageRank float64  `json:"page_rank,omitempty"`
+	Heat     uint32   `json:"heat,omitempty"`
+	Rank     uint32   `json:"rank"`
+	Platform uint16   `json:"platform,omitempty"`
+	Type     uint8    `json:"type"`
+	NSFW     bool     `json:"nsfw"`
+}
+
 type Record struct {
 	Date   string          `json:"date"`
 	Image  string          `json:"image"`
@@ -27,20 +43,4 @@ type Record struct {
 	Score  float64         `json:"score"`
 	ID     model.SubjectID `json:"id"`
 	Rank   uint32          `json:"rank"`
-}
-
-type Subject struct {
-	Summary      string   `json:"summary"`
-	Tag          []string `json:"tag,omitempty"`
-	Name         []string `json:"name"`
-	GamePlatform []string `json:"game_platform"`
-	Record       Record   `json:"record"`
-	Date         int      `json:"date,omitempty"`
-	Score        float64  `json:"score"`
-	PageRank     float64  `json:"page_rank,omitempty"`
-	Heat         uint32   `json:"heat,omitempty"`
-	Rank         uint32   `json:"rank"`
-	Platform     uint16   `json:"platform,omitempty"`
-	Type         uint8    `json:"type"`
-	NSFW         bool     `json:"nsfw"`
 }
