@@ -32,14 +32,14 @@ func extractNames(s *model.Subject, w wiki.Wiki) []string {
 
 	for _, field := range w.Fields {
 		if field.Key == "别名" {
-			names = append(names, GetValues(field)...)
+			names = append(names, getValues(field)...)
 		}
 	}
 
 	return names
 }
 
-func GetValues(f wiki.Field) []string {
+func getValues(f wiki.Field) []string {
 	if f.Null {
 		return nil
 	}

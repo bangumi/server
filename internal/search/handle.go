@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
+// Package search 基于 meilisearch 提供搜索功能
 package search
 
 import (
@@ -32,6 +33,8 @@ import (
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
+
+// TODO: 想个办法挪到 web 里面去
 
 type Handler interface {
 	Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error
