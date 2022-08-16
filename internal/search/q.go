@@ -18,42 +18,33 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/search/syntax"
 )
 
-// keyword, filters,  error.
-func parse(s string) (string, [][]string, error) {
-	r, err := syntax.Parse(s)
-	if err != nil {
-		return "", nil, errgo.Wrap(err, "parse syntax")
-	}
-
+func filterToMeiliFilter(req Filter) [][]string {
 	var filter [][]string
-	for field, values := range r.Filter {
-		var op string
-		if field[0] == '-' {
-			op = " -= "
-		} else {
-			op = " = "
-		}
+	// for field, values := range req {
+	// 	var op string
+	// 	if field[0] == '-' {
+	// 		op = " -= "
+	// 	} else {
+	// 		op = " = "
+	// 	}
+	//
+	// 	switch field {
+	// 	case "airdate":
+	// 		filter = append(filter, parseDateFilter(values))
+	// 	case "tag":
+	// 		for _, value := range values {
+	// 			filter = append(filter, []string{"tag" + op + value})
+	// 		}
+	// 	case "game_platform":
+	// 		filter = append(filter, values)
+	// 	case "type":
+	// 		filter = append(filter, values)
+	// 	}
+	// }
 
-		switch field {
-		case "airdate":
-			filter = append(filter, parseDateFilter(values))
-		case "tag":
-			for _, value := range values {
-				filter = append(filter, []string{"tag" + op + value})
-			}
-		case "game_platform":
-			filter = append(filter, values)
-		case "type":
-			filter = append(filter, values)
-		}
-	}
-
-	return strings.Join(r.Keyword, " "), filter, nil
+	return filter
 }
 
 // parse date filter like `<2020-01-20`, `>=2020-01-23`.

@@ -106,15 +106,15 @@ x-parameters:
 
 paths:
   "/v0/search/subjects":
-    get:
+    post:
       tags:
         - 搜索
       summary: 条目搜索
       operationId: searchSubjects
       description: |
         ## 实验性 API， 本 schema 和实际的 API 行为都可能随时发生改动
-        搜索条件直接在包含在 `q` 中，类似 [github 搜索](https://github.com/search/advanced?q=repo%3Abangumi%2Fapi+stars%3A%3E100&type=Repositories)
-        支持的筛选条件包括:
+
+        目前支持的筛选条件包括:
         - type: 条目类型，参照 `SubjectType` enum。
         - tag: 标签，可以多次出现。多值之间为`且`关系。
         - airdate: 播出日期/发售日期。
@@ -127,17 +127,6 @@ paths:
         - 两人/多人合作作品
         - 评分人数
       parameters:
-        - name: q
-          in: query
-          description: |
-            example:
-            - `叛逆的鲁鲁修 tag:中二 airdate:>2003-05-09 nsfw:exclude`
-            - `nsfw:only airdate:>2002-05-09 airdate:<2021-01-09`
-            - `type:2 tag:校园 tag:爱情`
-          required: true
-          schema:
-            type: string
-
         - name: order
           in: query
           description: 可以使用筛选条件配合 `order=rank` 的方式来筛选排行榜结果。
@@ -156,6 +145,68 @@ paths:
           required: false
           schema:
             type: integer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              required:
+                - keyword
+              properties:
+                keyword:
+                  type: string
+                filter:
+                  type: object
+                  description: 不同条件之间是 `且` 的关系
+                  properties:
+                    type:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/SubjectType"
+                      description: 条目类型，参照 `SubjectType` enum，多值之间为 `或` 的关系。
+                    tag:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                        - 童年
+                        - 原创
+                      description: 标签，可以多次出现。多值之间为 `且` 关系。
+                    air_date:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                        - ">=2020-07-01"
+                        - "<2020-10-01"
+                      description: 播出日期/发售日期，日期必需为 `YYYY-MM-DD` 格式。多值之间为 `且` 关系。
+                    rating:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                        - ">=6"
+                        - "<8"
+                      description: 用于搜索指定评分的条目，多值之间为 `且` 关系。
+                    rank:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                        - ">10"
+                        - "<=18"
+                      description: 用于搜索指定排名的条目，多值之间为 `且` 关系。
+                    nsfw:
+                      type: boolean
+                      description: |
+                        无权限的用户会直接忽略此字段，不会返回R18条目。
+
+                        默认或者 `null` 会返回包含 R18 的所有搜索结果。
+
+                        `true` 只会返回 R18 条目。
+
+                        `false` 只会返回非 R18 条目。
+
       responses:
         200:
           description: 返回搜索结果

@@ -16,14 +16,15 @@ package search
 
 import (
 	"fmt"
-	"strings"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/mitchellh/mapstructure"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -35,24 +36,33 @@ type Handler interface {
 const defaultLimit = 50
 const maxLimit = 200
 
-func (c *Client) Handle(ctx *fiber.Ctx) error {
-	query := strings.TrimSpace(ctx.Query("q"))
-	sort := ctx.Query("sort")
-	if query == "" {
-		return ctx.SendString("empty query string")
-	}
+type Req struct {
+	Filter  Filter `json:"filter"`
+	Keyword string `json:"keyword"`
+}
 
+type Filter struct {
+	Type    model.SubjectType `json:"type"`
+	Tag     []string          `json:"tag"`
+	AirDate []string          `json:"air_date"`
+	Rating  string            `json:"rating"`
+	Rank    string            `json:"rank"`
+	NSFW    null.Bool         `json:"nsfw"`
+}
+
+func (c *Client) Handle(ctx *fiber.Ctx) error {
+	sort := ctx.Query("sort")
 	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
 	if err != nil {
 		return err
 	}
 
-	w, filter, err := parse(query)
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(err)
+	var query Req
+	if err := json.Unmarshal(ctx.Body(), &query); err != nil {
+		return res.JSONError(ctx, err)
 	}
 
-	result, err := c.doSearch(w, filter, sort, q.Limit, q.Offset)
+	result, err := c.doSearch(query.Keyword, filterToMeiliFilter(query.Filter), sort, q.Limit, q.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "search")
 	}
