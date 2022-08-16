@@ -77,13 +77,13 @@ func (c *Client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 		return errgo.Wrap(err, "subjectRepo.Get")
 	}
 
-	extracted := c.ExtractSubject(&s)
+	extracted := extractSubject(&s)
 
-	return c.UpsertSubject(ctx, extracted)
+	return c.upsertSubject(ctx, extracted)
 }
 
 // UpsertSubject add subject to search backend.
-func (c *Client) UpsertSubject(ctx context.Context, s Subject) error {
+func (c *Client) upsertSubject(ctx context.Context, s subjectIndex) error {
 	_, err := c.search.Index(c.subject).UpdateDocuments(s, "id")
 
 	return errgo.Wrap(err, "search")

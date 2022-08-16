@@ -77,7 +77,7 @@ func (c *Client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 
 	data := make([]resSubject, len(result.Hits))
 	for i, hit := range result.Hits {
-		var source = Subject{}
+		var source = subjectIndex{}
 
 		d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 			WeaklyTypedInput: true,
