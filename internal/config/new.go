@@ -25,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-//nolint:govet
 type AppConfig struct {
 	Debug map[string]bool `yaml:"debug"`
 
