@@ -287,6 +287,7 @@ linters-settings:
 linters:
   enable-all: true
   disable:
+    - nolintlint
     - ireturn
     - contextcheck
     - bodyclose
