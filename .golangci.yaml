@@ -222,7 +222,8 @@ linters-settings:
     default-signifies-exhaustive: true
   govet:
     enable-all: true
-  #    disable:
+    disable:
+      - fieldalignment
   #      - shadow
   wrapcheck:
     # An array of strings that specify substrings of signatures to ignore.
