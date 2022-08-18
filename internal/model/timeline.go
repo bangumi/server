@@ -30,32 +30,76 @@ const (
 )
 
 type TimeLine struct {
-	Related string
-	Memo    TimeLineMemo
-	Image   TimeLineImages
+	ID  TimeLineID
+	UID UserID
 
-	ID   TimeLineID
-	UID  UserID
-	Cat  uint16 // Category
-	Type TimeLineType
-
+	Related  string
 	Batch    uint8
 	Source   uint8
 	Replies  uint32
 	Dateline uint32
+	Image    TimeLineImages
+
+	Cat  uint16 // Category
+	Type TimeLineType
+	Memo TimeLineMemo
 }
 
 type TimeLineMemo struct {
-	*TimeLineDoujinMemo
-	*TimeLineMonoMemo
 	*TimeLineRelationMemo
-	*TimeLineIndexMemo
-	*TimeLineSubjectMemo
-	*TimeLineWikiMemo
-	*TimeLineBlogMemo
 	*TimeLineGroupMemo
-	*TimeLineSayMemo
+	*TimeLineWikiMemo
+	*TimeLineSubjectMemo
 	*TimeLineProgressMemo
+	*TimeLineSayMemo
+	*TimeLineBlogMemo
+	*TimeLineIndexMemo
+	*TimeLineMonoMemo
+	*TimeLineDoujinMemo
+}
+
+func (tl *TimeLine) fillCatAndType() *TimeLine {
+	m := tl.Memo
+	if m.TimeLineRelationMemo != nil {
+		return setCatAndType(tl, 1, 2)
+	}
+	if m.TimeLineGroupMemo != nil {
+		return setCatAndType(tl, 1, 3)
+	}
+	if m.TimeLineWikiMemo != nil {
+		return setCatAndType(tl, 2, 0)
+	}
+	if m.TimeLineSubjectMemo != nil {
+		return setCatAndType(tl, 3, 0)
+	}
+	if m.TimeLineProgressMemo != nil {
+		return setCatAndType(tl, 4, 0)
+	}
+	if m.TimeLineSayMemo != nil {
+		if m.TimeLineSayMemo.TimeLineSayEdit != nil {
+			return setCatAndType(tl, 5, 2)
+		}
+		return setCatAndType(tl, 5, 0)
+	}
+	if m.TimeLineBlogMemo != nil {
+		return setCatAndType(tl, 6, 0)
+	}
+	if m.TimeLineIndexMemo != nil {
+		return setCatAndType(tl, 7, 0)
+	}
+	if m.TimeLineMonoMemo != nil {
+		return setCatAndType(tl, 8, 1)
+	}
+	if m.TimeLineDoujinMemo != nil {
+		return setCatAndType(tl, 9, 0)
+	}
+	return tl
+}
+
+func setCatAndType(tl *TimeLine, cat uint16, typ TimeLineType) *TimeLine {
+	tl.Cat = cat
+	tl.Type = typ
+	return tl
 }
 
 type TimeLineDoujinMemo struct {
