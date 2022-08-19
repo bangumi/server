@@ -26,7 +26,7 @@ import (
 func OnSubjectChange(key json.RawMessage, payload payload) {
 	switch payload.Op {
 	case opCreate:
-	case opReplace:
+	case opSnapshot:
 		// fmt.Println(payload.After)
 	case opDelete:
 		// fmt.Println(payload.Before)

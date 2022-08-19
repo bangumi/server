@@ -128,10 +128,10 @@ func startReaders(eg *errgroup.Group) ([]io.Closer, error) {
 }
 
 const (
-	opCreate  = "c"
-	opReplace = "r"
-	opDelete  = "d"
-	opUpdate  = "u"
+	opCreate   = "c"
+	opDelete   = "d"
+	opUpdate   = "u"
+	opSnapshot = "r" // just ignore them, production debezium disable snapshot.
 )
 
 // https://debezium.io/documentation/reference/connectors/mysql.html
