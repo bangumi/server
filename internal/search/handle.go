@@ -132,7 +132,7 @@ func (c *Client) doSearch(
 		sortOpt = []string{sort}
 	}
 
-	response, err := c.search.Index("subjects").Search(words, &meilisearch.SearchRequest{
+	response, err := c.subjectIndex.Search(words, &meilisearch.SearchRequest{
 		Offset: int64(offset),
 		Limit:  int64(limit),
 		Filter: filter,

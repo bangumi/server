@@ -24,7 +24,7 @@ import (
 
 func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) {
 	switch payload.Op {
-	case opCreate, opReplace, opDelete:
+	case opCreate, opSnapshot, opDelete:
 		return
 	case opUpdate:
 		var diff = make([]string, 0, len(payload.After))

@@ -25,11 +25,18 @@ import (
 )
 
 func (e *eventHandler) OnSubjectChange(key json.RawMessage, payload payload) {
+	var k SubjectKey
+	if err := json.UnmarshalNoEscape(key, &k); err != nil {
+		return
+	}
+
 	switch payload.Op {
-	case opCreate, opUpdate, opReplace:
-		var k SubjectKey
-		if err := json.UnmarshalNoEscape(key, &k); err != nil {
-			return
+	case opCreate, opUpdate, opSnapshot:
+		var diff = make([]string, 0, len(payload.After))
+		for key, value := range payload.Before {
+			if string(payload.After[key]) != string(value) {
+				diff = append(diff, key)
+			}
 		}
 
 		if err := e.search.OnSubjectUpdate(context.TODO(), k.ID); err != nil {

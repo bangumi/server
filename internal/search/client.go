@@ -49,20 +49,22 @@ func New(c config.AppConfig, subjectRepo domain.SubjectRepo, log *zap.Logger, qu
 	}
 
 	return &Client{
-		search:      client,
-		q:           query,
-		subject:     "subjects",
-		log:         log.Named("search"),
-		subjectRepo: subjectRepo,
+		search:       client,
+		q:            query,
+		subject:      "subjects",
+		subjectIndex: client.Index("subjects"),
+		log:          log.Named("search"),
+		subjectRepo:  subjectRepo,
 	}, nil
 }
 
 type Client struct {
-	subjectRepo domain.SubjectRepo
-	search      *meilisearch.Client
-	q           *query.Query
-	log         *zap.Logger
-	subject     string
+	subjectRepo  domain.SubjectRepo
+	search       *meilisearch.Client
+	q            *query.Query
+	subjectIndex *meilisearch.Index
+	log          *zap.Logger
+	subject      string
 }
 
 // OnSubjectUpdate is the hook called by canal.
@@ -82,15 +84,22 @@ func (c *Client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 	return c.upsertSubject(ctx, extracted)
 }
 
+// OnSubjectDelete is the hook called by canal.
+func (c *Client) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
+	_, err := c.subjectIndex.DeleteDocument(strconv.FormatUint(uint64(id), 10))
+
+	return errgo.Wrap(err, "search")
+}
+
 // UpsertSubject add subject to search backend.
 func (c *Client) upsertSubject(ctx context.Context, s subjectIndex) error {
-	_, err := c.search.Index(c.subject).UpdateDocuments(s, "id")
+	_, err := c.subjectIndex.UpdateDocuments(s, "id")
 
 	return errgo.Wrap(err, "search")
 }
 
 func (c *Client) DeleteSubject(ctx context.Context, id string) error {
-	_, err := c.search.Index(c.subject).Delete(id)
+	_, err := c.subjectIndex.Delete(id)
 
 	return errgo.Wrap(err, "delete")
 }
