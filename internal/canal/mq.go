@@ -135,6 +135,7 @@ func (e *eventHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 					zap.String("topic", msg.Topic),
 					zap.ByteString("key", msg.Key),
 					zap.ByteString("value", msg.Value),
+					zap.Error(err),
 				)
 				continue
 			}
