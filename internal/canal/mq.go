@@ -18,13 +18,13 @@ package canal
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/segmentio/kafka-go"
+	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/bangumi/server/internal/config"
@@ -111,19 +111,20 @@ func startReaders(eg *errgroup.Group) ([]io.Closer, error) {
 				}
 
 				var k messageKey
-				if err := json.Unmarshal(msg.Key, &k); err != nil {
+				if err = json.Unmarshal(msg.Key, &k); err != nil {
 					continue
 				}
 
 				var v messageValue
-				if err := json.Unmarshal(msg.Value, &v); err != nil {
+				if err = json.Unmarshal(msg.Value, &v); err != nil {
 					continue
 				}
 
 				readerCfg.handler(k.Payload, v.Payload)
 
 				if err = reader.CommitMessages(context.Background(), msg); err != nil {
-					fmt.Println(err)
+					e.log.Error("failed to commit message", zap.Error(err))
+					return errgo.Wrap(err, "reader.CommitMessages")
 				}
 			}
 		})

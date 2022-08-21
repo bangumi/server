@@ -16,6 +16,7 @@ package canal
 
 import (
 	"context"
+	"runtime"
 
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
@@ -38,7 +39,7 @@ func (e *eventHandler) OnSubjectChange(key json.RawMessage, payload payload) {
 				diff = append(diff, key)
 			}
 		}
-
+		runtime.KeepAlive(diff)
 		if err := e.search.OnSubjectUpdate(context.TODO(), k.ID); err != nil {
 			e.log.Error("error when try to update search subject", zap.Error(err), log.SubjectID(k.ID))
 		}

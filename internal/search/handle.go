@@ -104,7 +104,7 @@ func (c *Client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 		data = append(data, resSubject{
 			ID:     record.ID,
 			Date:   record.Date,
-			Image:  record.Image,
+			Image:  res.SubjectImage(record.Image).Large,
 			Name:   record.Name,
 			NameCN: record.NameCN,
 			Tags:   record.Tags,
@@ -172,9 +172,6 @@ func (c *Client) doSearch(
 		Sort:   sortOpt,
 	})
 	if err != nil {
-		fmt.Println("=======")
-		fmt.Println(err.Error())
-		fmt.Println("=======")
 		return nil, errgo.Wrap(err, "meilisearch search")
 	}
 

@@ -56,27 +56,8 @@ func New(
 		return nil, errgo.Wrap(err, "meilisearch")
 	}
 
-	var shouldCreateIndex = false
-	index, err := meili.GetIndex("subjects")
-	if err != nil {
-		var e *meilisearch.Error
-		if errors.As(err, &e) {
-			shouldCreateIndex = true
-		} else {
-			panic(err)
-		}
-	} else {
-		stat, err := index.GetStats()
-		if err != nil {
-			panic(err)
-		}
-		if stat.NumberOfDocuments == 0 {
-			shouldCreateIndex = true
-		}
-	}
-
 	client := &Client{
-		search:       meili,
+		meili:        meili,
 		q:            query,
 		subject:      "subjects",
 		subjectIndex: meili.Index("subjects"),
@@ -84,16 +65,21 @@ func New(
 		subjectRepo:  subjectRepo,
 	}
 
-	if shouldCreateIndex {
+	shouldCreateIndex, err := client.needFirstRun()
+	if err != nil {
+		return nil, err
 	}
-	go firstRun(client)
+
+	if shouldCreateIndex {
+		go client.firstRun()
+	}
 
 	return client, nil
 }
 
 type Client struct {
 	subjectRepo  domain.SubjectRepo
-	search       *meilisearch.Client
+	meili        *meilisearch.Client
 	q            *query.Query
 	subjectIndex *meilisearch.Index
 	log          *zap.Logger
@@ -137,16 +123,34 @@ func (c *Client) DeleteSubject(ctx context.Context, id model.SubjectID) error {
 	return errgo.Wrap(err, "delete")
 }
 
-func firstRun(client *Client) {
-	client.log.Info("search initialize")
-	_, err := client.search.CreateIndex(&meilisearch.IndexConfig{
+func (c *Client) needFirstRun() (bool, error) {
+	index, err := c.meili.GetIndex("subjects")
+	if err != nil {
+		var e *meilisearch.Error
+		if errors.As(err, &e) {
+			return true, nil
+		}
+		return false, errgo.Wrap(err, "get subjects index")
+	}
+
+	stat, err := index.GetStats()
+	if err != nil {
+		return false, errgo.Wrap(err, "get subjects index stats")
+	}
+
+	return stat.NumberOfDocuments == 0, nil
+}
+
+func (c *Client) firstRun() {
+	c.log.Info("search initialize")
+	_, err := c.meili.CreateIndex(&meilisearch.IndexConfig{
 		Uid:        "subjects",
 		PrimaryKey: "id",
 	})
 	if err != nil {
 		panic(err)
 	}
-	subjectIndex := client.search.Index("subjects")
+	subjectIndex := c.meili.Index("subjects")
 
 	_, err = subjectIndex.UpdateFilterableAttributes(&[]string{
 		"type",
@@ -171,32 +175,17 @@ func firstRun(client *Client) {
 
 	ctx := context.Background()
 
-	// subjects, err := client.q.Subject.WithContext(ctx).Find()
-	// if err != nil {
-	// 	panic(err)
-	// }
-	//
-	// for _, subject := range subjects {
-	// 	err := client.OnSubjectUpdate(ctx, subject.ID)
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	//
-	// }
-	//
-	// return
-
-	maxSubject, err := client.q.Subject.WithContext(ctx).Limit(1).Order(client.q.Subject.ID.Desc()).First()
+	maxSubject, err := c.q.Subject.WithContext(ctx).Limit(1).Order(c.q.Subject.ID.Desc()).First()
 	if err != nil {
 		panic(err)
 	}
 
-	client.log.Info(fmt.Sprintln("run full search index with max subject id", maxSubject))
+	c.log.Info(fmt.Sprintln("run full search index with max subject id", maxSubject))
 
 	for i := model.SubjectID(1); i < maxSubject.ID; i++ {
-		err := client.OnSubjectUpdate(ctx, i)
+		err := c.OnSubjectUpdate(ctx, i)
 		if err != nil {
-			client.log.Error("error when updating subject", zap.Error(err))
+			c.log.Error("error when updating subject", zap.Error(err))
 		}
 	}
 }
