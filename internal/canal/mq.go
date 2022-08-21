@@ -83,7 +83,7 @@ func startReaders(eg *errgroup.Group) (io.Closer, error) {
 
 	topics := []string{"chii.bangumi.chii_subject_fields", "chii.bangumi.chii_subjects", "chii.bangumi.chii_members"}
 
-	eg.Go(func() error { return client.Consume(context.Background(), topics, e) })
+	eg.Go(func() error { return client.Consume(context.Background(), topics, e) }) //nolint:wrapcheck
 
 	return client, nil
 }
@@ -122,11 +122,11 @@ func (e *eventHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 			var err error
 			switch msg.Topic {
 			case "chii.bangumi.chii_subject_fields":
-				e.OnSubjectField(k.Payload, v.Payload)
+				err = e.OnSubjectField(k.Payload, v.Payload)
 			case "chii.bangumi.chii_subjects":
-				e.OnSubject(k.Payload, v.Payload)
+				err = e.OnSubject(k.Payload, v.Payload)
 			case "chii.bangumi.chii_members":
-				e.OnUserChange(k.Payload, v.Payload)
+				err = e.OnUserChange(k.Payload, v.Payload)
 			}
 
 			if err != nil {

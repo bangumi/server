@@ -92,14 +92,17 @@ func getEventHandler() (*eventHandler, error) {
 	return h, nil
 }
 
-func (e *eventHandler) OnUserPasswordChange(id model.UserID) {
+func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
 	e.log.Info("user change password", log.UserID(id))
 	if e.dryRun {
 		e.log.Info("dry-run enabled, skip handler")
-		return
+		return nil
 	}
 
 	if err := e.session.RevokeUser(context.Background(), id); err != nil {
 		e.log.Error("failed to revoke user", log.UserID(id), zap.Error(err))
+		return errgo.Wrap(err, "session.RevokeUser")
 	}
+
+	return nil
 }

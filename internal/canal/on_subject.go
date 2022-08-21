@@ -18,43 +18,42 @@ import (
 	"context"
 
 	"github.com/goccy/go-json"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) {
+func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {
 	var k SubjectKey
 	if err := json.UnmarshalNoEscape(key, &k); err != nil {
-		return
+		return nil
 	}
 
-	e.onSubjectChange(k.ID, payload.Op)
+	return e.onSubjectChange(k.ID, payload.Op)
 }
 
-func (e *eventHandler) OnSubjectField(key json.RawMessage, payload payload) {
+func (e *eventHandler) OnSubjectField(key json.RawMessage, payload payload) error {
 	var k SubjectFieldKey
 	if err := json.UnmarshalNoEscape(key, &k); err != nil {
-		return
+		return nil
 	}
 
-	e.onSubjectChange(k.ID, payload.Op)
+	return e.onSubjectChange(k.ID, payload.Op)
 }
 
-func (e *eventHandler) onSubjectChange(subjectID model.SubjectID, op string) {
+func (e *eventHandler) onSubjectChange(subjectID model.SubjectID, op string) error {
 	switch op {
 	case opCreate, opUpdate, opSnapshot:
 		if err := e.search.OnSubjectUpdate(context.TODO(), subjectID); err != nil {
-			e.log.Error("error when try to update search subject", zap.Error(err), log.SubjectID(subjectID))
+			return errgo.Wrap(err, "search.OnSubjectUpdate")
 		}
-
-		return
 	case opDelete:
-		if err := e.search.OnSubjectUpdate(context.TODO(), subjectID); err != nil {
-			e.log.Error("error when try to update search subject", zap.Error(err), log.SubjectID(subjectID))
+		if err := e.search.OnSubjectDelete(context.TODO(), subjectID); err != nil {
+			return errgo.Wrap(err, "search.OnSubjectDelete")
 		}
 	}
+
+	return nil
 }
 
 type SubjectKey struct {

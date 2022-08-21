@@ -19,13 +19,14 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) {
+func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error {
 	switch payload.Op {
 	case opCreate, opSnapshot, opDelete:
-		return
+		return nil
 	case opUpdate:
 		var diff = make([]string, 0, len(payload.After))
 		for k, v := range payload.Before {
@@ -38,11 +39,13 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) {
 			var k UserKey
 			if err := json.UnmarshalNoEscape(key, &k); err != nil {
 				e.log.Error("failed to unmarshal json", zap.Error(err))
-				return
+				return errgo.Wrap(err, "json.Unmarshal")
 			}
-			e.OnUserPasswordChange(k.ID)
+			return e.OnUserPasswordChange(k.ID)
 		}
 	}
+
+	return nil
 }
 
 type UserKey struct {
