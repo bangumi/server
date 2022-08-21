@@ -115,24 +115,20 @@ paths:
         ## 实验性 API， 本 schema 和实际的 API 行为都可能随时发生改动
 
         目前支持的筛选条件包括:
-        - type: 条目类型，参照 `SubjectType` enum。
-        - tag: 标签，可以多次出现。多值之间为`且`关系。
-        - airdate: 播出日期/发售日期。
-        - rating: 用于搜索指定评分的条目。
-        - rank: 用于搜索指定排名的条目。
-        - nsfw: 使用 `include` 包含NSFW搜索结果。默认排除搜索NSFW条目。无权限情况下忽略此选项，不会返回NSFW条目。
-        - game_platform: 游戏的发行平台，多值之间为 `或` 关系。
+        - `type`: 条目类型，参照 `SubjectType` enum， `或`。
+        - `tag`: 标签，可以多次出现。`且` 关系。
+        - `airdate`: 播出日期/发售日期。`且` 关系。
+        - `rating`: 用于搜索指定评分的条目。`且` 关系。
+        - `rank`: 用于搜索指定排名的条目。`且` 关系。
+        - `nsfw`: 使用 `include` 包含NSFW搜索结果。默认排除搜索NSFW条目。无权限情况下忽略此选项，不会返回NSFW条目。
+
+        不同筛选条件之间为 `且`
+
         计划支持:
         - 标记人数
-        - 两人/多人合作作品
         - 评分人数
+      #        - 两人/多人合作作品
       parameters:
-        - name: order
-          in: query
-          description: 可以使用筛选条件配合 `order=rank` 的方式来筛选排行榜结果。
-          required: false
-          schema:
-            type: string
         - name: limit
           in: query
           description: 分页参数
@@ -155,6 +151,10 @@ paths:
               properties:
                 keyword:
                   type: string
+                order:
+                  type: string
+                  example: rank
+                  description: 排序
                 filter:
                   type: object
                   description: 不同条件之间是 `且` 的关系
