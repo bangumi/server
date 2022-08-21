@@ -84,8 +84,8 @@ func startReaders(eg *errgroup.Group) ([]io.Closer, error) {
 	var closers = make([]io.Closer, 0)
 
 	for _, readerCfg := range []streamReader{
-		{Topic: "chii.bangumi.chii_subject_fields", handler: e.OnSubjectChange},
-		{Topic: "chii.bangumi.chii_subjects", handler: e.OnSubjectChange},
+		{Topic: "chii.bangumi.chii_subject_fields", handler: e.OnSubject},
+		{Topic: "chii.bangumi.chii_subjects", handler: e.OnSubject},
 		{Topic: "chii.bangumi.chii_members", handler: e.OnUserChange},
 	} {
 		readerCfg := readerCfg

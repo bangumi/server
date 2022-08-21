@@ -16,7 +16,6 @@ package canal
 
 import (
 	"context"
-	"runtime"
 
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
@@ -25,30 +24,43 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
-func (e *eventHandler) OnSubjectChange(key json.RawMessage, payload payload) {
+func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) {
 	var k SubjectKey
 	if err := json.UnmarshalNoEscape(key, &k); err != nil {
 		return
 	}
 
-	switch payload.Op {
+	e.onSubjectChange(k.ID, payload.Op)
+}
+
+func (e *eventHandler) OnSubjectField(key json.RawMessage, payload payload) {
+	var k SubjectFieldKey
+	if err := json.UnmarshalNoEscape(key, &k); err != nil {
+		return
+	}
+
+	e.onSubjectChange(k.ID, payload.Op)
+}
+
+func (e *eventHandler) onSubjectChange(subjectID model.SubjectID, op string) {
+	switch op {
 	case opCreate, opUpdate, opSnapshot:
-		var diff = make([]string, 0, len(payload.After))
-		for key, value := range payload.Before {
-			if string(payload.After[key]) != string(value) {
-				diff = append(diff, key)
-			}
-		}
-		runtime.KeepAlive(diff)
-		if err := e.search.OnSubjectUpdate(context.TODO(), k.ID); err != nil {
-			e.log.Error("error when try to update search subject", zap.Error(err), log.SubjectID(k.ID))
+		if err := e.search.OnSubjectUpdate(context.TODO(), subjectID); err != nil {
+			e.log.Error("error when try to update search subject", zap.Error(err), log.SubjectID(subjectID))
 		}
 
 		return
 	case opDelete:
+		if err := e.search.OnSubjectUpdate(context.TODO(), subjectID); err != nil {
+			e.log.Error("error when try to update search subject", zap.Error(err), log.SubjectID(subjectID))
+		}
 	}
 }
 
 type SubjectKey struct {
 	ID model.SubjectID `json:"subject_id"`
+}
+
+type SubjectFieldKey struct {
+	ID model.SubjectID `json:"field_sid"`
 }
