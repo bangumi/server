@@ -108,7 +108,7 @@ paths:
   "/v0/search/subjects":
     post:
       tags:
-        - 搜索
+        - 条目
       summary: 条目搜索
       operationId: searchSubjects
       description: |

@@ -18,6 +18,7 @@ package canal
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"os/signal"
@@ -98,7 +99,7 @@ func startReaders(eg *errgroup.Group) ([]io.Closer, error) {
 			closers = append(closers, reader)
 
 			for {
-				msg, err := reader.ReadMessage(context.Background())
+				msg, err := reader.FetchMessage(context.Background())
 				if err != nil {
 					return errgo.Wrap(err, "reader.ReadMessage")
 				}
@@ -120,6 +121,10 @@ func startReaders(eg *errgroup.Group) ([]io.Closer, error) {
 				}
 
 				readerCfg.handler(k.Payload, v.Payload)
+
+				if err = reader.CommitMessages(context.Background(), msg); err != nil {
+					fmt.Println(err)
+				}
 			}
 		})
 	}

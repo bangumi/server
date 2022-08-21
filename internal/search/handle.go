@@ -23,12 +23,12 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/meilisearch/meilisearch-go"
-	"github.com/mitchellh/mapstructure"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/pkg/obj"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -45,6 +45,7 @@ const maxLimit = 200
 
 type Req struct {
 	Keyword string `json:"keyword"`
+	Sort    string `json:"sort"`
 	Filter  Filter `json:"filter"`
 }
 
@@ -52,59 +53,64 @@ type Filter struct {
 	Type    []model.SubjectType `json:"type"`     // or
 	Tag     []string            `json:"tag"`      // and
 	AirDate []string            `json:"air_date"` // and
-	Rating  []string            `json:"rating"`   // and
+	Score   []string            `json:"rating"`   // and
 	Rank    []string            `json:"rank"`     // and
 	NSFW    null.Bool           `json:"nsfw"`
 }
 
 func (c *Client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
-	sort := ctx.Query("sort")
 	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
 	if err != nil {
 		return err
 	}
 
-	var query Req
-	if err = json.Unmarshal(ctx.Body(), &query); err != nil {
+	var r Req
+	if err = json.Unmarshal(ctx.Body(), &r); err != nil {
 		return res.JSONError(ctx, err)
 	}
 
 	if !auth.AllowNSFW() {
-		query.Filter.NSFW = null.New(false)
+		r.Filter.NSFW = null.New(false)
 	}
 
-	result, err := c.doSearch(query.Keyword, filterToMeiliFilter(query.Filter), sort, q.Limit, q.Offset)
+	result, err := c.doSearch(r.Keyword, filterToMeiliFilter(r.Filter), r.Sort, q.Limit, q.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "search")
 	}
 
-	data := make([]resSubject, len(result.Hits))
-	for i, hit := range result.Hits {
-		var source = subjectIndex{}
+	data := make([]resSubject, 0, len(result.Hits))
+	for _, h := range result.Hits {
+		hit, ok := h.(map[string]any)
+		if !ok {
+			continue
+		}
 
-		d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-			WeaklyTypedInput: true,
-			TagName:          "json",
-			Result:           &source,
+		recordMap, ok := hit["record"].(map[string]any)
+		if !ok {
+			continue
+		}
+
+		record := Record{
+			Date:   obj.GetString(recordMap, "date"),
+			Image:  obj.GetString(recordMap, "image"),
+			Name:   obj.GetString(recordMap, "name"),
+			NameCN: obj.GetString(recordMap, "name_cn"),
+			Tags:   anyToResTag(recordMap["tags"]),
+			Score:  obj.GetFloat64(recordMap, "score"),
+			ID:     model.SubjectID(obj.GetFloat64(recordMap, "id")),
+			Rank:   uint32(obj.GetFloat64(recordMap, "rank")),
+		}
+
+		data = append(data, resSubject{
+			ID:     record.ID,
+			Date:   record.Date,
+			Image:  record.Image,
+			Name:   record.Name,
+			NameCN: record.NameCN,
+			Tags:   record.Tags,
+			Score:  record.Score,
+			Rank:   record.Rank,
 		})
-		if err != nil {
-			return errgo.Wrap(err, "mapstruct NewDecoder")
-		}
-
-		if err := d.Decode(hit); err != nil {
-			return errgo.Wrap(err, "failed to convert from any")
-		}
-
-		data[i] = resSubject{
-			ID:     source.Record.ID,
-			Date:   intDateToString(source.Date),
-			Image:  source.Record.Image,
-			Name:   source.Record.Name,
-			NameCN: source.Record.NameCN,
-			Tags:   source.Record.Tags,
-			Score:  source.Record.Score,
-			Rank:   source.Record.Rank,
-		}
 	}
 
 	return res.JSON(ctx, res.Paged{
@@ -113,6 +119,33 @@ func (c *Client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 		Limit:  q.Limit,
 		Offset: q.Offset,
 	})
+}
+
+func anyToResTag(v any) []res.SubjectTag {
+	if v == nil {
+		return nil
+	}
+
+	tags, ok := v.([]any)
+	if !ok {
+		return nil
+	}
+
+	var result = make([]res.SubjectTag, 0, len(tags))
+	for _, tagAny := range tags {
+		tagMap, ok := tagAny.(map[string]any)
+		if !ok {
+			continue
+		}
+		tag := res.SubjectTag{
+			Name:  obj.GetString(tagMap, "name"),
+			Count: int(obj.GetFloat64(tagMap, "count")),
+		}
+
+		result = append(result, tag)
+	}
+
+	return result
 }
 
 func (c *Client) doSearch(
@@ -128,7 +161,7 @@ func (c *Client) doSearch(
 	}
 
 	var sortOpt []string
-	if sort == "" {
+	if sort != "" {
 		sortOpt = []string{sort}
 	}
 
@@ -139,6 +172,9 @@ func (c *Client) doSearch(
 		Sort:   sortOpt,
 	})
 	if err != nil {
+		fmt.Println("=======")
+		fmt.Println(err.Error())
+		fmt.Println("=======")
 		return nil, errgo.Wrap(err, "meilisearch search")
 	}
 
@@ -146,33 +182,25 @@ func (c *Client) doSearch(
 }
 
 type resSubject struct {
-	Date   string          `json:"date"`
-	Image  string          `json:"image"`
-	Name   string          `json:"name"`
-	NameCN string          `json:"name_cn"`
-	Tags   []model.Tag     `json:"tags,omitempty"`
-	Score  float64         `json:"score"`
-	ID     model.SubjectID `json:"id"`
-	Rank   uint32          `json:"rank"`
-}
-
-func intDateToString(v int) string {
-	if v == 0 {
-		return ""
-	}
-
-	return fmt.Sprintf("%04d-%02d-%02d", v/10000, (v%10000)/100*100, v%100)
+	Date   string           `json:"date"`
+	Image  string           `json:"image"`
+	Name   string           `json:"name"`
+	NameCN string           `json:"name_cn"`
+	Tags   []res.SubjectTag `json:"tags,omitempty"`
+	Score  float64          `json:"score"`
+	ID     model.SubjectID  `json:"id"`
+	Rank   uint32           `json:"rank"`
 }
 
 func filterToMeiliFilter(req Filter) [][]string {
-	var filter = make([][]string, 0, 6)
+	var filter = make([][]string, 0, 5+len(req.Tag))
 
 	if len(req.AirDate) != 0 {
 		filter = append(filter, parseDateFilter(req.AirDate))
 	}
 
-	for _, s := range req.Tag {
-		filter = append(filter, []string{fmt.Sprintf("tag = %s", s)})
+	for _, tag := range req.Tag {
+		filter = append(filter, []string{"tag = " + strconv.Quote(tag)})
 	}
 
 	if len(req.Type) != 0 {
@@ -187,10 +215,14 @@ func filterToMeiliFilter(req Filter) [][]string {
 		}))
 	}
 
-	if len(req.Rating) != 0 {
-		filter = append(filter, slice.Map(req.Rating, func(s string) string {
-			return "rating" + s
+	if len(req.Score) != 0 {
+		filter = append(filter, slice.Map(req.Score, func(s string) string {
+			return "score " + s
 		}))
+	}
+
+	if req.NSFW.Set {
+		filter = append(filter, []string{"nsfw = " + strconv.FormatBool(req.NSFW.Value)})
 	}
 
 	return filter
