@@ -83,7 +83,7 @@ flowchart TD
   Nginx -->|static new frontend files|FS[(file system)];
 
   Nginx -->|HTTP API Request|B;
-  Nginx --> |HTTP Search request|meilisearch;
+  B --> |HTTP Search request|meilisearch;
 
   C --> |增量更新数据|meilisearch;
 
