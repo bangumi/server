@@ -24,6 +24,7 @@ import (
 	"syscall"
 
 	"github.com/Shopify/sarama"
+	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/bangumi/server/internal/config"
@@ -130,6 +131,11 @@ func (e *eventHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 			}
 
 			if err != nil {
+				e.log.Error("failed to handle kafka message",
+					zap.String("topic", msg.Topic),
+					zap.ByteString("key", msg.Key),
+					zap.ByteString("value", msg.Value),
+				)
 				continue
 			}
 
