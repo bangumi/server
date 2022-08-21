@@ -18,7 +18,6 @@ package canal
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"os/signal"
@@ -31,11 +30,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
-
-type streamReader struct {
-	handler func(key json.RawMessage, payload payload)
-	Topic   string
-}
 
 func Main() error {
 	var eg errgroup.Group
@@ -109,8 +103,6 @@ func (e *eventHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 	for {
 		select {
 		case msg := <-claim.Messages():
-			fmt.Println(msg.Topic)
-
 			if len(msg.Value) == 0 {
 				// fake event, just ignore
 				// https://debezium.io/documentation/reference/stable/connectors/mysql.html#mysql-tombstone-events
@@ -127,7 +119,6 @@ func (e *eventHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 				continue
 			}
 
-			fmt.Println(msg.Topic)
 			var err error
 			switch msg.Topic {
 			case "chii.bangumi.chii_subject_fields":
