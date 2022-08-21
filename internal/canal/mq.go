@@ -18,13 +18,13 @@ package canal
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/segmentio/kafka-go"
-	"go.uber.org/zap"
+	"github.com/Shopify/sarama"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/bangumi/server/internal/config"
@@ -39,7 +39,7 @@ type streamReader struct {
 
 func Main() error {
 	var eg errgroup.Group
-	closers, err := startReaders(&eg)
+	closer, err := startReaders(&eg)
 	if err != nil {
 		return err
 	}
@@ -51,9 +51,7 @@ func Main() error {
 	go func() {
 		<-sigChan
 		logger.Info("receive signal, shutdown")
-		for _, closer := range closers {
-			closer.Close()
-		}
+		closer.Close()
 		shutdown <- 1
 	}()
 
@@ -70,8 +68,10 @@ func Main() error {
 	}
 }
 
-func startReaders(eg *errgroup.Group) ([]io.Closer, error) {
-	cfg, err := config.NewAppConfig()
+const groupID = "my-group"
+
+func startReaders(eg *errgroup.Group) (io.Closer, error) {
+	appConfig, err := config.NewAppConfig()
 	if err != nil {
 		return nil, errgo.Wrap(err, "config.NewAppConfig")
 	}
@@ -81,56 +81,72 @@ func startReaders(eg *errgroup.Group) ([]io.Closer, error) {
 		return nil, err
 	}
 
-	var closers = make([]io.Closer, 0)
-
-	for _, readerCfg := range []streamReader{
-		{Topic: "chii.bangumi.chii_subject_fields", handler: e.OnSubjectField},
-		{Topic: "chii.bangumi.chii_subjects", handler: e.OnSubject},
-		{Topic: "chii.bangumi.chii_members", handler: e.OnUserChange},
-	} {
-		readerCfg := readerCfg
-		eg.Go(func() error {
-			reader := kafka.NewReader(kafka.ReaderConfig{
-				Brokers: []string{cfg.KafkaBroker},
-				GroupID: "my-group",
-				Topic:   readerCfg.Topic,
-			})
-
-			closers = append(closers, reader)
-
-			for {
-				msg, err := reader.FetchMessage(context.Background())
-				if err != nil {
-					return errgo.Wrap(err, "reader.ReadMessage")
-				}
-
-				if len(msg.Value) == 0 {
-					// fake event, just ignore
-					// https://debezium.io/documentation/reference/stable/connectors/mysql.html#mysql-tombstone-events
-					continue
-				}
-
-				var k messageKey
-				if err = json.Unmarshal(msg.Key, &k); err != nil {
-					continue
-				}
-
-				var v messageValue
-				if err = json.Unmarshal(msg.Value, &v); err != nil {
-					continue
-				}
-
-				readerCfg.handler(k.Payload, v.Payload)
-
-				if err = reader.CommitMessages(context.Background(), msg); err != nil {
-					e.log.Error("failed to commit message", zap.Error(err))
-					return errgo.Wrap(err, "reader.CommitMessages")
-				}
-			}
-		})
+	cfg := sarama.NewConfig()
+	client, err := sarama.NewConsumerGroup([]string{appConfig.KafkaBroker}, groupID, cfg)
+	if err != nil {
+		panic(err)
 	}
 
-	return closers, nil
+	topics := []string{"chii.bangumi.chii_subject_fields", "chii.bangumi.chii_subjects", "chii.bangumi.chii_members"}
+
+	eg.Go(func() error { return client.Consume(context.Background(), topics, e) })
+
+	return client, nil
+}
+
+func (e *eventHandler) Setup(groupSession sarama.ConsumerGroupSession) error {
+	e.log.Info("eventHandler sarama setup")
+	return nil
+}
+
+func (e *eventHandler) Cleanup(groupSession sarama.ConsumerGroupSession) error {
+	e.log.Info("eventHandler sarama cleanup")
+	return nil
+}
+
+func (e *eventHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	e.log.Info("eventHandler sarama ConsumeClaim")
+	for {
+		select {
+		case msg := <-claim.Messages():
+			fmt.Println(msg.Topic)
+
+			if len(msg.Value) == 0 {
+				// fake event, just ignore
+				// https://debezium.io/documentation/reference/stable/connectors/mysql.html#mysql-tombstone-events
+				continue
+			}
+
+			var k messageKey
+			if err := json.Unmarshal(msg.Key, &k); err != nil {
+				continue
+			}
+
+			var v messageValue
+			if err := json.Unmarshal(msg.Value, &v); err != nil {
+				continue
+			}
+
+			fmt.Println(msg.Topic)
+			var err error
+			switch msg.Topic {
+			case "chii.bangumi.chii_subject_fields":
+				e.OnSubjectField(k.Payload, v.Payload)
+			case "chii.bangumi.chii_subjects":
+				e.OnSubject(k.Payload, v.Payload)
+			case "chii.bangumi.chii_members":
+				e.OnUserChange(k.Payload, v.Payload)
+			}
+
+			if err != nil {
+				continue
+			}
+
+			session.MarkMessage(msg, "")
+		case <-session.Context().Done():
+			return nil
+		}
+	}
 }
 
 const (
