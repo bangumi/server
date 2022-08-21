@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"os"
 	"strconv"
 	"time"
 
@@ -124,6 +125,10 @@ func (c *Client) DeleteSubject(ctx context.Context, id model.SubjectID) error {
 }
 
 func (c *Client) needFirstRun() (bool, error) {
+	if os.Getenv("CHII_SEARCH_INIT") == "true" {
+		return true, nil
+	}
+
 	index, err := c.meili.GetIndex("subjects")
 	if err != nil {
 		var e *meilisearch.Error
