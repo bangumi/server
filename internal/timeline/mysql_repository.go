@@ -39,22 +39,22 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (m mysqlRepo) GetByID(ctx context.Context, id model.TimeLineID) (model.TimeLine, error) {
+func (m mysqlRepo) GetByID(ctx context.Context, id model.TimeLineID) (*model.TimeLine, error) {
 	tl, err := m.q.TimeLine.WithContext(ctx).Where(m.q.TimeLine.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.TimeLine{}, domain.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 
 		m.log.Error("unexpected happened", zap.Error(err))
-		return model.TimeLine{}, errgo.Wrap(err, "dal")
+		return nil, errgo.Wrap(err, "dal")
 	}
 	return daoToModel(tl)
 }
 
 func (m mysqlRepo) ListByUID(
 	ctx context.Context, uid model.UserID, limit int, since model.TimeLineID,
-) ([]model.TimeLine, error) {
+) ([]*model.TimeLine, error) {
 	tls, err := m.q.TimeLine.WithContext(ctx).
 		Where(m.q.TimeLine.UID.Eq(uid), m.q.TimeLine.ID.Gt(since)).
 		Order(m.q.TimeLine.Dateline).
@@ -62,12 +62,12 @@ func (m mysqlRepo) ListByUID(
 		Find()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return []model.TimeLine{}, domain.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		m.log.Error("unexpected happened", zap.Error(err))
-		return []model.TimeLine{}, errgo.Wrap(err, "dal")
+		return nil, errgo.Wrap(err, "dal")
 	}
-	result := make([]model.TimeLine, 0, len(tls))
+	result := make([]*model.TimeLine, 0, len(tls))
 	for _, tl := range tls {
 		mtl, err := daoToModel(tl)
 		if err != nil {
@@ -79,10 +79,10 @@ func (m mysqlRepo) ListByUID(
 	return result, nil
 }
 
-func (m mysqlRepo) Create(ctx context.Context, tls ...model.TimeLine) error {
+func (m mysqlRepo) Create(ctx context.Context, tls ...*model.TimeLine) error {
 	daos := make([]*dao.TimeLine, 0, len(tls))
 	for i := range tls {
-		d, err := modelToDAO(&tls[i])
+		d, err := modelToDAO(tls[i])
 		if err != nil {
 			m.log.Error("modelToDAO", zap.Error(err))
 			return errgo.Wrap(err, "modelToDAO")
@@ -96,18 +96,46 @@ func (m mysqlRepo) Create(ctx context.Context, tls ...model.TimeLine) error {
 	return nil
 }
 
-func daoToModel(tl *dao.TimeLine) (model.TimeLine, error) {
+func (m mysqlRepo) dedupeTimeLine(ctx context.Context, daos ...*dao.TimeLine) ([]*dao.TimeLine, error) {
+	if len(daos) == 0 {
+		return nil, nil
+	}
+		dbTLs, err := m.q.TimeLine.WithContext(ctx).
+		Where(m.q.TimeLine.UID.Eq(daos[0].UID)).
+		Order(m.q.TimeLine.Dateline.Desc()).
+		Limit(len(tls)).
+		Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+	result := make([]*model.TimeLine, 0, len(dbTLs))
+	for _, tl := range tls {
+
+	}
+	return result, nil
+}
+
+func isModelTlDupedInDB(m *model.TimeLine, ds []*dao.TimeLine) bool {
+	for _, d := range ds {
+		if d.Dateline == m.Dateline && d.Cat == m.Cat && d.{
+			return true
+		}
+	}
+	return false
+}
+
+func daoToModel(tl *dao.TimeLine) (*model.TimeLine, error) {
 	mm, err := memo.DAOToModel(tl)
 	if err != nil {
-		return model.TimeLine{}, errgo.Wrap(err, "DAOToModel")
+		return nil, errgo.Wrap(err, "DAOToModel")
 	}
 
 	img, err := image.DAOToModel(tl)
 	if err != nil {
-		return model.TimeLine{}, errgo.Wrap(err, "DAOToModel")
+		return nil, errgo.Wrap(err, "DAOToModel")
 	}
 
-	return model.TimeLine{
+	return &model.TimeLine{
 		ID:       tl.ID,
 		Related:  tl.Related,
 		Memo:     *mm,

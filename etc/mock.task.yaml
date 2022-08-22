@@ -35,6 +35,7 @@ tasks:
       - GroupRepo
       - CollectionRepo
       - TopicRepo
+      - TimeLineRepo
 
   base-mock:
     deps:
@@ -271,3 +272,15 @@ tasks:
         vars:
           SRC_DIR: ./internal/domain
           INTERFACE: TopicRepo
+
+  TimeLineRepo:
+    sources:
+      - internal/domain/timeline.go
+      - ./internal/pkg/tools/go.mod
+    generates:
+      - internal/mocks/TimeLineRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: TimeLineRepo
