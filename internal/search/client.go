@@ -34,12 +34,19 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
+// New provide a search app is AppConfig.MeiliSearchURL is empty string, return nope search client.
+//
+// see `MeiliSearchURL` and `MeiliSearchKey` in [config.AppConfig].
 func New(
 	c config.AppConfig,
 	subjectRepo domain.SubjectRepo,
 	log *zap.Logger,
 	query *query.Query,
-) (*Client, error) {
+) (Client, error) {
+	if c.MeiliSearchURL == "" {
+		return NopeClient{}, nil
+	}
+
 	if subjectRepo == nil {
 		panic("nil SubjectRepo")
 	}
@@ -57,7 +64,7 @@ func New(
 		return nil, errgo.Wrap(err, "meilisearch")
 	}
 
-	client := &Client{
+	client := &client{
 		meili:        meili,
 		q:            query,
 		subject:      "subjects",
@@ -78,7 +85,7 @@ func New(
 	return client, nil
 }
 
-type Client struct {
+type client struct {
 	subjectRepo  domain.SubjectRepo
 	meili        *meilisearch.Client
 	q            *query.Query
@@ -88,7 +95,7 @@ type Client struct {
 }
 
 // OnSubjectUpdate is the hook called by canal.
-func (c *Client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
+func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
 	s, err := c.subjectRepo.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -105,26 +112,26 @@ func (c *Client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 }
 
 // OnSubjectDelete is the hook called by canal.
-func (c *Client) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
+func (c *client) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
 	_, err := c.subjectIndex.DeleteDocument(strconv.FormatUint(uint64(id), 10))
 
 	return errgo.Wrap(err, "search")
 }
 
 // UpsertSubject add subject to search backend.
-func (c *Client) upsertSubject(ctx context.Context, s subjectIndex) error {
+func (c *client) upsertSubject(ctx context.Context, s subjectIndex) error {
 	_, err := c.subjectIndex.UpdateDocuments(s)
 
 	return errgo.Wrap(err, "search")
 }
 
-func (c *Client) DeleteSubject(ctx context.Context, id model.SubjectID) error {
+func (c *client) DeleteSubject(ctx context.Context, id model.SubjectID) error {
 	_, err := c.subjectIndex.Delete(strconv.FormatUint(uint64(id), 10))
 
 	return errgo.Wrap(err, "delete")
 }
 
-func (c *Client) needFirstRun() (bool, error) {
+func (c *client) needFirstRun() (bool, error) {
 	if os.Getenv("CHII_SEARCH_INIT") == "true" {
 		return true, nil
 	}
@@ -146,7 +153,7 @@ func (c *Client) needFirstRun() (bool, error) {
 	return stat.NumberOfDocuments == 0, nil
 }
 
-func (c *Client) firstRun() {
+func (c *client) firstRun() {
 	c.log.Info("search initialize")
 	_, err := c.meili.CreateIndex(&meilisearch.IndexConfig{
 		Uid:        "subjects",

@@ -113,7 +113,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		// don't need a default mock for these repositories.
 		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
 		fx.Provide(func() domain.CollectionRepo { return m.CollectionRepo }),
-		fx.Provide(func() search.Handler { return &search.Client{} }),
+		fx.Provide(func() search.Handler { return search.NopeClient{} }),
 
 		// this will transform t.FailNow()
 		// to panic

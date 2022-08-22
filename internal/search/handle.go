@@ -16,6 +16,7 @@
 package search
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -34,8 +35,14 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-// TODO: 想个办法挪到 web 里面去
+type Client interface {
+	Handler
+	OnSubjectUpdate(ctx context.Context, id model.SubjectID) error
+	OnSubjectDelete(ctx context.Context, id model.SubjectID) error
+}
 
+// Handler
+// TODO: 想个办法挪到 web 里面去.
 type Handler interface {
 	Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error
 }
@@ -58,7 +65,7 @@ type Filter struct {
 	NSFW    null.Bool           `json:"nsfw"`
 }
 
-func (c *Client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
+func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
 	if err != nil {
 		return err
@@ -148,7 +155,7 @@ func anyToResTag(v any) []res.SubjectTag {
 	return result
 }
 
-func (c *Client) doSearch(
+func (c *client) doSearch(
 	words string,
 	filter [][]string,
 	sort string,

@@ -26,7 +26,6 @@ import (
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/gtime"
-	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/handler/character"
@@ -53,7 +52,6 @@ func AddRouters(
 	personHandler person.Person,
 	characterHandler character.Character,
 	subjectHandler subject.Subject,
-	search search.Handler,
 ) {
 	app.Use(ua.DisableDefaultHTTPLibrary)
 

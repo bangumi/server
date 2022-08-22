@@ -41,7 +41,7 @@ type eventHandler struct {
 	session session.Manager
 	log     *zap.Logger
 	q       *query.Query
-	search  *search.Client
+	search  search.Client
 	dryRun  bool
 }
 
@@ -49,7 +49,7 @@ func newEventHandler(
 	q *query.Query,
 	log *zap.Logger,
 	session session.Manager,
-	search *search.Client,
+	search search.Client,
 ) *eventHandler {
 	dryRun, _ := strconv.ParseBool(os.Getenv("DRY_RUN"))
 

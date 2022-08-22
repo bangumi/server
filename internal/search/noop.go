@@ -12,29 +12,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package web
+package search
 
 import (
-	"go.uber.org/fx"
+	"context"
 
-	"github.com/bangumi/server/internal/search"
-	"github.com/bangumi/server/internal/web/captcha"
-	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler"
-	"github.com/bangumi/server/internal/web/rate"
-	"github.com/bangumi/server/internal/web/session"
+	"github.com/gofiber/fiber/v2"
+
+	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/web/accessor"
 )
 
-var Module = fx.Module("web",
-	handler.Module,
-	fx.Provide(
-		New,
-		session.NewMysqlRepo,
-		rate.New,
-		captcha.New,
-		session.New,
-		frontend.NewTemplateEngine,
-		func(c search.Client) search.Handler { return c },
-	),
-	fx.Invoke(AddRouters),
-)
+var _ Client = NopeClient{}
+
+type NopeClient struct {
+}
+
+func (n NopeClient) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
+	return ctx.SendString("search is not enable")
+}
+
+func (n NopeClient) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
+	return nil
+}
+
+func (n NopeClient) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
+	return nil
+}
