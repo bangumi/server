@@ -16,40 +16,36 @@ package errgo
 
 import (
 	"fmt"
+	"io"
 	"runtime"
+	"strconv"
 )
-
-const unknownText = "(unknown)"
 
 // stack represents a stack of program counters.
 type stack []uintptr
 
 func (s stack) Format(st fmt.State, verb rune) {
 	if verb == 'v' && st.Flag('+') {
-		for _, pc := range s {
-			st.Write([]byte("\n"))
-			frame(pc).Format(st, 'v')
+		frames := runtime.CallersFrames(s)
+
+		for {
+			frame, more := frames.Next()
+			_, _ = io.WriteString(st, "\n")
+			_, _ = io.WriteString(st, frame.Function)
+			_, _ = io.WriteString(st, "\n\t")
+			_, _ = io.WriteString(st, frame.File)
+			_, _ = io.WriteString(st, ":")
+			_, _ = io.WriteString(st, strconv.Itoa(frame.Line))
+			if !more {
+				break
+			}
 		}
 	}
-}
-
-func toFrames(s []uintptr) []frame {
-	f := make([]frame, len(s))
-	for i, u := range s {
-		f[i] = frame(u)
-	}
-	return f
 }
 
 func callers() stack {
 	const depth = 16
 	var pcs [depth]uintptr
 	n := runtime.Callers(3, pcs[:])
-	var st stack = pcs[0:n]
-	return st
-}
-
-type encodeToJSONError struct {
-	Message string  `json:"msg"`
-	Stace   []frame `json:"stace"`
+	return pcs[:n]
 }

@@ -26,6 +26,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/trim21/go-phpserialize v0.0.15
 	github.com/uber-go/tally/v4 v4.1.2
+	github.com/valyala/bytebufferpool v1.0.0
 	go.uber.org/fx v1.18.1
 	go.uber.org/zap v1.22.0
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
@@ -71,7 +72,6 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.38.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect

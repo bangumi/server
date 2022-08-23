@@ -17,9 +17,10 @@ package errgo
 import (
 	"fmt"
 	"io"
+	"runtime"
 	"strconv"
 
-	"github.com/goccy/go-json"
+	"github.com/valyala/bytebufferpool"
 )
 
 type unwrap interface {
@@ -112,14 +113,49 @@ func (w *withStackError) Format(s fmt.State, verb rune) {
 	}
 }
 
-//nolint:wrapcheck
+// MarshalJSON marshal error with stack to
+//
+//	{
+//		"error": "context: real error",
+//		"stack": [
+//			"main.main  C:/Users/Trim21/proj/chii/main.go:54",
+//			"runtime.main  C:/Users/Trim21/.g/go/src/runtime/proc.go:250",
+//			"runtime.goexit  C:/Users/Trim21/.g/go/src/runtime/asm_amd64.s:1594"
+//		]
+//	}
 func (w *withStackError) MarshalJSON() ([]byte, error) {
 	if w == nil {
 		return []byte("null"), nil
 	}
 
-	return json.Marshal(encodeToJSONError{
-		Message: w.Error(),
-		Stace:   toFrames(w.Stack),
-	})
+	b := bytebufferpool.Get()
+	defer bytebufferpool.Put(b)
+
+	b.WriteString(`{"error":`)
+	b.B = strconv.AppendQuote(b.B, w.Error())
+	b.WriteString(",")
+
+	b.WriteString(`"stack":[`)
+
+	frames := runtime.CallersFrames(w.Stack)
+	for {
+		frame, more := frames.Next()
+		b.WriteString(`"`)
+		b.WriteString(frame.Function)
+		b.WriteString("  ")
+		b.WriteString(frame.File)
+		b.WriteString(":")
+		b.B = strconv.AppendInt(b.B, int64(frame.Line), 10)
+		b.WriteString(`"`)
+		if !more {
+			break
+		}
+		b.WriteString(",")
+	}
+
+	b.WriteString("]}")
+
+	var bytes = make([]byte, len(b.B))
+	copy(bytes, b.Bytes())
+	return bytes, nil
 }
