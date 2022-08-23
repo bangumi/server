@@ -118,9 +118,8 @@ func (w *withStackError) Format(s fmt.State, verb rune) {
 //	{
 //		"error": "context: real error",
 //		"stack": [
-//			"main.main  C:/Users/Trim21/proj/chii/main.go:54",
-//			"runtime.main  C:/Users/Trim21/.g/go/src/runtime/proc.go:250",
-//			"runtime.goexit  C:/Users/Trim21/.g/go/src/runtime/asm_amd64.s:1594"
+//			"main.main  ...main.go:54",
+//			"..."
 //		]
 //	}
 func (w *withStackError) MarshalJSON() ([]byte, error) {
