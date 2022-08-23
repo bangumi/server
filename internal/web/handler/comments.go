@@ -15,6 +15,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
@@ -45,7 +46,7 @@ func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	group, err := h.g.GetByID(c.Context(), model.GroupID(data.ParentID))
+	group, err := h.g.GetByID(context.TODO(), model.GroupID(data.ParentID))
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

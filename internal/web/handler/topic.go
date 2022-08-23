@@ -15,6 +15,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
@@ -84,7 +85,7 @@ func (h Handler) getResTopicWithComments(
 ) (*res.PrivateTopicDetail, error) {
 	a := h.GetHTTPAccessor(c)
 
-	t, err := h.ctrl.GetTopic(c.Context(), a.Auth, topicType, topicID, 0, 0)
+	t, err := h.ctrl.GetTopic(context.TODO(), a.Auth, topicType, topicID, 0, 0)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, res.ErrNotFound
@@ -103,14 +104,14 @@ func (h Handler) getResTopicWithComments(
 
 	userIDs[t.CreatorID] = struct{}{}
 
-	users, err := h.ctrl.GetUsersByIDs(c.Context(), gmap.Keys(userIDs)...)
+	users, err := h.ctrl.GetUsersByIDs(context.TODO(), gmap.Keys(userIDs)...)
 	if err != nil {
 		return nil, errgo.Wrap(err, "ctrl.GetUsersByIDs")
 	}
 
 	var friends map[model.UserID]domain.FriendItem
 	if a.Login {
-		friends, err = h.ctrl.GetFriends(c.Context(), a.ID)
+		friends, err = h.ctrl.GetFriends(context.TODO(), a.ID)
 		if err != nil {
 			return nil, errgo.Wrap(err, "userRepo.GetFriends")
 		}
