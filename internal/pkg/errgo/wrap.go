@@ -95,12 +95,12 @@ func (w *withStackError) Format(s fmt.State, verb rune) {
 	case 'v':
 		// _, _ = io.WriteString(s, w.Error())
 		if s.Flag('#') {
-			fmt.Fprintf(s, "%#v", w.Err)
+			fmt.Fprintf(s, "&errgo.withStackError{Err: %#v, Stack: ...}", w.Err)
 			return
 		}
 
 		if s.Flag('+') {
-			fmt.Fprintf(s, "error: %+v", w.Err)
+			_, _ = io.WriteString(s, "error stack:")
 			w.Stack.Format(s, verb)
 			return
 		}

@@ -38,7 +38,7 @@ func TestStackTrace(t *testing.T) {
 
 	err := errgo.Wrap(errors.New("a error"), "m")
 	s := fmt.Sprintf("%+v", err)
-	require.Regexp(t, regexp.MustCompile("^error: m: a error\n.*"), s)
+	require.Regexp(t, regexp.MustCompile("^error stack:\n.*"), s)
 }
 
 func TestErrorIs(t *testing.T) {
