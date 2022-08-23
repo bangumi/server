@@ -30,6 +30,7 @@ type PrivateTopic struct {
 }
 
 type PrivateTopicDetail struct {
+	ParentID  uint32           `json:"parent_id"` // episode ID, subject ID, group ID ...
 	CreatedAt time.Time        `json:"created_at"`
 	UpdatedAt time.Time        `json:"updated_at"`
 	Title     string           `json:"title"`

@@ -57,7 +57,7 @@ func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model
 		CreatorID: model.UserID(topic.GetCreatorID()),
 		State:     model.CommentState(topic.GetState()),
 		Replies:   topic.GetReplies(),
-		ObjectID:  topic.GetObjectID(),
+		ParentID:  topic.GetParentID(),
 		Status:    model.TopicStatus(topic.GetStatus()),
 	}, nil
 }

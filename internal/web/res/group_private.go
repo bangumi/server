@@ -20,6 +20,14 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
+type PrivateGroup struct {
+	ID        model.GroupID `json:"id"`
+	Name      string        `json:"name"`
+	CreatedAt time.Time     `json:"created_at"`
+	Title     string        `json:"title"`
+	Icon      string        `json:"icon" format:"url"`
+}
+
 type PrivateGroupProfile struct {
 	CreatedAt    time.Time            `json:"created_at"`
 	Name         string               `json:"name"`

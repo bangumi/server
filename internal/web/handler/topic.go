@@ -24,7 +24,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -35,12 +34,6 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	if err != nil {
 		return err
 	}
-	var response = res.Paged{
-		Data:   res.EmptySlice(),
-		Limit:  page.Limit,
-		Offset: page.Offset,
-	}
-
 	topics, count, err := h.ctrl.ListTopics(c.Context(), u.Auth, topicType, id, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "ctrl.ListTopics")
@@ -67,7 +60,6 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	response.Total = count
 	var data = make([]res.PrivateTopic, len(topics))
 	for i, topic := range topics {
 		data[i] = res.PrivateTopic{
@@ -79,20 +71,26 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 			ReplyCount: topic.Replies,
 		}
 	}
-	response.Data = data
-	return res.JSON(c, response)
+	return res.JSON(c, res.Paged{
+		Data:   data,
+		Total:  count,
+		Limit:  page.Limit,
+		Offset: page.Offset,
+	})
 }
 
-func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicType, topicID model.TopicID) error {
+func (h Handler) getResTopicWithComments(
+	c *fiber.Ctx, topicType domain.TopicType, topicID model.TopicID,
+) (*res.PrivateTopicDetail, error) {
 	a := h.GetHTTPAccessor(c)
 
-	t, err := h.ctrl.GetTopic(c.Context(), a.Auth, topicType, topicID, 1000000, 0) //nolint:gomnd
+	t, err := h.ctrl.GetTopic(c.Context(), a.Auth, topicType, topicID, 0, 0)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return res.ErrNotFound
+			return nil, res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get topic", log.TopicID(topicID), log.TopicType(topicType))
+		return nil, errgo.Wrap(err, "failed to get topic")
 	}
 
 	var userIDs = make(map[model.UserID]struct{}, len(t.Replies))
@@ -107,18 +105,19 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 
 	users, err := h.ctrl.GetUsersByIDs(c.Context(), gmap.Keys(userIDs)...)
 	if err != nil {
-		return errgo.Wrap(err, "ctrl.GetUsersByIDs")
+		return nil, errgo.Wrap(err, "ctrl.GetUsersByIDs")
 	}
 
 	var friends map[model.UserID]domain.FriendItem
 	if a.Login {
 		friends, err = h.ctrl.GetFriends(c.Context(), a.ID)
 		if err != nil {
-			return errgo.Wrap(err, "userRepo.GetFriends")
+			return nil, errgo.Wrap(err, "userRepo.GetFriends")
 		}
 	}
 
-	return res.JSON(c, res.PrivateTopicDetail{
+	return &res.PrivateTopicDetail{
+		ParentID:  t.ParentID,
 		ID:        t.ID,
 		Title:     t.Title,
 		IsFriend:  gmap.Has(friends, t.CreatorID),
@@ -128,7 +127,7 @@ func (h Handler) getResTopicWithComments(c *fiber.Ctx, topicType domain.TopicTyp
 		State:     res.ToCommentState(t.State),
 		Comments:  fromModelComments(t.Replies, users, friends),
 		Text:      t.Content,
-	})
+	}, nil
 }
 
 func fromModelComments(

@@ -29,13 +29,40 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
+type ResPrivateTopicDetailWithGroup struct {
+	*res.PrivateTopicDetail
+	Group res.PrivateGroup `json:"group"`
+}
+
 func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 	topicID, err := req.ParseTopicID(c.Params("topic_id"))
 	if err != nil {
 		return err
 	}
 
-	return h.getResTopicWithComments(c, domain.TopicTypeGroup, topicID)
+	data, err := h.getResTopicWithComments(c, domain.TopicTypeGroup, topicID)
+	if err != nil {
+		return err
+	}
+
+	group, err := h.g.GetByID(c.Context(), model.GroupID(data.ParentID))
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return errgo.Wrap(err, "failed to get group")
+	}
+
+	return res.JSON(c, ResPrivateTopicDetailWithGroup{
+		PrivateTopicDetail: data,
+		PrivateGroup: res.PrivateGroup{
+			ID:        group.ID,
+			Name:      group.Name,
+			CreatedAt: group.CreatedAt,
+			Title:     group.Title,
+			Icon:      groupIconPrefix + group.Icon,
+		},
+	})
 }
 
 func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
@@ -44,7 +71,12 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topicID)
+	data, err := h.getResTopicWithComments(c, domain.TopicTypeSubject, topicID)
+	if err != nil {
+		return err
+	}
+
+	return res.JSON(c, data)
 }
 
 func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
