@@ -23,7 +23,7 @@ type Topic struct {
 	ID        TopicID
 	CreatorID UserID
 	Replies   uint32
-	ObjectID  uint32
+	ParentID  uint32
 	State     CommentState
 	Status    TopicStatus
 }

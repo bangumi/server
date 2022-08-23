@@ -128,7 +128,7 @@ func AddRouters(
 	private.Get("/groups/:name/topics", addMetrics(h.ListGroupTopics))
 	private.Get("/subjects/:id/topics", addMetrics(h.ListSubjectTopics))
 
-	private.Get("/groups/:name/topics/:topic_id", addMetrics(h.GetGroupTopic))
+	private.Get("/groups/-/topics/:topic_id", addMetrics(h.GetGroupTopic))
 	private.Get("/subjects/:id/topics/:topic_id", addMetrics(h.GetSubjectTopic))
 	private.Get("/indices/:id/comments", addMetrics(h.GetIndexComments))
 	private.Get("/episodes/:id/comments", addMetrics(h.GetEpisodeComments))
