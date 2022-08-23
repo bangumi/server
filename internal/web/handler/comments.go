@@ -55,7 +55,7 @@ func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 
 	return res.JSON(c, ResPrivateTopicDetailWithGroup{
 		PrivateTopicDetail: data,
-		PrivateGroup: res.PrivateGroup{
+		Group: res.PrivateGroup{
 			ID:        group.ID,
 			Name:      group.Name,
 			CreatedAt: group.CreatedAt,
