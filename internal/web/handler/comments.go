@@ -125,7 +125,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get subject of episode", log.SubjectID(e.SubjectID))
 	}
 
-	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
+	return h.listComments(c, u.Auth, domain.CommentEpisode, model.TopicID(id))
 }
 
 func (h Handler) GetPersonComments(c *fiber.Ctx) error {
@@ -148,7 +148,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
+	return h.listComments(c, u.Auth, domain.CommentPerson, model.TopicID(id))
 }
 
 func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
@@ -167,7 +167,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
 	}
 
-	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
+	return h.listComments(c, u.Auth, domain.CommentCharacter, model.TopicID(id))
 }
 
 func (h Handler) GetIndexComments(c *fiber.Ctx) error {
