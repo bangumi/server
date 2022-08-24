@@ -89,7 +89,7 @@ tasks:
     deps:
       - gotestfmt
     cmds:
-      - go test -json -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages
+      - go test -timeout 5s -json -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./... 2>&1 | .bin/gotestfmt.exe -hide empty-packages,successful-packages
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
