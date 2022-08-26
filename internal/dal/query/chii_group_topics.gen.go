@@ -26,7 +26,7 @@ func newGroupTopic(db *gorm.DB) groupTopic {
 	_groupTopic.groupTopicDo.UseModel(&dao.GroupTopic{})
 
 	tableName := _groupTopic.groupTopicDo.TableName()
-	_groupTopic.ALL = field.NewField(tableName, "*")
+	_groupTopic.ALL = field.NewAsterisk(tableName)
 	_groupTopic.ID = field.NewUint32(tableName, "grp_tpc_id")
 	_groupTopic.GroupID = field.NewUint32(tableName, "grp_tpc_gid")
 	_groupTopic.UID = field.NewUint32(tableName, "grp_tpc_uid")
@@ -45,7 +45,7 @@ func newGroupTopic(db *gorm.DB) groupTopic {
 type groupTopic struct {
 	groupTopicDo groupTopicDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	GroupID     field.Uint32
 	UID         field.Uint32
@@ -70,7 +70,7 @@ func (g groupTopic) As(alias string) *groupTopic {
 }
 
 func (g *groupTopic) updateTableName(table string) *groupTopic {
-	g.ALL = field.NewField(table, "*")
+	g.ALL = field.NewAsterisk(table)
 	g.ID = field.NewUint32(table, "grp_tpc_id")
 	g.GroupID = field.NewUint32(table, "grp_tpc_gid")
 	g.UID = field.NewUint32(table, "grp_tpc_uid")

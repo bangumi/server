@@ -26,7 +26,7 @@ func newUserGroup(db *gorm.DB) userGroup {
 	_userGroup.userGroupDo.UseModel(&dao.UserGroup{})
 
 	tableName := _userGroup.userGroupDo.TableName()
-	_userGroup.ALL = field.NewField(tableName, "*")
+	_userGroup.ALL = field.NewAsterisk(tableName)
 	_userGroup.ID = field.NewUint8(tableName, "usr_grp_id")
 	_userGroup.Name = field.NewString(tableName, "usr_grp_name")
 	_userGroup.Perm = field.NewBytes(tableName, "usr_grp_perm")
@@ -40,7 +40,7 @@ func newUserGroup(db *gorm.DB) userGroup {
 type userGroup struct {
 	userGroupDo userGroupDo
 
-	ALL      field.Field
+	ALL      field.Asterisk
 	ID       field.Uint8
 	Name     field.String
 	Perm     field.Bytes
@@ -60,7 +60,7 @@ func (u userGroup) As(alias string) *userGroup {
 }
 
 func (u *userGroup) updateTableName(table string) *userGroup {
-	u.ALL = field.NewField(table, "*")
+	u.ALL = field.NewAsterisk(table)
 	u.ID = field.NewUint8(table, "usr_grp_id")
 	u.Name = field.NewString(table, "usr_grp_name")
 	u.Perm = field.NewBytes(table, "usr_grp_perm")

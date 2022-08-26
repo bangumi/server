@@ -26,7 +26,7 @@ func newPersonComment(db *gorm.DB) personComment {
 	_personComment.personCommentDo.UseModel(&dao.PersonComment{})
 
 	tableName := _personComment.personCommentDo.TableName()
-	_personComment.ALL = field.NewField(tableName, "*")
+	_personComment.ALL = field.NewAsterisk(tableName)
 	_personComment.ID = field.NewUint32(tableName, "prsn_pst_id")
 	_personComment.TopicID = field.NewUint32(tableName, "prsn_pst_mid")
 	_personComment.UID = field.NewUint32(tableName, "prsn_pst_uid")
@@ -42,7 +42,7 @@ func newPersonComment(db *gorm.DB) personComment {
 type personComment struct {
 	personCommentDo personCommentDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	TopicID     field.Uint32
 	UID         field.Uint32
@@ -64,7 +64,7 @@ func (p personComment) As(alias string) *personComment {
 }
 
 func (p *personComment) updateTableName(table string) *personComment {
-	p.ALL = field.NewField(table, "*")
+	p.ALL = field.NewAsterisk(table)
 	p.ID = field.NewUint32(table, "prsn_pst_id")
 	p.TopicID = field.NewUint32(table, "prsn_pst_mid")
 	p.UID = field.NewUint32(table, "prsn_pst_uid")

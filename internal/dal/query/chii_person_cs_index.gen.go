@@ -26,7 +26,7 @@ func newPersonSubjects(db *gorm.DB) personSubjects {
 	_personSubjects.personSubjectsDo.UseModel(&dao.PersonSubjects{})
 
 	tableName := _personSubjects.personSubjectsDo.TableName()
-	_personSubjects.ALL = field.NewField(tableName, "*")
+	_personSubjects.ALL = field.NewAsterisk(tableName)
 	_personSubjects.PrsnType = field.NewString(tableName, "prsn_type")
 	_personSubjects.PersonID = field.NewField(tableName, "prsn_id")
 	_personSubjects.PrsnPosition = field.NewUint16(tableName, "prsn_position")
@@ -64,7 +64,7 @@ func newPersonSubjects(db *gorm.DB) personSubjects {
 type personSubjects struct {
 	personSubjectsDo personSubjectsDo
 
-	ALL           field.Field
+	ALL           field.Asterisk
 	PrsnType      field.String
 	PersonID      field.Field
 	PrsnPosition  field.Uint16
@@ -90,7 +90,7 @@ func (p personSubjects) As(alias string) *personSubjects {
 }
 
 func (p *personSubjects) updateTableName(table string) *personSubjects {
-	p.ALL = field.NewField(table, "*")
+	p.ALL = field.NewAsterisk(table)
 	p.PrsnType = field.NewString(table, "prsn_type")
 	p.PersonID = field.NewField(table, "prsn_id")
 	p.PrsnPosition = field.NewUint16(table, "prsn_position")

@@ -26,7 +26,7 @@ func newWebSession(db *gorm.DB) webSession {
 	_webSession.webSessionDo.UseModel(&dao.WebSession{})
 
 	tableName := _webSession.webSessionDo.TableName()
-	_webSession.ALL = field.NewField(tableName, "*")
+	_webSession.ALL = field.NewAsterisk(tableName)
 	_webSession.Key = field.NewString(tableName, "key")
 	_webSession.UserID = field.NewField(tableName, "user_id")
 	_webSession.Value = field.NewBytes(tableName, "value")
@@ -41,7 +41,7 @@ func newWebSession(db *gorm.DB) webSession {
 type webSession struct {
 	webSessionDo webSessionDo
 
-	ALL       field.Field
+	ALL       field.Asterisk
 	Key       field.String
 	UserID    field.Field
 	Value     field.Bytes
@@ -62,7 +62,7 @@ func (w webSession) As(alias string) *webSession {
 }
 
 func (w *webSession) updateTableName(table string) *webSession {
-	w.ALL = field.NewField(table, "*")
+	w.ALL = field.NewAsterisk(table)
 	w.Key = field.NewString(table, "key")
 	w.UserID = field.NewField(table, "user_id")
 	w.Value = field.NewBytes(table, "value")

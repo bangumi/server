@@ -26,7 +26,7 @@ func newIndex(db *gorm.DB) index {
 	_index.indexDo.UseModel(&dao.Index{})
 
 	tableName := _index.indexDo.TableName()
-	_index.ALL = field.NewField(tableName, "*")
+	_index.ALL = field.NewAsterisk(tableName)
 	_index.ID = field.NewUint32(tableName, "idx_id")
 	_index.Type = field.NewUint8(tableName, "idx_type")
 	_index.Title = field.NewString(tableName, "idx_title")
@@ -48,7 +48,7 @@ func newIndex(db *gorm.DB) index {
 type index struct {
 	indexDo indexDo
 
-	ALL          field.Field
+	ALL          field.Asterisk
 	ID           field.Uint32
 	Type         field.Uint8
 	Title        field.String
@@ -76,7 +76,7 @@ func (i index) As(alias string) *index {
 }
 
 func (i *index) updateTableName(table string) *index {
-	i.ALL = field.NewField(table, "*")
+	i.ALL = field.NewAsterisk(table)
 	i.ID = field.NewUint32(table, "idx_id")
 	i.Type = field.NewUint8(table, "idx_type")
 	i.Title = field.NewString(table, "idx_title")

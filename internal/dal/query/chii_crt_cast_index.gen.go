@@ -26,7 +26,7 @@ func newCast(db *gorm.DB) cast {
 	_cast.castDo.UseModel(&dao.Cast{})
 
 	tableName := _cast.castDo.TableName()
-	_cast.ALL = field.NewField(tableName, "*")
+	_cast.ALL = field.NewAsterisk(tableName)
 	_cast.CharacterID = field.NewField(tableName, "crt_id")
 	_cast.PersonID = field.NewField(tableName, "prsn_id")
 	_cast.SubjectID = field.NewField(tableName, "subject_id")
@@ -73,7 +73,7 @@ func newCast(db *gorm.DB) cast {
 type cast struct {
 	castDo castDo
 
-	ALL           field.Field
+	ALL           field.Asterisk
 	CharacterID   field.Field
 	PersonID      field.Field
 	SubjectID     field.Field
@@ -99,7 +99,7 @@ func (c cast) As(alias string) *cast {
 }
 
 func (c *cast) updateTableName(table string) *cast {
-	c.ALL = field.NewField(table, "*")
+	c.ALL = field.NewAsterisk(table)
 	c.CharacterID = field.NewField(table, "crt_id")
 	c.PersonID = field.NewField(table, "prsn_id")
 	c.SubjectID = field.NewField(table, "subject_id")

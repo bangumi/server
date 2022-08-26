@@ -26,7 +26,7 @@ func newCharacterSubjects(db *gorm.DB) characterSubjects {
 	_characterSubjects.characterSubjectsDo.UseModel(&dao.CharacterSubjects{})
 
 	tableName := _characterSubjects.characterSubjectsDo.TableName()
-	_characterSubjects.ALL = field.NewField(tableName, "*")
+	_characterSubjects.ALL = field.NewAsterisk(tableName)
 	_characterSubjects.CharacterID = field.NewField(tableName, "crt_id")
 	_characterSubjects.SubjectID = field.NewField(tableName, "subject_id")
 	_characterSubjects.SubjectTypeID = field.NewUint8(tableName, "subject_type_id")
@@ -63,7 +63,7 @@ func newCharacterSubjects(db *gorm.DB) characterSubjects {
 type characterSubjects struct {
 	characterSubjectsDo characterSubjectsDo
 
-	ALL           field.Field
+	ALL           field.Asterisk
 	CharacterID   field.Field
 	SubjectID     field.Field
 	SubjectTypeID field.Uint8
@@ -88,7 +88,7 @@ func (c characterSubjects) As(alias string) *characterSubjects {
 }
 
 func (c *characterSubjects) updateTableName(table string) *characterSubjects {
-	c.ALL = field.NewField(table, "*")
+	c.ALL = field.NewAsterisk(table)
 	c.CharacterID = field.NewField(table, "crt_id")
 	c.SubjectID = field.NewField(table, "subject_id")
 	c.SubjectTypeID = field.NewUint8(table, "subject_type_id")
