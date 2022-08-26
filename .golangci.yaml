@@ -336,7 +336,7 @@ issues:
     - source: 'var Module = fx\.Module\('
       linters: [gochecknoglobals]
 
-    - source: "var log"
+    - source: 'var .* = sync\.Once\{\}'
       linters: [gochecknoglobals]
 
     - linters: [goerr113, errorlint]
