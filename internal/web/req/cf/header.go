@@ -12,16 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build dev || test
+package cf
 
-package util
-
-import (
-	"net"
-
-	"github.com/gofiber/fiber/v2"
-)
-
-func RequestIP(c *fiber.Ctx) net.IP {
-	return c.Context().RemoteIP()
-}
+const HeaderRequestID = "Cf-Ray"
+const HeaderRequestIP = "Cf-Connecting-Ip"
