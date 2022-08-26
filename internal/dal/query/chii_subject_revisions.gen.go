@@ -26,7 +26,7 @@ func newSubjectRevision(db *gorm.DB) subjectRevision {
 	_subjectRevision.subjectRevisionDo.UseModel(&dao.SubjectRevision{})
 
 	tableName := _subjectRevision.subjectRevisionDo.TableName()
-	_subjectRevision.ALL = field.NewField(tableName, "*")
+	_subjectRevision.ALL = field.NewAsterisk(tableName)
 	_subjectRevision.ID = field.NewUint32(tableName, "rev_id")
 	_subjectRevision.Type = field.NewUint8(tableName, "rev_type")
 	_subjectRevision.SubjectID = field.NewField(tableName, "rev_subject_id")
@@ -60,7 +60,7 @@ func newSubjectRevision(db *gorm.DB) subjectRevision {
 type subjectRevision struct {
 	subjectRevisionDo subjectRevisionDo
 
-	ALL          field.Field
+	ALL          field.Asterisk
 	ID           field.Uint32
 	Type         field.Uint8
 	SubjectID    field.Field
@@ -91,7 +91,7 @@ func (s subjectRevision) As(alias string) *subjectRevision {
 }
 
 func (s *subjectRevision) updateTableName(table string) *subjectRevision {
-	s.ALL = field.NewField(table, "*")
+	s.ALL = field.NewAsterisk(table)
 	s.ID = field.NewUint32(table, "rev_id")
 	s.Type = field.NewUint8(table, "rev_type")
 	s.SubjectID = field.NewField(table, "rev_subject_id")

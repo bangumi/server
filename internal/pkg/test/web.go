@@ -113,23 +113,6 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
 		fx.Provide(func() domain.CollectionRepo { return m.CollectionRepo }),
 
-		// this will transform t.FailNow()
-		// to panic
-		// until https://github.com/gofiber/fiber/issues/1996
-		fx.Invoke(func(app *fiber.App) {
-			app.Use(func(c *fiber.Ctx) error {
-				var returned bool
-				defer func() {
-					if !returned {
-						panic("t.FailNow() called in handler")
-					}
-				}()
-
-				err := c.Next()
-				returned = true
-				return err
-			})
-		}),
 		fx.Invoke(web.AddRouters),
 
 		fx.Populate(&f),

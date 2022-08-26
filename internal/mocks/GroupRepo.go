@@ -51,9 +51,9 @@ type GroupRepo_CountMembersByID_Call struct {
 }
 
 // CountMembersByID is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id model.GroupID
-//  - memberType domain.GroupMemberType
+//   - ctx context.Context
+//   - id model.GroupID
+//   - memberType domain.GroupMemberType
 func (_e *GroupRepo_Expecter) CountMembersByID(ctx interface{}, id interface{}, memberType interface{}) *GroupRepo_CountMembersByID_Call {
 	return &GroupRepo_CountMembersByID_Call{Call: _e.mock.On("CountMembersByID", ctx, id, memberType)}
 }
@@ -66,6 +66,51 @@ func (_c *GroupRepo_CountMembersByID_Call) Run(run func(ctx context.Context, id 
 }
 
 func (_c *GroupRepo_CountMembersByID_Call) Return(_a0 int64, _a1 error) *GroupRepo_CountMembersByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// GetByID provides a mock function with given fields: ctx, id
+func (_m *GroupRepo) GetByID(ctx context.Context, id model.GroupID) (model.Group, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 model.Group
+	if rf, ok := ret.Get(0).(func(context.Context, model.GroupID) model.Group); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(model.Group)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.GroupID) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GroupRepo_GetByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+type GroupRepo_GetByID_Call struct {
+	*mock.Call
+}
+
+// GetByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id model.GroupID
+func (_e *GroupRepo_Expecter) GetByID(ctx interface{}, id interface{}) *GroupRepo_GetByID_Call {
+	return &GroupRepo_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
+}
+
+func (_c *GroupRepo_GetByID_Call) Run(run func(ctx context.Context, id model.GroupID)) *GroupRepo_GetByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.GroupID))
+	})
+	return _c
+}
+
+func (_c *GroupRepo_GetByID_Call) Return(_a0 model.Group, _a1 error) *GroupRepo_GetByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
@@ -97,8 +142,8 @@ type GroupRepo_GetByName_Call struct {
 }
 
 // GetByName is a helper method to define mock.On call
-//  - ctx context.Context
-//  - name string
+//   - ctx context.Context
+//   - name string
 func (_e *GroupRepo_Expecter) GetByName(ctx interface{}, name interface{}) *GroupRepo_GetByName_Call {
 	return &GroupRepo_GetByName_Call{Call: _e.mock.On("GetByName", ctx, name)}
 }
@@ -144,11 +189,11 @@ type GroupRepo_ListMembersByID_Call struct {
 }
 
 // ListMembersByID is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id model.GroupID
-//  - memberType domain.GroupMemberType
-//  - limit int
-//  - offset int
+//   - ctx context.Context
+//   - id model.GroupID
+//   - memberType domain.GroupMemberType
+//   - limit int
+//   - offset int
 func (_e *GroupRepo_Expecter) ListMembersByID(ctx interface{}, id interface{}, memberType interface{}, limit interface{}, offset interface{}) *GroupRepo_ListMembersByID_Call {
 	return &GroupRepo_ListMembersByID_Call{Call: _e.mock.On("ListMembersByID", ctx, id, memberType, limit, offset)}
 }

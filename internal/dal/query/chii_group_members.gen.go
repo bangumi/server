@@ -26,7 +26,7 @@ func newGroupMember(db *gorm.DB) groupMember {
 	_groupMember.groupMemberDo.UseModel(&dao.GroupMember{})
 
 	tableName := _groupMember.groupMemberDo.TableName()
-	_groupMember.ALL = field.NewField(tableName, "*")
+	_groupMember.ALL = field.NewAsterisk(tableName)
 	_groupMember.UserID = field.NewField(tableName, "gmb_uid")
 	_groupMember.GroupID = field.NewField(tableName, "gmb_gid")
 	_groupMember.Moderator = field.NewBool(tableName, "gmb_moderator")
@@ -40,7 +40,7 @@ func newGroupMember(db *gorm.DB) groupMember {
 type groupMember struct {
 	groupMemberDo groupMemberDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	UserID      field.Field
 	GroupID     field.Field
 	Moderator   field.Bool
@@ -60,7 +60,7 @@ func (g groupMember) As(alias string) *groupMember {
 }
 
 func (g *groupMember) updateTableName(table string) *groupMember {
-	g.ALL = field.NewField(table, "*")
+	g.ALL = field.NewAsterisk(table)
 	g.UserID = field.NewField(table, "gmb_uid")
 	g.GroupID = field.NewField(table, "gmb_gid")
 	g.Moderator = field.NewBool(table, "gmb_moderator")

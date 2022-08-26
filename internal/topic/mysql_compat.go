@@ -29,7 +29,7 @@ type mysqlTopic interface {
 	GetCreatorID() uint32
 	GetState() uint8
 	GetReplies() uint32
-	GetObjectID() uint32
+	GetParentID() uint32
 	GetStatus() uint8
 }
 
@@ -51,7 +51,7 @@ func wrapDao[T mysqlTopic](data []T, err error) ([]model.Topic, error) {
 			CreatorID: model.UserID(item.GetCreatorID()),
 			State:     model.CommentState(item.GetState()),
 			Replies:   item.GetReplies(),
-			ObjectID:  item.GetObjectID(),
+			ParentID:  item.GetParentID(),
 			Status:    model.TopicStatus(item.GetStatus()),
 		}
 	}
@@ -67,7 +67,7 @@ type mysqlComment interface {
 	GetContent() string
 	GetState() uint8
 	RelatedTo() model.CommentID
-	// GetObjectID() uint32
+	// GetParentID() uint32
 }
 
 func wrapCommentDao[T mysqlComment](data []T, err error) ([]mysqlComment, error) {

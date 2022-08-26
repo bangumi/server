@@ -26,7 +26,7 @@ func newEpisodeComment(db *gorm.DB) episodeComment {
 	_episodeComment.episodeCommentDo.UseModel(&dao.EpisodeComment{})
 
 	tableName := _episodeComment.episodeCommentDo.TableName()
-	_episodeComment.ALL = field.NewField(tableName, "*")
+	_episodeComment.ALL = field.NewAsterisk(tableName)
 	_episodeComment.ID = field.NewUint32(tableName, "ep_pst_id")
 	_episodeComment.TopicID = field.NewUint32(tableName, "ep_pst_mid")
 	_episodeComment.UID = field.NewUint32(tableName, "ep_pst_uid")
@@ -42,7 +42,7 @@ func newEpisodeComment(db *gorm.DB) episodeComment {
 type episodeComment struct {
 	episodeCommentDo episodeCommentDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	TopicID     field.Uint32
 	UID         field.Uint32
@@ -64,7 +64,7 @@ func (e episodeComment) As(alias string) *episodeComment {
 }
 
 func (e *episodeComment) updateTableName(table string) *episodeComment {
-	e.ALL = field.NewField(table, "*")
+	e.ALL = field.NewAsterisk(table)
 	e.ID = field.NewUint32(table, "ep_pst_id")
 	e.TopicID = field.NewUint32(table, "ep_pst_mid")
 	e.UID = field.NewUint32(table, "ep_pst_uid")

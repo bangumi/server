@@ -55,11 +55,11 @@ type CollectionRepo_CountSubjectCollections_Call struct {
 }
 
 // CountSubjectCollections is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - subjectType uint8
-//  - collectionType model.SubjectCollection
-//  - showPrivate bool
+//   - ctx context.Context
+//   - userID model.UserID
+//   - subjectType uint8
+//   - collectionType model.SubjectCollection
+//   - showPrivate bool
 func (_e *CollectionRepo_Expecter) CountSubjectCollections(ctx interface{}, userID interface{}, subjectType interface{}, collectionType interface{}, showPrivate interface{}) *CollectionRepo_CountSubjectCollections_Call {
 	return &CollectionRepo_CountSubjectCollections_Call{Call: _e.mock.On("CountSubjectCollections", ctx, userID, subjectType, collectionType, showPrivate)}
 }
@@ -103,9 +103,9 @@ type CollectionRepo_GetSubjectCollection_Call struct {
 }
 
 // GetSubjectCollection is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - subjectID model.SubjectID
+//   - ctx context.Context
+//   - userID model.UserID
+//   - subjectID model.SubjectID
 func (_e *CollectionRepo_Expecter) GetSubjectCollection(ctx interface{}, userID interface{}, subjectID interface{}) *CollectionRepo_GetSubjectCollection_Call {
 	return &CollectionRepo_GetSubjectCollection_Call{Call: _e.mock.On("GetSubjectCollection", ctx, userID, subjectID)}
 }
@@ -151,9 +151,9 @@ type CollectionRepo_GetSubjectEpisodesCollection_Call struct {
 }
 
 // GetSubjectEpisodesCollection is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - subjectID model.SubjectID
+//   - ctx context.Context
+//   - userID model.UserID
+//   - subjectID model.SubjectID
 func (_e *CollectionRepo_Expecter) GetSubjectEpisodesCollection(ctx interface{}, userID interface{}, subjectID interface{}) *CollectionRepo_GetSubjectEpisodesCollection_Call {
 	return &CollectionRepo_GetSubjectEpisodesCollection_Call{Call: _e.mock.On("GetSubjectEpisodesCollection", ctx, userID, subjectID)}
 }
@@ -199,13 +199,13 @@ type CollectionRepo_ListSubjectCollection_Call struct {
 }
 
 // ListSubjectCollection is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - subjectType uint8
-//  - collectionType model.SubjectCollection
-//  - showPrivate bool
-//  - limit int
-//  - offset int
+//   - ctx context.Context
+//   - userID model.UserID
+//   - subjectType uint8
+//   - collectionType model.SubjectCollection
+//   - showPrivate bool
+//   - limit int
+//   - offset int
 func (_e *CollectionRepo_Expecter) ListSubjectCollection(ctx interface{}, userID interface{}, subjectType interface{}, collectionType interface{}, showPrivate interface{}, limit interface{}, offset interface{}) *CollectionRepo_ListSubjectCollection_Call {
 	return &CollectionRepo_ListSubjectCollection_Call{Call: _e.mock.On("ListSubjectCollection", ctx, userID, subjectType, collectionType, showPrivate, limit, offset)}
 }
@@ -251,12 +251,12 @@ type CollectionRepo_UpdateEpisodeCollection_Call struct {
 }
 
 // UpdateEpisodeCollection is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - subjectID model.SubjectID
-//  - episodeIDs []model.EpisodeID
-//  - collection model.EpisodeCollection
-//  - at time.Time
+//   - ctx context.Context
+//   - userID model.UserID
+//   - subjectID model.SubjectID
+//   - episodeIDs []model.EpisodeID
+//   - collection model.EpisodeCollection
+//   - at time.Time
 func (_e *CollectionRepo_Expecter) UpdateEpisodeCollection(ctx interface{}, userID interface{}, subjectID interface{}, episodeIDs interface{}, collection interface{}, at interface{}) *CollectionRepo_UpdateEpisodeCollection_Call {
 	return &CollectionRepo_UpdateEpisodeCollection_Call{Call: _e.mock.On("UpdateEpisodeCollection", ctx, userID, subjectID, episodeIDs, collection, at)}
 }
@@ -293,11 +293,11 @@ type CollectionRepo_UpdateSubjectCollection_Call struct {
 }
 
 // UpdateSubjectCollection is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - subjectID model.SubjectID
-//  - data domain.SubjectCollectionUpdate
-//  - at time.Time
+//   - ctx context.Context
+//   - userID model.UserID
+//   - subjectID model.SubjectID
+//   - data domain.SubjectCollectionUpdate
+//   - at time.Time
 func (_e *CollectionRepo_Expecter) UpdateSubjectCollection(ctx interface{}, userID interface{}, subjectID interface{}, data interface{}, at interface{}) *CollectionRepo_UpdateSubjectCollection_Call {
 	return &CollectionRepo_UpdateSubjectCollection_Call{Call: _e.mock.On("UpdateSubjectCollection", ctx, userID, subjectID, data, at)}
 }
@@ -336,7 +336,7 @@ type CollectionRepo_WithQuery_Call struct {
 }
 
 // WithQuery is a helper method to define mock.On call
-//  - _a0 *query.Query
+//   - _a0 *query.Query
 func (_e *CollectionRepo_Expecter) WithQuery(_a0 interface{}) *CollectionRepo_WithQuery_Call {
 	return &CollectionRepo_WithQuery_Call{Call: _e.mock.On("WithQuery", _a0)}
 }

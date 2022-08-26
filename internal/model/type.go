@@ -14,7 +14,11 @@
 
 package model
 
-import "database/sql/driver"
+import (
+	"database/sql/driver"
+
+	"go.uber.org/zap"
+)
 
 type EpisodeID uint32
 type SubjectID uint32
@@ -67,4 +71,7 @@ func (v GroupID) Value() (driver.Value, error) {
 
 func (v TimeLineID) Value() (driver.Value, error) {
 	return int64(v), nil
+
+func (v GroupID) Zap() zap.Field {
+	return zap.Uint32("group_id", uint32(v))
 }

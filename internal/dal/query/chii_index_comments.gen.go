@@ -26,7 +26,7 @@ func newIndexComment(db *gorm.DB) indexComment {
 	_indexComment.indexCommentDo.UseModel(&dao.IndexComment{})
 
 	tableName := _indexComment.indexCommentDo.TableName()
-	_indexComment.ALL = field.NewField(tableName, "*")
+	_indexComment.ALL = field.NewAsterisk(tableName)
 	_indexComment.ID = field.NewUint32(tableName, "idx_pst_id")
 	_indexComment.TopicID = field.NewUint32(tableName, "idx_pst_mid")
 	_indexComment.UID = field.NewUint32(tableName, "idx_pst_uid")
@@ -42,7 +42,7 @@ func newIndexComment(db *gorm.DB) indexComment {
 type indexComment struct {
 	indexCommentDo indexCommentDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	TopicID     field.Uint32
 	UID         field.Uint32
@@ -64,7 +64,7 @@ func (i indexComment) As(alias string) *indexComment {
 }
 
 func (i *indexComment) updateTableName(table string) *indexComment {
-	i.ALL = field.NewField(table, "*")
+	i.ALL = field.NewAsterisk(table)
 	i.ID = field.NewUint32(table, "idx_pst_id")
 	i.TopicID = field.NewUint32(table, "idx_pst_mid")
 	i.UID = field.NewUint32(table, "idx_pst_uid")

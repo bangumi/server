@@ -26,7 +26,7 @@ func newFriend(db *gorm.DB) friend {
 	_friend.friendDo.UseModel(&dao.Friend{})
 
 	tableName := _friend.friendDo.TableName()
-	_friend.ALL = field.NewField(tableName, "*")
+	_friend.ALL = field.NewAsterisk(tableName)
 	_friend.UserID = field.NewField(tableName, "frd_uid")
 	_friend.FriendID = field.NewField(tableName, "frd_fid")
 	_friend.Grade = field.NewUint8(tableName, "frd_grade")
@@ -41,7 +41,7 @@ func newFriend(db *gorm.DB) friend {
 type friend struct {
 	friendDo friendDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	UserID      field.Field
 	FriendID    field.Field
 	Grade       field.Uint8
@@ -62,7 +62,7 @@ func (f friend) As(alias string) *friend {
 }
 
 func (f *friend) updateTableName(table string) *friend {
-	f.ALL = field.NewField(table, "*")
+	f.ALL = field.NewAsterisk(table)
 	f.UserID = field.NewField(table, "frd_uid")
 	f.FriendID = field.NewField(table, "frd_fid")
 	f.Grade = field.NewUint8(table, "frd_grade")

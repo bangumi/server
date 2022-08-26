@@ -26,7 +26,7 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 	_subjectCollection.subjectCollectionDo.UseModel(&dao.SubjectCollection{})
 
 	tableName := _subjectCollection.subjectCollectionDo.TableName()
-	_subjectCollection.ALL = field.NewField(tableName, "*")
+	_subjectCollection.ALL = field.NewAsterisk(tableName)
 	_subjectCollection.ID = field.NewUint32(tableName, "interest_id")
 	_subjectCollection.UserID = field.NewField(tableName, "interest_uid")
 	_subjectCollection.SubjectID = field.NewField(tableName, "interest_subject_id")
@@ -56,7 +56,7 @@ func newSubjectCollection(db *gorm.DB) subjectCollection {
 type subjectCollection struct {
 	subjectCollectionDo subjectCollectionDo
 
-	ALL          field.Field
+	ALL          field.Asterisk
 	ID           field.Uint32
 	UserID       field.Field
 	SubjectID    field.Field
@@ -92,7 +92,7 @@ func (s subjectCollection) As(alias string) *subjectCollection {
 }
 
 func (s *subjectCollection) updateTableName(table string) *subjectCollection {
-	s.ALL = field.NewField(table, "*")
+	s.ALL = field.NewAsterisk(table)
 	s.ID = field.NewUint32(table, "interest_id")
 	s.UserID = field.NewField(table, "interest_uid")
 	s.SubjectID = field.NewField(table, "interest_subject_id")

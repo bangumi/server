@@ -26,7 +26,7 @@ func newAccessToken(db *gorm.DB) accessToken {
 	_accessToken.accessTokenDo.UseModel(&dao.AccessToken{})
 
 	tableName := _accessToken.accessTokenDo.TableName()
-	_accessToken.ALL = field.NewField(tableName, "*")
+	_accessToken.ALL = field.NewAsterisk(tableName)
 	_accessToken.ID = field.NewUint32(tableName, "id")
 	_accessToken.Type = field.NewUint8(tableName, "type")
 	_accessToken.AccessToken = field.NewString(tableName, "access_token")
@@ -44,7 +44,7 @@ func newAccessToken(db *gorm.DB) accessToken {
 type accessToken struct {
 	accessTokenDo accessTokenDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	Type        field.Uint8
 	AccessToken field.String
@@ -68,7 +68,7 @@ func (a accessToken) As(alias string) *accessToken {
 }
 
 func (a *accessToken) updateTableName(table string) *accessToken {
-	a.ALL = field.NewField(table, "*")
+	a.ALL = field.NewAsterisk(table)
 	a.ID = field.NewUint32(table, "id")
 	a.Type = field.NewUint8(table, "type")
 	a.AccessToken = field.NewString(table, "access_token")

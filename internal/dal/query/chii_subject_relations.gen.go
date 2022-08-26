@@ -26,7 +26,7 @@ func newSubjectRelation(db *gorm.DB) subjectRelation {
 	_subjectRelation.subjectRelationDo.UseModel(&dao.SubjectRelation{})
 
 	tableName := _subjectRelation.subjectRelationDo.TableName()
-	_subjectRelation.ALL = field.NewField(tableName, "*")
+	_subjectRelation.ALL = field.NewAsterisk(tableName)
 	_subjectRelation.SubjectID = field.NewField(tableName, "rlt_subject_id")
 	_subjectRelation.SubjectTypeID = field.NewUint8(tableName, "rlt_subject_type_id")
 	_subjectRelation.RelationType = field.NewUint16(tableName, "rlt_relation_type")
@@ -53,7 +53,7 @@ func newSubjectRelation(db *gorm.DB) subjectRelation {
 type subjectRelation struct {
 	subjectRelationDo subjectRelationDo
 
-	ALL                  field.Field
+	ALL                  field.Asterisk
 	SubjectID            field.Field
 	SubjectTypeID        field.Uint8
 	RelationType         field.Uint16
@@ -77,7 +77,7 @@ func (s subjectRelation) As(alias string) *subjectRelation {
 }
 
 func (s *subjectRelation) updateTableName(table string) *subjectRelation {
-	s.ALL = field.NewField(table, "*")
+	s.ALL = field.NewAsterisk(table)
 	s.SubjectID = field.NewField(table, "rlt_subject_id")
 	s.SubjectTypeID = field.NewUint8(table, "rlt_subject_type_id")
 	s.RelationType = field.NewUint16(table, "rlt_relation_type")

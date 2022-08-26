@@ -26,7 +26,7 @@ func newEpisode(db *gorm.DB) episode {
 	_episode.episodeDo.UseModel(&dao.Episode{})
 
 	tableName := _episode.episodeDo.TableName()
-	_episode.ALL = field.NewField(tableName, "*")
+	_episode.ALL = field.NewAsterisk(tableName)
 	_episode.ID = field.NewField(tableName, "ep_id")
 	_episode.SubjectID = field.NewField(tableName, "ep_subject_id")
 	_episode.Sort = field.NewFloat32(tableName, "ep_sort")
@@ -64,7 +64,7 @@ func newEpisode(db *gorm.DB) episode {
 type episode struct {
 	episodeDo episodeDo
 
-	ALL       field.Field
+	ALL       field.Asterisk
 	ID        field.Field
 	SubjectID field.Field
 	Sort      field.Float32
@@ -99,7 +99,7 @@ func (e episode) As(alias string) *episode {
 }
 
 func (e *episode) updateTableName(table string) *episode {
-	e.ALL = field.NewField(table, "*")
+	e.ALL = field.NewAsterisk(table)
 	e.ID = field.NewField(table, "ep_id")
 	e.SubjectID = field.NewField(table, "ep_subject_id")
 	e.Sort = field.NewFloat32(table, "ep_sort")

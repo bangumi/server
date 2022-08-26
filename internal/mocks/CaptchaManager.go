@@ -48,8 +48,8 @@ type CaptchaManager_Verify_Call struct {
 }
 
 // Verify is a helper method to define mock.On call
-//  - ctx context.Context
-//  - response string
+//   - ctx context.Context
+//   - response string
 func (_e *CaptchaManager_Expecter) Verify(ctx interface{}, response interface{}) *CaptchaManager_Verify_Call {
 	return &CaptchaManager_Verify_Call{Call: _e.mock.On("Verify", ctx, response)}
 }

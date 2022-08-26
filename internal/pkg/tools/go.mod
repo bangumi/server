@@ -2,10 +2,7 @@ module tools
 
 go 1.18
 
-require (
-	github.com/haveyoudebuggedit/gotestfmt/v2 v2.3.2
-	github.com/vektra/mockery/v2 v2.14.0
-)
+require github.com/vektra/mockery/v2 v2.14.0
 
 require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect

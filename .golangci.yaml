@@ -222,7 +222,8 @@ linters-settings:
     default-signifies-exhaustive: true
   govet:
     enable-all: true
-  #    disable:
+    disable:
+      - fieldalignment
   #      - shadow
   wrapcheck:
     # An array of strings that specify substrings of signatures to ignore.
@@ -286,6 +287,7 @@ linters-settings:
 linters:
   enable-all: true
   disable:
+    - nolintlint
     - ireturn
     - contextcheck
     - bodyclose
@@ -295,27 +297,28 @@ linters:
     - exhaustruct # too noisy
     - gofumpt # break import grouping
     - prealloc # perf
-    - scopelint # archived
-    - golint # archived
     - maligned # replaced by go vert
-    - interfacer # archived
     - dupl
     - cyclop # we have gocyclo
     - goimports # we have gci already
     - nlreturn
     - godox
     - execinquery
-    - ifshort # deprecated
-    # 1.18
-    - wastedassign
-    - unparam
-    - tparallel
-    - structcheck
+    # useless
     - sqlclosecheck
     - rowserrcheck
-    - noctx
     - nilerr
+    # 1.18
+    - wastedassign
     - nosnakecase # false positive for variable and const defined in other lib
+    - structcheck
+    # deprecated
+    - varcheck
+    - deadcode
+    - interfacer
+    - ifshort
+    - scopelint
+    - golint
 
   fast: false
 
@@ -333,7 +336,7 @@ issues:
     - source: 'var Module = fx\.Module\('
       linters: [gochecknoglobals]
 
-    - source: "var log"
+    - source: 'var .* = sync\.Once\{\}'
       linters: [gochecknoglobals]
 
     - linters: [goerr113, errorlint]

@@ -26,7 +26,7 @@ func newGroupTopicComment(db *gorm.DB) groupTopicComment {
 	_groupTopicComment.groupTopicCommentDo.UseModel(&dao.GroupTopicComment{})
 
 	tableName := _groupTopicComment.groupTopicCommentDo.TableName()
-	_groupTopicComment.ALL = field.NewField(tableName, "*")
+	_groupTopicComment.ALL = field.NewAsterisk(tableName)
 	_groupTopicComment.ID = field.NewUint32(tableName, "grp_pst_id")
 	_groupTopicComment.TopicID = field.NewUint32(tableName, "grp_pst_mid")
 	_groupTopicComment.UID = field.NewUint32(tableName, "grp_pst_uid")
@@ -43,7 +43,7 @@ func newGroupTopicComment(db *gorm.DB) groupTopicComment {
 type groupTopicComment struct {
 	groupTopicCommentDo groupTopicCommentDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	TopicID     field.Uint32
 	UID         field.Uint32
@@ -66,7 +66,7 @@ func (g groupTopicComment) As(alias string) *groupTopicComment {
 }
 
 func (g *groupTopicComment) updateTableName(table string) *groupTopicComment {
-	g.ALL = field.NewField(table, "*")
+	g.ALL = field.NewAsterisk(table)
 	g.ID = field.NewUint32(table, "grp_pst_id")
 	g.TopicID = field.NewUint32(table, "grp_pst_mid")
 	g.UID = field.NewUint32(table, "grp_pst_uid")

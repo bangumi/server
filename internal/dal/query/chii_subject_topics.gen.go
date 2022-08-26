@@ -26,7 +26,7 @@ func newSubjectTopic(db *gorm.DB) subjectTopic {
 	_subjectTopic.subjectTopicDo.UseModel(&dao.SubjectTopic{})
 
 	tableName := _subjectTopic.subjectTopicDo.TableName()
-	_subjectTopic.ALL = field.NewField(tableName, "*")
+	_subjectTopic.ALL = field.NewAsterisk(tableName)
 	_subjectTopic.ID = field.NewUint32(tableName, "sbj_tpc_id")
 	_subjectTopic.SubjectID = field.NewUint32(tableName, "sbj_tpc_subject_id")
 	_subjectTopic.UID = field.NewUint32(tableName, "sbj_tpc_uid")
@@ -45,7 +45,7 @@ func newSubjectTopic(db *gorm.DB) subjectTopic {
 type subjectTopic struct {
 	subjectTopicDo subjectTopicDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	SubjectID   field.Uint32
 	UID         field.Uint32
@@ -70,7 +70,7 @@ func (s subjectTopic) As(alias string) *subjectTopic {
 }
 
 func (s *subjectTopic) updateTableName(table string) *subjectTopic {
-	s.ALL = field.NewField(table, "*")
+	s.ALL = field.NewAsterisk(table)
 	s.ID = field.NewUint32(table, "sbj_tpc_id")
 	s.SubjectID = field.NewUint32(table, "sbj_tpc_subject_id")
 	s.UID = field.NewUint32(table, "sbj_tpc_uid")
