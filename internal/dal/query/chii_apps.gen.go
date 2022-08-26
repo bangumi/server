@@ -26,7 +26,7 @@ func newApp(db *gorm.DB) app {
 	_app.appDo.UseModel(&dao.App{})
 
 	tableName := _app.appDo.TableName()
-	_app.ALL = field.NewField(tableName, "*")
+	_app.ALL = field.NewAsterisk(tableName)
 	_app.ID = field.NewUint32(tableName, "app_id")
 	_app.Type = field.NewUint8(tableName, "app_type")
 	_app.Creator = field.NewField(tableName, "app_creator")
@@ -47,7 +47,7 @@ func newApp(db *gorm.DB) app {
 type app struct {
 	appDo appDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	Type        field.Uint8
 	Creator     field.Field
@@ -74,7 +74,7 @@ func (a app) As(alias string) *app {
 }
 
 func (a *app) updateTableName(table string) *app {
-	a.ALL = field.NewField(table, "*")
+	a.ALL = field.NewAsterisk(table)
 	a.ID = field.NewUint32(table, "app_id")
 	a.Type = field.NewUint8(table, "app_type")
 	a.Creator = field.NewField(table, "app_creator")

@@ -26,7 +26,7 @@ func newRevisionHistory(db *gorm.DB) revisionHistory {
 	_revisionHistory.revisionHistoryDo.UseModel(&dao.RevisionHistory{})
 
 	tableName := _revisionHistory.revisionHistoryDo.TableName()
-	_revisionHistory.ALL = field.NewField(tableName, "*")
+	_revisionHistory.ALL = field.NewAsterisk(tableName)
 	_revisionHistory.ID = field.NewUint32(tableName, "rev_id")
 	_revisionHistory.Type = field.NewUint8(tableName, "rev_type")
 	_revisionHistory.Mid = field.NewUint32(tableName, "rev_mid")
@@ -43,7 +43,7 @@ func newRevisionHistory(db *gorm.DB) revisionHistory {
 type revisionHistory struct {
 	revisionHistoryDo revisionHistoryDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	Type        field.Uint8
 	Mid         field.Uint32
@@ -66,7 +66,7 @@ func (r revisionHistory) As(alias string) *revisionHistory {
 }
 
 func (r *revisionHistory) updateTableName(table string) *revisionHistory {
-	r.ALL = field.NewField(table, "*")
+	r.ALL = field.NewAsterisk(table)
 	r.ID = field.NewUint32(table, "rev_id")
 	r.Type = field.NewUint8(table, "rev_type")
 	r.Mid = field.NewUint32(table, "rev_mid")

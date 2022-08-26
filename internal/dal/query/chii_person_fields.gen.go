@@ -26,7 +26,7 @@ func newPersonField(db *gorm.DB) personField {
 	_personField.personFieldDo.UseModel(&dao.PersonField{})
 
 	tableName := _personField.personFieldDo.TableName()
-	_personField.ALL = field.NewField(tableName, "*")
+	_personField.ALL = field.NewAsterisk(tableName)
 	_personField.OwnerType = field.NewString(tableName, "prsn_cat")
 	_personField.OwnerID = field.NewField(tableName, "prsn_id")
 	_personField.Gender = field.NewUint8(tableName, "gender")
@@ -43,7 +43,7 @@ func newPersonField(db *gorm.DB) personField {
 type personField struct {
 	personFieldDo personFieldDo
 
-	ALL       field.Field
+	ALL       field.Asterisk
 	OwnerType field.String
 	OwnerID   field.Field
 	Gender    field.Uint8
@@ -66,7 +66,7 @@ func (p personField) As(alias string) *personField {
 }
 
 func (p *personField) updateTableName(table string) *personField {
-	p.ALL = field.NewField(table, "*")
+	p.ALL = field.NewAsterisk(table)
 	p.OwnerType = field.NewString(table, "prsn_cat")
 	p.OwnerID = field.NewField(table, "prsn_id")
 	p.Gender = field.NewUint8(table, "gender")

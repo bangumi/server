@@ -26,7 +26,7 @@ func newSubjectField(db *gorm.DB) subjectField {
 	_subjectField.subjectFieldDo.UseModel(&dao.SubjectField{})
 
 	tableName := _subjectField.subjectFieldDo.TableName()
-	_subjectField.ALL = field.NewField(tableName, "*")
+	_subjectField.ALL = field.NewAsterisk(tableName)
 	_subjectField.Sid = field.NewUint32(tableName, "field_sid")
 	_subjectField.Tid = field.NewUint16(tableName, "field_tid")
 	_subjectField.Tags = field.NewBytes(tableName, "field_tags")
@@ -56,7 +56,7 @@ func newSubjectField(db *gorm.DB) subjectField {
 type subjectField struct {
 	subjectFieldDo subjectFieldDo
 
-	ALL      field.Field
+	ALL      field.Asterisk
 	Sid      field.Uint32
 	Tid      field.Uint16
 	Tags     field.Bytes
@@ -92,7 +92,7 @@ func (s subjectField) As(alias string) *subjectField {
 }
 
 func (s *subjectField) updateTableName(table string) *subjectField {
-	s.ALL = field.NewField(table, "*")
+	s.ALL = field.NewAsterisk(table)
 	s.Sid = field.NewUint32(table, "field_sid")
 	s.Tid = field.NewUint16(table, "field_tid")
 	s.Tags = field.NewBytes(table, "field_tags")

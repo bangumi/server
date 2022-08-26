@@ -26,7 +26,7 @@ func newEpCollection(db *gorm.DB) epCollection {
 	_epCollection.epCollectionDo.UseModel(&dao.EpCollection{})
 
 	tableName := _epCollection.epCollectionDo.TableName()
-	_epCollection.ALL = field.NewField(tableName, "*")
+	_epCollection.ALL = field.NewAsterisk(tableName)
 	_epCollection.ID = field.NewUint32(tableName, "ep_stt_id")
 	_epCollection.UserID = field.NewField(tableName, "ep_stt_uid")
 	_epCollection.SubjectID = field.NewField(tableName, "ep_stt_sid")
@@ -42,7 +42,7 @@ func newEpCollection(db *gorm.DB) epCollection {
 type epCollection struct {
 	epCollectionDo epCollectionDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Uint32
 	UserID      field.Field
 	SubjectID   field.Field
@@ -64,7 +64,7 @@ func (e epCollection) As(alias string) *epCollection {
 }
 
 func (e *epCollection) updateTableName(table string) *epCollection {
-	e.ALL = field.NewField(table, "*")
+	e.ALL = field.NewAsterisk(table)
 	e.ID = field.NewUint32(table, "ep_stt_id")
 	e.UserID = field.NewField(table, "ep_stt_uid")
 	e.SubjectID = field.NewField(table, "ep_stt_sid")

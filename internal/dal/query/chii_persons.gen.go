@@ -26,7 +26,7 @@ func newPerson(db *gorm.DB) person {
 	_person.personDo.UseModel(&dao.Person{})
 
 	tableName := _person.personDo.TableName()
-	_person.ALL = field.NewField(tableName, "*")
+	_person.ALL = field.NewAsterisk(tableName)
 	_person.ID = field.NewField(tableName, "prsn_id")
 	_person.Name = field.NewString(tableName, "prsn_name")
 	_person.Type = field.NewUint8(tableName, "prsn_type")
@@ -64,7 +64,7 @@ func newPerson(db *gorm.DB) person {
 type person struct {
 	personDo personDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Field
 	Name        field.String
 	Type        field.Uint8
@@ -104,7 +104,7 @@ func (p person) As(alias string) *person {
 }
 
 func (p *person) updateTableName(table string) *person {
-	p.ALL = field.NewField(table, "*")
+	p.ALL = field.NewAsterisk(table)
 	p.ID = field.NewField(table, "prsn_id")
 	p.Name = field.NewString(table, "prsn_name")
 	p.Type = field.NewUint8(table, "prsn_type")
