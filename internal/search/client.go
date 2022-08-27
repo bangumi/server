@@ -112,20 +112,20 @@ func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 }
 
 // OnSubjectDelete is the hook called by canal.
-func (c *client) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
+func (c *client) OnSubjectDelete(_ context.Context, id model.SubjectID) error {
 	_, err := c.subjectIndex.DeleteDocument(strconv.FormatUint(uint64(id), 10))
 
 	return errgo.Wrap(err, "search")
 }
 
 // UpsertSubject add subject to search backend.
-func (c *client) upsertSubject(ctx context.Context, s subjectIndex) error {
+func (c *client) upsertSubject(_ context.Context, s subjectIndex) error {
 	_, err := c.subjectIndex.UpdateDocuments(s)
 
 	return errgo.Wrap(err, "search")
 }
 
-func (c *client) DeleteSubject(ctx context.Context, id model.SubjectID) error {
+func (c *client) DeleteSubject(_ context.Context, id model.SubjectID) error {
 	_, err := c.subjectIndex.Delete(strconv.FormatUint(uint64(id), 10))
 
 	return errgo.Wrap(err, "delete")

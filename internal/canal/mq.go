@@ -81,8 +81,6 @@ func (e *eventHandler) onMessage(msg kafka.Message) error {
 	}
 
 	return err
-
-	return nil
 }
 
 const (

@@ -67,7 +67,7 @@ func (e *eventHandler) start() <-chan error {
 				continue
 			}
 
-			e.reader.CommitMessages(context.Background(), message)
+			_ = e.reader.CommitMessages(context.Background(), message)
 		}
 	}()
 
@@ -75,7 +75,7 @@ func (e *eventHandler) start() <-chan error {
 }
 
 func (e *eventHandler) Close() error {
-	return e.reader.Close()
+	return errgo.Wrap(e.reader.Close(), "kafka.Close")
 }
 
 func newEventHandler(
@@ -115,7 +115,11 @@ func getEventHandler() (*eventHandler, error) {
 			session.NewMysqlRepo, session.New,
 
 			func(c config.AppConfig) *kafka.Reader {
-				topics := []string{"chii.bangumi.chii_subject_fields", "chii.bangumi.chii_subjects", "chii.bangumi.chii_members"}
+				topics := []string{
+					"chii.bangumi.chii_subject_fields",
+					"chii.bangumi.chii_subjects",
+					"chii.bangumi.chii_members",
+				}
 				return kafka.NewReader(kafka.ReaderConfig{
 					Brokers:     []string{c.KafkaBroker},
 					GroupID:     groupID,
