@@ -16,25 +16,18 @@
 package canal
 
 import (
-	"context"
 	"encoding/json"
-	"io"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/Shopify/sarama"
-	"go.uber.org/zap"
-	"golang.org/x/sync/errgroup"
+	"github.com/segmentio/kafka-go"
 
-	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 func Main() error {
-	var eg errgroup.Group
-	closer, err := startReaders(&eg)
+	e, err := getEventHandler()
 	if err != nil {
 		return err
 	}
@@ -46,17 +39,12 @@ func Main() error {
 	go func() {
 		<-sigChan
 		logger.Info("receive signal, shutdown")
-		closer.Close()
+		e.Close()
 		shutdown <- 1
 	}()
 
-	errChan := make(chan error)
-	go func() {
-		errChan <- eg.Wait()
-	}()
-
 	select {
-	case err := <-errChan:
+	case err := <-e.start():
 		return err
 	case <-shutdown:
 		return nil
@@ -65,86 +53,36 @@ func Main() error {
 
 const groupID = "my-group"
 
-func startReaders(eg *errgroup.Group) (io.Closer, error) {
-	appConfig, err := config.NewAppConfig()
-	if err != nil {
-		return nil, errgo.Wrap(err, "config.NewAppConfig")
+func (e *eventHandler) onMessage(msg kafka.Message) error {
+	if len(msg.Value) == 0 {
+		// fake event, just ignore
+		// https://debezium.io/documentation/reference/stable/connectors/mysql.html#mysql-tombstone-events
+		return nil
 	}
 
-	e, err := getEventHandler()
-	if err != nil {
-		return nil, err
+	var k messageKey
+	if err := json.Unmarshal(msg.Key, &k); err != nil {
+		return nil
 	}
 
-	cfg := sarama.NewConfig()
-	client, err := sarama.NewConsumerGroup([]string{appConfig.KafkaBroker}, groupID, cfg)
-	if err != nil {
-		panic(err)
+	var v messageValue
+	if err := json.Unmarshal(msg.Value, &v); err != nil {
+		return nil
 	}
 
-	topics := []string{"chii.bangumi.chii_subject_fields", "chii.bangumi.chii_subjects", "chii.bangumi.chii_members"}
+	var err error
+	switch msg.Topic {
+	case "chii.bangumi.chii_subject_fields":
+		err = e.OnSubjectField(k.Payload, v.Payload)
+	case "chii.bangumi.chii_subjects":
+		err = e.OnSubject(k.Payload, v.Payload)
+	case "chii.bangumi.chii_members":
+		err = e.OnUserChange(k.Payload, v.Payload)
+	}
 
-	eg.Go(func() error { return client.Consume(context.Background(), topics, e) }) //nolint:wrapcheck
+	return err
 
-	return client, nil
-}
-
-func (e *eventHandler) Setup(groupSession sarama.ConsumerGroupSession) error {
-	e.log.Info("eventHandler sarama setup")
 	return nil
-}
-
-func (e *eventHandler) Cleanup(groupSession sarama.ConsumerGroupSession) error {
-	e.log.Info("eventHandler sarama cleanup")
-	return nil
-}
-
-func (e *eventHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	e.log.Info("eventHandler sarama ConsumeClaim")
-	for {
-		select {
-		case msg := <-claim.Messages():
-			if len(msg.Value) == 0 {
-				// fake event, just ignore
-				// https://debezium.io/documentation/reference/stable/connectors/mysql.html#mysql-tombstone-events
-				continue
-			}
-
-			var k messageKey
-			if err := json.Unmarshal(msg.Key, &k); err != nil {
-				continue
-			}
-
-			var v messageValue
-			if err := json.Unmarshal(msg.Value, &v); err != nil {
-				continue
-			}
-
-			var err error
-			switch msg.Topic {
-			case "chii.bangumi.chii_subject_fields":
-				err = e.OnSubjectField(k.Payload, v.Payload)
-			case "chii.bangumi.chii_subjects":
-				err = e.OnSubject(k.Payload, v.Payload)
-			case "chii.bangumi.chii_members":
-				err = e.OnUserChange(k.Payload, v.Payload)
-			}
-
-			if err != nil {
-				e.log.Error("failed to handle kafka message",
-					zap.String("topic", msg.Topic),
-					zap.ByteString("key", msg.Key),
-					zap.ByteString("value", msg.Value),
-					zap.Error(err),
-				)
-				continue
-			}
-
-			session.MarkMessage(msg, "")
-		case <-session.Context().Done():
-			return nil
-		}
-	}
 }
 
 const (

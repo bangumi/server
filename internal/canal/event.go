@@ -19,13 +19,13 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/segmentio/kafka-go"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/model"
@@ -38,25 +38,60 @@ import (
 )
 
 type eventHandler struct {
+	config  config.AppConfig
 	session session.Manager
 	log     *zap.Logger
-	q       *query.Query
 	search  search.Client
 	dryRun  bool
+	reader  *kafka.Reader
+}
+
+func (e *eventHandler) start() <-chan error {
+	errChan := make(chan error)
+
+	go func() {
+		for {
+			message, err := e.reader.FetchMessage(context.Background())
+			if err != nil {
+				continue
+			}
+
+			err = e.onMessage(message)
+			if err != nil {
+				e.log.Error("failed to handle kafka message",
+					zap.String("topic", message.Topic),
+					zap.ByteString("key", message.Key),
+					zap.ByteString("value", message.Value),
+					zap.Error(err),
+				)
+				continue
+			}
+
+			e.reader.CommitMessages(context.Background(), message)
+		}
+	}()
+
+	return errChan
+}
+
+func (e *eventHandler) Close() error {
+	return e.reader.Close()
 }
 
 func newEventHandler(
-	q *query.Query,
 	log *zap.Logger,
+	appConfig config.AppConfig,
 	session session.Manager,
+	reader *kafka.Reader,
 	search search.Client,
 ) *eventHandler {
 	dryRun, _ := strconv.ParseBool(os.Getenv("DRY_RUN"))
 
 	return &eventHandler{
 		dryRun:  dryRun,
+		config:  appConfig,
 		session: session,
-		q:       q,
+		reader:  reader,
 		search:  search,
 		log:     log.Named("eventHandler"),
 	}
@@ -78,6 +113,15 @@ func getEventHandler() (*eventHandler, error) {
 			subject.NewMysqlRepo,
 			search.New,
 			session.NewMysqlRepo, session.New,
+
+			func(c config.AppConfig) *kafka.Reader {
+				topics := []string{"chii.bangumi.chii_subject_fields", "chii.bangumi.chii_subjects", "chii.bangumi.chii_members"}
+				return kafka.NewReader(kafka.ReaderConfig{
+					Brokers:     []string{c.KafkaBroker},
+					GroupID:     groupID,
+					GroupTopics: topics,
+				})
+			},
 
 			newEventHandler,
 		),

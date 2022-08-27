@@ -12,35 +12,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test
+package canal
 
 import (
-	"os"
-	"strconv"
-	"strings"
 	"testing"
+
+	"github.com/bangumi/server/internal/pkg/test"
 )
 
-const EnvMysql = "mysql"
-const EnvRedis = "redis"
-const EnvKafka = "kafka"
-const EnvExternalHTTP = "http" // external http server like hCaptcha
-
-const TreeHoleAccessToken = "a_development_access_token"
-
-// RequireEnv
-//
-//	func TestGet(t *testing.T) {
-//	  RequireEnv(t, test.EnvRedis, test.EnvMysql)
-//	  ...
-//	}
-func RequireEnv(tb testing.TB, envs ...string) {
-	tb.Helper()
-	for _, env := range envs {
-		if v, ok := os.LookupEnv(strings.ToUpper("test_" + env)); !ok {
-			tb.SkipNow()
-		} else if ok, _ = strconv.ParseBool(v); !ok {
-			tb.SkipNow()
-		}
-	}
+func TestOnSubjectChange(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvKafka)
 }
