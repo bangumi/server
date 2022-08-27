@@ -55,6 +55,20 @@ func (r mysqlRepo) getIDByName(ctx context.Context, name string) (model.GroupID,
 	return g.ID, nil
 }
 
+func (r mysqlRepo) GetByID(ctx context.Context, id model.GroupID) (model.Group, error) {
+	g, err := r.q.Group.WithContext(ctx).Where(r.q.Group.ID.Eq(id)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Group{}, domain.ErrNotFound
+		}
+
+		r.log.Error("un-expected error when getting single group", zap.Error(err), id.Zap())
+		return model.Group{}, errgo.Wrap(err, "dal")
+	}
+
+	return convertDao(g), nil
+}
+
 func (r mysqlRepo) GetByName(ctx context.Context, name string) (model.Group, error) {
 	g, err := r.q.Group.WithContext(ctx).Where(r.q.Group.Name.Eq(name)).First()
 	if err != nil {

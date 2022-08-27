@@ -16,7 +16,8 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
+
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func (h Handler) render(c *fiber.Ctx, templateName string, data any) error {
@@ -25,7 +26,7 @@ func (h Handler) render(c *fiber.Ctx, templateName string, data any) error {
 
 	err := h.template.Execute(buf, templateName, data)
 	if err != nil {
-		return h.InternalError(c, err, "failed to execute html/template", zap.String("template_name", templateName))
+		return errgo.Wrap(err, "failed to execute html/template")
 	}
 
 	c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)

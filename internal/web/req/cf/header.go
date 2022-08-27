@@ -12,18 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package wiki
+package cf
 
-import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-)
-
-func TestTrim(t *testing.T) {
-	t.Parallel()
-	require.Equal(t, "", trim(" ", ' '))
-	require.Equal(t, "test", trim(".test.", '.'))
-	require.Equal(t, ".test.", trim(".test.", '/'))
-	require.Equal(t, "", trim("  ", ' '))
-}
+const HeaderRequestID = "Cf-Ray"
+const HeaderRequestIP = "Cf-Connecting-Ip"

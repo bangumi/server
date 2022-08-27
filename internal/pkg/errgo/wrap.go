@@ -17,9 +17,10 @@ package errgo
 import (
 	"fmt"
 	"io"
+	"runtime"
 	"strconv"
 
-	"github.com/goccy/go-json"
+	"github.com/valyala/bytebufferpool"
 )
 
 type unwrap interface {
@@ -95,12 +96,12 @@ func (w *withStackError) Format(s fmt.State, verb rune) {
 	case 'v':
 		// _, _ = io.WriteString(s, w.Error())
 		if s.Flag('#') {
-			fmt.Fprintf(s, "%#v", w.Err)
+			fmt.Fprintf(s, "&errgo.withStackError{Err: %#v, Stack: ...}", w.Err)
 			return
 		}
 
 		if s.Flag('+') {
-			fmt.Fprintf(s, "error: %+v", w.Err)
+			_, _ = io.WriteString(s, "error stack:")
 			w.Stack.Format(s, verb)
 			return
 		}
@@ -112,14 +113,48 @@ func (w *withStackError) Format(s fmt.State, verb rune) {
 	}
 }
 
-//nolint:wrapcheck
+// MarshalJSON marshal error with stack to
+//
+//	{
+//		"error": "context: real error",
+//		"stack": [
+//			"main.main  ...main.go:54",
+//			"..."
+//		]
+//	}
 func (w *withStackError) MarshalJSON() ([]byte, error) {
 	if w == nil {
 		return []byte("null"), nil
 	}
 
-	return json.Marshal(encodeToJSONError{
-		Message: w.Error(),
-		Stace:   toFrames(w.Stack),
-	})
+	b := bytebufferpool.Get()
+	defer bytebufferpool.Put(b)
+
+	b.WriteString(`{"error":`)
+	b.B = strconv.AppendQuote(b.B, w.Error())
+	b.WriteString(",")
+
+	b.WriteString(`"stack":[`)
+
+	frames := runtime.CallersFrames(w.Stack)
+	for {
+		frame, more := frames.Next()
+		b.WriteString(`"`)
+		b.WriteString(frame.Function)
+		b.WriteString("  ")
+		b.WriteString(frame.File)
+		b.WriteString(":")
+		b.B = strconv.AppendInt(b.B, int64(frame.Line), 10)
+		b.WriteString(`"`)
+		if !more {
+			break
+		}
+		b.WriteString(",")
+	}
+
+	b.WriteString("]}")
+
+	var bytes = make([]byte, len(b.B))
+	copy(bytes, b.Bytes())
+	return bytes, nil
 }

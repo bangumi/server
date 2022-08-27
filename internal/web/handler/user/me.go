@@ -17,6 +17,7 @@ package user
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -28,7 +29,7 @@ func (h User) GetCurrent(c *fiber.Ctx) error {
 
 	user, err := h.user.GetByID(c.Context(), u.ID)
 	if err != nil {
-		return h.InternalError(c, err, "failed to get user")
+		return errgo.Wrap(err, "failed to get user")
 	}
 
 	return res.JSON(c, res.User{

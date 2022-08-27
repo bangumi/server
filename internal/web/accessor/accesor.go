@@ -22,7 +22,7 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/web/req"
+	"github.com/bangumi/server/internal/web/req/cf"
 	"github.com/bangumi/server/internal/web/util"
 )
 
@@ -39,7 +39,7 @@ func (a *Accessor) AllowNSFW() bool {
 
 func (a *Accessor) FillBasicInfo(c *fiber.Ctx) {
 	a.Login = false
-	a.RequestID = c.Get(req.HeaderCFRay)
+	a.RequestID = c.Get(cf.HeaderRequestID)
 	a.IP = util.RequestIP(c)
 }
 

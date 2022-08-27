@@ -23,6 +23,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/accessor"
@@ -58,7 +59,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	a := h.GetHTTPAccessor(c)
 	allowed, remain, err := h.rateLimit.Login(c.Context(), a.IP.String())
 	if err != nil {
-		return h.InternalError(c, err, "failed to apply rate limit", a.Log())
+		return errgo.Wrap(err, "failed to apply rate limit")
 	}
 
 	if !allowed {
@@ -71,7 +72,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
 	if err != nil {
-		return h.InternalError(c, err, "Unexpected error when logging in")
+		return errgo.Wrap(err, "Unexpected error when logging in")
 	}
 
 	if !ok {
@@ -84,7 +85,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 
 	key, s, err := h.session.Create(c.Context(), login)
 	if err != nil {
-		return h.InternalError(c, err, "failed to create session", a.Log())
+		return errgo.Wrap(err, "failed to create session")
 	}
 
 	if err = h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
@@ -102,7 +103,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 
 	user, err := h.ctrl.GetUser(c.Context(), s.UserID)
 	if err != nil {
-		return h.InternalError(c, err, "failed to get user by user id", a.Log())
+		return errgo.Wrap(err, "failed to get user by user id")
 	}
 
 	h.log.Info("user Login", log.UserID(user.ID))
@@ -125,7 +126,7 @@ func (h Handler) PrivateLogout(c *fiber.Ctx) error {
 
 	sessionID := utils.UnsafeString(c.Context().Request.Header.Cookie(session.CookieKey))
 	if err := h.session.Revoke(c.Context(), sessionID); err != nil {
-		return h.InternalError(c, err, "failed to revoke session", zap.String("session_id", sessionID))
+		return errgo.Wrap(err, "failed to revoke session")
 	}
 
 	cookie.Clear(c, session.CookieKey)

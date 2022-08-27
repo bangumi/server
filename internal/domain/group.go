@@ -22,6 +22,7 @@ import (
 
 type GroupRepo interface {
 	GetByName(ctx context.Context, name string) (model.Group, error)
+	GetByID(ctx context.Context, id model.GroupID) (model.Group, error)
 
 	CountMembersByID(ctx context.Context, id model.GroupID, memberType GroupMemberType) (int64, error)
 	ListMembersByID(

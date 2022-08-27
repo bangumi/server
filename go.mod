@@ -14,7 +14,7 @@ require (
 	github.com/go-redis/redismock/v8 v8.0.6
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/goccy/go-json v0.9.10
+	github.com/goccy/go-json v0.9.11
 	github.com/gofiber/adaptor/v2 v2.1.25
 	github.com/gofiber/fiber/v2 v2.36.0
 	github.com/ilyakaznacheev/cleanenv v1.3.0
@@ -27,15 +27,16 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/trim21/go-phpserialize v0.0.15
 	github.com/uber-go/tally/v4 v4.1.2
+	github.com/valyala/bytebufferpool v1.0.0
 	go.uber.org/fx v1.18.1
-	go.uber.org/zap v1.22.0
-	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
-	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
+	go.uber.org/zap v1.23.0
+	golang.org/x/crypto v0.0.0-20220824171710-5757bc0c5503
+	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/driver/mysql v1.3.5
-	gorm.io/gen v0.3.14
+	gorm.io/driver/mysql v1.3.6
+	gorm.io/gen v0.3.15
 	gorm.io/gorm v1.23.9-0.20220713102635-3262daf8d468
-	gorm.io/plugin/dbresolver v1.2.2
+	gorm.io/plugin/dbresolver v1.2.3
 )
 
 require (
@@ -88,7 +89,6 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.38.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
@@ -98,7 +98,7 @@ require (
 	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced // indirect
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.11 // indirect
+	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gorm.io/datatypes v1.0.7 // indirect
 	gorm.io/hints v1.1.0 // indirect

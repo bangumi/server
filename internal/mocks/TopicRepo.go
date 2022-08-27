@@ -51,10 +51,10 @@ type TopicRepo_Count_Call struct {
 }
 
 // Count is a helper method to define mock.On call
-//  - ctx context.Context
-//  - topicType domain.TopicType
-//  - id uint32
-//  - statuses []model.TopicStatus
+//   - ctx context.Context
+//   - topicType domain.TopicType
+//   - id uint32
+//   - statuses []model.TopicStatus
 func (_e *TopicRepo_Expecter) Count(ctx interface{}, topicType interface{}, id interface{}, statuses interface{}) *TopicRepo_Count_Call {
 	return &TopicRepo_Count_Call{Call: _e.mock.On("Count", ctx, topicType, id, statuses)}
 }
@@ -98,9 +98,9 @@ type TopicRepo_CountReplies_Call struct {
 }
 
 // CountReplies is a helper method to define mock.On call
-//  - ctx context.Context
-//  - commentType domain.CommentType
-//  - id model.TopicID
+//   - ctx context.Context
+//   - commentType domain.CommentType
+//   - id model.TopicID
 func (_e *TopicRepo_Expecter) CountReplies(ctx interface{}, commentType interface{}, id interface{}) *TopicRepo_CountReplies_Call {
 	return &TopicRepo_CountReplies_Call{Call: _e.mock.On("CountReplies", ctx, commentType, id)}
 }
@@ -144,9 +144,9 @@ type TopicRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//  - ctx context.Context
-//  - topicType domain.TopicType
-//  - id model.TopicID
+//   - ctx context.Context
+//   - topicType domain.TopicType
+//   - id model.TopicID
 func (_e *TopicRepo_Expecter) Get(ctx interface{}, topicType interface{}, id interface{}) *TopicRepo_Get_Call {
 	return &TopicRepo_Get_Call{Call: _e.mock.On("Get", ctx, topicType, id)}
 }
@@ -190,9 +190,9 @@ type TopicRepo_GetTopicContent_Call struct {
 }
 
 // GetTopicContent is a helper method to define mock.On call
-//  - ctx context.Context
-//  - topicType domain.TopicType
-//  - id model.TopicID
+//   - ctx context.Context
+//   - topicType domain.TopicType
+//   - id model.TopicID
 func (_e *TopicRepo_Expecter) GetTopicContent(ctx interface{}, topicType interface{}, id interface{}) *TopicRepo_GetTopicContent_Call {
 	return &TopicRepo_GetTopicContent_Call{Call: _e.mock.On("GetTopicContent", ctx, topicType, id)}
 }
@@ -238,12 +238,12 @@ type TopicRepo_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//  - ctx context.Context
-//  - topicType domain.TopicType
-//  - id uint32
-//  - statuses []model.TopicStatus
-//  - limit int
-//  - offset int
+//   - ctx context.Context
+//   - topicType domain.TopicType
+//   - id uint32
+//   - statuses []model.TopicStatus
+//   - limit int
+//   - offset int
 func (_e *TopicRepo_Expecter) List(ctx interface{}, topicType interface{}, id interface{}, statuses interface{}, limit interface{}, offset interface{}) *TopicRepo_List_Call {
 	return &TopicRepo_List_Call{Call: _e.mock.On("List", ctx, topicType, id, statuses, limit, offset)}
 }
@@ -289,11 +289,11 @@ type TopicRepo_ListReplies_Call struct {
 }
 
 // ListReplies is a helper method to define mock.On call
-//  - ctx context.Context
-//  - commentType domain.CommentType
-//  - id model.TopicID
-//  - limit int
-//  - offset int
+//   - ctx context.Context
+//   - commentType domain.CommentType
+//   - id model.TopicID
+//   - limit int
+//   - offset int
 func (_e *TopicRepo_Expecter) ListReplies(ctx interface{}, commentType interface{}, id interface{}, limit interface{}, offset interface{}) *TopicRepo_ListReplies_Call {
 	return &TopicRepo_ListReplies_Call{Call: _e.mock.On("ListReplies", ctx, commentType, id, limit, offset)}
 }

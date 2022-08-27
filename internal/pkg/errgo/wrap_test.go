@@ -21,6 +21,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -38,7 +39,7 @@ func TestStackTrace(t *testing.T) {
 
 	err := errgo.Wrap(errors.New("a error"), "m")
 	s := fmt.Sprintf("%+v", err)
-	require.Regexp(t, regexp.MustCompile("^error: m: a error\n.*"), s)
+	require.Regexp(t, regexp.MustCompile("^error stack:\n.*errgo_test\\.TestStackTrace\n.*wrap_test.go:\\d+\n.*"), s)
 }
 
 func TestErrorIs(t *testing.T) {
@@ -54,4 +55,24 @@ func TestErrorIs(t *testing.T) {
 
 	err = errgo.Msg(e, "ctx")
 	require.True(t, errors.Is(err, e))
+}
+
+func TestMarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	e := errors.New("expected")
+	err := errgo.Wrap(e, "ctx")
+
+	b, jerr := json.Marshal(err)
+	require.NoError(t, jerr)
+
+	var m struct {
+		Error string   `json:"error"`
+		Stack []string `json:"stack"`
+	}
+
+	require.NoError(t, json.Unmarshal(b, &m))
+
+	require.Equal(t, "ctx: expected", m.Error)
+	require.NotZero(t, len(m.Stack), "stack should not be zero")
 }

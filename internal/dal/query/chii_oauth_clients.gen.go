@@ -26,7 +26,7 @@ func newOAuthClient(db *gorm.DB) oAuthClient {
 	_oAuthClient.oAuthClientDo.UseModel(&dao.OAuthClient{})
 
 	tableName := _oAuthClient.oAuthClientDo.TableName()
-	_oAuthClient.ALL = field.NewField(tableName, "*")
+	_oAuthClient.ALL = field.NewAsterisk(tableName)
 	_oAuthClient.AppID = field.NewUint32(tableName, "app_id")
 	_oAuthClient.ClientID = field.NewString(tableName, "client_id")
 	_oAuthClient.ClientSecret = field.NewString(tableName, "client_secret")
@@ -48,7 +48,7 @@ func newOAuthClient(db *gorm.DB) oAuthClient {
 type oAuthClient struct {
 	oAuthClientDo oAuthClientDo
 
-	ALL          field.Field
+	ALL          field.Asterisk
 	AppID        field.Uint32
 	ClientID     field.String
 	ClientSecret field.String
@@ -72,7 +72,7 @@ func (o oAuthClient) As(alias string) *oAuthClient {
 }
 
 func (o *oAuthClient) updateTableName(table string) *oAuthClient {
-	o.ALL = field.NewField(table, "*")
+	o.ALL = field.NewAsterisk(table)
 	o.AppID = field.NewUint32(table, "app_id")
 	o.ClientID = field.NewString(table, "client_id")
 	o.ClientSecret = field.NewString(table, "client_secret")

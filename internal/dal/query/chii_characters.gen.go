@@ -26,7 +26,7 @@ func newCharacter(db *gorm.DB) character {
 	_character.characterDo.UseModel(&dao.Character{})
 
 	tableName := _character.characterDo.TableName()
-	_character.ALL = field.NewField(tableName, "*")
+	_character.ALL = field.NewAsterisk(tableName)
 	_character.ID = field.NewField(tableName, "crt_id")
 	_character.Name = field.NewString(tableName, "crt_name")
 	_character.Role = field.NewUint8(tableName, "crt_role")
@@ -57,7 +57,7 @@ func newCharacter(db *gorm.DB) character {
 type character struct {
 	characterDo characterDo
 
-	ALL      field.Field
+	ALL      field.Asterisk
 	ID       field.Field
 	Name     field.String
 	Role     field.Uint8
@@ -90,7 +90,7 @@ func (c character) As(alias string) *character {
 }
 
 func (c *character) updateTableName(table string) *character {
-	c.ALL = field.NewField(table, "*")
+	c.ALL = field.NewAsterisk(table)
 	c.ID = field.NewField(table, "crt_id")
 	c.Name = field.NewString(table, "crt_name")
 	c.Role = field.NewUint8(table, "crt_role")

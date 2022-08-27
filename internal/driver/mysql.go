@@ -29,16 +29,14 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-var setLoggerMutex = sync.Mutex{} //nolint:gochecknoglobals
+var setLoggerOnce = sync.Once{}
 
 func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
 	const maxIdleTime = time.Hour * 6
 
-	setLoggerMutex.Lock()
-	if err := mysql.SetLogger(logger.Std()); err != nil {
-		logger.Panic("can't replace mysql driver's errLog", zap.Error(err))
-	}
-	setLoggerMutex.Unlock()
+	setLoggerOnce.Do(func() {
+		_ = mysql.SetLogger(logger.StdAt(zap.ErrorLevel))
+	})
 
 	logger.Infoln("creating sql connection pool with size", c.MySQLMaxConn)
 

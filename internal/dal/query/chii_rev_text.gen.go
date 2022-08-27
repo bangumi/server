@@ -26,7 +26,7 @@ func newRevisionText(db *gorm.DB) revisionText {
 	_revisionText.revisionTextDo.UseModel(&dao.RevisionText{})
 
 	tableName := _revisionText.revisionTextDo.TableName()
-	_revisionText.ALL = field.NewField(tableName, "*")
+	_revisionText.ALL = field.NewAsterisk(tableName)
 	_revisionText.TextID = field.NewUint32(tableName, "rev_text_id")
 	_revisionText.Text = field.NewBytes(tableName, "rev_text")
 
@@ -38,7 +38,7 @@ func newRevisionText(db *gorm.DB) revisionText {
 type revisionText struct {
 	revisionTextDo revisionTextDo
 
-	ALL    field.Field
+	ALL    field.Asterisk
 	TextID field.Uint32
 	Text   field.Bytes
 
@@ -56,7 +56,7 @@ func (r revisionText) As(alias string) *revisionText {
 }
 
 func (r *revisionText) updateTableName(table string) *revisionText {
-	r.ALL = field.NewField(table, "*")
+	r.ALL = field.NewAsterisk(table)
 	r.TextID = field.NewUint32(table, "rev_text_id")
 	r.Text = field.NewBytes(table, "rev_text")
 

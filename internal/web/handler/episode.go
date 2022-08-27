@@ -22,8 +22,8 @@ import (
 
 	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -42,7 +42,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
+		return errgo.Wrap(err, "failed to get episode")
 	}
 
 	_, err = h.ctrl.GetSubject(c.Context(), u.Auth, e.SubjectID)
@@ -51,7 +51,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to find subject of episode", log.SubjectID(e.SubjectID))
+		return errgo.Wrap(err, "failed to find subject of episode")
 	}
 
 	return res.JSON(c, res.ConvertModelEpisode(e))
@@ -83,7 +83,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-		return h.InternalError(c, err, "failed to get subject")
+		return errgo.Wrap(err, "failed to get subject")
 	}
 
 	episodes, count, err := h.ctrl.ListEpisode(c.Context(), subjectID, epType, page.Limit, page.Offset)
@@ -91,7 +91,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		if errors.Is(err, ctrl.ErrOffsetTooBig) {
 			return res.BadRequest("offset should be less than or equal to " + strconv.FormatInt(count, 10))
 		}
-		return h.InternalError(c, err, "failed to list episode")
+		return errgo.Wrap(err, "failed to list episode")
 	}
 
 	var data = make([]res.Episode, len(episodes))

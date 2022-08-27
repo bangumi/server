@@ -53,8 +53,8 @@ type AuthService_ComparePassword_Call struct {
 }
 
 // ComparePassword is a helper method to define mock.On call
-//  - hashed []byte
-//  - password string
+//   - hashed []byte
+//   - password string
 func (_e *AuthService_Expecter) ComparePassword(hashed interface{}, password interface{}) *AuthService_ComparePassword_Call {
 	return &AuthService_ComparePassword_Call{Call: _e.mock.On("ComparePassword", hashed, password)}
 }
@@ -98,10 +98,10 @@ type AuthService_CreateAccessToken_Call struct {
 }
 
 // CreateAccessToken is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - name string
-//  - expiration time.Duration
+//   - ctx context.Context
+//   - userID model.UserID
+//   - name string
+//   - expiration time.Duration
 func (_e *AuthService_Expecter) CreateAccessToken(ctx interface{}, userID interface{}, name interface{}, expiration interface{}) *AuthService_CreateAccessToken_Call {
 	return &AuthService_CreateAccessToken_Call{Call: _e.mock.On("CreateAccessToken", ctx, userID, name, expiration)}
 }
@@ -145,8 +145,8 @@ type AuthService_DeleteAccessToken_Call struct {
 }
 
 // DeleteAccessToken is a helper method to define mock.On call
-//  - ctx context.Context
-//  - tokenID uint32
+//   - ctx context.Context
+//   - tokenID uint32
 func (_e *AuthService_Expecter) DeleteAccessToken(ctx interface{}, tokenID interface{}) *AuthService_DeleteAccessToken_Call {
 	return &AuthService_DeleteAccessToken_Call{Call: _e.mock.On("DeleteAccessToken", ctx, tokenID)}
 }
@@ -190,8 +190,8 @@ type AuthService_GetByID_Call struct {
 }
 
 // GetByID is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *AuthService_Expecter) GetByID(ctx interface{}, userID interface{}) *AuthService_GetByID_Call {
 	return &AuthService_GetByID_Call{Call: _e.mock.On("GetByID", ctx, userID)}
 }
@@ -235,8 +235,8 @@ type AuthService_GetByToken_Call struct {
 }
 
 // GetByToken is a helper method to define mock.On call
-//  - ctx context.Context
-//  - token string
+//   - ctx context.Context
+//   - token string
 func (_e *AuthService_Expecter) GetByToken(ctx interface{}, token interface{}) *AuthService_GetByToken_Call {
 	return &AuthService_GetByToken_Call{Call: _e.mock.On("GetByToken", ctx, token)}
 }
@@ -280,8 +280,8 @@ type AuthService_GetTokenByID_Call struct {
 }
 
 // GetTokenByID is a helper method to define mock.On call
-//  - ctx context.Context
-//  - tokenID uint32
+//   - ctx context.Context
+//   - tokenID uint32
 func (_e *AuthService_Expecter) GetTokenByID(ctx interface{}, tokenID interface{}) *AuthService_GetTokenByID_Call {
 	return &AuthService_GetTokenByID_Call{Call: _e.mock.On("GetTokenByID", ctx, tokenID)}
 }
@@ -327,8 +327,8 @@ type AuthService_ListAccessToken_Call struct {
 }
 
 // ListAccessToken is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *AuthService_Expecter) ListAccessToken(ctx interface{}, userID interface{}) *AuthService_ListAccessToken_Call {
 	return &AuthService_ListAccessToken_Call{Call: _e.mock.On("ListAccessToken", ctx, userID)}
 }
@@ -379,9 +379,9 @@ type AuthService_Login_Call struct {
 }
 
 // Login is a helper method to define mock.On call
-//  - ctx context.Context
-//  - email string
-//  - password string
+//   - ctx context.Context
+//   - email string
+//   - password string
 func (_e *AuthService_Expecter) Login(ctx interface{}, email interface{}, password interface{}) *AuthService_Login_Call {
 	return &AuthService_Login_Call{Call: _e.mock.On("Login", ctx, email, password)}
 }

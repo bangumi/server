@@ -26,7 +26,7 @@ func newMember(db *gorm.DB) member {
 	_member.memberDo.UseModel(&dao.Member{})
 
 	tableName := _member.memberDo.TableName()
-	_member.ALL = field.NewField(tableName, "*")
+	_member.ALL = field.NewAsterisk(tableName)
 	_member.ID = field.NewField(tableName, "uid")
 	_member.Username = field.NewString(tableName, "username")
 	_member.Nickname = field.NewString(tableName, "nickname")
@@ -58,7 +58,7 @@ func newMember(db *gorm.DB) member {
 type member struct {
 	memberDo memberDo
 
-	ALL           field.Field
+	ALL           field.Asterisk
 	ID            field.Field
 	Username      field.String
 	Nickname      field.String
@@ -92,7 +92,7 @@ func (m member) As(alias string) *member {
 }
 
 func (m *member) updateTableName(table string) *member {
-	m.ALL = field.NewField(table, "*")
+	m.ALL = field.NewAsterisk(table)
 	m.ID = field.NewField(table, "uid")
 	m.Username = field.NewString(table, "username")
 	m.Nickname = field.NewString(table, "nickname")

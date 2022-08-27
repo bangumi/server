@@ -15,6 +15,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
@@ -24,10 +25,14 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
+
+type ResPrivateTopicDetailWithGroup struct {
+	*res.PrivateTopicDetail
+	Group res.PrivateGroup `json:"group"`
+}
 
 func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 	topicID, err := req.ParseTopicID(c.Params("topic_id"))
@@ -35,7 +40,29 @@ func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	return h.getResTopicWithComments(c, domain.TopicTypeGroup, topicID)
+	data, err := h.getResTopicWithComments(c, domain.TopicTypeGroup, topicID)
+	if err != nil {
+		return err
+	}
+
+	group, err := h.g.GetByID(context.TODO(), model.GroupID(data.ParentID))
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return errgo.Wrap(err, "failed to get group")
+	}
+
+	return res.JSON(c, ResPrivateTopicDetailWithGroup{
+		PrivateTopicDetail: data,
+		Group: res.PrivateGroup{
+			ID:        group.ID,
+			Name:      group.Name,
+			CreatedAt: group.CreatedAt,
+			Title:     group.Title,
+			Icon:      groupIconPrefix + group.Icon,
+		},
+	})
 }
 
 func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
@@ -44,7 +71,12 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	return h.getResTopicWithComments(c, domain.TopicTypeSubject, topicID)
+	data, err := h.getResTopicWithComments(c, domain.TopicTypeSubject, topicID)
+	if err != nil {
+		return err
+	}
+
+	return res.JSON(c, data)
 }
 
 func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
@@ -60,7 +92,7 @@ func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-		return h.InternalError(c, err, "failed to subject", log.SubjectID(id))
+		return errgo.Wrap(err, "failed to subject")
 	}
 
 	return h.listTopics(c, domain.TopicTypeSubject, uint32(id))
@@ -80,7 +112,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
+		return errgo.Wrap(err, "failed to get episode")
 	}
 
 	_, err = h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, e.SubjectID)
@@ -89,10 +121,10 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get subject of episode", log.SubjectID(e.SubjectID))
+		return errgo.Wrap(err, "failed to get subject of episode")
 	}
 
-	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
+	return h.listComments(c, u.Auth, domain.CommentEpisode, model.TopicID(id))
 }
 
 func (h Handler) GetPersonComments(c *fiber.Ctx) error {
@@ -107,7 +139,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get person", log.PersonID(id))
+		return errgo.Wrap(err, "failed to get person")
 	}
 
 	if r.Redirect != 0 {
@@ -115,7 +147,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
+	return h.listComments(c, u.Auth, domain.CommentPerson, model.TopicID(id))
 }
 
 func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
@@ -131,10 +163,10 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
+		return errgo.Wrap(err, "failed to get character")
 	}
 
-	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
+	return h.listComments(c, u.Auth, domain.CommentCharacter, model.TopicID(id))
 }
 
 func (h Handler) GetIndexComments(c *fiber.Ctx) error {

@@ -25,7 +25,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var log = setup()
+var log = setup() //nolint:gochecknoglobals
 
 const (
 	timeKey    = "time"
@@ -55,6 +55,14 @@ func setup() *zap.Logger {
 // Std return a stdlib logger with zap logger underlying.
 func Std() *stdLog.Logger {
 	return zap.NewStdLog(log.WithOptions(zap.AddCallerSkip(-1)))
+}
+
+func StdAt(level zapcore.Level) *stdLog.Logger {
+	l, err := zap.NewStdLogAt(log.WithOptions(zap.AddCallerSkip(-1)), level)
+	if err != nil {
+		panic(err)
+	}
+	return l
 }
 
 func Copy() *zap.Logger {

@@ -74,11 +74,11 @@ func (t *SubjectTopic) GetReplies() uint32 {
 	return t.Replies
 }
 
-func (t *SubjectTopic) GetObjectID() uint32 {
+func (t *SubjectTopic) GetParentID() uint32 {
 	return t.SubjectID
 }
 
-func (t *GroupTopic) GetObjectID() uint32 {
+func (t *GroupTopic) GetParentID() uint32 {
 	return t.GroupID
 }
 

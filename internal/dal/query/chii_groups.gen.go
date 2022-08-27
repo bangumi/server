@@ -26,7 +26,7 @@ func newGroup(db *gorm.DB) group {
 	_group.groupDo.UseModel(&dao.Group{})
 
 	tableName := _group.groupDo.TableName()
-	_group.ALL = field.NewField(tableName, "*")
+	_group.ALL = field.NewAsterisk(tableName)
 	_group.ID = field.NewField(tableName, "grp_id")
 	_group.Cat = field.NewUint16(tableName, "grp_cat")
 	_group.Name = field.NewString(tableName, "grp_name")
@@ -50,7 +50,7 @@ func newGroup(db *gorm.DB) group {
 type group struct {
 	groupDo groupDo
 
-	ALL            field.Field
+	ALL            field.Asterisk
 	ID             field.Field
 	Cat            field.Uint16
 	Name           field.String
@@ -80,7 +80,7 @@ func (g group) As(alias string) *group {
 }
 
 func (g *group) updateTableName(table string) *group {
-	g.ALL = field.NewField(table, "*")
+	g.ALL = field.NewAsterisk(table)
 	g.ID = field.NewField(table, "grp_id")
 	g.Cat = field.NewUint16(table, "grp_cat")
 	g.Name = field.NewString(table, "grp_name")

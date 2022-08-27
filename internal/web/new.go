@@ -40,7 +40,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/random"
 	"github.com/bangumi/server/internal/web/middleware/recovery"
-	"github.com/bangumi/server/internal/web/req"
+	"github.com/bangumi/server/internal/web/req/cf"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/util"
 )
@@ -75,14 +75,15 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 	if config.Development {
 		app.Use(func(c *fiber.Ctx) error {
 			devRequestID := "fake-ray-" + random.Base62String(10)
-			c.Request().Header.Set(req.HeaderCFRay, devRequestID)
-			c.Set(req.HeaderCFRay, devRequestID)
+			c.Request().Header.Set(cf.HeaderRequestID, devRequestID)
+			c.Request().Header.Set(cf.HeaderRequestIP, c.Context().RemoteIP().String())
+			c.Set(cf.HeaderRequestID, devRequestID)
 
 			return c.Next()
 		})
 		app.Use(cors.New(cors.Config{
 			MaxAge:        gtime.OneWeekSec,
-			ExposeHeaders: strings.Join([]string{headerProcessTime, headerServerVersion, req.HeaderCFRay}, ","),
+			ExposeHeaders: strings.Join([]string{headerProcessTime, headerServerVersion, cf.HeaderRequestID}, ","),
 		}))
 	}
 
@@ -130,7 +131,7 @@ func getDefaultErrorHandler() func(*fiber.Ctx, error) error {
 				zap.String("message", fErr.Message),
 				zap.String("path", ctx.Path()),
 				zap.ByteString("query", ctx.Request().URI().QueryString()),
-				zap.String("cf-ray", ctx.Get(req.HeaderCFRay)),
+				zap.String("cf-ray", ctx.Get(cf.HeaderRequestID)),
 			)
 
 			return res.JSON(ctx.Status(http.StatusInternalServerError), res.Error{
@@ -144,13 +145,10 @@ func getDefaultErrorHandler() func(*fiber.Ctx, error) error {
 			zap.Error(err),
 			zap.String("path", ctx.Path()),
 			zap.ByteString("query", ctx.Request().URI().QueryString()),
-			zap.String("cf-ray", ctx.Get(req.HeaderCFRay)),
+			zap.String("cf-ray", ctx.Get(cf.HeaderRequestID)),
 		)
+
 		// unexpected error, return internal server error
-		return res.JSON(ctx.Status(http.StatusInternalServerError), res.Error{
-			Title:       "Internal Server Error",
-			Description: "Unexpected Internal Server Error",
-			Details:     util.DetailWithErr(ctx, err),
-		})
+		return res.InternalError(ctx, err, "Unexpected Internal Server Error")
 	}
 }

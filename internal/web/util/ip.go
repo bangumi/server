@@ -12,16 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build dev || test
-
 package util
 
 import (
 	"net"
 
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/bangumi/server/internal/web/req/cf"
 )
 
 func RequestIP(c *fiber.Ctx) net.IP {
-	return c.Context().RemoteIP()
+	ip := c.Get(cf.HeaderRequestIP)
+	if ip == "" {
+		return c.Context().RemoteIP()
+	}
+
+	return net.ParseIP(ip)
 }

@@ -32,6 +32,9 @@ import (
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
+const notFoundGroupID = 600
+const notFoundGroupName = "not-exist-group-name"
+
 func getRepo(t *testing.T) (domain.GroupRepo, *query.Query) {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
@@ -144,12 +147,41 @@ func assertHaveID(t *testing.T, members []model.GroupMember, id ...model.UserID)
 	}
 }
 
-// $ task test-all -- -run '^TestMysqlRepo_GetByName$'
+func TestMysqlRepo_GetByID(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+	const groupID model.GroupID = 201
+	const groupName = "group-201"
+
+	repo, q := getRepo(t)
+
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(context.Background()).Group.Where(q.Group.ID.Eq(groupID)).Delete()
+		assert.NoError(t, err)
+	})
+
+	err := q.WithContext(context.Background()).Group.Create(&dao.Group{
+		ID:          groupID,
+		Name:        groupName,
+		CreatorID:   1,
+		CreatedTime: uint32(time.Now().Unix()),
+	})
+	require.NoError(t, err)
+
+	g, err := repo.GetByID(context.Background(), groupID)
+	require.NoError(t, err)
+	require.Equal(t, groupID, g.ID)
+	require.Equal(t, groupName, g.Name)
+
+	_, err = repo.GetByID(context.Background(), notFoundGroupID)
+	require.ErrorIs(t, err, domain.ErrNotFound)
+}
+
 func TestMysqlRepo_GetByName(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
 	const groupID model.GroupID = 200
-	const groupName = "aabbccdeeeffgg"
+	const groupName = "group-200"
 
 	repo, q := getRepo(t)
 
@@ -170,6 +202,9 @@ func TestMysqlRepo_GetByName(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, groupID, g.ID)
 	require.Equal(t, groupName, g.Name)
+
+	_, err = repo.GetByName(context.Background(), notFoundGroupName)
+	require.ErrorIs(t, err, domain.ErrNotFound)
 }
 
 // $ task test-all -- -run '^TestMysqlRepo_GetByName_not_found'
