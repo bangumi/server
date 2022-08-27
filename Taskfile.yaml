@@ -88,7 +88,6 @@ tasks:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
       TEST_HTTP: "1"
-      TEST_KAFKA: "1"
 
   coverage:
     desc: Run tests with coverage report, used in CI.
