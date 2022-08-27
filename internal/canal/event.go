@@ -16,8 +16,6 @@ package canal
 
 import (
 	"context"
-	"os"
-	"strconv"
 
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/fx"
@@ -84,8 +82,6 @@ func newEventHandler(
 	reader *kafka.Reader,
 	search search.Client,
 ) *eventHandler {
-	dryRun, _ := strconv.ParseBool(os.Getenv("DRY_RUN"))
-
 	return &eventHandler{
 		config:  appConfig,
 		session: session,
