@@ -69,3 +69,43 @@ jobs:
       - uses: codecov/codecov-action@v3
         with:
           files: coverage.out
+
+  test-kafka:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - run: docker-compose up -d
+        working-directory: .github/compose/
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.19"
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+
+      - name: Go Build Cache (test)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg
+          key: go-cache-119-${{ hashFiles('**/go.sum') }}-test
+          restore-keys: |
+            go-cache-119-${{ hashFiles('**/go.sum') }}-
+
+      - run: go get -t ./...
+
+      - name: Run tests
+        run: task coverage
+        env:
+          GORACE: halt_on_error=1
+          KAFKA_BROKER: "127.0.0.1:29092"
+
+      - uses: codecov/codecov-action@v3
+        with:
+          files: coverage.out
