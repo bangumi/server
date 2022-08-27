@@ -147,11 +147,8 @@ func getDefaultErrorHandler() func(*fiber.Ctx, error) error {
 			zap.ByteString("query", ctx.Request().URI().QueryString()),
 			zap.String("cf-ray", ctx.Get(cf.HeaderRequestID)),
 		)
+
 		// unexpected error, return internal server error
-		return res.JSON(ctx.Status(http.StatusInternalServerError), res.Error{
-			Title:       "Internal Server Error",
-			Description: "Unexpected Internal Server Error",
-			Details:     util.DetailWithErr(ctx, err),
-		})
+		return res.InternalError(ctx, err, "Unexpected Internal Server Error")
 	}
 }

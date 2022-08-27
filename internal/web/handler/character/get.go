@@ -21,7 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
-	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -39,7 +39,7 @@ func (h Character) Get(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
+		return errgo.Wrap(err, "failed to get character")
 	}
 
 	if r.Redirect != 0 {
@@ -61,7 +61,7 @@ func (h Character) GetImage(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
+		return errgo.Wrap(err, "failed to get character")
 	}
 
 	l, ok := res.PersonImage(p.Image).Select(c.Query("type"))

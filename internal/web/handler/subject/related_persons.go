@@ -21,7 +21,6 @@ import (
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/vars"
@@ -40,7 +39,7 @@ func (h Subject) GetRelatedPersons(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-		return h.InternalError(c, err, "failed to get subject", log.SubjectID(id))
+		return errgo.Wrap(err, "failed to get subject")
 	}
 
 	relations, err := h.person.GetSubjectRelated(c.Context(), id)

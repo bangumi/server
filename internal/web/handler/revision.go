@@ -21,7 +21,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
@@ -102,7 +101,7 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get person related revision", zap.Uint32("rev_id", id))
+		return errgo.Wrap(err, "failed to get person related revision")
 	}
 
 	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), r.CreatorID)
@@ -186,7 +185,7 @@ func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get character related revision", zap.Uint32("rev_id", id))
+		return errgo.Wrap(err, "failed to get character related revision")
 	}
 
 	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), r.CreatorID)
@@ -266,7 +265,7 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get subject related revision", zap.Uint32("rev_id", id))
+		return errgo.Wrap(err, "failed to get subject related revision")
 	}
 
 	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), r.CreatorID)

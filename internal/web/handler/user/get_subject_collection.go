@@ -18,11 +18,10 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -51,7 +50,7 @@ func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID mode
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to subject info", log.SubjectID(subjectID))
+		return errgo.Wrap(err, "failed to subject info")
 	}
 
 	u, err := h.user.GetByName(c.Context(), username)
@@ -60,7 +59,7 @@ func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID mode
 			return res.NotFound("user doesn't exist or has been removed")
 		}
 
-		return h.InternalError(c, err, "failed to get user by name", zap.String("name", username))
+		return errgo.Wrap(err, "failed to get user by name")
 	}
 
 	var showPrivate = u.ID == v.ID
@@ -71,8 +70,7 @@ func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID mode
 			return res.NotFound(notFoundMessage)
 		}
 
-		return h.InternalError(c, err, "failed to get user's subject collection",
-			log.UserID(u.ID), log.SubjectID(subjectID))
+		return errgo.Wrap(err, "failed to get user's subject collection")
 	}
 
 	if !showPrivate && collection.Private {

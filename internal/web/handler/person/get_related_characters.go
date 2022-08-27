@@ -21,7 +21,6 @@ import (
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -38,7 +37,7 @@ func (h Person) GetRelatedCharacters(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get person", log.PersonID(id))
+		return errgo.Wrap(err, "failed to get person")
 	}
 
 	if r.Redirect != 0 {
