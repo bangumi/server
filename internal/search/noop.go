@@ -23,19 +23,19 @@ import (
 	"github.com/bangumi/server/internal/web/accessor"
 )
 
-var _ Client = NopeClient{}
+var _ Client = NoopClient{}
 
-type NopeClient struct {
+type NoopClient struct {
 }
 
-func (n NopeClient) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
+func (n NoopClient) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 	return ctx.SendString("search is not enable")
 }
 
-func (n NopeClient) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
+func (n NoopClient) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
 	return nil
 }
 
-func (n NopeClient) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
+func (n NoopClient) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
 	return nil
 }

@@ -44,7 +44,7 @@ func New(
 	query *query.Query,
 ) (Client, error) {
 	if c.MeiliSearchURL == "" {
-		return NopeClient{}, nil
+		return NoopClient{}, nil
 	}
 
 	if subjectRepo == nil {
