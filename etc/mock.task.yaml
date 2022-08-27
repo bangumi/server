@@ -35,6 +35,7 @@ tasks:
       - GroupRepo
       - CollectionRepo
       - TopicRepo
+      - SearchClient
 
   base-mock:
     deps:
@@ -271,3 +272,16 @@ tasks:
         vars:
           SRC_DIR: ./internal/domain
           INTERFACE: TopicRepo
+
+  SearchClient:
+    sources:
+      - internal/search/client.go
+      - ./internal/pkg/tools/go.mod
+    generates:
+      - internal/mocks/SearchClient.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/search
+          INTERFACE: Client
+          MOCK_STRUCT: SearchClient

@@ -17,10 +17,30 @@ package canal
 import (
 	"testing"
 
-	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/segmentio/kafka-go"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 func TestOnSubjectChange(t *testing.T) {
 	t.Parallel()
-	test.RequireEnv(t, test.EnvKafka)
+	session := mocks.NewSessionManager(t)
+
+	c, err := config.NewAppConfig()
+	require.NoError(t, err)
+
+	search := mocks.NewSearchClient(t)
+
+	eh := &eventHandler{
+		config:  c,
+		session: session,
+		reader:  nil,
+		search:  search,
+		log:     logger.Named("eventHandler"),
+	}
+
+	eh.onMessage(kafka.Message{})
 }

@@ -80,13 +80,6 @@ tasks:
     env:
       TEST_HTTP: "1"
 
-  test-kafka:
-    desc: Run mocked tests, and tests require kafka, alias for `TEST_KAFKA=1 task test`
-    cmds:
-      - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
-    env:
-      TEST_KAFKA: "1"
-
   test-all:
     desc: Run all tests.
     cmds:
@@ -101,6 +94,10 @@ tasks:
     desc: Run tests with coverage report, used in CI.
     cmds:
       - go test -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./...
+    env:
+      TEST_MYSQL: "1"
+      TEST_REDIS: "1"
+      TEST_HTTP: "1"
 
   # generated files
   gen:

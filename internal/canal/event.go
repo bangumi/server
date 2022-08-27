@@ -42,7 +42,6 @@ type eventHandler struct {
 	session session.Manager
 	log     *zap.Logger
 	search  search.Client
-	dryRun  bool
 	reader  *kafka.Reader
 }
 
@@ -88,7 +87,6 @@ func newEventHandler(
 	dryRun, _ := strconv.ParseBool(os.Getenv("DRY_RUN"))
 
 	return &eventHandler{
-		dryRun:  dryRun,
 		config:  appConfig,
 		session: session,
 		reader:  reader,
@@ -142,10 +140,6 @@ func getEventHandler() (*eventHandler, error) {
 
 func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
 	e.log.Info("user change password", log.UserID(id))
-	if e.dryRun {
-		e.log.Info("dry-run enabled, skip handler")
-		return nil
-	}
 
 	if err := e.session.RevokeUser(context.Background(), id); err != nil {
 		e.log.Error("failed to revoke user", log.UserID(id), zap.Error(err))
