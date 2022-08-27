@@ -54,7 +54,7 @@ tasks:
       - golangci-lint run --fix
 
   test:
-    desc: Run tests without mysql and redis.
+    desc: Run mocked tests, need nothing.
     cmds:
       - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
     env:
@@ -65,31 +65,37 @@ tasks:
     cmds:
       - go test -bench=. -benchmem ./pkg/wiki
 
-  test-all:
-    desc: Run all tests, need mysql and redis, except hCaptcha tests, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
+  test-db:
+    desc: Run mocked tests, and tests require mysql and redis. alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
     cmds:
       - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
 
-  test-all-with-http:
-    desc: Run all tests, need mysql and redis, alias for `TEST_MYSQL=1 TEST_REDIS=1 TEST_HTTP=1 task test`
+  test-http:
+    desc: Run mocked tests, and tests require external HTTP resources, alias for `TEST_HTTP=1 task test`
     cmds:
       - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
     env:
-      TEST_MYSQL: "1"
-      TEST_REDIS: "1"
       TEST_HTTP: "1"
 
+  test-kafka:
+    desc: Run mocked tests, and tests require kafka, alias for `TEST_KAFKA=1 task test`
+    cmds:
+      - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
+    env:
+      TEST_KAFKA: "1"
+
   coverage:
-    desc: Run tests with coverage report, used in CI.
+    desc: Run all tests with coverage report, used in CI.
     cmds:
       - go test -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
       TEST_HTTP: "1"
+      TEST_KAFKA: "1"
 
   # generated files
   gen:
