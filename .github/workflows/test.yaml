@@ -65,6 +65,9 @@ jobs:
           MYSQL_PASS: password
           MYSQL_DB: bangumi
           REDIS_URI: "redis://:redis-pass@127.0.0.1:6379/0"
+          TEST_MYSQL: "1"
+          TEST_REDIS: "1"
+          TEST_HTTP: "1"
 
       - uses: codecov/codecov-action@v3
         with:
@@ -105,6 +108,7 @@ jobs:
         env:
           GORACE: halt_on_error=1
           KAFKA_BROKER: "127.0.0.1:29092"
+          TEST_KAFKA: "1"
 
       - uses: codecov/codecov-action@v3
         with:

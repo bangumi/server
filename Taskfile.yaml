@@ -87,15 +87,20 @@ tasks:
     env:
       TEST_KAFKA: "1"
 
-  coverage:
-    desc: Run all tests with coverage report, used in CI.
+  test-all:
+    desc: Run all tests.
     cmds:
-      - go test -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./...
+      - go test -timeout 10s -tags test ./...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
       TEST_HTTP: "1"
       TEST_KAFKA: "1"
+
+  coverage:
+    desc: Run tests with coverage report, used in CI.
+    cmds:
+      - go test -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./...
 
   # generated files
   gen:

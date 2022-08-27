@@ -135,6 +135,7 @@ task test       # Run mocked unit tests, need nothing.
 task test-db    # Run mocked tests, and tests require mysql and redis. alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
 task test-http  # Run mocked tests, and tests require external HTTP resources, alias for `TEST_HTTP=1 task test`
 task test-kafka # Run mocked tests, and tests require kafka, alias for `TEST_KAFKA=1 task test`
+task test-all   # Run all tests.
 ```
 
 使用 `task coverage` 来运行所有测试。
