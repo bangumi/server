@@ -42,5 +42,6 @@ func TestOnSubjectChange(t *testing.T) {
 		log:     logger.Named("eventHandler"),
 	}
 
-	eh.onMessage(kafka.Message{})
+	err = eh.onMessage(kafka.Message{})
+	require.NoError(t, err)
 }
