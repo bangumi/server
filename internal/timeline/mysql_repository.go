@@ -15,9 +15,11 @@
 package timeline
 
 import (
+	"bytes"
 	"context"
 	"errors"
 
+	"github.com/bangumi/server/internal/web/res"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -86,6 +88,15 @@ func (m mysqlRepo) Create(ctx context.Context, tl *model.TimeLine) error {
 		return errgo.Wrap(err, "modelToDAO")
 	}
 
+	isDuped, err := m.isDupeTimeLine(ctx, d)
+	if err != nil {
+		m.log.Error("isDupeTimeLine", zap.Error(err))
+		return errgo.Wrap(err, "isDupeTimeLine")
+	}
+	if isDuped {
+		return res.BadRequest("duplicated timeline")
+	}
+
 	if err := m.q.TimeLine.WithContext(ctx).Create(d); err != nil {
 		return errgo.Wrap(err, "dal")
 	}
@@ -106,16 +117,19 @@ func (m mysqlRepo) isDupeTimeLine(ctx context.Context, dao *dao.TimeLine) (bool,
 		return false, nil
 	}
 	daoTL := daoTLs[0]
-
-}
-
-func isModelTlDupedInDB(m *model.TimeLine, ds []*dao.TimeLine) bool {
-	for _, d := range ds {
-		if d.Dateline == m.Dateline && d.Cat == m.Cat {
-			return true
-		}
+	if dao.Dateline != daoTL.Dateline {
+		return false, nil
 	}
-	return false
+	if dao.Cat != daoTL.Cat {
+		return false, nil
+	}
+	if bytes.Compare(dao.Memo, daoTL.Memo) != 0 {
+		return false, nil
+	}
+	if bytes.Compare(dao.Img, daoTL.Img) != 0 {
+		return false, nil
+	}
+	return true, nil
 }
 
 func daoToModel(tl *dao.TimeLine) (*model.TimeLine, error) {
