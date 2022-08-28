@@ -16,9 +16,12 @@ package canal
 
 import (
 	"context"
+	"errors"
+	"io"
 
 	"github.com/goccy/go-json"
 	"github.com/segmentio/kafka-go"
+	"go.uber.org/atomic"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
@@ -30,6 +33,7 @@ import (
 )
 
 type eventHandler struct {
+	closed  atomic.Bool
 	config  config.AppConfig
 	session session.Manager
 	log     *zap.Logger
@@ -37,47 +41,37 @@ type eventHandler struct {
 	reader  *kafka.Reader
 }
 
-func (e *eventHandler) start(ctx context.Context) <-chan error {
-	errChan := make(chan error)
-
-	go func() {
-		for {
-			// break when done
-			if done := ctx.Done(); done != nil {
-				select {
-				case <-done:
-					break
-				default:
-				}
-			}
-
-			msg, err := e.reader.FetchMessage(context.Background())
-			if err != nil {
-				e.log.Error("error fetching msg", zap.Error(err))
-				continue
-			}
-
-			e.log.Debug("new message", zap.String("topic", msg.Topic))
-
-			err = e.onMessage(msg)
-			if err != nil {
-				e.log.Error("failed to handle kafka msg",
-					zap.String("topic", msg.Topic),
-					zap.ByteString("key", msg.Key),
-					zap.ByteString("value", msg.Value),
-					zap.Error(err),
-				)
-				continue
-			}
-
-			_ = e.reader.CommitMessages(context.Background(), msg)
+func (e *eventHandler) start() error {
+	for {
+		if e.closed.Load() {
+			return nil
 		}
-	}()
 
-	return errChan
+		msg, err := e.reader.FetchMessage(context.Background())
+		if err != nil {
+			if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
+				return errgo.Wrap(err, "read message")
+			}
+
+			e.log.Error("error fetching msg", zap.Error(err))
+			continue
+		}
+
+		e.log.Debug("new message", zap.String("topic", msg.Topic))
+
+		err = e.onMessage(msg)
+		if err != nil {
+			e.log.Error("failed to handle kafka msg", zap.ByteString("value", msg.Value), zap.Error(err),
+				zap.String("topic", msg.Topic), zap.ByteString("key", msg.Key))
+			continue
+		}
+
+		_ = e.reader.CommitMessages(context.Background(), msg)
+	}
 }
 
 func (e *eventHandler) Close() error {
+	e.closed.Store(true)
 	return errgo.Wrap(e.reader.Close(), "kafka.Close")
 }
 
@@ -107,8 +101,6 @@ func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
 
 	return nil
 }
-
-const groupID = "my-group"
 
 func (e *eventHandler) onMessage(msg kafka.Message) error {
 	if len(msg.Value) == 0 {

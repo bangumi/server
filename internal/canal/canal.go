@@ -12,16 +12,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//nolint:depguard
 package canal
 
 import (
-	"context"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/segmentio/kafka-go"
+	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
 
 	"github.com/bangumi/server/internal/cache"
@@ -37,69 +38,67 @@ import (
 )
 
 func Main() error {
-	e, err := getEventHandler()
-	if err != nil {
-		return err
-	}
-
-	shutdown := make(chan int)
-	sigChan := make(chan os.Signal, 1)
-	// register for interrupt (Ctrl+C) and SIGTERM (docker)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-sigChan
-		logger.Info("receive signal, shutdown")
-		e.Close()
-		shutdown <- 1
-	}()
-
-	select {
-	case err := <-e.start(context.Background()):
-		return err
-	case <-shutdown:
-		return nil
-	}
-}
-
-func getEventHandler() (*eventHandler, error) {
 	var h *eventHandler
+	var reporter promreporter.Reporter
 
-	err := fx.New(
+	di := fx.New(
 		logger.FxLogger(),
-		config.Module,
-
-		dal.Module,
+		config.Module, dal.Module,
 
 		// driver and connector
 		fx.Provide(
 			driver.NewMysqlConnectionPool, metrics.NewScope,
 			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
-			subject.NewMysqlRepo,
-			search.New,
-			session.NewMysqlRepo, session.New,
+			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
 
-			func(c config.AppConfig) *kafka.Reader {
-				topics := []string{
-					"chii.bangumi.chii_subject_fields",
-					"chii.bangumi.chii_subjects",
-					"chii.bangumi.chii_members",
-				}
-				return kafka.NewReader(kafka.ReaderConfig{
-					Brokers:     []string{c.KafkaBroker},
-					GroupID:     groupID,
-					GroupTopics: topics,
-				})
-			},
-
-			newEventHandler,
+			newKafkaReader, newEventHandler,
 		),
 
-		fx.Populate(&h),
-	).Err()
+		fx.Populate(&h, &reporter),
+	)
 
-	if err != nil {
-		return nil, errgo.Wrap(err, "fx")
+	if err := di.Err(); err != nil {
+		return errgo.Wrap(err, "fx")
 	}
 
-	return h, nil
+	var errChan = make(chan error, 1)
+
+	go func() {
+		mux := http.NewServeMux()
+		mux.Handle("/metrics", promhttp.Handler())
+		errChan <- http.ListenAndServe(h.config.ListenAddr(), mux) //nolint:gosec
+	}()
+
+	go func() {
+		errChan <- h.start()
+	}()
+
+	// register for interrupt (Ctrl+C) and SIGTERM (docker)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	defer h.Close()
+
+	select {
+	case err := <-errChan:
+		return err
+	case <-sigChan:
+		logger.Info("receive signal, shutdown")
+		return nil
+	}
+}
+
+const groupID = "my-group"
+
+func newKafkaReader(c config.AppConfig) *kafka.Reader {
+	topics := []string{
+		"chii.bangumi.chii_subject_fields",
+		"chii.bangumi.chii_subjects",
+		"chii.bangumi.chii_members",
+	}
+	return kafka.NewReader(kafka.ReaderConfig{
+		Brokers:     []string{c.KafkaBroker},
+		GroupID:     groupID,
+		GroupTopics: topics,
+	})
 }

@@ -16,7 +16,6 @@ package web
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/pprof"
 	"strconv"
@@ -103,10 +102,10 @@ func addProfile(app *fiber.App) {
 }
 
 func Start(c config.AppConfig, app *fiber.App) error {
-	addr := fmt.Sprintf("%s:%d", c.HTTPHost, c.HTTPPort)
+	addr := c.ListenAddr()
 	logger.Infoln("http server listening at", addr)
 
-	return errgo.Wrap(app.Listen(addr), "fiber.App.Listen")
+	return errgo.Wrap(app.Listen(c.ListenAddr()), "fiber.App.Listen")
 }
 
 func getDefaultErrorHandler() func(*fiber.Ctx, error) error {
