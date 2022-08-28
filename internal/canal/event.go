@@ -43,28 +43,40 @@ type eventHandler struct {
 	reader  *kafka.Reader
 }
 
-func (e *eventHandler) start() <-chan error {
+func (e *eventHandler) start(ctx context.Context) <-chan error {
 	errChan := make(chan error)
 
 	go func() {
 		for {
-			message, err := e.reader.FetchMessage(context.Background())
+			// break when done
+			if done := ctx.Done(); done != nil {
+				select {
+				case <-done:
+					break
+				default:
+				}
+			}
+
+			msg, err := e.reader.FetchMessage(context.Background())
 			if err != nil {
+				e.log.Error("error fetching msg", zap.Error(err))
 				continue
 			}
 
-			err = e.onMessage(message)
+			e.log.Debug("new message", zap.String("topic", msg.Topic))
+
+			err = e.onMessage(msg)
 			if err != nil {
-				e.log.Error("failed to handle kafka message",
-					zap.String("topic", message.Topic),
-					zap.ByteString("key", message.Key),
-					zap.ByteString("value", message.Value),
+				e.log.Error("failed to handle kafka msg",
+					zap.String("topic", msg.Topic),
+					zap.ByteString("key", msg.Key),
+					zap.ByteString("value", msg.Value),
 					zap.Error(err),
 				)
 				continue
 			}
 
-			_ = e.reader.CommitMessages(context.Background(), message)
+			_ = e.reader.CommitMessages(context.Background(), msg)
 		}
 	}()
 

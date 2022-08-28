@@ -16,6 +16,7 @@
 package canal
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"os/signal"
@@ -44,7 +45,7 @@ func Main() error {
 	}()
 
 	select {
-	case err := <-e.start():
+	case err := <-e.start(context.Background()):
 		return err
 	case <-shutdown:
 		return nil
