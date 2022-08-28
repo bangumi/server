@@ -79,45 +79,39 @@ func (m mysqlRepo) ListByUID(
 	return result, nil
 }
 
-func (m mysqlRepo) Create(ctx context.Context, tls ...*model.TimeLine) error {
-	daos := make([]*dao.TimeLine, 0, len(tls))
-	for i := range tls {
-		d, err := modelToDAO(tls[i])
-		if err != nil {
-			m.log.Error("modelToDAO", zap.Error(err))
-			return errgo.Wrap(err, "modelToDAO")
-		}
-		daos = append(daos, d)
+func (m mysqlRepo) Create(ctx context.Context, tl *model.TimeLine) error {
+	d, err := modelToDAO(tl)
+	if err != nil {
+		m.log.Error("modelToDAO", zap.Error(err))
+		return errgo.Wrap(err, "modelToDAO")
 	}
 
-	if err := m.q.TimeLine.WithContext(ctx).Create(daos...); err != nil {
+	if err := m.q.TimeLine.WithContext(ctx).Create(d); err != nil {
 		return errgo.Wrap(err, "dal")
 	}
 	return nil
 }
 
-func (m mysqlRepo) dedupeTimeLine(ctx context.Context, daos ...*dao.TimeLine) ([]*dao.TimeLine, error) {
-	if len(daos) == 0 {
-		return nil, nil
-	}
-		dbTLs, err := m.q.TimeLine.WithContext(ctx).
-		Where(m.q.TimeLine.UID.Eq(daos[0].UID)).
+func (m mysqlRepo) isDupeTimeLine(ctx context.Context, dao *dao.TimeLine) (bool, error) {
+	daoTLs, err := m.q.TimeLine.WithContext(ctx).
+		Where(m.q.TimeLine.UID.Eq(dao.UID)).
 		Order(m.q.TimeLine.Dateline.Desc()).
-		Limit(len(tls)).
+		Limit(1).
 		Find()
 	if err != nil {
-		return nil, errgo.Wrap(err, "dal")
+		return false, errgo.Wrap(err, "dal")
 	}
-	result := make([]*model.TimeLine, 0, len(dbTLs))
-	for _, tl := range tls {
 
+	if len(daoTLs) == 0 {
+		return false, nil
 	}
-	return result, nil
+	daoTL := daoTLs[0]
+
 }
 
 func isModelTlDupedInDB(m *model.TimeLine, ds []*dao.TimeLine) bool {
 	for _, d := range ds {
-		if d.Dateline == m.Dateline && d.Cat == m.Cat && d.{
+		if d.Dateline == m.Dateline && d.Cat == m.Cat {
 			return true
 		}
 	}
