@@ -103,16 +103,29 @@ func Test_mysqlRepo_Create(t *testing.T) {
 
 	once := func(tlID model.TimeLineID) {
 		newTLID := tlID + 987654321
+
+		// delete if already exists
 		_, err := q.WithContext(ctx).TimeLine.Where(q.TimeLine.ID.Eq(newTLID)).Delete()
 		require.NoError(t, err)
 
+		// get the timeline
 		tlModel, err := repo.GetByID(ctx, tlID)
 		require.NoError(t, err)
+
+		// alter id and uid
 		tlModel.ID = newTLID
+		tlModel.UID += 654321
+		tlModel.FillCatAndType()
+
+		// create with new id
 		err = repo.Create(ctx, tlModel)
 		require.NoError(t, err)
+
+		// get new timeline
 		newTLModel, err := repo.GetByID(ctx, newTLID)
 		require.NoError(t, err)
+
+		// check if the new timeline eq old timeline
 		require.Equal(t, tlModel, newTLModel)
 	}
 

@@ -58,7 +58,8 @@ type TimeLineMemo struct {
 	*TimeLineDoujinMemo
 }
 
-func (tl *TimeLine) fillCatAndType() *TimeLine {
+//nolint:gomnd,gocyclo
+func (tl *TimeLine) FillCatAndType() *TimeLine {
 	m := tl.Memo
 	if m.TimeLineRelationMemo != nil {
 		return setCatAndType(tl, 1, 2)

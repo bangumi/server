@@ -123,10 +123,10 @@ func (m mysqlRepo) isDupeTimeLine(ctx context.Context, dao *dao.TimeLine) (bool,
 	if dao.Cat != daoTL.Cat {
 		return false, nil
 	}
-	if bytes.Compare(dao.Memo, daoTL.Memo) != 0 {
+	if !bytes.Equal(dao.Memo, daoTL.Memo) {
 		return false, nil
 	}
-	if bytes.Compare(dao.Img, daoTL.Img) != 0 {
+	if !bytes.Equal(dao.Img, daoTL.Img) {
 		return false, nil
 	}
 	return true, nil
