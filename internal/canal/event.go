@@ -17,21 +17,15 @@ package canal
 import (
 	"context"
 
+	"github.com/goccy/go-json"
 	"github.com/segmentio/kafka-go"
-	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/search"
-	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -103,49 +97,6 @@ func newEventHandler(
 	}
 }
 
-func getEventHandler() (*eventHandler, error) {
-	var h *eventHandler
-
-	err := fx.New(
-		logger.FxLogger(),
-		config.Module,
-
-		dal.Module,
-
-		// driver and connector
-		fx.Provide(
-			driver.NewMysqlConnectionPool, metrics.NewScope,
-			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
-			subject.NewMysqlRepo,
-			search.New,
-			session.NewMysqlRepo, session.New,
-
-			func(c config.AppConfig) *kafka.Reader {
-				topics := []string{
-					"chii.bangumi.chii_subject_fields",
-					"chii.bangumi.chii_subjects",
-					"chii.bangumi.chii_members",
-				}
-				return kafka.NewReader(kafka.ReaderConfig{
-					Brokers:     []string{c.KafkaBroker},
-					GroupID:     groupID,
-					GroupTopics: topics,
-				})
-			},
-
-			newEventHandler,
-		),
-
-		fx.Populate(&h),
-	).Err()
-
-	if err != nil {
-		return nil, errgo.Wrap(err, "fx")
-	}
-
-	return h, nil
-}
-
 func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
 	e.log.Info("user change password", log.UserID(id))
 
@@ -155,4 +106,75 @@ func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
 	}
 
 	return nil
+}
+
+const groupID = "my-group"
+
+func (e *eventHandler) onMessage(msg kafka.Message) error {
+	if len(msg.Value) == 0 {
+		// fake event, just ignore
+		// https://debezium.io/documentation/reference/stable/connectors/mysql.html#mysql-tombstone-events
+		return nil
+	}
+
+	var k messageKey
+	if err := json.Unmarshal(msg.Key, &k); err != nil {
+		return nil
+	}
+
+	var v messageValue
+	if err := json.Unmarshal(msg.Value, &v); err != nil {
+		return nil
+	}
+
+	var err error
+	switch msg.Topic {
+	case "chii.bangumi.chii_subject_fields":
+		err = e.OnSubjectField(k.Payload, v.Payload)
+	case "chii.bangumi.chii_subjects":
+		err = e.OnSubject(k.Payload, v.Payload)
+	case "chii.bangumi.chii_members":
+		err = e.OnUserChange(k.Payload, v.Payload)
+	}
+
+	return err
+}
+
+const (
+	opCreate   = "c"
+	opDelete   = "d"
+	opUpdate   = "u"
+	opSnapshot = "r" // just ignore them, production debezium disable snapshot.
+)
+
+// https://debezium.io/documentation/reference/connectors/mysql.html
+// Table 9. Overview of change event basic content
+
+type messageKey struct {
+	Payload json.RawMessage `json:"payload"`
+	Schema  struct {
+		Type   string `json:"type"`
+		Name   string `json:"name"`
+		Fields []struct {
+			Type     string `json:"type"`
+			Field    string `json:"field"`
+			Optional bool   `json:"optional"`
+		} `json:"fields"`
+		Optional bool `json:"optional"`
+	} `json:"schema"`
+}
+
+type messageValue struct {
+	Payload payload `json:"payload"`
+}
+
+type payload struct {
+	Before map[string]json.RawMessage `json:"before"`
+	After  map[string]json.RawMessage `json:"after"`
+	Source source                     `json:"source"`
+	Op     string                     `json:"op"`
+}
+
+type source struct {
+	Table string `json:"table"`
 }
