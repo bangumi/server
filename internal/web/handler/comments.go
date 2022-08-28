@@ -25,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -93,7 +92,7 @@ func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-		return h.InternalError(c, err, "failed to subject", log.SubjectID(id))
+		return errgo.Wrap(err, "failed to subject")
 	}
 
 	return h.listTopics(c, domain.TopicTypeSubject, uint32(id))
@@ -113,7 +112,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get episode", log.EpisodeID(id))
+		return errgo.Wrap(err, "failed to get episode")
 	}
 
 	_, err = h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, e.SubjectID)
@@ -122,7 +121,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get subject of episode", log.SubjectID(e.SubjectID))
+		return errgo.Wrap(err, "failed to get subject of episode")
 	}
 
 	return h.listComments(c, u.Auth, domain.CommentEpisode, model.TopicID(id))
@@ -140,7 +139,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get person", log.PersonID(id))
+		return errgo.Wrap(err, "failed to get person")
 	}
 
 	if r.Redirect != 0 {
@@ -164,7 +163,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to get character", log.CharacterID(id))
+		return errgo.Wrap(err, "failed to get character")
 	}
 
 	return h.listComments(c, u.Auth, domain.CommentCharacter, model.TopicID(id))

@@ -12,27 +12,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package search
 
 import (
+	"context"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/web/frontend"
+	"github.com/bangumi/server/internal/web/accessor"
 )
 
-func (h Handler) PageLogin(c *fiber.Ctx) error {
-	v := h.GetHTTPAccessor(c)
-	var u model.User
-	if v.Login {
-		var err error
-		u, err = h.ctrl.GetUser(c.Context(), v.ID)
+var _ Client = NoopClient{}
 
-		if err != nil {
-			return errgo.Wrap(err, "failed to get current user")
-		}
-	}
+type NoopClient struct {
+}
 
-	return h.render(c, frontend.TplLogin, frontend.Login{Title: "Login", User: u})
+func (n NoopClient) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
+	return ctx.SendString("search is not enable")
+}
+
+func (n NoopClient) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
+	return nil
+}
+
+func (n NoopClient) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
+	return nil
 }

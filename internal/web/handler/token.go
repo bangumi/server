@@ -21,11 +21,10 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -47,7 +46,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 
 	token, err := h.a.CreateAccessToken(c.Context(), v.ID, r.Name, gtime.OneDay*time.Duration(r.DurationDays))
 	if err != nil {
-		return h.InternalError(c, err, "failed to create token", log.UserID(v.ID), zap.String("token_name", r.Name))
+		return errgo.Wrap(err, "failed to create token")
 	}
 
 	return c.JSON(token)
@@ -73,7 +72,7 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 			return res.BadRequest("token not exist")
 		}
 
-		return h.InternalError(c, err, "failed to get token info", zap.Uint32("token_id", r.ID))
+		return errgo.Wrap(err, "failed to get token info")
 	}
 
 	if token.UserID != v.ID {
@@ -82,7 +81,7 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 
 	ok, err := h.a.DeleteAccessToken(c.Context(), r.ID)
 	if err != nil {
-		return h.InternalError(c, err, "failed to delete token", zap.Uint32("token_id", r.ID), log.UserID(v.ID))
+		return errgo.Wrap(err, "failed to delete token")
 	}
 
 	if !ok {

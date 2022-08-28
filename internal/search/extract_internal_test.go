@@ -12,27 +12,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package search
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"testing"
 
-	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/web/frontend"
+	"github.com/stretchr/testify/require"
 )
 
-func (h Handler) PageLogin(c *fiber.Ctx) error {
-	v := h.GetHTTPAccessor(c)
-	var u model.User
-	if v.Login {
-		var err error
-		u, err = h.ctrl.GetUser(c.Context(), v.ID)
+func Test_parseDateVal(t *testing.T) {
+	t.Parallel()
 
-		if err != nil {
-			return errgo.Wrap(err, "failed to get current user")
-		}
-	}
-
-	return h.render(c, frontend.TplLogin, frontend.Login{Title: "Login", User: u})
+	require.Equal(t, 0, parseDateVal(""))
+	require.Equal(t, 20080120, parseDateVal("2008-01-20"))
+	require.Equal(t, 21080620, parseDateVal("2108-06-20"))
+	require.Equal(t, 0, parseDateVal("2108-06-0"))
 }

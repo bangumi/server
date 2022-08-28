@@ -44,12 +44,12 @@ func (h Handler) GetGroupProfileByNamePrivate(c *fiber.Ctx) error {
 			return res.NotFound("group not found")
 		}
 
-		return h.InternalError(c, err, "failed to get group", zap.String("group_name", groupName))
+		return errgo.Wrap(err, "failed to get group")
 	}
 
 	members, err := h.listGroupMembers(c.Context(), g.ID, domain.GroupMemberAll, 10, 0)
 	if err != nil {
-		return h.InternalError(c, err, "failed to list recent members", log.GroupID(g.ID))
+		return errgo.Wrap(err, "failed to list recent members")
 	}
 
 	return res.JSON(c, res.PrivateGroupProfile{
@@ -98,12 +98,12 @@ func (h Handler) listGroupMembersPrivate(
 			return res.NotFound("group not found")
 		}
 
-		return h.InternalError(c, err, "failed to get group", zap.String("group_name", groupName))
+		return errgo.Wrap(err, "failed to get group")
 	}
 
 	memberCount, err := h.g.CountMembersByID(c.Context(), g.ID, memberType)
 	if err != nil {
-		return h.InternalError(c, err, "failed to count group member", zap.String("grou_name", groupName))
+		return errgo.Wrap(err, "failed to count group member")
 	}
 
 	if memberCount == 0 {
@@ -116,7 +116,7 @@ func (h Handler) listGroupMembersPrivate(
 
 	data, err := h.listGroupMembers(c.Context(), g.ID, memberType, page.Limit, page.Offset)
 	if err != nil {
-		return h.InternalError(c, err, "failed to list group members")
+		return errgo.Wrap(err, "failed to list group members")
 	}
 
 	return res.JSON(c, res.Paged{
@@ -197,7 +197,7 @@ func (h Handler) ListGroupTopics(c *fiber.Ctx) error {
 			return res.NotFound("group not found")
 		}
 
-		return h.InternalError(c, err, "failed to get group", zap.String("group_name", groupName))
+		return errgo.Wrap(err, "failed to get group")
 	}
 
 	return h.listTopics(c, domain.TopicTypeGroup, uint32(g.ID))

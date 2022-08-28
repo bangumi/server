@@ -16,23 +16,8 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-
-	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/web/frontend"
 )
 
-func (h Handler) PageLogin(c *fiber.Ctx) error {
-	v := h.GetHTTPAccessor(c)
-	var u model.User
-	if v.Login {
-		var err error
-		u, err = h.ctrl.GetUser(c.Context(), v.ID)
-
-		if err != nil {
-			return errgo.Wrap(err, "failed to get current user")
-		}
-	}
-
-	return h.render(c, frontend.TplLogin, frontend.Login{Title: "Login", User: u})
+func (h Handler) Search(c *fiber.Ctx) error {
+	return h.search.Handle(c, h.GetHTTPAccessor(c)) //nolint:wrapcheck
 }

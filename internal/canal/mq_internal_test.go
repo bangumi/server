@@ -12,16 +12,36 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package common
+package canal
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
+	"testing"
 
-	"github.com/bangumi/server/internal/web/res"
+	"github.com/segmentio/kafka-go"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-func (h Common) InternalError(c *fiber.Ctx, err error, message string, logFields ...zap.Field) error {
-	h.skip1Log.Error(message, append(logFields, zap.Error(err))...)
-	return res.InternalError(c, err, message)
+func TestOnSubjectChange(t *testing.T) {
+	t.Parallel()
+	session := mocks.NewSessionManager(t)
+
+	c, err := config.NewAppConfig()
+	require.NoError(t, err)
+
+	search := mocks.NewSearchClient(t)
+
+	eh := &eventHandler{
+		config:  c,
+		session: session,
+		reader:  nil,
+		search:  search,
+		log:     logger.Named("eventHandler"),
+	}
+
+	err = eh.onMessage(kafka.Message{})
+	require.NoError(t, err)
 }

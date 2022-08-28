@@ -23,7 +23,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -74,7 +73,7 @@ func (h User) listCollection(
 ) error {
 	count, err := h.collect.CountSubjectCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
-		return h.InternalError(c, err, "failed to count user's subject collections", log.UserID(u.ID))
+		return errgo.Wrap(err, "failed to count user's subject collections")
 	}
 
 	if count == 0 {
@@ -88,7 +87,7 @@ func (h User) listCollection(
 	collections, err := h.collect.ListSubjectCollection(c.Context(),
 		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
-		return h.InternalError(c, err, "failed to list user's subject collections", log.UserID(u.ID))
+		return errgo.Wrap(err, "failed to list user's subject collections")
 	}
 
 	subjectIDs := slice.Map(collections, func(item model.UserSubjectCollection) model.SubjectID {
@@ -97,7 +96,7 @@ func (h User) listCollection(
 
 	subjectMap, err := h.ctrl.GetSubjectByIDs(c.Context(), subjectIDs...)
 	if err != nil {
-		return h.InternalError(c, err, "failed to get subjects")
+		return errgo.Wrap(err, "failed to get subjects")
 	}
 
 	var data = make([]res.SubjectCollection, len(collections))

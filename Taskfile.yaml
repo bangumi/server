@@ -54,7 +54,7 @@ tasks:
       - golangci-lint run --fix
 
   test:
-    desc: Run tests without mysql and redis.
+    desc: Run mocked tests, need nothing.
     cmds:
       - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
     env:
@@ -65,18 +65,25 @@ tasks:
     cmds:
       - go test -bench=. -benchmem ./pkg/wiki
 
-  test-all:
-    desc: Run all tests, need mysql and redis, except hCaptcha tests, alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
+  test-db:
+    desc: Run mocked tests, and tests require mysql and redis. alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
     cmds:
       - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
 
-  test-all-with-http:
-    desc: Run all tests, need mysql and redis, alias for `TEST_MYSQL=1 TEST_REDIS=1 TEST_HTTP=1 task test`
+  test-http:
+    desc: Run mocked tests, and tests require external HTTP resources, alias for `TEST_HTTP=1 task test`
     cmds:
       - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
+    env:
+      TEST_HTTP: "1"
+
+  test-all:
+    desc: Run all tests.
+    cmds:
+      - go test -timeout 10s -tags test ./...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"

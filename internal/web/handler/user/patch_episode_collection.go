@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -77,7 +78,7 @@ func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		return h.InternalError(c, err, "failed to update episode")
+		return errgo.Wrap(err, "failed to update episode")
 	}
 
 	c.Status(http.StatusNoContent)

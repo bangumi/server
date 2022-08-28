@@ -12,27 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package obj
 
-import (
-	"github.com/gofiber/fiber/v2"
-
-	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/web/frontend"
-)
-
-func (h Handler) PageLogin(c *fiber.Ctx) error {
-	v := h.GetHTTPAccessor(c)
-	var u model.User
-	if v.Login {
-		var err error
-		u, err = h.ctrl.GetUser(c.Context(), v.ID)
-
-		if err != nil {
-			return errgo.Wrap(err, "failed to get current user")
-		}
+func GetString[K comparable, M ~map[K]any](m M, key K) string {
+	value := m[key]
+	if value == nil {
+		return ""
 	}
 
-	return h.render(c, frontend.TplLogin, frontend.Login{Title: "Login", User: u})
+	s, ok := value.(string)
+	if ok {
+		return ""
+	}
+
+	return s
+}
+
+func GetFloat64[K comparable, M ~map[K]any](m M, key K) float64 {
+	value := m[key]
+	if value == nil {
+		return 0
+	}
+
+	s, ok := value.(float64)
+	if ok {
+		return 0
+	}
+
+	return s
 }

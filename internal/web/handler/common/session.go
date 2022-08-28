@@ -23,7 +23,6 @@ import (
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"
@@ -51,7 +50,7 @@ func (h Common) MiddlewareSessionAuth(c *fiber.Ctx) error {
 
 		auth, err := h.auth.GetByID(c.Context(), s.UserID)
 		if err != nil {
-			return h.InternalError(c, err, "failed to user with permission", a.Log(), log.UserID(s.UserID))
+			return errgo.Wrap(err, "failed to user with permission")
 		}
 
 		a.SetAuth(auth)

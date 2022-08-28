@@ -19,9 +19,9 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -40,7 +40,7 @@ func (h User) Get(c *fiber.Ctx) error {
 			return res.NotFound("can't find user with username " + strconv.Quote(username))
 		}
 
-		return h.InternalError(c, err, "failed to get user by username", zap.String("username", username))
+		return errgo.Wrap(err, "failed to get user by username")
 	}
 
 	var r = res.ConvertModelUser(user)
@@ -63,7 +63,7 @@ func (h User) GetAvatar(c *fiber.Ctx) error {
 			return res.NotFound("can't find user with username " + strconv.Quote(username))
 		}
 
-		return h.InternalError(c, err, "failed to get user by username")
+		return errgo.Wrap(err, "failed to get user by username")
 	}
 
 	l, ok := res.UserAvatar(user.Avatar).Select(c.Query("type"))
