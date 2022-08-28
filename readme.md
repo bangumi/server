@@ -83,7 +83,7 @@ flowchart TD
   Nginx -->|static new frontend files|FS[(file system)];
 
   Nginx -->|HTTP API Request|B;
-  Nginx --> |HTTP Search request|meilisearch;
+  B --> |HTTP Search request|meilisearch;
 
   C --> |增量更新数据|meilisearch;
 
@@ -131,16 +131,11 @@ flowchart TD
 使用 [mock](./internal/mocks/) 进行部分测试。
 
 ```
-task test
+task test       # Run mocked unit tests, need nothing.
+task test-db    # Run mocked tests, and tests require mysql and redis. alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
+task test-http  # Run mocked tests, and tests require external HTTP resources, alias for `TEST_HTTP=1 task test`
+task test-all   # Run all tests.
 ```
-
-运行 hCaptcha 以外的的全部测试，需要数据库环境。
-
-```
-task test-all
-```
-
-使用 `task test-all-with-http` 或者 `task coverage` 来运行所有测试。
 
 ## 代码风格
 
@@ -163,4 +158,5 @@ task lint
 
 Copyright (C) 2021-2022 bangumi server contributors.
 
-Source is licensed under the GNU AGPLv3 license that can be found in the [LICENSE.txt](https://github.com/bangumi/server/blob/master/LICENSE.txt) file.
+Source is licensed under the GNU AGPLv3 license that can be found in
+the [LICENSE.txt](https://github.com/bangumi/server/blob/master/LICENSE.txt) file.

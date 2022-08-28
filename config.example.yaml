@@ -13,6 +13,10 @@ mysql_db: bangumi
 
 hcaptcha_secret_key: 0x0000000000000000000000000000000000000000
 
+# 如果为空字符串则不会启用搜索相关的功能。
+meilisearch_url: ""
+meilisearch_key: ""
+
 debug:
   gorm: true
 nsfw_word: "里番|无码|18x|エロ"

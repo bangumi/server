@@ -12,29 +12,36 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package web
+package canal
 
 import (
-	"go.uber.org/fx"
+	"testing"
 
-	"github.com/bangumi/server/internal/search"
-	"github.com/bangumi/server/internal/web/captcha"
-	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler"
-	"github.com/bangumi/server/internal/web/rate"
-	"github.com/bangumi/server/internal/web/session"
+	"github.com/segmentio/kafka-go"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-var Module = fx.Module("web",
-	handler.Module,
-	fx.Provide(
-		New,
-		session.NewMysqlRepo,
-		rate.New,
-		captcha.New,
-		session.New,
-		frontend.NewTemplateEngine,
-		func(c search.Client) search.Handler { return c },
-	),
-	fx.Invoke(AddRouters),
-)
+func TestOnSubjectChange(t *testing.T) {
+	t.Parallel()
+	session := mocks.NewSessionManager(t)
+
+	c, err := config.NewAppConfig()
+	require.NoError(t, err)
+
+	search := mocks.NewSearchClient(t)
+
+	eh := &eventHandler{
+		config:  c,
+		session: session,
+		reader:  nil,
+		search:  search,
+		log:     logger.Named("eventHandler"),
+	}
+
+	err = eh.onMessage(kafka.Message{})
+	require.NoError(t, err)
+}

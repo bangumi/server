@@ -42,6 +42,9 @@ type AppConfig struct {
 
 	KafkaBroker string `yaml:"kafka_broker" env:"KAFKA_BROKER"`
 
+	MeiliSearchURL string `yaml:"meilisearch_url" env:"MEILISEARCH_URL"`
+	MeiliSearchKey string `yaml:"meilisearch_key" env:"MEILISEARCH_KEY"`
+
 	HCaptchaSecretKey string `yaml:"hcaptcha_secret_key" env:"HCAPTCHA_SECRET_KEY"`
 
 	NsfwWord     string `yaml:"nsfw_word"`

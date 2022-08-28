@@ -39,6 +39,7 @@ import (
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/web"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
@@ -112,6 +113,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		// don't need a default mock for these repositories.
 		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
 		fx.Provide(func() domain.CollectionRepo { return m.CollectionRepo }),
+		fx.Provide(func() search.Handler { return search.NoopClient{} }),
 
 		fx.Invoke(web.AddRouters),
 

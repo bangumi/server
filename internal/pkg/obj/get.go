@@ -12,29 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package web
+package obj
 
-import (
-	"go.uber.org/fx"
+func GetString[K comparable, M ~map[K]any](m M, key K) string {
+	value := m[key]
+	if value == nil {
+		return ""
+	}
 
-	"github.com/bangumi/server/internal/search"
-	"github.com/bangumi/server/internal/web/captcha"
-	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler"
-	"github.com/bangumi/server/internal/web/rate"
-	"github.com/bangumi/server/internal/web/session"
-)
+	s, ok := value.(string)
+	if ok {
+		return ""
+	}
 
-var Module = fx.Module("web",
-	handler.Module,
-	fx.Provide(
-		New,
-		session.NewMysqlRepo,
-		rate.New,
-		captcha.New,
-		session.New,
-		frontend.NewTemplateEngine,
-		func(c search.Client) search.Handler { return c },
-	),
-	fx.Invoke(AddRouters),
-)
+	return s
+}
+
+func GetFloat64[K comparable, M ~map[K]any](m M, key K) float64 {
+	value := m[key]
+	if value == nil {
+		return 0
+	}
+
+	s, ok := value.(float64)
+	if ok {
+		return 0
+	}
+
+	return s
+}

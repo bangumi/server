@@ -12,29 +12,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package web
+package search
 
 import (
-	"go.uber.org/fx"
+	"testing"
 
-	"github.com/bangumi/server/internal/search"
-	"github.com/bangumi/server/internal/web/captcha"
-	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler"
-	"github.com/bangumi/server/internal/web/rate"
-	"github.com/bangumi/server/internal/web/session"
+	"github.com/stretchr/testify/require"
 )
 
-var Module = fx.Module("web",
-	handler.Module,
-	fx.Provide(
-		New,
-		session.NewMysqlRepo,
-		rate.New,
-		captcha.New,
-		session.New,
-		frontend.NewTemplateEngine,
-		func(c search.Client) search.Handler { return c },
-	),
-	fx.Invoke(AddRouters),
-)
+func Test_parseDateVal(t *testing.T) {
+	t.Parallel()
+
+	require.Equal(t, 0, parseDateVal(""))
+	require.Equal(t, 20080120, parseDateVal("2008-01-20"))
+	require.Equal(t, 21080620, parseDateVal("2108-06-20"))
+	require.Equal(t, 0, parseDateVal("2108-06-0"))
+}

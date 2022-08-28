@@ -69,6 +69,8 @@ func AddRouters(
 
 	v0 := app.Group("/v0/", h.MiddlewareAccessTokenAuth)
 
+	v0.Post("/search/subjects", h.Search)
+
 	v0.Get("/subjects/:id", addMetrics(subjectHandler.Get))
 	v0.Get("/subjects/:id/image", addMetrics(subjectHandler.GetImage))
 	v0.Get("/subjects/:id/persons", addMetrics(subjectHandler.GetRelatedPersons))

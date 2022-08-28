@@ -39,6 +39,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/revision"
+	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
@@ -84,7 +85,7 @@ func start() error {
 
 			dam.New,
 
-			auth.NewService, person.NewService, group.NewMysqlRepo,
+			auth.NewService, person.NewService, group.NewMysqlRepo, search.New,
 		),
 
 		ctrl.Module,

@@ -15,34 +15,51 @@
 package canal
 
 import (
-	"sort"
-	"strings"
+	"context"
 
 	"github.com/goccy/go-json"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func OnSubjectChange(key json.RawMessage, payload payload) {
-	switch payload.Op {
-	case opCreate:
-	case opSnapshot:
-		// fmt.Println(payload.After)
-	case opDelete:
-		// fmt.Println(payload.Before)
-	case opUpdate:
-		var diff = make([]string, 0, len(payload.After))
-		for key, value := range payload.Before {
-			if string(payload.After[key]) != string(value) {
-				diff = append(diff, key)
-			}
-		}
-		sort.Slice(diff, func(i, j int) bool {
-			return strings.Compare(diff[i], diff[j]) > 0
-		})
+func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {
+	var k SubjectKey
+	if err := json.UnmarshalNoEscape(key, &k); err != nil {
+		return nil
 	}
+
+	return e.onSubjectChange(k.ID, payload.Op)
 }
 
-type SubjectPayload struct {
+func (e *eventHandler) OnSubjectField(key json.RawMessage, payload payload) error {
+	var k SubjectFieldKey
+	if err := json.UnmarshalNoEscape(key, &k); err != nil {
+		return nil
+	}
+
+	return e.onSubjectChange(k.ID, payload.Op)
+}
+
+func (e *eventHandler) onSubjectChange(subjectID model.SubjectID, op string) error {
+	switch op {
+	case opCreate, opUpdate, opSnapshot:
+		if err := e.search.OnSubjectUpdate(context.TODO(), subjectID); err != nil {
+			return errgo.Wrap(err, "search.OnSubjectUpdate")
+		}
+	case opDelete:
+		if err := e.search.OnSubjectDelete(context.TODO(), subjectID); err != nil {
+			return errgo.Wrap(err, "search.OnSubjectDelete")
+		}
+	}
+
+	return nil
+}
+
+type SubjectKey struct {
 	ID model.SubjectID `json:"subject_id"`
+}
+
+type SubjectFieldKey struct {
+	ID model.SubjectID `json:"field_sid"`
 }
