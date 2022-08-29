@@ -21,8 +21,6 @@ import (
 	"os"
 
 	"github.com/goccy/go-json"
-	"go.uber.org/fx"
-	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -51,10 +49,6 @@ func getLogger(level zapcore.Level) *zap.Logger {
 		zap.AddCallerSkip(1),
 		zap.AddStacktrace(zapcore.ErrorLevel),
 	)
-}
-
-func FxLogger() fx.Option {
-	return fx.WithLogger(func() fxevent.Logger { return &fxevent.ZapLogger{Logger: Named("fx")} })
 }
 
 func defaultReflectedEncoder(w io.Writer) zapcore.ReflectedEncoder {

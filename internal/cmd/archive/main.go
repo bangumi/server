@@ -64,7 +64,7 @@ var maxPersonID model.PersonID       //nolint:gochecknoglobals
 func start(out string) {
 	var q *query.Query
 	err := fx.New(
-		logger.FxLogger(),
+		fx.NopLogger,
 		fx.Provide(
 			driver.NewMysqlConnectionPool, dal.NewDB,
 

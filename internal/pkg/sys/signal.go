@@ -12,16 +12,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build dev
-
-package logger
+package sys
 
 import (
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
-// development log config.
-func getLogger(level zapcore.Level) *zap.Logger {
-	return textLogger(level)
+func HandleSignal() <-chan os.Signal {
+	// register for interrupt (Ctrl+C) and SIGTERM (docker)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	return sigChan
 }

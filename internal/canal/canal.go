@@ -15,10 +15,9 @@
 package canal
 
 import (
+	"context"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/segmentio/kafka-go"
@@ -32,6 +31,7 @@ import (
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/internal/pkg/sys"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web/session"
@@ -42,7 +42,7 @@ func Main() error {
 	var reporter promreporter.Reporter
 
 	di := fx.New(
-		logger.FxLogger(),
+		fx.NopLogger,
 		config.Module, dal.Module,
 
 		// driver and connector
@@ -63,26 +63,20 @@ func Main() error {
 
 	var errChan = make(chan error, 1)
 
-	go func() {
-		mux := http.NewServeMux()
-		mux.Handle("/metrics", promhttp.Handler())
-		errChan <- http.ListenAndServe(h.config.ListenAddr(), mux) //nolint:gosec
-	}()
+	// metrics http reporter
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	srv := &http.Server{Addr: h.config.ListenAddr(), Handler: mux, ReadHeaderTimeout: time.Second}
+	go func() { errChan <- errgo.Wrap(srv.ListenAndServe(), "http") }()
+	defer srv.Shutdown(context.Background()) //nolint:errcheck
 
-	go func() {
-		errChan <- h.start()
-	}()
-
-	// register for interrupt (Ctrl+C) and SIGTERM (docker)
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
-
+	go func() { errChan <- errgo.Wrap(h.start(), "kafka") }()
 	defer h.Close()
 
 	select {
 	case err := <-errChan:
 		return err
-	case <-sigChan:
+	case <-sys.HandleSignal():
 		logger.Info("receive signal, shutdown")
 		return nil
 	}

@@ -57,7 +57,7 @@ func start() error {
 	var cfg config.AppConfig
 
 	err := fx.New(
-		logger.FxLogger(),
+		fx.NopLogger,
 		config.Module,
 
 		// driver and connector

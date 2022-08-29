@@ -33,7 +33,7 @@ import (
 )
 
 type eventHandler struct {
-	closed  atomic.Bool
+	closed  *atomic.Bool
 	config  config.AppConfig
 	session session.Manager
 	log     *zap.Logger
@@ -83,6 +83,7 @@ func newEventHandler(
 	search search.Client,
 ) *eventHandler {
 	return &eventHandler{
+		closed:  atomic.NewBool(false),
 		config:  appConfig,
 		session: session,
 		reader:  reader,
