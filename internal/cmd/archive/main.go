@@ -84,7 +84,7 @@ func start(out string) {
 
 	abs, err := filepath.Abs(out)
 	if err != nil {
-		panic(err)
+		logger.Fatal("failed to get output file full path", zap.Error(err))
 	}
 
 	fmt.Println(abs)

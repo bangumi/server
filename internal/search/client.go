@@ -160,8 +160,8 @@ func (c *client) firstRun() {
 		PrimaryKey: "id",
 	})
 	if err != nil {
-		c.log.Error("failed to create search subject index", zap.Error(err))
-		panic(err)
+		c.log.Fatal("failed to create search subject index", zap.Error(err))
+		return
 	}
 	subjectIndex := c.meili.Index("subjects")
 
@@ -174,7 +174,8 @@ func (c *client) firstRun() {
 		"tag",
 	})
 	if err != nil {
-		panic(err)
+		c.log.Fatal("failed to update search index filterable attributes", zap.Error(err))
+		return
 	}
 
 	_, err = subjectIndex.UpdateSearchableAttributes(&[]string{
@@ -183,14 +184,16 @@ func (c *client) firstRun() {
 		"summary",
 	})
 	if err != nil {
-		panic(err)
+		c.log.Fatal("failed to update search index searchable attributes", zap.Error(err))
+		return
 	}
 
 	ctx := context.Background()
 
 	maxSubject, err := c.q.Subject.WithContext(ctx).Limit(1).Order(c.q.Subject.ID.Desc()).First()
 	if err != nil {
-		panic(err)
+		c.log.Fatal("failed to get current max subject id", zap.Error(err))
+		return
 	}
 
 	c.log.Info(fmt.Sprintln("run full search index with max subject id", maxSubject.ID))
