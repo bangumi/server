@@ -61,8 +61,7 @@ func (e *eventHandler) start() error {
 
 		err = e.onMessage(msg)
 		if err != nil {
-			e.log.Error("failed to handle kafka msg", zap.ByteString("value", msg.Value), zap.Error(err),
-				zap.String("topic", msg.Topic), zap.ByteString("key", msg.Key))
+			e.log.Error("failed to handle kafka msg", zap.Error(err), zap.String("topic", msg.Topic))
 			continue
 		}
 

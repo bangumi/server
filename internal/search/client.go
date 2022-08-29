@@ -160,6 +160,7 @@ func (c *client) firstRun() {
 		PrimaryKey: "id",
 	})
 	if err != nil {
+		c.log.Error("failed to create search subject index", zap.Error(err))
 		panic(err)
 	}
 	subjectIndex := c.meili.Index("subjects")
@@ -192,7 +193,7 @@ func (c *client) firstRun() {
 		panic(err)
 	}
 
-	c.log.Info(fmt.Sprintln("run full search index with max subject id", maxSubject))
+	c.log.Info(fmt.Sprintln("run full search index with max subject id", maxSubject.ID))
 
 	for i := model.SubjectID(1); i < maxSubject.ID; i++ {
 		err := c.OnSubjectUpdate(ctx, i)
