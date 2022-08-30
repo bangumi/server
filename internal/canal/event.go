@@ -161,10 +161,10 @@ type messageValue struct {
 }
 
 type payload struct {
-	Before map[string]json.RawMessage `json:"before"`
-	After  map[string]json.RawMessage `json:"after"`
-	Source source                     `json:"source"`
-	Op     string                     `json:"op"`
+	Before json.RawMessage `json:"before"`
+	After  json.RawMessage `json:"after"`
+	Source source          `json:"source"`
+	Op     string          `json:"op"`
 }
 
 type source struct {

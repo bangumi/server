@@ -20,7 +20,6 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error {
@@ -28,14 +27,16 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error 
 	case opCreate, opSnapshot, opDelete:
 		return nil
 	case opUpdate:
-		var diff = make([]string, 0, len(payload.After))
-		for k, v := range payload.Before {
-			if string(payload.After[k]) != string(v) {
-				diff = append(diff, k)
-			}
+		var before userPayload
+		if err := json.Unmarshal(payload.Before, &before); err != nil {
+			return errgo.Wrap(err, "json")
+		}
+		var after userPayload
+		if err := json.Unmarshal(payload.After, &after); err != nil {
+			return errgo.Wrap(err, "json")
 		}
 
-		if slice.Contain(diff, "password_crypt") {
+		if before.Password != after.Password {
 			var k UserKey
 			if err := json.UnmarshalNoEscape(key, &k); err != nil {
 				e.log.Error("failed to unmarshal json", zap.Error(err))
@@ -50,4 +51,8 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error 
 
 type UserKey struct {
 	ID model.UserID `json:"uid"`
+}
+
+type userPayload struct {
+	Password string `json:"password_crypt"`
 }
