@@ -108,7 +108,7 @@ func (m mysqlRepo) Create(ctx context.Context, tl *model.TimeLine) error {
 }
 
 func (m mysqlRepo) isDupeTimeLine(ctx context.Context, dao *dao.TimeLine) (bool, error) {
-	daoTLs, err := m.q.TimeLine.WithContext(ctx).
+	daoTimeLines, err := m.q.TimeLine.WithContext(ctx).
 		Where(m.q.TimeLine.UID.Eq(dao.UID)).
 		Order(m.q.TimeLine.Dateline.Desc()).
 		Limit(1).
@@ -117,10 +117,10 @@ func (m mysqlRepo) isDupeTimeLine(ctx context.Context, dao *dao.TimeLine) (bool,
 		return false, errgo.Wrap(err, "dal")
 	}
 
-	if len(daoTLs) == 0 {
+	if len(daoTimeLines) == 0 {
 		return false, nil
 	}
-	daoTL := daoTLs[0]
+	daoTL := daoTimeLines[0]
 	if dao.Dateline != daoTL.Dateline {
 		return false, nil
 	}
