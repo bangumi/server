@@ -19,7 +19,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/bangumi/server/internal/web/res"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -30,6 +29,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/timeline/image"
 	"github.com/bangumi/server/internal/timeline/memo"
+	"github.com/bangumi/server/internal/web/res"
 )
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TimeLineRepo, error) {
