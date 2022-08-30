@@ -16,7 +16,7 @@ package util
 
 import "reflect"
 
-func CopySameNameField(dst interface{}, src interface{}) {
+func CopySameNameField(dst, src any) {
 	rvs, ok := truncatePtr(reflect.ValueOf(src))
 	if !ok {
 		return
