@@ -97,26 +97,16 @@ func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 			continue
 		}
 
-		record := Record{
-			Date:   obj.GetString(recordMap, "date"),
-			Image:  obj.GetString(recordMap, "image"),
-			Name:   obj.GetString(recordMap, "name"),
-			NameCN: obj.GetString(recordMap, "name_cn"),
-			Tags:   anyToResTag(recordMap["tags"]),
-			Score:  obj.GetFloat64(recordMap, "score"),
-			ID:     model.SubjectID(obj.GetFloat64(recordMap, "id")),
-			Rank:   uint32(obj.GetFloat64(recordMap, "rank")),
-		}
-
 		data = append(data, resSubject{
-			ID:     record.ID,
-			Date:   record.Date,
-			Image:  res.SubjectImage(record.Image).Large,
-			Name:   record.Name,
-			NameCN: record.NameCN,
-			Tags:   record.Tags,
-			Score:  record.Score,
-			Rank:   record.Rank,
+			ID:      model.SubjectID(obj.GetFloat64(recordMap, "id")),
+			Summary: obj.GetString(hit, "summary"),
+			Date:    obj.GetString(recordMap, "date"),
+			Image:   res.SubjectImage(obj.GetString(recordMap, "image")).Large,
+			Name:    obj.GetString(recordMap, "name"),
+			NameCN:  obj.GetString(recordMap, "name_cn"),
+			Tags:    anyToResTag(recordMap["tags"]),
+			Score:   obj.GetFloat64(recordMap, "score"),
+			Rank:    uint32(obj.GetFloat64(recordMap, "rank")),
 		})
 	}
 
@@ -168,8 +158,16 @@ func (c *client) doSearch(
 	}
 
 	var sortOpt []string
-	if sort != "" {
-		sortOpt = []string{sort}
+	switch sort {
+	case "", "match":
+	case "score":
+		sortOpt = []string{"score:desc"}
+	case "heat":
+		sortOpt = []string{"heat:desc"}
+	case "rank":
+		sortOpt = []string{"rank:desc"}
+	default:
+		return nil, res.BadRequest("sort not supported")
 	}
 
 	response, err := c.subjectIndex.Search(words, &meilisearch.SearchRequest{
@@ -186,14 +184,15 @@ func (c *client) doSearch(
 }
 
 type resSubject struct {
-	Date   string           `json:"date"`
-	Image  string           `json:"image"`
-	Name   string           `json:"name"`
-	NameCN string           `json:"name_cn"`
-	Tags   []res.SubjectTag `json:"tags,omitempty"`
-	Score  float64          `json:"score"`
-	ID     model.SubjectID  `json:"id"`
-	Rank   uint32           `json:"rank"`
+	Date    string           `json:"date"`
+	Image   string           `json:"image"`
+	Name    string           `json:"name"`
+	NameCN  string           `json:"name_cn"`
+	Tags    []res.SubjectTag `json:"tags,omitempty"`
+	Score   float64          `json:"score"`
+	ID      model.SubjectID  `json:"id"`
+	Rank    uint32           `json:"rank"`
+	Summary string           `json:"summary"`
 }
 
 func filterToMeiliFilter(req Filter) [][]string {

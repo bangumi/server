@@ -23,21 +23,23 @@ import (
 	"github.com/bangumi/server/pkg/wiki"
 )
 
-// 是最终 meilisearch 索引的文档.
+// 最终 meilisearch 索引的文档.
+// 使用 `searchable:"true"`，`filterable:"true"`， `sortable:"true"`
+// 三种 tag 来设置是否可以被搜索，索引和排序.
 type subjectIndex struct {
 	ID       model.SubjectID `json:"id"`
-	Summary  string          `json:"summary"`
-	Tag      []string        `json:"tag,omitempty"`
-	Name     []string        `json:"name"`
+	Summary  string          `json:"summary" searchable:"true"`
+	Tag      []string        `json:"tag,omitempty" searchable:"true"`
+	Name     []string        `json:"name" searchable:"true"`
 	Record   Record          `json:"record"`
-	Date     int             `json:"date,omitempty"`
-	Score    float64         `json:"score"`
-	PageRank float64         `json:"page_rank,omitempty"`
-	Heat     uint32          `json:"heat,omitempty"`
-	Rank     uint32          `json:"rank"`
+	Date     int             `json:"date,omitempty" filterable:"true" sortable:"true"`
+	Score    float64         `json:"score" filterable:"true" sortable:"true"`
+	PageRank float64         `json:"page_rank" sortable:"true"`
+	Heat     uint32          `json:"heat" sortable:"true"`
+	Rank     uint32          `json:"rank" filterable:"true" sortable:"true"`
 	Platform uint16          `json:"platform,omitempty"`
-	Type     uint8           `json:"type"`
-	NSFW     bool            `json:"nsfw"`
+	Type     uint8           `json:"type" filterable:"true"`
+	NSFW     bool            `json:"nsfw" filterable:"true"`
 }
 
 type Record struct {
@@ -56,7 +58,6 @@ func extractSubject(s *model.Subject) subjectIndex {
 
 	w := wiki.ParseOmitError(s.Infobox)
 
-	rank := s.Rating.Total
 	score := s.Rating.Score
 
 	tagNames := make([]string, len(tags))
@@ -73,7 +74,7 @@ func extractSubject(s *model.Subject) subjectIndex {
 		Type:     s.TypeID,
 		Date:     parseDateVal(s.Date),
 		Platform: s.PlatformID,
-		PageRank: float64(rank),
+		PageRank: float64(s.Rating.Total),
 		Rank:     s.Rating.Rank,
 		Heat:     heat(s),
 		Score:    score,
@@ -86,7 +87,7 @@ func extractSubject(s *model.Subject) subjectIndex {
 			Tags: slice.Map(tags, func(t model.Tag) res.SubjectTag {
 				return res.SubjectTag{Name: t.Name, Count: t.Count}
 			}),
-			Rank:  rank,
+			Rank:  s.Rating.Rank,
 			Score: score,
 		},
 	}
