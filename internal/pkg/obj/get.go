@@ -21,7 +21,7 @@ func GetString[K comparable, M ~map[K]any](m M, key K) string {
 	}
 
 	s, ok := value.(string)
-	if ok {
+	if !ok {
 		return ""
 	}
 
@@ -35,7 +35,7 @@ func GetFloat64[K comparable, M ~map[K]any](m M, key K) float64 {
 	}
 
 	s, ok := value.(float64)
-	if ok {
+	if !ok {
 		return 0
 	}
 

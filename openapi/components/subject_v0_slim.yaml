@@ -57,18 +57,5 @@ properties:
 
   tags:
     description: 前 10 个 tag
-    title: Tags
-    type: array
-    items:
-      title: Tag
-      required:
-        - name
-        - count
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-        count:
-          title: Count
-          type: integer
+    allOf:
+      - $ref: "./subject_tags.yaml"
