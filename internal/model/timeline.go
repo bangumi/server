@@ -95,7 +95,7 @@ func (tl *TimeLine) FillCatAndType() *TimeLine {
 	return tl
 }
 
-func setCatAndType(tl *TimeLine, cat uint16, typ TimeLineCat) *TimeLine {
+func setCatAndType(tl *TimeLine, cat TimeLineCat, typ uint16) *TimeLine {
 	tl.Cat = cat
 	tl.Type = typ
 	return tl

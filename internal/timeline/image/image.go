@@ -50,29 +50,30 @@ func (i *Image) UnmarshalPHP(b []byte) error {
 		return errgo.Wrap(err, "phpserialize.Unmarshal")
 	}
 
-	i.Cat = extract[int64](m, "cat")
-	i.GroupID = extract[string](m, "grp_id")
-	i.GroupName = extract[string](m, "grp_name")
-	i.Name = extract[string](m, "name")
-	i.Title = extract[string](m, "title")
-	i.UserID = extract[string](m, "uid")
-	i.SubjectID = extract[string](m, "subject_id")
-	i.Images = extract[string](m, "images")
+	i.Cat = extractAs[int64](m, "cat")
+	i.GroupID = extractAs[string](m, "grp_id")
+	i.GroupName = extractAs[string](m, "grp_name")
+	i.Name = extractAs[string](m, "name")
+	i.Title = extractAs[string](m, "title")
+	i.UserID = extractAs[string](m, "uid")
+	i.SubjectID = extractAs[string](m, "subject_id")
+	i.Images = extractAs[string](m, "images")
 
-	i.ID = extract[int](m, "id")
+	i.ID = extractAs[int](m, "id")
 	if i.ID == nil {
-		// for some cases, the ID is stored as string in db, here try to extract as string if int failed
-		i.ID = strPtrToIntPtr(extract[string](m, "id"))
+		// for some cases, the ID is stored as string in db
+		// try to extractAs string if failed as int
+		i.ID = strPtrToIntPtr(extractAs[string](m, "id"))
 	}
 	return nil
 }
 
-func extract[typ interface{ int64 | string | int }](m map[string]any, key string) *typ {
+func extractAs[T interface{ int64 | string | int }](m map[string]any, key string) *T {
 	d, ok := m[key]
 	if !ok {
 		return nil
 	}
-	d2, ok := d.(typ)
+	d2, ok := d.(T)
 	if !ok {
 		return nil
 	}
