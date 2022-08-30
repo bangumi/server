@@ -12,32 +12,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package obj
+package sys
 
-func GetString[K comparable, M ~map[K]any](m M, key K) string {
-	value := m[key]
-	if value == nil {
-		return ""
-	}
+import (
+	"os"
+	"os/signal"
+	"syscall"
+)
 
-	s, ok := value.(string)
-	if !ok {
-		return ""
-	}
+func HandleSignal() <-chan os.Signal {
+	// register for interrupt (Ctrl+C) and SIGTERM (docker)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	return s
-}
-
-func GetFloat64[K comparable, M ~map[K]any](m M, key K) float64 {
-	value := m[key]
-	if value == nil {
-		return 0
-	}
-
-	s, ok := value.(float64)
-	if !ok {
-		return 0
-	}
-
-	return s
+	return sigChan
 }

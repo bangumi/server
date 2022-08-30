@@ -20,7 +20,9 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/meilisearch/meilisearch-go"
@@ -160,39 +162,39 @@ func (c *client) firstRun() {
 		PrimaryKey: "id",
 	})
 	if err != nil {
-		panic(err)
+		c.log.Fatal("failed to create search subject index", zap.Error(err))
+		return
 	}
+
 	subjectIndex := c.meili.Index("subjects")
 
-	_, err = subjectIndex.UpdateFilterableAttributes(&[]string{
-		"type",
-		"score",
-		"nsfw",
-		"rank",
-		"date",
-		"tag",
-	})
+	_, err = subjectIndex.UpdateSortableAttributes(getAttributes("sortable"))
 	if err != nil {
-		panic(err)
+		c.log.Fatal("failed to update search index sortable attributes", zap.Error(err))
+		return
 	}
 
-	_, err = subjectIndex.UpdateSearchableAttributes(&[]string{
-		"name",
-		"name_cn",
-		"summary",
-	})
+	_, err = subjectIndex.UpdateFilterableAttributes(getAttributes("filterable"))
 	if err != nil {
-		panic(err)
+		c.log.Fatal("failed to update search index filterable attributes", zap.Error(err))
+		return
+	}
+
+	_, err = subjectIndex.UpdateSearchableAttributes(getAttributes("searchable"))
+	if err != nil {
+		c.log.Fatal("failed to update search index searchable attributes", zap.Error(err))
+		return
 	}
 
 	ctx := context.Background()
 
 	maxSubject, err := c.q.Subject.WithContext(ctx).Limit(1).Order(c.q.Subject.ID.Desc()).First()
 	if err != nil {
-		panic(err)
+		c.log.Fatal("failed to get current max subject id", zap.Error(err))
+		return
 	}
 
-	c.log.Info(fmt.Sprintln("run full search index with max subject id", maxSubject))
+	c.log.Info(fmt.Sprintln("run full search index with max subject id", maxSubject.ID))
 
 	for i := model.SubjectID(1); i < maxSubject.ID; i++ {
 		err := c.OnSubjectUpdate(ctx, i)
@@ -200,4 +202,32 @@ func (c *client) firstRun() {
 			c.log.Error("error when updating subject", zap.Error(err))
 		}
 	}
+}
+
+func getAttributes(tag string) *[]string {
+	rt := reflect.TypeOf(subjectIndex{})
+	var s []string
+	for i := 0; i < rt.NumField(); i++ {
+		t, ok := rt.Field(i).Tag.Lookup(tag)
+		if !ok {
+			continue
+		}
+
+		if t != "true" {
+			continue
+		}
+
+		s = append(s, getJSONFieldName(rt.Field(i)))
+	}
+
+	return &s
+}
+
+func getJSONFieldName(f reflect.StructField) string {
+	t := f.Tag.Get("json")
+	if t == "" {
+		return f.Name
+	}
+
+	return strings.Split(t, ",")[0]
 }

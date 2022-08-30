@@ -64,7 +64,7 @@ var maxPersonID model.PersonID       //nolint:gochecknoglobals
 func start(out string) {
 	var q *query.Query
 	err := fx.New(
-		logger.FxLogger(),
+		fx.NopLogger,
 		fx.Provide(
 			driver.NewMysqlConnectionPool, dal.NewDB,
 
@@ -84,7 +84,7 @@ func start(out string) {
 
 	abs, err := filepath.Abs(out)
 	if err != nil {
-		panic(err)
+		logger.Fatal("failed to get output file full path", zap.Error(err))
 	}
 
 	fmt.Println(abs)

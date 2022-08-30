@@ -17,7 +17,6 @@
 package logger
 
 import (
-	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -25,8 +24,4 @@ import (
 // development log config.
 func getLogger(level zapcore.Level) *zap.Logger {
 	return textLogger(level)
-}
-
-func FxLogger() fx.Option {
-	return fx.Provide() // as nil fx.Option
 }

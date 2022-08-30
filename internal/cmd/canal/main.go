@@ -15,11 +15,14 @@
 package main
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/bangumi/server/internal/canal"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 func main() {
 	if err := canal.Main(); err != nil {
-		panic(err)
+		logger.Fatal("failed to start canal service", zap.Error(err))
 	}
 }
