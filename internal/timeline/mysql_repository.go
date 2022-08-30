@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -29,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/timeline/image"
 	"github.com/bangumi/server/internal/timeline/memo"
-	"github.com/bangumi/server/internal/web/res"
 )
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TimeLineRepo, error) {
@@ -77,7 +77,7 @@ func (m mysqlRepo) ListByUID(
 	for _, tl := range tls {
 		mtl, err := daoToModel(tl)
 		if err != nil {
-			m.log.Error("daoToModel failed", zap.Error(err))
+			m.log.Error("daoToModel failed: ", zap.Error(err), zap.Uint32("id", uint32(tl.ID)))
 			continue
 		}
 		result = append(result, mtl)
@@ -98,7 +98,8 @@ func (m mysqlRepo) Create(ctx context.Context, tl *model.TimeLine) error {
 		return errgo.Wrap(err, "isDupeTimeLine")
 	}
 	if isDuped {
-		return res.BadRequest("duplicated timeline")
+		m.log.Info(fmt.Sprintf("duped timeline: %v", d))
+		return nil
 	}
 
 	if err := m.q.TimeLine.WithContext(ctx).Create(d); err != nil {

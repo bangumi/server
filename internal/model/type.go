@@ -35,7 +35,7 @@ type IndexID = uint32
 type RevisionID = uint32
 type UserGroupID = uint8
 type RevisionType = uint8
-type TimeLineType = uint16
+type TimeLineCat = uint16
 
 var _ driver.Valuer = UserID(0)
 var _ driver.Valuer = PersonID(0)

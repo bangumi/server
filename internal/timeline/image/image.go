@@ -12,20 +12,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-// SPDX-License-Identifier: AGPL-3.0-only
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, version 3.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// See the GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>
-
 package image
 
 import (
@@ -59,7 +45,7 @@ func (i *Image) ToModel() *model.TimeLineImage {
 }
 
 func (i *Image) UnmarshalPHP(b []byte) error {
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	if err := phpserialize.Unmarshal(b, &m); err != nil {
 		return errgo.Wrap(err, "phpserialize.Unmarshal")
 	}
@@ -81,7 +67,7 @@ func (i *Image) UnmarshalPHP(b []byte) error {
 	return nil
 }
 
-func extract[typ interface{ int64 | string | int }](m map[string]interface{}, key string) *typ {
+func extract[typ interface{ int64 | string | int }](m map[string]any, key string) *typ {
 	d, ok := m[key]
 	if !ok {
 		return nil
@@ -117,11 +103,11 @@ func (i *Image) FromModel(image *model.TimeLineImage) {
 }
 
 //nolint:gocyclo
-func imageToMap(image *model.TimeLineImage, cat uint16) map[string]interface{} {
+func imageToMap(image *model.TimeLineImage, cat uint16) map[string]any {
 	var i Image
 	i.FromModel(image)
 
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	if i.Cat != nil {
 		m["cat"] = i.Cat
 	}
@@ -202,7 +188,7 @@ func ModelToDAO(tl *model.TimeLine) ([]byte, error) {
 		return result, errgo.Wrap(err, "phpserialize.Marshal")
 	}
 
-	var is []map[string]interface{}
+	var is []map[string]any
 	for i := range images {
 		is = append(is, imageToMap(&images[i], tl.Cat))
 	}

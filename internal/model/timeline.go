@@ -15,18 +15,16 @@
 package model
 
 const (
-	TimeLineTypeAll TimeLineType = iota
-	TimeLineTypeSubject
-	TimeLineTypeProgress
-	TimeLineTypeRelation
-	TimeLineTypeGroup
-	TimeLineTypeSay
-	TimeLineTypeWiki
-	TimeLineTypeBlog
-	TimeLineTypeIndex
-	TimeLineTypeMono
-	TimeLineTypeDoujin
-	TimeLineTypeReplies
+	TimeLineCatRelation TimeLineCat = 1
+	TimeLineCatGroup    TimeLineCat = 1
+	TimeLineCatWiki     TimeLineCat = 2
+	TimeLineCatSubject  TimeLineCat = 3
+	TimeLineCatProgress TimeLineCat = 4
+	TimeLineCatSay      TimeLineCat = 5
+	TimeLineCatBlog     TimeLineCat = 6
+	TimeLineCatIndex    TimeLineCat = 7
+	TimeLineCatMono     TimeLineCat = 8
+	TimeLineCatDoujin   TimeLineCat = 9
 )
 
 type TimeLine struct {
@@ -40,8 +38,8 @@ type TimeLine struct {
 	Dateline uint32
 	Image    TimeLineImages
 
-	Cat  uint16 // Category
-	Type TimeLineType
+	Cat  TimeLineCat // Category
+	Type uint16
 	Memo TimeLineMemo
 }
 
@@ -62,42 +60,42 @@ type TimeLineMemo struct {
 func (tl *TimeLine) FillCatAndType() *TimeLine {
 	m := tl.Memo
 	if m.TimeLineRelationMemo != nil {
-		return setCatAndType(tl, 1, 2)
+		return setCatAndType(tl, TimeLineCatRelation, 2)
 	}
 	if m.TimeLineGroupMemo != nil {
-		return setCatAndType(tl, 1, 3)
+		return setCatAndType(tl, TimeLineCatGroup, 3)
 	}
 	if m.TimeLineWikiMemo != nil {
-		return setCatAndType(tl, 2, 0)
+		return setCatAndType(tl, TimeLineCatWiki, 0)
 	}
 	if m.TimeLineSubjectMemo != nil {
-		return setCatAndType(tl, 3, 0)
+		return setCatAndType(tl, TimeLineCatSubject, 0)
 	}
 	if m.TimeLineProgressMemo != nil {
-		return setCatAndType(tl, 4, 0)
+		return setCatAndType(tl, TimeLineCatProgress, 0)
 	}
 	if m.TimeLineSayMemo != nil {
 		if m.TimeLineSayMemo.TimeLineSayEdit != nil {
-			return setCatAndType(tl, 5, 2)
+			return setCatAndType(tl, TimeLineCatSay, 2)
 		}
-		return setCatAndType(tl, 5, 0)
+		return setCatAndType(tl, TimeLineCatSay, 0)
 	}
 	if m.TimeLineBlogMemo != nil {
-		return setCatAndType(tl, 6, 0)
+		return setCatAndType(tl, TimeLineCatBlog, 0)
 	}
 	if m.TimeLineIndexMemo != nil {
-		return setCatAndType(tl, 7, 0)
+		return setCatAndType(tl, TimeLineCatIndex, 0)
 	}
 	if m.TimeLineMonoMemo != nil {
-		return setCatAndType(tl, 8, 1)
+		return setCatAndType(tl, TimeLineCatMono, 1)
 	}
 	if m.TimeLineDoujinMemo != nil {
-		return setCatAndType(tl, 9, 0)
+		return setCatAndType(tl, TimeLineCatDoujin, 0)
 	}
 	return tl
 }
 
-func setCatAndType(tl *TimeLine, cat uint16, typ TimeLineType) *TimeLine {
+func setCatAndType(tl *TimeLine, cat uint16, typ TimeLineCat) *TimeLine {
 	tl.Cat = cat
 	tl.Type = typ
 	return tl
