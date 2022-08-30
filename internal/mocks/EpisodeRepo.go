@@ -53,9 +53,9 @@ type EpisodeRepo_Count_Call struct {
 }
 
 // Count is a helper method to define mock.On call
-//   - ctx context.Context
-//   - subjectID model.SubjectID
-//   - filter domain.EpisodeFilter
+//  - ctx context.Context
+//  - subjectID model.SubjectID
+//  - filter domain.EpisodeFilter
 func (_e *EpisodeRepo_Expecter) Count(ctx interface{}, subjectID interface{}, filter interface{}) *EpisodeRepo_Count_Call {
 	return &EpisodeRepo_Count_Call{Call: _e.mock.On("Count", ctx, subjectID, filter)}
 }
@@ -99,8 +99,8 @@ type EpisodeRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx context.Context
-//   - episodeID model.EpisodeID
+//  - ctx context.Context
+//  - episodeID model.EpisodeID
 func (_e *EpisodeRepo_Expecter) Get(ctx interface{}, episodeID interface{}) *EpisodeRepo_Get_Call {
 	return &EpisodeRepo_Get_Call{Call: _e.mock.On("Get", ctx, episodeID)}
 }
@@ -146,11 +146,11 @@ type EpisodeRepo_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//   - ctx context.Context
-//   - subjectID model.SubjectID
-//   - filter domain.EpisodeFilter
-//   - limit int
-//   - offset int
+//  - ctx context.Context
+//  - subjectID model.SubjectID
+//  - filter domain.EpisodeFilter
+//  - limit int
+//  - offset int
 func (_e *EpisodeRepo_Expecter) List(ctx interface{}, subjectID interface{}, filter interface{}, limit interface{}, offset interface{}) *EpisodeRepo_List_Call {
 	return &EpisodeRepo_List_Call{Call: _e.mock.On("List", ctx, subjectID, filter, limit, offset)}
 }
@@ -189,7 +189,7 @@ type EpisodeRepo_WithQuery_Call struct {
 }
 
 // WithQuery is a helper method to define mock.On call
-//   - _a0 *query.Query
+//  - _a0 *query.Query
 func (_e *EpisodeRepo_Expecter) WithQuery(_a0 interface{}) *EpisodeRepo_WithQuery_Call {
 	return &EpisodeRepo_WithQuery_Call{Call: _e.mock.On("WithQuery", _a0)}
 }

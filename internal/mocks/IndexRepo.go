@@ -51,9 +51,9 @@ type IndexRepo_CountSubjects_Call struct {
 }
 
 // CountSubjects is a helper method to define mock.On call
-//   - ctx context.Context
-//   - id uint32
-//   - subjectType uint8
+//  - ctx context.Context
+//  - id uint32
+//  - subjectType uint8
 func (_e *IndexRepo_Expecter) CountSubjects(ctx interface{}, id interface{}, subjectType interface{}) *IndexRepo_CountSubjects_Call {
 	return &IndexRepo_CountSubjects_Call{Call: _e.mock.On("CountSubjects", ctx, id, subjectType)}
 }
@@ -97,8 +97,8 @@ type IndexRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx context.Context
-//   - id uint32
+//  - ctx context.Context
+//  - id uint32
 func (_e *IndexRepo_Expecter) Get(ctx interface{}, id interface{}) *IndexRepo_Get_Call {
 	return &IndexRepo_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
@@ -144,11 +144,11 @@ type IndexRepo_ListSubjects_Call struct {
 }
 
 // ListSubjects is a helper method to define mock.On call
-//   - ctx context.Context
-//   - id uint32
-//   - subjectType uint8
-//   - limit int
-//   - offset int
+//  - ctx context.Context
+//  - id uint32
+//  - subjectType uint8
+//  - limit int
+//  - offset int
 func (_e *IndexRepo_Expecter) ListSubjects(ctx interface{}, id interface{}, subjectType interface{}, limit interface{}, offset interface{}) *IndexRepo_ListSubjects_Call {
 	return &IndexRepo_ListSubjects_Call{Call: _e.mock.On("ListSubjects", ctx, id, subjectType, limit, offset)}
 }

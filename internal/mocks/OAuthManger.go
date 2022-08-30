@@ -58,8 +58,8 @@ type OAuthManger_GetClientByID_Call struct {
 }
 
 // GetClientByID is a helper method to define mock.On call
-//   - ctx context.Context
-//   - clientIDs ...string
+//  - ctx context.Context
+//  - clientIDs ...string
 func (_e *OAuthManger_Expecter) GetClientByID(ctx interface{}, clientIDs ...interface{}) *OAuthManger_GetClientByID_Call {
 	return &OAuthManger_GetClientByID_Call{Call: _e.mock.On("GetClientByID",
 		append([]interface{}{ctx}, clientIDs...)...)}

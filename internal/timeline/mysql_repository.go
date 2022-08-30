@@ -41,6 +41,10 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
+func (m mysqlRepo) WithQuery(query *query.Query) domain.TimeLineRepo {
+	return mysqlRepo{q: query, log: m.log}
+}
+
 func (m mysqlRepo) GetByID(ctx context.Context, id model.TimeLineID) (*model.TimeLine, error) {
 	tl, err := m.q.TimeLine.WithContext(ctx).Where(m.q.TimeLine.ID.Eq(id)).First()
 	if err != nil {

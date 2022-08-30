@@ -26,7 +26,7 @@ func newTimeLine(db *gorm.DB) timeLine {
 	_timeLine.timeLineDo.UseModel(&dao.TimeLine{})
 
 	tableName := _timeLine.timeLineDo.TableName()
-	_timeLine.ALL = field.NewField(tableName, "*")
+	_timeLine.ALL = field.NewAsterisk(tableName)
 	_timeLine.ID = field.NewField(tableName, "tml_id")
 	_timeLine.UID = field.NewField(tableName, "tml_uid")
 	_timeLine.Cat = field.NewUint16(tableName, "tml_cat")
@@ -48,7 +48,7 @@ func newTimeLine(db *gorm.DB) timeLine {
 type timeLine struct {
 	timeLineDo timeLineDo
 
-	ALL      field.Field
+	ALL      field.Asterisk
 	ID       field.Field
 	UID      field.Field
 	Cat      field.Uint16
@@ -76,7 +76,7 @@ func (t timeLine) As(alias string) *timeLine {
 }
 
 func (t *timeLine) updateTableName(table string) *timeLine {
-	t.ALL = field.NewField(table, "*")
+	t.ALL = field.NewAsterisk(table)
 	t.ID = field.NewField(table, "tml_id")
 	t.UID = field.NewField(table, "tml_uid")
 	t.Cat = field.NewUint16(table, "tml_cat")

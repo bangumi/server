@@ -17,10 +17,13 @@ package domain
 import (
 	"context"
 
+	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/model"
 )
 
 type TimeLineRepo interface {
+	// WithQuery is used to replace repo's query to txn
+	WithQuery(query *query.Query) TimeLineRepo
 	GetByID(ctx context.Context, id model.TimeLineID) (*model.TimeLine, error)
 	ListByUID(ctx context.Context, uid model.UserID, limit int, since model.TimeLineID) ([]*model.TimeLine, error)
 	Create(ctx context.Context, tls *model.TimeLine) error
