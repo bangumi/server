@@ -194,9 +194,14 @@ func (c *client) firstRun() {
 		return
 	}
 
-	c.log.Info(fmt.Sprintln("run full search index with max subject id", maxSubject.ID))
+	c.log.Info(fmt.Sprintf("run full search index with max subject id %d", maxSubject.ID))
 
+	width := len(strconv.Itoa(int(maxSubject.ID)))
 	for i := model.SubjectID(1); i < maxSubject.ID; i++ {
+		if i%10000 == 0 {
+			c.log.Info(fmt.Sprintf("progress %*d/%d", width, i, maxSubject.ID))
+		}
+
 		err := c.OnSubjectUpdate(ctx, i)
 		if err != nil {
 			c.log.Error("error when updating subject", zap.Error(err))
