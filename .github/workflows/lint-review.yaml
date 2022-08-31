@@ -1,42 +1,27 @@
-name: Lint Other Language
+name: Lint Review
 
 on:
   push:
     branches-ignore:
       - renovate/**
-    paths:
-      - "**.md"
-      - "**.py"
-      - "**.js"
-      - "**.yaml"
-      - "**.yml"
-      - "**.html"
-      - "**.json"
   pull_request_target:
     types: [opened, synchronize, reopened]
     branches:
       - master
-    paths:
-      - "**.md"
-      - "**.py"
-      - "**.js"
-      - "**.yaml"
-      - "**.yml"
-      - "**.html"
-      - "**.json"
 
 jobs:
-  lint-other:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Install Node LTS
         uses: actions/setup-node@v3
 
-      - run: npm i -g prettier
-
-      - uses: reviewdog/action-setup@v1
+      - name: Install Go
+        uses: actions/setup-go@v3
         with:
-          reviewdog_version: latest
+          go-version: "1.19"
+
+      - run: npm i -g prettier
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -51,7 +36,15 @@ jobs:
       - name: prettier
         run: prettier --write --list-different ./
 
+      - name: gofmt
+        run: gofmt -w -s .
+
       - run: git diff --exit-code
+
+      - uses: reviewdog/action-setup@v1
+        if: ${{ failure() && github.event_name != 'push' }}
+        with:
+          reviewdog_version: latest
 
       - name: create review
         if: ${{ failure() && github.event_name != 'push' }}
