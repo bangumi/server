@@ -11,30 +11,6 @@ info:
 #  - url: https://dev.bgm38.com/
 #    description: 开发用服务器
 
-x-parameters:
-  default_query_limit: &default_query_limit
-    required: false
-    schema:
-      title: Limit
-      maximum: 50
-      minimum: 1
-      type: integer
-      default: 30
-    name: limit
-    description: 分页参数
-    in: query
-
-  default_query_offset: &default_query_offset
-    required: false
-    schema:
-      title: Offset
-      minimum: 0
-      type: integer
-      default: 0
-    description: 分页参数
-    name: offset
-    in: query
-
 tags:
   - name: Auth
 
@@ -555,8 +531,8 @@ paths:
               - all
           description: 成员类型，默认为 `all`
           required: true
-        - *default_query_limit
-        - *default_query_offset
+        - $ref: "#/components/parameters/default_query_limit"
+        - $ref: "#/components/parameters/default_query_offset"
       responses:
         "200":
           description: "列出用户"
@@ -578,6 +554,30 @@ paths:
           description: 小组不存在
 
 components:
+  parameters:
+    default_query_limit:
+      required: false
+      schema:
+        title: Limit
+        maximum: 50
+        minimum: 1
+        type: integer
+        default: 30
+      name: limit
+      description: 分页参数
+      in: query
+
+    default_query_offset:
+      required: false
+      schema:
+        title: Offset
+        minimum: 0
+        type: integer
+        default: 0
+      description: 分页参数
+      name: offset
+      in: query
+
   schemas:
     User:
       $ref: "./components/user.yaml"
