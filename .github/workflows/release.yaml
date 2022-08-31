@@ -79,7 +79,7 @@ jobs:
           file: ${{ matrix.dockerfile }}
           tags: ghcr.io/${{ matrix.image }}:latest,ghcr.io/${{ matrix.image }}:${{env.TAG}}
 
-  openapi-v0:
+  openapi:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -88,47 +88,38 @@ jobs:
           node-version: 16
 
       - run: npm ci
+      - run: npm build
 
       - uses: actions/checkout@v3
         with:
           repository: "bangumi/api"
           path: api
 
-      - run: node ./openapi/bundle.js ./openapi/v0.yaml ./api/open-api/v0.yaml
+      - run: cp ./dist/v0.yaml ./api/open-api/v0.yaml
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
           path: api
           token: ${{ secrets.PAT }}
-          title: Update Openapi Specification for v0
+          title: Update Openapi Specification from bangumi/server
           push-to-fork: Trim21-bot/api
           branch: "update-upstream"
           author: "Trim21-bot <trim21-bot@users.noreply.github.com>"
-
-  openapi-private:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - run: npm ci
 
       - uses: actions/checkout@v3
         with:
           repository: "bangumi/dev-docs"
           path: dev-docs
 
-      - run: node ./openapi/bundle.js ./openapi/private.yaml ./dev-docs/api.yaml
+      - run: cp ./dist/private.yaml ./dev-docs/api.yaml
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
           path: dev-docs
           token: ${{ secrets.PAT }}
-          title: Update Openapi Specification for private api
+          title: Update Openapi Specification from bangumi/server
           push-to-fork: Trim21-bot/dev-docs
           branch: "update-upstream"
           author: "Trim21-bot <trim21-bot@users.noreply.github.com>"

@@ -6,7 +6,7 @@
   "scripts": {
     "format": "prettier -w --list-different ./",
     "test": "node openapi/test.js",
-    "start": "node openapi/dev-server.js",
+    "build": "node ./openapi/build.js",
     "update-web-static": "node scripts/update_web_static.js",
     "version": "node scripts/bump.js"
   },
