@@ -17,6 +17,7 @@ package topic
 import (
 	"context"
 	"errors"
+	"math"
 	"sort"
 
 	"go.uber.org/zap"
@@ -112,6 +113,11 @@ func (r mysqlRepo) getParentComments(
 ) (map[model.CommentID]model.Comment, error) {
 	var comments []mysqlComment
 	var err error
+
+	// mysql不支持仅有offset没有limit
+	if limit == 0 {
+		limit = math.MaxUint32
+	}
 
 	switch commentType {
 	case domain.CommentTypeGroupTopic:
