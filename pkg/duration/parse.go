@@ -29,10 +29,23 @@ var ErrOverFlow = errors.New(
 	"overflow: components like minutes or seconds is bigger than it should be",
 )
 
+func ParseOmitError(s string) time.Duration {
+	d, err := Parse(s)
+	if err != nil {
+		return 0
+	}
+
+	return d
+}
+
 var extraPattern = regexp.MustCompile(`^(\d+(:))?(\d+):(\d+)$`)
 
 // Parse a string like "01:31:41" and go default Duration.String() to time.Duration.
 func Parse(s string) (time.Duration, error) {
+	if s == "" {
+		return 0, nil
+	}
+
 	g := extraPattern.FindStringSubmatch(s)
 	if g == nil {
 		d, err := time.ParseDuration(s)

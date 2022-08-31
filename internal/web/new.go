@@ -90,6 +90,10 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 	app.Get("/metrics", adaptor.HTTPHandler(reporter.HTTPHandler()))
 	addProfile(app)
 
+	if config.Development {
+		app.Use("/openapi/", openapiHandler)
+	}
+
 	return app
 }
 

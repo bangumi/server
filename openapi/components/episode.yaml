@@ -41,6 +41,7 @@ properties:
     type: integer
   duration:
     title: Duration
+    description: 维基人填写的原始时长
     type: string
   desc:
     title: Desc
@@ -50,6 +51,10 @@ properties:
     title: Disc
     type: integer
     description: 音乐曲目的碟片数
+  "duration_seconds":
+    description: 服务器解析的时长，无法解析时为 `0`
+    type: integer
+
 example:
   "airdate": ""
   "comment": 0
@@ -63,3 +68,4 @@ example:
   "sort": 6
   "subject_id": 15
   "type": 0
+  "duration_seconds": 1440

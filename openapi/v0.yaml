@@ -45,17 +45,6 @@ x-parameters:
     description: 人物 ID
     in: path
 
-  path_episode_id: &path_episode_id
-    required: true
-    schema:
-      title: Episode ID
-      minimum: 1
-      description: 剧集 ID
-      type: integer
-    name: episode_id
-    description: 章节 ID
-    in: path
-
   query_subject_id: &query_subject_id
     required: true
     name: subject_id
@@ -513,7 +502,7 @@ paths:
       summary: Get Episode
       operationId: getEpisodeById
       parameters:
-        - *path_episode_id
+        - $ref: "#/components/parameters/path_episode_id"
       responses:
         "200":
           description: Successful Response
@@ -1169,7 +1158,7 @@ paths:
       summary: 章节收藏信息
       operationId: getUserEpisodeCollection
       parameters:
-        - *path_episode_id
+        - $ref: "#/components/parameters/path_episode_id"
       responses:
         "200":
           description: Successful Response
@@ -1526,6 +1515,16 @@ components:
   parameters:
     path_subject_id: *path_subject_id
     path_username: *path_username
+    path_episode_id:
+      required: true
+      schema:
+        title: Episode ID
+        minimum: 1
+        description: 剧集 ID
+        type: integer
+      name: episode_id
+      description: 章节 ID
+      in: path
 
   schemas:
     User:
