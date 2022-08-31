@@ -3,11 +3,13 @@ info:
   title: "Bangumi Private API"
   version: ""
   description: "`next.bgm.tv` 域名不支持跨域，"
-servers:
-  - url: https://next.bgm.tv
-    description: Production server
-  - url: https://dev.bgm38.com/
-    description: 开发用服务器
+
+# 构建脚本会添加 servers
+#servers:
+#  - url: https://next.bgm.tv
+#    description: Production server
+#  - url: https://dev.bgm38.com/
+#    description: 开发用服务器
 
 x-parameters:
   default_query_limit: &default_query_limit

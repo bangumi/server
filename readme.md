@@ -54,6 +54,12 @@ Web 框架: [fiber](https://github.com/gofiber/fiber)
 
 ORM: [GORM](https://github.com/go-gorm/gorm) 和 [GORM Gen](https://github.com/go-gorm/gen)
 
+在开发时请使用 go build tag `dev` 构建进行构建。
+
+```shell
+go run --tags dev main.go --config config.yaml
+```
+
 ### 后端环境
 
 redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env> 。

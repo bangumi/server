@@ -16,6 +16,7 @@ package web
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/pprof"
 	"strconv"
@@ -108,6 +109,9 @@ func addProfile(app *fiber.App) {
 func Start(c config.AppConfig, app *fiber.App) error {
 	addr := c.ListenAddr()
 	logger.Infoln("http server listening at", addr)
+	if config.Development {
+		fmt.Printf("\nvisit http://%s/\n\n", strings.ReplaceAll(addr, "0.0.0.0", "127.0.0.1"))
+	}
 
 	return errgo.Wrap(app.Listen(c.ListenAddr()), "fiber.App.Listen")
 }

@@ -53,6 +53,8 @@ func AddRouters(
 	characterHandler character.Character,
 	subjectHandler subject.Subject,
 ) {
+	app.Get("/", indexPage)
+
 	app.Use(ua.DisableDefaultHTTPLibrary)
 
 	// add logger wrapper and metrics counter
