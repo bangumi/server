@@ -96,6 +96,14 @@ func TestMysqlRepo_GetByToken(t *testing.T) {
 }
 ```
 
+## 代码生成
+
+目前有两部分代码是自动生成的，gorm-gen 和 mocks。
+
+设置数据库相关的环境变量（或者用`.env`）后使用 `task gorm` 生成 gorm 相关的 dal。
+
+使用 `task mock` 在自动生成用到的 mock，相关的 task 定义在 [etc/mock.task.yaml](../etc/mock.task.yaml) 中。
+
 ## Code Style
 
 [Uber Go Style Guide](https://github.com/uber-go/guide/blob/master/style.md)

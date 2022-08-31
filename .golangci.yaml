@@ -92,6 +92,9 @@ linters-settings:
       - ^fiber\.Err.*$
       - ^fiber\.NewErr.*$
 
+  gofmt:
+    simplify: true
+
   funlen:
     lines: 60
     statements: 40
