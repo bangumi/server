@@ -18,7 +18,6 @@ import (
 	"database/sql"
 	"log"
 	"os"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/uber-go/tally/v4"
@@ -31,13 +30,9 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-const slowQueryTimeout = time.Millisecond * 200
-
-func NewDB(
-	conn *sql.DB, c config.AppConfig, scope tally.Scope, register prometheus.Registerer,
-) (*gorm.DB, error) {
+func NewDB(conn *sql.DB, c config.AppConfig, scope tally.Scope, prom prometheus.Registerer) (*gorm.DB, error) {
 	var gLog gormLogger.Interface
-	if c.Debug["gorm"] {
+	if c.Debug.Gorm {
 		logger.Info("enable gorm debug mode, will log all sql")
 		gLog = gormLogger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags),
@@ -48,35 +43,20 @@ func NewDB(
 			},
 		)
 	} else {
-		gLog = gormLogger.New(
-			logger.Std(),
-			gormLogger.Config{
-				SlowThreshold:             slowQueryTimeout,
-				LogLevel:                  gormLogger.Warn,
-				IgnoreRecordNotFoundError: true,
-				Colorful:                  false,
-			},
-		)
+		gLog = newProdLog(scope)
 	}
 
-	db, err := gorm.Open(mysql.New(mysql.Config{Conn: conn,
-		DisableDatetimePrecision: true,
-	}), &gorm.Config{
-		Logger:      gLog,
-		QueryFields: true,
-		PrepareStmt: true,
-	})
+	db, err := gorm.Open(
+		mysql.New(mysql.Config{Conn: conn, DisableDatetimePrecision: true}),
+		&gorm.Config{Logger: gLog, QueryFields: true, PrepareStmt: true},
+	)
 	if err != nil {
 		return nil, errgo.Wrap(err, "create dal")
 	}
 
-	if err = setupMetrics(db, conn, scope, register); err != nil {
+	if err = setupMetrics(db, conn, scope, prom); err != nil {
 		return nil, errgo.Wrap(err, "setup metrics")
 	}
 
-	if c.Debug["gorm"] {
-		return db.Debug(), errgo.Wrap(err, "init gorm")
-	}
-
-	return db, errgo.Wrap(err, "init gorm")
+	return db, nil
 }

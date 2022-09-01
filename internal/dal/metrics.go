@@ -15,43 +15,17 @@
 package dal
 
 import (
-	"context"
 	"database/sql"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/uber-go/tally/v4"
 	"gorm.io/gorm"
-	gormLogger "gorm.io/gorm/logger"
 
-	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func newMetricsLog(log gormLogger.Interface, scope tally.Scope) gormLogger.Interface {
-	return metricsLog{
-		Interface: log,
-		h:         scope.Histogram("sql_time", metrics.SQLTimeBucket()),
-	}
-}
-
-type metricsLog struct {
-	gormLogger.Interface
-	h tally.Histogram
-}
-
-func (l metricsLog) Trace(
-	ctx context.Context,
-	begin time.Time,
-	fc func() (sql string, rowsAffected int64), err error,
-) {
-	fc()
-	l.h.RecordDuration(time.Since(begin))
-}
-
 func setupMetrics(db *gorm.DB, conn *sql.DB, scope tally.Scope, register prometheus.Registerer) error {
-	db.Logger = newMetricsLog(db.Logger, scope)
-
 	var DatabaseQuery = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "chii_db_execute_total",

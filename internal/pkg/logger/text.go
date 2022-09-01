@@ -17,6 +17,8 @@
 package logger
 
 import (
+	"strings"
+
 	"github.com/mattn/go-colorable"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -34,7 +36,15 @@ func textLogger(level zapcore.Level) *zap.Logger {
 		EncodeLevel:    zapcore.LowercaseColorLevelEncoder,
 		EncodeTime:     zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05"),
 		EncodeDuration: zapcore.MillisDurationEncoder,
-		EncodeCaller:   zapcore.FullCallerEncoder,
+		EncodeCaller: func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
+			const prefix = "github.com/bangumi/server"
+			p := caller.String()
+			if strings.HasPrefix(p, prefix) {
+				encoder.AppendString("." + strings.TrimPrefix(p, prefix))
+				return
+			}
+			encoder.AppendString(p)
+		},
 	})
 
 	return zap.New(

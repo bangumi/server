@@ -19,7 +19,9 @@ import (
 )
 
 type AppConfig struct {
-	Debug map[string]bool `yaml:"debug"`
+	Debug struct {
+		Gorm bool `yaml:"gorm"`
+	} `yaml:"debug"`
 
 	RedisURL      string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
 	MySQLHost     string `yaml:"mysql_host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
