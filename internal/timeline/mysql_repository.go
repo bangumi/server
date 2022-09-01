@@ -105,6 +105,8 @@ func (m mysqlRepo) Create(ctx context.Context, tl *model.TimeLine) error {
 	if err := m.q.TimeLine.WithContext(ctx).Create(d); err != nil {
 		return errgo.Wrap(err, "dal")
 	}
+
+	tl.ID = d.ID // backport auto incr primary key
 	return nil
 }
 
