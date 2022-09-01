@@ -26,13 +26,13 @@ func (_m *TimeLineRepo) EXPECT() *TimeLineRepo_Expecter {
 	return &TimeLineRepo_Expecter{mock: &_m.Mock}
 }
 
-// Create provides a mock function with given fields: ctx, tls
-func (_m *TimeLineRepo) Create(ctx context.Context, tls *model.TimeLine) error {
-	ret := _m.Called(ctx, tls)
+// Create provides a mock function with given fields: ctx, tl
+func (_m *TimeLineRepo) Create(ctx context.Context, tl *model.TimeLine) error {
+	ret := _m.Called(ctx, tl)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, *model.TimeLine) error); ok {
-		r0 = rf(ctx, tls)
+		r0 = rf(ctx, tl)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -47,12 +47,12 @@ type TimeLineRepo_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //  - ctx context.Context
-//  - tls *model.TimeLine
-func (_e *TimeLineRepo_Expecter) Create(ctx interface{}, tls interface{}) *TimeLineRepo_Create_Call {
-	return &TimeLineRepo_Create_Call{Call: _e.mock.On("Create", ctx, tls)}
+//  - tl *model.TimeLine
+func (_e *TimeLineRepo_Expecter) Create(ctx interface{}, tl interface{}) *TimeLineRepo_Create_Call {
+	return &TimeLineRepo_Create_Call{Call: _e.mock.On("Create", ctx, tl)}
 }
 
-func (_c *TimeLineRepo_Create_Call) Run(run func(ctx context.Context, tls *model.TimeLine)) *TimeLineRepo_Create_Call {
+func (_c *TimeLineRepo_Create_Call) Run(run func(ctx context.Context, tl *model.TimeLine)) *TimeLineRepo_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*model.TimeLine))
 	})

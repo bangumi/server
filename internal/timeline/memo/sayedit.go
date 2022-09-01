@@ -24,12 +24,12 @@ type SayEditMemo struct {
 	After  string `php:"after"`
 }
 
-func (m *SayEditMemo) ToModel() *model.TimeLineMemo {
+func (m *SayEditMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineSayEdit{}
 	util.CopySameNameField(result, m)
-	return &model.TimeLineMemo{TimeLineSayMemo: &model.TimeLineSayMemo{TimeLineSayEdit: result}}
+	return &model.TimeLineMemoContent{TimeLineSayMemo: &model.TimeLineSayMemo{TimeLineSayEdit: result}}
 }
 
-func (m *SayEditMemo) FromModel(memo *model.TimeLine) {
-	util.CopySameNameField(m, memo.Memo.TimeLineSayMemo.TimeLineSayEdit)
+func (m *SayEditMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(m, mc.TimeLineSayMemo.TimeLineSayEdit)
 }

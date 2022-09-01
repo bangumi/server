@@ -25,12 +25,12 @@ type RelationMemo struct {
 	Nickname string `php:"nickname"`
 }
 
-func (m *RelationMemo) ToModel() *model.TimeLineMemo {
+func (m *RelationMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineRelationMemo{}
 	util.CopySameNameField(result, m)
-	return &model.TimeLineMemo{TimeLineRelationMemo: result}
+	return &model.TimeLineMemoContent{TimeLineRelationMemo: result}
 }
 
-func (m *RelationMemo) FromModel(tl *model.TimeLine) {
-	util.CopySameNameField(m, tl.Memo.TimeLineRelationMemo)
+func (m *RelationMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(m, mc.TimeLineRelationMemo)
 }

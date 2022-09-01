@@ -115,7 +115,6 @@ func Test_mysqlRepo_Create(t *testing.T) {
 		// alter id and uid
 		tlModel.ID = newTLID
 		tlModel.UID += 654321
-		tlModel.FillCatAndType()
 
 		// create with new id
 		err = repo.Create(ctx, tlModel)

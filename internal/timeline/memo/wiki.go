@@ -25,12 +25,12 @@ type WikiMemo struct {
 	SubjectID     int    `php:"subject_id"`
 }
 
-func (m *WikiMemo) ToModel() *model.TimeLineMemo {
+func (m *WikiMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineWikiMemo{}
 	util.CopySameNameField(result, m)
-	return &model.TimeLineMemo{TimeLineWikiMemo: result}
+	return &model.TimeLineMemoContent{TimeLineWikiMemo: result}
 }
 
-func (m *WikiMemo) FromModel(tl *model.TimeLine) {
-	util.CopySameNameField(m, tl.Memo.TimeLineWikiMemo)
+func (m *WikiMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(m, mc.TimeLineWikiMemo)
 }

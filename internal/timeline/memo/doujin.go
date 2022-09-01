@@ -25,12 +25,12 @@ type DoujinMemo struct {
 	Title string `php:"title"`
 }
 
-func (m *DoujinMemo) ToModel() *model.TimeLineMemo {
+func (m *DoujinMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineDoujinMemo{}
 	util.CopySameNameField(result, m)
-	return &model.TimeLineMemo{TimeLineDoujinMemo: result}
+	return &model.TimeLineMemoContent{TimeLineDoujinMemo: result}
 }
 
-func (m *DoujinMemo) FromModel(tl *model.TimeLine) {
-	util.CopySameNameField(m, tl.Memo.TimeLineDoujinMemo)
+func (m *DoujinMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(m, mc.TimeLineDoujinMemo)
 }

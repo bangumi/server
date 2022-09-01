@@ -32,12 +32,12 @@ type ProgressMemo struct {
 	SubjectTypeID *model.SubjectType `php:"subject_type_id,omitempty,string"`
 }
 
-func (m *ProgressMemo) ToModel() *model.TimeLineMemo {
+func (m *ProgressMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineProgressMemo{}
 	util.CopySameNameField(result, m)
-	return &model.TimeLineMemo{TimeLineProgressMemo: result}
+	return &model.TimeLineMemoContent{TimeLineProgressMemo: result}
 }
 
-func (m *ProgressMemo) FromModel(tl *model.TimeLine) {
-	util.CopySameNameField(m, tl.Memo.TimeLineProgressMemo)
+func (m *ProgressMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(m, mc.TimeLineProgressMemo)
 }

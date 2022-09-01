@@ -140,26 +140,26 @@ func (m mysqlRepo) isDupeTimeLine(ctx context.Context, dao *dao.TimeLine) (bool,
 func daoToModel(tl *dao.TimeLine) (*model.TimeLine, error) {
 	mm, err := memo.DAOToModel(tl)
 	if err != nil {
-		return nil, errgo.Wrap(err, "DAOToModel")
+		return nil, errgo.Wrap(err, "memo.DAOToModel")
 	}
 
 	img, err := image.DAOToModel(tl)
 	if err != nil {
-		return nil, errgo.Wrap(err, "DAOToModel")
+		return nil, errgo.Wrap(err, "ContentDAOToModel")
 	}
 
 	return &model.TimeLine{
-		ID:       tl.ID,
-		Related:  tl.Related,
-		Memo:     *mm,
-		Image:    img,
-		UID:      tl.UID,
-		Replies:  tl.Replies,
-		Dateline: tl.Dateline,
-		Cat:      tl.Cat,
-		Type:     tl.Type,
-		Batch:    tl.Batch,
-		Source:   tl.Source,
+		TimeLineMeta: &model.TimeLineMeta{
+			ID:       tl.ID,
+			Related:  tl.Related,
+			Image:    img,
+			UID:      tl.UID,
+			Replies:  tl.Replies,
+			Dateline: tl.Dateline,
+			Batch:    tl.Batch,
+			Source:   tl.Source,
+		},
+		TimeLineMemo: mm,
 	}, nil
 }
 
@@ -169,7 +169,7 @@ func modelToDAO(tl *model.TimeLine) (*dao.TimeLine, error) {
 		return nil, errgo.Wrap(err, "modelImageToDAO")
 	}
 
-	mm, err := memo.ModelToDAO(tl)
+	mm, err := memo.ModelToDAO(tl.TimeLineMemo)
 	if err != nil {
 		return nil, errgo.Wrap(err, "ModelToDAO")
 	}

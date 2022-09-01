@@ -26,12 +26,12 @@ type GroupMemo struct {
 	Description string `php:"grp_desc"`
 }
 
-func (g *GroupMemo) ToModel() *model.TimeLineMemo {
+func (g *GroupMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineGroupMemo{}
 	util.CopySameNameField(result, g)
-	return &model.TimeLineMemo{TimeLineGroupMemo: result}
+	return &model.TimeLineMemoContent{TimeLineGroupMemo: result}
 }
 
-func (g *GroupMemo) FromModel(tl *model.TimeLine) {
-	util.CopySameNameField(g, tl.Memo.TimeLineGroupMemo)
+func (g *GroupMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(g, mc.TimeLineGroupMemo)
 }

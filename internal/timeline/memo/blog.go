@@ -25,12 +25,12 @@ type BlogMemo struct {
 	EntryID          int    `php:"entry_id"`
 }
 
-func (m *BlogMemo) ToModel() *model.TimeLineMemo {
+func (m *BlogMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineBlogMemo{}
 	util.CopySameNameField(result, m)
-	return &model.TimeLineMemo{TimeLineBlogMemo: result}
+	return &model.TimeLineMemoContent{TimeLineBlogMemo: result}
 }
 
-func (m *BlogMemo) FromModel(tl *model.TimeLine) {
-	util.CopySameNameField(m, tl.Memo.TimeLineBlogMemo)
+func (m *BlogMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(m, mc.TimeLineBlogMemo)
 }

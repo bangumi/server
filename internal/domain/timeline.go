@@ -26,5 +26,5 @@ type TimeLineRepo interface {
 	WithQuery(query *query.Query) TimeLineRepo
 	GetByID(ctx context.Context, id model.TimeLineID) (*model.TimeLine, error)
 	ListByUID(ctx context.Context, uid model.UserID, limit int, since model.TimeLineID) ([]*model.TimeLine, error)
-	Create(ctx context.Context, tls *model.TimeLine) error
+	Create(ctx context.Context, tl *model.TimeLine) error
 }

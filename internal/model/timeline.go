@@ -28,6 +28,11 @@ const (
 )
 
 type TimeLine struct {
+	*TimeLineMeta
+	*TimeLineMemo
+}
+
+type TimeLineMeta struct {
 	ID  TimeLineID
 	UID UserID
 
@@ -37,13 +42,16 @@ type TimeLine struct {
 	Replies  uint32
 	Dateline uint32
 	Image    TimeLineImages
-
-	Cat  TimeLineCat // Category
-	Type uint16
-	Memo TimeLineMemo
 }
 
 type TimeLineMemo struct {
+	Cat  TimeLineCat // Category
+	Type uint16
+
+	Content *TimeLineMemoContent
+}
+
+type TimeLineMemoContent struct {
 	*TimeLineRelationMemo
 	*TimeLineGroupMemo
 	*TimeLineWikiMemo
@@ -56,49 +64,47 @@ type TimeLineMemo struct {
 	*TimeLineDoujinMemo
 }
 
-//nolint:gomnd,gocyclo
-func (tl *TimeLine) FillCatAndType() *TimeLine {
-	m := tl.Memo
-	if m.TimeLineRelationMemo != nil {
-		return setCatAndType(tl, TimeLineCatRelation, 2)
-	}
-	if m.TimeLineGroupMemo != nil {
-		return setCatAndType(tl, TimeLineCatGroup, 3)
-	}
-	if m.TimeLineWikiMemo != nil {
-		return setCatAndType(tl, TimeLineCatWiki, 0)
-	}
-	if m.TimeLineSubjectMemo != nil {
-		return setCatAndType(tl, TimeLineCatSubject, 0)
-	}
-	if m.TimeLineProgressMemo != nil {
-		return setCatAndType(tl, TimeLineCatProgress, 0)
-	}
-	if m.TimeLineSayMemo != nil {
-		if m.TimeLineSayMemo.TimeLineSayEdit != nil {
-			return setCatAndType(tl, TimeLineCatSay, 2)
-		}
-		return setCatAndType(tl, TimeLineCatSay, 0)
-	}
-	if m.TimeLineBlogMemo != nil {
-		return setCatAndType(tl, TimeLineCatBlog, 0)
-	}
-	if m.TimeLineIndexMemo != nil {
-		return setCatAndType(tl, TimeLineCatIndex, 0)
-	}
-	if m.TimeLineMonoMemo != nil {
-		return setCatAndType(tl, TimeLineCatMono, 1)
-	}
-	if m.TimeLineDoujinMemo != nil {
-		return setCatAndType(tl, TimeLineCatDoujin, 0)
-	}
-	return tl
+type TimeLineMemoContentType interface {
+	*TimeLineRelationMemo | *TimeLineGroupMemo | *TimeLineWikiMemo | *TimeLineSubjectMemo | *TimeLineProgressMemo | *TimeLineSayMemo | *TimeLineBlogMemo | *TimeLineIndexMemo | *TimeLineMonoMemo | *TimeLineDoujinMemo
 }
 
-func setCatAndType(tl *TimeLine, cat TimeLineCat, typ uint16) *TimeLine {
-	tl.Cat = cat
-	tl.Type = typ
-	return tl
+func NewTimeLineMemo[T TimeLineMemoContentType](content T) *TimeLineMemo {
+	val := any(content)
+	switch typed := val.(type) {
+	case *TimeLineRelationMemo:
+		return newTimeLineMemo(TimeLineCatRelation, 2, &TimeLineMemoContent{TimeLineRelationMemo: typed})
+	case *TimeLineGroupMemo:
+		return newTimeLineMemo(TimeLineCatGroup, 3, &TimeLineMemoContent{TimeLineGroupMemo: typed})
+	case *TimeLineWikiMemo:
+		return newTimeLineMemo(TimeLineCatWiki, 0, &TimeLineMemoContent{TimeLineWikiMemo: typed})
+	case *TimeLineSubjectMemo:
+		return newTimeLineMemo(TimeLineCatSubject, 0, &TimeLineMemoContent{TimeLineSubjectMemo: typed})
+	case *TimeLineProgressMemo:
+		return newTimeLineMemo(TimeLineCatProgress, 0, &TimeLineMemoContent{TimeLineProgressMemo: typed})
+	case *TimeLineSayMemo:
+		if typed.TimeLineSayEdit != nil {
+			return newTimeLineMemo(TimeLineCatSay, 2, &TimeLineMemoContent{TimeLineSayMemo: typed})
+		}
+		return newTimeLineMemo(TimeLineCatSay, 0, &TimeLineMemoContent{TimeLineSayMemo: typed})
+	case *TimeLineBlogMemo:
+		return newTimeLineMemo(TimeLineCatBlog, 0, &TimeLineMemoContent{TimeLineBlogMemo: typed})
+	case *TimeLineIndexMemo:
+		return newTimeLineMemo(TimeLineCatIndex, 0, &TimeLineMemoContent{TimeLineIndexMemo: typed})
+	case *TimeLineMonoMemo:
+		return newTimeLineMemo(TimeLineCatMono, 1, &TimeLineMemoContent{TimeLineMonoMemo: typed})
+	case *TimeLineDoujinMemo:
+		return newTimeLineMemo(TimeLineCatDoujin, 0, &TimeLineMemoContent{TimeLineDoujinMemo: typed})
+	default:
+		return nil
+	}
+}
+
+func newTimeLineMemo(cat TimeLineCat, typ uint16, content *TimeLineMemoContent) *TimeLineMemo {
+	return &TimeLineMemo{
+		Cat:     cat,
+		Type:    typ,
+		Content: content,
+	}
 }
 
 type TimeLineDoujinMemo struct {

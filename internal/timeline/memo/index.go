@@ -25,12 +25,12 @@ type IndexMemo struct {
 	Description string `php:"idx_desc"`
 }
 
-func (m *IndexMemo) ToModel() *model.TimeLineMemo {
+func (m *IndexMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineIndexMemo{}
 	util.CopySameNameField(result, m)
-	return &model.TimeLineMemo{TimeLineIndexMemo: result}
+	return &model.TimeLineMemoContent{TimeLineIndexMemo: result}
 }
 
-func (m *IndexMemo) FromModel(tl *model.TimeLine) {
-	util.CopySameNameField(m, tl.Memo.TimeLineIndexMemo)
+func (m *IndexMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(m, mc.TimeLineIndexMemo)
 }

@@ -25,12 +25,12 @@ type MonoMemo struct {
 	ID   int    `php:"id"`
 }
 
-func (m *MonoMemo) ToModel() *model.TimeLineMemo {
+func (m *MonoMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineMonoMemo{}
 	util.CopySameNameField(result, m)
-	return &model.TimeLineMemo{TimeLineMonoMemo: result}
+	return &model.TimeLineMemoContent{TimeLineMonoMemo: result}
 }
 
-func (m *MonoMemo) FromModel(tl *model.TimeLine) {
-	util.CopySameNameField(m, tl.Memo.TimeLineMonoMemo)
+func (m *MonoMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(m, mc.TimeLineMonoMemo)
 }

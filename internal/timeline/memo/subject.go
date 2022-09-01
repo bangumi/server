@@ -29,12 +29,12 @@ type SubjectMemo struct {
 	CollectRate    int    `php:"collect_rate"`
 }
 
-func (m *SubjectMemo) ToModel() *model.TimeLineMemo {
+func (m *SubjectMemo) ToModel() *model.TimeLineMemoContent {
 	result := &model.TimeLineSubjectMemo{}
 	util.CopySameNameField(result, m)
-	return &model.TimeLineMemo{TimeLineSubjectMemo: result}
+	return &model.TimeLineMemoContent{TimeLineSubjectMemo: result}
 }
 
-func (m *SubjectMemo) FromModel(tl *model.TimeLine) {
-	util.CopySameNameField(m, tl.Memo.TimeLineSubjectMemo)
+func (m *SubjectMemo) FromModel(mc *model.TimeLineMemoContent) {
+	util.CopySameNameField(m, mc.TimeLineSubjectMemo)
 }
