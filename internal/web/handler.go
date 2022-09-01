@@ -17,12 +17,9 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"github.com/gofiber/fiber/v2/utils"
-	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/gtime"
@@ -47,7 +44,6 @@ func AddRouters(
 	app *fiber.App,
 	c config.AppConfig,
 	h handler.Handler,
-	scope tally.Scope,
 	userHandler user.User,
 	personHandler person.Person,
 	characterHandler character.Character,
@@ -57,60 +53,47 @@ func AddRouters(
 
 	app.Use(ua.DisableDefaultHTTPLibrary)
 
-	// add logger wrapper and metrics counter
-	addMetrics := func(handler fiber.Handler) fiber.Handler {
-		reqCounter := scope.
-			Tagged(map[string]string{"handler": trimFuncName(utils.FunctionName(handler))}).
-			Counter("request_count")
-
-		return func(ctx *fiber.Ctx) error {
-			reqCounter.Inc(1)
-			return handler(ctx)
-		}
-	}
-
 	v0 := app.Group("/v0/", h.MiddlewareAccessTokenAuth)
 
 	v0.Post("/search/subjects", h.Search)
 
-	v0.Get("/subjects/:id", addMetrics(subjectHandler.Get))
-	v0.Get("/subjects/:id/image", addMetrics(subjectHandler.GetImage))
-	v0.Get("/subjects/:id/persons", addMetrics(subjectHandler.GetRelatedPersons))
-	v0.Get("/subjects/:id/subjects", addMetrics(subjectHandler.GetRelatedSubjects))
-	v0.Get("/subjects/:id/characters", addMetrics(subjectHandler.GetRelatedCharacters))
-	v0.Get("/persons/:id", addMetrics(personHandler.Get))
-	v0.Get("/persons/:id/image", addMetrics(personHandler.GetImage))
-	v0.Get("/persons/:id/subjects", addMetrics(personHandler.GetRelatedSubjects))
-	v0.Get("/persons/:id/characters", addMetrics(personHandler.GetRelatedCharacters))
-	v0.Get("/characters/:id", addMetrics(characterHandler.Get))
-	v0.Get("/characters/:id/image", addMetrics(characterHandler.GetImage))
-	v0.Get("/characters/:id/subjects", addMetrics(characterHandler.GetRelatedSubjects))
-	v0.Get("/characters/:id/persons", addMetrics(characterHandler.GetRelatedPersons))
-	v0.Get("/episodes/:id", addMetrics(h.GetEpisode))
-	v0.Get("/episodes", addMetrics(h.ListEpisode))
+	v0.Get("/subjects/:id", subjectHandler.Get)
+	v0.Get("/subjects/:id/image", subjectHandler.GetImage)
+	v0.Get("/subjects/:id/persons", subjectHandler.GetRelatedPersons)
+	v0.Get("/subjects/:id/subjects", subjectHandler.GetRelatedSubjects)
+	v0.Get("/subjects/:id/characters", subjectHandler.GetRelatedCharacters)
+	v0.Get("/persons/:id", personHandler.Get)
+	v0.Get("/persons/:id/image", personHandler.GetImage)
+	v0.Get("/persons/:id/subjects", personHandler.GetRelatedSubjects)
+	v0.Get("/persons/:id/characters", personHandler.GetRelatedCharacters)
+	v0.Get("/characters/:id", characterHandler.Get)
+	v0.Get("/characters/:id/image", characterHandler.GetImage)
+	v0.Get("/characters/:id/subjects", characterHandler.GetRelatedSubjects)
+	v0.Get("/characters/:id/persons", characterHandler.GetRelatedPersons)
+	v0.Get("/episodes/:id", h.GetEpisode)
+	v0.Get("/episodes", h.ListEpisode)
 
-	v0.Get("/me", addMetrics(userHandler.GetCurrent))
-	v0.Get("/users/:username", addMetrics(userHandler.Get))
-	v0.Get("/users/:username/collections", addMetrics(userHandler.ListSubjectCollection))
-	v0.Get("/users/:username/collections/:subject_id", addMetrics(userHandler.GetSubjectCollection))
-	v0.Get("/users/-/collections/-/episodes/:episode_id", h.NeedLogin, addMetrics(userHandler.GetEpisodeCollection))
-	v0.Get("/users/-/collections/:subject_id/episodes", h.NeedLogin, addMetrics(userHandler.GetSubjectEpisodeCollection))
-	v0.Patch("/users/-/collections/:subject_id", req.JSON, h.NeedLogin, addMetrics(userHandler.PatchSubjectCollection))
+	v0.Get("/me", userHandler.GetCurrent)
+	v0.Get("/users/:username", userHandler.Get)
+	v0.Get("/users/:username/collections", userHandler.ListSubjectCollection)
+	v0.Get("/users/:username/collections/:subject_id", userHandler.GetSubjectCollection)
+	v0.Get("/users/-/collections/-/episodes/:episode_id", h.NeedLogin, userHandler.GetEpisodeCollection)
+	v0.Get("/users/-/collections/:subject_id/episodes", h.NeedLogin, userHandler.GetSubjectEpisodeCollection)
+	v0.Patch("/users/-/collections/:subject_id", req.JSON, h.NeedLogin, userHandler.PatchSubjectCollection)
 	v0.Patch("/users/-/collections/:subject_id/episodes",
-		req.JSON, h.NeedLogin,
-		addMetrics(userHandler.PatchEpisodeCollectionBatch),
+		req.JSON, h.NeedLogin, userHandler.PatchEpisodeCollectionBatch,
 	)
-	v0.Get("/users/:username/avatar", addMetrics(userHandler.GetAvatar))
+	v0.Get("/users/:username/avatar", userHandler.GetAvatar)
 
-	v0.Get("/indices/:id", addMetrics(h.GetIndex))
-	v0.Get("/indices/:id/subjects", addMetrics(h.GetIndexSubjects))
+	v0.Get("/indices/:id", h.GetIndex)
+	v0.Get("/indices/:id/subjects", h.GetIndexSubjects)
 
-	v0.Get("/revisions/persons/:id", addMetrics(h.GetPersonRevision))
-	v0.Get("/revisions/persons", addMetrics(h.ListPersonRevision))
-	v0.Get("/revisions/subjects/:id", addMetrics(h.GetSubjectRevision))
-	v0.Get("/revisions/subjects", addMetrics(h.ListSubjectRevision))
-	v0.Get("/revisions/characters/:id", addMetrics(h.GetCharacterRevision))
-	v0.Get("/revisions/characters", addMetrics(h.ListCharacterRevision))
+	v0.Get("/revisions/persons/:id", h.GetPersonRevision)
+	v0.Get("/revisions/persons", h.ListPersonRevision)
+	v0.Get("/revisions/subjects/:id", h.GetSubjectRevision)
+	v0.Get("/revisions/subjects", h.ListSubjectRevision)
+	v0.Get("/revisions/characters/:id", h.GetCharacterRevision)
+	v0.Get("/revisions/characters", h.ListCharacterRevision)
 
 	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.WebDomain))
 	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.WebDomain))
@@ -123,34 +106,34 @@ func AddRouters(
 	// frontend private api
 	private := app.Group("/p/", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
 
-	private.Post("/login", req.JSON, addMetrics(h.PrivateLogin))
-	private.Post("/logout", addMetrics(h.PrivateLogout))
-	private.Get("/me", addMetrics(userHandler.GetCurrent))
-	private.Get("/groups/:name", addMetrics(h.GetGroupProfileByNamePrivate))
-	private.Get("/groups/:name/members", addMetrics(h.ListGroupMembersPrivate))
+	private.Post("/login", req.JSON, h.PrivateLogin)
+	private.Post("/logout", h.PrivateLogout)
+	private.Get("/me", userHandler.GetCurrent)
+	private.Get("/groups/:name", h.GetGroupProfileByNamePrivate)
+	private.Get("/groups/:name/members", h.ListGroupMembersPrivate)
 
-	private.Get("/groups/:name/topics", addMetrics(h.ListGroupTopics))
-	private.Get("/subjects/:id/topics", addMetrics(h.ListSubjectTopics))
+	private.Get("/groups/:name/topics", h.ListGroupTopics)
+	private.Get("/subjects/:id/topics", h.ListSubjectTopics)
 
-	private.Get("/groups/-/topics/:topic_id", addMetrics(h.GetGroupTopic))
-	private.Get("/subjects/:id/topics/:topic_id", addMetrics(h.GetSubjectTopic))
-	private.Get("/indices/:id/comments", addMetrics(h.GetIndexComments))
-	private.Get("/episodes/:id/comments", addMetrics(h.GetEpisodeComments))
-	private.Get("/characters/:id/comments", addMetrics(h.GetCharacterComments))
-	private.Get("/persons/:id/comments", addMetrics(h.GetPersonComments))
+	private.Get("/groups/-/topics/:topic_id", h.GetGroupTopic)
+	private.Get("/subjects/:id/topics/:topic_id", h.GetSubjectTopic)
+	private.Get("/indices/:id/comments", h.GetIndexComments)
+	private.Get("/episodes/:id/comments", h.GetEpisodeComments)
+	private.Get("/characters/:id/comments", h.GetCharacterComments)
+	private.Get("/persons/:id/comments", h.GetPersonComments)
 
 	// un-documented
-	private.Post("/access-tokens", req.JSON, addMetrics(h.CreatePersonalAccessToken))
-	private.Delete("/access-tokens", req.JSON, addMetrics(h.DeletePersonalAccessToken))
+	private.Post("/access-tokens", req.JSON, h.CreatePersonalAccessToken)
+	private.Delete("/access-tokens", req.JSON, h.DeletePersonalAccessToken)
 
 	if c.WebDomain != "" {
 		CORSBlockMiddleware = []fiber.Handler{originMiddleware}
 	}
 
 	privateHTML := app.Group("/demo/", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
-	privateHTML.Get("/login", addMetrics(h.PageLogin))
-	privateHTML.Get("/access-token", addMetrics(h.PageListAccessToken))
-	privateHTML.Get("/access-token/create", addMetrics(h.PageCreateAccessToken))
+	privateHTML.Get("/login", h.PageLogin)
+	privateHTML.Get("/access-token", h.PageListAccessToken)
+	privateHTML.Get("/access-token/create", h.PageCreateAccessToken)
 
 	app.Use("/static/", filesystem.New(filesystem.Config{
 		PathPrefix: "static",
@@ -166,8 +149,4 @@ func AddRouters(
 			Details:     util.Detail(c),
 		})
 	})
-}
-
-func trimFuncName(s string) string {
-	return strings.TrimSuffix(strings.TrimPrefix(s, "github.com/bangumi/server/internal/"), "-fm")
 }
