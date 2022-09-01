@@ -134,3 +134,66 @@ func Test_mysqlRepo_Create(t *testing.T) {
 		})
 	}
 }
+
+func Test_mysqlRepo_NewTimeLineMemo(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	type caseT struct {
+		id        model.TimeLineID
+		extractor func(content *model.TimeLineMemoContent) *model.TimeLineMemo
+	}
+
+	var cases = []caseT{
+		{28684877, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineRelationMemo)
+		}}, // cat=1, type=2
+		{28682314, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineGroupMemo)
+		}}, // cat=1, type=3
+		{28683701, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineWikiMemo)
+		}}, // cat=2
+		{28685055, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineSubjectMemo)
+		}}, // cat=3
+		{28976108, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineProgressMemo)
+		}}, // cat=4
+		{28684294, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineSayMemo)
+		}}, // cat=5, type=2
+		{28683198, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineSayMemo)
+		}}, // cat=5, type=1
+		{28684975, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineBlogMemo)
+		}}, // cat=6
+		{28684740, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineIndexMemo)
+		}}, // cat=7
+		{28685042, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineMonoMemo)
+		}}, // cat=8
+		{28523860, func(content *model.TimeLineMemoContent) *model.TimeLineMemo {
+			return model.NewTimeLineMemo(content.TimeLineDoujinMemo)
+		}}, // cat=9
+	}
+
+	repo, _ := getRepo(t)
+	ctx := context.Background()
+
+	for _, cas := range cases {
+		cas := cas
+		t.Run(fmt.Sprintf("start testing case: %d", cas.id), func(t *testing.T) {
+			t.Parallel()
+
+			// get the model.TL
+			expected, err := repo.GetByID(ctx, cas.id)
+			require.NoError(t, err)
+
+			// check if the NewTimeLineMemo works
+			require.Equal(t, expected.TimeLineMemo, cas.extractor(expected.Content))
+		})
+	}
+}
