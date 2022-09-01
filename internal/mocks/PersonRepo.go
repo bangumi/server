@@ -159,8 +159,8 @@ type PersonRepo_GetCharacterRelated_Call struct {
 }
 
 // GetCharacterRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - subjectID model.CharacterID
+//   - ctx context.Context
+//   - subjectID model.CharacterID
 func (_e *PersonRepo_Expecter) GetCharacterRelated(ctx interface{}, subjectID interface{}) *PersonRepo_GetCharacterRelated_Call {
 	return &PersonRepo_GetCharacterRelated_Call{Call: _e.mock.On("GetCharacterRelated", ctx, subjectID)}
 }
@@ -206,8 +206,8 @@ type PersonRepo_GetSubjectRelated_Call struct {
 }
 
 // GetSubjectRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - subjectID model.SubjectID
+//   - ctx context.Context
+//   - subjectID model.SubjectID
 func (_e *PersonRepo_Expecter) GetSubjectRelated(ctx interface{}, subjectID interface{}) *PersonRepo_GetSubjectRelated_Call {
 	return &PersonRepo_GetSubjectRelated_Call{Call: _e.mock.On("GetSubjectRelated", ctx, subjectID)}
 }
