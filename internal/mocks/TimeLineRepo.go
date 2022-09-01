@@ -46,8 +46,8 @@ type TimeLineRepo_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//  - ctx context.Context
-//  - tl *model.TimeLine
+//   - ctx context.Context
+//   - tl *model.TimeLine
 func (_e *TimeLineRepo_Expecter) Create(ctx interface{}, tl interface{}) *TimeLineRepo_Create_Call {
 	return &TimeLineRepo_Create_Call{Call: _e.mock.On("Create", ctx, tl)}
 }
@@ -93,8 +93,8 @@ type TimeLineRepo_GetByID_Call struct {
 }
 
 // GetByID is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id model.TimeLineID
+//   - ctx context.Context
+//   - id model.TimeLineID
 func (_e *TimeLineRepo_Expecter) GetByID(ctx interface{}, id interface{}) *TimeLineRepo_GetByID_Call {
 	return &TimeLineRepo_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
 }
@@ -140,10 +140,10 @@ type TimeLineRepo_ListByUID_Call struct {
 }
 
 // ListByUID is a helper method to define mock.On call
-//  - ctx context.Context
-//  - uid model.UserID
-//  - limit int
-//  - since model.TimeLineID
+//   - ctx context.Context
+//   - uid model.UserID
+//   - limit int
+//   - since model.TimeLineID
 func (_e *TimeLineRepo_Expecter) ListByUID(ctx interface{}, uid interface{}, limit interface{}, since interface{}) *TimeLineRepo_ListByUID_Call {
 	return &TimeLineRepo_ListByUID_Call{Call: _e.mock.On("ListByUID", ctx, uid, limit, since)}
 }
@@ -182,7 +182,7 @@ type TimeLineRepo_WithQuery_Call struct {
 }
 
 // WithQuery is a helper method to define mock.On call
-//  - _a0 *query.Query
+//   - _a0 *query.Query
 func (_e *TimeLineRepo_Expecter) WithQuery(_a0 interface{}) *TimeLineRepo_WithQuery_Call {
 	return &TimeLineRepo_WithQuery_Call{Call: _e.mock.On("WithQuery", _a0)}
 }

@@ -47,8 +47,8 @@ type SearchClient_Handle_Call struct {
 }
 
 // Handle is a helper method to define mock.On call
-//  - ctx *fiber.Ctx
-//  - auth *accessor.Accessor
+//   - ctx *fiber.Ctx
+//   - auth *accessor.Accessor
 func (_e *SearchClient_Expecter) Handle(ctx interface{}, auth interface{}) *SearchClient_Handle_Call {
 	return &SearchClient_Handle_Call{Call: _e.mock.On("Handle", ctx, auth)}
 }
@@ -85,8 +85,8 @@ type SearchClient_OnSubjectDelete_Call struct {
 }
 
 // OnSubjectDelete is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id model.SubjectID
+//   - ctx context.Context
+//   - id model.SubjectID
 func (_e *SearchClient_Expecter) OnSubjectDelete(ctx interface{}, id interface{}) *SearchClient_OnSubjectDelete_Call {
 	return &SearchClient_OnSubjectDelete_Call{Call: _e.mock.On("OnSubjectDelete", ctx, id)}
 }
@@ -123,8 +123,8 @@ type SearchClient_OnSubjectUpdate_Call struct {
 }
 
 // OnSubjectUpdate is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id model.SubjectID
+//   - ctx context.Context
+//   - id model.SubjectID
 func (_e *SearchClient_Expecter) OnSubjectUpdate(ctx interface{}, id interface{}) *SearchClient_OnSubjectUpdate_Call {
 	return &SearchClient_OnSubjectUpdate_Call{Call: _e.mock.On("OnSubjectUpdate", ctx, id)}
 }

@@ -50,8 +50,8 @@ type RevisionRepo_CountCharacterRelated_Call struct {
 }
 
 // CountCharacterRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - characterID model.CharacterID
+//   - ctx context.Context
+//   - characterID model.CharacterID
 func (_e *RevisionRepo_Expecter) CountCharacterRelated(ctx interface{}, characterID interface{}) *RevisionRepo_CountCharacterRelated_Call {
 	return &RevisionRepo_CountCharacterRelated_Call{Call: _e.mock.On("CountCharacterRelated", ctx, characterID)}
 }
@@ -95,8 +95,8 @@ type RevisionRepo_CountPersonRelated_Call struct {
 }
 
 // CountPersonRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - personID model.PersonID
+//   - ctx context.Context
+//   - personID model.PersonID
 func (_e *RevisionRepo_Expecter) CountPersonRelated(ctx interface{}, personID interface{}) *RevisionRepo_CountPersonRelated_Call {
 	return &RevisionRepo_CountPersonRelated_Call{Call: _e.mock.On("CountPersonRelated", ctx, personID)}
 }
@@ -140,8 +140,8 @@ type RevisionRepo_CountSubjectRelated_Call struct {
 }
 
 // CountSubjectRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id model.SubjectID
+//   - ctx context.Context
+//   - id model.SubjectID
 func (_e *RevisionRepo_Expecter) CountSubjectRelated(ctx interface{}, id interface{}) *RevisionRepo_CountSubjectRelated_Call {
 	return &RevisionRepo_CountSubjectRelated_Call{Call: _e.mock.On("CountSubjectRelated", ctx, id)}
 }
@@ -185,8 +185,8 @@ type RevisionRepo_GetCharacterRelated_Call struct {
 }
 
 // GetCharacterRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id uint32
+//   - ctx context.Context
+//   - id uint32
 func (_e *RevisionRepo_Expecter) GetCharacterRelated(ctx interface{}, id interface{}) *RevisionRepo_GetCharacterRelated_Call {
 	return &RevisionRepo_GetCharacterRelated_Call{Call: _e.mock.On("GetCharacterRelated", ctx, id)}
 }
@@ -230,8 +230,8 @@ type RevisionRepo_GetPersonRelated_Call struct {
 }
 
 // GetPersonRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id uint32
+//   - ctx context.Context
+//   - id uint32
 func (_e *RevisionRepo_Expecter) GetPersonRelated(ctx interface{}, id interface{}) *RevisionRepo_GetPersonRelated_Call {
 	return &RevisionRepo_GetPersonRelated_Call{Call: _e.mock.On("GetPersonRelated", ctx, id)}
 }
@@ -275,8 +275,8 @@ type RevisionRepo_GetSubjectRelated_Call struct {
 }
 
 // GetSubjectRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id uint32
+//   - ctx context.Context
+//   - id uint32
 func (_e *RevisionRepo_Expecter) GetSubjectRelated(ctx interface{}, id interface{}) *RevisionRepo_GetSubjectRelated_Call {
 	return &RevisionRepo_GetSubjectRelated_Call{Call: _e.mock.On("GetSubjectRelated", ctx, id)}
 }
@@ -322,10 +322,10 @@ type RevisionRepo_ListCharacterRelated_Call struct {
 }
 
 // ListCharacterRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - characterID model.CharacterID
-//  - limit int
-//  - offset int
+//   - ctx context.Context
+//   - characterID model.CharacterID
+//   - limit int
+//   - offset int
 func (_e *RevisionRepo_Expecter) ListCharacterRelated(ctx interface{}, characterID interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListCharacterRelated_Call {
 	return &RevisionRepo_ListCharacterRelated_Call{Call: _e.mock.On("ListCharacterRelated", ctx, characterID, limit, offset)}
 }
@@ -420,10 +420,10 @@ type RevisionRepo_ListSubjectRelated_Call struct {
 }
 
 // ListSubjectRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id model.SubjectID
-//  - limit int
-//  - offset int
+//   - ctx context.Context
+//   - id model.SubjectID
+//   - limit int
+//   - offset int
 func (_e *RevisionRepo_Expecter) ListSubjectRelated(ctx interface{}, id interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListSubjectRelated_Call {
 	return &RevisionRepo_ListSubjectRelated_Call{Call: _e.mock.On("ListSubjectRelated", ctx, id, limit, offset)}
 }
