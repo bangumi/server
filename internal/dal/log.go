@@ -84,6 +84,6 @@ func (l *metricsLog) Trace(_ context.Context, begin time.Time, fc func() (sql st
 		l.log.Error("gorm error", zap.String("sql", sql), zap.Error(err),
 			zap.Duration("duration", elapsed), zap.Int64("rows", rows))
 	case elapsed >= slowQueryTimeout:
-		l.log.Error(slowLog, zap.String("sql", sql), zap.Duration("duration", elapsed), zap.Int64("rows", rows))
+		l.log.Warn(slowLog, zap.String("sql", sql), zap.Duration("duration", elapsed), zap.Int64("rows", rows))
 	}
 }
