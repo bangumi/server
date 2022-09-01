@@ -29,7 +29,7 @@ import (
 type subjectIndex struct {
 	ID       model.SubjectID `json:"id"`
 	Summary  string          `json:"summary" searchable:"true"`
-	Tag      []string        `json:"tag,omitempty" searchable:"true"`
+	Tag      []string        `json:"tag,omitempty" filterable:"true" searchable:"true"`
 	Name     []string        `json:"name" searchable:"true"`
 	Record   Record          `json:"record"`
 	Date     int             `json:"date,omitempty" filterable:"true" sortable:"true"`

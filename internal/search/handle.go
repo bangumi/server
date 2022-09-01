@@ -51,12 +51,12 @@ const defaultLimit = 50
 const maxLimit = 200
 
 type Req struct {
-	Keyword string `json:"keyword"`
-	Sort    string `json:"sort"`
-	Filter  Filter `json:"filter"`
+	Keyword string    `json:"keyword"`
+	Sort    string    `json:"sort"`
+	Filter  ReqFilter `json:"filter"`
 }
 
-type Filter struct {
+type ReqFilter struct {
 	Type    []model.SubjectType `json:"type"`     // or
 	Tag     []string            `json:"tag"`      // and
 	AirDate []string            `json:"air_date"` // and
@@ -195,7 +195,7 @@ type resSubject struct {
 	Summary string           `json:"summary"`
 }
 
-func filterToMeiliFilter(req Filter) [][]string {
+func filterToMeiliFilter(req ReqFilter) [][]string {
 	var filter = make([][]string, 0, 5+len(req.Tag))
 
 	if len(req.AirDate) != 0 {

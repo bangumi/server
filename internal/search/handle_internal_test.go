@@ -15,20 +15,23 @@
 package search
 
 import (
-	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
-func TestIndexFilter(t *testing.T) {
+func Test_ReqFilterToMeiliFilter(t *testing.T) {
 	t.Parallel()
 
-	actual := *(getAttributes("filterable"))
-	expected := []string{"date", "score", "rank", "type", "nsfw", "tag"}
+	actual := filterToMeiliFilter(ReqFilter{
+		Tag:  []string{"a", "b"},
+		NSFW: null.Bool{Set: false},
+	})
 
-	sort.Strings(expected)
-	sort.Strings(actual)
-
-	require.Equal(t, expected, actual)
+	require.Equal(t, [][]string{
+		{`tag = "a"`},
+		{`tag = "b"`},
+	}, actual)
 }
