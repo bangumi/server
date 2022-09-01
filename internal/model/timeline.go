@@ -65,7 +65,8 @@ type TimeLineMemoContent struct {
 }
 
 type TimeLineMemoContentType interface {
-	*TimeLineRelationMemo | *TimeLineGroupMemo | *TimeLineWikiMemo | *TimeLineSubjectMemo | *TimeLineProgressMemo | *TimeLineSayMemo | *TimeLineBlogMemo | *TimeLineIndexMemo | *TimeLineMonoMemo | *TimeLineDoujinMemo
+	*TimeLineRelationMemo | *TimeLineGroupMemo | *TimeLineWikiMemo | *TimeLineSubjectMemo | *TimeLineProgressMemo |
+		*TimeLineSayMemo | *TimeLineBlogMemo | *TimeLineIndexMemo | *TimeLineMonoMemo | *TimeLineDoujinMemo
 }
 
 func NewTimeLineMemo[T TimeLineMemoContentType](content T) *TimeLineMemo {
