@@ -44,6 +44,8 @@ var characterIDTypeString = "model.CharacterID" // reflect.TypeOf(new(model.Char
 var episodeIDTypeString = "model.EpisodeID"     // reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
 var subjectIDTypeString = "model.SubjectID"     // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
 var groupIDTypeString = "model." + reflect.TypeOf(new(model.GroupID)).Elem().Name()
+var timelineIDTypeString = "model." + reflect.TypeOf(new(model.TimeLineID)).Elem().Name()
+var timelineCatTypeString = reflect.TypeOf(new(model.TimeLineCat)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
@@ -168,6 +170,15 @@ func main() {
 	))
 
 	g.ApplyBasic(oauthApp)
+
+	g.ApplyBasic(g.GenerateModelAs("chii_timeline", "TimeLine",
+		gen.FieldTrimPrefix("tml_"),
+		gen.FieldType("tml_id", timelineIDTypeString),
+		gen.FieldType("tml_uid", userIDTypeString),
+		gen.FieldType("tml_cat", timelineCatTypeString),
+		gen.FieldType("tml_img", "[]byte"),
+		gen.FieldType("tml_memo", "[]byte"),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "AccessToken",
 		gen.FieldType("type", "uint8"),
