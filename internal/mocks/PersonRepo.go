@@ -51,8 +51,8 @@ type PersonRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//  - ctx context.Context
-//  - id model.PersonID
+//   - ctx context.Context
+//   - id model.PersonID
 func (_e *PersonRepo_Expecter) Get(ctx interface{}, id interface{}) *PersonRepo_Get_Call {
 	return &PersonRepo_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
@@ -105,8 +105,8 @@ type PersonRepo_GetByIDs_Call struct {
 }
 
 // GetByIDs is a helper method to define mock.On call
-//  - ctx context.Context
-//  - ids ...model.PersonID
+//   - ctx context.Context
+//   - ids ...model.PersonID
 func (_e *PersonRepo_Expecter) GetByIDs(ctx interface{}, ids ...interface{}) *PersonRepo_GetByIDs_Call {
 	return &PersonRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs",
 		append([]interface{}{ctx}, ids...)...)}
