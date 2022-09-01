@@ -50,7 +50,8 @@ jobs:
         if: ${{ failure() && github.event_name != 'push' }}
         run: |
           TMPFILE=$(mktemp)
-          git diff >"${TMPFILE}"
+          content=$(git diff --name-only|sort|head -n |xargs git diff --)
+          echo "${content}" >"${TMPFILE}"
           git reset --hard HEAD
 
           reviewdog -f=diff -f.diff.strip=1 -reporter=github-pr-review -tee < "${TMPFILE}"
