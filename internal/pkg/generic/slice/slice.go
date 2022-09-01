@@ -88,16 +88,19 @@ func Flat[T any](in [][]T) []T {
 	return out
 }
 
-func UniqueUnsorted[T comparable](in []T) []T {
-	var m = make(map[T]struct{}, len(in))
+type empty = struct{}
 
-	for _, t := range in {
-		m[t] = struct{}{}
-	}
+func Unique[T comparable](in []T) []T {
+	var m = make(map[T]empty, len(in))
+	var out = make([]T, 0, len(in))
 
-	var out = make([]T, 0, len(m))
-	for k := range m {
-		out = append(out, k)
+	for _, item := range in {
+		if _, ok := m[item]; ok {
+			continue
+		}
+
+		out = append(out, item)
+		m[item] = empty{}
 	}
 
 	return out

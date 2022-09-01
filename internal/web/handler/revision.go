@@ -77,7 +77,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.UniqueUnsorted(creatorIDs)...)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs)...)
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -157,7 +157,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.UniqueUnsorted(creatorIDs)...)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs)...)
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -242,7 +242,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.UniqueUnsorted(creatorIDs)...)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs)...)
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
