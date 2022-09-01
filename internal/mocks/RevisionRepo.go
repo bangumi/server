@@ -371,10 +371,10 @@ type RevisionRepo_ListPersonRelated_Call struct {
 }
 
 // ListPersonRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - personID model.PersonID
-//  - limit int
-//  - offset int
+//   - ctx context.Context
+//   - personID model.PersonID
+//   - limit int
+//   - offset int
 func (_e *RevisionRepo_Expecter) ListPersonRelated(ctx interface{}, personID interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListPersonRelated_Call {
 	return &RevisionRepo_ListPersonRelated_Call{Call: _e.mock.On("ListPersonRelated", ctx, personID, limit, offset)}
 }
