@@ -75,15 +75,16 @@ func (l *metricsLog) LogMode(level gormLogger.LogLevel) gormLogger.Interface {
 var slowLog = "SLOW SQL >= " + slowQueryTimeout.String() //nolint:gochecknoglobals
 
 func (l *metricsLog) Trace(_ context.Context, begin time.Time, fc func() (sql string, rows int64), err error) {
-	sql, rows := fc()
 	elapsed := time.Since(begin)
 	l.h.RecordDuration(elapsed)
 
 	switch {
 	case err != nil && !errors.Is(err, gorm.ErrRecordNotFound):
+		sql, rows := fc()
 		l.log.Error("gorm error", zap.String("sql", sql), zap.Error(err),
 			zap.Duration("duration", elapsed), zap.Int64("rows", rows))
 	case elapsed >= slowQueryTimeout:
+		sql, rows := fc()
 		l.log.Warn(slowLog, zap.String("sql", sql), zap.Duration("duration", elapsed), zap.Int64("rows", rows))
 	}
 }
