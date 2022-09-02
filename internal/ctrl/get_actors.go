@@ -35,7 +35,7 @@ func (ctl Ctrl) GetActors(
 
 	vs := slice.Unique(slice.Flat(gmap.Values(actors)))
 
-	persons, err := ctl.person.GetByIDs(ctx, vs...)
+	persons, err := ctl.person.GetByIDs(ctx, vs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get persons")
 	}

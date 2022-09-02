@@ -194,7 +194,7 @@ func (r mysqlRepo) GetSubjectRelated(
 }
 
 func (r mysqlRepo) GetByIDs(
-	ctx context.Context, ids ...model.SubjectID,
+	ctx context.Context, ids []model.SubjectID,
 ) (map[model.SubjectID]model.Subject, error) {
 	records, err := r.q.Subject.WithContext(ctx).
 		Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(slice.ToValuer(ids)...)).Find()

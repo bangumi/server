@@ -87,7 +87,7 @@ func (ctl Ctrl) GetSubjectByIDs(
 		}
 	}
 
-	newSubjectMap, err := ctl.subject.GetByIDs(ctx, notCached...)
+	newSubjectMap, err := ctl.subject.GetByIDs(ctx, notCached)
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get subjects")
 	}

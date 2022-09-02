@@ -70,19 +70,12 @@ func (_c *CharacterRepo_Get_Call) Return(_a0 model.Character, _a1 error) *Charac
 }
 
 // GetByIDs provides a mock function with given fields: ctx, ids
-func (_m *CharacterRepo) GetByIDs(ctx context.Context, ids ...model.CharacterID) (map[model.CharacterID]model.Character, error) {
-	_va := make([]interface{}, len(ids))
-	for _i := range ids {
-		_va[_i] = ids[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
+func (_m *CharacterRepo) GetByIDs(ctx context.Context, ids []model.CharacterID) (map[model.CharacterID]model.Character, error) {
+	ret := _m.Called(ctx, ids)
 
 	var r0 map[model.CharacterID]model.Character
-	if rf, ok := ret.Get(0).(func(context.Context, ...model.CharacterID) map[model.CharacterID]model.Character); ok {
-		r0 = rf(ctx, ids...)
+	if rf, ok := ret.Get(0).(func(context.Context, []model.CharacterID) map[model.CharacterID]model.Character); ok {
+		r0 = rf(ctx, ids)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(map[model.CharacterID]model.Character)
@@ -90,8 +83,8 @@ func (_m *CharacterRepo) GetByIDs(ctx context.Context, ids ...model.CharacterID)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, ...model.CharacterID) error); ok {
-		r1 = rf(ctx, ids...)
+	if rf, ok := ret.Get(1).(func(context.Context, []model.CharacterID) error); ok {
+		r1 = rf(ctx, ids)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -106,21 +99,14 @@ type CharacterRepo_GetByIDs_Call struct {
 
 // GetByIDs is a helper method to define mock.On call
 //   - ctx context.Context
-//   - ids ...model.CharacterID
-func (_e *CharacterRepo_Expecter) GetByIDs(ctx interface{}, ids ...interface{}) *CharacterRepo_GetByIDs_Call {
-	return &CharacterRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs",
-		append([]interface{}{ctx}, ids...)...)}
+//   - ids []model.CharacterID
+func (_e *CharacterRepo_Expecter) GetByIDs(ctx interface{}, ids interface{}) *CharacterRepo_GetByIDs_Call {
+	return &CharacterRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs", ctx, ids)}
 }
 
-func (_c *CharacterRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids ...model.CharacterID)) *CharacterRepo_GetByIDs_Call {
+func (_c *CharacterRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids []model.CharacterID)) *CharacterRepo_GetByIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]model.CharacterID, len(args)-1)
-		for i, a := range args[1:] {
-			if a != nil {
-				variadicArgs[i] = a.(model.CharacterID)
-			}
-		}
-		run(args[0].(context.Context), variadicArgs...)
+		run(args[0].(context.Context), args[1].([]model.CharacterID))
 	})
 	return _c
 }
