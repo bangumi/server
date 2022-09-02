@@ -105,7 +105,7 @@ jobs:
           title: Update Openapi Specification from bangumi/server
           push-to-fork: Trim21-bot/api
           branch: "update-upstream"
-          author: "Trim21-bot <trim21-bot@users.noreply.github.com>"
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
       - uses: actions/checkout@v3
         with:
@@ -122,4 +122,4 @@ jobs:
           title: Update Openapi Specification from bangumi/server
           push-to-fork: Trim21-bot/dev-docs
           branch: "update-upstream"
-          author: "Trim21-bot <trim21-bot@users.noreply.github.com>"
+          author: "github-actions <github-actions@github.com>"
