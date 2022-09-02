@@ -40,12 +40,12 @@ func (ctl Ctrl) GetPersonRelatedCharacters(
 		subjectIDs[i] = relation.SubjectID
 	}
 
-	characters, err := ctl.character.GetByIDs(ctx, characterIDs...)
+	characters, err := ctl.character.GetByIDs(ctx, characterIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
 	}
 
-	subjects, err := ctl.subject.GetByIDs(ctx, subjectIDs...)
+	subjects, err := ctl.subject.GetByIDs(ctx, subjectIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}

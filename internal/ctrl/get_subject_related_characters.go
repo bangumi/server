@@ -42,7 +42,7 @@ func (ctl Ctrl) GetSubjectRelatedCharacters(
 		return item.CharacterID
 	})
 
-	characters, err := ctl.character.GetByIDs(ctx, characterIDs...)
+	characters, err := ctl.character.GetByIDs(ctx, characterIDs)
 	if err != nil {
 		return s, nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
 	}

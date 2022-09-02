@@ -53,7 +53,7 @@ func (r mysqlRepo) Get(ctx context.Context, id model.CharacterID) (model.Charact
 }
 
 func (r mysqlRepo) GetByIDs(
-	ctx context.Context, ids ...model.CharacterID,
+	ctx context.Context, ids []model.CharacterID,
 ) (map[model.CharacterID]model.Character, error) {
 	records, err := r.q.Character.WithContext(ctx).Preload(r.q.Character.Fields).
 		Where(r.q.Character.ID.In(slice.ToValuer(ids)...)).Find()

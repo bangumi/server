@@ -132,19 +132,12 @@ func (_c *SubjectRepo_GetActors_Call) Return(_a0 map[model.CharacterID][]model.P
 }
 
 // GetByIDs provides a mock function with given fields: ctx, ids
-func (_m *SubjectRepo) GetByIDs(ctx context.Context, ids ...model.SubjectID) (map[model.SubjectID]model.Subject, error) {
-	_va := make([]interface{}, len(ids))
-	for _i := range ids {
-		_va[_i] = ids[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
+func (_m *SubjectRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID]model.Subject, error) {
+	ret := _m.Called(ctx, ids)
 
 	var r0 map[model.SubjectID]model.Subject
-	if rf, ok := ret.Get(0).(func(context.Context, ...model.SubjectID) map[model.SubjectID]model.Subject); ok {
-		r0 = rf(ctx, ids...)
+	if rf, ok := ret.Get(0).(func(context.Context, []model.SubjectID) map[model.SubjectID]model.Subject); ok {
+		r0 = rf(ctx, ids)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(map[model.SubjectID]model.Subject)
@@ -152,8 +145,8 @@ func (_m *SubjectRepo) GetByIDs(ctx context.Context, ids ...model.SubjectID) (ma
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, ...model.SubjectID) error); ok {
-		r1 = rf(ctx, ids...)
+	if rf, ok := ret.Get(1).(func(context.Context, []model.SubjectID) error); ok {
+		r1 = rf(ctx, ids)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -168,21 +161,14 @@ type SubjectRepo_GetByIDs_Call struct {
 
 // GetByIDs is a helper method to define mock.On call
 //   - ctx context.Context
-//   - ids ...model.SubjectID
-func (_e *SubjectRepo_Expecter) GetByIDs(ctx interface{}, ids ...interface{}) *SubjectRepo_GetByIDs_Call {
-	return &SubjectRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs",
-		append([]interface{}{ctx}, ids...)...)}
+//   - ids []model.SubjectID
+func (_e *SubjectRepo_Expecter) GetByIDs(ctx interface{}, ids interface{}) *SubjectRepo_GetByIDs_Call {
+	return &SubjectRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs", ctx, ids)}
 }
 
-func (_c *SubjectRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids ...model.SubjectID)) *SubjectRepo_GetByIDs_Call {
+func (_c *SubjectRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids []model.SubjectID)) *SubjectRepo_GetByIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]model.SubjectID, len(args)-1)
-		for i, a := range args[1:] {
-			if a != nil {
-				variadicArgs[i] = a.(model.SubjectID)
-			}
-		}
-		run(args[0].(context.Context), variadicArgs...)
+		run(args[0].(context.Context), args[1].([]model.SubjectID))
 	})
 	return _c
 }

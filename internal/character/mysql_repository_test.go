@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
@@ -63,7 +64,7 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.GetByIDs(context.Background(), 1, 2)
+	s, err := repo.GetByIDs(context.Background(), []model.CharacterID{1, 2})
 	require.NoError(t, err)
 
 	_, ok := s[1]

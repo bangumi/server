@@ -48,7 +48,7 @@ func (s service) GetSubjectRelated(
 		personIDs[i] = relation.PersonID
 	}
 
-	persons, err := s.repo.GetByIDs(ctx, personIDs...)
+	persons, err := s.repo.GetByIDs(ctx, personIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}
@@ -85,12 +85,12 @@ func (s service) GetCharacterRelated(
 		subjectIDs[i] = relation.SubjectID
 	}
 
-	persons, err := s.repo.GetByIDs(ctx, personIDs...)
+	persons, err := s.repo.GetByIDs(ctx, personIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}
 
-	subjects, err := s.s.GetByIDs(ctx, subjectIDs...)
+	subjects, err := s.s.GetByIDs(ctx, subjectIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.Get")
 	}

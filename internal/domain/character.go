@@ -22,7 +22,7 @@ import (
 
 type CharacterRepo interface {
 	Get(ctx context.Context, id model.CharacterID) (model.Character, error)
-	GetByIDs(ctx context.Context, ids ...model.CharacterID) (map[model.CharacterID]model.Character, error)
+	GetByIDs(ctx context.Context, ids []model.CharacterID) (map[model.CharacterID]model.Character, error)
 
 	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]PersonCharacterRelation, error)
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectCharacterRelation, error)
