@@ -37,6 +37,7 @@ tasks:
       - TopicRepo
       - TimeLineRepo
       - SearchClient
+      - PrivateMessageRepo
 
   base-mock:
     deps:
@@ -299,3 +300,15 @@ tasks:
           SRC_DIR: ./internal/search
           INTERFACE: Client
           MOCK_STRUCT: SearchClient
+
+  PrivateMessageRepo:
+    sources:
+      - internal/domain/pm.go
+      - ./internal/pkg/tools/go.mod
+    generates:
+      - internal/mocks/PrivateMessageRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/domain
+          INTERFACE: PrivateMessageRepo

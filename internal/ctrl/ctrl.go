@@ -39,6 +39,7 @@ func New(
 	topic domain.TopicRepo,
 	tx dal.Transaction,
 	dam dam.Dam,
+	privateMessage domain.PrivateMessageRepo,
 	log *zap.Logger,
 ) Ctrl {
 	return Ctrl{
@@ -48,15 +49,16 @@ func New(
 		tx:  tx,
 		dam: dam,
 
-		user:       user,
-		topic:      topic,
-		person:     person,
-		episode:    episode,
-		subject:    subject,
-		character:  character,
-		index:      index,
-		collection: collection,
-		timeline:   timeline,
+		user:           user,
+		topic:          topic,
+		person:         person,
+		episode:        episode,
+		subject:        subject,
+		character:      character,
+		index:          index,
+		collection:     collection,
+		timeline:       timeline,
+		privateMessage: privateMessage,
 
 		metricUserQueryCount:  metric.Counter("app_user_query_count"),
 		metricUserQueryCached: metric.Counter("app_user_query_cached_count"),
@@ -85,6 +87,7 @@ type Ctrl struct {
 	collection            domain.CollectionRepo
 	index                 domain.IndexRepo
 	timeline              domain.TimeLineRepo
+	privateMessage        domain.PrivateMessageRepo
 	metricUserQueryCached tally.Counter
 	metricUserQueryCount  tally.Counter
 

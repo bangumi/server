@@ -29,6 +29,10 @@ type UserRepo interface {
 	GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]model.User, error)
 
 	GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]FriendItem, error)
+
+	CheckIsFriendToOthers(ctx context.Context, selfID model.UserID, otherIDs ...model.UserID) (bool, error)
+
+	GetFieldsByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]model.UserFields, error)
 }
 
 type FriendItem struct{}

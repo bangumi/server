@@ -12,29 +12,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package pm
 
 import (
-	"go.uber.org/fx"
+	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/web/handler/character"
-	"github.com/bangumi/server/internal/web/handler/common"
-	"github.com/bangumi/server/internal/web/handler/index"
-	"github.com/bangumi/server/internal/web/handler/person"
-	"github.com/bangumi/server/internal/web/handler/pm"
-	"github.com/bangumi/server/internal/web/handler/subject"
-	"github.com/bangumi/server/internal/web/handler/user"
+	"github.com/bangumi/server/internal/web/res"
 )
 
-var Module = fx.Module("handler",
-	fx.Provide(
-		New,
-		common.New,
-		user.New,
-		person.New,
-		subject.New,
-		character.New,
-		index.New,
-		pm.New,
-	),
-)
+func (h PrivateMessage) CountTypes(c *fiber.Ctx) error {
+	accessor := h.Common.GetHTTPAccessor(c)
+	counts, err := h.pmRepo.CountTypes(c.Context(), accessor.ID)
+	if err != nil {
+		return h.InternalError(c, err, "failed to count private message types")
+	}
+	return res.JSON(c, res.PrivateMessageTypeCounts{
+		Unread: counts.Unread,
+		Inbox:  counts.Inbox,
+		Outbox: counts.Outbox,
+	})
+}

@@ -77,11 +77,14 @@ type Query struct {
 	IndexComment        indexComment
 	IndexSubject        indexSubject
 	Member              member
+	Notification        notification
+	NotificationField   notificationField
 	OAuthClient         oAuthClient
 	Person              person
 	PersonComment       personComment
 	PersonField         personField
 	PersonSubjects      personSubjects
+	PrivateMessage      privateMessage
 	RevisionHistory     revisionHistory
 	RevisionText        revisionText
 	Subject             subject
@@ -119,11 +122,14 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		IndexComment:        q.IndexComment.clone(db),
 		IndexSubject:        q.IndexSubject.clone(db),
 		Member:              q.Member.clone(db),
+		Notification:        q.Notification.clone(db),
+		NotificationField:   q.NotificationField.clone(db),
 		OAuthClient:         q.OAuthClient.clone(db),
 		Person:              q.Person.clone(db),
 		PersonComment:       q.PersonComment.clone(db),
 		PersonField:         q.PersonField.clone(db),
 		PersonSubjects:      q.PersonSubjects.clone(db),
+		PrivateMessage:      q.PrivateMessage.clone(db),
 		RevisionHistory:     q.RevisionHistory.clone(db),
 		RevisionText:        q.RevisionText.clone(db),
 		Subject:             q.Subject.clone(db),
@@ -207,11 +213,14 @@ type queryCtx struct {
 	IndexComment        *indexCommentDo
 	IndexSubject        *indexSubjectDo
 	Member              *memberDo
+	Notification        *notificationDo
+	NotificationField   *notificationFieldDo
 	OAuthClient         *oAuthClientDo
 	Person              *personDo
 	PersonComment       *personCommentDo
 	PersonField         *personFieldDo
 	PersonSubjects      *personSubjectsDo
+	PrivateMessage      *privateMessageDo
 	RevisionHistory     *revisionHistoryDo
 	RevisionText        *revisionTextDo
 	Subject             *subjectDo
@@ -246,11 +255,14 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		IndexComment:        q.IndexComment.WithContext(ctx),
 		IndexSubject:        q.IndexSubject.WithContext(ctx),
 		Member:              q.Member.WithContext(ctx),
+		Notification:        q.Notification.WithContext(ctx),
+		NotificationField:   q.NotificationField.WithContext(ctx),
 		OAuthClient:         q.OAuthClient.WithContext(ctx),
 		Person:              q.Person.WithContext(ctx),
 		PersonComment:       q.PersonComment.WithContext(ctx),
 		PersonField:         q.PersonField.WithContext(ctx),
 		PersonSubjects:      q.PersonSubjects.WithContext(ctx),
+		PrivateMessage:      q.PrivateMessage.WithContext(ctx),
 		RevisionHistory:     q.RevisionHistory.WithContext(ctx),
 		RevisionText:        q.RevisionText.WithContext(ctx),
 		Subject:             q.Subject.WithContext(ctx),

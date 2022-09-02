@@ -11,30 +11,24 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
+package model
 
-package handler
+import "time"
 
-import (
-	"go.uber.org/fx"
+type NotificationField struct {
+	Title       string
+	ID          NotificationFieldID
+	RelatedID   uint32 // 关联的主体事项的id，条目讨论，日志的
+	RelatedType uint8  // 关联的主体事项的分类
+}
 
-	"github.com/bangumi/server/internal/web/handler/character"
-	"github.com/bangumi/server/internal/web/handler/common"
-	"github.com/bangumi/server/internal/web/handler/index"
-	"github.com/bangumi/server/internal/web/handler/person"
-	"github.com/bangumi/server/internal/web/handler/pm"
-	"github.com/bangumi/server/internal/web/handler/subject"
-	"github.com/bangumi/server/internal/web/handler/user"
-)
-
-var Module = fx.Module("handler",
-	fx.Provide(
-		New,
-		common.New,
-		user.New,
-		person.New,
-		subject.New,
-		character.New,
-		index.New,
-		pm.New,
-	),
-)
+type Notification struct {
+	CreatedTime time.Time
+	ID          NotificationID
+	ReceiverID  UserID
+	SenderID    UserID
+	FieldID     NotificationFieldID
+	RelatedID   uint32 // 触发通知的实际事项id，如回复的
+	Type        NotificationType
+	Status      NotificationStatus
+}

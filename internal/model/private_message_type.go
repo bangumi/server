@@ -11,30 +11,11 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
+package model
 
-package handler
+type PrivateMessageFolderType string
 
-import (
-	"go.uber.org/fx"
-
-	"github.com/bangumi/server/internal/web/handler/character"
-	"github.com/bangumi/server/internal/web/handler/common"
-	"github.com/bangumi/server/internal/web/handler/index"
-	"github.com/bangumi/server/internal/web/handler/person"
-	"github.com/bangumi/server/internal/web/handler/pm"
-	"github.com/bangumi/server/internal/web/handler/subject"
-	"github.com/bangumi/server/internal/web/handler/user"
-)
-
-var Module = fx.Module("handler",
-	fx.Provide(
-		New,
-		common.New,
-		user.New,
-		person.New,
-		subject.New,
-		character.New,
-		index.New,
-		pm.New,
-	),
+const (
+	PrivateMessageFolderTypeInbox  PrivateMessageFolderType = "inbox"
+	PrivateMessageFolderTypeOutbox PrivateMessageFolderType = "outbox"
 )

@@ -16,6 +16,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/trim21/go-phpserialize"
 )
 
 // User is visible for everyone.
@@ -31,4 +33,58 @@ type User struct {
 
 func (u User) GetID() UserID {
 	return u.ID
+}
+
+type UserSubjectEpisodesCollection map[EpisodeID]UserEpisodeCollection
+
+type UserReceiveFilter uint8
+
+const (
+	UserReceiveFilterAll UserReceiveFilter = iota
+	UserReceiveFilterFriends
+	UserReceiveFilterNone
+)
+
+type UserPrivacySettingsField int
+
+const (
+	UserPrivacyReceivePrivateMessage      UserPrivacySettingsField = 1
+	UserPrivacyReceiveTimelineReply       UserPrivacySettingsField = 30
+	UserPrivacyReceiveMentionNotification UserPrivacySettingsField = 20
+	UserPrivacyReceiveCommentNotification UserPrivacySettingsField = 21
+)
+
+type UserPrivacySettings struct {
+	ReceivePrivateMessage      UserReceiveFilter
+	ReceiveTimelineReply       UserReceiveFilter
+	ReceiveMentionNotification UserReceiveFilter
+	ReceiveCommentNotification UserReceiveFilter
+}
+
+func (settings *UserPrivacySettings) Unmarshal(s string) {
+	rawMap := make(map[int]uint8, 4)
+	err := phpserialize.Unmarshal([]byte(s), rawMap)
+	if err != nil {
+		if v, ok := rawMap[int(UserPrivacyReceivePrivateMessage)]; ok {
+			settings.ReceivePrivateMessage = UserReceiveFilter(v)
+		}
+		if v, ok := rawMap[int(UserPrivacyReceiveTimelineReply)]; ok {
+			settings.ReceiveTimelineReply = UserReceiveFilter(v)
+		}
+		if v, ok := rawMap[int(UserPrivacyReceiveMentionNotification)]; ok {
+			settings.ReceiveMentionNotification = UserReceiveFilter(v)
+		}
+		if v, ok := rawMap[int(UserPrivacyReceiveCommentNotification)]; ok {
+			settings.ReceiveCommentNotification = UserReceiveFilter(v)
+		}
+	}
+}
+
+type UserFields struct {
+	Site      string
+	Location  string
+	Bio       string
+	Blocklist []UserID
+	Privacy   UserPrivacySettings
+	UID       UserID
 }

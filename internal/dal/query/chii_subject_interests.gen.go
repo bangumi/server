@@ -137,7 +137,7 @@ func (s *subjectCollection) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (s *subjectCollection) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 20)
+	s.fieldMap = make(map[string]field.Expr, 18)
 	s.fieldMap["interest_id"] = s.ID
 	s.fieldMap["interest_uid"] = s.UserID
 	s.fieldMap["interest_subject_id"] = s.SubjectID

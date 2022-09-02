@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/index"
 	"github.com/bangumi/server/internal/web/handler/person"
+	"github.com/bangumi/server/internal/web/handler/pm"
 	"github.com/bangumi/server/internal/web/handler/subject"
 	"github.com/bangumi/server/internal/web/handler/user"
 	"github.com/bangumi/server/internal/web/middleware/origin"
@@ -45,6 +46,7 @@ func AddRouters(
 	userHandler user.User,
 	personHandler person.Person,
 	characterHandler character.Character,
+	pmHandler pm.PrivateMessage,
 	subjectHandler subject.Subject,
 	indexHandler index.Handler,
 ) {
@@ -97,6 +99,14 @@ func AddRouters(
 		v0.Put("/indices/:id/subjects/:subject_id", req.JSON, i.NeedLogin, i.UpdateIndexSubject)
 		v0.Delete("/indices/:id/subjects/:subject_id", i.NeedLogin, i.RemoveIndexSubject)
 	}
+
+	v0.Get("/pms/list", h.NeedLogin, addMetrics(pmHandler.List))
+	v0.Get("/pms/list/:id", h.NeedLogin, addMetrics(pmHandler.ListRelated))
+	v0.Get("/pms/counts", h.NeedLogin, addMetrics(pmHandler.CountTypes))
+	v0.Get("/pms/contact/recent", h.NeedLogin, addMetrics(pmHandler.ListRecentContact))
+	v0.Patch("/pms/mark-read", req.JSON, h.NeedLogin, addMetrics(pmHandler.MarkRead))
+	v0.Post("/pms/create", req.JSON, h.NeedLogin, addMetrics(pmHandler.Create))
+	v0.Delete("/pms/delete", req.JSON, h.NeedLogin, addMetrics(pmHandler.Delete))
 
 	v0.Get("/revisions/persons/:id", h.GetPersonRevision)
 	v0.Get("/revisions/persons", h.ListPersonRevision)

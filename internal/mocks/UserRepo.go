@@ -24,6 +24,66 @@ func (_m *UserRepo) EXPECT() *UserRepo_Expecter {
 	return &UserRepo_Expecter{mock: &_m.Mock}
 }
 
+// CheckIsFriendToOthers provides a mock function with given fields: ctx, selfID, otherIDs
+func (_m *UserRepo) CheckIsFriendToOthers(ctx context.Context, selfID model.UserID, otherIDs ...model.UserID) (bool, error) {
+	_va := make([]interface{}, len(otherIDs))
+	for _i := range otherIDs {
+		_va[_i] = otherIDs[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, selfID)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, ...model.UserID) bool); ok {
+		r0 = rf(ctx, selfID, otherIDs...)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, ...model.UserID) error); ok {
+		r1 = rf(ctx, selfID, otherIDs...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UserRepo_CheckIsFriendToOthers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CheckIsFriendToOthers'
+type UserRepo_CheckIsFriendToOthers_Call struct {
+	*mock.Call
+}
+
+// CheckIsFriendToOthers is a helper method to define mock.On call
+//  - ctx context.Context
+//  - selfID model.UserID
+//  - otherIDs ...model.UserID
+func (_e *UserRepo_Expecter) CheckIsFriendToOthers(ctx interface{}, selfID interface{}, otherIDs ...interface{}) *UserRepo_CheckIsFriendToOthers_Call {
+	return &UserRepo_CheckIsFriendToOthers_Call{Call: _e.mock.On("CheckIsFriendToOthers",
+		append([]interface{}{ctx, selfID}, otherIDs...)...)}
+}
+
+func (_c *UserRepo_CheckIsFriendToOthers_Call) Run(run func(ctx context.Context, selfID model.UserID, otherIDs ...model.UserID)) *UserRepo_CheckIsFriendToOthers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]model.UserID, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(model.UserID)
+			}
+		}
+		run(args[0].(context.Context), args[1].(model.UserID), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *UserRepo_CheckIsFriendToOthers_Call) Return(_a0 bool, _a1 error) *UserRepo_CheckIsFriendToOthers_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // GetByID provides a mock function with given fields: ctx, userID
 func (_m *UserRepo) GetByID(ctx context.Context, userID model.UserID) (model.User, error) {
 	ret := _m.Called(ctx, userID)
@@ -157,6 +217,53 @@ func (_c *UserRepo_GetByName_Call) Run(run func(ctx context.Context, username st
 }
 
 func (_c *UserRepo_GetByName_Call) Return(_a0 model.User, _a1 error) *UserRepo_GetByName_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// GetFieldsByIDs provides a mock function with given fields: ctx, ids
+func (_m *UserRepo) GetFieldsByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]model.UserFields, error) {
+	ret := _m.Called(ctx, ids)
+
+	var r0 map[model.UserID]model.UserFields
+	if rf, ok := ret.Get(0).(func(context.Context, []model.UserID) map[model.UserID]model.UserFields); ok {
+		r0 = rf(ctx, ids)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[model.UserID]model.UserFields)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, []model.UserID) error); ok {
+		r1 = rf(ctx, ids)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UserRepo_GetFieldsByIDs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFieldsByIDs'
+type UserRepo_GetFieldsByIDs_Call struct {
+	*mock.Call
+}
+
+// GetFieldsByIDs is a helper method to define mock.On call
+//  - ctx context.Context
+//  - ids []model.UserID
+func (_e *UserRepo_Expecter) GetFieldsByIDs(ctx interface{}, ids interface{}) *UserRepo_GetFieldsByIDs_Call {
+	return &UserRepo_GetFieldsByIDs_Call{Call: _e.mock.On("GetFieldsByIDs", ctx, ids)}
+}
+
+func (_c *UserRepo_GetFieldsByIDs_Call) Run(run func(ctx context.Context, ids []model.UserID)) *UserRepo_GetFieldsByIDs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].([]model.UserID))
+	})
+	return _c
+}
+
+func (_c *UserRepo_GetFieldsByIDs_Call) Return(_a0 map[model.UserID]model.UserFields, _a1 error) *UserRepo_GetFieldsByIDs_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
