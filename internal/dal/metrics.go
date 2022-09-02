@@ -43,7 +43,9 @@ func setupMetrics(db *gorm.DB, conn *sql.DB, scope tally.Scope, register prometh
 		return errgo.Wrap(err, "gorm callback")
 	}
 
-	register.MustRegister(DatabaseQuery)
+	if err = register.Register(DatabaseQuery); err != nil {
+		return errgo.Wrap(err, "prom.Register")
+	}
 
 	dbConnCount := scope.Gauge("db_open_connections_total")
 	go func() {

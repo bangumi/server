@@ -48,7 +48,7 @@ func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
 		return nil, errgo.Wrap(err, "client.Ping")
 	}
 
-	cli.AddHook(metrics.RedisHook())
+	cli.AddHook(metrics.RedisHook(redisOptions.Addr))
 
 	return cli, nil
 }
