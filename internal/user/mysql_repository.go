@@ -67,7 +67,7 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (model.User, 
 	return fromDao(u), nil
 }
 
-func (m mysqlRepo) GetByIDs(ctx context.Context, ids ...model.UserID) (map[model.UserID]model.User, error) {
+func (m mysqlRepo) GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]model.User, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(slice.ToValuer(ids)...)).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))

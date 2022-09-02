@@ -143,7 +143,7 @@ func (h Handler) listGroupMembers(
 	for i, member := range members {
 		userIDs[i] = member.UserID
 	}
-	userMap, err := h.ctrl.GetUsersByIDs(ctx, userIDs...)
+	userMap, err := h.ctrl.GetUsersByIDs(ctx, userIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "userRepo.GetByIDs")
 	}

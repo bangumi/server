@@ -77,7 +77,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs)...)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs))
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -104,7 +104,7 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get person related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), r.CreatorID)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -157,7 +157,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs)...)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -188,7 +188,7 @@ func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get character related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), r.CreatorID)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -242,7 +242,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs)...)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -268,7 +268,7 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get subject related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), r.CreatorID)
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
