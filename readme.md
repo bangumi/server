@@ -107,8 +107,8 @@ flowchart TD
     ...
   end
 
-  subgraph C[Kafka consumer]
-    C1[consumer 1];
+  subgraph C[canal]
+    C1[kafka consumer];
   end
 
   meilisearch[(new search engine)];
