@@ -114,7 +114,7 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 
 	repo := getRepo(t)
 
-	users, err := repo.GetByIDs(context.Background(), 1, 382951)
+	users, err := repo.GetByIDs(context.Background(), []model.UserID{1, 382951})
 	require.NoError(t, err)
 
 	require.Len(t, users, 2)

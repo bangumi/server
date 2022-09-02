@@ -56,7 +56,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	userIDs := slice.Map(topics, func(item model.Topic) model.UserID {
 		return item.CreatorID
 	})
-	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(userIDs)...)
+	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(userIDs))
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -104,7 +104,7 @@ func (h Handler) getResTopicWithComments(
 
 	userIDs[t.CreatorID] = struct{}{}
 
-	users, err := h.ctrl.GetUsersByIDs(context.TODO(), gmap.Keys(userIDs)...)
+	users, err := h.ctrl.GetUsersByIDs(context.TODO(), gmap.Keys(userIDs))
 	if err != nil {
 		return nil, errgo.Wrap(err, "ctrl.GetUsersByIDs")
 	}

@@ -60,7 +60,7 @@ func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, e
 	return r, nil
 }
 
-func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs ...model.UserID) (map[model.UserID]model.User, error) {
+func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs []model.UserID) (map[model.UserID]model.User, error) {
 	ctl.metricUserQueryCount.Inc(int64(len(userIDs)))
 	var notCached = make([]model.UserID, 0, len(userIDs))
 
@@ -81,7 +81,7 @@ func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs ...model.UserID) (map
 	}
 
 	ctl.metricUserQueryCached.Inc(int64(len(result)))
-	newUserMap, err := ctl.user.GetByIDs(ctx, notCached...)
+	newUserMap, err := ctl.user.GetByIDs(ctx, notCached)
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get subjects")
 	}

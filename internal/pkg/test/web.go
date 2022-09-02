@@ -200,13 +200,13 @@ func MockUserRepo(repo domain.UserRepo) fx.Option {
 		mocker := &mocks.UserRepo{}
 		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(model.User{}, nil)
 		mocker.On("GetByIDs", mock.Anything, mock.Anything).
-			Return(func(ctx context.Context, ids ...model.UserID) map[model.UserID]model.User {
+			Return(func(ctx context.Context, ids []model.UserID) map[model.UserID]model.User {
 				var ret = make(map[model.UserID]model.User, len(ids))
 				for _, id := range ids {
 					ret[id] = model.User{}
 				}
 				return ret
-			}, func(ctx context.Context, ids ...model.UserID) error {
+			}, func(ctx context.Context, ids []model.UserID) error {
 				return nil
 			})
 		repo = mocker

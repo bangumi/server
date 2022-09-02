@@ -202,7 +202,7 @@ func (h Handler) listComments(
 		return errgo.Wrap(err, "topic.ListReplies")
 	}
 
-	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), commentsToUserIDs(comments)...)
+	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), commentsToUserIDs(comments))
 	if err != nil {
 		return errgo.Wrap(err, "query.GetUsersByIDs")
 	}
