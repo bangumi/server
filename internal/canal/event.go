@@ -18,10 +18,10 @@ import (
 	"context"
 	"errors"
 	"io"
+	"sync/atomic"
 
 	"github.com/goccy/go-json"
 	"github.com/segmentio/kafka-go"
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
@@ -32,8 +32,24 @@ import (
 	"github.com/bangumi/server/internal/web/session"
 )
 
+func newEventHandler(
+	log *zap.Logger,
+	appConfig config.AppConfig,
+	session session.Manager,
+	reader *kafka.Reader,
+	search search.Client,
+) *eventHandler {
+	return &eventHandler{
+		config:  appConfig,
+		session: session,
+		reader:  reader,
+		search:  search,
+		log:     log.Named("eventHandler"),
+	}
+}
+
 type eventHandler struct {
-	closed  *atomic.Bool
+	closed  atomic.Bool
 	config  config.AppConfig
 	session session.Manager
 	log     *zap.Logger
@@ -72,23 +88,6 @@ func (e *eventHandler) start() error {
 func (e *eventHandler) Close() error {
 	e.closed.Store(true)
 	return errgo.Wrap(e.reader.Close(), "kafka.Close")
-}
-
-func newEventHandler(
-	log *zap.Logger,
-	appConfig config.AppConfig,
-	session session.Manager,
-	reader *kafka.Reader,
-	search search.Client,
-) *eventHandler {
-	return &eventHandler{
-		closed:  atomic.NewBool(false),
-		config:  appConfig,
-		session: session,
-		reader:  reader,
-		search:  search,
-		log:     log.Named("eventHandler"),
-	}
 }
 
 func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
