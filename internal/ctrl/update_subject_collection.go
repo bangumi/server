@@ -32,7 +32,8 @@ import (
 )
 
 type UpdateCollectionRequest struct {
-	IP string
+	IP  string
+	UID model.UserID
 
 	Comment   null.String
 	Tags      []string
@@ -91,6 +92,19 @@ func (ctl Ctrl) UpdateCollection(
 			return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 		}
 
+		err = ctl.timeline.WithQuery(tx).Create(ctx, &model.TimeLine{
+			TimeLineMeta: &model.TimeLineMeta{
+				UID: req.UID,
+				// TODO: filling fields
+			},
+			TimeLineMemo: model.NewTimeLineMemo(&model.TimeLineProgressMemo{
+				// TODO: filling fields
+			}),
+		})
+		if err != nil {
+			ctl.log.Error("failed to create associated timeline", zap.Error(err))
+			return errgo.Wrap(err, "timelineRepo.Create")
+		}
 		return nil
 	})
 

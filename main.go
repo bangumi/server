@@ -15,6 +15,7 @@
 package main
 
 import (
+	"github.com/bangumi/server/internal/timeline"
 	"github.com/go-resty/resty/v2"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -81,7 +82,7 @@ func start() error {
 
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
-			topic.NewMysqlRepo,
+			topic.NewMysqlRepo, timeline.NewMysqlRepo,
 
 			dam.New,
 
