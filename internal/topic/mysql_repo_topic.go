@@ -128,6 +128,10 @@ func (r mysqlRepo) GetTopicContent(
 		return model.Comment{}, errUnSupportTopicType
 	}
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Comment{}, domain.ErrNotFound
+		}
+
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.Comment{}, errgo.Wrap(err, "dal")
 	}
