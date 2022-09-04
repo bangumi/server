@@ -26,7 +26,6 @@ import (
 	"gorm.io/gen/field"
 	"gorm.io/gorm"
 
-	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
@@ -274,10 +273,6 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 
 	d, err := table.WithContext(ctx).Where(where...).First()
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return r.createEpisodeCollection(ctx, userID, subjectID, episodeIDs, collectionType, at)
-		}
-
 		r.log.Error("failed to get episode collection record", zap.Error(err), userID.Zap(), subjectID.Zap())
 		return nil, errgo.Wrap(err, "dal")
 	}
@@ -301,37 +296,6 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 		UpdateColumnSimple(table.Status.Value(bytes), table.UpdatedTime.Value(uint32(at.Unix())))
 	if err != nil {
 		return nil, errgo.Wrap(err, "EpCollection.UpdateColumnSimple")
-	}
-
-	return e.toModel(), nil
-}
-
-func (r mysqlRepo) createEpisodeCollection(
-	ctx context.Context,
-	userID model.UserID,
-	subjectID model.SubjectID,
-	episodeIDs []model.EpisodeID,
-	collectionType model.EpisodeCollection,
-	at time.Time,
-) (model.UserSubjectEpisodesCollection, error) {
-	var e = make(mysqlEpCollection, len(episodeIDs))
-	updateMysqlEpisodeCollection(e, episodeIDs, collectionType)
-
-	bytes, err := serializePhpEpStatus(e)
-	if err != nil {
-		return nil, err
-	}
-
-	table := r.q.EpCollection
-	err = table.WithContext(ctx).Where(table.UserID.Eq(userID), table.SubjectID.Eq(subjectID)).Create(&dao.EpCollection{
-		UserID:      userID,
-		SubjectID:   subjectID,
-		Status:      bytes,
-		UpdatedTime: uint32(at.Unix()),
-	})
-	if err != nil {
-		r.log.Error("failed to create episode collection record", zap.Error(err), userID.Zap(), subjectID.Zap())
-		return nil, errgo.Wrap(err, "dal")
 	}
 
 	return e.toModel(), nil

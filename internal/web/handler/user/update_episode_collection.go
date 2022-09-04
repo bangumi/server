@@ -71,9 +71,11 @@ func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	err = h.ctrl.UpdateEpisodeCollection(c.UserContext(), u.Auth, subjectID, r.EpisodeID, r.Type)
+	err = h.ctrl.UpdateEpisodesCollection(c.UserContext(), u.Auth, subjectID, r.EpisodeID, r.Type)
 	if err != nil {
 		switch {
+		case errors.Is(err, domain.ErrSubjectNotCollected):
+			return res.BadRequest("you need to add subject to your collection first")
 		case errors.Is(err, ctrl.ErrInvalidInput):
 			return res.BadRequest(err.Error())
 		case errors.Is(err, domain.ErrNotFound):
@@ -101,20 +103,12 @@ func (h User) PutEpisodeCollection(c *fiber.Ctx) error {
 		return res.JSONError(c, err)
 	}
 
-	e, err := h.ctrl.GetEpisode(c.UserContext(), episodeID)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.ErrNotFound
-		}
-
-		h.log.Error("failed to get episode", episodeID.Zap())
-		return errgo.Wrap(err, "query.GetEpisode")
-	}
-
 	u := h.GetHTTPAccessor(c)
-	err = h.ctrl.UpdateEpisodeCollection(c.UserContext(), u.Auth, e.SubjectID, []model.EpisodeID{episodeID}, r.Type)
+	err = h.ctrl.UpdateEpisodeCollection(c.UserContext(), u.Auth, episodeID, r.Type)
 	if err != nil {
 		switch {
+		case errors.Is(err, domain.ErrSubjectNotCollected):
+			return res.BadRequest("you need to add subject to your collection first")
 		case errors.Is(err, ctrl.ErrInvalidInput):
 			return res.BadRequest(err.Error())
 		case errors.Is(err, domain.ErrNotFound):
