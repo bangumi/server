@@ -124,4 +124,4 @@ jobs:
           title: Update Openapi Specification from bangumi/server
           push-to-fork: Trim21-bot/dev-docs
           branch: "update-upstream"
-          author: "github-actions <github-actions@github.com>"
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
