@@ -125,7 +125,7 @@ func (h Handler) getResTopicWithComments(
 		CreatedAt: t.CreatedAt,
 		UpdatedAt: t.UpdatedAt,
 		Creator:   res.ConvertModelUser(users[t.CreatorID]),
-		State:     res.ToCommentState(t.State),
+		State:     t.State,
 		Comments:  fromModelComments(t.Replies, users, friends),
 		Text:      t.Content,
 	}, nil
@@ -146,7 +146,7 @@ func fromModelComments(
 				Text:      comment.Content,
 				Creator:   res.ConvertModelUser(users[comment.CreatorID]),
 				IsFriend:  f,
-				State:     res.ToCommentState(comment.State),
+				State:     comment.State,
 				ID:        comment.ID,
 			})
 		}
@@ -159,7 +159,7 @@ func fromModelComments(
 			Replies:   subComments,
 			ID:        reply.ID,
 			IsFriend:  f,
-			State:     res.ToCommentState(reply.State),
+			State:     reply.State,
 		})
 	}
 

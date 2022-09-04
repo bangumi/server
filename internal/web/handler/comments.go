@@ -251,7 +251,7 @@ func convertModelComments(
 				Text:      subComment.Content,
 				Creator:   res.ConvertModelUser(userMap[subComment.CreatorID]),
 				ID:        subComment.ID,
-				State:     res.ToCommentState(subComment.State),
+				State:     subComment.State,
 			}
 		}
 
@@ -265,7 +265,7 @@ func convertModelComments(
 			CreatedAt: comment.CreatedAt,
 			Creator:   res.ConvertModelUser(userMap[comment.CreatorID]),
 			Replies:   replies,
-			State:     res.ToCommentState(comment.State),
+			State:     comment.State,
 		}
 	}
 
