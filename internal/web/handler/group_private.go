@@ -25,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -135,7 +134,7 @@ func (h Handler) listGroupMembers(
 ) ([]res.PrivateGroupMember, error) {
 	members, err := h.g.ListMembersByID(ctx, groupID, memberType, limit, offset)
 	if err != nil {
-		h.log.Error("failed to list recent members", zap.Error(err), log.GroupID(groupID))
+		h.log.Error("failed to list recent members", zap.Error(err), groupID.Zap())
 		return nil, errgo.Wrap(err, "groupRepo。ListMembersByID")
 	}
 

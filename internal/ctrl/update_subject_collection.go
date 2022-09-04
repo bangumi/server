@@ -27,7 +27,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/set"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/null"
 )
 
@@ -49,7 +48,7 @@ func (ctl Ctrl) UpdateCollection(
 	subjectID model.SubjectID,
 	req UpdateCollectionRequest,
 ) error {
-	ctl.log.Info("try to update collection", log.SubjectID(subjectID), log.UserID(u.ID), zap.Reflect("'req", req))
+	ctl.log.Info("try to update collection", subjectID.Zap(), u.ID.Zap(), zap.Reflect("'req", req))
 
 	collect, err := ctl.collection.GetSubjectCollection(ctx, u.ID, subjectID)
 	if err != nil {
@@ -108,8 +107,8 @@ func (ctl Ctrl) UpdateEpisodeCollection(
 		return err
 	}
 
-	ctl.log.Info("try to update collection info", log.SubjectID(subjectID),
-		log.UserID(u.ID), zap.Reflect("episode_ids", episodeIDs))
+	ctl.log.Info("try to update collection info", subjectID.Zap(),
+		u.ID.Zap(), zap.Reflect("episode_ids", episodeIDs))
 
 	return ctl.tx.Transaction(ctl.updateEpisodeCollectionTx(ctx, u, subjectID, episodeIDs, t, time.Now()))
 }

@@ -26,7 +26,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -62,7 +61,7 @@ func (h User) patchSubjectCollection(
 			return res.NotFound("subject not found")
 		}
 
-		h.log.Error("failed to get subject", zap.Error(err), log.SubjectID(subjectID))
+		h.log.Error("failed to get subject", zap.Error(err), subjectID.Zap())
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 

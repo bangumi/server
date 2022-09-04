@@ -32,7 +32,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gstr"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
 var _ domain.CollectionRepo = mysqlRepo{}
@@ -142,7 +141,7 @@ func (r mysqlRepo) GetSubjectCollection(
 			return model.UserSubjectCollection{}, domain.ErrSubjectNotCollected
 		}
 
-		r.log.Error("unexpected error happened", zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+		r.log.Error("unexpected error happened", zap.Error(err), userID.Zap(), subjectID.Zap())
 		return model.UserSubjectCollection{}, errgo.Wrap(err, "dal")
 	}
 
@@ -175,14 +174,14 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 		}
 
 		r.log.Error("failed to get episode collection record", zap.Error(err),
-			log.UserID(userID), log.SubjectID(subjectID))
+			userID.Zap(), subjectID.Zap())
 		return nil, errgo.Wrap(err, "query.EpCollection.Find")
 	}
 
 	e, err := deserializePhpEpStatus(d.Status)
 	if err != nil {
 		r.log.Error("failed to deserialize php-serialized bytes to go data",
-			zap.Error(err), log.UserID(userID), log.SubjectID(subjectID))
+			zap.Error(err), userID.Zap(), subjectID.Zap())
 		return nil, err
 	}
 

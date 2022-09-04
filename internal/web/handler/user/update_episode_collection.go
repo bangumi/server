@@ -26,7 +26,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -108,7 +107,7 @@ func (h User) PutEpisodeCollection(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		h.log.Error("failed to get episode", log.EpisodeID(episodeID))
+		h.log.Error("failed to get episode", episodeID.Zap())
 		return errgo.Wrap(err, "query.GetEpisode")
 	}
 

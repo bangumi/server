@@ -24,7 +24,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -49,7 +48,7 @@ func (ctl Ctrl) GetTopic(
 			return model.TopicDetail{}, domain.ErrNotFound
 		}
 
-		ctl.log.Error("failed to get topic", zap.Error(err), log.TopicType(topicType), log.TopicID(topicID))
+		ctl.log.Error("failed to get topic", zap.Error(err), topicType.Zap(), topicID.Zap())
 		return model.TopicDetail{}, errgo.Wrap(err, "topicRepo.Get")
 	}
 
@@ -63,7 +62,7 @@ func (ctl Ctrl) GetTopic(
 			return model.TopicDetail{}, res.ErrNotFound
 		}
 
-		ctl.log.Error("failed to get topic content", zap.Error(err), log.TopicType(topicType), log.TopicID(topicID))
+		ctl.log.Error("failed to get topic content", zap.Error(err), topicType.Zap(), topicID.Zap())
 		return model.TopicDetail{}, errgo.Wrap(err, "topic.GetTopicContent")
 	}
 

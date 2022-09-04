@@ -17,6 +17,8 @@ package domain
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -62,6 +64,10 @@ type TopicRepo interface {
 }
 
 type TopicType uint32
+
+func (t TopicType) Zap() zap.Field {
+	return zap.Uint32("topic_type", uint32(t))
+}
 
 const (
 	TopicTypeUnknown TopicType = iota

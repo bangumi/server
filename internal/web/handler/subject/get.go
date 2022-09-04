@@ -27,7 +27,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -68,7 +67,7 @@ func platformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
 	if !ok && s.TypeID != 0 {
 		logger.Warn("unknown platform",
-			log.SubjectID(s.ID),
+			s.ID.Zap(),
 			zap.Uint8("type", s.TypeID),
 			zap.Uint16("platform", s.PlatformID),
 		)

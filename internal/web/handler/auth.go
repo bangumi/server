@@ -25,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/req"
@@ -106,7 +105,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 		return errgo.Wrap(err, "failed to get user by user id")
 	}
 
-	h.log.Info("user Login", log.UserID(user.ID))
+	h.log.Info("user Login", user.ID.Zap())
 
 	return res.JSON(c, res.User{
 		ID:        user.ID,

@@ -23,7 +23,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -46,7 +45,7 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		h.log.Error("failed to get episode", log.EpisodeID(episodeID))
+		h.log.Error("failed to get episode", episodeID.Zap())
 		return errgo.Wrap(err, "query.GetEpisode")
 	}
 
@@ -85,14 +84,14 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 			return res.ErrNotFound
 		}
 
-		h.log.Error("failed to fetch subject", zap.Error(err), log.SubjectID(subjectID), v.Log())
+		h.log.Error("failed to fetch subject", zap.Error(err), subjectID.Zap(), v.Log())
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 
 	ec, err := h.collect.GetSubjectEpisodesCollection(c.Context(), v.ID, subjectID)
 	if err != nil {
 		h.log.Error("unexpected error to fetch user subject collections",
-			zap.Error(err), log.UserID(v.ID), log.SubjectID(subjectID))
+			zap.Error(err), v.ID.Zap(), subjectID.Zap())
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 

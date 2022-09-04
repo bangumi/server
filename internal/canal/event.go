@@ -27,7 +27,6 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -91,10 +90,10 @@ func (e *eventHandler) Close() error {
 }
 
 func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
-	e.log.Info("user change password", log.UserID(id))
+	e.log.Info("user change password", id.Zap())
 
 	if err := e.session.RevokeUser(context.Background(), id); err != nil {
-		e.log.Error("failed to revoke user", log.UserID(id), zap.Error(err))
+		e.log.Error("failed to revoke user", id.Zap(), zap.Error(err))
 		return errgo.Wrap(err, "session.RevokeUser")
 	}
 
