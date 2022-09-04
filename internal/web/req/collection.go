@@ -15,8 +15,6 @@
 package req
 
 import (
-	"fmt"
-
 	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -45,15 +43,6 @@ func (v SubjectEpisodeCollectionPatch) Validate() error {
 		}
 	}
 
-	if v.Type.Set {
-		switch v.Type.Value {
-		case model.SubjectCollectionWish, model.SubjectCollectionDone, model.SubjectCollectionDoing,
-			model.SubjectCollectionOnHold, model.SubjectCollectionDropped:
-		default:
-			return res.BadRequest(fmt.Sprintf("%d is not valid subject collection type", v.Type.Value))
-		}
-	}
-
 	if len(v.Tags) > 0 {
 		if !slice.All(v.Tags, dam.AllPrintableChar) {
 			return res.BadRequest("invisible character are included in tags")
@@ -67,4 +56,8 @@ func (v SubjectEpisodeCollectionPatch) Validate() error {
 	}
 
 	return nil
+}
+
+type UpdateUserEpisodeCollection struct {
+	Type model.EpisodeCollection `json:"type"`
 }

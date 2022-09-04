@@ -339,7 +339,10 @@ issues:
     - source: 'var Module = fx\.Module\('
       linters: [gochecknoglobals]
 
-    - source: 'var .* = sync\.Once\{\}'
+    - source: 'var .* = reflect\.TypeOf'
+      linters: [gochecknoglobals]
+
+    - source: 'var .* sync\.Once'
       linters: [gochecknoglobals]
 
     - linters: [goerr113, errorlint]

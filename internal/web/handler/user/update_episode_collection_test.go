@@ -77,3 +77,46 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 	require.Equal(t, []model.EpisodeID{1, 2, 3}, eIDs)
 	require.Equal(t, model.EpisodeCollectionDone, eType)
 }
+
+func TestUser_PutEpisodeCollection(t *testing.T) {
+	t.Parallel()
+	const sid model.SubjectID = 8
+	const eid model.EpisodeID = 10
+	const uid model.UserID = 1
+
+	var eIDs []model.EpisodeID
+	var eType model.EpisodeCollection
+
+	a := mocks.NewAuthService(t)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: uid}, nil)
+
+	e := mocks.NewEpisodeRepo(t)
+	e.EXPECT().WithQuery(mock.Anything).Return(e)
+	e.EXPECT().Count(mock.Anything, mock.Anything, mock.Anything).Return(4, nil)
+	e.EXPECT().Get(mock.Anything, eid).Return(model.Episode{ID: eid, SubjectID: sid}, nil)
+	e.EXPECT().List(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]model.Episode{
+		{ID: eid, SubjectID: sid},
+	}, nil)
+
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().WithQuery(mock.Anything).Return(c)
+	c.EXPECT().UpdateEpisodeCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID,
+			episodeIDs []model.EpisodeID, collection model.EpisodeCollection, _ time.Time) {
+			eIDs = episodeIDs
+			eType = collection
+		}).Return(model.UserSubjectEpisodesCollection{}, nil)
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).Return(nil)
+
+	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
+
+	test.New(t).
+		Header(fiber.HeaderAuthorization, "Bearer t").
+		JSON(map[string]any{"type": model.EpisodeCollectionDone}).
+		Put(fmt.Sprintf("/v0/users/-/collections/-/episodes/%d", eid)).
+		Execute(app).
+		ExpectCode(http.StatusNoContent)
+
+	require.Equal(t, []model.EpisodeID{eid}, eIDs)
+	require.Equal(t, model.EpisodeCollectionDone, eType)
+}

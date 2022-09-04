@@ -78,6 +78,7 @@ func AddRouters(
 	v0.Get("/users/:username/collections", userHandler.ListSubjectCollection)
 	v0.Get("/users/:username/collections/:subject_id", userHandler.GetSubjectCollection)
 	v0.Get("/users/-/collections/-/episodes/:episode_id", h.NeedLogin, userHandler.GetEpisodeCollection)
+	v0.Put("/users/-/collections/-/episodes/:episode_id", req.JSON, h.NeedLogin, userHandler.PutEpisodeCollection)
 	v0.Get("/users/-/collections/:subject_id/episodes", h.NeedLogin, userHandler.GetSubjectEpisodeCollection)
 	v0.Patch("/users/-/collections/:subject_id", req.JSON, h.NeedLogin, userHandler.PatchSubjectCollection)
 	v0.Patch("/users/-/collections/:subject_id/episodes",
