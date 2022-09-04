@@ -39,7 +39,7 @@ func New(
 	log *zap.Logger,
 ) Ctrl {
 	return Ctrl{
-		log:   log.Named("app.query"),
+		log:   log.Named("controller"),
 		cache: cache,
 
 		tx:  tx,
