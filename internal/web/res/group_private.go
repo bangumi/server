@@ -21,11 +21,13 @@ import (
 )
 
 type PrivateGroup struct {
-	ID        model.GroupID `json:"id"`
-	Name      string        `json:"name"`
-	CreatedAt time.Time     `json:"created_at"`
-	Title     string        `json:"title"`
-	Icon      string        `json:"icon" format:"url"`
+	ID           model.GroupID `json:"id"`
+	Name         string        `json:"name"`
+	CreatedAt    time.Time     `json:"created_at"`
+	Title        string        `json:"title"`
+	Icon         string        `json:"icon" format:"url"`
+	TotalMembers int64         `json:"total_members"`
+	Description  string        `json:"description"`
 }
 
 type PrivateGroupProfile struct {

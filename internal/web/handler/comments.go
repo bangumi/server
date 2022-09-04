@@ -56,11 +56,13 @@ func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 	return res.JSON(c, ResPrivateTopicDetailWithGroup{
 		PrivateTopicDetail: data,
 		Group: res.PrivateGroup{
-			ID:        group.ID,
-			Name:      group.Name,
-			CreatedAt: group.CreatedAt,
-			Title:     group.Title,
-			Icon:      groupIconPrefix + group.Icon,
+			ID:           group.ID,
+			Name:         group.Name,
+			CreatedAt:    group.CreatedAt,
+			Title:        group.Title,
+			Icon:         groupIconPrefix + group.Icon,
+			TotalMembers: group.MemberCount,
+			Description:  group.Description,
 		},
 	})
 }
