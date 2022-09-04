@@ -35,7 +35,7 @@ func newGroupTopic(db *gorm.DB) groupTopic {
 	_groupTopic.UpdatedTime = field.NewUint32(tableName, "grp_tpc_lastpost")
 	_groupTopic.Replies = field.NewUint32(tableName, "grp_tpc_replies")
 	_groupTopic.State = field.NewUint8(tableName, "grp_tpc_state")
-	_groupTopic.Status = field.NewUint8(tableName, "grp_tpc_display")
+	_groupTopic.Display = field.NewUint8(tableName, "grp_tpc_display")
 
 	_groupTopic.fillFieldMap()
 
@@ -54,7 +54,7 @@ type groupTopic struct {
 	UpdatedTime field.Uint32
 	Replies     field.Uint32
 	State       field.Uint8
-	Status      field.Uint8
+	Display     field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -79,7 +79,7 @@ func (g *groupTopic) updateTableName(table string) *groupTopic {
 	g.UpdatedTime = field.NewUint32(table, "grp_tpc_lastpost")
 	g.Replies = field.NewUint32(table, "grp_tpc_replies")
 	g.State = field.NewUint8(table, "grp_tpc_state")
-	g.Status = field.NewUint8(table, "grp_tpc_display")
+	g.Display = field.NewUint8(table, "grp_tpc_display")
 
 	g.fillFieldMap()
 
@@ -113,7 +113,7 @@ func (g *groupTopic) fillFieldMap() {
 	g.fieldMap["grp_tpc_lastpost"] = g.UpdatedTime
 	g.fieldMap["grp_tpc_replies"] = g.Replies
 	g.fieldMap["grp_tpc_state"] = g.State
-	g.fieldMap["grp_tpc_display"] = g.Status
+	g.fieldMap["grp_tpc_display"] = g.Display
 }
 
 func (g groupTopic) clone(db *gorm.DB) groupTopic {

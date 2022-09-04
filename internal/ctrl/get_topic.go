@@ -86,9 +86,9 @@ func (ctl Ctrl) ListTopics(
 	objectID uint32,
 	limit, offset int,
 ) ([]model.Topic, int64, error) {
-	statuses := auth.TopicStatuses(u)
+	displays := auth.ListTopicDisplays(u)
 
-	count, err := ctl.topic.Count(ctx, topicType, objectID, statuses)
+	count, err := ctl.topic.Count(ctx, topicType, objectID, displays)
 	if err != nil {
 		return nil, 0, errgo.Wrap(err, "topicRepo.Count")
 	}
@@ -97,7 +97,7 @@ func (ctl Ctrl) ListTopics(
 		return []model.Topic{}, 0, nil
 	}
 
-	topics, err := ctl.topic.List(ctx, topicType, objectID, statuses, limit, offset)
+	topics, err := ctl.topic.List(ctx, topicType, objectID, displays, limit, offset)
 	if err != nil {
 		return nil, 0, errgo.Wrap(err, "repo.topic.GetTopics")
 	}

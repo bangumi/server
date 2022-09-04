@@ -30,7 +30,7 @@ type mysqlTopic interface {
 	GetState() uint8
 	GetReplies() uint32
 	GetParentID() uint32
-	GetStatus() uint8
+	GetDisplay() uint8
 }
 
 var _ mysqlTopic = (*dao.GroupTopic)(nil)
@@ -52,7 +52,7 @@ func wrapDao[T mysqlTopic](data []T, err error) ([]model.Topic, error) {
 			State:     model.CommentState(item.GetState()),
 			Replies:   item.GetReplies(),
 			ParentID:  item.GetParentID(),
-			Status:    model.TopicStatus(item.GetStatus()),
+			Display:   model.TopicDisplay(item.GetDisplay()),
 		}
 	}
 

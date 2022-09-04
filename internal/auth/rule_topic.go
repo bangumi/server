@@ -21,18 +21,17 @@ import (
 	"github.com/bangumi/server/internal/pkg/gtime"
 )
 
-// 目前列表是根据 display(status) 来判断是否能看到标题，state 决定是否能查看内容。
-
-func TopicStatuses(u domain.Auth) []model.TopicStatus {
+// ListTopicDisplays 在帖子列表能看到哪些状态的帖子。
+func ListTopicDisplays(u domain.Auth) []model.TopicDisplay {
 	if u.ID == 0 {
-		return []model.TopicStatus{model.TopicStatusNormal}
+		return []model.TopicDisplay{model.TopicDisplayNormal}
 	}
 
 	if u.Permission.ManageTopicState || u.Permission.BanPost {
-		return []model.TopicStatus{model.TopicStatusBan, model.TopicStatusNormal, model.TopicStatusReview}
+		return []model.TopicDisplay{model.TopicDisplayBan, model.TopicDisplayNormal, model.TopicDisplayReview}
 	}
 
-	return []model.TopicStatus{model.TopicStatusNormal}
+	return []model.TopicDisplay{model.TopicDisplayNormal}
 }
 
 func RewriteSubCommit(t model.SubComment) model.SubComment {
@@ -70,17 +69,29 @@ func RewriteCommentTree(comments []model.Comment) []model.Comment {
 
 func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {
 	if u.ID == 0 {
-		return topic.State == model.CommentStateNone
+		// 未登录用户只能看到正常帖子
+		return topic.State == model.CommentStateNone && topic.Display == model.TopicDisplayNormal
 	}
 
+	// 登录用户
+
+	// 管理员啥都能看
 	if u.Permission.ManageTopicState || u.Permission.BanPost {
 		return true
 	}
 
 	if u.ID == topic.CreatorID {
-		return topic.State != model.CommentStateUserDelete
+		if topic.Display == model.TopicDisplayReview {
+			return true
+		}
 	}
 
+	// 非管理员看不到删除和review的帖子
+	if topic.Display != model.TopicDisplayNormal {
+		return false
+	}
+
+	// 注册时间决定
 	switch topic.State {
 	case model.CommentStateNone, model.CommentStateAdminReopen,
 		model.CommentStateAdminMerge, model.CommentStateAdminPin, model.CommentStateAdminSilentTopic:

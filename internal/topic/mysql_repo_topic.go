@@ -58,12 +58,12 @@ func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model
 		State:     model.CommentState(topic.GetState()),
 		Replies:   topic.GetReplies(),
 		ParentID:  topic.GetParentID(),
-		Status:    model.TopicStatus(topic.GetStatus()),
+		Display:   model.TopicDisplay(topic.GetDisplay()),
 	}, nil
 }
 
 func (r mysqlRepo) Count(
-	ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus,
+	ctx context.Context, topicType domain.TopicType, id uint32, display []model.TopicDisplay,
 ) (int64, error) {
 	var (
 		count int64
@@ -72,10 +72,10 @@ func (r mysqlRepo) Count(
 	switch topicType {
 	case domain.TopicTypeGroup:
 		count, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
-			Where(r.q.GroupTopic.Status.In(slice.ToUint8(statuses)...)).Count()
+			Where(r.q.GroupTopic.Display.In(slice.ToUint8(display)...)).Count()
 	case domain.TopicTypeSubject:
 		count, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).
-			Where(r.q.SubjectTopic.Status.In(slice.ToUint8(statuses)...)).Count()
+			Where(r.q.SubjectTopic.Display.In(slice.ToUint8(display)...)).Count()
 	default:
 		return 0, errUnSupportTopicType
 	}
@@ -86,7 +86,7 @@ func (r mysqlRepo) Count(
 }
 
 func (r mysqlRepo) List(
-	ctx context.Context, topicType domain.TopicType, id uint32, statuses []model.TopicStatus, limit int, offset int,
+	ctx context.Context, topicType domain.TopicType, id uint32, display []model.TopicDisplay, limit int, offset int,
 ) ([]model.Topic, error) {
 	var topics []model.Topic
 	var err error
@@ -94,12 +94,12 @@ func (r mysqlRepo) List(
 	case domain.TopicTypeGroup:
 		topics, err = wrapDao(r.q.GroupTopic.WithContext(ctx).Where(
 			r.q.GroupTopic.GroupID.Eq(id),
-			r.q.GroupTopic.Status.In(slice.ToUint8(statuses)...),
+			r.q.GroupTopic.Display.In(slice.ToUint8(display)...),
 		).Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedTime.Desc()).Find())
 	case domain.TopicTypeSubject:
 		topics, err = wrapDao(r.q.SubjectTopic.WithContext(ctx).Where(
 			r.q.SubjectTopic.SubjectID.Eq(id),
-			r.q.SubjectTopic.Status.In(slice.ToUint8(statuses)...),
+			r.q.SubjectTopic.Display.In(slice.ToUint8(display)...),
 		).Offset(offset).Limit(limit).Order(r.q.SubjectTopic.UpdatedTime.Desc()).Find())
 	default:
 		return nil, errUnSupportTopicType
