@@ -49,7 +49,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	}
-	count, err := h.r.CountPersonRelated(c.Context(), personID)
+	count, err := h.r.CountPersonRelated(c.UserContext(), personID)
 	if err != nil {
 		return errgo.Wrap(err, "revision.CountPersonRelated")
 	}
@@ -65,7 +65,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 
 	response.Total = count
 
-	revisions, err := h.r.ListPersonRelated(c.Context(), personID, page.Limit, page.Offset)
+	revisions, err := h.r.ListPersonRelated(c.UserContext(), personID, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "revision.ListPersonRelated")
 	}
@@ -77,7 +77,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), slice.Unique(creatorIDs))
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -95,7 +95,7 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 	if err != nil || id <= 0 {
 		return res.BadRequest(fmt.Sprintf("bad param id: %s", c.Params("id")))
 	}
-	r, err := h.r.GetPersonRelated(c.Context(), id)
+	r, err := h.r.GetPersonRelated(c.UserContext(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -104,7 +104,7 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get person related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -131,7 +131,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	}
-	count, err := h.r.CountCharacterRelated(c.Context(), characterID)
+	count, err := h.r.CountCharacterRelated(c.UserContext(), characterID)
 	if err != nil {
 		return errgo.Wrap(err, "revision.CountCharacterRelated")
 	}
@@ -147,7 +147,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 
 	response.Total = count
 
-	revisions, err := h.r.ListCharacterRelated(c.Context(), characterID, page.Limit, page.Offset)
+	revisions, err := h.r.ListCharacterRelated(c.UserContext(), characterID, page.Limit, page.Offset)
 
 	if err != nil {
 		return errgo.Wrap(err, "revision.ListCharacterRelated")
@@ -157,7 +157,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), slice.Unique(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -179,7 +179,7 @@ func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
 			fmt.Sprintf("bad param id: %s", strconv.Quote(c.Params("id"))),
 		)
 	}
-	r, err := h.r.GetCharacterRelated(c.Context(), id)
+	r, err := h.r.GetCharacterRelated(c.UserContext(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -188,7 +188,7 @@ func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get character related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -214,7 +214,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	}
-	count, err := h.r.CountSubjectRelated(c.Context(), subjectID)
+	count, err := h.r.CountSubjectRelated(c.UserContext(), subjectID)
 	if err != nil {
 		return errgo.Wrap(err, "revision.CountSubjectRelated")
 	}
@@ -230,7 +230,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 
 	response.Total = count
 
-	revisions, err := h.r.ListSubjectRelated(c.Context(), subjectID, page.Limit, page.Offset)
+	revisions, err := h.r.ListSubjectRelated(c.UserContext(), subjectID, page.Limit, page.Offset)
 
 	if err != nil {
 		return errgo.Wrap(err, "revision.ListSubjectRelated")
@@ -242,7 +242,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), slice.Unique(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -259,7 +259,7 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	if err != nil || id == 0 {
 		return res.BadRequest("bad param id: " + strconv.Quote(c.Params("id")))
 	}
-	r, err := h.r.GetSubjectRelated(c.Context(), id)
+	r, err := h.r.GetSubjectRelated(c.UserContext(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -268,7 +268,7 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get subject related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Context(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}

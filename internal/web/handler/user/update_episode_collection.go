@@ -71,7 +71,7 @@ func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	err = h.ctrl.UpdateEpisodeCollection(c.Context(), u.Auth, subjectID, r.EpisodeID, r.Type)
+	err = h.ctrl.UpdateEpisodeCollection(c.UserContext(), u.Auth, subjectID, r.EpisodeID, r.Type)
 	if err != nil {
 		switch {
 		case errors.Is(err, ctrl.ErrInvalidInput):

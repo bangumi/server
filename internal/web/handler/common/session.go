@@ -48,7 +48,7 @@ func (h Common) MiddlewareSessionAuth(c *fiber.Ctx) error {
 			return res.InternalError(c, err, "failed to read session, please try clear your browser cookies and re-try")
 		}
 
-		auth, err := h.auth.GetByID(c.Context(), s.UserID)
+		auth, err := h.auth.GetByID(c.UserContext(), s.UserID)
 		if err != nil {
 			return errgo.Wrap(err, "failed to user with permission")
 		}
@@ -64,7 +64,7 @@ Next:
 }
 
 func (h Common) getSession(c *fiber.Ctx, value string) (session.Session, error) {
-	s, err := h.session.Get(c.Context(), value)
+	s, err := h.session.Get(c.UserContext(), value)
 	if err != nil {
 		return session.Session{}, errgo.Wrap(err, "sessionManager.Get")
 	}

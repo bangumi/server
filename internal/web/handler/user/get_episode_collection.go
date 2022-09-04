@@ -39,7 +39,7 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, err := h.ctrl.GetEpisode(c.Context(), episodeID)
+	e, err := h.ctrl.GetEpisode(c.UserContext(), episodeID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -49,7 +49,7 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "query.GetEpisode")
 	}
 
-	m, err := h.collect.GetSubjectEpisodesCollection(c.Context(), v.ID, e.SubjectID)
+	m, err := h.collect.GetSubjectEpisodesCollection(c.UserContext(), v.ID, e.SubjectID)
 	if err != nil {
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
@@ -78,7 +78,7 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = h.ctrl.GetSubject(c.Context(), v.Auth, subjectID)
+	_, err = h.ctrl.GetSubject(c.UserContext(), v.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -88,14 +88,14 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 
-	ec, err := h.collect.GetSubjectEpisodesCollection(c.Context(), v.ID, subjectID)
+	ec, err := h.collect.GetSubjectEpisodesCollection(c.UserContext(), v.ID, subjectID)
 	if err != nil {
 		h.log.Error("unexpected error to fetch user subject collections",
 			zap.Error(err), v.ID.Zap(), subjectID.Zap())
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 
-	episodes, count, err := h.ctrl.ListEpisode(c.Context(), subjectID, episodeType, page.Limit, page.Offset)
+	episodes, count, err := h.ctrl.ListEpisode(c.UserContext(), subjectID, episodeType, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "query.ListEpisode")
 	}

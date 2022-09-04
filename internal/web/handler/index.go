@@ -92,7 +92,7 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.Context(), id)
+	r, ok, err := h.getIndexWithCache(c.UserContext(), id)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.Context(), id)
+	r, ok, err := h.getIndexWithCache(c.UserContext(), id)
 	if err != nil {
 		return err
 	}
@@ -137,7 +137,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 func (h Handler) getIndexSubjects(
 	c *fiber.Ctx, id model.IndexID, subjectType uint8, page req.PageQuery,
 ) error {
-	count, err := h.i.CountSubjects(c.Context(), id, subjectType)
+	count, err := h.i.CountSubjects(c.UserContext(), id, subjectType)
 	if err != nil {
 		return errgo.Wrap(err, "Index.CountSubjects")
 	}
@@ -155,7 +155,7 @@ func (h Handler) getIndexSubjects(
 		return err
 	}
 
-	subjects, err := h.i.ListSubjects(c.Context(), id, subjectType, page.Limit, page.Offset)
+	subjects, err := h.i.ListSubjects(c.UserContext(), id, subjectType, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "Index.ListSubjects")
 	}

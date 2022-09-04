@@ -37,7 +37,7 @@ func (h Handler) GetGroupProfileByNamePrivate(c *fiber.Ctx) error {
 		return res.BadRequest("group name is required")
 	}
 
-	g, err := h.g.GetByName(c.Context(), groupName)
+	g, err := h.g.GetByName(c.UserContext(), groupName)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("group not found")
@@ -46,7 +46,7 @@ func (h Handler) GetGroupProfileByNamePrivate(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get group")
 	}
 
-	members, err := h.listGroupMembers(c.Context(), g.ID, domain.GroupMemberAll, 10, 0)
+	members, err := h.listGroupMembers(c.UserContext(), g.ID, domain.GroupMemberAll, 10, 0)
 	if err != nil {
 		return errgo.Wrap(err, "failed to list recent members")
 	}
@@ -91,7 +91,7 @@ func (h Handler) listGroupMembersPrivate(
 	page req.PageQuery,
 	memberType domain.GroupMemberType,
 ) error {
-	g, err := h.g.GetByName(c.Context(), groupName)
+	g, err := h.g.GetByName(c.UserContext(), groupName)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("group not found")
@@ -100,7 +100,7 @@ func (h Handler) listGroupMembersPrivate(
 		return errgo.Wrap(err, "failed to get group")
 	}
 
-	memberCount, err := h.g.CountMembersByID(c.Context(), g.ID, memberType)
+	memberCount, err := h.g.CountMembersByID(c.UserContext(), g.ID, memberType)
 	if err != nil {
 		return errgo.Wrap(err, "failed to count group member")
 	}
@@ -113,7 +113,7 @@ func (h Handler) listGroupMembersPrivate(
 		return err
 	}
 
-	data, err := h.listGroupMembers(c.Context(), g.ID, memberType, page.Limit, page.Offset)
+	data, err := h.listGroupMembers(c.UserContext(), g.ID, memberType, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "failed to list group members")
 	}
@@ -190,7 +190,7 @@ func (h Handler) ListGroupTopics(c *fiber.Ctx) error {
 		return res.BadRequest("group name is required")
 	}
 
-	g, err := h.g.GetByName(c.Context(), groupName)
+	g, err := h.g.GetByName(c.UserContext(), groupName)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("group not found")

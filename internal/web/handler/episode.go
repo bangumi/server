@@ -36,7 +36,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, err := h.ctrl.GetEpisode(c.Context(), id)
+	e, err := h.ctrl.GetEpisode(c.UserContext(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -45,7 +45,7 @@ func (h Handler) GetEpisode(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get episode")
 	}
 
-	_, err = h.ctrl.GetSubject(c.Context(), u.Auth, e.SubjectID)
+	_, err = h.ctrl.GetSubject(c.UserContext(), u.Auth, e.SubjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -78,7 +78,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return res.BadRequest("missing required query `subject_id`")
 	}
 
-	_, err = h.ctrl.GetSubject(c.Context(), u.Auth, subjectID)
+	_, err = h.ctrl.GetSubject(c.UserContext(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -86,7 +86,7 @@ func (h Handler) ListEpisode(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get subject")
 	}
 
-	episodes, count, err := h.ctrl.ListEpisode(c.Context(), subjectID, epType, page.Limit, page.Offset)
+	episodes, count, err := h.ctrl.ListEpisode(c.UserContext(), subjectID, epType, page.Limit, page.Offset)
 	if err != nil {
 		if errors.Is(err, ctrl.ErrOffsetTooBig) {
 			return res.BadRequest("offset should be less than or equal to " + strconv.FormatInt(count, 10))

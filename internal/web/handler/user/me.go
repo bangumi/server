@@ -27,7 +27,7 @@ func (h User) GetCurrent(c *fiber.Ctx) error {
 		return res.Unauthorized("need Login")
 	}
 
-	user, err := h.user.GetByID(c.Context(), u.ID)
+	user, err := h.user.GetByID(c.UserContext(), u.ID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get user")
 	}

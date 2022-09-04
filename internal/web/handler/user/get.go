@@ -34,7 +34,7 @@ func (h User) Get(c *fiber.Ctx) error {
 		return res.BadRequest("username is too long")
 	}
 
-	user, err := h.user.GetByName(c.Context(), username)
+	user, err := h.user.GetByName(c.UserContext(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("can't find user with username " + strconv.Quote(username))
@@ -57,7 +57,7 @@ func (h User) GetAvatar(c *fiber.Ctx) error {
 		return res.BadRequest("username is too long")
 	}
 
-	user, err := h.user.GetByName(c.Context(), username)
+	user, err := h.user.GetByName(c.UserContext(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("can't find user with username " + strconv.Quote(username))

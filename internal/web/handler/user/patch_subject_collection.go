@@ -55,7 +55,7 @@ func (h User) patchSubjectCollection(
 ) error {
 	u := h.GetHTTPAccessor(c)
 
-	s, err := h.ctrl.GetSubject(c.Context(), u.Auth, subjectID)
+	s, err := h.ctrl.GetSubject(c.UserContext(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("subject not found")
@@ -71,7 +71,7 @@ func (h User) patchSubjectCollection(
 		}
 	}
 
-	err = h.ctrl.UpdateCollection(c.Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
+	err = h.ctrl.UpdateCollection(c.UserContext(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
 		IP: u.IP.String(),
 
 		VolStatus: r.VolStatus,

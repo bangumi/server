@@ -35,7 +35,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	if err != nil {
 		return err
 	}
-	topics, count, err := h.ctrl.ListTopics(c.Context(), u.Auth, topicType, id, page.Limit, page.Offset)
+	topics, count, err := h.ctrl.ListTopics(c.UserContext(), u.Auth, topicType, id, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "ctrl.ListTopics")
 	}
@@ -56,7 +56,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	userIDs := slice.Map(topics, func(item model.Topic) model.UserID {
 		return item.CreatorID
 	})
-	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(userIDs))
+	userMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), slice.Unique(userIDs))
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
