@@ -48,7 +48,7 @@ func NewDB(conn *sql.DB, c config.AppConfig, scope tally.Scope, prom prometheus.
 
 	db, err := gorm.Open(
 		mysql.New(mysql.Config{Conn: conn, DisableDatetimePrecision: true}),
-		&gorm.Config{Logger: gLog, QueryFields: true, PrepareStmt: true},
+		&gorm.Config{Logger: gLog, QueryFields: true, PrepareStmt: true, SkipDefaultTransaction: true},
 	)
 	if err != nil {
 		return nil, errgo.Wrap(err, "create dal")
