@@ -43,7 +43,7 @@ func NewDB(conn *sql.DB, c config.AppConfig, scope tally.Scope, prom prometheus.
 			},
 		)
 	} else {
-		gLog = newProdLog(scope)
+		gLog = newProdLog(c, scope)
 	}
 
 	db, err := gorm.Open(
