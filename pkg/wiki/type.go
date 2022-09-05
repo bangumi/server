@@ -34,13 +34,7 @@ type Item struct {
 
 // NonZero return a wiki without empty fields and items.
 func (w Wiki) NonZero() Wiki {
-	// count fields and items for pre-allocation
-	var itemsCount, fieldsCount int = w.countFieldsAndItems()
-
-	var wiki = Wiki{Type: w.Type, Fields: make([]Field, 0, fieldsCount)}
-	var items = make([]Item, 0, itemsCount)
-	var lastCut, currentCut int
-
+	var wiki = Wiki{Type: w.Type, Fields: make([]Field, 0, len(w.Fields))}
 	for _, f := range w.Fields {
 		if f.Null {
 			continue
@@ -56,45 +50,21 @@ func (w Wiki) NonZero() Wiki {
 			continue
 		}
 
+		var items []Item
 		for _, item := range f.Values {
 			if item.Value == "" {
 				continue
 			}
 
-			currentCut++
 			items = append(items, item)
 		}
 
 		wiki.Fields = append(wiki.Fields, Field{
 			Key:    f.Key,
 			Array:  f.Array,
-			Values: items[lastCut:currentCut],
+			Values: items,
 		})
-
-		lastCut = currentCut
 	}
 
 	return wiki
-}
-
-func (w Wiki) countFieldsAndItems() (int, int) {
-	var itemsCount, fieldsCount int
-	for _, field := range w.Fields {
-		if field.Null {
-			continue
-		}
-		fieldsCount++
-
-		if !field.Array {
-			continue
-		}
-
-		for _, item := range field.Values {
-			if item.Value != "" {
-				itemsCount++
-			}
-		}
-	}
-
-	return itemsCount, fieldsCount
 }

@@ -71,8 +71,6 @@ func Parse(s string) (Wiki, error) {
 	w.Fields = make([]Field, 0, eolCount-1)
 	// pre-alloc for all items.
 	var itemContainer = make([]Item, 0, eolCount-2)
-	var lastCut = 0
-	var currentCut = 0
 
 	// loop state
 	var inArray = false
@@ -126,7 +124,6 @@ func Parse(s string) (Wiki, error) {
 				w.Fields = append(w.Fields, Field{Key: key, Null: true})
 
 				continue
-
 			case "{":
 				inArray = true
 				currentField.Key = key
@@ -143,8 +140,8 @@ func Parse(s string) (Wiki, error) {
 		if inArray {
 			if line == "}" { // close array
 				inArray = false
-				currentField.Values = itemContainer[lastCut:currentCut]
-				lastCut = currentCut
+				currentField.Values = copySlice(itemContainer)
+				itemContainer = itemContainer[:0]
 				w.Fields = append(w.Fields, currentField)
 
 				continue
@@ -158,7 +155,6 @@ func Parse(s string) (Wiki, error) {
 				Key:   key,
 				Value: value,
 			})
-			currentCut++
 		}
 
 		if !inArray {
@@ -209,4 +205,11 @@ func readStartLine(line string) (string, string, error) {
 	}
 
 	return trimRightSpace(line[:i]), trimLeftSpace(line[i+1:]), nil
+}
+
+func copySlice[T any](items []T) []T {
+	var out = make([]T, len(items))
+	copy(out, items)
+
+	return out
 }
