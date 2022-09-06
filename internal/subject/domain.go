@@ -36,6 +36,6 @@ type Repo interface {
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]domain.SubjectInternalRelation, error)
 
 	GetActors(
-		ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
+		ctx context.Context, subjectID model.SubjectID, characterIDs []model.CharacterID,
 	) (map[model.CharacterID][]model.PersonID, error)
 }

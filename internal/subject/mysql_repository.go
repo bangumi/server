@@ -229,7 +229,7 @@ func (r mysqlRepo) GetByIDs(
 func (r mysqlRepo) GetActors(
 	ctx context.Context,
 	subjectID model.SubjectID,
-	characterIDs ...model.CharacterID,
+	characterIDs []model.CharacterID,
 ) (map[model.CharacterID][]model.PersonID, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
 		Where(r.q.Cast.CharacterID.In(slice.ToValuer(characterIDs)...), r.q.Cast.SubjectID.Eq(subjectID)).

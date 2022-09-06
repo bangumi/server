@@ -73,19 +73,12 @@ func (_c *SubjectRepo_Get_Call) Return(_a0 model.Subject, _a1 error) *SubjectRep
 }
 
 // GetActors provides a mock function with given fields: ctx, subjectID, characterIDs
-func (_m *SubjectRepo) GetActors(ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID) (map[model.CharacterID][]model.PersonID, error) {
-	_va := make([]interface{}, len(characterIDs))
-	for _i := range characterIDs {
-		_va[_i] = characterIDs[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx, subjectID)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
+func (_m *SubjectRepo) GetActors(ctx context.Context, subjectID model.SubjectID, characterIDs []model.CharacterID) (map[model.CharacterID][]model.PersonID, error) {
+	ret := _m.Called(ctx, subjectID, characterIDs)
 
 	var r0 map[model.CharacterID][]model.PersonID
-	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, ...model.CharacterID) map[model.CharacterID][]model.PersonID); ok {
-		r0 = rf(ctx, subjectID, characterIDs...)
+	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, []model.CharacterID) map[model.CharacterID][]model.PersonID); ok {
+		r0 = rf(ctx, subjectID, characterIDs)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(map[model.CharacterID][]model.PersonID)
@@ -93,8 +86,8 @@ func (_m *SubjectRepo) GetActors(ctx context.Context, subjectID model.SubjectID,
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, ...model.CharacterID) error); ok {
-		r1 = rf(ctx, subjectID, characterIDs...)
+	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, []model.CharacterID) error); ok {
+		r1 = rf(ctx, subjectID, characterIDs)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -110,21 +103,14 @@ type SubjectRepo_GetActors_Call struct {
 // GetActors is a helper method to define mock.On call
 //   - ctx context.Context
 //   - subjectID model.SubjectID
-//   - characterIDs ...model.CharacterID
-func (_e *SubjectRepo_Expecter) GetActors(ctx interface{}, subjectID interface{}, characterIDs ...interface{}) *SubjectRepo_GetActors_Call {
-	return &SubjectRepo_GetActors_Call{Call: _e.mock.On("GetActors",
-		append([]interface{}{ctx, subjectID}, characterIDs...)...)}
+//   - characterIDs []model.CharacterID
+func (_e *SubjectRepo_Expecter) GetActors(ctx interface{}, subjectID interface{}, characterIDs interface{}) *SubjectRepo_GetActors_Call {
+	return &SubjectRepo_GetActors_Call{Call: _e.mock.On("GetActors", ctx, subjectID, characterIDs)}
 }
 
-func (_c *SubjectRepo_GetActors_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID)) *SubjectRepo_GetActors_Call {
+func (_c *SubjectRepo_GetActors_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, characterIDs []model.CharacterID)) *SubjectRepo_GetActors_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]model.CharacterID, len(args)-2)
-		for i, a := range args[2:] {
-			if a != nil {
-				variadicArgs[i] = a.(model.CharacterID)
-			}
-		}
-		run(args[0].(context.Context), args[1].(model.SubjectID), variadicArgs...)
+		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].([]model.CharacterID))
 	})
 	return _c
 }
