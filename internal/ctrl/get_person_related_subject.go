@@ -36,7 +36,7 @@ func (ctl Ctrl) GetPersonRelated(
 		return nil, errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	subjects, err := ctl.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectPersonRelation.GetSubjectID)...)
+	subjects, err := ctl.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectPersonRelation.GetSubjectID), SubjectFilter{})
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}

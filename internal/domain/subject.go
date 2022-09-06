@@ -15,24 +15,8 @@
 package domain
 
 import (
-	"context"
-
 	"github.com/bangumi/server/internal/model"
 )
-
-type SubjectRepo interface {
-	// Get return a repository model.
-	Get(ctx context.Context, id model.SubjectID) (model.Subject, error)
-	GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID]model.Subject, error)
-
-	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]SubjectCharacterRelation, error)
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectInternalRelation, error)
-
-	GetActors(
-		ctx context.Context, subjectID model.SubjectID, characterIDs ...model.CharacterID,
-	) (map[model.CharacterID][]model.PersonID, error)
-}
 
 type SubjectPersonRelation struct {
 	TypeID uint16
@@ -61,8 +45,4 @@ type SubjectInternalRelation struct {
 
 func (s SubjectInternalRelation) GetSourceID() model.SubjectID {
 	return s.SourceID
-}
-
-func (s SubjectInternalRelation) GetDestinationID() model.SubjectID {
-	return s.DestinationID
 }

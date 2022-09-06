@@ -32,7 +32,7 @@ func TestHandler_GetEpisode(t *testing.T) {
 	m := mocks.NewEpisodeRepo(t)
 	m.EXPECT().Get(mock.Anything, model.EpisodeID(7)).Return(model.Episode{ID: 7, SubjectID: 3}, nil)
 	s := mocks.NewSubjectRepo(t)
-	s.EXPECT().Get(mock.Anything, model.SubjectID(3)).Return(model.Subject{ID: 3}, nil)
+	s.EXPECT().Get(mock.Anything, model.SubjectID(3), mock.Anything).Return(model.Subject{ID: 3}, nil)
 
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: m, SubjectRepo: s})
 

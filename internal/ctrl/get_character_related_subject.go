@@ -46,7 +46,7 @@ func (ctl Ctrl) GetCharacterRelatedSubjects(
 		return item.SubjectID
 	})
 
-	subjects, err := ctl.GetSubjectByIDs(ctx, subjectIDs...)
+	subjects, err := ctl.GetSubjectByIDs(ctx, subjectIDs, SubjectFilter{})
 	if err != nil {
 		return model.Character{}, nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}

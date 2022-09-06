@@ -21,6 +21,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
 func (ctl Ctrl) GetSubjectRelatedSubjects(
@@ -38,7 +39,10 @@ func (ctl Ctrl) GetSubjectRelatedSubjects(
 		return s, nil, errgo.Wrap(err, "SubjectRepo.GetSubjectRelated")
 	}
 
-	subjects, err := ctl.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectInternalRelation.GetDestinationID)...)
+	subjects, err := ctl.GetSubjectByIDs(ctx,
+		slice.Map(relations, func(r domain.SubjectInternalRelation) model.SubjectID { return r.DestinationID }),
+		SubjectFilter{NSFW: null.Bool{Value: false, Set: !user.AllowNSFW()}},
+	)
 	if err != nil {
 		return s, nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}
