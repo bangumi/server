@@ -26,8 +26,15 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
+type RedisCache interface {
+	Get(ctx context.Context, key string, value any) (bool, error)
+	Set(ctx context.Context, key string, value any, ttl time.Duration) error
+	Del(ctx context.Context, keys ...string) error
+	// SetMany(ctx context.Context, keys string, values []any, ttl time.Duration) error
+}
+
 // NewRedisCache create a redis backed cache.
-func NewRedisCache(cli *redis.Client) Cache {
+func NewRedisCache(cli *redis.Client) RedisCache {
 	return redisCache{r: cli}
 }
 
@@ -35,8 +42,7 @@ type redisCache struct {
 	r *redis.Client
 }
 
-func (c redisCache) Get(
-	ctx context.Context, key string, value any) (bool, error) {
+func (c redisCache) Get(ctx context.Context, key string, value any) (bool, error) {
 	raw, err := c.r.Get(ctx, key).Bytes()
 	if err != nil {
 		if err == redis.Nil {
@@ -57,8 +63,7 @@ func (c redisCache) Get(
 	return true, nil
 }
 
-func (c redisCache) Set(
-	ctx context.Context, key string, value any, ttl time.Duration) error {
+func (c redisCache) Set(ctx context.Context, key string, value any, ttl time.Duration) error {
 	b, err := json.MarshalWithOption(value, json.DisableHTMLEscape())
 	if err != nil {
 		return errgo.Wrap(err, "json")

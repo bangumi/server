@@ -30,17 +30,17 @@ func (h Handler) PageListAccessToken(c *fiber.Ctx) error {
 		return c.Redirect("/demo/login")
 	}
 
-	u, err := h.ctrl.GetUser(c.Context(), v.ID)
+	u, err := h.ctrl.GetUser(c.UserContext(), v.ID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get current user")
 	}
 
-	tokens, err := h.a.ListAccessToken(c.Context(), v.ID)
+	tokens, err := h.a.ListAccessToken(c.UserContext(), v.ID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to fetch access tokens")
 	}
 
-	clients, err := h.oauth.GetClientByID(c.Context(), clientIDs(tokens)...)
+	clients, err := h.oauth.GetClientByID(c.UserContext(), clientIDs(tokens)...)
 	if err != nil {
 		return errgo.Wrap(err, "failed to fetch access tokens")
 	}
@@ -54,7 +54,7 @@ func (h Handler) PageCreateAccessToken(c *fiber.Ctx) error {
 		return c.Redirect("/demo/login")
 	}
 
-	u, err := h.ctrl.GetUser(c.Context(), v.ID)
+	u, err := h.ctrl.GetUser(c.UserContext(), v.ID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get current user")
 	}

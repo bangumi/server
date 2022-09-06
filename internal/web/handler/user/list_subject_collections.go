@@ -49,7 +49,7 @@ func (h User) ListSubjectCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	u, err := h.user.GetByName(c.Context(), username)
+	u, err := h.user.GetByName(c.UserContext(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("user doesn't exist or has been removed")
@@ -71,7 +71,7 @@ func (h User) listCollection(
 	page req.PageQuery,
 	showPrivate bool,
 ) error {
-	count, err := h.collect.CountSubjectCollections(c.Context(), u.ID, subjectType, collectionType, showPrivate)
+	count, err := h.collect.CountSubjectCollections(c.UserContext(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
 		return errgo.Wrap(err, "failed to count user's subject collections")
 	}
@@ -84,7 +84,7 @@ func (h User) listCollection(
 		return err
 	}
 
-	collections, err := h.collect.ListSubjectCollection(c.Context(),
+	collections, err := h.collect.ListSubjectCollection(c.UserContext(),
 		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "failed to list user's subject collections")
@@ -94,7 +94,7 @@ func (h User) listCollection(
 		return item.SubjectID
 	})
 
-	subjectMap, err := h.ctrl.GetSubjectByIDs(c.Context(), subjectIDs...)
+	subjectMap, err := h.ctrl.GetSubjectByIDs(c.UserContext(), subjectIDs...)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get subjects")
 	}

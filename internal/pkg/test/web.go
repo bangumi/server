@@ -64,7 +64,7 @@ type Mock struct {
 	TimeLineRepo   domain.TimeLineRepo
 	CaptchaManager captcha.Manager
 	SessionManager session.Manager
-	Cache          cache.Cache
+	Cache          cache.RedisCache
 	RateLimiter    rate.Manager
 	OAuthManager   oauth.Manager
 	HTTPMock       *httpmock.MockTransport
@@ -301,19 +301,10 @@ func MockTimeLineRepo(m domain.TimeLineRepo) fx.Option {
 	return fx.Supply(fx.Annotate(m, fx.As(new(domain.TimeLineRepo))))
 }
 
-func MockCache(mock cache.Cache) fx.Option {
-	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.Cache))))
+func MockCache(mock cache.RedisCache) fx.Option {
+	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.RedisCache))))
 }
 
 func MockEmptyCache() fx.Option {
-	return fx.Provide(NopCache)
-}
-
-func NopCache() cache.Cache {
-	mc := &mocks.Cache{}
-	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
-	mc.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	mc.EXPECT().Del(mock.Anything, mock.Anything).Return(nil)
-
-	return mc
+	return fx.Provide(cache.NewNoop)
 }

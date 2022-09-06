@@ -16,6 +16,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 )
 
 type AppConfig struct {
@@ -41,6 +42,8 @@ type AppConfig struct {
 	MeiliSearchKey string `yaml:"meilisearch_key" env:"MEILISEARCH_KEY"`
 
 	HCaptchaSecretKey string `yaml:"hcaptcha_secret_key" env:"HCAPTCHA_SECRET_KEY"`
+
+	SlowSQLDuration time.Duration `yaml:"slow_sql_duration" env:"SLOW_SQL_DURATION"`
 
 	NsfwWord     string `yaml:"nsfw_word"`
 	DisableWords string `yaml:"disable_words"`

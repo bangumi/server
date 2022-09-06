@@ -38,7 +38,7 @@ func rateMiddleware(r rate.Manager, h baseHandler, action action.Action, limit r
 			return res.Unauthorized("login required")
 		}
 
-		allowed, _, err := r.AllowAction(c.Context(), a.ID, action, limit)
+		allowed, _, err := r.AllowAction(c.UserContext(), a.ID, action, limit)
 		if err != nil {
 			return errgo.Wrap(err, "rate.Manager.AllowAction")
 		}

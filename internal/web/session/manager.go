@@ -43,13 +43,13 @@ type Manager interface {
 	RevokeUser(ctx context.Context, id model.UserID) error
 }
 
-func New(c cache.Cache, repo Repo, log *zap.Logger) Manager {
+func New(c cache.RedisCache, repo Repo, log *zap.Logger) Manager {
 	return manager{cache: c, repo: repo, log: log.Named("web.Session.Manager")}
 }
 
 type manager struct {
 	repo  Repo
-	cache cache.Cache
+	cache cache.RedisCache
 	log   *zap.Logger
 }
 

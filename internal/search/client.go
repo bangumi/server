@@ -33,7 +33,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
 // New provide a search app is AppConfig.MeiliSearchURL is empty string, return nope search client.
@@ -104,7 +103,7 @@ func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 			return c.DeleteSubject(ctx, id)
 		}
 
-		c.log.Error("unexpected error get subject from mysql", zap.Error(err), log.SubjectID(id))
+		c.log.Error("unexpected error get subject from mysql", zap.Error(err), id.Zap())
 		return errgo.Wrap(err, "subjectRepo.Get")
 	}
 

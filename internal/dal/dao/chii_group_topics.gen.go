@@ -16,7 +16,7 @@ type GroupTopic struct {
 	UpdatedTime uint32 `gorm:"column:grp_tpc_lastpost;type:int(10) unsigned;not null"`
 	Replies     uint32 `gorm:"column:grp_tpc_replies;type:mediumint(8) unsigned;not null"`
 	State       uint8  `gorm:"column:grp_tpc_state;type:tinyint(1) unsigned;not null"`
-	Status      uint8  `gorm:"column:grp_tpc_display;type:tinyint(1) unsigned;not null;default:1"`
+	Display     uint8  `gorm:"column:grp_tpc_display;type:tinyint(1) unsigned;not null;default:1"`
 }
 
 // TableName GroupTopic's table name

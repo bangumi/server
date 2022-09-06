@@ -19,6 +19,7 @@ package logger
 import (
 	"io"
 	"os"
+	"time"
 
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
@@ -28,17 +29,19 @@ import (
 // production log config.
 func getLogger(level zapcore.Level) *zap.Logger {
 	prod := zapcore.EncoderConfig{
-		TimeKey:        timeKey,
-		NameKey:        nameKey,
-		MessageKey:     messageKey,
-		CallerKey:      callerKey,
-		LevelKey:       levelKey,
-		StacktraceKey:  traceKey,
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.RFC3339NanoTimeEncoder,
-		EncodeDuration: zapcore.MillisDurationEncoder,
-		EncodeCaller:   zapcore.FullCallerEncoder,
+		TimeKey:       timeKey,
+		NameKey:       nameKey,
+		MessageKey:    messageKey,
+		CallerKey:     callerKey,
+		LevelKey:      levelKey,
+		StacktraceKey: traceKey,
+		LineEnding:    zapcore.DefaultLineEnding,
+		EncodeLevel:   zapcore.LowercaseLevelEncoder,
+		EncodeTime:    zapcore.RFC3339NanoTimeEncoder,
+		EncodeDuration: func(duration time.Duration, enc zapcore.PrimitiveArrayEncoder) {
+			enc.AppendString((duration / time.Millisecond * time.Millisecond).String()) //nolint:durationcheck
+		},
+		EncodeCaller: zapcore.FullCallerEncoder,
 
 		NewReflectedEncoder: defaultReflectedEncoder,
 	}

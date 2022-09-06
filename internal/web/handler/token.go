@@ -44,7 +44,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 		return h.ValidationError(c, err)
 	}
 
-	token, err := h.a.CreateAccessToken(c.Context(), v.ID, r.Name, gtime.OneDay*time.Duration(r.DurationDays))
+	token, err := h.a.CreateAccessToken(c.UserContext(), v.ID, r.Name, gtime.OneDay*time.Duration(r.DurationDays))
 	if err != nil {
 		return errgo.Wrap(err, "failed to create token")
 	}
@@ -66,7 +66,7 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 		return h.ValidationError(c, err)
 	}
 
-	token, err := h.a.GetTokenByID(c.Context(), r.ID)
+	token, err := h.a.GetTokenByID(c.UserContext(), r.ID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.BadRequest("token not exist")
@@ -79,7 +79,7 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 		return res.Unauthorized("you don't have this token")
 	}
 
-	ok, err := h.a.DeleteAccessToken(c.Context(), r.ID)
+	ok, err := h.a.DeleteAccessToken(c.UserContext(), r.ID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to delete token")
 	}

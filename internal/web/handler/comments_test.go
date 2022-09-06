@@ -33,7 +33,8 @@ func TestHandler_GetGroupTopic(t *testing.T) {
 	g.EXPECT().GetByID(mock.Anything, model.GroupID(6)).Return(model.Group{Name: "group name", ID: 6}, nil)
 
 	topic := mocks.NewTopicRepo(t)
-	topic.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(model.Topic{ID: 1, ParentID: 6}, nil)
+	topic.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).
+		Return(model.Topic{ID: 1, ParentID: 6, Display: model.TopicDisplayNormal}, nil)
 	topic.EXPECT().GetTopicContent(mock.Anything, mock.Anything, mock.Anything).Return(model.Comment{}, nil)
 	topic.EXPECT().ListReplies(mock.Anything, mock.Anything, model.TopicID(1), 0, 0).Return([]model.Comment{}, nil)
 
@@ -45,4 +46,20 @@ func TestHandler_GetGroupTopic(t *testing.T) {
 	resp := test.New(t).Get("/p/groups/-/topics/1").Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestHandler_GetGroupTopic_soft_delete(t *testing.T) {
+	t.Parallel()
+
+	topic := mocks.NewTopicRepo(t)
+	topic.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).
+		Return(model.Topic{ID: 1, ParentID: 6, Display: model.TopicDisplayBan}, nil)
+
+	app := test.GetWebApp(t, test.Mock{
+		TopicRepo: topic,
+	})
+
+	resp := test.New(t).Get("/p/groups/-/topics/1").Execute(app)
+
+	require.Equal(t, http.StatusNotFound, resp.StatusCode)
 }

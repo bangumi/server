@@ -25,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/req"
@@ -43,7 +42,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return h.ValidationError(c, err)
 	}
 
-	ok, err := h.captcha.Verify(c.Context(), r.HCaptchaResponse)
+	ok, err := h.captcha.Verify(c.UserContext(), r.HCaptchaResponse)
 	if err != nil {
 		return res.FromError(c, err, http.StatusBadGateway, "Failed to connect to hCaptcha server")
 	}
@@ -57,7 +56,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	}
 
 	a := h.GetHTTPAccessor(c)
-	allowed, remain, err := h.rateLimit.Login(c.Context(), a.IP.String())
+	allowed, remain, err := h.rateLimit.Login(c.UserContext(), a.IP.String())
 	if err != nil {
 		return errgo.Wrap(err, "failed to apply rate limit")
 	}
@@ -70,7 +69,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 }
 
 func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogin, remain int) error {
-	login, ok, err := h.a.Login(c.Context(), r.Email, r.Password)
+	login, ok, err := h.a.Login(c.UserContext(), r.Email, r.Password)
 	if err != nil {
 		return errgo.Wrap(err, "Unexpected error when logging in")
 	}
@@ -83,12 +82,12 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 		})
 	}
 
-	key, s, err := h.session.Create(c.Context(), login)
+	key, s, err := h.session.Create(c.UserContext(), login)
 	if err != nil {
 		return errgo.Wrap(err, "failed to create session")
 	}
 
-	if err = h.rateLimit.Reset(c.Context(), c.Context().RemoteIP().String()); err != nil {
+	if err = h.rateLimit.Reset(c.UserContext(), c.Context().RemoteIP().String()); err != nil {
 		h.log.Error("failed to reset Login rate limit", zap.Error(err), a.Log())
 	}
 
@@ -101,12 +100,12 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 		SameSite: fiber.CookieSameSiteLaxMode,
 	})
 
-	user, err := h.ctrl.GetUser(c.Context(), s.UserID)
+	user, err := h.ctrl.GetUser(c.UserContext(), s.UserID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get user by user id")
 	}
 
-	h.log.Info("user Login", log.UserID(user.ID))
+	h.log.Info("user Login", user.ID.Zap())
 
 	return res.JSON(c, res.User{
 		ID:        user.ID,
@@ -125,7 +124,7 @@ func (h Handler) PrivateLogout(c *fiber.Ctx) error {
 	}
 
 	sessionID := utils.UnsafeString(c.Context().Request.Header.Cookie(session.CookieKey))
-	if err := h.session.Revoke(c.Context(), sessionID); err != nil {
+	if err := h.session.Revoke(c.UserContext(), sessionID); err != nil {
 		return errgo.Wrap(err, "failed to revoke session")
 	}
 

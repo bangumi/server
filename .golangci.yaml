@@ -331,7 +331,7 @@ issues:
   exclude-use-default: true
   exclude-rules:
     - path: '.*_test\.go'
-      linters: [gocritic, gochecknoglobals, godot, nosnakecase]
+      linters: [gocritic, gochecknoglobals, godot, nosnakecase, funlen]
 
     - source: "var .* = pool.New"
       linters: [gochecknoglobals]
@@ -339,7 +339,10 @@ issues:
     - source: 'var Module = fx\.Module\('
       linters: [gochecknoglobals]
 
-    - source: 'var .* = sync\.Once\{\}'
+    - source: 'var .* = reflect\.TypeOf'
+      linters: [gochecknoglobals]
+
+    - source: 'var .* sync\.Once'
       linters: [gochecknoglobals]
 
     - linters: [goerr113, errorlint]

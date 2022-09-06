@@ -82,10 +82,10 @@ func (t *GroupTopic) GetParentID() uint32 {
 	return t.GroupID
 }
 
-func (t *SubjectTopic) GetStatus() uint8 {
-	return t.Status
+func (t *SubjectTopic) GetDisplay() uint8 {
+	return t.Display
 }
 
-func (t *GroupTopic) GetStatus() uint8 {
-	return t.Status
+func (t *GroupTopic) GetDisplay() uint8 {
+	return t.Display
 }

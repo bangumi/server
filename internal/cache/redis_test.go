@@ -34,7 +34,7 @@ type RedisCacheTestItem struct {
 
 const key = "news_redis_cache"
 
-func mockedCache() (cache.Cache, redismock.ClientMock) {
+func mockedCache() (cache.RedisCache, redismock.ClientMock) {
 	db, mock := redismock.NewClientMock()
 	c := cache.NewRedisCache(db)
 

@@ -95,4 +95,14 @@ func TestRateLimitManager_Allowed(t *testing.T) {
 	require.NoError(t, err)
 	require.False(t, allowed)
 	require.Equal(t, 0, remain)
+
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
+	require.NoError(t, err)
+	require.False(t, allowed)
+	require.Equal(t, 0, remain)
+
+	allowed, remain, err = rateLimiter.Login(context.TODO(), ip)
+	require.NoError(t, err)
+	require.False(t, allowed)
+	require.Equal(t, 0, remain)
 }

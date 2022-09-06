@@ -25,7 +25,7 @@ type Topic struct {
 	Replies   uint32
 	ParentID  uint32
 	State     CommentState
-	Status    TopicStatus
+	Display   TopicDisplay
 }
 
 type TopicDetail struct {
@@ -49,10 +49,10 @@ const (
 	CommentStateAdminDelete      CommentState = 7 // 管理员删除
 )
 
-type TopicStatus uint8
+type TopicDisplay uint8
 
 const (
-	TopicStatusBan    TopicStatus = 0
-	TopicStatusNormal TopicStatus = 1
-	TopicStatusReview TopicStatus = 2
+	TopicDisplayBan    TopicDisplay = 0 // 软删除
+	TopicDisplayNormal TopicDisplay = 1
+	TopicDisplayReview TopicDisplay = 2
 )

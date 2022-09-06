@@ -23,6 +23,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -30,7 +31,7 @@ import (
 )
 
 func getService() domain.AuthService {
-	return auth.NewService(nil, nil, zap.NewNop(), test.NopCache())
+	return auth.NewService(nil, nil, zap.NewNop(), cache.NewNoop())
 }
 
 func TestService_ComparePassword(t *testing.T) {
@@ -53,7 +54,7 @@ func TestService_GetByToken(t *testing.T) {
 
 	var u = mocks.NewUserRepo(t)
 
-	s := auth.NewService(m, u, zap.NewNop(), test.NopCache())
+	s := auth.NewService(m, u, zap.NewNop(), cache.NewNoop())
 
 	a, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
 	require.NoError(t, err)

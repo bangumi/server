@@ -26,7 +26,7 @@ import (
 
 func New(
 	episode domain.EpisodeRepo,
-	cache cache.Cache,
+	cache cache.RedisCache,
 	subject domain.SubjectRepo,
 	person domain.PersonRepo,
 	character domain.CharacterRepo,
@@ -40,7 +40,7 @@ func New(
 	log *zap.Logger,
 ) Ctrl {
 	return Ctrl{
-		log:   log.Named("app.query"),
+		log:   log.Named("controller"),
 		cache: cache,
 
 		tx:  tx,
@@ -68,7 +68,7 @@ func New(
 
 type Ctrl struct {
 	log   *zap.Logger
-	cache cache.Cache
+	cache cache.RedisCache
 
 	tx  dal.Transaction
 	dam dam.Dam

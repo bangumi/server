@@ -24,7 +24,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -49,7 +48,7 @@ func (ctl Ctrl) GetTopic(
 			return model.TopicDetail{}, domain.ErrNotFound
 		}
 
-		ctl.log.Error("failed to get topic", zap.Error(err), log.TopicType(topicType), log.TopicID(topicID))
+		ctl.log.Error("failed to get topic", zap.Error(err), topicType.Zap(), topicID.Zap())
 		return model.TopicDetail{}, errgo.Wrap(err, "topicRepo.Get")
 	}
 
@@ -63,7 +62,7 @@ func (ctl Ctrl) GetTopic(
 			return model.TopicDetail{}, res.ErrNotFound
 		}
 
-		ctl.log.Error("failed to get topic content", zap.Error(err), log.TopicType(topicType), log.TopicID(topicID))
+		ctl.log.Error("failed to get topic content", zap.Error(err), topicType.Zap(), topicID.Zap())
 		return model.TopicDetail{}, errgo.Wrap(err, "topic.GetTopicContent")
 	}
 
@@ -86,9 +85,9 @@ func (ctl Ctrl) ListTopics(
 	objectID uint32,
 	limit, offset int,
 ) ([]model.Topic, int64, error) {
-	statuses := auth.TopicStatuses(u)
+	displays := auth.ListTopicDisplays(u)
 
-	count, err := ctl.topic.Count(ctx, topicType, objectID, statuses)
+	count, err := ctl.topic.Count(ctx, topicType, objectID, displays)
 	if err != nil {
 		return nil, 0, errgo.Wrap(err, "topicRepo.Count")
 	}
@@ -97,7 +96,7 @@ func (ctl Ctrl) ListTopics(
 		return []model.Topic{}, 0, nil
 	}
 
-	topics, err := ctl.topic.List(ctx, topicType, objectID, statuses, limit, offset)
+	topics, err := ctl.topic.List(ctx, topicType, objectID, displays, limit, offset)
 	if err != nil {
 		return nil, 0, errgo.Wrap(err, "repo.topic.GetTopics")
 	}

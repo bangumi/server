@@ -414,7 +414,7 @@ func main() {
 		gen.FieldRename("sbj_tpc_subject_id", "SubjectID"),
 		gen.FieldRename("sbj_tpc_dateline", createdTime),
 		gen.FieldRename("sbj_tpc_lastpost", "UpdatedTime"),
-		gen.FieldRename("sbj_tpc_display", "Status"),
+		gen.FieldRename("sbj_tpc_display", "Display"),
 		gen.FieldType("sbj_tpc_state", "uint8"),
 		gen.FieldType("sbj_tpc_display", "uint8"),
 	))
@@ -424,7 +424,7 @@ func main() {
 		gen.FieldRename("grp_tpc_gid", "GroupID"),
 		gen.FieldRename("grp_tpc_dateline", createdTime),
 		gen.FieldRename("grp_tpc_lastpost", "UpdatedTime"),
-		gen.FieldRename("grp_tpc_display", "Status"),
+		gen.FieldRename("grp_tpc_display", "Display"),
 		gen.FieldType("grp_tpc_state", "uint8"),
 		gen.FieldType("grp_tpc_display", "uint8"),
 	))

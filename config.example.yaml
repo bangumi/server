@@ -17,6 +17,10 @@ hcaptcha_secret_key: 0x0000000000000000000000000000000000000000
 meilisearch_url: ""
 meilisearch_key: ""
 
+# log slow sql, in go time.Duration format string
+# empty or zero value will disable slow sql logging
+slow_sql_duration: ""
+
 debug:
   gorm: true
 nsfw_word: "里番|无码|18x|エロ"

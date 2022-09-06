@@ -59,16 +59,16 @@ tasks:
 
   cache:
     sources:
-      - internal/cache/interface.go
+      - internal/cache/redis.go
       - ./internal/pkg/tools/go.mod
     generates:
-      - internal/mocks/Cache.go
+      - internal/mocks/RedisCache.go
     cmds:
       - task: base-mock
         vars:
           SRC_DIR: ./internal/cache
-          INTERFACE: "Cache"
-          MOCK_STRUCT: Cache
+          INTERFACE: "RedisCache"
+          MOCK_STRUCT: RedisCache
 
   session-manager:
     sources:

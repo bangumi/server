@@ -34,7 +34,7 @@ func (h Subject) GetRelatedPersons(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, id)
+	r, err := h.ctrl.GetSubjectNoRedirect(c.UserContext(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -42,7 +42,7 @@ func (h Subject) GetRelatedPersons(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get subject")
 	}
 
-	relations, err := h.person.GetSubjectRelated(c.Context(), id)
+	relations, err := h.person.GetSubjectRelated(c.UserContext(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}

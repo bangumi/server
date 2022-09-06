@@ -23,7 +23,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -40,17 +39,17 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, err := h.ctrl.GetEpisode(c.Context(), episodeID)
+	e, err := h.ctrl.GetEpisode(c.UserContext(), episodeID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
-		h.log.Error("failed to get episode", log.EpisodeID(episodeID))
+		h.log.Error("failed to get episode", episodeID.Zap())
 		return errgo.Wrap(err, "query.GetEpisode")
 	}
 
-	m, err := h.collect.GetSubjectEpisodesCollection(c.Context(), v.ID, e.SubjectID)
+	m, err := h.collect.GetSubjectEpisodesCollection(c.UserContext(), v.ID, e.SubjectID)
 	if err != nil {
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
@@ -79,24 +78,24 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = h.ctrl.GetSubject(c.Context(), v.Auth, subjectID)
+	_, err = h.ctrl.GetSubject(c.UserContext(), v.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
-		h.log.Error("failed to fetch subject", zap.Error(err), log.SubjectID(subjectID), v.Log())
+		h.log.Error("failed to fetch subject", zap.Error(err), subjectID.Zap(), v.Log())
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 
-	ec, err := h.collect.GetSubjectEpisodesCollection(c.Context(), v.ID, subjectID)
+	ec, err := h.collect.GetSubjectEpisodesCollection(c.UserContext(), v.ID, subjectID)
 	if err != nil {
 		h.log.Error("unexpected error to fetch user subject collections",
-			zap.Error(err), log.UserID(v.ID), log.SubjectID(subjectID))
+			zap.Error(err), v.ID.Zap(), subjectID.Zap())
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 
-	episodes, count, err := h.ctrl.ListEpisode(c.Context(), subjectID, episodeType, page.Limit, page.Offset)
+	episodes, count, err := h.ctrl.ListEpisode(c.UserContext(), subjectID, episodeType, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "query.ListEpisode")
 	}
