@@ -18,6 +18,7 @@ package logger
 
 import (
 	"strings"
+	"time"
 
 	"github.com/mattn/go-colorable"
 	"go.uber.org/zap"
@@ -26,16 +27,18 @@ import (
 
 func textLogger(level zapcore.Level) *zap.Logger {
 	consoleEncoding := zapcore.NewConsoleEncoder(zapcore.EncoderConfig{
-		TimeKey:        timeKey,
-		NameKey:        nameKey,
-		MessageKey:     messageKey,
-		CallerKey:      callerKey,
-		LevelKey:       levelKey,
-		StacktraceKey:  traceKey,
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseColorLevelEncoder,
-		EncodeTime:     zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05"),
-		EncodeDuration: zapcore.MillisDurationEncoder,
+		TimeKey:       timeKey,
+		NameKey:       nameKey,
+		MessageKey:    messageKey,
+		CallerKey:     callerKey,
+		LevelKey:      levelKey,
+		StacktraceKey: traceKey,
+		LineEnding:    zapcore.DefaultLineEnding,
+		EncodeLevel:   zapcore.LowercaseColorLevelEncoder,
+		EncodeTime:    zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05"),
+		EncodeDuration: func(duration time.Duration, enc zapcore.PrimitiveArrayEncoder) {
+			enc.AppendString(duration.String())
+		},
 		EncodeCaller: func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
 			const prefix = "github.com/bangumi/server"
 			p := caller.String()
