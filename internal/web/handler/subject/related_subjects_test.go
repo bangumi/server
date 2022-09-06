@@ -38,7 +38,7 @@ func TestSubject_GetRelatedSubjects(t *testing.T) {
 	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, subjectID, mock.Anything).Return(model.Subject{ID: subjectID}, nil)
 	m.EXPECT().GetByIDs(mock.Anything, mock.Anything, subject.Filter{NSFW: null.New(false)}).
-		Return(map[model.SubjectID]model.Subject{}, nil)
+		Return(map[model.SubjectID]model.Subject{1: {ID: 1}}, nil)
 	m.EXPECT().GetSubjectRelated(mock.Anything, subjectID).Return([]domain.SubjectInternalRelation{
 		{TypeID: 1, SourceID: subjectID, DestinationID: 1},
 	}, nil)
@@ -55,4 +55,5 @@ func TestSubject_GetRelatedSubjects(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.Len(t, r, 1)
+	require.Equal(t, model.SubjectID(1), r[0].SubjectID)
 }
