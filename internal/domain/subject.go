@@ -25,10 +25,6 @@ type SubjectPersonRelation struct {
 	SubjectID model.SubjectID
 }
 
-func (r SubjectPersonRelation) GetSubjectID() model.SubjectID {
-	return r.SubjectID
-}
-
 type SubjectCharacterRelation struct {
 	TypeID uint8
 
