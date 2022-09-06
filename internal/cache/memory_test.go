@@ -78,16 +78,3 @@ func Test_MemCache_Expired(t *testing.T) {
 	require.NoError(t, err)
 	require.False(t, ok)
 }
-
-func Test_MemCache_Del(t *testing.T) {
-	t.Parallel()
-	var key = "K" + t.Name()
-	m := cache.NewMemoryCache()
-
-	require.NoError(t, m.Set(context.Background(), key, MemCacheTestItem{}, time.Hour))
-	require.NoError(t, m.Del(context.Background(), key))
-
-	ok, err := m.Get(context.Background(), key, &MemCacheTestItem{})
-	require.NoError(t, err)
-	require.False(t, ok)
-}

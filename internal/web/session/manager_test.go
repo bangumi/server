@@ -21,11 +21,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/web/session"
 )
 
@@ -37,7 +37,7 @@ func TestManager_Create(t *testing.T) {
 	m.EXPECT().Create(mock.Anything, uid, mock.Anything, mock.Anything).
 		Return("", session.Session{UserID: uid}, nil)
 
-	manager := session.New(test.NopCache(), m, logger.Copy())
+	manager := session.New(cache.NewNoop(), m, logger.Copy())
 
 	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
 	require.NoError(t, err)
@@ -51,7 +51,7 @@ func TestManager_Get(t *testing.T) {
 	m.EXPECT().Create(mock.Anything, uid, mock.Anything, mock.Anything).
 		Return("", session.Session{UserID: uid}, nil)
 
-	manager := session.New(test.NopCache(), m, logger.Copy())
+	manager := session.New(cache.NewNoop(), m, logger.Copy())
 
 	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
 	require.NoError(t, err)
@@ -66,7 +66,7 @@ func TestManager_Revoke(t *testing.T) {
 	m.EXPECT().Create(mock.Anything, uid, mock.Anything, mock.Anything).
 		Return("", session.Session{UserID: uid}, nil)
 
-	manager := session.New(test.NopCache(), m, logger.Copy())
+	manager := session.New(cache.NewNoop(), m, logger.Copy())
 
 	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
 	require.NoError(t, err)

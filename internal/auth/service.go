@@ -35,22 +35,22 @@ import (
 const TokenTypeOauthToken = 0
 const TokenTypeAccessToken = 1
 
-func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.Cache) domain.AuthService {
+func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.RedisCache) domain.AuthService {
 	return service{
-		localCache: cache.NewMemoryCache(),
-		cache:      c,
-		repo:       repo,
-		log:        logger.Named("auth.Service"),
-		user:       user,
+		permCache: cache.NewMemoryCache(),
+		cache:     c,
+		repo:      repo,
+		log:       logger.Named("auth.Service"),
+		user:      user,
 	}
 }
 
 type service struct {
-	localCache cache.Cache
-	cache      cache.Cache
-	repo       domain.AuthRepo
-	user       domain.UserRepo
-	log        *zap.Logger
+	permCache *cache.MemoryCache
+	cache     cache.RedisCache
+	repo      domain.AuthRepo
+	user      domain.UserRepo
+	log       *zap.Logger
 }
 
 func (s service) GetByID(ctx context.Context, userID model.UserID) (domain.Auth, error) {
@@ -181,7 +181,7 @@ func preProcessPassword(s string) [32]byte {
 func (s service) getPermission(ctx context.Context, id model.UserGroupID) (domain.Permission, error) {
 	var p domain.Permission
 	key := strconv.FormatUint(uint64(id), 10)
-	ok, err := s.localCache.Get(ctx, key, &p)
+	ok, err := s.permCache.Get(ctx, key, &p)
 	if err != nil {
 		return domain.Permission{}, errgo.Wrap(err, "read cache")
 	}
@@ -195,7 +195,7 @@ func (s service) getPermission(ctx context.Context, id model.UserGroupID) (domai
 		return domain.Permission{}, errgo.Wrap(err, "AuthRepo.GetPermission")
 	}
 
-	_ = s.localCache.Set(ctx, key, p, time.Minute)
+	_ = s.permCache.Set(ctx, key, p, time.Minute)
 
 	return p, nil
 }

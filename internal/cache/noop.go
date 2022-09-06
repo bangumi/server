@@ -19,9 +19,20 @@ import (
 	"time"
 )
 
-type Cache interface {
-	Get(ctx context.Context, key string, value any) (bool, error)
-	Set(ctx context.Context, key string, value any, ttl time.Duration) error
-	Del(ctx context.Context, keys ...string) error
-	// SetMany(ctx context.Context, keys string, values []any, ttl time.Duration) error
+func NewNoop() RedisCache {
+	return noop{}
+}
+
+type noop struct{}
+
+func (n noop) Get(context.Context, string, any) (bool, error) {
+	return false, nil
+}
+
+func (n noop) Set(context.Context, string, any, time.Duration) error {
+	return nil
+}
+
+func (n noop) Del(context.Context, ...string) error {
+	return nil
 }

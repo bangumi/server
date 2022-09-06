@@ -26,7 +26,7 @@ import (
 
 func New(
 	episode domain.EpisodeRepo,
-	cache cache.Cache,
+	cache cache.RedisCache,
 	subject domain.SubjectRepo,
 	person domain.PersonRepo,
 	character domain.CharacterRepo,
@@ -66,7 +66,7 @@ func New(
 
 type Ctrl struct {
 	log   *zap.Logger
-	cache cache.Cache
+	cache cache.RedisCache
 
 	tx  dal.Transaction
 	dam dam.Dam

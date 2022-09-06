@@ -36,7 +36,7 @@ func New(
 	r domain.RevisionRepo,
 	g domain.GroupRepo,
 	index domain.IndexRepo,
-	cache cache.Cache,
+	cache cache.RedisCache,
 	ctrl ctrl.Ctrl,
 	captcha captcha.Manager,
 	session session.Manager,
@@ -71,7 +71,7 @@ type Handler struct {
 	g         domain.GroupRepo
 	oauth     oauth.Manager
 	r         domain.RevisionRepo
-	cache     cache.Cache
+	cache     cache.RedisCache
 	a         domain.AuthService
 	session   session.Manager
 	captcha   captcha.Manager
