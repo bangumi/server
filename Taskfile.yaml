@@ -92,7 +92,7 @@ tasks:
   coverage:
     desc: Run tests with coverage report, used in CI.
     cmds:
-      - go test -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./...
+      - go test -parallel 3 -timeout 5s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out -count=1 ./...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
