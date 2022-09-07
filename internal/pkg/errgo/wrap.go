@@ -21,6 +21,8 @@ import (
 	"strconv"
 
 	"github.com/valyala/bytebufferpool"
+
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 type unwrap interface {
@@ -154,7 +156,5 @@ func (w *withStackError) MarshalJSON() ([]byte, error) {
 
 	b.WriteString("]}")
 
-	var bytes = make([]byte, len(b.B))
-	copy(bytes, b.Bytes())
-	return bytes, nil
+	return slice.Clone(b.B), nil
 }
