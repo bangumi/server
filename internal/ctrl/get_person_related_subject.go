@@ -43,11 +43,17 @@ func (ctl Ctrl) GetPersonRelated(
 		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}
 
-	var results = make([]model.SubjectPersonRelation, len(relations))
-	for i, rel := range relations {
-		results[i].Subject = subjects[rel.SubjectID]
-		results[i].TypeID = rel.TypeID
-		results[i].Person = person
+	var results = make([]model.SubjectPersonRelation, 0, len(relations))
+	for _, rel := range relations {
+		s, ok := subjects[rel.SubjectID]
+		if !ok {
+			continue
+		}
+		results = append(results, model.SubjectPersonRelation{
+			Person:  person,
+			Subject: s,
+			TypeID:  rel.TypeID,
+		})
 	}
 
 	return results, nil

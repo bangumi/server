@@ -28,15 +28,15 @@ func (ctl Ctrl) GetSubjectRelatedSubjects(
 	ctx context.Context,
 	user domain.Auth,
 	subjectID model.SubjectID,
-) (model.Subject, []model.SubjectInternalRelation, error) {
-	s, err := ctl.GetSubjectNoRedirect(ctx, user, subjectID)
+) ([]model.SubjectInternalRelation, error) {
+	currentSubject, err := ctl.GetSubjectNoRedirect(ctx, user, subjectID)
 	if err != nil {
-		return model.Subject{}, nil, err
+		return nil, err
 	}
 
 	relations, err := ctl.subject.GetSubjectRelated(ctx, subjectID)
 	if err != nil {
-		return s, nil, errgo.Wrap(err, "SubjectRepo.GetSubjectRelated")
+		return nil, errgo.Wrap(err, "SubjectRepo.GetSubjectRelated")
 	}
 
 	subjects, err := ctl.GetSubjectByIDs(ctx,
@@ -44,17 +44,22 @@ func (ctl Ctrl) GetSubjectRelatedSubjects(
 		SubjectFilter{NSFW: null.Bool{Value: false, Set: !user.AllowNSFW()}},
 	)
 	if err != nil {
-		return s, nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
+		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}
 
-	var results = make([]model.SubjectInternalRelation, len(relations))
-	for i, rel := range relations {
-		results[i] = model.SubjectInternalRelation{
-			Destination: subjects[rel.DestinationID],
-			TypeID:      rel.TypeID,
-			Source:      s,
+	var results = make([]model.SubjectInternalRelation, 0, len(relations))
+	for _, rel := range relations {
+		s, ok := subjects[rel.DestinationID]
+		if !ok {
+			continue
 		}
+
+		results = append(results, model.SubjectInternalRelation{
+			Destination: s,
+			TypeID:      rel.TypeID,
+			Source:      currentSubject,
+		})
 	}
 
-	return s, results, nil
+	return results, nil
 }

@@ -51,13 +51,17 @@ func (ctl Ctrl) GetCharacterRelatedSubjects(
 		return model.Character{}, nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}
 
-	var results = make([]model.SubjectCharacterRelation, len(relations))
-	for i, rel := range relations {
-		results[i] = model.SubjectCharacterRelation{
-			Subject:   subjects[rel.SubjectID],
+	var results = make([]model.SubjectCharacterRelation, 0, len(relations))
+	for _, rel := range relations {
+		s, ok := subjects[rel.SubjectID]
+		if !ok {
+			continue
+		}
+		results = append(results, model.SubjectCharacterRelation{
+			Subject:   s,
 			TypeID:    rel.TypeID,
 			Character: character,
-		}
+		})
 	}
 
 	return character, results, nil
