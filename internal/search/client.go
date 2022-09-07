@@ -33,6 +33,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/subject"
 )
 
 // New provide a search app is AppConfig.MeiliSearchURL is empty string, return nope search client.
@@ -40,7 +41,7 @@ import (
 // see `MeiliSearchURL` and `MeiliSearchKey` in [config.AppConfig].
 func New(
 	c config.AppConfig,
-	subjectRepo domain.SubjectRepo,
+	subjectRepo subject.Repo,
 	log *zap.Logger,
 	query *query.Query,
 ) (Client, error) {
@@ -87,7 +88,7 @@ func New(
 }
 
 type client struct {
-	subjectRepo  domain.SubjectRepo
+	subjectRepo  subject.Repo
 	meili        *meilisearch.Client
 	q            *query.Query
 	subjectIndex *meilisearch.Index
@@ -97,7 +98,7 @@ type client struct {
 
 // OnSubjectUpdate is the hook called by canal.
 func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
-	s, err := c.subjectRepo.Get(ctx, id)
+	s, err := c.subjectRepo.Get(ctx, id, subject.Filter{})
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return c.DeleteSubject(ctx, id)

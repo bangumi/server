@@ -35,12 +35,18 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.SubjectRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("subject.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID) (model.Subject, error) {
-	s, err := r.q.Subject.WithContext(ctx).Preload(r.q.Subject.Fields).Where(r.q.Subject.ID.Eq(id)).First()
+func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID, filter Filter) (model.Subject, error) {
+	q := r.q.Subject.WithContext(ctx).Preload(r.q.Subject.Fields).Where(r.q.Subject.ID.Eq(id))
+
+	if filter.NSFW.Set {
+		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
+	}
+
+	s, err := q.First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Subject{}, domain.ErrNotFound
@@ -194,10 +200,15 @@ func (r mysqlRepo) GetSubjectRelated(
 }
 
 func (r mysqlRepo) GetByIDs(
-	ctx context.Context, ids []model.SubjectID,
+	ctx context.Context, ids []model.SubjectID, filter Filter,
 ) (map[model.SubjectID]model.Subject, error) {
-	records, err := r.q.Subject.WithContext(ctx).
-		Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(slice.ToValuer(ids)...)).Find()
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(slice.ToValuer(ids)...))
+
+	if filter.NSFW.Set {
+		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
+	}
+
+	records, err := q.Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
@@ -218,7 +229,7 @@ func (r mysqlRepo) GetByIDs(
 func (r mysqlRepo) GetActors(
 	ctx context.Context,
 	subjectID model.SubjectID,
-	characterIDs ...model.CharacterID,
+	characterIDs []model.CharacterID,
 ) (map[model.CharacterID][]model.PersonID, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
 		Where(r.q.Cast.CharacterID.In(slice.ToValuer(characterIDs)...), r.q.Cast.SubjectID.Eq(subjectID)).

@@ -93,7 +93,7 @@ func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs []model.UserID) (map[
 		}
 	}
 
-	gmap.Copy(result, newUserMap)
+	gmap.CopyTo(result, newUserMap)
 
 	return result, nil
 }

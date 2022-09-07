@@ -28,7 +28,7 @@ func (ctl Ctrl) GetActors(
 	subjectID model.SubjectID,
 	characterIDs ...model.CharacterID,
 ) (map[model.CharacterID][]model.Person, error) {
-	actors, err := ctl.subject.GetActors(ctx, subjectID, characterIDs...)
+	actors, err := ctl.subject.GetActors(ctx, subjectID, characterIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "subjectRepo.GetActors")
 	}

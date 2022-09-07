@@ -22,12 +22,13 @@ import (
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/subject"
 )
 
 func New(
 	episode domain.EpisodeRepo,
 	cache cache.RedisCache,
-	subject domain.SubjectRepo,
+	subject subject.Repo,
 	person domain.PersonRepo,
 	character domain.CharacterRepo,
 	collection domain.CollectionRepo,
@@ -75,7 +76,7 @@ type Ctrl struct {
 	topic                 domain.TopicRepo
 	person                domain.PersonRepo
 	episode               domain.EpisodeRepo
-	subject               domain.SubjectRepo
+	subject               subject.Repo
 	character             domain.CharacterRepo
 	collection            domain.CollectionRepo
 	metricUserQueryCached tally.Counter

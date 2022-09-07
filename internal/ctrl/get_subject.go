@@ -27,6 +27,8 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 )
 
 func (ctl Ctrl) GetSubject(ctx context.Context, user domain.Auth, subjectID model.SubjectID) (model.Subject, error) {
@@ -63,9 +65,14 @@ func (ctl Ctrl) GetSubjectNoRedirect(
 	return subject, nil
 }
 
+type SubjectFilter struct {
+	NSFW null.Bool
+}
+
 func (ctl Ctrl) GetSubjectByIDs(
 	ctx context.Context,
-	subjectIDs ...model.SubjectID,
+	subjectIDs []model.SubjectID,
+	filter SubjectFilter,
 ) (map[model.SubjectID]model.Subject, error) {
 	ctl.metricSubjectQueryCount.Inc(int64(len(subjectIDs)))
 	var notCached = make([]model.SubjectID, 0, len(subjectIDs))
@@ -87,19 +94,19 @@ func (ctl Ctrl) GetSubjectByIDs(
 		}
 	}
 
-	newSubjectMap, err := ctl.subject.GetByIDs(ctx, notCached)
+	newSubjectMap, err := ctl.subject.GetByIDs(ctx, notCached, subject.Filter{NSFW: filter.NSFW})
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get subjects")
 	}
 
-	for subjectID, subject := range newSubjectMap {
-		err = ctl.cache.Set(ctx, cachekey.Subject(subjectID), subject, time.Minute)
+	for subjectID, s := range newSubjectMap {
+		err = ctl.cache.Set(ctx, cachekey.Subject(subjectID), s, time.Minute)
 		if err != nil {
 			ctl.log.Error("failed to set subject cache")
 		}
 	}
 
-	gmap.Copy(result, newSubjectMap)
+	gmap.CopyTo(result, newSubjectMap)
 
 	return result, nil
 }
@@ -120,7 +127,7 @@ func (ctl Ctrl) getSubject(ctx context.Context, id model.SubjectID) (model.Subje
 		return r, nil
 	}
 
-	r, err = ctl.subject.Get(ctx, id)
+	r, err = ctl.subject.Get(ctx, id, subject.Filter{})
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return r, domain.ErrSubjectNotFound

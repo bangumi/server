@@ -19,6 +19,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -94,7 +95,7 @@ func (h User) listCollection(
 		return item.SubjectID
 	})
 
-	subjectMap, err := h.ctrl.GetSubjectByIDs(c.UserContext(), subjectIDs...)
+	subjectMap, err := h.ctrl.GetSubjectByIDs(c.UserContext(), subjectIDs, ctrl.SubjectFilter{})
 	if err != nil {
 		return errgo.Wrap(err, "failed to get subjects")
 	}

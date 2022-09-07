@@ -35,7 +35,7 @@ func TestSubject_Get(t *testing.T) {
 	var subjectID model.SubjectID = 7
 
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, subjectID).Return(model.Subject{ID: subjectID}, nil)
+	m.EXPECT().Get(mock.Anything, subjectID, mock.Anything).Return(model.Subject{ID: subjectID}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
@@ -65,7 +65,7 @@ func TestSubject_Get(t *testing.T) {
 func TestSubject_Get_Redirect(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, model.SubjectID(8)).Return(model.Subject{Redirect: 2}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(8), mock.Anything).Return(model.Subject{Redirect: 2}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{
@@ -83,7 +83,7 @@ func TestSubject_Get_NSFW_200(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, model.SubjectID(7)).Return(model.Subject{NSFW: true}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(7), mock.Anything).Return(model.Subject{NSFW: true}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
@@ -108,7 +108,7 @@ func TestSubject_Get_NSFW_404(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, model.SubjectID(7)).Return(model.Subject{NSFW: true}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(7), mock.Anything).Return(model.Subject{NSFW: true}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.AuthUserInfo{}, nil)
@@ -148,8 +148,8 @@ func TestSubject_Get_bad_id(t *testing.T) {
 func TestSubject_GetImage_302(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, model.SubjectID(1)).Return(model.Subject{ID: 1, Image: "temp"}, nil)
-	m.EXPECT().Get(mock.Anything, model.SubjectID(3)).Return(model.Subject{ID: 1}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(1), mock.Anything).Return(model.Subject{ID: 1, Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(3), mock.Anything).Return(model.Subject{ID: 1}, nil)
 
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 
@@ -174,7 +174,7 @@ func TestSubject_GetImage_302(t *testing.T) {
 func TestSubject_GetImage_400(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{Image: "temp"}, nil)
+	m.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(model.Subject{Image: "temp"}, nil)
 
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 
