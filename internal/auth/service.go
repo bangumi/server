@@ -157,7 +157,7 @@ func (s service) GetByToken(ctx context.Context, token string) (domain.Auth, err
 func (s service) ComparePassword(hashed []byte, password string) (bool, error) {
 	p := preProcessPassword(password)
 
-	if err := bcrypt.CompareHashAndPassword(hashed, p[:]); err != nil {
+	if err := bcrypt.CompareHashAndPassword(hashed, p); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return false, nil
 		}
@@ -168,14 +168,11 @@ func (s service) ComparePassword(hashed []byte, password string) (bool, error) {
 	return true, nil
 }
 
-func preProcessPassword(s string) [32]byte {
+func preProcessPassword(s string) []byte {
 	// don't know why old code base use md5 to hash password first
 	p := md5.Sum([]byte(s)) //nolint:gosec
-	var md5Password [32]byte
 
-	hex.Encode(md5Password[:], p[:])
-
-	return md5Password
+	return []byte(hex.EncodeToString(p[:]))
 }
 
 func (s service) getPermission(ctx context.Context, id model.UserGroupID) (domain.Permission, error) {
