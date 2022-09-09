@@ -19,7 +19,6 @@ import (
 	"crypto/md5" //nolint:gosec
 	"encoding/hex"
 	"errors"
-	"strconv"
 	"time"
 
 	"go.uber.org/zap"
@@ -37,7 +36,7 @@ const TokenTypeAccessToken = 1
 
 func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.RedisCache) domain.AuthService {
 	return service{
-		permCache: cache.NewMemoryCache(),
+		permCache: cache.NewMemoryCache[model.UserGroupID, domain.Permission](),
 		cache:     c,
 		repo:      repo,
 		log:       logger.Named("auth.Service"),
@@ -46,7 +45,7 @@ func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, 
 }
 
 type service struct {
-	permCache *cache.MemoryCache
+	permCache *cache.MemoryCache[model.UserGroupID, domain.Permission]
 	cache     cache.RedisCache
 	repo      domain.AuthRepo
 	user      domain.UserRepo
@@ -176,23 +175,18 @@ func preProcessPassword(s string) []byte {
 }
 
 func (s service) getPermission(ctx context.Context, id model.UserGroupID) (domain.Permission, error) {
-	var p domain.Permission
-	key := strconv.FormatUint(uint64(id), 10)
-	ok, err := s.permCache.Get(ctx, key, &p)
-	if err != nil {
-		return domain.Permission{}, errgo.Wrap(err, "read cache")
-	}
+	p, ok := s.permCache.Get(ctx, id)
 
 	if ok {
 		return p, nil
 	}
 
-	p, err = s.repo.GetPermission(ctx, id)
+	p, err := s.repo.GetPermission(ctx, id)
 	if err != nil {
 		return domain.Permission{}, errgo.Wrap(err, "AuthRepo.GetPermission")
 	}
 
-	_ = s.permCache.Set(ctx, key, p, time.Minute)
+	s.permCache.Set(ctx, id, p, time.Minute)
 
 	return p, nil
 }
