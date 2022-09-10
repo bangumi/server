@@ -14,7 +14,7 @@
 
 package set
 
-type empty struct {
+type empty = struct {
 }
 
 // Set is a not thread-safe set based on built-in map.
@@ -53,8 +53,25 @@ func (s Set[T]) Remove(item T) {
 	delete(s.m, item)
 }
 
+func (s Set[T]) Removes(items ...T) Set[T] {
+	for _, item := range items {
+		delete(s.m, item)
+	}
+
+	return s
+}
+
 func (s Set[T]) Len() int {
 	return len(s.m)
+}
+
+func (s Set[T]) ToSlice() []T {
+	var out = make([]T, 0, len(s.m))
+	for k := range s.m {
+		out = append(out, k)
+	}
+
+	return out
 }
 
 // Union return a new set = (s1 | s2).

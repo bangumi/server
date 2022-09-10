@@ -15,32 +15,25 @@
 package cache
 
 import (
-	"context"
-	"time"
+	"github.com/goccy/go-json"
+
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func NewNoop() RedisCache {
-	return noop{}
+func marshalBytes(v any) ([]byte, error) {
+	b, err := json.MarshalWithOption(v, json.DisableHTMLEscape(), json.DisableNormalizeUTF8())
+	if err != nil {
+		return nil, errgo.Wrap(err, "json.Marshal")
+	}
+
+	return b, nil
 }
 
-type noop struct{}
+func unmarshalBytes(b []byte, v any) error {
+	err := json.UnmarshalNoEscape(b, v)
+	if err != nil {
+		return errgo.Wrap(err, "json.Unmarshal")
+	}
 
-func (n noop) GetMany(ctx context.Context, keys []string) GetManyResult {
-	return GetManyResult{}
-}
-
-func (n noop) SetMany(ctx context.Context, data map[string]any, ttl time.Duration) error {
-	return nil
-}
-
-func (n noop) Get(context.Context, string, any) (bool, error) {
-	return false, nil
-}
-
-func (n noop) Set(context.Context, string, any, time.Duration) error {
-	return nil
-}
-
-func (n noop) Del(context.Context, ...string) error {
 	return nil
 }

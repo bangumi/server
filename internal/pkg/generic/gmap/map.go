@@ -33,13 +33,25 @@ func Values[M map[K]V, K comparable, V any](m M) []V {
 	return s
 }
 
-func CopyTo[M1 ~map[K]V, M2 ~map[K]V, K comparable, V any](dst M1, src M2) {
+func Merge[M1 ~map[K]V, M2 ~map[K]V, K comparable, V any](dst M1, src M2) M1 {
 	for k, v := range src {
 		dst[k] = v
 	}
+
+	return dst
 }
 
 func Has[M ~map[K]V, K comparable, V any](m M, key K) bool {
 	_, ok := m[key]
 	return ok
+}
+
+func Map[S ~map[SK]SV, SK comparable, SV any, F ~func(SK, SV) (DK, DV), DK comparable, DV any](src S, fn F) map[DK]DV {
+	var dst = make(map[DK]DV, len(src))
+	for key, value := range src {
+		dstKey, dstValue := fn(key, value)
+		dst[dstKey] = dstValue
+	}
+
+	return dst
 }

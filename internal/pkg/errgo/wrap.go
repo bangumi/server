@@ -103,7 +103,8 @@ func (w *withStackError) Format(s fmt.State, verb rune) {
 		}
 
 		if s.Flag('+') {
-			_, _ = io.WriteString(s, "error stack:")
+			_, _ = io.WriteString(s, w.Err.Error())
+			_, _ = io.WriteString(s, "\nerror stack:")
 			w.Stack.Format(s, verb)
 			return
 		}
