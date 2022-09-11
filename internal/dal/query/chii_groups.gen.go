@@ -61,9 +61,9 @@ type group struct {
 	Posts          field.Uint32
 	Members        field.Uint32
 	Description    field.String
-	LastPostedTime field.Uint32
+	LastPostedTime field.Uint32 // 目前永远是0
 	CreatedTime    field.Uint32
-	Accessible     field.Uint8
+	Accessible     field.Uint8 // 可访问性
 	Nsfw           field.Bool
 
 	fieldMap map[string]field.Expr

@@ -67,24 +67,24 @@ type person struct {
 	ALL         field.Asterisk
 	ID          field.Field
 	Name        field.String
-	Type        field.Uint8
+	Type        field.Uint8 // 个人，公司，组合
 	Infobox     field.String
 	Producer    field.Bool
 	Mangaka     field.Bool
 	Artist      field.Bool
 	Seiyu       field.Bool
-	Writer      field.Bool
-	Illustrator field.Bool
-	Actor       field.Bool
+	Writer      field.Bool // 作家
+	Illustrator field.Bool // 绘师
+	Actor       field.Bool // 演员
 	Summary     field.String
 	Img         field.String
-	ImgAnidb    field.String
+	ImgAnidb    field.String // Deprecated
 	Comment     field.Uint32
 	Collects    field.Uint32
 	Dateline    field.Uint32
 	Lastpost    field.Uint32
 	Lock        field.Int8
-	AnidbID     field.Uint32
+	AnidbID     field.Uint32 // Deprecated
 	Ban         field.Uint8
 	Redirect    field.Field
 	Nsfw        field.Bool

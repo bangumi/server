@@ -67,11 +67,11 @@ type personSubjects struct {
 	ALL           field.Asterisk
 	PrsnType      field.String
 	PersonID      field.Field
-	PrsnPosition  field.Uint16
+	PrsnPosition  field.Uint16 // 监督，原案，脚本,..
 	SubjectID     field.Field
 	SubjectTypeID field.Uint8
 	Summary       field.String
-	PrsnAppearEps field.String
+	PrsnAppearEps field.String // 可选，人物参与的章节
 	Subject       personSubjectsHasOneSubject
 
 	Person personSubjectsHasOnePerson

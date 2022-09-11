@@ -62,7 +62,7 @@ type subjectRevision struct {
 
 	ALL          field.Asterisk
 	ID           field.Uint32
-	Type         field.Uint8
+	Type         field.Uint8 // 修订类型
 	SubjectID    field.Field
 	TypeID       field.Uint16
 	CreatorID    field.Field

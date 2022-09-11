@@ -60,7 +60,7 @@ type character struct {
 	ALL      field.Asterisk
 	ID       field.Field
 	Name     field.String
-	Role     field.Uint8
+	Role     field.Uint8 // 角色，机体，组织。。
 	Infobox  field.String
 	Summary  field.String
 	Img      field.String
@@ -69,8 +69,8 @@ type character struct {
 	Dateline field.Uint32
 	Lastpost field.Uint32
 	Lock     field.Int8
-	ImgAnidb field.String
-	AnidbID  field.Uint32
+	ImgAnidb field.String // Deprecated
+	AnidbID  field.Uint32 // Deprecated
 	Ban      field.Uint8
 	Redirect field.Field
 	Nsfw     field.Bool
