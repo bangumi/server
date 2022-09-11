@@ -57,8 +57,8 @@ type timeLine struct {
 	Memo     field.Bytes
 	Img      field.Bytes
 	Batch    field.Uint8
-	Source   field.Uint8
-	Replies  field.Uint32
+	Source   field.Uint8  // 更新来源
+	Replies  field.Uint32 // 回复数
 	Dateline field.Uint32
 	Status   field.Uint8
 

@@ -67,7 +67,7 @@ type subjectCollection struct {
 	Comment      field.String
 	Tag          field.String
 	EpStatus     field.Uint32
-	VolStatus    field.Uint32
+	VolStatus    field.Uint32 // 卷数
 	WishTime     field.Uint32
 	DoingTime    field.Uint32
 	DoneTime     field.Uint32
