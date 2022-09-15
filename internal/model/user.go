@@ -35,8 +35,6 @@ func (u User) GetID() UserID {
 	return u.ID
 }
 
-type UserSubjectEpisodesCollection map[EpisodeID]UserEpisodeCollection
-
 type UserReceiveFilter uint8
 
 const (

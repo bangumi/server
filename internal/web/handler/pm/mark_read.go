@@ -37,7 +37,7 @@ func (h PrivateMessage) MarkRead(c *fiber.Ctx) error {
 	}
 	err := h.pmRepo.MarkRead(c.Context(), accessor.ID, model.PrivateMessageID(r.ID))
 	if err != nil {
-		return h.InternalError(c, err, "failed to mark private message(s) read")
+		return res.InternalError(c, err, "failed to mark private message(s) read")
 	}
 	return c.SendStatus(http.StatusNoContent)
 }

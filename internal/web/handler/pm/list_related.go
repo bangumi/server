@@ -31,13 +31,13 @@ func (h PrivateMessage) ListRelated(c *fiber.Ctx) error {
 	}
 	list, err := h.pmRepo.ListRelated(c.Context(), accessor.ID, relatedID)
 	if err != nil {
-		return h.InternalError(c, err, "failed to list related private messages")
+		return res.InternalError(c, err, "failed to list related private messages")
 	}
 	if len(list) > 0 {
 		userIDs := []model.UserID{list[0].SenderID, list[0].ReceiverID}
-		users, err := h.ctrl.GetUsersByIDs(c.Context(), userIDs...)
+		users, err := h.ctrl.GetUsersByIDs(c.Context(), userIDs)
 		if err != nil {
-			return h.InternalError(c, err, "failed to get users")
+			return res.InternalError(c, err, "failed to get users")
 		}
 		data := slice.Map(list, func(v model.PrivateMessage) res.PrivateMessage {
 			return res.ConvertModelPrivateMessage(v, users)

@@ -46,14 +46,14 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 		r.Title,
 		r.Content)
 	if err != nil {
-		return h.InternalError(c, err, "failed to create private message(s)")
+		return res.InternalError(c, err, "failed to create private message(s)")
 	}
 	userIDs := make([]model.UserID, len(r.ReceiverIDs)+1)
 	copy(userIDs, receiverIDs)
 	userIDs[len(userIDs)-1] = accessor.ID
-	users, err := h.ctrl.GetUsersByIDs(c.Context(), slice.UniqueUnsorted(userIDs)...)
+	users, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(userIDs))
 	if err != nil {
-		return h.InternalError(c, err, "failed to get users")
+		return res.InternalError(c, err, "failed to get users")
 	}
 	return c.JSON(slice.Map(msgs, func(v model.PrivateMessage) res.PrivateMessage {
 		return res.ConvertModelPrivateMessage(v, users)

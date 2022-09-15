@@ -35,7 +35,7 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 	}
 	list, err := h.pmRepo.List(c.Context(), accessor.ID, folder, page.Offset, page.Limit)
 	if err != nil {
-		return h.InternalError(c, err, "failed to list private messages")
+		return res.InternalError(c, err, "failed to list private messages")
 	}
 	if len(list) == 0 {
 		return res.JSON(c, make([]res.PrivateMessage, 0))
@@ -49,10 +49,10 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 		}
 	}
 	userIDs[len(userIDs)-1] = accessor.ID
-	userIDs = slice.UniqueUnsorted(userIDs)
-	users, err := h.ctrl.GetUsersByIDs(c.Context(), userIDs...)
+	userIDs = slice.Unique(userIDs)
+	users, err := h.ctrl.GetUsersByIDs(c.Context(), userIDs)
 	if err != nil {
-		return h.InternalError(c, err, "failed to get users")
+		return res.InternalError(c, err, "failed to get users")
 	}
 	data := slice.Map(list, func(v model.PrivateMessageListItem) res.PrivateMessage {
 		return res.ConvertModelPrivateMessageListItem(v, users)

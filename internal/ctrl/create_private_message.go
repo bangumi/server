@@ -56,7 +56,7 @@ func (ctl Ctrl) checkNeedFriendshipReceivers(
 func (ctl Ctrl) checkReceivers(ctx context.Context,
 	senderID model.UserID,
 	receiverIDs []model.UserID) error {
-	receivers, err := ctl.user.GetByIDs(ctx, receiverIDs...)
+	receivers, err := ctl.user.GetByIDs(ctx, receiverIDs)
 	if err != nil {
 		return errgo.Wrap(err, "dal")
 	}

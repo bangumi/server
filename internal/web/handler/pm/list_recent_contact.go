@@ -26,11 +26,11 @@ func (h PrivateMessage) ListRecentContact(c *fiber.Ctx) error {
 	accessor := h.Common.GetHTTPAccessor(c)
 	contactIDs, err := h.pmRepo.ListRecentContact(c.Context(), accessor.ID)
 	if err != nil {
-		return h.InternalError(c, err, "failed to list recent contact")
+		return res.InternalError(c, err, "failed to list recent contact")
 	}
-	contacts, err := h.ctrl.GetUsersByIDs(c.Context(), contactIDs...)
+	contacts, err := h.ctrl.GetUsersByIDs(c.Context(), contactIDs)
 	if err != nil {
-		return h.InternalError(c, err, "failed to get contacts")
+		return res.InternalError(c, err, "failed to get contacts")
 	}
 	return res.JSON(c, slice.MapFilter(contactIDs, func(v model.UserID) (res.User, bool) {
 		if m, ok := contacts[v]; ok {

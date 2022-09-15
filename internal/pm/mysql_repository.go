@@ -88,7 +88,7 @@ func (r mysqlRepo) List(
 		return make([]model.PrivateMessageListItem, 0), errgo.Wrap(err, "dal")
 	}
 
-	mainIDs := slice.UniqueUnsorted(slice.Map(ret, func(v *dao.PrivateMessage) model.PrivateMessageID {
+	mainIDs := slice.Unique(slice.Map(ret, func(v *dao.PrivateMessage) model.PrivateMessageID {
 		return v.RelatedMessageID
 	}))
 

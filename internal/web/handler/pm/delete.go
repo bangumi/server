@@ -44,7 +44,7 @@ func (h PrivateMessage) Delete(c *fiber.Ctx) error {
 				return model.PrivateMessageID(v)
 			}))
 	if err != nil {
-		return h.InternalError(c, err, "failed to delete private message(s)")
+		return res.InternalError(c, err, "failed to delete private message(s)")
 	}
 	return c.SendStatus(http.StatusNoContent)
 }

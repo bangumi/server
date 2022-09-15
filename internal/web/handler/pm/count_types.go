@@ -24,7 +24,7 @@ func (h PrivateMessage) CountTypes(c *fiber.Ctx) error {
 	accessor := h.Common.GetHTTPAccessor(c)
 	counts, err := h.pmRepo.CountTypes(c.Context(), accessor.ID)
 	if err != nil {
-		return h.InternalError(c, err, "failed to count private message types")
+		return res.InternalError(c, err, "failed to count private message types")
 	}
 	return res.JSON(c, res.PrivateMessageTypeCounts{
 		Unread: counts.Unread,

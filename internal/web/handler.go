@@ -100,13 +100,13 @@ func AddRouters(
 		v0.Delete("/indices/:id/subjects/:subject_id", i.NeedLogin, i.RemoveIndexSubject)
 	}
 
-	v0.Get("/pms/list", h.NeedLogin, addMetrics(pmHandler.List))
-	v0.Get("/pms/list/:id", h.NeedLogin, addMetrics(pmHandler.ListRelated))
-	v0.Get("/pms/counts", h.NeedLogin, addMetrics(pmHandler.CountTypes))
-	v0.Get("/pms/contact/recent", h.NeedLogin, addMetrics(pmHandler.ListRecentContact))
-	v0.Patch("/pms/mark-read", req.JSON, h.NeedLogin, addMetrics(pmHandler.MarkRead))
-	v0.Post("/pms/create", req.JSON, h.NeedLogin, addMetrics(pmHandler.Create))
-	v0.Delete("/pms/delete", req.JSON, h.NeedLogin, addMetrics(pmHandler.Delete))
+	v0.Get("/pms/list", h.NeedLogin, pmHandler.List)
+	v0.Get("/pms/list/:id", h.NeedLogin, pmHandler.ListRelated)
+	v0.Get("/pms/counts", h.NeedLogin, pmHandler.CountTypes)
+	v0.Get("/pms/contact/recent", h.NeedLogin, pmHandler.ListRecentContact)
+	v0.Patch("/pms/mark-read", req.JSON, h.NeedLogin, pmHandler.MarkRead)
+	v0.Post("/pms/create", req.JSON, h.NeedLogin, pmHandler.Create)
+	v0.Delete("/pms/delete", req.JSON, h.NeedLogin, pmHandler.Delete)
 
 	v0.Get("/revisions/persons/:id", h.GetPersonRevision)
 	v0.Get("/revisions/persons", h.ListPersonRevision)
