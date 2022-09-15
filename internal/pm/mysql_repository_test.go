@@ -43,7 +43,7 @@ func TestListInbox(t *testing.T) {
 
 	repo := getRepo(t)
 
-	list, err := repo.List(context.Background(), model.UserID(1), model.PrivateMessageFolderTypeInbox, 0, 10)
+	list, err := repo.List(context.Background(), 1, model.PrivateMessageFolderTypeInbox, 0, 10)
 	require.NoError(t, err)
 	require.Empty(t, list)
 }
@@ -54,7 +54,7 @@ func TestListOutbox(t *testing.T) {
 
 	repo := getRepo(t)
 
-	list, err := repo.List(context.Background(), model.UserID(1), model.PrivateMessageFolderTypeOutbox, 0, 10)
+	list, err := repo.List(context.Background(), 1, model.PrivateMessageFolderTypeOutbox, 0, 10)
 	require.NoError(t, err)
 	require.Empty(t, list)
 }
@@ -65,7 +65,7 @@ func TestListRelated(t *testing.T) {
 
 	repo := getRepo(t)
 
-	list, err := repo.ListRelated(context.Background(), model.UserID(1), model.PrivateMessageID(1))
+	list, err := repo.ListRelated(context.Background(), 1, 1)
 	require.NoError(t, err)
 	require.Empty(t, list)
 }
@@ -76,7 +76,7 @@ func TestCountTypes(t *testing.T) {
 
 	repo := getRepo(t)
 
-	counts, err := repo.CountTypes(context.Background(), model.UserID(1))
+	counts, err := repo.CountTypes(context.Background(), 1)
 	require.NoError(t, err)
 	require.Equal(t, counts.Inbox, 0)
 	require.Equal(t, counts.Outbox, 0)
@@ -89,7 +89,7 @@ func TestListRecentContact(t *testing.T) {
 
 	repo := getRepo(t)
 
-	list, err := repo.ListRecentContact(context.Background(), model.UserID(1))
+	list, err := repo.ListRecentContact(context.Background(), 1)
 	require.NoError(t, err)
 	require.Empty(t, list)
 }
@@ -100,7 +100,7 @@ func TestMarkRead(t *testing.T) {
 
 	repo := getRepo(t)
 
-	err := repo.MarkRead(context.Background(), model.UserID(1), model.PrivateMessageID(1))
+	err := repo.MarkRead(context.Background(), 1, 1)
 	require.Error(t, err)
 }
 
@@ -112,8 +112,8 @@ func TestCreate(t *testing.T) {
 
 	res, err := repo.Create(
 		context.Background(),
-		model.UserID(1),
-		[]model.UserID{model.UserID(382951)},
+		1,
+		[]model.UserID{382951},
 		domain.PrivateMessageIDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
 		"私信",
 		"内容",
@@ -131,13 +131,13 @@ func TestDelete(t *testing.T) {
 	res, err := repo.Create(
 		context.Background(),
 		model.UserID(1),
-		[]model.UserID{model.UserID(382951)},
+		[]model.UserID{382951},
 		domain.PrivateMessageIDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
 		"私信",
 		"内容",
 	)
 	require.NoError(t, err)
 	require.Len(t, res, 1)
-	err = repo.Delete(context.Background(), model.UserID(1), []model.PrivateMessageID{res[0].ID})
+	err = repo.Delete(context.Background(), 1, []model.PrivateMessageID{res[0].ID})
 	require.NoError(t, err)
 }
