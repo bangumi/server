@@ -168,18 +168,21 @@ func (c *client) firstRun() {
 
 	subjectIndex := c.meili.Index("subjects")
 
+	c.log.Info("set sortable attributes", zap.Strings("attributes", *getAttributes("sortable")))
 	_, err = subjectIndex.UpdateSortableAttributes(getAttributes("sortable"))
 	if err != nil {
 		c.log.Fatal("failed to update search index sortable attributes", zap.Error(err))
 		return
 	}
 
+	c.log.Info("set filterable attributes", zap.Strings("attributes", *getAttributes("filterable")))
 	_, err = subjectIndex.UpdateFilterableAttributes(getAttributes("filterable"))
 	if err != nil {
 		c.log.Fatal("failed to update search index filterable attributes", zap.Error(err))
 		return
 	}
 
+	c.log.Info("set searchable attributes", zap.Strings("attributes", *getAttributes("searchable")))
 	_, err = subjectIndex.UpdateSearchableAttributes(getAttributes("searchable"))
 	if err != nil {
 		c.log.Fatal("failed to update search index searchable attributes", zap.Error(err))
