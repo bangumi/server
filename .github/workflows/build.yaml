@@ -63,6 +63,8 @@ jobs:
 
       - name: Install Task
         uses: arduino/setup-task@v1
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - run: go get ./...
 

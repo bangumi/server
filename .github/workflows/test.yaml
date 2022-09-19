@@ -40,6 +40,8 @@ jobs:
 
       - name: Install Task
         uses: arduino/setup-task@v1
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Go Build Cache (test)
         uses: actions/cache@v3
