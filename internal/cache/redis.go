@@ -110,9 +110,13 @@ func (c redisCache) Del(ctx context.Context, keys ...string) error {
 }
 
 func (c redisCache) GetMany(ctx context.Context, keys []string) GetManyResult {
+	if len(keys) == 0 {
+		return GetManyResult{}
+	}
+
 	values, err := c.r.MGet(ctx, keys...).Result()
 	if err != nil {
-		return GetManyResult{Err: errgo.Wrap(err, "redis set")}
+		return GetManyResult{Err: errgo.Wrap(err, "redis mget")}
 	}
 
 	var result = make(map[string][]byte, len(keys))

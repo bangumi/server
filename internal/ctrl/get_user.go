@@ -64,6 +64,10 @@ func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, e
 }
 
 func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs []model.UserID) (map[model.UserID]model.User, error) {
+	if len(userIDs) == 0 {
+		return map[model.UserID]model.User{}, nil
+	}
+
 	result, err := cache.UnmarshalMany(ctl.cache.GetMany(ctx, slice.Map(userIDs, cachekey.User)), model.User.GetID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "cache.GetMany")

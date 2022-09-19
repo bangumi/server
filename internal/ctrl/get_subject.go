@@ -77,6 +77,10 @@ func (ctl Ctrl) GetSubjectByIDs(
 	subjectIDs []model.SubjectID,
 	filter SubjectFilter,
 ) (map[model.SubjectID]model.Subject, error) {
+	if len(subjectIDs) == 0 {
+		return map[model.SubjectID]model.Subject{}, nil
+	}
+
 	b := ctl.cache.GetMany(ctx, slice.Map(subjectIDs, cachekey.Subject))
 	result, err := cache.UnmarshalMany(b, model.Subject.GetID)
 	if err != nil {
