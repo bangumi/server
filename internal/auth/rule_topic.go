@@ -70,7 +70,8 @@ func RewriteCommentTree(comments []model.Comment) []model.Comment {
 func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {
 	if u.ID == 0 {
 		// 未登录用户只能看到正常帖子
-		return topic.State == model.CommentStateNone && topic.Display == model.TopicDisplayNormal
+		return topic.Display == model.TopicDisplayNormal && (topic.State == model.CommentStateNone ||
+			topic.State == model.CommentStateAdminReopen)
 	}
 
 	// 登录用户
