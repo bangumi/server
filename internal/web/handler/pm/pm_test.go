@@ -35,7 +35,7 @@ func TestPrivateMessage_List(t *testing.T) {
 	m := mocks.NewPrivateMessageRepo(t)
 	m.EXPECT().List(
 		mock.Anything,
-		1,
+		model.UserID(1),
 		model.PrivateMessageFolderTypeInbox,
 		0,
 		10,
@@ -59,8 +59,8 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 	m := mocks.NewPrivateMessageRepo(t)
 	m.EXPECT().ListRelated(
 		mock.Anything,
-		1,
-		1,
+		model.UserID(1),
+		model.PrivateMessageID(1),
 	).Return([]model.PrivateMessage{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
@@ -81,7 +81,7 @@ func TestPrivateMessage_ListRecentContact(t *testing.T) {
 	m := mocks.NewPrivateMessageRepo(t)
 	m.EXPECT().ListRecentContact(
 		mock.Anything,
-		1,
+		model.UserID(1),
 	).Return([]model.UserID{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
@@ -102,7 +102,7 @@ func TestPrivateMessage_CountTypes(t *testing.T) {
 	m := mocks.NewPrivateMessageRepo(t)
 	m.EXPECT().CountTypes(
 		mock.Anything,
-		1,
+		model.UserID(1),
 	).Return(model.PrivateMessageTypeCounts{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
@@ -123,8 +123,8 @@ func TestPrivateMessage_MarkRead(t *testing.T) {
 	m := mocks.NewPrivateMessageRepo(t)
 	m.EXPECT().MarkRead(
 		mock.Anything,
-		1,
-		1,
+		model.UserID(1),
+		model.PrivateMessageID(1),
 	).Return(nil)
 
 	mockAuth := mocks.NewAuthService(t)
@@ -147,7 +147,7 @@ func TestPrivateMessage_Create(t *testing.T) {
 	m := mocks.NewPrivateMessageRepo(t)
 	m.EXPECT().Create(
 		mock.Anything,
-		1,
+		model.UserID(1),
 		[]model.UserID{382951},
 		domain.PrivateMessageIDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
 		"测试标题",
@@ -174,7 +174,7 @@ func TestPrivateMessage_Delete(t *testing.T) {
 	m := mocks.NewPrivateMessageRepo(t)
 	m.EXPECT().Delete(
 		mock.Anything,
-		1,
+		model.UserID(1),
 		[]model.PrivateMessageID{1},
 	).Return(nil)
 

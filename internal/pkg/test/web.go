@@ -63,12 +63,13 @@ type Mock struct {
 	RevisionRepo       domain.RevisionRepo
 	CollectionRepo     domain.CollectionRepo
 	TimeLineRepo       domain.TimeLineRepo
-	PrivateMessageRepo domain.PrivateMessageRepo
 	CaptchaManager     captcha.Manager
 	SessionManager     session.Manager
 	Cache              cache.RedisCache
 	RateLimiter        rate.Manager
 	OAuthManager       oauth.Manager
+	PrivateMessageRepo domain.PrivateMessageRepo
+	NotificationRepo   domain.NotificationRepo
 	HTTPMock           *httpmock.MockTransport
 	Dam                *dam.Dam
 }
@@ -110,6 +111,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockIndexRepo(m.IndexRepo),
 		MockRevisionRepo(m.RevisionRepo),
 		MockPrivateMessageRepo(m.PrivateMessageRepo),
+		MockNoticationRepo(m.NotificationRepo),
 		MockCaptchaManager(m.CaptchaManager),
 		MockSessionManager(m.SessionManager),
 		MockRateLimiter(m.RateLimiter),
@@ -170,6 +172,13 @@ func MockPrivateMessageRepo(repo domain.PrivateMessageRepo) fx.Option {
 		repo = &mocks.PrivateMessageRepo{}
 	}
 	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.PrivateMessageRepo))))
+}
+
+func MockNoticationRepo(repo domain.NotificationRepo) fx.Option {
+	if repo == nil {
+		repo = &mocks.NotificationRepo{}
+	}
+	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.NotificationRepo))))
 }
 
 func MockRateLimiter(repo rate.Manager) fx.Option {

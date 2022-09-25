@@ -49,8 +49,8 @@ type RedisCache_Del_Call struct {
 }
 
 // Del is a helper method to define mock.On call
-//   - ctx context.Context
-//   - keys ...string
+//  - ctx context.Context
+//  - keys ...string
 func (_e *RedisCache_Expecter) Del(ctx interface{}, keys ...interface{}) *RedisCache_Del_Call {
 	return &RedisCache_Del_Call{Call: _e.mock.On("Del",
 		append([]interface{}{ctx}, keys...)...)}
@@ -101,9 +101,9 @@ type RedisCache_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx context.Context
-//   - key string
-//   - value interface{}
+//  - ctx context.Context
+//  - key string
+//  - value interface{}
 func (_e *RedisCache_Expecter) Get(ctx interface{}, key interface{}, value interface{}) *RedisCache_Get_Call {
 	return &RedisCache_Get_Call{Call: _e.mock.On("Get", ctx, key, value)}
 }
@@ -140,10 +140,10 @@ type RedisCache_Set_Call struct {
 }
 
 // Set is a helper method to define mock.On call
-//   - ctx context.Context
-//   - key string
-//   - value interface{}
-//   - ttl time.Duration
+//  - ctx context.Context
+//  - key string
+//  - value interface{}
+//  - ttl time.Duration
 func (_e *RedisCache_Expecter) Set(ctx interface{}, key interface{}, value interface{}, ttl interface{}) *RedisCache_Set_Call {
 	return &RedisCache_Set_Call{Call: _e.mock.On("Set", ctx, key, value, ttl)}
 }

@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/index"
+	"github.com/bangumi/server/internal/web/handler/notification"
 	"github.com/bangumi/server/internal/web/handler/person"
 	"github.com/bangumi/server/internal/web/handler/pm"
 	"github.com/bangumi/server/internal/web/handler/subject"
@@ -47,6 +48,7 @@ func AddRouters(
 	personHandler person.Person,
 	characterHandler character.Character,
 	pmHandler pm.PrivateMessage,
+	notificationHandler notification.Notification,
 	subjectHandler subject.Subject,
 	indexHandler index.Handler,
 ) {
@@ -107,6 +109,8 @@ func AddRouters(
 	v0.Patch("/pms/mark-read", req.JSON, h.NeedLogin, pmHandler.MarkRead)
 	v0.Post("/pms/create", req.JSON, h.NeedLogin, pmHandler.Create)
 	v0.Delete("/pms/delete", req.JSON, h.NeedLogin, pmHandler.Delete)
+
+	v0.Get("/notifications/count", h.NeedLogin, notificationHandler.Count)
 
 	v0.Get("/revisions/persons/:id", h.GetPersonRevision)
 	v0.Get("/revisions/persons", h.ListPersonRevision)

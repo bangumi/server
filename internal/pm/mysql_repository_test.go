@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/pm"
@@ -37,15 +38,52 @@ func getRepo(t *testing.T) domain.PrivateMessageRepo {
 	return repo
 }
 
+func mapToID(msg model.PrivateMessage) model.PrivateMessageID {
+	return msg.ID
+}
+
+func mockMessage(
+	ctx context.Context,
+	t *testing.T,
+	repo domain.PrivateMessageRepo,
+	relatedID *model.PrivateMessageID,
+	senderID model.UserID,
+	receiverID model.UserID,
+) model.PrivateMessage {
+	t.Helper()
+	m, err := repo.Create(
+		ctx,
+		senderID,
+		[]model.UserID{receiverID},
+		domain.PrivateMessageIDFilter{Type: null.NewFromPtr(relatedID)},
+		"title",
+		"content",
+	)
+	require.NoError(t, err)
+	require.NotEmpty(t, m)
+	t.Cleanup(func() {
+		err = repo.Delete(ctx, senderID, slice.Map(m, mapToID))
+		require.NoError(t, err)
+		err = repo.Delete(ctx, receiverID, slice.Map(m, mapToID))
+		require.NoError(t, err)
+	})
+	return m[0]
+}
+
 func TestListInbox(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
 	repo := getRepo(t)
 
-	list, err := repo.List(context.Background(), 1, model.PrivateMessageFolderTypeInbox, 0, 10)
+	ctx := context.Background()
+
+	m := mockMessage(ctx, t, repo, nil, 1, 382951)
+
+	list, err := repo.List(ctx, 382951, model.PrivateMessageFolderTypeInbox, 0, 10)
 	require.NoError(t, err)
-	require.Empty(t, list)
+	require.NotEmpty(t, list)
+	require.LessOrEqual(t, m.ID, list[0].Self.ID)
 }
 
 func TestListOutbox(t *testing.T) {
@@ -54,9 +92,14 @@ func TestListOutbox(t *testing.T) {
 
 	repo := getRepo(t)
 
-	list, err := repo.List(context.Background(), 1, model.PrivateMessageFolderTypeOutbox, 0, 10)
+	ctx := context.Background()
+
+	m := mockMessage(ctx, t, repo, nil, 1, 382951)
+
+	list, err := repo.List(ctx, 1, model.PrivateMessageFolderTypeOutbox, 0, 10)
 	require.NoError(t, err)
-	require.Empty(t, list)
+	require.NotEmpty(t, list)
+	require.LessOrEqual(t, m.ID, list[0].Self.ID)
 }
 
 func TestListRelated(t *testing.T) {
@@ -65,9 +108,15 @@ func TestListRelated(t *testing.T) {
 
 	repo := getRepo(t)
 
-	list, err := repo.ListRelated(context.Background(), 1, 1)
+	ctx := context.Background()
+	msg := mockMessage(ctx, t, repo, nil, 1, 382951)
+
+	msg2 := mockMessage(ctx, t, repo, &msg.ID, 382951, 1)
+
+	list, err := repo.ListRelated(ctx, 1, msg.ID)
 	require.NoError(t, err)
-	require.Empty(t, list)
+	require.Len(t, list, 2)
+	require.Equal(t, msg2.ID, list[len(list)-1].ID)
 }
 
 func TestCountTypes(t *testing.T) {
@@ -75,12 +124,19 @@ func TestCountTypes(t *testing.T) {
 	t.Parallel()
 
 	repo := getRepo(t)
-
-	counts, err := repo.CountTypes(context.Background(), 1)
+	ctx := context.Background()
+	prevCounts, err := repo.CountTypes(ctx, 1)
 	require.NoError(t, err)
-	require.Equal(t, counts.Inbox, 0)
-	require.Equal(t, counts.Outbox, 0)
-	require.Empty(t, counts.Unread, 0)
+	prevCounts2, err := repo.CountTypes(ctx, 382951)
+	require.NoError(t, err)
+	mockMessage(ctx, t, repo, nil, 1, 382951)
+	counts, err := repo.CountTypes(ctx, 1)
+	require.NoError(t, err)
+	counts2, err := repo.CountTypes(ctx, 382951)
+	require.NoError(t, err)
+	require.Less(t, prevCounts.Outbox, counts.Outbox)
+	require.Less(t, prevCounts2.Unread, counts2.Unread)
+	require.Less(t, prevCounts2.Inbox, counts2.Inbox)
 }
 
 func TestListRecentContact(t *testing.T) {
@@ -89,9 +145,14 @@ func TestListRecentContact(t *testing.T) {
 
 	repo := getRepo(t)
 
-	list, err := repo.ListRecentContact(context.Background(), 1)
+	ctx := context.Background()
+
+	mockMessage(ctx, t, repo, nil, 1, 382951)
+
+	list, err := repo.ListRecentContact(ctx, 1)
 	require.NoError(t, err)
-	require.Empty(t, list)
+	require.NotEmpty(t, list)
+	require.Contains(t, list, model.UserID(382951))
 }
 
 func TestMarkRead(t *testing.T) {
@@ -100,8 +161,14 @@ func TestMarkRead(t *testing.T) {
 
 	repo := getRepo(t)
 
-	err := repo.MarkRead(context.Background(), 1, 1)
-	require.Error(t, err)
+	ctx := context.Background()
+	msg := mockMessage(ctx, t, repo, nil, 1, 382951)
+	err := repo.MarkRead(ctx, 382951, msg.ID)
+	require.NoError(t, err)
+	msgs, err := repo.ListRelated(ctx, 1, msg.ID)
+	require.NoError(t, err)
+	require.Len(t, msgs, 1)
+	require.Equal(t, false, msgs[0].New)
 }
 
 func TestCreate(t *testing.T) {
@@ -110,8 +177,56 @@ func TestCreate(t *testing.T) {
 
 	repo := getRepo(t)
 
+	ctx := context.Background()
+
+	mainMsgs, err := repo.Create(
+		ctx,
+		1,
+		[]model.UserID{382951, 2},
+		domain.PrivateMessageIDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
+		"私信",
+		"内容",
+	)
+	require.NoError(t, err)
+	require.Len(t, mainMsgs, 2)
+
+	msgs := mainMsgs
+
+	// reply
+	res, err := repo.Create(ctx, 382951, []model.UserID{1}, domain.PrivateMessageIDFilter{
+		Type: null.New(mainMsgs[0].ID),
+	}, "私信回复", "内容")
+
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, mainMsgs[0].ID, res[0].RelatedMessageID)
+
+	msgs = append(msgs, res...)
+
+	_, err = repo.Create(ctx, 382951, []model.UserID{2}, domain.PrivateMessageIDFilter{
+		Type: null.New(mainMsgs[1].ID),
+	}, "私信回复", "内容")
+
+	require.Error(t, err)
+
+	t.Cleanup(func() {
+		for _, msg := range msgs {
+			err = repo.Delete(ctx, msg.SenderID, slice.Map([]model.PrivateMessage{msg}, mapToID))
+			require.NoError(t, err)
+			err = repo.Delete(ctx, msg.ReceiverID, slice.Map([]model.PrivateMessage{msg}, mapToID))
+			require.NoError(t, err)
+		}
+	})
+}
+
+func TestDelete(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	ctx := context.Background()
 	res, err := repo.Create(
-		context.Background(),
+		ctx,
 		1,
 		[]model.UserID{382951},
 		domain.PrivateMessageIDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
@@ -120,24 +235,15 @@ func TestCreate(t *testing.T) {
 	)
 	require.NoError(t, err)
 	require.Len(t, res, 1)
-}
-
-func TestDelete(t *testing.T) {
-	test.RequireEnv(t, test.EnvMysql)
-	t.Parallel()
-
-	repo := getRepo(t)
-
-	res, err := repo.Create(
-		context.Background(),
-		model.UserID(1),
-		[]model.UserID{382951},
-		domain.PrivateMessageIDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
-		"私信",
-		"内容",
-	)
+	err = repo.Delete(ctx, 1, []model.PrivateMessageID{res[0].ID})
+	require.NoError(t, err)
+	_, err = repo.ListRelated(ctx, 1, res[0].ID)
+	require.Error(t, err)
+	res, err = repo.ListRelated(ctx, 382951, res[0].ID)
 	require.NoError(t, err)
 	require.Len(t, res, 1)
-	err = repo.Delete(context.Background(), 1, []model.PrivateMessageID{res[0].ID})
-	require.NoError(t, err)
+	t.Cleanup(func() {
+		err := repo.Delete(ctx, 382951, []model.PrivateMessageID{res[0].ID})
+		require.NoError(t, err)
+	})
 }

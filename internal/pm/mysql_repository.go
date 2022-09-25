@@ -46,18 +46,6 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.PrivateMessageRepo, e
 	return mysqlRepo{q: q, log: log.Named("pm.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) exists(ctx context.Context, id model.PrivateMessageID) (bool, error) {
-	res, err := r.q.PrivateMessage.
-		WithContext(ctx).
-		Select(r.q.PrivateMessage.ID).
-		Where(r.q.PrivateMessage.ID.Eq(id)).
-		First()
-	if err != nil {
-		return false, errgo.Wrap(err, "dal")
-	}
-	return res != nil, nil
-}
-
 func (r mysqlRepo) List(
 	ctx context.Context,
 	userID model.UserID,
@@ -79,10 +67,9 @@ func (r mysqlRepo) List(
 		}
 	}
 	ret, err := do.
-		Select(r.q.PrivateMessage.RelatedMessageID).
 		Where(
 			conds...,
-		).Offset(offset).Limit(limit).Find()
+		).Order(r.q.PrivateMessage.ID.Desc()).Offset(offset).Limit(limit).Find()
 
 	if err != nil {
 		return make([]model.PrivateMessageListItem, 0), errgo.Wrap(err, "dal")
@@ -128,10 +115,21 @@ func (r mysqlRepo) ListRelated(
 		(firstMsg.ReceiverID == userID && firstMsg.DeletedByReceiver) {
 		return emptyMsgList, domain.ErrPrivateMessageDeleted
 	}
-	res, err := do.Where(r.q.PrivateMessage.RelatedMessageID.Eq(id), do.Or(
-		do.Where(r.q.PrivateMessage.SenderID.Eq(userID), r.q.PrivateMessage.DeletedBySender.Is(false)),
-		do.Where(r.q.PrivateMessage.ReceiverID.Eq(userID), r.q.PrivateMessage.DeletedByReceiver.Is(false)),
-	)).Find()
+	res, err := do.Where(
+		r.q.PrivateMessage.RelatedMessageID.Eq(id),
+		do.Where(
+			do.
+				Where(
+					r.q.PrivateMessage.SenderID.Eq(userID),
+					r.q.PrivateMessage.DeletedBySender.Is(false),
+				),
+		).
+			Or(
+				r.q.PrivateMessage.ReceiverID.Eq(userID),
+				r.q.PrivateMessage.DeletedByReceiver.Is(false),
+			),
+	).
+		Find()
 	if err != nil {
 		return emptyMsgList, errgo.Wrap(err, "dal")
 	}
@@ -219,11 +217,15 @@ func (r mysqlRepo) Create(
 ) ([]model.PrivateMessage, error) {
 	emptyList := make([]model.PrivateMessage, 0)
 	if relatedIDFilter.Type.Set {
-		ok, err := r.exists(ctx, relatedIDFilter.Type.Value)
-		if err != nil {
-			return emptyList, err
+		if len(receiverIDs) > 1 {
+			return emptyList, errRelatedPrivateMessageNotExists
 		}
-		if !ok {
+		msg, err := r.q.WithContext(ctx).
+			PrivateMessage.
+			Where(r.q.PrivateMessage.ID.Eq(relatedIDFilter.Type.Value)).First()
+		if err != nil ||
+			(msg.SenderID != senderID && msg.SenderID != receiverIDs[0]) ||
+			(msg.ReceiverID != senderID && msg.ReceiverID != receiverIDs[0]) {
 			return emptyList, errRelatedPrivateMessageNotExists
 		}
 	}
@@ -283,24 +285,13 @@ func (r mysqlRepo) Delete(
 		return errUserIrrelevantMessageType
 	}
 	err = r.q.Transaction(func(tx *query.Query) error {
-		txCtx := tx.WithContext(ctx)
-		senderDeletes := mapFilterSenderDeletes(pms, userID)
-		receiverDeletes := mapFilterReceiverDeletes(pms, userID)
-		if len(senderDeletes) != 0 {
-			_, err = txCtx.PrivateMessage.Where(
-				tx.PrivateMessage.ID.In(senderDeletes...),
-			).Update(tx.PrivateMessage.DeletedBySender, true)
-			if err != nil {
-				return errgo.Wrap(err, "dal")
-			}
+		err = handleReplyDeletes(ctx, tx, pms, userID)
+		if err != nil {
+			return err
 		}
-		if len(receiverDeletes) != 0 {
-			_, err = txCtx.PrivateMessage.Where(
-				tx.PrivateMessage.ID.In(receiverDeletes...),
-			).Update(tx.PrivateMessage.DeletedByReceiver, true)
-			if err != nil {
-				return errgo.Wrap(err, "dal")
-			}
+		err = handleMainDeletes(ctx, tx, pms, userID)
+		if err != nil {
+			return err
 		}
 		return nil
 	})
@@ -312,28 +303,76 @@ func (r mysqlRepo) Delete(
 	return nil
 }
 
-func mapFilterSenderDeletes(pms []*dao.PrivateMessage, senderID model.UserID) []driver.Valuer {
-	return slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
-		ok := !v.DeletedBySender && (v.MainMessageID != 0 || (v.MainMessageID == 0 && v.SenderID == senderID))
+func handleReplyDeletes(ctx context.Context, tx *query.Query, pms []*dao.PrivateMessage, userID model.UserID) error {
+	senderDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
+		ok := !v.DeletedBySender && v.MainMessageID == 0 && v.SenderID == userID
 		if ok {
 			return driver.Valuer(v.ID), ok
 		}
 		return nil, false
 	})
-}
-
-func mapFilterReceiverDeletes(pms []*dao.PrivateMessage, receiverID model.UserID) []driver.Valuer {
-	return slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
-		ok := !v.DeletedByReceiver && (v.MainMessageID != 0 || (v.MainMessageID == 0 && v.ReceiverID == receiverID))
+	receiverDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
+		ok := !v.DeletedByReceiver && v.MainMessageID == 0 && v.ReceiverID == userID
 		if ok {
 			return driver.Valuer(v.ID), ok
 		}
 		return nil, false
 	})
+	txCtx := tx.WithContext(ctx)
+	if len(senderDeletes) != 0 {
+		_, err := txCtx.PrivateMessage.Where(
+			tx.PrivateMessage.ID.In(senderDeletes...),
+		).Update(tx.PrivateMessage.DeletedBySender, true)
+		if err != nil {
+			return errgo.Wrap(err, "dal")
+		}
+	}
+	if len(receiverDeletes) != 0 {
+		_, err := txCtx.PrivateMessage.Where(
+			tx.PrivateMessage.ID.In(receiverDeletes...),
+		).Update(tx.PrivateMessage.DeletedByReceiver, true)
+		if err != nil {
+			return errgo.Wrap(err, "dal")
+		}
+	}
+	return nil
 }
 
-func (r mysqlRepo) DeletePrivateMessagesBySender() {
-
+func handleMainDeletes(ctx context.Context, tx *query.Query, pms []*dao.PrivateMessage, userID model.UserID) error {
+	senderDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
+		ok := v.MainMessageID != 0 && v.SenderID == userID
+		if ok {
+			return driver.Valuer(v.ID), ok
+		}
+		return nil, false
+	})
+	receiverDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
+		ok := v.MainMessageID != 0 && v.ReceiverID == userID
+		if ok {
+			return driver.Valuer(v.ID), ok
+		}
+		return nil, false
+	})
+	txCtx := tx.WithContext(ctx)
+	if len(senderDeletes) != 0 {
+		_, err := txCtx.PrivateMessage.Where(
+			tx.PrivateMessage.RelatedMessageID.In(senderDeletes...),
+			tx.PrivateMessage.DeletedBySender.Is(false),
+		).Update(tx.PrivateMessage.DeletedBySender, true)
+		if err != nil {
+			return errgo.Wrap(err, "dal")
+		}
+	}
+	if len(receiverDeletes) != 0 {
+		_, err := txCtx.PrivateMessage.Where(
+			tx.PrivateMessage.RelatedMessageID.In(receiverDeletes...),
+			tx.PrivateMessage.DeletedByReceiver.Is(false),
+		).Update(tx.PrivateMessage.DeletedByReceiver, true)
+		if err != nil {
+			return errgo.Wrap(err, "dal")
+		}
+	}
+	return nil
 }
 
 func convertDaoToModel(d *dao.PrivateMessage) model.PrivateMessage {
