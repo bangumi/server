@@ -16,45 +16,44 @@ package model
 type NotificationType uint8
 
 const (
-	NotificationTypeGroupTopicReply          NotificationType = iota + 1 // 发起的小组话题有新回复
-	NotificationTypeReplyToGroupTopicReply                               // 在小组话题收到回复
-	NotificationTypeSubjectTopicReply                                    // 发起的条目讨论有新回复
-	NotificationTypeReplyToSubjectTopicReply                             // 在条目讨论收到回复
-	NotificationTypeCharacterMessage                                     // 关注的角色讨论有新回复
-	NotificationTypeReplyToCharacterMessage                              // 在角色讨论收到回复
-	NotificationTypeBlogMessage                                          // 日志留言
-	NotificationTypeReplyToBlogMessage                                   // 日志留言的回复
-	NotificationTypeEpisodeTopicReply                                    // 章节讨论有新回复
-	NotificationTypeReplyToEpisodeTopic                                  // 在章节讨论收到回复
-	NotificationTypeIndexMessage                                         // 目录有新留言
-	NotificationTypeReplyToIndexMessage                                  // 目录留言收到回复
-	NotificationTypeReplyToPersonMessage                                 // 人物留言收到回复
-	NotificationTypeFriendRequest                                        // 收到好友申请
-	NotificationTypePassFriendRequest                                    // 好友申请通过
-	_
-	NotificationTypeDoujinClubTopicReply           //    同人社团讨论有新回复
-	NotificationTypeReplyToDoujinClubTopicReply    //    在同人社团讨论收到回复
-	NotificationTypeReplyToDoujinSubjectTopicReply //    同人作品讨论有新回复
-	NotificationTypeDoujinEventTopicReply          //    同人展会讨论有新回复
-	NotificationTypeReplyToDoujinEventTopicReply   //    在同人展会讨论收到回复
-	NotificationTypeTsukkomiReply                  //    吐槽有新回复
-	NotificationTypeGroupTopicMention              //    在小组讨论中被提及
-	NotificationTypeSubjectTopicMention            //    在条目讨论中被提及
-	NotificationTypeCharacterMessageMention        //    在角色留言中被提及
-	NotificationTypePersonMessageMention           //    在人物留言中被提及
-	NotificationTypeIndexMessageMention            //    在目录留言中被提及
-	NotificationTypeTukkomiMention                 //    在吐槽中被提及
-	NotificationTypeBlogMessageMention             //    在日志留言中被提及
-	NotificationTypeEpisodeTopicMention            //    在章节讨论中被提及
-	NotificationTypeDoujinClubMessageMention       //    在同人社团留言中被提及
-	NotificationTypeDoujinClubTopicMention         //    在同人社团讨论中被提及
-	NotificationTypeDoujinSubjectMessageMention    //    在同人作品留言中被提及
-	NotificationTypeDoujinEventTopicMention        //    在同人展会讨论中被提及
+	NotificationTypeGroupTopicReply                NotificationType = 1  // 发起的小组话题有新回复
+	NotificationTypeReplyToGroupTopicReply         NotificationType = 2  // 在小组话题收到回复
+	NotificationTypeSubjectTopicReply              NotificationType = 3  // 发起的条目讨论有新回复
+	NotificationTypeReplyToSubjectTopicReply       NotificationType = 4  // 在条目讨论收到回复
+	NotificationTypeCharacterMessage               NotificationType = 5  // 关注的角色讨论有新回复
+	NotificationTypeReplyToCharacterMessage        NotificationType = 6  // 在角色讨论收到回复
+	NotificationTypeBlogMessage                    NotificationType = 7  // 日志留言
+	NotificationTypeReplyToBlogMessage             NotificationType = 8  // 日志留言的回复
+	NotificationTypeEpisodeTopicReply              NotificationType = 9  // 章节讨论有新回复
+	NotificationTypeReplyToEpisodeTopic            NotificationType = 10 // 在章节讨论收到回复
+	NotificationTypeIndexMessage                   NotificationType = 11 // 目录有新留言
+	NotificationTypeReplyToIndexMessage            NotificationType = 12 // 目录留言收到回复
+	NotificationTypeReplyToPersonMessage           NotificationType = 13 // 人物留言收到回复
+	NotificationTypeFriendRequest                  NotificationType = 14 // 收到好友申请
+	NotificationTypePassFriendRequest              NotificationType = 15 // 好友申请通过
+	NotificationTypeDoujinClubTopicReply           NotificationType = 17 //    同人社团讨论有新回复
+	NotificationTypeReplyToDoujinClubTopicReply    NotificationType = 18 //    在同人社团讨论收到回复
+	NotificationTypeReplyToDoujinSubjectTopicReply NotificationType = 19 //    同人作品讨论有新回复
+	NotificationTypeDoujinEventTopicReply          NotificationType = 20 //    同人展会讨论有新回复
+	NotificationTypeReplyToDoujinEventTopicReply   NotificationType = 21 //    在同人展会讨论收到回复
+	NotificationTypeTsukkomiReply                  NotificationType = 22 //    吐槽有新回复
+	NotificationTypeGroupTopicMention              NotificationType = 23 //    在小组讨论中被提及
+	NotificationTypeSubjectTopicMention            NotificationType = 24 //    在条目讨论中被提及
+	NotificationTypeCharacterMessageMention        NotificationType = 25 //    在角色留言中被提及
+	NotificationTypePersonMessageMention           NotificationType = 26 //    在人物留言中被提及
+	NotificationTypeIndexMessageMention            NotificationType = 27 //    在目录留言中被提及
+	NotificationTypeTukkomiMention                 NotificationType = 28 //    在吐槽中被提及
+	NotificationTypeBlogMessageMention             NotificationType = 29 //    在日志留言中被提及
+	NotificationTypeEpisodeTopicMention            NotificationType = 30 //    在章节讨论中被提及
+	NotificationTypeDoujinClubMessageMention       NotificationType = 31 //    在同人社团留言中被提及
+	NotificationTypeDoujinClubTopicMention         NotificationType = 32 //    在同人社团讨论中被提及
+	NotificationTypeDoujinSubjectMessageMention    NotificationType = 33 //    在同人作品留言中被提及
+	NotificationTypeDoujinEventTopicMention        NotificationType = 34 //    在同人展会讨论中被提及
 )
 
 type NotificationStatus uint8
 
 const (
-	NotificationStatusRead NotificationStatus = iota
-	NotificationStatusUnread
+	NotificationStatusRead   NotificationStatus = 0
+	NotificationStatusUnread NotificationStatus = 1
 )
