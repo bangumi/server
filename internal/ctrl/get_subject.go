@@ -22,14 +22,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/gmap"
-	"github.com/bangumi/server/internal/pkg/generic/set"
-	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
 )
@@ -81,29 +77,12 @@ func (ctl Ctrl) GetSubjectByIDs(
 		return map[model.SubjectID]model.Subject{}, nil
 	}
 
-	b := ctl.cache.GetMany(ctx, slice.Map(subjectIDs, cachekey.Subject))
-	result, err := cache.UnmarshalMany(b, model.Subject.GetID)
-	if err != nil {
-		return nil, errgo.Wrap(err, "cache.GetMany")
-	}
-
-	for key, item := range result {
-		if filter.NSFW.Set && (filter.NSFW.Value != item.NSFW) {
-			delete(result, key)
-		}
-	}
-
-	var notCachedID = set.FromSlice(subjectIDs).Removes(gmap.Keys(result)...).ToSlice()
-	notCachedSubjects, err := ctl.subject.GetByIDs(ctx, notCachedID, subject.Filter{NSFW: filter.NSFW})
+	notCachedSubjects, err := ctl.subject.GetByIDs(ctx, subjectIDs, subject.Filter{NSFW: filter.NSFW})
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get subjects")
 	}
 
-	if err := ctl.cache.SetMany(ctx, cache.MarshalMany(notCachedSubjects, cachekey.Subject), time.Minute); err != nil {
-		ctl.log.Error("cache.SetMany", zap.Error(err))
-	}
-
-	return gmap.Merge(result, notCachedSubjects), nil
+	return notCachedSubjects, nil
 }
 
 func (ctl Ctrl) getSubject(ctx context.Context, id model.SubjectID) (model.Subject, error) {

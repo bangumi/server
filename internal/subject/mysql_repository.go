@@ -202,6 +202,9 @@ func (r mysqlRepo) GetSubjectRelated(
 func (r mysqlRepo) GetByIDs(
 	ctx context.Context, ids []model.SubjectID, filter Filter,
 ) (map[model.SubjectID]model.Subject, error) {
+	if len(ids) == 0 {
+		return map[model.SubjectID]model.Subject{}, nil
+	}
 	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(slice.ToValuer(ids)...))
 
 	if filter.NSFW.Set {

@@ -21,14 +21,10 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/gmap"
-	"github.com/bangumi/server/internal/pkg/generic/set"
-	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, error) {
@@ -68,23 +64,12 @@ func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs []model.UserID) (map[
 		return map[model.UserID]model.User{}, nil
 	}
 
-	result, err := cache.UnmarshalMany(ctl.cache.GetMany(ctx, slice.Map(userIDs, cachekey.User)), model.User.GetID)
-	if err != nil {
-		return nil, errgo.Wrap(err, "cache.GetMany")
-	}
-
-	var notCachedID = set.FromSlice(userIDs).Removes(gmap.Keys(result)...).ToSlice()
-
-	unCachedUsers, err := ctl.user.GetByIDs(ctx, notCachedID)
+	users, err := ctl.user.GetByIDs(ctx, userIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get subjects")
 	}
 
-	if err := ctl.cache.SetMany(ctx, cache.MarshalMany(unCachedUsers, cachekey.User), time.Minute); err != nil {
-		ctl.log.Error("cache.SetMany", zap.Error(err))
-	}
-
-	return gmap.Merge(result, unCachedUsers), nil
+	return users, nil
 }
 
 func (ctl Ctrl) GetFriends(ctx context.Context, id model.UserID) (map[model.UserID]domain.FriendItem, error) {
