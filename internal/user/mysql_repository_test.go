@@ -131,5 +131,5 @@ func TestGetFieldsByIDs(t *testing.T) {
 
 	fields, err := repo.GetFieldsByIDs(context.Background(), []model.UserID{model.UserID(1)})
 	require.NoError(t, err)
-	require.Empty(t, fields)
+	require.Len(t, fields, 1)
 }
