@@ -72,6 +72,7 @@ func (r mysqlRepo) List(
 		).Order(r.q.PrivateMessage.ID.Desc()).Offset(offset).Limit(limit).Find()
 
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return make([]model.PrivateMessageListItem, 0), errgo.Wrap(err, "dal")
 	}
 
@@ -81,6 +82,7 @@ func (r mysqlRepo) List(
 
 	mainMsgList, err := do.Where(r.q.PrivateMessage.ID.In(slice.ToValuer(mainIDs)...)).Find()
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return make([]model.PrivateMessageListItem, 0), errgo.Wrap(err, "dal")
 	}
 	mainMsgs := slice.ToMap(mainMsgList, func(v *dao.PrivateMessage) model.PrivateMessageID {
@@ -103,6 +105,7 @@ func (r mysqlRepo) ListRelated(
 	firstMsg, err := do.Where(r.q.PrivateMessage.ID.Eq(id)).First()
 	var emptyMsgList = make([]model.PrivateMessage, 0)
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return emptyMsgList, errgo.Wrap(err, "dal")
 	}
 	if firstMsg == nil {
@@ -131,6 +134,7 @@ func (r mysqlRepo) ListRelated(
 	).
 		Find()
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return emptyMsgList, errgo.Wrap(err, "dal")
 	}
 	return slice.Map(res, convertDaoToModel), nil
@@ -147,6 +151,7 @@ func (r mysqlRepo) CountTypes(
 		r.q.PrivateMessage.DeletedBySender.Is(false)).
 		Count()
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return res, errgo.Wrap(err, "dal")
 	}
 	c2, err := do.Where(
@@ -154,6 +159,7 @@ func (r mysqlRepo) CountTypes(
 		r.q.PrivateMessage.DeletedBySender.Is(false)).
 		Count()
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return res, errgo.Wrap(err, "dal")
 	}
 	c3, err := do.Where(
@@ -162,6 +168,7 @@ func (r mysqlRepo) CountTypes(
 		r.q.PrivateMessage.New.Is(true)).
 		Count()
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return res, errgo.Wrap(err, "dal")
 	}
 	res.Outbox = c1
@@ -183,6 +190,7 @@ func (r mysqlRepo) ListRecentContact(
 		Limit(recentContactLimit).
 		Find()
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return make([]model.UserID, 0), errgo.Wrap(err, "dal")
 	}
 	return slice.Map(res, func(v *dao.PrivateMessage) model.UserID {
@@ -199,6 +207,7 @@ func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID 
 		Update(r.q.PrivateMessage.New, false)
 
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return errgo.Wrap(err, "dal")
 	}
 	if rows.RowsAffected == 0 {
@@ -226,6 +235,7 @@ func (r mysqlRepo) Create(
 		if err != nil ||
 			(msg.SenderID != senderID && msg.SenderID != receiverIDs[0]) ||
 			(msg.ReceiverID != senderID && msg.ReceiverID != receiverIDs[0]) {
+			r.log.Error("unexpected error", zap.Error(err))
 			return emptyList, errRelatedPrivateMessageNotExists
 		}
 	}
@@ -248,6 +258,7 @@ func (r mysqlRepo) Create(
 		txCtx := tx.WithContext(ctx)
 		err := txCtx.PrivateMessage.Create(msgs...)
 		if err != nil {
+			r.log.Error("unexpected error", zap.Error(err))
 			return errgo.Wrap(err, "dal")
 		}
 		if !relatedIDFilter.Type.Set {
@@ -257,6 +268,7 @@ func (r mysqlRepo) Create(
 			}
 			err = txCtx.PrivateMessage.Save(msgs...)
 			if err != nil {
+				r.log.Error("unexpected error", zap.Error(err))
 				return errgo.Wrap(err, "dal")
 			}
 		}
@@ -279,6 +291,7 @@ func (r mysqlRepo) Delete(
 				r.q.PrivateMessage.SenderID.Eq(userID)).Or(r.q.PrivateMessage.ReceiverID.Eq(userID)),
 		).Find()
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return errgo.Wrap(err, "dal")
 	}
 	if len(pms) != len(ids) {
@@ -287,16 +300,19 @@ func (r mysqlRepo) Delete(
 	err = r.q.Transaction(func(tx *query.Query) error {
 		err = handleReplyDeletes(ctx, tx, pms, userID)
 		if err != nil {
+			r.log.Error("unexpected error", zap.Error(err))
 			return err
 		}
 		err = handleMainDeletes(ctx, tx, pms, userID)
 		if err != nil {
+			r.log.Error("unexpected error", zap.Error(err))
 			return err
 		}
 		return nil
 	})
 
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return errgo.Wrap(err, "dal")
 	}
 

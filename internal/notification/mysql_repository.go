@@ -40,6 +40,7 @@ func (r mysqlRepo) Count(ctx context.Context, userID model.UserID) (int64, error
 		r.q.Notification.Status.Eq(model.NotificationStatusUnread),
 	).Count()
 	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
 		return 0, errgo.Wrap(err, "dal")
 	}
 	return count, nil
