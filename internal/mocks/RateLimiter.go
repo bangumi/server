@@ -61,10 +61,10 @@ type RateLimiter_AllowAction_Call struct {
 }
 
 // AllowAction is a helper method to define mock.On call
-//  - ctx context.Context
-//  - u model.UserID
-//  - _a2 action.Action
-//  - limit rate.Limit
+//   - ctx context.Context
+//   - u model.UserID
+//   - _a2 action.Action
+//   - limit rate.Limit
 func (_e *RateLimiter_Expecter) AllowAction(ctx interface{}, u interface{}, _a2 interface{}, limit interface{}) *RateLimiter_AllowAction_Call {
 	return &RateLimiter_AllowAction_Call{Call: _e.mock.On("AllowAction", ctx, u, _a2, limit)}
 }
@@ -115,8 +115,8 @@ type RateLimiter_Login_Call struct {
 }
 
 // Login is a helper method to define mock.On call
-//  - ctx context.Context
-//  - ip string
+//   - ctx context.Context
+//   - ip string
 func (_e *RateLimiter_Expecter) Login(ctx interface{}, ip interface{}) *RateLimiter_Login_Call {
 	return &RateLimiter_Login_Call{Call: _e.mock.On("Login", ctx, ip)}
 }
@@ -153,8 +153,8 @@ type RateLimiter_Reset_Call struct {
 }
 
 // Reset is a helper method to define mock.On call
-//  - ctx context.Context
-//  - ip string
+//   - ctx context.Context
+//   - ip string
 func (_e *RateLimiter_Expecter) Reset(ctx interface{}, ip interface{}) *RateLimiter_Reset_Call {
 	return &RateLimiter_Reset_Call{Call: _e.mock.On("Reset", ctx, ip)}
 }

@@ -50,8 +50,8 @@ type NotificationRepo_Count_Call struct {
 }
 
 // Count is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *NotificationRepo_Expecter) Count(ctx interface{}, userID interface{}) *NotificationRepo_Count_Call {
 	return &NotificationRepo_Count_Call{Call: _e.mock.On("Count", ctx, userID)}
 }

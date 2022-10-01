@@ -26,7 +26,7 @@ func newPrivateMessage(db *gorm.DB) privateMessage {
 	_privateMessage.privateMessageDo.UseModel(&dao.PrivateMessage{})
 
 	tableName := _privateMessage.privateMessageDo.TableName()
-	_privateMessage.ALL = field.NewField(tableName, "*")
+	_privateMessage.ALL = field.NewAsterisk(tableName)
 	_privateMessage.ID = field.NewField(tableName, "msg_id")
 	_privateMessage.SenderID = field.NewField(tableName, "msg_sid")
 	_privateMessage.ReceiverID = field.NewField(tableName, "msg_rid")
@@ -48,7 +48,7 @@ func newPrivateMessage(db *gorm.DB) privateMessage {
 type privateMessage struct {
 	privateMessageDo privateMessageDo
 
-	ALL               field.Field
+	ALL               field.Asterisk
 	ID                field.Field
 	SenderID          field.Field
 	ReceiverID        field.Field
@@ -76,7 +76,7 @@ func (p privateMessage) As(alias string) *privateMessage {
 }
 
 func (p *privateMessage) updateTableName(table string) *privateMessage {
-	p.ALL = field.NewField(table, "*")
+	p.ALL = field.NewAsterisk(table)
 	p.ID = field.NewField(table, "msg_id")
 	p.SenderID = field.NewField(table, "msg_sid")
 	p.ReceiverID = field.NewField(table, "msg_rid")

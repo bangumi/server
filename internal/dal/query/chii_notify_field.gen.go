@@ -26,7 +26,7 @@ func newNotificationField(db *gorm.DB) notificationField {
 	_notificationField.notificationFieldDo.UseModel(&dao.NotificationField{})
 
 	tableName := _notificationField.notificationFieldDo.TableName()
-	_notificationField.ALL = field.NewField(tableName, "*")
+	_notificationField.ALL = field.NewAsterisk(tableName)
 	_notificationField.ID = field.NewField(tableName, "ntf_id")
 	_notificationField.RelatedType = field.NewUint8(tableName, "ntf_hash")
 	_notificationField.RelatedID = field.NewUint32(tableName, "ntf_rid")
@@ -40,7 +40,7 @@ func newNotificationField(db *gorm.DB) notificationField {
 type notificationField struct {
 	notificationFieldDo notificationFieldDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Field
 	RelatedType field.Uint8
 	RelatedID   field.Uint32
@@ -60,7 +60,7 @@ func (n notificationField) As(alias string) *notificationField {
 }
 
 func (n *notificationField) updateTableName(table string) *notificationField {
-	n.ALL = field.NewField(table, "*")
+	n.ALL = field.NewAsterisk(table)
 	n.ID = field.NewField(table, "ntf_id")
 	n.RelatedType = field.NewUint8(table, "ntf_hash")
 	n.RelatedID = field.NewUint32(table, "ntf_rid")

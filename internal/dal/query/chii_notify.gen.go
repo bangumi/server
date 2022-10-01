@@ -26,7 +26,7 @@ func newNotification(db *gorm.DB) notification {
 	_notification.notificationDo.UseModel(&dao.Notification{})
 
 	tableName := _notification.notificationDo.TableName()
-	_notification.ALL = field.NewField(tableName, "*")
+	_notification.ALL = field.NewAsterisk(tableName)
 	_notification.ID = field.NewField(tableName, "nt_id")
 	_notification.ReceiverID = field.NewField(tableName, "nt_uid")
 	_notification.SenderID = field.NewField(tableName, "nt_from_uid")
@@ -44,13 +44,13 @@ func newNotification(db *gorm.DB) notification {
 type notification struct {
 	notificationDo notificationDo
 
-	ALL         field.Field
+	ALL         field.Asterisk
 	ID          field.Field
 	ReceiverID  field.Field
 	SenderID    field.Field
 	Status      field.Field
 	Type        field.Field
-	FieldID     field.Field
+	FieldID     field.Field // ID in notify_field
 	RelatedID   field.Uint32
 	CreatedTime field.Uint32
 
@@ -68,7 +68,7 @@ func (n notification) As(alias string) *notification {
 }
 
 func (n *notification) updateTableName(table string) *notification {
-	n.ALL = field.NewField(table, "*")
+	n.ALL = field.NewAsterisk(table)
 	n.ID = field.NewField(table, "nt_id")
 	n.ReceiverID = field.NewField(table, "nt_uid")
 	n.SenderID = field.NewField(table, "nt_from_uid")

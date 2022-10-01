@@ -51,8 +51,8 @@ type PrivateMessageRepo_CountTypes_Call struct {
 }
 
 // CountTypes is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *PrivateMessageRepo_Expecter) CountTypes(ctx interface{}, userID interface{}) *PrivateMessageRepo_CountTypes_Call {
 	return &PrivateMessageRepo_CountTypes_Call{Call: _e.mock.On("CountTypes", ctx, userID)}
 }
@@ -98,12 +98,12 @@ type PrivateMessageRepo_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//  - ctx context.Context
-//  - senderID model.UserID
-//  - receiverIDs []model.UserID
-//  - relatedIDFilter domain.PrivateMessageIDFilter
-//  - title string
-//  - content string
+//   - ctx context.Context
+//   - senderID model.UserID
+//   - receiverIDs []model.UserID
+//   - relatedIDFilter domain.PrivateMessageIDFilter
+//   - title string
+//   - content string
 func (_e *PrivateMessageRepo_Expecter) Create(ctx interface{}, senderID interface{}, receiverIDs interface{}, relatedIDFilter interface{}, title interface{}, content interface{}) *PrivateMessageRepo_Create_Call {
 	return &PrivateMessageRepo_Create_Call{Call: _e.mock.On("Create", ctx, senderID, receiverIDs, relatedIDFilter, title, content)}
 }
@@ -140,9 +140,9 @@ type PrivateMessageRepo_Delete_Call struct {
 }
 
 // Delete is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - ids []model.PrivateMessageID
+//   - ctx context.Context
+//   - userID model.UserID
+//   - ids []model.PrivateMessageID
 func (_e *PrivateMessageRepo_Expecter) Delete(ctx interface{}, userID interface{}, ids interface{}) *PrivateMessageRepo_Delete_Call {
 	return &PrivateMessageRepo_Delete_Call{Call: _e.mock.On("Delete", ctx, userID, ids)}
 }
@@ -188,11 +188,11 @@ type PrivateMessageRepo_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - folder model.PrivateMessageFolderType
-//  - offset int
-//  - limit int
+//   - ctx context.Context
+//   - userID model.UserID
+//   - folder model.PrivateMessageFolderType
+//   - offset int
+//   - limit int
 func (_e *PrivateMessageRepo_Expecter) List(ctx interface{}, userID interface{}, folder interface{}, offset interface{}, limit interface{}) *PrivateMessageRepo_List_Call {
 	return &PrivateMessageRepo_List_Call{Call: _e.mock.On("List", ctx, userID, folder, offset, limit)}
 }
@@ -238,8 +238,8 @@ type PrivateMessageRepo_ListRecentContact_Call struct {
 }
 
 // ListRecentContact is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *PrivateMessageRepo_Expecter) ListRecentContact(ctx interface{}, userID interface{}) *PrivateMessageRepo_ListRecentContact_Call {
 	return &PrivateMessageRepo_ListRecentContact_Call{Call: _e.mock.On("ListRecentContact", ctx, userID)}
 }
@@ -285,9 +285,9 @@ type PrivateMessageRepo_ListRelated_Call struct {
 }
 
 // ListRelated is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - id model.PrivateMessageID
+//   - ctx context.Context
+//   - userID model.UserID
+//   - id model.PrivateMessageID
 func (_e *PrivateMessageRepo_Expecter) ListRelated(ctx interface{}, userID interface{}, id interface{}) *PrivateMessageRepo_ListRelated_Call {
 	return &PrivateMessageRepo_ListRelated_Call{Call: _e.mock.On("ListRelated", ctx, userID, id)}
 }
@@ -324,9 +324,9 @@ type PrivateMessageRepo_MarkRead_Call struct {
 }
 
 // MarkRead is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
-//  - relatedID model.PrivateMessageID
+//   - ctx context.Context
+//   - userID model.UserID
+//   - relatedID model.PrivateMessageID
 func (_e *PrivateMessageRepo_Expecter) MarkRead(ctx interface{}, userID interface{}, relatedID interface{}) *PrivateMessageRepo_MarkRead_Call {
 	return &PrivateMessageRepo_MarkRead_Call{Call: _e.mock.On("MarkRead", ctx, userID, relatedID)}
 }

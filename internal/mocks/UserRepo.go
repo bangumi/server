@@ -58,9 +58,9 @@ type UserRepo_CheckIsFriendToOthers_Call struct {
 }
 
 // CheckIsFriendToOthers is a helper method to define mock.On call
-//  - ctx context.Context
-//  - selfID model.UserID
-//  - otherIDs ...model.UserID
+//   - ctx context.Context
+//   - selfID model.UserID
+//   - otherIDs ...model.UserID
 func (_e *UserRepo_Expecter) CheckIsFriendToOthers(ctx interface{}, selfID interface{}, otherIDs ...interface{}) *UserRepo_CheckIsFriendToOthers_Call {
 	return &UserRepo_CheckIsFriendToOthers_Call{Call: _e.mock.On("CheckIsFriendToOthers",
 		append([]interface{}{ctx, selfID}, otherIDs...)...)}
@@ -111,8 +111,8 @@ type UserRepo_GetByID_Call struct {
 }
 
 // GetByID is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *UserRepo_Expecter) GetByID(ctx interface{}, userID interface{}) *UserRepo_GetByID_Call {
 	return &UserRepo_GetByID_Call{Call: _e.mock.On("GetByID", ctx, userID)}
 }
@@ -158,8 +158,8 @@ type UserRepo_GetByIDs_Call struct {
 }
 
 // GetByIDs is a helper method to define mock.On call
-//  - ctx context.Context
-//  - ids []model.UserID
+//   - ctx context.Context
+//   - ids []model.UserID
 func (_e *UserRepo_Expecter) GetByIDs(ctx interface{}, ids interface{}) *UserRepo_GetByIDs_Call {
 	return &UserRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs", ctx, ids)}
 }
@@ -203,8 +203,8 @@ type UserRepo_GetByName_Call struct {
 }
 
 // GetByName is a helper method to define mock.On call
-//  - ctx context.Context
-//  - username string
+//   - ctx context.Context
+//   - username string
 func (_e *UserRepo_Expecter) GetByName(ctx interface{}, username interface{}) *UserRepo_GetByName_Call {
 	return &UserRepo_GetByName_Call{Call: _e.mock.On("GetByName", ctx, username)}
 }
@@ -250,8 +250,8 @@ type UserRepo_GetFieldsByIDs_Call struct {
 }
 
 // GetFieldsByIDs is a helper method to define mock.On call
-//  - ctx context.Context
-//  - ids []model.UserID
+//   - ctx context.Context
+//   - ids []model.UserID
 func (_e *UserRepo_Expecter) GetFieldsByIDs(ctx interface{}, ids interface{}) *UserRepo_GetFieldsByIDs_Call {
 	return &UserRepo_GetFieldsByIDs_Call{Call: _e.mock.On("GetFieldsByIDs", ctx, ids)}
 }
@@ -297,8 +297,8 @@ type UserRepo_GetFriends_Call struct {
 }
 
 // GetFriends is a helper method to define mock.On call
-//  - ctx context.Context
-//  - userID model.UserID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *UserRepo_Expecter) GetFriends(ctx interface{}, userID interface{}) *UserRepo_GetFriends_Call {
 	return &UserRepo_GetFriends_Call{Call: _e.mock.On("GetFriends", ctx, userID)}
 }
