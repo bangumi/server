@@ -96,6 +96,30 @@ func (r mysqlRepo) List(
 	}), nil
 }
 
+func (r mysqlRepo) CountByFolder(ctx context.Context,
+	userID model.UserID,
+	folder model.PrivateMessageFolderType) (int64, error) {
+	var conds []gen.Condition
+	do := r.q.PrivateMessage.WithContext(ctx)
+	if folder == model.PrivateMessageFolderTypeInbox {
+		conds = []gen.Condition{
+			r.q.PrivateMessage.ReceiverID.Eq(userID),
+			r.q.PrivateMessage.DeletedByReceiver.Is(false),
+		}
+	} else {
+		conds = []gen.Condition{
+			r.q.PrivateMessage.SenderID.Eq(userID),
+			r.q.PrivateMessage.DeletedBySender.Is(false),
+		}
+	}
+	count, err := do.Where(conds...).Count()
+	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
+		return 0, errgo.Wrap(err, "dal")
+	}
+	return count, nil
+}
+
 func (r mysqlRepo) ListRelated(
 	ctx context.Context,
 	userID model.UserID,
@@ -146,21 +170,13 @@ func (r mysqlRepo) CountTypes(
 ) (model.PrivateMessageTypeCounts, error) {
 	do := r.q.PrivateMessage.WithContext(ctx)
 	res := model.PrivateMessageTypeCounts{}
-	c1, err := do.Where(
-		r.q.PrivateMessage.SenderID.Eq(userID),
-		r.q.PrivateMessage.DeletedBySender.Is(false)).
-		Count()
+	c1, err := r.CountByFolder(ctx, userID, model.PrivateMessageFolderTypeOutbox)
 	if err != nil {
-		r.log.Error("unexpected error", zap.Error(err))
-		return res, errgo.Wrap(err, "dal")
+		return res, err
 	}
-	c2, err := do.Where(
-		r.q.PrivateMessage.ReceiverID.Eq(userID),
-		r.q.PrivateMessage.DeletedBySender.Is(false)).
-		Count()
+	c2, err := r.CountByFolder(ctx, userID, model.PrivateMessageFolderTypeInbox)
 	if err != nil {
-		r.log.Error("unexpected error", zap.Error(err))
-		return res, errgo.Wrap(err, "dal")
+		return res, err
 	}
 	c3, err := do.Where(
 		r.q.PrivateMessage.ReceiverID.Eq(userID),

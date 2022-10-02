@@ -33,12 +33,22 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	list, err := h.pmRepo.List(c.Context(), accessor.ID, folder, page.Offset, page.Limit)
+	ctx := c.Context()
+	count, err := h.pmRepo.CountByFolder(ctx, accessor.ID, folder)
+	if err != nil {
+		return res.InternalError(c, err, "failed to count private messages")
+	}
+	list, err := h.pmRepo.List(ctx, accessor.ID, folder, page.Offset, page.Limit)
 	if err != nil {
 		return res.InternalError(c, err, "failed to list private messages")
 	}
 	if len(list) == 0 {
-		return res.JSON(c, make([]res.PrivateMessage, 0))
+		return res.JSON(c, res.Paged{
+			Data:   make([]res.PrivateMessage, 0),
+			Total:  count,
+			Limit:  page.Limit,
+			Offset: page.Offset,
+		})
 	}
 	userIDs := make([]model.UserID, len(list)+1)
 	for i := range list {
@@ -57,5 +67,10 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 	data := slice.Map(list, func(v model.PrivateMessageListItem) res.PrivateMessage {
 		return res.ConvertModelPrivateMessageListItem(v, users)
 	})
-	return res.JSON(c, data)
+	return res.JSON(c, res.Paged{
+		Data:   data,
+		Total:  count,
+		Limit:  page.Limit,
+		Offset: page.Offset,
+	})
 }

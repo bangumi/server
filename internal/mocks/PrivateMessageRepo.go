@@ -24,6 +24,52 @@ func (_m *PrivateMessageRepo) EXPECT() *PrivateMessageRepo_Expecter {
 	return &PrivateMessageRepo_Expecter{mock: &_m.Mock}
 }
 
+// CountByFolder provides a mock function with given fields: ctx, userID, folder
+func (_m *PrivateMessageRepo) CountByFolder(ctx context.Context, userID model.UserID, folder model.PrivateMessageFolderType) (int64, error) {
+	ret := _m.Called(ctx, userID, folder)
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, model.PrivateMessageFolderType) int64); ok {
+		r0 = rf(ctx, userID, folder)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, model.PrivateMessageFolderType) error); ok {
+		r1 = rf(ctx, userID, folder)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// PrivateMessageRepo_CountByFolder_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountByFolder'
+type PrivateMessageRepo_CountByFolder_Call struct {
+	*mock.Call
+}
+
+// CountByFolder is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID model.UserID
+//   - folder model.PrivateMessageFolderType
+func (_e *PrivateMessageRepo_Expecter) CountByFolder(ctx interface{}, userID interface{}, folder interface{}) *PrivateMessageRepo_CountByFolder_Call {
+	return &PrivateMessageRepo_CountByFolder_Call{Call: _e.mock.On("CountByFolder", ctx, userID, folder)}
+}
+
+func (_c *PrivateMessageRepo_CountByFolder_Call) Run(run func(ctx context.Context, userID model.UserID, folder model.PrivateMessageFolderType)) *PrivateMessageRepo_CountByFolder_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.PrivateMessageFolderType))
+	})
+	return _c
+}
+
+func (_c *PrivateMessageRepo_CountByFolder_Call) Return(_a0 int64, _a1 error) *PrivateMessageRepo_CountByFolder_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // CountTypes provides a mock function with given fields: ctx, userID
 func (_m *PrivateMessageRepo) CountTypes(ctx context.Context, userID model.UserID) (model.PrivateMessageTypeCounts, error) {
 	ret := _m.Called(ctx, userID)

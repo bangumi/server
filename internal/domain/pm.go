@@ -34,6 +34,12 @@ type PrivateMessageRepo interface {
 		limit int,
 	) ([]model.PrivateMessageListItem, error)
 
+	CountByFolder(
+		ctx context.Context,
+		userID model.UserID,
+		folder model.PrivateMessageFolderType,
+	) (int64, error)
+
 	ListRelated(
 		ctx context.Context,
 		userID model.UserID,
