@@ -25,14 +25,6 @@ func NewNoop() RedisCache {
 
 type noop struct{}
 
-func (n noop) GetMany(ctx context.Context, keys []string) GetManyResult {
-	return GetManyResult{}
-}
-
-func (n noop) SetMany(ctx context.Context, data map[string]any, ttl time.Duration) error {
-	return nil
-}
-
 func (n noop) Get(context.Context, string, any) (bool, error) {
 	return false, nil
 }
