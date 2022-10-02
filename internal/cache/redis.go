@@ -16,7 +16,6 @@ package cache
 
 import (
 	"context"
-	_ "embed"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -25,12 +24,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
-
-type GetManyResult struct {
-	cache  RedisCache
-	Result map[string][]byte
-	Err    error
-}
 
 // RedisCache
 //
