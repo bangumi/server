@@ -21,7 +21,7 @@ import (
 )
 
 type PrivateMessage struct {
-	CreatedTime    time.Time       `json:"created_time"`
+	CreatedAt      time.Time       `json:"created_at"`
 	RelatedMessage *PrivateMessage `json:"related_message"`
 	Sender         *User           `json:"sender"`
 	Receiver       *User           `json:"receiver"`
@@ -42,11 +42,11 @@ func ConvertModelPrivateMessage(
 	users map[model.UserID]model.User,
 ) PrivateMessage {
 	msg := PrivateMessage{
-		CreatedTime: item.CreatedTime,
-		Title:       item.Title,
-		Content:     item.Content,
-		ID:          uint32(item.ID),
-		New:         item.New,
+		CreatedAt: item.CreatedTime,
+		Title:     item.Title,
+		Content:   item.Content,
+		ID:        uint32(item.ID),
+		New:       item.New,
 	}
 	if users != nil {
 		if u, ok := users[item.SenderID]; ok {
