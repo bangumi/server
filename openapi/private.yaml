@@ -2,7 +2,7 @@ openapi: 3.0.2
 info:
   title: "Bangumi Private API"
   version: ""
-  description: "`next.bgm.tv` 域名不支持跨域，"
+  description: "`next.bgm.tv` 域名不支持跨域"
 
 # 构建脚本会添加 servers
 #servers:
