@@ -22,9 +22,9 @@ import (
 
 type PrivateMessage struct {
 	CreatedAt      time.Time       `json:"created_at"`
-	RelatedMessage *PrivateMessage `json:"related_message"`
-	Sender         *User           `json:"sender"`
-	Receiver       *User           `json:"receiver"`
+	RelatedMessage *PrivateMessage `json:"related_message,omitempty"`
+	Sender         *User           `json:"sender,omitempty"`
+	Receiver       *User           `json:"receiver,omitempty"`
 	Title          string          `json:"title"`
 	Content        string          `json:"content"`
 	ID             uint32          `json:"id"`

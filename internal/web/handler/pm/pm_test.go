@@ -33,13 +33,19 @@ import (
 func TestPrivateMessage_List(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPrivateMessageRepo(t)
+	m.EXPECT().CountByFolder(mock.Anything, model.UserID(1), model.PrivateMessageFolderTypeInbox).Return(1, nil)
 	m.EXPECT().List(
 		mock.Anything,
 		model.UserID(1),
 		model.PrivateMessageFolderTypeInbox,
 		0,
 		10,
-	).Return([]model.PrivateMessageListItem{}, nil)
+	).Return([]model.PrivateMessageListItem{
+		{
+			Main: model.PrivateMessage{},
+			Self: model.PrivateMessage{},
+		},
+	}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
