@@ -182,3 +182,27 @@ func (h Handler) getIndexSubjects(
 		Offset: page.Offset,
 	})
 }
+
+func (h Handler) NewIndex(c *fiber.Ctx) error {
+	return c.JSON(res.Index{})
+}
+
+func (h Handler) UpdateIndex(c *fiber.Ctx) error {
+	return nil
+}
+
+func (h Handler) DeleteIndex(c *fiber.Ctx) error {
+	return nil
+}
+
+func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
+	return nil
+}
+
+func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
+	return nil
+}
+
+func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
+	return nil
+}
