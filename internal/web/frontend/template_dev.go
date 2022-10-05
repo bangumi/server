@@ -21,12 +21,9 @@ package frontend
 import (
 	"html/template"
 	"io"
-	"os"
 
 	"github.com/Masterminds/sprig/v3"
 )
-
-var StaticFS = os.DirFS("./internal/web/frontend") //nolint:gochecknoglobals
 
 func NewTemplateEngine() (TemplateEngine, error) {
 	return TemplateEngine{}, nil
