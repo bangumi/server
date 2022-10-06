@@ -219,6 +219,35 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 }
 
 func (h Handler) UpdateIndex(c *fiber.Ctx) error {
+	var reqData req.IndexBasicInfo
+	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+		return errgo.Wrap(err, "request data is invalid")
+	}
+
+	if reqData.Title == "" && reqData.Description == "" {
+		return res.BadRequest("request data is empty")
+	}
+
+	id, err := req.ParseIndexID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	accessor := h.GetHTTPAccessor(c)
+
+	// TODO: 是否走 redis 缓存
+	index, err := h.i.Get(c.UserContext(), id)
+	if err != nil {
+		return res.NotFound("index not found")
+	}
+
+	if index.CreatorID != accessor.ID {
+		return res.Unauthorized("you are not the creator of this index")
+	}
+
+	if err = h.i.Update(c.UserContext(), id, reqData.Title, reqData.Description); err != nil {
+		return errgo.Wrap(err, "update index failed")
+	}
 	return nil
 }
 

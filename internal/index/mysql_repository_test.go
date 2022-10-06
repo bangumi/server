@@ -95,3 +95,35 @@ func TestMysqlRepo_NewIndex(t *testing.T) {
 	require.EqualValues(t, "test", i.Title)
 	require.EqualValues(t, now.Truncate(time.Second), i.CreatedAt)
 }
+
+func TestMysqlRepo_UpdateIndex(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	i, err := repo.Get(context.Background(), 15045)
+
+	defaultTitle := "日本动画最高收视率TOP100"
+	defaultDesc := "[url]http://www.tudou.com/programs/view/" +
+		"W6eIoxnHs6g/[/url]\r\n有美国动画混入，所以准确的说是在日本播放的" +
+		"动画最高收视率（而且是关东地区的\r\n基本大部分是70年代的，那个年代娱乐贫乏优势真大"
+
+	// check current
+	require.NoError(t, err)
+	require.EqualValues(t, defaultTitle, i.Title)
+	require.EqualValues(t, defaultDesc, i.Description)
+
+	// update index information
+	err = repo.Update(context.Background(), 15045, "日本动画", "日本动画的介绍")
+	require.NoError(t, err)
+
+	// check updated index information
+	i, err = repo.Get(context.Background(), 15045)
+	require.NoError(t, err)
+	require.EqualValues(t, "日本动画", i.Title)
+	require.EqualValues(t, "日本动画的介绍", i.Description)
+
+	// revert update
+	err = repo.Update(context.Background(), 15045, defaultTitle, defaultDesc)
+	require.NoError(t, err)
+}

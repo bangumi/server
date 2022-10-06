@@ -132,6 +132,21 @@ func (r mysqlRepo) New(ctx context.Context, i *model.Index) error {
 	return nil
 }
 
+func (r mysqlRepo) Update(ctx context.Context, id uint32, title string, desc string) error {
+	query := r.q.Index.WithContext(ctx)
+	result, err := query.Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
+		Title: title,
+		Desc:  desc,
+	})
+	if err != nil {
+		return errgo.Wrap(err, "failed to update index info")
+	}
+	if err = result.Error; err != nil {
+		return errgo.Wrap(err, "failed to update index info")
+	}
+	return nil
+}
+
 func daoToModel(index *dao.Index) *model.Index {
 	return &model.Index{
 		ID:          index.ID,

@@ -203,6 +203,46 @@ func (_c *IndexRepo_New_Call) Return(_a0 error) *IndexRepo_New_Call {
 	return _c
 }
 
+// Update provides a mock function with given fields: ctx, id, title, desc
+func (_m *IndexRepo) Update(ctx context.Context, id uint32, title string, desc string) error {
+	ret := _m.Called(ctx, id, title, desc)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, string, string) error); ok {
+		r0 = rf(ctx, id, title, desc)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// IndexRepo_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type IndexRepo_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - title string
+//   - desc string
+func (_e *IndexRepo_Expecter) Update(ctx interface{}, id interface{}, title interface{}, desc interface{}) *IndexRepo_Update_Call {
+	return &IndexRepo_Update_Call{Call: _e.mock.On("Update", ctx, id, title, desc)}
+}
+
+func (_c *IndexRepo_Update_Call) Run(run func(ctx context.Context, id uint32, title string, desc string)) *IndexRepo_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(string), args[3].(string))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_Update_Call) Return(_a0 error) *IndexRepo_Update_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
 type mockConstructorTestingTNewIndexRepo interface {
 	mock.TestingT
 	Cleanup(func())
