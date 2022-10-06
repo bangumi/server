@@ -194,9 +194,10 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "request data is invalid")
 	}
 	accessor := h.GetHTTPAccessor(c)
+	now := time.Now()
 	i := &model.Index{
 		ID:          0,
-		CreatedAt:   time.Now(),
+		CreatedAt:   now,
 		Title:       reqData.Title,
 		Description: reqData.Description,
 		CreatorID:   accessor.ID,
@@ -252,6 +253,25 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 }
 
 func (h Handler) DeleteIndex(c *fiber.Ctx) error {
+	id, err := req.ParseIndexID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	accessor := h.GetHTTPAccessor(c)
+	index, err := h.i.Get(c.UserContext(), id)
+	if err != nil {
+		return res.NotFound("index not found")
+	}
+
+	if index.CreatorID != accessor.ID {
+		return res.Unauthorized("you are not the creator of this index")
+	}
+
+	if err = h.i.Delete(c.UserContext(), id); err != nil {
+		return errgo.Wrap(err, "failed to delete index from db")
+	}
+
 	return nil
 }
 

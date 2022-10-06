@@ -127,3 +127,37 @@ func TestMysqlRepo_UpdateIndex(t *testing.T) {
 	err = repo.Update(context.Background(), 15045, defaultTitle, defaultDesc)
 	require.NoError(t, err)
 }
+
+func TestMysqlRepo_DeleteIndex(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   time.Now(),
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+	_ = repo.New(context.Background(), index)
+	require.NotEqual(t, 0, index.ID)
+
+	i, err := repo.Get(context.Background(), index.ID)
+	require.NoError(t, err)
+	require.EqualValues(t, index.ID, i.ID)
+
+	err = repo.Delete(context.Background(), index.ID)
+	require.NoError(t, err)
+
+	_, err = repo.Get(context.Background(), index.ID)
+	require.Error(t, err)
+	require.ErrorIs(t, err, domain.ErrNotFound)
+
+	// TODO: all subjects in the index should be removed as well
+}

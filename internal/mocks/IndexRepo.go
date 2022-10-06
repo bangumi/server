@@ -70,6 +70,44 @@ func (_c *IndexRepo_CountSubjects_Call) Return(_a0 int64, _a1 error) *IndexRepo_
 	return _c
 }
 
+// Delete provides a mock function with given fields: ctx, id
+func (_m *IndexRepo) Delete(ctx context.Context, id uint32) error {
+	ret := _m.Called(ctx, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// IndexRepo_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type IndexRepo_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+func (_e *IndexRepo_Expecter) Delete(ctx interface{}, id interface{}) *IndexRepo_Delete_Call {
+	return &IndexRepo_Delete_Call{Call: _e.mock.On("Delete", ctx, id)}
+}
+
+func (_c *IndexRepo_Delete_Call) Run(run func(ctx context.Context, id uint32)) *IndexRepo_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_Delete_Call) Return(_a0 error) *IndexRepo_Delete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, id
 func (_m *IndexRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
 	ret := _m.Called(ctx, id)

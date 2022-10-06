@@ -24,7 +24,8 @@ import (
 type IndexRepo interface {
 	Get(ctx context.Context, id model.IndexID) (model.Index, error)
 	New(ctx context.Context, i *model.Index) error
-	Update(ctx context.Context, id uint32, title string, desc string) error
+	Update(ctx context.Context, id model.IndexID, title string, desc string) error
+	Delete(ctx context.Context, id model.IndexID) error
 
 	CountSubjects(ctx context.Context, id model.IndexID, subjectType model.SubjectType) (int64, error)
 	ListSubjects(

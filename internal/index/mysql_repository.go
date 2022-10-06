@@ -16,6 +16,7 @@ package index
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"time"
 
@@ -39,7 +40,7 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (r mysqlRepo) isNsfw(ctx context.Context, id uint32) (bool, error) {
+func (r mysqlRepo) isNsfw(ctx context.Context, id model.IndexID) (bool, error) {
 	i, err := r.q.IndexSubject.WithContext(ctx).
 		Join(r.q.Subject, r.q.IndexSubject.Sid.EqCol(r.q.Subject.ID)).
 		Where(r.q.IndexSubject.Rid.Eq(id), r.q.Subject.Nsfw.Is(true)).Count()
@@ -51,7 +52,7 @@ func (r mysqlRepo) isNsfw(ctx context.Context, id uint32) (bool, error) {
 	return i != 0, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
+func (r mysqlRepo) Get(ctx context.Context, id model.IndexID) (model.Index, error) {
 	i, err := r.q.Index.WithContext(ctx).
 		Where(r.q.Index.ID.Eq(id), r.q.Index.Ban.Is(false)).First()
 	if err != nil {
@@ -72,8 +73,52 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
 	return *ret, nil
 }
 
+func (r mysqlRepo) New(ctx context.Context, i *model.Index) error {
+	dao := modelToDAO(i)
+	if err := r.q.Index.WithContext(ctx).Create(dao); err != nil {
+		return errgo.Wrap(err, "failed to create index in db")
+	}
+	i.ID = dao.ID
+	return nil
+}
+
+func (r mysqlRepo) Update(ctx context.Context, id model.IndexID, title string, desc string) error {
+	query := r.q.Index.WithContext(ctx)
+	result, err := query.Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
+		Title: title,
+		Desc:  desc,
+	})
+	if err != nil {
+		return errgo.Wrap(err, "failed to update index info")
+	}
+	if err = result.Error; err != nil {
+		return errgo.Wrap(err, "failed to update index info")
+	}
+	return nil
+}
+
+func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
+	return r.q.Transaction(func(tx *query.Query) error {
+		result, err := tx.Index.WithContext(ctx).Where(tx.Index.ID.Eq(id)).Delete()
+		if err != nil {
+			return errgo.Wrap(err, "failed to delete index")
+		}
+		if result.Error != nil {
+			return result.Error
+		}
+		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.Rid.Eq(id)).Delete()
+		if err != nil {
+			return errgo.Wrap(err, "failed to delete index subjects")
+		}
+		if result.Error != nil {
+			return result.Error
+		}
+		return nil
+	}, &sql.TxOptions{})
+}
+
 func (r mysqlRepo) CountSubjects(
-	ctx context.Context, id uint32, subjectType model.SubjectType,
+	ctx context.Context, id model.IndexID, subjectType model.SubjectType,
 ) (int64, error) {
 	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.Rid.Eq(id))
 	if subjectType != 0 {
@@ -90,7 +135,7 @@ func (r mysqlRepo) CountSubjects(
 
 func (r mysqlRepo) ListSubjects(
 	ctx context.Context,
-	id uint32,
+	id model.IndexID,
 	subjectType model.SubjectType,
 	limit, offset int,
 ) ([]domain.IndexSubject, error) {
@@ -121,30 +166,6 @@ func (r mysqlRepo) ListSubjects(
 	}
 
 	return results, nil
-}
-
-func (r mysqlRepo) New(ctx context.Context, i *model.Index) error {
-	dao := modelToDAO(i)
-	if err := r.q.Index.WithContext(ctx).Create(dao); err != nil {
-		return errgo.Wrap(err, "failed to create index in db")
-	}
-	i.ID = dao.ID
-	return nil
-}
-
-func (r mysqlRepo) Update(ctx context.Context, id uint32, title string, desc string) error {
-	query := r.q.Index.WithContext(ctx)
-	result, err := query.Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
-		Title: title,
-		Desc:  desc,
-	})
-	if err != nil {
-		return errgo.Wrap(err, "failed to update index info")
-	}
-	if err = result.Error; err != nil {
-		return errgo.Wrap(err, "failed to update index info")
-	}
-	return nil
 }
 
 func daoToModel(index *dao.Index) *model.Index {
