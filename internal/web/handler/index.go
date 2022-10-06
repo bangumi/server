@@ -241,7 +241,10 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 	// TODO: 是否走 redis 缓存
 	index, err := h.i.Get(c.UserContext(), id)
 	if err != nil {
-		return res.NotFound("index not found")
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.NotFound("index not found")
+		}
+		return res.InternalError(c, err, "failed to get index")
 	}
 
 	if index.CreatorID != accessor.ID {
