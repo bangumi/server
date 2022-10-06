@@ -16,7 +16,6 @@ package index
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"time"
 
@@ -114,7 +113,7 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 			return result.Error
 		}
 		return nil
-	}, &sql.TxOptions{})
+	})
 }
 
 func (r mysqlRepo) CountSubjects(
