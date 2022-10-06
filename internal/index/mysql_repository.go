@@ -180,6 +180,7 @@ func daoToModel(index *dao.Index) *model.Index {
 		Ban:         index.Ban,
 		NSFW:        false, // check nsfw outside of this function
 		CreatedAt:   time.Unix(int64(index.Dateline), 0),
+		UpdateAt:    time.Unix(int64(index.Lasttouch), 0),
 	}
 }
 
@@ -192,5 +193,6 @@ func modelToDAO(index *model.Index) *dao.Index {
 		CreatorID: index.CreatorID,
 		Ban:       index.Ban,
 		Dateline:  int32(index.CreatedAt.Unix()),
+		Lasttouch: uint32(index.UpdateAt.Unix()),
 	}
 }

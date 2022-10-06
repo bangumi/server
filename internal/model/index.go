@@ -18,6 +18,7 @@ import "time"
 
 type Index struct {
 	CreatedAt   time.Time
+	UpdateAt    time.Time
 	Title       string
 	Description string
 	CreatorID   UserID

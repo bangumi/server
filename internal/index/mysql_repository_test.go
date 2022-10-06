@@ -78,6 +78,7 @@ func TestMysqlRepo_NewIndex(t *testing.T) {
 		Description: "Test Index",
 		CreatorID:   382951,
 		CreatedAt:   now,
+		UpdateAt:    now,
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
@@ -94,6 +95,7 @@ func TestMysqlRepo_NewIndex(t *testing.T) {
 	require.EqualValues(t, 382951, i.CreatorID)
 	require.EqualValues(t, "test", i.Title)
 	require.EqualValues(t, now.Truncate(time.Second), i.CreatedAt)
+	require.EqualValues(t, now.Truncate(time.Second), i.UpdateAt)
 }
 
 func TestMysqlRepo_UpdateIndex(t *testing.T) {
