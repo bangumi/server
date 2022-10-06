@@ -12,28 +12,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package req
 
-import (
-	"context"
-	"time"
-
-	"github.com/bangumi/server/internal/model"
-)
-
-type IndexRepo interface {
-	Get(ctx context.Context, id model.IndexID) (model.Index, error)
-
-	CountSubjects(ctx context.Context, id model.IndexID, subjectType model.SubjectType) (int64, error)
-	ListSubjects(
-		ctx context.Context, id model.IndexID, subjectType model.SubjectType, limit, offset int,
-	) ([]IndexSubject, error)
-
-	New(ctx context.Context, i *model.Index) error
-}
-
-type IndexSubject struct {
-	Comment string
-	AddedAt time.Time
-	Subject model.Subject
+type IndexBasicInfo struct {
+	Title       string `json:"title"`
+	Description string `json:"desc"`
 }

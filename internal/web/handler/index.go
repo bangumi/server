@@ -19,6 +19,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
@@ -32,6 +33,26 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/wiki"
 )
+
+func modelToResponse(i *model.Index, u model.User) res.Index {
+	return res.Index{
+		CreatedAt: i.CreatedAt,
+		Creator: res.Creator{
+			Username: u.UserName,
+			Nickname: u.NickName,
+		},
+		Title:       i.Title,
+		Description: i.Description,
+		Total:       i.Total,
+		ID:          i.ID,
+		Stat: res.Stat{
+			Comments: i.Comments,
+			Collects: i.Collects,
+		},
+		Ban:  i.Ban,
+		NSFW: i.NSFW,
+	}
+}
 
 func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, bool, error) {
 	var key = cachekey.Index(id)
@@ -59,23 +80,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
 	}
 
-	r = res.Index{
-		CreatedAt: i.CreatedAt,
-		Creator: res.Creator{
-			Username: u.UserName,
-			Nickname: u.NickName,
-		},
-		Title:       i.Title,
-		Description: i.Description,
-		Total:       i.Total,
-		ID:          id,
-		Stat: res.Stat{
-			Comments: i.Comments,
-			Collects: i.Collects,
-		},
-		Ban:  i.Ban,
-		NSFW: i.NSFW,
-	}
+	r = modelToResponse(&i, u)
 
 	if e := h.cache.Set(c, key, r, time.Hour); e != nil {
 		h.log.Error("can't set response to cache", zap.Error(e))
@@ -184,7 +189,33 @@ func (h Handler) getIndexSubjects(
 }
 
 func (h Handler) NewIndex(c *fiber.Ctx) error {
-	return c.JSON(res.Index{})
+	var reqData req.IndexBasicInfo
+	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+		return errgo.Wrap(err, "request data is invalid")
+	}
+	accessor := h.GetHTTPAccessor(c)
+	i := &model.Index{
+		ID:          0,
+		CreatedAt:   time.Now(),
+		Title:       reqData.Title,
+		Description: reqData.Description,
+		CreatorID:   accessor.ID,
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+	ctx := c.UserContext()
+	if err := h.i.New(ctx, i); err != nil {
+		return errgo.Wrap(err, "failed to create a new index")
+	}
+	u, err := h.ctrl.GetUser(ctx, i.CreatorID)
+	if err != nil {
+		return errgo.Wrap(err, "failed to get user info")
+	}
+	resp := modelToResponse(i, u)
+	return c.JSON(resp)
 }
 
 func (h Handler) UpdateIndex(c *fiber.Ctx) error {

@@ -91,11 +91,11 @@ func AddRouters(
 	// indices
 	v0.Post("/indices", req.JSON, h.NeedLogin, h.NewIndex)
 	v0.Put("/indices/:id", req.JSON, h.NeedLogin, h.UpdateIndex)
-	v0.Delete("/indices/:id", req.JSON, h.NeedLogin, h.DeleteIndex)
+	v0.Delete("/indices/:id", h.NeedLogin, h.DeleteIndex)
 	// indices subjects
 	v0.Post("/indices/:id/subjects", req.JSON, h.NeedLogin, h.AddIndexSubject)
 	v0.Put("/indices/:id/subjects/:subject_id", req.JSON, h.NeedLogin, h.UpdateIndexSubject)
-	v0.Delete("/indices/:id/subjects/:subject_id", req.JSON, h.NeedLogin, h.RemoveIndexSubject)
+	v0.Delete("/indices/:id/subjects/:subject_id", h.NeedLogin, h.RemoveIndexSubject)
 
 	v0.Get("/revisions/persons/:id", h.GetPersonRevision)
 	v0.Get("/revisions/persons", h.ListPersonRevision)

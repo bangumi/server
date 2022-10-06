@@ -17,6 +17,7 @@ package index_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
@@ -59,4 +60,38 @@ func TestMysqlRepo_ListSubjects(t *testing.T) {
 	subjects, err := repo.ListSubjects(context.Background(), 15045, model.SubjectTypeAll, 20, 0)
 	require.NoError(t, err)
 	require.Len(t, subjects, 20)
+}
+
+func TestMysqlRepo_NewIndex(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	// 存入的时间戳是 int32 类型， nanosecond 会被忽略掉
+	// TODO: 数据库时间戳是否应该改成 uint32 或者 uint64 类型
+	now := time.Now()
+
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   now,
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+	err := repo.New(context.Background(), index)
+	require.NoError(t, err)
+	require.NotEqualValues(t, 0, index.ID)
+
+	i, err := repo.Get(context.Background(), index.ID)
+	require.NoError(t, err)
+
+	require.EqualValues(t, 382951, i.CreatorID)
+	require.EqualValues(t, "test", i.Title)
+	require.EqualValues(t, now.Truncate(time.Second), i.CreatedAt)
 }

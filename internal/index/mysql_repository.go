@@ -22,6 +22,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
@@ -66,18 +67,9 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
 		return model.Index{}, err
 	}
 
-	return model.Index{
-		CreatedAt:   time.Unix(int64(i.Dateline), 0),
-		Title:       i.Title,
-		Description: i.Desc,
-		CreatorID:   i.CreatorID,
-		Total:       i.SubjectTotal,
-		ID:          id,
-		Comments:    i.Replies,
-		Collects:    i.Collects,
-		Ban:         i.Ban,
-		NSFW:        nsfw,
-	}, nil
+	ret := daoToModel(i)
+	ret.NSFW = nsfw
+	return *ret, nil
 }
 
 func (r mysqlRepo) CountSubjects(
@@ -129,4 +121,40 @@ func (r mysqlRepo) ListSubjects(
 	}
 
 	return results, nil
+}
+
+func (r mysqlRepo) New(ctx context.Context, i *model.Index) error {
+	dao := modelToDAO(i)
+	if err := r.q.Index.WithContext(ctx).Create(dao); err != nil {
+		return errgo.Wrap(err, "failed to create index in db")
+	}
+	i.ID = dao.ID
+	return nil
+}
+
+func daoToModel(index *dao.Index) *model.Index {
+	return &model.Index{
+		ID:          index.ID,
+		Title:       index.Title,
+		Description: index.Desc,
+		CreatorID:   index.CreatorID,
+		Total:       index.SubjectTotal,
+		Comments:    index.Replies,
+		Collects:    index.Collects,
+		Ban:         index.Ban,
+		NSFW:        false, // check nsfw outside of this function
+		CreatedAt:   time.Unix(int64(index.Dateline), 0),
+	}
+}
+
+func modelToDAO(index *model.Index) *dao.Index {
+	return &dao.Index{
+		ID:        index.ID,
+		Type:      0,
+		Title:     index.Title,
+		Desc:      index.Description,
+		CreatorID: index.CreatorID,
+		Ban:       index.Ban,
+		Dateline:  int32(index.CreatedAt.Unix()),
+	}
 }

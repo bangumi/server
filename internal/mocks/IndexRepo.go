@@ -165,6 +165,44 @@ func (_c *IndexRepo_ListSubjects_Call) Return(_a0 []domain.IndexSubject, _a1 err
 	return _c
 }
 
+// New provides a mock function with given fields: ctx, i
+func (_m *IndexRepo) New(ctx context.Context, i *model.Index) error {
+	ret := _m.Called(ctx, i)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *model.Index) error); ok {
+		r0 = rf(ctx, i)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// IndexRepo_New_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'New'
+type IndexRepo_New_Call struct {
+	*mock.Call
+}
+
+// New is a helper method to define mock.On call
+//   - ctx context.Context
+//   - i *model.Index
+func (_e *IndexRepo_Expecter) New(ctx interface{}, i interface{}) *IndexRepo_New_Call {
+	return &IndexRepo_New_Call{Call: _e.mock.On("New", ctx, i)}
+}
+
+func (_c *IndexRepo_New_Call) Run(run func(ctx context.Context, i *model.Index)) *IndexRepo_New_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*model.Index))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_New_Call) Return(_a0 error) *IndexRepo_New_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
 type mockConstructorTestingTNewIndexRepo interface {
 	mock.TestingT
 	Cleanup(func())
