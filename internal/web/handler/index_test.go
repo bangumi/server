@@ -66,8 +66,8 @@ func TestHandler_NewIndex_NoPermission(t *testing.T) {
 		Post("/v0/indices").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
-			"title": "测试",
-			"desc":  "测试123",
+			"title":       "测试",
+			"description": "测试123",
 		}).Execute(app)
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
@@ -91,8 +91,8 @@ func TestHandler_NewIndex_With_Permission(t *testing.T) {
 		Post("/v0/indices").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
-			"title": "测试",
-			"desc":  "测试123",
+			"title":       "测试",
+			"description": "测试123",
 		}).Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -109,8 +109,8 @@ func TestHandler_UpdateIndex_NoPermission(t *testing.T) {
 		Put("/v0/indices/7").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
-			"title": "测试",
-			"desc":  "测试123",
+			"title":       "测试",
+			"description": "测试123",
 		}).Execute(app)
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
@@ -135,8 +135,8 @@ func TestHandler_UpdateIndex_With_Permission(t *testing.T) {
 		Put("/v0/indices/7").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
-			"title": "测试",
-			"desc":  "测试123",
+			"title":       "测试",
+			"description": "测试123",
 		}).Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)

@@ -16,5 +16,5 @@ package req
 
 type IndexBasicInfo struct {
 	Title       string `json:"title"`
-	Description string `json:"desc"`
+	Description string `json:"description"`
 }

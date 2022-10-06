@@ -25,7 +25,7 @@ type Index struct {
 	UpdateAt    time.Time     `json:"update_at"`
 	Creator     Creator       `json:"creator"`
 	Title       string        `json:"title"`
-	Description string        `json:"desc"`
+	Description string        `json:"description"`
 	Total       uint32        `json:"total"`
 	ID          model.IndexID `json:"id"`
 	Stat        Stat          `json:"stat"`
