@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"gorm.io/gen"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/internal/dal/dao"
@@ -87,30 +88,18 @@ func (r mysqlRepo) Update(ctx context.Context, id model.IndexID, title string, d
 		Title: title,
 		Desc:  desc,
 	})
-	if err != nil {
-		return errgo.Wrap(err, "failed to update index info")
-	}
-	if err = result.Error; err != nil {
-		return errgo.Wrap(err, "failed to update index info")
-	}
-	return nil
+	return r.WrapResult(result, err, "failed to update index info")
 }
 
 func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 	return r.q.Transaction(func(tx *query.Query) error {
 		result, err := tx.Index.WithContext(ctx).Where(tx.Index.ID.Eq(id)).Delete()
-		if err != nil {
-			return errgo.Wrap(err, "failed to delete index")
-		}
-		if result.Error != nil {
-			return result.Error
+		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
+			return err
 		}
 		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.Rid.Eq(id)).Delete()
-		if err != nil {
-			return errgo.Wrap(err, "failed to delete index subjects")
-		}
-		if result.Error != nil {
-			return result.Error
+		if err = r.WrapResult(result, err, "failed to delete subjects in the index"); err != nil {
+			return err
 		}
 		return nil
 	})
@@ -165,6 +154,127 @@ func (r mysqlRepo) ListSubjects(
 	}
 
 	return results, nil
+}
+
+func (r mysqlRepo) AddIndexSubject(
+	ctx context.Context, id model.IndexID, subject_id model.SubjectID, sort uint32, comment string,
+) (*domain.IndexSubject, error) {
+
+	index, err := r.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	subjectDO, err := r.q.Subject.WithContext(ctx).
+		Where(r.q.Subject.ID.Eq(subject_id)).
+		First()
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrSubjectNotFound
+		}
+		return nil, err
+	}
+
+	var indexSubject *dao.IndexSubject
+	now := time.Now().Unix()
+
+	// 事务：增加 indexSubject 并更新 index 的 Lasttouch 和 SubjectTotal
+	err = r.q.Transaction(func(tx *query.Query) error {
+		q := r.q.IndexSubject
+		indexSubject, err = q.WithContext(ctx).Where(q.Rid.Eq(id), q.Sid.Eq(uint32(subject_id))).FirstOrInit()
+
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+
+		if indexSubject.ID != 0 {
+			return domain.ErrExists
+		}
+
+		indexSubject.Comment = comment
+		indexSubject.Order = sort
+		indexSubject.Dateline = uint32(now)
+		indexSubject.Type = subjectDO.TypeID
+		indexSubject.Rid = id
+		indexSubject.Sid = uint32(subject_id)
+		q.WithContext(ctx).Create(indexSubject)
+
+		result, err := r.q.Index.WithContext(ctx).
+			Where(r.q.Index.ID.Eq(id)).
+			Updates(dao.Index{
+				Lasttouch:    uint32(now),
+				SubjectTotal: index.Total + 1,
+			})
+
+		return r.WrapResult(result, err, "failed to update index info")
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	subject, err := subject.ConvertDao(subjectDO)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.IndexSubject{
+		AddedAt: time.Unix(int64(indexSubject.Dateline), 0),
+		Comment: indexSubject.Comment,
+		Subject: subject,
+	}, nil
+
+}
+
+func (r mysqlRepo) UpdateIndexSubject(
+	ctx context.Context, id model.IndexID, subject_id model.SubjectID, sort uint32, comment string,
+) error {
+	q := r.q.IndexSubject
+	result, err := q.WithContext(ctx).
+		Where(q.Rid.Eq(id), q.Sid.Eq(uint32(subject_id))).
+		Updates(dao.IndexSubject{
+			Comment: comment,
+			Order:   sort,
+		})
+	return r.WrapResult(result, err, "failed to update index subject")
+}
+
+func (r mysqlRepo) DeleteIndexSubject(
+	ctx context.Context, id model.IndexID, subject_id model.SubjectID,
+) error {
+	return r.q.Transaction(func(tx *query.Query) error {
+		result, err := r.q.IndexSubject.WithContext(ctx).
+			Where(r.q.IndexSubject.Rid.Eq(id), r.q.IndexSubject.Sid.Eq(uint32(subject_id))).
+			Delete()
+		if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
+			return err
+		}
+		index, err := r.Get(ctx, id)
+		if err != nil {
+			return err
+		}
+		result, err = r.q.Index.WithContext(ctx).Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
+			SubjectTotal: index.Total - 1,
+		})
+		if err = r.WrapResult(result, err, "failed to update index info"); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+func (r mysqlRepo) WrapResult(result gen.ResultInfo, err error, msg string) error {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrNotFound
+		}
+		return errgo.Wrap(err, msg)
+	}
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
 func daoToModel(index *dao.Index) *model.Index {

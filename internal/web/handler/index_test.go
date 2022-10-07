@@ -243,3 +243,180 @@ func TestHandler_DeleteIndex_Not_Exists(t *testing.T) {
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
+
+func TestHandler_Add_Index_Subject(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
+		CreatorID: 6,
+		ID:        7,
+	}, nil)
+	mockIndex.EXPECT().
+		AddIndexSubject(mock.Anything, model.IndexID(7), model.SubjectID(5), uint32(48), "test123").
+		Return(&domain.IndexSubject{}, nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Post("/v0/indices/7/subjects").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		JSON(map[string]interface{}{
+			"subject_id": 5,
+			"sort":       48,
+			"comment":    "test123",
+		}).
+		Execute(app)
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestHandler_Add_Index_Subject_NoPermission(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
+		CreatorID: 1,
+		ID:        7,
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Post("/v0/indices/7/subjects").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		JSON(map[string]interface{}{
+			"subject_id": 5,
+			"sort":       48,
+			"comment":    "test123",
+		}).
+		Execute(app)
+
+	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+}
+
+func TestHandler_Update_Index_Subject(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
+		CreatorID: 6,
+		ID:        7,
+	}, nil)
+	mockIndex.EXPECT().
+		UpdateIndexSubject(mock.Anything, model.IndexID(7), model.SubjectID(5), uint32(48), "test123").
+		Return(nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Put("/v0/indices/7/subjects/5").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		JSON(map[string]interface{}{
+			"sort":    48,
+			"comment": "test123",
+		}).
+		Execute(app)
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestHandler_Update_Index_Subject_NoPermission(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
+		CreatorID: 1,
+		ID:        7,
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Put("/v0/indices/7/subjects/5").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		JSON(map[string]interface{}{
+			"sort":    48,
+			"comment": "test123",
+		}).
+		Execute(app)
+
+	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+}
+
+func TestHandler_Delete_Index_Subject(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
+		CreatorID: 6,
+		ID:        7,
+	}, nil)
+	mockIndex.EXPECT().
+		DeleteIndexSubject(mock.Anything, model.IndexID(7), model.SubjectID(5)).
+		Return(nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Delete("/v0/indices/7/subjects/5").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		Execute(app)
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestHandler_Delete_Index_Subject_NoPermission(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
+		CreatorID: 1,
+		ID:        7,
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Delete("/v0/indices/7/subjects/5").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		Execute(app)
+
+	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+}

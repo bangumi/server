@@ -24,6 +24,56 @@ func (_m *IndexRepo) EXPECT() *IndexRepo_Expecter {
 	return &IndexRepo_Expecter{mock: &_m.Mock}
 }
 
+// AddIndexSubject provides a mock function with given fields: ctx, id, subject_id, sort, comment
+func (_m *IndexRepo) AddIndexSubject(ctx context.Context, id uint32, subject_id model.SubjectID, sort uint32, comment string) (*domain.IndexSubject, error) {
+	ret := _m.Called(ctx, id, subject_id, sort, comment)
+
+	var r0 *domain.IndexSubject
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.SubjectID, uint32, string) *domain.IndexSubject); ok {
+		r0 = rf(ctx, id, subject_id, sort, comment)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.IndexSubject)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, model.SubjectID, uint32, string) error); ok {
+		r1 = rf(ctx, id, subject_id, sort, comment)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// IndexRepo_AddIndexSubject_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddIndexSubject'
+type IndexRepo_AddIndexSubject_Call struct {
+	*mock.Call
+}
+
+// AddIndexSubject is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - subject_id model.SubjectID
+//   - sort uint32
+//   - comment string
+func (_e *IndexRepo_Expecter) AddIndexSubject(ctx interface{}, id interface{}, subject_id interface{}, sort interface{}, comment interface{}) *IndexRepo_AddIndexSubject_Call {
+	return &IndexRepo_AddIndexSubject_Call{Call: _e.mock.On("AddIndexSubject", ctx, id, subject_id, sort, comment)}
+}
+
+func (_c *IndexRepo_AddIndexSubject_Call) Run(run func(ctx context.Context, id uint32, subject_id model.SubjectID, sort uint32, comment string)) *IndexRepo_AddIndexSubject_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(model.SubjectID), args[3].(uint32), args[4].(string))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_AddIndexSubject_Call) Return(_a0 *domain.IndexSubject, _a1 error) *IndexRepo_AddIndexSubject_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // CountSubjects provides a mock function with given fields: ctx, id, subjectType
 func (_m *IndexRepo) CountSubjects(ctx context.Context, id uint32, subjectType uint8) (int64, error) {
 	ret := _m.Called(ctx, id, subjectType)
@@ -104,6 +154,45 @@ func (_c *IndexRepo_Delete_Call) Run(run func(ctx context.Context, id uint32)) *
 }
 
 func (_c *IndexRepo_Delete_Call) Return(_a0 error) *IndexRepo_Delete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+// DeleteIndexSubject provides a mock function with given fields: ctx, id, subject_id
+func (_m *IndexRepo) DeleteIndexSubject(ctx context.Context, id uint32, subject_id model.SubjectID) error {
+	ret := _m.Called(ctx, id, subject_id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.SubjectID) error); ok {
+		r0 = rf(ctx, id, subject_id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// IndexRepo_DeleteIndexSubject_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteIndexSubject'
+type IndexRepo_DeleteIndexSubject_Call struct {
+	*mock.Call
+}
+
+// DeleteIndexSubject is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - subject_id model.SubjectID
+func (_e *IndexRepo_Expecter) DeleteIndexSubject(ctx interface{}, id interface{}, subject_id interface{}) *IndexRepo_DeleteIndexSubject_Call {
+	return &IndexRepo_DeleteIndexSubject_Call{Call: _e.mock.On("DeleteIndexSubject", ctx, id, subject_id)}
+}
+
+func (_c *IndexRepo_DeleteIndexSubject_Call) Run(run func(ctx context.Context, id uint32, subject_id model.SubjectID)) *IndexRepo_DeleteIndexSubject_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(model.SubjectID))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_DeleteIndexSubject_Call) Return(_a0 error) *IndexRepo_DeleteIndexSubject_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
@@ -277,6 +366,47 @@ func (_c *IndexRepo_Update_Call) Run(run func(ctx context.Context, id uint32, ti
 }
 
 func (_c *IndexRepo_Update_Call) Return(_a0 error) *IndexRepo_Update_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+// UpdateIndexSubject provides a mock function with given fields: ctx, id, subject_id, sort, comment
+func (_m *IndexRepo) UpdateIndexSubject(ctx context.Context, id uint32, subject_id model.SubjectID, sort uint32, comment string) error {
+	ret := _m.Called(ctx, id, subject_id, sort, comment)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.SubjectID, uint32, string) error); ok {
+		r0 = rf(ctx, id, subject_id, sort, comment)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// IndexRepo_UpdateIndexSubject_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateIndexSubject'
+type IndexRepo_UpdateIndexSubject_Call struct {
+	*mock.Call
+}
+
+// UpdateIndexSubject is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - subject_id model.SubjectID
+//   - sort uint32
+//   - comment string
+func (_e *IndexRepo_Expecter) UpdateIndexSubject(ctx interface{}, id interface{}, subject_id interface{}, sort interface{}, comment interface{}) *IndexRepo_UpdateIndexSubject_Call {
+	return &IndexRepo_UpdateIndexSubject_Call{Call: _e.mock.On("UpdateIndexSubject", ctx, id, subject_id, sort, comment)}
+}
+
+func (_c *IndexRepo_UpdateIndexSubject_Call) Run(run func(ctx context.Context, id uint32, subject_id model.SubjectID, sort uint32, comment string)) *IndexRepo_UpdateIndexSubject_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(model.SubjectID), args[3].(uint32), args[4].(string))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_UpdateIndexSubject_Call) Return(_a0 error) *IndexRepo_UpdateIndexSubject_Call {
 	_c.Call.Return(_a0)
 	return _c
 }

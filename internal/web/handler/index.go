@@ -168,17 +168,7 @@ func (h Handler) getIndexSubjects(
 
 	var data = make([]res.IndexSubjectV0, len(subjects))
 	for i, s := range subjects {
-		data[i] = res.IndexSubjectV0{
-			AddedAt: s.AddedAt,
-			Date:    null.NilString(s.Subject.Date),
-			Image:   res.SubjectImage(s.Subject.Image),
-			Name:    s.Subject.Name,
-			NameCN:  s.Subject.NameCN,
-			Comment: s.Comment,
-			Infobox: compat.V0Wiki(wiki.ParseOmitError(s.Subject.Infobox).NonZero()),
-			ID:      s.Subject.ID,
-			TypeID:  s.Subject.TypeID,
-		}
+		data[i] = indexSubjectToResp(&s)
 	}
 
 	return c.JSON(res.Paged{
@@ -221,6 +211,27 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
+// 确保目录存在, 并且当前请求的用户持有权限.
+func (h Handler) ensureIndexPermission(c *fiber.Ctx) (*model.Index, error) {
+	id, err := req.ParseIndexID(c.Params("id"))
+	if err != nil {
+		return nil, err
+	}
+	accessor := h.GetHTTPAccessor(c)
+	// TODO: 是否走 redis 缓存
+	index, err := h.i.Get(c.UserContext(), id)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return nil, res.NotFound("index not found")
+		}
+		return nil, res.InternalError(c, err, "failed to get index")
+	}
+	if index.CreatorID != accessor.ID {
+		return nil, res.Unauthorized("you are not the creator of this index")
+	}
+	return &index, nil
+}
+
 func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 	var reqData req.IndexBasicInfo
 	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
@@ -231,49 +242,23 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 		return res.BadRequest("request data is empty")
 	}
 
-	id, err := req.ParseIndexID(c.Params("id"))
+	index, err := h.ensureIndexPermission(c)
 	if err != nil {
 		return err
 	}
-
-	accessor := h.GetHTTPAccessor(c)
-
-	// TODO: 是否走 redis 缓存
-	index, err := h.i.Get(c.UserContext(), id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.NotFound("index not found")
-		}
-		return res.InternalError(c, err, "failed to get index")
-	}
-
-	if index.CreatorID != accessor.ID {
-		return res.Unauthorized("you are not the creator of this index")
-	}
-
-	if err = h.i.Update(c.UserContext(), id, reqData.Title, reqData.Description); err != nil {
+	if err = h.i.Update(c.UserContext(), index.ID, reqData.Title, reqData.Description); err != nil {
 		return errgo.Wrap(err, "update index failed")
 	}
 	return nil
 }
 
 func (h Handler) DeleteIndex(c *fiber.Ctx) error {
-	id, err := req.ParseIndexID(c.Params("id"))
+	index, err := h.ensureIndexPermission(c)
 	if err != nil {
 		return err
 	}
 
-	accessor := h.GetHTTPAccessor(c)
-	index, err := h.i.Get(c.UserContext(), id)
-	if err != nil {
-		return res.NotFound("index not found")
-	}
-
-	if index.CreatorID != accessor.ID {
-		return res.Unauthorized("you are not the creator of this index")
-	}
-
-	if err = h.i.Delete(c.UserContext(), id); err != nil {
+	if err = h.i.Delete(c.UserContext(), index.ID); err != nil {
 		return errgo.Wrap(err, "failed to delete index from db")
 	}
 
@@ -281,13 +266,68 @@ func (h Handler) DeleteIndex(c *fiber.Ctx) error {
 }
 
 func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
-	return nil
+	var reqData req.IndexAddSubject
+	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+		return errgo.Wrap(err, "request data is invalid")
+	}
+	index, err := h.ensureIndexPermission(c)
+	if err != nil {
+		return err
+	}
+	indexSubject, err := h.i.AddIndexSubject(c.UserContext(),
+		index.ID, reqData.SubjectID, reqData.SortKey, reqData.Comment)
+	if err != nil {
+		return errgo.Wrap(err, "failed to edit subject in the index")
+	}
+	return c.JSON(indexSubjectToResp(indexSubject))
 }
 
 func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
+	var reqData req.IndexSubjectInfo
+	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+		return errgo.Wrap(err, "request data is invalid")
+	}
+	index, err := h.ensureIndexPermission(c)
+	if err != nil {
+		return err
+	}
+	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	if err != nil {
+		return errgo.Wrap(err, "subject id is invalid")
+	}
+	err = h.i.UpdateIndexSubject(c.UserContext(),
+		index.ID, subjectID, reqData.SortKey, reqData.Comment)
+	if err != nil {
+		return errgo.Wrap(err, "failed to edit subject in the index")
+	}
 	return nil
 }
 
 func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
+	index, err := h.ensureIndexPermission(c)
+	if err != nil {
+		return err
+	}
+	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	if err != nil {
+		return errgo.Wrap(err, "subject id is invalid")
+	}
+	if err = h.i.DeleteIndexSubject(c.UserContext(), index.ID, subjectID); err != nil {
+		return errgo.Wrap(err, "failed to delete subject from index")
+	}
 	return nil
+}
+
+func indexSubjectToResp(s *domain.IndexSubject) res.IndexSubjectV0 {
+	return res.IndexSubjectV0{
+		AddedAt: s.AddedAt,
+		Date:    null.NilString(s.Subject.Date),
+		Image:   res.SubjectImage(s.Subject.Image),
+		Name:    s.Subject.Name,
+		NameCN:  s.Subject.NameCN,
+		Comment: s.Comment,
+		Infobox: compat.V0Wiki(wiki.ParseOmitError(s.Subject.Infobox).NonZero()),
+		ID:      s.Subject.ID,
+		TypeID:  s.Subject.TypeID,
+	}
 }

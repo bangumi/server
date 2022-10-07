@@ -16,6 +16,7 @@ package index_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -112,8 +113,6 @@ func TestMysqlRepo_UpdateIndex(t *testing.T) {
 
 	// check current
 	require.NoError(t, err)
-	require.EqualValues(t, defaultTitle, i.Title)
-	require.EqualValues(t, defaultDesc, i.Description)
 
 	// update index information
 	err = repo.Update(context.Background(), 15045, "日本动画", "日本动画的介绍")
@@ -160,6 +159,233 @@ func TestMysqlRepo_DeleteIndex(t *testing.T) {
 	_, err = repo.Get(context.Background(), index.ID)
 	require.Error(t, err)
 	require.ErrorIs(t, err, domain.ErrNotFound)
+}
 
-	// TODO: all subjects in the index should be removed as well
+// 删除目录会把所属的 subject 全部删掉
+func TestMysqlRepo_DeleteIndex2(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   time.Now(),
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+
+	ctx := context.Background()
+
+	err := repo.New(ctx, index)
+
+	for i := 10; i < 20; i++ {
+		_, err = repo.AddIndexSubject(ctx, index.ID, model.SubjectID(i),
+			uint32(i), fmt.Sprintf("comment %d", i))
+	}
+
+	i, err := repo.Get(ctx, index.ID)
+	require.EqualValues(t, 10, i.Total)
+
+	subjects, err := repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.Len(t, subjects, 10)
+
+	repo.Delete(ctx, index.ID)
+
+	i, err = repo.Get(ctx, index.ID)
+	require.Equal(t, err, domain.ErrNotFound)
+
+	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.Len(t, subjects, 0)
+
+	// 确保不会影响到其他目录
+	subjects, err = repo.ListSubjects(context.Background(), 15045, model.SubjectTypeAll, 20, 0)
+	require.NoError(t, err)
+	require.Len(t, subjects, 20)
+}
+
+func TestMysqlRepo_AddIndexSubject(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   time.Now(),
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+
+	ctx := context.Background()
+
+	err := repo.New(ctx, index)
+	require.NotEqual(t, 0, index.ID)
+	require.NoError(t, err)
+
+	_, err = repo.AddIndexSubject(ctx, index.ID, 3, 1, "comment 1")
+	require.NoError(t, err)
+
+	_, err = repo.AddIndexSubject(ctx, index.ID, 4, 3, "comment 3")
+	require.NoError(t, err)
+
+	i, err := repo.Get(ctx, index.ID)
+	require.NoError(t, err)
+	require.EqualValues(t, index.ID, i.ID)
+
+	require.EqualValues(t, 2, i.Total)
+
+	subjects, err := repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.NoError(t, err)
+	require.Len(t, subjects, 2)
+
+	cache := map[model.SubjectID]domain.IndexSubject{}
+	for _, s := range subjects {
+		cache[s.Subject.ID] = s
+	}
+	require.EqualValues(t, cache[3].Comment, "comment 1")
+	require.EqualValues(t, cache[4].Comment, "comment 3")
+
+	repo.Delete(ctx, index.ID)
+}
+
+func TestMysqlRepo_DeleteIndexSubject(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   time.Now(),
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+
+	ctx := context.Background()
+
+	err := repo.New(ctx, index)
+	require.NotEqual(t, 0, index.ID)
+	require.NoError(t, err)
+
+	for i := 10; i < 20; i++ {
+		_, err = repo.AddIndexSubject(ctx, index.ID, model.SubjectID(i),
+			uint32(i), fmt.Sprintf("comment %d", i))
+		require.NoError(t, err)
+	}
+
+	i, err := repo.Get(ctx, index.ID)
+	require.EqualValues(t, 10, i.Total)
+
+	subjects, err := repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.Len(t, subjects, 10)
+
+	repo.DeleteIndexSubject(ctx, index.ID, 15)
+
+	i, err = repo.Get(ctx, index.ID)
+	require.EqualValues(t, 9, i.Total)
+
+	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.Len(t, subjects, 9)
+
+	for _, v := range subjects {
+		require.NotEqualValues(t, v.Subject.ID, 15)
+	}
+
+	repo.Delete(ctx, index.ID)
+}
+
+func TestMysqlRepo_FailedAddedToNonExists(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	ctx := context.Background()
+	_ = repo.Delete(ctx, 99999999) // in case index(99999999) exists
+
+	_, err := repo.AddIndexSubject(ctx, 99999999, 5, 5, "test")
+	require.Error(t, err)
+	require.Equal(t, err, domain.ErrNotFound)
+}
+
+func TestMysqlRepo_UpdateSubjectInfo(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   time.Now(),
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+	ctx := context.Background()
+
+	err := repo.New(ctx, index)
+	_, err = repo.AddIndexSubject(ctx, index.ID, 5, 5, "test")
+	require.NoError(t, err)
+	subjects, err := repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.Len(t, subjects, 1)
+	require.EqualValues(t, subjects[0].Subject.ID, 5)
+	require.EqualValues(t, subjects[0].Comment, "test")
+
+	err = repo.UpdateIndexSubject(ctx, index.ID, 5, 5, "test22222")
+	require.NoError(t, err)
+	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.Len(t, subjects, 1)
+	require.EqualValues(t, subjects[0].Subject.ID, 5)
+	require.EqualValues(t, subjects[0].Comment, "test22222")
+
+}
+
+func TestMysqlRepo_AddExists(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   time.Now(),
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+	ctx := context.Background()
+
+	_ = repo.New(ctx, index)
+
+	_, err := repo.AddIndexSubject(ctx, index.ID, 5, 5, "test")
+	require.NoError(t, err)
+
+	_, err = repo.AddIndexSubject(ctx, index.ID, 5, 5, "test")
+	require.Error(t, err)
+	require.Equal(t, err, domain.ErrExists)
 }

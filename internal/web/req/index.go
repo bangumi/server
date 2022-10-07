@@ -14,7 +14,19 @@
 
 package req
 
+import "github.com/bangumi/server/internal/model"
+
 type IndexBasicInfo struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
+}
+
+type IndexAddSubject struct {
+	SubjectID model.SubjectID `json:"subject_id"`
+	*IndexSubjectInfo
+}
+
+type IndexSubjectInfo struct {
+	SortKey uint32 `json:"sort"`
+	Comment string `json:"comment"`
 }

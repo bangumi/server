@@ -31,3 +31,5 @@ var ErrUserNotFound = errgo.MsgNoTrace(ErrNotFound, "user not found")
 var ErrSubjectNotCollected = errgo.MsgNoTrace(ErrNotFound, "subject is not collected by user")
 
 var ErrInput = errors.New("input not valid")
+
+var ErrExists = errors.New("item already exists")
