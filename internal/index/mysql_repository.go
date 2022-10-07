@@ -255,14 +255,14 @@ func (r mysqlRepo) DeleteIndexSubject(
 	ctx context.Context, id model.IndexID, subjectID model.SubjectID,
 ) error {
 	return r.q.Transaction(func(tx *query.Query) error {
+		index, err := r.Get(ctx, id)
+		if err != nil {
+			return err
+		}
 		result, err := r.q.IndexSubject.WithContext(ctx).
 			Where(r.q.IndexSubject.Rid.Eq(id), r.q.IndexSubject.Sid.Eq(uint32(subjectID))).
 			Delete()
 		if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
-			return err
-		}
-		index, err := r.Get(ctx, id)
-		if err != nil {
 			return err
 		}
 		result, err = r.q.Index.WithContext(ctx).Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{

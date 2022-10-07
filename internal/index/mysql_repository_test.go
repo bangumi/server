@@ -323,6 +323,21 @@ func TestMysqlRepo_DeleteIndexSubject(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestMysqlRepo_DeleteNonExistsIndexSubject(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	ctx := context.Background()
+
+	_ = repo.Delete(ctx, 99999999)
+
+	err := repo.DeleteIndexSubject(ctx, 99999999, 15)
+	require.Error(t, err)
+	require.Error(t, err, domain.ErrNotFound)
+}
+
 func TestMysqlRepo_FailedAddedToNonExists(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
@@ -405,4 +420,17 @@ func TestMysqlRepo_AddExists(t *testing.T) {
 	_, err = repo.AddIndexSubject(ctx, index.ID, 5, 5, "test")
 	require.Error(t, err)
 	require.Equal(t, err, domain.ErrExists)
+}
+
+func TestMysqlRepo_AddNoneExistsSubject(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	ctx := context.Background()
+
+	_, err := repo.AddIndexSubject(ctx, 15045, 999999999, 5, "test")
+	require.Error(t, err)
+	require.Equal(t, err, domain.ErrSubjectNotFound)
 }
