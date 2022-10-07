@@ -168,7 +168,7 @@ func (h Handler) getIndexSubjects(
 
 	var data = make([]res.IndexSubjectV0, len(subjects))
 	for i, s := range subjects {
-		data[i] = indexSubjectToResp(&s)
+		data[i] = indexSubjectToResp(s)
 	}
 
 	return c.JSON(res.Paged{
@@ -276,10 +276,10 @@ func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
 	}
 	indexSubject, err := h.i.AddIndexSubject(c.UserContext(),
 		index.ID, reqData.SubjectID, reqData.SortKey, reqData.Comment)
-	if err != nil {
+	if err != nil || indexSubject == nil {
 		return errgo.Wrap(err, "failed to edit subject in the index")
 	}
-	return c.JSON(indexSubjectToResp(indexSubject))
+	return c.JSON(indexSubjectToResp(*indexSubject))
 }
 
 func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
@@ -318,7 +318,7 @@ func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
 	return nil
 }
 
-func indexSubjectToResp(s *domain.IndexSubject) res.IndexSubjectV0 {
+func indexSubjectToResp(s domain.IndexSubject) res.IndexSubjectV0 {
 	return res.IndexSubjectV0{
 		AddedAt: s.AddedAt,
 		Date:    null.NilString(s.Subject.Date),

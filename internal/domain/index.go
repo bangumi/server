@@ -32,13 +32,13 @@ type IndexRepo interface {
 		ctx context.Context, id model.IndexID, subjectType model.SubjectType, limit, offset int,
 	) ([]IndexSubject, error)
 	AddIndexSubject(
-		ctx context.Context, id model.IndexID, subject_id model.SubjectID, sort uint32, comment string,
+		ctx context.Context, id model.IndexID, subjectID model.SubjectID, sort uint32, comment string,
 	) (*IndexSubject, error)
 	UpdateIndexSubject(
-		ctx context.Context, id model.IndexID, subject_id model.SubjectID, sort uint32, comment string,
+		ctx context.Context, id model.IndexID, subjectID model.SubjectID, sort uint32, comment string,
 	) error
 	DeleteIndexSubject(
-		ctx context.Context, id model.IndexID, subject_id model.SubjectID,
+		ctx context.Context, id model.IndexID, subjectID model.SubjectID,
 	) error
 }
 

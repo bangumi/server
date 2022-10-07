@@ -104,7 +104,7 @@ func TestMysqlRepo_UpdateIndex(t *testing.T) {
 	t.Parallel()
 
 	repo := getRepo(t)
-	i, err := repo.Get(context.Background(), 15045)
+	_, err := repo.Get(context.Background(), 15045)
 
 	defaultTitle := "日本动画最高收视率TOP100"
 	defaultDesc := "[url]http://www.tudou.com/programs/view/" +
@@ -119,7 +119,7 @@ func TestMysqlRepo_UpdateIndex(t *testing.T) {
 	require.NoError(t, err)
 
 	// check updated index information
-	i, err = repo.Get(context.Background(), 15045)
+	i, err := repo.Get(context.Background(), 15045)
 	require.NoError(t, err)
 	require.EqualValues(t, "日本动画", i.Title)
 	require.EqualValues(t, "日本动画的介绍", i.Description)
@@ -183,24 +183,30 @@ func TestMysqlRepo_DeleteIndex2(t *testing.T) {
 	ctx := context.Background()
 
 	err := repo.New(ctx, index)
+	require.NoError(t, err)
 
 	for i := 10; i < 20; i++ {
 		_, err = repo.AddIndexSubject(ctx, index.ID, model.SubjectID(i),
 			uint32(i), fmt.Sprintf("comment %d", i))
+		require.NoError(t, err)
 	}
 
 	i, err := repo.Get(ctx, index.ID)
+	require.NoError(t, err)
 	require.EqualValues(t, 10, i.Total)
 
 	subjects, err := repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.NoError(t, err)
 	require.Len(t, subjects, 10)
 
-	repo.Delete(ctx, index.ID)
+	err = repo.Delete(ctx, index.ID)
+	require.NoError(t, err)
 
 	i, err = repo.Get(ctx, index.ID)
 	require.Equal(t, err, domain.ErrNotFound)
 
 	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.NoError(t, err)
 	require.Len(t, subjects, 0)
 
 	// 确保不会影响到其他目录
@@ -256,7 +262,8 @@ func TestMysqlRepo_AddIndexSubject(t *testing.T) {
 	require.EqualValues(t, cache[3].Comment, "comment 1")
 	require.EqualValues(t, cache[4].Comment, "comment 3")
 
-	repo.Delete(ctx, index.ID)
+	err = repo.Delete(ctx, index.ID)
+	require.NoError(t, err)
 }
 
 func TestMysqlRepo_DeleteIndexSubject(t *testing.T) {
@@ -290,24 +297,30 @@ func TestMysqlRepo_DeleteIndexSubject(t *testing.T) {
 	}
 
 	i, err := repo.Get(ctx, index.ID)
+	require.NoError(t, err)
 	require.EqualValues(t, 10, i.Total)
 
 	subjects, err := repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.NoError(t, err)
 	require.Len(t, subjects, 10)
 
-	repo.DeleteIndexSubject(ctx, index.ID, 15)
+	err = repo.DeleteIndexSubject(ctx, index.ID, 15)
+	require.NoError(t, err)
 
 	i, err = repo.Get(ctx, index.ID)
+	require.NoError(t, err)
 	require.EqualValues(t, 9, i.Total)
 
 	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.NoError(t, err)
 	require.Len(t, subjects, 9)
 
 	for _, v := range subjects {
 		require.NotEqualValues(t, v.Subject.ID, 15)
 	}
 
-	repo.Delete(ctx, index.ID)
+	err = repo.Delete(ctx, index.ID)
+	require.NoError(t, err)
 }
 
 func TestMysqlRepo_FailedAddedToNonExists(t *testing.T) {
@@ -344,20 +357,24 @@ func TestMysqlRepo_UpdateSubjectInfo(t *testing.T) {
 	ctx := context.Background()
 
 	err := repo.New(ctx, index)
+	require.NoError(t, err)
+
 	_, err = repo.AddIndexSubject(ctx, index.ID, 5, 5, "test")
 	require.NoError(t, err)
 	subjects, err := repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.NoError(t, err)
 	require.Len(t, subjects, 1)
 	require.EqualValues(t, subjects[0].Subject.ID, 5)
 	require.EqualValues(t, subjects[0].Comment, "test")
 
 	err = repo.UpdateIndexSubject(ctx, index.ID, 5, 5, "test22222")
 	require.NoError(t, err)
+
 	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	require.NoError(t, err)
 	require.Len(t, subjects, 1)
 	require.EqualValues(t, subjects[0].Subject.ID, 5)
 	require.EqualValues(t, subjects[0].Comment, "test22222")
-
 }
 
 func TestMysqlRepo_AddExists(t *testing.T) {
