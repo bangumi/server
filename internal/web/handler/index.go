@@ -190,13 +190,12 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-// 确保目录存在, 并且当前请求的用户持有权限.
-func (h Handler) ensureIndexPermission(c *fiber.Ctx) (*model.Index, error) {
+// 确保目录存在.
+func (h Handler) ensureIndexExists(c *fiber.Ctx) (*model.Index, error) {
 	id, err := req.ParseIndexID(c.Params("id"))
 	if err != nil {
 		return nil, err
 	}
-	accessor := h.GetHTTPAccessor(c)
 	// TODO: 是否走 redis 缓存
 	index, err := h.i.Get(c.UserContext(), id)
 	if err != nil {
@@ -205,10 +204,20 @@ func (h Handler) ensureIndexPermission(c *fiber.Ctx) (*model.Index, error) {
 		}
 		return nil, res.InternalError(c, err, "failed to get index")
 	}
+	return &index, nil
+}
+
+// 确保目录存在, 并且当前请求的用户持有权限.
+func (h Handler) ensureIndexPermission(c *fiber.Ctx) (*model.Index, error) {
+	index, err := h.ensureIndexExists(c)
+	if err != nil {
+		return nil, err
+	}
+	accessor := h.GetHTTPAccessor(c)
 	if index.CreatorID != accessor.ID {
 		return nil, res.Unauthorized("you are not the creator of this index")
 	}
-	return &index, nil
+	return index, nil
 }
 
 func (h Handler) UpdateIndex(c *fiber.Ctx) error {
@@ -303,6 +312,37 @@ func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
 		IndexID: index.ID, SubjectID: subjectID,
 	}); err != nil {
 		return errgo.Wrap(err, "failed to delete subject from index")
+	}
+	return nil
+}
+
+func (h Handler) CollectIndex(c *fiber.Ctx) error {
+	index, err := h.ensureIndexExists(c)
+	if err != nil {
+		return err
+	}
+	accessor := h.GetHTTPAccessor(c)
+	if err = h.i.CollectIndex(c.UserContext(), index.ID, accessor.ID); err != nil {
+		if errors.Is(err, domain.ErrExists) {
+			return res.Accepted("index has been collected")
+		}
+		return errgo.Wrap(err, "failed to collect index")
+	}
+	return nil
+}
+
+// 删除收藏，自造词 DeCollect :).
+func (h Handler) DeCollectIndex(c *fiber.Ctx) error {
+	index, err := h.ensureIndexExists(c)
+	if err != nil {
+		return err
+	}
+	accessor := h.GetHTTPAccessor(c)
+	if err = h.i.DeCollectIndex(c.UserContext(), index.ID, accessor.ID); err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.NotFound("index has not been collected")
+		}
+		return errgo.Wrap(err, "failed to remove collect of index")
 	}
 	return nil
 }

@@ -12,11 +12,11 @@ const TableNameIndexCollect = "chii_index_collects"
 
 // IndexCollect mapped from table <chii_index_collects>
 type IndexCollect struct {
-	ID          uint32        `gorm:"column:idx_clt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	IndexID     model.IndexID `gorm:"column:idx_clt_mid;type:mediumint(8) unsigned;not null"` // 目录ID
-	CreatorID   model.UserID  `gorm:"column:idx_clt_uid;type:mediumint(8) unsigned;not null"` // 用户UID
-	CreatedTime uint32        `gorm:"column:idx_clt_dateline;type:int(10) unsigned;not null"`
-	Index       Index         `gorm:"foreignKey:idx_clt_mid;references:idx_id" json:"index"`
+	ID          uint32       `gorm:"column:idx_clt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
+	IndexID     uint32       `gorm:"column:idx_clt_mid;type:mediumint(8) unsigned;not null"` // 目录ID
+	CreatorID   model.UserID `gorm:"column:idx_clt_uid;type:mediumint(8) unsigned;not null"` // 用户UID
+	CreatedTime uint32       `gorm:"column:idx_clt_dateline;type:int(10) unsigned;not null"`
+	Index       Index        `gorm:"foreignKey:idx_clt_mid;references:idx_id" json:"index"`
 }
 
 // TableName IndexCollect's table name

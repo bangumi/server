@@ -508,5 +508,103 @@ func TestMysqlRepo_UserIndices(t *testing.T) {
 func TestMysqlRepo_UserCollectedIndices(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
-	// TODO:
+
+	var err error
+	repo := getRepo(t)
+	ctx := context.Background()
+	uid := model.UserID(110525)
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   time.Now(),
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+	_ = repo.New(ctx, index)
+
+	indices, err := repo.GetCollectedIndicesByUser(ctx, uid, 20, 0)
+	require.NoError(t, err)
+	require.Len(t, indices, 0)
+
+	err = repo.CollectIndex(ctx, index.ID, uid)
+	require.NoError(t, err)
+
+	indices, err = repo.GetCollectedIndicesByUser(ctx, uid, 20, 0)
+	require.NoError(t, err)
+	require.Len(t, indices, 0)
+
+	_ = repo.DeCollectIndex(ctx, index.ID, uid) // ignore error
+	_ = repo.Delete(ctx, index.ID)
+}
+
+func TestMysqlRepo_CollectIndex(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	var err error
+	repo := getRepo(t)
+	ctx := context.Background()
+	uid := model.UserID(110525)
+
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   time.Now(),
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+	_ = repo.New(ctx, index)
+
+	err = repo.CollectIndex(ctx, index.ID, uid)
+	require.NoError(t, err)
+
+	err = repo.CollectIndex(ctx, index.ID, uid)
+	require.Error(t, err)
+	require.ErrorIs(t, err, domain.ErrExists)
+
+	_ = repo.DeCollectIndex(ctx, index.ID, uid) // ignore error
+	_ = repo.Delete(ctx, index.ID)
+}
+
+func TestMysqlRepo_DeCollectIndex(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	var err error
+	repo := getRepo(t)
+	ctx := context.Background()
+	uid := model.UserID(110525)
+	index := &model.Index{
+		ID:          0,
+		Title:       "test",
+		Description: "Test Index",
+		CreatorID:   382951,
+		CreatedAt:   time.Now(),
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+	_ = repo.New(ctx, index)
+
+	err = repo.CollectIndex(ctx, index.ID, uid)
+	require.NoError(t, err)
+
+	err = repo.DeCollectIndex(ctx, index.ID, uid)
+	require.NoError(t, err)
+
+	err = repo.DeCollectIndex(ctx, index.ID, uid)
+	require.Error(t, err)
+	require.ErrorIs(t, err, domain.ErrNotFound)
 }

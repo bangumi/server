@@ -433,3 +433,143 @@ func TestHandler_Delete_Index_Subject_NoPermission(t *testing.T) {
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }
+
+func TestHandler_Collect_NoPermission(t *testing.T) {
+	t.Parallel()
+
+	app := test.GetWebApp(t, test.Mock{})
+
+	resp := test.New(t).
+		Post("/v0/indices/7/collect").
+		Execute(app)
+
+	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+}
+
+func TestHandler_Collect_Permission(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
+		CreatorID: 1,
+		ID:        7,
+	}, nil)
+
+	mockIndex.EXPECT().CollectIndex(mock.Anything, uint32(7), model.UserID(6)).Return(nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Post("/v0/indices/7/collect").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		Execute(app)
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+// 收藏同一个目录两次
+// 第二次应当返回 Accepted
+func TestHandler_Collect_Exists(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).
+		Return(model.Index{
+			CreatorID: 1,
+			ID:        7,
+		}, nil)
+
+	mockIndex.EXPECT().CollectIndex(mock.Anything, uint32(7), model.UserID(6)).
+		Return(domain.ErrExists)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Post("/v0/indices/7/collect").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		Execute(app)
+
+	require.Equal(t, http.StatusAccepted, resp.StatusCode)
+}
+
+func TestHandler_DeCollect_NoPermission(t *testing.T) {
+	t.Parallel()
+
+	app := test.GetWebApp(t, test.Mock{})
+
+	resp := test.New(t).
+		Delete("/v0/indices/7/collect").
+		Execute(app)
+
+	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+}
+
+func TestHandler_DeCollect_Permission(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
+		CreatorID: 1,
+		ID:        7,
+	}, nil)
+
+	mockIndex.EXPECT().DeCollectIndex(mock.Anything, uint32(7), model.UserID(6)).Return(nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Delete("/v0/indices/7/collect").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		Execute(app)
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+// 收藏同一个目录两次
+// 第二次应当返回 Accepted
+func TestHandler_DeCollect_Non_Exists(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).
+		Return(model.Index{
+			CreatorID: 1,
+			ID:        7,
+		}, nil)
+
+	mockIndex.EXPECT().DeCollectIndex(mock.Anything, uint32(7), model.UserID(6)).
+		Return(domain.ErrNotFound)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Delete("/v0/indices/7/collect").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		Execute(app)
+
+	require.Equal(t, http.StatusNotFound, resp.StatusCode)
+}

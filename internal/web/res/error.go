@@ -89,3 +89,7 @@ func Unauthorized(message string) error {
 func Forbidden(message string) error {
 	return NewError(http.StatusForbidden, message)
 }
+
+func Accepted(message string) error {
+	return NewError(http.StatusAccepted, message)
+}

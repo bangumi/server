@@ -310,9 +310,10 @@ func (r mysqlRepo) GetCollectedIndicesByUser(
 	ctx context.Context, creatorID model.UserID, limit int, offset int,
 ) ([]model.IndexCollect, error) {
 	query := r.q.IndexCollect.WithContext(ctx).
+		Debug().
+		Preload(r.q.IndexCollect.Index).
+		Preload(r.q.IndexCollect.Index.Creator).
 		Where(r.q.IndexCollect.CreatorID.Eq(creatorID)).
-		Join(r.q.Index, r.q.Index.ID.EqCol(r.q.IndexCollect.ID)).
-		Join(r.q.Member, r.q.Member.ID.EqCol(r.q.Index.CreatorID)).
 		Order(r.q.IndexCollect.CreatedTime).
 		Limit(limit).Offset(offset)
 	arr, err := query.Find()
@@ -324,6 +325,85 @@ func (r mysqlRepo) GetCollectedIndicesByUser(
 		ret[i] = indexCollectDaoToModel(*arr[i])
 	}
 	return ret, nil
+}
+
+func (r mysqlRepo) CollectIndex(ctx context.Context, id model.IndexID, uid model.UserID) error {
+	// 查询是否存在
+	iCollect, err := r.q.IndexCollect.WithContext(ctx).
+		Where(r.q.IndexCollect.IndexID.Eq(id), r.q.IndexCollect.CreatorID.Eq(uid)).
+		First()
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return errgo.Wrap(err, "failed to find collect record")
+	}
+
+	if iCollect != nil && iCollect.ID != 0 {
+		return domain.ErrExists
+	}
+
+	return r.q.Transaction(func(tx *query.Query) error {
+		// Index 的 Collect + 1
+		index, err := r.Get(ctx, id)
+		if err != nil {
+			return err
+		}
+		result, err := r.q.Index.WithContext(ctx).
+			Where(r.q.Index.ID.Eq(id)).
+			Updates(dao.Index{
+				Collects: index.Collects + 1,
+			})
+		if err = r.WrapResult(result, err, "failed to increases collect count"); err != nil {
+			return err
+		}
+
+		// 写 IndexCollect 记录
+		err = r.q.IndexCollect.WithContext(ctx).
+			Create(&dao.IndexCollect{
+				IndexID:     id,
+				CreatorID:   uid,
+				CreatedTime: uint32(time.Now().Unix()),
+			})
+		return errgo.Wrap(err, "write index collect record failed")
+	})
+}
+
+func (r mysqlRepo) DeCollectIndex(ctx context.Context, id model.IndexID, uid model.UserID) error {
+	// 查询是否存在
+	_, err := r.q.IndexCollect.WithContext(ctx).
+		Where(r.q.IndexCollect.IndexID.Eq(id), r.q.IndexCollect.CreatorID.Eq(uid)).
+		First()
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrNotFound
+		}
+		return errgo.Wrap(err, "failed to find collect record")
+	}
+
+	return r.q.Transaction(func(tx *query.Query) error {
+		// Index 的 Collect - 1
+		index, err := r.Get(ctx, id)
+		if err != nil {
+			return err
+		}
+		result, err := r.q.Index.WithContext(ctx).
+			Where(r.q.Index.ID.Eq(id)).
+			Updates(dao.Index{
+				Collects: index.Collects - 1,
+			})
+		if err = r.WrapResult(result, err, "failed to increases collect count"); err != nil {
+			return err
+		}
+
+		// 删除 IndexCollect 记录
+		result, err = r.q.IndexCollect.WithContext(ctx).
+			Where(r.q.IndexCollect.IndexID.Eq(id), r.q.IndexCollect.CreatorID.Eq(uid)).
+			Delete()
+		if err = r.WrapResult(result, err, "failed to increases collect count"); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func indexDaoToModel(index dao.Index) model.Index {
@@ -365,6 +445,7 @@ func indexCollectDaoToModel(i dao.IndexCollect) model.IndexCollect {
 		IndexCreator: model.User{
 			ID:               user.ID,
 			NickName:         user.Nickname,
+			UserName:         user.Username,
 			Avatar:           user.Avatar,
 			Sign:             user.Sign,
 			RegistrationTime: time.Unix(user.Regdate, 0),

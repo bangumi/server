@@ -71,6 +71,45 @@ func (_c *IndexRepo_AddIndexSubject_Call) Return(_a0 *domain.IndexSubject, _a1 e
 	return _c
 }
 
+// CollectIndex provides a mock function with given fields: ctx, id, uid
+func (_m *IndexRepo) CollectIndex(ctx context.Context, id uint32, uid model.UserID) error {
+	ret := _m.Called(ctx, id, uid)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.UserID) error); ok {
+		r0 = rf(ctx, id, uid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// IndexRepo_CollectIndex_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CollectIndex'
+type IndexRepo_CollectIndex_Call struct {
+	*mock.Call
+}
+
+// CollectIndex is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - uid model.UserID
+func (_e *IndexRepo_Expecter) CollectIndex(ctx interface{}, id interface{}, uid interface{}) *IndexRepo_CollectIndex_Call {
+	return &IndexRepo_CollectIndex_Call{Call: _e.mock.On("CollectIndex", ctx, id, uid)}
+}
+
+func (_c *IndexRepo_CollectIndex_Call) Run(run func(ctx context.Context, id uint32, uid model.UserID)) *IndexRepo_CollectIndex_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(model.UserID))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_CollectIndex_Call) Return(_a0 error) *IndexRepo_CollectIndex_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
 // CountSubjects provides a mock function with given fields: ctx, id, subjectType
 func (_m *IndexRepo) CountSubjects(ctx context.Context, id uint32, subjectType uint8) (int64, error) {
 	ret := _m.Called(ctx, id, subjectType)
@@ -114,6 +153,45 @@ func (_c *IndexRepo_CountSubjects_Call) Run(run func(ctx context.Context, id uin
 
 func (_c *IndexRepo_CountSubjects_Call) Return(_a0 int64, _a1 error) *IndexRepo_CountSubjects_Call {
 	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// DeCollectIndex provides a mock function with given fields: ctx, id, uid
+func (_m *IndexRepo) DeCollectIndex(ctx context.Context, id uint32, uid model.UserID) error {
+	ret := _m.Called(ctx, id, uid)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.UserID) error); ok {
+		r0 = rf(ctx, id, uid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// IndexRepo_DeCollectIndex_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeCollectIndex'
+type IndexRepo_DeCollectIndex_Call struct {
+	*mock.Call
+}
+
+// DeCollectIndex is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - uid model.UserID
+func (_e *IndexRepo_Expecter) DeCollectIndex(ctx interface{}, id interface{}, uid interface{}) *IndexRepo_DeCollectIndex_Call {
+	return &IndexRepo_DeCollectIndex_Call{Call: _e.mock.On("DeCollectIndex", ctx, id, uid)}
+}
+
+func (_c *IndexRepo_DeCollectIndex_Call) Run(run func(ctx context.Context, id uint32, uid model.UserID)) *IndexRepo_DeCollectIndex_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(model.UserID))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_DeCollectIndex_Call) Return(_a0 error) *IndexRepo_DeCollectIndex_Call {
+	_c.Call.Return(_a0)
 	return _c
 }
 

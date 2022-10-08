@@ -28,7 +28,7 @@ func newIndexCollect(db *gorm.DB) indexCollect {
 	tableName := _indexCollect.indexCollectDo.TableName()
 	_indexCollect.ALL = field.NewAsterisk(tableName)
 	_indexCollect.ID = field.NewUint32(tableName, "idx_clt_id")
-	_indexCollect.IndexID = field.NewField(tableName, "idx_clt_mid")
+	_indexCollect.IndexID = field.NewUint32(tableName, "idx_clt_mid")
 	_indexCollect.CreatorID = field.NewField(tableName, "idx_clt_uid")
 	_indexCollect.CreatedTime = field.NewUint32(tableName, "idx_clt_dateline")
 	_indexCollect.Index = indexCollectBelongsToIndex{
@@ -60,8 +60,8 @@ type indexCollect struct {
 
 	ALL         field.Asterisk
 	ID          field.Uint32
-	IndexID     field.Field // 目录ID
-	CreatorID   field.Field // 用户UID
+	IndexID     field.Uint32 // 目录ID
+	CreatorID   field.Field  // 用户UID
 	CreatedTime field.Uint32
 	Index       indexCollectBelongsToIndex
 
@@ -81,7 +81,7 @@ func (i indexCollect) As(alias string) *indexCollect {
 func (i *indexCollect) updateTableName(table string) *indexCollect {
 	i.ALL = field.NewAsterisk(table)
 	i.ID = field.NewUint32(table, "idx_clt_id")
-	i.IndexID = field.NewField(table, "idx_clt_mid")
+	i.IndexID = field.NewUint32(table, "idx_clt_mid")
 	i.CreatorID = field.NewField(table, "idx_clt_uid")
 	i.CreatedTime = field.NewUint32(table, "idx_clt_dateline")
 

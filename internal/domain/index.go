@@ -60,6 +60,8 @@ type indexUserRepo interface {
 	GetCollectedIndicesByUser(
 		ctx context.Context, creatorID model.UserID, limit int, offset int,
 	) ([]model.IndexCollect, error)
+	CollectIndex(ctx context.Context, id model.IndexID, uid model.UserID) error
+	DeCollectIndex(ctx context.Context, id model.IndexID, uid model.UserID) error
 }
 
 type IndexRepo interface {

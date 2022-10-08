@@ -228,7 +228,7 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("chii_index_collects", "IndexCollect",
 		gen.FieldTrimPrefix("idx_clt_"),
 		gen.FieldRename("idx_clt_id", "ID"),
-		gen.FieldType("idx_clt_mid", indexIDTypeString),
+		// gen.FieldType("idx_clt_mid", indexIDTypeString),
 		gen.FieldRename("idx_clt_mid", "IndexID"),
 		gen.FieldType("idx_clt_uid", userIDTypeString),
 		gen.FieldRename("idx_clt_uid", "CreatorID"),
