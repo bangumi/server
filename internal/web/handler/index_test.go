@@ -259,7 +259,12 @@ func TestHandler_Add_Index_Subject(t *testing.T) {
 		ID:        7,
 	}, nil)
 	mockIndex.EXPECT().
-		AddIndexSubject(mock.Anything, model.IndexID(7), model.SubjectID(5), uint32(48), "test123").
+		AddIndexSubject(mock.Anything, domain.IndexEditSubjectInfo{
+			IndexID:   model.IndexID(7),
+			SubjectID: model.SubjectID(5),
+			Sort:      uint32(48),
+			Comment:   "test123",
+		}).
 		Return(&domain.IndexSubject{}, nil)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
@@ -322,7 +327,12 @@ func TestHandler_Update_Index_Subject(t *testing.T) {
 		ID:        7,
 	}, nil)
 	mockIndex.EXPECT().
-		UpdateIndexSubject(mock.Anything, model.IndexID(7), model.SubjectID(5), uint32(48), "test123").
+		UpdateIndexSubject(mock.Anything, domain.IndexEditSubjectInfo{
+			IndexID:   model.IndexID(7),
+			SubjectID: model.SubjectID(5),
+			Sort:      uint32(48),
+			Comment:   "test123",
+		}).
 		Return(nil)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
@@ -383,7 +393,10 @@ func TestHandler_Delete_Index_Subject(t *testing.T) {
 		ID:        7,
 	}, nil)
 	mockIndex.EXPECT().
-		DeleteIndexSubject(mock.Anything, model.IndexID(7), model.SubjectID(5)).
+		DeleteIndexSubject(mock.Anything, domain.IndexSubjectInfo{
+			IndexID:   model.IndexID(7),
+			SubjectID: model.SubjectID(5),
+		}).
 		Return(nil)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})

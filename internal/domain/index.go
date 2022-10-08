@@ -21,32 +21,51 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type IndexRepo interface {
+// 和目录直接相关数据库操作.
+type indexRepo interface {
 	Get(ctx context.Context, id model.IndexID) (model.Index, error)
 	New(ctx context.Context, i *model.Index) error
 	Update(ctx context.Context, id model.IndexID, title string, desc string) error
 	Delete(ctx context.Context, id model.IndexID) error
+}
 
+type IndexSubjectInfo struct {
+	IndexID   model.IndexID
+	SubjectID model.SubjectID
+}
+
+type IndexEditSubjectInfo struct {
+	IndexID   model.IndexID
+	SubjectID model.SubjectID
+	Sort      uint32
+	Comment   string
+}
+
+// 和目录内条目相关的数据库操作.
+type indexSubjectRepo interface {
 	CountSubjects(ctx context.Context, id model.IndexID, subjectType model.SubjectType) (int64, error)
 	ListSubjects(
 		ctx context.Context, id model.IndexID, subjectType model.SubjectType, limit, offset int,
 	) ([]IndexSubject, error)
-	AddIndexSubject(
-		ctx context.Context, id model.IndexID, subjectID model.SubjectID, sort uint32, comment string,
-	) (*IndexSubject, error)
-	UpdateIndexSubject(
-		ctx context.Context, id model.IndexID, subjectID model.SubjectID, sort uint32, comment string,
-	) error
-	DeleteIndexSubject(
-		ctx context.Context, id model.IndexID, subjectID model.SubjectID,
-	) error
+	AddIndexSubject(ctx context.Context, info IndexEditSubjectInfo) (*IndexSubject, error)
+	UpdateIndexSubject(ctx context.Context, info IndexEditSubjectInfo) error
+	DeleteIndexSubject(ctx context.Context, info IndexSubjectInfo) error
+}
 
+// 与用户和目录相关的操作.
+type indexUserRepo interface {
 	GetIndicesByUser(
 		ctx context.Context, creatorID model.UserID, limit int, offset int,
 	) ([]model.Index, error)
 	GetCollectedIndicesByUser(
 		ctx context.Context, creatorID model.UserID, limit int, offset int,
 	) ([]model.IndexCollect, error)
+}
+
+type IndexRepo interface {
+	indexRepo
+	indexSubjectRepo
+	indexUserRepo
 }
 
 type IndexSubject struct {

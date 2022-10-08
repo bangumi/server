@@ -253,8 +253,12 @@ func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	indexSubject, err := h.i.AddIndexSubject(c.UserContext(),
-		index.ID, reqData.SubjectID, reqData.SortKey, reqData.Comment)
+	indexSubject, err := h.i.AddIndexSubject(c.UserContext(), domain.IndexEditSubjectInfo{
+		IndexID:   index.ID,
+		SubjectID: reqData.SubjectID,
+		Sort:      reqData.SortKey,
+		Comment:   reqData.Comment,
+	})
 	if err != nil || indexSubject == nil {
 		return errgo.Wrap(err, "failed to edit subject in the index")
 	}
@@ -274,8 +278,12 @@ func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
 	if err != nil {
 		return errgo.Wrap(err, "subject id is invalid")
 	}
-	err = h.i.UpdateIndexSubject(c.UserContext(),
-		index.ID, subjectID, reqData.SortKey, reqData.Comment)
+	err = h.i.UpdateIndexSubject(c.UserContext(), domain.IndexEditSubjectInfo{
+		IndexID:   index.ID,
+		SubjectID: subjectID,
+		Sort:      reqData.SortKey,
+		Comment:   reqData.Comment,
+	})
 	if err != nil {
 		return errgo.Wrap(err, "failed to edit subject in the index")
 	}
@@ -291,7 +299,9 @@ func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
 	if err != nil {
 		return errgo.Wrap(err, "subject id is invalid")
 	}
-	if err = h.i.DeleteIndexSubject(c.UserContext(), index.ID, subjectID); err != nil {
+	if err = h.i.DeleteIndexSubject(c.UserContext(), domain.IndexSubjectInfo{
+		IndexID: index.ID, SubjectID: subjectID,
+	}); err != nil {
 		return errgo.Wrap(err, "failed to delete subject from index")
 	}
 	return nil
