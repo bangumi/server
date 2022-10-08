@@ -29,3 +29,11 @@ type Index struct {
 	Ban         bool
 	NSFW        bool
 }
+
+type IndexCollect struct {
+	ID           uint32
+	CreatedAt    time.Time
+	CreatorID    UserID
+	Index        Index
+	IndexCreator User
+}

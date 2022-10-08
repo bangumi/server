@@ -242,6 +242,104 @@ func (_c *IndexRepo_Get_Call) Return(_a0 model.Index, _a1 error) *IndexRepo_Get_
 	return _c
 }
 
+// GetCollectedIndicesByUser provides a mock function with given fields: ctx, creatorID, limit, offset
+func (_m *IndexRepo) GetCollectedIndicesByUser(ctx context.Context, creatorID model.UserID, limit int, offset int) ([]model.IndexCollect, error) {
+	ret := _m.Called(ctx, creatorID, limit, offset)
+
+	var r0 []model.IndexCollect
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, int, int) []model.IndexCollect); ok {
+		r0 = rf(ctx, creatorID, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.IndexCollect)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, int, int) error); ok {
+		r1 = rf(ctx, creatorID, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// IndexRepo_GetCollectedIndicesByUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCollectedIndicesByUser'
+type IndexRepo_GetCollectedIndicesByUser_Call struct {
+	*mock.Call
+}
+
+// GetCollectedIndicesByUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - creatorID model.UserID
+//   - limit int
+//   - offset int
+func (_e *IndexRepo_Expecter) GetCollectedIndicesByUser(ctx interface{}, creatorID interface{}, limit interface{}, offset interface{}) *IndexRepo_GetCollectedIndicesByUser_Call {
+	return &IndexRepo_GetCollectedIndicesByUser_Call{Call: _e.mock.On("GetCollectedIndicesByUser", ctx, creatorID, limit, offset)}
+}
+
+func (_c *IndexRepo_GetCollectedIndicesByUser_Call) Run(run func(ctx context.Context, creatorID model.UserID, limit int, offset int)) *IndexRepo_GetCollectedIndicesByUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(int), args[3].(int))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_GetCollectedIndicesByUser_Call) Return(_a0 []model.IndexCollect, _a1 error) *IndexRepo_GetCollectedIndicesByUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// GetIndicesByUser provides a mock function with given fields: ctx, creatorID, limit, offset
+func (_m *IndexRepo) GetIndicesByUser(ctx context.Context, creatorID model.UserID, limit int, offset int) ([]model.Index, error) {
+	ret := _m.Called(ctx, creatorID, limit, offset)
+
+	var r0 []model.Index
+	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, int, int) []model.Index); ok {
+		r0 = rf(ctx, creatorID, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Index)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, int, int) error); ok {
+		r1 = rf(ctx, creatorID, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// IndexRepo_GetIndicesByUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetIndicesByUser'
+type IndexRepo_GetIndicesByUser_Call struct {
+	*mock.Call
+}
+
+// GetIndicesByUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - creatorID model.UserID
+//   - limit int
+//   - offset int
+func (_e *IndexRepo_Expecter) GetIndicesByUser(ctx interface{}, creatorID interface{}, limit interface{}, offset interface{}) *IndexRepo_GetIndicesByUser_Call {
+	return &IndexRepo_GetIndicesByUser_Call{Call: _e.mock.On("GetIndicesByUser", ctx, creatorID, limit, offset)}
+}
+
+func (_c *IndexRepo_GetIndicesByUser_Call) Run(run func(ctx context.Context, creatorID model.UserID, limit int, offset int)) *IndexRepo_GetIndicesByUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(int), args[3].(int))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_GetIndicesByUser_Call) Return(_a0 []model.Index, _a1 error) *IndexRepo_GetIndicesByUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // ListSubjects provides a mock function with given fields: ctx, id, subjectType, limit, offset
 func (_m *IndexRepo) ListSubjects(ctx context.Context, id uint32, subjectType uint8, limit int, offset int) ([]domain.IndexSubject, error) {
 	ret := _m.Called(ctx, id, subjectType, limit, offset)

@@ -40,6 +40,13 @@ type IndexRepo interface {
 	DeleteIndexSubject(
 		ctx context.Context, id model.IndexID, subjectID model.SubjectID,
 	) error
+
+	GetIndicesByUser(
+		ctx context.Context, creatorID model.UserID, limit int, offset int,
+	) ([]model.Index, error)
+	GetCollectedIndicesByUser(
+		ctx context.Context, creatorID model.UserID, limit int, offset int,
+	) ([]model.IndexCollect, error)
 }
 
 type IndexSubject struct {

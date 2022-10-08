@@ -32,3 +32,43 @@ type Index struct {
 	Ban         bool          `json:"ban"`
 	NSFW        bool          `json:"nsfw" doc:"if index contains any nsfw subjects"`
 }
+
+func ConvertIndexModel(i model.Index, u model.User) Index {
+	return Index{
+		CreatedAt: i.CreatedAt,
+		UpdateAt:  i.UpdateAt,
+		Creator: Creator{
+			Username: u.UserName,
+			Nickname: u.NickName,
+		},
+		Title:       i.Title,
+		Description: i.Description,
+		Total:       i.Total,
+		ID:          i.ID,
+		Stat: Stat{
+			Comments: i.Comments,
+			Collects: i.Collects,
+		},
+		Ban:  i.Ban,
+		NSFW: i.NSFW,
+	}
+}
+
+type IndexCollect struct {
+	User             Creator `json:"user"`
+	CollectedIndices []Index `json:"indices"`
+}
+
+func ConvertIndexCollectModel(arr []model.IndexCollect, u model.User) IndexCollect {
+	ret := IndexCollect{
+		User: Creator{
+			Username: u.UserName,
+			Nickname: u.NickName,
+		},
+		CollectedIndices: make([]Index, len(arr)),
+	}
+	for i := range arr {
+		ret.CollectedIndices[i] = ConvertIndexModel(arr[i].Index, arr[i].IndexCreator)
+	}
+	return ret
+}

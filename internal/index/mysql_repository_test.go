@@ -434,3 +434,23 @@ func TestMysqlRepo_AddNoneExistsSubject(t *testing.T) {
 	require.Error(t, err)
 	require.Equal(t, err, domain.ErrSubjectNotFound)
 }
+
+func TestMysqlRepo_UserIndices(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	ctx := context.Background()
+
+	arr, err := repo.GetIndicesByUser(ctx, 110525, 20, 0)
+	require.NoError(t, err)
+	require.Len(t, arr, 1)
+	require.EqualValues(t, arr[0].ID, 15465)
+}
+
+func TestMysqlRepo_UserCollectedIndices(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+	// TODO:
+}

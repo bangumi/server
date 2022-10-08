@@ -68,14 +68,14 @@ func (r mysqlRepo) Get(ctx context.Context, id model.IndexID) (model.Index, erro
 		return model.Index{}, err
 	}
 
-	ret := daoToModel(i)
+	ret := indexDaoToModel(*i)
 	ret.NSFW = nsfw
-	return *ret, nil
+	return ret, nil
 }
 
 func (r mysqlRepo) New(ctx context.Context, i *model.Index) error {
-	dao := modelToDAO(i)
-	if err := r.q.Index.WithContext(ctx).Create(dao); err != nil {
+	dao := indexModelToDAO(*i)
+	if err := r.q.Index.WithContext(ctx).Create(&dao); err != nil {
 		return errgo.Wrap(err, "failed to create index in db")
 	}
 	i.ID = dao.ID
@@ -160,8 +160,6 @@ func (r mysqlRepo) AddIndexSubject(
 	ctx context.Context, id model.IndexID,
 	subjectID model.SubjectID, sort uint32, comment string,
 ) (*domain.IndexSubject, error) {
-	var err error
-
 	index, err := r.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -178,12 +176,10 @@ func (r mysqlRepo) AddIndexSubject(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var indexSubject *dao.IndexSubject
-	now := time.Now().Unix()
+	now := time.Now()
 
-	// 事务：增加 indexSubject 并更新 index 的 Lasttouch 和 SubjectTotal
-	q := r.q.IndexSubject
-	indexSubject, err = q.WithContext(ctx).Where(q.Rid.Eq(id), q.Sid.Eq(uint32(subjectID))).First()
+	indexSubject, err := r.q.IndexSubject.WithContext(ctx).
+		Where(r.q.IndexSubject.Rid.Eq(id), r.q.IndexSubject.Sid.Eq(uint32(subjectID))).First()
 
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, errgo.Wrap(err, "dal")
@@ -193,33 +189,13 @@ func (r mysqlRepo) AddIndexSubject(
 		return nil, domain.ErrExists
 	}
 
-	indexSubject = &dao.IndexSubject{
+	err = r.addSubjectToIndex(ctx, index, &dao.IndexSubject{
 		Comment:  comment,
 		Order:    sort,
-		Dateline: uint32(now),
+		Dateline: uint32(now.Unix()),
 		Type:     subjectDO.TypeID,
 		Rid:      id,
 		Sid:      uint32(subjectID),
-	}
-
-	err = r.q.Transaction(func(tx *query.Query) error {
-		err = q.WithContext(ctx).Create(indexSubject)
-		if err != nil {
-			return errgo.Wrap(err, "failed to create subject in index")
-		}
-
-		// avoid lint error
-		// shadow: declaration of "err" shadows declaration
-		var result gen.ResultInfo
-
-		result, err = r.q.Index.WithContext(ctx).
-			Where(r.q.Index.ID.Eq(id)).
-			Updates(dao.Index{
-				Lasttouch:    uint32(now),
-				SubjectTotal: index.Total + 1,
-			})
-
-		return r.WrapResult(result, err, "failed to update index info")
 	})
 
 	if err != nil {
@@ -232,10 +208,27 @@ func (r mysqlRepo) AddIndexSubject(
 	}
 
 	return &domain.IndexSubject{
-		AddedAt: time.Unix(int64(indexSubject.Dateline), 0),
-		Comment: indexSubject.Comment,
+		AddedAt: now,
+		Comment: comment,
 		Subject: subject,
 	}, nil
+}
+
+func (r mysqlRepo) addSubjectToIndex(ctx context.Context, index model.Index, subject *dao.IndexSubject) error {
+	return r.q.Transaction(func(tx *query.Query) error {
+		err := r.q.IndexSubject.WithContext(ctx).Create(subject)
+		if err != nil {
+			return errgo.Wrap(err, "failed to create subject in index")
+		}
+		result, err := r.q.Index.WithContext(ctx).
+			Where(r.q.Index.ID.Eq(index.ID)).
+			Updates(dao.Index{
+				Lasttouch:    uint32(time.Now().Unix()),
+				SubjectTotal: index.Total + 1,
+			})
+
+		return r.WrapResult(result, err, "failed to update index info")
+	})
 }
 
 func (r mysqlRepo) UpdateIndexSubject(
@@ -288,8 +281,47 @@ func (r mysqlRepo) WrapResult(result gen.ResultInfo, err error, msg string) erro
 	return nil
 }
 
-func daoToModel(index *dao.Index) *model.Index {
-	return &model.Index{
+// 获取用户 creatorID 创建的目录.
+func (r mysqlRepo) GetIndicesByUser(
+	ctx context.Context, creatorID model.UserID, limit int, offset int,
+) ([]model.Index, error) {
+	query := r.q.Index.WithContext(ctx).
+		Where(r.q.Index.CreatorID.Eq(creatorID)).
+		Order(r.q.Index.Dateline).Limit(limit).Offset(offset)
+	arr, err := query.Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "failed to get index")
+	}
+	ret := make([]model.Index, len(arr))
+	for i := range arr {
+		ret[i] = indexDaoToModel(*arr[i])
+	}
+	return ret, nil
+}
+
+// 获取用户 creatorID 收藏的目录.
+func (r mysqlRepo) GetCollectedIndicesByUser(
+	ctx context.Context, creatorID model.UserID, limit int, offset int,
+) ([]model.IndexCollect, error) {
+	query := r.q.IndexCollect.WithContext(ctx).
+		Where(r.q.IndexCollect.CreatorID.Eq(creatorID)).
+		Join(r.q.Index, r.q.Index.ID.EqCol(r.q.IndexCollect.ID)).
+		Join(r.q.Member, r.q.Member.ID.EqCol(r.q.Index.CreatorID)).
+		Order(r.q.IndexCollect.CreatedTime).
+		Limit(limit).Offset(offset)
+	arr, err := query.Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "failed to get index that collected by user")
+	}
+	ret := make([]model.IndexCollect, len(arr))
+	for i := range arr {
+		ret[i] = indexCollectDaoToModel(*arr[i])
+	}
+	return ret, nil
+}
+
+func indexDaoToModel(index dao.Index) model.Index {
+	return model.Index{
 		ID:          index.ID,
 		Title:       index.Title,
 		Description: index.Desc,
@@ -304,8 +336,8 @@ func daoToModel(index *dao.Index) *model.Index {
 	}
 }
 
-func modelToDAO(index *model.Index) *dao.Index {
-	return &dao.Index{
+func indexModelToDAO(index model.Index) dao.Index {
+	return dao.Index{
 		ID:        index.ID,
 		Type:      0,
 		Title:     index.Title,
@@ -314,5 +346,23 @@ func modelToDAO(index *model.Index) *dao.Index {
 		Ban:       index.Ban,
 		Dateline:  int32(index.CreatedAt.Unix()),
 		Lasttouch: uint32(index.UpdateAt.Unix()),
+	}
+}
+
+func indexCollectDaoToModel(i dao.IndexCollect) model.IndexCollect {
+	user := i.Index.Creator
+	return model.IndexCollect{
+		ID:        i.ID,
+		CreatorID: i.CreatorID,
+		CreatedAt: time.Unix(int64(i.CreatedTime), 0),
+		Index:     indexDaoToModel(i.Index),
+		IndexCreator: model.User{
+			ID:               user.ID,
+			NickName:         user.Nickname,
+			Avatar:           user.Avatar,
+			Sign:             user.Sign,
+			RegistrationTime: time.Unix(user.Regdate, 0),
+			UserGroup:        user.Groupid,
+		},
 	}
 }

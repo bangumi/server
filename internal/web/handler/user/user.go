@@ -32,12 +32,14 @@ type User struct {
 	log     *zap.Logger
 	user    domain.UserRepo
 	cfg     config.AppConfig
+	index   domain.IndexRepo
 }
 
 func New(
 	common common.Common,
 	p domain.PersonService,
 	user domain.UserRepo,
+	index domain.IndexRepo,
 	topic domain.TopicRepo,
 	ctrl ctrl.Ctrl,
 	collect domain.CollectionRepo,
@@ -48,6 +50,7 @@ func New(
 		ctrl:    ctrl,
 		collect: collect,
 		user:    user,
+		index:   index,
 		person:  p,
 		topic:   topic,
 		log:     log.Named("handler.User"),

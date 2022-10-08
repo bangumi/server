@@ -24,6 +24,7 @@ type Index struct {
 	Lasttouch    uint32       `gorm:"column:idx_lasttouch;type:int(10) unsigned;not null"`
 	CreatorID    model.UserID `gorm:"column:idx_uid;type:mediumint(8);not null"` // 创建人UID
 	Ban          bool         `gorm:"column:idx_ban;type:tinyint(1) unsigned;not null"`
+	Creator      Member       `gorm:"foreignKey:idx_uid;references:uid" json:"creator"`
 }
 
 // TableName Index's table name

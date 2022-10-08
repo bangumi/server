@@ -43,6 +43,7 @@ var personIDTypeString = "model.PersonID"       // reflect.TypeOf(new(model.Pers
 var characterIDTypeString = "model.CharacterID" // reflect.TypeOf(new(model.CharacterID)).Elem().Name()
 var episodeIDTypeString = "model.EpisodeID"     // reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
 var subjectIDTypeString = "model.SubjectID"     // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
+var indexIDTypeString = "model.IndexID"         // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
 var groupIDTypeString = "model." + reflect.TypeOf(new(model.GroupID)).Elem().Name()
 var timelineIDTypeString = "model." + reflect.TypeOf(new(model.TimeLineID)).Elem().Name()
 var timelineCatTypeString = reflect.TypeOf(new(model.TimeLineCat)).Elem().Name()
@@ -211,12 +212,31 @@ func main() {
 		gen.FieldTrimPrefix("interest_"),
 	))
 
-	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
+	modelIndex := g.GenerateModelAs("chii_index", "Index",
 		gen.FieldTrimPrefix("idx_"),
 		gen.FieldType("idx_id", "uint32"),
 		gen.FieldType("idx_uid", userIDTypeString),
 		gen.FieldRename("idx_uid", "CreatorID"),
-		gen.FieldType("idx_collects", "uint32")))
+		gen.FieldType("idx_collects", "uint32"),
+		gen.FieldRelate(field.BelongsTo, "Creator", modelMember, &field.RelateConfig{
+			GORMTag: "foreignKey:idx_uid;references:uid",
+		}),
+	)
+
+	g.ApplyBasic(modelIndex)
+
+	g.ApplyBasic(g.GenerateModelAs("chii_index_collects", "IndexCollect",
+		gen.FieldTrimPrefix("idx_clt_"),
+		gen.FieldRename("idx_clt_id", "ID"),
+		gen.FieldType("idx_clt_mid", indexIDTypeString),
+		gen.FieldRename("idx_clt_mid", "IndexID"),
+		gen.FieldType("idx_clt_uid", userIDTypeString),
+		gen.FieldRename("idx_clt_uid", "CreatorID"),
+		gen.FieldRename("idx_clt_dateline", createdTime),
+		gen.FieldRelate(field.BelongsTo, "Index", modelIndex, &field.RelateConfig{
+			GORMTag: "foreignKey:idx_clt_mid;references:idx_id",
+		}),
+	))
 
 	modelPersonField := g.GenerateModelAs("chii_person_fields", "PersonField",
 		gen.FieldTrimPrefix("prsn_"),

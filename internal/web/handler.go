@@ -86,6 +86,9 @@ func AddRouters(
 	)
 	v0.Get("/users/:username/avatar", userHandler.GetAvatar)
 
+	v0.Get("/users/:username/indices", userHandler.Indices)
+	v0.Get("/users/:username/indices/collect", userHandler.CollectedIndices)
+
 	v0.Get("/indices/:id", h.GetIndex)
 	v0.Get("/indices/:id/subjects", h.GetIndexSubjects)
 	// indices

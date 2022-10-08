@@ -34,27 +34,6 @@ import (
 	"github.com/bangumi/server/pkg/wiki"
 )
 
-func modelToResponse(i *model.Index, u model.User) res.Index {
-	return res.Index{
-		CreatedAt: i.CreatedAt,
-		UpdateAt:  i.UpdateAt,
-		Creator: res.Creator{
-			Username: u.UserName,
-			Nickname: u.NickName,
-		},
-		Title:       i.Title,
-		Description: i.Description,
-		Total:       i.Total,
-		ID:          i.ID,
-		Stat: res.Stat{
-			Comments: i.Comments,
-			Collects: i.Collects,
-		},
-		Ban:  i.Ban,
-		NSFW: i.NSFW,
-	}
-}
-
 func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, bool, error) {
 	var key = cachekey.Index(id)
 
@@ -81,7 +60,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
 	}
 
-	r = modelToResponse(&i, u)
+	r = res.ConvertIndexModel(i, u)
 
 	if e := h.cache.Set(c, key, r, time.Hour); e != nil {
 		h.log.Error("can't set response to cache", zap.Error(e))
@@ -186,7 +165,7 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 	}
 	accessor := h.GetHTTPAccessor(c)
 	now := time.Now()
-	i := &model.Index{
+	i := model.Index{
 		ID:          0,
 		CreatedAt:   now,
 		UpdateAt:    now,
@@ -200,14 +179,14 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 		NSFW:        false,
 	}
 	ctx := c.UserContext()
-	if err := h.i.New(ctx, i); err != nil {
+	if err := h.i.New(ctx, &i); err != nil {
 		return errgo.Wrap(err, "failed to create a new index")
 	}
 	u, err := h.ctrl.GetUser(ctx, i.CreatorID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get user info")
 	}
-	resp := modelToResponse(i, u)
+	resp := res.ConvertIndexModel(i, u)
 	return c.JSON(resp)
 }
 

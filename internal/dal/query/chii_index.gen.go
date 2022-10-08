@@ -39,6 +39,16 @@ func newIndex(db *gorm.DB) index {
 	_index.Lasttouch = field.NewUint32(tableName, "idx_lasttouch")
 	_index.CreatorID = field.NewField(tableName, "idx_uid")
 	_index.Ban = field.NewBool(tableName, "idx_ban")
+	_index.Creator = indexBelongsToCreator{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Creator", "dao.Member"),
+		Fields: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("Creator.Fields", "dao.MemberField"),
+		},
+	}
 
 	_index.fillFieldMap()
 
@@ -61,6 +71,7 @@ type index struct {
 	Lasttouch    field.Uint32
 	CreatorID    field.Field // 创建人UID
 	Ban          field.Bool
+	Creator      indexBelongsToCreator
 
 	fieldMap map[string]field.Expr
 }
@@ -111,7 +122,7 @@ func (i *index) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (i *index) fillFieldMap() {
-	i.fieldMap = make(map[string]field.Expr, 12)
+	i.fieldMap = make(map[string]field.Expr, 13)
 	i.fieldMap["idx_id"] = i.ID
 	i.fieldMap["idx_type"] = i.Type
 	i.fieldMap["idx_title"] = i.Title
@@ -124,11 +135,82 @@ func (i *index) fillFieldMap() {
 	i.fieldMap["idx_lasttouch"] = i.Lasttouch
 	i.fieldMap["idx_uid"] = i.CreatorID
 	i.fieldMap["idx_ban"] = i.Ban
+
 }
 
 func (i index) clone(db *gorm.DB) index {
 	i.indexDo.ReplaceDB(db)
 	return i
+}
+
+type indexBelongsToCreator struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	Fields struct {
+		field.RelationField
+	}
+}
+
+func (a indexBelongsToCreator) Where(conds ...field.Expr) *indexBelongsToCreator {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a indexBelongsToCreator) WithContext(ctx context.Context) *indexBelongsToCreator {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a indexBelongsToCreator) Model(m *dao.Index) *indexBelongsToCreatorTx {
+	return &indexBelongsToCreatorTx{a.db.Model(m).Association(a.Name())}
+}
+
+type indexBelongsToCreatorTx struct{ tx *gorm.Association }
+
+func (a indexBelongsToCreatorTx) Find() (result *dao.Member, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a indexBelongsToCreatorTx) Append(values ...*dao.Member) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a indexBelongsToCreatorTx) Replace(values ...*dao.Member) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a indexBelongsToCreatorTx) Delete(values ...*dao.Member) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a indexBelongsToCreatorTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a indexBelongsToCreatorTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type indexDo struct{ gen.DO }
