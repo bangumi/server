@@ -15,7 +15,6 @@
 package main
 
 import (
-	"github.com/bangumi/server/internal/timeline"
 	"github.com/go-resty/resty/v2"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -42,6 +41,7 @@ import (
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/timeline"
 	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web"
