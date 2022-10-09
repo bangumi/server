@@ -19,6 +19,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -94,15 +95,19 @@ func (h User) listCollection(
 		return item.SubjectID
 	})
 
-	subjectMap, err := h.ctrl.GetSubjectByIDs(c.UserContext(), subjectIDs...)
+	subjectMap, err := h.ctrl.GetSubjectByIDs(c.UserContext(), subjectIDs, ctrl.SubjectFilter{})
 	if err != nil {
 		return errgo.Wrap(err, "failed to get subjects")
 	}
 
-	var data = make([]res.SubjectCollection, len(collections))
-	for i, collection := range collections {
-		s := subjectMap[collection.SubjectID]
-		data[i] = res.ConvertModelSubjectCollection(collection, res.ToSlimSubjectV0(s))
+	var data = make([]res.SubjectCollection, 0, len(collections))
+	for _, collection := range collections {
+		s, ok := subjectMap[collection.SubjectID]
+		if !ok {
+			continue
+		}
+
+		data = append(data, res.ConvertModelSubjectCollection(collection, res.ToSlimSubjectV0(s)))
 	}
 
 	return c.JSON(res.Paged{

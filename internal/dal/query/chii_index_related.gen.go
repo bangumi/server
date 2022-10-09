@@ -57,9 +57,9 @@ type indexSubject struct {
 	ALL      field.Asterisk
 	ID       field.Uint32
 	Cat      field.Int8
-	Rid      field.Uint32
-	Type     field.Uint8
-	Sid      field.Uint32
+	Rid      field.Uint32 // 关联目录
+	Type     field.Uint8  // 关联条目类型
+	Sid      field.Uint32 // 关联条目ID
 	Order    field.Uint32
 	Comment  field.String
 	Dateline field.Uint32

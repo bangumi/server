@@ -12,32 +12,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
-
-package frontend
+package util
 
 import (
-	"embed"
-	"html/template"
-	"io"
+	"reflect"
+	"testing"
 
-	"github.com/Masterminds/sprig/v3"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/stretchr/testify/require"
 )
 
-//go:embed templates
-var templateFS embed.FS
+func TestSameSimpleType(t *testing.T) {
+	t.Parallel()
 
-func NewTemplateEngine() (TemplateEngine, error) {
-	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).ParseFS(templateFS, "templates/**.gohtml")
-	if err != nil {
-		return TemplateEngine{}, errgo.Wrap(err, "template")
-	}
+	require.True(t, sameSimpleType(reflect.TypeOf((*int)(nil)), reflect.TypeOf((*int)(nil))))
+	require.True(t, sameSimpleType(reflect.TypeOf(int(1)), reflect.TypeOf(int(1))))
+	require.True(t, sameSimpleType(reflect.TypeOf("int(1)"), reflect.TypeOf("")))
 
-	return TemplateEngine{t: t}, nil
-}
-
-func (e TemplateEngine) Execute(w io.Writer, name string, data any) error {
-	return e.t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
+	require.False(t, sameSimpleType(reflect.TypeOf((**int)(nil)), reflect.TypeOf((**int)(nil))))
+	require.False(t, sameSimpleType(reflect.TypeOf(map[int]bool{}), reflect.TypeOf(map[int]bool{})))
+	require.False(t, sameSimpleType(reflect.TypeOf(struct{}{}), reflect.TypeOf(struct{}{})))
 }

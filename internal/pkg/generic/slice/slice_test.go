@@ -98,3 +98,12 @@ func TestUnique(t *testing.T) {
 	require.Equal(t, []int{1, 0}, slice.Unique([]int{1, 0, 0, 0}))
 	require.Equal(t, []int{0, 1, 2, 3, 4}, slice.Unique([]int{0, 0, 1, 1, 2, 2, 3, 3, 4, 4}))
 }
+
+func TestClone(t *testing.T) {
+	t.Parallel()
+
+	e := []int{0, 0, 1, 1, 2, 2, 3, 3, 4, 4}
+
+	require.Equal(t, []int(nil), slice.Clone([]int(nil)))
+	require.Equal(t, []int{0, 0, 1}, slice.Clone(e[:3]))
+}

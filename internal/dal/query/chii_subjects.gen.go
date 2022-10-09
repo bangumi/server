@@ -71,21 +71,21 @@ type subject struct {
 	TypeID      field.Uint8
 	Name        field.String
 	NameCN      field.String
-	UID         field.String
+	UID         field.String // isbn / imdb
 	Creator     field.Uint32
 	Dateline    field.Uint32
 	Image       field.String
 	Platform    field.Uint16
 	Infobox     field.String
-	Summary     field.String
-	Field5      field.String
-	Volumes     field.Uint32
+	Summary     field.String // summary
+	Field5      field.String // author summary
+	Volumes     field.Uint32 // 卷数
 	Eps         field.Uint32
 	Wish        field.Uint32
 	Collect     field.Uint32
 	Doing       field.Uint32
-	OnHold      field.Uint32
-	Dropped     field.Uint32
+	OnHold      field.Uint32 // 搁置人数
+	Dropped     field.Uint32 // 抛弃人数
 	Series      field.Bool
 	SeriesEntry field.Uint32
 	IdxCn       field.String

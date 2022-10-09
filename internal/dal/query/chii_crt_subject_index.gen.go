@@ -67,8 +67,8 @@ type characterSubjects struct {
 	CharacterID   field.Field
 	SubjectID     field.Field
 	SubjectTypeID field.Uint8
-	CrtType       field.Uint8
-	CtrAppearEps  field.String
+	CrtType       field.Uint8  // 主角，配角
+	CtrAppearEps  field.String // 可选，角色出场的的章节
 	CrtOrder      field.Uint8
 	Character     characterSubjectsHasOneCharacter
 

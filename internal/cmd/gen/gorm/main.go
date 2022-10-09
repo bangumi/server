@@ -49,6 +49,10 @@ var timelineCatTypeString = reflect.TypeOf(new(model.TimeLineCat)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
 
+func DeprecatedFiled(s string) gen.ModelOpt {
+	return gen.FieldComment(s, "Deprecated")
+}
+
 const createdTime = "CreatedTime"
 
 // generate code.
@@ -227,6 +231,8 @@ func main() {
 
 	modelPerson := g.GenerateModelAs("chii_persons", "Person",
 		gen.FieldTrimPrefix("prsn_"),
+		DeprecatedFiled("prsn_img_anidb"),
+		DeprecatedFiled("prsn_anidb_id"),
 		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("prsn_illustrator", "bool"),
 		gen.FieldType("prsn_writer", "bool"),
@@ -239,6 +245,8 @@ func main() {
 
 	modelCharacter := g.GenerateModelAs("chii_characters", "Character",
 		gen.FieldTrimPrefix("crt_"),
+		DeprecatedFiled("crt_img_anidb"),
+		DeprecatedFiled("crt_anidb_id"),
 		gen.FieldType("crt_id", characterIDTypeString),
 		gen.FieldType("crt_redirect", characterIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{

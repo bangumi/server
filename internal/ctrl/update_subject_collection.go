@@ -60,9 +60,9 @@ func (ctl Ctrl) UpdateCollection(
 	var privacy null.Null[model.CollectPrivacy]
 	if req.Private.Set {
 		if req.Private.Value {
-			privacy = null.New(model.CollectPrivacyNone)
-		} else {
 			privacy = null.New(model.CollectPrivacySelf)
+		} else {
+			privacy = null.New(model.CollectPrivacyNone)
 		}
 	}
 

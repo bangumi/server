@@ -49,17 +49,17 @@ type index struct {
 	indexDo indexDo
 
 	ALL          field.Asterisk
-	ID           field.Uint32
+	ID           field.Uint32 // 自动id
 	Type         field.Uint8
-	Title        field.String
-	Desc         field.String
-	Replies      field.Uint32
-	SubjectTotal field.Uint32
-	Collects     field.Uint32
+	Title        field.String // 标题
+	Desc         field.String // 简介
+	Replies      field.Uint32 // 回复数
+	SubjectTotal field.Uint32 // 内含条目总数
+	Collects     field.Uint32 // 收藏数
 	Stats        field.String
-	Dateline     field.Int32
+	Dateline     field.Int32 // 创建时间
 	Lasttouch    field.Uint32
-	CreatorID    field.Field
+	CreatorID    field.Field // 创建人UID
 	Ban          field.Bool
 
 	fieldMap map[string]field.Expr

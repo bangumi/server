@@ -199,7 +199,7 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 	var filter = make([][]string, 0, 5+len(req.Tag))
 
 	if len(req.AirDate) != 0 {
-		filter = append(filter, parseDateFilter(req.AirDate))
+		filter = append(filter, parseDateFilter(req.AirDate)...)
 	}
 
 	for _, tag := range req.Tag {
@@ -232,30 +232,30 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 }
 
 // parse date filter like `<2020-01-20`, `>=2020-01-23`.
-func parseDateFilter(filters []string) []string {
-	var result = make([]string, 0, len(filters))
+func parseDateFilter(filters []string) [][]string {
+	var result = make([][]string, 0, len(filters))
 
 	for _, s := range filters {
 		switch {
 		case strings.HasPrefix(s, ">="):
 			if v, ok := parseDateValOk(s[2:]); ok {
-				result = append(result, fmt.Sprintf("date >= %d", v))
+				result = append(result, []string{fmt.Sprintf("date >= %d", v)})
 			}
 		case strings.HasPrefix(s, ">"):
 			if v, ok := parseDateValOk(s[1:]); ok {
-				result = append(result, fmt.Sprintf("date > %d", v))
+				result = append(result, []string{fmt.Sprintf("date > %d", v)})
 			}
 		case strings.HasPrefix(s, "<="):
 			if v, ok := parseDateValOk(s[2:]); ok {
-				result = append(result, fmt.Sprintf("date <= %d", v))
+				result = append(result, []string{fmt.Sprintf("date <= %d", v)})
 			}
 		case strings.HasPrefix(s, "<"):
 			if v, ok := parseDateValOk(s[1:]); ok {
-				result = append(result, fmt.Sprintf("date < %d", v))
+				result = append(result, []string{fmt.Sprintf("date < %d", v)})
 			}
 		default:
 			if v, ok := parseDateValOk(s); ok {
-				result = append(result, fmt.Sprintf("date = %d", v))
+				result = append(result, []string{fmt.Sprintf("date = %d", v)})
 			}
 		}
 	}

@@ -69,7 +69,7 @@ type episode struct {
 	SubjectID field.Field
 	Sort      field.Float32
 	Type      field.Uint8
-	Disc      field.Uint8
+	Disc      field.Uint8 // 碟片数
 	Name      field.String
 	NameCn    field.String
 	Rate      field.Int8

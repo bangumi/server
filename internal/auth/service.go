@@ -19,7 +19,6 @@ import (
 	"crypto/md5" //nolint:gosec
 	"encoding/hex"
 	"errors"
-	"strconv"
 	"time"
 
 	"go.uber.org/zap"
@@ -37,7 +36,7 @@ const TokenTypeAccessToken = 1
 
 func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.RedisCache) domain.AuthService {
 	return service{
-		permCache: cache.NewMemoryCache(),
+		permCache: cache.NewMemoryCache[model.UserGroupID, domain.Permission](),
 		cache:     c,
 		repo:      repo,
 		log:       logger.Named("auth.Service"),
@@ -46,7 +45,7 @@ func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, 
 }
 
 type service struct {
-	permCache *cache.MemoryCache
+	permCache *cache.MemoryCache[model.UserGroupID, domain.Permission]
 	cache     cache.RedisCache
 	repo      domain.AuthRepo
 	user      domain.UserRepo
@@ -157,7 +156,7 @@ func (s service) GetByToken(ctx context.Context, token string) (domain.Auth, err
 func (s service) ComparePassword(hashed []byte, password string) (bool, error) {
 	p := preProcessPassword(password)
 
-	if err := bcrypt.CompareHashAndPassword(hashed, p[:]); err != nil {
+	if err := bcrypt.CompareHashAndPassword(hashed, p); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return false, nil
 		}
@@ -168,34 +167,26 @@ func (s service) ComparePassword(hashed []byte, password string) (bool, error) {
 	return true, nil
 }
 
-func preProcessPassword(s string) [32]byte {
+func preProcessPassword(s string) []byte {
 	// don't know why old code base use md5 to hash password first
 	p := md5.Sum([]byte(s)) //nolint:gosec
-	var md5Password [32]byte
 
-	hex.Encode(md5Password[:], p[:])
-
-	return md5Password
+	return []byte(hex.EncodeToString(p[:]))
 }
 
 func (s service) getPermission(ctx context.Context, id model.UserGroupID) (domain.Permission, error) {
-	var p domain.Permission
-	key := strconv.FormatUint(uint64(id), 10)
-	ok, err := s.permCache.Get(ctx, key, &p)
-	if err != nil {
-		return domain.Permission{}, errgo.Wrap(err, "read cache")
-	}
+	p, ok := s.permCache.Get(ctx, id)
 
 	if ok {
 		return p, nil
 	}
 
-	p, err = s.repo.GetPermission(ctx, id)
+	p, err := s.repo.GetPermission(ctx, id)
 	if err != nil {
 		return domain.Permission{}, errgo.Wrap(err, "AuthRepo.GetPermission")
 	}
 
-	_ = s.permCache.Set(ctx, key, p, time.Minute)
+	s.permCache.Set(ctx, id, p, time.Minute)
 
 	return p, nil
 }

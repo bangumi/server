@@ -8,33 +8,33 @@ require (
 	github.com/globocom/go-redis-prometheus v0.4.0
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
-	github.com/go-playground/validator/v10 v10.11.0
+	github.com/go-playground/validator/v10 v10.11.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-redis/redismock/v8 v8.0.6
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goccy/go-json v0.9.11
-	github.com/gofiber/adaptor/v2 v2.1.25
-	github.com/gofiber/fiber/v2 v2.36.0
+	github.com/gofiber/adaptor/v2 v2.1.27
+	github.com/gofiber/fiber/v2 v2.38.1
 	github.com/ilyakaznacheev/cleanenv v1.3.0
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/mattn/go-colorable v0.1.13
-	github.com/meilisearch/meilisearch-go v0.20.1
+	github.com/meilisearch/meilisearch-go v0.21.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.13.0
-	github.com/segmentio/kafka-go v0.4.34
+	github.com/segmentio/kafka-go v0.4.35
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
 	github.com/trim21/go-phpserialize v0.0.15
 	github.com/uber-go/tally/v4 v4.1.2
 	github.com/valyala/bytebufferpool v1.0.0
-	go.uber.org/fx v1.18.1
+	go.uber.org/fx v1.18.2
 	go.uber.org/zap v1.23.0
-	golang.org/x/crypto v0.0.0-20220824171710-5757bc0c5503
+	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.3.6
-	gorm.io/gen v0.3.15
-	gorm.io/gorm v1.23.9-0.20220713102635-3262daf8d468
+	gorm.io/gen v0.3.16
+	gorm.io/gorm v1.23.10
 	gorm.io/plugin/dbresolver v1.2.3
 )
 
@@ -48,7 +48,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -75,7 +75,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
-	github.com/valyala/fasthttp v1.38.0 // indirect
+	github.com/valyala/fasthttp v1.40.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/dig v1.15.0 // indirect

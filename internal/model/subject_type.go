@@ -46,6 +46,6 @@ func SubjectTypeString(s uint8) string {
 	case SubjectTypeReal:
 		return textSubjectReal
 	default:
-		return "unknown repository type"
+		return "unknown subject type"
 	}
 }

@@ -251,3 +251,39 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	require.NoError(t, phpserialize.Unmarshal(r.Status, &m2))
 	require.Len(t, m2, 0)
 }
+
+// 旧站的条目收藏只会创建条目收藏条目，章节收藏纪录是用到时才创建的。
+// 这个测试是针对这种情况
+func TestMysqlRepo_UpdateEpisodeCollection_create_ep_status(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 40010
+	const sid model.SubjectID = 1011
+
+	repo, q := getRepo(t)
+	table := q.EpCollection
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+	})
+
+	now := time.Now()
+
+	_, err := repo.UpdateEpisodeCollection(context.Background(),
+		uid, sid, []model.EpisodeID{1, 2}, model.EpisodeCollectionDone, now)
+	require.NoError(t, err)
+
+	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	require.NoError(t, err)
+
+	var m map[uint32]struct {
+		Type int `php:"type"`
+	}
+	require.NoError(t, phpserialize.Unmarshal(r.Status, &m))
+	require.Len(t, m, 2)
+	require.Contains(t, m, uint32(1))
+	require.EqualValues(t, model.EpisodeCollectionDone, m[1].Type)
+	require.Contains(t, m, uint32(2))
+	require.EqualValues(t, model.EpisodeCollectionDone, m[2].Type)
+}

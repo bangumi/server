@@ -47,7 +47,7 @@ func TestUser_ListCollection(t *testing.T) {
 		Return(1, nil)
 
 	s := mocks.NewSubjectRepo(t)
-	s.EXPECT().GetByIDs(mock.Anything, mock.Anything).Return(map[model.SubjectID]model.Subject{
+	s.EXPECT().GetByIDs(mock.Anything, mock.Anything, mock.Anything).Return(map[model.SubjectID]model.Subject{
 		subjectID: {Name: "v"},
 	}, nil)
 
@@ -81,7 +81,7 @@ func TestUser_GetSubjectCollection(t *testing.T) {
 		Return(model.UserSubjectCollection{SubjectID: subjectID, Type: 1}, nil)
 
 	s := mocks.NewSubjectRepo(t)
-	s.EXPECT().Get(mock.Anything, subjectID).Return(model.Subject{
+	s.EXPECT().Get(mock.Anything, subjectID, mock.Anything).Return(model.Subject{
 		Name: "v",
 	}, nil)
 

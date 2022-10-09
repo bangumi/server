@@ -21,6 +21,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/subject"
 )
 
 func (ctl Ctrl) GetPersonRelated(
@@ -36,16 +37,24 @@ func (ctl Ctrl) GetPersonRelated(
 		return nil, errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	subjects, err := ctl.GetSubjectByIDs(ctx, slice.Map(relations, domain.SubjectPersonRelation.GetSubjectID)...)
+	subjects, err := ctl.subject.GetByIDs(ctx,
+		slice.Map(relations, func(r domain.SubjectPersonRelation) model.SubjectID { return r.SubjectID }),
+		subject.Filter{})
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}
 
-	var results = make([]model.SubjectPersonRelation, len(relations))
-	for i, rel := range relations {
-		results[i].Subject = subjects[rel.SubjectID]
-		results[i].TypeID = rel.TypeID
-		results[i].Person = person
+	var results = make([]model.SubjectPersonRelation, 0, len(relations))
+	for _, rel := range relations {
+		s, ok := subjects[rel.SubjectID]
+		if !ok {
+			continue
+		}
+		results = append(results, model.SubjectPersonRelation{
+			Person:  person,
+			Subject: s,
+			TypeID:  rel.TypeID,
+		})
 	}
 
 	return results, nil

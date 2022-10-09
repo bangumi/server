@@ -12,32 +12,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
-
-package frontend
+package slice
 
 import (
-	"embed"
-	"html/template"
-	"io"
-
-	"github.com/Masterminds/sprig/v3"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
+	"database/sql/driver"
 )
 
-//go:embed templates
-var templateFS embed.FS
-
-func NewTemplateEngine() (TemplateEngine, error) {
-	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).ParseFS(templateFS, "templates/**.gohtml")
-	if err != nil {
-		return TemplateEngine{}, errgo.Wrap(err, "template")
+func ToUint8[S ~[]T, T ~uint8](s S) []uint8 {
+	var out = make([]uint8, len(s))
+	for i, t := range s {
+		out[i] = uint8(t)
 	}
 
-	return TemplateEngine{t: t}, nil
+	return out
 }
 
-func (e TemplateEngine) Execute(w io.Writer, name string, data any) error {
-	return e.t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
+func ToValuer[S ~[]T, T driver.Valuer](s S) []driver.Valuer {
+	var out = make([]driver.Valuer, len(s))
+	for i, t := range s {
+		out[i] = t
+	}
+
+	return out
 }

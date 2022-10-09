@@ -18,6 +18,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 var (
@@ -140,7 +142,7 @@ func Parse(s string) (Wiki, error) {
 		if inArray {
 			if line == "}" { // close array
 				inArray = false
-				currentField.Values = copySlice(itemContainer)
+				currentField.Values = slice.Clone(itemContainer)
 				itemContainer = itemContainer[:0]
 				w.Fields = append(w.Fields, currentField)
 
@@ -205,11 +207,4 @@ func readStartLine(line string) (string, string, error) {
 	}
 
 	return trimRightSpace(line[:i]), trimLeftSpace(line[i+1:]), nil
-}
-
-func copySlice[T any](items []T) []T {
-	var out = make([]T, len(items))
-	copy(out, items)
-
-	return out
 }

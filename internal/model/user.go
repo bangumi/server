@@ -28,3 +28,7 @@ type User struct {
 	ID               UserID
 	UserGroup        UserGroupID
 }
+
+func (u User) GetID() UserID {
+	return u.ID
+}

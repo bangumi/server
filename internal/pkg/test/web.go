@@ -40,6 +40,7 @@ import (
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/search"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
@@ -49,7 +50,7 @@ import (
 )
 
 type Mock struct {
-	SubjectRepo    domain.SubjectRepo
+	SubjectRepo    subject.Repo
 	PersonRepo     domain.PersonRepo
 	CharacterRepo  domain.CharacterRepo
 	AuthRepo       domain.AuthRepo
@@ -278,15 +279,15 @@ func MockOAuthManager(m oauth.Manager) fx.Option {
 	return fx.Provide(func() oauth.Manager { return m })
 }
 
-func MockSubjectRepo(m domain.SubjectRepo) fx.Option {
+func MockSubjectRepo(m subject.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.SubjectRepo{}
-		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{}, nil)
+		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(model.Subject{}, nil)
 
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.SubjectRepo))))
+	return fx.Provide(func() subject.Repo { return m })
 }
 
 func MockTimeLineRepo(m domain.TimeLineRepo) fx.Option {

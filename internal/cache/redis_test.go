@@ -32,8 +32,6 @@ type RedisCacheTestItem struct {
 	I int
 }
 
-const key = "news_redis_cache"
-
 func mockedCache() (cache.RedisCache, redismock.ClientMock) {
 	db, mock := redismock.NewClientMock()
 	c := cache.NewRedisCache(db)
@@ -43,6 +41,7 @@ func mockedCache() (cache.RedisCache, redismock.ClientMock) {
 
 func TestRedisCache_Set(t *testing.T) {
 	t.Parallel()
+	var key = t.Name() + "redis_key"
 	c, mock := mockedCache()
 	mock.Regexp().ExpectSet(key, `.*`, time.Hour).SetVal("OK")
 
@@ -60,6 +59,8 @@ func TestRedisCache_Set(t *testing.T) {
 
 func TestRedisCache_Get_Nil(t *testing.T) {
 	t.Parallel()
+
+	var key = t.Name() + "redis_key"
 	c, mock := mockedCache()
 	mock.Regexp().ExpectGet(key).RedisNil()
 
@@ -76,6 +77,8 @@ func TestRedisCache_Get_Nil(t *testing.T) {
 
 func TestRedisCache_Get_Cached(t *testing.T) {
 	t.Parallel()
+
+	var key = t.Name() + "redis_key"
 	value := RedisCacheTestItem{
 		S: "sss",
 		I: 2,
@@ -102,6 +105,8 @@ func TestRedisCache_Get_Cached(t *testing.T) {
 
 func TestRedisCache_Get_Broken(t *testing.T) {
 	t.Parallel()
+
+	var key = t.Name() + "redis_key"
 	c, mock := mockedCache()
 
 	mock.Regexp().ExpectGet(key).SetVal("some random broken content")
@@ -122,6 +127,8 @@ func TestRedisCache_Real(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, "redis")
 
+	var key = t.Name() + "redis_key"
+
 	db := test.GetRedis(t)
 	db.Del(context.TODO(), key)
 
@@ -141,7 +148,7 @@ func TestRedisCache_Del(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvRedis)
 
-	var key = "redis_test " + t.Name()
+	var key = t.Name() + "redis_test "
 
 	db := test.GetRedis(t)
 	require.NoError(t, db.Set(context.Background(), key, "", 0).Err())

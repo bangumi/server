@@ -12,32 +12,28 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
-
-package frontend
+package cache
 
 import (
-	"embed"
-	"html/template"
-	"io"
-
-	"github.com/Masterminds/sprig/v3"
+	"github.com/goccy/go-json"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-//go:embed templates
-var templateFS embed.FS
-
-func NewTemplateEngine() (TemplateEngine, error) {
-	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).ParseFS(templateFS, "templates/**.gohtml")
+func marshalBytes(v any) ([]byte, error) {
+	b, err := json.MarshalWithOption(v, json.DisableHTMLEscape(), json.DisableNormalizeUTF8())
 	if err != nil {
-		return TemplateEngine{}, errgo.Wrap(err, "template")
+		return nil, errgo.Wrap(err, "json.Marshal")
 	}
 
-	return TemplateEngine{t: t}, nil
+	return b, nil
 }
 
-func (e TemplateEngine) Execute(w io.Writer, name string, data any) error {
-	return e.t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
+func unmarshalBytes(b []byte, v any) error {
+	err := json.UnmarshalNoEscape(b, v)
+	if err != nil {
+		return errgo.Wrap(err, "json.Unmarshal")
+	}
+
+	return nil
 }

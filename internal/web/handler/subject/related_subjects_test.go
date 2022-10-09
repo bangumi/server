@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler_test
+package subject_test
 
 import (
 	"net/http"
@@ -21,25 +21,39 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func TestHandler_GetEpisode(t *testing.T) {
+func TestSubject_GetRelatedSubjects(t *testing.T) {
 	t.Parallel()
-	m := mocks.NewEpisodeRepo(t)
-	m.EXPECT().Get(mock.Anything, model.EpisodeID(7)).Return(model.Episode{ID: 7, SubjectID: 3}, nil)
-	s := mocks.NewSubjectRepo(t)
-	s.EXPECT().Get(mock.Anything, model.SubjectID(3), mock.Anything).Return(model.Subject{ID: 3}, nil)
 
-	app := test.GetWebApp(t, test.Mock{EpisodeRepo: m, SubjectRepo: s})
+	var subjectID model.SubjectID = 7
 
-	var episode res.Episode
-	resp := test.New(t).Get("/v0/episodes/7").Execute(app).JSON(&episode)
+	m := mocks.NewSubjectRepo(t)
+	m.EXPECT().Get(mock.Anything, subjectID, mock.Anything).Return(model.Subject{ID: subjectID}, nil)
+	m.EXPECT().GetByIDs(mock.Anything, mock.Anything, subject.Filter{NSFW: null.New(false)}).
+		Return(map[model.SubjectID]model.Subject{1: {ID: 1}}, nil)
+	m.EXPECT().GetSubjectRelated(mock.Anything, subjectID).Return([]domain.SubjectInternalRelation{
+		{TypeID: 1, SourceID: subjectID, DestinationID: 1},
+	}, nil)
+
+	app := test.GetWebApp(t,
+		test.Mock{
+			SubjectRepo: m,
+		},
+	)
+
+	var r []res.SubjectRelatedSubject
+	resp := test.New(t).Get("/v0/subjects/7/subjects").
+		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
-
-	require.EqualValues(t, 7, episode.ID)
+	require.Len(t, r, 1)
+	require.Equal(t, model.SubjectID(1), r[0].SubjectID)
 }

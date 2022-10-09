@@ -44,7 +44,7 @@ type characterComment struct {
 
 	ALL         field.Asterisk
 	ID          field.Uint32
-	TopicID     field.Uint32
+	TopicID     field.Uint32 // 关联人物ID
 	UID         field.Uint32
 	Related     field.Uint32
 	CreatedTime field.Uint32
