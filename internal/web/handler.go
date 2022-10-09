@@ -103,12 +103,12 @@ func AddRouters(
 	}
 
 	v0.Get("/pms/list", h.NeedLogin, pmHandler.List)
-	v0.Get("/pms/list/:id", h.NeedLogin, pmHandler.ListRelated)
+	v0.Get("/pms/related-msgs/:id", h.NeedLogin, pmHandler.ListRelated)
 	v0.Get("/pms/counts", h.NeedLogin, pmHandler.CountTypes)
-	v0.Get("/pms/contact/recent", h.NeedLogin, pmHandler.ListRecentContact)
-	v0.Patch("/pms/mark-read", req.JSON, h.NeedLogin, pmHandler.MarkRead)
-	v0.Post("/pms/create", req.JSON, h.NeedLogin, pmHandler.Create)
-	v0.Delete("/pms/delete", req.JSON, h.NeedLogin, pmHandler.Delete)
+	v0.Get("/pms/contacts/recent", h.NeedLogin, pmHandler.ListRecentContact)
+	v0.Patch("/pms/read", req.JSON, h.NeedLogin, pmHandler.MarkRead)
+	v0.Post("/pms", req.JSON, h.NeedLogin, pmHandler.Create)
+	v0.Delete("/pms", req.JSON, h.NeedLogin, pmHandler.Delete)
 
 	v0.Get("/notifications/count", h.NeedLogin, notificationHandler.Count)
 

@@ -75,7 +75,7 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
 
 	resp := test.New(t).
-		Get("/v0/pms/list/1").
+		Get("/v0/pms/related-msgs/1").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		Execute(app)
 
@@ -96,7 +96,7 @@ func TestPrivateMessage_ListRecentContact(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
 
 	resp := test.New(t).
-		Get("/v0/pms/contact/recent").
+		Get("/v0/pms/contacts/recent").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		Execute(app)
 
@@ -139,7 +139,7 @@ func TestPrivateMessage_MarkRead(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
 
 	resp := test.New(t).
-		Patch("/v0/pms/mark-read").
+		Patch("/v0/pms/read").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		Header(fiber.HeaderContentType, "application/json").
 		JSON(req.PrivateMessageMarkRead{ID: 1}).
@@ -166,7 +166,7 @@ func TestPrivateMessage_Create(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
 
 	resp := test.New(t).
-		Post("/v0/pms/create").
+		Post("/v0/pms").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		Header(fiber.HeaderContentType, "application/json").
 		JSON(req.PrivateMessageCreate{Title: "测试标题", Content: "测试内容", ReceiverIDs: []uint32{382951}, SenderID: 1}).
@@ -190,7 +190,7 @@ func TestPrivateMessage_Delete(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
 
 	resp := test.New(t).
-		Delete("/v0/pms/delete").
+		Delete("/v0/pms").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		Header(fiber.HeaderContentType, "application/json").
 		JSON(req.PrivateMessageDelete{IDs: []uint32{1}}).
