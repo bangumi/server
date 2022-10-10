@@ -18,8 +18,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
+	"github.com/bangumi/server/internal/subject"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/dal/query"
@@ -91,16 +93,7 @@ func (ctl Ctrl) UpdateCollection(
 			ctl.log.Error("failed to update user collection info", zap.Error(err))
 			return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 		}
-
-		err = ctl.timeline.WithQuery(tx).Create(ctx, &model.TimeLine{
-			TimeLineMeta: &model.TimeLineMeta{
-				UID: req.UID,
-				// TODO: filling fields
-			},
-			TimeLineMemo: model.NewTimeLineMemo(&model.TimeLineProgressMemo{
-				// TODO: filling fields
-			}),
-		})
+		err = ctl.saveTimeLine(ctx, u, subjectID, req, tx)
 		if err != nil {
 			ctl.log.Error("failed to create associated timeline", zap.Error(err))
 			return errgo.Wrap(err, "timelineRepo.Create")
@@ -109,6 +102,39 @@ func (ctl Ctrl) UpdateCollection(
 	})
 
 	return txErr
+}
+
+func (ctl Ctrl) saveTimeLine(
+	ctx context.Context,
+	_ domain.Auth,
+	subjectID model.SubjectID,
+	req UpdateCollectionRequest,
+	tx *query.Query,
+) error {
+	sj, err := ctl.subject.Get(ctx, subjectID, subject.Filter{NSFW: null.NewBool(false)}) // TODO: filter
+	if err != nil {
+		return errgo.Wrap(err, "subject.Get")
+	}
+
+	tlMeta := &model.TimeLineMeta{
+		UID: req.UID,
+		// TODO: filling fields
+	}
+	tlMemo := model.NewTimeLineMemo(&model.TimeLineSubjectMemo{
+		ID:     strconv.Itoa(int(subjectID)),
+		TypeID: string(req.Type.Default(0)),
+		// TODO: image
+		Name:   sj.Name,
+		NameCN: sj.NameCN,
+		// TODO: series
+		CollectComment: req.Comment.Default(""),
+		CollectRate:    int(req.Rate.Default(0)),
+	})
+
+	return ctl.timeline.WithQuery(tx).Create(ctx, &model.TimeLine{
+		TimeLineMeta: tlMeta,
+		TimeLineMemo: tlMemo,
+	})
 }
 
 func (ctl Ctrl) UpdateEpisodesCollection(
