@@ -252,19 +252,6 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 	return nil
 }
 
-func (h Handler) DeleteIndex(c *fiber.Ctx) error {
-	index, err := h.ensureIndexPermission(c)
-	if err != nil {
-		return err
-	}
-
-	if err = h.i.Delete(c.UserContext(), index.ID); err != nil {
-		return errgo.Wrap(err, "failed to delete index from db")
-	}
-
-	return nil
-}
-
 func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
 	var reqData req.IndexAddSubject
 	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
