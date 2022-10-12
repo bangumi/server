@@ -22,7 +22,7 @@ import (
 
 type Index struct {
 	CreatedAt   time.Time     `json:"created_at"`
-	UpdateAt    time.Time     `json:"update_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
 	Creator     Creator       `json:"creator"`
 	Title       string        `json:"title"`
 	Description string        `json:"desc"`

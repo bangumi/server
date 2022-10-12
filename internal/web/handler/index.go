@@ -37,7 +37,7 @@ import (
 func modelToResponse(i *model.Index, u model.User) res.Index {
 	return res.Index{
 		CreatedAt: i.CreatedAt,
-		UpdateAt:  i.UpdateAt,
+		UpdatedAt: i.UpdatedAt,
 		Creator: res.Creator{
 			Username: u.UserName,
 			Nickname: u.NickName,
@@ -189,7 +189,7 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 	i := &model.Index{
 		ID:          0,
 		CreatedAt:   now,
-		UpdateAt:    now,
+		UpdatedAt:   now,
 		Title:       reqData.Title,
 		Description: reqData.Description,
 		CreatorID:   accessor.ID,
