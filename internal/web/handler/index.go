@@ -303,6 +303,21 @@ func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
 	return nil
 }
 
+func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
+	index, err := h.ensureIndexPermission(c)
+	if err != nil {
+		return err
+	}
+	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	if err != nil {
+		return errgo.Wrap(err, "subject id is invalid")
+	}
+	if err = h.i.DeleteIndexSubject(c.UserContext(), index.ID, subjectID); err != nil {
+		return errgo.Wrap(err, "failed to delete subject from index")
+	}
+	return nil
+}
+
 func indexSubjectToResp(s domain.IndexSubject) res.IndexSubjectV0 {
 	return res.IndexSubjectV0{
 		AddedAt: s.AddedAt,
