@@ -1582,8 +1582,9 @@ paths:
     put:
       tags:
         - 目录
-      summary: Edit subject inforation in a index
+      summary: Edit subject information in a index
       operationId: editIndexSubjectsByIndexIdAndSubjectID
+      description: 如果条目不存在于目录，会创建该条目
       parameters:
         - required: true
           description: "目录 ID"

@@ -257,16 +257,7 @@ func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
 	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
 		return errgo.Wrap(err, "request data is invalid")
 	}
-	index, err := h.ensureIndexPermission(c)
-	if err != nil {
-		return err
-	}
-	indexSubject, err := h.i.AddIndexSubject(c.UserContext(),
-		index.ID, reqData.SubjectID, reqData.SortKey, reqData.Comment)
-	if err != nil || indexSubject == nil {
-		return errgo.Wrap(err, "failed to edit subject in the index")
-	}
-	return c.JSON(indexSubjectToResp(*indexSubject))
+	return h.addOrUpdateIndexSubject(c, reqData)
 }
 
 func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
@@ -274,20 +265,30 @@ func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
 	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
 		return errgo.Wrap(err, "request data is invalid")
 	}
-	index, err := h.ensureIndexPermission(c)
-	if err != nil {
-		return err
-	}
 	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
 	if err != nil {
 		return errgo.Wrap(err, "subject id is invalid")
 	}
-	err = h.i.UpdateIndexSubject(c.UserContext(),
-		index.ID, subjectID, reqData.SortKey, reqData.Comment)
+	return h.addOrUpdateIndexSubject(c, req.IndexAddSubject{
+		SubjectID:        subjectID,
+		IndexSubjectInfo: &reqData,
+	})
+}
+
+func (h Handler) addOrUpdateIndexSubject(c *fiber.Ctx, req req.IndexAddSubject) error {
+	index, err := h.ensureIndexPermission(c)
 	if err != nil {
+		return err
+	}
+	indexSubject, err := h.i.AddOrUpdateIndexSubject(c.UserContext(),
+		index.ID, req.SubjectID, req.SortKey, req.Comment)
+	if err != nil {
+		if errors.Is(err, domain.ErrSubjectNotFound) {
+			return res.NotFound("subject not found")
+		}
 		return errgo.Wrap(err, "failed to edit subject in the index")
 	}
-	return nil
+	return c.JSON(indexSubjectToResp(*indexSubject))
 }
 
 func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {

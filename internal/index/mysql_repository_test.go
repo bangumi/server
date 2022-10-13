@@ -194,7 +194,7 @@ func TestMysqlRepo_DeleteIndex2(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := 10; i < 20; i++ {
-		_, err = repo.AddIndexSubject(ctx, index.ID, model.SubjectID(i),
+		_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, model.SubjectID(i),
 			uint32(i), fmt.Sprintf("comment %d", i))
 		require.NoError(t, err)
 	}
@@ -223,7 +223,7 @@ func TestMysqlRepo_DeleteIndex2(t *testing.T) {
 	require.Len(t, subjects, 20)
 }
 
-func TestMysqlRepo_AddIndexSubject(t *testing.T) {
+func TestMysqlRepo_AddOrUpdateIndexSubject(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 
@@ -247,10 +247,10 @@ func TestMysqlRepo_AddIndexSubject(t *testing.T) {
 	require.NotEqual(t, 0, index.ID)
 	require.NoError(t, err)
 
-	_, err = repo.AddIndexSubject(ctx, index.ID, 3, 1, "comment 1")
+	_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, 3, 1, "comment 1")
 	require.NoError(t, err)
 
-	_, err = repo.AddIndexSubject(ctx, index.ID, 4, 3, "comment 3")
+	_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, 4, 3, "comment 3")
 	require.NoError(t, err)
 
 	i, err := repo.Get(ctx, index.ID)
@@ -299,7 +299,7 @@ func TestMysqlRepo_DeleteIndexSubject(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := 10; i < 20; i++ {
-		_, err = repo.AddIndexSubject(ctx, index.ID, model.SubjectID(i),
+		_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, model.SubjectID(i),
 			uint32(i), fmt.Sprintf("comment %d", i))
 		require.NoError(t, err)
 	}
@@ -355,7 +355,7 @@ func TestMysqlRepo_FailedAddedToNonExists(t *testing.T) {
 	ctx := context.Background()
 	_ = repo.Delete(ctx, 99999999) // in case index(99999999) exists
 
-	_, err := repo.AddIndexSubject(ctx, 99999999, 5, 5, "test")
+	_, err := repo.AddOrUpdateIndexSubject(ctx, 99999999, 5, 5, "test")
 	require.Error(t, err)
 	require.Equal(t, err, domain.ErrNotFound)
 }
@@ -382,7 +382,7 @@ func TestMysqlRepo_UpdateSubjectInfo(t *testing.T) {
 	err := repo.New(ctx, index)
 	require.NoError(t, err)
 
-	_, err = repo.AddIndexSubject(ctx, index.ID, 5, 5, "test")
+	_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, 5, 5, "test")
 	require.NoError(t, err)
 	subjects, err := repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
 	require.NoError(t, err)
@@ -390,7 +390,7 @@ func TestMysqlRepo_UpdateSubjectInfo(t *testing.T) {
 	require.EqualValues(t, subjects[0].Subject.ID, 5)
 	require.EqualValues(t, subjects[0].Comment, "test")
 
-	err = repo.UpdateIndexSubject(ctx, index.ID, 5, 5, "test22222")
+	_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, 5, 5, "test22222")
 	require.NoError(t, err)
 
 	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
@@ -422,12 +422,13 @@ func TestMysqlRepo_AddExists(t *testing.T) {
 
 	_ = repo.New(ctx, index)
 
-	_, err := repo.AddIndexSubject(ctx, index.ID, 5, 5, "test")
+	subject, err := repo.AddOrUpdateIndexSubject(ctx, index.ID, 5, 5, "test")
 	require.NoError(t, err)
+	require.EqualValues(t, subject.Comment, "test")
 
-	_, err = repo.AddIndexSubject(ctx, index.ID, 5, 5, "test")
-	require.Error(t, err)
-	require.Equal(t, err, domain.ErrExists)
+	subject, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, 5, 5, "test2")
+	require.NoError(t, err)
+	require.EqualValues(t, subject.Comment, "test2")
 }
 
 func TestMysqlRepo_AddNoneExistsSubject(t *testing.T) {
@@ -438,7 +439,7 @@ func TestMysqlRepo_AddNoneExistsSubject(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, err := repo.AddIndexSubject(ctx, 15045, 999999999, 5, "test")
+	_, err := repo.AddOrUpdateIndexSubject(ctx, 15045, 999999999, 5, "test")
 	require.Error(t, err)
 	require.Equal(t, err, domain.ErrSubjectNotFound)
 }

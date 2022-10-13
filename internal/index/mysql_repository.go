@@ -156,12 +156,10 @@ func (r mysqlRepo) ListSubjects(
 	return results, nil
 }
 
-func (r mysqlRepo) AddIndexSubject(
+func (r mysqlRepo) AddOrUpdateIndexSubject(
 	ctx context.Context, id model.IndexID,
 	subjectID model.SubjectID, sort uint32, comment string,
 ) (*domain.IndexSubject, error) {
-	var err error
-
 	index, err := r.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -178,35 +176,37 @@ func (r mysqlRepo) AddIndexSubject(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	now := time.Now()
+	subject, err := subject.ConvertDao(subjectDO)
+	if err != nil {
+		return nil, errgo.Wrap(err, "subject.ConvertDao")
+	}
 
 	indexSubject, err := r.q.IndexSubject.WithContext(ctx).
-		Where(r.q.IndexSubject.Rid.Eq(id), r.q.IndexSubject.Sid.Eq(uint32(subjectID))).First()
+		Where(r.q.IndexSubject.Rid.Eq(id), r.q.IndexSubject.Sid.Eq(uint32(subjectID))).
+		FirstOrInit()
 
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	if indexSubject != nil && indexSubject.ID != 0 {
-		return nil, domain.ErrExists
-	}
+	now := time.Now()
 
-	err = r.addSubjectToIndex(ctx, index, &dao.IndexSubject{
-		Comment:  comment,
-		Order:    sort,
-		Dateline: uint32(now.Unix()),
-		Type:     subjectDO.TypeID,
-		Rid:      id,
-		Sid:      uint32(subjectID),
-	})
+	if indexSubject.ID != 0 {
+		// 已经存在，更新！
+		err = r.updateIndexSubject(ctx, id, subjectID, sort, comment)
+	} else {
+		err = r.addSubjectToIndex(ctx, index, &dao.IndexSubject{
+			Comment:  comment,
+			Order:    sort,
+			Dateline: uint32(now.Unix()),
+			Type:     subjectDO.TypeID,
+			Rid:      id,
+			Sid:      uint32(subjectID),
+		})
+	}
 
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
-	}
-
-	subject, err := subject.ConvertDao(subjectDO)
-	if err != nil {
-		return nil, errgo.Wrap(err, "subject.ConvertDao")
 	}
 
 	return &domain.IndexSubject{
@@ -214,6 +214,19 @@ func (r mysqlRepo) AddIndexSubject(
 		Comment: comment,
 		Subject: subject,
 	}, nil
+}
+
+func (r mysqlRepo) updateIndexSubject(
+	ctx context.Context, id model.IndexID,
+	subjectID model.SubjectID, sort uint32, comment string,
+) error {
+	result, err := r.q.IndexSubject.WithContext(ctx).
+		Where(r.q.IndexSubject.Rid.Eq(id), r.q.IndexSubject.Sid.Eq(uint32(subjectID))).
+		Updates(dao.IndexSubject{
+			Order:   sort,
+			Comment: comment,
+		})
+	return r.WrapResult(result, err, "failed to update index subject")
 }
 
 func (r mysqlRepo) addSubjectToIndex(ctx context.Context, index model.Index, subject *dao.IndexSubject) error {
@@ -232,19 +245,6 @@ func (r mysqlRepo) addSubjectToIndex(ctx context.Context, index model.Index, sub
 
 		return r.WrapResult(result, err, "failed to update index info")
 	})
-}
-
-func (r mysqlRepo) UpdateIndexSubject(
-	ctx context.Context, id model.IndexID, subjectID model.SubjectID, sort uint32, comment string,
-) error {
-	q := r.q.IndexSubject
-	result, err := q.WithContext(ctx).
-		Where(q.Rid.Eq(id), q.Sid.Eq(uint32(subjectID))).
-		Updates(dao.IndexSubject{
-			Comment: comment,
-			Order:   sort,
-		})
-	return r.WrapResult(result, err, "failed to update index subject")
 }
 
 func (r mysqlRepo) DeleteIndexSubject(
