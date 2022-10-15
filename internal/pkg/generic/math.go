@@ -30,6 +30,18 @@ type Integer interface {
 	Signed | Unsigned
 }
 
+type UnderlyingSigned interface {
+	~int8 | ~int16 | ~int32 | ~int64 | ~int
+}
+
+type UnderlyingUnsigned interface {
+	~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uint
+}
+
+type UnderlyingInteger interface {
+	UnderlyingSigned | UnderlyingUnsigned
+}
+
 type Float interface {
 	float32 | float64
 }
