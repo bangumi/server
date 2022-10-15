@@ -20,17 +20,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bangumi/server/internal/pkg/generic"
-	"github.com/bangumi/server/internal/subject"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic"
 	"github.com/bangumi/server/internal/pkg/generic/set"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 )
 
 type UpdateCollectionRequest struct {
@@ -115,7 +115,8 @@ func (ctl Ctrl) saveTimeLine(
 	if err != nil {
 		return errgo.Wrap(err, "subject.Get")
 	}
-	return ctl.timeline.WithQuery(tx).Create(ctx, ctl.makeTimeline(req, sj))
+	err = ctl.timeline.WithQuery(tx).Create(ctx, ctl.makeTimeline(req, sj))
+	return errgo.Wrap(err, "timeline.Create")
 }
 
 func (ctl Ctrl) makeTimeline(req UpdateCollectionRequest, sj model.Subject) *model.TimeLine {
