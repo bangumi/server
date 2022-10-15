@@ -115,26 +115,35 @@ func (ctl Ctrl) saveTimeLine(
 	if err != nil {
 		return errgo.Wrap(err, "subject.Get")
 	}
+	return ctl.timeline.WithQuery(tx).Create(ctx, ctl.makeTimeline(req, sj))
+}
 
+func (ctl Ctrl) makeTimeline(req UpdateCollectionRequest, sj model.Subject) *model.TimeLine {
+	sidStr := strconv.Itoa(int(sj.ID))
 	tlMeta := &model.TimeLineMeta{
-		UID: req.UID,
-		// TODO: filling fields
+		UID:      req.UID,
+		Related:  sidStr,
+		Dateline: uint32(time.Now().Unix()),
 	}
 	tlMemo := model.NewTimeLineMemo(&model.TimeLineSubjectMemo{
-		ID:     strconv.Itoa(int(subjectID)),
+		ID:     sidStr,
 		TypeID: string(req.Type.Default(0)),
-		// TODO: image
 		Name:   sj.Name,
 		NameCN: sj.NameCN,
 		// TODO: series
 		CollectComment: req.Comment.Default(""),
 		CollectRate:    int(req.Rate.Default(0)),
 	})
+	tlImg := model.TimeLineImage{
+		SubjectID: &sidStr,
+		Images:    &sj.Image,
+	}
 
-	return ctl.timeline.WithQuery(tx).Create(ctx, &model.TimeLine{
-		TimeLineMeta: tlMeta,
-		TimeLineMemo: tlMemo,
-	})
+	return &model.TimeLine{
+		TimeLineMeta:   tlMeta,
+		TimeLineMemo:   tlMemo,
+		TimeLineImages: model.TimeLineImages{tlImg},
+	}
 }
 
 func (ctl Ctrl) UpdateEpisodesCollection(
