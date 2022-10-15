@@ -93,7 +93,7 @@ func (ctl Ctrl) UpdateCollection(
 			ctl.log.Error("failed to update user collection info", zap.Error(err))
 			return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 		}
-		err = ctl.saveTimeLine(ctx, u, subjectID, req, tx)
+		err = ctl.saveTimeLineSubject(ctx, u, subjectID, req, tx)
 		if err != nil {
 			ctl.log.Error("failed to create associated timeline", zap.Error(err))
 			return errgo.Wrap(err, "timelineRepo.Create")
@@ -104,22 +104,22 @@ func (ctl Ctrl) UpdateCollection(
 	return txErr
 }
 
-func (ctl Ctrl) saveTimeLine(
+func (ctl Ctrl) saveTimeLineSubject(
 	ctx context.Context,
-	_ domain.Auth,
+	u domain.Auth,
 	subjectID model.SubjectID,
 	req UpdateCollectionRequest,
 	tx *query.Query,
 ) error {
-	sj, err := ctl.subject.Get(ctx, subjectID, subject.Filter{NSFW: null.NewBool(false)}) // TODO: filter
+	sj, err := ctl.subject.Get(ctx, subjectID, subject.Filter{NSFW: null.NewBool(u.AllowNSFW())})
 	if err != nil {
 		return errgo.Wrap(err, "subject.Get")
 	}
-	err = ctl.timeline.WithQuery(tx).Create(ctx, ctl.makeTimeline(req, sj))
+	err = ctl.timeline.WithQuery(tx).Create(ctx, makeTimeLineSubject(req, sj))
 	return errgo.Wrap(err, "timeline.Create")
 }
 
-func (ctl Ctrl) makeTimeline(req UpdateCollectionRequest, sj model.Subject) *model.TimeLine {
+func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.TimeLine {
 	sidStr := generic.Itoa(sj.ID)
 	tlMeta := &model.TimeLineMeta{
 		UID:      req.UID,
