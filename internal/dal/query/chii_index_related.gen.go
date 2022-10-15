@@ -29,12 +29,12 @@ func newIndexSubject(db *gorm.DB) indexSubject {
 	_indexSubject.ALL = field.NewAsterisk(tableName)
 	_indexSubject.ID = field.NewUint32(tableName, "idx_rlt_id")
 	_indexSubject.Cat = field.NewInt8(tableName, "idx_rlt_cat")
-	_indexSubject.Rid = field.NewUint32(tableName, "idx_rlt_rid")
-	_indexSubject.Type = field.NewUint8(tableName, "idx_rlt_type")
-	_indexSubject.Sid = field.NewUint32(tableName, "idx_rlt_sid")
+	_indexSubject.IndexID = field.NewUint32(tableName, "idx_rlt_rid")
+	_indexSubject.SubjectType = field.NewUint8(tableName, "idx_rlt_type")
+	_indexSubject.SubjectID = field.NewUint32(tableName, "idx_rlt_sid")
 	_indexSubject.Order = field.NewUint32(tableName, "idx_rlt_order")
 	_indexSubject.Comment = field.NewString(tableName, "idx_rlt_comment")
-	_indexSubject.Dateline = field.NewUint32(tableName, "idx_rlt_dateline")
+	_indexSubject.CreatedTime = field.NewUint32(tableName, "idx_rlt_dateline")
 	_indexSubject.Subject = indexSubjectBelongsToSubject{
 		db: db.Session(&gorm.Session{}),
 
@@ -54,16 +54,16 @@ func newIndexSubject(db *gorm.DB) indexSubject {
 type indexSubject struct {
 	indexSubjectDo indexSubjectDo
 
-	ALL      field.Asterisk
-	ID       field.Uint32
-	Cat      field.Int8
-	Rid      field.Uint32 // 关联目录
-	Type     field.Uint8  // 关联条目类型
-	Sid      field.Uint32 // 关联条目ID
-	Order    field.Uint32
-	Comment  field.String
-	Dateline field.Uint32
-	Subject  indexSubjectBelongsToSubject
+	ALL         field.Asterisk
+	ID          field.Uint32
+	Cat         field.Int8
+	IndexID     field.Uint32 // 关联目录
+	SubjectType field.Uint8  // 关联条目类型
+	SubjectID   field.Uint32 // 关联条目ID
+	Order       field.Uint32
+	Comment     field.String
+	CreatedTime field.Uint32
+	Subject     indexSubjectBelongsToSubject
 
 	fieldMap map[string]field.Expr
 }
@@ -82,12 +82,12 @@ func (i *indexSubject) updateTableName(table string) *indexSubject {
 	i.ALL = field.NewAsterisk(table)
 	i.ID = field.NewUint32(table, "idx_rlt_id")
 	i.Cat = field.NewInt8(table, "idx_rlt_cat")
-	i.Rid = field.NewUint32(table, "idx_rlt_rid")
-	i.Type = field.NewUint8(table, "idx_rlt_type")
-	i.Sid = field.NewUint32(table, "idx_rlt_sid")
+	i.IndexID = field.NewUint32(table, "idx_rlt_rid")
+	i.SubjectType = field.NewUint8(table, "idx_rlt_type")
+	i.SubjectID = field.NewUint32(table, "idx_rlt_sid")
 	i.Order = field.NewUint32(table, "idx_rlt_order")
 	i.Comment = field.NewString(table, "idx_rlt_comment")
-	i.Dateline = field.NewUint32(table, "idx_rlt_dateline")
+	i.CreatedTime = field.NewUint32(table, "idx_rlt_dateline")
 
 	i.fillFieldMap()
 
@@ -115,12 +115,12 @@ func (i *indexSubject) fillFieldMap() {
 	i.fieldMap = make(map[string]field.Expr, 9)
 	i.fieldMap["idx_rlt_id"] = i.ID
 	i.fieldMap["idx_rlt_cat"] = i.Cat
-	i.fieldMap["idx_rlt_rid"] = i.Rid
-	i.fieldMap["idx_rlt_type"] = i.Type
-	i.fieldMap["idx_rlt_sid"] = i.Sid
+	i.fieldMap["idx_rlt_rid"] = i.IndexID
+	i.fieldMap["idx_rlt_type"] = i.SubjectType
+	i.fieldMap["idx_rlt_sid"] = i.SubjectID
 	i.fieldMap["idx_rlt_order"] = i.Order
 	i.fieldMap["idx_rlt_comment"] = i.Comment
-	i.fieldMap["idx_rlt_dateline"] = i.Dateline
+	i.fieldMap["idx_rlt_dateline"] = i.CreatedTime
 
 }
 

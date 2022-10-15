@@ -42,8 +42,8 @@ type mysqlRepo struct {
 
 func (r mysqlRepo) isNsfw(ctx context.Context, id model.IndexID) (bool, error) {
 	i, err := r.q.IndexSubject.WithContext(ctx).
-		Join(r.q.Subject, r.q.IndexSubject.Sid.EqCol(r.q.Subject.ID)).
-		Where(r.q.IndexSubject.Rid.Eq(id), r.q.Subject.Nsfw.Is(true)).Count()
+		Join(r.q.Subject, r.q.IndexSubject.SubjectID.EqCol(r.q.Subject.ID)).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.Subject.Nsfw.Is(true)).Count()
 	if err != nil {
 		r.log.Error("unexpected error when checking index nsfw", zap.Uint32("index_id", id))
 		return false, errgo.Wrap(err, "dal")
@@ -97,7 +97,7 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
 			return err
 		}
-		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.Rid.Eq(id)).Delete()
+		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.IndexID.Eq(id)).Delete()
 		if err = r.WrapResult(result, err, "failed to delete subjects in the index"); err != nil {
 			return err
 		}
@@ -108,9 +108,9 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 func (r mysqlRepo) CountSubjects(
 	ctx context.Context, id model.IndexID, subjectType model.SubjectType,
 ) (int64, error) {
-	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.Rid.Eq(id))
+	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.IndexID.Eq(id))
 	if subjectType != 0 {
-		q = q.Where(r.q.IndexSubject.Type.Eq(subjectType))
+		q = q.Where(r.q.IndexSubject.SubjectType.Eq(subjectType))
 	}
 
 	i, err := q.Count()
@@ -127,11 +127,13 @@ func (r mysqlRepo) ListSubjects(
 	subjectType model.SubjectType,
 	limit, offset int,
 ) ([]domain.IndexSubject, error) {
-	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).Preload(r.q.IndexSubject.Subject.Fields).
-		Where(r.q.IndexSubject.Rid.Eq(id)).
-		Order(r.q.IndexSubject.Order).Limit(limit).Offset(offset)
+	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).
+		Preload(r.q.IndexSubject.Subject.Fields).
+		Where(r.q.IndexSubject.IndexID.Eq(id)).
+		Order(r.q.IndexSubject.Order).
+		Limit(limit).Offset(offset)
 	if subjectType != 0 {
-		q = q.Where(r.q.IndexSubject.Type.Eq(subjectType))
+		q = q.Where(r.q.IndexSubject.SubjectType.Eq(subjectType))
 	}
 
 	d, err := q.Find()
@@ -147,7 +149,7 @@ func (r mysqlRepo) ListSubjects(
 		}
 
 		results[i] = domain.IndexSubject{
-			AddedAt: time.Unix(int64(s.Dateline), 0),
+			AddedAt: time.Unix(int64(s.CreatedTime), 0),
 			Comment: s.Comment,
 			Subject: sub,
 		}
@@ -182,7 +184,7 @@ func (r mysqlRepo) AddOrUpdateIndexSubject(
 	}
 
 	indexSubject, err := r.q.IndexSubject.WithContext(ctx).
-		Where(r.q.IndexSubject.Rid.Eq(id), r.q.IndexSubject.Sid.Eq(uint32(subjectID))).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(uint32(subjectID))).
 		FirstOrInit()
 
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -196,12 +198,12 @@ func (r mysqlRepo) AddOrUpdateIndexSubject(
 		err = r.updateIndexSubject(ctx, id, subjectID, sort, comment)
 	} else {
 		err = r.addSubjectToIndex(ctx, index, &dao.IndexSubject{
-			Comment:  comment,
-			Order:    sort,
-			Dateline: uint32(now.Unix()),
-			Type:     subjectDO.TypeID,
-			Rid:      id,
-			Sid:      uint32(subjectID),
+			Comment:     comment,
+			Order:       sort,
+			CreatedTime: uint32(now.Unix()),
+			IndexID:     id,
+			SubjectType: subjectDO.TypeID,
+			SubjectID:   uint32(subjectID),
 		})
 	}
 
@@ -221,7 +223,7 @@ func (r mysqlRepo) updateIndexSubject(
 	subjectID model.SubjectID, sort uint32, comment string,
 ) error {
 	result, err := r.q.IndexSubject.WithContext(ctx).
-		Where(r.q.IndexSubject.Rid.Eq(id), r.q.IndexSubject.Sid.Eq(uint32(subjectID))).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(uint32(subjectID))).
 		Updates(dao.IndexSubject{
 			Order:   sort,
 			Comment: comment,
@@ -239,8 +241,8 @@ func (r mysqlRepo) addSubjectToIndex(ctx context.Context, index model.Index, sub
 		result, err := r.q.Index.WithContext(ctx).
 			Where(r.q.Index.ID.Eq(index.ID)).
 			Updates(dao.Index{
-				Lasttouch:    uint32(time.Now().Unix()),
-				SubjectTotal: index.Total + 1,
+				UpdatedTime:  uint32(time.Now().Unix()),
+				SubjectCount: index.Total + 1,
 			})
 
 		return r.WrapResult(result, err, "failed to update index info")
@@ -256,13 +258,13 @@ func (r mysqlRepo) DeleteIndexSubject(
 			return err
 		}
 		result, err := r.q.IndexSubject.WithContext(ctx).
-			Where(r.q.IndexSubject.Rid.Eq(id), r.q.IndexSubject.Sid.Eq(uint32(subjectID))).
+			Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(uint32(subjectID))).
 			Delete()
 		if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
 			return err
 		}
 		result, err = r.q.Index.WithContext(ctx).Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
-			SubjectTotal: index.Total - 1,
+			SubjectCount: index.Total - 1,
 		})
 		if err = r.WrapResult(result, err, "failed to update index info"); err != nil {
 			return err
@@ -290,25 +292,25 @@ func daoToModel(index *dao.Index) *model.Index {
 		Title:       index.Title,
 		Description: index.Desc,
 		CreatorID:   index.CreatorID,
-		Total:       index.SubjectTotal,
-		Comments:    index.Replies,
-		Collects:    index.Collects,
+		Total:       index.SubjectCount,
+		Comments:    index.ReplyCount,
+		Collects:    index.CollectCount,
 		Ban:         index.Ban,
-		NSFW:        false, // check nsfw outside of this function
-		CreatedAt:   time.Unix(int64(index.Dateline), 0),
-		UpdatedAt:   time.Unix(int64(index.Lasttouch), 0),
+		NSFW:        false, // check nsfw outSubjectIDe of this function
+		CreatedAt:   time.Unix(int64(index.CreatedTime), 0),
+		UpdatedAt:   time.Unix(int64(index.UpdatedTime), 0),
 	}
 }
 
 func modelToDAO(index *model.Index) *dao.Index {
 	return &dao.Index{
-		ID:        index.ID,
-		Type:      0,
-		Title:     index.Title,
-		Desc:      index.Description,
-		CreatorID: index.CreatorID,
-		Ban:       index.Ban,
-		Dateline:  int32(index.CreatedAt.Unix()),
-		Lasttouch: uint32(index.UpdatedAt.Unix()),
+		ID:          index.ID,
+		Type:        0,
+		Title:       index.Title,
+		Desc:        index.Description,
+		CreatorID:   index.CreatorID,
+		Ban:         index.Ban,
+		CreatedTime: int32(index.CreatedAt.Unix()),
+		UpdatedTime: uint32(index.UpdatedAt.Unix()),
 	}
 }

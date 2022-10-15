@@ -31,12 +31,12 @@ func newIndex(db *gorm.DB) index {
 	_index.Type = field.NewUint8(tableName, "idx_type")
 	_index.Title = field.NewString(tableName, "idx_title")
 	_index.Desc = field.NewString(tableName, "idx_desc")
-	_index.Replies = field.NewUint32(tableName, "idx_replies")
-	_index.SubjectTotal = field.NewUint32(tableName, "idx_subject_total")
-	_index.Collects = field.NewUint32(tableName, "idx_collects")
+	_index.ReplyCount = field.NewUint32(tableName, "idx_replies")
+	_index.SubjectCount = field.NewUint32(tableName, "idx_subject_total")
+	_index.CollectCount = field.NewUint32(tableName, "idx_collects")
 	_index.Stats = field.NewString(tableName, "idx_stats")
-	_index.Dateline = field.NewInt32(tableName, "idx_dateline")
-	_index.Lasttouch = field.NewUint32(tableName, "idx_lasttouch")
+	_index.CreatedTime = field.NewInt32(tableName, "idx_dateline")
+	_index.UpdatedTime = field.NewUint32(tableName, "idx_lasttouch")
 	_index.CreatorID = field.NewField(tableName, "idx_uid")
 	_index.Ban = field.NewBool(tableName, "idx_ban")
 
@@ -53,12 +53,12 @@ type index struct {
 	Type         field.Uint8
 	Title        field.String // 标题
 	Desc         field.String // 简介
-	Replies      field.Uint32 // 回复数
-	SubjectTotal field.Uint32 // 内含条目总数
-	Collects     field.Uint32 // 收藏数
+	ReplyCount   field.Uint32 // 回复数
+	SubjectCount field.Uint32 // 内含条目总数
+	CollectCount field.Uint32 // 收藏数
 	Stats        field.String
-	Dateline     field.Int32 // 创建时间
-	Lasttouch    field.Uint32
+	CreatedTime  field.Int32 // 创建时间
+	UpdatedTime  field.Uint32
 	CreatorID    field.Field // 创建人UID
 	Ban          field.Bool
 
@@ -81,12 +81,12 @@ func (i *index) updateTableName(table string) *index {
 	i.Type = field.NewUint8(table, "idx_type")
 	i.Title = field.NewString(table, "idx_title")
 	i.Desc = field.NewString(table, "idx_desc")
-	i.Replies = field.NewUint32(table, "idx_replies")
-	i.SubjectTotal = field.NewUint32(table, "idx_subject_total")
-	i.Collects = field.NewUint32(table, "idx_collects")
+	i.ReplyCount = field.NewUint32(table, "idx_replies")
+	i.SubjectCount = field.NewUint32(table, "idx_subject_total")
+	i.CollectCount = field.NewUint32(table, "idx_collects")
 	i.Stats = field.NewString(table, "idx_stats")
-	i.Dateline = field.NewInt32(table, "idx_dateline")
-	i.Lasttouch = field.NewUint32(table, "idx_lasttouch")
+	i.CreatedTime = field.NewInt32(table, "idx_dateline")
+	i.UpdatedTime = field.NewUint32(table, "idx_lasttouch")
 	i.CreatorID = field.NewField(table, "idx_uid")
 	i.Ban = field.NewBool(table, "idx_ban")
 
@@ -116,12 +116,12 @@ func (i *index) fillFieldMap() {
 	i.fieldMap["idx_type"] = i.Type
 	i.fieldMap["idx_title"] = i.Title
 	i.fieldMap["idx_desc"] = i.Desc
-	i.fieldMap["idx_replies"] = i.Replies
-	i.fieldMap["idx_subject_total"] = i.SubjectTotal
-	i.fieldMap["idx_collects"] = i.Collects
+	i.fieldMap["idx_replies"] = i.ReplyCount
+	i.fieldMap["idx_subject_total"] = i.SubjectCount
+	i.fieldMap["idx_collects"] = i.CollectCount
 	i.fieldMap["idx_stats"] = i.Stats
-	i.fieldMap["idx_dateline"] = i.Dateline
-	i.fieldMap["idx_lasttouch"] = i.Lasttouch
+	i.fieldMap["idx_dateline"] = i.CreatedTime
+	i.fieldMap["idx_lasttouch"] = i.UpdatedTime
 	i.fieldMap["idx_uid"] = i.CreatorID
 	i.fieldMap["idx_ban"] = i.Ban
 }
