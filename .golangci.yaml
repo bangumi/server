@@ -94,6 +94,9 @@ linters-settings:
 
   gofmt:
     simplify: true
+    rewrite-rules:
+      - pattern: "interface{}"
+        replacement: "any"
 
   funlen:
     lines: 60
@@ -311,6 +314,7 @@ linters:
     - sqlclosecheck
     - rowserrcheck
     - nilerr
+    - dupword
     # 1.18
     - wastedassign
     - nosnakecase # false positive for variable and const defined in other lib

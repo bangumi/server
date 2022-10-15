@@ -45,15 +45,15 @@ type metricsLog struct {
 	log           *zap.Logger
 }
 
-func (l *metricsLog) Info(_ context.Context, s string, i ...interface{}) {
+func (l *metricsLog) Info(_ context.Context, s string, i ...any) {
 	l.log.Info(fmt.Sprintln(s, i))
 }
 
-func (l *metricsLog) Warn(_ context.Context, s string, i ...interface{}) {
+func (l *metricsLog) Warn(_ context.Context, s string, i ...any) {
 	l.log.Warn(fmt.Sprintln(s, i))
 }
 
-func (l *metricsLog) Error(_ context.Context, s string, i ...interface{}) {
+func (l *metricsLog) Error(_ context.Context, s string, i ...any) {
 	l.log.Error(fmt.Sprintln(s, i))
 }
 
