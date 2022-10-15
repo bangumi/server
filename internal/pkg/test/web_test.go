@@ -30,7 +30,7 @@ func TestGetWebApp(t *testing.T) {
 			AuthRepo:    mocks.NewAuthRepo(t),
 			EpisodeRepo: mocks.NewEpisodeRepo(t),
 			TopicRepo:   mocks.NewTopicRepo(t),
-			Cache:       mocks.NewCache(t),
+			Cache:       mocks.NewRedisCache(t),
 		},
 	)
 
@@ -39,7 +39,7 @@ func TestGetWebApp(t *testing.T) {
 			SubjectRepo: mocks.NewSubjectRepo(t),
 			AuthRepo:    mocks.NewAuthRepo(t),
 			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			Cache:       mocks.NewCache(t),
+			Cache:       mocks.NewRedisCache(t),
 		},
 	)
 }

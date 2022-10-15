@@ -18,22 +18,37 @@ import (
 	"context"
 	"errors"
 	"io"
+	"sync/atomic"
 
 	"github.com/goccy/go-json"
 	"github.com/segmentio/kafka-go"
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/web/session"
 )
 
+func newEventHandler(
+	log *zap.Logger,
+	appConfig config.AppConfig,
+	session session.Manager,
+	reader *kafka.Reader,
+	search search.Client,
+) *eventHandler {
+	return &eventHandler{
+		config:  appConfig,
+		session: session,
+		reader:  reader,
+		search:  search,
+		log:     log.Named("eventHandler"),
+	}
+}
+
 type eventHandler struct {
-	closed  *atomic.Bool
+	closed  atomic.Bool
 	config  config.AppConfig
 	session session.Manager
 	log     *zap.Logger
@@ -74,28 +89,11 @@ func (e *eventHandler) Close() error {
 	return errgo.Wrap(e.reader.Close(), "kafka.Close")
 }
 
-func newEventHandler(
-	log *zap.Logger,
-	appConfig config.AppConfig,
-	session session.Manager,
-	reader *kafka.Reader,
-	search search.Client,
-) *eventHandler {
-	return &eventHandler{
-		closed:  atomic.NewBool(false),
-		config:  appConfig,
-		session: session,
-		reader:  reader,
-		search:  search,
-		log:     log.Named("eventHandler"),
-	}
-}
-
 func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
-	e.log.Info("user change password", log.UserID(id))
+	e.log.Info("user change password", id.Zap())
 
 	if err := e.session.RevokeUser(context.Background(), id); err != nil {
-		e.log.Error("failed to revoke user", log.UserID(id), zap.Error(err))
+		e.log.Error("failed to revoke user", id.Zap(), zap.Error(err))
 		return errgo.Wrap(err, "session.RevokeUser")
 	}
 

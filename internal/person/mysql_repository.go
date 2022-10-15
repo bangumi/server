@@ -99,9 +99,7 @@ func (r mysqlRepo) GetCharacterRelated(
 	return results, nil
 }
 
-func (r mysqlRepo) GetByIDs(
-	ctx context.Context, ids ...model.PersonID,
-) (map[model.PersonID]model.Person, error) {
+func (r mysqlRepo) GetByIDs(ctx context.Context, ids []model.PersonID) (map[model.PersonID]model.Person, error) {
 	u, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).
 		Where(r.q.Person.ID.In(slice.ToValuer(ids)...)).Find()
 	if err != nil {

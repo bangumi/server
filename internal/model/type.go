@@ -76,3 +76,19 @@ func (v TimeLineID) Value() (driver.Value, error) {
 func (v GroupID) Zap() zap.Field {
 	return zap.Uint32("group_id", uint32(v))
 }
+
+func (v UserID) Zap() zap.Field {
+	return zap.Uint32("user_id", uint32(v))
+}
+
+func (v SubjectID) Zap() zap.Field {
+	return zap.Uint32("subject_id", uint32(v))
+}
+
+func (v EpisodeID) Zap() zap.Field {
+	return zap.Uint32("episode_id", uint32(v))
+}
+
+func (v TopicID) Zap() zap.Field {
+	return zap.Uint32("topic_id", uint32(v))
+}

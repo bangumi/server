@@ -14,8 +14,6 @@
 
 package slice
 
-import "database/sql/driver"
-
 func Map[T any, K any, F func(item T) K](in []T, fn F) []K {
 	var s = make([]K, len(in))
 	for i, t := range in {
@@ -46,32 +44,18 @@ func ToMap[K comparable, T any, F func(item T) K](in []T, fn F) map[K]T {
 	return s
 }
 
-func ToUint8[T interface{ ~uint8 }](in []T) []uint8 {
-	var s = make([]uint8, len(in))
-	for i, t := range in {
-		s[i] = uint8(t)
+func First[S ~[]T, T any](s S, end int) S {
+	if s == nil {
+		return nil
 	}
 
-	return s
-}
-
-func First[T any](in []T, end int) []T {
-	if len(in) < end {
-		end = len(in)
+	if len(s) < end {
+		end = len(s)
 	}
 
-	out := make([]T, end)
-	copy(out, in)
+	out := make(S, end)
+	copy(out, s)
 	return out
-}
-
-func ToValuer[T driver.Valuer](in []T) []driver.Valuer {
-	var s = make([]driver.Valuer, len(in))
-	for i, t := range in {
-		s[i] = t
-	}
-
-	return s
 }
 
 func Flat[T any](in [][]T) []T {
@@ -90,11 +74,11 @@ func Flat[T any](in [][]T) []T {
 
 type empty = struct{}
 
-func Unique[T comparable](in []T) []T {
-	var m = make(map[T]empty, len(in))
-	var out = make([]T, 0, len(in))
+func Unique[S ~[]T, T comparable](s S) S {
+	var m = make(map[T]empty, len(s))
+	var out = make(S, 0, len(s))
 
-	for _, item := range in {
+	for _, item := range s {
 		if _, ok := m[item]; ok {
 			continue
 		}
@@ -134,4 +118,16 @@ func Contain[T comparable](s []T, item T) bool {
 	}
 
 	return false
+}
+
+func Clone[S ~[]E, E any](s S) S {
+	// Preserve nil in case it matters.
+	if s == nil {
+		return nil
+	}
+
+	var out = make(S, len(s))
+	copy(out, s)
+
+	return out
 }

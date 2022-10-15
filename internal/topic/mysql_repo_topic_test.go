@@ -43,8 +43,8 @@ func TestMysqlRepo_Count(t *testing.T) {
 
 	repo := getRepo(t)
 
-	count, err := repo.Count(context.Background(), domain.TopicTypeSubject, 1, []model.TopicStatus{
-		model.TopicStatusNormal,
+	count, err := repo.Count(context.Background(), domain.TopicTypeSubject, 1, []model.TopicDisplay{
+		model.TopicDisplayNormal,
 	})
 	require.NoError(t, err)
 	require.Equal(t, count, int64(1))
@@ -56,8 +56,8 @@ func TestMysqlRepo_List(t *testing.T) {
 
 	repo := getRepo(t)
 
-	_, err := repo.List(context.Background(), domain.TopicTypeSubject, 2, []model.TopicStatus{
-		model.TopicStatusNormal,
+	_, err := repo.List(context.Background(), domain.TopicTypeSubject, 2, []model.TopicDisplay{
+		model.TopicDisplayNormal,
 	}, 0, 0)
 	require.NoError(t, err)
 }

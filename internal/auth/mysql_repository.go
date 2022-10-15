@@ -31,7 +31,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/random"
 )
 
@@ -107,7 +106,7 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Per
 	r, err := m.q.UserGroup.WithContext(ctx).Where(m.q.UserGroup.ID.Eq(groupID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			m.log.Error("can't find permission for group", log.UserGroup(groupID))
+			m.log.Error("can't find permission for group", zap.Uint8("user_group_id", groupID))
 			return domain.Permission{}, nil
 		}
 
@@ -117,7 +116,7 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Per
 
 	p, err := parsePhpSerializedPermission(r.Perm)
 	if err != nil {
-		m.log.Error("failed to decode php serialized content", zap.Error(err), log.UserGroup(groupID))
+		m.log.Error("failed to decode php serialized content", zap.Error(err), zap.Uint8("user_group_id", groupID))
 		return domain.Permission{}, nil
 	}
 

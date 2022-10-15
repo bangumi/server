@@ -22,12 +22,13 @@ import (
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/subject"
 )
 
 func New(
 	episode domain.EpisodeRepo,
-	cache cache.Cache,
-	subject domain.SubjectRepo,
+	cache cache.RedisCache,
+	subject subject.Repo,
 	person domain.PersonRepo,
 	character domain.CharacterRepo,
 	collection domain.CollectionRepo,
@@ -39,7 +40,7 @@ func New(
 	log *zap.Logger,
 ) Ctrl {
 	return Ctrl{
-		log:   log.Named("app.query"),
+		log:   log.Named("controller"),
 		cache: cache,
 
 		tx:  tx,
@@ -66,7 +67,7 @@ func New(
 
 type Ctrl struct {
 	log   *zap.Logger
-	cache cache.Cache
+	cache cache.RedisCache
 
 	tx  dal.Transaction
 	dam dam.Dam
@@ -75,7 +76,7 @@ type Ctrl struct {
 	topic                 domain.TopicRepo
 	person                domain.PersonRepo
 	episode               domain.EpisodeRepo
-	subject               domain.SubjectRepo
+	subject               subject.Repo
 	character             domain.CharacterRepo
 	collection            domain.CollectionRepo
 	metricUserQueryCached tally.Counter

@@ -27,7 +27,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
 var _ domain.GroupRepo = mysqlRepo{}
@@ -109,7 +108,7 @@ func (r mysqlRepo) countMembersByID(
 
 	c, err := q.Count()
 	if err != nil {
-		r.log.Error("un-expected error when counting group member", zap.Error(err), log.GroupID(id))
+		r.log.Error("un-expected error when counting group member", zap.Error(err), id.Zap())
 		return 0, errgo.Wrap(err, "dal")
 	}
 
@@ -132,7 +131,7 @@ func (r mysqlRepo) listMembersByID(
 
 	c, err := q.Limit(limit).Offset(offset).Order(r.q.GroupMember.CreatedTime.Desc()).Find()
 	if err != nil {
-		r.log.Error("un-expected error when counting group member", zap.Error(err), log.GroupID(id))
+		r.log.Error("un-expected error when counting group member", zap.Error(err), id.Zap())
 		return nil, errgo.Wrap(err, "dal")
 	}
 

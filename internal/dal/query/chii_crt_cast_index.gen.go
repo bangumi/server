@@ -77,8 +77,8 @@ type cast struct {
 	CharacterID   field.Field
 	PersonID      field.Field
 	SubjectID     field.Field
-	SubjectTypeID field.Uint8
-	Summary       field.String
+	SubjectTypeID field.Uint8  // 根据人物归类查询角色，动画，书籍，游戏
+	Summary       field.String // 幼年，男乱马，女乱马，变身形态，少女形态。。
 	Character     castHasOneCharacter
 
 	Subject castHasOneSubject

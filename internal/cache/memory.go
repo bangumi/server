@@ -16,80 +16,56 @@ package cache
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"reflect"
 	"sync"
 	"time"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-// NewMemoryCache return an in-memory cache.
-// This cache backend should be used to cache limited-sized entries like user group permission rule.
-func NewMemoryCache() Cache {
-	return &memCache{}
+// NewMemoryCache 不对缓存的对象进行序列化，直接用 [sync.Map] 保存在内存里。
+//
+// 过期的缓存不会从内存中自动回收，不能用来缓存值空间非常大的数据如条目或用户，
+// 用于缓存用户组权限这样的值空间比较小的数据。
+func NewMemoryCache[K comparable, V any]() *MemoryCache[K, V] {
+	return &MemoryCache[K, V]{}
 }
 
-var errCacheNotSameType = errors.New("cached item have is not same type as expected result")
-
-// memCache store data in memory,
+// MemoryCache store data in memory,
 // will be used to cache user group permission rule.
-type memCache struct {
+type MemoryCache[K comparable, T any] struct {
 	m sync.Map
 }
 
-type cacheItem struct {
-	Value any
+type cacheItem[T any] struct {
+	Value T
 	Dead  time.Time
 }
 
-func (c *memCache) Get(_ context.Context, key string, value any) (bool, error) {
+func (c *MemoryCache[K, T]) Get(_ context.Context, key K) (T, bool) {
 	v, ok := c.m.Load(key)
 	if !ok {
-		return ok, nil
+		return c.zero(), false
 	}
 
-	item, ok := v.(cacheItem)
+	item, ok := v.(cacheItem[T])
 	if !ok {
 		panic("can't cast MemCache cache item")
 	}
 
 	if time.Now().After(item.Dead) {
 		c.m.Delete(key)
-
-		return false, nil
+		return c.zero(), false
 	}
 
-	vOut := reflect.ValueOf(value).Elem()
-	vCache := reflect.ValueOf(item.Value)
-
-	// vOut.Set(vCache) will panic if we don't check their type here.
-	if !vCache.Type().AssignableTo(vOut.Type()) {
-		return false, errgo.Wrap(errCacheNotSameType,
-			fmt.Sprintf(
-				"cached item is %s, but receiver it ptr of type %s", vOut.Type(), vCache.Type(),
-			))
-	}
-
-	vOut.Set(vCache)
-
-	return true, nil
+	return item.Value, true
 }
 
-func (c *memCache) Set(_ context.Context, key string, value any, ttl time.Duration) error {
-	c.m.Store(key, cacheItem{
+func (c *MemoryCache[K, T]) Set(_ context.Context, key K, value T, ttl time.Duration) {
+	c.m.Store(key, cacheItem[T]{
 		Value: value,
 		Dead:  time.Now().Add(ttl),
 	})
-
-	return nil
 }
 
-func (c *memCache) Del(ctx context.Context, keys ...string) error {
-	for _, key := range keys {
-		c.m.Delete(key)
-	}
-
-	return nil
+func (c *MemoryCache[K, T]) zero() T {
+	var t T
+	return t
 }

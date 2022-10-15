@@ -25,23 +25,24 @@ import (
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 
+	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-const slowQueryTimeout = time.Millisecond * 200
-
 // production gorm logger log do sql time monitoring and error logging to zap logger.
-func newProdLog(scope tally.Scope) gormLogger.Interface {
+func newProdLog(cfg config.AppConfig, scope tally.Scope) gormLogger.Interface {
 	return &metricsLog{
-		log: logger.Named("gorm").WithOptions(zap.AddStacktrace(zap.DPanicLevel)),
-		h:   scope.Histogram("sql_time", metrics.SQLTimeBucket()),
+		slowThreshold: cfg.SlowSQLDuration,
+		log:           logger.Named("gorm").WithOptions(zap.AddStacktrace(zap.DPanicLevel)),
+		h:             scope.Histogram("sql_time", metrics.SQLTimeBucket()),
 	}
 }
 
 type metricsLog struct {
-	h   tally.Histogram
-	log *zap.Logger
+	slowThreshold time.Duration
+	h             tally.Histogram
+	log           *zap.Logger
 }
 
 func (l *metricsLog) Info(_ context.Context, s string, i ...interface{}) {
@@ -69,21 +70,24 @@ func (l *metricsLog) LogMode(level gormLogger.LogLevel) gormLogger.Interface {
 		log.WithOptions(zap.IncreaseLevel(zap.ErrorLevel))
 	}
 
-	return &metricsLog{log: log, h: l.h}
+	return &metricsLog{
+		slowThreshold: l.slowThreshold,
+		h:             l.h,
+		log:           log,
+	}
 }
 
-var slowLog = "SLOW SQL >= " + slowQueryTimeout.String() //nolint:gochecknoglobals
-
 func (l *metricsLog) Trace(_ context.Context, begin time.Time, fc func() (sql string, rows int64), err error) {
-	sql, rows := fc()
 	elapsed := time.Since(begin)
 	l.h.RecordDuration(elapsed)
 
 	switch {
 	case err != nil && !errors.Is(err, gorm.ErrRecordNotFound):
+		sql, rows := fc()
 		l.log.Error("gorm error", zap.String("sql", sql), zap.Error(err),
 			zap.Duration("duration", elapsed), zap.Int64("rows", rows))
-	case elapsed >= slowQueryTimeout:
-		l.log.Error(slowLog, zap.String("sql", sql), zap.Duration("duration", elapsed), zap.Int64("rows", rows))
+	case l.slowThreshold > 0 && elapsed >= l.slowThreshold:
+		sql, rows := fc()
+		l.log.Warn("slow SQL", zap.String("sql", sql), zap.Duration("duration", elapsed), zap.Int64("rows", rows))
 	}
 }

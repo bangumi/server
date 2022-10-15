@@ -35,7 +35,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	if err != nil {
 		return err
 	}
-	topics, count, err := h.ctrl.ListTopics(c.Context(), u.Auth, topicType, id, page.Limit, page.Offset)
+	topics, count, err := h.ctrl.ListTopics(c.UserContext(), u.Auth, topicType, id, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "ctrl.ListTopics")
 	}
@@ -56,7 +56,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 	userIDs := slice.Map(topics, func(item model.Topic) model.UserID {
 		return item.CreatorID
 	})
-	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(userIDs)...)
+	userMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), slice.Unique(userIDs))
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -104,7 +104,7 @@ func (h Handler) getResTopicWithComments(
 
 	userIDs[t.CreatorID] = struct{}{}
 
-	users, err := h.ctrl.GetUsersByIDs(context.TODO(), gmap.Keys(userIDs)...)
+	users, err := h.ctrl.GetUsersByIDs(context.TODO(), gmap.Keys(userIDs))
 	if err != nil {
 		return nil, errgo.Wrap(err, "ctrl.GetUsersByIDs")
 	}
@@ -125,7 +125,7 @@ func (h Handler) getResTopicWithComments(
 		CreatedAt: t.CreatedAt,
 		UpdatedAt: t.UpdatedAt,
 		Creator:   res.ConvertModelUser(users[t.CreatorID]),
-		State:     res.ToCommentState(t.State),
+		State:     t.State,
 		Comments:  fromModelComments(t.Replies, users, friends),
 		Text:      t.Content,
 	}, nil
@@ -146,7 +146,7 @@ func fromModelComments(
 				Text:      comment.Content,
 				Creator:   res.ConvertModelUser(users[comment.CreatorID]),
 				IsFriend:  f,
-				State:     res.ToCommentState(comment.State),
+				State:     comment.State,
 				ID:        comment.ID,
 			})
 		}
@@ -159,7 +159,7 @@ func fromModelComments(
 			Replies:   subComments,
 			ID:        reply.ID,
 			IsFriend:  f,
-			State:     res.ToCommentState(reply.State),
+			State:     reply.State,
 		})
 	}
 

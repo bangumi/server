@@ -40,6 +40,7 @@ import (
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/search"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
@@ -49,7 +50,7 @@ import (
 )
 
 type Mock struct {
-	SubjectRepo    domain.SubjectRepo
+	SubjectRepo    subject.Repo
 	PersonRepo     domain.PersonRepo
 	CharacterRepo  domain.CharacterRepo
 	AuthRepo       domain.AuthRepo
@@ -63,7 +64,7 @@ type Mock struct {
 	CollectionRepo domain.CollectionRepo
 	CaptchaManager captcha.Manager
 	SessionManager session.Manager
-	Cache          cache.Cache
+	Cache          cache.RedisCache
 	RateLimiter    rate.Manager
 	OAuthManager   oauth.Manager
 	HTTPMock       *httpmock.MockTransport
@@ -200,13 +201,13 @@ func MockUserRepo(repo domain.UserRepo) fx.Option {
 		mocker := &mocks.UserRepo{}
 		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(model.User{}, nil)
 		mocker.On("GetByIDs", mock.Anything, mock.Anything).
-			Return(func(ctx context.Context, ids ...model.UserID) map[model.UserID]model.User {
+			Return(func(ctx context.Context, ids []model.UserID) map[model.UserID]model.User {
 				var ret = make(map[model.UserID]model.User, len(ids))
 				for _, id := range ids {
 					ret[id] = model.User{}
 				}
 				return ret
-			}, func(ctx context.Context, ids ...model.UserID) error {
+			}, func(ctx context.Context, ids []model.UserID) error {
 				return nil
 			})
 		repo = mocker
@@ -276,30 +277,21 @@ func MockOAuthManager(m oauth.Manager) fx.Option {
 	return fx.Provide(func() oauth.Manager { return m })
 }
 
-func MockSubjectRepo(m domain.SubjectRepo) fx.Option {
+func MockSubjectRepo(m subject.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.SubjectRepo{}
-		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Subject{}, nil)
+		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(model.Subject{}, nil)
 
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.SubjectRepo))))
+	return fx.Provide(func() subject.Repo { return m })
 }
 
-func MockCache(mock cache.Cache) fx.Option {
-	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.Cache))))
+func MockCache(mock cache.RedisCache) fx.Option {
+	return fx.Supply(fx.Annotate(mock, fx.As(new(cache.RedisCache))))
 }
 
 func MockEmptyCache() fx.Option {
-	return fx.Provide(NopCache)
-}
-
-func NopCache() cache.Cache {
-	mc := &mocks.Cache{}
-	mc.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
-	mc.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	mc.EXPECT().Del(mock.Anything, mock.Anything).Return(nil)
-
-	return mc
+	return fx.Provide(cache.NewNoop)
 }

@@ -25,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/gmap"
 )
 
 func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, error) {
@@ -60,42 +59,17 @@ func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, e
 	return r, nil
 }
 
-func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs ...model.UserID) (map[model.UserID]model.User, error) {
-	ctl.metricUserQueryCount.Inc(int64(len(userIDs)))
-	var notCached = make([]model.UserID, 0, len(userIDs))
-
-	var result = make(map[model.UserID]model.User, len(userIDs))
-	for _, userID := range userIDs {
-		key := cachekey.User(userID)
-		var s model.User
-		ok, err := ctl.cache.Get(ctx, key, &s)
-		if err != nil {
-			return nil, errgo.Wrap(err, "cache.Get")
-		}
-
-		if ok {
-			result[userID] = s
-		} else {
-			notCached = append(notCached, userID)
-		}
+func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs []model.UserID) (map[model.UserID]model.User, error) {
+	if len(userIDs) == 0 {
+		return map[model.UserID]model.User{}, nil
 	}
 
-	ctl.metricUserQueryCached.Inc(int64(len(result)))
-	newUserMap, err := ctl.user.GetByIDs(ctx, notCached...)
+	users, err := ctl.user.GetByIDs(ctx, userIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get subjects")
 	}
 
-	for userID, user := range newUserMap {
-		err := ctl.cache.Set(ctx, cachekey.User(userID), user, time.Hour)
-		if err != nil {
-			ctl.log.Error("failed to set user cache")
-		}
-	}
-
-	gmap.Copy(result, newUserMap)
-
-	return result, nil
+	return users, nil
 }
 
 func (ctl Ctrl) GetFriends(ctx context.Context, id model.UserID) (map[model.UserID]domain.FriendItem, error) {

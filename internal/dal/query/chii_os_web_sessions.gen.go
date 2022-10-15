@@ -42,11 +42,11 @@ type webSession struct {
 	webSessionDo webSessionDo
 
 	ALL       field.Asterisk
-	Key       field.String
-	UserID    field.Field
-	Value     field.Bytes
-	CreatedAt field.Int64
-	ExpiredAt field.Int64
+	Key       field.String // session key
+	UserID    field.Field  // uint32 user id
+	Value     field.Bytes  // json encoded session data
+	CreatedAt field.Int64  // int64 unix timestamp, when session is created
+	ExpiredAt field.Int64  // int64 unix timestamp, when session is expired
 
 	fieldMap map[string]field.Expr
 }

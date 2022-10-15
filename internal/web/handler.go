@@ -19,11 +19,8 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/pkg/gtime"
-	"github.com/bangumi/server/internal/web/frontend"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/person"
@@ -78,6 +75,7 @@ func AddRouters(
 	v0.Get("/users/:username/collections", userHandler.ListSubjectCollection)
 	v0.Get("/users/:username/collections/:subject_id", userHandler.GetSubjectCollection)
 	v0.Get("/users/-/collections/-/episodes/:episode_id", h.NeedLogin, userHandler.GetEpisodeCollection)
+	v0.Put("/users/-/collections/-/episodes/:episode_id", req.JSON, h.NeedLogin, userHandler.PutEpisodeCollection)
 	v0.Get("/users/-/collections/:subject_id/episodes", h.NeedLogin, userHandler.GetSubjectEpisodeCollection)
 	v0.Patch("/users/-/collections/:subject_id", req.JSON, h.NeedLogin, userHandler.PatchSubjectCollection)
 	v0.Patch("/users/-/collections/:subject_id/episodes",
@@ -134,12 +132,6 @@ func AddRouters(
 	privateHTML.Get("/login", h.PageLogin)
 	privateHTML.Get("/access-token", h.PageListAccessToken)
 	privateHTML.Get("/access-token/create", h.PageCreateAccessToken)
-
-	app.Use("/static/", filesystem.New(filesystem.Config{
-		PathPrefix: "static",
-		Root:       http.FS(frontend.StaticFS),
-		MaxAge:     gtime.OneWeekSec,
-	}))
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {

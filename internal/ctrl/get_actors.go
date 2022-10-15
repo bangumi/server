@@ -28,14 +28,14 @@ func (ctl Ctrl) GetActors(
 	subjectID model.SubjectID,
 	characterIDs ...model.CharacterID,
 ) (map[model.CharacterID][]model.Person, error) {
-	actors, err := ctl.subject.GetActors(ctx, subjectID, characterIDs...)
+	actors, err := ctl.subject.GetActors(ctx, subjectID, characterIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "subjectRepo.GetActors")
 	}
 
 	vs := slice.Unique(slice.Flat(gmap.Values(actors)))
 
-	persons, err := ctl.person.GetByIDs(ctx, vs...)
+	persons, err := ctl.person.GetByIDs(ctx, vs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get persons")
 	}

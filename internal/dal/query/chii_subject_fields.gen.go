@@ -72,10 +72,10 @@ type subjectField struct {
 	Rate10   field.Uint32
 	Airtime  field.Uint8
 	Rank     field.Uint32
-	Year     field.Int32
-	Mon      field.Int8
-	WeekDay  field.Int8
-	Date     field.Time
+	Year     field.Int32 // 放送年份
+	Mon      field.Int8  // 放送月份
+	WeekDay  field.Int8  // 放送日(星期X)
+	Date     field.Time  // 放送日期
 	Redirect field.Field
 
 	fieldMap map[string]field.Expr

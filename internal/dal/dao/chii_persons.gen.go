@@ -25,13 +25,13 @@ type Person struct {
 	Actor       bool           `gorm:"column:prsn_actor;type:tinyint(1);not null"`       // 演员
 	Summary     string         `gorm:"column:prsn_summary;type:mediumtext;not null"`
 	Img         string         `gorm:"column:prsn_img;type:varchar(255);not null"`
-	ImgAnidb    string         `gorm:"column:prsn_img_anidb;type:varchar(255);not null"`
+	ImgAnidb    string         `gorm:"column:prsn_img_anidb;type:varchar(255);not null"` // Deprecated
 	Comment     uint32         `gorm:"column:prsn_comment;type:mediumint(9) unsigned;not null"`
 	Collects    uint32         `gorm:"column:prsn_collects;type:mediumint(8) unsigned;not null"`
 	Dateline    uint32         `gorm:"column:prsn_dateline;type:int(10) unsigned;not null"`
 	Lastpost    uint32         `gorm:"column:prsn_lastpost;type:int(11) unsigned;not null"`
 	Lock        int8           `gorm:"column:prsn_lock;type:tinyint(4);not null"`
-	AnidbID     uint32         `gorm:"column:prsn_anidb_id;type:mediumint(8) unsigned;not null"`
+	AnidbID     uint32         `gorm:"column:prsn_anidb_id;type:mediumint(8) unsigned;not null"` // Deprecated
 	Ban         uint8          `gorm:"column:prsn_ban;type:tinyint(3) unsigned;not null"`
 	Redirect    model.PersonID `gorm:"column:prsn_redirect;type:int(10) unsigned;not null"`
 	Nsfw        bool           `gorm:"column:prsn_nsfw;type:tinyint(1) unsigned;not null"`

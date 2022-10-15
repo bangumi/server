@@ -33,6 +33,12 @@ task
 - `REDIS_URI` 默认 `redis://127.0.0.1:6379/0`
 - `HTTP_PORT` 默认 `3000`
 
+搜索功能相关的环境变量
+
+- `MEILISEARCH_URL` meilisearch 地址，默认为空。不设置的话不会初始化搜索客户端。
+- `MEILISEARCH_KEY` meilisearch key。
+- `KAFKA_BROKER` kafka broker 地址，启动 `./internal/cmd/canal/main.go` 需要 kafka。
+
 你也可以把配置放在 `.env` 文件中，`go-task` 会自动加载 `.env` 文件中的环境变量。
 
 example:
@@ -44,7 +50,12 @@ MYSQL_USER="user"
 MYSQL_PASS="password"
 MYSQL_DB="bangumi"
 REDIS_URI="redis://:redis-pass@127.0.0.1:6379/1"
+MEILISEARCH_URL="http://127.0.0.1:7700/"
 ```
+
+或者使用 yaml 格式的配置文件：
+
+查看 config.example.yaml 或者 [internal/config/config.go](https://github.com/bangumi/server/blob/master/internal/config/config.go)
 
 ## 开发
 
@@ -56,8 +67,16 @@ ORM: [GORM](https://github.com/go-gorm/gorm) 和 [GORM Gen](https://github.com/g
 
 在开发时请使用 go build tag `dev` 构建进行构建。
 
+启动 HTTP server
+
 ```shell
 go run --tags dev main.go --config config.yaml
+```
+
+启动 kafka consumer
+
+```shell
+go run --tags dev ./internal/cmd/canal/main.go --config config.yaml
 ```
 
 ### 后端环境
@@ -107,8 +126,8 @@ flowchart TD
     ...
   end
 
-  subgraph C[Kafka consumer]
-    C1[consumer 1];
+  subgraph C[canal]
+    C1[kafka consumer];
   end
 
   meilisearch[(new search engine)];

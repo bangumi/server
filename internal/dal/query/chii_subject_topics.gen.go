@@ -35,7 +35,7 @@ func newSubjectTopic(db *gorm.DB) subjectTopic {
 	_subjectTopic.UpdatedTime = field.NewUint32(tableName, "sbj_tpc_lastpost")
 	_subjectTopic.Replies = field.NewUint32(tableName, "sbj_tpc_replies")
 	_subjectTopic.State = field.NewUint8(tableName, "sbj_tpc_state")
-	_subjectTopic.Status = field.NewUint8(tableName, "sbj_tpc_display")
+	_subjectTopic.Display = field.NewUint8(tableName, "sbj_tpc_display")
 
 	_subjectTopic.fillFieldMap()
 
@@ -54,7 +54,7 @@ type subjectTopic struct {
 	UpdatedTime field.Uint32
 	Replies     field.Uint32
 	State       field.Uint8
-	Status      field.Uint8
+	Display     field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -79,7 +79,7 @@ func (s *subjectTopic) updateTableName(table string) *subjectTopic {
 	s.UpdatedTime = field.NewUint32(table, "sbj_tpc_lastpost")
 	s.Replies = field.NewUint32(table, "sbj_tpc_replies")
 	s.State = field.NewUint8(table, "sbj_tpc_state")
-	s.Status = field.NewUint8(table, "sbj_tpc_display")
+	s.Display = field.NewUint8(table, "sbj_tpc_display")
 
 	s.fillFieldMap()
 
@@ -113,7 +113,7 @@ func (s *subjectTopic) fillFieldMap() {
 	s.fieldMap["sbj_tpc_lastpost"] = s.UpdatedTime
 	s.fieldMap["sbj_tpc_replies"] = s.Replies
 	s.fieldMap["sbj_tpc_state"] = s.State
-	s.fieldMap["sbj_tpc_display"] = s.Status
+	s.fieldMap["sbj_tpc_display"] = s.Display
 }
 
 func (s subjectTopic) clone(db *gorm.DB) subjectTopic {

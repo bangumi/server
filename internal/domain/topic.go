@@ -17,6 +17,8 @@ package domain
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -24,7 +26,7 @@ type TopicRepo interface {
 	Get(ctx context.Context, topicType TopicType, id model.TopicID) (model.Topic, error)
 
 	// Count all topic for a subject/group.
-	Count(ctx context.Context, topicType TopicType, id uint32, statuses []model.TopicStatus) (int64, error)
+	Count(ctx context.Context, topicType TopicType, id uint32, displays []model.TopicDisplay) (int64, error)
 
 	// List return paged topic list of a subject/group.
 	// userID should not be filtered
@@ -32,7 +34,7 @@ type TopicRepo interface {
 		ctx context.Context,
 		topicType TopicType,
 		id uint32,
-		statuses []model.TopicStatus,
+		displays []model.TopicDisplay,
 		limit int, offset int,
 	) ([]model.Topic, error)
 
@@ -62,6 +64,10 @@ type TopicRepo interface {
 }
 
 type TopicType uint32
+
+func (t TopicType) Zap() zap.Field {
+	return zap.Uint32("topic_type", uint32(t))
+}
 
 const (
 	TopicTypeUnknown TopicType = iota

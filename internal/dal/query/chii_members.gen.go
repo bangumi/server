@@ -72,7 +72,7 @@ type member struct {
 	Timeformat    field.Bool
 	Timeoffset    field.String
 	Newpm         field.Bool
-	NewNotify     field.Uint16
+	NewNotify     field.Uint16 // 新提醒
 	Sign          field.String
 	PasswordCrypt field.Bytes
 	Email         field.String

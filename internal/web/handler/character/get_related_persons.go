@@ -32,7 +32,7 @@ func (h Character) GetRelatedPersons(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = h.ctrl.GetCharacterNoRedirect(c.Context(), u.Auth, id)
+	_, err = h.ctrl.GetCharacterNoRedirect(c.UserContext(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -40,7 +40,7 @@ func (h Character) GetRelatedPersons(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get character")
 	}
 
-	casts, err := h.person.GetCharacterRelated(c.Context(), id)
+	casts, err := h.person.GetCharacterRelated(c.UserContext(), id)
 	if err != nil {
 		return errgo.Wrap(err, "repo.GetCharacterRelated")
 	}

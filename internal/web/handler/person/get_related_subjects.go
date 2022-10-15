@@ -32,7 +32,7 @@ func (h Person) GetRelatedSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetPerson(c.Context(), id)
+	r, err := h.ctrl.GetPerson(c.UserContext(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -45,7 +45,7 @@ func (h Person) GetRelatedSubjects(c *fiber.Ctx) error {
 		return res.ErrNotFound
 	}
 
-	relations, err := h.ctrl.GetPersonRelated(c.Context(), id)
+	relations, err := h.ctrl.GetPersonRelated(c.UserContext(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}

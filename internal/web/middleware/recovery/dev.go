@@ -26,6 +26,9 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
+
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 //go:embed debug.html
@@ -33,13 +36,15 @@ var _debugHTML string
 
 // New creates a new middleware handler with debug info.
 func New() fiber.Handler {
+	log := logger.Copy().WithOptions(zap.AddCallerSkip(2))
 	// Return new handler
 	return func(c *fiber.Ctx) (err error) { //nolint:nonamedreturns
 		defer func() {
 			if r := recover(); r != nil {
 				c.Status(http.StatusInternalServerError).
 					Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
-				_, err = fmt.Fprintf(c, _debugHTML, takeStacktrace(2))
+				_, err = fmt.Fprintf(c, _debugHTML, r, takeStacktrace(2))
+				log.Error("panic: " + fmt.Sprintln(r))
 			}
 		}()
 

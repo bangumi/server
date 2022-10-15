@@ -47,6 +47,10 @@ type Subject struct {
 	Redirect      SubjectID
 }
 
+func (s Subject) GetID() SubjectID {
+	return s.ID
+}
+
 func (s Subject) Locked() bool {
 	return s.Ban == subjectLocked
 }

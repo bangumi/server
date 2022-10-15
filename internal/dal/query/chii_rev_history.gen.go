@@ -45,8 +45,8 @@ type revisionHistory struct {
 
 	ALL         field.Asterisk
 	ID          field.Uint32
-	Type        field.Uint8
-	Mid         field.Uint32
+	Type        field.Uint8  // 条目，角色，人物
+	Mid         field.Uint32 // 对应条目，人物的ID
 	TextID      field.Uint32
 	CreatedTime field.Uint32
 	CreatorID   field.Field

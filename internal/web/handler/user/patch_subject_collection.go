@@ -26,7 +26,6 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -56,13 +55,13 @@ func (h User) patchSubjectCollection(
 ) error {
 	u := h.GetHTTPAccessor(c)
 
-	s, err := h.ctrl.GetSubject(c.Context(), u.Auth, subjectID)
+	s, err := h.ctrl.GetSubject(c.UserContext(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("subject not found")
 		}
 
-		h.log.Error("failed to get subject", zap.Error(err), log.SubjectID(subjectID))
+		h.log.Error("failed to get subject", zap.Error(err), subjectID.Zap())
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 
@@ -72,7 +71,7 @@ func (h User) patchSubjectCollection(
 		}
 	}
 
-	err = h.ctrl.UpdateCollection(c.Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
+	err = h.ctrl.UpdateCollection(c.UserContext(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
 		IP: u.IP.String(),
 
 		VolStatus: r.VolStatus,

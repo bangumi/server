@@ -16,7 +16,6 @@ package cache_test
 
 import (
 	"context"
-	"regexp"
 	"testing"
 	"time"
 
@@ -34,60 +33,24 @@ func Test_MemCache_HappyPath(t *testing.T) {
 	const key = "K"
 	var value = MemCacheTestItem{V: 1}
 
-	m := cache.NewMemoryCache()
+	m := cache.NewMemoryCache[string, MemCacheTestItem]()
 
-	require.NoError(t, m.Set(context.Background(), key, value, time.Hour))
+	m.Set(context.Background(), key, value, time.Hour)
 
-	var result MemCacheTestItem
-
-	ok, err := m.Get(context.Background(), key, &result)
-
-	require.NoError(t, err)
+	result, ok := m.Get(context.Background(), key)
 	require.True(t, ok, "should get item")
-
 	require.Equal(t, value.V, result.V)
-}
-
-func Test_MemCache_WrongType(t *testing.T) {
-	t.Parallel()
-	const key = "K"
-	m := cache.NewMemoryCache()
-
-	require.NoError(t, m.Set(context.Background(), key, struct{ F int }{}, time.Hour))
-
-	var result MemCacheTestItem
-
-	ok, err := m.Get(context.Background(), key, &result)
-	require.NotNil(t, err)
-	require.Regexp(t, regexp.MustCompile("not same type"), err)
-	require.False(t, ok)
 }
 
 func Test_MemCache_Expired(t *testing.T) {
 	t.Parallel()
 	const key = "K"
-	m := cache.NewMemoryCache()
+	m := cache.NewMemoryCache[string, MemCacheTestItem]()
 
-	require.NoError(t, m.Set(context.Background(), key, MemCacheTestItem{}, time.Duration(0)))
+	m.Set(context.Background(), key, MemCacheTestItem{}, time.Duration(0))
 
 	time.Sleep(time.Millisecond * 100)
 
-	var result MemCacheTestItem
-
-	ok, err := m.Get(context.Background(), key, &result)
-	require.NoError(t, err)
-	require.False(t, ok)
-}
-
-func Test_MemCache_Del(t *testing.T) {
-	t.Parallel()
-	var key = "K" + t.Name()
-	m := cache.NewMemoryCache()
-
-	require.NoError(t, m.Set(context.Background(), key, MemCacheTestItem{}, time.Hour))
-	require.NoError(t, m.Del(context.Background(), key))
-
-	ok, err := m.Get(context.Background(), key, &MemCacheTestItem{})
-	require.NoError(t, err)
+	_, ok := m.Get(context.Background(), key)
 	require.False(t, ok)
 }

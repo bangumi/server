@@ -7,6 +7,8 @@ on:
 
 jobs:
   github:
+    needs:
+      - docker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,7 +30,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  docker-components:
+  docker:
     strategy:
       matrix:
         include:
@@ -45,7 +47,7 @@ jobs:
             image: bangumi/chii-canal
             dockerfile: etc/canal.Dockerfile
 
-    name: "docker-${{ matrix.job }}"
+    name: "docker ${{ matrix.job }}"
 
     runs-on: ubuntu-latest
 
@@ -55,12 +57,15 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v3
         with:
-          go-version: "1.19"
+          go-version-file: "go.mod"
+          check-latest: true
 
       - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
       - name: Install Task
         uses: arduino/setup-task@v1
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - run: task ${{ matrix.task }}
         name: Build Binary
@@ -105,7 +110,7 @@ jobs:
           title: Update Openapi Specification from bangumi/server
           push-to-fork: Trim21-bot/api
           branch: "update-upstream"
-          author: "Trim21-bot <trim21-bot@users.noreply.github.com>"
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
       - uses: actions/checkout@v3
         with:
@@ -122,4 +127,4 @@ jobs:
           title: Update Openapi Specification from bangumi/server
           push-to-fork: Trim21-bot/dev-docs
           branch: "update-upstream"
-          author: "Trim21-bot <trim21-bot@users.noreply.github.com>"
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"

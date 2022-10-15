@@ -52,9 +52,12 @@ func (r ReqEpisodeCollectionBatch) Validate() error {
 	return nil
 }
 
+// PatchEpisodeCollectionBatch
+//
+//	/v0/users/-/collections/:subject_id/episodes"
 func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 	var r ReqEpisodeCollectionBatch
-	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
+	if err := json.Unmarshal(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -68,10 +71,44 @@ func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-
-	err = h.ctrl.UpdateEpisodeCollection(c.Context(), u.Auth, subjectID, r.EpisodeID, r.Type)
+	err = h.ctrl.UpdateEpisodesCollection(c.UserContext(), u.Auth, subjectID, r.EpisodeID, r.Type)
 	if err != nil {
 		switch {
+		case errors.Is(err, domain.ErrSubjectNotCollected):
+			return res.BadRequest("you need to add subject to your collection first")
+		case errors.Is(err, ctrl.ErrInvalidInput):
+			return res.BadRequest(err.Error())
+		case errors.Is(err, domain.ErrNotFound):
+			return res.ErrNotFound
+		}
+
+		return errgo.Wrap(err, "failed to update episode")
+	}
+
+	c.Status(http.StatusNoContent)
+	return nil
+}
+
+// PutEpisodeCollection
+//
+//	/v0/users/-/collections/-/episodes/:episode_id
+func (h User) PutEpisodeCollection(c *fiber.Ctx) error {
+	episodeID, err := req.ParseEpisodeID(c.Params("episode_id"))
+	if err != nil {
+		return err
+	}
+
+	var r req.UpdateUserEpisodeCollection
+	if err = json.Unmarshal(c.Body(), &r); err != nil {
+		return res.JSONError(c, err)
+	}
+
+	u := h.GetHTTPAccessor(c)
+	err = h.ctrl.UpdateEpisodeCollection(c.UserContext(), u.Auth, episodeID, r.Type)
+	if err != nil {
+		switch {
+		case errors.Is(err, domain.ErrSubjectNotCollected):
+			return res.BadRequest("you need to add subject to your collection first")
 		case errors.Is(err, ctrl.ErrInvalidInput):
 			return res.BadRequest(err.Error())
 		case errors.Is(err, domain.ErrNotFound):

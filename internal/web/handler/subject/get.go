@@ -27,7 +27,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -43,7 +42,7 @@ func (h Subject) Get(c *fiber.Ctx) error {
 		return err
 	}
 
-	s, err := h.ctrl.GetSubject(c.Context(), u.Auth, id)
+	s, err := h.ctrl.GetSubject(c.UserContext(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -56,7 +55,7 @@ func (h Subject) Get(c *fiber.Ctx) error {
 		return c.Redirect("/v0/subjects/" + strconv.FormatUint(uint64(s.Redirect), 10))
 	}
 
-	totalEpisode, err := h.ctrl.CountEpisode(c.Context(), id, nil)
+	totalEpisode, err := h.ctrl.CountEpisode(c.UserContext(), id, nil)
 	if err != nil {
 		return errgo.Wrap(err, "failed to count episodes of subject")
 	}
@@ -68,7 +67,7 @@ func platformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
 	if !ok && s.TypeID != 0 {
 		logger.Warn("unknown platform",
-			log.SubjectID(s.ID),
+			s.ID.Zap(),
 			zap.Uint8("type", s.TypeID),
 			zap.Uint16("platform", s.PlatformID),
 		)
@@ -89,7 +88,7 @@ func (h Subject) GetImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetSubject(c.Context(), u.Auth, id)
+	r, err := h.ctrl.GetSubject(c.UserContext(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

@@ -2,7 +2,7 @@ openapi: 3.0.2
 info:
   title: "Bangumi Private API"
   version: ""
-  description: "`next.bgm.tv` 域名不支持跨域，"
+  description: "`next.bgm.tv` 域名不支持跨域"
 
 # 构建脚本会添加 servers
 #servers:
@@ -595,6 +595,8 @@ components:
         - created_at
         - title
         - icon
+        - total_members
+        - description
       properties:
         id:
           type: integer
@@ -608,6 +610,10 @@ components:
         icon:
           type: string
           format: url
+        total_members:
+          type: integer
+        description:
+          type: string
     PrivateTopicDetail:
       $ref: "./components/private/private_topic_detail.yaml"
     Topic:
@@ -615,22 +621,9 @@ components:
     Comment:
       $ref: "./components/private/comment.yaml"
     GroupMember:
-      type: array
-      items:
-        "$ref": "./components/private/group_member.yaml"
+      "$ref": "./components/private/group_member.yaml"
     Paged:
       $ref: "./components/page.yaml"
-    Paged_GroupMember:
-      title: Paged[GroupMember]
-      allOf:
-        - $ref: "#/components/schemas/Paged"
-        - type: object
-          properties:
-            data:
-              title: Data
-              type: array
-              items:
-                "$ref": "#/components/schemas/GroupMember"
     Paged_Topic:
       title: Paged[Topic]
       allOf:

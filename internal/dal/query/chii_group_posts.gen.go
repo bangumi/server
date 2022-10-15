@@ -47,7 +47,7 @@ type groupTopicComment struct {
 	ID          field.Uint32
 	TopicID     field.Uint32
 	UID         field.Uint32
-	Related     field.Uint32
+	Related     field.Uint32 // 关联回复ID
 	Content     field.String
 	State       field.Uint8
 	CreatedTime field.Uint32

@@ -1,6 +1,6 @@
 server {
   server_name api.bgm.tv;
-  listen 433;
+  listen 443;
   absolute_redirect off;
 
   location /v0/ {
@@ -28,7 +28,7 @@ server {
 
 server {
   server_name next.bgm.tv;
-  listen 3000;
+  listen 443;
   absolute_redirect off;
 
   add_header Content-Security-Policy "frame-ancestors 'none'; script-src 'self' 'unsafe-inline' https://js.hcaptcha.com/" always;

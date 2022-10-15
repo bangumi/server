@@ -33,7 +33,7 @@ func (h Character) Get(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetCharacter(c.Context(), u.Auth, id)
+	r, err := h.ctrl.GetCharacter(c.UserContext(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -56,7 +56,7 @@ func (h Character) GetImage(c *fiber.Ctx) error {
 		return err
 	}
 
-	p, err := h.ctrl.GetCharacterNoRedirect(c.Context(), u.Auth, id)
+	p, err := h.ctrl.GetCharacterNoRedirect(c.UserContext(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

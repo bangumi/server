@@ -15,7 +15,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
@@ -45,7 +44,7 @@ func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	group, err := h.g.GetByID(context.TODO(), model.GroupID(data.ParentID))
+	group, err := h.g.GetByID(c.UserContext(), model.GroupID(data.ParentID))
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -56,11 +55,13 @@ func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 	return res.JSON(c, ResPrivateTopicDetailWithGroup{
 		PrivateTopicDetail: data,
 		Group: res.PrivateGroup{
-			ID:        group.ID,
-			Name:      group.Name,
-			CreatedAt: group.CreatedAt,
-			Title:     group.Title,
-			Icon:      groupIconPrefix + group.Icon,
+			ID:           group.ID,
+			Name:         group.Name,
+			CreatedAt:    group.CreatedAt,
+			Title:        group.Title,
+			Icon:         groupIconPrefix + group.Icon,
+			TotalMembers: group.MemberCount,
+			Description:  group.Description,
 		},
 	})
 }
@@ -87,7 +88,7 @@ func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 		return res.BadRequest(err.Error())
 	}
 
-	_, err = h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, id)
+	_, err = h.ctrl.GetSubjectNoRedirect(c.UserContext(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -106,7 +107,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	e, err := h.ctrl.GetEpisode(c.Context(), id)
+	e, err := h.ctrl.GetEpisode(c.UserContext(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -115,7 +116,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get episode")
 	}
 
-	_, err = h.ctrl.GetSubjectNoRedirect(c.Context(), u.Auth, e.SubjectID)
+	_, err = h.ctrl.GetSubjectNoRedirect(c.UserContext(), u.Auth, e.SubjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -133,7 +134,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetPerson(c.Context(), id)
+	r, err := h.ctrl.GetPerson(c.UserContext(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -157,7 +158,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = h.ctrl.GetCharacterNoRedirect(c.Context(), u.Auth, id)
+	_, err = h.ctrl.GetCharacterNoRedirect(c.UserContext(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -177,7 +178,7 @@ func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.Context(), id)
+	r, ok, err := h.getIndexWithCache(c.UserContext(), id)
 	if err != nil {
 		return err
 	}
@@ -197,19 +198,19 @@ func (h Handler) listComments(
 	id model.TopicID,
 ) error {
 	// a noop limit to fetch all comments
-	comments, _, err := h.ctrl.ListReplies(c.Context(), commentType, id, 100000, 0) //nolint:gomnd
+	comments, _, err := h.ctrl.ListReplies(c.UserContext(), commentType, id, 100000, 0) //nolint:gomnd
 	if err != nil {
 		return errgo.Wrap(err, "topic.ListReplies")
 	}
 
-	userMap, err := h.ctrl.GetUsersByIDs(c.Context(), commentsToUserIDs(comments)...)
+	userMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), commentsToUserIDs(comments))
 	if err != nil {
 		return errgo.Wrap(err, "query.GetUsersByIDs")
 	}
 
 	var friends map[model.UserID]domain.FriendItem
 	if u.ID != 0 {
-		friends, err = h.ctrl.GetFriends(c.Context(), u.ID)
+		friends, err = h.ctrl.GetFriends(c.UserContext(), u.ID)
 		if err != nil {
 			return errgo.Wrap(err, "userRepo.GetFriends")
 		}
@@ -249,7 +250,7 @@ func convertModelComments(
 				Text:      subComment.Content,
 				Creator:   res.ConvertModelUser(userMap[subComment.CreatorID]),
 				ID:        subComment.ID,
-				State:     res.ToCommentState(subComment.State),
+				State:     subComment.State,
 			}
 		}
 
@@ -263,7 +264,7 @@ func convertModelComments(
 			CreatedAt: comment.CreatedAt,
 			Creator:   res.ConvertModelUser(userMap[comment.CreatorID]),
 			Replies:   replies,
-			State:     res.ToCommentState(comment.State),
+			State:     comment.State,
 		}
 	}
 

@@ -33,7 +33,7 @@ func (h Subject) GetRelatedSubjects(c *fiber.Ctx) error {
 
 	u := h.GetHTTPAccessor(c)
 
-	_, relations, err := h.ctrl.GetSubjectRelatedSubjects(c.Context(), u.Auth, id)
+	relations, err := h.ctrl.GetSubjectRelatedSubjects(c.UserContext(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

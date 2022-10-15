@@ -20,15 +20,16 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/subject"
 )
 
-func NewService(p domain.PersonRepo, s domain.SubjectRepo) domain.PersonService {
+func NewService(p domain.PersonRepo, s subject.Repo) domain.PersonService {
 	return service{repo: p, s: s}
 }
 
 type service struct {
 	repo domain.PersonRepo
-	s    domain.SubjectRepo
+	s    subject.Repo
 }
 
 func (s service) Get(ctx context.Context, id model.PersonID) (model.Person, error) {
@@ -48,12 +49,12 @@ func (s service) GetSubjectRelated(
 		personIDs[i] = relation.PersonID
 	}
 
-	persons, err := s.repo.GetByIDs(ctx, personIDs...)
+	persons, err := s.repo.GetByIDs(ctx, personIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}
 
-	subject, err := s.s.Get(ctx, subjectID)
+	sub, err := s.s.Get(ctx, subjectID, subject.Filter{})
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.Get")
 	}
@@ -62,7 +63,7 @@ func (s service) GetSubjectRelated(
 	for i, rel := range relations {
 		results[i] = model.SubjectPersonRelation{
 			Person:  persons[rel.PersonID],
-			Subject: subject,
+			Subject: sub,
 			TypeID:  rel.TypeID,
 		}
 	}
@@ -85,12 +86,12 @@ func (s service) GetCharacterRelated(
 		subjectIDs[i] = relation.SubjectID
 	}
 
-	persons, err := s.repo.GetByIDs(ctx, personIDs...)
+	persons, err := s.repo.GetByIDs(ctx, personIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
 	}
 
-	subjects, err := s.s.GetByIDs(ctx, subjectIDs...)
+	subjects, err := s.s.GetByIDs(ctx, subjectIDs, subject.Filter{})
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.Get")
 	}

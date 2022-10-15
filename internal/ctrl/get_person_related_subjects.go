@@ -19,6 +19,7 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/subject"
 )
 
 func (ctl Ctrl) GetPersonRelatedCharacters(
@@ -40,12 +41,12 @@ func (ctl Ctrl) GetPersonRelatedCharacters(
 		subjectIDs[i] = relation.SubjectID
 	}
 
-	characters, err := ctl.character.GetByIDs(ctx, characterIDs...)
+	characters, err := ctl.character.GetByIDs(ctx, characterIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
 	}
 
-	subjects, err := ctl.subject.GetByIDs(ctx, subjectIDs...)
+	subjects, err := ctl.subject.GetByIDs(ctx, subjectIDs, subject.Filter{})
 	if err != nil {
 		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
 	}

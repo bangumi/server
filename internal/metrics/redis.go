@@ -19,9 +19,10 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-func RedisHook() redis.Hook {
+func RedisHook(instance string) redis.Hook {
 	return redisprom.NewHook(
 		redisprom.WithNamespace("chii"),
 		redisprom.WithDurationBuckets([]float64{.001, .002, .003, .004, .005, .0075, .01, .05, .1}),
+		redisprom.WithInstanceName(instance),
 	)
 }

@@ -23,12 +23,14 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
+	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/web/rate/action"
 )
 
+const keyPrefix = "chii:rate:" + config.Version
 const defaultAllowPerHour = 5
 
 //go:embed allow.lua
@@ -69,8 +71,8 @@ func (m manager) AllowAction(
 	action action.Action,
 	limit Limit,
 ) (bool, int, error) {
-	rateKey := fmt.Sprintf("chii:rate:%d:%d", action, u)
-	banKey := fmt.Sprintf("chii:rate:ban:%d:%d", action, u)
+	rateKey := fmt.Sprintf("%s:%d:%d", keyPrefix, action, u)
+	banKey := fmt.Sprintf("%s:ban:%d:%d", keyPrefix, action, u)
 
 	res, err := m.allow(ctx, rateKey, banKey, limit)
 	if err != nil {
@@ -107,10 +109,10 @@ func (m manager) allow(
 ) (Result, error) {
 	now := time.Now()
 	var keys = []string{rateKey, banKey}
-	var values = []any{
+	scriptValues := []any{
 		limit.Burst, limit.Rate, limit.Period.Seconds(), now.Unix(), now.Nanosecond() / 1000, gtime.OneWeekSec,
 	}
-	v, err := allowScript.Run(ctx, m.r, keys, values...).Result()
+	v, err := allowScript.Run(ctx, m.r, keys, scriptValues...).Result()
 	if err != nil {
 		return Result{}, errgo.Wrap(err, "luaScript.Run")
 	}

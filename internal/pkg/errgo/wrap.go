@@ -21,6 +21,8 @@ import (
 	"strconv"
 
 	"github.com/valyala/bytebufferpool"
+
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 type unwrap interface {
@@ -101,7 +103,8 @@ func (w *withStackError) Format(s fmt.State, verb rune) {
 		}
 
 		if s.Flag('+') {
-			_, _ = io.WriteString(s, "error stack:")
+			_, _ = io.WriteString(s, w.Err.Error())
+			_, _ = io.WriteString(s, "\nerror stack:")
 			w.Stack.Format(s, verb)
 			return
 		}
@@ -154,7 +157,5 @@ func (w *withStackError) MarshalJSON() ([]byte, error) {
 
 	b.WriteString("]}")
 
-	var bytes = make([]byte, len(b.B))
-	copy(bytes, b.Bytes())
-	return bytes, nil
+	return slice.Clone(b.B), nil
 }

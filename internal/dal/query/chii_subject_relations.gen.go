@@ -54,13 +54,13 @@ type subjectRelation struct {
 	subjectRelationDo subjectRelationDo
 
 	ALL                  field.Asterisk
-	SubjectID            field.Field
+	SubjectID            field.Field // 关联主 ID
 	SubjectTypeID        field.Uint8
-	RelationType         field.Uint16
-	RelatedSubjectID     field.Field
-	RelatedSubjectTypeID field.Uint8
+	RelationType         field.Uint16 // 关联类型
+	RelatedSubjectID     field.Field  // 关联目标 ID
+	RelatedSubjectTypeID field.Uint8  // 关联目标类型
 	ViceVersa            field.Bool
-	Order                field.Uint8
+	Order                field.Uint8 // 关联排序
 	Subject              subjectRelationHasOneSubject
 
 	fieldMap map[string]field.Expr

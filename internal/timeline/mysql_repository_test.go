@@ -104,34 +104,33 @@ func Test_mysqlRepo_Create(t *testing.T) {
 	ctx := context.Background()
 
 	for _, tlID := range cases {
-		tlID := tlID
-		t.Run(fmt.Sprintf("start testing case: %d", tlID), func(t *testing.T) {
-			t.Parallel()
-			newTLID := tlID + 987654321
+		msg := fmt.Sprintf("start testing case: %d", tlID)
+		newTLID := tlID + 28523860
 
+		test.RunAndCleanup(t, func() {
 			// delete if already exists
 			_, err := q.WithContext(ctx).TimeLine.Where(q.TimeLine.ID.Eq(newTLID)).Delete()
-			require.NoError(t, err)
-
-			// get the timeline
-			tlModel, err := repo.GetByID(ctx, tlID)
-			require.NoError(t, err)
-
-			// alter id and uid
-			tlModel.ID = newTLID
-			tlModel.UID += 654321
-
-			// create with new id
-			err = repo.Create(ctx, tlModel)
-			require.NoError(t, err)
-
-			// get new timeline
-			newTLModel, err := repo.GetByID(ctx, newTLID)
-			require.NoError(t, err)
-
-			// check if the new timeline eq old timeline
-			require.Equal(t, tlModel, newTLModel)
+			require.NoError(t, err, msg)
 		})
+
+		// get the timeline
+		tlModel, err := repo.GetByID(ctx, tlID)
+		require.NoError(t, err, msg)
+
+		// alter id and uid
+		tlModel.ID = newTLID
+		tlModel.UID += 654321
+
+		// create with new id
+		err = repo.Create(ctx, tlModel)
+		require.NoError(t, err, msg)
+
+		// get new timeline
+		newTLModel, err := repo.GetByID(ctx, newTLID)
+		require.NoError(t, err, msg)
+
+		// check if the new timeline eq old timeline
+		require.Equal(t, tlModel, newTLModel, msg)
 	}
 }
 
