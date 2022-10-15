@@ -32,6 +32,7 @@ type Subject struct {
 	Tags          []Tag
 	OnHold        uint32
 	Dropped       uint32
+	Series        bool
 	Volumes       uint32
 	Eps           uint32
 	Wish          uint32
