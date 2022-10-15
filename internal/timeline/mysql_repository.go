@@ -154,14 +154,14 @@ func daoToModel(tl *dao.TimeLine) (*model.TimeLine, error) {
 		TimeLineMeta: &model.TimeLineMeta{
 			ID:       tl.ID,
 			Related:  tl.Related,
-			Image:    img,
 			UID:      tl.UID,
 			Replies:  tl.Replies,
 			Dateline: tl.Dateline,
 			Batch:    tl.Batch,
 			Source:   tl.Source,
 		},
-		TimeLineMemo: mm,
+		TimeLineMemo:   mm,
+		TimeLineImages: img,
 	}, nil
 }
 
