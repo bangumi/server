@@ -9,6 +9,8 @@ import (
 	"database/sql"
 
 	"gorm.io/gorm"
+
+	"gorm.io/plugin/dbresolver"
 )
 
 func Use(db *gorm.DB) *Query {
@@ -133,6 +135,18 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		UserGroup:           q.UserGroup.clone(db),
 		WebSession:          q.WebSession.clone(db),
 	}
+}
+
+func (q *Query) ReadDB() *Query {
+	return q.clone(q.db.Clauses(dbresolver.Read))
+}
+
+func (q *Query) WriteDB() *Query {
+	return q.clone(q.db.Clauses(dbresolver.Write))
+}
+
+func (q *Query) ReplaceDB(db *gorm.DB) *Query {
+	return q.clone(db)
 }
 
 type queryCtx struct {
