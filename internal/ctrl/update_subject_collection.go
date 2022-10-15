@@ -18,9 +18,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
+	"github.com/bangumi/server/internal/pkg/generic"
 	"github.com/bangumi/server/internal/subject"
 	"go.uber.org/zap"
 
@@ -119,18 +119,20 @@ func (ctl Ctrl) saveTimeLine(
 }
 
 func (ctl Ctrl) makeTimeline(req UpdateCollectionRequest, sj model.Subject) *model.TimeLine {
-	sidStr := strconv.Itoa(int(sj.ID))
+	sidStr := generic.Itoa(sj.ID)
 	tlMeta := &model.TimeLineMeta{
 		UID:      req.UID,
 		Related:  sidStr,
 		Dateline: uint32(time.Now().Unix()),
 	}
+
+	seriesStr := generic.Itoa(generic.Btoi(sj.Series))
 	tlMemo := model.NewTimeLineMemo(&model.TimeLineSubjectMemo{
-		ID:     sidStr,
-		TypeID: string(req.Type.Default(0)),
-		Name:   sj.Name,
-		NameCN: sj.NameCN,
-		// TODO: series
+		ID:             sidStr,
+		TypeID:         string(req.Type.Default(0)),
+		Name:           sj.Name,
+		NameCN:         sj.NameCN,
+		Series:         seriesStr,
 		CollectComment: req.Comment.Default(""),
 		CollectRate:    int(req.Rate.Default(0)),
 	})
