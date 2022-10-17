@@ -1,6 +1,6 @@
 module tools
 
-go 1.18
+go 1.19
 
 require github.com/vektra/mockery/v2 v2.14.0
 

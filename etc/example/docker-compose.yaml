@@ -47,8 +47,8 @@ services:
 
   meilisearch:
     container_name: "chii-meilisearch"
-    image: "getmeili/meilisearch:v0.28.1"
-    command: meilisearch --enable-auto-batching --env production
+    image: "getmeili/meilisearch:v0.29"
+    command: meilisearch --env production
     environment:
       MEILI_ENABLE_METRICS_ROUTE: "true"
       MEILI_MASTER_KEY: "$master-key"

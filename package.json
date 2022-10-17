@@ -7,7 +7,6 @@
     "format": "prettier -w --list-different ./",
     "test": "node openapi/test.js",
     "build": "node ./openapi/build.js",
-    "update-web-static": "node scripts/update_web_static.js",
     "version": "node scripts/bump.js"
   },
   "prettier": {
@@ -15,9 +14,7 @@
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
-    "bootstrap": "5.2.1",
     "conventional-changelog": "^3.1.25",
-    "jquery": "3.6.1",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21"
   },

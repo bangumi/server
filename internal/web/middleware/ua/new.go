@@ -45,10 +45,12 @@ func isDefaultUA(u string) bool {
 	return strings.HasPrefix(u, "Java/") ||
 		strings.HasPrefix(u, "axios/") ||
 		strings.HasPrefix(u, "okhttp/") ||
+		strings.HasPrefix(u, "go-resty/") ||
 		strings.HasPrefix(u, "Faraday v") ||
 		strings.HasPrefix(u, "node-fetch/") ||
-		strings.HasPrefix(u, "Apache-HttpClient/") ||
+		strings.HasPrefix(u, "Go-http-client/") ||
 		strings.HasPrefix(u, "python-requests/") ||
+		strings.HasPrefix(u, "Apache-HttpClient/") ||
 		u == "node-fetch" ||
 		u == "database"
 }

@@ -26,9 +26,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-//go:embed static
-var StaticFS embed.FS
-
 //go:embed templates
 var templateFS embed.FS
 
