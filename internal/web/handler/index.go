@@ -90,6 +90,11 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 	return r, true, nil
 }
 
+func (h Handler) invalidateIndexCache(ctx context.Context, id uint32) {
+	// ignore error
+	_ = h.cache.Del(ctx, cachekey.Index(id))
+}
+
 func (h Handler) GetIndex(c *fiber.Ctx) error {
 	user := h.GetHTTPAccessor(c)
 
@@ -182,7 +187,7 @@ func (h Handler) getIndexSubjects(
 func (h Handler) NewIndex(c *fiber.Ctx) error {
 	var reqData req.IndexBasicInfo
 	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
-		return errgo.Wrap(err, "request data is invalid")
+		return res.JSONError(c, err)
 	}
 	accessor := h.GetHTTPAccessor(c)
 	now := time.Now()
@@ -218,7 +223,6 @@ func (h Handler) ensureIndexPermission(c *fiber.Ctx) (*model.Index, error) {
 		return nil, err
 	}
 	accessor := h.GetHTTPAccessor(c)
-	// TODO: 是否走 redis 缓存
 	index, err := h.i.Get(c.UserContext(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -235,7 +239,7 @@ func (h Handler) ensureIndexPermission(c *fiber.Ctx) (*model.Index, error) {
 func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 	var reqData req.IndexBasicInfo
 	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
-		return errgo.Wrap(err, "request data is invalid")
+		return res.JSONError(c, err)
 	}
 
 	if reqData.Title == "" && reqData.Description == "" {
@@ -249,13 +253,14 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 	if err = h.i.Update(c.UserContext(), index.ID, reqData.Title, reqData.Description); err != nil {
 		return errgo.Wrap(err, "update index failed")
 	}
+	h.invalidateIndexCache(c.UserContext(), index.ID)
 	return nil
 }
 
 func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
 	var reqData req.IndexAddSubject
 	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
-		return errgo.Wrap(err, "request data is invalid")
+		return res.JSONError(c, err)
 	}
 	return h.addOrUpdateIndexSubject(c, reqData)
 }
@@ -263,7 +268,7 @@ func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
 func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
 	var reqData req.IndexSubjectInfo
 	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
-		return errgo.Wrap(err, "request data is invalid")
+		return res.JSONError(c, err)
 	}
 	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
 	if err != nil {
