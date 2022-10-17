@@ -23,6 +23,7 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/handler/character"
+	"github.com/bangumi/server/internal/web/handler/index"
 	"github.com/bangumi/server/internal/web/handler/person"
 	"github.com/bangumi/server/internal/web/handler/subject"
 	"github.com/bangumi/server/internal/web/handler/user"
@@ -45,6 +46,7 @@ func AddRouters(
 	personHandler person.Person,
 	characterHandler character.Character,
 	subjectHandler subject.Subject,
+	indexHandler index.Handler,
 ) {
 	app.Get("/", indexPage)
 
@@ -83,15 +85,18 @@ func AddRouters(
 	)
 	v0.Get("/users/:username/avatar", userHandler.GetAvatar)
 
-	v0.Get("/indices/:id", h.GetIndex)
-	v0.Get("/indices/:id/subjects", h.GetIndexSubjects)
-	// indices
-	v0.Post("/indices", req.JSON, h.NeedLogin, h.NewIndex)
-	v0.Put("/indices/:id", req.JSON, h.NeedLogin, h.UpdateIndex)
-	// indices subjects
-	v0.Post("/indices/:id/subjects", req.JSON, h.NeedLogin, h.AddIndexSubject)
-	v0.Put("/indices/:id/subjects/:subject_id", req.JSON, h.NeedLogin, h.UpdateIndexSubject)
-	v0.Delete("/indices/:id/subjects/:subject_id", h.NeedLogin, h.RemoveIndexSubject)
+	{
+		i := indexHandler
+		v0.Get("/indices/:id", i.GetIndex)
+		v0.Get("/indices/:id/subjects", i.GetIndexSubjects)
+		// indices
+		v0.Post("/indices", req.JSON, i.NeedLogin, i.NewIndex)
+		v0.Put("/indices/:id", req.JSON, i.NeedLogin, i.UpdateIndex)
+		// indices subjects
+		v0.Post("/indices/:id/subjects", req.JSON, i.NeedLogin, i.AddIndexSubject)
+		v0.Put("/indices/:id/subjects/:subject_id", req.JSON, i.NeedLogin, i.UpdateIndexSubject)
+		v0.Delete("/indices/:id/subjects/:subject_id", i.NeedLogin, i.RemoveIndexSubject)
+	}
 
 	v0.Get("/revisions/persons/:id", h.GetPersonRevision)
 	v0.Get("/revisions/persons", h.ListPersonRevision)

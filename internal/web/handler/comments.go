@@ -178,9 +178,9 @@ func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.UserContext(), id)
+	r, ok, err := h.ctrl.GetIndexWithCache(c.UserContext(), id)
 	if err != nil {
-		return err
+		return errgo.Wrap(err, "failed to get index")
 	}
 
 	if !ok || r.NSFW && !user.AllowNSFW() {

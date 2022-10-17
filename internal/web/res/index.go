@@ -32,3 +32,24 @@ type Index struct {
 	Ban         bool          `json:"ban"`
 	NSFW        bool          `json:"nsfw" doc:"if index contains any nsfw subjects"`
 }
+
+func IndexModelToResponse(i *model.Index, u model.User) Index {
+	return Index{
+		CreatedAt: i.CreatedAt,
+		UpdatedAt: i.UpdatedAt,
+		Creator: Creator{
+			Username: u.UserName,
+			Nickname: u.NickName,
+		},
+		Title:       i.Title,
+		Description: i.Description,
+		Total:       i.Total,
+		ID:          i.ID,
+		Stat: Stat{
+			Comments: i.Comments,
+			Collects: i.Collects,
+		},
+		Ban:  i.Ban,
+		NSFW: i.NSFW,
+	}
+}

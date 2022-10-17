@@ -12,88 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package index
 
 import (
-	"context"
 	"errors"
 	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/null"
-	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/pkg/wiki"
 )
-
-func modelToResponse(i *model.Index, u model.User) res.Index {
-	return res.Index{
-		CreatedAt: i.CreatedAt,
-		UpdatedAt: i.UpdatedAt,
-		Creator: res.Creator{
-			Username: u.UserName,
-			Nickname: u.NickName,
-		},
-		Title:       i.Title,
-		Description: i.Description,
-		Total:       i.Total,
-		ID:          i.ID,
-		Stat: res.Stat{
-			Comments: i.Comments,
-			Collects: i.Collects,
-		},
-		Ban:  i.Ban,
-		NSFW: i.NSFW,
-	}
-}
-
-func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, bool, error) {
-	var key = cachekey.Index(id)
-
-	var r res.Index
-	ok, err := h.cache.Get(c, key, &r)
-	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
-	}
-
-	i, err := h.i.Get(c, id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.Index{}, false, nil
-		}
-
-		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
-	}
-
-	u, err := h.ctrl.GetUser(c, i.CreatorID)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			h.log.Error("index missing creator", zap.Uint32("index_id", id), i.CreatorID.Zap())
-		}
-		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
-	}
-
-	r = modelToResponse(&i, u)
-
-	if e := h.cache.Set(c, key, r, time.Hour); e != nil {
-		h.log.Error("can't set response to cache", zap.Error(e))
-	}
-
-	return r, true, nil
-}
-
-func (h Handler) invalidateIndexCache(ctx context.Context, id uint32) {
-	// ignore error
-	_ = h.cache.Del(ctx, cachekey.Index(id))
-}
 
 func (h Handler) GetIndex(c *fiber.Ctx) error {
 	user := h.GetHTTPAccessor(c)
@@ -103,9 +36,9 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.UserContext(), id)
+	r, ok, err := h.ctrl.GetIndexWithCache(c.UserContext(), id)
 	if err != nil {
-		return err
+		return errgo.Wrap(err, "failed to get index")
 	}
 
 	if !ok || r.NSFW && !user.AllowNSFW() {
@@ -133,9 +66,9 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.UserContext(), id)
+	r, ok, err := h.ctrl.GetIndexWithCache(c.UserContext(), id)
 	if err != nil {
-		return err
+		return errgo.Wrap(err, "failed to get index")
 	}
 
 	if !ok || (r.NSFW && !user.AllowNSFW()) {
@@ -212,7 +145,7 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 	if err != nil {
 		return errgo.Wrap(err, "failed to get user info")
 	}
-	resp := modelToResponse(i, u)
+	resp := res.IndexModelToResponse(i, u)
 	return c.JSON(resp)
 }
 
@@ -255,72 +188,4 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 	}
 	h.invalidateIndexCache(c.UserContext(), index.ID)
 	return nil
-}
-
-func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
-	var reqData req.IndexAddSubject
-	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
-		return res.JSONError(c, err)
-	}
-	return h.addOrUpdateIndexSubject(c, reqData)
-}
-
-func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
-	var reqData req.IndexSubjectInfo
-	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
-		return res.JSONError(c, err)
-	}
-	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
-	if err != nil {
-		return errgo.Wrap(err, "subject id is invalid")
-	}
-	return h.addOrUpdateIndexSubject(c, req.IndexAddSubject{
-		SubjectID:        subjectID,
-		IndexSubjectInfo: &reqData,
-	})
-}
-
-func (h Handler) addOrUpdateIndexSubject(c *fiber.Ctx, req req.IndexAddSubject) error {
-	index, err := h.ensureIndexPermission(c)
-	if err != nil {
-		return err
-	}
-	indexSubject, err := h.i.AddOrUpdateIndexSubject(c.UserContext(),
-		index.ID, req.SubjectID, req.SortKey, req.Comment)
-	if err != nil {
-		if errors.Is(err, domain.ErrSubjectNotFound) {
-			return res.NotFound("subject not found")
-		}
-		return errgo.Wrap(err, "failed to edit subject in the index")
-	}
-	return c.JSON(indexSubjectToResp(*indexSubject))
-}
-
-func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
-	index, err := h.ensureIndexPermission(c)
-	if err != nil {
-		return err
-	}
-	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
-	if err != nil {
-		return errgo.Wrap(err, "subject id is invalid")
-	}
-	if err = h.i.DeleteIndexSubject(c.UserContext(), index.ID, subjectID); err != nil {
-		return errgo.Wrap(err, "failed to delete subject from index")
-	}
-	return nil
-}
-
-func indexSubjectToResp(s domain.IndexSubject) res.IndexSubjectV0 {
-	return res.IndexSubjectV0{
-		AddedAt: s.AddedAt,
-		Date:    null.NilString(s.Subject.Date),
-		Image:   res.SubjectImage(s.Subject.Image),
-		Name:    s.Subject.Name,
-		NameCN:  s.Subject.NameCN,
-		Comment: s.Comment,
-		Infobox: compat.V0Wiki(wiki.ParseOmitError(s.Subject.Infobox).NonZero()),
-		ID:      s.Subject.ID,
-		TypeID:  s.Subject.TypeID,
-	}
 }
