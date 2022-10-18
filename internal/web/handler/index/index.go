@@ -150,13 +150,9 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 }
 
 // 确保目录存在, 并且当前请求的用户持有权限.
-func (h Handler) ensureIndexPermission(c *fiber.Ctx) (*model.Index, error) {
-	id, err := req.ParseIndexID(c.Params("id"))
-	if err != nil {
-		return nil, err
-	}
+func (h Handler) ensureIndexPermission(c *fiber.Ctx, indexID uint32) (*model.Index, error) {
 	accessor := h.GetHTTPAccessor(c)
-	index, err := h.i.Get(c.UserContext(), id)
+	index, err := h.i.Get(c.UserContext(), indexID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, res.NotFound("index not found")
@@ -170,8 +166,12 @@ func (h Handler) ensureIndexPermission(c *fiber.Ctx) (*model.Index, error) {
 }
 
 func (h Handler) UpdateIndex(c *fiber.Ctx) error {
+	indexID, err := req.ParseIndexID(c.Params("id"))
+	if err != nil {
+		return err
+	}
 	var reqData req.IndexBasicInfo
-	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+	if err = json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -179,7 +179,7 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 		return res.BadRequest("request data is empty")
 	}
 
-	index, err := h.ensureIndexPermission(c)
+	index, err := h.ensureIndexPermission(c, indexID)
 	if err != nil {
 		return err
 	}

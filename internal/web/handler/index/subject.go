@@ -49,13 +49,17 @@ func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
 	})
 }
 
-func (h Handler) addOrUpdateIndexSubject(c *fiber.Ctx, req req.IndexAddSubject) error {
-	index, err := h.ensureIndexPermission(c)
+func (h Handler) addOrUpdateIndexSubject(c *fiber.Ctx, payload req.IndexAddSubject) error {
+	indexID, err := req.ParseIndexID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+	index, err := h.ensureIndexPermission(c, indexID)
 	if err != nil {
 		return err
 	}
 	indexSubject, err := h.i.AddOrUpdateIndexSubject(c.UserContext(),
-		index.ID, req.SubjectID, req.SortKey, req.Comment)
+		index.ID, payload.SubjectID, payload.SortKey, payload.Comment)
 	if err != nil {
 		if errors.Is(err, domain.ErrSubjectNotFound) {
 			return res.NotFound("subject not found")
@@ -66,7 +70,11 @@ func (h Handler) addOrUpdateIndexSubject(c *fiber.Ctx, req req.IndexAddSubject) 
 }
 
 func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
-	index, err := h.ensureIndexPermission(c)
+	indexID, err := req.ParseIndexID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+	index, err := h.ensureIndexPermission(c, indexID)
 	if err != nil {
 		return err
 	}
