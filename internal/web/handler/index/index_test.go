@@ -179,3 +179,40 @@ func TestHandler_UpdateIndex_NonExists(t *testing.T) {
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
+
+func TestHandler_New_Index_Invalid_Input(t *testing.T) {
+	t.Parallel()
+	app := test.GetWebApp(t, test.Mock{})
+
+	resp := test.New(t).
+		Post("/v0/indices").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		JSON(map[string]string{
+			"title":       "测试\001测试",
+			"description": "测试123",
+		}).Execute(app)
+
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}
+
+func TestHandler_Update_Index_Invalid_Input(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6, RegTime: time.Unix(1e9, 0)}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	app := test.GetWebApp(t, test.Mock{AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Put("/v0/indices/7").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		JSON(map[string]string{
+			"title":       "测试\000",
+			"description": "测试123",
+		}).Execute(app)
+
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}

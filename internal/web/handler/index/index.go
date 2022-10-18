@@ -122,6 +122,9 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
+	if err := h.ensureValidStrings(reqData.Description, reqData.Title); err != nil {
+		return err
+	}
 	accessor := h.GetHTTPAccessor(c)
 	now := time.Now()
 	i := &model.Index{
@@ -177,6 +180,10 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 
 	if reqData.Title == "" && reqData.Description == "" {
 		return res.BadRequest("request data is empty")
+	}
+
+	if err = h.ensureValidStrings(reqData.Description, reqData.Title); err != nil {
+		return err
 	}
 
 	index, err := h.ensureIndexPermission(c, indexID)

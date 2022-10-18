@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"github.com/bangumi/server/internal/compat"
+	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
@@ -42,4 +43,13 @@ func indexSubjectToResp(s domain.IndexSubject) res.IndexSubjectV0 {
 func (h Handler) invalidateIndexCache(ctx context.Context, id uint32) {
 	// ignore error
 	_ = h.cache.Del(ctx, cachekey.Index(id))
+}
+
+func (h Handler) ensureValidStrings(strings ...string) error {
+	for _, str := range strings {
+		if !dam.AllPrintableChar(str) {
+			return res.BadRequest("invalid string")
+		}
+	}
+	return nil
 }

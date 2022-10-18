@@ -235,3 +235,26 @@ func TestHandler_Delete_Index_Subject_NoPermission(t *testing.T) {
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }
+
+func TestHandler_Update_Index_Invalid_Comment(t *testing.T) {
+	t.Parallel()
+
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(domain.AuthUserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(domain.Permission{}, nil)
+
+	app := test.GetWebApp(t, test.Mock{AuthRepo: mockAuth})
+
+	resp := test.New(t).
+		Put("/v0/indices/7/subjects/5").
+		Header(fiber.HeaderAuthorization, "Bearer token").
+		JSON(map[string]any{
+			"sort":    48,
+			"comment": "test123\000",
+		}).
+		Execute(app)
+
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}

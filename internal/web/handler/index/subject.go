@@ -50,6 +50,9 @@ func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
 }
 
 func (h Handler) addOrUpdateIndexSubject(c *fiber.Ctx, payload req.IndexAddSubject) error {
+	if err := h.ensureValidStrings(payload.Comment); err != nil {
+		return err
+	}
 	indexID, err := req.ParseIndexID(c.Params("id"))
 	if err != nil {
 		return err
