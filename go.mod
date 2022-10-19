@@ -28,6 +28,7 @@ require (
 	github.com/trim21/go-phpserialize v0.0.15
 	github.com/uber-go/tally/v4 v4.1.3
 	github.com/valyala/bytebufferpool v1.0.0
+	go.uber.org/dig v1.15.0
 	go.uber.org/fx v1.18.2
 	go.uber.org/zap v1.23.0
 	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a
@@ -78,7 +79,6 @@ require (
 	github.com/valyala/fasthttp v1.40.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/dig v1.15.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced // indirect

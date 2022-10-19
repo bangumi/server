@@ -32,7 +32,7 @@ const defaultRedisPoolSize = 4
 func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
 	redisOptions, err := redis.ParseURL(c.RedisURL)
 	if err != nil {
-		logger.Fatal("failed to parse redis url", zap.String("url", c.RedisURL))
+		logger.Fatal("redis: failed to parse redis url", zap.String("url", c.RedisURL))
 	}
 
 	if redisOptions.PoolSize == 0 {
@@ -45,7 +45,7 @@ func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
 	defer cancel()
 
 	if err := cli.Ping(ctx).Err(); err != nil {
-		return nil, errgo.Wrap(err, "client.Ping")
+		return nil, errgo.Wrap(err, "redis: failed to ping")
 	}
 
 	cli.AddHook(metrics.RedisHook(redisOptions.Addr))

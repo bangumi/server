@@ -15,11 +15,13 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/go-resty/resty/v2"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/dig"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
@@ -49,7 +51,7 @@ import (
 
 func main() {
 	if err := start(); err != nil {
-		logger.Fatal("failed to start app", zap.Error(err))
+		logger.Fatal("failed to start app:\n" + fmt.Sprintf("\n%+v", err))
 	}
 }
 
@@ -96,7 +98,7 @@ func start() error {
 	).Err()
 
 	if err != nil {
-		return errgo.Wrap(err, "fx")
+		return dig.RootCause(err) //nolint:wrapcheck
 	}
 
 	return errgo.Wrap(web.Start(cfg, f), "failed to start app")

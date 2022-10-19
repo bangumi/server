@@ -51,14 +51,14 @@ func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
 
 	db, err := sql.Open("mysql", u.FormatDSN())
 	if err != nil {
-		return nil, errgo.Wrap(err, "failed to create sql connection pool")
+		return nil, errgo.Wrap(err, "mysql: failed to create sql connection pool")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	if err = db.PingContext(ctx); err != nil {
-		return nil, errgo.Wrap(err, "db.PingContext")
+		return nil, errgo.Wrap(err, "mysql: failed to ping")
 	}
 
 	db.SetMaxOpenConns(c.MySQLMaxConn)
