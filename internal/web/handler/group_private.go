@@ -29,8 +29,6 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-const groupIconPrefix = "https://lain.bgm.tv/pic/icon/l/"
-
 func (h Handler) GetGroupProfileByNamePrivate(c *fiber.Ctx) error {
 	groupName := c.Params("name")
 	if groupName == "" {
@@ -57,7 +55,7 @@ func (h Handler) GetGroupProfileByNamePrivate(c *fiber.Ctx) error {
 		Name:         g.Name,
 		Title:        g.Title,
 		Description:  g.Description,
-		Icon:         groupIconPrefix + g.Icon,
+		Icon:         res.GroupIcon(g.Icon),
 		TotalMembers: g.MemberCount,
 		NewMembers:   members,
 	})
