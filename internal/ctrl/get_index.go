@@ -27,11 +27,11 @@ import (
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (ctrl Ctrl) GetIndexWithCache(c context.Context, id uint32) (res.Index, bool, error) {
+func (ctl Ctrl) GetIndexWithCache(c context.Context, id uint32) (res.Index, bool, error) {
 	var key = cachekey.Index(id)
 
 	var r res.Index
-	ok, err := ctrl.cache.Get(c, key, &r)
+	ok, err := ctl.cache.Get(c, key, &r)
 	if err != nil {
 		return r, ok, errgo.Wrap(err, "cache.Get")
 	}
@@ -40,7 +40,7 @@ func (ctrl Ctrl) GetIndexWithCache(c context.Context, id uint32) (res.Index, boo
 		return r, ok, nil
 	}
 
-	i, err := ctrl.index.Get(c, id)
+	i, err := ctl.index.Get(c, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.Index{}, false, nil
@@ -49,18 +49,18 @@ func (ctrl Ctrl) GetIndexWithCache(c context.Context, id uint32) (res.Index, boo
 		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
 	}
 
-	u, err := ctrl.GetUser(c, i.CreatorID)
+	u, err := ctl.GetUser(c, i.CreatorID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			ctrl.log.Error("index missing creator", zap.Uint32("index_id", id), i.CreatorID.Zap())
+			ctl.log.Error("index missing creator", zap.Uint32("index_id", id), i.CreatorID.Zap())
 		}
 		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
 	}
 
 	r = res.IndexModelToResponse(&i, u)
 
-	if e := ctrl.cache.Set(c, key, r, time.Hour); e != nil {
-		ctrl.log.Error("can't set response to cache", zap.Error(e))
+	if e := ctl.cache.Set(c, key, r, time.Hour); e != nil {
+		ctl.log.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return r, true, nil
