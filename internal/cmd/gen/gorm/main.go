@@ -48,12 +48,12 @@ var timelineIDTypeString = "model." + reflect.TypeOf(new(model.TimeLineID)).Elem
 var timelineCatTypeString = reflect.TypeOf(new(model.TimeLineCat)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
-var notificationIDTypeString = "model.NotificationID"
-var notificationFieldIDTypeString = "model.NotificationFieldID"
-var notificationTypeTypeString = "model.NotificationType"
-var notificationStatusTypeString = "model.NotificationStatus"
-var privateMessageIDTypeString = "model.PrivateMessageID"
-var privateMessageFolderTypeTypeString = "model.PrivateMessageFolderType"
+var notificationIDTypeString = "model." + reflect.TypeOf(new(model.NotificationID)).Elem().Name()
+var notificationFieldIDTypeString = "model." + reflect.TypeOf(new(model.NotificationFieldID)).Elem().Name()
+var notificationTypeTypeString = "model." + reflect.TypeOf(new(model.NotificationType)).Elem().Name()
+var notificationStatusTypeString = "model." + reflect.TypeOf(new(model.NotificationStatus)).Elem().Name()
+var privateMessageIDTypeString = "model." + reflect.TypeOf(new(model.PrivateMessageID)).Elem().Name()
+var privateMessageFolderTypeTypeString = "model." + reflect.TypeOf(new(model.PrivateMessageFolderType)).Elem().Name()
 
 func DeprecatedFiled(s string) gen.ModelOpt {
 	return gen.FieldComment(s, "Deprecated")
