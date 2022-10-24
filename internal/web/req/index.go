@@ -12,27 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package req
 
-import (
-	"go.uber.org/fx"
+import "github.com/bangumi/server/internal/model"
 
-	"github.com/bangumi/server/internal/web/handler/character"
-	"github.com/bangumi/server/internal/web/handler/common"
-	"github.com/bangumi/server/internal/web/handler/index"
-	"github.com/bangumi/server/internal/web/handler/person"
-	"github.com/bangumi/server/internal/web/handler/subject"
-	"github.com/bangumi/server/internal/web/handler/user"
-)
+type IndexBasicInfo struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
 
-var Module = fx.Module("handler",
-	fx.Provide(
-		New,
-		common.New,
-		user.New,
-		person.New,
-		subject.New,
-		character.New,
-		index.New,
-	),
-)
+type IndexAddSubject struct {
+	SubjectID model.SubjectID `json:"subject_id"`
+	*IndexSubjectInfo
+}
+
+type IndexSubjectInfo struct {
+	SortKey uint32 `json:"sort"`
+	Comment string `json:"comment"`
+}

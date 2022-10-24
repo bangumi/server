@@ -20,8 +20,10 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"gorm.io/gen"
 	"gorm.io/gorm"
 
+	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
@@ -38,10 +40,10 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (r mysqlRepo) isNsfw(ctx context.Context, id uint32) (bool, error) {
+func (r mysqlRepo) isNsfw(ctx context.Context, id model.IndexID) (bool, error) {
 	i, err := r.q.IndexSubject.WithContext(ctx).
-		Join(r.q.Subject, r.q.IndexSubject.Sid.EqCol(r.q.Subject.ID)).
-		Where(r.q.IndexSubject.Rid.Eq(id), r.q.Subject.Nsfw.Is(true)).Count()
+		Join(r.q.Subject, r.q.IndexSubject.SubjectID.EqCol(r.q.Subject.ID)).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.Subject.Nsfw.Is(true)).Count()
 	if err != nil {
 		r.log.Error("unexpected error when checking index nsfw", zap.Uint32("index_id", id))
 		return false, errgo.Wrap(err, "dal")
@@ -50,7 +52,7 @@ func (r mysqlRepo) isNsfw(ctx context.Context, id uint32) (bool, error) {
 	return i != 0, nil
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
+func (r mysqlRepo) Get(ctx context.Context, id model.IndexID) (model.Index, error) {
 	i, err := r.q.Index.WithContext(ctx).
 		Where(r.q.Index.ID.Eq(id), r.q.Index.Ban.Is(false)).First()
 	if err != nil {
@@ -66,26 +68,49 @@ func (r mysqlRepo) Get(ctx context.Context, id uint32) (model.Index, error) {
 		return model.Index{}, err
 	}
 
-	return model.Index{
-		CreatedAt:   time.Unix(int64(i.Dateline), 0),
-		Title:       i.Title,
-		Description: i.Desc,
-		CreatorID:   i.CreatorID,
-		Total:       i.SubjectTotal,
-		ID:          id,
-		Comments:    i.Replies,
-		Collects:    i.Collects,
-		Ban:         i.Ban,
-		NSFW:        nsfw,
-	}, nil
+	ret := daoToModel(i)
+	ret.NSFW = nsfw
+	return *ret, nil
+}
+
+func (r mysqlRepo) New(ctx context.Context, i *model.Index) error {
+	dao := modelToDAO(i)
+	if err := r.q.Index.WithContext(ctx).Create(dao); err != nil {
+		return errgo.Wrap(err, "failed to create index in db")
+	}
+	i.ID = dao.ID
+	return nil
+}
+
+func (r mysqlRepo) Update(ctx context.Context, id model.IndexID, title string, desc string) error {
+	query := r.q.Index.WithContext(ctx)
+	result, err := query.Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
+		Title: title,
+		Desc:  desc,
+	})
+	return r.WrapResult(result, err, "failed to update index info")
+}
+
+func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
+	return r.q.Transaction(func(tx *query.Query) error {
+		result, err := tx.Index.WithContext(ctx).Where(tx.Index.ID.Eq(id)).Delete()
+		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
+			return err
+		}
+		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.IndexID.Eq(id)).Delete()
+		if err = r.WrapResult(result, err, "failed to delete subjects in the index"); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (r mysqlRepo) CountSubjects(
-	ctx context.Context, id uint32, subjectType model.SubjectType,
+	ctx context.Context, id model.IndexID, subjectType model.SubjectType,
 ) (int64, error) {
-	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.Rid.Eq(id))
+	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.IndexID.Eq(id))
 	if subjectType != 0 {
-		q = q.Where(r.q.IndexSubject.Type.Eq(subjectType))
+		q = q.Where(r.q.IndexSubject.SubjectType.Eq(subjectType))
 	}
 
 	i, err := q.Count()
@@ -98,15 +123,17 @@ func (r mysqlRepo) CountSubjects(
 
 func (r mysqlRepo) ListSubjects(
 	ctx context.Context,
-	id uint32,
+	id model.IndexID,
 	subjectType model.SubjectType,
 	limit, offset int,
 ) ([]domain.IndexSubject, error) {
-	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).Preload(r.q.IndexSubject.Subject.Fields).
-		Where(r.q.IndexSubject.Rid.Eq(id)).
-		Order(r.q.IndexSubject.Order).Limit(limit).Offset(offset)
+	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).
+		Preload(r.q.IndexSubject.Subject.Fields).
+		Where(r.q.IndexSubject.IndexID.Eq(id)).
+		Order(r.q.IndexSubject.Order).
+		Limit(limit).Offset(offset)
 	if subjectType != 0 {
-		q = q.Where(r.q.IndexSubject.Type.Eq(subjectType))
+		q = q.Where(r.q.IndexSubject.SubjectType.Eq(subjectType))
 	}
 
 	d, err := q.Find()
@@ -122,11 +149,168 @@ func (r mysqlRepo) ListSubjects(
 		}
 
 		results[i] = domain.IndexSubject{
-			AddedAt: time.Unix(int64(s.Dateline), 0),
+			AddedAt: time.Unix(int64(s.CreatedTime), 0),
 			Comment: s.Comment,
 			Subject: sub,
 		}
 	}
 
 	return results, nil
+}
+
+func (r mysqlRepo) AddOrUpdateIndexSubject(
+	ctx context.Context, id model.IndexID,
+	subjectID model.SubjectID, sort uint32, comment string,
+) (*domain.IndexSubject, error) {
+	index, err := r.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	subjectDO, err := r.q.Subject.WithContext(ctx).
+		Where(r.q.Subject.ID.Eq(subjectID)).
+		First()
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrSubjectNotFound
+		}
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	subject, err := subject.ConvertDao(subjectDO)
+	if err != nil {
+		return nil, errgo.Wrap(err, "subject.ConvertDao")
+	}
+
+	indexSubject, err := r.q.IndexSubject.WithContext(ctx).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(uint32(subjectID))).
+		FirstOrInit()
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	now := time.Now()
+
+	if indexSubject.ID != 0 {
+		// 已经存在，更新！
+		err = r.updateIndexSubject(ctx, id, subjectID, sort, comment)
+	} else {
+		err = r.addSubjectToIndex(ctx, index, &dao.IndexSubject{
+			Comment:     comment,
+			Order:       sort,
+			CreatedTime: uint32(now.Unix()),
+			IndexID:     id,
+			SubjectType: subjectDO.TypeID,
+			SubjectID:   uint32(subjectID),
+		})
+	}
+
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	return &domain.IndexSubject{
+		AddedAt: now,
+		Comment: comment,
+		Subject: subject,
+	}, nil
+}
+
+func (r mysqlRepo) updateIndexSubject(
+	ctx context.Context, id model.IndexID,
+	subjectID model.SubjectID, sort uint32, comment string,
+) error {
+	result, err := r.q.IndexSubject.WithContext(ctx).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(uint32(subjectID))).
+		Updates(dao.IndexSubject{
+			Order:   sort,
+			Comment: comment,
+		})
+	return r.WrapResult(result, err, "failed to update index subject")
+}
+
+func (r mysqlRepo) addSubjectToIndex(ctx context.Context, index model.Index, subject *dao.IndexSubject) error {
+	return r.q.Transaction(func(tx *query.Query) error {
+		err := r.q.IndexSubject.WithContext(ctx).Create(subject)
+		if err != nil {
+			return errgo.Wrap(err, "failed to create subject in index")
+		}
+
+		result, err := r.q.Index.WithContext(ctx).
+			Where(r.q.Index.ID.Eq(index.ID)).
+			Updates(dao.Index{
+				UpdatedTime:  uint32(time.Now().Unix()),
+				SubjectCount: index.Total + 1,
+			})
+
+		return r.WrapResult(result, err, "failed to update index info")
+	})
+}
+
+func (r mysqlRepo) DeleteIndexSubject(
+	ctx context.Context, id model.IndexID, subjectID model.SubjectID,
+) error {
+	return r.q.Transaction(func(tx *query.Query) error {
+		index, err := r.Get(ctx, id)
+		if err != nil {
+			return err
+		}
+		result, err := r.q.IndexSubject.WithContext(ctx).
+			Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(uint32(subjectID))).
+			Delete()
+		if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
+			return err
+		}
+		result, err = r.q.Index.WithContext(ctx).Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
+			SubjectCount: index.Total - 1,
+		})
+		if err = r.WrapResult(result, err, "failed to update index info"); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+func (r mysqlRepo) WrapResult(result gen.ResultInfo, err error, msg string) error {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.ErrNotFound
+		}
+		return errgo.Wrap(err, msg)
+	}
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func daoToModel(index *dao.Index) *model.Index {
+	return &model.Index{
+		ID:          index.ID,
+		Title:       index.Title,
+		Description: index.Desc,
+		CreatorID:   index.CreatorID,
+		Total:       index.SubjectCount,
+		Comments:    index.ReplyCount,
+		Collects:    index.CollectCount,
+		Ban:         index.Ban,
+		NSFW:        false, // check nsfw outSubjectIDe of this function
+		CreatedAt:   time.Unix(int64(index.CreatedTime), 0),
+		UpdatedAt:   time.Unix(int64(index.UpdatedTime), 0),
+	}
+}
+
+func modelToDAO(index *model.Index) *dao.Index {
+	return &dao.Index{
+		ID:          index.ID,
+		Type:        0,
+		Title:       index.Title,
+		Desc:        index.Description,
+		CreatorID:   index.CreatorID,
+		Ban:         index.Ban,
+		CreatedTime: int32(index.CreatedAt.Unix()),
+		UpdatedTime: uint32(index.UpdatedAt.Unix()),
+	}
 }

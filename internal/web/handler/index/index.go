@@ -12,77 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package index
 
 import (
-	"context"
 	"errors"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/null"
-	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
-	"github.com/bangumi/server/pkg/wiki"
 )
-
-func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, bool, error) {
-	var key = cachekey.Index(id)
-
-	var r res.Index
-	ok, err := h.cache.Get(c, key, &r)
-	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
-	}
-
-	i, err := h.i.Get(c, id)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return res.Index{}, false, nil
-		}
-
-		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
-	}
-
-	u, err := h.ctrl.GetUser(c, i.CreatorID)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			h.log.Error("index missing creator", zap.Uint32("index_id", id), i.CreatorID.Zap())
-		}
-		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
-	}
-
-	r = res.Index{
-		CreatedAt: i.CreatedAt,
-		Creator: res.Creator{
-			Username: u.UserName,
-			Nickname: u.NickName,
-		},
-		Title:       i.Title,
-		Description: i.Description,
-		Total:       i.Total,
-		ID:          id,
-		Stat: res.Stat{
-			Comments: i.Comments,
-			Collects: i.Collects,
-		},
-		Ban:  i.Ban,
-		NSFW: i.NSFW,
-	}
-
-	if e := h.cache.Set(c, key, r, time.Hour); e != nil {
-		h.log.Error("can't set response to cache", zap.Error(e))
-	}
-
-	return r, true, nil
-}
 
 func (h Handler) GetIndex(c *fiber.Ctx) error {
 	user := h.GetHTTPAccessor(c)
@@ -92,9 +36,9 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.UserContext(), id)
+	r, ok, err := h.ctrl.GetIndexWithCache(c.UserContext(), id)
 	if err != nil {
-		return err
+		return errgo.Wrap(err, "failed to get index")
 	}
 
 	if !ok || r.NSFW && !user.AllowNSFW() {
@@ -122,9 +66,9 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.UserContext(), id)
+	r, ok, err := h.ctrl.GetIndexWithCache(c.UserContext(), id)
 	if err != nil {
-		return err
+		return errgo.Wrap(err, "failed to get index")
 	}
 
 	if !ok || (r.NSFW && !user.AllowNSFW()) {
@@ -162,17 +106,7 @@ func (h Handler) getIndexSubjects(
 
 	var data = make([]res.IndexSubjectV0, len(subjects))
 	for i, s := range subjects {
-		data[i] = res.IndexSubjectV0{
-			AddedAt: s.AddedAt,
-			Date:    null.NilString(s.Subject.Date),
-			Image:   res.SubjectImage(s.Subject.Image),
-			Name:    s.Subject.Name,
-			NameCN:  s.Subject.NameCN,
-			Comment: s.Comment,
-			Infobox: compat.V0Wiki(wiki.ParseOmitError(s.Subject.Infobox).NonZero()),
-			ID:      s.Subject.ID,
-			TypeID:  s.Subject.TypeID,
-		}
+		data[i] = indexSubjectToResp(s)
 	}
 
 	return c.JSON(res.Paged{
@@ -181,4 +115,84 @@ func (h Handler) getIndexSubjects(
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	})
+}
+
+func (h Handler) NewIndex(c *fiber.Ctx) error {
+	var reqData req.IndexBasicInfo
+	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+		return res.JSONError(c, err)
+	}
+	if err := h.ensureValidStrings(reqData.Description, reqData.Title); err != nil {
+		return err
+	}
+	accessor := h.GetHTTPAccessor(c)
+	now := time.Now()
+	i := &model.Index{
+		ID:          0,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+		Title:       reqData.Title,
+		Description: reqData.Description,
+		CreatorID:   accessor.ID,
+		Total:       0,
+		Comments:    0,
+		Collects:    0,
+		Ban:         false,
+		NSFW:        false,
+	}
+	ctx := c.UserContext()
+	if err := h.i.New(ctx, i); err != nil {
+		return errgo.Wrap(err, "failed to create a new index")
+	}
+	u, err := h.ctrl.GetUser(ctx, i.CreatorID)
+	if err != nil {
+		return errgo.Wrap(err, "failed to get user info")
+	}
+	resp := res.IndexModelToResponse(i, u)
+	return c.JSON(resp)
+}
+
+// 确保目录存在, 并且当前请求的用户持有权限.
+func (h Handler) ensureIndexPermission(c *fiber.Ctx, indexID uint32) (*model.Index, error) {
+	accessor := h.GetHTTPAccessor(c)
+	index, err := h.i.Get(c.UserContext(), indexID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return nil, res.NotFound("index not found")
+		}
+		return nil, res.InternalError(c, err, "failed to get index")
+	}
+	if index.CreatorID != accessor.ID {
+		return nil, res.Unauthorized("you are not the creator of this index")
+	}
+	return &index, nil
+}
+
+func (h Handler) UpdateIndex(c *fiber.Ctx) error {
+	indexID, err := req.ParseIndexID(c.Params("id"))
+	if err != nil {
+		return err
+	}
+	var reqData req.IndexBasicInfo
+	if err = json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+		return res.JSONError(c, err)
+	}
+
+	if reqData.Title == "" && reqData.Description == "" {
+		return res.BadRequest("request data is empty")
+	}
+
+	if err = h.ensureValidStrings(reqData.Description, reqData.Title); err != nil {
+		return err
+	}
+
+	index, err := h.ensureIndexPermission(c, indexID)
+	if err != nil {
+		return err
+	}
+	if err = h.i.Update(c.UserContext(), index.ID, reqData.Title, reqData.Description); err != nil {
+		return errgo.Wrap(err, "update index failed")
+	}
+	h.invalidateIndexCache(c.UserContext(), index.ID)
+	return nil
 }

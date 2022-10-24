@@ -23,11 +23,20 @@ import (
 
 type IndexRepo interface {
 	Get(ctx context.Context, id model.IndexID) (model.Index, error)
+	New(ctx context.Context, i *model.Index) error
+	Update(ctx context.Context, id model.IndexID, title string, desc string) error
+	Delete(ctx context.Context, id model.IndexID) error
 
 	CountSubjects(ctx context.Context, id model.IndexID, subjectType model.SubjectType) (int64, error)
 	ListSubjects(
 		ctx context.Context, id model.IndexID, subjectType model.SubjectType, limit, offset int,
 	) ([]IndexSubject, error)
+	AddOrUpdateIndexSubject(
+		ctx context.Context, id model.IndexID, subjectID model.SubjectID, sort uint32, comment string,
+	) (*IndexSubject, error)
+	DeleteIndexSubject(
+		ctx context.Context, id model.IndexID, subjectID model.SubjectID,
+	) error
 }
 
 type IndexSubject struct {

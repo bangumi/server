@@ -22,6 +22,7 @@ import (
 
 type Index struct {
 	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
 	Creator     Creator       `json:"creator"`
 	Title       string        `json:"title"`
 	Description string        `json:"desc"`
@@ -30,4 +31,25 @@ type Index struct {
 	Stat        Stat          `json:"stat"`
 	Ban         bool          `json:"ban"`
 	NSFW        bool          `json:"nsfw" doc:"if index contains any nsfw subjects"`
+}
+
+func IndexModelToResponse(i *model.Index, u model.User) Index {
+	return Index{
+		CreatedAt: i.CreatedAt,
+		UpdatedAt: i.UpdatedAt,
+		Creator: Creator{
+			Username: u.UserName,
+			Nickname: u.NickName,
+		},
+		Title:       i.Title,
+		Description: i.Description,
+		Total:       i.Total,
+		ID:          i.ID,
+		Stat: Stat{
+			Comments: i.Comments,
+			Collects: i.Collects,
+		},
+		Ban:  i.Ban,
+		NSFW: i.NSFW,
+	}
 }

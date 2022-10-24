@@ -215,8 +215,15 @@ func main() {
 		gen.FieldTrimPrefix("idx_"),
 		gen.FieldType("idx_id", "uint32"),
 		gen.FieldType("idx_uid", userIDTypeString),
+		gen.FieldType("idx_collects", "uint32"),
+		// 变量重命名
 		gen.FieldRename("idx_uid", "CreatorID"),
-		gen.FieldType("idx_collects", "uint32")))
+		gen.FieldRename("idx_dateline", "CreatedTime"),
+		gen.FieldRename("idx_lasttouch", "UpdatedTime"),
+		gen.FieldRename("idx_replies", "ReplyCount"),
+		gen.FieldRename("idx_collects", "CollectCount"),
+		gen.FieldRename("idx_subject_total", "SubjectCount"),
+	))
 
 	modelPersonField := g.GenerateModelAs("chii_person_fields", "PersonField",
 		gen.FieldTrimPrefix("prsn_"),
@@ -382,6 +389,11 @@ func main() {
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
 			GORMTag: "foreignKey:idx_rlt_sid;references:subject_id",
 		}),
+		// 变量重命名
+		gen.FieldRename("idx_rlt_rid", "IndexID"),
+		gen.FieldRename("idx_rlt_sid", "SubjectID"),
+		gen.FieldRename("idx_rlt_type", "SubjectType"),
+		gen.FieldRename("idx_rlt_dateline", "CreatedTime"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_rev_text", "RevisionText",
