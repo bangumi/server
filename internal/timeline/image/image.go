@@ -181,7 +181,7 @@ func DAOToModel(tl *dao.TimeLine) (model.TimeLineImages, error) {
 }
 
 func ModelToDAO(tl *model.TimeLine) ([]byte, error) {
-	images := tl.Image
+	images := tl.TimeLineImages
 
 	// handle the single-Image case first, fast path
 	if len(images) == 1 {

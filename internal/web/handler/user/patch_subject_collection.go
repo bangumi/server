@@ -72,8 +72,8 @@ func (h User) patchSubjectCollection(
 	}
 
 	err = h.ctrl.UpdateCollection(c.UserContext(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
-		IP: u.IP.String(),
-
+		IP:        u.IP.String(),
+		UID:       u.ID,
 		VolStatus: r.VolStatus,
 		EpStatus:  r.EpStatus,
 		Type:      r.Type,

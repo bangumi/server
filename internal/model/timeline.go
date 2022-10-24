@@ -29,7 +29,9 @@ const (
 
 type TimeLine struct {
 	*TimeLineMeta
+
 	*TimeLineMemo
+	TimeLineImages
 }
 
 type TimeLineMeta struct {
@@ -41,7 +43,6 @@ type TimeLineMeta struct {
 	Source   uint8
 	Replies  uint32
 	Dateline uint32
-	Image    TimeLineImages
 }
 
 type TimeLineMemo struct {
