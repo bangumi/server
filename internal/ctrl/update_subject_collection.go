@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"go.uber.org/zap"
@@ -120,14 +121,14 @@ func (ctl Ctrl) saveTimeLineSubject(
 }
 
 func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.TimeLine {
-	sidStr := generic.Itoa(sj.ID)
+	sidStr := strconv.Itoa(int(sj.ID))
 	tlMeta := &model.TimeLineMeta{
 		UID:      req.UID,
 		Related:  sidStr,
 		Dateline: uint32(time.Now().Unix()),
 	}
 
-	seriesStr := generic.Itoa(generic.Btoi(sj.Series))
+	seriesStr := strconv.Itoa(generic.Btoi(sj.Series))
 	tlMemo := model.NewTimeLineMemo(&model.TimeLineSubjectMemo{
 		ID:             sidStr,
 		TypeID:         string(req.Type.Default(0)),
