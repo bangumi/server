@@ -62,6 +62,7 @@ type Mock struct {
 	IndexRepo      domain.IndexRepo
 	RevisionRepo   domain.RevisionRepo
 	CollectionRepo domain.CollectionRepo
+	TimeLineRepo   domain.TimeLineRepo
 	CaptchaManager captcha.Manager
 	SessionManager session.Manager
 	Cache          cache.RedisCache
@@ -110,6 +111,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCaptchaManager(m.CaptchaManager),
 		MockSessionManager(m.SessionManager),
 		MockRateLimiter(m.RateLimiter),
+		MockTimeLineRepo(m.TimeLineRepo),
 
 		// don't need a default mock for these repositories.
 		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
@@ -286,6 +288,18 @@ func MockSubjectRepo(m subject.Repo) fx.Option {
 	}
 
 	return fx.Provide(func() subject.Repo { return m })
+}
+
+func MockTimeLineRepo(m domain.TimeLineRepo) fx.Option {
+	if m == nil {
+		mocker := &mocks.TimeLineRepo{}
+		mocker.EXPECT().WithQuery(mock.Anything).Return(mocker)
+		mocker.EXPECT().Create(mock.Anything, mock.Anything).Return(nil)
+
+		m = mocker
+	}
+
+	return fx.Supply(fx.Annotate(m, fx.As(new(domain.TimeLineRepo))))
 }
 
 func MockCache(mock cache.RedisCache) fx.Option {

@@ -87,6 +87,7 @@ func ConvertDao(s *dao.Subject) (model.Subject, error) {
 		Collect:    s.Collect,
 		Doing:      s.Doing,
 		OnHold:     s.OnHold,
+		Series:     s.Series,
 		Tags:       tags,
 		Dropped:    s.Dropped,
 		Airtime:    s.Airtime,

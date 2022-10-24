@@ -33,6 +33,7 @@ func New(
 	character domain.CharacterRepo,
 	collection domain.CollectionRepo,
 	index domain.IndexRepo,
+	timeline domain.TimeLineRepo,
 	metric tally.Scope,
 	user domain.UserRepo,
 	topic domain.TopicRepo,
@@ -52,9 +53,10 @@ func New(
 		person:     person,
 		episode:    episode,
 		subject:    subject,
-		collection: collection,
 		character:  character,
 		index:      index,
+		collection: collection,
+		timeline:   timeline,
 
 		metricUserQueryCount:  metric.Counter("app_user_query_count"),
 		metricUserQueryCached: metric.Counter("app_user_query_cached_count"),
@@ -82,6 +84,7 @@ type Ctrl struct {
 	character             domain.CharacterRepo
 	collection            domain.CollectionRepo
 	index                 domain.IndexRepo
+	timeline              domain.TimeLineRepo
 	metricUserQueryCached tally.Counter
 	metricUserQueryCount  tally.Counter
 

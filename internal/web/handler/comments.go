@@ -59,7 +59,7 @@ func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 			Name:         group.Name,
 			CreatedAt:    group.CreatedAt,
 			Title:        group.Title,
-			Icon:         groupIconPrefix + group.Icon,
+			Icon:         res.GroupIcon(group.Icon),
 			TotalMembers: group.MemberCount,
 			Description:  group.Description,
 		},

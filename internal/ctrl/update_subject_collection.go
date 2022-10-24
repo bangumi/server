@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"go.uber.org/zap"
@@ -26,13 +27,16 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic"
 	"github.com/bangumi/server/internal/pkg/generic/set"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 )
 
 type UpdateCollectionRequest struct {
-	IP string
+	IP  string
+	UID model.UserID
 
 	Comment   null.String
 	Tags      []string
@@ -90,11 +94,60 @@ func (ctl Ctrl) UpdateCollection(
 			ctl.log.Error("failed to update user collection info", zap.Error(err))
 			return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 		}
-
+		err = ctl.saveTimeLineSubject(ctx, u, subjectID, req, tx)
+		if err != nil {
+			ctl.log.Error("failed to create associated timeline", zap.Error(err))
+			return errgo.Wrap(err, "timelineRepo.Create")
+		}
 		return nil
 	})
 
 	return txErr
+}
+
+func (ctl Ctrl) saveTimeLineSubject(
+	ctx context.Context,
+	u domain.Auth,
+	subjectID model.SubjectID,
+	req UpdateCollectionRequest,
+	tx *query.Query,
+) error {
+	sj, err := ctl.subject.Get(ctx, subjectID, subject.Filter{NSFW: null.NewBool(u.AllowNSFW())})
+	if err != nil {
+		return errgo.Wrap(err, "subject.Get")
+	}
+	err = ctl.timeline.WithQuery(tx).Create(ctx, makeTimeLineSubject(req, sj))
+	return errgo.Wrap(err, "timeline.Create")
+}
+
+func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.TimeLine {
+	sidStr := strconv.Itoa(int(sj.ID))
+	tlMeta := &model.TimeLineMeta{
+		UID:      req.UID,
+		Related:  sidStr,
+		Dateline: uint32(time.Now().Unix()),
+	}
+
+	seriesStr := strconv.Itoa(generic.Btoi(sj.Series))
+	tlMemo := model.NewTimeLineMemo(&model.TimeLineSubjectMemo{
+		ID:             sidStr,
+		TypeID:         string(req.Type.Default(0)),
+		Name:           sj.Name,
+		NameCN:         sj.NameCN,
+		Series:         seriesStr,
+		CollectComment: req.Comment.Default(""),
+		CollectRate:    int(req.Rate.Default(0)),
+	})
+	tlImg := model.TimeLineImage{
+		SubjectID: &sidStr,
+		Images:    &sj.Image,
+	}
+
+	return &model.TimeLine{
+		TimeLineMeta:   tlMeta,
+		TimeLineMemo:   tlMemo,
+		TimeLineImages: model.TimeLineImages{tlImg},
+	}
 }
 
 func (ctl Ctrl) UpdateEpisodesCollection(
