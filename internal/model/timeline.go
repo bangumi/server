@@ -77,8 +77,31 @@ func NewTimeLineMemo[T TimeLineMemoContentType](content T) *TimeLineMemo {
 	case *TimeLineGroupMemo:
 		return newTimeLineMemo(TimeLineCatGroup, 3, &TimeLineMemoContent{TimeLineGroupMemo: typed})
 	case *TimeLineWikiMemo:
+		// typ should be subject type id of `typed.SubjectID`
 		return newTimeLineMemo(TimeLineCatWiki, 0, &TimeLineMemoContent{TimeLineWikiMemo: typed})
 	case *TimeLineSubjectMemo:
+		/*
+		   public static function switchSubjectType($type, $subject_type)
+		   {
+		       if ($subject_type == 1) {
+		           $source = array(1 => '1', 2 => '5', 3 => '9', 4 => '13', 5 => '14');
+		           $type = $source[$type];
+		       } elseif ($subject_type == 2 || $subject_type == 6) {
+		           $source = array(1 => '2', 2 => '6', 3 => '10', 4 => '13', 5 => '14');
+		           $type = $source[$type];
+		       } elseif ($subject_type == 3) {
+		           $source = array(1 => '3', 2 => '7', 3 => '11', 4 => '13', 5 => '14');
+		           $type = $source[$type];
+		       } elseif ($subject_type == 4) {
+		           $source = array(1 => '4', 2 => '8', 3 => '12', 4 => '13', 5 => '14');
+		           $type = $source[$type];
+		       } else {
+		           $type = $type;
+		       }
+		       return $type;
+		   }
+		*/
+		// typ = switchSubjectType(typed.TypeID, `a model.SubjectCollection`)
 		return newTimeLineMemo(TimeLineCatSubject, 0, &TimeLineMemoContent{TimeLineSubjectMemo: typed})
 	case *TimeLineProgressMemo:
 		return newTimeLineMemo(TimeLineCatProgress, 0, &TimeLineMemoContent{TimeLineProgressMemo: typed})
