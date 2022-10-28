@@ -104,19 +104,43 @@ func NewTimeLineMemo[T TimeLineMemoContentType](content T) *TimeLineMemo {
 		// typ = switchSubjectType(typed.TypeID, `a model.SubjectCollection`)
 		return newTimeLineMemo(TimeLineCatSubject, 0, &TimeLineMemoContent{TimeLineSubjectMemo: typed})
 	case *TimeLineProgressMemo:
+		/*	subjectSetWatchedEps
+			if ($wacthed_eps > 0 || $watched_vols > 0) {
+			    typ = TimelineCore::TYPE_BGM_PROGRESS_BATCH(0)
+			}
+		*/
+		/*	SaveEpStatus
+			想看=1 看过=2 抛弃=3
+		*/
 		return newTimeLineMemo(TimeLineCatProgress, 0, &TimeLineMemoContent{TimeLineProgressMemo: typed})
 	case *TimeLineSayMemo:
+		// nickname: typ = 2
 		if typed.TimeLineSayEdit != nil {
 			return newTimeLineMemo(TimeLineCatSay, 2, &TimeLineMemoContent{TimeLineSayMemo: typed})
 		}
+		// sign: typ = 0
 		return newTimeLineMemo(TimeLineCatSay, 0, &TimeLineMemoContent{TimeLineSayMemo: typed})
 	case *TimeLineBlogMemo:
-		return newTimeLineMemo(TimeLineCatBlog, 0, &TimeLineMemoContent{TimeLineBlogMemo: typed})
+		// 1 only
+		return newTimeLineMemo(TimeLineCatBlog, 1, &TimeLineMemoContent{TimeLineBlogMemo: typed})
 	case *TimeLineIndexMemo:
+		// create index, input['errors']==0 : typ=0
+		// manage collect : typ=1
 		return newTimeLineMemo(TimeLineCatIndex, 0, &TimeLineMemoContent{TimeLineIndexMemo: typed})
 	case *TimeLineMonoMemo:
+		// 1 only
 		return newTimeLineMemo(TimeLineCatMono, 1, &TimeLineMemoContent{TimeLineMonoMemo: typed})
 	case *TimeLineDoujinMemo:
+		/*
+			event create:
+			   const CAT_DOUJIN_EVENT_NEW    = 6;
+			club follow:
+			   const CAT_DOUJIN_CLUB_FOLLOW  = 3;
+			DoujinCore.php manageCollect:
+			   const CAT_DOUJIN_SBJ_COLLECT  = 1;
+			EventCore.php manageCollect:
+			   const CAT_DOUJIN_EVENT_COLLECT = 5;
+		*/
 		return newTimeLineMemo(TimeLineCatDoujin, 0, &TimeLineMemoContent{TimeLineDoujinMemo: typed})
 	default:
 		return nil
