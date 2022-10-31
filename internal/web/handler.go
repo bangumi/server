@@ -19,6 +19,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
@@ -71,12 +74,23 @@ func AddRouters(
 	})
 
 	{
-		std := gqlHandler.New(generated.NewExecutableSchema(generated.Config{Resolvers: &r}))
-		v0.Post("/query", adaptor.HTTPHandler(std))
+		srv := gqlHandler.New(generated.NewExecutableSchema(generated.Config{Resolvers: &r}))
+		srv.AddTransport(transport.Options{})
+		srv.AddTransport(transport.GET{})
+		srv.AddTransport(transport.POST{})
+		srv.AddTransport(transport.MultipartForm{})
+
+		srv.SetQueryCache(lru.New(1000))
+
+		srv.Use(extension.Introspection{})
+		srv.Use(extension.AutomaticPersistedQuery{
+			Cache: lru.New(100),
+		})
+		v0.Use("/query", adaptor.HTTPHandler(srv))
 	}
 
 	{
-		std := playground.Handler("GraphQL", "/query")
+		std := playground.Handler("GraphQL", "/v0/query")
 		v0.Get("/playground", adaptor.HTTPHandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 			std.ServeHTTP(writer, request)
 		}))
