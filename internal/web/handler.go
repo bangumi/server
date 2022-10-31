@@ -15,11 +15,18 @@
 package web
 
 import (
+	_ "embed" //nolint:revive
 	"fmt"
 	"net/http"
 
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
 
+	gqlHandler "github.com/99designs/gqlgen/graphql/handler"
+
+	"github.com/bangumi/server/graph"
+	"github.com/bangumi/server/graph/generated"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/handler/character"
@@ -35,6 +42,9 @@ import (
 	"github.com/bangumi/server/internal/web/util"
 )
 
+//go:embed v0.html
+var v0PageHTML []byte
+
 // AddRouters add all router and default 404 Handler to app.
 //
 //nolint:funlen
@@ -47,12 +57,30 @@ func AddRouters(
 	characterHandler character.Character,
 	subjectHandler subject.Subject,
 	indexHandler index.Handler,
+	r graph.Resolver,
 ) {
 	app.Get("/", indexPage)
 
 	app.Use(ua.DisableDefaultHTTPLibrary)
 
 	v0 := app.Group("/v0/", h.MiddlewareAccessTokenAuth)
+
+	v0.Get("/", func(c *fiber.Ctx) error {
+		c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
+		return c.Send(v0PageHTML)
+	})
+
+	{
+		std := gqlHandler.New(generated.NewExecutableSchema(generated.Config{Resolvers: &r}))
+		v0.Post("/query", adaptor.HTTPHandler(std))
+	}
+
+	{
+		std := playground.Handler("GraphQL", "/query")
+		v0.Get("/playground", adaptor.HTTPHandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+			std.ServeHTTP(writer, request)
+		}))
+	}
 
 	v0.Post("/search/subjects", h.Search)
 
