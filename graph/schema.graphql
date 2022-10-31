@@ -1,0 +1,25 @@
+type Episode {
+  id: Int!
+}
+
+type Subject {
+  id: Int!
+  name: String!
+  name_cn: String!
+  episodes(limit: Int! = 10, offset: Int! = -5): [Episode]
+}
+
+# The "Query" type is special: it lists all of the available queries that
+# clients can execute, along with the return type for each. In this
+# case, the "books" query returns an array of zero or more Books (defined above).
+type Query {
+  me: Me
+  subject(id: Int!): Subject
+  subjects(id: [Int!]!): [Subject]!
+}
+
+type Me {
+  id: Int!
+  userName: String!
+  nickName: String!
+}

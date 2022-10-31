@@ -23,6 +23,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
@@ -33,6 +35,8 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/bangumi/server/graph"
+	"github.com/bangumi/server/graph/generated"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -48,7 +52,7 @@ import (
 const headerProcessTime = "x-process-time-ms"
 const headerServerVersion = "x-server-version"
 
-func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
+func New(r graph.Resolver, scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 		StrictRouting:         true,
@@ -90,6 +94,20 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 	app.Use(recovery.New())
 	app.Get("/metrics", adaptor.HTTPHandler(reporter.HTTPHandler()))
 	addProfile(app)
+
+	{
+		std := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &r}))
+		h := adaptor.HTTPHandler(std)
+		app.Post("/query", h)
+	}
+
+	{
+		std := playground.Handler("GraphQL", "/query")
+		h := adaptor.HTTPHandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+			std.ServeHTTP(writer, request)
+		})
+		app.Get("/", h)
+	}
 
 	if config.Development {
 		app.Use("/openapi/", openapiHandler)
