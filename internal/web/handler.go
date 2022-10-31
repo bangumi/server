@@ -19,14 +19,13 @@ import (
 	"fmt"
 	"net/http"
 
+	gqlHandler "github.com/99designs/gqlgen/graphql/handler" //nolint:importas
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
-
-	gqlHandler "github.com/99designs/gqlgen/graphql/handler"
 
 	"github.com/bangumi/server/graph"
 	"github.com/bangumi/server/graph/generated"

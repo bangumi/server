@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"reflect"
 
+	"go.uber.org/zap"
+
 	"github.com/bangumi/server/graph/generated"
 	"github.com/bangumi/server/graph/gql"
 	"github.com/bangumi/server/internal/domain"
@@ -15,7 +17,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/subject"
-	"go.uber.org/zap"
 )
 
 // Me is the resolver for the me field.
@@ -53,7 +54,8 @@ func (r *queryResolver) Subject(ctx context.Context, id int) (*gql.Subject, erro
 
 // Subjects is the resolver for the subjects field.
 func (r *queryResolver) Subjects(ctx context.Context, id []int) ([]*gql.Subject, error) {
-	s, err := r.subject.GetByIDs(ctx, slice.Map(id, func(i int) model.SubjectID { return model.SubjectID(i) }), subject.Filter{})
+	s, err := r.subject.GetByIDs(ctx,
+		slice.Map(id, func(i int) model.SubjectID { return model.SubjectID(i) }), subject.Filter{})
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +70,12 @@ func (r *queryResolver) Subjects(ctx context.Context, id []int) ([]*gql.Subject,
 }
 
 // Episodes is the resolver for the episodes field.
-func (r *subjectResolver) Episodes(ctx context.Context, obj *gql.Subject, limit int, offset int) ([]*gql.Episode, error) {
+func (r *subjectResolver) Episodes(
+	ctx context.Context,
+	obj *gql.Subject,
+	limit int,
+	offset int,
+) ([]*gql.Episode, error) {
 	if obj == nil {
 		return nil, nil
 	}
