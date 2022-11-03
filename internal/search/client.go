@@ -122,7 +122,7 @@ func (c *client) OnSubjectDelete(_ context.Context, id model.SubjectID) error {
 
 // UpsertSubject add subject to search backend.
 func (c *client) upsertSubject(_ context.Context, s subjectIndex) error {
-	_, err := c.subjectIndex.UpdateDocuments(s)
+	_, err := c.subjectIndex.UpdateDocuments(s, "id")
 
 	return errgo.Wrap(err, "search")
 }
@@ -182,8 +182,15 @@ func (c *client) firstRun() {
 		return
 	}
 
-	c.log.Info("set searchable attributes", zap.Strings("attributes", *getAttributes("searchable")))
-	_, err = subjectIndex.UpdateSearchableAttributes(getAttributes("searchable"))
+	c.log.Info("set searchable attributes", zap.Strings("attributes", *searchAbleAttribute()))
+	_, err = subjectIndex.UpdateSearchableAttributes(searchAbleAttribute())
+	if err != nil {
+		c.log.Fatal("failed to update search index searchable attributes", zap.Error(err))
+		return
+	}
+
+	c.log.Info("set ranking rules", zap.Strings("rule", *rankRule()))
+	_, err = subjectIndex.UpdateRankingRules(rankRule())
 	if err != nil {
 		c.log.Fatal("failed to update search index searchable attributes", zap.Error(err))
 		return

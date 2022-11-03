@@ -24,13 +24,14 @@ import (
 )
 
 // 最终 meilisearch 索引的文档.
-// 使用 `searchable:"true"`，`filterable:"true"`， `sortable:"true"`
-// 三种 tag 来设置是否可以被搜索，索引和排序.
+// 使用 `filterable:"true"`， `sortable:"true"`
+// 两种 tag 来设置是否可以被索引和排序.
+// 搜索字段因为带有排序，所以定义我 [search.searchAbleAttribute] 中
 type subjectIndex struct {
 	ID       model.SubjectID `json:"id"`
-	Summary  string          `json:"summary" searchable:"true"`
-	Tag      []string        `json:"tag,omitempty" filterable:"true" searchable:"true"`
-	Name     []string        `json:"name" searchable:"true"`
+	Summary  string          `json:"summary"`
+	Tag      []string        `json:"tag,omitempty" filterable:"true"`
+	Name     []string        `json:"name"`
 	Record   Record          `json:"record"`
 	Date     int             `json:"date,omitempty" filterable:"true" sortable:"true"`
 	Score    float64         `json:"score" filterable:"true" sortable:"true"`
@@ -40,6 +41,34 @@ type subjectIndex struct {
 	Platform uint16          `json:"platform,omitempty"`
 	Type     uint8           `json:"type" filterable:"true"`
 	NSFW     bool            `json:"nsfw" filterable:"true"`
+}
+
+func searchAbleAttribute() *[]string {
+	return &[]string{
+		"name",
+		"summary",
+		"tag",
+		"type",
+		"id",
+	}
+}
+
+func rankRule() *[]string {
+	return &[]string{
+		// 相似度最优先
+		"exactness",
+		"words",
+		"typo",
+		"proximity",
+		"attribute",
+		"sort",
+		// id 在前的优先展示，主要是为了系列作品能有个很好的顺序
+		"id:asc",
+		// 以下酌情，我选择优先展示排行榜排名更高、评分更高的条目，且尽量优先展示 sfw 内容
+		"rank:asc",
+		"score:desc",
+		"nsfw:asc",
+	}
 }
 
 type Record struct {
