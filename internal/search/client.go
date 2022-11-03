@@ -155,6 +155,7 @@ func (c *client) needFirstRun() (bool, error) {
 	return stat.NumberOfDocuments == 0, nil
 }
 
+//nolint:funlen
 func (c *client) firstRun() {
 	c.log.Info("search initialize")
 	_, err := c.meili.CreateIndex(&meilisearch.IndexConfig{

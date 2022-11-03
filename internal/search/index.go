@@ -26,7 +26,7 @@ import (
 // 最终 meilisearch 索引的文档.
 // 使用 `filterable:"true"`， `sortable:"true"`
 // 两种 tag 来设置是否可以被索引和排序.
-// 搜索字段因为带有排序，所以定义我 [search.searchAbleAttribute] 中
+// 搜索字段因为带有排序，所以定义在 [search.searchAbleAttribute] 中.
 type subjectIndex struct {
 	ID       model.SubjectID `json:"id"`
 	Summary  string          `json:"summary"`
