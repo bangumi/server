@@ -66,7 +66,7 @@ services:
 
   debezium-server:
     container_name: chii-debezium
-    image: debezium/server:1.9.5.Final
+    image: debezium/server:2.0
     environment:
       # set full config as you needed
       - "JAVA_OPTS=-Xms256m -Xmx1536m"
@@ -74,3 +74,6 @@ services:
       - "debezium.source.snapshot.mode=schema_only"
       - "debezium.source.snapshot.locking.mode=none"
       - "debezium.source.table.include.list=bangumi.chii_members,bangumi.chii_subjects,bangumi.chii_subject_fields"
+      - "debezium.source.schema.history.internal.kafka.topic=debezium.history"
+      - "debezium.source.schema.history.internal.kafka.bootstrap.servers=kafka:9092"
+      - "debezium.source.topic.prefix=debezium.chii"

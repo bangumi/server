@@ -26,3 +26,8 @@ debug:
 nsfw_word: "里番|无码|18x|エロ"
 disable_words: "办假存单|办理假证|0月租手机"
 banned_domain: "lista.cc|snapmail.cc|ashotmail.com|zoutlook.com"
+
+kafka_canal_topics:
+  - debezium.bangumi.chii_subject_fields
+  - debezium.bangumi.chii_subjects
+  - debezium.bangumi.chii_members

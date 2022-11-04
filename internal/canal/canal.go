@@ -85,14 +85,9 @@ func Main() error {
 const groupID = "my-group"
 
 func newKafkaReader(c config.AppConfig) *kafka.Reader {
-	topics := []string{
-		"chii.bangumi.chii_subject_fields",
-		"chii.bangumi.chii_subjects",
-		"chii.bangumi.chii_members",
-	}
 	return kafka.NewReader(kafka.ReaderConfig{
 		Brokers:     []string{c.KafkaBroker},
 		GroupID:     groupID,
-		GroupTopics: topics,
+		GroupTopics: c.KafkaCanalTopics,
 	})
 }

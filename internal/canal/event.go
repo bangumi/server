@@ -118,12 +118,12 @@ func (e *eventHandler) onMessage(msg kafka.Message) error {
 	}
 
 	var err error
-	switch msg.Topic {
-	case "chii.bangumi.chii_subject_fields":
+	switch v.Payload.Source.Table {
+	case "chii_subject_fields":
 		err = e.OnSubjectField(k.Payload, v.Payload)
-	case "chii.bangumi.chii_subjects":
+	case "chii_subjects":
 		err = e.OnSubject(k.Payload, v.Payload)
-	case "chii.bangumi.chii_members":
+	case "chii_members":
 		err = e.OnUserChange(k.Payload, v.Payload)
 	}
 
@@ -142,16 +142,6 @@ const (
 
 type messageKey struct {
 	Payload json.RawMessage `json:"payload"`
-	Schema  struct {
-		Type   string `json:"type"`
-		Name   string `json:"name"`
-		Fields []struct {
-			Type     string `json:"type"`
-			Field    string `json:"field"`
-			Optional bool   `json:"optional"`
-		} `json:"fields"`
-		Optional bool `json:"optional"`
-	} `json:"schema"`
 }
 
 type messageValue struct {
