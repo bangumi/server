@@ -64,7 +64,7 @@ func (e *eventHandler) start() error {
 
 		msg, err := e.reader.FetchMessage(context.Background())
 		if err != nil {
-			if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
+			if errors.Is(err, io.EOF) || errgo.IsNetworkError(err) {
 				return errgo.Wrap(err, "read message")
 			}
 
