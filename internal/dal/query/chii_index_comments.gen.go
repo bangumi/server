@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newIndexComment(db *gorm.DB) indexComment {
+func newIndexComment(db *gorm.DB, opts ...gen.DOOption) indexComment {
 	_indexComment := indexComment{}
 
-	_indexComment.indexCommentDo.UseDB(db)
+	_indexComment.indexCommentDo.UseDB(db, opts...)
 	_indexComment.indexCommentDo.UseModel(&dao.IndexComment{})
 
 	tableName := _indexComment.indexCommentDo.TableName()
@@ -105,6 +105,11 @@ func (i *indexComment) fillFieldMap() {
 }
 
 func (i indexComment) clone(db *gorm.DB) indexComment {
+	i.indexCommentDo.ReplaceConnPool(db.Statement.ConnPool)
+	return i
+}
+
+func (i indexComment) replaceDB(db *gorm.DB) indexComment {
 	i.indexCommentDo.ReplaceDB(db)
 	return i
 }
@@ -125,6 +130,10 @@ func (i indexCommentDo) ReadDB() *indexCommentDo {
 
 func (i indexCommentDo) WriteDB() *indexCommentDo {
 	return i.Clauses(dbresolver.Write)
+}
+
+func (i indexCommentDo) Session(config *gorm.Session) *indexCommentDo {
+	return i.withDO(i.DO.Session(config))
 }
 
 func (i indexCommentDo) Clauses(conds ...clause.Expression) *indexCommentDo {

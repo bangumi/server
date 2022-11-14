@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newCast(db *gorm.DB) cast {
+func newCast(db *gorm.DB, opts ...gen.DOOption) cast {
 	_cast := cast{}
 
-	_cast.castDo.UseDB(db)
+	_cast.castDo.UseDB(db, opts...)
 	_cast.castDo.UseModel(&dao.Cast{})
 
 	tableName := _cast.castDo.TableName()
@@ -137,6 +137,11 @@ func (c *cast) fillFieldMap() {
 }
 
 func (c cast) clone(db *gorm.DB) cast {
+	c.castDo.ReplaceConnPool(db.Statement.ConnPool)
+	return c
+}
+
+func (c cast) replaceDB(db *gorm.DB) cast {
 	c.castDo.ReplaceDB(db)
 	return c
 }
@@ -367,6 +372,10 @@ func (c castDo) ReadDB() *castDo {
 
 func (c castDo) WriteDB() *castDo {
 	return c.Clauses(dbresolver.Write)
+}
+
+func (c castDo) Session(config *gorm.Session) *castDo {
+	return c.withDO(c.DO.Session(config))
 }
 
 func (c castDo) Clauses(conds ...clause.Expression) *castDo {

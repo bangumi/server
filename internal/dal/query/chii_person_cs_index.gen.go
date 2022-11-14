@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newPersonSubjects(db *gorm.DB) personSubjects {
+func newPersonSubjects(db *gorm.DB, opts ...gen.DOOption) personSubjects {
 	_personSubjects := personSubjects{}
 
-	_personSubjects.personSubjectsDo.UseDB(db)
+	_personSubjects.personSubjectsDo.UseDB(db, opts...)
 	_personSubjects.personSubjectsDo.UseModel(&dao.PersonSubjects{})
 
 	tableName := _personSubjects.personSubjectsDo.TableName()
@@ -134,6 +134,11 @@ func (p *personSubjects) fillFieldMap() {
 }
 
 func (p personSubjects) clone(db *gorm.DB) personSubjects {
+	p.personSubjectsDo.ReplaceConnPool(db.Statement.ConnPool)
+	return p
+}
+
+func (p personSubjects) replaceDB(db *gorm.DB) personSubjects {
 	p.personSubjectsDo.ReplaceDB(db)
 	return p
 }
@@ -294,6 +299,10 @@ func (p personSubjectsDo) ReadDB() *personSubjectsDo {
 
 func (p personSubjectsDo) WriteDB() *personSubjectsDo {
 	return p.Clauses(dbresolver.Write)
+}
+
+func (p personSubjectsDo) Session(config *gorm.Session) *personSubjectsDo {
+	return p.withDO(p.DO.Session(config))
 }
 
 func (p personSubjectsDo) Clauses(conds ...clause.Expression) *personSubjectsDo {

@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newAccessToken(db *gorm.DB) accessToken {
+func newAccessToken(db *gorm.DB, opts ...gen.DOOption) accessToken {
 	_accessToken := accessToken{}
 
-	_accessToken.accessTokenDo.UseDB(db)
+	_accessToken.accessTokenDo.UseDB(db, opts...)
 	_accessToken.accessTokenDo.UseModel(&dao.AccessToken{})
 
 	tableName := _accessToken.accessTokenDo.TableName()
@@ -113,6 +113,11 @@ func (a *accessToken) fillFieldMap() {
 }
 
 func (a accessToken) clone(db *gorm.DB) accessToken {
+	a.accessTokenDo.ReplaceConnPool(db.Statement.ConnPool)
+	return a
+}
+
+func (a accessToken) replaceDB(db *gorm.DB) accessToken {
 	a.accessTokenDo.ReplaceDB(db)
 	return a
 }
@@ -133,6 +138,10 @@ func (a accessTokenDo) ReadDB() *accessTokenDo {
 
 func (a accessTokenDo) WriteDB() *accessTokenDo {
 	return a.Clauses(dbresolver.Write)
+}
+
+func (a accessTokenDo) Session(config *gorm.Session) *accessTokenDo {
+	return a.withDO(a.DO.Session(config))
 }
 
 func (a accessTokenDo) Clauses(conds ...clause.Expression) *accessTokenDo {

@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newMember(db *gorm.DB) member {
+func newMember(db *gorm.DB, opts ...gen.DOOption) member {
 	_member := member{}
 
-	_member.memberDo.UseDB(db)
+	_member.memberDo.UseDB(db, opts...)
 	_member.memberDo.UseModel(&dao.Member{})
 
 	tableName := _member.memberDo.TableName()
@@ -154,6 +154,11 @@ func (m *member) fillFieldMap() {
 }
 
 func (m member) clone(db *gorm.DB) member {
+	m.memberDo.ReplaceConnPool(db.Statement.ConnPool)
+	return m
+}
+
+func (m member) replaceDB(db *gorm.DB) member {
 	m.memberDo.ReplaceDB(db)
 	return m
 }
@@ -240,6 +245,10 @@ func (m memberDo) ReadDB() *memberDo {
 
 func (m memberDo) WriteDB() *memberDo {
 	return m.Clauses(dbresolver.Write)
+}
+
+func (m memberDo) Session(config *gorm.Session) *memberDo {
+	return m.withDO(m.DO.Session(config))
 }
 
 func (m memberDo) Clauses(conds ...clause.Expression) *memberDo {

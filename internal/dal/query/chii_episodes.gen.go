@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newEpisode(db *gorm.DB) episode {
+func newEpisode(db *gorm.DB, opts ...gen.DOOption) episode {
 	_episode := episode{}
 
-	_episode.episodeDo.UseDB(db)
+	_episode.episodeDo.UseDB(db, opts...)
 	_episode.episodeDo.UseModel(&dao.Episode{})
 
 	tableName := _episode.episodeDo.TableName()
@@ -163,6 +163,11 @@ func (e *episode) fillFieldMap() {
 }
 
 func (e episode) clone(db *gorm.DB) episode {
+	e.episodeDo.ReplaceConnPool(db.Statement.ConnPool)
+	return e
+}
+
+func (e episode) replaceDB(db *gorm.DB) episode {
 	e.episodeDo.ReplaceDB(db)
 	return e
 }
@@ -253,6 +258,10 @@ func (e episodeDo) ReadDB() *episodeDo {
 
 func (e episodeDo) WriteDB() *episodeDo {
 	return e.Clauses(dbresolver.Write)
+}
+
+func (e episodeDo) Session(config *gorm.Session) *episodeDo {
+	return e.withDO(e.DO.Session(config))
 }
 
 func (e episodeDo) Clauses(conds ...clause.Expression) *episodeDo {

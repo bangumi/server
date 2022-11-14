@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newRevisionText(db *gorm.DB) revisionText {
+func newRevisionText(db *gorm.DB, opts ...gen.DOOption) revisionText {
 	_revisionText := revisionText{}
 
-	_revisionText.revisionTextDo.UseDB(db)
+	_revisionText.revisionTextDo.UseDB(db, opts...)
 	_revisionText.revisionTextDo.UseModel(&dao.RevisionText{})
 
 	tableName := _revisionText.revisionTextDo.TableName()
@@ -89,6 +89,11 @@ func (r *revisionText) fillFieldMap() {
 }
 
 func (r revisionText) clone(db *gorm.DB) revisionText {
+	r.revisionTextDo.ReplaceConnPool(db.Statement.ConnPool)
+	return r
+}
+
+func (r revisionText) replaceDB(db *gorm.DB) revisionText {
 	r.revisionTextDo.ReplaceDB(db)
 	return r
 }
@@ -109,6 +114,10 @@ func (r revisionTextDo) ReadDB() *revisionTextDo {
 
 func (r revisionTextDo) WriteDB() *revisionTextDo {
 	return r.Clauses(dbresolver.Write)
+}
+
+func (r revisionTextDo) Session(config *gorm.Session) *revisionTextDo {
+	return r.withDO(r.DO.Session(config))
 }
 
 func (r revisionTextDo) Clauses(conds ...clause.Expression) *revisionTextDo {
