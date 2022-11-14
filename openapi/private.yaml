@@ -107,6 +107,8 @@ paths:
                   detail:
                     title: Detail
                     type: object
+                    required:
+                      - remain
                     properties:
                       "remain":
                         type: integer
