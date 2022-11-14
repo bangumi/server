@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newEpCollection(db *gorm.DB) epCollection {
+func newEpCollection(db *gorm.DB, opts ...gen.DOOption) epCollection {
 	_epCollection := epCollection{}
 
-	_epCollection.epCollectionDo.UseDB(db)
+	_epCollection.epCollectionDo.UseDB(db, opts...)
 	_epCollection.epCollectionDo.UseModel(&dao.EpCollection{})
 
 	tableName := _epCollection.epCollectionDo.TableName()
@@ -105,6 +105,11 @@ func (e *epCollection) fillFieldMap() {
 }
 
 func (e epCollection) clone(db *gorm.DB) epCollection {
+	e.epCollectionDo.ReplaceConnPool(db.Statement.ConnPool)
+	return e
+}
+
+func (e epCollection) replaceDB(db *gorm.DB) epCollection {
 	e.epCollectionDo.ReplaceDB(db)
 	return e
 }
@@ -125,6 +130,10 @@ func (e epCollectionDo) ReadDB() *epCollectionDo {
 
 func (e epCollectionDo) WriteDB() *epCollectionDo {
 	return e.Clauses(dbresolver.Write)
+}
+
+func (e epCollectionDo) Session(config *gorm.Session) *epCollectionDo {
+	return e.withDO(e.DO.Session(config))
 }
 
 func (e epCollectionDo) Clauses(conds ...clause.Expression) *epCollectionDo {

@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newSubjectTopicComment(db *gorm.DB) subjectTopicComment {
+func newSubjectTopicComment(db *gorm.DB, opts ...gen.DOOption) subjectTopicComment {
 	_subjectTopicComment := subjectTopicComment{}
 
-	_subjectTopicComment.subjectTopicCommentDo.UseDB(db)
+	_subjectTopicComment.subjectTopicCommentDo.UseDB(db, opts...)
 	_subjectTopicComment.subjectTopicCommentDo.UseModel(&dao.SubjectTopicComment{})
 
 	tableName := _subjectTopicComment.subjectTopicCommentDo.TableName()
@@ -109,6 +109,11 @@ func (s *subjectTopicComment) fillFieldMap() {
 }
 
 func (s subjectTopicComment) clone(db *gorm.DB) subjectTopicComment {
+	s.subjectTopicCommentDo.ReplaceConnPool(db.Statement.ConnPool)
+	return s
+}
+
+func (s subjectTopicComment) replaceDB(db *gorm.DB) subjectTopicComment {
 	s.subjectTopicCommentDo.ReplaceDB(db)
 	return s
 }
@@ -129,6 +134,10 @@ func (s subjectTopicCommentDo) ReadDB() *subjectTopicCommentDo {
 
 func (s subjectTopicCommentDo) WriteDB() *subjectTopicCommentDo {
 	return s.Clauses(dbresolver.Write)
+}
+
+func (s subjectTopicCommentDo) Session(config *gorm.Session) *subjectTopicCommentDo {
+	return s.withDO(s.DO.Session(config))
 }
 
 func (s subjectTopicCommentDo) Clauses(conds ...clause.Expression) *subjectTopicCommentDo {

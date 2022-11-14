@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newGroup(db *gorm.DB) group {
+func newGroup(db *gorm.DB, opts ...gen.DOOption) group {
 	_group := group{}
 
-	_group.groupDo.UseDB(db)
+	_group.groupDo.UseDB(db, opts...)
 	_group.groupDo.UseModel(&dao.Group{})
 
 	tableName := _group.groupDo.TableName()
@@ -135,6 +135,11 @@ func (g *group) fillFieldMap() {
 }
 
 func (g group) clone(db *gorm.DB) group {
+	g.groupDo.ReplaceConnPool(db.Statement.ConnPool)
+	return g
+}
+
+func (g group) replaceDB(db *gorm.DB) group {
 	g.groupDo.ReplaceDB(db)
 	return g
 }
@@ -155,6 +160,10 @@ func (g groupDo) ReadDB() *groupDo {
 
 func (g groupDo) WriteDB() *groupDo {
 	return g.Clauses(dbresolver.Write)
+}
+
+func (g groupDo) Session(config *gorm.Session) *groupDo {
+	return g.withDO(g.DO.Session(config))
 }
 
 func (g groupDo) Clauses(conds ...clause.Expression) *groupDo {

@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newTimeLine(db *gorm.DB) timeLine {
+func newTimeLine(db *gorm.DB, opts ...gen.DOOption) timeLine {
 	_timeLine := timeLine{}
 
-	_timeLine.timeLineDo.UseDB(db)
+	_timeLine.timeLineDo.UseDB(db, opts...)
 	_timeLine.timeLineDo.UseModel(&dao.TimeLine{})
 
 	tableName := _timeLine.timeLineDo.TableName()
@@ -127,6 +127,11 @@ func (t *timeLine) fillFieldMap() {
 }
 
 func (t timeLine) clone(db *gorm.DB) timeLine {
+	t.timeLineDo.ReplaceConnPool(db.Statement.ConnPool)
+	return t
+}
+
+func (t timeLine) replaceDB(db *gorm.DB) timeLine {
 	t.timeLineDo.ReplaceDB(db)
 	return t
 }
@@ -147,6 +152,10 @@ func (t timeLineDo) ReadDB() *timeLineDo {
 
 func (t timeLineDo) WriteDB() *timeLineDo {
 	return t.Clauses(dbresolver.Write)
+}
+
+func (t timeLineDo) Session(config *gorm.Session) *timeLineDo {
+	return t.withDO(t.DO.Session(config))
 }
 
 func (t timeLineDo) Clauses(conds ...clause.Expression) *timeLineDo {

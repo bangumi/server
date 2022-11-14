@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newWebSession(db *gorm.DB) webSession {
+func newWebSession(db *gorm.DB, opts ...gen.DOOption) webSession {
 	_webSession := webSession{}
 
-	_webSession.webSessionDo.UseDB(db)
+	_webSession.webSessionDo.UseDB(db, opts...)
 	_webSession.webSessionDo.UseModel(&dao.WebSession{})
 
 	tableName := _webSession.webSessionDo.TableName()
@@ -101,6 +101,11 @@ func (w *webSession) fillFieldMap() {
 }
 
 func (w webSession) clone(db *gorm.DB) webSession {
+	w.webSessionDo.ReplaceConnPool(db.Statement.ConnPool)
+	return w
+}
+
+func (w webSession) replaceDB(db *gorm.DB) webSession {
 	w.webSessionDo.ReplaceDB(db)
 	return w
 }
@@ -121,6 +126,10 @@ func (w webSessionDo) ReadDB() *webSessionDo {
 
 func (w webSessionDo) WriteDB() *webSessionDo {
 	return w.Clauses(dbresolver.Write)
+}
+
+func (w webSessionDo) Session(config *gorm.Session) *webSessionDo {
+	return w.withDO(w.DO.Session(config))
 }
 
 func (w webSessionDo) Clauses(conds ...clause.Expression) *webSessionDo {

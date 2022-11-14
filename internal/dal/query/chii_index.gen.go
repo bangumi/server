@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newIndex(db *gorm.DB) index {
+func newIndex(db *gorm.DB, opts ...gen.DOOption) index {
 	_index := index{}
 
-	_index.indexDo.UseDB(db)
+	_index.indexDo.UseDB(db, opts...)
 	_index.indexDo.UseModel(&dao.Index{})
 
 	tableName := _index.indexDo.TableName()
@@ -127,6 +127,11 @@ func (i *index) fillFieldMap() {
 }
 
 func (i index) clone(db *gorm.DB) index {
+	i.indexDo.ReplaceConnPool(db.Statement.ConnPool)
+	return i
+}
+
+func (i index) replaceDB(db *gorm.DB) index {
 	i.indexDo.ReplaceDB(db)
 	return i
 }
@@ -147,6 +152,10 @@ func (i indexDo) ReadDB() *indexDo {
 
 func (i indexDo) WriteDB() *indexDo {
 	return i.Clauses(dbresolver.Write)
+}
+
+func (i indexDo) Session(config *gorm.Session) *indexDo {
+	return i.withDO(i.DO.Session(config))
 }
 
 func (i indexDo) Clauses(conds ...clause.Expression) *indexDo {

@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newOAuthClient(db *gorm.DB) oAuthClient {
+func newOAuthClient(db *gorm.DB, opts ...gen.DOOption) oAuthClient {
 	_oAuthClient := oAuthClient{}
 
-	_oAuthClient.oAuthClientDo.UseDB(db)
+	_oAuthClient.oAuthClientDo.UseDB(db, opts...)
 	_oAuthClient.oAuthClientDo.UseModel(&dao.OAuthClient{})
 
 	tableName := _oAuthClient.oAuthClientDo.TableName()
@@ -116,6 +116,11 @@ func (o *oAuthClient) fillFieldMap() {
 }
 
 func (o oAuthClient) clone(db *gorm.DB) oAuthClient {
+	o.oAuthClientDo.ReplaceConnPool(db.Statement.ConnPool)
+	return o
+}
+
+func (o oAuthClient) replaceDB(db *gorm.DB) oAuthClient {
 	o.oAuthClientDo.ReplaceDB(db)
 	return o
 }
@@ -202,6 +207,10 @@ func (o oAuthClientDo) ReadDB() *oAuthClientDo {
 
 func (o oAuthClientDo) WriteDB() *oAuthClientDo {
 	return o.Clauses(dbresolver.Write)
+}
+
+func (o oAuthClientDo) Session(config *gorm.Session) *oAuthClientDo {
+	return o.withDO(o.DO.Session(config))
 }
 
 func (o oAuthClientDo) Clauses(conds ...clause.Expression) *oAuthClientDo {

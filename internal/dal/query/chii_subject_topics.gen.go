@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newSubjectTopic(db *gorm.DB) subjectTopic {
+func newSubjectTopic(db *gorm.DB, opts ...gen.DOOption) subjectTopic {
 	_subjectTopic := subjectTopic{}
 
-	_subjectTopic.subjectTopicDo.UseDB(db)
+	_subjectTopic.subjectTopicDo.UseDB(db, opts...)
 	_subjectTopic.subjectTopicDo.UseModel(&dao.SubjectTopic{})
 
 	tableName := _subjectTopic.subjectTopicDo.TableName()
@@ -117,6 +117,11 @@ func (s *subjectTopic) fillFieldMap() {
 }
 
 func (s subjectTopic) clone(db *gorm.DB) subjectTopic {
+	s.subjectTopicDo.ReplaceConnPool(db.Statement.ConnPool)
+	return s
+}
+
+func (s subjectTopic) replaceDB(db *gorm.DB) subjectTopic {
 	s.subjectTopicDo.ReplaceDB(db)
 	return s
 }
@@ -137,6 +142,10 @@ func (s subjectTopicDo) ReadDB() *subjectTopicDo {
 
 func (s subjectTopicDo) WriteDB() *subjectTopicDo {
 	return s.Clauses(dbresolver.Write)
+}
+
+func (s subjectTopicDo) Session(config *gorm.Session) *subjectTopicDo {
+	return s.withDO(s.DO.Session(config))
 }
 
 func (s subjectTopicDo) Clauses(conds ...clause.Expression) *subjectTopicDo {

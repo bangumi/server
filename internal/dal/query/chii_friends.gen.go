@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newFriend(db *gorm.DB) friend {
+func newFriend(db *gorm.DB, opts ...gen.DOOption) friend {
 	_friend := friend{}
 
-	_friend.friendDo.UseDB(db)
+	_friend.friendDo.UseDB(db, opts...)
 	_friend.friendDo.UseModel(&dao.Friend{})
 
 	tableName := _friend.friendDo.TableName()
@@ -99,6 +99,11 @@ func (f *friend) fillFieldMap() {
 }
 
 func (f friend) clone(db *gorm.DB) friend {
+	f.friendDo.ReplaceConnPool(db.Statement.ConnPool)
+	return f
+}
+
+func (f friend) replaceDB(db *gorm.DB) friend {
 	f.friendDo.ReplaceDB(db)
 	return f
 }
@@ -119,6 +124,10 @@ func (f friendDo) ReadDB() *friendDo {
 
 func (f friendDo) WriteDB() *friendDo {
 	return f.Clauses(dbresolver.Write)
+}
+
+func (f friendDo) Session(config *gorm.Session) *friendDo {
+	return f.withDO(f.DO.Session(config))
 }
 
 func (f friendDo) Clauses(conds ...clause.Expression) *friendDo {
