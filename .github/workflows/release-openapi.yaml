@@ -1,4 +1,4 @@
-name: release
+name: Release(openapi)
 
 on:
   push:
