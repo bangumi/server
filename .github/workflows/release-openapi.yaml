@@ -1,0 +1,53 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+jobs:
+  openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: actions/checkout@v3
+        with:
+          repository: "bangumi/api"
+          path: api
+
+      - run: cp ./dist/v0.yaml ./api/open-api/v0.yaml
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          path: api
+          token: ${{ secrets.PAT }}
+          title: Update Openapi Specification from bangumi/server
+          push-to-fork: Trim21-bot/api
+          branch: "update-upstream"
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+
+      - uses: actions/checkout@v3
+        with:
+          repository: "bangumi/dev-docs"
+          path: dev-docs
+
+      - run: cp ./dist/private.yaml ./dev-docs/api.yaml
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          path: dev-docs
+          token: ${{ secrets.PAT }}
+          title: Update Openapi Specification from bangumi/server
+          push-to-fork: Trim21-bot/dev-docs
+          branch: "update-upstream"
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
