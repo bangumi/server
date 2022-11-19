@@ -120,6 +120,13 @@ paths:
         "422":
           description: "JSON 语法错误"
 
+        "429":
+          description: "登录失败次数太多"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+
         "502":
           description: hCaptcha HTTP 请求失败
 

@@ -10,7 +10,7 @@ properties:
   description:
     title: Description
     type: string
-  detail:
+  details:
     title: Detail
     oneOf:
       - type: string
