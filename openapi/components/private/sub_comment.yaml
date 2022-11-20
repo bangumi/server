@@ -12,7 +12,7 @@ properties:
     format: date-time
     example: 2012-12-23T20:46:29+08:00
   creator:
-    $ref: "../creator.yaml"
+    $ref: "../user.yaml"
   id:
     type: integer
     format: int32
