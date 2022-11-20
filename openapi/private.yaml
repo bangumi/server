@@ -162,13 +162,13 @@ paths:
                 $ref: "#/components/schemas/User"
         "401":
           description: 用户未登录或者 session 已失效
-  "/p/groups/{group_id}/topics":
+  "/p/groups/{name}/topics":
     get:
       tags:
         - 小组
         - 讨论
       summary: 分页获取小组讨论列表，按照回复时间倒序分页
-      operationId: getGroupTopicsById
+      operationId: getGroupTopicsByGroupName
       parameters:
         - required: true
           description: 小组ID
@@ -176,7 +176,7 @@ paths:
             title: Group ID
             minimum: 0
             type: integer
-          name: group_id
+          name: name
           in: path
         - required: true
           description: 小组 Limit
