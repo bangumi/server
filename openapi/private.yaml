@@ -171,32 +171,13 @@ paths:
       operationId: getGroupTopicsByGroupName
       parameters:
         - required: true
-          description: 小组ID
+          description: 小组名称
           schema:
-            title: Group ID
-            minimum: 0
-            type: integer
+            type: string
           name: name
           in: path
-        - required: true
-          description: 小组 Limit
-          schema:
-            title: Limit
-            maximum: 100
-            minimum: 0
-            type: integer
-            default: 30
-          name: limit
-          in: query
-        - required: true
-          description: 小组 Offset
-          schema:
-            title: Offset
-            minimum: 0
-            type: integer
-            default: 0
-          name: offset
-          in: query
+        - $ref: "#/components/parameters/default_query_limit"
+        - $ref: "#/components/parameters/default_query_offset"
       responses:
         "200":
           description: Successful Response
