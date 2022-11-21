@@ -3,7 +3,6 @@ required:
   - total
   - limit
   - offset
-  - data
 properties:
   total:
     title: Total
@@ -14,8 +13,3 @@ properties:
   offset:
     title: Offset
     type: integer
-  data:
-    title: Data
-    type: array
-    items:
-      type: object

@@ -533,6 +533,8 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/Paged"
                   - type: object
+                    required:
+                      - data
                     properties:
                       data:
                         title: Data
@@ -619,6 +621,8 @@ components:
       allOf:
         - $ref: "#/components/schemas/Paged"
         - type: object
+          required:
+            - data
           properties:
             data:
               title: Data
