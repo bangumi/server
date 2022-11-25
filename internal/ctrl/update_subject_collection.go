@@ -122,22 +122,29 @@ func (ctl Ctrl) saveTimeLineSubject(
 
 func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.TimeLine {
 	sidStr := strconv.Itoa(int(sj.ID))
+
 	tlMeta := &model.TimeLineMeta{
 		UID:      req.UID,
 		Related:  sidStr,
 		Dateline: uint32(time.Now().Unix()),
 	}
 
-	seriesStr := strconv.Itoa(generic.Btoi(sj.Series))
-	tlMemo := model.NewTimeLineMemo(&model.TimeLineSubjectMemo{
-		ID:             sidStr,
-		TypeID:         string(req.Type.Default(0)),
-		Name:           sj.Name,
-		NameCN:         sj.NameCN,
-		Series:         seriesStr,
-		CollectComment: req.Comment.Default(""),
-		CollectRate:    int(req.Rate.Default(0)),
-	})
+	tlMemo := &model.TimeLineMemo{
+		Cat:  model.TimeLineCatSubject,
+		Type: convSubjectType(req, sj),
+		Content: &model.TimeLineMemoContent{
+			TimeLineSubjectMemo: &model.TimeLineSubjectMemo{
+				ID:             sidStr,
+				TypeID:         string(req.Type.Default(0)),
+				Name:           sj.Name,
+				NameCN:         sj.NameCN,
+				Series:         strconv.Itoa(generic.Btoi(sj.Series)),
+				CollectComment: req.Comment.Default(""),
+				CollectRate:    int(req.Rate.Default(0)),
+			},
+		},
+	}
+
 	tlImg := model.TimeLineImage{
 		SubjectID: &sidStr,
 		Images:    &sj.Image,
@@ -148,6 +155,27 @@ func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.T
 		TimeLineMemo:   tlMemo,
 		TimeLineImages: model.TimeLineImages{tlImg},
 	}
+}
+
+var _convSubjectTypeMap = map[model.SubjectType][]uint16{
+	model.SubjectTypeBook:  {0, 1, 5, 9, 13, 14},
+	model.SubjectTypeAnime: {0, 2, 6, 10, 13, 14},
+	model.SubjectTypeMusic: {0, 3, 7, 11, 13, 14},
+	model.SubjectTypeGame:  {0, 4, 8, 12, 13, 14},
+	model.SubjectTypeReal:  {0, 2, 6, 10, 13, 14},
+}
+
+func convSubjectType(req UpdateCollectionRequest, sj model.Subject) uint16 {
+	original := req.Type.Default(0)
+	st := sj.TypeID
+	l, ok := _convSubjectTypeMap[st]
+	if !ok {
+		return uint16(original)
+	}
+	if original < 1 || original > 5 {
+		return uint16(original)
+	}
+	return l[original]
 }
 
 func (ctl Ctrl) UpdateEpisodesCollection(
