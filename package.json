@@ -13,7 +13,7 @@
     "printWidth": 120
   },
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^9.0.9",
+    "@apidevtools/json-schema-ref-parser": "^9.1.0",
     "conventional-changelog": "^3.1.25",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21"
@@ -22,6 +22,6 @@
     "@types/conventional-changelog": "^3.1.1",
     "colors": "^1.4.0",
     "oas-validator": "^5.0.8",
-    "prettier": "^2.7.1"
+    "prettier": "^2.8.0"
   }
 }
