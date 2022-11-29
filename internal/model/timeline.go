@@ -65,50 +65,6 @@ type TimeLineMemoContent struct {
 	*TimeLineDoujinMemo
 }
 
-type TimeLineMemoContentType interface {
-	*TimeLineRelationMemo | *TimeLineGroupMemo | *TimeLineWikiMemo | *TimeLineSubjectMemo | *TimeLineProgressMemo |
-		*TimeLineSayMemo | *TimeLineBlogMemo | *TimeLineIndexMemo | *TimeLineMonoMemo | *TimeLineDoujinMemo
-}
-
-func NewTimeLineMemo[T TimeLineMemoContentType](content T) *TimeLineMemo {
-	val := any(content)
-	switch typed := val.(type) {
-	case *TimeLineRelationMemo:
-		return newTimeLineMemo(TimeLineCatRelation, 2, &TimeLineMemoContent{TimeLineRelationMemo: typed})
-	case *TimeLineGroupMemo:
-		return newTimeLineMemo(TimeLineCatGroup, 3, &TimeLineMemoContent{TimeLineGroupMemo: typed})
-	case *TimeLineWikiMemo:
-		return newTimeLineMemo(TimeLineCatWiki, 0, &TimeLineMemoContent{TimeLineWikiMemo: typed})
-	case *TimeLineSubjectMemo:
-		return newTimeLineMemo(TimeLineCatSubject, 0, &TimeLineMemoContent{TimeLineSubjectMemo: typed})
-	case *TimeLineProgressMemo:
-		return newTimeLineMemo(TimeLineCatProgress, 0, &TimeLineMemoContent{TimeLineProgressMemo: typed})
-	case *TimeLineSayMemo:
-		if typed.TimeLineSayEdit != nil {
-			return newTimeLineMemo(TimeLineCatSay, 2, &TimeLineMemoContent{TimeLineSayMemo: typed})
-		}
-		return newTimeLineMemo(TimeLineCatSay, 0, &TimeLineMemoContent{TimeLineSayMemo: typed})
-	case *TimeLineBlogMemo:
-		return newTimeLineMemo(TimeLineCatBlog, 0, &TimeLineMemoContent{TimeLineBlogMemo: typed})
-	case *TimeLineIndexMemo:
-		return newTimeLineMemo(TimeLineCatIndex, 0, &TimeLineMemoContent{TimeLineIndexMemo: typed})
-	case *TimeLineMonoMemo:
-		return newTimeLineMemo(TimeLineCatMono, 1, &TimeLineMemoContent{TimeLineMonoMemo: typed})
-	case *TimeLineDoujinMemo:
-		return newTimeLineMemo(TimeLineCatDoujin, 0, &TimeLineMemoContent{TimeLineDoujinMemo: typed})
-	default:
-		return nil
-	}
-}
-
-func newTimeLineMemo(cat TimeLineCat, typ uint16, content *TimeLineMemoContent) *TimeLineMemo {
-	return &TimeLineMemo{
-		Cat:     cat,
-		Type:    typ,
-		Content: content,
-	}
-}
-
 type TimeLineDoujinMemo struct {
 	ID    string
 	Name  string
