@@ -157,18 +157,10 @@ func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.T
 	}
 }
 
-var _convSubjectTypeMap = map[model.SubjectType][]uint16{
-	model.SubjectTypeBook:  {0, 1, 5, 9, 13, 14},
-	model.SubjectTypeAnime: {0, 2, 6, 10, 13, 14},
-	model.SubjectTypeMusic: {0, 3, 7, 11, 13, 14},
-	model.SubjectTypeGame:  {0, 4, 8, 12, 13, 14},
-	model.SubjectTypeReal:  {0, 2, 6, 10, 13, 14},
-}
-
 func convSubjectType(req UpdateCollectionRequest, sj model.Subject) uint16 {
 	original := req.Type.Default(0)
 	st := sj.TypeID
-	l, ok := _convSubjectTypeMap[st]
+	l, ok := subjectTypeMap()[st]
 	if !ok {
 		return uint16(original)
 	}
@@ -176,6 +168,16 @@ func convSubjectType(req UpdateCollectionRequest, sj model.Subject) uint16 {
 		return uint16(original)
 	}
 	return l[original]
+}
+
+func subjectTypeMap() map[model.SubjectType][]uint16 {
+	return map[model.SubjectType][]uint16{
+		model.SubjectTypeBook:  {0, 1, 5, 9, 13, 14},
+		model.SubjectTypeAnime: {0, 2, 6, 10, 13, 14},
+		model.SubjectTypeMusic: {0, 3, 7, 11, 13, 14},
+		model.SubjectTypeGame:  {0, 4, 8, 12, 13, 14},
+		model.SubjectTypeReal:  {0, 2, 6, 10, 13, 14},
+	}
 }
 
 func (ctl Ctrl) UpdateEpisodesCollection(
