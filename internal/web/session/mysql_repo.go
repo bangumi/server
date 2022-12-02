@@ -19,7 +19,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -46,9 +46,9 @@ func (r mysqlRepo) Create(
 	createdAt := time.Now().Unix()
 	expiredAt := createdAt + gtime.OneWeekSec
 	s := Session{RegTime: regTime, UserID: userID, ExpiredAt: expiredAt}
-	encodedJSON, err := json.MarshalWithOption(s, json.DisableHTMLEscape(), json.DisableNormalizeUTF8())
+	encodedJSON, err := sonic.Marshal(s)
 	if err != nil {
-		return "", Session{}, errgo.Wrap(err, "json.MarshalWithOption")
+		return "", Session{}, errgo.Wrap(err, "sonic.MarshalWithOption")
 	}
 
 	tx := r.q.Begin()
@@ -101,8 +101,8 @@ func (r mysqlRepo) Get(ctx context.Context, key string) (Session, error) {
 	}
 
 	var s Session
-	if err = json.Unmarshal(record.Value, &s); err != nil {
-		return Session{}, errgo.Wrap(err, "json.Unmarshal")
+	if err = sonic.Unmarshal(record.Value, &s); err != nil {
+		return Session{}, errgo.Wrap(err, "sonic.Unmarshal")
 	}
 
 	s.UserID = record.UserID

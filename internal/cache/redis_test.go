@@ -19,8 +19,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/go-redis/redismock/v8"
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/cache"
@@ -85,7 +85,7 @@ func TestRedisCache_Get_Cached(t *testing.T) {
 	}
 
 	c, mock := mockedCache()
-	encoded, err := json.Marshal(value)
+	encoded, err := sonic.Marshal(value)
 	require.NoError(t, err)
 
 	mock.Regexp().ExpectGet(key).SetVal(string(encoded))

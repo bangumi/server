@@ -18,8 +18,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/bytedance/sonic"
 	"github.com/go-resty/resty/v2"
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/mock"
@@ -78,8 +78,8 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 	var f *fiber.App
 
 	httpClient := resty.New().SetJSONEscapeHTML(false)
-	httpClient.JSONUnmarshal = json.Unmarshal
-	httpClient.JSONMarshal = json.Marshal
+	httpClient.JSONUnmarshal = sonic.Unmarshal
+	httpClient.JSONMarshal = sonic.Marshal
 
 	var options = []fx.Option{
 		fx.NopLogger,

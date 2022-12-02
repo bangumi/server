@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -90,7 +90,7 @@ func TestHandler_ListGroupMembersPrivate(t *testing.T) {
 	require.EqualValues(t, 5, r.Total)
 
 	var data []res.PrivateGroupMember
-	require.NoError(t, json.Unmarshal(r.Data, &data))
+	require.NoError(t, sonic.Unmarshal(r.Data, &data))
 }
 
 // $ task test -- -run 'TestHandler_ListGroupMembersPrivate_not_found'

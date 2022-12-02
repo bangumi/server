@@ -16,8 +16,9 @@ package canal
 
 import (
 	"context"
+	"encoding/json"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -25,7 +26,7 @@ import (
 
 func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {
 	var k SubjectKey
-	if err := json.UnmarshalNoEscape(key, &k); err != nil {
+	if err := sonic.Unmarshal(key, &k); err != nil {
 		return nil
 	}
 
@@ -34,7 +35,7 @@ func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {
 
 func (e *eventHandler) OnSubjectField(key json.RawMessage, payload payload) error {
 	var k SubjectFieldKey
-	if err := json.UnmarshalNoEscape(key, &k); err != nil {
+	if err := sonic.Unmarshal(key, &k); err != nil {
 		return nil
 	}
 

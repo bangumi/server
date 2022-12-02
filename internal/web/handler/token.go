@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
@@ -36,7 +36,7 @@ func (h Handler) CreatePersonalAccessToken(c *fiber.Ctx) error {
 	}
 
 	var r req.CreatePersonalAccessToken
-	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
+	if err := sonic.Unmarshal(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -59,7 +59,7 @@ func (h Handler) DeletePersonalAccessToken(c *fiber.Ctx) error {
 	}
 
 	var r req.DeletePersonalAccessToken
-	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
+	if err := sonic.Unmarshal(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
 	if err := h.Common.V.Struct(r); err != nil {

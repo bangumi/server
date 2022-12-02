@@ -21,7 +21,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -65,7 +65,7 @@ func TestMarshalJSON(t *testing.T) {
 	e := errors.New("expected")
 	err := errgo.Wrap(e, "ctx")
 
-	b, jerr := json.Marshal(err)
+	b, jerr := sonic.Marshal(err)
 	require.NoError(t, jerr)
 
 	var m struct {
@@ -73,7 +73,7 @@ func TestMarshalJSON(t *testing.T) {
 		Stack []string `json:"stack"`
 	}
 
-	require.NoError(t, json.Unmarshal(b, &m))
+	require.NoError(t, sonic.Unmarshal(b, &m))
 
 	require.Equal(t, "ctx: expected", m.Error)
 	require.NotZero(t, len(m.Stack), "stack should not be zero")

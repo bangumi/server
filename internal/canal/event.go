@@ -16,11 +16,12 @@ package canal
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"sync/atomic"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 
@@ -108,12 +109,12 @@ func (e *eventHandler) onMessage(msg kafka.Message) error {
 	}
 
 	var k messageKey
-	if err := json.Unmarshal(msg.Key, &k); err != nil {
+	if err := sonic.Unmarshal(msg.Key, &k); err != nil {
 		return nil
 	}
 
 	var v messageValue
-	if err := json.Unmarshal(msg.Value, &v); err != nil {
+	if err := sonic.Unmarshal(msg.Value, &v); err != nil {
 		return nil
 	}
 

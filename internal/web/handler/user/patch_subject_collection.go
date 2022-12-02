@@ -18,7 +18,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
@@ -37,7 +37,7 @@ func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
 	}
 
 	var r req.SubjectEpisodeCollectionPatch
-	if err = json.UnmarshalNoEscape(c.Body(), &r); err != nil {
+	if err = sonic.Unmarshal(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
 

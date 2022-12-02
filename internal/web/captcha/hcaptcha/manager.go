@@ -19,8 +19,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/go-resty/resty/v2"
-	"github.com/goccy/go-json"
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -48,8 +48,8 @@ func (m Manager) Verify(ctx context.Context, response string) (bool, error) {
 	}
 
 	var d hCaptcha
-	if err := json.UnmarshalNoEscape(resp.Body(), &d); err != nil {
-		return false, errgo.Wrap(err, "json.Unmarshal")
+	if err := sonic.Unmarshal(resp.Body(), &d); err != nil {
+		return false, errgo.Wrap(err, "sonic.Unmarshal")
 	}
 
 	return d.Success, nil

@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -54,7 +54,7 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 		StrictRouting:         true,
 		CaseSensitive:         true,
 		ErrorHandler:          getDefaultErrorHandler(),
-		JSONEncoder:           json.Marshal,
+		JSONEncoder:           sonic.Marshal,
 	})
 
 	count := scope.Counter("request_count_total")

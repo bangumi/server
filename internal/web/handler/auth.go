@@ -17,7 +17,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 	"go.uber.org/zap"
@@ -34,7 +34,7 @@ import (
 
 func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 	var r req.UserLogin
-	if err := json.UnmarshalNoEscape(c.Body(), &r); err != nil {
+	if err := sonic.Unmarshal(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
 

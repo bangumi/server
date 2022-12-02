@@ -15,7 +15,9 @@
 package canal
 
 import (
-	"github.com/goccy/go-json"
+	"encoding/json"
+
+	"github.com/bytedance/sonic"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
@@ -28,19 +30,19 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error 
 		return nil
 	case opUpdate:
 		var before userPayload
-		if err := json.Unmarshal(payload.Before, &before); err != nil {
+		if err := sonic.Unmarshal(payload.Before, &before); err != nil {
 			return errgo.Wrap(err, "json")
 		}
 		var after userPayload
-		if err := json.Unmarshal(payload.After, &after); err != nil {
+		if err := sonic.Unmarshal(payload.After, &after); err != nil {
 			return errgo.Wrap(err, "json")
 		}
 
 		if before.Password != after.Password {
 			var k UserKey
-			if err := json.UnmarshalNoEscape(key, &k); err != nil {
+			if err := sonic.Unmarshal(key, &k); err != nil {
 				e.log.Error("failed to unmarshal json", zap.Error(err))
-				return errgo.Wrap(err, "json.Unmarshal")
+				return errgo.Wrap(err, "sonic.Unmarshal")
 			}
 			return e.OnUserPasswordChange(k.ID)
 		}

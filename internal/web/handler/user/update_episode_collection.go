@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/ctrl"
@@ -57,7 +57,7 @@ func (r ReqEpisodeCollectionBatch) Validate() error {
 //	/v0/users/-/collections/:subject_id/episodes"
 func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 	var r ReqEpisodeCollectionBatch
-	if err := json.Unmarshal(c.Body(), &r); err != nil {
+	if err := sonic.Unmarshal(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -99,7 +99,7 @@ func (h User) PutEpisodeCollection(c *fiber.Ctx) error {
 	}
 
 	var r req.UpdateUserEpisodeCollection
-	if err = json.Unmarshal(c.Body(), &r); err != nil {
+	if err = sonic.Unmarshal(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
 

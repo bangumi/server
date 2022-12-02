@@ -17,7 +17,7 @@ package model_test
 import (
 	"testing"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/model"
@@ -39,11 +39,11 @@ func TestEpisodeCollection_UnmarshalJSON(t *testing.T) {
 	for _, tc := range testCases {
 		var r model.EpisodeCollection
 		if tc.Err {
-			require.Error(t, json.Unmarshal(tc.Raw, &r))
+			require.Error(t, sonic.Unmarshal(tc.Raw, &r))
 			continue
 		}
 
-		require.NoError(t, json.Unmarshal(tc.Raw, &r))
+		require.NoError(t, sonic.Unmarshal(tc.Raw, &r))
 		require.Equal(t, tc.Expected, r)
 	}
 }
@@ -64,11 +64,11 @@ func TestSubjectCollection_UnmarshalJSON(t *testing.T) {
 	for _, tc := range testCases {
 		var r model.SubjectCollection
 		if tc.Err {
-			require.Error(t, json.Unmarshal(tc.Raw, &r))
+			require.Error(t, sonic.Unmarshal(tc.Raw, &r))
 			continue
 		}
 
-		require.NoError(t, json.Unmarshal(tc.Raw, &r))
+		require.NoError(t, sonic.Unmarshal(tc.Raw, &r))
 		require.Equal(t, tc.Expected, r)
 	}
 }

@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -60,7 +60,7 @@ func TestUser_ListCollection(t *testing.T) {
 		ExpectCode(http.StatusOK)
 
 	var data []res.SubjectCollection
-	require.NoError(t, json.Unmarshal(r.Data, &data))
+	require.NoError(t, sonic.Unmarshal(r.Data, &data))
 
 	require.Len(t, data, 1)
 

@@ -18,7 +18,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
@@ -119,7 +119,7 @@ func (h Handler) getIndexSubjects(
 
 func (h Handler) NewIndex(c *fiber.Ctx) error {
 	var reqData req.IndexBasicInfo
-	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+	if err := sonic.Unmarshal(c.Body(), &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 	if err := h.ensureValidStrings(reqData.Description, reqData.Title); err != nil {
@@ -174,7 +174,7 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 		return err
 	}
 	var reqData req.IndexBasicInfo
-	if err = json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+	if err = sonic.Unmarshal(c.Body(), &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 

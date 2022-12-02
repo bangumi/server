@@ -17,12 +17,12 @@ package res
 import (
 	"net/http"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 )
 
 func JSON(c *fiber.Ctx, v any) error {
-	data, err := json.Marshal(v)
+	data, err := sonic.Marshal(v)
 	if err != nil {
 		c.Status(http.StatusInternalServerError).Context().SetBodyString("failed to encode json body: " + err.Error())
 		return nil

@@ -21,7 +21,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/meilisearch/meilisearch-go"
 
@@ -72,7 +72,7 @@ func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 	}
 
 	var r Req
-	if err = json.Unmarshal(ctx.Body(), &r); err != nil {
+	if err = sonic.Unmarshal(ctx.Body(), &r); err != nil {
 		return res.JSONError(ctx, err)
 	}
 

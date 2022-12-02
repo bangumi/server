@@ -132,14 +132,13 @@ linters-settings:
     # A list of packages for the list type specified.
     # Default: []
     packages:
-      - "encoding/json"
       - "github.com/sirupsen/logrus"
       - "github.com/golang/mock/gomock"
     # A list of packages for the list type specified.
     # Specify an error message to output when a denied package is used.
     # Default: []
     packages-with-error-message:
-      - "encoding/json": 'use "github.com/goccy/go-json"'
+      - "github.com/goccy/go-json": 'use "github.com/bytedance/sonic"'
       - "github.com/sirupsen/logrus": 'use "app/pkg/logger"'
       - "github.com/golang/mock": 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
     # Create additional guards that follow the same configuration pattern.

@@ -17,8 +17,8 @@ package main
 import (
 	"fmt"
 
+	"github.com/bytedance/sonic"
 	"github.com/go-resty/resty/v2"
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/dig"
 	"go.uber.org/fx"
@@ -69,8 +69,8 @@ func start() error {
 			driver.NewMysqlConnectionPool, // mysql
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
-				httpClient.JSONUnmarshal = json.Unmarshal
-				httpClient.JSONMarshal = json.Marshal
+				httpClient.JSONUnmarshal = sonic.Unmarshal
+				httpClient.JSONMarshal = sonic.Marshal
 				return httpClient
 			},
 		),

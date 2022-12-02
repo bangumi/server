@@ -15,10 +15,9 @@
 package model
 
 import (
+	"encoding/json"
 	"reflect"
 	"strconv"
-
-	"github.com/goccy/go-json"
 )
 
 var _ json.Unmarshaler = (*SubjectCollection)(nil)

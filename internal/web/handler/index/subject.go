@@ -17,7 +17,7 @@ package index
 import (
 	"errors"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
@@ -28,7 +28,7 @@ import (
 
 func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
 	var reqData req.IndexAddSubject
-	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+	if err := sonic.Unmarshal(c.Body(), &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 	return h.addOrUpdateIndexSubject(c, reqData)
@@ -36,7 +36,7 @@ func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
 
 func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
 	var reqData req.IndexSubjectInfo
-	if err := json.UnmarshalNoEscape(c.Body(), &reqData); err != nil {
+	if err := sonic.Unmarshal(c.Body(), &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))

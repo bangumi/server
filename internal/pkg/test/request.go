@@ -16,6 +16,7 @@ package test
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -24,7 +25,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/require"
 )
@@ -130,7 +131,7 @@ func (r *Request) JSON(v any) *Request {
 	require.Empty(r.t, r.contentType, "content-type should not be empty")
 
 	var err error
-	r.httpBody, err = json.Marshal(v)
+	r.httpBody, err = sonic.Marshal(v)
 	require.NoError(r.t, err)
 
 	r.contentType = fiber.MIMEApplicationJSON
@@ -200,7 +201,7 @@ func (r *Response) JSON(v any) *Response {
 	r.t.Helper()
 
 	if strings.HasPrefix(r.Header.Get(fiber.HeaderContentType), fiber.MIMEApplicationJSON) {
-		require.NoError(r.t, json.Unmarshal(r.Body, v))
+		require.NoError(r.t, sonic.Unmarshal(r.Body, v))
 	}
 
 	return r

@@ -20,7 +20,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic/decoder"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/require"
 
@@ -43,7 +43,7 @@ func TestDefaultErrorHandler_resError(t *testing.T) {
 	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
 	var body res.Error
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&body))
+	require.NoError(t, decoder.NewStreamDecoder(resp.Body).Decode(&body))
 
 	require.Equal(t, "mm", body.Description)
 }

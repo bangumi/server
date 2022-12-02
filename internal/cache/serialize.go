@@ -15,24 +15,24 @@
 package cache
 
 import (
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func marshalBytes(v any) ([]byte, error) {
-	b, err := json.MarshalWithOption(v, json.DisableHTMLEscape(), json.DisableNormalizeUTF8())
+	b, err := sonic.Marshal(v)
 	if err != nil {
-		return nil, errgo.Wrap(err, "json.Marshal")
+		return nil, errgo.Wrap(err, "sonic.Marshal")
 	}
 
 	return b, nil
 }
 
 func unmarshalBytes(b []byte, v any) error {
-	err := json.UnmarshalNoEscape(b, v)
+	err := sonic.Unmarshal(b, v)
 	if err != nil {
-		return errgo.Wrap(err, "json.Unmarshal")
+		return errgo.Wrap(err, "sonic.Unmarshal")
 	}
 
 	return nil
