@@ -90,7 +90,7 @@ func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 		var hit struct {
 			Record Record `json:"record"`
 		}
-		if err := json.Unmarshal(h, &hit); err != nil {
+		if err := sonic.Unmarshal(h, &hit); err != nil {
 			return errgo.Wrap(err, "json.Unmarshal")
 		}
 
