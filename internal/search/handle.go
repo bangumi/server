@@ -17,6 +17,7 @@ package search
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -29,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
-	"github.com/bangumi/server/internal/pkg/obj"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -85,29 +85,16 @@ func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 		return errgo.Wrap(err, "search")
 	}
 
-	data := make([]resSubject, 0, len(result.Hits))
+	data := make([]Record, 0, len(result.Hits))
 	for _, h := range result.Hits {
-		hit, ok := h.(map[string]any)
-		if !ok {
-			continue
+		var hit struct {
+			Record Record `json:"record"`
+		}
+		if err := json.Unmarshal(h, &hit); err != nil {
+			return errgo.Wrap(err, "json.Unmarshal")
 		}
 
-		recordMap, ok := hit["record"].(map[string]any)
-		if !ok {
-			continue
-		}
-
-		data = append(data, resSubject{
-			ID:      model.SubjectID(obj.GetFloat64(recordMap, "id")),
-			Summary: obj.GetString(hit, "summary"),
-			Date:    obj.GetString(recordMap, "date"),
-			Image:   res.SubjectImage(obj.GetString(recordMap, "image")).Large,
-			Name:    obj.GetString(recordMap, "name"),
-			NameCN:  obj.GetString(recordMap, "name_cn"),
-			Tags:    anyToResTag(recordMap["tags"]),
-			Score:   obj.GetFloat64(recordMap, "score"),
-			Rank:    uint32(obj.GetFloat64(recordMap, "rank")),
-		})
+		data = append(data, hit.Record)
 	}
 
 	return res.JSON(ctx, res.Paged{
@@ -118,39 +105,12 @@ func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 	})
 }
 
-func anyToResTag(v any) []res.SubjectTag {
-	if v == nil {
-		return nil
-	}
-
-	tags, ok := v.([]any)
-	if !ok {
-		return nil
-	}
-
-	var result = make([]res.SubjectTag, 0, len(tags))
-	for _, tagAny := range tags {
-		tagMap, ok := tagAny.(map[string]any)
-		if !ok {
-			continue
-		}
-		tag := res.SubjectTag{
-			Name:  obj.GetString(tagMap, "name"),
-			Count: int(obj.GetFloat64(tagMap, "count")),
-		}
-
-		result = append(result, tag)
-	}
-
-	return result
-}
-
 func (c *client) doSearch(
 	words string,
 	filter [][]string,
 	sort string,
 	limit, offset int,
-) (*meilisearch.SearchResponse, error) {
+) (*meiliSearchResponse, error) {
 	if limit == 0 {
 		limit = 10
 	} else if limit > 50 {
@@ -170,7 +130,7 @@ func (c *client) doSearch(
 		return nil, res.BadRequest("sort not supported")
 	}
 
-	response, err := c.subjectIndex.Search(words, &meilisearch.SearchRequest{
+	raw, err := c.subjectIndex.SearchRaw(words, &meilisearch.SearchRequest{
 		Offset: int64(offset),
 		Limit:  int64(limit),
 		Filter: filter,
@@ -180,19 +140,17 @@ func (c *client) doSearch(
 		return nil, errgo.Wrap(err, "meilisearch search")
 	}
 
-	return response, nil
+	var r meiliSearchResponse
+	if err := sonic.Unmarshal(*raw, &r); err != nil {
+		return nil, errgo.Wrap(err, "json.Unmarshal")
+	}
+
+	return &r, nil
 }
 
-type resSubject struct {
-	Date    string           `json:"date"`
-	Image   string           `json:"image"`
-	Name    string           `json:"name"`
-	NameCN  string           `json:"name_cn"`
-	Tags    []res.SubjectTag `json:"tags,omitempty"`
-	Score   float64          `json:"score"`
-	ID      model.SubjectID  `json:"id"`
-	Rank    uint32           `json:"rank"`
-	Summary string           `json:"summary"`
+type meiliSearchResponse struct {
+	Hits               []json.RawMessage `json:"hits"`
+	EstimatedTotalHits int64             `json:"estimatedTotalHits"` //nolint:tagliatelle
 }
 
 func filterToMeiliFilter(req ReqFilter) [][]string {

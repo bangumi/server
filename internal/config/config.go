@@ -19,6 +19,9 @@ import (
 	"time"
 )
 
+const AppTypeCanal = "canal"
+const AppTypeHttp = "http"
+
 type AppConfig struct {
 	Debug struct {
 		Gorm bool `yaml:"gorm"`
@@ -49,6 +52,8 @@ type AppConfig struct {
 	NsfwWord     string `yaml:"nsfw_word"`
 	DisableWords string `yaml:"disable_words"`
 	BannedDomain string `yaml:"banned_domain"`
+
+	AppType string `yaml:"app_type" env:"APP_TYPE"`
 }
 
 func (c AppConfig) ListenAddr() string {
