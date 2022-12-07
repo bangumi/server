@@ -20,7 +20,7 @@ import (
 )
 
 const AppTypeCanal = "canal"
-const AppTypeHHTTP = "http"
+const AppTypeHTTP = "http"
 
 type AppConfig struct {
 	Debug struct {
