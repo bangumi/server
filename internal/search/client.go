@@ -75,6 +75,10 @@ func New(
 		subjectRepo:  subjectRepo,
 	}
 
+	if c.AppType != config.AppTypeCanal {
+		return client, nil
+	}
+
 	shouldCreateIndex, err := client.needFirstRun()
 	if err != nil {
 		return nil, err
