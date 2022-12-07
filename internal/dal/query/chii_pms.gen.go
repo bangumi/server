@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newPrivateMessage(db *gorm.DB) privateMessage {
+func newPrivateMessage(db *gorm.DB, opts ...gen.DOOption) privateMessage {
 	_privateMessage := privateMessage{}
 
-	_privateMessage.privateMessageDo.UseDB(db)
+	_privateMessage.privateMessageDo.UseDB(db, opts...)
 	_privateMessage.privateMessageDo.UseModel(&dao.PrivateMessage{})
 
 	tableName := _privateMessage.privateMessageDo.TableName()
@@ -129,6 +129,11 @@ func (p *privateMessage) fillFieldMap() {
 }
 
 func (p privateMessage) clone(db *gorm.DB) privateMessage {
+	p.privateMessageDo.ReplaceConnPool(db.Statement.ConnPool)
+	return p
+}
+
+func (p privateMessage) replaceDB(db *gorm.DB) privateMessage {
 	p.privateMessageDo.ReplaceDB(db)
 	return p
 }
@@ -149,6 +154,10 @@ func (p privateMessageDo) ReadDB() *privateMessageDo {
 
 func (p privateMessageDo) WriteDB() *privateMessageDo {
 	return p.Clauses(dbresolver.Write)
+}
+
+func (p privateMessageDo) Session(config *gorm.Session) *privateMessageDo {
+	return p.withDO(p.DO.Session(config))
 }
 
 func (p privateMessageDo) Clauses(conds ...clause.Expression) *privateMessageDo {

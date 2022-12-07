@@ -28,7 +28,7 @@ import (
 func (h PrivateMessage) MarkRead(c *fiber.Ctx) error {
 	accessor := h.Common.GetHTTPAccessor(c)
 	var r req.PrivateMessageMarkRead
-	if err := sonic.UnmarshalNoEscape(c.Body(), &r); err != nil {
+	if err := sonic.Unmarshal(c.Body(), &r); err != nil {
 		return res.JSONError(c, err)
 	}
 

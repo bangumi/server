@@ -19,10 +19,10 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 )
 
-func newNotificationField(db *gorm.DB) notificationField {
+func newNotificationField(db *gorm.DB, opts ...gen.DOOption) notificationField {
 	_notificationField := notificationField{}
 
-	_notificationField.notificationFieldDo.UseDB(db)
+	_notificationField.notificationFieldDo.UseDB(db, opts...)
 	_notificationField.notificationFieldDo.UseModel(&dao.NotificationField{})
 
 	tableName := _notificationField.notificationFieldDo.TableName()
@@ -97,6 +97,11 @@ func (n *notificationField) fillFieldMap() {
 }
 
 func (n notificationField) clone(db *gorm.DB) notificationField {
+	n.notificationFieldDo.ReplaceConnPool(db.Statement.ConnPool)
+	return n
+}
+
+func (n notificationField) replaceDB(db *gorm.DB) notificationField {
 	n.notificationFieldDo.ReplaceDB(db)
 	return n
 }
@@ -117,6 +122,10 @@ func (n notificationFieldDo) ReadDB() *notificationFieldDo {
 
 func (n notificationFieldDo) WriteDB() *notificationFieldDo {
 	return n.Clauses(dbresolver.Write)
+}
+
+func (n notificationFieldDo) Session(config *gorm.Session) *notificationFieldDo {
+	return n.withDO(n.DO.Session(config))
 }
 
 func (n notificationFieldDo) Clauses(conds ...clause.Expression) *notificationFieldDo {
