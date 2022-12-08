@@ -59,9 +59,9 @@ type UserPrivacySettings struct {
 	ReceiveCommentNotification UserReceiveFilter
 }
 
-func (settings *UserPrivacySettings) Unmarshal(s string) {
+func (settings *UserPrivacySettings) Unmarshal(s []byte) {
 	rawMap := make(map[UserPrivacySettingsField]UserReceiveFilter, 4)
-	err := phpserialize.Unmarshal([]byte(s), rawMap)
+	err := phpserialize.Unmarshal(s, rawMap)
 	if err != nil {
 		if v, ok := rawMap[UserPrivacyReceivePrivateMessage]; ok {
 			settings.ReceivePrivateMessage = v

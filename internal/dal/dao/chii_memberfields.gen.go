@@ -16,7 +16,7 @@ type MemberField struct {
 	Site      string       `gorm:"column:site;type:varchar(75);not null"`
 	Location  string       `gorm:"column:location;type:varchar(30);not null"`
 	Bio       string       `gorm:"column:bio;type:text;not null"`
-	Privacy   string       `gorm:"column:privacy;type:mediumtext;not null"`
+	Privacy   []byte       `gorm:"column:privacy;type:mediumtext;not null"`
 	Blocklist string       `gorm:"column:blocklist;type:mediumtext;not null"`
 }
 

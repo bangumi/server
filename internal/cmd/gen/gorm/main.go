@@ -138,6 +138,7 @@ func main() {
 
 	modelField := g.GenerateModelAs("chii_memberfields", "MemberField",
 		gen.FieldType("uid", userIDTypeString),
+		gen.FieldType("privacy", "[]byte"),
 	)
 
 	modelMember := g.GenerateModelAs("chii_members", "Member",
