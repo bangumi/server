@@ -60,20 +60,20 @@ type UserPrivacySettings struct {
 }
 
 func (settings *UserPrivacySettings) Unmarshal(s string) {
-	rawMap := make(map[int]uint8, 4)
+	rawMap := make(map[UserPrivacySettingsField]UserReceiveFilter, 4)
 	err := phpserialize.Unmarshal([]byte(s), rawMap)
 	if err != nil {
-		if v, ok := rawMap[int(UserPrivacyReceivePrivateMessage)]; ok {
-			settings.ReceivePrivateMessage = UserReceiveFilter(v)
+		if v, ok := rawMap[UserPrivacyReceivePrivateMessage]; ok {
+			settings.ReceivePrivateMessage = v
 		}
-		if v, ok := rawMap[int(UserPrivacyReceiveTimelineReply)]; ok {
-			settings.ReceiveTimelineReply = UserReceiveFilter(v)
+		if v, ok := rawMap[UserPrivacyReceiveTimelineReply]; ok {
+			settings.ReceiveTimelineReply = v
 		}
-		if v, ok := rawMap[int(UserPrivacyReceiveMentionNotification)]; ok {
-			settings.ReceiveMentionNotification = UserReceiveFilter(v)
+		if v, ok := rawMap[UserPrivacyReceiveMentionNotification]; ok {
+			settings.ReceiveMentionNotification = v
 		}
-		if v, ok := rawMap[int(UserPrivacyReceiveCommentNotification)]; ok {
-			settings.ReceiveCommentNotification = UserReceiveFilter(v)
+		if v, ok := rawMap[UserPrivacyReceiveCommentNotification]; ok {
+			settings.ReceiveCommentNotification = v
 		}
 	}
 }
