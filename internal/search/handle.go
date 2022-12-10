@@ -94,6 +94,7 @@ func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 			return errgo.Wrap(err, "json.Unmarshal")
 		}
 
+		hit.Record.Image = res.SubjectImage(hit.Record.Image).Large
 		data = append(data, hit.Record)
 	}
 
