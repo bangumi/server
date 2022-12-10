@@ -39,7 +39,7 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 	receiverIDs := slice.Map(r.ReceiverIDs, func(v uint32) model.UserID { return model.UserID(v) })
 
 	msgs, err := h.ctrl.CreatePrivateMessage(
-		c.Context(),
+		c.UserContext(),
 		model.UserID(r.SenderID),
 		receiverIDs,
 		domain.PrivateMessageIDFilter{Type: null.NewFromPtr((*model.PrivateMessageID)(r.RelatedID))},
