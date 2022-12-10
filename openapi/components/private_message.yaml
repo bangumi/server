@@ -1,0 +1,41 @@
+title: PrivateMessage
+type: object
+required:
+  - created_at
+  - title
+  - content
+  - id
+  - new
+properties:
+  created_at:
+    title: Created At
+    type: string
+    format: date-time
+  related_message:
+    title: Related Message
+    description: 发起会话的那条私信
+    $ref: './private_message.yaml'
+  sender:
+    title: Sender
+    description: 发信人
+    $ref: './user.yaml'
+  receiver:
+    title: Receiver
+    description: 收信人
+    $ref: './user.yaml'
+  title:
+    title: Title
+    description: 标题
+    type: string
+  content:
+    title: Content
+    description: 内容
+    type: string
+  id:
+    title: ID
+    type: integer
+    minimum: 1
+  new:
+    title: New
+    type: boolean
+    description: 未读
