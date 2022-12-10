@@ -33,7 +33,7 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	ctx := c.Context()
+	ctx := c.UserContext()
 	count, err := h.pmRepo.CountByFolder(ctx, accessor.ID, folder)
 	if err != nil {
 		return res.InternalError(c, err, "failed to count private messages")
