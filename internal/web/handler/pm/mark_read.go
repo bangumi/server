@@ -15,11 +15,13 @@
 package pm
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -37,6 +39,9 @@ func (h PrivateMessage) MarkRead(c *fiber.Ctx) error {
 	}
 	err := h.pmRepo.MarkRead(c.Context(), accessor.ID, model.PrivateMessageID(r.ID))
 	if err != nil {
+		if errors.Is(err, domain.ErrPmInvalidOperation) {
+			return res.BadRequest(err.Error())
+		}
 		return res.InternalError(c, err, "failed to mark private message(s) read")
 	}
 	return c.SendStatus(http.StatusNoContent)

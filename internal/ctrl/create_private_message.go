@@ -24,9 +24,10 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
-var errTypeBlocked = errors.New("have been blocked")
-var errTypeReceiverRejectPrivateMessage = errors.New("some receivers reject private message")
-var errTypeNotAFriend = errors.New("not a friend to some receivers")
+var ErrPmBlocked = errors.New("have been blocked")
+var ErrPmNotAllReceiversExist = errors.New("some receivers not exist")
+var ErrPmReceiverReject = errors.New("some receivers reject private message")
+var ErrPmNotAFriend = errors.New("not a friend to some receivers")
 
 func (ctl Ctrl) checkNeedFriendshipReceivers(
 	ctx context.Context,
@@ -47,7 +48,7 @@ func (ctl Ctrl) checkNeedFriendshipReceivers(
 			return errgo.Wrap(checkErr, "dal")
 		}
 		if !ok {
-			return errTypeNotAFriend
+			return ErrPmNotAFriend
 		}
 	}
 	return nil
@@ -61,7 +62,7 @@ func (ctl Ctrl) checkReceivers(ctx context.Context,
 		return errgo.Wrap(err, "dal")
 	}
 	if len(receivers) != len(receiverIDs) {
-		return errgo.Wrap(err, "some receivers not exist")
+		return ErrPmNotAllReceiversExist
 	}
 	fieldsMap, err := ctl.user.GetFieldsByIDs(ctx, receiverIDs)
 	if err != nil {
@@ -71,10 +72,10 @@ func (ctl Ctrl) checkReceivers(ctx context.Context,
 		if fields, ok := fieldsMap[id]; ok {
 			i := slice.FindIndex(fields.Blocklist, func(v model.UserID) bool { return v == senderID })
 			if i != -1 {
-				return errTypeBlocked
+				return ErrPmBlocked
 			}
 			if fields.Privacy.ReceivePrivateMessage == model.UserReceiveFilterNone {
-				return errTypeReceiverRejectPrivateMessage
+				return ErrPmReceiverReject
 			}
 		}
 	}

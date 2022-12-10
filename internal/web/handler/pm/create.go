@@ -15,9 +15,12 @@
 package pm
 
 import (
+	"errors"
+
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -40,12 +43,19 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 
 	msgs, err := h.ctrl.CreatePrivateMessage(
 		c.UserContext(),
-		model.UserID(r.SenderID),
+		accessor.ID,
 		receiverIDs,
 		domain.PrivateMessageIDFilter{Type: null.NewFromPtr((*model.PrivateMessageID)(r.RelatedID))},
 		r.Title,
 		r.Content)
 	if err != nil {
+		switch {
+		case errors.Is(err, ctrl.ErrPmBlocked):
+		case errors.Is(err, ctrl.ErrPmNotAFriend):
+		case errors.Is(err, ctrl.ErrPmNotAllReceiversExist):
+		case errors.Is(err, ctrl.ErrPmReceiverReject):
+			return res.BadRequest(err.Error())
+		}
 		return res.InternalError(c, err, "failed to create private message(s)")
 	}
 	userIDs := make([]model.UserID, len(r.ReceiverIDs)+1)

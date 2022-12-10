@@ -23,7 +23,6 @@ type PrivateMessageCreate struct {
 	Content     string   `json:"content" validate:"required,gt=0,lte=1000"`
 	RelatedID   *uint32  `json:"related_id" validate:"omitempty,gt=0"`
 	ReceiverIDs []uint32 `json:"receiver_ids" validate:"required,gt=0,dive,gt=0"`
-	SenderID    uint32   `json:"sender_id" validate:"required,gt=0"`
 }
 
 type PrivateMessageDelete struct {

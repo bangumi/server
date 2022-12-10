@@ -15,11 +15,13 @@
 package pm
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/web/req"
@@ -44,6 +46,9 @@ func (h PrivateMessage) Delete(c *fiber.Ctx) error {
 				return model.PrivateMessageID(v)
 			}))
 	if err != nil {
+		if errors.Is(err, domain.ErrPmUserIrrelevant) {
+			return res.BadRequest(err.Error())
+		}
 		return res.InternalError(c, err, "failed to delete private message(s)")
 	}
 	return c.SendStatus(http.StatusNoContent)

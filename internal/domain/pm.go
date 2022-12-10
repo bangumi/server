@@ -22,8 +22,12 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 )
 
-var ErrPrivateMessageNotOwned = errors.New("not sent or received this private message")
-var ErrPrivateMessageDeleted = errors.New("private message deleted")
+var ErrPmNotOwned = errors.New("not sent or received this private message")
+var ErrPmDeleted = errors.New("private message deleted")
+var ErrPmNotMain = errors.New("not a main message")
+var ErrPmUserIrrelevant = errors.New("has user irrelevant message")
+var ErrPmRelatedNotExists = errors.New("related private message not exists")
+var ErrPmInvalidOperation = errors.New("invalid operation")
 
 type PrivateMessageRepo interface {
 	List(

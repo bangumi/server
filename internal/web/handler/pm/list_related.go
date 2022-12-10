@@ -15,8 +15,11 @@
 package pm
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/web/req"
@@ -31,18 +34,22 @@ func (h PrivateMessage) ListRelated(c *fiber.Ctx) error {
 	}
 	list, err := h.pmRepo.ListRelated(c.Context(), accessor.ID, relatedID)
 	if err != nil {
+		switch {
+		case errors.Is(err, domain.ErrNotFound):
+			return res.ErrNotFound
+		case errors.Is(err, domain.ErrPmDeleted):
+		case errors.Is(err, domain.ErrPmNotOwned):
+			return res.BadRequest(err.Error())
+		}
 		return res.InternalError(c, err, "failed to list related private messages")
 	}
-	if len(list) > 0 {
-		userIDs := []model.UserID{list[0].SenderID, list[0].ReceiverID}
-		users, err := h.ctrl.GetUsersByIDs(c.Context(), userIDs)
-		if err != nil {
-			return res.InternalError(c, err, "failed to get users")
-		}
-		data := slice.Map(list, func(v model.PrivateMessage) res.PrivateMessage {
-			return res.ConvertModelPrivateMessage(v, users)
-		})
-		return res.JSON(c, data)
+	userIDs := []model.UserID{list[0].SenderID, list[0].ReceiverID}
+	users, err := h.ctrl.GetUsersByIDs(c.Context(), userIDs)
+	if err != nil {
+		return res.InternalError(c, err, "failed to get users")
 	}
-	return res.NotFound("related private messages not found")
+	data := slice.Map(list, func(v model.PrivateMessage) res.PrivateMessage {
+		return res.ConvertModelPrivateMessage(v, users)
+	})
+	return res.JSON(c, data)
 }

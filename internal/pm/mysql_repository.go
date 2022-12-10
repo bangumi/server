@@ -17,7 +17,6 @@ package pm
 import (
 	"context"
 	"database/sql/driver"
-	"errors"
 	"time"
 
 	"go.uber.org/zap"
@@ -32,10 +31,6 @@ import (
 )
 
 const recentContactLimit = 15
-
-var errUserIrrelevantMessageType = errors.New("has user irrelevant message")
-var errRelatedPrivateMessageNotExists = errors.New("related private message not exists")
-var errInvalidOperation = errors.New("invalid operation")
 
 type mysqlRepo struct {
 	q   *query.Query
@@ -135,12 +130,15 @@ func (r mysqlRepo) ListRelated(
 	if firstMsg == nil {
 		return emptyMsgList, domain.ErrNotFound
 	}
+	if firstMsg.MainMessageID == 0 {
+		return emptyMsgList, domain.ErrPmNotMain
+	}
 	if firstMsg.SenderID != userID && firstMsg.ReceiverID != userID {
-		return emptyMsgList, domain.ErrPrivateMessageNotOwned
+		return emptyMsgList, domain.ErrPmNotOwned
 	}
 	if (firstMsg.SenderID == userID && firstMsg.DeletedBySender) ||
 		(firstMsg.ReceiverID == userID && firstMsg.DeletedByReceiver) {
-		return emptyMsgList, domain.ErrPrivateMessageDeleted
+		return emptyMsgList, domain.ErrPmDeleted
 	}
 	res, err := do.Where(
 		r.q.PrivateMessage.RelatedMessageID.Eq(id),
@@ -227,7 +225,7 @@ func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID 
 		return errgo.Wrap(err, "dal")
 	}
 	if rows.RowsAffected == 0 {
-		return errInvalidOperation
+		return domain.ErrPmInvalidOperation
 	}
 	return nil
 }
@@ -243,7 +241,7 @@ func (r mysqlRepo) Create(
 	emptyList := make([]model.PrivateMessage, 0)
 	if relatedIDFilter.Type.Set {
 		if len(receiverIDs) > 1 {
-			return emptyList, errRelatedPrivateMessageNotExists
+			return emptyList, domain.ErrPmInvalidOperation
 		}
 		msg, err := r.q.WithContext(ctx).
 			PrivateMessage.
@@ -252,7 +250,11 @@ func (r mysqlRepo) Create(
 			(msg.SenderID != senderID && msg.SenderID != receiverIDs[0]) ||
 			(msg.ReceiverID != senderID && msg.ReceiverID != receiverIDs[0]) {
 			r.log.Error("unexpected error", zap.Error(err))
-			return emptyList, errRelatedPrivateMessageNotExists
+			return emptyList, domain.ErrPmRelatedNotExists
+		}
+
+		if msg.MainMessageID == 0 {
+			return emptyList, domain.ErrPmNotMain
 		}
 	}
 	msgs := make([]*dao.PrivateMessage, len(receiverIDs))
@@ -311,7 +313,7 @@ func (r mysqlRepo) Delete(
 		return errgo.Wrap(err, "dal")
 	}
 	if len(pms) != len(ids) {
-		return errUserIrrelevantMessageType
+		return domain.ErrPmUserIrrelevant
 	}
 	err = r.q.Transaction(func(tx *query.Query) error {
 		err = handleReplyDeletes(ctx, tx, pms, userID)

@@ -67,7 +67,7 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 		mock.Anything,
 		model.UserID(1),
 		model.PrivateMessageID(1),
-	).Return([]model.PrivateMessage{}, nil)
+	).Return([]model.PrivateMessage{}, domain.ErrNotFound)
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
@@ -169,7 +169,7 @@ func TestPrivateMessage_Create(t *testing.T) {
 		Post("/v0/pms").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		Header(fiber.HeaderContentType, "application/json").
-		JSON(req.PrivateMessageCreate{Title: "测试标题", Content: "测试内容", ReceiverIDs: []uint32{382951}, SenderID: 1}).
+		JSON(req.PrivateMessageCreate{Title: "测试标题", Content: "测试内容", ReceiverIDs: []uint32{382951}}).
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
