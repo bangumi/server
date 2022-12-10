@@ -117,6 +117,10 @@ func TestListRelated(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, list, 2)
 	require.Equal(t, msg2.ID, list[len(list)-1].ID)
+
+	// 使用非首条信息作查询
+	_, err = repo.ListRelated(ctx, 382951, msg2.ID)
+	require.Equal(t, err, domain.ErrPmNotMain)
 }
 
 func TestCountTypes(t *testing.T) {
@@ -193,21 +197,27 @@ func TestCreate(t *testing.T) {
 	msgs := mainMsgs
 
 	// reply
-	res, err := repo.Create(ctx, 382951, []model.UserID{1}, domain.PrivateMessageIDFilter{
+	replyMsgs, err := repo.Create(ctx, 382951, []model.UserID{1}, domain.PrivateMessageIDFilter{
 		Type: null.New(mainMsgs[0].ID),
 	}, "私信回复", "内容")
 
 	require.NoError(t, err)
-	require.Len(t, res, 1)
-	require.Equal(t, mainMsgs[0].ID, res[0].RelatedMessageID)
+	require.Len(t, replyMsgs, 1)
+	require.Equal(t, mainMsgs[0].ID, replyMsgs[0].RelatedMessageID)
 
-	msgs = append(msgs, res...)
+	msgs = append(msgs, replyMsgs...)
 
 	_, err = repo.Create(ctx, 382951, []model.UserID{2}, domain.PrivateMessageIDFilter{
 		Type: null.New(mainMsgs[1].ID),
-	}, "私信回复", "内容")
+	}, "私信回复", "发给错误的人")
 
 	require.Error(t, err)
+
+	_, err = repo.Create(ctx, 1, []model.UserID{382951}, domain.PrivateMessageIDFilter{
+		Type: null.New(replyMsgs[0].ID),
+	}, "私信回复", "使用非首条信息的id作为related id")
+
+	require.Equal(t, domain.ErrPmNotMain, err)
 
 	t.Cleanup(func() {
 		for _, msg := range msgs {

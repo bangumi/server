@@ -16,6 +16,7 @@ package pm
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -40,6 +41,8 @@ func (h PrivateMessage) ListRelated(c *fiber.Ctx) error {
 		case errors.Is(err, domain.ErrPmDeleted):
 		case errors.Is(err, domain.ErrPmNotOwned):
 			return res.BadRequest(err.Error())
+		case errors.Is(err, domain.ErrPmNotMain):
+			return c.Redirect(fmt.Sprintf("/v0/pms/related-msgs/%d", list[0].RelatedMessageID))
 		}
 		return res.InternalError(c, err, "failed to list related private messages")
 	}

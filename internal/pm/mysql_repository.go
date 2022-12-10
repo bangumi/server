@@ -131,7 +131,7 @@ func (r mysqlRepo) ListRelated(
 		return emptyMsgList, domain.ErrNotFound
 	}
 	if firstMsg.MainMessageID == 0 {
-		return emptyMsgList, domain.ErrPmNotMain
+		return []model.PrivateMessage{convertDaoToModel(firstMsg)}, domain.ErrPmNotMain
 	}
 	if firstMsg.SenderID != userID && firstMsg.ReceiverID != userID {
 		return emptyMsgList, domain.ErrPmNotOwned
@@ -230,6 +230,30 @@ func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID 
 	return nil
 }
 
+func (r mysqlRepo) checkReplyParams(
+	ctx context.Context,
+	senderID model.UserID,
+	receiverIDs []model.UserID,
+	relatedID model.PrivateMessageID) error {
+	if len(receiverIDs) > 1 {
+		return domain.ErrPmInvalidOperation
+	}
+	msg, err := r.q.WithContext(ctx).
+		PrivateMessage.
+		Where(r.q.PrivateMessage.ID.Eq(relatedID)).First()
+	if err != nil ||
+		(msg.SenderID != senderID && msg.SenderID != receiverIDs[0]) ||
+		(msg.ReceiverID != senderID && msg.ReceiverID != receiverIDs[0]) {
+		r.log.Error("unexpected error", zap.Error(err))
+		return domain.ErrPmRelatedNotExists
+	}
+
+	if msg.MainMessageID == 0 {
+		return domain.ErrPmNotMain
+	}
+	return nil
+}
+
 func (r mysqlRepo) Create(
 	ctx context.Context,
 	senderID model.UserID,
@@ -240,21 +264,12 @@ func (r mysqlRepo) Create(
 ) ([]model.PrivateMessage, error) {
 	emptyList := make([]model.PrivateMessage, 0)
 	if relatedIDFilter.Type.Set {
-		if len(receiverIDs) > 1 {
-			return emptyList, domain.ErrPmInvalidOperation
-		}
-		msg, err := r.q.WithContext(ctx).
-			PrivateMessage.
-			Where(r.q.PrivateMessage.ID.Eq(relatedIDFilter.Type.Value)).First()
-		if err != nil ||
-			(msg.SenderID != senderID && msg.SenderID != receiverIDs[0]) ||
-			(msg.ReceiverID != senderID && msg.ReceiverID != receiverIDs[0]) {
-			r.log.Error("unexpected error", zap.Error(err))
-			return emptyList, domain.ErrPmRelatedNotExists
-		}
-
-		if msg.MainMessageID == 0 {
-			return emptyList, domain.ErrPmNotMain
+		err := r.checkReplyParams(ctx,
+			senderID,
+			receiverIDs,
+			relatedIDFilter.Type.Value)
+		if err != nil {
+			return emptyList, err
 		}
 	}
 	msgs := make([]*dao.PrivateMessage, len(receiverIDs))

@@ -54,6 +54,9 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 		case errors.Is(err, ctrl.ErrPmNotAFriend):
 		case errors.Is(err, ctrl.ErrPmNotAllReceiversExist):
 		case errors.Is(err, ctrl.ErrPmReceiverReject):
+		case errors.Is(err, domain.ErrPmNotMain):
+		case errors.Is(err, domain.ErrPmRelatedNotExists):
+		case errors.Is(err, domain.ErrPmInvalidOperation):
 			return res.BadRequest(err.Error())
 		}
 		return res.InternalError(c, err, "failed to create private message(s)")
