@@ -24,7 +24,7 @@ import (
 
 func (h PrivateMessage) ListRecentContact(c *fiber.Ctx) error {
 	accessor := h.Common.GetHTTPAccessor(c)
-	contactIDs, err := h.pmRepo.ListRecentContact(c.Context(), accessor.ID)
+	contactIDs, err := h.pmRepo.ListRecentContact(c.UserContext(), accessor.ID)
 	if err != nil {
 		return res.InternalError(c, err, "failed to list recent contact")
 	}
