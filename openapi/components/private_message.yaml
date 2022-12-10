@@ -14,15 +14,15 @@ properties:
   related_message:
     title: Related Message
     description: 发起会话的那条私信
-    $ref: './private_message.yaml'
+    $ref: "./private_message.yaml"
   sender:
     title: Sender
     description: 发信人
-    $ref: './user.yaml'
+    $ref: "./user.yaml"
   receiver:
     title: Receiver
     description: 收信人
-    $ref: './user.yaml'
+    $ref: "./user.yaml"
   title:
     title: Title
     description: 标题

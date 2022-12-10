@@ -1705,29 +1705,29 @@ paths:
                       minLength: 0
                       maxLength: 1000
                 - oneOf:
-                  - type: object
-                    properties:
-                      related_id:
-                        type: integer
-                        description: 关联会话的首条
-                        minimum: 1
-                      receiver_ids:
-                        type: array
-                        description: 收信人id列表
-                        minItems: 1
-                        maxItems: 1
-                        items:
+                    - type: object
+                      properties:
+                        related_id:
                           type: integer
+                          description: 关联会话的首条
                           minimum: 1
-                  - type: object
-                    properties:
-                      receiver_ids:
-                        type: array
-                        description: 收信人id列表
-                        minItems: 1
-                        items:
-                          type: integer
-                          minimum: 1
+                        receiver_ids:
+                          type: array
+                          description: 收信人id列表
+                          minItems: 1
+                          maxItems: 1
+                          items:
+                            type: integer
+                            minimum: 1
+                    - type: object
+                      properties:
+                        receiver_ids:
+                          type: array
+                          description: 收信人id列表
+                          minItems: 1
+                          items:
+                            type: integer
+                            minimum: 1
       responses:
         "200":
           description: Successful Response
@@ -1784,11 +1784,6 @@ paths:
                 minimum: 0
       security:
         - HTTPBearer: []
-
-
-
-
-
 
 components:
   parameters:
