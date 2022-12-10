@@ -28,7 +28,7 @@ func (h PrivateMessage) ListRecentContact(c *fiber.Ctx) error {
 	if err != nil {
 		return res.InternalError(c, err, "failed to list recent contact")
 	}
-	contacts, err := h.ctrl.GetUsersByIDs(c.Context(), contactIDs)
+	contacts, err := h.ctrl.GetUsersByIDs(c.UserContext(), contactIDs)
 	if err != nil {
 		return res.InternalError(c, err, "failed to get contacts")
 	}
