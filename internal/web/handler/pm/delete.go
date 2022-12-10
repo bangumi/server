@@ -38,7 +38,7 @@ func (h PrivateMessage) Delete(c *fiber.Ctx) error {
 	}
 	err := h.pmRepo.
 		Delete(
-			c.Context(),
+			c.UserContext(),
 			accessor.ID,
 			slice.Map(r.IDs, func(v uint32) model.PrivateMessageID {
 				return model.PrivateMessageID(v)
