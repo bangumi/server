@@ -422,7 +422,7 @@ func convertDaoToModel(d *dao.PrivateMessage) model.PrivateMessage {
 		MainMessageID:     d.MainMessageID,
 		RelatedMessageID:  d.RelatedMessageID,
 		New:               d.New,
-		DeletedBySender:   d.DeletedByReceiver,
-		DeletedByReceiver: d.DeletedBySender,
+		DeletedBySender:   d.DeletedBySender,
+		DeletedByReceiver: d.DeletedByReceiver,
 	}
 }
