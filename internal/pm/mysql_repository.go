@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
 const recentContactLimit = 15
@@ -115,23 +116,38 @@ func (r mysqlRepo) CountByFolder(ctx context.Context,
 	return count, nil
 }
 
+func (r mysqlRepo) getMainMsg(
+	ctx context.Context,
+	id model.PrivateMessageID,
+) (*dao.PrivateMessage, error) {
+	do := r.q.PrivateMessage.WithContext(ctx)
+	msg, err := do.Where(r.q.PrivateMessage.ID.Eq(id)).First()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+	if msg == nil {
+		return nil, domain.ErrNotFound
+	}
+	if msg.MainMessageID == 0 {
+		if msg.RelatedMessageID == 0 {
+			return nil, domain.ErrNotFound
+		}
+		return r.getMainMsg(ctx, msg.RelatedMessageID)
+	}
+	return msg, nil
+}
+
 func (r mysqlRepo) ListRelated(
 	ctx context.Context,
 	userID model.UserID,
 	id model.PrivateMessageID,
 ) ([]model.PrivateMessage, error) {
 	do := r.q.PrivateMessage.WithContext(ctx)
-	firstMsg, err := do.Where(r.q.PrivateMessage.ID.Eq(id)).First()
+	firstMsg, err := r.getMainMsg(ctx, id)
 	var emptyMsgList = make([]model.PrivateMessage, 0)
 	if err != nil {
 		r.log.Error("unexpected error", zap.Error(err))
 		return emptyMsgList, errgo.Wrap(err, "dal")
-	}
-	if firstMsg == nil {
-		return emptyMsgList, domain.ErrNotFound
-	}
-	if firstMsg.MainMessageID == 0 {
-		return []model.PrivateMessage{convertDaoToModel(firstMsg)}, domain.ErrPmNotMain
 	}
 	if firstMsg.SenderID != userID && firstMsg.ReceiverID != userID {
 		return emptyMsgList, domain.ErrPmNotOwned
@@ -141,7 +157,7 @@ func (r mysqlRepo) ListRelated(
 		return emptyMsgList, domain.ErrPmDeleted
 	}
 	res, err := do.Where(
-		r.q.PrivateMessage.RelatedMessageID.Eq(id),
+		r.q.PrivateMessage.RelatedMessageID.Eq(firstMsg.ID),
 		do.Where(
 			do.
 				Where(
@@ -230,30 +246,6 @@ func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID 
 	return nil
 }
 
-func (r mysqlRepo) checkReplyParams(
-	ctx context.Context,
-	senderID model.UserID,
-	receiverIDs []model.UserID,
-	relatedID model.PrivateMessageID) error {
-	if len(receiverIDs) > 1 {
-		return domain.ErrPmInvalidOperation
-	}
-	msg, err := r.q.WithContext(ctx).
-		PrivateMessage.
-		Where(r.q.PrivateMessage.ID.Eq(relatedID)).First()
-	if err != nil ||
-		(msg.SenderID != senderID && msg.SenderID != receiverIDs[0]) ||
-		(msg.ReceiverID != senderID && msg.ReceiverID != receiverIDs[0]) {
-		r.log.Error("unexpected error", zap.Error(err))
-		return domain.ErrPmRelatedNotExists
-	}
-
-	if msg.MainMessageID == 0 {
-		return domain.ErrPmNotMain
-	}
-	return nil
-}
-
 func (r mysqlRepo) Create(
 	ctx context.Context,
 	senderID model.UserID,
@@ -264,12 +256,16 @@ func (r mysqlRepo) Create(
 ) ([]model.PrivateMessage, error) {
 	emptyList := make([]model.PrivateMessage, 0)
 	if relatedIDFilter.Type.Set {
-		err := r.checkReplyParams(ctx,
-			senderID,
-			receiverIDs,
-			relatedIDFilter.Type.Value)
-		if err != nil {
-			return emptyList, err
+		if len(receiverIDs) > 1 {
+			return emptyList, domain.ErrPmInvalidOperation
+		}
+		msg, err := r.getMainMsg(ctx, relatedIDFilter.Type.Value)
+		if (err != nil || msg.SenderID != senderID && msg.SenderID != receiverIDs[0]) ||
+			(msg.ReceiverID != senderID && msg.ReceiverID != receiverIDs[0]) {
+			return emptyList, domain.ErrPmRelatedNotExists
+		}
+		if msg.ID != relatedIDFilter.Type.Value {
+			relatedIDFilter = domain.PrivateMessageIDFilter{Type: null.New(msg.ID)}
 		}
 	}
 	msgs := make([]*dao.PrivateMessage, len(receiverIDs))

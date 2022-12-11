@@ -82,32 +82,6 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
 
-func TestPrivateMessage_ListRelatedNotMain(t *testing.T) {
-	t.Parallel()
-	m := mocks.NewPrivateMessageRepo(t)
-	m.EXPECT().ListRelated(
-		mock.Anything,
-		model.UserID(1),
-		model.PrivateMessageID(2),
-	).Return([]model.PrivateMessage{{
-		ID:               2,
-		RelatedMessageID: 1,
-	}}, domain.ErrPmNotMain)
-
-	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
-
-	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
-
-	resp := test.New(t).
-		Get("/v0/pms/related-msgs/2").
-		Header(fiber.HeaderAuthorization, "Bearer token").
-		Execute(app)
-
-	require.Equal(t, http.StatusFound, resp.StatusCode)
-	require.Equal(t, resp.Header.Get("Location"), "/v0/pms/related-msgs/1")
-}
-
 func TestPrivateMessage_ListRecentContact(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPrivateMessageRepo(t)
