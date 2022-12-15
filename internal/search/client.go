@@ -74,10 +74,8 @@ func New(
 		subjectIndex: meili.Index("subjects"),
 		log:          log.Named("search"),
 		subjectRepo:  subjectRepo,
-		limiter:      rate.NewLimiter(rate.Every(time.Second), 100),
+		limiter:      rate.NewLimiter(rate.Every(time.Second/100), 50), //nolint:gomnd
 	}
-
-	client.limiter.SetBurst(50) //nolint:gomnd
 
 	if c.AppType != config.AppTypeCanal {
 		return client, nil
