@@ -24,7 +24,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - run: git clone https://github.com/bangumi/dev-env $HOME/dev-env
       - run: cd ~/dev-env && docker-compose up -d
