@@ -27,6 +27,7 @@ import (
 
 	"github.com/meilisearch/meilisearch-go"
 	"go.uber.org/zap"
+	"golang.org/x/time/rate"
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal/query"
@@ -73,7 +74,10 @@ func New(
 		subjectIndex: meili.Index("subjects"),
 		log:          log.Named("search"),
 		subjectRepo:  subjectRepo,
+		limiter:      rate.NewLimiter(rate.Every(time.Second), 100),
 	}
+
+	client.limiter.SetBurst(50) //nolint:gomnd
 
 	if c.AppType != config.AppTypeCanal {
 		return client, nil
@@ -98,6 +102,7 @@ type client struct {
 	subjectIndex *meilisearch.Index
 	log          *zap.Logger
 	subject      string
+	limiter      *rate.Limiter
 }
 
 // OnSubjectUpdate is the hook called by canal.
@@ -126,6 +131,9 @@ func (c *client) OnSubjectDelete(_ context.Context, id model.SubjectID) error {
 
 // UpsertSubject add subject to search backend.
 func (c *client) upsertSubject(_ context.Context, s subjectIndex) error {
+	// rate limit to avoid huge write, to avoid meilisearch timeout
+	_ = c.limiter.Wait(context.Background())
+
 	_, err := c.subjectIndex.UpdateDocuments(s, "id")
 
 	return errgo.Wrap(err, "search")
