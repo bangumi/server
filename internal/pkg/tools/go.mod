@@ -2,7 +2,7 @@ module tools
 
 go 1.19
 
-require github.com/vektra/mockery/v2 v2.14.1
+require github.com/vektra/mockery/v2 v2.15.0
 
 require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
