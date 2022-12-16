@@ -250,18 +250,18 @@ func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID 
 				tx.PrivateMessage.New.Is(true)).
 			Update(r.q.PrivateMessage.New, false)
 		if err != nil {
-			return err
+			return errgo.Wrap(err, "dal")
 		}
 		affectedRows = rows.RowsAffected
 		if rows.RowsAffected != 0 {
 			count, err := countByFolder(ctx, tx, userID, model.PrivateMessageFolderTypeInbox)
 			if err != nil {
-				return err
+				return errgo.Wrap(err, "dal")
 			}
 			if count == 0 {
 				_, err = txCtx.Member.Where(tx.Member.ID.Eq(userID)).Update(tx.Member.Newpm, false)
 				if err != nil {
-					return err
+					return errgo.Wrap(err, "dal")
 				}
 			}
 		}
@@ -278,6 +278,30 @@ func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID 
 		return domain.ErrPmInvalidOperation
 	}
 	return nil
+}
+
+func (r mysqlRepo) constructMsgs(
+	senderID model.UserID,
+	receiverIDs []model.UserID,
+	relatedIDFilter domain.PrivateMessageIDFilter,
+	title string,
+	content string,
+) []*dao.PrivateMessage {
+	msgs := make([]*dao.PrivateMessage, len(receiverIDs))
+	for i := range msgs {
+		msgs[i] = &dao.PrivateMessage{
+			SenderID:    senderID,
+			ReceiverID:  receiverIDs[i],
+			Title:       title,
+			Content:     content,
+			New:         true,
+			CreatedTime: uint32(time.Now().Unix()),
+		}
+		if relatedIDFilter.Type.Set {
+			msgs[i].RelatedMessageID = relatedIDFilter.Type.Value
+		}
+	}
+	return msgs
 }
 
 func (r mysqlRepo) Create(
@@ -302,30 +326,17 @@ func (r mysqlRepo) Create(
 			relatedIDFilter = domain.PrivateMessageIDFilter{Type: null.New(msg.ID)}
 		}
 	}
-	msgs := make([]*dao.PrivateMessage, len(receiverIDs))
-	for i := range msgs {
-		msgs[i] = &dao.PrivateMessage{
-			SenderID:    senderID,
-			ReceiverID:  receiverIDs[i],
-			Title:       title,
-			Content:     content,
-			New:         true,
-			CreatedTime: uint32(time.Now().Unix()),
-		}
-		if relatedIDFilter.Type.Set {
-			msgs[i].RelatedMessageID = relatedIDFilter.Type.Value
-		}
-	}
+	msgs := r.constructMsgs(senderID, receiverIDs, relatedIDFilter, title, content)
 	res := emptyList
 	err := r.q.Transaction(func(tx *query.Query) error {
 		txCtx := tx.WithContext(ctx)
 		err := txCtx.PrivateMessage.Create(msgs...)
 		if err != nil {
-			return err
+			return errgo.Wrap(err, "dal")
 		}
 		_, err = txCtx.Member.Where(tx.Member.ID.In(slice.ToValuer(receiverIDs)...)).Update(tx.Member.Newpm, true)
 		if err != nil {
-			return err
+			return errgo.Wrap(err, "dal")
 		}
 		if !relatedIDFilter.Type.Set {
 			for i := range msgs {
@@ -334,7 +345,7 @@ func (r mysqlRepo) Create(
 			}
 			err = txCtx.PrivateMessage.Save(msgs...)
 			if err != nil {
-				return err
+				return errgo.Wrap(err, "dal")
 			}
 		}
 		res = slice.Map(msgs, convertDaoToModel)

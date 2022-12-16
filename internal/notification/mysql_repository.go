@@ -34,7 +34,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.NotificationRepo, err
 	return mysqlRepo{q: q, log: log.Named("notification.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) count(ctx context.Context, userID model.UserID) (int64, error) {
+func (r mysqlRepo) count(ctx context.Context, userID model.UserID) (int64, error) { //nolint:golint,unused
 	count, err := r.q.Notification.WithContext(ctx).Where(
 		r.q.Notification.ReceiverID.Eq(userID),
 		r.q.Notification.Status.Eq(model.NotificationStatusUnread),
