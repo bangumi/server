@@ -92,26 +92,37 @@ func (r mysqlRepo) List(
 	}), nil
 }
 
-func (r mysqlRepo) CountByFolder(ctx context.Context,
+func countByFolder(ctx context.Context,
+	q *query.Query,
 	userID model.UserID,
 	folder model.PrivateMessageFolderType) (int64, error) {
 	var conds []gen.Condition
-	do := r.q.PrivateMessage.WithContext(ctx)
+	do := q.PrivateMessage.WithContext(ctx)
 	if folder == model.PrivateMessageFolderTypeInbox {
 		conds = []gen.Condition{
-			r.q.PrivateMessage.ReceiverID.Eq(userID),
-			r.q.PrivateMessage.DeletedByReceiver.Is(false),
+			q.PrivateMessage.ReceiverID.Eq(userID),
+			q.PrivateMessage.DeletedByReceiver.Is(false),
 		}
 	} else {
 		conds = []gen.Condition{
-			r.q.PrivateMessage.SenderID.Eq(userID),
-			r.q.PrivateMessage.DeletedBySender.Is(false),
+			q.PrivateMessage.SenderID.Eq(userID),
+			q.PrivateMessage.DeletedBySender.Is(false),
 		}
 	}
 	count, err := do.Where(conds...).Count()
 	if err != nil {
-		r.log.Error("unexpected error", zap.Error(err))
 		return 0, errgo.Wrap(err, "dal")
+	}
+	return count, nil
+}
+
+func (r mysqlRepo) CountByFolder(ctx context.Context,
+	userID model.UserID,
+	folder model.PrivateMessageFolderType) (int64, error) {
+	count, err := countByFolder(ctx, r.q, userID, folder)
+	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
+		return 0, err
 	}
 	return count, nil
 }
@@ -229,18 +240,41 @@ func (r mysqlRepo) ListRecentContact(
 }
 
 func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID model.PrivateMessageID) error {
-	rows, err := r.q.PrivateMessage.WithContext(ctx).
-		Where(
-			r.q.PrivateMessage.RelatedMessageID.Eq(relatedID),
-			r.q.PrivateMessage.ReceiverID.Eq(userID),
-			r.q.PrivateMessage.New.Is(true)).
-		Update(r.q.PrivateMessage.New, false)
+	var affectedRows int64
+	err := r.q.Transaction(func(tx *query.Query) error {
+		txCtx := tx.WithContext(ctx)
+		rows, err := txCtx.PrivateMessage.
+			Where(
+				tx.PrivateMessage.RelatedMessageID.Eq(relatedID),
+				tx.PrivateMessage.ReceiverID.Eq(userID),
+				tx.PrivateMessage.New.Is(true)).
+			Update(r.q.PrivateMessage.New, false)
+		if err != nil {
+			return err
+		}
+		affectedRows = rows.RowsAffected
+		if rows.RowsAffected != 0 {
+			count, err := countByFolder(ctx, tx, userID, model.PrivateMessageFolderTypeInbox)
+			if err != nil {
+				return err
+			}
+			if count == 0 {
+				_, err = txCtx.Member.Where(tx.Member.ID.Eq(userID)).Update(tx.Member.Newpm, false)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+
+	r.q.Member.WithContext(ctx)
 
 	if err != nil {
 		r.log.Error("unexpected error", zap.Error(err))
 		return errgo.Wrap(err, "dal")
 	}
-	if rows.RowsAffected == 0 {
+	if affectedRows == 0 {
 		return domain.ErrPmInvalidOperation
 	}
 	return nil
@@ -287,8 +321,11 @@ func (r mysqlRepo) Create(
 		txCtx := tx.WithContext(ctx)
 		err := txCtx.PrivateMessage.Create(msgs...)
 		if err != nil {
-			r.log.Error("unexpected error", zap.Error(err))
-			return errgo.Wrap(err, "dal")
+			return err
+		}
+		_, err = txCtx.Member.Where(tx.Member.ID.In(slice.ToValuer(receiverIDs)...)).Update(tx.Member.Newpm, true)
+		if err != nil {
+			return err
 		}
 		if !relatedIDFilter.Type.Set {
 			for i := range msgs {
@@ -297,13 +334,16 @@ func (r mysqlRepo) Create(
 			}
 			err = txCtx.PrivateMessage.Save(msgs...)
 			if err != nil {
-				r.log.Error("unexpected error", zap.Error(err))
-				return errgo.Wrap(err, "dal")
+				return err
 			}
 		}
 		res = slice.Map(msgs, convertDaoToModel)
 		return nil
 	})
+	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
+		return res, errgo.Wrap(err, "dal")
+	}
 	return res, err
 }
 

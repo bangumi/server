@@ -34,7 +34,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.NotificationRepo, err
 	return mysqlRepo{q: q, log: log.Named("notification.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) Count(ctx context.Context, userID model.UserID) (int64, error) {
+func (r mysqlRepo) count(ctx context.Context, userID model.UserID) (int64, error) {
 	count, err := r.q.Notification.WithContext(ctx).Where(
 		r.q.Notification.ReceiverID.Eq(userID),
 		r.q.Notification.Status.Eq(model.NotificationStatusUnread),
@@ -44,4 +44,15 @@ func (r mysqlRepo) Count(ctx context.Context, userID model.UserID) (int64, error
 		return 0, errgo.Wrap(err, "dal")
 	}
 	return count, nil
+}
+
+func (r mysqlRepo) Count(ctx context.Context, userID model.UserID) (int64, error) {
+	member, err := r.q.Member.WithContext(ctx).Where(
+		r.q.Member.ID.Eq(userID),
+	).Select(r.q.Member.ID, r.q.Member.NewNotify).First()
+	if err != nil {
+		r.log.Error("unexpected error", zap.Error(err))
+		return 0, errgo.Wrap(err, "dal")
+	}
+	return int64(member.NewNotify), nil
 }
