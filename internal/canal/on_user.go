@@ -16,6 +16,7 @@ package canal
 
 import (
 	"context"
+	"encoding"
 	"encoding/json"
 	"fmt"
 
@@ -61,9 +62,15 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error 
 	return nil
 }
 
+var _ encoding.BinaryMarshaler = redisUserChannel{}
+
 type redisUserChannel struct {
 	UserID    model.UserID `json:"user_id"`
 	NewNotify uint16       `json:"new_notify"`
+}
+
+func (r redisUserChannel) MarshalBinary() ([]byte, error) {
+	return sonic.Marshal(r) //nolint:wrapcheck
 }
 
 type UserKey struct {
