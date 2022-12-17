@@ -15,7 +15,9 @@
 package canal
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/bytedance/sonic"
 	"go.uber.org/zap"
@@ -25,6 +27,12 @@ import (
 )
 
 func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error {
+	var k UserKey
+	if err := sonic.Unmarshal(key, &k); err != nil {
+		e.log.Error("failed to unmarshal json", zap.Error(err))
+		return errgo.Wrap(err, "sonic.Unmarshal")
+	}
+
 	switch payload.Op {
 	case opCreate, opSnapshot, opDelete:
 		return nil
@@ -39,16 +47,23 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error 
 		}
 
 		if before.Password != after.Password {
-			var k UserKey
-			if err := sonic.Unmarshal(key, &k); err != nil {
-				e.log.Error("failed to unmarshal json", zap.Error(err))
-				return errgo.Wrap(err, "sonic.Unmarshal")
-			}
 			return e.OnUserPasswordChange(k.ID)
+		}
+
+		if before.NewNotify != after.NewNotify {
+			e.redis.Publish(context.Background(), fmt.Sprintf("event-user-notify-%d", k.ID), redisUserChannel{
+				UserID:    k.ID,
+				NewNotify: after.NewNotify,
+			})
 		}
 	}
 
 	return nil
+}
+
+type redisUserChannel struct {
+	UserID    model.UserID `json:"user_id"`
+	NewNotify uint16       `json:"new_notify"`
 }
 
 type UserKey struct {
@@ -56,5 +71,6 @@ type UserKey struct {
 }
 
 type userPayload struct {
-	Password string `json:"password_crypt"`
+	Password  string `json:"password_crypt"`
+	NewNotify uint16 `json:"new_notify"`
 }
