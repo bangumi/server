@@ -12,8 +12,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build dev
-
 package recovery
 
 import (
@@ -35,7 +33,7 @@ import (
 var _debugHTML string
 
 // New creates a new middleware handler with debug info.
-func New() fiber.Handler {
+func dev() fiber.Handler {
 	log := logger.Copy().WithOptions(zap.AddCallerSkip(2))
 	// Return new handler
 	return func(c *fiber.Ctx) (err error) { //nolint:nonamedreturns

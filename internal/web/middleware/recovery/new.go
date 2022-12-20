@@ -12,8 +12,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
-
 package recovery
 
 import (
@@ -23,6 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/config/env"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
@@ -30,6 +29,10 @@ var errInternal = errors.New("internal server error")
 
 // New creates a new middleware handler.
 func New() fiber.Handler {
+	if !env.Production {
+		return dev()
+	}
+
 	// Set default config
 	log := logger.Named("http.recovery")
 	// Return new handler

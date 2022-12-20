@@ -52,7 +52,7 @@ func AddRouters(
 	subjectHandler subject.Subject,
 	indexHandler index.Handler,
 ) {
-	app.Get("/", indexPage)
+	app.Get("/", indexPage())
 
 	app.Use(ua.DisableDefaultHTTPLibrary)
 

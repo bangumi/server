@@ -12,17 +12,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package main
+package canal
 
 import (
-	"go.uber.org/zap"
+	"github.com/spf13/cobra"
 
 	"github.com/bangumi/server/internal/canal"
-	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-func main() {
-	if err := canal.Main(); err != nil {
-		logger.Fatal("failed to start canal service", zap.Error(err))
-	}
+var Command = &cobra.Command{
+	Use:   "canal",
+	Short: "start mysql binlog events handler",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return canal.Main()
+	},
 }

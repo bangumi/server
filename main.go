@@ -17,89 +17,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/bytedance/sonic"
-	"github.com/go-resty/resty/v2"
-	"github.com/gofiber/fiber/v2"
-	"go.uber.org/dig"
-	"go.uber.org/fx"
-
-	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/character"
-	"github.com/bangumi/server/internal/collection"
-	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/ctrl"
-	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/dam"
-	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/group"
-	"github.com/bangumi/server/internal/index"
-	"github.com/bangumi/server/internal/metrics"
-	"github.com/bangumi/server/internal/oauth"
-	"github.com/bangumi/server/internal/person"
-	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/cmd"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/revision"
-	"github.com/bangumi/server/internal/search"
-	"github.com/bangumi/server/internal/subject"
-	"github.com/bangumi/server/internal/timeline"
-	"github.com/bangumi/server/internal/topic"
-	"github.com/bangumi/server/internal/user"
-	"github.com/bangumi/server/internal/web"
 )
 
 func main() {
-	if err := start(); err != nil {
+	if err := cmd.Root.Execute(); err != nil {
 		logger.Fatal("failed to start app:\n" + fmt.Sprintf("\n%+v", err))
 	}
-}
-
-func start() error {
-	var f *fiber.App
-	var cfg config.AppConfig
-
-	err := fx.New(
-		fx.NopLogger,
-		config.Module,
-
-		// driver and connector
-		fx.Provide(
-			driver.NewRedisClient,         // redis
-			driver.NewMysqlConnectionPool, // mysql
-			func() *resty.Client {
-				httpClient := resty.New().SetJSONEscapeHTML(false)
-				httpClient.JSONUnmarshal = sonic.Unmarshal
-				httpClient.JSONMarshal = sonic.Marshal
-				return httpClient
-			},
-		),
-
-		dal.Module,
-
-		fx.Provide(
-			logger.Copy, metrics.NewScope, cache.NewRedisCache,
-
-			oauth.NewMysqlRepo,
-
-			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
-			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
-			topic.NewMysqlRepo, timeline.NewMysqlRepo,
-
-			dam.New,
-
-			auth.NewService, person.NewService, group.NewMysqlRepo, search.New,
-		),
-
-		ctrl.Module,
-		web.Module,
-
-		fx.Populate(&f, &cfg),
-	).Err()
-
-	if err != nil {
-		return dig.RootCause(err) //nolint:wrapcheck
-	}
-
-	return errgo.Wrap(web.Start(cfg, f), "failed to start app")
 }

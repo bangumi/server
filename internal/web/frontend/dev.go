@@ -12,32 +12,31 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
-
+//nolint:wrapcheck
 package frontend
 
+// dev file to avoid rebuild whole application when only editing template and static files.
+
 import (
-	"embed"
 	"html/template"
 	"io"
 
 	"github.com/Masterminds/sprig/v3"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-//go:embed templates
-var templateFS embed.FS
-
-func NewTemplateEngine() (TemplateEngine, error) {
-	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).ParseFS(templateFS, "templates/**.gohtml")
-	if err != nil {
-		return TemplateEngine{}, errgo.Wrap(err, "template")
-	}
-
-	return TemplateEngine{t: t}, nil
+type devEngine struct {
 }
 
-func (e TemplateEngine) Execute(w io.Writer, name string, data any) error {
-	return e.t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
+func newDevTemplateEngine() (TemplateEngine, error) {
+	return devEngine{}, nil
+}
+
+func (e devEngine) Execute(w io.Writer, name string, data any) error {
+	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).
+		ParseGlob("./internal/web/frontend/templates/**.gohtml")
+	if err != nil {
+		return err
+	}
+
+	return t.ExecuteTemplate(w, name, data)
 }

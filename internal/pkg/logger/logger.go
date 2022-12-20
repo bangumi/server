@@ -23,6 +23,8 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"github.com/bangumi/server/internal/config/env"
 )
 
 var log = setup() //nolint:gochecknoglobals
@@ -50,6 +52,13 @@ func setup() *zap.Logger {
 	zap.ReplaceGlobals(l)
 
 	return l
+}
+
+func getLogger(level zapcore.Level) *zap.Logger {
+	if env.Production || env.Stage {
+		return jsonLogger(level)
+	}
+	return textLogger(level)
 }
 
 // Std return a stdlib logger with zap logger underlying.

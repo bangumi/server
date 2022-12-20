@@ -12,8 +12,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
+package cmd
 
-package config
+import (
+	"github.com/spf13/cobra"
 
-const Development = false
+	"github.com/bangumi/server/internal/cmd/archive"
+	"github.com/bangumi/server/internal/cmd/canal"
+	"github.com/bangumi/server/internal/cmd/web"
+)
+
+var Root = cobra.Command{
+	CompletionOptions: cobra.CompletionOptions{
+		DisableDefaultCmd:   false,
+		DisableNoDescFlag:   false,
+		DisableDescriptions: false,
+		HiddenDefaultCmd:    true,
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return nil
+	},
+}
+
+func init() {
+	Root.PersistentFlags().String("config", "", "config file location")
+	Root.AddCommand(canal.Command, web.Command, archive.Command)
+}

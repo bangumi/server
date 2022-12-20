@@ -22,6 +22,7 @@ import (
 	"sync/atomic"
 
 	"github.com/bytedance/sonic"
+	"github.com/go-redis/redis/v8"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 
@@ -37,6 +38,7 @@ func newEventHandler(
 	appConfig config.AppConfig,
 	session session.Manager,
 	reader *kafka.Reader,
+	redis *redis.Client,
 	search search.Client,
 ) *eventHandler {
 	return &eventHandler{
@@ -44,6 +46,7 @@ func newEventHandler(
 		session: session,
 		reader:  reader,
 		search:  search,
+		redis:   redis,
 		log:     log.Named("eventHandler"),
 	}
 }
@@ -54,6 +57,7 @@ type eventHandler struct {
 	session session.Manager
 	log     *zap.Logger
 	search  search.Client
+	redis   *redis.Client
 	reader  *kafka.Reader
 }
 

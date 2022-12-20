@@ -12,16 +12,28 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build dev
-
-package origin
+package web
 
 import (
+	_ "embed" //nolint:revive
+
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/bangumi/server/internal/config/env"
 )
 
-func New(allowed string) fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
-		return ctx.Next()
+//go:embed index.html
+var indexPageHTML []byte
+
+func indexPage() fiber.Handler {
+	if env.Production {
+		return func(c *fiber.Ctx) error {
+			return c.Redirect("https://github.com/bangumi/")
+		}
+	}
+
+	return func(c *fiber.Ctx) error {
+		c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
+		return c.Send(indexPageHTML)
 	}
 }

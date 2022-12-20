@@ -31,7 +31,6 @@ func NewAppConfig() (AppConfig, error) {
 	var config = cli.String("config", "", "config file location, optional")
 	_ = cli.Parse(os.Args[1:])
 
-	logger.Info("reading app config", zap.String("version", Version))
 	var cfg AppConfig
 	var err error
 	if *config != "" {

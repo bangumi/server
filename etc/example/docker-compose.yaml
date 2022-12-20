@@ -10,6 +10,7 @@ services:
   chii:
     container_name: "chii-web-server"
     image: ghcr.io/bangumi/chii:latest
+    command: [web]
     restart: always
     ports:
       - "3000:3000"
@@ -29,8 +30,9 @@ services:
 
   chii-canal:
     container_name: "chii-app-canal"
-    image: "ghcr.io/bangumi/chii-canal:${CHII_VERSION}"
+    image: ghcr.io/bangumi/chii:latest
     restart: always
+    command: [canal]
     environment:
       HTTP_PORT: "2000" # metrics
       KAFKA_BROKER: "..."
@@ -47,7 +49,7 @@ services:
 
   meilisearch:
     container_name: "chii-meilisearch"
-    image: "getmeili/meilisearch:v0.29"
+    image: "getmeili/meilisearch:v0.30"
     command: meilisearch --env production
     environment:
       MEILI_ENABLE_METRICS_ROUTE: "true"
@@ -66,7 +68,7 @@ services:
 
   debezium-server:
     container_name: chii-debezium
-    image: debezium/server:2.0
+    image: debezium/server:2.1
     environment:
       # set full config as you needed
       - "JAVA_OPTS=-Xms256m -Xmx1536m"
