@@ -333,6 +333,9 @@ issues:
   fix: false
   exclude-use-default: true
   exclude-rules:
+    - path: "internal/cmd/.*"
+      linters: [gochecknoglobals, gochecknoinits, wrapcheck]
+
     - path: '.*_test\.go'
       linters: [gocritic, gochecknoglobals, godot, nosnakecase, funlen]
 
