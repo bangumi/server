@@ -43,7 +43,7 @@ func TestNotification_Count(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{NotificationRepo: m, AuthService: mockAuth})
 
 	resp := test.New(t).
-		Get("/v0/notifications/count").
+		Get("/p/notifications/count").
 		Header(fiber.HeaderAuthorization, "Bearer token").
 		Execute(app)
 
