@@ -35,5 +35,6 @@ var Root = cobra.Command{
 }
 
 func init() {
+	Root.PersistentFlags().String("config", "", "config file location")
 	Root.AddCommand(canal.Command, web.Command, archive.Command)
 }
