@@ -62,10 +62,10 @@ func start() error {
 
 	err := fx.New(
 		fx.NopLogger,
-		config.Module,
 
 		// driver and connector
 		fx.Provide(
+			config.AppConfigReader(config.AppTypeCanal),
 			driver.NewRedisClient,         // redis
 			driver.NewMysqlConnectionPool, // mysql
 			func() *resty.Client {

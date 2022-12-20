@@ -43,10 +43,11 @@ func Main() error {
 
 	di := fx.New(
 		fx.NopLogger,
-		config.Module, dal.Module,
+		dal.Module,
 
 		// driver and connector
 		fx.Provide(
+			config.AppConfigReader(config.AppTypeCanal),
 			driver.NewMysqlConnectionPool, metrics.NewScope,
 			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
 			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,

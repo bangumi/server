@@ -53,8 +53,7 @@ type AppConfig struct {
 	DisableWords string `yaml:"disable_words"`
 	BannedDomain string `yaml:"banned_domain"`
 
-	// 读取之后会被转换为全小写
-	AppType string `yaml:"app_type" env:"APP_TYPE"`
+	AppType string
 }
 
 func (c AppConfig) ListenAddr() string {

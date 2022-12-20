@@ -26,6 +26,14 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
+func AppConfigReader(appType string) func() (AppConfig, error) {
+	return func() (AppConfig, error) {
+		c, err := NewAppConfig()
+		c.AppType = appType
+		return c, err
+	}
+}
+
 func NewAppConfig() (AppConfig, error) {
 	cli := pflag.NewFlagSet(os.Args[0], pflag.ContinueOnError)
 	var config = cli.String("config", "", "config file location, optional")
