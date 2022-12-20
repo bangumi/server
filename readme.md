@@ -25,6 +25,7 @@ task
 
 可设置的环境变量
 
+- `APP_ENV` 不设置此变量默认为开发环境。在生产环境会被设置为 `production` 或 `stage`
 - `MYSQL_HOST` 默认 `127.0.0.1`
 - `MYSQL_PORT` 默认 `3306`
 - `MYSQL_DB` 默认 `bangumi`

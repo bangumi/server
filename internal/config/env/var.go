@@ -12,12 +12,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
+//nolint:gochecknoglobals
 package env
 
 import (
 	"os"
 )
 
+var Development = os.Getenv("APP_ENV") == ""
 var Production = os.Getenv("APP_ENV") == "production"
-var Development = os.Getenv("APP_ENV") != "production"
 var Stage = os.Getenv("APP_ENV") == "stage"
