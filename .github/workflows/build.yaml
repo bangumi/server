@@ -26,8 +26,6 @@ on:
 
 jobs:
   docker:
-    name: "${{ matrix.job }}"
-
     runs-on: ubuntu-20.04
 
     steps:
