@@ -12,20 +12,33 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build dev
-
-package web
+package frontend
 
 import (
-	_ "embed" //nolint:revive
+	"embed"
+	"html/template"
+	"io"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/Masterminds/sprig/v3"
+
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-//go:embed index.html
-var indexPageHTML []byte
+var templateFS embed.FS //nolint:gochecknoglobals
 
-func indexPage(c *fiber.Ctx) error {
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
-	return c.Send(indexPageHTML)
+type prodEngine struct {
+	t *template.Template
+}
+
+func newProdTemplateEngine() (TemplateEngine, error) {
+	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).ParseFS(templateFS, "templates/**.gohtml")
+	if err != nil {
+		return prodEngine{}, errgo.Wrap(err, "template")
+	}
+
+	return prodEngine{t: t}, nil
+}
+
+func (e prodEngine) Execute(w io.Writer, name string, data any) error {
+	return e.t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
 }

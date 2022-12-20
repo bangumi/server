@@ -22,7 +22,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/config/env"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/web/accessor"
@@ -95,7 +95,7 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 		Name:     session.CookieKey,
 		Value:    key,
 		MaxAge:   gtime.OneWeekSec * 2,
-		Secure:   !config.Development,
+		Secure:   !env.Development,
 		HTTPOnly: true,
 		SameSite: fiber.CookieSameSiteLaxMode,
 	})

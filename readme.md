@@ -25,6 +25,7 @@ task
 
 可设置的环境变量
 
+- `APP_ENV` 不设置此变量默认为开发环境。在生产环境会被设置为 `production` 或 `stage`
 - `MYSQL_HOST` 默认 `127.0.0.1`
 - `MYSQL_PORT` 默认 `3306`
 - `MYSQL_DB` 默认 `bangumi`
@@ -65,18 +66,16 @@ Web 框架: [fiber](https://github.com/gofiber/fiber)
 
 ORM: [GORM](https://github.com/go-gorm/gorm) 和 [GORM Gen](https://github.com/go-gorm/gen)
 
-在开发时请使用 go build tag `dev` 构建进行构建。
-
 启动 HTTP server
 
 ```shell
-go run --tags dev main.go --config config.yaml web
+go run main.go --config config.yaml web
 ```
 
 启动 kafka consumer
 
 ```shell
-go run --tags dev main.go canal --config config.yaml
+go run main.go canal --config config.yaml
 ```
 
 ### 后端环境
