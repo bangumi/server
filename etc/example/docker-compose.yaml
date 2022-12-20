@@ -10,6 +10,7 @@ services:
   chii:
     container_name: "chii-web-server"
     image: ghcr.io/bangumi/chii:latest
+    command: [web]
     restart: always
     ports:
       - "3000:3000"
@@ -29,8 +30,9 @@ services:
 
   chii-canal:
     container_name: "chii-app-canal"
-    image: "ghcr.io/bangumi/chii-canal:${CHII_VERSION}"
+    image: ghcr.io/bangumi/chii:latest
     restart: always
+    command: [canal]
     environment:
       HTTP_PORT: "2000" # metrics
       KAFKA_BROKER: "..."

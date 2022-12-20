@@ -70,13 +70,13 @@ ORM: [GORM](https://github.com/go-gorm/gorm) 和 [GORM Gen](https://github.com/g
 启动 HTTP server
 
 ```shell
-go run --tags dev main.go --config config.yaml
+go run --tags dev main.go --config config.yaml web
 ```
 
 启动 kafka consumer
 
 ```shell
-go run --tags dev ./internal/cmd/canal/main.go --config config.yaml
+go run --tags dev main.go canal --config config.yaml
 ```
 
 ### 后端环境

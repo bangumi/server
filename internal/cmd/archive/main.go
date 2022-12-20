@@ -13,7 +13,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
 //nolint:forbidigo,funlen
-package main
+package archive
 
 import (
 	"archive/zip"
@@ -25,6 +25,7 @@ import (
 
 	"github.com/bytedance/sonic/encoder"
 	"github.com/go-sql-driver/mysql"
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -36,23 +37,30 @@ import (
 	"github.com/bangumi/server/internal/driver"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 const defaultStep = 50
 
-func main() {
-	if err := mysql.SetLogger(logger.Std()); err != nil {
-		logger.Panic("can't replace mysql driver's errLog", zap.Error(err))
-	}
+var Command = &cobra.Command{
+	Use:   "archive",
+	Short: "create a wiki dump",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := mysql.SetLogger(logger.Std()); err != nil {
+			return errgo.Wrap(err, "can't replace mysql driver's errLog")
+		}
 
-	fmt.Println("dumping data with args:", os.Args)
+		fmt.Println("dumping data with args:", os.Args)
 
-	var out string
-	pflag.StringVar(&out, "out", "archive.zip", "zip file output location")
-	pflag.Parse()
+		var out string
+		pflag.StringVar(&out, "out", "archive.zip", "zip file output location")
+		pflag.Parse()
 
-	start(out)
+		start(out)
+
+		return nil
+	},
 }
 
 var ctx = context.Background() //nolint:gochecknoglobals
