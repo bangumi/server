@@ -66,8 +66,6 @@ Web 框架: [fiber](https://github.com/gofiber/fiber)
 
 ORM: [GORM](https://github.com/go-gorm/gorm) 和 [GORM Gen](https://github.com/go-gorm/gen)
 
-在开发时请使用 go build tag `dev` 构建进行构建。
-
 启动 HTTP server
 
 ```shell
