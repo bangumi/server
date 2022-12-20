@@ -12,31 +12,33 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package handler
+package pm
 
 import (
-	"go.uber.org/fx"
+	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/web/handler/character"
+	"github.com/bangumi/server/internal/ctrl"
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/web/handler/common"
-	"github.com/bangumi/server/internal/web/handler/index"
-	"github.com/bangumi/server/internal/web/handler/notification"
-	"github.com/bangumi/server/internal/web/handler/person"
-	"github.com/bangumi/server/internal/web/handler/pm"
-	"github.com/bangumi/server/internal/web/handler/subject"
-	"github.com/bangumi/server/internal/web/handler/user"
 )
 
-var Module = fx.Module("handler",
-	fx.Provide(
-		New,
-		common.New,
-		user.New,
-		person.New,
-		subject.New,
-		character.New,
-		index.New,
-		pm.New,
-		notification.New,
-	),
-)
+type PrivateMessage struct {
+	ctrl ctrl.Ctrl
+	common.Common
+	pmRepo domain.PrivateMessageRepo
+	log    *zap.Logger
+}
+
+func New(
+	common common.Common,
+	pmRepo domain.PrivateMessageRepo,
+	ctrl ctrl.Ctrl,
+	log *zap.Logger,
+) (PrivateMessage, error) {
+	return PrivateMessage{
+		Common: common,
+		ctrl:   ctrl,
+		pmRepo: pmRepo,
+		log:    log.Named("handler.PrivateMessage"),
+	}, nil
+}

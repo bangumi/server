@@ -37,6 +37,10 @@ type UserGroupID = uint8
 type RevisionType = uint8
 type TimeLineCat = uint16
 
+type PrivateMessageID uint32
+type NotificationID uint32
+type NotificationFieldID uint32
+
 var _ driver.Valuer = UserID(0)
 var _ driver.Valuer = PersonID(0)
 var _ driver.Valuer = CharacterID(0)
@@ -69,7 +73,15 @@ func (v GroupID) Value() (driver.Value, error) {
 	return int64(v), nil
 }
 
+func (v PrivateMessageID) Value() (driver.Value, error) {
+	return int64(v), nil
+}
+
 func (v TimeLineID) Value() (driver.Value, error) {
+	return int64(v), nil
+}
+
+func (v NotificationStatus) Value() (driver.Value, error) {
 	return int64(v), nil
 }
 

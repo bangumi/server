@@ -48,6 +48,12 @@ var timelineIDTypeString = "model." + reflect.TypeOf(new(model.TimeLineID)).Elem
 var timelineCatTypeString = reflect.TypeOf(new(model.TimeLineCat)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
+var notificationIDTypeString = "model." + reflect.TypeOf(new(model.NotificationID)).Elem().Name()
+var notificationFieldIDTypeString = "model." + reflect.TypeOf(new(model.NotificationFieldID)).Elem().Name()
+var notificationTypeTypeString = "model." + reflect.TypeOf(new(model.NotificationType)).Elem().Name()
+var notificationStatusTypeString = "model." + reflect.TypeOf(new(model.NotificationStatus)).Elem().Name()
+var privateMessageIDTypeString = "model." + reflect.TypeOf(new(model.PrivateMessageID)).Elem().Name()
+var privateMessageFolderTypeTypeString = "model." + reflect.TypeOf(new(model.PrivateMessageFolderType)).Elem().Name()
 
 func DeprecatedFiled(s string) gen.ModelOpt {
 	return gen.FieldComment(s, "Deprecated")
@@ -132,6 +138,7 @@ func main() {
 
 	modelField := g.GenerateModelAs("chii_memberfields", "MemberField",
 		gen.FieldType("uid", userIDTypeString),
+		gen.FieldType("privacy", "[]byte"),
 	)
 
 	modelMember := g.GenerateModelAs("chii_members", "Member",
@@ -494,6 +501,45 @@ func main() {
 		gen.FieldType("frd_fid", userIDTypeString),
 		gen.FieldRename("frd_fid", "FriendID"),
 		gen.FieldRename("frd_dateline", createdTime),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_notify", "Notification",
+		gen.FieldTrimPrefix("nt_"),
+		gen.FieldType("nt_uid", userIDTypeString),
+		gen.FieldType("nt_from_uid", userIDTypeString),
+		gen.FieldType("nt_id", notificationIDTypeString),
+		gen.FieldType("nt_mid", notificationFieldIDTypeString),
+		gen.FieldType("nt_type", notificationTypeTypeString),
+		gen.FieldType("nt_status", notificationStatusTypeString),
+		gen.FieldRename("nt_uid", "ReceiverID"),
+		gen.FieldRename("nt_from_uid", "SenderID"),
+		gen.FieldRename("nt_mid", "FieldID"),
+		gen.FieldRename("nt_dateline", createdTime),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_notify_field", "NotificationField",
+		gen.FieldTrimPrefix("ntf_"),
+		gen.FieldType("ntf_id", notificationFieldIDTypeString),
+		gen.FieldRename("ntf_rid", "RelatedID"),
+		gen.FieldRename("ntf_hash", "RelatedType"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_pms", "PrivateMessage",
+		gen.FieldTrimPrefix("msg_"),
+		gen.FieldType("msg_id", privateMessageIDTypeString),
+		gen.FieldType("msg_folder", privateMessageFolderTypeTypeString),
+		gen.FieldType("msg_sid", userIDTypeString),
+		gen.FieldType("msg_rid", userIDTypeString),
+		gen.FieldType("msg_related_main", privateMessageIDTypeString),
+		gen.FieldType("msg_related", privateMessageIDTypeString),
+		gen.FieldRename("msg_dateline", createdTime),
+		gen.FieldRename("msg_message", "Content"),
+		gen.FieldRename("msg_sid", "SenderID"),
+		gen.FieldRename("msg_rid", "ReceiverID"),
+		gen.FieldRename("msg_related_main", "MainMessageID"),
+		gen.FieldRename("msg_related", "RelatedMessageID"),
+		gen.FieldRename("msg_sdeleted", "DeletedBySender"),
+		gen.FieldRename("msg_rdeleted", "DeletedByReceiver"),
 	))
 
 	// execute the action of code generation

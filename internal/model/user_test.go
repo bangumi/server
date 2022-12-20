@@ -12,27 +12,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package model_test
 
 import (
-	"context"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/model"
 )
 
-type UserRepo interface {
-	// GetByID find a user by uid.
-	GetByID(ctx context.Context, userID model.UserID) (model.User, error)
-	// GetByName find a user by username.
-	GetByName(ctx context.Context, username string) (model.User, error)
+func TestUnmarshal(t *testing.T) {
+	t.Parallel()
 
-	GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]model.User, error)
+	var s = model.UserPrivacySettings{}
 
-	GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]FriendItem, error)
+	s.Unmarshal([]byte("a:4:{i:1;i:2;i:30;i:2;i:20;i:2;i:21;i:0;}"))
 
-	CheckIsFriendToOthers(ctx context.Context, selfID model.UserID, otherIDs ...model.UserID) (bool, error)
-
-	GetFieldsByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]model.UserFields, error)
+	require.Equal(t, s.ReceiveTimelineReply, model.UserReceiveFilterNone)
 }
-
-type FriendItem struct{}

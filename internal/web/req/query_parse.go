@@ -29,6 +29,7 @@ var errMissingPersonID = res.BadRequest("person ID is required")
 var errMissingEpisodeID = res.BadRequest("episode ID is required")
 var errMissingIndexID = res.BadRequest("index ID is required")
 var errMissingTopicID = res.BadRequest("topic ID is required")
+var errMissingPrivateMessageID = res.BadRequest("pm ID is required")
 
 func ParseSubjectType(s string) (model.SubjectType, error) {
 	if s == "" {
@@ -175,4 +176,32 @@ func ParseEpTypeOptional(s string) (*model.EpType, error) {
 	}
 
 	return nil, res.BadRequest(strconv.Quote(s) + " is not valid episode type")
+}
+
+func ParsePrivateMessageFolder(s string) (model.PrivateMessageFolderType, error) {
+	v := model.PrivateMessageFolderType(s)
+	switch v {
+	case model.PrivateMessageFolderTypeInbox,
+		model.PrivateMessageFolderTypeOutbox:
+		return v, nil
+	}
+	return v, res.BadRequest(
+		"folder must be " +
+			string(model.PrivateMessageFolderTypeInbox) +
+			" or " +
+			string(model.PrivateMessageFolderTypeOutbox))
+}
+
+func ParsePrivateMessageID(s string) (model.PrivateMessageID, error) {
+	if s == "" {
+		return 0, errMissingPrivateMessageID
+	}
+
+	v, err := gstr.ParseUint32(s)
+
+	if err != nil || v == 0 {
+		return 0, res.BadRequest(strconv.Quote(s) + " is not valid private message ID")
+	}
+
+	return model.PrivateMessageID(v), nil
 }

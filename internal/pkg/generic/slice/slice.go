@@ -35,6 +35,17 @@ func MapFilter[T any, K any, F func(item T) (k K, ok bool)](in []T, fn F) []K {
 	return s
 }
 
+func FindIndex[T any, F func(item T) bool](in []T, fn F) int {
+	for i, t := range in {
+		ok := fn(t)
+		if ok {
+			return i
+		}
+	}
+
+	return -1
+}
+
 func ToMap[K comparable, T any, F func(item T) K](in []T, fn F) map[K]T {
 	var s = make(map[K]T, len(in))
 	for _, t := range in {

@@ -122,3 +122,14 @@ func TestMysqlRepo_GetByIDs(t *testing.T) {
 	require.Equal(t, model.UserID(1), users[1].ID)
 	require.Equal(t, model.UserID(382951), users[382951].ID)
 }
+
+func TestGetFieldsByIDs(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	fields, err := repo.GetFieldsByIDs(context.Background(), []model.UserID{model.UserID(1)})
+	require.NoError(t, err)
+	require.Len(t, fields, 1)
+}

@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/gstr"
 )
 
 func NewUserRepo(q *query.Query, log *zap.Logger) (domain.UserRepo, error) {
@@ -92,6 +93,54 @@ func (m mysqlRepo) GetFriends(ctx context.Context, userID model.UserID) (map[mod
 	var r = make(map[model.UserID]domain.FriendItem, len(friends))
 	for _, friend := range friends {
 		r[friend.FriendID] = struct{}{}
+	}
+
+	return r, nil
+}
+
+func (m mysqlRepo) CheckIsFriendToOthers(
+	ctx context.Context,
+	selfID model.UserID,
+	otherIDs ...model.UserID) (bool, error) {
+	count, err := m.q.Friend.
+		WithContext(ctx).
+		Where(m.q.Friend.UserID.In(slice.ToValuer(otherIDs)...), m.q.Friend.FriendID.Eq(selfID)).Count()
+	if err != nil {
+		return false, errgo.Wrap(err, "dal")
+	}
+	return count >= int64(len(otherIDs)), nil
+}
+
+func (m mysqlRepo) GetFieldsByIDs(ctx context.Context,
+	userIDs []model.UserID) (map[model.UserID]model.UserFields, error) {
+	if len(userIDs) == 0 {
+		return make(map[model.UserID]model.UserFields, 0), nil
+	}
+	users, err := m.q.Member.
+		WithContext(ctx).
+		Joins(m.q.Member.Fields).Select(m.q.Member.ID).
+		Where(m.q.Member.ID.In(slice.ToValuer(userIDs)...)).Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var r = make(map[model.UserID]model.UserFields, len(users))
+	for _, user := range users {
+		var privacySettings model.UserPrivacySettings
+		privacySettings.Unmarshal(user.Fields.Privacy)
+		r[user.Fields.UID] = model.UserFields{
+			UID:  user.Fields.UID,
+			Site: user.Fields.Site,
+			Bio:  user.Fields.Bio,
+			Blocklist: slice.MapFilter(gstr.Split(user.Fields.Blocklist, ","), func(s string) (model.UserID, bool) {
+				id, err := gstr.ParseUint32(s)
+				if err != nil {
+					return 0, false
+				}
+				return model.UserID(id), true
+			}),
+			Privacy: privacySettings,
+		}
 	}
 
 	return r, nil

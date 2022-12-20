@@ -16,6 +16,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/trim21/go-phpserialize"
 )
 
 // User is visible for everyone.
@@ -31,4 +33,50 @@ type User struct {
 
 func (u User) GetID() UserID {
 	return u.ID
+}
+
+type UserReceiveFilter uint8
+
+const (
+	UserReceiveFilterAll UserReceiveFilter = iota
+	UserReceiveFilterFriends
+	UserReceiveFilterNone
+)
+
+type UserPrivacySettingsField int
+
+const (
+	UserPrivacyReceivePrivateMessage      UserPrivacySettingsField = 1
+	UserPrivacyReceiveTimelineReply       UserPrivacySettingsField = 30
+	UserPrivacyReceiveMentionNotification UserPrivacySettingsField = 20
+	UserPrivacyReceiveCommentNotification UserPrivacySettingsField = 21
+)
+
+type UserPrivacySettings struct {
+	ReceivePrivateMessage      UserReceiveFilter
+	ReceiveTimelineReply       UserReceiveFilter
+	ReceiveMentionNotification UserReceiveFilter
+	ReceiveCommentNotification UserReceiveFilter
+}
+
+func (settings *UserPrivacySettings) Unmarshal(s []byte) {
+	rawMap := make(map[UserPrivacySettingsField]UserReceiveFilter, 4)
+	err := phpserialize.Unmarshal(s, &rawMap)
+	if err != nil {
+		return
+	}
+
+	settings.ReceivePrivateMessage = rawMap[UserPrivacyReceivePrivateMessage]
+	settings.ReceiveTimelineReply = rawMap[UserPrivacyReceiveTimelineReply]
+	settings.ReceiveMentionNotification = rawMap[UserPrivacyReceiveMentionNotification]
+	settings.ReceiveCommentNotification = rawMap[UserPrivacyReceiveCommentNotification]
+}
+
+type UserFields struct {
+	Site      string
+	Location  string
+	Bio       string
+	Blocklist []UserID
+	Privacy   UserPrivacySettings
+	UID       UserID
 }

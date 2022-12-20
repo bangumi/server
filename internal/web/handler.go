@@ -24,7 +24,9 @@ import (
 	"github.com/bangumi/server/internal/web/handler"
 	"github.com/bangumi/server/internal/web/handler/character"
 	"github.com/bangumi/server/internal/web/handler/index"
+	"github.com/bangumi/server/internal/web/handler/notification"
 	"github.com/bangumi/server/internal/web/handler/person"
+	"github.com/bangumi/server/internal/web/handler/pm"
 	"github.com/bangumi/server/internal/web/handler/subject"
 	"github.com/bangumi/server/internal/web/handler/user"
 	"github.com/bangumi/server/internal/web/middleware/origin"
@@ -45,6 +47,8 @@ func AddRouters(
 	userHandler user.User,
 	personHandler person.Person,
 	characterHandler character.Character,
+	pmHandler pm.PrivateMessage,
+	notificationHandler notification.Notification,
 	subjectHandler subject.Subject,
 	indexHandler index.Handler,
 ) {
@@ -131,6 +135,16 @@ func AddRouters(
 	private.Get("/episodes/:id/comments", h.GetEpisodeComments)
 	private.Get("/characters/:id/comments", h.GetCharacterComments)
 	private.Get("/persons/:id/comments", h.GetPersonComments)
+
+	private.Get("/pms/list", h.NeedLogin, pmHandler.List)
+	private.Get("/pms/related-msgs/:id", h.NeedLogin, pmHandler.ListRelated)
+	private.Get("/pms/counts", h.NeedLogin, pmHandler.CountTypes)
+	private.Get("/pms/contacts/recent", h.NeedLogin, pmHandler.ListRecentContact)
+	private.Patch("/pms/read", req.JSON, h.NeedLogin, pmHandler.MarkRead)
+	private.Post("/pms", req.JSON, h.NeedLogin, pmHandler.Create)
+	private.Delete("/pms", req.JSON, h.NeedLogin, pmHandler.Delete)
+
+	private.Get("/notifications/count", h.NeedLogin, notificationHandler.Count)
 
 	// un-documented
 	private.Post("/access-tokens", req.JSON, h.CreatePersonalAccessToken)

@@ -50,26 +50,28 @@ import (
 )
 
 type Mock struct {
-	SubjectRepo    subject.Repo
-	PersonRepo     domain.PersonRepo
-	CharacterRepo  domain.CharacterRepo
-	AuthRepo       domain.AuthRepo
-	AuthService    domain.AuthService
-	EpisodeRepo    domain.EpisodeRepo
-	TopicRepo      domain.TopicRepo
-	GroupRepo      domain.GroupRepo
-	UserRepo       domain.UserRepo
-	IndexRepo      domain.IndexRepo
-	RevisionRepo   domain.RevisionRepo
-	CollectionRepo domain.CollectionRepo
-	TimeLineRepo   domain.TimeLineRepo
-	CaptchaManager captcha.Manager
-	SessionManager session.Manager
-	Cache          cache.RedisCache
-	RateLimiter    rate.Manager
-	OAuthManager   oauth.Manager
-	HTTPMock       *httpmock.MockTransport
-	Dam            *dam.Dam
+	SubjectRepo        subject.Repo
+	PersonRepo         domain.PersonRepo
+	CharacterRepo      domain.CharacterRepo
+	AuthRepo           domain.AuthRepo
+	AuthService        domain.AuthService
+	EpisodeRepo        domain.EpisodeRepo
+	TopicRepo          domain.TopicRepo
+	GroupRepo          domain.GroupRepo
+	UserRepo           domain.UserRepo
+	IndexRepo          domain.IndexRepo
+	RevisionRepo       domain.RevisionRepo
+	CollectionRepo     domain.CollectionRepo
+	TimeLineRepo       domain.TimeLineRepo
+	CaptchaManager     captcha.Manager
+	SessionManager     session.Manager
+	Cache              cache.RedisCache
+	RateLimiter        rate.Manager
+	OAuthManager       oauth.Manager
+	PrivateMessageRepo domain.PrivateMessageRepo
+	NotificationRepo   domain.NotificationRepo
+	HTTPMock           *httpmock.MockTransport
+	Dam                *dam.Dam
 }
 
 //nolint:funlen
@@ -108,6 +110,8 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockUserRepo(m.UserRepo),
 		MockIndexRepo(m.IndexRepo),
 		MockRevisionRepo(m.RevisionRepo),
+		MockPrivateMessageRepo(m.PrivateMessageRepo),
+		MockNoticationRepo(m.NotificationRepo),
 		MockCaptchaManager(m.CaptchaManager),
 		MockSessionManager(m.SessionManager),
 		MockRateLimiter(m.RateLimiter),
@@ -163,6 +167,20 @@ func MockIndexRepo(repo domain.IndexRepo) fx.Option {
 	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.IndexRepo))))
 }
 
+func MockPrivateMessageRepo(repo domain.PrivateMessageRepo) fx.Option {
+	if repo == nil {
+		repo = &mocks.PrivateMessageRepo{}
+	}
+	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.PrivateMessageRepo))))
+}
+
+func MockNoticationRepo(repo domain.NotificationRepo) fx.Option {
+	if repo == nil {
+		repo = &mocks.NotificationRepo{}
+	}
+	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.NotificationRepo))))
+}
+
 func MockRateLimiter(repo rate.Manager) fx.Option {
 	if repo == nil {
 		mocker := &mocks.RateLimiter{}
@@ -207,6 +225,16 @@ func MockUserRepo(repo domain.UserRepo) fx.Option {
 				var ret = make(map[model.UserID]model.User, len(ids))
 				for _, id := range ids {
 					ret[id] = model.User{}
+				}
+				return ret
+			}, func(ctx context.Context, ids []model.UserID) error {
+				return nil
+			})
+		mocker.On("GetFieldsByIDs", mock.Anything, mock.Anything, mock.Anything).
+			Return(func(ctx context.Context, ids []model.UserID) map[model.UserID]model.UserFields {
+				var ret = make(map[model.UserID]model.UserFields, len(ids))
+				for _, id := range ids {
+					ret[id] = model.UserFields{}
 				}
 				return ret
 			}, func(ctx context.Context, ids []model.UserID) error {
