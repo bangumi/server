@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
+//nolint:wrapcheck
 package frontend
 
 // dev file to avoid rebuild whole application when only editing template and static files.
@@ -37,5 +38,5 @@ func (e devEngine) Execute(w io.Writer, name string, data any) error {
 		return err
 	}
 
-	return t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
+	return t.ExecuteTemplate(w, name, data)
 }
