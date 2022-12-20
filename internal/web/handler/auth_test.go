@@ -59,9 +59,9 @@ func TestHandler_PrivateLogin(t *testing.T) {
 	)
 
 	resp := test.New(t).Post("/p/login").JSON(fiber.Map{
-		"email":              "a@example.com",
-		"password":           "p",
-		"h-captcha-response": "req",
+		"email":                 "a@example.com",
+		"password":              "p",
+		"cf-turnstile-response": "req",
 	}).Execute(app, 3000)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())

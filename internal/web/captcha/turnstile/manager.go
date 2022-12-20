@@ -13,7 +13,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
 //nolint:tagliatelle
-package hcaptcha
+package turnstile
 
 import (
 	"context"
@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-const VerifyURL = "https://hcaptcha.com/siteverify"
+const VerifyURL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 
 type Manager struct {
 	http   *resty.Client
@@ -34,7 +34,7 @@ type Manager struct {
 }
 
 func New(cfg config.AppConfig, http *resty.Client) Manager {
-	return Manager{secret: cfg.HCaptchaSecretKey, http: http}
+	return Manager{secret: cfg.TurnstileSecretKey, http: http}
 }
 
 func (m Manager) Verify(ctx context.Context, response string) (bool, error) {

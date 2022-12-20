@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package hcaptcha_test
+package turnstile_test
 
 import (
 	"context"
@@ -23,20 +23,20 @@ import (
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/web/captcha/hcaptcha"
+	"github.com/bangumi/server/internal/web/captcha/turnstile"
 )
 
 func TestManager_Verify(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvExternalHTTP)
 	// testing key, checkout https://docs.hcaptcha.com/#integration-testing-test-keys
-	manager := hcaptcha.New(config.AppConfig{
-		HCaptchaSecretKey: "0x0000000000000000000000000000000000000000",
+	manager := turnstile.New(config.AppConfig{
+		TurnstileSecretKey: "1x0000000000000000000000000000000AA",
 	}, resty.New())
 
 	ok, err := manager.Verify(context.Background(), "10000000-aaaa-bbbb-cccc-000000000001")
 	if err != nil {
-		t.Fatal("unexpected hCaptcha error, you may need to set a proxy with `HTTPS_PROXY`")
+		t.Fatal("unexpected turnstile error, you may need to set a proxy with `HTTPS_PROXY`")
 	}
 
 	require.True(t, ok)
@@ -46,13 +46,13 @@ func TestManager_Verify_fail(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvExternalHTTP)
 	// testing key, checkout https://docs.hcaptcha.com/#integration-testing-test-keys
-	manager := hcaptcha.New(config.AppConfig{
-		HCaptchaSecretKey: "0x0000000000000000000000000000000000000000",
+	manager := turnstile.New(config.AppConfig{
+		TurnstileSecretKey: "2x0000000000000000000000000000000AA",
 	}, resty.New())
 
 	ok, err := manager.Verify(context.Background(), "10000000-aaaa-bbbb-cccc-000000000002")
 	if err != nil {
-		t.Fatal("unexpected hCaptcha error, you may need to set a proxy with `HTTPS_PROXY`")
+		t.Fatal("unexpected turnstile error, you may need to set a proxy with `HTTPS_PROXY`")
 	}
 
 	require.False(t, ok)

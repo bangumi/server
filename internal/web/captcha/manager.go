@@ -20,7 +20,7 @@ import (
 	"github.com/go-resty/resty/v2"
 
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/web/captcha/hcaptcha"
+	"github.com/bangumi/server/internal/web/captcha/turnstile"
 )
 
 type Manager interface {
@@ -28,9 +28,9 @@ type Manager interface {
 }
 
 func New(cfg config.AppConfig, http *resty.Client) (Manager, error) {
-	if cfg.HCaptchaSecretKey == "0x0000000000000000000000000000000000000000" {
+	if cfg.TurnstileSecretKey == "1x0000000000000000000000000000000AA" {
 		return nopeManager{}, nil
 	}
 
-	return hcaptcha.New(cfg, http), nil
+	return turnstile.New(cfg, http), nil
 }

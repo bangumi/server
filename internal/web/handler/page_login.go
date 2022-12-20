@@ -34,5 +34,9 @@ func (h Handler) PageLogin(c *fiber.Ctx) error {
 		}
 	}
 
-	return h.render(c, frontend.TplLogin, frontend.Login{Title: "Login", User: u})
+	return h.render(c, frontend.TplLogin, frontend.Login{
+		Title:            "Login",
+		User:             u,
+		TurnstileSiteKey: h.Common.Config.TurnstileSiteKey,
+	})
 }

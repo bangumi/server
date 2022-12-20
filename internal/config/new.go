@@ -16,7 +16,6 @@ package config
 
 import (
 	"os"
-	"strings"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/spf13/pflag"
@@ -52,17 +51,5 @@ func NewAppConfig() (AppConfig, error) {
 		return AppConfig{}, err
 	}
 
-	// 太长了
-	cfg.HCaptchaSecretKey = setDefault(cfg.HCaptchaSecretKey, "0x0000000000000000000000000000000000000000")
-
-	cfg.AppType = strings.ToLower(cfg.AppType)
-
 	return cfg, nil
-}
-
-func setDefault(s string, defaultValue string) string {
-	if s == "" {
-		return defaultValue
-	}
-	return s
 }
