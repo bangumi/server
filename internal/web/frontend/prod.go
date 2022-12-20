@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
+//go:embed templates
 var templateFS embed.FS //nolint:gochecknoglobals
 
 type prodEngine struct {
