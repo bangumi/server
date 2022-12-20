@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/web/session"
 )
 
 func TestNotification_Count(t *testing.T) {
@@ -38,13 +39,16 @@ func TestNotification_Count(t *testing.T) {
 	).Return(0, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
 
-	app := test.GetWebApp(t, test.Mock{NotificationRepo: m, AuthService: mockAuth})
+	s := mocks.NewSessionManager(t)
+	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{NotificationRepo: m, AuthService: mockAuth, SessionManager: s})
 
 	resp := test.New(t).
 		Get("/p/notifications/count").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(fiber.HeaderCookie, "sessionID=11").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)

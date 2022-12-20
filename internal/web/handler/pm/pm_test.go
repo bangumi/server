@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/web/req"
+	"github.com/bangumi/server/internal/web/session"
 )
 
 func TestPrivateMessage_List(t *testing.T) {
@@ -48,13 +49,16 @@ func TestPrivateMessage_List(t *testing.T) {
 	}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
 
-	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
+	s := mocks.NewSessionManager(t)
+	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
 	resp := test.New(t).
 		Get("/p/pms/list?offset=0&limit=10&folder=inbox").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(fiber.HeaderCookie, "sessionID=11").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -70,13 +74,16 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 	).Return([]model.PrivateMessage{}, domain.ErrNotFound)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
 
-	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
+	s := mocks.NewSessionManager(t)
+	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
 	resp := test.New(t).
 		Get("/p/pms/related-msgs/1").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(fiber.HeaderCookie, "sessionID=11").
 		Execute(app)
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
@@ -91,13 +98,16 @@ func TestPrivateMessage_ListRecentContact(t *testing.T) {
 	).Return([]model.UserID{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
 
-	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
+	s := mocks.NewSessionManager(t)
+	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
 	resp := test.New(t).
 		Get("/p/pms/contacts/recent").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(fiber.HeaderCookie, "sessionID=11").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -112,13 +122,16 @@ func TestPrivateMessage_CountTypes(t *testing.T) {
 	).Return(model.PrivateMessageTypeCounts{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
 
-	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
+	s := mocks.NewSessionManager(t)
+	s.EXPECT().Get(mock.Anything, "111").Return(session.Session{UserID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
 	resp := test.New(t).
 		Get("/p/pms/counts").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(fiber.HeaderCookie, "sessionID=111").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -134,14 +147,16 @@ func TestPrivateMessage_MarkRead(t *testing.T) {
 	).Return(nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
 
-	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
+	s := mocks.NewSessionManager(t)
+	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
 	resp := test.New(t).
 		Patch("/p/pms/read").
-		Header(fiber.HeaderAuthorization, "Bearer token").
-		Header(fiber.HeaderContentType, "application/json").
+		Header(fiber.HeaderCookie, "sessionID=11").
 		JSON(req.PrivateMessageMarkRead{ID: 1}).
 		Execute(app)
 
@@ -161,14 +176,16 @@ func TestPrivateMessage_Create(t *testing.T) {
 	).Return([]model.PrivateMessage{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
 
-	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
+	s := mocks.NewSessionManager(t)
+	s.EXPECT().Get(mock.Anything, "111").Return(session.Session{UserID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
 	resp := test.New(t).
 		Post("/p/pms").
-		Header(fiber.HeaderAuthorization, "Bearer token").
-		Header(fiber.HeaderContentType, "application/json").
+		Header(fiber.HeaderCookie, "sessionID=111").
 		JSON(req.PrivateMessageCreate{Title: "测试标题", Content: "测试内容", ReceiverIDs: []uint32{382951}}).
 		Execute(app)
 
@@ -185,14 +202,16 @@ func TestPrivateMessage_Delete(t *testing.T) {
 	).Return(nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
 
-	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth})
+	s := mocks.NewSessionManager(t)
+	s.EXPECT().Get(mock.Anything, "111").Return(session.Session{UserID: 1}, nil)
+
+	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
 	resp := test.New(t).
 		Delete("/p/pms").
-		Header(fiber.HeaderAuthorization, "Bearer token").
-		Header(fiber.HeaderContentType, "application/json").
+		Header(fiber.HeaderCookie, "sessionID=111").
 		JSON(req.PrivateMessageDelete{IDs: []uint32{1}}).
 		Execute(app)
 
