@@ -65,7 +65,7 @@ func start() error {
 
 		// driver and connector
 		fx.Provide(
-			config.AppConfigReader(config.AppTypeCanal),
+			config.AppConfigReader(config.AppTypeHTTP),
 			driver.NewRedisClient,         // redis
 			driver.NewMysqlConnectionPool, // mysql
 			func() *resty.Client {
