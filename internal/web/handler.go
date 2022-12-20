@@ -102,16 +102,6 @@ func AddRouters(
 		v0.Delete("/indices/:id/subjects/:subject_id", i.NeedLogin, i.RemoveIndexSubject)
 	}
 
-	v0.Get("/pms/list", h.NeedLogin, pmHandler.List)
-	v0.Get("/pms/related-msgs/:id", h.NeedLogin, pmHandler.ListRelated)
-	v0.Get("/pms/counts", h.NeedLogin, pmHandler.CountTypes)
-	v0.Get("/pms/contacts/recent", h.NeedLogin, pmHandler.ListRecentContact)
-	v0.Patch("/pms/read", req.JSON, h.NeedLogin, pmHandler.MarkRead)
-	v0.Post("/pms", req.JSON, h.NeedLogin, pmHandler.Create)
-	v0.Delete("/pms", req.JSON, h.NeedLogin, pmHandler.Delete)
-
-	v0.Get("/notifications/count", h.NeedLogin, notificationHandler.Count)
-
 	v0.Get("/revisions/persons/:id", h.GetPersonRevision)
 	v0.Get("/revisions/persons", h.ListPersonRevision)
 	v0.Get("/revisions/subjects/:id", h.GetSubjectRevision)
@@ -145,6 +135,16 @@ func AddRouters(
 	private.Get("/episodes/:id/comments", h.GetEpisodeComments)
 	private.Get("/characters/:id/comments", h.GetCharacterComments)
 	private.Get("/persons/:id/comments", h.GetPersonComments)
+
+	private.Get("/pms/list", h.NeedLogin, pmHandler.List)
+	private.Get("/pms/related-msgs/:id", h.NeedLogin, pmHandler.ListRelated)
+	private.Get("/pms/counts", h.NeedLogin, pmHandler.CountTypes)
+	private.Get("/pms/contacts/recent", h.NeedLogin, pmHandler.ListRecentContact)
+	private.Patch("/pms/read", req.JSON, h.NeedLogin, pmHandler.MarkRead)
+	private.Post("/pms", req.JSON, h.NeedLogin, pmHandler.Create)
+	private.Delete("/pms", req.JSON, h.NeedLogin, pmHandler.Delete)
+
+	private.Get("/notifications/count", h.NeedLogin, notificationHandler.Count)
 
 	// un-documented
 	private.Post("/access-tokens", req.JSON, h.CreatePersonalAccessToken)

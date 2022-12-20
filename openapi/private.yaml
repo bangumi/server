@@ -545,6 +545,239 @@ paths:
         "404":
           description: 小组不存在
 
+  "/p/pms/list":
+    get:
+      tags:
+        - 私信
+      summary: List Private Messages
+      operationId: ListPrivateMessages
+      parameters:
+        - required: true
+          name: folder
+          description: 私信收/发信箱
+          schema:
+            enum:
+              - inbox
+              - outbox
+            type: string
+          in: query
+        - $ref: "#/components/parameters/default_query_limit"
+        - $ref: "#/components/parameters/default_query_offset"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Paged_PrivateMessage"
+        "400":
+          "$ref": "#/components/responses/400"
+      security:
+        - CookiesSession: []
+  "/p/pms/related-msgs/{pm_id}":
+    get:
+      tags:
+        - 私信
+      summary: Get related messages of a message
+      operationId: GetRelatedPrivateMessages
+      parameters:
+        - $ref: "#/components/parameters/path_pm_id"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/PrivateMessage"
+        "404":
+          "$ref": "#/components/responses/404"
+        "400":
+          "$ref": "#/components/responses/400"
+      security:
+        - CookiesSession: []
+  "/p/pms/counts":
+    get:
+      tags:
+        - 私信
+      summary: Count private message by types
+      operationId: CountPrivateMessageByTypes
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - unread
+                  - inbox
+                  - outbox
+                properties:
+                  unread:
+                    type: integer
+                    description: 未读数
+                    minimum: 0
+                  inbox:
+                    type: integer
+                    description: 收信数
+                    minimum: 0
+                  outbox:
+                    type: integer
+                    description: 发信数
+                    minimum: 0
+      security:
+        - CookiesSession: []
+  "/p/pms/contacts/recent":
+    get:
+      tags:
+        - 私信
+      summary: Get 15 users most recently sent messages to
+      operationId: GetRecentContacts
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/User"
+                maxItems: 15
+      security:
+        - CookiesSession: []
+  "/p/pms/read":
+    patch:
+      tags:
+        - 私信
+      summary: mark a private message read
+      operationId: MarkPrivateMessageRead
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  minimum: 1
+      responses:
+        "204":
+          "$ref": "#/components/responses/200-no-content"
+        "400":
+          "$ref": "#/components/responses/400"
+      security:
+        - CookiesSession: []
+  "/p/pms":
+    post:
+      tags:
+        - 私信
+      summary: create private messages
+      operationId: CreatePrivateMessages
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              required:
+                - title
+                - content
+                - receiver_ids
+              allOf:
+                - type: object
+                  properties:
+                    title:
+                      type: string
+                      minLength: 0
+                      maxLength: 100
+                    content:
+                      type: string
+                      minLength: 0
+                      maxLength: 1000
+                - oneOf:
+                    - type: object
+                      properties:
+                        related_id:
+                          type: integer
+                          description: 关联会话的首条
+                          minimum: 1
+                        receiver_ids:
+                          type: array
+                          description: 收信人id列表
+                          minItems: 1
+                          maxItems: 1
+                          items:
+                            type: integer
+                            minimum: 1
+                    - type: object
+                      properties:
+                        receiver_ids:
+                          type: array
+                          description: 收信人id列表
+                          minItems: 1
+                          items:
+                            type: integer
+                            minimum: 1
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/PrivateMessage"
+        "400":
+          "$ref": "#/components/responses/400"
+      security:
+        - CookiesSession: []
+    delete:
+      tags:
+        - 私信
+      summary: delete private messages
+      operationId: DeletePrivateMessages
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              required:
+                - ids
+              properties:
+                ids:
+                  type: array
+                  description: 私信id列表
+                  minItems: 1
+                  items:
+                    type: integer
+                    minimum: 1
+      responses:
+        "204":
+          "$ref": "#/components/responses/200-no-content"
+        "400":
+          "$ref": "#/components/responses/400"
+      security:
+        - CookiesSession: []
+  "/p/notifications/count":
+    get:
+      tags:
+        - 通知
+      summary: Count notifications
+      operationId: CountNotifications
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: integer
+                minimum: 0
+      security:
+        - CookiesSession: []
+
 components:
   parameters:
     default_query_limit:
@@ -569,6 +802,16 @@ components:
       description: 分页参数
       name: offset
       in: query
+
+    path_pm_id:
+      required: true
+      description: "私信 ID"
+      schema:
+        title: Private Message ID
+        minimum: 1
+        type: integer
+      name: pm_id
+      in: path
 
   schemas:
     User:
@@ -639,8 +882,54 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Comment"
+    PrivateMessage:
+      $ref: "./components/private_message.yaml"
+    Paged_PrivateMessage:
+      title: Paged[PrivateMessage]
+      type: object
+      properties:
+        total:
+          title: Total
+          type: integer
+          default: 0
+        limit:
+          title: Limit
+          type: integer
+          default: 0
+        offset:
+          title: Offset
+          type: integer
+          default: 0
+        data:
+          title: Data
+          type: array
+          items:
+            $ref: "#/components/schemas/PrivateMessage"
+          default: []
+
   securitySchemes:
     CookiesSession:
       name: sessionID
       type: apiKey
       in: cookie
+  responses:
+    200-no-content:
+      description: Successful Response
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorDetail"
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorDetail"
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorDetail"
