@@ -20,6 +20,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"
@@ -30,6 +31,7 @@ func New(
 	log *zap.Logger,
 	auth domain.AuthService,
 	session session.Manager,
+	config config.AppConfig,
 ) (Common, error) {
 	validate, trans, err := getValidator()
 	if err != nil {
@@ -38,6 +40,7 @@ func New(
 
 	log = log.Named("handler.Common")
 	return Common{
+		Config:               config,
 		session:              session,
 		auth:                 auth,
 		log:                  log,
@@ -48,6 +51,7 @@ func New(
 }
 
 type Common struct {
+	Config               config.AppConfig
 	auth                 domain.AuthService
 	skip1Log             *zap.Logger
 	log                  *zap.Logger

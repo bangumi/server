@@ -26,7 +26,8 @@
   }
 </script>
 {{else}}
-<script src="https://js.hcaptcha.com/1/api.js?hl=zh-CN" defer></script>
+<script src='https://challenges.cloudflare.com/turnstile/v0/api.js' async defer></script>
+
 <div class="container mt-5">
   <div class="row">
     <ul class="list-group error-details"></ul>
@@ -46,6 +47,7 @@
       </div>
       <div class="mb-3">
         <div class="h-captcha" data-sitekey="4874acee-9c6e-4e47-99ad-e2ea1606961f"></div>
+        <div class='cf-turnstile' data-action='login' data-sitekey='{{ .TurnstileSiteKey }}' data-theme='light'></div>
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
@@ -72,7 +74,7 @@
             body: JSON.stringify(data)
           });
           if (res.status > 300) {
-            hcaptcha.reset()
+            turnstile.reset()
             const d = await res.json()
             if (res.status === 401) {
               $(".error-details")

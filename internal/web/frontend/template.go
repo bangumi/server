@@ -57,8 +57,9 @@ var _ interface {
 } = devEngine{}
 
 type Login struct {
-	Title string
-	User  model.User
+	Title            string
+	User             model.User
+	TurnstileSiteKey string
 }
 
 type ListAccessToken struct {

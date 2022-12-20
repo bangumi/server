@@ -42,7 +42,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return h.ValidationError(c, err)
 	}
 
-	ok, err := h.captcha.Verify(c.UserContext(), r.HCaptchaResponse)
+	ok, err := h.captcha.Verify(c.UserContext(), r.CaptchaResponse)
 	if err != nil {
 		return res.FromError(c, err, http.StatusBadGateway, "Failed to connect to hCaptcha server")
 	}
@@ -51,7 +51,7 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return res.JSON(c.Status(http.StatusBadRequest), res.Error{
 			Title:       utils.StatusMessage(http.StatusBadRequest),
 			Description: "can't validate request body",
-			Details:     []string{"未通过hCaptcha验证"},
+			Details:     []string{"未通过captcha验证"},
 		})
 	}
 

@@ -15,9 +15,9 @@
 package req
 
 type UserLogin struct {
-	Email            string `json:"email" validate:"required,email"`
-	Password         string `json:"password" validate:"required"`
-	HCaptchaResponse string `json:"h-captcha-response" validate:"required"` //nolint:tagliatelle
+	Email           string `json:"email" validate:"required,email"`
+	Password        string `json:"password" validate:"required"`
+	CaptchaResponse string `json:"cf-turnstile-response" validate:"required"` //nolint:tagliatelle
 }
 
 type CreatePersonalAccessToken struct {

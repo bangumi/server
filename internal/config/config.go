@@ -45,7 +45,8 @@ type AppConfig struct {
 	MeiliSearchURL string `yaml:"meilisearch_url" env:"MEILISEARCH_URL"`
 	MeiliSearchKey string `yaml:"meilisearch_key" env:"MEILISEARCH_KEY"`
 
-	HCaptchaSecretKey string `yaml:"hcaptcha_secret_key" env:"HCAPTCHA_SECRET_KEY"`
+	TurnstileSecretKey string `env:"TURNSTILE_SECRET_KEY" env-default:"1x0000000000000000000000000000000AA"`
+	TurnstileSiteKey   string `env:"TURNSTILE_SITE_KEY" env-default:"1x00000000000000000000AA"`
 
 	SlowSQLDuration time.Duration `yaml:"slow_sql_duration" env:"SLOW_SQL_DURATION"`
 

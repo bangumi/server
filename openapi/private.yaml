@@ -22,9 +22,11 @@ paths:
       summary: 登录
       operationId: login
       description: |
-        `h-captcha-response` 是 [hCaptcha 的验证码](https://docs.hcaptcha.com/#add-the-hcaptcha-widget-to-your-webpage)
+        `cf-turnstile-response` 是 cloudflare turnstile 的验证码。
 
-        site key 是 `4874acee-9c6e-4e47-99ad-e2ea1606961f`
+        bgm.tv 的 site key 是 `0x4AAAAAAABkMYinukE8nzYS`
+
+        其他域名的 site key 都是测试用 key `1x00000000000000000000AA`
       requestBody:
         content:
           application/json:
@@ -33,13 +35,13 @@ paths:
               required:
                 - email
                 - password
-                - h-captcha-response
+                - cf-turnstile-response
               properties:
                 email:
                   type: string
                 password:
                   type: string
-                h-captcha-response:
+                cf-turnstile-response:
                   type: string
       responses:
         "200":

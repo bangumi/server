@@ -27,8 +27,8 @@ import (
 func TestLoginPass(t *testing.T) {
 	t.Parallel()
 	var testCase = []req.UserLogin{
-		{Email: "a@b.com", Password: "qa", HCaptchaResponse: "qe"},
-		{Email: "abc@abc.com", Password: "qqqqqqqq", HCaptchaResponse: "q"},
+		{Email: "a@b.com", Password: "qa", CaptchaResponse: "qe"},
+		{Email: "abc@abc.com", Password: "qqqqqqqq", CaptchaResponse: "q"},
 	}
 	validate := validator.New()
 	for i, login := range testCase {
@@ -43,10 +43,10 @@ func TestLoginPass(t *testing.T) {
 func TestLoginErr(t *testing.T) {
 	t.Parallel()
 	var testCase = []req.UserLogin{
-		{Email: "b", Password: "qa", HCaptchaResponse: "qe"},
-		{Email: "1", Password: "qqqqq", HCaptchaResponse: "q"},
-		{Email: "abc@abc.com", Password: "", HCaptchaResponse: "q"},
-		{Email: "abc@abc.com", Password: "q", HCaptchaResponse: ""},
+		{Email: "b", Password: "qa", CaptchaResponse: "qe"},
+		{Email: "1", Password: "qqqqq", CaptchaResponse: "q"},
+		{Email: "abc@abc.com", Password: "", CaptchaResponse: "q"},
+		{Email: "abc@abc.com", Password: "q", CaptchaResponse: ""},
 	}
 	validate := validator.New()
 	for i, login := range testCase {
