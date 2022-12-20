@@ -15,11 +15,11 @@
 package frontend
 
 import (
-	"html/template"
 	"io"
 	"math/rand"
 	"time"
 
+	"github.com/bangumi/server/internal/config/env"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/oauth"
@@ -40,13 +40,21 @@ func filters() map[string]any {
 	}
 }
 
-type TemplateEngine struct {
-	t *template.Template
+func NewTemplateEngine() (TemplateEngine, error) {
+	if env.Development {
+		return newDevTemplateEngine()
+	}
+
+	return newProdTemplateEngine()
+}
+
+type TemplateEngine interface {
+	Execute(w io.Writer, name string, data any) error
 }
 
 var _ interface {
 	Execute(w io.Writer, name string, data any) error
-} = TemplateEngine{}
+} = devEngine{}
 
 type Login struct {
 	Title string

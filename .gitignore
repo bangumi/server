@@ -1,7 +1,6 @@
 .idea
 .vscode
 
-env
 .env
 .envrc
 

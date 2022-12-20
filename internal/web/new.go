@@ -34,6 +34,7 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/config/env"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
@@ -72,7 +73,7 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 		return err
 	})
 
-	if config.Development {
+	if env.Development {
 		app.Use(func(c *fiber.Ctx) error {
 			devRequestID := "fake-ray-" + random.Base62String(10)
 			c.Request().Header.Set(cf.HeaderRequestID, devRequestID)
@@ -91,7 +92,7 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 	app.Get("/metrics", adaptor.HTTPHandler(reporter.HTTPHandler()))
 	addProfile(app)
 
-	if config.Development {
+	if env.Development {
 		app.Use("/openapi/", openapiHandler)
 	}
 
@@ -109,7 +110,7 @@ func addProfile(app *fiber.App) {
 func Start(c config.AppConfig, app *fiber.App) error {
 	addr := c.ListenAddr()
 	logger.Infoln("http server listening at", addr)
-	if config.Development {
+	if env.Development {
 		fmt.Printf("\nvisit http://%s/\n\n", strings.ReplaceAll(addr, "0.0.0.0", "127.0.0.1"))
 	}
 

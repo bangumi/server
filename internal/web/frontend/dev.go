@@ -12,8 +12,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build dev
+package frontend
 
-package config
+// dev file to avoid rebuild whole application when only editing template and static files.
 
-const Development = true
+import (
+	"html/template"
+	"io"
+
+	"github.com/Masterminds/sprig/v3"
+)
+
+type devEngine struct {
+}
+
+func newDevTemplateEngine() (TemplateEngine, error) {
+	return devEngine{}, nil
+}
+
+func (e devEngine) Execute(w io.Writer, name string, data any) error {
+	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).
+		ParseGlob("./internal/web/frontend/templates/**.gohtml")
+	if err != nil {
+		return err
+	}
+
+	return t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
+}

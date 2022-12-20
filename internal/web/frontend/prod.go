@@ -12,8 +12,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev
-
 package frontend
 
 import (
@@ -26,18 +24,21 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-//go:embed templates
-var templateFS embed.FS
+var templateFS embed.FS //nolint:gochecknoglobals
 
-func NewTemplateEngine() (TemplateEngine, error) {
-	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).ParseFS(templateFS, "templates/**.gohtml")
-	if err != nil {
-		return TemplateEngine{}, errgo.Wrap(err, "template")
-	}
-
-	return TemplateEngine{t: t}, nil
+type prodEngine struct {
+	t *template.Template
 }
 
-func (e TemplateEngine) Execute(w io.Writer, name string, data any) error {
+func newProdTemplateEngine() (TemplateEngine, error) {
+	t, err := template.New("").Funcs(filters()).Funcs(sprig.FuncMap()).ParseFS(templateFS, "templates/**.gohtml")
+	if err != nil {
+		return prodEngine{}, errgo.Wrap(err, "template")
+	}
+
+	return prodEngine{t: t}, nil
+}
+
+func (e prodEngine) Execute(w io.Writer, name string, data any) error {
 	return e.t.ExecuteTemplate(w, name, data) //nolint:wrapcheck
 }

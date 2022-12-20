@@ -12,20 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build dev
-
-package web
+package env
 
 import (
-	_ "embed" //nolint:revive
-
-	"github.com/gofiber/fiber/v2"
+	"os"
 )
 
-//go:embed index.html
-var indexPageHTML []byte
-
-func indexPage(c *fiber.Ctx) error {
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
-	return c.Send(indexPageHTML)
-}
+var Production = os.Getenv("APP_ENV") == "production"
+var Development = os.Getenv("APP_ENV") != "production"
+var Stage = os.Getenv("APP_ENV") == "stage"

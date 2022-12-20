@@ -12,8 +12,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//go:build !dev && !test
-
 package logger
 
 import (
@@ -27,7 +25,7 @@ import (
 )
 
 // production log config.
-func getLogger(level zapcore.Level) *zap.Logger {
+func jsonLogger(level zapcore.Level) *zap.Logger {
 	prod := zapcore.EncoderConfig{
 		TimeKey:       timeKey,
 		NameKey:       nameKey,
