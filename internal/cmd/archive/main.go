@@ -26,7 +26,6 @@ import (
 	"github.com/bytedance/sonic/encoder"
 	"github.com/go-sql-driver/mysql"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -43,6 +42,8 @@ import (
 
 const defaultStep = 50
 
+var out string
+
 var Command = &cobra.Command{
 	Use:   "archive",
 	Short: "create a wiki dump",
@@ -51,16 +52,16 @@ var Command = &cobra.Command{
 			return errgo.Wrap(err, "can't replace mysql driver's errLog")
 		}
 
-		fmt.Println("dumping data with args:", os.Args)
-
-		var out string
-		pflag.StringVar(&out, "out", "archive.zip", "zip file output location")
-		pflag.Parse()
+		fmt.Println("dumping data with args:", args)
 
 		start(out)
 
 		return nil
 	},
+}
+
+func init() {
+	Command.Flags().StringVar(&out, "out", "archive.zip", "zip file output location")
 }
 
 var ctx = context.Background() //nolint:gochecknoglobals

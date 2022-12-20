@@ -30,7 +30,7 @@
       "**_test.go",
       ".git"
     ],
-    "exec": "godotenv go run main.go",
+    "exec": "godotenv go run main.go web --config config.yaml",
     "ext": "go,json,html"
   }
 }

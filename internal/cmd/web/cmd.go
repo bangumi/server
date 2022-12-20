@@ -35,10 +35,12 @@ import (
 	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/metrics"
+	"github.com/bangumi/server/internal/notification"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
@@ -85,7 +87,7 @@ func start() error {
 
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
-			topic.NewMysqlRepo, timeline.NewMysqlRepo,
+			topic.NewMysqlRepo, timeline.NewMysqlRepo, pm.NewMysqlRepo, notification.NewMysqlRepo,
 
 			dam.New,
 
