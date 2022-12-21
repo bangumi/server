@@ -23,7 +23,6 @@ type TimeLine struct {
 	Source   uint8            `gorm:"column:tml_source;type:tinyint(3) unsigned;not null"`    // 更新来源
 	Replies  uint32           `gorm:"column:tml_replies;type:mediumint(8) unsigned;not null"` // 回复数
 	Dateline uint32           `gorm:"column:tml_dateline;type:int(10) unsigned;not null"`
-	Status   uint8            `gorm:"column:tml_status;type:tinyint(3) unsigned;not null"`
 }
 
 // TableName TimeLine's table name

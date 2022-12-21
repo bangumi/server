@@ -18,9 +18,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
+	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
@@ -32,6 +34,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/subject"
 )
 
 var _ domain.CollectionRepo = mysqlRepo{}
@@ -239,7 +242,52 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		return errgo.Wrap(err, "SubjectCollection.Update")
 	}
 
-	return nil
+	if data.Tags == nil {
+		return nil
+	}
+
+	return r.updateSubjectTags(ctx, subjectID)
+}
+
+func (r mysqlRepo) updateSubjectTags(ctx context.Context, subjectID model.SubjectID) error {
+	collections, err := r.q.SubjectCollection.WithContext(ctx).Where(r.q.SubjectCollection.SubjectID.Eq(subjectID)).Find()
+	if err != nil {
+		return errgo.Wrap(err, "failed to get all collection")
+	}
+
+	var tags = make(map[string]int)
+	for _, collection := range collections {
+		for _, s := range strings.Split(collection.Tag, " ") {
+			if s == "" {
+				continue
+			}
+			tags[s]++
+		}
+	}
+
+	var phpTags = make([]subject.Tag, 0, len(tags))
+
+	for name, count := range tags {
+		name := name
+		phpTags = append(phpTags, subject.Tag{
+			Name:  &name,
+			Count: count,
+		})
+	}
+
+	sort.Slice(phpTags, func(i, j int) bool {
+		return phpTags[i].Count >= phpTags[j].Count
+	})
+
+	newTag, err := phpserialize.Marshal(phpTags)
+	if err != nil {
+		return errgo.Wrap(err, "php.Marshal")
+	}
+
+	_, err = r.q.SubjectField.WithContext(ctx).Where(r.q.SubjectField.Sid.Eq(subjectID)).
+		UpdateSimple(r.q.SubjectField.Tags.Value(newTag))
+
+	return errgo.Wrap(err, "failed to update subject field")
 }
 
 func (r mysqlRepo) subjectCollectionUpdater(t model.SubjectCollection, at time.Time) (field.AssignExpr, error) {
