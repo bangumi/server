@@ -284,7 +284,11 @@ func (r mysqlRepo) updateSubjectTags(ctx context.Context, subjectID model.Subjec
 	}
 
 	sort.Slice(phpTags, func(i, j int) bool {
-		return phpTags[i].Count >= phpTags[j].Count
+		if phpTags[i].Count != phpTags[j].Count {
+			return phpTags[i].Count > phpTags[j].Count
+		}
+
+		return *phpTags[i].Name > *phpTags[j].Name
 	})
 
 	newTag, err := phpserialize.Marshal(phpTags)
