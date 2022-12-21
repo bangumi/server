@@ -17,6 +17,7 @@ package subject
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math"
 
 	"go.uber.org/zap"
@@ -49,7 +50,7 @@ func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID, filter Filter) (
 	s, err := q.First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Subject{}, domain.ErrNotFound
+			return model.Subject{}, fmt.Errorf("%w: %d", domain.ErrNotFound, id)
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))

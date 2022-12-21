@@ -112,7 +112,11 @@ func (ctl Ctrl) saveTimeLineSubject(
 	req UpdateCollectionRequest,
 	tx *query.Query,
 ) error {
-	sj, err := ctl.subject.Get(ctx, subjectID, subject.Filter{NSFW: null.NewBool(u.AllowNSFW())})
+	if !(req.VolStatus.Set || req.EpStatus.Set) {
+		return nil
+	}
+
+	sj, err := ctl.subject.Get(ctx, subjectID, subject.Filter{NSFW: null.Bool{Value: true, Set: !u.AllowNSFW()}})
 	if err != nil {
 		return errgo.Wrap(err, "subject.Get")
 	}

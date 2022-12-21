@@ -23,6 +23,7 @@ import (
 )
 
 type Filter struct {
+	// if nsfw subject are allowed
 	NSFW null.Bool
 }
 
