@@ -246,11 +246,19 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		return nil
 	}
 
+	if data.Privacy.Value == model.CollectPrivacyBan {
+		return nil
+	}
+
 	return r.updateSubjectTags(ctx, subjectID)
 }
 
 func (r mysqlRepo) updateSubjectTags(ctx context.Context, subjectID model.SubjectID) error {
-	collections, err := r.q.SubjectCollection.WithContext(ctx).Where(r.q.SubjectCollection.SubjectID.Eq(subjectID)).Find()
+	collections, err := r.q.SubjectCollection.WithContext(ctx).
+		Where(
+			r.q.SubjectCollection.SubjectID.Eq(subjectID),
+			r.q.SubjectCollection.Private.Neq(uint8(model.CollectPrivacyBan)),
+		).Find()
 	if err != nil {
 		return errgo.Wrap(err, "failed to get all collection")
 	}
