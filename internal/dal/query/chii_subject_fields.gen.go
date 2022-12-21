@@ -27,7 +27,7 @@ func newSubjectField(db *gorm.DB, opts ...gen.DOOption) subjectField {
 
 	tableName := _subjectField.subjectFieldDo.TableName()
 	_subjectField.ALL = field.NewAsterisk(tableName)
-	_subjectField.Sid = field.NewUint32(tableName, "field_sid")
+	_subjectField.Sid = field.NewField(tableName, "field_sid")
 	_subjectField.Tid = field.NewUint16(tableName, "field_tid")
 	_subjectField.Tags = field.NewBytes(tableName, "field_tags")
 	_subjectField.Rate1 = field.NewUint32(tableName, "field_rate_1")
@@ -57,7 +57,7 @@ type subjectField struct {
 	subjectFieldDo subjectFieldDo
 
 	ALL      field.Asterisk
-	Sid      field.Uint32
+	Sid      field.Field
 	Tid      field.Uint16
 	Tags     field.Bytes
 	Rate1    field.Uint32
@@ -93,7 +93,7 @@ func (s subjectField) As(alias string) *subjectField {
 
 func (s *subjectField) updateTableName(table string) *subjectField {
 	s.ALL = field.NewAsterisk(table)
-	s.Sid = field.NewUint32(table, "field_sid")
+	s.Sid = field.NewField(table, "field_sid")
 	s.Tid = field.NewUint16(table, "field_tid")
 	s.Tags = field.NewBytes(table, "field_tags")
 	s.Rate1 = field.NewUint32(table, "field_rate_1")

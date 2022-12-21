@@ -38,7 +38,6 @@ func newTimeLine(db *gorm.DB, opts ...gen.DOOption) timeLine {
 	_timeLine.Source = field.NewUint8(tableName, "tml_source")
 	_timeLine.Replies = field.NewUint32(tableName, "tml_replies")
 	_timeLine.Dateline = field.NewUint32(tableName, "tml_dateline")
-	_timeLine.Status = field.NewUint8(tableName, "tml_status")
 
 	_timeLine.fillFieldMap()
 
@@ -60,7 +59,6 @@ type timeLine struct {
 	Source   field.Uint8  // 更新来源
 	Replies  field.Uint32 // 回复数
 	Dateline field.Uint32
-	Status   field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -88,7 +86,6 @@ func (t *timeLine) updateTableName(table string) *timeLine {
 	t.Source = field.NewUint8(table, "tml_source")
 	t.Replies = field.NewUint32(table, "tml_replies")
 	t.Dateline = field.NewUint32(table, "tml_dateline")
-	t.Status = field.NewUint8(table, "tml_status")
 
 	t.fillFieldMap()
 
@@ -111,7 +108,7 @@ func (t *timeLine) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (t *timeLine) fillFieldMap() {
-	t.fieldMap = make(map[string]field.Expr, 12)
+	t.fieldMap = make(map[string]field.Expr, 11)
 	t.fieldMap["tml_id"] = t.ID
 	t.fieldMap["tml_uid"] = t.UID
 	t.fieldMap["tml_cat"] = t.Cat
@@ -123,7 +120,6 @@ func (t *timeLine) fillFieldMap() {
 	t.fieldMap["tml_source"] = t.Source
 	t.fieldMap["tml_replies"] = t.Replies
 	t.fieldMap["tml_dateline"] = t.Dateline
-	t.fieldMap["tml_status"] = t.Status
 }
 
 func (t timeLine) clone(db *gorm.DB) timeLine {

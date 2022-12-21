@@ -14,7 +14,7 @@ const TableNameSubjectField = "chii_subject_fields"
 
 // SubjectField mapped from table <chii_subject_fields>
 type SubjectField struct {
-	Sid      uint32          `gorm:"column:field_sid;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
+	Sid      model.SubjectID `gorm:"column:field_sid;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
 	Tid      uint16          `gorm:"column:field_tid;type:smallint(6) unsigned;not null"`
 	Tags     []byte          `gorm:"column:field_tags;type:mediumtext;not null"`
 	Rate1    uint32          `gorm:"column:field_rate_1;type:mediumint(8) unsigned;not null"`
