@@ -41,13 +41,12 @@ jobs:
           path: dev-docs
 
       - run: cp ./dist/private.yaml ./dev-docs/api.yaml
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
-        with:
-          path: dev-docs
-          token: ${{ secrets.PAT }}
-          title: Update Openapi Specification from bangumi/server
-          push-to-fork: Trim21-bot/dev-docs
-          branch: "update-upstream"
-          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+#      - name: Create Pull Request
+#        uses: peter-evans/create-pull-request@v4
+#        with:
+#          path: dev-docs
+#          token: ${{ secrets.PAT }}
+#          title: Update Openapi Specification from bangumi/server
+#          push-to-fork: Trim21-bot/dev-docs
+#          branch: "update-upstream"
+#          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
