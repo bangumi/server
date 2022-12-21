@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -273,6 +274,10 @@ func (r mysqlRepo) updateSubjectTags(ctx context.Context, subjectID model.Subjec
 			Count: count,
 		})
 	}
+
+	sort.Slice(phpTags, func(i, j int) bool {
+		return phpTags[i].Count >= phpTags[j].Count
+	})
 
 	newTag, err := phpserialize.Marshal(phpTags)
 	if err != nil {
