@@ -276,14 +276,13 @@ func (r mysqlRepo) updateSubjectTags(ctx context.Context, subjectID model.Subjec
 
 	newTag, err := phpserialize.Marshal(phpTags)
 	if err != nil {
-		return err
+		return errgo.Wrap(err, "php.Marshal")
 	}
 
 	_, err = r.q.SubjectField.WithContext(ctx).Where(r.q.SubjectField.Sid.Eq(subjectID)).
 		UpdateSimple(r.q.SubjectField.Tags.Value(newTag))
 
 	return errgo.Wrap(err, "failed to update subject field")
-
 }
 
 func (r mysqlRepo) subjectCollectionUpdater(t model.SubjectCollection, at time.Time) (field.AssignExpr, error) {
