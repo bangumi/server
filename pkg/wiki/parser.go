@@ -188,12 +188,12 @@ func readArrayItem(line string) (string, string, error) {
 
 	content := line[1 : len(line)-1]
 
-	i := strings.IndexByte(content, '|')
-	if i == -1 {
+	before, after, found := strings.Cut(content, "|")
+	if !found {
 		return "", trimSpace(content), nil
 	}
 
-	return trimSpace(content[:i]), trimSpace(content[i+1:]), nil
+	return trimSpace(before), trimSpace(after), nil
 }
 
 // read line without leading '|' as key value pair, spaces are trimmed.
@@ -201,10 +201,10 @@ func readArrayItem(line string) (string, string, error) {
 //	readStartLine("播放日期 = 2017年4月16日") => 播放日期, 2017年4月16日, nil
 //	readStartLine("播放日期 = ") => 播放日期, "", nil
 func readStartLine(line string) (string, string, error) {
-	i := strings.IndexByte(line, '=')
-	if i == -1 {
+	before, after, found := strings.Cut(line, "=")
+	if !found {
 		return "", "", ErrExpectingSignEqual
 	}
 
-	return trimRightSpace(line[:i]), trimLeftSpace(line[i+1:]), nil
+	return trimRightSpace(before), trimLeftSpace(after), nil
 }
