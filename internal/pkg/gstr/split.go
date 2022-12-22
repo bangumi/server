@@ -16,19 +16,6 @@ package gstr
 
 import "strings"
 
-// Partition split string in 2 part.
-//
-//	Partition("1=2", '=') => "1", "2"
-//	Partition("123", '=') => "123", ""
-func Partition(s string, c byte) (string, string) {
-	i := strings.IndexByte(s, c)
-	if i == -1 {
-		return s, ""
-	}
-
-	return s[:i], s[i+1:]
-}
-
 func Split(s string, c string) []string {
 	split := strings.Split(s, c)
 
