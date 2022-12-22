@@ -16,12 +16,12 @@ package common
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"
@@ -35,25 +35,31 @@ func (h Common) MiddlewareAccessTokenAuth(ctx *fiber.Ctx) error {
 	a.FillBasicInfo(ctx)
 
 	authorization := ctx.Get(fiber.HeaderAuthorization)
-	if authorization != "" {
-		key, token := gstr.Partition(authorization, ' ')
-		if key != "Bearer" {
-			return res.Unauthorized("http Authorization header has wrong scope")
-		}
-
-		var auth domain.Auth
-		var err error
-		if auth, err = h.auth.GetByToken(ctx.Context(), token); err != nil {
-			if errors.Is(err, domain.ErrNotFound) || errors.Is(err, session.ErrExpired) {
-				cookie.Clear(ctx, session.CookieKey)
-				return res.Unauthorized("access token has been expired or doesn't exist")
-			}
-
-			return errgo.Wrap(err, "auth.GetByToken")
-		}
-
-		a.SetAuth(auth)
+	if authorization == "" {
+		ctx.Context().SetUserValue(ctxkey.User, a)
+		return ctx.Next()
 	}
+
+	key, token, found := strings.Cut(authorization, " ")
+	if !found {
+		return res.Unauthorized("invalid http Authorization header, missing scope or missing token")
+	}
+
+	if key != "Bearer" {
+		return res.Unauthorized("http Authorization header has wrong scope")
+	}
+
+	auth, err := h.auth.GetByToken(ctx.Context(), token)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) || errors.Is(err, session.ErrExpired) {
+			cookie.Clear(ctx, session.CookieKey)
+			return res.Unauthorized("access token has been expired or doesn't exist")
+		}
+
+		return errgo.Wrap(err, "auth.GetByToken")
+	}
+
+	a.SetAuth(auth)
 
 	ctx.Context().SetUserValue(ctxkey.User, a)
 	return ctx.Next()
