@@ -49,9 +49,8 @@ func (h Common) MiddlewareAccessTokenAuth(ctx *fiber.Ctx) error {
 		return res.Unauthorized("http Authorization header has wrong scope")
 	}
 
-	var auth domain.Auth
-	var err error
-	if auth, err = h.auth.GetByToken(ctx.Context(), token); err != nil {
+	auth, err := h.auth.GetByToken(ctx.Context(), token)
+	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) || errors.Is(err, session.ErrExpired) {
 			cookie.Clear(ctx, session.CookieKey)
 			return res.Unauthorized("access token has been expired or doesn't exist")
