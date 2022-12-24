@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/uber-go/tally/v4"
 	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
@@ -61,8 +62,13 @@ func ResponseTimeBucket() tally.Buckets {
 	}
 }
 
-func NewScope(lc fx.Lifecycle) (tally.Scope, promreporter.Reporter, prometheus.Registerer) {
-	r := promreporter.NewReporter(promreporter.Options{})
+func NewScope(lc fx.Lifecycle) (tally.Scope, promreporter.Reporter, prometheus.Registerer, prometheus.Gatherer) {
+	reg := prometheus.NewRegistry()
+
+	reg.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	reg.MustRegister(collectors.NewGoCollector())
+
+	r := promreporter.NewReporter(promreporter.Options{Registerer: reg, Gatherer: reg})
 	scope, closer := tally.NewRootScope(tally.ScopeOptions{
 		Prefix:         "chii",
 		Tags:           map[string]string{},
@@ -74,5 +80,5 @@ func NewScope(lc fx.Lifecycle) (tally.Scope, promreporter.Reporter, prometheus.R
 		return errgo.Wrap(closer.Close(), "close tally")
 	}})
 
-	return scope, r, prometheus.DefaultRegisterer
+	return scope, r, reg, reg
 }

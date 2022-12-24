@@ -19,9 +19,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/segmentio/kafka-go"
-	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
 
 	"github.com/bangumi/server/internal/cache"
@@ -39,7 +39,8 @@ import (
 
 func Main() error {
 	var h *eventHandler
-	var reporter promreporter.Reporter
+	var registerer prometheus.Registerer
+	var gatherer prometheus.Gatherer
 
 	di := fx.New(
 		fx.NopLogger,
@@ -55,7 +56,7 @@ func Main() error {
 			newKafkaReader, newEventHandler,
 		),
 
-		fx.Populate(&h, &reporter),
+		fx.Populate(&h, &registerer, &gatherer),
 	)
 
 	if err := di.Err(); err != nil {
@@ -66,7 +67,7 @@ func Main() error {
 
 	// metrics http reporter
 	mux := http.NewServeMux()
-	mux.Handle("/metrics", promhttp.Handler())
+	mux.Handle("/metrics", promhttp.HandlerFor(gatherer, promhttp.HandlerOpts{Registry: registerer}))
 	srv := &http.Server{Addr: h.config.ListenAddr(), Handler: mux, ReadHeaderTimeout: time.Second}
 	go func() { errChan <- errgo.Wrap(srv.ListenAndServe(), "http") }()
 	defer srv.Shutdown(context.Background()) //nolint:errcheck
