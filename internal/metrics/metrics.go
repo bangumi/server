@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//nolint:gomnd
+//nolint:gomnd,gochecknoinits,gochecknoglobals
 package metrics
 
 import (
@@ -20,8 +20,8 @@ import (
 )
 
 func init() {
-	prometheus.DefaultRegisterer.MustRegister(RequestCount)
-	prometheus.DefaultRegisterer.MustRegister(RequestHistogram)
+	prometheus.MustRegister(RequestCount)
+	prometheus.MustRegister(RequestHistogram)
 	prometheus.MustRegister(SQLHistogram)
 }
 
@@ -33,41 +33,41 @@ var RequestCount = prometheus.NewCounter(prometheus.CounterOpts{
 
 var RequestHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 	Subsystem: "chii",
-	Name:      "response_time_ms",
+	Name:      "response_time_seconds",
 	Help:      "web response time",
 	Buckets: []float64{
-		1,
-		5,
-		10,
-		20,
-		50,
-		100,
-		200,
-		300,
-		500,
-		1000,
+		0.001,
+		0.005,
+		0.010,
+		0.020,
+		0.050,
+		0.100,
+		0.200,
+		0.300,
+		0.500,
+		1.000,
 	},
 })
 
 var SQLHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 	Subsystem: "chii",
-	Name:      "sql_time_ms",
+	Name:      "sql_time_seconds",
 	Help:      "sql execution time",
 	Buckets: []float64{
-		1,
-		2,
-		3,
-		4,
-		5,
-		10,
-		20,
-		30,
-		40,
-		50,
-		100,
-		200,
-		300,
-		500,
-		1000,
+		0.001,
+		0.002,
+		0.003,
+		0.004,
+		0.005,
+		0.010,
+		0.020,
+		0.030,
+		0.040,
+		0.050,
+		0.100,
+		0.200,
+		0.300,
+		0.500,
+		1.000,
 	},
 })

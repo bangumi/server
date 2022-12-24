@@ -63,9 +63,9 @@ func New() *fiber.App {
 
 		err := c.Next()
 
-		ms := time.Since(start).Milliseconds()
-		metrics.RequestHistogram.Observe(float64(ms))
-		c.Set(headerProcessTime, strconv.FormatInt(ms, 10))
+		sub := time.Since(start)
+		metrics.RequestHistogram.Observe(sub.Seconds())
+		c.Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
 		c.Set(headerServerVersion, config.Version)
 		return err
 	})

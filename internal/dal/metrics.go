@@ -45,7 +45,7 @@ func setupMetrics(db *gorm.DB, conn *sql.DB) error {
 	prometheus.MustRegister(prometheus.NewGaugeFunc(
 		prometheus.GaugeOpts{
 			Subsystem: "chii",
-			Name:      "db_open_connections_total",
+			Name:      "db_open_connections",
 			Help:      "opened connections",
 		},
 		func() float64 {

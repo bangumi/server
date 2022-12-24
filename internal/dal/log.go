@@ -79,7 +79,7 @@ func (l *metricsLog) LogMode(level gormLogger.LogLevel) gormLogger.Interface {
 
 func (l *metricsLog) Trace(_ context.Context, begin time.Time, fc func() (sql string, rows int64), err error) {
 	elapsed := time.Since(begin)
-	l.h.Observe(float64(elapsed.Milliseconds()))
+	l.h.Observe(elapsed.Seconds())
 
 	switch {
 	case err != nil && !errors.Is(err, gorm.ErrRecordNotFound):
