@@ -53,6 +53,7 @@ jobs:
           key: go-cache-119-${{ hashFiles('**/go.sum') }}-build
           restore-keys: |
             go-cache-119-${{ hashFiles('**/go.sum') }}-
+            go-cache-119-
 
       - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
