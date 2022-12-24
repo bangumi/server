@@ -91,7 +91,9 @@ func (e *eventHandler) start() error {
 
 func (e *eventHandler) Close() error {
 	e.closed.Store(true)
-	return errgo.Wrap(e.reader.Close(), "kafka.Close")
+	err := errgo.Wrap(e.reader.Close(), "kafka.Close")
+	e.search.Close()
+	return err
 }
 
 func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {

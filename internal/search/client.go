@@ -118,6 +118,12 @@ type client struct {
 	queue        *queue.Batched[subjectIndex]
 }
 
+func (c *client) Close() {
+	if c.queue != nil {
+		c.queue.Close()
+	}
+}
+
 // OnSubjectUpdate is the hook called by canal.
 func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
 	s, err := c.subjectRepo.Get(ctx, id, subject.Filter{})

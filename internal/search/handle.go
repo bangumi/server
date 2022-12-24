@@ -38,6 +38,7 @@ import (
 type Client interface {
 	Handler
 	OnSubjectUpdate(ctx context.Context, id model.SubjectID) error
+	Close()
 	OnSubjectDelete(ctx context.Context, id model.SubjectID) error
 }
 

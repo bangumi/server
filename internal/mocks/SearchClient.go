@@ -27,6 +27,33 @@ func (_m *SearchClient) EXPECT() *SearchClient_Expecter {
 	return &SearchClient_Expecter{mock: &_m.Mock}
 }
 
+// Close provides a mock function with given fields:
+func (_m *SearchClient) Close() {
+	_m.Called()
+}
+
+// SearchClient_Close_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Close'
+type SearchClient_Close_Call struct {
+	*mock.Call
+}
+
+// Close is a helper method to define mock.On call
+func (_e *SearchClient_Expecter) Close() *SearchClient_Close_Call {
+	return &SearchClient_Close_Call{Call: _e.mock.On("Close")}
+}
+
+func (_c *SearchClient_Close_Call) Run(run func()) *SearchClient_Close_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *SearchClient_Close_Call) Return() *SearchClient_Close_Call {
+	_c.Call.Return()
+	return _c
+}
+
 // Handle provides a mock function with given fields: ctx, auth
 func (_m *SearchClient) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 	ret := _m.Called(ctx, auth)

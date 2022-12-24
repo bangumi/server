@@ -39,3 +39,6 @@ func (n NoopClient) OnSubjectUpdate(ctx context.Context, id model.SubjectID) err
 func (n NoopClient) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
 	return nil
 }
+
+func (n NoopClient) Close() {
+}
