@@ -2,9 +2,10 @@ module tools
 
 go 1.19
 
-require github.com/vektra/mockery/v2 v2.15.0
+require github.com/vektra/mockery/v2 v2.16.0
 
 require (
+	github.com/chigopher/pathlib v0.12.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
