@@ -27,6 +27,7 @@ import (
 
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/samber/lo"
 	"github.com/trim21/pkg/queue"
 	"go.uber.org/zap"
 
@@ -95,7 +96,17 @@ func (c *client) canalInit(cfg config.AppConfig) error {
 		return fmt.Errorf("config.SearchBatchInterval should >= 0, current %d", cfg.SearchBatchInterval)
 	}
 
-	c.queue = queue.NewBatched[subjectIndex](c.sendBatch, cfg.SearchBatchSize, cfg.SearchBatchInterval)
+	c.queue = queue.NewBatchedDedupe[subjectIndex](
+		c.sendBatch,
+		cfg.SearchBatchSize,
+		cfg.SearchBatchInterval,
+		func(items []subjectIndex) []subjectIndex {
+			// lo.UniqBy 会保留第一次出现的元素，reverse 之后会保留新的数据
+			return lo.UniqBy(lo.Reverse(items), func(item subjectIndex) model.SubjectID {
+				return item.ID
+			})
+		},
+	)
 
 	prometheus.DefaultRegisterer.MustRegister(
 		prometheus.NewGaugeFunc(
