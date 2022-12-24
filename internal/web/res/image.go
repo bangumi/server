@@ -75,11 +75,12 @@ func SubjectImage(s string) SubjectImages {
 	}
 
 	return SubjectImages{
-		Grid:   "https://lain.bgm.tv/pic/cover/g/" + s,
-		Small:  "https://lain.bgm.tv/pic/cover/s/" + s,
-		Common: "https://lain.bgm.tv/pic/cover/c/" + s,
-		Large:  "https://lain.bgm.tv/pic/cover/l/" + s,
-		Medium: "https://lain.bgm.tv/pic/cover/m/" + s,
+		Large: "https://lain.bgm.tv/pic/cover/l/" + s,
+
+		Grid:   "https://lain.bgm.tv/r/100/pic/cover/l/" + s,
+		Small:  "https://lain.bgm.tv/r/200/pic/cover/l/" + s,
+		Common: "https://lain.bgm.tv/r/400/pic/cover/l/" + s,
+		Medium: "https://lain.bgm.tv/r/800/pic/cover/l/" + s,
 	}
 }
 
@@ -89,10 +90,11 @@ func PersonImage(s string) PersonImages {
 	}
 
 	return PersonImages{
-		Grid:   "https://lain.bgm.tv/pic/crt/g/" + s,
-		Small:  "https://lain.bgm.tv/pic/crt/s/" + s,
-		Large:  "https://lain.bgm.tv/pic/crt/l/" + s,
-		Medium: "https://lain.bgm.tv/pic/crt/m/" + s,
+		Large: "https://lain.bgm.tv/pic/crt/l/" + s,
+
+		Small:  "https://lain.bgm.tv/r/100/pic/crt/l/" + s,
+		Grid:   "https://lain.bgm.tv/r/200/pic/crt/l/" + s,
+		Medium: "https://lain.bgm.tv/r/400/pic/crt/l/" + s,
 	}
 }
 
