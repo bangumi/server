@@ -27,7 +27,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.1
 	github.com/trim21/go-phpserialize v0.0.15
-	github.com/trim21/pkg v0.0.0-20221224080402-557bb5da384e
+	github.com/trim21/pkg v0.0.0-20221224085647-32d4d7a17f1b
 	github.com/uber-go/tally/v4 v4.1.4
 	github.com/valyala/bytebufferpool v1.0.0
 	go.uber.org/dig v1.15.0

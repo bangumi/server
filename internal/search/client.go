@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/meilisearch/meilisearch-go"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/trim21/pkg/queue"
 	"go.uber.org/zap"
 
@@ -95,6 +96,18 @@ func (c *client) canalInit(cfg config.AppConfig) error {
 	}
 
 	c.queue = queue.NewBatched[subjectIndex](c.sendBatch, cfg.SearchBatchSize, cfg.SearchBatchInterval)
+
+	prometheus.DefaultRegisterer.MustRegister(
+		prometheus.NewGaugeFunc(
+			prometheus.GaugeOpts{
+				Namespace: "chii",
+				Name:      "meilisearch_queue_batch",
+				Help:      "meilisearch update queue batch size",
+			},
+			func() float64 {
+				return float64(c.queue.Len())
+			},
+		))
 
 	shouldCreateIndex, err := c.needFirstRun()
 	if err != nil {

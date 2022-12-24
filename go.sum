@@ -604,8 +604,8 @@ github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/trim21/go-phpserialize v0.0.15 h1:m5Dd6P46ssSBc0DEZkNi6FJhByibaUERdxO6qrlSvfA=
 github.com/trim21/go-phpserialize v0.0.15/go.mod h1:P8ULk1Go0OQQLb2+LGihbE5cqkiX+yOUV3SZ5CoGfuI=
-github.com/trim21/pkg v0.0.0-20221224080402-557bb5da384e h1:WCkUfhQz9rM8irSUwyHJ0YBPEcVrRiL8Im3G5pSjHa0=
-github.com/trim21/pkg v0.0.0-20221224080402-557bb5da384e/go.mod h1:JrRIFidkCLeuU5j0vBP5ZN0NOp2JavagHZNr4D3AH6Q=
+github.com/trim21/pkg v0.0.0-20221224085647-32d4d7a17f1b h1:geUy6W3PrwvOkjsfi+bq64RucjJh5ZsYfvE3MvXLbpw=
+github.com/trim21/pkg v0.0.0-20221224085647-32d4d7a17f1b/go.mod h1:JrRIFidkCLeuU5j0vBP5ZN0NOp2JavagHZNr4D3AH6Q=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
 github.com/twmb/murmur3 v1.1.5/go.mod h1:Qq/R7NUyOfr65zD+6Q5IHKsJLwP7exErjN6lyyq3OSQ=
