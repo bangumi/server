@@ -26,8 +26,8 @@ import (
 	"time"
 
 	"github.com/meilisearch/meilisearch-go"
+	"github.com/trim21/pkg/queue"
 	"go.uber.org/zap"
-	"golang.org/x/time/rate"
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal/query"
@@ -41,25 +41,25 @@ import (
 //
 // see `MeiliSearchURL` and `MeiliSearchKey` in [config.AppConfig].
 func New(
-	c config.AppConfig,
+	cfg config.AppConfig,
 	subjectRepo subject.Repo,
 	log *zap.Logger,
 	query *query.Query,
 ) (Client, error) {
-	if c.MeiliSearchURL == "" {
+	if cfg.MeiliSearchURL == "" {
 		return NoopClient{}, nil
 	}
 
 	if subjectRepo == nil {
 		panic("nil SubjectRepo")
 	}
-	if _, err := url.Parse(c.MeiliSearchURL); err != nil {
+	if _, err := url.Parse(cfg.MeiliSearchURL); err != nil {
 		return nil, errgo.Wrap(err, "url.Parse")
 	}
 
 	meili := meilisearch.NewClient(meilisearch.ClientConfig{
-		Host:    c.MeiliSearchURL,
-		APIKey:  c.MeiliSearchKey,
+		Host:    cfg.MeiliSearchURL,
+		APIKey:  cfg.MeiliSearchKey,
 		Timeout: time.Second,
 	})
 
@@ -67,30 +67,45 @@ func New(
 		return nil, errgo.Wrap(err, "meilisearch")
 	}
 
-	client := &client{
+	c := &client{
 		meili:        meili,
 		q:            query,
 		subject:      "subjects",
 		subjectIndex: meili.Index("subjects"),
 		log:          log.Named("search"),
 		subjectRepo:  subjectRepo,
-		limiter:      rate.NewLimiter(rate.Every(time.Second/100), 50), //nolint:gomnd
 	}
 
-	if c.AppType != config.AppTypeCanal {
-		return client, nil
+	if cfg.AppType != config.AppTypeCanal {
+		return c, nil
 	}
 
-	shouldCreateIndex, err := client.needFirstRun()
+	return c, c.canalInit(cfg)
+}
+
+func (c *client) canalInit(cfg config.AppConfig) error {
+	if cfg.SearchBatchSize <= 0 {
+		// nolint: goerr113
+		return fmt.Errorf("config.SearchBatchSize should >= 0, current %d", cfg.SearchBatchSize)
+	}
+
+	if cfg.SearchBatchInterval <= 0 {
+		// nolint: goerr113
+		return fmt.Errorf("config.SearchBatchInterval should >= 0, current %d", cfg.SearchBatchInterval)
+	}
+
+	c.queue = queue.NewBatched[subjectIndex](c.sendBatch, cfg.SearchBatchSize, cfg.SearchBatchInterval)
+
+	shouldCreateIndex, err := c.needFirstRun()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if shouldCreateIndex {
-		go client.firstRun()
+		go c.firstRun()
 	}
 
-	return client, nil
+	return nil
 }
 
 type client struct {
@@ -100,7 +115,7 @@ type client struct {
 	subjectIndex *meilisearch.Index
 	log          *zap.Logger
 	subject      string
-	limiter      *rate.Limiter
+	queue        *queue.Batched[subjectIndex]
 }
 
 // OnSubjectUpdate is the hook called by canal.
@@ -117,7 +132,9 @@ func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 
 	extracted := extractSubject(&s)
 
-	return c.upsertSubject(ctx, extracted)
+	c.queue.Push(extracted)
+
+	return nil
 }
 
 // OnSubjectDelete is the hook called by canal.
@@ -128,13 +145,13 @@ func (c *client) OnSubjectDelete(_ context.Context, id model.SubjectID) error {
 }
 
 // UpsertSubject add subject to search backend.
-func (c *client) upsertSubject(_ context.Context, s subjectIndex) error {
-	// rate limit to avoid huge write, to avoid meilisearch timeout
-	_ = c.limiter.Wait(context.Background())
+func (c *client) sendBatch(items []subjectIndex) {
+	c.log.Debug("send batch to meilisearch", zap.Int("len", len(items)))
+	_, err := c.subjectIndex.UpdateDocuments(items, "id")
 
-	_, err := c.subjectIndex.UpdateDocuments(s, "id")
-
-	return errgo.Wrap(err, "search")
+	if err != nil {
+		c.log.Error("failed to send batch", zap.Error(err))
+	}
 }
 
 func (c *client) DeleteSubject(_ context.Context, id model.SubjectID) error {

@@ -27,13 +27,13 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.1
 	github.com/trim21/go-phpserialize v0.0.15
+	github.com/trim21/pkg v0.0.0-20221224080402-557bb5da384e
 	github.com/uber-go/tally/v4 v4.1.4
 	github.com/valyala/bytebufferpool v1.0.0
 	go.uber.org/dig v1.15.0
 	go.uber.org/fx v1.18.2
 	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.4.0
-	golang.org/x/time v0.3.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.4.4
 	gorm.io/gen v0.3.18

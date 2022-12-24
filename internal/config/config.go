@@ -48,6 +48,9 @@ type AppConfig struct {
 	TurnstileSecretKey string `env:"TURNSTILE_SECRET_KEY" env-default:"1x0000000000000000000000000000000AA"`
 	TurnstileSiteKey   string `env:"TURNSTILE_SITE_KEY" env-default:"1x00000000000000000000AA"`
 
+	SearchBatchSize     int           `env:"SEARCH_BATCH_SIZE" yaml:"search_batch_size" env-default:"100"`
+	SearchBatchInterval time.Duration `env:"SEARCH_BATCH_INTERVAL" yaml:"search_batch_interval" env-default:"10m"`
+
 	SlowSQLDuration time.Duration `yaml:"slow_sql_duration" env:"SLOW_SQL_DURATION"`
 
 	NsfwWord     string `yaml:"nsfw_word"`
