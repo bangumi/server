@@ -15,6 +15,7 @@
 package web
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -85,6 +86,8 @@ func New() *fiber.App {
 		}))
 	}
 
+	app.Use(setUserContext)
+
 	app.Use(recovery.New())
 	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 	addProfile(app)
@@ -94,6 +97,19 @@ func New() *fiber.App {
 	}
 
 	return app
+}
+
+// set user context with request trace.
+func setUserContext(c *fiber.Ctx) error {
+	reqID := c.Get(cf.HeaderRequestID)
+	reqIP := c.Get(cf.HeaderRequestIP)
+
+	c.SetUserContext(context.WithValue(context.Background(), logger.RequestKey, &logger.RequestTrace{
+		IP:    reqIP,
+		ReqID: reqID,
+	}))
+
+	return c.Next()
 }
 
 func addProfile(app *fiber.App) {

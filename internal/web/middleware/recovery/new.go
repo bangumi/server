@@ -39,7 +39,7 @@ func New() fiber.Handler {
 	return func(c *fiber.Ctx) (err error) {
 		defer func() {
 			if r := recover(); r != nil {
-				log.Error("recovery", zap.Any("recovery", r))
+				log.Error("recovery", zap.Any("recovery", r), logger.Ctx(c.UserContext()))
 
 				var ok bool
 				if err, ok = r.(error); !ok {
