@@ -48,7 +48,6 @@ type Manager interface {
 		action action.Action,
 		limit Limit,
 	) (allowed bool, remain int, err error)
-	// Reset 登录成功时应该重置计数。
 	Reset(ctx context.Context, ip string) error
 }
 

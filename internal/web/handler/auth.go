@@ -20,12 +20,10 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/config/env"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
-	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/cookie"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -65,10 +63,10 @@ func (h Handler) PrivateLogin(c *fiber.Ctx) error {
 		return res.NewError(http.StatusTooManyRequests, "Too many requests, you are not allowed to log in for a while.")
 	}
 
-	return h.privateLogin(c, a, r, remain)
+	return h.privateLogin(c, r, remain)
 }
 
-func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogin, remain int) error {
+func (h Handler) privateLogin(c *fiber.Ctx, r req.UserLogin, remain int) error {
 	login, ok, err := h.a.Login(c.UserContext(), r.Email, r.Password)
 	if err != nil {
 		return errgo.Wrap(err, "Unexpected error when logging in")
@@ -85,10 +83,6 @@ func (h Handler) privateLogin(c *fiber.Ctx, a *accessor.Accessor, r req.UserLogi
 	key, s, err := h.session.Create(c.UserContext(), login)
 	if err != nil {
 		return errgo.Wrap(err, "failed to create session")
-	}
-
-	if err = h.rateLimit.Reset(c.UserContext(), c.Context().RemoteIP().String()); err != nil {
-		h.log.Error("failed to reset Login rate limit", zap.Error(err), a.Log())
 	}
 
 	c.Cookie(&fiber.Cookie{
