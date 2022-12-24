@@ -15,7 +15,6 @@
 package ctrl
 
 import (
-	"github.com/uber-go/tally/v4"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/cache"
@@ -34,7 +33,6 @@ func New(
 	collection domain.CollectionRepo,
 	index domain.IndexRepo,
 	timeline domain.TimeLineRepo,
-	metric tally.Scope,
 	user domain.UserRepo,
 	topic domain.TopicRepo,
 	tx dal.Transaction,
@@ -59,15 +57,6 @@ func New(
 		collection:     collection,
 		timeline:       timeline,
 		privateMessage: privateMessage,
-
-		metricUserQueryCount:  metric.Counter("app_user_query_count"),
-		metricUserQueryCached: metric.Counter("app_user_query_cached_count"),
-
-		metricSubjectQueryCount:  metric.Counter("app_subject_query_count"),
-		metricSubjectQueryCached: metric.Counter("app_subject_query_cached_count"),
-
-		metricsEpisodeQueryCount:  metric.Counter("app_episode_query_count"),
-		metricsEpisodeQueryCached: metric.Counter("app_subject_query_cached_count"),
 	}
 }
 
@@ -78,22 +67,14 @@ type Ctrl struct {
 	tx  dal.Transaction
 	dam dam.Dam
 
-	user                  domain.UserRepo
-	topic                 domain.TopicRepo
-	person                domain.PersonRepo
-	episode               domain.EpisodeRepo
-	subject               subject.Repo
-	character             domain.CharacterRepo
-	collection            domain.CollectionRepo
-	index                 domain.IndexRepo
-	timeline              domain.TimeLineRepo
-	privateMessage        domain.PrivateMessageRepo
-	metricUserQueryCached tally.Counter
-	metricUserQueryCount  tally.Counter
-
-	metricSubjectQueryCached tally.Counter
-	metricSubjectQueryCount  tally.Counter
-
-	metricsEpisodeQueryCount  tally.Counter
-	metricsEpisodeQueryCached tally.Counter
+	user           domain.UserRepo
+	topic          domain.TopicRepo
+	person         domain.PersonRepo
+	episode        domain.EpisodeRepo
+	subject        subject.Repo
+	character      domain.CharacterRepo
+	collection     domain.CollectionRepo
+	index          domain.IndexRepo
+	timeline       domain.TimeLineRepo
+	privateMessage domain.PrivateMessageRepo
 }

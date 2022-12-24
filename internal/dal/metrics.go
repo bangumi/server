@@ -16,16 +16,14 @@ package dal
 
 import (
 	"database/sql"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/uber-go/tally/v4"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func setupMetrics(db *gorm.DB, conn *sql.DB, scope tally.Scope, register prometheus.Registerer) error {
+func setupMetrics(db *gorm.DB, conn *sql.DB) error {
 	var DatabaseQuery = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "chii_db_execute_total",
@@ -43,18 +41,18 @@ func setupMetrics(db *gorm.DB, conn *sql.DB, scope tally.Scope, register prometh
 		return errgo.Wrap(err, "gorm callback")
 	}
 
-	if err = register.Register(DatabaseQuery); err != nil {
-		return errgo.Wrap(err, "prom.Register")
-	}
-
-	dbConnCount := scope.Gauge("db_open_connections_total")
-	go func() {
-		for {
+	prometheus.MustRegister(DatabaseQuery)
+	prometheus.MustRegister(prometheus.NewGaugeFunc(
+		prometheus.GaugeOpts{
+			Subsystem: "chii",
+			Name:      "db_open_connections_total",
+			Help:      "opened connections",
+		},
+		func() float64 {
 			s := conn.Stats()
-			dbConnCount.Update(float64(s.OpenConnections))
-			time.Sleep(time.Second * 15)
-		}
-	}()
+			return float64(s.OpenConnections)
+		},
+	))
 
 	return nil
 }

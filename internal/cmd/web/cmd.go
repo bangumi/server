@@ -34,7 +34,6 @@ import (
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
-	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/notification"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
@@ -81,7 +80,7 @@ func start() error {
 		dal.Module,
 
 		fx.Provide(
-			logger.Copy, metrics.NewScope, cache.NewRedisCache,
+			logger.Copy, cache.NewRedisCache,
 
 			oauth.NewMysqlRepo,
 

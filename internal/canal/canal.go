@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/fx"
@@ -28,7 +27,6 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/sys"
@@ -39,9 +37,6 @@ import (
 
 func Main() error {
 	var h *eventHandler
-	var registerer prometheus.Registerer
-	var gatherer prometheus.Gatherer
-
 	di := fx.New(
 		fx.NopLogger,
 		dal.Module,
@@ -49,14 +44,14 @@ func Main() error {
 		// driver and connector
 		fx.Provide(
 			config.AppConfigReader(config.AppTypeCanal),
-			driver.NewMysqlConnectionPool, metrics.NewScope,
+			driver.NewMysqlConnectionPool,
 			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
 			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
 
 			newKafkaReader, newEventHandler,
 		),
 
-		fx.Populate(&h, &registerer, &gatherer),
+		fx.Populate(&h),
 	)
 
 	if err := di.Err(); err != nil {
@@ -67,7 +62,7 @@ func Main() error {
 
 	// metrics http reporter
 	mux := http.NewServeMux()
-	mux.Handle("/metrics", promhttp.HandlerFor(gatherer, promhttp.HandlerOpts{Registry: registerer}))
+	mux.Handle("/metrics", promhttp.Handler())
 	srv := &http.Server{Addr: h.config.ListenAddr(), Handler: mux, ReadHeaderTimeout: time.Second}
 	go func() { errChan <- errgo.Wrap(srv.ListenAndServe(), "http") }()
 	defer srv.Shutdown(context.Background()) //nolint:errcheck

@@ -17,9 +17,7 @@ package dal_test
 import (
 	"testing"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
-	"github.com/uber-go/tally/v4"
 
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
@@ -35,7 +33,7 @@ func TestNewDB(t *testing.T) {
 
 	conn, err := driver.NewMysqlConnectionPool(cfg)
 	require.NoError(t, err)
-	db, err := dal.NewDB(conn, cfg, tally.NoopScope, prometheus.NewRegistry())
+	db, err := dal.NewDB(conn, cfg)
 	require.NoError(t, err)
 
 	err = db.Exec("select 0;").Error

@@ -28,7 +28,6 @@ import (
 )
 
 func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, error) {
-	ctl.metricUserQueryCount.Inc(1)
 	var key = cachekey.User(userID)
 
 	// try to read from cache
@@ -39,7 +38,6 @@ func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, e
 	}
 
 	if ok {
-		ctl.metricUserQueryCached.Inc(1)
 		return r, nil
 	}
 
