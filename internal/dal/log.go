@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/uber-go/tally/v4"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
@@ -31,17 +31,17 @@ import (
 )
 
 // production gorm logger log do sql time monitoring and error logging to zap logger.
-func newProdLog(cfg config.AppConfig, scope tally.Scope) gormLogger.Interface {
+func newProdLog(cfg config.AppConfig) gormLogger.Interface {
 	return &metricsLog{
 		slowThreshold: cfg.SlowSQLDuration,
 		log:           logger.Named("gorm").WithOptions(zap.AddStacktrace(zap.DPanicLevel)),
-		h:             scope.Histogram("sql_time", metrics.SQLTimeBucket()),
+		h:             metrics.SQLHistogram,
 	}
 }
 
 type metricsLog struct {
 	slowThreshold time.Duration
-	h             tally.Histogram
+	h             prometheus.Histogram
 	log           *zap.Logger
 }
 
@@ -79,7 +79,7 @@ func (l *metricsLog) LogMode(level gormLogger.LogLevel) gormLogger.Interface {
 
 func (l *metricsLog) Trace(_ context.Context, begin time.Time, fc func() (sql string, rows int64), err error) {
 	elapsed := time.Since(begin)
-	l.h.RecordDuration(elapsed)
+	l.h.Observe(elapsed.Seconds())
 
 	switch {
 	case err != nil && !errors.Is(err, gorm.ErrRecordNotFound):

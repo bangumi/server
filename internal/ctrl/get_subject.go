@@ -86,7 +86,6 @@ func (ctl Ctrl) GetSubjectByIDs(
 }
 
 func (ctl Ctrl) getSubject(ctx context.Context, id model.SubjectID) (model.Subject, error) {
-	ctl.metricSubjectQueryCount.Inc(1)
 	var key = cachekey.Subject(id)
 
 	// try to read from cache
@@ -97,7 +96,6 @@ func (ctl Ctrl) getSubject(ctx context.Context, id model.SubjectID) (model.Subje
 	}
 
 	if ok {
-		ctl.metricSubjectQueryCached.Inc(1)
 		return r, nil
 	}
 

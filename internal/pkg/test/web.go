@@ -23,8 +23,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/mock"
-	"github.com/uber-go/tally/v4"
-	promreporter "github.com/uber-go/tally/v4/prometheus"
 	"go.uber.org/fx"
 
 	"github.com/bangumi/server/internal/auth"
@@ -88,8 +86,6 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 		handler.Module, ctrl.Module,
 
-		fx.Provide(func() tally.Scope { return tally.NoopScope }),
-		fx.Supply(fx.Annotate(promreporter.NewReporter(promreporter.Options{}), fx.As(new(promreporter.Reporter)))),
 		fx.Provide(func() dal.Transaction { return dal.NoopTransaction{} }),
 
 		fx.Supply(httpClient),

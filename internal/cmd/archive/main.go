@@ -34,7 +34,6 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
-	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -77,7 +76,7 @@ func start(out string) {
 		fx.Provide(
 			driver.NewMysqlConnectionPool, dal.NewDB,
 
-			config.NewAppConfig, logger.Copy, metrics.NewScope,
+			config.NewAppConfig, logger.Copy,
 
 			query.Use,
 		),

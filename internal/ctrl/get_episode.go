@@ -28,7 +28,6 @@ import (
 )
 
 func (ctl Ctrl) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episode, error) {
-	ctl.metricsEpisodeQueryCount.Inc(1)
 	var key = cachekey.Episode(id)
 	// try to read from cache
 	var e model.Episode
@@ -38,7 +37,6 @@ func (ctl Ctrl) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episo
 	}
 
 	if cached {
-		ctl.metricsEpisodeQueryCached.Inc(1)
 		return e, nil
 	}
 

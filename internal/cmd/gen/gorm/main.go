@@ -27,8 +27,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/uber-go/tally/v4"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
@@ -95,7 +93,7 @@ func main() {
 		panic(err)
 	}
 
-	db, err := dal.NewDB(conn, c, tally.NoopScope, prometheus.NewRegistry())
+	db, err := dal.NewDB(conn, c)
 	if err != nil {
 		panic(err)
 	}

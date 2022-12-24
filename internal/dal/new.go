@@ -19,8 +19,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/uber-go/tally/v4"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
@@ -30,7 +28,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-func NewDB(conn *sql.DB, c config.AppConfig, scope tally.Scope, prom prometheus.Registerer) (*gorm.DB, error) {
+func NewDB(conn *sql.DB, c config.AppConfig) (*gorm.DB, error) {
 	var gLog gormLogger.Interface
 	if c.Debug.Gorm {
 		logger.Info("enable gorm debug mode, will log all sql")
@@ -43,7 +41,7 @@ func NewDB(conn *sql.DB, c config.AppConfig, scope tally.Scope, prom prometheus.
 			},
 		)
 	} else {
-		gLog = newProdLog(c, scope)
+		gLog = newProdLog(c)
 	}
 
 	db, err := gorm.Open(
@@ -54,7 +52,7 @@ func NewDB(conn *sql.DB, c config.AppConfig, scope tally.Scope, prom prometheus.
 		return nil, errgo.Wrap(err, "create dal")
 	}
 
-	if err = setupMetrics(db, conn, scope, prom); err != nil {
+	if err = setupMetrics(db, conn); err != nil {
 		return nil, errgo.Wrap(err, "setup metrics")
 	}
 

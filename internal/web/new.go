@@ -28,8 +28,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/utils"
-	"github.com/uber-go/tally/v4"
-	promreporter "github.com/uber-go/tally/v4/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -49,7 +48,7 @@ import (
 const headerProcessTime = "x-process-time-ms"
 const headerServerVersion = "x-server-version"
 
-func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
+func New() *fiber.App {
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 		StrictRouting:         true,
@@ -58,16 +57,14 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 		JSONEncoder:           sonic.Marshal,
 	})
 
-	count := scope.Counter("request_count_total")
-	histogram := scope.Histogram("response_time", metrics.ResponseTimeBucket())
 	app.Use(func(c *fiber.Ctx) error {
-		count.Inc(1)
+		metrics.RequestCount.Inc()
 		start := time.Now()
 
 		err := c.Next()
 
 		sub := time.Since(start)
-		histogram.RecordDuration(sub)
+		metrics.RequestHistogram.Observe(sub.Seconds())
 		c.Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
 		c.Set(headerServerVersion, config.Version)
 		return err
@@ -89,7 +86,7 @@ func New(scope tally.Scope, reporter promreporter.Reporter) *fiber.App {
 	}
 
 	app.Use(recovery.New())
-	app.Get("/metrics", adaptor.HTTPHandler(reporter.HTTPHandler()))
+	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 	addProfile(app)
 
 	if env.Development {

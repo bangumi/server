@@ -46,7 +46,6 @@ func New(
 	subjectRepo subject.Repo,
 	log *zap.Logger,
 	query *query.Query,
-	registerer prometheus.Registerer,
 ) (Client, error) {
 	if cfg.MeiliSearchURL == "" {
 		return NoopClient{}, nil
@@ -82,10 +81,10 @@ func New(
 		return c, nil
 	}
 
-	return c, c.canalInit(cfg, registerer)
+	return c, c.canalInit(cfg)
 }
 
-func (c *client) canalInit(cfg config.AppConfig, registerer prometheus.Registerer) error {
+func (c *client) canalInit(cfg config.AppConfig) error {
 	if cfg.SearchBatchSize <= 0 {
 		// nolint: goerr113
 		return fmt.Errorf("config.SearchBatchSize should >= 0, current %d", cfg.SearchBatchSize)
@@ -98,7 +97,7 @@ func (c *client) canalInit(cfg config.AppConfig, registerer prometheus.Registere
 
 	c.queue = queue.NewBatched[subjectIndex](c.sendBatch, cfg.SearchBatchSize, cfg.SearchBatchInterval)
 
-	registerer.MustRegister(
+	prometheus.DefaultRegisterer.MustRegister(
 		prometheus.NewGaugeFunc(
 			prometheus.GaugeOpts{
 				Namespace: "chii",
