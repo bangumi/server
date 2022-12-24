@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/samber/lo"
 	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen"
@@ -291,7 +292,7 @@ func (r mysqlRepo) updateSubjectTags(ctx context.Context, subjectID model.Subjec
 		return *phpTags[i].Name > *phpTags[j].Name
 	})
 
-	newTag, err := phpserialize.Marshal(phpTags)
+	newTag, err := phpserialize.Marshal(lo.Slice(phpTags, 0, 30))
 	if err != nil {
 		return errgo.Wrap(err, "php.Marshal")
 	}
