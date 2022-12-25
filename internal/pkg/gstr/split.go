@@ -14,8 +14,11 @@
 
 package gstr
 
-import "strings"
+import (
+	"strings"
+)
 
+// Split a string into slice and remove empty elements.
 func Split(s string, c string) []string {
 	split := strings.Split(s, c)
 

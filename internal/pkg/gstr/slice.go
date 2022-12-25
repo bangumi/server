@@ -14,12 +14,10 @@
 
 package gstr
 
-func First(s string, end int) string {
-	r := []rune(s)
+import (
+	"github.com/samber/lo"
+)
 
-	if len(r) <= end {
-		return s
-	}
-
-	return string(r[:end])
+func Slice(s string, start int, length uint) string {
+	return string(lo.Subset([]rune(s), start, length))
 }

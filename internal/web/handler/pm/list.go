@@ -16,6 +16,7 @@ package pm
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/samber/lo"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -59,7 +60,7 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 		}
 	}
 	userIDs[len(userIDs)-1] = accessor.ID
-	userIDs = slice.Unique(userIDs)
+	userIDs = lo.Uniq(userIDs)
 	users, err := h.ctrl.GetUsersByIDs(c.Context(), userIDs)
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")

@@ -21,11 +21,11 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/samber/lo"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -77,7 +77,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), slice.Unique(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), lo.Uniq(creatorIDs))
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -157,7 +157,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), slice.Unique(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), lo.Uniq(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -242,7 +242,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), slice.Unique(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), lo.Uniq(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
