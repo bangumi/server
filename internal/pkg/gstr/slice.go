@@ -18,6 +18,6 @@ import (
 	"github.com/samber/lo"
 )
 
-func Slice(s string, start int, length uint) string {
-	return string(lo.Subset([]rune(s), start, length))
+func Slice[T ~string](s T, start int, length uint) T {
+	return T(lo.Subset([]rune(s), start, length))
 }
