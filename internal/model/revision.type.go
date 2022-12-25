@@ -61,3 +61,14 @@ func CharacterRevisionTypes() []uint8 {
 		RevisionTypeCharacterSubjectRelation,
 	}
 }
+
+func EpisodeRevisionTypes() []uint8 {
+	return []uint8{
+		RevisionTypeEp,
+		RevisionTypeEpErase,
+		RevisionTypeEpMerge,
+		RevisionTypeEpMove,
+		RevisionTypeEpLock,
+		RevisionTypeEpUnlock,
+	}
+}

@@ -68,6 +68,51 @@ func (_c *RevisionRepo_CountCharacterRelated_Call) Return(_a0 int64, _a1 error) 
 	return _c
 }
 
+// CountEpisodeRelated provides a mock function with given fields: ctx, episodeID
+func (_m *RevisionRepo) CountEpisodeRelated(ctx context.Context, episodeID model.EpisodeID) (int64, error) {
+	ret := _m.Called(ctx, episodeID)
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(context.Context, model.EpisodeID) int64); ok {
+		r0 = rf(ctx, episodeID)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.EpisodeID) error); ok {
+		r1 = rf(ctx, episodeID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// RevisionRepo_CountEpisodeRelated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountEpisodeRelated'
+type RevisionRepo_CountEpisodeRelated_Call struct {
+	*mock.Call
+}
+
+// CountEpisodeRelated is a helper method to define mock.On call
+//   - ctx context.Context
+//   - episodeID model.EpisodeID
+func (_e *RevisionRepo_Expecter) CountEpisodeRelated(ctx interface{}, episodeID interface{}) *RevisionRepo_CountEpisodeRelated_Call {
+	return &RevisionRepo_CountEpisodeRelated_Call{Call: _e.mock.On("CountEpisodeRelated", ctx, episodeID)}
+}
+
+func (_c *RevisionRepo_CountEpisodeRelated_Call) Run(run func(ctx context.Context, episodeID model.EpisodeID)) *RevisionRepo_CountEpisodeRelated_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.EpisodeID))
+	})
+	return _c
+}
+
+func (_c *RevisionRepo_CountEpisodeRelated_Call) Return(_a0 int64, _a1 error) *RevisionRepo_CountEpisodeRelated_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // CountPersonRelated provides a mock function with given fields: ctx, personID
 func (_m *RevisionRepo) CountPersonRelated(ctx context.Context, personID model.PersonID) (int64, error) {
 	ret := _m.Called(ctx, personID)
@@ -199,6 +244,51 @@ func (_c *RevisionRepo_GetCharacterRelated_Call) Run(run func(ctx context.Contex
 }
 
 func (_c *RevisionRepo_GetCharacterRelated_Call) Return(_a0 model.CharacterRevision, _a1 error) *RevisionRepo_GetCharacterRelated_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// GetEpisodeRelated provides a mock function with given fields: ctx, id
+func (_m *RevisionRepo) GetEpisodeRelated(ctx context.Context, id uint32) (model.EpisodeRevision, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 model.EpisodeRevision
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) model.EpisodeRevision); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(model.EpisodeRevision)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// RevisionRepo_GetEpisodeRelated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetEpisodeRelated'
+type RevisionRepo_GetEpisodeRelated_Call struct {
+	*mock.Call
+}
+
+// GetEpisodeRelated is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+func (_e *RevisionRepo_Expecter) GetEpisodeRelated(ctx interface{}, id interface{}) *RevisionRepo_GetEpisodeRelated_Call {
+	return &RevisionRepo_GetEpisodeRelated_Call{Call: _e.mock.On("GetEpisodeRelated", ctx, id)}
+}
+
+func (_c *RevisionRepo_GetEpisodeRelated_Call) Run(run func(ctx context.Context, id uint32)) *RevisionRepo_GetEpisodeRelated_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *RevisionRepo_GetEpisodeRelated_Call) Return(_a0 model.EpisodeRevision, _a1 error) *RevisionRepo_GetEpisodeRelated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
@@ -338,6 +428,55 @@ func (_c *RevisionRepo_ListCharacterRelated_Call) Run(run func(ctx context.Conte
 }
 
 func (_c *RevisionRepo_ListCharacterRelated_Call) Return(_a0 []model.CharacterRevision, _a1 error) *RevisionRepo_ListCharacterRelated_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// ListEpisodeRelated provides a mock function with given fields: ctx, episodeID, limit, offset
+func (_m *RevisionRepo) ListEpisodeRelated(ctx context.Context, episodeID model.EpisodeID, limit int, offset int) ([]model.EpisodeRevision, error) {
+	ret := _m.Called(ctx, episodeID, limit, offset)
+
+	var r0 []model.EpisodeRevision
+	if rf, ok := ret.Get(0).(func(context.Context, model.EpisodeID, int, int) []model.EpisodeRevision); ok {
+		r0 = rf(ctx, episodeID, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.EpisodeRevision)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, model.EpisodeID, int, int) error); ok {
+		r1 = rf(ctx, episodeID, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// RevisionRepo_ListEpisodeRelated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListEpisodeRelated'
+type RevisionRepo_ListEpisodeRelated_Call struct {
+	*mock.Call
+}
+
+// ListEpisodeRelated is a helper method to define mock.On call
+//   - ctx context.Context
+//   - episodeID model.EpisodeID
+//   - limit int
+//   - offset int
+func (_e *RevisionRepo_Expecter) ListEpisodeRelated(ctx interface{}, episodeID interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListEpisodeRelated_Call {
+	return &RevisionRepo_ListEpisodeRelated_Call{Call: _e.mock.On("ListEpisodeRelated", ctx, episodeID, limit, offset)}
+}
+
+func (_c *RevisionRepo_ListEpisodeRelated_Call) Run(run func(ctx context.Context, episodeID model.EpisodeID, limit int, offset int)) *RevisionRepo_ListEpisodeRelated_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.EpisodeID), args[2].(int), args[3].(int))
+	})
+	return _c
+}
+
+func (_c *RevisionRepo_ListEpisodeRelated_Call) Return(_a0 []model.EpisodeRevision, _a1 error) *RevisionRepo_ListEpisodeRelated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }

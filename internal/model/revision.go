@@ -88,3 +88,21 @@ type CharacterRevisionDataItem struct {
 	Summary string `json:"summary"`
 	Extra   Extra  `json:"extra"`
 }
+
+// EpisodeRevision concrete revision data type.
+type EpisodeRevision struct {
+	Data EpisodeRevisionData
+	RevisionCommon
+}
+
+type EpisodeRevisionData map[string]EpisodeRevisionDataItem
+
+type EpisodeRevisionDataItem struct {
+	Airdate  string `json:"airdate" mapstructure:"ep_airdate"`
+	Desc     string `json:"desc" mapstructure:"ep_desc"`
+	Duration string `json:"duration" mapstructure:"ep_duration"`
+	Name     string `json:"name" mapstructure:"ep_name"`
+	NameCn   string `json:"name_cn" mapstructure:"ep_name_cn"`
+	Sort     string `json:"sort" mapstructure:"ep_sort"`
+	Type     string `json:"type" mapstructure:"ep_type"`
+}
