@@ -44,26 +44,6 @@ func ToMap[K comparable, T any, F func(item T) K](in []T, fn F) map[K]T {
 	return s
 }
 
-func Any[T any, F func(item T) bool](in []T, fn F) bool {
-	for _, t := range in {
-		if fn(t) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func All[T any, F func(item T) bool](in []T, fn F) bool {
-	for _, t := range in {
-		if !fn(t) {
-			return false
-		}
-	}
-
-	return true
-}
-
 // Clone is an alias of go builtin copy.
 func Clone[S ~[]E, E any](s S) S {
 	// Preserve nil in case it matters.

@@ -21,6 +21,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/samber/lo"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/dal/query"
@@ -75,7 +76,7 @@ func (ctl Ctrl) UpdateCollection(
 		}
 	}
 
-	if slice.Any(req.Tags, ctl.dam.NeedReview) {
+	if lo.ContainsBy(req.Tags, ctl.dam.NeedReview) {
 		privacy = null.New(model.CollectPrivacyBan)
 	}
 

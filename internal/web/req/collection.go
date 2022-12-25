@@ -15,9 +15,10 @@
 package req
 
 import (
+	"github.com/samber/lo"
+
 	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -44,7 +45,7 @@ func (v SubjectEpisodeCollectionPatch) Validate() error {
 	}
 
 	if len(v.Tags) > 0 {
-		if !slice.All(v.Tags, dam.AllPrintableChar) {
+		if !lo.EveryBy(v.Tags, dam.AllPrintableChar) {
 			return res.BadRequest("invisible character are included in tags")
 		}
 	}
