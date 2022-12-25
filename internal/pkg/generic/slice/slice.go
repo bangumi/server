@@ -64,6 +64,7 @@ func All[T any, F func(item T) bool](in []T, fn F) bool {
 	return true
 }
 
+// Clone is an alias of go builtin copy.
 func Clone[S ~[]E, E any](s S) S {
 	// Preserve nil in case it matters.
 	if s == nil {
