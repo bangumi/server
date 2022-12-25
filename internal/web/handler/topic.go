@@ -105,7 +105,7 @@ func (h Handler) getResTopicWithComments(
 
 	userIDs[t.CreatorID] = struct{}{}
 
-	users, err := h.ctrl.GetUsersByIDs(context.TODO(), gmap.Keys(userIDs))
+	users, err := h.ctrl.GetUsersByIDs(context.TODO(), lo.Keys(userIDs))
 	if err != nil {
 		return nil, errgo.Wrap(err, "ctrl.GetUsersByIDs")
 	}
