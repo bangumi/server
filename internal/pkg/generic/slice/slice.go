@@ -35,17 +35,6 @@ func MapFilter[T any, K any, F func(item T) (k K, ok bool)](in []T, fn F) []K {
 	return s
 }
 
-func FindIndex[T any, F func(item T) bool](in []T, fn F) int {
-	for i, t := range in {
-		ok := fn(t)
-		if ok {
-			return i
-		}
-	}
-
-	return -1
-}
-
 func ToMap[K comparable, T any, F func(item T) K](in []T, fn F) map[K]T {
 	var s = make(map[K]T, len(in))
 	for _, t := range in {
@@ -53,52 +42,6 @@ func ToMap[K comparable, T any, F func(item T) K](in []T, fn F) map[K]T {
 	}
 
 	return s
-}
-
-func First[S ~[]T, T any](s S, end int) S {
-	if s == nil {
-		return nil
-	}
-
-	if len(s) < end {
-		end = len(s)
-	}
-
-	out := make(S, end)
-	copy(out, s)
-	return out
-}
-
-func Flat[T any](in [][]T) []T {
-	var c int
-	for _, ts := range in {
-		c += len(ts)
-	}
-
-	var out = make([]T, 0, c)
-	for _, ts := range in {
-		out = append(out, ts...)
-	}
-
-	return out
-}
-
-type empty = struct{}
-
-func Unique[S ~[]T, T comparable](s S) S {
-	var m = make(map[T]empty, len(s))
-	var out = make(S, 0, len(s))
-
-	for _, item := range s {
-		if _, ok := m[item]; ok {
-			continue
-		}
-
-		out = append(out, item)
-		m[item] = empty{}
-	}
-
-	return out
 }
 
 func Any[T any, F func(item T) bool](in []T, fn F) bool {
@@ -121,16 +64,7 @@ func All[T any, F func(item T) bool](in []T, fn F) bool {
 	return true
 }
 
-func Contain[T comparable](s []T, item T) bool {
-	for _, t := range s {
-		if t == item {
-			return true
-		}
-	}
-
-	return false
-}
-
+// Clone is an alias of go builtin copy.
 func Clone[S ~[]E, E any](s S) S {
 	// Preserve nil in case it matters.
 	if s == nil {

@@ -22,21 +22,22 @@ import (
 	"github.com/bangumi/server/internal/pkg/gstr"
 )
 
-func TestFirst(t *testing.T) {
+func TestSlice(t *testing.T) {
 	t.Parallel()
 
 	var s = "关于我们社区指导原则"
 
-	require.Equal(t, "", gstr.First(s, 0))
-	require.Equal(t, "关于", gstr.First(s, 2))
-	require.Equal(t, "关于我们社区指导原", gstr.First(s, 9))
-	require.Equal(t, s, gstr.First(s, 10))
-	require.Equal(t, s, gstr.First(s, 11))
-	require.Equal(t, s, gstr.First(s, 20))
+	require.Equal(t, "", gstr.Slice(s, 0, 0))
+	require.Equal(t, "关于", gstr.Slice(s, 0, 2))
+	require.Equal(t, "关于我们社区指导原", gstr.Slice(s, 0, 9))
+	require.Equal(t, s, gstr.Slice(s, 0, 10))
+	require.Equal(t, s, gstr.Slice(s, 0, 11))
+	require.Equal(t, s, gstr.Slice(s, 0, 20))
 
-	var s2 = "👩👩👩"
-	require.Equal(t, "👩👩", gstr.First(s2, 2))
+	var s2 = "1👩👩👩"
+	require.Equal(t, "👩👩", gstr.Slice(s2, 1, 2))
 
 	var s3 = "abcd"
-	require.Equal(t, "ab", gstr.First(s3, 2))
+	require.Equal(t, "cd", gstr.Slice(s3, 2, 4))
+	require.Equal(t, "cd", gstr.Slice(s3, 2, 10))
 }

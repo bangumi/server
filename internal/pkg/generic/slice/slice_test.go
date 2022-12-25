@@ -47,17 +47,6 @@ func TestMapFilter(t *testing.T) {
 	}))
 }
 
-func TestReduce(t *testing.T) {
-	t.Parallel()
-
-	require.Equal(t, []int{1, 2, 3, 3, 6}, slice.Flat([][]int{
-		{1},
-		{2},
-		{3, 3},
-		{6},
-	}))
-}
-
 func TestAll(t *testing.T) {
 	t.Parallel()
 
@@ -80,23 +69,6 @@ func TestAny(t *testing.T) {
 	require.True(t, slice.Any([]int{0, 1, 2, 3, 4}, func(i int) bool {
 		return []bool{0: true}[i]
 	}))
-}
-
-func TestContain(t *testing.T) {
-	t.Parallel()
-
-	require.False(t, slice.Contain([]int{1, 0, 0, 0}, 2))
-
-	require.True(t, slice.Contain([]int{1, 0, 0, 0}, 1))
-
-	require.True(t, slice.Contain([]int{1, 2, 3, 4}, 4))
-}
-
-func TestUnique(t *testing.T) {
-	t.Parallel()
-
-	require.Equal(t, []int{1, 0}, slice.Unique([]int{1, 0, 0, 0}))
-	require.Equal(t, []int{0, 1, 2, 3, 4}, slice.Unique([]int{0, 0, 1, 1, 2, 2, 3, 3, 4, 4}))
 }
 
 func TestClone(t *testing.T) {

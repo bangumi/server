@@ -17,9 +17,10 @@ package ctrl
 import (
 	"context"
 
+	"github.com/samber/lo"
+
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
@@ -33,7 +34,7 @@ func (ctl Ctrl) GetActors(
 		return nil, errgo.Wrap(err, "subjectRepo.GetActors")
 	}
 
-	vs := slice.Unique(slice.Flat(gmap.Values(actors)))
+	vs := lo.Uniq(lo.Flatten(lo.Values(actors)))
 
 	persons, err := ctl.person.GetByIDs(ctx, vs)
 	if err != nil {

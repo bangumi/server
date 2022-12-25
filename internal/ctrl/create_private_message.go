@@ -18,6 +18,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/samber/lo"
+
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -70,10 +72,10 @@ func (ctl Ctrl) checkReceivers(ctx context.Context,
 	}
 	for _, id := range receiverIDs {
 		if fields, ok := fieldsMap[id]; ok {
-			i := slice.FindIndex(fields.Blocklist, func(v model.UserID) bool { return v == senderID })
-			if i != -1 {
+			if lo.Contains(fields.Blocklist, senderID) {
 				return ErrPmBlocked
 			}
+
 			if fields.Privacy.ReceivePrivateMessage == model.UserReceiveFilterNone {
 				return ErrPmReceiverReject
 			}

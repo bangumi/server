@@ -17,6 +17,8 @@ package res
 import (
 	"time"
 
+	"github.com/samber/lo"
+
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/gstr"
@@ -79,13 +81,13 @@ func ToSlimSubjectV0(s model.Subject) SlimSubjectV0 {
 		Name:   s.Name,
 		NameCN: s.NameCN,
 		Date:   date,
-		Tags: slice.Map(slice.First(s.Tags, 10), func(item model.Tag) SubjectTag {
+		Tags: slice.Map(lo.Slice(s.Tags, 0, 10), func(item model.Tag) SubjectTag {
 			return SubjectTag{
 				Name:  item.Name,
 				Count: item.Count,
 			}
 		}),
-		ShortSummary:    gstr.First(s.Summary, defaultShortSummaryLength),
+		ShortSummary:    gstr.Slice(s.Summary, 0, defaultShortSummaryLength),
 		Image:           SubjectImage(s.Image),
 		Eps:             s.Eps,
 		Volumes:         s.Volumes,

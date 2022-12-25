@@ -20,12 +20,12 @@ import (
 	"math"
 	"sort"
 
+	"github.com/samber/lo"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
@@ -74,7 +74,7 @@ func (r mysqlRepo) ListReplies(
 		return nil, err
 	}
 
-	comments, err := r.getSubComments(ctx, commentType, id, gmap.Keys(commentMap)...)
+	comments, err := r.getSubComments(ctx, commentType, id, lo.Keys(commentMap)...)
 	if err != nil {
 		r.log.Error("failed to get sub replies")
 		return nil, err
@@ -96,7 +96,7 @@ func (r mysqlRepo) ListReplies(
 		commentMap[parent.ID] = parent
 	}
 
-	data := gmap.Values(commentMap)
+	data := lo.Values(commentMap)
 	sort.Slice(data, func(i, j int) bool {
 		if data[i].CreatedAt.Equal(data[j].CreatedAt) {
 			return data[i].ID < data[j].ID

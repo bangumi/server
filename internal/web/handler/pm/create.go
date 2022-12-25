@@ -19,6 +19,7 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
+	"github.com/samber/lo"
 
 	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/domain"
@@ -63,7 +64,7 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 	userIDs := make([]model.UserID, len(r.ReceiverIDs)+1)
 	copy(userIDs, receiverIDs)
 	userIDs[len(userIDs)-1] = accessor.ID
-	users, err := h.ctrl.GetUsersByIDs(c.Context(), slice.Unique(userIDs))
+	users, err := h.ctrl.GetUsersByIDs(c.Context(), lo.Uniq(userIDs))
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}

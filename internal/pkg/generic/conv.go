@@ -14,7 +14,7 @@
 
 package generic
 
-func Btoi(b bool) int {
+func BtoI(b bool) int {
 	if b {
 		return 1
 	}

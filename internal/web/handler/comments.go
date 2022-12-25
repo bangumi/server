@@ -18,12 +18,12 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/samber/lo"
 
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -228,7 +228,7 @@ func commentsToUserIDs(comments []model.Comment) []model.UserID {
 		}
 	}
 
-	return gmap.Keys(uidMap)
+	return lo.Keys(uidMap)
 }
 
 func convertModelComments(
