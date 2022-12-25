@@ -88,3 +88,14 @@ type CharacterRevisionDataItem struct {
 	Summary string `json:"summary"`
 	Extra   Extra  `json:"extra"`
 }
+
+type EpisodeRevision struct {
+	CreatedAt time.Time                          `json:"created_at"`
+	Data      map[string]EpisodeRevisionDataItem `json:"data,omitempty"`
+	Creator   Creator                            `json:"creator"`
+	Summary   string                             `json:"summary"`
+	ID        uint32                             `json:"id"`
+	Type      uint8                              `json:"type"`
+}
+
+type EpisodeRevisionDataItem model.EpisodeRevisionDataItem

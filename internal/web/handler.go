@@ -109,6 +109,9 @@ func AddRouters(
 	v0.Get("/revisions/characters/:id", h.GetCharacterRevision)
 	v0.Get("/revisions/characters", h.ListCharacterRevision)
 
+	v0.Get("/revisions/episodes/:id", h.GetEpisodeRevision)
+	v0.Get("/revisions/episodes", h.ListEpisodeRevision)
+
 	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.WebDomain))
 	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.WebDomain))
 

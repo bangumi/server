@@ -20,7 +20,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type RevisionRepo interface {
+type RevisionRepo interface { //nolint:interfacebloat
 	CountPersonRelated(ctx context.Context, personID model.PersonID) (int64, error)
 
 	ListPersonRelated(
@@ -44,4 +44,12 @@ type RevisionRepo interface {
 	) ([]model.CharacterRevision, error)
 
 	GetCharacterRelated(ctx context.Context, id model.RevisionID) (model.CharacterRevision, error)
+
+	CountEpisodeRelated(ctx context.Context, episodeID model.EpisodeID) (int64, error)
+
+	ListEpisodeRelated(
+		ctx context.Context, episodeID model.EpisodeID, limit int, offset int,
+	) ([]model.EpisodeRevision, error)
+
+	GetEpisodeRelated(ctx context.Context, id model.RevisionID) (model.EpisodeRevision, error)
 }

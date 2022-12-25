@@ -373,3 +373,22 @@ func convertModelCharacterRevision(
 	}
 	return ret
 }
+
+func convertModelEpisodeRevision(r *model.EpisodeRevision, creatorMap map[model.UserID]model.User) res.EpisodeRevision {
+	creator := creatorMap[r.CreatorID]
+	ret := res.EpisodeRevision{
+		ID:      r.ID,
+		Type:    r.Type,
+		Summary: r.Summary,
+		Creator: res.Creator{
+			Username: creator.UserName,
+			Nickname: creator.UserName,
+		},
+		CreatedAt: r.CreatedAt,
+	}
+	ret.Data = make(map[string]res.EpisodeRevisionDataItem, len(r.Data))
+	for id, item := range r.Data {
+		ret.Data[id] = res.EpisodeRevisionDataItem(item)
+	}
+	return ret
+}
