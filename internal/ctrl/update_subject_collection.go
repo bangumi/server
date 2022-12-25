@@ -142,7 +142,7 @@ func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.T
 				TypeID:         string(req.Type.Default(0)),
 				Name:           sj.Name,
 				NameCN:         sj.NameCN,
-				Series:         strconv.Itoa(generic.Btoi(sj.Series)),
+				Series:         strconv.Itoa(generic.BtoI(sj.Series)),
 				CollectComment: req.Comment.Default(""),
 				CollectRate:    int(req.Rate.Default(0)),
 			},
