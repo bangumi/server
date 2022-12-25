@@ -18,6 +18,8 @@ import (
 	"github.com/samber/lo"
 )
 
+// use [lo.Substring] remove this after https://github.com/samber/lo/pull/288 is fixed
+
 func Slice[T ~string](s T, start int, length uint) T {
 	return T(lo.Subset([]rune(s), start, length))
 }
