@@ -29,9 +29,8 @@ var Root = cobra.Command{
 		DisableDescriptions: false,
 		HiddenDefaultCmd:    true,
 	},
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return nil
-	},
+	SilenceUsage:  true,
+	SilenceErrors: true,
 }
 
 func init() {
