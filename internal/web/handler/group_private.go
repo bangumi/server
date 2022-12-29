@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/topic"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -150,7 +151,7 @@ func (h Handler) listGroupMembers(
 	return convertGroupMembers(members, userMap), nil
 }
 
-func convertGroupMembers(members []model.GroupMember, userMap map[model.UserID]model.User) []res.PrivateGroupMember {
+func convertGroupMembers(members []model.GroupMember, userMap map[model.UserID]user.User) []res.PrivateGroupMember {
 	s := make([]res.PrivateGroupMember, len(members))
 	for i, member := range members {
 		u := userMap[member.UserID]

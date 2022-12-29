@@ -33,7 +33,6 @@ type CommentID uint32
 
 type IndexID = uint32
 type RevisionID = uint32
-type UserGroupID = uint8
 type RevisionType = uint8
 type TimeLineCat = uint16
 

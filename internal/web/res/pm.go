@@ -17,7 +17,10 @@ package res
 import (
 	"time"
 
+	"github.com/samber/lo"
+
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/user"
 )
 
 type PrivateMessage struct {
@@ -37,10 +40,7 @@ type PrivateMessageTypeCounts struct {
 	Outbox int64 `json:"outbox"`
 }
 
-func ConvertModelPrivateMessage(
-	item model.PrivateMessage,
-	users map[model.UserID]model.User,
-) PrivateMessage {
+func ConvertModelPrivateMessage(item model.PrivateMessage, users map[model.UserID]user.User) PrivateMessage {
 	msg := PrivateMessage{
 		CreatedAt: item.CreatedTime,
 		Title:     item.Title,
@@ -50,12 +50,10 @@ func ConvertModelPrivateMessage(
 	}
 	if users != nil {
 		if u, ok := users[item.SenderID]; ok {
-			user := ConvertModelUser(u)
-			msg.Sender = &user
+			msg.Sender = lo.ToPtr(ConvertModelUser(u))
 		}
 		if u, ok := users[item.ReceiverID]; ok {
-			user := ConvertModelUser(u)
-			msg.Receiver = &user
+			msg.Receiver = lo.ToPtr(ConvertModelUser(u))
 		}
 	}
 	return msg
@@ -63,7 +61,7 @@ func ConvertModelPrivateMessage(
 
 func ConvertModelPrivateMessageListItem(
 	item model.PrivateMessageListItem,
-	users map[model.UserID]model.User,
+	users map[model.UserID]user.User,
 ) PrivateMessage {
 	relatedMsg := ConvertModelPrivateMessage(item.Main, nil)
 	msg := ConvertModelPrivateMessage(item.Self, users)

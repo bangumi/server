@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -37,7 +38,7 @@ func TestHandler_GetGroupByNamePrivate(t *testing.T) {
 	const gid = model.GroupID(5)
 
 	u := mocks.NewUserRepo(t)
-	u.EXPECT().GetByIDs(mock.Anything, []model.UserID{3}).Return(map[model.UserID]model.User{
+	u.EXPECT().GetByIDs(mock.Anything, []model.UserID{3}).Return(map[model.UserID]user.User{
 		3: {UserName: "nn", ID: 1},
 	}, nil)
 
@@ -66,7 +67,7 @@ func TestHandler_ListGroupMembersPrivate(t *testing.T) {
 	const gid = model.GroupID(1)
 
 	u := mocks.NewUserRepo(t)
-	u.EXPECT().GetByIDs(mock.Anything, mock.Anything).Return(map[model.UserID]model.User{
+	u.EXPECT().GetByIDs(mock.Anything, mock.Anything).Return(map[model.UserID]user.User{
 		1: {UserName: "nn", ID: 1},
 	}, nil)
 

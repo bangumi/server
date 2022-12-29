@@ -22,17 +22,17 @@ import (
 
 type Repo interface {
 	// GetByID find a user by uid.
-	GetByID(ctx context.Context, userID model.UserID) (model.User, error)
+	GetByID(ctx context.Context, userID model.UserID) (User, error)
 	// GetByName find a user by username.
-	GetByName(ctx context.Context, username string) (model.User, error)
+	GetByName(ctx context.Context, username string) (User, error)
 
-	GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]model.User, error)
+	GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]User, error)
 
 	GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]FriendItem, error)
 
 	CheckIsFriendToOthers(ctx context.Context, selfID model.UserID, otherIDs ...model.UserID) (bool, error)
 
-	GetFieldsByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]model.UserFields, error)
+	GetFieldsByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]Fields, error)
 }
 
 type FriendItem struct{}

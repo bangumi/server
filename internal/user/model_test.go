@@ -12,22 +12,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model_test
+package user_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/user"
 )
 
 func TestUnmarshal(t *testing.T) {
 	t.Parallel()
 
-	var s = model.UserPrivacySettings{}
+	var s = user.PrivacySettings{}
 
 	s.Unmarshal([]byte("a:4:{i:1;i:2;i:30;i:2;i:20;i:2;i:21;i:0;}"))
 
-	require.Equal(t, s.ReceiveTimelineReply, model.UserReceiveFilterNone)
+	require.Equal(t, s.ReceiveTimelineReply, user.ReceiveFilterNone)
 }

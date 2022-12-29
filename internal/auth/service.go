@@ -35,18 +35,18 @@ import (
 const TokenTypeOauthToken = 0
 const TokenTypeAccessToken = 1
 
-func NewService(repo Repo, user user.Repo, logger *zap.Logger, c cache.RedisCache) Service {
+func NewService(repo Repo, u user.Repo, logger *zap.Logger, c cache.RedisCache) Service {
 	return service{
-		permCache: cache.NewMemoryCache[model.UserGroupID, Permission](),
+		permCache: cache.NewMemoryCache[user.GroupID, Permission](),
 		cache:     c,
 		repo:      repo,
 		log:       logger.Named("auth.Service"),
-		user:      user,
+		user:      u,
 	}
 }
 
 type service struct {
-	permCache *cache.MemoryCache[model.UserGroupID, Permission]
+	permCache *cache.MemoryCache[user.GroupID, Permission]
 	cache     cache.RedisCache
 	repo      Repo
 	user      user.Repo
@@ -63,7 +63,7 @@ func (s service) GetByID(ctx context.Context, userID model.UserID) (Auth, error)
 	}
 
 	if !ok {
-		var u model.User
+		var u user.User
 		u, err = s.user.GetByID(ctx, userID)
 		if err != nil {
 			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
@@ -175,7 +175,7 @@ func preProcessPassword(s string) []byte {
 	return []byte(hex.EncodeToString(p[:]))
 }
 
-func (s service) getPermission(ctx context.Context, id model.UserGroupID) (Permission, error) {
+func (s service) getPermission(ctx context.Context, id user.GroupID) (Permission, error) {
 	p, ok := s.permCache.Get(ctx, id)
 
 	if ok {

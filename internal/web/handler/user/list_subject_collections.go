@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -66,7 +67,7 @@ func (h User) ListSubjectCollection(c *fiber.Ctx) error {
 
 func (h User) listCollection(
 	c *fiber.Ctx,
-	u model.User,
+	u user.User,
 	subjectType model.SubjectType,
 	collectionType model.SubjectCollection,
 	page req.PageQuery,

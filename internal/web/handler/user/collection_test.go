@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -38,7 +39,7 @@ func TestUser_ListCollection(t *testing.T) {
 	const subjectID model.SubjectID = 9
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
+	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().ListSubjectCollection(mock.Anything, userID, mock.Anything, mock.Anything, mock.Anything, 10, 0).
@@ -75,7 +76,7 @@ func TestUser_GetSubjectCollection(t *testing.T) {
 	const subjectID model.SubjectID = 9
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
+	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).
 		Return(model.UserSubjectCollection{SubjectID: subjectID, Type: 1}, nil)
@@ -107,7 +108,7 @@ func TestUser_ListSubjectCollection_other_user(t *testing.T) {
 	a.EXPECT().GetByToken(mock.Anything, "v").Return(auth.Auth{ID: userID + 1}, nil)
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)
+	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).

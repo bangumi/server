@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pm"
+	"github.com/bangumi/server/internal/user"
 )
 
 var ErrPmBlocked = errors.New("have been blocked")
@@ -35,10 +36,10 @@ func (ctl Ctrl) checkNeedFriendshipReceivers(
 	ctx context.Context,
 	senderID model.UserID,
 	receiverIDs []model.UserID,
-	fieldsMap map[model.UserID]model.UserFields) error {
+	fieldsMap map[model.UserID]user.Fields) error {
 	checkFriendshipList := slice.MapFilter(receiverIDs, func(id model.UserID) (model.UserID, bool) {
 		if fields, ok := fieldsMap[id]; ok {
-			if fields.Privacy.ReceivePrivateMessage == model.UserReceiveFilterFriends {
+			if fields.Privacy.ReceivePrivateMessage == user.ReceiveFilterFriends {
 				return id, true
 			}
 		}
@@ -72,11 +73,11 @@ func (ctl Ctrl) checkReceivers(ctx context.Context,
 	}
 	for _, id := range receiverIDs {
 		if fields, ok := fieldsMap[id]; ok {
-			if lo.Contains(fields.Blocklist, senderID) {
+			if lo.Contains(fields.BlockList, senderID) {
 				return ErrPmBlocked
 			}
 
-			if fields.Privacy.ReceivePrivateMessage == model.UserReceiveFilterNone {
+			if fields.Privacy.ReceivePrivateMessage == user.ReceiveFilterNone {
 				return ErrPmReceiverReject
 			}
 		}

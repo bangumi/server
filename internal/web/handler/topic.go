@@ -136,7 +136,7 @@ func (h Handler) getResTopicWithComments(
 
 func fromModelComments(
 	replies []model.Comment,
-	users map[model.UserID]model.User,
+	users map[model.UserID]user.User,
 	friends map[model.UserID]user.FriendItem,
 ) []res.PrivateComment {
 	var comments = make([]res.PrivateComment, 0, len(replies))

@@ -16,6 +16,7 @@ package res
 
 import (
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/user"
 )
 
 type Avatar struct {
@@ -68,7 +69,7 @@ type LoginRemain struct {
 	Remain int `json:"remain"`
 }
 
-func ConvertModelUser(u model.User) User {
+func ConvertModelUser(u user.User) User {
 	return User{
 		ID:        u.ID,
 		URL:       "https://bgm.tv/user/" + u.UserName,

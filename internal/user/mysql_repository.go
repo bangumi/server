@@ -40,42 +40,42 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (model.User, error) {
+func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (User, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(userID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.User{}, domain.ErrUserNotFound
+			return User{}, domain.ErrUserNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
-		return model.User{}, errgo.Wrap(err, "dal")
+		return User{}, errgo.Wrap(err, "dal")
 	}
 
 	return fromDao(u), nil
 }
 
-func (m mysqlRepo) GetByName(ctx context.Context, username string) (model.User, error) {
+func (m mysqlRepo) GetByName(ctx context.Context, username string) (User, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Username.Eq(username)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.User{}, domain.ErrUserNotFound
+			return User{}, domain.ErrUserNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
-		return model.User{}, errgo.Wrap(err, "dal")
+		return User{}, errgo.Wrap(err, "dal")
 	}
 
 	return fromDao(u), nil
 }
 
-func (m mysqlRepo) GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]model.User, error) {
+func (m mysqlRepo) GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]User, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(slice.ToValuer(ids)...)).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var r = make(map[model.UserID]model.User, len(ids))
+	var r = make(map[model.UserID]User, len(ids))
 
 	for _, member := range u {
 		r[member.ID] = fromDao(member)
@@ -112,9 +112,9 @@ func (m mysqlRepo) CheckIsFriendToOthers(
 }
 
 func (m mysqlRepo) GetFieldsByIDs(ctx context.Context,
-	userIDs []model.UserID) (map[model.UserID]model.UserFields, error) {
+	userIDs []model.UserID) (map[model.UserID]Fields, error) {
 	if len(userIDs) == 0 {
-		return make(map[model.UserID]model.UserFields, 0), nil
+		return make(map[model.UserID]Fields, 0), nil
 	}
 	users, err := m.q.Member.
 		WithContext(ctx).
@@ -124,15 +124,15 @@ func (m mysqlRepo) GetFieldsByIDs(ctx context.Context,
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var r = make(map[model.UserID]model.UserFields, len(users))
+	var r = make(map[model.UserID]Fields, len(users))
 	for _, user := range users {
-		var privacySettings model.UserPrivacySettings
+		var privacySettings PrivacySettings
 		privacySettings.Unmarshal(user.Fields.Privacy)
-		r[user.Fields.UID] = model.UserFields{
+		r[user.Fields.UID] = Fields{
 			UID:  user.Fields.UID,
 			Site: user.Fields.Site,
 			Bio:  user.Fields.Bio,
-			Blocklist: slice.MapFilter(gstr.Split(user.Fields.Blocklist, ","), func(s string) (model.UserID, bool) {
+			BlockList: slice.MapFilter(gstr.Split(user.Fields.Blocklist, ","), func(s string) (model.UserID, bool) {
 				id, err := gstr.ParseUint32(s)
 				if err != nil {
 					return 0, false
@@ -146,8 +146,8 @@ func (m mysqlRepo) GetFieldsByIDs(ctx context.Context,
 	return r, nil
 }
 
-func fromDao(m *dao.Member) model.User {
-	return model.User{
+func fromDao(m *dao.Member) User {
+	return User{
 		UserName:         m.Username,
 		NickName:         m.Nickname,
 		UserGroup:        m.Groupid,

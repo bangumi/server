@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -35,7 +36,7 @@ func TestUser_Get(t *testing.T) {
 	const uid model.UserID = 7
 
 	u := mocks.NewUserRepo(t)
-	u.EXPECT().GetByID(mock.Anything, uid).Return(model.User{ID: uid}, nil)
+	u.EXPECT().GetByID(mock.Anything, uid).Return(user.User{ID: uid}, nil)
 
 	a := mocks.NewAuthRepo(t)
 	a.EXPECT().GetByToken(mock.Anything, "token").Return(auth.UserInfo{ID: uid}, nil)
@@ -60,7 +61,7 @@ func TestUser_Get_200(t *testing.T) {
 	t.Parallel()
 	const uid model.UserID = 7
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, "u").Return(model.User{ID: uid}, nil)
+	m.EXPECT().GetByName(mock.Anything, "u").Return(user.User{ID: uid}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{
@@ -79,7 +80,7 @@ func TestUser_Get_404(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{}, domain.ErrNotFound)
+	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(user.User{}, domain.ErrNotFound)
 
 	app := test.GetWebApp(t,
 		test.Mock{
@@ -97,7 +98,7 @@ func TestUser_Get_private_200(t *testing.T) {
 	const sessionID = "ss"
 
 	u := mocks.NewUserRepo(t)
-	u.EXPECT().GetByID(mock.Anything, uid).Return(model.User{ID: uid}, nil)
+	u.EXPECT().GetByID(mock.Anything, uid).Return(user.User{ID: uid}, nil)
 
 	s := mocks.NewSessionManager(t)
 	s.EXPECT().Get(mock.Anything, sessionID).Return(session.Session{UserID: uid}, nil)
@@ -121,7 +122,7 @@ func TestUser_GetAvatar_302(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, "u").Return(model.User{ID: 1, Avatar: "temp"}, nil)
+	m.EXPECT().GetByName(mock.Anything, "u").Return(user.User{ID: 1, Avatar: "temp"}, nil)
 
 	app := test.GetWebApp(t, test.Mock{UserRepo: m})
 	for _, imageType := range []string{"large", "medium", "small"} {
@@ -141,7 +142,7 @@ func TestUser_GetAvatar_400(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(model.User{Avatar: "temp"}, nil)
+	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(user.User{Avatar: "temp"}, nil)
 	app := test.GetWebApp(t,
 		test.Mock{
 			UserRepo: m,

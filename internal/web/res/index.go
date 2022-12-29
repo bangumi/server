@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/user"
 )
 
 type Index struct {
@@ -33,7 +34,7 @@ type Index struct {
 	NSFW        bool          `json:"nsfw" doc:"if index contains any nsfw subjects"`
 }
 
-func IndexModelToResponse(i *model.Index, u model.User) Index {
+func IndexModelToResponse(i *model.Index, u user.User) Index {
 	return Index{
 		CreatedAt: i.CreatedAt,
 		UpdatedAt: i.UpdatedAt,

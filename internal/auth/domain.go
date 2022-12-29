@@ -20,6 +20,7 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gtime"
+	"github.com/bangumi/server/internal/user"
 )
 
 // AuthRepo presents an authorization.
@@ -61,14 +62,14 @@ type Service interface {
 type UserInfo struct {
 	RegTime time.Time
 	ID      model.UserID
-	GroupID model.UserGroupID
+	GroupID user.GroupID
 }
 
 // Auth is the basic authorization represent a user.
 type Auth struct {
 	RegTime    time.Time
 	ID         model.UserID // user id
-	GroupID    model.UserGroupID
+	GroupID    user.GroupID
 	Permission Permission `json:"-"` // disable cache for this field.
 }
 

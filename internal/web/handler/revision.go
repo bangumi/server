@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -276,7 +277,7 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 	return c.JSON(convertModelSubjectRevision(&r, creatorMap))
 }
 
-func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UserID]model.User) res.PersonRevision {
+func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UserID]user.User) res.PersonRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.PersonRevision{
 		ID:      r.ID,
@@ -314,7 +315,7 @@ func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.Us
 }
 
 func convertModelSubjectRevision(
-	r *model.SubjectRevision, creatorMap map[model.UserID]model.User,
+	r *model.SubjectRevision, creatorMap map[model.UserID]user.User,
 ) res.SubjectRevision {
 	creator := creatorMap[r.CreatorID]
 	var data *res.SubjectRevisionData
@@ -347,7 +348,7 @@ func convertModelSubjectRevision(
 }
 
 func convertModelCharacterRevision(
-	r *model.CharacterRevision, creatorMap map[model.UserID]model.User,
+	r *model.CharacterRevision, creatorMap map[model.UserID]user.User,
 ) res.CharacterRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.CharacterRevision{
@@ -374,7 +375,7 @@ func convertModelCharacterRevision(
 	return ret
 }
 
-func convertModelEpisodeRevision(r *model.EpisodeRevision, creatorMap map[model.UserID]model.User) res.EpisodeRevision {
+func convertModelEpisodeRevision(r *model.EpisodeRevision, creatorMap map[model.UserID]user.User) res.EpisodeRevision {
 	creator := creatorMap[r.CreatorID]
 	ret := res.EpisodeRevision{
 		ID:      r.ID,

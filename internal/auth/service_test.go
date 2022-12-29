@@ -25,8 +25,8 @@ import (
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/mocks"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/user"
 )
 
 func getService() auth.Service {
@@ -49,7 +49,7 @@ func TestService_GetByToken(t *testing.T) {
 
 	var m = mocks.NewAuthRepo(t)
 	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(auth.UserInfo{GroupID: 2}, nil)
-	m.EXPECT().GetPermission(mock.Anything, model.UserGroupID(2)).Return(auth.Permission{EpEdit: true}, nil)
+	m.EXPECT().GetPermission(mock.Anything, user.GroupID(2)).Return(auth.Permission{EpEdit: true}, nil)
 
 	var u = mocks.NewUserRepo(t)
 
@@ -58,6 +58,6 @@ func TestService_GetByToken(t *testing.T) {
 	a, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
 	require.NoError(t, err)
 
-	require.Equal(t, model.UserGroupID(2), a.GroupID)
+	require.Equal(t, user.GroupID(2), a.GroupID)
 	require.True(t, a.Permission.EpEdit)
 }

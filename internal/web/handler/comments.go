@@ -235,7 +235,7 @@ func commentsToUserIDs(comments []model.Comment) []model.UserID {
 
 func convertModelComments(
 	comments []model.Comment,
-	userMap map[model.UserID]model.User,
+	userMap map[model.UserID]user.User,
 	friends map[model.UserID]user.FriendItem,
 ) []res.PrivateComment {
 	result := make([]res.PrivateComment, len(comments))

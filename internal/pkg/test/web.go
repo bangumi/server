@@ -225,22 +225,22 @@ func MockCaptchaManager(repo captcha.Manager) fx.Option {
 func MockUserRepo(repo user.Repo) fx.Option {
 	if repo == nil {
 		mocker := &mocks.UserRepo{}
-		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(model.User{}, nil)
+		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(user.User{}, nil)
 		mocker.On("GetByIDs", mock.Anything, mock.Anything).
-			Return(func(ctx context.Context, ids []model.UserID) map[model.UserID]model.User {
-				var ret = make(map[model.UserID]model.User, len(ids))
+			Return(func(ctx context.Context, ids []model.UserID) map[model.UserID]user.User {
+				var ret = make(map[model.UserID]user.User, len(ids))
 				for _, id := range ids {
-					ret[id] = model.User{}
+					ret[id] = user.User{}
 				}
 				return ret
 			}, func(ctx context.Context, ids []model.UserID) error {
 				return nil
 			})
 		mocker.On("GetFieldsByIDs", mock.Anything, mock.Anything, mock.Anything).
-			Return(func(ctx context.Context, ids []model.UserID) map[model.UserID]model.UserFields {
-				var ret = make(map[model.UserID]model.UserFields, len(ids))
+			Return(func(ctx context.Context, ids []model.UserID) map[model.UserID]user.Fields {
+				var ret = make(map[model.UserID]user.Fields, len(ids))
 				for _, id := range ids {
-					ret[id] = model.UserFields{}
+					ret[id] = user.Fields{}
 				}
 				return ret
 			}, func(ctx context.Context, ids []model.UserID) error {

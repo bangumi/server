@@ -28,11 +28,11 @@ import (
 	"github.com/bangumi/server/internal/user"
 )
 
-func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, error) {
+func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (user.User, error) {
 	var key = cachekey.User(userID)
 
 	// try to read from cache
-	var r model.User
+	var r user.User
 	ok, err := ctl.cache.Get(ctx, key, &r)
 	if err != nil {
 		return r, errgo.Wrap(err, "cache.Get")
@@ -58,9 +58,9 @@ func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, e
 	return r, nil
 }
 
-func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs []model.UserID) (map[model.UserID]model.User, error) {
+func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs []model.UserID) (map[model.UserID]user.User, error) {
 	if len(userIDs) == 0 {
-		return map[model.UserID]model.User{}, nil
+		return map[model.UserID]user.User{}, nil
 	}
 
 	users, err := ctl.user.GetByIDs(ctx, userIDs)

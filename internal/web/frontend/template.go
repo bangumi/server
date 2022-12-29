@@ -21,8 +21,8 @@ import (
 
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/config/env"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/oauth"
+	"github.com/bangumi/server/internal/user"
 )
 
 const TplLogin = "login.gohtml"
@@ -58,17 +58,17 @@ var _ interface {
 
 type Login struct {
 	Title            string
-	User             model.User
+	User             user.User
 	TurnstileSiteKey string
 }
 
 type ListAccessToken struct {
 	Clients map[string]oauth.Client
 	Title   string
-	User    model.User
+	User    user.User
 	Tokens  []auth.AccessToken
 }
 
 type CreateAccessToken struct {
-	User model.User
+	User user.User
 }
