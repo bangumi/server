@@ -17,7 +17,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/bangumi/server/internal/cmd"
+	"github.com/bangumi/server/cmd"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 

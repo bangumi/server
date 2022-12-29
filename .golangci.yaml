@@ -245,25 +245,25 @@ linters-settings:
       - "func (*github.com/gofiber/fiber/v2.Ctx).JSON("
       - "func os.Open(name string)"
       - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
-      - "func github.com/bangumi/server/internal/web/req.GetPageQuery("
-      - "func (github.com/bangumi/server/internal/web/req.PageQuery).Check("
-      - "func github.com/bangumi/server/internal/web/res.NewError("
-      - "func github.com/bangumi/server/internal/web/res.Response("
-      - "func github.com/bangumi/server/internal/web/res.FromError("
-      - "func github.com/bangumi/server/internal/web/res.JSONError("
-      - "func github.com/bangumi/server/internal/web/res.InternalError("
-      - "func github.com/bangumi/server/internal/web/res.Forbidden("
-      - "func github.com/bangumi/server/internal/web/res.NotFound("
-      - "func github.com/bangumi/server/internal/web/res.Unauthorized("
-      - "func github.com/bangumi/server/internal/web/res.BadRequest("
-      - "func github.com/bangumi/server/internal/web/res.JSON("
-      - "func (github.com/bangumi/server/internal/web/handler/common.Common)."
+      - "func github.com/bangumi/server/web/req.GetPageQuery("
+      - "func (github.com/bangumi/server/web/req.PageQuery).Check("
+      - "func github.com/bangumi/server/web/res.NewError("
+      - "func github.com/bangumi/server/web/res.Response("
+      - "func github.com/bangumi/server/web/res.FromError("
+      - "func github.com/bangumi/server/web/res.JSONError("
+      - "func github.com/bangumi/server/web/res.InternalError("
+      - "func github.com/bangumi/server/web/res.Forbidden("
+      - "func github.com/bangumi/server/web/res.NotFound("
+      - "func github.com/bangumi/server/web/res.Unauthorized("
+      - "func github.com/bangumi/server/web/res.BadRequest("
+      - "func github.com/bangumi/server/web/res.JSON("
+      - "func (github.com/bangumi/server/web/handler/common.Common)."
       - "func (*github.com/bangumi/server/internal/dal/query.Query).Transaction("
       - "func (github.com/bangumi/server/internal/dal.Transaction).Transaction("
       - "func (*golang.org/x/sync/errgroup.Group).Wait()"
     ignoreSigRegexps:
-      - 'func \(github.com/bangumi/server/internal/web/req\..*\)\.Validate\('
-      - 'func github.com/bangumi/server/internal/web/req\.Parse.*\('
+      - 'func \(github.com/bangumi/server/web/req\..*\)\.Validate\('
+      - 'func github.com/bangumi/server/web/req\.Parse.*\('
 
   nlreturn:
     block-size: 3
@@ -331,7 +331,7 @@ issues:
   fix: false
   exclude-use-default: true
   exclude-rules:
-    - path: "internal/cmd/.*"
+    - path: "cmd/.*"
       linters: [gochecknoglobals, gochecknoinits, wrapcheck]
 
     - path: '.*_test\.go'

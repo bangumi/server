@@ -30,7 +30,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/search"
-	"github.com/bangumi/server/internal/web/session"
+	"github.com/bangumi/server/web/session"
 )
 
 func newEventHandler(

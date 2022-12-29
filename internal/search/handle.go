@@ -31,9 +31,9 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
-	"github.com/bangumi/server/internal/web/accessor"
-	"github.com/bangumi/server/internal/web/req"
-	"github.com/bangumi/server/internal/web/res"
+	"github.com/bangumi/server/web/accessor"
+	"github.com/bangumi/server/web/req"
+	"github.com/bangumi/server/web/res"
 )
 
 type Client interface {

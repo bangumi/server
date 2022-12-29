@@ -20,7 +20,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/web/accessor"
+	"github.com/bangumi/server/web/accessor"
 )
 
 var _ Client = NoopClient{}

@@ -25,12 +25,12 @@ import (
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/fx"
 
+	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/episode"
@@ -49,12 +49,12 @@ import (
 	"github.com/bangumi/server/internal/timeline"
 	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
-	"github.com/bangumi/server/internal/web"
-	"github.com/bangumi/server/internal/web/captcha"
-	"github.com/bangumi/server/internal/web/frontend"
-	"github.com/bangumi/server/internal/web/handler"
-	"github.com/bangumi/server/internal/web/rate"
-	"github.com/bangumi/server/internal/web/session"
+	"github.com/bangumi/server/web"
+	"github.com/bangumi/server/web/captcha"
+	"github.com/bangumi/server/web/frontend"
+	"github.com/bangumi/server/web/handler"
+	"github.com/bangumi/server/web/rate"
+	"github.com/bangumi/server/web/session"
 )
 
 type Mock struct {

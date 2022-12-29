@@ -18,8 +18,8 @@ import (
 	"strconv"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/wiki"
+	"github.com/bangumi/server/web/res"
 )
 
 // 最终 meilisearch 索引的文档.
