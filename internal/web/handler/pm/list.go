@@ -20,6 +20,7 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -53,7 +54,7 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 	}
 	userIDs := make([]model.UserID, len(list)+1)
 	for i := range list {
-		if folder == model.PrivateMessageFolderTypeInbox {
+		if folder == pm.FolderTypeInbox {
 			userIDs[i] = list[i].Self.SenderID
 		} else {
 			userIDs[i] = list[i].Self.ReceiverID
@@ -65,7 +66,7 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}
-	data := slice.Map(list, func(v model.PrivateMessageListItem) res.PrivateMessage {
+	data := slice.Map(list, func(v pm.PrivateMessageListItem) res.PrivateMessage {
 		return res.ConvertModelPrivateMessageListItem(v, users)
 	})
 	return res.JSON(c, res.Paged{

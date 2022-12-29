@@ -93,8 +93,8 @@ func (ctl Ctrl) CreatePrivateMessage(
 	receiverIDs []model.UserID,
 	relatedIDFilter pm.IDFilter,
 	title string,
-	content string) ([]model.PrivateMessage, error) {
-	emptyList := make([]model.PrivateMessage, 0)
+	content string) ([]pm.PrivateMessage, error) {
+	emptyList := make([]pm.PrivateMessage, 0)
 	err := ctl.checkReceivers(ctx, senderID, receiverIDs)
 	if err != nil {
 		return emptyList, errgo.Wrap(err, "dal")

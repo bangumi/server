@@ -208,7 +208,7 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 		return errgo.Wrap(err, "episodeRepo.List")
 	}
 
-	eIDs := set.FromSlice(slice.Map(episodes, func(e model.Episode) model.EpisodeID {
+	eIDs := set.FromSlice(slice.Map(episodes, func(e episode.Episode) model.EpisodeID {
 		return e.ID
 	}))
 

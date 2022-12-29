@@ -18,6 +18,7 @@ import (
 	"strconv"
 
 	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -35,7 +36,7 @@ func Subject(id model.SubjectID) string {
 	return resPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
 }
 
-func EpisodeCount(id model.SubjectID, epType *model.EpType) string {
+func EpisodeCount(id model.SubjectID, epType *episode.Type) string {
 	if epType == nil {
 		return resPrefix + "episode:count:" + strconv.FormatUint(uint64(id), 10)
 	}

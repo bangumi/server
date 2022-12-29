@@ -30,9 +30,9 @@ func newNotification(db *gorm.DB, opts ...gen.DOOption) notification {
 	_notification.ID = field.NewField(tableName, "nt_id")
 	_notification.ReceiverID = field.NewField(tableName, "nt_uid")
 	_notification.SenderID = field.NewField(tableName, "nt_from_uid")
-	_notification.Status = field.NewField(tableName, "nt_status")
-	_notification.Type = field.NewField(tableName, "nt_type")
-	_notification.FieldID = field.NewField(tableName, "nt_mid")
+	_notification.Status = field.NewUint8(tableName, "nt_status")
+	_notification.Type = field.NewUint8(tableName, "nt_type")
+	_notification.FieldID = field.NewUint32(tableName, "nt_mid")
 	_notification.RelatedID = field.NewUint32(tableName, "nt_related_id")
 	_notification.CreatedTime = field.NewUint32(tableName, "nt_dateline")
 
@@ -48,9 +48,9 @@ type notification struct {
 	ID          field.Field
 	ReceiverID  field.Field
 	SenderID    field.Field
-	Status      field.Field
-	Type        field.Field
-	FieldID     field.Field // ID in notify_field
+	Status      field.Uint8
+	Type        field.Uint8
+	FieldID     field.Uint32 // ID in notify_field
 	RelatedID   field.Uint32
 	CreatedTime field.Uint32
 
@@ -72,9 +72,9 @@ func (n *notification) updateTableName(table string) *notification {
 	n.ID = field.NewField(table, "nt_id")
 	n.ReceiverID = field.NewField(table, "nt_uid")
 	n.SenderID = field.NewField(table, "nt_from_uid")
-	n.Status = field.NewField(table, "nt_status")
-	n.Type = field.NewField(table, "nt_type")
-	n.FieldID = field.NewField(table, "nt_mid")
+	n.Status = field.NewUint8(table, "nt_status")
+	n.Type = field.NewUint8(table, "nt_type")
+	n.FieldID = field.NewUint32(table, "nt_mid")
 	n.RelatedID = field.NewUint32(table, "nt_related_id")
 	n.CreatedTime = field.NewUint32(table, "nt_dateline")
 

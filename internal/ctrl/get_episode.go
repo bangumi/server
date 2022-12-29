@@ -23,17 +23,18 @@ import (
 
 	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (ctl Ctrl) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episode, error) {
+func (ctl Ctrl) GetEpisode(ctx context.Context, id model.EpisodeID) (episode.Episode, error) {
 	var key = cachekey.Episode(id)
 	// try to read from cache
-	var e model.Episode
+	var e episode.Episode
 	cached, err := ctl.cache.Get(ctx, key, &e)
 	if err != nil {
-		return model.Episode{}, errgo.Wrap(err, "cache.Get")
+		return episode.Episode{}, errgo.Wrap(err, "cache.Get")
 	}
 
 	if cached {
@@ -43,7 +44,7 @@ func (ctl Ctrl) GetEpisode(ctx context.Context, id model.EpisodeID) (model.Episo
 	e, err = ctl.episode.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return model.Episode{}, domain.ErrEpisodeNotFound
+			return episode.Episode{}, domain.ErrEpisodeNotFound
 		}
 
 		return e, errgo.Wrap(err, "EpisodeRepo.Get")

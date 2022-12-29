@@ -25,24 +25,24 @@ type Repo interface {
 	List(
 		ctx context.Context,
 		userID model.UserID,
-		folder model.PrivateMessageFolderType,
+		folder FolderType,
 		offset int,
 		limit int,
-	) ([]model.PrivateMessageListItem, error)
+	) ([]PrivateMessageListItem, error)
 
 	CountByFolder(
 		ctx context.Context,
 		userID model.UserID,
-		folder model.PrivateMessageFolderType,
+		folder FolderType,
 	) (int64, error)
 
 	ListRelated(
 		ctx context.Context,
 		userID model.UserID,
 		id model.PrivateMessageID,
-	) ([]model.PrivateMessage, error)
+	) ([]PrivateMessage, error)
 
-	CountTypes(ctx context.Context, userID model.UserID) (model.PrivateMessageTypeCounts, error)
+	CountTypes(ctx context.Context, userID model.UserID) (PrivateMessageTypeCounts, error)
 
 	MarkRead(ctx context.Context, userID model.UserID, relatedID model.PrivateMessageID) error
 
@@ -55,7 +55,7 @@ type Repo interface {
 		relatedIDFilter IDFilter,
 		title string,
 		content string,
-	) ([]model.PrivateMessage, error)
+	) ([]PrivateMessage, error)
 
 	Delete(
 		ctx context.Context,

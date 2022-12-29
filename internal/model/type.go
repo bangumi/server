@@ -80,10 +80,6 @@ func (v TimeLineID) Value() (driver.Value, error) {
 	return int64(v), nil
 }
 
-func (v NotificationStatus) Value() (driver.Value, error) {
-	return int64(v), nil
-}
-
 func (v GroupID) Zap() zap.Field {
 	return zap.Uint32("group_id", uint32(v))
 }

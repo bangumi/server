@@ -36,17 +36,17 @@ import (
 func TestPrivateMessage_List(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewPrivateMessageRepo(t)
-	m.EXPECT().CountByFolder(mock.Anything, model.UserID(1), model.PrivateMessageFolderTypeInbox).Return(1, nil)
+	m.EXPECT().CountByFolder(mock.Anything, model.UserID(1), pm.FolderTypeInbox).Return(1, nil)
 	m.EXPECT().List(
 		mock.Anything,
 		model.UserID(1),
-		model.PrivateMessageFolderTypeInbox,
+		pm.FolderTypeInbox,
 		0,
 		10,
-	).Return([]model.PrivateMessageListItem{
+	).Return([]pm.PrivateMessageListItem{
 		{
-			Main: model.PrivateMessage{},
-			Self: model.PrivateMessage{},
+			Main: pm.PrivateMessage{},
+			Self: pm.PrivateMessage{},
 		},
 	}, nil)
 
@@ -73,7 +73,7 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 		mock.Anything,
 		model.UserID(1),
 		model.PrivateMessageID(1),
-	).Return([]model.PrivateMessage{}, domain.ErrNotFound)
+	).Return([]pm.PrivateMessage{}, domain.ErrNotFound)
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
@@ -121,7 +121,7 @@ func TestPrivateMessage_CountTypes(t *testing.T) {
 	m.EXPECT().CountTypes(
 		mock.Anything,
 		model.UserID(1),
-	).Return(model.PrivateMessageTypeCounts{}, nil)
+	).Return(pm.PrivateMessageTypeCounts{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
@@ -175,7 +175,7 @@ func TestPrivateMessage_Create(t *testing.T) {
 		pm.IDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
 		"测试标题",
 		"测试内容",
-	).Return([]model.PrivateMessage{}, nil)
+	).Return([]pm.PrivateMessage{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)

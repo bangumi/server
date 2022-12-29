@@ -15,6 +15,7 @@
 package res
 
 import (
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/pkg/duration"
 )
@@ -30,12 +31,12 @@ type Episode struct {
 	ID              model.EpisodeID `json:"id"`
 	SubjectID       model.SubjectID `json:"subject_id"`
 	Comment         uint32          `json:"comment"`
-	Type            model.EpType    `json:"type"`
+	Type            episode.Type    `json:"type"`
 	Disc            uint8           `json:"disc"`
 	DurationSeconds int             `json:"duration_seconds"`
 }
 
-func ConvertModelEpisode(s model.Episode) Episode {
+func ConvertModelEpisode(s episode.Episode) Episode {
 	return Episode{
 		ID:              s.ID,
 		Name:            s.Name,

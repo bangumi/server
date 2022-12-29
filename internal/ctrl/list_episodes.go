@@ -26,23 +26,23 @@ import (
 func (ctl Ctrl) ListEpisode(
 	ctx context.Context,
 	subjectID model.SubjectID,
-	epType *model.EpType,
+	epType *episode.Type,
 	limit, offset int,
-) ([]model.Episode, int64, error) {
+) ([]episode.Episode, int64, error) {
 	count, err := ctl.CountEpisode(ctx, subjectID, epType)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	if count == 0 {
-		return []model.Episode{}, 0, nil
+		return []episode.Episode{}, 0, nil
 	}
 
 	if int64(offset) > count {
-		return []model.Episode{}, count, ErrOffsetTooBig
+		return []episode.Episode{}, count, ErrOffsetTooBig
 	}
 
-	var episodes []model.Episode
+	var episodes []episode.Episode
 	episodes, err = ctl.episode.List(ctx, subjectID, episode.Filter{Type: null.NewFromPtr(epType)}, limit, offset)
 	if err != nil {
 		return nil, 0, errgo.Wrap(err, "episode.List")

@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 )
 
-func (ctl Ctrl) CountEpisode(ctx context.Context, subjectID model.SubjectID, epType *model.EpType) (int64, error) {
+func (ctl Ctrl) CountEpisode(ctx context.Context, subjectID model.SubjectID, epType *episode.Type) (int64, error) {
 	key := cachekey.EpisodeCount(subjectID, epType)
 	var count int64
 	ok, err := ctl.cache.Get(ctx, key, &count)

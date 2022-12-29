@@ -26,7 +26,7 @@ type Repo interface {
 	// WithQuery is used to replace repo's query to txn
 	WithQuery(query *query.Query) Repo
 
-	Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error)
+	Get(ctx context.Context, episodeID model.EpisodeID) (Episode, error)
 
 	// Count all episode for a subject.
 	Count(ctx context.Context, subjectID model.SubjectID, filter Filter) (int64, error)
@@ -37,9 +37,9 @@ type Repo interface {
 		subjectID model.SubjectID,
 		filter Filter,
 		limit int, offset int,
-	) ([]model.Episode, error)
+	) ([]Episode, error)
 }
 
 type Filter struct {
-	Type null.Null[model.EpType]
+	Type null.Null[Type]
 }

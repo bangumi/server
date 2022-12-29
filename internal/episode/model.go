@@ -11,34 +11,43 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
-package model
+
+package episode
 
 import (
-	"time"
+	"github.com/bangumi/server/internal/model"
 )
 
-type PrivateMessage struct {
-	CreatedTime       time.Time
-	Title             string
-	Content           string
-	Folder            PrivateMessageFolderType
-	SenderID          UserID
-	ReceiverID        UserID
-	ID                PrivateMessageID
-	MainMessageID     PrivateMessageID // 如果当前是首条私信，则为当前私信的id，否则为0
-	RelatedMessageID  PrivateMessageID // 首条私信的id
-	New               bool
-	DeletedBySender   bool
-	DeletedByReceiver bool
+type Type = uint8
+
+const (
+	TypeNormal  Type = 0
+	TypeSpecial Type = 1
+	TypeOpening Type = 2
+	TypeEnding  Type = 3
+	TypeMad     Type = 4
+	TypeOther   Type = 6
+)
+
+type Episode struct {
+	Airdate     string
+	Name        string
+	NameCN      string
+	Duration    string
+	Description string
+	Ep          float32
+	SubjectID   model.SubjectID
+	Sort        float32
+	Comment     uint32
+	ID          model.EpisodeID
+	Type        Type
+	Disc        uint8
 }
 
-type PrivateMessageListItem struct {
-	Main PrivateMessage
-	Self PrivateMessage
-}
+func (e Episode) Less(o Episode) bool {
+	if e.Type == o.Type {
+		return e.Sort <= o.Sort
+	}
 
-type PrivateMessageTypeCounts struct {
-	Unread int64
-	Inbox  int64
-	Outbox int64
+	return e.Type <= o.Type
 }

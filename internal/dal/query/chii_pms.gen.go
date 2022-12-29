@@ -30,7 +30,7 @@ func newPrivateMessage(db *gorm.DB, opts ...gen.DOOption) privateMessage {
 	_privateMessage.ID = field.NewField(tableName, "msg_id")
 	_privateMessage.SenderID = field.NewField(tableName, "msg_sid")
 	_privateMessage.ReceiverID = field.NewField(tableName, "msg_rid")
-	_privateMessage.Folder = field.NewField(tableName, "msg_folder")
+	_privateMessage.Folder = field.NewString(tableName, "msg_folder")
 	_privateMessage.New = field.NewBool(tableName, "msg_new")
 	_privateMessage.Title = field.NewString(tableName, "msg_title")
 	_privateMessage.CreatedTime = field.NewUint32(tableName, "msg_dateline")
@@ -52,7 +52,7 @@ type privateMessage struct {
 	ID                field.Field
 	SenderID          field.Field
 	ReceiverID        field.Field
-	Folder            field.Field
+	Folder            field.String
 	New               field.Bool
 	Title             field.String
 	CreatedTime       field.Uint32
@@ -80,7 +80,7 @@ func (p *privateMessage) updateTableName(table string) *privateMessage {
 	p.ID = field.NewField(table, "msg_id")
 	p.SenderID = field.NewField(table, "msg_sid")
 	p.ReceiverID = field.NewField(table, "msg_rid")
-	p.Folder = field.NewField(table, "msg_folder")
+	p.Folder = field.NewString(table, "msg_folder")
 	p.New = field.NewBool(table, "msg_new")
 	p.Title = field.NewString(table, "msg_title")
 	p.CreatedTime = field.NewUint32(table, "msg_dateline")

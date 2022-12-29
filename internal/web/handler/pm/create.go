@@ -68,7 +68,7 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}
-	return c.JSON(slice.Map(msgs, func(v model.PrivateMessage) res.PrivateMessage {
+	return c.JSON(slice.Map(msgs, func(v pm.PrivateMessage) res.PrivateMessage {
 		return res.ConvertModelPrivateMessage(v, users)
 	}))
 }

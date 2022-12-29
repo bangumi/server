@@ -41,21 +41,21 @@ func (r mysqlRepo) WithQuery(query *query.Query) Repo {
 	return mysqlRepo{q: query, log: r.log}
 }
 
-func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error) {
+func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (Episode, error) {
 	episode, err := r.q.Episode.WithContext(ctx).
 		Where(r.q.Episode.ID.Eq(episodeID), r.q.Episode.Ban.Eq(0)).Limit(1).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Episode{}, domain.ErrNotFound
+			return Episode{}, domain.ErrNotFound
 		}
 
-		return model.Episode{}, errgo.Wrap(err, "dal")
+		return Episode{}, errgo.Wrap(err, "dal")
 	}
 
 	var first float32
-	if episode.Type == model.EpTypeNormal {
+	if episode.Type == TypeNormal {
 		if first, err = r.firstEpisode(ctx, episode.SubjectID); err != nil {
-			return model.Episode{}, err
+			return Episode{}, err
 		}
 	}
 
@@ -83,11 +83,11 @@ func (r mysqlRepo) Count(
 
 func (r mysqlRepo) List(
 	ctx context.Context, subjectID model.SubjectID, filter Filter, limit int, offset int,
-) ([]model.Episode, error) {
+) ([]Episode, error) {
 	first, err := r.firstEpisode(ctx, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return []model.Episode{}, nil
+			return []Episode{}, nil
 		}
 
 		return nil, err
@@ -103,7 +103,7 @@ func (r mysqlRepo) List(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var result = make([]model.Episode, len(episodes))
+	var result = make([]Episode, len(episodes))
 	for i, episode := range episodes {
 		result[i] = convertDaoEpisode(episode, first)
 	}
@@ -115,7 +115,7 @@ func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID model.SubjectID) 
 	episode, err := r.q.Episode.WithContext(ctx).
 		Where(
 			r.q.Episode.SubjectID.Eq(subjectID),
-			r.q.Episode.Type.Eq(model.EpTypeNormal),
+			r.q.Episode.Type.Eq(TypeNormal),
 			r.q.Episode.Ban.Eq(0),
 		).
 		Order(r.q.Episode.Disc, r.q.Episode.Sort).Limit(1).First()
@@ -130,13 +130,13 @@ func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID model.SubjectID) 
 	return episode.Sort, nil
 }
 
-func convertDaoEpisode(e *dao.Episode, firstEpisode float32) model.Episode {
+func convertDaoEpisode(e *dao.Episode, firstEpisode float32) Episode {
 	var ep float32
-	if e.Type == model.EpTypeNormal {
+	if e.Type == TypeNormal {
 		ep = e.Sort - firstEpisode + 1
 	}
 
-	return model.Episode{
+	return Episode{
 		Airdate:     e.Airdate,
 		Name:        e.Name,
 		NameCN:      e.NameCn,

@@ -34,6 +34,7 @@ import (
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/driver"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -300,7 +301,7 @@ type Episode struct {
 	Disc        uint8           `json:"disc"`
 	SubjectID   model.SubjectID `json:"subject_id"`
 	Sort        float32         `json:"sort"`
-	Type        model.EpType    `json:"type"`
+	Type        episode.Type    `json:"type"`
 }
 
 func exportEpisodes(q *query.Query, w io.Writer) {

@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -39,10 +40,10 @@ func TestUser_GetEpisodeCollection(t *testing.T) {
 	c.EXPECT().GetSubjectEpisodesCollection(mock.Anything, mock.Anything, mock.Anything).
 		Return(map[model.EpisodeID]model.UserEpisodeCollection{}, nil)
 
-	episode := mocks.NewEpisodeRepo(t)
-	episode.EXPECT().Get(mock.Anything, model.EpisodeID(1)).Return(model.Episode{}, nil)
+	e := mocks.NewEpisodeRepo(t)
+	e.EXPECT().Get(mock.Anything, model.EpisodeID(1)).Return(episode.Episode{}, nil)
 
-	app := test.GetWebApp(t, test.Mock{AuthService: mockAuth, CollectionRepo: c, EpisodeRepo: episode})
+	app := test.GetWebApp(t, test.Mock{AuthService: mockAuth, CollectionRepo: c, EpisodeRepo: e})
 
 	var r struct {
 		Type uint8 `json:"type"`
@@ -64,12 +65,12 @@ func TestUser_GetSubjectEpisodeCollection(t *testing.T) {
 	c.EXPECT().GetSubjectEpisodesCollection(mock.Anything, mock.Anything, mock.Anything).
 		Return(map[model.EpisodeID]model.UserEpisodeCollection{}, nil)
 
-	episode := mocks.NewEpisodeRepo(t)
-	episode.EXPECT().Count(mock.Anything, mock.Anything, mock.Anything).Return(20, nil)
-	episode.EXPECT().List(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-		Return([]model.Episode{}, nil)
+	e := mocks.NewEpisodeRepo(t)
+	e.EXPECT().Count(mock.Anything, mock.Anything, mock.Anything).Return(20, nil)
+	e.EXPECT().List(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return([]episode.Episode{}, nil)
 
-	app := test.GetWebApp(t, test.Mock{AuthService: mockAuth, CollectionRepo: c, EpisodeRepo: episode})
+	app := test.GetWebApp(t, test.Mock{AuthService: mockAuth, CollectionRepo: c, EpisodeRepo: e})
 
 	var r res.PagedG[struct {
 		Type uint8 `json:"type"`

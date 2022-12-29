@@ -49,7 +49,7 @@ func (h PrivateMessage) ListRelated(c *fiber.Ctx) error {
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}
-	data := slice.Map(list, func(v model.PrivateMessage) res.PrivateMessage {
+	data := slice.Map(list, func(v pm.PrivateMessage) res.PrivateMessage {
 		return res.ConvertModelPrivateMessage(v, users)
 	})
 	return res.JSON(c, data)

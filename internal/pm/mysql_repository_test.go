@@ -37,7 +37,7 @@ func getRepo(t *testing.T) pm.Repo {
 	return repo
 }
 
-func mapToID(msg model.PrivateMessage) model.PrivateMessageID {
+func mapToID(msg pm.PrivateMessage) model.PrivateMessageID {
 	return msg.ID
 }
 
@@ -48,7 +48,7 @@ func mockMessage(
 	relatedID *model.PrivateMessageID,
 	senderID model.UserID,
 	receiverID model.UserID,
-) model.PrivateMessage {
+) pm.PrivateMessage {
 	t.Helper()
 	m, err := repo.Create(
 		ctx,
@@ -79,7 +79,7 @@ func TestListInbox(t *testing.T) {
 
 	m := mockMessage(ctx, t, repo, nil, 1, 382951)
 
-	list, err := repo.List(ctx, 382951, model.PrivateMessageFolderTypeInbox, 0, 10)
+	list, err := repo.List(ctx, 382951, pm.FolderTypeInbox, 0, 10)
 	require.NoError(t, err)
 	require.NotEmpty(t, list)
 	require.LessOrEqual(t, m.ID, list[0].Self.ID)
@@ -95,7 +95,7 @@ func TestListOutbox(t *testing.T) {
 
 	m := mockMessage(ctx, t, repo, nil, 1, 382951)
 
-	list, err := repo.List(ctx, 1, model.PrivateMessageFolderTypeOutbox, 0, 10)
+	list, err := repo.List(ctx, 1, pm.FolderTypeOutbox, 0, 10)
 	require.NoError(t, err)
 	require.NotEmpty(t, list)
 	require.LessOrEqual(t, m.ID, list[0].Self.ID)
@@ -225,9 +225,9 @@ func TestCreate(t *testing.T) {
 
 	t.Cleanup(func() {
 		for _, msg := range msgs {
-			err = repo.Delete(ctx, msg.SenderID, slice.Map([]model.PrivateMessage{msg}, mapToID))
+			err = repo.Delete(ctx, msg.SenderID, slice.Map([]pm.PrivateMessage{msg}, mapToID))
 			require.NoError(t, err)
-			err = repo.Delete(ctx, msg.ReceiverID, slice.Map([]model.PrivateMessage{msg}, mapToID))
+			err = repo.Delete(ctx, msg.ReceiverID, slice.Map([]pm.PrivateMessage{msg}, mapToID))
 			require.NoError(t, err)
 		}
 	})

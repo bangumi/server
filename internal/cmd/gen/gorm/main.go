@@ -33,6 +33,7 @@ import (
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/driver"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -45,13 +46,13 @@ var groupIDTypeString = "model." + reflect.TypeOf(new(model.GroupID)).Elem().Nam
 var timelineIDTypeString = "model." + reflect.TypeOf(new(model.TimeLineID)).Elem().Name()
 var timelineCatTypeString = reflect.TypeOf(new(model.TimeLineCat)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
-var episodeTypeTypeString = reflect.TypeOf(new(model.EpType)).Elem().Name()
+var episodeTypeTypeString = reflect.TypeOf(new(episode.Type)).Elem().Name()
 var notificationIDTypeString = "model." + reflect.TypeOf(new(model.NotificationID)).Elem().Name()
-var notificationFieldIDTypeString = "model." + reflect.TypeOf(new(model.NotificationFieldID)).Elem().Name()
-var notificationTypeTypeString = "model." + reflect.TypeOf(new(model.NotificationType)).Elem().Name()
-var notificationStatusTypeString = "model." + reflect.TypeOf(new(model.NotificationStatus)).Elem().Name()
+var notificationFieldIDTypeString = "uint32"
+var notificationTypeTypeString = "uint8"
+var notificationStatusTypeString = "uint8"
 var privateMessageIDTypeString = "model." + reflect.TypeOf(new(model.PrivateMessageID)).Elem().Name()
-var privateMessageFolderTypeTypeString = "model." + reflect.TypeOf(new(model.PrivateMessageFolderType)).Elem().Name()
+var privateMessageFolderTypeTypeString = "string"
 
 func DeprecatedFiled(s string) gen.ModelOpt {
 	return gen.FieldComment(s, "Deprecated")

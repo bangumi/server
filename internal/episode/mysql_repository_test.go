@@ -61,7 +61,7 @@ func TestMysqlRepo_Get(t *testing.T) {
 	e, err := repo.Get(context.TODO(), eid)
 	require.NoError(t, err)
 
-	require.Equal(t, model.Episode{
+	require.Equal(t, episode.Episode{
 		Airdate:   "2008-07-12",
 		Name:      "ギアス 狩り",
 		NameCN:    "Geass 狩猎",
@@ -71,7 +71,7 @@ func TestMysqlRepo_Get(t *testing.T) {
 		Sort:      14,
 		Comment:   11,
 		ID:        eid,
-		Type:      model.EpTypeNormal,
+		Type:      episode.TypeNormal,
 	}, e)
 }
 
@@ -86,11 +86,11 @@ func TestMysqlRepo_List(t *testing.T) {
 		len    int
 	}{
 		{filter: episode.Filter{}, len: 31},
-		{filter: episode.Filter{Type: null.New(model.EpTypeNormal)}, len: 26},
-		{filter: episode.Filter{Type: null.New(model.EpTypeSpecial)}, len: 1},
-		{filter: episode.Filter{Type: null.New(model.EpTypeOpening)}, len: 1},
-		{filter: episode.Filter{Type: null.New(model.EpTypeEnding)}, len: 3},
-		{filter: episode.Filter{Type: null.New(model.EpTypeMad)}, len: 0},
+		{filter: episode.Filter{Type: null.New(episode.TypeNormal)}, len: 26},
+		{filter: episode.Filter{Type: null.New(episode.TypeSpecial)}, len: 1},
+		{filter: episode.Filter{Type: null.New(episode.TypeOpening)}, len: 1},
+		{filter: episode.Filter{Type: null.New(episode.TypeEnding)}, len: 3},
+		{filter: episode.Filter{Type: null.New(episode.TypeMad)}, len: 0},
 	}
 
 	for _, tc := range testCases {

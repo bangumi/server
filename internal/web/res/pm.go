@@ -20,6 +20,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/user"
 )
 
@@ -40,7 +41,7 @@ type PrivateMessageTypeCounts struct {
 	Outbox int64 `json:"outbox"`
 }
 
-func ConvertModelPrivateMessage(item model.PrivateMessage, users map[model.UserID]user.User) PrivateMessage {
+func ConvertModelPrivateMessage(item pm.PrivateMessage, users map[model.UserID]user.User) PrivateMessage {
 	msg := PrivateMessage{
 		CreatedAt: item.CreatedTime,
 		Title:     item.Title,
@@ -60,7 +61,7 @@ func ConvertModelPrivateMessage(item model.PrivateMessage, users map[model.UserI
 }
 
 func ConvertModelPrivateMessageListItem(
-	item model.PrivateMessageListItem,
+	item pm.PrivateMessageListItem,
 	users map[model.UserID]user.User,
 ) PrivateMessage {
 	relatedMsg := ConvertModelPrivateMessage(item.Main, nil)

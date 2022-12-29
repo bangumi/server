@@ -46,13 +46,13 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 func (r mysqlRepo) List(
 	ctx context.Context,
 	userID model.UserID,
-	folder model.PrivateMessageFolderType,
+	folder FolderType,
 	offset int,
 	limit int,
-) ([]model.PrivateMessageListItem, error) {
+) ([]PrivateMessageListItem, error) {
 	var conds []gen.Condition
 	do := r.q.PrivateMessage.WithContext(ctx)
-	if folder == model.PrivateMessageFolderTypeInbox {
+	if folder == FolderTypeInbox {
 		conds = []gen.Condition{
 			r.q.PrivateMessage.ReceiverID.Eq(userID),
 			r.q.PrivateMessage.DeletedByReceiver.Is(false),
@@ -70,7 +70,7 @@ func (r mysqlRepo) List(
 
 	if err != nil {
 		r.log.Error("unexpected error", zap.Error(err))
-		return make([]model.PrivateMessageListItem, 0), errgo.Wrap(err, "dal")
+		return make([]PrivateMessageListItem, 0), errgo.Wrap(err, "dal")
 	}
 
 	mainIDs := lo.Uniq(slice.Map(ret, func(v *dao.PrivateMessage) model.PrivateMessageID {
@@ -80,13 +80,13 @@ func (r mysqlRepo) List(
 	mainMsgList, err := do.Where(r.q.PrivateMessage.ID.In(slice.ToValuer(mainIDs)...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error", zap.Error(err))
-		return make([]model.PrivateMessageListItem, 0), errgo.Wrap(err, "dal")
+		return make([]PrivateMessageListItem, 0), errgo.Wrap(err, "dal")
 	}
 	mainMsgs := slice.ToMap(mainMsgList, func(v *dao.PrivateMessage) model.PrivateMessageID {
 		return v.ID
 	})
-	return slice.Map(ret, func(v *dao.PrivateMessage) model.PrivateMessageListItem {
-		return model.PrivateMessageListItem{
+	return slice.Map(ret, func(v *dao.PrivateMessage) PrivateMessageListItem {
+		return PrivateMessageListItem{
 			Main: convertDaoToModel(mainMsgs[v.RelatedMessageID]),
 			Self: convertDaoToModel(v),
 		}
@@ -96,10 +96,10 @@ func (r mysqlRepo) List(
 func countByFolder(ctx context.Context,
 	q *query.Query,
 	userID model.UserID,
-	folder model.PrivateMessageFolderType) (int64, error) {
+	folder FolderType) (int64, error) {
 	var conds []gen.Condition
 	do := q.PrivateMessage.WithContext(ctx)
-	if folder == model.PrivateMessageFolderTypeInbox {
+	if folder == FolderTypeInbox {
 		conds = []gen.Condition{
 			q.PrivateMessage.ReceiverID.Eq(userID),
 			q.PrivateMessage.DeletedByReceiver.Is(false),
@@ -119,7 +119,7 @@ func countByFolder(ctx context.Context,
 
 func (r mysqlRepo) CountByFolder(ctx context.Context,
 	userID model.UserID,
-	folder model.PrivateMessageFolderType) (int64, error) {
+	folder FolderType) (int64, error) {
 	count, err := countByFolder(ctx, r.q, userID, folder)
 	if err != nil {
 		r.log.Error("unexpected error", zap.Error(err))
@@ -153,10 +153,10 @@ func (r mysqlRepo) ListRelated(
 	ctx context.Context,
 	userID model.UserID,
 	id model.PrivateMessageID,
-) ([]model.PrivateMessage, error) {
+) ([]PrivateMessage, error) {
 	do := r.q.PrivateMessage.WithContext(ctx)
 	firstMsg, err := r.getMainMsg(ctx, id)
-	var emptyMsgList = make([]model.PrivateMessage, 0)
+	var emptyMsgList = make([]PrivateMessage, 0)
 	if err != nil {
 		r.log.Error("unexpected error", zap.Error(err))
 		return emptyMsgList, errgo.Wrap(err, "dal")
@@ -193,14 +193,14 @@ func (r mysqlRepo) ListRelated(
 func (r mysqlRepo) CountTypes(
 	ctx context.Context,
 	userID model.UserID,
-) (model.PrivateMessageTypeCounts, error) {
+) (PrivateMessageTypeCounts, error) {
 	do := r.q.PrivateMessage.WithContext(ctx)
-	res := model.PrivateMessageTypeCounts{}
-	c1, err := r.CountByFolder(ctx, userID, model.PrivateMessageFolderTypeOutbox)
+	res := PrivateMessageTypeCounts{}
+	c1, err := r.CountByFolder(ctx, userID, FolderTypeOutbox)
 	if err != nil {
 		return res, err
 	}
-	c2, err := r.CountByFolder(ctx, userID, model.PrivateMessageFolderTypeInbox)
+	c2, err := r.CountByFolder(ctx, userID, FolderTypeInbox)
 	if err != nil {
 		return res, err
 	}
@@ -255,7 +255,7 @@ func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID 
 		}
 		affectedRows = rows.RowsAffected
 		if rows.RowsAffected != 0 {
-			count, err := countByFolder(ctx, tx, userID, model.PrivateMessageFolderTypeInbox)
+			count, err := countByFolder(ctx, tx, userID, FolderTypeInbox)
 			if err != nil {
 				return errgo.Wrap(err, "dal")
 			}
@@ -312,8 +312,8 @@ func (r mysqlRepo) Create(
 	relatedIDFilter IDFilter,
 	title string,
 	content string,
-) ([]model.PrivateMessage, error) {
-	emptyList := make([]model.PrivateMessage, 0)
+) ([]PrivateMessage, error) {
+	emptyList := make([]PrivateMessage, 0)
 	if relatedIDFilter.Type.Set {
 		if len(receiverIDs) > 1 {
 			return emptyList, ErrPmInvalidOperation
@@ -472,15 +472,15 @@ func handleMainDeletes(ctx context.Context, tx *query.Query, pms []*dao.PrivateM
 	return nil
 }
 
-func convertDaoToModel(d *dao.PrivateMessage) model.PrivateMessage {
+func convertDaoToModel(d *dao.PrivateMessage) PrivateMessage {
 	if d == nil {
-		return model.PrivateMessage{}
+		return PrivateMessage{}
 	}
-	return model.PrivateMessage{
+	return PrivateMessage{
 		CreatedTime:       time.Unix(int64(d.CreatedTime), 0),
 		Title:             d.Title,
 		Content:           d.Content,
-		Folder:            d.Folder,
+		Folder:            FolderType(d.Folder),
 		SenderID:          d.SenderID,
 		ReceiverID:        d.ReceiverID,
 		ID:                d.ID,

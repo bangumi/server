@@ -17,8 +17,10 @@ package req
 import (
 	"strconv"
 
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/web/res"
 )
 
@@ -158,7 +160,7 @@ func ParseCollectionType(s string) (model.SubjectCollection, error) {
 	return 0, res.BadRequest(strconv.Quote(s) + "is not a valid collection type")
 }
 
-func ParseEpTypeOptional(s string) (*model.EpType, error) {
+func ParseEpTypeOptional(s string) (*episode.Type, error) {
 	if s == "" {
 		return nil, nil //nolint:nilnil
 	}
@@ -169,27 +171,27 @@ func ParseEpTypeOptional(s string) (*model.EpType, error) {
 	}
 
 	switch v {
-	case model.EpTypeNormal, model.EpTypeSpecial,
-		model.EpTypeOpening, model.EpTypeEnding,
-		model.EpTypeMad, model.EpTypeOther:
+	case episode.TypeNormal, episode.TypeSpecial,
+		episode.TypeOpening, episode.TypeEnding,
+		episode.TypeMad, episode.TypeOther:
 		return &v, nil
 	}
 
 	return nil, res.BadRequest(strconv.Quote(s) + " is not valid episode type")
 }
 
-func ParsePrivateMessageFolder(s string) (model.PrivateMessageFolderType, error) {
-	v := model.PrivateMessageFolderType(s)
+func ParsePrivateMessageFolder(s string) (pm.FolderType, error) {
+	v := pm.FolderType(s)
 	switch v {
-	case model.PrivateMessageFolderTypeInbox,
-		model.PrivateMessageFolderTypeOutbox:
+	case pm.FolderTypeInbox,
+		pm.FolderTypeOutbox:
 		return v, nil
 	}
 	return v, res.BadRequest(
 		"folder must be " +
-			string(model.PrivateMessageFolderTypeInbox) +
+			string(pm.FolderTypeInbox) +
 			" or " +
-			string(model.PrivateMessageFolderTypeOutbox))
+			string(pm.FolderTypeOutbox))
 }
 
 func ParsePrivateMessageID(s string) (model.PrivateMessageID, error) {
