@@ -30,6 +30,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
@@ -86,18 +87,40 @@ func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 		return errgo.Wrap(err, "search")
 	}
 
-	data := make([]Record, 0, len(result.Hits))
+	ids := make([]model.SubjectID, 0, len(result.Hits))
 	for _, h := range result.Hits {
 		var hit struct {
-			Record Record `json:"record"`
+			ID model.SubjectID `json:"id"`
 		}
-		if err := sonic.Unmarshal(h, &hit); err != nil {
+
+		if err = sonic.Unmarshal(h, &hit); err != nil {
 			return errgo.Wrap(err, "json.Unmarshal")
 		}
 
-		hit.Record.Image = res.SubjectImage(hit.Record.Image).Large
-		data = append(data, hit.Record)
+		ids = append(ids, hit.ID)
 	}
+
+	subjects, err := c.subjectRepo.GetByIDs(ctx.UserContext(), ids, subject.Filter{NSFW: r.Filter.NSFW})
+	if err != nil {
+		return errgo.Wrap(err, "subjectRepo.GetByIDs")
+	}
+
+	data := slice.Map(ids, func(id model.SubjectID) Record {
+		s := subjects[id]
+
+		return Record{
+			Date:   s.Date,
+			Image:  res.SubjectImage(s.Image).Large,
+			Name:   s.Name,
+			NameCN: s.NameCN,
+			Tags: slice.Map(s.Tags, func(item model.Tag) res.SubjectTag {
+				return res.SubjectTag{Name: item.Name, Count: item.Count}
+			}),
+			Score: s.Rating.Score,
+			ID:    s.ID,
+			Rank:  s.Rating.Rank,
+		}
+	})
 
 	return res.JSON(ctx, res.Paged{
 		Data:   data,

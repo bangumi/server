@@ -18,7 +18,6 @@ import (
 	"strconv"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/wiki"
 )
@@ -32,7 +31,6 @@ type subjectIndex struct {
 	Summary  string          `json:"summary"`
 	Tag      []string        `json:"tag,omitempty" filterable:"true"`
 	Name     []string        `json:"name"`
-	Record   Record          `json:"record"`
 	Date     int             `json:"date,omitempty" filterable:"true" sortable:"true"`
 	Score    float64         `json:"score" filterable:"true" sortable:"true"`
 	PageRank float64         `json:"page_rank" sortable:"true"`
@@ -107,18 +105,6 @@ func extractSubject(s *model.Subject) subjectIndex {
 		Rank:     s.Rating.Rank,
 		Heat:     heat(s),
 		Score:    score,
-		Record: Record{
-			ID:     s.ID,
-			Image:  s.Image,
-			Name:   s.Name,
-			NameCN: s.NameCN,
-			Date:   s.Date,
-			Tags: slice.Map(tags, func(t model.Tag) res.SubjectTag {
-				return res.SubjectTag{Name: t.Name, Count: t.Count}
-			}),
-			Rank:  s.Rating.Rank,
-			Score: score,
-		},
 	}
 }
 
