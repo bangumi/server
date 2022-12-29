@@ -23,13 +23,12 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/timeline"
 )
 
-func getRepo(t *testing.T) (domain.TimeLineRepo, *query.Query) {
+func getRepo(t *testing.T) (timeline.Repo, *query.Query) {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
 	repo, err := timeline.NewMysqlRepo(q, zap.NewNop())

@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package auth
 
 import (
 	"context"
@@ -23,9 +23,9 @@ import (
 )
 
 // AuthRepo presents an authorization.
-type AuthRepo interface {
+type Repo interface {
 	// GetByToken return an authorized user by a valid access token.
-	GetByToken(ctx context.Context, token string) (AuthUserInfo, error)
+	GetByToken(ctx context.Context, token string) (UserInfo, error)
 	GetPermission(ctx context.Context, groupID uint8) (Permission, error)
 
 	CreateAccessToken(
@@ -36,11 +36,29 @@ type AuthRepo interface {
 	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
 
 	// GetByEmail return (Auth, HashedPassword, error)
-	GetByEmail(ctx context.Context, email string) (AuthUserInfo, []byte, error)
+	GetByEmail(ctx context.Context, email string) (UserInfo, []byte, error)
 	GetTokenByID(ctx context.Context, id uint32) (AccessToken, error)
 }
 
-type AuthUserInfo struct {
+type Service interface {
+	GetByToken(ctx context.Context, token string) (Auth, error)
+	GetByID(ctx context.Context, userID model.UserID) (Auth, error)
+
+	ComparePassword(hashed []byte, password string) (bool, error)
+
+	Login(ctx context.Context, email, password string) (Auth, bool, error)
+
+	GetTokenByID(ctx context.Context, tokenID uint32) (AccessToken, error)
+	CreateAccessToken(
+		ctx context.Context, userID model.UserID, name string, expiration time.Duration,
+	) (token string, err error)
+	ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error)
+	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
+
+	// GetPermission(ctx context.Context, id model.UserGroupID) (Permission, error)
+}
+
+type UserInfo struct {
 	RegTime time.Time
 	ID      model.UserID
 	GroupID model.UserGroupID
@@ -67,24 +85,6 @@ func (u Auth) RegisteredLongerThan(t time.Duration) bool {
 	}
 
 	return time.Since(u.RegTime) >= t
-}
-
-type AuthService interface {
-	GetByToken(ctx context.Context, token string) (Auth, error)
-	GetByID(ctx context.Context, userID model.UserID) (Auth, error)
-
-	ComparePassword(hashed []byte, password string) (bool, error)
-
-	Login(ctx context.Context, email, password string) (Auth, bool, error)
-
-	GetTokenByID(ctx context.Context, tokenID uint32) (AccessToken, error)
-	CreateAccessToken(
-		ctx context.Context, userID model.UserID, name string, expiration time.Duration,
-	) (token string, err error)
-	ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error)
-	DeleteAccessToken(ctx context.Context, tokenID uint32) (bool, error)
-
-	// GetPermission(ctx context.Context, id model.UserGroupID) (Permission, error)
 }
 
 type AccessToken struct {

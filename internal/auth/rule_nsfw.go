@@ -15,11 +15,10 @@
 package auth
 
 import (
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 )
 
-func AllowReadSubject(u domain.Auth, s model.Subject) bool {
+func AllowReadSubject(u Auth, s model.Subject) bool {
 	if !s.NSFW {
 		return true
 	}
@@ -27,7 +26,7 @@ func AllowReadSubject(u domain.Auth, s model.Subject) bool {
 	return u.AllowNSFW()
 }
 
-func AllowReadCharacter(u domain.Auth, c model.Character) bool {
+func AllowReadCharacter(u Auth, c model.Character) bool {
 	if !c.NSFW {
 		return true
 	}

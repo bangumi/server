@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package collection
 
 import (
 	"context"
@@ -23,9 +23,9 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 )
 
-type CollectionRepo interface {
+type Repo interface {
 	// WithQuery is used to replace repo's query to txn
-	WithQuery(query *query.Query) CollectionRepo
+	WithQuery(query *query.Query) Repo
 	CountSubjectCollections(
 		ctx context.Context,
 		userID model.UserID,
@@ -52,7 +52,7 @@ type CollectionRepo interface {
 	) (model.UserSubjectEpisodesCollection, error)
 
 	UpdateSubjectCollection(
-		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data SubjectCollectionUpdate,
+		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data Update,
 		at time.Time,
 	) error
 
@@ -64,7 +64,7 @@ type CollectionRepo interface {
 	) (model.UserSubjectEpisodesCollection, error)
 }
 
-type SubjectCollectionUpdate struct {
+type Update struct {
 	IP string
 
 	Comment   null.String

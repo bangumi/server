@@ -24,8 +24,11 @@ import (
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic"
@@ -50,7 +53,7 @@ type UpdateCollectionRequest struct {
 
 func (ctl Ctrl) UpdateCollection(
 	ctx context.Context,
-	u domain.Auth,
+	u auth.Auth,
 	subjectID model.SubjectID,
 	req UpdateCollectionRequest,
 ) error {
@@ -81,16 +84,17 @@ func (ctl Ctrl) UpdateCollection(
 	}
 
 	txErr := ctl.tx.Transaction(func(tx *query.Query) error {
-		err := ctl.collection.WithQuery(tx).UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
-			IP:        req.IP,
-			Comment:   req.Comment,
-			Tags:      req.Tags,
-			VolStatus: req.VolStatus,
-			EpStatus:  req.EpStatus,
-			Type:      req.Type,
-			Rate:      req.Rate,
-			Privacy:   privacy,
-		}, time.Now())
+		err := ctl.collection.WithQuery(tx).
+			UpdateSubjectCollection(ctx, u.ID, subjectID, collection.Update{
+				IP:        req.IP,
+				Comment:   req.Comment,
+				Tags:      req.Tags,
+				VolStatus: req.VolStatus,
+				EpStatus:  req.EpStatus,
+				Type:      req.Type,
+				Rate:      req.Rate,
+				Privacy:   privacy,
+			}, time.Now())
 		if err != nil {
 			ctl.log.Error("failed to update user collection info", zap.Error(err))
 			return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
@@ -108,7 +112,7 @@ func (ctl Ctrl) UpdateCollection(
 
 func (ctl Ctrl) saveTimeLineSubject(
 	ctx context.Context,
-	u domain.Auth,
+	u auth.Auth,
 	subjectID model.SubjectID,
 	req UpdateCollectionRequest,
 	tx *query.Query,
@@ -187,7 +191,7 @@ func subjectTypeMap() map[model.SubjectType][]uint16 {
 
 func (ctl Ctrl) UpdateEpisodesCollection(
 	ctx context.Context,
-	u domain.Auth,
+	u auth.Auth,
 	subjectID model.SubjectID,
 	episodeIDs []model.EpisodeID,
 	t model.EpisodeCollection,
@@ -199,7 +203,7 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 	ctl.log.Info("try to update collection info", subjectID.Zap(),
 		u.ID.Zap(), zap.Reflect("episode_ids", episodeIDs))
 
-	episodes, err := ctl.episode.List(ctx, subjectID, domain.EpisodeFilter{}, 0, 0)
+	episodes, err := ctl.episode.List(ctx, subjectID, episode.Filter{}, 0, 0)
 	if err != nil {
 		return errgo.Wrap(err, "episodeRepo.List")
 	}
@@ -221,7 +225,7 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 
 func (ctl Ctrl) UpdateEpisodeCollection(
 	ctx context.Context,
-	u domain.Auth,
+	u auth.Auth,
 	episodeID model.EpisodeID,
 	t model.EpisodeCollection,
 ) error {
@@ -243,7 +247,7 @@ func (ctl Ctrl) UpdateEpisodeCollection(
 
 func (ctl Ctrl) updateEpisodesCollectionTx(
 	ctx context.Context,
-	u domain.Auth,
+	u auth.Auth,
 	subjectID model.SubjectID,
 	episodeIDs []model.EpisodeID,
 	t model.EpisodeCollection,
@@ -268,7 +272,7 @@ func (ctl Ctrl) updateEpisodesCollectionTx(
 
 		epStatus := len(ec)
 
-		err = collectionTx.UpdateSubjectCollection(ctx, u.ID, subjectID, domain.SubjectCollectionUpdate{
+		err = collectionTx.UpdateSubjectCollection(ctx, u.ID, subjectID, collection.Update{
 			EpStatus: null.New(uint32(epStatus)),
 		}, at)
 		if err != nil {

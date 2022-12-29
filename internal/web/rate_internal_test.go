@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/web/accessor"
@@ -42,7 +42,7 @@ func Test_rateMiddleware(t *testing.T) {
 
 	app.Use(rateMiddleware(r, mockBaseHandler{
 		a: &accessor.Accessor{
-			RequestID: "fake-request-id", IP: net.IPv4(1, 1, 1, 1), Auth: domain.Auth{ID: 1}, Login: true,
+			RequestID: "fake-request-id", IP: net.IPv4(1, 1, 1, 1), Auth: auth.Auth{ID: 1}, Login: true,
 		},
 	}, action.Action(0), rate.PerHour(10)))
 
@@ -64,7 +64,7 @@ func Test_rateMiddleware_allow(t *testing.T) {
 
 	app.Use(rateMiddleware(r, mockBaseHandler{
 		a: &accessor.Accessor{
-			RequestID: "fake-request-id", IP: net.IPv4(1, 1, 1, 1), Auth: domain.Auth{ID: 1}, Login: true,
+			RequestID: "fake-request-id", IP: net.IPv4(1, 1, 1, 1), Auth: auth.Auth{ID: 1}, Login: true,
 		},
 	}, action.Action(0), rate.PerHour(10)))
 
@@ -88,7 +88,7 @@ func Test_rateMiddleware_not_login(t *testing.T) {
 
 	app.Use(rateMiddleware(r, mockBaseHandler{
 		a: &accessor.Accessor{
-			RequestID: "fake-request-id", IP: net.IPv4(1, 1, 1, 1), Auth: domain.Auth{ID: 1}, Login: false,
+			RequestID: "fake-request-id", IP: net.IPv4(1, 1, 1, 1), Auth: auth.Auth{ID: 1}, Login: false,
 		},
 	}, action.Action(0), rate.PerHour(10)))
 

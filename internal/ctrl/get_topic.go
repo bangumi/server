@@ -24,20 +24,21 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/web/res"
 )
 
 var ErrInvalidInput = errors.New("failed")
 
 func (ctl Ctrl) GetTopic(
-	ctx context.Context, u domain.Auth, topicType domain.TopicType, topicID model.TopicID, limit int, offset int,
+	ctx context.Context, u auth.Auth, topicType topic.Type, topicID model.TopicID, limit int, offset int,
 ) (model.TopicDetail, error) {
-	var commentType domain.CommentType
+	var commentType topic.CommentType
 	switch topicType {
-	case domain.TopicTypeGroup:
-		commentType = domain.CommentTypeGroupTopic
-	case domain.TopicTypeSubject:
-		commentType = domain.CommentTypeSubjectTopic
+	case topic.TypeGroup:
+		commentType = topic.CommentTypeGroupTopic
+	case topic.TypeSubject:
+		commentType = topic.CommentTypeSubjectTopic
 	default:
 		return model.TopicDetail{}, ErrInvalidInput
 	}
@@ -80,8 +81,8 @@ func (ctl Ctrl) GetTopic(
 
 func (ctl Ctrl) ListTopics(
 	ctx context.Context,
-	u domain.Auth,
-	topicType domain.TopicType,
+	u auth.Auth,
+	topicType topic.Type,
 	objectID uint32,
 	limit, offset int,
 ) ([]model.Topic, int64, error) {
@@ -106,7 +107,7 @@ func (ctl Ctrl) ListTopics(
 
 func (ctl Ctrl) ListReplies(
 	ctx context.Context,
-	commentType domain.CommentType,
+	commentType topic.CommentType,
 	topicID model.TopicID,
 	limit, offset int,
 ) ([]model.Comment, int64, error) {

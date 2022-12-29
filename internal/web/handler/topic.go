@@ -26,11 +26,13 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/gmap"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/topic"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
 
-func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32) error {
+func (h Handler) listTopics(c *fiber.Ctx, topicType topic.Type, id uint32) error {
 	u := h.GetHTTPAccessor(c)
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
@@ -82,7 +84,7 @@ func (h Handler) listTopics(c *fiber.Ctx, topicType domain.TopicType, id uint32)
 }
 
 func (h Handler) getResTopicWithComments(
-	c *fiber.Ctx, topicType domain.TopicType, topicID model.TopicID,
+	c *fiber.Ctx, topicType topic.Type, topicID model.TopicID,
 ) (*res.PrivateTopicDetail, error) {
 	a := h.GetHTTPAccessor(c)
 
@@ -110,7 +112,7 @@ func (h Handler) getResTopicWithComments(
 		return nil, errgo.Wrap(err, "ctrl.GetUsersByIDs")
 	}
 
-	var friends map[model.UserID]domain.FriendItem
+	var friends map[model.UserID]user.FriendItem
 	if a.Login {
 		friends, err = h.ctrl.GetFriends(context.TODO(), a.ID)
 		if err != nil {
@@ -135,7 +137,7 @@ func (h Handler) getResTopicWithComments(
 func fromModelComments(
 	replies []model.Comment,
 	users map[model.UserID]model.User,
-	friends map[model.UserID]domain.FriendItem,
+	friends map[model.UserID]user.FriendItem,
 ) []res.PrivateComment {
 	var comments = make([]res.PrivateComment, 0, len(replies))
 	for _, reply := range replies {

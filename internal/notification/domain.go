@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package notification
 
 import (
 	"context"
@@ -20,16 +20,6 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type CharacterRepo interface {
-	Get(ctx context.Context, id model.CharacterID) (model.Character, error)
-	GetByIDs(ctx context.Context, ids []model.CharacterID) (map[model.CharacterID]model.Character, error)
-
-	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]PersonCharacterRelation, error)
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectCharacterRelation, error)
-}
-
-type PersonCharacterRelation struct {
-	CharacterID model.CharacterID
-	PersonID    model.PersonID
-	SubjectID   model.SubjectID
+type Repo interface {
+	Count(ctx context.Context, userID model.UserID) (int64, error)
 }

@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -39,7 +39,7 @@ func TestNotification_Count(t *testing.T) {
 	).Return(0, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
 
 	s := mocks.NewSessionManager(t)
 	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)

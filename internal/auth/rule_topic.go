@@ -15,14 +15,13 @@
 package auth
 
 import (
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/gtime"
 )
 
 // ListTopicDisplays 在帖子列表能看到哪些状态的帖子。
-func ListTopicDisplays(u domain.Auth) []model.TopicDisplay {
+func ListTopicDisplays(u Auth) []model.TopicDisplay {
 	if u.ID == 0 {
 		return []model.TopicDisplay{model.TopicDisplayNormal}
 	}
@@ -67,7 +66,7 @@ func RewriteCommentTree(comments []model.Comment) []model.Comment {
 	return newComments
 }
 
-func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {
+func CanViewTopicContent(u Auth, topic model.Topic) bool {
 	if u.ID == 0 {
 		// 未登录用户只能看到正常帖子
 		return topic.Display == model.TopicDisplayNormal && (topic.State == model.CommentStateNone ||
@@ -111,10 +110,10 @@ func CanViewTopicContent(u domain.Auth, topic model.Topic) bool {
 const CanViewStateClosedTopic = gtime.OneDay * 180
 const CanViewStateDeleteTopic = gtime.OneDay * 365
 
-func CanViewDeleteTopic(a domain.Auth) bool {
+func CanViewDeleteTopic(a Auth) bool {
 	return a.RegisteredLongerThan(CanViewStateDeleteTopic)
 }
 
-func CanViewClosedTopic(a domain.Auth) bool {
+func CanViewClosedTopic(a Auth) bool {
 	return a.RegisteredLongerThan(CanViewStateClosedTopic)
 }

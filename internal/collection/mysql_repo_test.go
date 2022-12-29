@@ -27,13 +27,12 @@ import (
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/dal/dao"
 	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getRepo(t *testing.T) (domain.CollectionRepo, *query.Query) {
+func getRepo(t *testing.T) (collection.Repo, *query.Query) {
 	t.Helper()
 	q := test.GetQuery(t)
 	repo, err := collection.NewMysqlRepo(q, zap.NewNop())
@@ -164,7 +163,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 
 	now := time.Now()
 
-	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, domain.SubjectCollectionUpdate{
+	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, collection.Update{
 		Comment: null.New("c"),
 		Rate:    null.New[uint8](1),
 		Type:    null.New(model.SubjectCollectionDropped),

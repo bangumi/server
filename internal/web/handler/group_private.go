@@ -23,8 +23,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -44,7 +46,7 @@ func (h Handler) GetGroupProfileByNamePrivate(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get group")
 	}
 
-	members, err := h.listGroupMembers(c.UserContext(), g.ID, domain.GroupMemberAll, 10, 0)
+	members, err := h.listGroupMembers(c.UserContext(), g.ID, group.MemberAll, 10, 0)
 	if err != nil {
 		return errgo.Wrap(err, "failed to list recent members")
 	}
@@ -87,7 +89,7 @@ func (h Handler) listGroupMembersPrivate(
 	c *fiber.Ctx,
 	groupName string,
 	page req.PageQuery,
-	memberType domain.GroupMemberType,
+	memberType group.MemberType,
 ) error {
 	g, err := h.g.GetByName(c.UserContext(), groupName)
 	if err != nil {
@@ -127,7 +129,7 @@ func (h Handler) listGroupMembersPrivate(
 func (h Handler) listGroupMembers(
 	ctx context.Context,
 	groupID model.GroupID,
-	memberType domain.GroupMemberType,
+	memberType group.MemberType,
 	limit, offset int,
 ) ([]res.PrivateGroupMember, error) {
 	members, err := h.g.ListMembersByID(ctx, groupID, memberType, limit, offset)
@@ -164,15 +166,15 @@ func convertGroupMembers(members []model.GroupMember, userMap map[model.UserID]m
 	return s
 }
 
-func parseGroupMemberType(c *fiber.Ctx) (domain.GroupMemberType, error) {
-	var memberType = domain.GroupMemberAll
+func parseGroupMemberType(c *fiber.Ctx) (group.MemberType, error) {
+	var memberType = group.MemberAll
 
 	memberQuery := c.Query("type")
 	switch memberQuery {
 	case "mod":
-		memberType = domain.GroupMemberMod
+		memberType = group.MemberMod
 	case "normal":
-		memberType = domain.GroupMemberNormal
+		memberType = group.MemberNormal
 	case "all", "":
 	default:
 		return 0, res.BadRequest(strconv.Quote(memberQuery) +
@@ -197,5 +199,5 @@ func (h Handler) ListGroupTopics(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get group")
 	}
 
-	return h.listTopics(c, domain.TopicTypeGroup, uint32(g.ID))
+	return h.listTopics(c, topic.TypeGroup, uint32(g.ID))
 }

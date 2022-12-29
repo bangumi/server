@@ -34,7 +34,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/random"
 )
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) domain.AuthRepo {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) Repo {
 	return mysqlRepo{q: q, log: log.Named("auth.mysqlRepo")}
 }
 
@@ -43,42 +43,42 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (domain.AuthUserInfo, []byte, error) {
+func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (UserInfo, []byte, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Email.Eq(email)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.AuthUserInfo{}, nil, domain.ErrNotFound
+			return UserInfo{}, nil, domain.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
-		return domain.AuthUserInfo{}, nil, errgo.Wrap(err, "gorm")
+		return UserInfo{}, nil, errgo.Wrap(err, "gorm")
 	}
 
-	return domain.AuthUserInfo{
+	return UserInfo{
 		RegTime: time.Unix(u.Regdate, 0),
 		ID:      u.ID,
 		GroupID: u.Groupid,
 	}, u.PasswordCrypt, nil
 }
 
-func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.AuthUserInfo, error) {
+func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, error) {
 	access, err := m.q.AccessToken.WithContext(ctx).
 		Where(m.q.AccessToken.AccessToken.Eq(token), m.q.AccessToken.ExpiredAt.Gte(time.Now())).
 		First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.AuthUserInfo{}, domain.ErrNotFound
+			return UserInfo{}, domain.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
 
-		return domain.AuthUserInfo{}, errgo.Wrap(err, "gorm")
+		return UserInfo{}, errgo.Wrap(err, "gorm")
 	}
 
 	id, err := gstr.ParseUint32(access.UserID)
 	if err != nil || id == 0 {
 		m.log.Error("wrong UserID in OAuth Access table", zap.String("user_id", access.UserID))
-		return domain.AuthUserInfo{}, errgo.Wrap(err, "parsing user id")
+		return UserInfo{}, errgo.Wrap(err, "parsing user id")
 	}
 
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(model.UserID(id))).First()
@@ -87,37 +87,37 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (domain.AuthUse
 			m.log.Error("can't find user of access token",
 				zap.String("token", token), zap.String("uid", access.UserID))
 
-			return domain.AuthUserInfo{}, domain.ErrNotFound
+			return UserInfo{}, domain.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
 
-		return domain.AuthUserInfo{}, errgo.Wrap(err, "gorm")
+		return UserInfo{}, errgo.Wrap(err, "gorm")
 	}
 
-	return domain.AuthUserInfo{
+	return UserInfo{
 		RegTime: time.Unix(u.Regdate, 0),
 		ID:      u.ID,
 		GroupID: u.Groupid,
 	}, nil
 }
 
-func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (domain.Permission, error) {
+func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission, error) {
 	r, err := m.q.UserGroup.WithContext(ctx).Where(m.q.UserGroup.ID.Eq(groupID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			m.log.Error("can't find permission for group", zap.Uint8("user_group_id", groupID))
-			return domain.Permission{}, nil
+			return Permission{}, nil
 		}
 
 		m.log.Error("unexpected error", zap.Error(err))
-		return domain.Permission{}, errgo.Wrap(err, "dal")
+		return Permission{}, errgo.Wrap(err, "dal")
 	}
 
 	p, err := parsePhpSerializedPermission(r.Perm)
 	if err != nil {
 		m.log.Error("failed to decode php serialized content", zap.Error(err), zap.Uint8("user_group_id", groupID))
-		return domain.Permission{}, nil
+		return Permission{}, nil
 	}
 
 	return p, nil
@@ -171,7 +171,7 @@ type TokenInfo struct {
 	Name      string    `json:"name"`
 }
 
-func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UserID) ([]domain.AccessToken, error) {
+func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error) {
 	records, err := m.q.AccessToken.WithContext(ctx).
 		Where(m.q.AccessToken.UserID.Eq(strconv.FormatUint(uint64(userID), 10)),
 			m.q.AccessToken.ExpiredAt.Gte(time.Now())).Find()
@@ -180,7 +180,7 @@ func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UserID) ([]
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var tokens = make([]domain.AccessToken, len(records))
+	var tokens = make([]AccessToken, len(records))
 	for i, record := range records {
 		tokens[i] = convertAccessToken(record)
 	}
@@ -190,7 +190,7 @@ func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UserID) ([]
 
 const defaultOauthAccessExpiration = time.Hour * 168
 
-func convertAccessToken(t *dao.AccessToken) domain.AccessToken {
+func convertAccessToken(t *dao.AccessToken) AccessToken {
 	var createdAt time.Time
 	var name = "oauth token"
 
@@ -216,7 +216,7 @@ func convertAccessToken(t *dao.AccessToken) domain.AccessToken {
 		logger.Fatal("parsing UserID", zap.String("raw", t.UserID), zap.Error(err))
 	}
 
-	return domain.AccessToken{
+	return AccessToken{
 		ExpiredAt: t.ExpiredAt,
 		CreatedAt: createdAt,
 		Name:      name,
@@ -232,15 +232,15 @@ func (m mysqlRepo) DeleteAccessToken(ctx context.Context, id uint32) (bool, erro
 	return info.RowsAffected > 0, errgo.Wrap(err, "dal.Delete")
 }
 
-func (m mysqlRepo) GetTokenByID(ctx context.Context, id uint32) (domain.AccessToken, error) {
+func (m mysqlRepo) GetTokenByID(ctx context.Context, id uint32) (AccessToken, error) {
 	record, err := m.q.AccessToken.WithContext(ctx).Where(m.q.AccessToken.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.AccessToken{}, domain.ErrNotFound
+			return AccessToken{}, domain.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
-		return domain.AccessToken{}, errgo.Wrap(err, "dal")
+		return AccessToken{}, errgo.Wrap(err, "dal")
 	}
 
 	return convertAccessToken(record), errgo.Wrap(err, "dal")

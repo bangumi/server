@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -42,7 +43,7 @@ func TestHandler_GetGroupByNamePrivate(t *testing.T) {
 
 	g := mocks.NewGroupRepo(t)
 	g.EXPECT().GetByName(mock.Anything, "g").Return(model.Group{Name: "g", ID: gid}, nil)
-	g.EXPECT().ListMembersByID(mock.Anything, gid, domain.GroupMemberAll, mock.Anything, mock.Anything).
+	g.EXPECT().ListMembersByID(mock.Anything, gid, group.MemberAll, mock.Anything, mock.Anything).
 		Return([]model.GroupMember{{
 			JoinAt: time.Now(),
 			UserID: 3,
@@ -71,8 +72,8 @@ func TestHandler_ListGroupMembersPrivate(t *testing.T) {
 
 	g := mocks.NewGroupRepo(t)
 	g.EXPECT().GetByName(mock.Anything, "g").Return(model.Group{Name: "g", ID: gid}, nil)
-	g.EXPECT().CountMembersByID(mock.Anything, gid, domain.GroupMemberMod).Return(5, nil)
-	g.EXPECT().ListMembersByID(mock.Anything, gid, domain.GroupMemberMod, mock.Anything, mock.Anything).
+	g.EXPECT().CountMembersByID(mock.Anything, gid, group.MemberMod).Return(5, nil)
+	g.EXPECT().ListMembersByID(mock.Anything, gid, group.MemberMod, mock.Anything, mock.Anything).
 		Return([]model.GroupMember{{
 			JoinAt: time.Now(),
 			UserID: 1,

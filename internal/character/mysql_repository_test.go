@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getRepo(t *testing.T) domain.CharacterRepo {
+func getRepo(t *testing.T) character.Repo {
 	t.Helper()
 	repo, err := character.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)

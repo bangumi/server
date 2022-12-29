@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package revision
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type RevisionRepo interface { //nolint:interfacebloat
+type Repo interface { //nolint:interfacebloat
 	CountPersonRelated(ctx context.Context, personID model.PersonID) (int64, error)
 
 	ListPersonRelated(

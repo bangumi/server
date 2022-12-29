@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package user
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type UserRepo interface {
+type Repo interface {
 	// GetByID find a user by uid.
 	GetByID(ctx context.Context, userID model.UserID) (model.User, error)
 	// GetByName find a user by username.

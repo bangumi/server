@@ -27,18 +27,28 @@ import (
 
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
+	"github.com/bangumi/server/internal/character"
+	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/ctrl"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dam"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/episode"
+	"github.com/bangumi/server/internal/group"
+	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/notification"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/internal/pm"
+	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/timeline"
+	"github.com/bangumi/server/internal/topic"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
@@ -49,25 +59,25 @@ import (
 
 type Mock struct {
 	SubjectRepo        subject.Repo
-	PersonRepo         domain.PersonRepo
-	CharacterRepo      domain.CharacterRepo
-	AuthRepo           domain.AuthRepo
-	AuthService        domain.AuthService
-	EpisodeRepo        domain.EpisodeRepo
-	TopicRepo          domain.TopicRepo
-	GroupRepo          domain.GroupRepo
-	UserRepo           domain.UserRepo
-	IndexRepo          domain.IndexRepo
-	RevisionRepo       domain.RevisionRepo
-	CollectionRepo     domain.CollectionRepo
-	TimeLineRepo       domain.TimeLineRepo
+	PersonRepo         person.Repo
+	CharacterRepo      character.Repo
+	AuthRepo           auth.Repo
+	AuthService        auth.Service
+	EpisodeRepo        episode.Repo
+	TopicRepo          topic.Repo
+	GroupRepo          group.Repo
+	UserRepo           user.Repo
+	IndexRepo          index.Repo
+	RevisionRepo       revision.Repo
+	CollectionRepo     collection.Repo
+	TimeLineRepo       timeline.Repo
 	CaptchaManager     captcha.Manager
 	SessionManager     session.Manager
 	Cache              cache.RedisCache
 	RateLimiter        rate.Manager
 	OAuthManager       oauth.Manager
-	PrivateMessageRepo domain.PrivateMessageRepo
-	NotificationRepo   domain.NotificationRepo
+	PrivateMessageRepo pm.Repo
+	NotificationRepo   notification.Repo
 	HTTPMock           *httpmock.MockTransport
 	Dam                *dam.Dam
 }
@@ -99,7 +109,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
-		fx.Provide(func() domain.TopicRepo { return m.TopicRepo }),
+		fx.Provide(func() topic.Repo { return m.TopicRepo }),
 		MockAuthRepo(m.AuthRepo),
 		MockOAuthManager(m.OAuthManager),
 		MockAuthService(m.AuthService),
@@ -114,8 +124,8 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockTimeLineRepo(m.TimeLineRepo),
 
 		// don't need a default mock for these repositories.
-		fx.Provide(func() domain.GroupRepo { return m.GroupRepo }),
-		fx.Provide(func() domain.CollectionRepo { return m.CollectionRepo }),
+		fx.Provide(func() group.Repo { return m.GroupRepo }),
+		fx.Provide(func() collection.Repo { return m.CollectionRepo }),
 		fx.Provide(func() search.Handler { return search.NoopClient{} }),
 
 		fx.Invoke(web.AddRouters),
@@ -146,35 +156,35 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 	return f
 }
 
-func MockRevisionRepo(repo domain.RevisionRepo) fx.Option {
+func MockRevisionRepo(repo revision.Repo) fx.Option {
 	if repo == nil {
 		repo = &mocks.RevisionRepo{}
 	}
-	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.RevisionRepo))))
+	return fx.Supply(fx.Annotate(repo, fx.As(new(revision.Repo))))
 }
 
-func MockIndexRepo(repo domain.IndexRepo) fx.Option {
+func MockIndexRepo(repo index.Repo) fx.Option {
 	if repo == nil {
 		mocker := &mocks.IndexRepo{}
 
 		repo = mocker
 	}
 
-	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.IndexRepo))))
+	return fx.Supply(fx.Annotate(repo, fx.As(new(index.Repo))))
 }
 
-func MockPrivateMessageRepo(repo domain.PrivateMessageRepo) fx.Option {
+func MockPrivateMessageRepo(repo pm.Repo) fx.Option {
 	if repo == nil {
 		repo = &mocks.PrivateMessageRepo{}
 	}
-	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.PrivateMessageRepo))))
+	return fx.Supply(fx.Annotate(repo, fx.As(new(pm.Repo))))
 }
 
-func MockNoticationRepo(repo domain.NotificationRepo) fx.Option {
+func MockNoticationRepo(repo notification.Repo) fx.Option {
 	if repo == nil {
 		repo = &mocks.NotificationRepo{}
 	}
-	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.NotificationRepo))))
+	return fx.Supply(fx.Annotate(repo, fx.As(new(notification.Repo))))
 }
 
 func MockRateLimiter(repo rate.Manager) fx.Option {
@@ -212,7 +222,7 @@ func MockCaptchaManager(repo captcha.Manager) fx.Option {
 	return fx.Provide(func() captcha.Manager { return repo })
 }
 
-func MockUserRepo(repo domain.UserRepo) fx.Option {
+func MockUserRepo(repo user.Repo) fx.Option {
 	if repo == nil {
 		mocker := &mocks.UserRepo{}
 		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(model.User{}, nil)
@@ -239,10 +249,10 @@ func MockUserRepo(repo domain.UserRepo) fx.Option {
 		repo = mocker
 	}
 
-	return fx.Supply(fx.Annotate(repo, fx.As(new(domain.UserRepo))))
+	return fx.Supply(fx.Annotate(repo, fx.As(new(user.Repo))))
 }
 
-func MockPersonRepo(m domain.PersonRepo) fx.Option {
+func MockPersonRepo(m person.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.PersonRepo{}
 		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Person{}, nil)
@@ -250,10 +260,10 @@ func MockPersonRepo(m domain.PersonRepo) fx.Option {
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.PersonRepo))))
+	return fx.Supply(fx.Annotate(m, fx.As(new(person.Repo))))
 }
 
-func MockCharacterRepo(m domain.CharacterRepo) fx.Option {
+func MockCharacterRepo(m character.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.CharacterRepo{}
 		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(model.Character{}, nil)
@@ -261,10 +271,10 @@ func MockCharacterRepo(m domain.CharacterRepo) fx.Option {
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.CharacterRepo))))
+	return fx.Supply(fx.Annotate(m, fx.As(new(character.Repo))))
 }
 
-func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
+func MockEpisodeRepo(m episode.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.EpisodeRepo{}
 		mocker.EXPECT().Count(mock.Anything, mock.Anything, mock.Anything).Return(0, nil)
@@ -272,27 +282,27 @@ func MockEpisodeRepo(m domain.EpisodeRepo) fx.Option {
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.EpisodeRepo))))
+	return fx.Supply(fx.Annotate(m, fx.As(new(episode.Repo))))
 }
 
-func MockAuthRepo(m domain.AuthRepo) fx.Option {
+func MockAuthRepo(m auth.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.AuthRepo{}
-		mocker.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.AuthUserInfo{}, nil)
-		mocker.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(domain.Permission{}, nil)
+		mocker.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.UserInfo{}, nil)
+		mocker.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(auth.Permission{}, nil)
 
 		m = mocker
 	}
 
-	return fx.Provide(func() domain.AuthRepo { return m })
+	return fx.Provide(func() auth.Repo { return m })
 }
 
-func MockAuthService(m domain.AuthService) fx.Option {
+func MockAuthService(m auth.Service) fx.Option {
 	if m == nil {
 		return fx.Provide(auth.NewService)
 	}
 
-	return fx.Provide(func() domain.AuthService { return m })
+	return fx.Provide(func() auth.Service { return m })
 }
 
 func MockOAuthManager(m oauth.Manager) fx.Option {
@@ -314,7 +324,7 @@ func MockSubjectRepo(m subject.Repo) fx.Option {
 	return fx.Provide(func() subject.Repo { return m })
 }
 
-func MockTimeLineRepo(m domain.TimeLineRepo) fx.Option {
+func MockTimeLineRepo(m timeline.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.TimeLineRepo{}
 		mocker.EXPECT().WithQuery(mock.Anything).Return(mocker)
@@ -323,7 +333,7 @@ func MockTimeLineRepo(m domain.TimeLineRepo) fx.Option {
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(domain.TimeLineRepo))))
+	return fx.Supply(fx.Annotate(m, fx.As(new(timeline.Repo))))
 }
 
 func MockCache(mock cache.RedisCache) fx.Option {

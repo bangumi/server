@@ -24,13 +24,12 @@ import (
 
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getService() domain.AuthService {
+func getService() auth.Service {
 	return auth.NewService(nil, nil, zap.NewNop(), cache.NewNoop())
 }
 
@@ -49,8 +48,8 @@ func TestService_GetByToken(t *testing.T) {
 	t.Parallel()
 
 	var m = mocks.NewAuthRepo(t)
-	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(domain.AuthUserInfo{GroupID: 2}, nil)
-	m.EXPECT().GetPermission(mock.Anything, model.UserGroupID(2)).Return(domain.Permission{EpEdit: true}, nil)
+	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(auth.UserInfo{GroupID: 2}, nil)
+	m.EXPECT().GetPermission(mock.Anything, model.UserGroupID(2)).Return(auth.Permission{EpEdit: true}, nil)
 
 	var u = mocks.NewUserRepo(t)
 

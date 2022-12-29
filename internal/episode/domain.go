@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package episode
 
 import (
 	"context"
@@ -22,24 +22,24 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 )
 
-type EpisodeRepo interface {
+type Repo interface {
 	// WithQuery is used to replace repo's query to txn
-	WithQuery(query *query.Query) EpisodeRepo
+	WithQuery(query *query.Query) Repo
 
 	Get(ctx context.Context, episodeID model.EpisodeID) (model.Episode, error)
 
 	// Count all episode for a subject.
-	Count(ctx context.Context, subjectID model.SubjectID, filter EpisodeFilter) (int64, error)
+	Count(ctx context.Context, subjectID model.SubjectID, filter Filter) (int64, error)
 
 	// List return all episode.
 	List(
 		ctx context.Context,
 		subjectID model.SubjectID,
-		filter EpisodeFilter,
+		filter Filter,
 		limit int, offset int,
 	) ([]model.Episode, error)
 }
 
-type EpisodeFilter struct {
+type Filter struct {
 	Type null.Null[model.EpType]
 }

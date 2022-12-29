@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/user"
 )
 
 func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (model.User, error) {
@@ -70,9 +71,9 @@ func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs []model.UserID) (map[
 	return users, nil
 }
 
-func (ctl Ctrl) GetFriends(ctx context.Context, id model.UserID) (map[model.UserID]domain.FriendItem, error) {
+func (ctl Ctrl) GetFriends(ctx context.Context, id model.UserID) (map[model.UserID]user.FriendItem, error) {
 	if id == 0 {
-		return map[model.UserID]domain.FriendItem{}, nil
+		return map[model.UserID]user.FriendItem{}, nil
 	}
 
 	f, err := ctl.user.GetFriends(ctx, id)

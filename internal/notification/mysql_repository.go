@@ -20,7 +20,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
@@ -30,7 +29,7 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.NotificationRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("notification.mysqlRepo")}, nil
 }
 

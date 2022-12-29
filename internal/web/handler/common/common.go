@@ -20,8 +20,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/web/accessor"
 	"github.com/bangumi/server/internal/web/handler/internal/ctxkey"
 	"github.com/bangumi/server/internal/web/session"
@@ -29,7 +29,7 @@ import (
 
 func New(
 	log *zap.Logger,
-	auth domain.AuthService,
+	auth auth.Service,
 	session session.Manager,
 	config config.AppConfig,
 ) (Common, error) {
@@ -52,7 +52,7 @@ func New(
 
 type Common struct {
 	Config               config.AppConfig
-	auth                 domain.AuthService
+	auth                 auth.Service
 	skip1Log             *zap.Logger
 	log                  *zap.Logger
 	session              session.Manager

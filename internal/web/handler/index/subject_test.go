@@ -22,7 +22,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -33,9 +34,9 @@ func TestHandler_Add_Index_Subject(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6}, nil)
+		Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
@@ -44,7 +45,7 @@ func TestHandler_Add_Index_Subject(t *testing.T) {
 	}, nil)
 	mockIndex.EXPECT().
 		AddOrUpdateIndexSubject(mock.Anything, model.IndexID(7), model.SubjectID(5), uint32(48), "test123").
-		Return(&domain.IndexSubject{}, nil)
+		Return(&index.Subject{}, nil)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
@@ -66,9 +67,9 @@ func TestHandler_Add_Index_Subject_NoPermission(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6}, nil)
+		Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
@@ -96,9 +97,9 @@ func TestHandler_Update_Index_Subject(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6}, nil)
+		Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
@@ -107,7 +108,7 @@ func TestHandler_Update_Index_Subject(t *testing.T) {
 	}, nil)
 	mockIndex.EXPECT().
 		AddOrUpdateIndexSubject(mock.Anything, model.IndexID(7), model.SubjectID(5), uint32(48), "test123").
-		Return(&domain.IndexSubject{}, nil)
+		Return(&index.Subject{}, nil)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
@@ -128,9 +129,9 @@ func TestHandler_Update_Index_Subject_NoPermission(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6}, nil)
+		Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
@@ -157,9 +158,9 @@ func TestHandler_Update_Index_Subject_NonExists(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 1}, nil)
+		Return(auth.UserInfo{ID: 1}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
@@ -167,7 +168,7 @@ func TestHandler_Update_Index_Subject_NonExists(t *testing.T) {
 		ID:        7,
 	}, nil)
 	mockIndex.EXPECT().AddOrUpdateIndexSubject(mock.Anything, uint32(7), model.SubjectID(5), uint32(48), "test123").
-		Return(&domain.IndexSubject{}, nil)
+		Return(&index.Subject{}, nil)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
@@ -188,9 +189,9 @@ func TestHandler_Delete_Index_Subject(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6}, nil)
+		Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
@@ -216,9 +217,9 @@ func TestHandler_Delete_Index_Subject_NoPermission(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6}, nil)
+		Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{
@@ -241,9 +242,9 @@ func TestHandler_Update_Index_Invalid_Comment(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6}, nil)
+		Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	app := test.GetWebApp(t, test.Mock{AuthRepo: mockAuth})
 

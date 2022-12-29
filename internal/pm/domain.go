@@ -12,23 +12,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package pm
 
 import (
 	"context"
-	"errors"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 )
 
-var ErrPmNotOwned = errors.New("not sent or received this private message")
-var ErrPmDeleted = errors.New("private message deleted")
-var ErrPmUserIrrelevant = errors.New("has user irrelevant message")
-var ErrPmRelatedNotExists = errors.New("related private message not exists")
-var ErrPmInvalidOperation = errors.New("invalid operation")
-
-type PrivateMessageRepo interface {
+type Repo interface {
 	List(
 		ctx context.Context,
 		userID model.UserID,
@@ -59,7 +52,7 @@ type PrivateMessageRepo interface {
 		ctx context.Context,
 		senderID model.UserID,
 		receiverIDs []model.UserID,
-		relatedIDFilter PrivateMessageIDFilter,
+		relatedIDFilter IDFilter,
 		title string,
 		content string,
 	) ([]model.PrivateMessage, error)
@@ -71,6 +64,6 @@ type PrivateMessageRepo interface {
 	) error
 }
 
-type PrivateMessageIDFilter struct {
+type IDFilter struct {
 	Type null.Null[model.PrivateMessageID]
 }

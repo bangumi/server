@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -39,9 +39,9 @@ func TestSubject_Get(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{RegTime: time.Unix(1e10, 0)}, nil)
+		Return(auth.UserInfo{RegTime: time.Unix(1e10, 0)}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	ep := mocks.NewEpisodeRepo(t)
 	ep.EXPECT().Count(mock.Anything, subjectID, mock.Anything).Return(3, nil)
@@ -87,9 +87,9 @@ func TestSubject_Get_NSFW_200(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
+		Return(auth.UserInfo{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{
@@ -111,9 +111,9 @@ func TestSubject_Get_NSFW_404(t *testing.T) {
 	m.EXPECT().Get(mock.Anything, model.SubjectID(7), mock.Anything).Return(model.Subject{NSFW: true}, nil)
 
 	mockAuth := mocks.NewAuthRepo(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.AuthUserInfo{}, nil)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.UserInfo{}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{

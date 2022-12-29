@@ -12,19 +12,37 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package topic
+package auth_test
 
 import (
-	"go.uber.org/zap"
+	"testing"
+	"time"
 
-	"github.com/bangumi/server/internal/dal/query"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/auth"
 )
 
-type mysqlRepo struct {
-	q   *query.Query
-	log *zap.Logger
+func TestAllowNsfw(t *testing.T) {
+	t.Parallel()
+
+	reg, err := time.Parse("2006-01-02", "2006-01-02")
+	require.NoError(t, err)
+	u := auth.Auth{
+		RegTime: reg,
+		ID:      1,
+	}
+
+	require.True(t, u.AllowNSFW())
 }
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
-	return mysqlRepo{q: q, log: log.Named("subject.mysqlRepo")}, nil
+func TestNotAllowNsfw(t *testing.T) {
+	t.Parallel()
+
+	u := auth.Auth{
+		RegTime: time.Now(),
+		ID:      0,
+	}
+
+	require.False(t, u.AllowNSFW())
 }

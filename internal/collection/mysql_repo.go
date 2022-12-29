@@ -38,9 +38,9 @@ import (
 	"github.com/bangumi/server/internal/subject"
 )
 
-var _ domain.CollectionRepo = mysqlRepo{}
+var _ Repo = mysqlRepo{}
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.CollectionRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{
 		q:   q,
 		log: log.Named("collection.mysqlRepo"),
@@ -52,7 +52,7 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (r mysqlRepo) WithQuery(query *query.Query) domain.CollectionRepo {
+func (r mysqlRepo) WithQuery(query *query.Query) Repo {
 	return mysqlRepo{q: query, log: r.log}
 }
 
@@ -196,7 +196,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
 	subjectID model.SubjectID,
-	data domain.SubjectCollectionUpdate,
+	data Update,
 	at time.Time,
 ) error {
 	t := r.q.SubjectCollection

@@ -29,9 +29,9 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-var _ domain.GroupRepo = mysqlRepo{}
+var _ Repo = mysqlRepo{}
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.GroupRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("group.mysqlRepo")}, nil
 }
 
@@ -83,7 +83,7 @@ func (r mysqlRepo) GetByName(ctx context.Context, name string) (model.Group, err
 }
 
 func (r mysqlRepo) CountMembersByName(
-	ctx context.Context, name string, memberType domain.GroupMemberType,
+	ctx context.Context, name string, memberType MemberType,
 ) (int64, error) {
 	id, err := r.getIDByName(ctx, name)
 	if err != nil {
@@ -94,15 +94,15 @@ func (r mysqlRepo) CountMembersByName(
 }
 
 func (r mysqlRepo) countMembersByID(
-	ctx context.Context, id model.GroupID, memberType domain.GroupMemberType,
+	ctx context.Context, id model.GroupID, memberType MemberType,
 ) (int64, error) {
 	q := r.q.GroupMember.WithContext(ctx).Where(r.q.GroupMember.GroupID.Eq(id))
 	switch memberType {
-	case domain.GroupMemberMod:
+	case MemberMod:
 		q = q.Where(r.q.GroupMember.Moderator.Is(true))
-	case domain.GroupMemberNormal:
+	case MemberNormal:
 		q = q.Where(r.q.GroupMember.Moderator.Is(false))
-	case domain.GroupMemberAll:
+	case MemberAll:
 		// do nothing
 	}
 
@@ -116,16 +116,16 @@ func (r mysqlRepo) countMembersByID(
 }
 
 func (r mysqlRepo) listMembersByID(
-	ctx context.Context, id model.GroupID, memberType domain.GroupMemberType, limit, offset int,
+	ctx context.Context, id model.GroupID, memberType MemberType, limit, offset int,
 ) ([]model.GroupMember, error) {
 	q := r.q.GroupMember.WithContext(ctx).Where(r.q.GroupMember.GroupID.Eq(id))
 
 	switch memberType {
-	case domain.GroupMemberMod:
+	case MemberMod:
 		q = q.Where(r.q.GroupMember.Moderator.Is(true))
-	case domain.GroupMemberNormal:
+	case MemberNormal:
 		q = q.Where(r.q.GroupMember.Moderator.Is(false))
-	case domain.GroupMemberAll:
+	case MemberAll:
 		// do nothing
 	}
 
@@ -144,7 +144,7 @@ func (r mysqlRepo) listMembersByID(
 }
 
 func (r mysqlRepo) ListMembersByName(
-	ctx context.Context, name string, memberType domain.GroupMemberType, limit, offset int,
+	ctx context.Context, name string, memberType MemberType, limit, offset int,
 ) ([]model.GroupMember, error) {
 	id, err := r.getIDByName(ctx, name)
 	if err != nil {
@@ -155,13 +155,13 @@ func (r mysqlRepo) ListMembersByName(
 }
 
 func (r mysqlRepo) CountMembersByID(
-	ctx context.Context, id model.GroupID, memberType domain.GroupMemberType,
+	ctx context.Context, id model.GroupID, memberType MemberType,
 ) (int64, error) {
 	return r.countMembersByID(ctx, id, memberType)
 }
 
 func (r mysqlRepo) ListMembersByID(
-	ctx context.Context, id model.GroupID, memberType domain.GroupMemberType, limit, offset int,
+	ctx context.Context, id model.GroupID, memberType MemberType, limit, offset int,
 ) ([]model.GroupMember, error) {
 	return r.listMembersByID(ctx, id, memberType, limit, offset)
 }

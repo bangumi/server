@@ -12,15 +12,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package topic
 
 import (
-	"context"
-
-	"github.com/bangumi/server/internal/model"
+	"go.uber.org/zap"
 )
 
-type NotificationRepo interface {
-	Count(ctx context.Context,
-		userID model.UserID) (int64, error)
+type Type uint32
+
+func (t Type) Zap() zap.Field {
+	return zap.Uint32("topic_type", uint32(t))
 }
+
+const (
+	TypeUnknown Type = iota
+	TypeSubject
+	TypeGroup
+)
+
+type CommentType uint32
+
+const (
+	CommentTypeUnknown CommentType = iota
+	CommentTypeSubjectTopic
+	CommentTypeGroupTopic
+	CommentIndex
+	CommentCharacter
+	CommentPerson
+	CommentEpisode
+)

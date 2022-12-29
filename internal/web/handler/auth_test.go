@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -45,8 +45,8 @@ func TestHandler_PrivateLogin(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByEmail(mock.Anything, "a@example.com").
-		Return(domain.AuthUserInfo{GroupID: 1}, passwordInDB, nil)
-	mockAuth.EXPECT().GetPermission(mock.Anything, uint8(1)).Return(domain.Permission{}, nil)
+		Return(auth.UserInfo{GroupID: 1}, passwordInDB, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, uint8(1)).Return(auth.Permission{}, nil)
 
 	mockCaptcha := mocks.NewCaptchaManager(t)
 	mockCaptcha.EXPECT().Verify(mock.Anything, "req").Return(true, nil)

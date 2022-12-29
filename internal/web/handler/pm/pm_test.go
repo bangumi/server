@@ -22,11 +22,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/session"
 )
@@ -49,7 +51,7 @@ func TestPrivateMessage_List(t *testing.T) {
 	}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
 
 	s := mocks.NewSessionManager(t)
 	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)
@@ -74,7 +76,7 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 	).Return([]model.PrivateMessage{}, domain.ErrNotFound)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
 
 	s := mocks.NewSessionManager(t)
 	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)
@@ -98,7 +100,7 @@ func TestPrivateMessage_ListRecentContact(t *testing.T) {
 	).Return([]model.UserID{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
 
 	s := mocks.NewSessionManager(t)
 	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)
@@ -122,7 +124,7 @@ func TestPrivateMessage_CountTypes(t *testing.T) {
 	).Return(model.PrivateMessageTypeCounts{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
 
 	s := mocks.NewSessionManager(t)
 	s.EXPECT().Get(mock.Anything, "111").Return(session.Session{UserID: 1}, nil)
@@ -147,7 +149,7 @@ func TestPrivateMessage_MarkRead(t *testing.T) {
 	).Return(nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
 
 	s := mocks.NewSessionManager(t)
 	s.EXPECT().Get(mock.Anything, "11").Return(session.Session{UserID: 1}, nil)
@@ -170,13 +172,13 @@ func TestPrivateMessage_Create(t *testing.T) {
 		mock.Anything,
 		model.UserID(1),
 		[]model.UserID{382951},
-		domain.PrivateMessageIDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
+		pm.IDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
 		"测试标题",
 		"测试内容",
 	).Return([]model.PrivateMessage{}, nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
 
 	s := mocks.NewSessionManager(t)
 	s.EXPECT().Get(mock.Anything, "111").Return(session.Session{UserID: 1}, nil)
@@ -202,7 +204,7 @@ func TestPrivateMessage_Delete(t *testing.T) {
 	).Return(nil)
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: 1}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
 
 	s := mocks.NewSessionManager(t)
 	s.EXPECT().Get(mock.Anything, "111").Return(session.Session{UserID: 1}, nil)

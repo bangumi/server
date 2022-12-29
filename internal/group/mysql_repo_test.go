@@ -35,7 +35,7 @@ import (
 const notFoundGroupID = 600
 const notFoundGroupName = "not-exist-group-name"
 
-func getRepo(t *testing.T) (domain.GroupRepo, *query.Query) {
+func getRepo(t *testing.T) (group.Repo, *query.Query) {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
 	repo, err := group.NewMysqlRepo(q, zap.NewNop())
@@ -44,7 +44,7 @@ func getRepo(t *testing.T) (domain.GroupRepo, *query.Query) {
 	return repo, q
 }
 
-func prepareGroupMemberData(t *testing.T, id model.GroupID) domain.GroupRepo {
+func prepareGroupMemberData(t *testing.T, id model.GroupID) group.Repo {
 	t.Helper()
 	repo, q := getRepo(t)
 
@@ -72,21 +72,21 @@ func TestMysqlRepo_CountMembersByName(t *testing.T) {
 
 	t.Run("count all", func(t *testing.T) {
 		t.Parallel()
-		count, err := repo.CountMembersByID(context.Background(), 1, domain.GroupMemberAll)
+		count, err := repo.CountMembersByID(context.Background(), 1, group.MemberAll)
 		require.NoError(t, err)
 		require.EqualValues(t, 4, count)
 	})
 
 	t.Run("count mod", func(t *testing.T) {
 		t.Parallel()
-		count, err := repo.CountMembersByID(context.Background(), 1, domain.GroupMemberMod)
+		count, err := repo.CountMembersByID(context.Background(), 1, group.MemberMod)
 		require.NoError(t, err)
 		require.EqualValues(t, 3, count)
 	})
 
 	t.Run("count normal", func(t *testing.T) {
 		t.Parallel()
-		count, err := repo.CountMembersByID(context.Background(), 1, domain.GroupMemberNormal)
+		count, err := repo.CountMembersByID(context.Background(), 1, group.MemberNormal)
 		require.NoError(t, err)
 		require.EqualValues(t, 1, count)
 	})
@@ -104,7 +104,7 @@ func TestMysqlRepo_ListMembersByID(t *testing.T) {
 
 	t.Run("list all", func(t *testing.T) {
 		t.Parallel()
-		members, err := repo.ListMembersByID(context.Background(), 2, domain.GroupMemberAll, limit, offset)
+		members, err := repo.ListMembersByID(context.Background(), 2, group.MemberAll, limit, offset)
 		require.NoError(t, err)
 		require.Len(t, members, 4)
 		assertHaveID(t, members, 1, 2, 3, 4)
@@ -112,7 +112,7 @@ func TestMysqlRepo_ListMembersByID(t *testing.T) {
 
 	t.Run("list mod", func(t *testing.T) {
 		t.Parallel()
-		members, err := repo.ListMembersByID(context.Background(), 2, domain.GroupMemberMod, limit, offset)
+		members, err := repo.ListMembersByID(context.Background(), 2, group.MemberMod, limit, offset)
 		require.NoError(t, err)
 		require.Len(t, members, 3)
 		assertHaveID(t, members, 1, 3, 4)
@@ -120,7 +120,7 @@ func TestMysqlRepo_ListMembersByID(t *testing.T) {
 
 	t.Run("list normal", func(t *testing.T) {
 		t.Parallel()
-		members, err := repo.ListMembersByID(context.Background(), 2, domain.GroupMemberNormal, limit, offset)
+		members, err := repo.ListMembersByID(context.Background(), 2, group.MemberNormal, limit, offset)
 		require.NoError(t, err)
 		require.Len(t, members, 1)
 		assertHaveID(t, members, 2)
@@ -128,7 +128,7 @@ func TestMysqlRepo_ListMembersByID(t *testing.T) {
 
 	t.Run("list offset", func(t *testing.T) {
 		t.Parallel()
-		members, err := repo.ListMembersByID(context.Background(), 2, domain.GroupMemberAll, limit, 1)
+		members, err := repo.ListMembersByID(context.Background(), 2, group.MemberAll, limit, 1)
 		require.NoError(t, err)
 		require.Len(t, members, 3)
 		assertHaveID(t, members, 1, 2, 3)

@@ -12,33 +12,28 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package group
 
 import (
+	"context"
+
 	"github.com/bangumi/server/internal/model"
 )
 
-type SubjectPersonRelation struct {
-	TypeID uint16
+type Repo interface {
+	GetByName(ctx context.Context, name string) (model.Group, error)
+	GetByID(ctx context.Context, id model.GroupID) (model.Group, error)
 
-	PersonID  model.PersonID
-	SubjectID model.SubjectID
+	CountMembersByID(ctx context.Context, id model.GroupID, memberType MemberType) (int64, error)
+	ListMembersByID(
+		ctx context.Context, id model.GroupID, memberType MemberType, limit, offset int,
+	) ([]model.GroupMember, error)
 }
 
-type SubjectCharacterRelation struct {
-	TypeID uint8
+type MemberType uint8
 
-	SubjectID   model.SubjectID
-	CharacterID model.CharacterID
-}
-
-type SubjectInternalRelation struct {
-	TypeID uint16
-
-	SourceID      model.SubjectID
-	DestinationID model.SubjectID
-}
-
-func (s SubjectInternalRelation) GetSourceID() model.SubjectID {
-	return s.SourceID
-}
+const (
+	MemberAll MemberType = 1 << iota / 2
+	MemberMod
+	MemberNormal
+)

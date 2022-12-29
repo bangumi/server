@@ -20,8 +20,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/topic"
 )
 
 func TestMysqlRepo_CountReplies(t *testing.T) {
@@ -30,7 +30,7 @@ func TestMysqlRepo_CountReplies(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.CountReplies(context.Background(), domain.CommentTypeSubjectTopic, 1)
+	s, err := repo.CountReplies(context.Background(), topic.CommentTypeSubjectTopic, 1)
 	require.NoError(t, err)
 
 	require.EqualValues(t, 59, s, "count top comments")
@@ -42,7 +42,7 @@ func TestMysqlRepo_ListReplies(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.ListReplies(context.Background(), domain.CommentTypeSubjectTopic, 1, 10, 0)
+	s, err := repo.ListReplies(context.Background(), topic.CommentTypeSubjectTopic, 1, 10, 0)
 	require.NoError(t, err)
 
 	require.NotEqual(t, 0, len(s), "fetch top comments")
@@ -54,7 +54,7 @@ func TestMysqlRepo_ListReplies_all(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.ListReplies(context.Background(), domain.CommentTypeSubjectTopic, 1, 0, 0)
+	s, err := repo.ListReplies(context.Background(), topic.CommentTypeSubjectTopic, 1, 0, 0)
 	require.NoError(t, err)
 
 	require.NotEqual(t, 0, len(s), "fetch top comments")

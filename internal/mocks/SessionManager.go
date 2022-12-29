@@ -5,7 +5,8 @@ package mocks
 import (
 	context "context"
 
-	domain "github.com/bangumi/server/internal/domain"
+	auth "github.com/bangumi/server/internal/auth"
+
 	mock "github.com/stretchr/testify/mock"
 
 	model "github.com/bangumi/server/internal/model"
@@ -27,25 +28,25 @@ func (_m *SessionManager) EXPECT() *SessionManager_Expecter {
 }
 
 // Create provides a mock function with given fields: ctx, a
-func (_m *SessionManager) Create(ctx context.Context, a domain.Auth) (string, session.Session, error) {
+func (_m *SessionManager) Create(ctx context.Context, a auth.Auth) (string, session.Session, error) {
 	ret := _m.Called(ctx, a)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(context.Context, domain.Auth) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, auth.Auth) string); ok {
 		r0 = rf(ctx, a)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 session.Session
-	if rf, ok := ret.Get(1).(func(context.Context, domain.Auth) session.Session); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, auth.Auth) session.Session); ok {
 		r1 = rf(ctx, a)
 	} else {
 		r1 = ret.Get(1).(session.Session)
 	}
 
 	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, domain.Auth) error); ok {
+	if rf, ok := ret.Get(2).(func(context.Context, auth.Auth) error); ok {
 		r2 = rf(ctx, a)
 	} else {
 		r2 = ret.Error(2)
@@ -61,14 +62,14 @@ type SessionManager_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - a domain.Auth
+//   - a auth.Auth
 func (_e *SessionManager_Expecter) Create(ctx interface{}, a interface{}) *SessionManager_Create_Call {
 	return &SessionManager_Create_Call{Call: _e.mock.On("Create", ctx, a)}
 }
 
-func (_c *SessionManager_Create_Call) Run(run func(ctx context.Context, a domain.Auth)) *SessionManager_Create_Call {
+func (_c *SessionManager_Create_Call) Run(run func(ctx context.Context, a auth.Auth)) *SessionManager_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(domain.Auth))
+		run(args[0].(context.Context), args[1].(auth.Auth))
 	})
 	return _c
 }

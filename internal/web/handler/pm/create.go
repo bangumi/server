@@ -22,10 +22,10 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/bangumi/server/internal/ctrl"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -46,7 +46,7 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 		c.UserContext(),
 		accessor.ID,
 		receiverIDs,
-		domain.PrivateMessageIDFilter{Type: null.NewFromPtr((*model.PrivateMessageID)(r.RelatedID))},
+		pm.IDFilter{Type: null.NewFromPtr((*model.PrivateMessageID)(r.RelatedID))},
 		r.Title,
 		r.Content)
 	if err != nil {
@@ -55,8 +55,8 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 		case errors.Is(err, ctrl.ErrPmNotAFriend):
 		case errors.Is(err, ctrl.ErrPmNotAllReceiversExist):
 		case errors.Is(err, ctrl.ErrPmReceiverReject):
-		case errors.Is(err, domain.ErrPmRelatedNotExists):
-		case errors.Is(err, domain.ErrPmInvalidOperation):
+		case errors.Is(err, pm.ErrPmRelatedNotExists):
+		case errors.Is(err, pm.ErrPmInvalidOperation):
 			return res.BadRequest(err.Error())
 		}
 		return res.InternalError(c, err, "failed to create private message(s)")

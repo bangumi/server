@@ -17,6 +17,7 @@ package ctrl
 import (
 	"context"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -25,7 +26,7 @@ import (
 
 func (ctl Ctrl) GetSubjectRelatedCharacters(
 	ctx context.Context,
-	user domain.Auth,
+	user auth.Auth,
 	subjectID model.SubjectID,
 ) (model.Subject, []model.SubjectCharacterRelation, error) {
 	s, err := ctl.GetSubjectNoRedirect(ctx, user, subjectID)

@@ -21,8 +21,8 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic"
@@ -37,7 +37,7 @@ const redisKeyPrefix = "chii:web:session:"
 var ErrExpired = errors.New("your session has been expired")
 
 type Manager interface {
-	Create(ctx context.Context, a domain.Auth) (string, Session, error)
+	Create(ctx context.Context, a auth.Auth) (string, Session, error)
 	Get(ctx context.Context, key string) (Session, error)
 	Revoke(ctx context.Context, key string) error
 	RevokeUser(ctx context.Context, id model.UserID) error
@@ -57,7 +57,7 @@ func defaultKeyGenerator() string {
 	return random.Base62String(defaultKeyLength)
 }
 
-func (m manager) Create(ctx context.Context, a domain.Auth) (string, Session, error) {
+func (m manager) Create(ctx context.Context, a auth.Auth) (string, Session, error) {
 	key, s, err := m.repo.Create(ctx, a.ID, a.RegTime, defaultKeyGenerator)
 
 	if err != nil {

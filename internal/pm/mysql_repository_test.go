@@ -22,7 +22,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -30,7 +29,7 @@ import (
 	"github.com/bangumi/server/internal/pm"
 )
 
-func getRepo(t *testing.T) domain.PrivateMessageRepo {
+func getRepo(t *testing.T) pm.Repo {
 	t.Helper()
 	repo, err := pm.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)
@@ -45,7 +44,7 @@ func mapToID(msg model.PrivateMessage) model.PrivateMessageID {
 func mockMessage(
 	ctx context.Context,
 	t *testing.T,
-	repo domain.PrivateMessageRepo,
+	repo pm.Repo,
 	relatedID *model.PrivateMessageID,
 	senderID model.UserID,
 	receiverID model.UserID,
@@ -55,7 +54,7 @@ func mockMessage(
 		ctx,
 		senderID,
 		[]model.UserID{receiverID},
-		domain.PrivateMessageIDFilter{Type: null.NewFromPtr(relatedID)},
+		pm.IDFilter{Type: null.NewFromPtr(relatedID)},
 		"title",
 		"content",
 	)
@@ -189,7 +188,7 @@ func TestCreate(t *testing.T) {
 		ctx,
 		1,
 		[]model.UserID{382951, 2},
-		domain.PrivateMessageIDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
+		pm.IDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
 		"私信",
 		"内容",
 	)
@@ -199,7 +198,7 @@ func TestCreate(t *testing.T) {
 	msgs := mainMsgs
 
 	// reply
-	replyMsgs, err := repo.Create(ctx, 382951, []model.UserID{1}, domain.PrivateMessageIDFilter{
+	replyMsgs, err := repo.Create(ctx, 382951, []model.UserID{1}, pm.IDFilter{
 		Type: null.New(mainMsgs[0].ID),
 	}, "私信回复", "内容")
 
@@ -209,13 +208,13 @@ func TestCreate(t *testing.T) {
 
 	msgs = append(msgs, replyMsgs...)
 
-	_, err = repo.Create(ctx, 382951, []model.UserID{2}, domain.PrivateMessageIDFilter{
+	_, err = repo.Create(ctx, 382951, []model.UserID{2}, pm.IDFilter{
 		Type: null.New(mainMsgs[1].ID),
 	}, "私信回复", "发给错误的人")
 
 	require.Error(t, err)
 
-	msgsNotMain, err := repo.Create(ctx, 1, []model.UserID{382951}, domain.PrivateMessageIDFilter{
+	msgsNotMain, err := repo.Create(ctx, 1, []model.UserID{382951}, pm.IDFilter{
 		Type: null.New(replyMsgs[0].ID),
 	}, "私信回复", "使用非首条信息的id作为related id")
 
@@ -244,7 +243,7 @@ func TestDelete(t *testing.T) {
 		ctx,
 		1,
 		[]model.UserID{382951},
-		domain.PrivateMessageIDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
+		pm.IDFilter{Type: null.NewFromPtr[model.PrivateMessageID](nil)},
 		"私信",
 		"内容",
 	)

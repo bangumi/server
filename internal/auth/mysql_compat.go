@@ -17,7 +17,6 @@ package auth
 import (
 	"github.com/trim21/go-phpserialize"
 
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
@@ -60,16 +59,16 @@ type phpPermission struct {
 	AppErase           string `php:"app_erase"`
 }
 
-func parsePhpSerializedPermission(b []byte) (domain.Permission, error) {
+func parsePhpSerializedPermission(b []byte) (Permission, error) {
 	var p phpPermission
 	if len(b) > 0 {
 		err := phpserialize.Unmarshal(b, &p)
 		if err != nil {
-			return domain.Permission{}, errgo.Wrap(err, "parsing permission: phpserialize.Unmarshal")
+			return Permission{}, errgo.Wrap(err, "parsing permission: phpserialize.Unmarshal")
 		}
 	}
 
-	return domain.Permission{
+	return Permission{
 		UserList:           parseBool(p.UserList),
 		ManageUserGroup:    parseBool(p.ManageUserGroup),
 		ManageUserPhoto:    parseBool(p.ManageUserPhoto),

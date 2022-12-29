@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (ctl Ctrl) GetCharacter(ctx context.Context, user domain.Auth, id model.CharacterID) (model.Character, error) {
+func (ctl Ctrl) GetCharacter(ctx context.Context, user auth.Auth, id model.CharacterID) (model.Character, error) {
 	character, err := ctl.getCharacter(ctx, id)
 	if err != nil {
 		return model.Character{}, err
@@ -42,7 +42,7 @@ func (ctl Ctrl) GetCharacter(ctx context.Context, user domain.Auth, id model.Cha
 }
 
 func (ctl Ctrl) GetCharacterNoRedirect(
-	ctx context.Context, user domain.Auth, id model.CharacterID,
+	ctx context.Context, user auth.Auth, id model.CharacterID,
 ) (model.Character, error) {
 	character, err := ctl.GetCharacter(ctx, user, id)
 	if err != nil {

@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -64,9 +64,9 @@ func TestCharacter_Get_NSFW(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
+		Return(auth.UserInfo{ID: 1, RegTime: time.Unix(1e9, 0)}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	app := test.GetWebApp(t, test.Mock{
 		CharacterRepo: m,

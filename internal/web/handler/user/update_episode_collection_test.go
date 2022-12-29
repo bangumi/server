@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -40,7 +40,7 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 	var eType model.EpisodeCollection
 
 	a := mocks.NewAuthService(t)
-	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: uid}, nil)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
 	e := mocks.NewEpisodeRepo(t)
 	e.EXPECT().List(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]model.Episode{
@@ -87,7 +87,7 @@ func TestUser_PutEpisodeCollection(t *testing.T) {
 	var eType model.EpisodeCollection
 
 	a := mocks.NewAuthService(t)
-	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: uid}, nil)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
 	e := mocks.NewEpisodeRepo(t)
 	e.EXPECT().Get(mock.Anything, eid).Return(model.Episode{ID: eid, SubjectID: sid}, nil)

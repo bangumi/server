@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -37,8 +38,8 @@ func TestUser_Get(t *testing.T) {
 	u.EXPECT().GetByID(mock.Anything, uid).Return(model.User{ID: uid}, nil)
 
 	a := mocks.NewAuthRepo(t)
-	a.EXPECT().GetByToken(mock.Anything, "token").Return(domain.AuthUserInfo{ID: uid}, nil)
-	a.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(domain.Permission{}, nil)
+	a.EXPECT().GetByToken(mock.Anything, "token").Return(auth.UserInfo{ID: uid}, nil)
+	a.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(auth.Permission{}, nil)
 
 	app := test.GetWebApp(t,
 		test.Mock{

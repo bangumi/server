@@ -20,9 +20,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/topic"
 )
 
 func TestMysqlRepo_Get(t *testing.T) {
@@ -31,7 +31,7 @@ func TestMysqlRepo_Get(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.Get(context.Background(), domain.TopicTypeSubject, 1)
+	s, err := repo.Get(context.Background(), topic.TypeSubject, 1)
 	require.NoError(t, err)
 
 	require.Equal(t, model.TopicID(1), s.ID)
@@ -43,7 +43,7 @@ func TestMysqlRepo_Count(t *testing.T) {
 
 	repo := getRepo(t)
 
-	count, err := repo.Count(context.Background(), domain.TopicTypeSubject, 1, []model.TopicDisplay{
+	count, err := repo.Count(context.Background(), topic.TypeSubject, 1, []model.TopicDisplay{
 		model.TopicDisplayNormal,
 	})
 	require.NoError(t, err)
@@ -56,7 +56,7 @@ func TestMysqlRepo_List(t *testing.T) {
 
 	repo := getRepo(t)
 
-	_, err := repo.List(context.Background(), domain.TopicTypeSubject, 2, []model.TopicDisplay{
+	_, err := repo.List(context.Background(), topic.TypeSubject, 2, []model.TopicDisplay{
 		model.TopicDisplayNormal,
 	}, 0, 0)
 	require.NoError(t, err)

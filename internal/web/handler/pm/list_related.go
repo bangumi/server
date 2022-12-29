@@ -22,6 +22,7 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -37,8 +38,8 @@ func (h PrivateMessage) ListRelated(c *fiber.Ctx) error {
 		switch {
 		case errors.Is(err, domain.ErrNotFound):
 			return res.ErrNotFound
-		case errors.Is(err, domain.ErrPmDeleted):
-		case errors.Is(err, domain.ErrPmNotOwned):
+		case errors.Is(err, pm.ErrPmDeleted):
+		case errors.Is(err, pm.ErrPmNotOwned):
 			return res.BadRequest(err.Error())
 		}
 		return res.InternalError(c, err, "failed to list related private messages")

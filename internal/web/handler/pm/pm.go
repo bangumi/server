@@ -18,20 +18,20 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/ctrl"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/web/handler/common"
 )
 
 type PrivateMessage struct {
 	ctrl ctrl.Ctrl
 	common.Common
-	pmRepo domain.PrivateMessageRepo
+	pmRepo pm.Repo
 	log    *zap.Logger
 }
 
 func New(
 	common common.Common,
-	pmRepo domain.PrivateMessageRepo,
+	pmRepo pm.Repo,
 	ctrl ctrl.Ctrl,
 	log *zap.Logger,
 ) (PrivateMessage, error) {

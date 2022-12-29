@@ -22,13 +22,12 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getRepo(t *testing.T) domain.PersonRepo {
+func getRepo(t *testing.T) person.Repo {
 	t.Helper()
 	return person.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 }

@@ -17,7 +17,7 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/web/frontend"
 )
@@ -62,7 +62,7 @@ func (h Handler) PageCreateAccessToken(c *fiber.Ctx) error {
 	return h.render(c, frontend.TplCreateAccessToken, frontend.CreateAccessToken{User: u})
 }
 
-func clientIDs(tokens []domain.AccessToken) []string {
+func clientIDs(tokens []auth.AccessToken) []string {
 	var clientIDs = make(map[string]struct{}, len(tokens))
 	for _, token := range tokens {
 		clientIDs[token.ClientID] = struct{}{}

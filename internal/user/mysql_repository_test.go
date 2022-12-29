@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/internal/user"
 )
 
-func getRepo(t *testing.T) domain.UserRepo {
+func getRepo(t *testing.T) user.Repo {
 	t.Helper()
 	repo, err := user.NewUserRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)

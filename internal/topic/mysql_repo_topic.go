@@ -29,13 +29,13 @@ import (
 
 var errUnSupportTopicType = errors.New("topic type not support")
 
-func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model.TopicID) (model.Topic, error) {
+func (r mysqlRepo) Get(ctx context.Context, topicType Type, id model.TopicID) (model.Topic, error) {
 	var topic mysqlTopic
 	var err error
 	switch topicType {
-	case domain.TopicTypeGroup:
+	case TypeGroup:
 		topic, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.ID.Eq(uint32(id))).First()
-	case domain.TopicTypeSubject:
+	case TypeSubject:
 		topic, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.ID.Eq(uint32(id))).First()
 	default:
 		return model.Topic{}, errUnSupportTopicType
@@ -63,17 +63,17 @@ func (r mysqlRepo) Get(ctx context.Context, topicType domain.TopicType, id model
 }
 
 func (r mysqlRepo) Count(
-	ctx context.Context, topicType domain.TopicType, id uint32, display []model.TopicDisplay,
+	ctx context.Context, topicType Type, id uint32, display []model.TopicDisplay,
 ) (int64, error) {
 	var (
 		count int64
 		err   error
 	)
 	switch topicType {
-	case domain.TopicTypeGroup:
+	case TypeGroup:
 		count, err = r.q.GroupTopic.WithContext(ctx).Where(r.q.GroupTopic.GroupID.Eq(id)).
 			Where(r.q.GroupTopic.Display.In(slice.ToUint8(display)...)).Count()
-	case domain.TopicTypeSubject:
+	case TypeSubject:
 		count, err = r.q.SubjectTopic.WithContext(ctx).Where(r.q.SubjectTopic.SubjectID.Eq(id)).
 			Where(r.q.SubjectTopic.Display.In(slice.ToUint8(display)...)).Count()
 	default:
@@ -86,17 +86,17 @@ func (r mysqlRepo) Count(
 }
 
 func (r mysqlRepo) List(
-	ctx context.Context, topicType domain.TopicType, id uint32, display []model.TopicDisplay, limit int, offset int,
+	ctx context.Context, topicType Type, id uint32, display []model.TopicDisplay, limit int, offset int,
 ) ([]model.Topic, error) {
 	var topics []model.Topic
 	var err error
 	switch topicType {
-	case domain.TopicTypeGroup:
+	case TypeGroup:
 		topics, err = wrapDao(r.q.GroupTopic.WithContext(ctx).Where(
 			r.q.GroupTopic.GroupID.Eq(id),
 			r.q.GroupTopic.Display.In(slice.ToUint8(display)...),
 		).Offset(offset).Limit(limit).Order(r.q.GroupTopic.UpdatedTime.Desc()).Find())
-	case domain.TopicTypeSubject:
+	case TypeSubject:
 		topics, err = wrapDao(r.q.SubjectTopic.WithContext(ctx).Where(
 			r.q.SubjectTopic.SubjectID.Eq(id),
 			r.q.SubjectTopic.Display.In(slice.ToUint8(display)...),
@@ -113,15 +113,15 @@ func (r mysqlRepo) List(
 }
 
 func (r mysqlRepo) GetTopicContent(
-	ctx context.Context, topicType domain.TopicType, id model.TopicID,
+	ctx context.Context, topicType Type, id model.TopicID,
 ) (model.Comment, error) {
 	var comment mysqlComment
 	var err error
 	switch topicType {
-	case domain.TopicTypeGroup:
+	case TypeGroup:
 		comment, err = r.q.GroupTopicComment.WithContext(ctx).
 			Where(r.q.GroupTopicComment.Related.Eq(0), r.q.GroupTopicComment.TopicID.Eq(uint32(id))).First()
-	case domain.TopicTypeSubject:
+	case TypeSubject:
 		comment, err = r.q.SubjectTopicComment.WithContext(ctx).
 			Where(r.q.SubjectTopicComment.Related.Eq(0), r.q.SubjectTopicComment.TopicID.Eq(uint32(id))).First()
 	default:

@@ -17,18 +17,17 @@ package person
 import (
 	"context"
 
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/subject"
 )
 
-func NewService(p domain.PersonRepo, s subject.Repo) domain.PersonService {
+func NewService(p Repo, s subject.Repo) Service {
 	return service{repo: p, s: s}
 }
 
 type service struct {
-	repo domain.PersonRepo
+	repo Repo
 	s    subject.Repo
 }
 

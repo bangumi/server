@@ -33,11 +33,11 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.EpisodeRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("episode.mysqlRepo")}, nil
 }
 
-func (r mysqlRepo) WithQuery(query *query.Query) domain.EpisodeRepo {
+func (r mysqlRepo) WithQuery(query *query.Query) Repo {
 	return mysqlRepo{q: query, log: r.log}
 }
 
@@ -65,7 +65,7 @@ func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (model.Ep
 func (r mysqlRepo) Count(
 	ctx context.Context,
 	subjectID model.SubjectID,
-	filter domain.EpisodeFilter,
+	filter Filter,
 ) (int64, error) {
 	q := r.q.Episode.WithContext(ctx).Where(r.q.Episode.SubjectID.Eq(subjectID), r.q.Episode.Ban.Eq(0))
 
@@ -82,7 +82,7 @@ func (r mysqlRepo) Count(
 }
 
 func (r mysqlRepo) List(
-	ctx context.Context, subjectID model.SubjectID, filter domain.EpisodeFilter, limit int, offset int,
+	ctx context.Context, subjectID model.SubjectID, filter Filter, limit int, offset int,
 ) ([]model.Episode, error) {
 	first, err := r.firstEpisode(ctx, subjectID)
 	if err != nil {

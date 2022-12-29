@@ -18,20 +18,20 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/ctrl"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/notification"
 	"github.com/bangumi/server/internal/web/handler/common"
 )
 
 type Notification struct {
 	ctrl ctrl.Ctrl
 	common.Common
-	notificationRepo domain.NotificationRepo
+	notificationRepo notification.Repo
 	log              *zap.Logger
 }
 
 func New(
 	common common.Common,
-	notificationRepo domain.NotificationRepo,
+	notificationRepo notification.Repo,
 	ctrl ctrl.Ctrl,
 	log *zap.Logger,
 ) (Notification, error) {

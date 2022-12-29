@@ -29,14 +29,15 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/user"
 )
 
 const TokenTypeOauthToken = 0
 const TokenTypeAccessToken = 1
 
-func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, c cache.RedisCache) domain.AuthService {
+func NewService(repo Repo, user user.Repo, logger *zap.Logger, c cache.RedisCache) Service {
 	return service{
-		permCache: cache.NewMemoryCache[model.UserGroupID, domain.Permission](),
+		permCache: cache.NewMemoryCache[model.UserGroupID, Permission](),
 		cache:     c,
 		repo:      repo,
 		log:       logger.Named("auth.Service"),
@@ -45,30 +46,30 @@ func NewService(repo domain.AuthRepo, user domain.UserRepo, logger *zap.Logger, 
 }
 
 type service struct {
-	permCache *cache.MemoryCache[model.UserGroupID, domain.Permission]
+	permCache *cache.MemoryCache[model.UserGroupID, Permission]
 	cache     cache.RedisCache
-	repo      domain.AuthRepo
-	user      domain.UserRepo
+	repo      Repo
+	user      user.Repo
 	log       *zap.Logger
 }
 
-func (s service) GetByID(ctx context.Context, userID model.UserID) (domain.Auth, error) {
+func (s service) GetByID(ctx context.Context, userID model.UserID) (Auth, error) {
 	var cacheKey = cachekey.User(userID)
 
-	var a domain.AuthUserInfo
+	var a UserInfo
 	ok, err := s.cache.Get(ctx, cacheKey, &a)
 	if err != nil {
-		return domain.Auth{}, errgo.Wrap(err, "cache.Get")
+		return Auth{}, errgo.Wrap(err, "cache.Get")
 	}
 
 	if !ok {
 		var u model.User
 		u, err = s.user.GetByID(ctx, userID)
 		if err != nil {
-			return domain.Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
+			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
 		}
 
-		a = domain.AuthUserInfo{
+		a = UserInfo{
 			RegTime: u.RegistrationTime,
 			ID:      u.ID,
 			GroupID: u.UserGroup,
@@ -79,10 +80,10 @@ func (s service) GetByID(ctx context.Context, userID model.UserID) (domain.Auth,
 
 	permission, err := s.getPermission(ctx, a.GroupID)
 	if err != nil {
-		return domain.Auth{}, err
+		return Auth{}, err
 	}
 
-	return domain.Auth{
+	return Auth{
 		RegTime:    a.RegTime,
 		ID:         a.ID,
 		GroupID:    a.GroupID,
@@ -90,31 +91,31 @@ func (s service) GetByID(ctx context.Context, userID model.UserID) (domain.Auth,
 	}, nil
 }
 
-func (s service) Login(ctx context.Context, email, password string) (domain.Auth, bool, error) {
+func (s service) Login(ctx context.Context, email, password string) (Auth, bool, error) {
 	var a, hashedPassword, err = s.repo.GetByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			return domain.Auth{}, false, nil
+			return Auth{}, false, nil
 		}
 
-		return domain.Auth{}, false, errgo.Wrap(err, "repo.GetByEmail")
+		return Auth{}, false, errgo.Wrap(err, "repo.GetByEmail")
 	}
 
 	ok, err := s.ComparePassword(hashedPassword, password)
 	if err != nil {
 		s.log.Error("unexpected error when comparing password with bcrypt", zap.Error(err))
-		return domain.Auth{}, false, err
+		return Auth{}, false, err
 	}
 	if !ok {
-		return domain.Auth{}, false, nil
+		return Auth{}, false, nil
 	}
 
 	p, err := s.getPermission(ctx, a.GroupID)
 	if err != nil {
-		return domain.Auth{}, false, err
+		return Auth{}, false, err
 	}
 
-	return domain.Auth{
+	return Auth{
 		RegTime:    a.RegTime,
 		ID:         a.ID,
 		GroupID:    a.GroupID,
@@ -122,19 +123,19 @@ func (s service) Login(ctx context.Context, email, password string) (domain.Auth
 	}, true, nil
 }
 
-func (s service) GetByToken(ctx context.Context, token string) (domain.Auth, error) {
-	var a domain.AuthUserInfo
+func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
+	var a UserInfo
 	var cacheKey = cachekey.Auth(token)
 
 	ok, err := s.cache.Get(ctx, cacheKey, &a)
 	if err != nil {
-		return domain.Auth{}, errgo.Wrap(err, "cache.Get")
+		return Auth{}, errgo.Wrap(err, "cache.Get")
 	}
 
 	if !ok {
 		a, err = s.repo.GetByToken(ctx, token)
 		if err != nil {
-			return domain.Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
+			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
 		}
 
 		_ = s.cache.Set(ctx, cacheKey, a, time.Hour)
@@ -142,10 +143,10 @@ func (s service) GetByToken(ctx context.Context, token string) (domain.Auth, err
 
 	permission, err := s.getPermission(ctx, a.GroupID)
 	if err != nil {
-		return domain.Auth{}, err
+		return Auth{}, err
 	}
 
-	return domain.Auth{
+	return Auth{
 		RegTime:    a.RegTime,
 		ID:         a.ID,
 		GroupID:    a.GroupID,
@@ -174,7 +175,7 @@ func preProcessPassword(s string) []byte {
 	return []byte(hex.EncodeToString(p[:]))
 }
 
-func (s service) getPermission(ctx context.Context, id model.UserGroupID) (domain.Permission, error) {
+func (s service) getPermission(ctx context.Context, id model.UserGroupID) (Permission, error) {
 	p, ok := s.permCache.Get(ctx, id)
 
 	if ok {
@@ -183,7 +184,7 @@ func (s service) getPermission(ctx context.Context, id model.UserGroupID) (domai
 
 	p, err := s.repo.GetPermission(ctx, id)
 	if err != nil {
-		return domain.Permission{}, errgo.Wrap(err, "AuthRepo.GetPermission")
+		return Permission{}, errgo.Wrap(err, "AuthRepo.GetPermission")
 	}
 
 	s.permCache.Set(ctx, id, p, time.Minute)
@@ -198,7 +199,7 @@ func (s service) CreateAccessToken(
 	return token, errgo.Wrap(err, "repo.CreateAccessToken")
 }
 
-func (s service) ListAccessToken(ctx context.Context, userID model.UserID) ([]domain.AccessToken, error) {
+func (s service) ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error) {
 	tokens, err := s.repo.ListAccessToken(ctx, userID)
 	return tokens, errgo.Wrap(err, "repo.ListAccessToken")
 }
@@ -208,7 +209,7 @@ func (s service) DeleteAccessToken(ctx context.Context, id uint32) (bool, error)
 	return result, errgo.Wrap(err, "repo.DeleteAccessToken")
 }
 
-func (s service) GetTokenByID(ctx context.Context, id uint32) (domain.AccessToken, error) {
+func (s service) GetTokenByID(ctx context.Context, id uint32) (AccessToken, error) {
 	result, err := s.repo.GetTokenByID(ctx, id)
 	return result, errgo.Wrap(err, "repo.GetTokenByID")
 }

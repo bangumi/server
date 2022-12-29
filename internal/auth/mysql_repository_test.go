@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getRepo(t *testing.T) (domain.AuthRepo, *query.Query) {
+func getRepo(t *testing.T) (auth.Repo, *query.Query) {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
 	repo := auth.NewMysqlRepo(q, zap.NewNop())

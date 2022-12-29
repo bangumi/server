@@ -25,9 +25,10 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/dam"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -39,17 +40,17 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
 
-	var call domain.SubjectCollectionUpdate
+	var call collection.Update
 
 	a := mocks.NewAuthService(t)
-	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: uid}, nil)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, uid, mock.Anything).
 		Return(model.UserSubjectCollection{}, nil)
 	c.EXPECT().WithQuery(mock.Anything).Return(c)
 	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).
-		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data domain.SubjectCollectionUpdate, _ time.Time) {
+		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data collection.Update, _ time.Time) {
 			call = data
 		}).Return(nil)
 
@@ -71,7 +72,7 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		Execute(app).
 		ExpectCode(http.StatusNoContent)
 
-	require.Equal(t, domain.SubjectCollectionUpdate{
+	require.Equal(t, collection.Update{
 		IP:      "0.0.0.0",
 		Comment: null.New("1 test_content 2"),
 		Tags:    []string{"q", "vv"},
@@ -86,17 +87,17 @@ func TestUser_PatchSubjectCollection_privacy(t *testing.T) {
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
 
-	var call domain.SubjectCollectionUpdate
+	var call collection.Update
 
 	a := mocks.NewAuthService(t)
-	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: uid}, nil)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, uid, mock.Anything).
 		Return(model.UserSubjectCollection{Comment: "办证"}, nil)
 	c.EXPECT().WithQuery(mock.Anything).Return(c)
 	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).
-		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data domain.SubjectCollectionUpdate, _ time.Time) {
+		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data collection.Update, _ time.Time) {
 			call = data
 		}).Return(nil)
 
@@ -114,7 +115,7 @@ func TestUser_PatchSubjectCollection_privacy(t *testing.T) {
 		Execute(app).
 		ExpectCode(http.StatusNoContent)
 
-	require.Equal(t, domain.SubjectCollectionUpdate{
+	require.Equal(t, collection.Update{
 		IP:      "0.0.0.0",
 		Privacy: null.New(model.CollectPrivacyBan),
 	}, call)
@@ -126,7 +127,7 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 	const sid model.SubjectID = 8
 
 	a := &mocks.AuthService{}
-	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: uid}, nil)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
 	t.Run("bad rate", func(t *testing.T) {
 		t.Parallel()

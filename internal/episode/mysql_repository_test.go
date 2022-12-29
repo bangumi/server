@@ -24,14 +24,13 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getRepo(t *testing.T) domain.EpisodeRepo {
+func getRepo(t *testing.T) episode.Repo {
 	t.Helper()
 	repo, err := episode.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)
@@ -45,7 +44,7 @@ func TestMysqlRepo_Count(t *testing.T) {
 
 	repo := getRepo(t)
 
-	s, err := repo.Count(context.Background(), 253, domain.EpisodeFilter{})
+	s, err := repo.Count(context.Background(), 253, episode.Filter{})
 	require.NoError(t, err)
 
 	require.Equal(t, int64(31), s)
@@ -83,15 +82,15 @@ func TestMysqlRepo_List(t *testing.T) {
 	repo := getRepo(t)
 
 	testCases := []struct {
-		filter domain.EpisodeFilter
+		filter episode.Filter
 		len    int
 	}{
-		{filter: domain.EpisodeFilter{}, len: 31},
-		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeNormal)}, len: 26},
-		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeSpecial)}, len: 1},
-		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeOpening)}, len: 1},
-		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeEnding)}, len: 3},
-		{filter: domain.EpisodeFilter{Type: null.New(model.EpTypeMad)}, len: 0},
+		{filter: episode.Filter{}, len: 31},
+		{filter: episode.Filter{Type: null.New(model.EpTypeNormal)}, len: 26},
+		{filter: episode.Filter{Type: null.New(model.EpTypeSpecial)}, len: 1},
+		{filter: episode.Filter{Type: null.New(model.EpTypeOpening)}, len: 1},
+		{filter: episode.Filter{Type: null.New(model.EpTypeEnding)}, len: 3},
+		{filter: episode.Filter{Type: null.New(model.EpTypeMad)}, len: 0},
 	}
 
 	for _, tc := range testCases {

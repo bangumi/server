@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -58,7 +59,7 @@ func TestHandler_NewIndex_NoPermission(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{}, domain.ErrNotFound)
+		Return(auth.UserInfo{}, domain.ErrNotFound)
 
 	app := test.GetWebApp(t, test.Mock{AuthRepo: mockAuth})
 
@@ -78,9 +79,9 @@ func TestHandler_NewIndex_With_Permission(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6}, nil)
+		Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().New(mock.Anything, mock.Anything).Return(nil)
@@ -121,9 +122,9 @@ func TestHandler_UpdateIndex_With_Permission(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6, RegTime: time.Unix(1e9, 0)}, nil)
+		Return(auth.UserInfo{ID: 6, RegTime: time.Unix(1e9, 0)}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{ID: 7, CreatorID: 6}, nil)
@@ -200,9 +201,9 @@ func TestHandler_Update_Index_Invalid_Input(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(domain.AuthUserInfo{ID: 6, RegTime: time.Unix(1e9, 0)}, nil)
+		Return(auth.UserInfo{ID: 6, RegTime: time.Unix(1e9, 0)}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(domain.Permission{}, nil)
+		Return(auth.Permission{}, nil)
 
 	app := test.GetWebApp(t, test.Mock{AuthRepo: mockAuth})
 

@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gtime"
@@ -36,7 +36,7 @@ func TestHandler_CreatePersonalAccessToken(t *testing.T) {
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().CreateAccessToken(mock.Anything, userID, "token name", gtime.OneDay).Return("ttt", nil)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: userID}, nil)
 
 	mockSession := mocks.NewSessionManager(t)
 	mockSession.EXPECT().Get(mock.Anything, "session key").Return(session.Session{UserID: userID}, nil)
@@ -62,8 +62,8 @@ func TestHandler_DeletePersonalAccessToken_401(t *testing.T) {
 	const tokenID uint32 = 5
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetTokenByID(mock.Anything, tokenID).Return(domain.AccessToken{UserID: 2, ID: tokenID}, nil)
-	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(domain.Auth{ID: userID}, nil)
+	mockAuth.EXPECT().GetTokenByID(mock.Anything, tokenID).Return(auth.AccessToken{UserID: 2, ID: tokenID}, nil)
+	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: userID}, nil)
 
 	mockSession := mocks.NewSessionManager(t)
 	mockSession.EXPECT().Get(mock.Anything, "session key").Return(session.Session{UserID: userID}, nil)

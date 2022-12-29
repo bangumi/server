@@ -32,7 +32,7 @@ import (
 	"github.com/bangumi/server/internal/timeline/memo"
 )
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.TimeLineRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("timeline.mysqlRepo")}, nil
 }
 
@@ -41,7 +41,7 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (m mysqlRepo) WithQuery(query *query.Query) domain.TimeLineRepo {
+func (m mysqlRepo) WithQuery(query *query.Query) Repo {
 	return mysqlRepo{q: query, log: m.log}
 }
 

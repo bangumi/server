@@ -30,7 +30,7 @@ import (
 	"github.com/bangumi/server/internal/subject"
 )
 
-func (ctl Ctrl) GetSubject(ctx context.Context, user domain.Auth, subjectID model.SubjectID) (model.Subject, error) {
+func (ctl Ctrl) GetSubject(ctx context.Context, user auth.Auth, subjectID model.SubjectID) (model.Subject, error) {
 	s, err := ctl.getSubject(ctx, subjectID)
 	if err != nil {
 		return model.Subject{}, err
@@ -45,7 +45,7 @@ func (ctl Ctrl) GetSubject(ctx context.Context, user domain.Auth, subjectID mode
 
 func (ctl Ctrl) GetSubjectNoRedirect(
 	ctx context.Context,
-	user domain.Auth,
+	user auth.Auth,
 	subjectID model.SubjectID,
 ) (model.Subject, error) {
 	s, err := ctl.getSubject(ctx, subjectID)

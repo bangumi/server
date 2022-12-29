@@ -41,7 +41,7 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.RevisionRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("revision.mysqlRepo")}, nil
 }
 

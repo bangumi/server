@@ -24,6 +24,8 @@ import (
 	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/topic"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web/req"
 	"github.com/bangumi/server/internal/web/res"
 )
@@ -39,7 +41,7 @@ func (h Handler) GetGroupTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	data, err := h.getResTopicWithComments(c, domain.TopicTypeGroup, topicID)
+	data, err := h.getResTopicWithComments(c, topic.TypeGroup, topicID)
 	if err != nil {
 		return err
 	}
@@ -72,7 +74,7 @@ func (h Handler) GetSubjectTopic(c *fiber.Ctx) error {
 		return err
 	}
 
-	data, err := h.getResTopicWithComments(c, domain.TopicTypeSubject, topicID)
+	data, err := h.getResTopicWithComments(c, topic.TypeSubject, topicID)
 	if err != nil {
 		return err
 	}
@@ -96,7 +98,7 @@ func (h Handler) ListSubjectTopics(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to subject")
 	}
 
-	return h.listTopics(c, domain.TopicTypeSubject, uint32(id))
+	return h.listTopics(c, topic.TypeSubject, uint32(id))
 }
 
 func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
@@ -125,7 +127,7 @@ func (h Handler) GetEpisodeComments(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get subject of episode")
 	}
 
-	return h.listComments(c, u.Auth, domain.CommentEpisode, model.TopicID(id))
+	return h.listComments(c, u.Auth, topic.CommentEpisode, model.TopicID(id))
 }
 
 func (h Handler) GetPersonComments(c *fiber.Ctx) error {
@@ -148,7 +150,7 @@ func (h Handler) GetPersonComments(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	return h.listComments(c, u.Auth, domain.CommentPerson, model.TopicID(id))
+	return h.listComments(c, u.Auth, topic.CommentPerson, model.TopicID(id))
 }
 
 func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
@@ -167,7 +169,7 @@ func (h Handler) GetCharacterComments(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get character")
 	}
 
-	return h.listComments(c, u.Auth, domain.CommentCharacter, model.TopicID(id))
+	return h.listComments(c, u.Auth, topic.CommentCharacter, model.TopicID(id))
 }
 
 func (h Handler) GetIndexComments(c *fiber.Ctx) error {
@@ -188,13 +190,13 @@ func (h Handler) GetIndexComments(c *fiber.Ctx) error {
 	}
 
 	u := h.GetHTTPAccessor(c)
-	return h.listComments(c, u.Auth, domain.CommentIndex, model.TopicID(id))
+	return h.listComments(c, u.Auth, topic.CommentIndex, model.TopicID(id))
 }
 
 func (h Handler) listComments(
 	c *fiber.Ctx,
-	u domain.Auth,
-	commentType domain.CommentType,
+	u auth.Auth,
+	commentType topic.CommentType,
 	id model.TopicID,
 ) error {
 	// a noop limit to fetch all comments
@@ -208,7 +210,7 @@ func (h Handler) listComments(
 		return errgo.Wrap(err, "query.GetUsersByIDs")
 	}
 
-	var friends map[model.UserID]domain.FriendItem
+	var friends map[model.UserID]user.FriendItem
 	if u.ID != 0 {
 		friends, err = h.ctrl.GetFriends(c.UserContext(), u.ID)
 		if err != nil {
@@ -234,7 +236,7 @@ func commentsToUserIDs(comments []model.Comment) []model.UserID {
 func convertModelComments(
 	comments []model.Comment,
 	userMap map[model.UserID]model.User,
-	friends map[model.UserID]domain.FriendItem,
+	friends map[model.UserID]user.FriendItem,
 ) []res.PrivateComment {
 	result := make([]res.PrivateComment, len(comments))
 	for k, comment := range comments {

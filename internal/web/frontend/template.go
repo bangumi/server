@@ -19,8 +19,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/config/env"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/oauth"
 )
@@ -66,7 +66,7 @@ type ListAccessToken struct {
 	Clients map[string]oauth.Client
 	Title   string
 	User    model.User
-	Tokens  []domain.AccessToken
+	Tokens  []auth.AccessToken
 }
 
 type CreateAccessToken struct {

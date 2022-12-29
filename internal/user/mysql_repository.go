@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/gstr"
 )
 
-func NewUserRepo(q *query.Query, log *zap.Logger) (domain.UserRepo, error) {
+func NewUserRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("user.mysqlRepo")}, nil
 }
 
@@ -84,13 +84,13 @@ func (m mysqlRepo) GetByIDs(ctx context.Context, ids []model.UserID) (map[model.
 	return r, nil
 }
 
-func (m mysqlRepo) GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]domain.FriendItem, error) {
+func (m mysqlRepo) GetFriends(ctx context.Context, userID model.UserID) (map[model.UserID]FriendItem, error) {
 	friends, err := m.q.Friend.WithContext(ctx).Where(m.q.Friend.UserID.Eq(userID)).Find()
 	if err != nil {
 		return nil, errgo.Wrap(err, "friend.Find")
 	}
 
-	var r = make(map[model.UserID]domain.FriendItem, len(friends))
+	var r = make(map[model.UserID]FriendItem, len(friends))
 	for _, friend := range friends {
 		r[friend.FriendID] = struct{}{}
 	}

@@ -17,30 +17,33 @@ package user
 import (
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/ctrl"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/person"
+	"github.com/bangumi/server/internal/topic"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/internal/web/handler/common"
 )
 
 type User struct {
 	common.Common
 	ctrl    ctrl.Ctrl
-	person  domain.PersonService
-	topic   domain.TopicRepo
-	collect domain.CollectionRepo
+	person  person.Service
+	topic   topic.Repo
+	collect collection.Repo
 	log     *zap.Logger
-	user    domain.UserRepo
+	user    user.Repo
 	cfg     config.AppConfig
 }
 
 func New(
 	common common.Common,
-	p domain.PersonService,
-	user domain.UserRepo,
-	topic domain.TopicRepo,
+	p person.Service,
+	user user.Repo,
+	topic topic.Repo,
 	ctrl ctrl.Ctrl,
-	collect domain.CollectionRepo,
+	collect collection.Repo,
 	log *zap.Logger,
 ) (User, error) {
 	return User{

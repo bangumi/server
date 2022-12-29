@@ -18,10 +18,13 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/ctrl"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/group"
+	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/oauth"
+	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/web/captcha"
 	"github.com/bangumi/server/internal/web/frontend"
@@ -32,10 +35,10 @@ import (
 
 func New(
 	common common.Common,
-	a domain.AuthService,
-	r domain.RevisionRepo,
-	g domain.GroupRepo,
-	index domain.IndexRepo,
+	a auth.Service,
+	r revision.Repo,
+	g group.Repo,
+	index index.Repo,
 	cache cache.RedisCache,
 	ctrl ctrl.Ctrl,
 	captcha captcha.Manager,
@@ -68,15 +71,15 @@ func New(
 type Handler struct {
 	ctrl ctrl.Ctrl
 	common.Common
-	g         domain.GroupRepo
+	g         group.Repo
 	oauth     oauth.Manager
-	r         domain.RevisionRepo
+	r         revision.Repo
 	cache     cache.RedisCache
-	a         domain.AuthService
+	a         auth.Service
 	session   session.Manager
 	captcha   captcha.Manager
 	rateLimit rate.Manager
-	i         domain.IndexRepo
+	i         index.Repo
 	search    search.Handler
 	template  frontend.TemplateEngine
 	buffPool  buffer.Pool

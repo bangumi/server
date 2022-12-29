@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -104,7 +104,7 @@ func TestUser_ListSubjectCollection_other_user(t *testing.T) {
 	const subjectID model.SubjectID = 9
 
 	a := mocks.NewAuthService(t)
-	a.EXPECT().GetByToken(mock.Anything, "v").Return(domain.Auth{ID: userID + 1}, nil)
+	a.EXPECT().GetByToken(mock.Anything, "v").Return(auth.Auth{ID: userID + 1}, nil)
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(model.User{ID: userID, UserName: username}, nil)

@@ -30,7 +30,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getRepo(t *testing.T) domain.IndexRepo {
+func getRepo(t *testing.T) index.Repo {
 	t.Helper()
 	repo, err := index.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)
@@ -228,7 +228,7 @@ func TestMysqlRepo_AddOrUpdateIndexSubject(t *testing.T) {
 	t.Parallel()
 
 	repo := getRepo(t)
-	index := &model.Index{
+	idx := &model.Index{
 		ID:          0,
 		Title:       "test",
 		Description: "Test Index",
@@ -243,34 +243,34 @@ func TestMysqlRepo_AddOrUpdateIndexSubject(t *testing.T) {
 
 	ctx := context.Background()
 
-	err := repo.New(ctx, index)
-	require.NotEqual(t, 0, index.ID)
+	err := repo.New(ctx, idx)
+	require.NotEqual(t, 0, idx.ID)
 	require.NoError(t, err)
 
-	_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, 3, 1, "comment 1")
+	_, err = repo.AddOrUpdateIndexSubject(ctx, idx.ID, 3, 1, "comment 1")
 	require.NoError(t, err)
 
-	_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, 4, 3, "comment 3")
+	_, err = repo.AddOrUpdateIndexSubject(ctx, idx.ID, 4, 3, "comment 3")
 	require.NoError(t, err)
 
-	i, err := repo.Get(ctx, index.ID)
+	i, err := repo.Get(ctx, idx.ID)
 	require.NoError(t, err)
-	require.EqualValues(t, index.ID, i.ID)
+	require.EqualValues(t, idx.ID, i.ID)
 
 	require.EqualValues(t, 2, i.Total)
 
-	subjects, err := repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
+	subjects, err := repo.ListSubjects(context.Background(), idx.ID, model.SubjectTypeAll, 20, 0)
 	require.NoError(t, err)
 	require.Len(t, subjects, 2)
 
-	cache := map[model.SubjectID]domain.IndexSubject{}
+	cache := map[model.SubjectID]index.Subject{}
 	for _, s := range subjects {
 		cache[s.Subject.ID] = s
 	}
 	require.EqualValues(t, cache[3].Comment, "comment 1")
 	require.EqualValues(t, cache[4].Comment, "comment 3")
 
-	err = repo.Delete(ctx, index.ID)
+	err = repo.Delete(ctx, idx.ID)
 	require.NoError(t, err)
 }
 

@@ -20,10 +20,10 @@ import (
 
 	"github.com/samber/lo"
 
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pm"
 )
 
 var ErrPmBlocked = errors.New("have been blocked")
@@ -90,7 +90,7 @@ func (ctl Ctrl) CreatePrivateMessage(
 	ctx context.Context,
 	senderID model.UserID,
 	receiverIDs []model.UserID,
-	relatedIDFilter domain.PrivateMessageIDFilter,
+	relatedIDFilter pm.IDFilter,
 	title string,
 	content string) ([]model.PrivateMessage, error) {
 	emptyList := make([]model.PrivateMessage, 0)

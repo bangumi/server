@@ -21,7 +21,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/web/req/cf"
 	"github.com/bangumi/server/internal/web/util"
 )
@@ -29,7 +29,7 @@ import (
 type Accessor struct {
 	RequestID string
 	IP        net.IP
-	domain.Auth
+	auth.Auth
 	Login bool
 }
 
@@ -43,7 +43,7 @@ func (a *Accessor) FillBasicInfo(c *fiber.Ctx) {
 	a.IP = util.RequestIP(c)
 }
 
-func (a *Accessor) SetAuth(auth domain.Auth) {
+func (a *Accessor) SetAuth(auth auth.Auth) {
 	a.Auth = auth
 	a.Login = true
 }
@@ -66,5 +66,5 @@ func (a *Accessor) reset() {
 	a.RequestID = ""
 	a.IP = nil
 	a.Login = false
-	a.Auth = domain.Auth{}
+	a.Auth = auth.Auth{}
 }

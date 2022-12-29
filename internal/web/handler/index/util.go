@@ -19,14 +19,14 @@ import (
 
 	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/dam"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/web/handler/internal/cachekey"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/wiki"
 )
 
-func indexSubjectToResp(s domain.IndexSubject) res.IndexSubjectV0 {
+func indexSubjectToResp(s index.Subject) res.IndexSubjectV0 {
 	return res.IndexSubjectV0{
 		AddedAt: s.AddedAt,
 		Date:    null.NilString(s.Subject.Date),

@@ -12,23 +12,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package person
 
 import (
 	"context"
 
+	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
 )
 
-type PersonRepo interface {
+type Repo interface {
 	Get(ctx context.Context, id model.PersonID) (model.Person, error)
 	GetByIDs(ctx context.Context, ids []model.PersonID) (map[model.PersonID]model.Person, error)
 
-	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]SubjectPersonRelation, error)
-	GetCharacterRelated(ctx context.Context, subjectID model.CharacterID) ([]PersonCharacterRelation, error)
+	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]domain.SubjectPersonRelation, error)
+	GetCharacterRelated(ctx context.Context, subjectID model.CharacterID) ([]domain.PersonCharacterRelation, error)
 }
 
-type PersonService interface {
+type Service interface {
 	Get(ctx context.Context, id model.PersonID) (model.Person, error)
 
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]model.SubjectPersonRelation, error)

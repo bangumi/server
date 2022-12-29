@@ -22,12 +22,11 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/notification"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getRepo(t *testing.T) domain.NotificationRepo {
+func getRepo(t *testing.T) notification.Repo {
 	t.Helper()
 	repo, err := notification.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)

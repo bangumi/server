@@ -21,7 +21,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/ctrl/internal/cachekey"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -39,7 +39,7 @@ func (ctl Ctrl) CountEpisode(ctx context.Context, subjectID model.SubjectID, epT
 		return count, nil
 	}
 
-	count, err = ctl.episode.Count(ctx, subjectID, domain.EpisodeFilter{Type: null.NewFromPtr(epType)})
+	count, err = ctl.episode.Count(ctx, subjectID, episode.Filter{Type: null.NewFromPtr(epType)})
 	if err != nil {
 		return 0, errgo.Wrap(err, "episode.Count")
 	}

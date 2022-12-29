@@ -12,19 +12,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package topic
+package pm
 
 import (
-	"go.uber.org/zap"
-
-	"github.com/bangumi/server/internal/dal/query"
+	"errors"
 )
 
-type mysqlRepo struct {
-	q   *query.Query
-	log *zap.Logger
-}
-
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
-	return mysqlRepo{q: q, log: log.Named("subject.mysqlRepo")}, nil
-}
+var ErrPmNotOwned = errors.New("not sent or received this private message")
+var ErrPmDeleted = errors.New("private message deleted")
+var ErrPmUserIrrelevant = errors.New("has user irrelevant message")
+var ErrPmRelatedNotExists = errors.New("related private message not exists")
+var ErrPmInvalidOperation = errors.New("invalid operation")

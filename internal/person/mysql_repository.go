@@ -34,7 +34,7 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) domain.PersonRepo {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) Repo {
 	return mysqlRepo{q: q, log: log.Named("person.mysqlRepo")}
 }
 

@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package timeline
 
 import (
 	"context"
@@ -21,9 +21,9 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-type TimeLineRepo interface {
+type Repo interface {
 	// WithQuery is used to replace repo's query to txn
-	WithQuery(query *query.Query) TimeLineRepo
+	WithQuery(query *query.Query) Repo
 	GetByID(ctx context.Context, id model.TimeLineID) (*model.TimeLine, error)
 	ListByUID(ctx context.Context, uid model.UserID, limit int, since model.TimeLineID) ([]*model.TimeLine, error)
 	Create(ctx context.Context, tl *model.TimeLine) error

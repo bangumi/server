@@ -12,33 +12,31 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package topic
 
 import (
 	"context"
 
-	"go.uber.org/zap"
-
 	"github.com/bangumi/server/internal/model"
 )
 
-type TopicRepo interface {
-	Get(ctx context.Context, topicType TopicType, id model.TopicID) (model.Topic, error)
+type Repo interface {
+	Get(ctx context.Context, topicType Type, id model.TopicID) (model.Topic, error)
 
 	// Count all topic for a subject/group.
-	Count(ctx context.Context, topicType TopicType, id uint32, displays []model.TopicDisplay) (int64, error)
+	Count(ctx context.Context, topicType Type, id uint32, displays []model.TopicDisplay) (int64, error)
 
 	// List return paged topic list of a subject/group.
 	// userID should not be filtered
 	List(
 		ctx context.Context,
-		topicType TopicType,
+		topicType Type,
 		id uint32,
 		displays []model.TopicDisplay,
 		limit int, offset int,
 	) ([]model.Topic, error)
 
-	GetTopicContent(ctx context.Context, topicType TopicType, id model.TopicID) (model.Comment, error)
+	GetTopicContent(ctx context.Context, topicType Type, id model.TopicID) (model.Comment, error)
 
 	// CountReplies top comments for a topic/index/character/person/episode.
 	// 一级回复
@@ -62,27 +60,3 @@ type TopicRepo interface {
 	// CreateComment
 	// CreateSubComment
 }
-
-type TopicType uint32
-
-func (t TopicType) Zap() zap.Field {
-	return zap.Uint32("topic_type", uint32(t))
-}
-
-const (
-	TopicTypeUnknown TopicType = iota
-	TopicTypeSubject
-	TopicTypeGroup
-)
-
-type CommentType uint32
-
-const (
-	CommentTypeUnknown CommentType = iota
-	CommentTypeSubjectTopic
-	CommentTypeGroupTopic
-	CommentIndex
-	CommentCharacter
-	CommentPerson
-	CommentEpisode
-)

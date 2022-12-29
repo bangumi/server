@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -33,7 +33,7 @@ func TestUser_GetEpisodeCollection(t *testing.T) {
 	t.Parallel()
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 3}, nil)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: 3}, nil)
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectEpisodesCollection(mock.Anything, mock.Anything, mock.Anything).
@@ -58,7 +58,7 @@ func TestUser_GetSubjectEpisodeCollection(t *testing.T) {
 	t.Parallel()
 
 	mockAuth := mocks.NewAuthService(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(domain.Auth{ID: 3}, nil)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: 3}, nil)
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectEpisodesCollection(mock.Anything, mock.Anything, mock.Anything).

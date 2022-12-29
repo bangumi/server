@@ -20,9 +20,10 @@ import (
 	"github.com/bangumi/server/internal/compat"
 	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/ctrl"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/web/handler/common"
 	"github.com/bangumi/server/internal/web/res"
 	"github.com/bangumi/server/pkg/wiki"
@@ -31,16 +32,16 @@ import (
 type Character struct {
 	ctrl ctrl.Ctrl
 	common.Common
-	person domain.PersonService
-	topic  domain.TopicRepo
+	person person.Service
+	topic  topic.Repo
 	log    *zap.Logger
 	cfg    config.AppConfig
 }
 
 func New(
 	common common.Common,
-	p domain.PersonService,
-	topic domain.TopicRepo,
+	p person.Service,
+	topic topic.Repo,
 	ctrl ctrl.Ctrl,
 	log *zap.Logger,
 ) (Character, error) {

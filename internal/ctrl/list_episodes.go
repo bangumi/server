@@ -17,7 +17,7 @@ package ctrl
 import (
 	"context"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -43,7 +43,7 @@ func (ctl Ctrl) ListEpisode(
 	}
 
 	var episodes []model.Episode
-	episodes, err = ctl.episode.List(ctx, subjectID, domain.EpisodeFilter{Type: null.NewFromPtr(epType)}, limit, offset)
+	episodes, err = ctl.episode.List(ctx, subjectID, episode.Filter{Type: null.NewFromPtr(epType)}, limit, offset)
 	if err != nil {
 		return nil, 0, errgo.Wrap(err, "episode.List")
 	}

@@ -39,7 +39,7 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.PrivateMessageRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("pm.mysqlRepo")}, nil
 }
 
@@ -162,11 +162,11 @@ func (r mysqlRepo) ListRelated(
 		return emptyMsgList, errgo.Wrap(err, "dal")
 	}
 	if firstMsg.SenderID != userID && firstMsg.ReceiverID != userID {
-		return emptyMsgList, domain.ErrPmNotOwned
+		return emptyMsgList, ErrPmNotOwned
 	}
 	if (firstMsg.SenderID == userID && firstMsg.DeletedBySender) ||
 		(firstMsg.ReceiverID == userID && firstMsg.DeletedByReceiver) {
-		return emptyMsgList, domain.ErrPmDeleted
+		return emptyMsgList, ErrPmDeleted
 	}
 	res, err := do.Where(
 		r.q.PrivateMessage.RelatedMessageID.Eq(firstMsg.ID),
@@ -276,7 +276,7 @@ func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID 
 		return errgo.Wrap(err, "dal")
 	}
 	if affectedRows == 0 {
-		return domain.ErrPmInvalidOperation
+		return ErrPmInvalidOperation
 	}
 	return nil
 }
@@ -284,7 +284,7 @@ func (r mysqlRepo) MarkRead(ctx context.Context, userID model.UserID, relatedID 
 func (r mysqlRepo) constructMsgs(
 	senderID model.UserID,
 	receiverIDs []model.UserID,
-	relatedIDFilter domain.PrivateMessageIDFilter,
+	relatedIDFilter IDFilter,
 	title string,
 	content string,
 ) []*dao.PrivateMessage {
@@ -309,22 +309,22 @@ func (r mysqlRepo) Create(
 	ctx context.Context,
 	senderID model.UserID,
 	receiverIDs []model.UserID,
-	relatedIDFilter domain.PrivateMessageIDFilter,
+	relatedIDFilter IDFilter,
 	title string,
 	content string,
 ) ([]model.PrivateMessage, error) {
 	emptyList := make([]model.PrivateMessage, 0)
 	if relatedIDFilter.Type.Set {
 		if len(receiverIDs) > 1 {
-			return emptyList, domain.ErrPmInvalidOperation
+			return emptyList, ErrPmInvalidOperation
 		}
 		msg, err := r.getMainMsg(ctx, relatedIDFilter.Type.Value)
 		if (err != nil || msg.SenderID != senderID && msg.SenderID != receiverIDs[0]) ||
 			(msg.ReceiverID != senderID && msg.ReceiverID != receiverIDs[0]) {
-			return emptyList, domain.ErrPmRelatedNotExists
+			return emptyList, ErrPmRelatedNotExists
 		}
 		if msg.ID != relatedIDFilter.Type.Value {
-			relatedIDFilter = domain.PrivateMessageIDFilter{Type: null.New(msg.ID)}
+			relatedIDFilter = IDFilter{Type: null.New(msg.ID)}
 		}
 	}
 	msgs := r.constructMsgs(senderID, receiverIDs, relatedIDFilter, title, content)
@@ -376,7 +376,7 @@ func (r mysqlRepo) Delete(
 		return errgo.Wrap(err, "dal")
 	}
 	if len(pms) != len(ids) {
-		return domain.ErrPmUserIrrelevant
+		return ErrPmUserIrrelevant
 	}
 	err = r.q.Transaction(func(tx *query.Query) error {
 		err = handleReplyDeletes(ctx, tx, pms, userID)

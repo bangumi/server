@@ -19,7 +19,7 @@ import (
 
 	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/ctrl"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/web/handler/common"
 )
 
@@ -27,13 +27,13 @@ type Handler struct {
 	common.Common
 	ctrl  ctrl.Ctrl
 	cache cache.RedisCache
-	i     domain.IndexRepo
+	i     index.Repo
 	log   *zap.Logger
 }
 
 func New(
 	common common.Common,
-	index domain.IndexRepo,
+	index index.Repo,
 	log *zap.Logger,
 	cache cache.RedisCache,
 	ctrl ctrl.Ctrl,

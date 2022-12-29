@@ -18,26 +18,34 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/cache"
+	"github.com/bangumi/server/internal/character"
+	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/dal"
 	"github.com/bangumi/server/internal/dam"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/internal/episode"
+	"github.com/bangumi/server/internal/index"
+	"github.com/bangumi/server/internal/person"
+	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/timeline"
+	"github.com/bangumi/server/internal/topic"
+	"github.com/bangumi/server/internal/user"
 )
 
 func New(
-	episode domain.EpisodeRepo,
+	episode episode.Repo,
 	cache cache.RedisCache,
 	subject subject.Repo,
-	person domain.PersonRepo,
-	character domain.CharacterRepo,
-	collection domain.CollectionRepo,
-	index domain.IndexRepo,
-	timeline domain.TimeLineRepo,
-	user domain.UserRepo,
-	topic domain.TopicRepo,
+	person person.Repo,
+	character character.Repo,
+	collection collection.Repo,
+	index index.Repo,
+	timeline timeline.Repo,
+	user user.Repo,
+	topic topic.Repo,
 	tx dal.Transaction,
 	dam dam.Dam,
-	privateMessage domain.PrivateMessageRepo,
+	privateMessage pm.Repo,
 	log *zap.Logger,
 ) Ctrl {
 	return Ctrl{
@@ -67,14 +75,14 @@ type Ctrl struct {
 	tx  dal.Transaction
 	dam dam.Dam
 
-	user           domain.UserRepo
-	topic          domain.TopicRepo
-	person         domain.PersonRepo
-	episode        domain.EpisodeRepo
+	user           user.Repo
+	topic          topic.Repo
+	person         person.Repo
+	episode        episode.Repo
 	subject        subject.Repo
-	character      domain.CharacterRepo
-	collection     domain.CollectionRepo
-	index          domain.IndexRepo
-	timeline       domain.TimeLineRepo
-	privateMessage domain.PrivateMessageRepo
+	character      character.Repo
+	collection     collection.Repo
+	index          index.Repo
+	timeline       timeline.Repo
+	privateMessage pm.Repo
 }

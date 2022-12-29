@@ -15,25 +15,36 @@
 package domain
 
 import (
-	"context"
-
 	"github.com/bangumi/server/internal/model"
 )
 
-type GroupRepo interface {
-	GetByName(ctx context.Context, name string) (model.Group, error)
-	GetByID(ctx context.Context, id model.GroupID) (model.Group, error)
-
-	CountMembersByID(ctx context.Context, id model.GroupID, memberType GroupMemberType) (int64, error)
-	ListMembersByID(
-		ctx context.Context, id model.GroupID, memberType GroupMemberType, limit, offset int,
-	) ([]model.GroupMember, error)
+type PersonCharacterRelation struct {
+	CharacterID model.CharacterID
+	PersonID    model.PersonID
+	SubjectID   model.SubjectID
 }
 
-type GroupMemberType uint8
+type SubjectPersonRelation struct {
+	TypeID uint16
 
-const (
-	GroupMemberAll GroupMemberType = 1 << iota / 2
-	GroupMemberMod
-	GroupMemberNormal
-)
+	PersonID  model.PersonID
+	SubjectID model.SubjectID
+}
+
+type SubjectCharacterRelation struct {
+	TypeID uint8
+
+	SubjectID   model.SubjectID
+	CharacterID model.CharacterID
+}
+
+type SubjectInternalRelation struct {
+	TypeID uint16
+
+	SourceID      model.SubjectID
+	DestinationID model.SubjectID
+}
+
+func (s SubjectInternalRelation) GetSourceID() model.SubjectID {
+	return s.SourceID
+}

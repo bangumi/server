@@ -21,8 +21,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -39,7 +39,7 @@ func TestManager_Create(t *testing.T) {
 
 	manager := session.New(cache.NewNoop(), m, logger.Copy())
 
-	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
+	_, s, err := manager.Create(context.Background(), auth.Auth{ID: uid})
 	require.NoError(t, err)
 	require.Equal(t, uid, s.UserID)
 }
@@ -53,7 +53,7 @@ func TestManager_Get(t *testing.T) {
 
 	manager := session.New(cache.NewNoop(), m, logger.Copy())
 
-	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
+	_, s, err := manager.Create(context.Background(), auth.Auth{ID: uid})
 	require.NoError(t, err)
 	require.Equal(t, uid, s.UserID)
 }
@@ -68,7 +68,7 @@ func TestManager_Revoke(t *testing.T) {
 
 	manager := session.New(cache.NewNoop(), m, logger.Copy())
 
-	_, s, err := manager.Create(context.Background(), domain.Auth{ID: uid})
+	_, s, err := manager.Create(context.Background(), auth.Auth{ID: uid})
 	require.NoError(t, err)
 	require.Equal(t, uid, s.UserID)
 }

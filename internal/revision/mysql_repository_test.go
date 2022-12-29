@@ -29,7 +29,7 @@ import (
 	"github.com/bangumi/server/internal/revision"
 )
 
-func getRepo(t *testing.T) domain.RevisionRepo {
+func getRepo(t *testing.T) revision.Repo {
 	t.Helper()
 	repo, err := revision.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)

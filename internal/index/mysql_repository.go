@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/internal/subject"
 )
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (domain.IndexRepo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("index.mysqlRepo")}, nil
 }
 
@@ -126,7 +126,7 @@ func (r mysqlRepo) ListSubjects(
 	id model.IndexID,
 	subjectType model.SubjectType,
 	limit, offset int,
-) ([]domain.IndexSubject, error) {
+) ([]Subject, error) {
 	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).
 		Preload(r.q.IndexSubject.Subject.Fields).
 		Where(r.q.IndexSubject.IndexID.Eq(id)).
@@ -141,14 +141,14 @@ func (r mysqlRepo) ListSubjects(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	var results = make([]domain.IndexSubject, len(d))
+	var results = make([]Subject, len(d))
 	for i, s := range d {
 		sub, err := subject.ConvertDao(&s.Subject)
 		if err != nil {
 			return nil, errgo.Wrap(err, "subject.ConvertDao")
 		}
 
-		results[i] = domain.IndexSubject{
+		results[i] = Subject{
 			AddedAt: time.Unix(int64(s.CreatedTime), 0),
 			Comment: s.Comment,
 			Subject: sub,
@@ -161,7 +161,7 @@ func (r mysqlRepo) ListSubjects(
 func (r mysqlRepo) AddOrUpdateIndexSubject(
 	ctx context.Context, id model.IndexID,
 	subjectID model.SubjectID, sort uint32, comment string,
-) (*domain.IndexSubject, error) {
+) (*Subject, error) {
 	index, err := r.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -211,7 +211,7 @@ func (r mysqlRepo) AddOrUpdateIndexSubject(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	return &domain.IndexSubject{
+	return &Subject{
 		AddedAt: now,
 		Comment: comment,
 		Subject: subject,
