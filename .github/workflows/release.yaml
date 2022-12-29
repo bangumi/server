@@ -9,7 +9,7 @@ jobs:
   github:
     needs:
       - docker
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -29,52 +29,3 @@ jobs:
         run: gh release create "$TAG" --title "$TAG" -F changelog.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  docker:
-    name: "docker"
-
-    runs-on: ubuntu-22.04
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version-file: "go.mod"
-          check-latest: true
-
-      - name: Go Build Cache (build)
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg
-          key: go-cache-119-${{ hashFiles('**/go.sum') }}-build
-          restore-keys: |
-            go-cache-119-${{ hashFiles('**/go.sum') }}-
-            go-cache-119-
-
-      - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
-
-      - name: Install Task
-        uses: arduino/setup-task@v1
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-
-      - run: task build
-        name: Build Binary
-
-      - uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          context: ./
-          file: etc/Dockerfile
-          tags: ghcr.io/bangumi/chii:latest,ghcr.io/bangumi/chii:${{env.TAG}}

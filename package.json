@@ -6,8 +6,7 @@
   "scripts": {
     "format": "prettier -w --list-different ./",
     "test": "node openapi/test.js",
-    "build": "node ./openapi/build.js",
-    "version": "node scripts/bump.js"
+    "build": "node ./openapi/build.js"
   },
   "prettier": {
     "printWidth": 120
