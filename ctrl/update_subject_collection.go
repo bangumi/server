@@ -35,7 +35,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/set"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
-	"github.com/bangumi/server/internal/subject"
 )
 
 type UpdateCollectionRequest struct {
@@ -121,9 +120,9 @@ func (ctl Ctrl) saveTimeLineSubject(
 		return nil
 	}
 
-	sj, err := ctl.subject.Get(ctx, subjectID, subject.Filter{NSFW: null.Bool{Value: true, Set: !u.AllowNSFW()}})
+	sj, err := ctl.GetSubject(ctx, u, subjectID)
 	if err != nil {
-		return errgo.Wrap(err, "subject.Get")
+		return err
 	}
 	err = ctl.timeline.WithQuery(tx).Create(ctx, makeTimeLineSubject(req, sj))
 	return errgo.Wrap(err, "timeline.Create")
@@ -144,7 +143,7 @@ func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.T
 		Content: &model.TimeLineMemoContent{
 			TimeLineSubjectMemo: &model.TimeLineSubjectMemo{
 				ID:             sidStr,
-				TypeID:         string(req.Type.Default(0)),
+				TypeID:         strconv.FormatUint(uint64(req.Type.Default(0)), 10),
 				Name:           sj.Name,
 				NameCN:         sj.NameCN,
 				Series:         strconv.Itoa(generic.BtoI(sj.Series)),
