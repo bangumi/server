@@ -17,7 +17,7 @@ package canal
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/bangumi/server/internal/canal"
+	"github.com/bangumi/server/canal"
 )
 
 var Command = &cobra.Command{

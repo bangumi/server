@@ -24,9 +24,9 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gen/field"
 
+	"github.com/bangumi/server/dal/dao"
+	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/collection"
-	"github.com/bangumi/server/internal/dal/dao"
-	"github.com/bangumi/server/internal/dal/query"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"

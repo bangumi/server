@@ -84,11 +84,11 @@ tasks:
 
   dal:comment:
     sources:
-      - ./internal/cmd/gen/dal/**/*.go
+      - ./cmd/gen/dal/**/*.go
     generates:
-      - ./internal/dal/dao/comment*.gen.go
+      - ./dal/dao/comment*.gen.go
     cmds:
-      - go run ./internal/cmd/gen/dal/comment.go
+      - go run ./cmd/gen/dal/comment.go
 
   mock:
     desc: Generate Mocks.
@@ -98,12 +98,12 @@ tasks:
   gorm:
     desc: Run gorm-gen to generate go struct from mysql database.
     generates:
-      - ./internal/dal/query/gen.go
+      - ./dal/query/gen.go
     sources:
-      - ./internal/cmd/gen/gorm/main.go
+      - ./cmd/gen/gorm/main.go
       - go.mod
     cmds:
-      - go run ./internal/cmd/gen/gorm/main.go
+      - go run ./cmd/gen/gorm/main.go
 
   clean:
     cmds:

@@ -20,8 +20,8 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/driver"
+	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/internal/pkg/driver"
 )
 
 func GetRedis(tb testing.TB) *redis.Client {

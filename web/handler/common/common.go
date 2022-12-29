@@ -20,8 +20,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/handler/internal/ctxkey"
 	"github.com/bangumi/server/web/session"

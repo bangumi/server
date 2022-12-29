@@ -24,10 +24,10 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/auth/internal/cachekey"
-	"github.com/bangumi/server/internal/cache"
-	"github.com/bangumi/server/internal/domain"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/user"
 )

@@ -25,12 +25,12 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/collection"
-	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )

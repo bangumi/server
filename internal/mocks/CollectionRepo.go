@@ -11,7 +11,7 @@ import (
 
 	model "github.com/bangumi/server/internal/model"
 
-	query "github.com/bangumi/server/internal/dal/query"
+	query "github.com/bangumi/server/dal/query"
 
 	time "time"
 )

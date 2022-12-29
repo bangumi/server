@@ -23,9 +23,9 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
-	"github.com/bangumi/server/internal/dal/dao"
-	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/dal/dao"
+	"github.com/bangumi/server/dal/query"
+	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"

@@ -258,8 +258,8 @@ linters-settings:
       - "func github.com/bangumi/server/web/res.BadRequest("
       - "func github.com/bangumi/server/web/res.JSON("
       - "func (github.com/bangumi/server/web/handler/common.Common)."
-      - "func (*github.com/bangumi/server/internal/dal/query.Query).Transaction("
-      - "func (github.com/bangumi/server/internal/dal.Transaction).Transaction("
+      - "func (*github.com/bangumi/server/dal/query.Query).Transaction("
+      - "func (github.com/bangumi/server/dal.Transaction).Transaction("
       - "func (*golang.org/x/sync/errgroup.Group).Wait()"
     ignoreSigRegexps:
       - 'func \(github.com/bangumi/server/web/req\..*\)\.Validate\('

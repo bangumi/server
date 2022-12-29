@@ -19,8 +19,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/config/env"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/user"
 )

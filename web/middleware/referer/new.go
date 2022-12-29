@@ -19,7 +19,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/config/env"
+	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/web/res"
 )
 

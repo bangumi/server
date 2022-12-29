@@ -20,7 +20,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/handler/character"
 	"github.com/bangumi/server/web/handler/index"

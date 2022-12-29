@@ -17,8 +17,8 @@ package req
 import (
 	"github.com/samber/lo"
 
-	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/web/res"
 )

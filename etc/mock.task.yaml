@@ -47,33 +47,33 @@ tasks:
 
   session-repo:
     sources:
-      - internal/web/session/repo.go
+      - ./web/session/repo.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/SessionRepo.go
     cmds:
       - task: base-mock
         vars:
-          SRC_DIR: ./internal/web/session
+          SRC_DIR: ./web/session
           INTERFACE: Repo
           MOCK_STRUCT: "SessionRepo"
 
   cache:
     sources:
-      - internal/cache/redis.go
+      - ./internal/pkg/cache/redis.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/RedisCache.go
     cmds:
       - task: base-mock
         vars:
-          SRC_DIR: ./internal/cache
+          SRC_DIR: ./internal/pkg/cache
           INTERFACE: "RedisCache"
           MOCK_STRUCT: RedisCache
 
   session-manager:
     sources:
-      - internal/web/session/manager.go
+      - ./web/session/manager.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/SessionManager.go
@@ -81,11 +81,11 @@ tasks:
       - task: base-mock
         vars:
           MOCK_STRUCT: SessionManager
-          SRC_DIR: ./internal/web/session
+          SRC_DIR: ./web/session
 
   captcha-manager:
     sources:
-      - internal/web/captcha/manager.go
+      - ./web/captcha/manager.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/CaptchaManager.go
@@ -93,7 +93,7 @@ tasks:
       - task: base-mock
         vars:
           MOCK_STRUCT: CaptchaManager
-          SRC_DIR: ./internal/web/captcha
+          SRC_DIR: ./web/captcha
 
   oauth-manager:
     sources:
@@ -109,14 +109,14 @@ tasks:
 
   rate-limit:
     sources:
-      - internal/web/rate/new.go
+      - ./web/rate/new.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/RateLimiter.go
     cmds:
       - task: base-mock
         vars:
-          SRC_DIR: ./internal/web/rate
+          SRC_DIR: ./web/rate
           MOCK_STRUCT: RateLimiter
 
   "Auth":

@@ -21,7 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/config/env"
+	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 

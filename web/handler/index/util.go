@@ -17,9 +17,9 @@ package index
 import (
 	"context"
 
-	"github.com/bangumi/server/internal/compat"
-	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/index"
+	"github.com/bangumi/server/internal/pkg/compat"
+	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/handler/internal/cachekey"

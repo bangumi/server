@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/topic"
 )

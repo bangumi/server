@@ -17,7 +17,7 @@ package character
 import (
 	"context"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 )
 

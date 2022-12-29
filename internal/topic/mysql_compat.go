@@ -17,7 +17,7 @@ package topic
 import (
 	"time"
 
-	"github.com/bangumi/server/internal/dal/dao"
+	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/internal/model"
 )
 

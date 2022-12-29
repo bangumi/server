@@ -21,7 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/cookie"

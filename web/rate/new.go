@@ -23,7 +23,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
-	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"

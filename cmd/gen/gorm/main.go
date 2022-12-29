@@ -30,11 +30,11 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 
-	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/driver"
+	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/dal"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/driver"
 )
 
 var userIDTypeString = "model.UserID"           // reflect.TypeOf(new(model.UserID)).Elem().Name()
@@ -64,7 +64,7 @@ const createdTime = "CreatedTime"
 func main() {
 	// specify the output directory (default: "./query")
 	// ### if you want to query without context constrain, set mode gen.WithoutContext ###
-	const dalBase = "./internal/dal"
+	const dalBase = "./dal"
 	g := gen.NewGenerator(gen.Config{
 		OutPath:      dalBase + "/query",
 		OutFile:      dalBase + "/query/gen.go",

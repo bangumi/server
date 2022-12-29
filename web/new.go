@@ -33,8 +33,8 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/config/env"
+	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/internal/metrics"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"

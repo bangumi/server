@@ -8,7 +8,7 @@ import (
 	model "github.com/bangumi/server/internal/model"
 	mock "github.com/stretchr/testify/mock"
 
-	query "github.com/bangumi/server/internal/dal/query"
+	query "github.com/bangumi/server/dal/query"
 
 	timeline "github.com/bangumi/server/internal/timeline"
 )

@@ -17,14 +17,14 @@ package ctrl
 import (
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/cache"
+	"github.com/bangumi/server/dal"
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collection"
-	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/dam"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/person"
+	"github.com/bangumi/server/internal/pkg/cache"
+	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/timeline"

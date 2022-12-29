@@ -6,7 +6,7 @@ web 相关的组件和 handler 在[internal/web/](../web) 文件夹中。
 
 controller 相关在[internal/ctrl/](../ctrl) 文件夹，按照读写区分。
 
-service 和 repository 在[internal/domain/](../internal/domain)定义为 interface，在各个子文件夹(如[internal/subject/](internal/subject)) 中实现。
+service 和 repository 在[internal/domain/](../domain)定义为 interface，在各个子文件夹(如[internal/subject/](internal/subject)) 中实现。
 
 ## 数据库
 

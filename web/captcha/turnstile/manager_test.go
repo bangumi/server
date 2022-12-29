@@ -21,7 +21,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/web/captcha/turnstile"
 )

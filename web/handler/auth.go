@@ -21,7 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 
-	"github.com/bangumi/server/internal/config/env"
+	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/web/cookie"

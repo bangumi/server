@@ -17,8 +17,8 @@ package subject
 import (
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/ctrl"
-	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/web/handler/common"

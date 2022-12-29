@@ -17,7 +17,7 @@ package cachekey
 import (
 	"strconv"
 
-	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 )

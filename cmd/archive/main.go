@@ -29,13 +29,13 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/config"
-	"github.com/bangumi/server/internal/dal"
-	"github.com/bangumi/server/internal/dal/dao"
-	"github.com/bangumi/server/internal/dal/query"
-	"github.com/bangumi/server/internal/driver"
+	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/dal"
+	"github.com/bangumi/server/dal/dao"
+	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/driver"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )

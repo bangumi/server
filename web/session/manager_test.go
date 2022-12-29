@@ -22,9 +22,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/web/session"
 )

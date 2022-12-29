@@ -17,7 +17,7 @@ package episode
 import (
 	"context"
 
-	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 )

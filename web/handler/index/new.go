@@ -18,8 +18,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/ctrl"
-	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/index"
+	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/web/handler/common"
 )
 

@@ -19,7 +19,7 @@ import (
 
 	"github.com/trim21/go-phpserialize"
 
-	"github.com/bangumi/server/internal/dal/dao"
+	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )

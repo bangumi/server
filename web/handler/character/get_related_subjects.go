@@ -19,7 +19,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/bangumi/server/internal/domain"
+	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"

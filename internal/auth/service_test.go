@@ -23,8 +23,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/cache"
 	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/user"
 )

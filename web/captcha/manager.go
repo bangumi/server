@@ -19,7 +19,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 
-	"github.com/bangumi/server/internal/config"
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/web/captcha/turnstile"
 )
 

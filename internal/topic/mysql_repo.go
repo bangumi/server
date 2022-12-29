@@ -17,7 +17,7 @@ package topic
 import (
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/dal/query"
+	"github.com/bangumi/server/dal/query"
 )
 
 type mysqlRepo struct {

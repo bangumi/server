@@ -17,11 +17,11 @@ package character
 import (
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/ctrl"
-	"github.com/bangumi/server/internal/compat"
-	"github.com/bangumi/server/internal/config"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/person"
+	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/pkg/wiki"

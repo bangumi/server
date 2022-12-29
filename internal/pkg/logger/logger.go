@@ -24,7 +24,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/bangumi/server/internal/config/env"
+	"github.com/bangumi/server/config/env"
 )
 
 var log = setup() //nolint:gochecknoglobals

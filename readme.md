@@ -38,7 +38,7 @@ task
 
 - `MEILISEARCH_URL` meilisearch 地址，默认为空。不设置的话不会初始化搜索客户端。
 - `MEILISEARCH_KEY` meilisearch key。
-- `KAFKA_BROKER` kafka broker 地址，启动 `./internal/cmd/canal/main.go` 需要 kafka。
+- `KAFKA_BROKER` kafka broker 地址，启动 canal 需要 kafka。
 
 你也可以把配置放在 `.env` 文件中，`go-task` 会自动加载 `.env` 文件中的环境变量。
 
@@ -56,7 +56,7 @@ MEILISEARCH_URL="http://127.0.0.1:7700/"
 
 或者使用 yaml 格式的配置文件：
 
-查看 config.example.yaml 或者 [internal/config/config.go](https://github.com/bangumi/server/blob/master/internal/config/config.go)
+查看 config.example.yaml 或者 [config/config.go](https://github.com/bangumi/server/blob/master/config/config.go)
 
 ## 开发
 

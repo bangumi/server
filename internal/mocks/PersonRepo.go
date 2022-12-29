@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	domain "github.com/bangumi/server/internal/domain"
+	domain "github.com/bangumi/server/domain"
 	mock "github.com/stretchr/testify/mock"
 
 	model "github.com/bangumi/server/internal/model"
