@@ -30,6 +30,8 @@
       "**_test.go",
       ".git"
     ],
+    "legacyWatch": true,
+    "delay": "1000",
     "exec": "godotenv go run main.go web --config config.yaml",
     "ext": "go,json,html"
   }
