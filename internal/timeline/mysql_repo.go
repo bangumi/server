@@ -16,10 +16,12 @@ package timeline
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"time"
 
 	"github.com/trim21/go-phpserialize"
+	"gorm.io/gorm"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/internal/auth"
@@ -41,28 +43,23 @@ func (m mysqlRepo) ChangeSubjectCollection(
 	rate uint8,
 ) error {
 	tlType := convSubjectType(collect, sbj.TypeID)
-	return m.changeSubjectCollection(ctx, u, sbj, tlType, comment, rate)
 
-	// TODO: update previous timeline
+	previous, err := m.q.TimeLine.WithContext(ctx).Where(
+		m.q.TimeLine.UID.Eq(u.ID),
+		m.q.TimeLine.Cat.Eq(model.TimeLineCatProgress),
+		m.q.TimeLine.Dateline.Gt(uint32(time.Now().Add(-mergeThreshold).Unix())),
+		m.q.TimeLine.Type.Eq(tlType),
+	).First()
 
-	// previous, err := m.q.TimeLine.WithContext(ctx).Where(
-	// 	m.q.TimeLine.UID.Eq(u.ID),
-	// 	m.q.TimeLine.Cat.Eq(model.TimeLineCatProgress),
-	// 	m.q.TimeLine.Dateline.Gt(uint32(time.Now().Add(-mergeThreshold).Unix())),
-	// 	m.q.TimeLine.Type.Eq(tlType),
-	// ).First()
-	//
-	// if err != nil {
-	// 	if errors.Is(err, gorm.ErrRecordNotFound) {
-	// 		return m.changeSubjectCollection(ctx, u, sbj, tlType, collect)
-	// 	}
-	//
-	// 	return errgo.Wrap(err, "dal")
-	// }
-	//
-	// return m.changeSubjectCollection(ctx, u, sbj, tlType, collect)
-	//
-	// return m.updatePreviousSubjectCollection(ctx, previous, u, sbj)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return m.changeSubjectCollection(ctx, u, sbj, tlType, comment, rate)
+		}
+
+		return errgo.Wrap(err, "dal")
+	}
+
+	return m.updatePreviousSubjectCollection(ctx, previous, u, sbj)
 }
 
 /*
@@ -99,26 +96,27 @@ func (m mysqlRepo) changeSubjectCollection(
 
 	err = m.q.TimeLine.WithContext(ctx).Create(
 		&dao.TimeLine{
-			UID:     u.ID,
-			Cat:     model.TimeLineCatProgress,
-			Type:    tlType,
-			Related: strconv.FormatUint(uint64(sbj.ID), 10),
-			Memo:    serializedMemo,
-			Img:     img,
+			UID:      u.ID,
+			Cat:      model.TimeLineCatSubject,
+			Type:     tlType,
+			Related:  strconv.FormatUint(uint64(sbj.ID), 10),
+			Memo:     serializedMemo,
+			Img:      img,
+			Dateline: uint32(time.Now().Unix()),
 		})
 
 	return errgo.Wrap(err, "dal.create")
 }
 
-// TODO
-// func (m mysqlRepo) updatePreviousSubjectCollection(
-// 	ctx context.Context,
-// 	p *dao.TimeLine,
-// 	u auth.Auth,
-// 	sbj model.Subject,
-// ) error {
-// 	return nil
-// }
+// TODO.
+func (m mysqlRepo) updatePreviousSubjectCollection(
+	ctx context.Context,
+	p *dao.TimeLine,
+	u auth.Auth,
+	sbj model.Subject,
+) error {
+	return nil
+}
 
 func convSubjectType(collection model.SubjectCollection, st model.SubjectType) uint16 {
 	original := collection
