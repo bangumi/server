@@ -57,7 +57,7 @@ func (m mysqlRepo) ChangeSubjectCollection(
 		return errgo.Wrap(err, "dal")
 	}
 
-	if previous.Cat == model.TimeLineCatProgress || previous.Type == tlType {
+	if previous.Cat == model.TimeLineCatProgress && previous.Type == tlType {
 		return m.updatePreviousSubjectCollection(ctx, previous, sbj)
 	}
 
