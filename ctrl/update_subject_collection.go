@@ -120,6 +120,10 @@ func (ctl Ctrl) saveTimeLineSubject(
 		return nil
 	}
 
+	if !req.Type.Set {
+		return nil
+	}
+
 	sj, err := ctl.GetSubject(ctx, u, subjectID)
 	if err != nil {
 		return err
@@ -143,7 +147,7 @@ func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.T
 		Content: &model.TimeLineMemoContent{
 			TimeLineSubjectMemo: &model.TimeLineSubjectMemo{
 				ID:             sidStr,
-				TypeID:         strconv.FormatUint(uint64(req.Type.Default(0)), 10),
+				TypeID:         strconv.FormatUint(uint64(sj.TypeID), 10),
 				Name:           sj.Name,
 				NameCN:         sj.NameCN,
 				Series:         strconv.Itoa(generic.BtoI(sj.Series)),
@@ -167,14 +171,17 @@ func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.T
 
 func convSubjectType(req UpdateCollectionRequest, sj model.Subject) uint16 {
 	original := req.Type.Default(0)
+
+	if original < 1 || original > 5 {
+		return 0
+	}
+
 	st := sj.TypeID
 	l, ok := subjectTypeMap()[st]
 	if !ok {
-		return uint16(original)
+		return 0
 	}
-	if original < 1 || original > 5 {
-		return uint16(original)
-	}
+
 	return l[original]
 }
 
