@@ -42,7 +42,7 @@ func newSubject(db *gorm.DB, opts ...gen.DOOption) subject {
 	_subject.Volumes = field.NewUint32(tableName, "field_volumes")
 	_subject.Eps = field.NewUint32(tableName, "field_eps")
 	_subject.Wish = field.NewUint32(tableName, "subject_wish")
-	_subject.Collect = field.NewUint32(tableName, "subject_collect")
+	_subject.Done = field.NewUint32(tableName, "subject_collect")
 	_subject.Doing = field.NewUint32(tableName, "subject_doing")
 	_subject.OnHold = field.NewUint32(tableName, "subject_on_hold")
 	_subject.Dropped = field.NewUint32(tableName, "subject_dropped")
@@ -82,7 +82,7 @@ type subject struct {
 	Volumes     field.Uint32 // 卷数
 	Eps         field.Uint32
 	Wish        field.Uint32
-	Collect     field.Uint32
+	Done        field.Uint32
 	Doing       field.Uint32
 	OnHold      field.Uint32 // 搁置人数
 	Dropped     field.Uint32 // 抛弃人数
@@ -124,7 +124,7 @@ func (s *subject) updateTableName(table string) *subject {
 	s.Volumes = field.NewUint32(table, "field_volumes")
 	s.Eps = field.NewUint32(table, "field_eps")
 	s.Wish = field.NewUint32(table, "subject_wish")
-	s.Collect = field.NewUint32(table, "subject_collect")
+	s.Done = field.NewUint32(table, "subject_collect")
 	s.Doing = field.NewUint32(table, "subject_doing")
 	s.OnHold = field.NewUint32(table, "subject_on_hold")
 	s.Dropped = field.NewUint32(table, "subject_dropped")
@@ -172,7 +172,7 @@ func (s *subject) fillFieldMap() {
 	s.fieldMap["field_volumes"] = s.Volumes
 	s.fieldMap["field_eps"] = s.Eps
 	s.fieldMap["subject_wish"] = s.Wish
-	s.fieldMap["subject_collect"] = s.Collect
+	s.fieldMap["subject_collect"] = s.Done
 	s.fieldMap["subject_doing"] = s.Doing
 	s.fieldMap["subject_on_hold"] = s.OnHold
 	s.fieldMap["subject_dropped"] = s.Dropped

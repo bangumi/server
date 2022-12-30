@@ -289,6 +289,7 @@ func main() {
 		gen.FieldRename("field_summary", "summary"),
 		gen.FieldRename("field_eps", "eps"),
 		gen.FieldRename("field_volumes", "volumes"),
+		gen.FieldRename("subject_collect", "Done"),
 		gen.FieldRename("field_infobox", "infobox"),
 		gen.FieldType("subject_id", subjectIDTypeString),
 		gen.FieldType("subject_ban", "uint8"),

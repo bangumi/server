@@ -32,8 +32,6 @@ import (
 	"github.com/bangumi/server/internal/timeline/memo"
 )
 
-const mergeThreshold = time.Minute * 15 //nolint:unused
-
 func (m mysqlRepo) ChangeSubjectCollection(
 	ctx context.Context,
 	u auth.Auth,
@@ -44,22 +42,26 @@ func (m mysqlRepo) ChangeSubjectCollection(
 ) error {
 	tlType := convSubjectType(collect, sbj.TypeID)
 
-	previous, err := m.q.TimeLine.WithContext(ctx).Where(
-		m.q.TimeLine.UID.Eq(u.ID),
-		m.q.TimeLine.Cat.Eq(model.TimeLineCatProgress),
-		m.q.TimeLine.Dateline.Gt(uint32(time.Now().Add(-mergeThreshold).Unix())),
-		m.q.TimeLine.Type.Eq(tlType),
-	).First()
+	if comment != "" {
+		return m.changeSubjectCollection(ctx, u, sbj, tlType, comment, rate)
+	}
+
+	previous, err := m.q.TimeLine.WithContext(ctx).Where(m.q.TimeLine.UID.Eq(u.ID)).
+		Limit(1).Order(m.q.TimeLine.ID.Desc()).First()
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return m.changeSubjectCollection(ctx, u, sbj, tlType, comment, rate)
+			return m.changeSubjectCollection(ctx, u, sbj, tlType, "", rate)
 		}
 
 		return errgo.Wrap(err, "dal")
 	}
 
-	return m.updatePreviousSubjectCollection(ctx, previous, u, sbj)
+	if previous.Cat == model.TimeLineCatProgress || previous.Type == tlType {
+		return m.updatePreviousSubjectCollection(ctx, previous, sbj)
+	}
+
+	return m.changeSubjectCollection(ctx, u, sbj, tlType, "", rate)
 }
 
 /*
@@ -108,14 +110,75 @@ func (m mysqlRepo) changeSubjectCollection(
 	return errgo.Wrap(err, "dal.create")
 }
 
-// TODO.
 func (m mysqlRepo) updatePreviousSubjectCollection(
 	ctx context.Context,
 	p *dao.TimeLine,
-	u auth.Auth,
 	sbj model.Subject,
 ) error {
-	return nil
+	serializedMemo, imgBytes, err := mergePreviousTimeline(p, sbj)
+	if err != nil {
+		return err
+	}
+
+	_, err = m.q.TimeLine.WithContext(ctx).Where(m.q.TimeLine.ID.Eq(p.ID)).UpdateSimple(
+		m.q.TimeLine.Memo.Value(serializedMemo),
+		m.q.TimeLine.Img.Value(imgBytes),
+		m.q.TimeLine.Batch.Value(1),
+	)
+
+	return errgo.Wrap(err, "dal.create")
+}
+
+func mergePreviousTimeline(p *dao.TimeLine, sbj model.Subject) ([]byte, []byte, error) {
+	var err error
+	var batch = p.Batch != 0
+	var batchImage = make(map[string]image.Subject, 2)
+	var batchMemo = make(map[string]memo.SubjectMemo, 2)
+
+	if batch {
+		var img image.Subject
+		err = phpserialize.Unmarshal(p.Img, &img)
+		batchImage[strconv.FormatUint(uint64(img.SubjectID), 10)] = img
+	} else {
+		err = phpserialize.Unmarshal(p.Img, &batchImage)
+	}
+	if err != nil {
+		return nil, nil, errgo.Wrap(err, "php.unmarshal")
+	}
+
+	batchImage[strconv.FormatUint(uint64(sbj.ID), 10)] = image.Subject{SubjectID: sbj.ID, Images: sbj.Image}
+
+	if batch {
+		var mm memo.SubjectMemo
+		err = phpserialize.Unmarshal(p.Memo, &mm)
+		batchMemo[mm.ID] = mm
+	} else {
+		err = phpserialize.Unmarshal(p.Memo, &batchMemo)
+	}
+
+	if err != nil {
+		return nil, nil, errgo.Wrap(err, "php.unmarshal")
+	}
+
+	batchMemo[strconv.FormatUint(uint64(sbj.ID), 10)] = memo.SubjectMemo{
+		ID:     strconv.FormatUint(uint64(sbj.ID), 10),
+		TypeID: strconv.FormatUint(uint64(sbj.TypeID), 10),
+		Name:   sbj.Name,
+		NameCN: sbj.NameCN,
+		Series: strconv.Itoa(generic.BtoI(sbj.Series)),
+	}
+
+	imgBytes, err := phpserialize.Marshal(batchImage)
+	if err != nil {
+		return nil, nil, errgo.Wrap(err, "marshal")
+	}
+
+	serializedMemo, err := phpserialize.Marshal(batchMemo)
+	if err != nil {
+		return nil, nil, errgo.Wrap(err, "marshal")
+	}
+
+	return serializedMemo, imgBytes, nil
 }
 
 func convSubjectType(collection model.SubjectCollection, st model.SubjectType) uint16 {

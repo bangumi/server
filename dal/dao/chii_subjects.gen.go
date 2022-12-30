@@ -27,7 +27,7 @@ type Subject struct {
 	Volumes     uint32          `gorm:"column:field_volumes;type:mediumint(8) unsigned;not null"` // 卷数
 	Eps         uint32          `gorm:"column:field_eps;type:mediumint(8) unsigned;not null"`
 	Wish        uint32          `gorm:"column:subject_wish;type:mediumint(8) unsigned;not null"`
-	Collect     uint32          `gorm:"column:subject_collect;type:mediumint(8) unsigned;not null"`
+	Done        uint32          `gorm:"column:subject_collect;type:mediumint(8) unsigned;not null"`
 	Doing       uint32          `gorm:"column:subject_doing;type:mediumint(8) unsigned;not null"`
 	OnHold      uint32          `gorm:"column:subject_on_hold;type:mediumint(8) unsigned;not null"` // 搁置人数
 	Dropped     uint32          `gorm:"column:subject_dropped;type:mediumint(8) unsigned;not null"` // 抛弃人数

@@ -243,15 +243,62 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		return errgo.Wrap(err, "SubjectCollection.Update")
 	}
 
-	if data.Tags == nil {
-		return nil
+	r.updateSubject(ctx, subjectID)
+
+	return nil
+}
+
+func (r mysqlRepo) updateSubject(ctx context.Context, subjectID model.SubjectID) {
+	if err := r.updateSubjectTags(ctx, subjectID); err != nil {
+		r.log.Error("failed to update subject tags", zap.Error(err), subjectID.Zap())
 	}
 
-	if data.Privacy.Value == model.CollectPrivacyBan {
-		return nil
+	if err := r.reCountSubjectCollection(ctx, subjectID); err != nil {
+		r.log.Error("failed to update collection counts", zap.Error(err), subjectID.Zap())
+	}
+}
+
+func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model.SubjectID) error {
+	var counts []struct {
+		Type  uint8  `gorm:"type"`
+		Total uint32 `gorm:"total"`
 	}
 
-	return r.updateSubjectTags(ctx, subjectID)
+	err := r.q.SubjectCollection.WithContext(ctx).
+		Select(r.q.SubjectCollection.Type.As("type"), r.q.SubjectCollection.Type.Count().As("total")).
+		Group(r.q.SubjectCollection.Type).
+		Where(r.q.SubjectCollection.SubjectID.Eq(subjectID)).Group(r.q.SubjectCollection.Type).Scan(&counts)
+	if err != nil {
+		return errgo.Wrap(err, "dal")
+	}
+
+	var updater = make([]field.AssignExpr, 0, 5)
+
+	for _, count := range counts {
+		switch model.SubjectCollection(count.Type) { //nolint:exhaustive
+		case model.SubjectCollectionDropped:
+			updater = append(updater, r.q.Subject.Dropped.Value(count.Total))
+
+		case model.SubjectCollectionWish:
+			updater = append(updater, r.q.Subject.Wish.Value(count.Total))
+
+		case model.SubjectCollectionDoing:
+			updater = append(updater, r.q.Subject.Doing.Value(count.Total))
+
+		case model.SubjectCollectionOnHold:
+			updater = append(updater, r.q.Subject.OnHold.Value(count.Total))
+
+		case model.SubjectCollectionDone:
+			updater = append(updater, r.q.Subject.Done.Value(count.Total))
+		}
+	}
+
+	_, err = r.q.Subject.WithContext(ctx).Where(r.q.Subject.ID.Eq(subjectID)).UpdateSimple(updater...)
+	if err != nil {
+		return errgo.Wrap(err, "dal")
+	}
+
+	return nil
 }
 
 func (r mysqlRepo) updateSubjectTags(ctx context.Context, subjectID model.SubjectID) error {

@@ -85,7 +85,7 @@ func ConvertDao(s *dao.Subject) (model.Subject, error) {
 		Volumes:    s.Volumes,
 		Eps:        s.Eps,
 		Wish:       s.Wish,
-		Collect:    s.Collect,
+		Collect:    s.Done,
 		Doing:      s.Doing,
 		OnHold:     s.OnHold,
 		Series:     s.Series,
