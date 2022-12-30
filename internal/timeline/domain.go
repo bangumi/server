@@ -19,6 +19,8 @@ import (
 
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/collection"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -36,5 +38,13 @@ type Repo interface {
 		collect model.SubjectCollection,
 		comment string,
 		rate uint8,
+	) error
+
+	ChangeEpisodeStatus(
+		ctx context.Context,
+		u auth.Auth,
+		sbj model.Subject,
+		episode episode.Episode,
+		update collection.Update,
 	) error
 }

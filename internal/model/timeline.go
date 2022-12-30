@@ -143,7 +143,7 @@ type TimeLineProgressMemo struct {
 	EpsUpdate     *int
 	VolsUpdate    *int
 	EpsTotal      *int
-	EpSort        *int
+	EpSort        *float32
 	EpID          *EpisodeID
 	SubjectID     *SubjectID
 	SubjectTypeID *SubjectType

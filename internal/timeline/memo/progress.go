@@ -25,8 +25,8 @@ type ProgressMemo struct {
 	SubjectName   *string            `php:"subject_name,omitempty"`
 	EpsUpdate     *int               `php:"eps_update,omitempty"`
 	VolsUpdate    *int               `php:"vols_update,omitempty,string"`
-	EpsTotal      *int               `php:"eps_total,omitempty,string"`
-	EpSort        *int               `php:"ep_sort,omitempty,string"`
+	EpsTotal      *string            `php:"eps_total,omitempty"`
+	EpSort        *float32           `php:"ep_sort,omitempty,string"`
 	EpID          *model.EpisodeID   `php:"ep_id,omitempty,string"`
 	SubjectID     *model.SubjectID   `php:"subject_id,omitempty,string"`
 	SubjectTypeID *model.SubjectType `php:"subject_type_id,omitempty,string"`
