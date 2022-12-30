@@ -97,6 +97,12 @@ type TimeLineSubjectMemo struct {
 	Series         string
 	CollectComment string
 	CollectRate    int
+
+	VolsTotal  string // 可能是 "??"
+	VolsUpdate *int
+
+	EpsTotal  string // 可能是 "??"
+	EpsUpdate *int
 }
 
 type TimeLineWikiMemo struct {

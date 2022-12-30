@@ -18,7 +18,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/samber/lo"
@@ -31,7 +30,6 @@ import (
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic"
 	"github.com/bangumi/server/internal/pkg/generic/set"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -58,7 +56,7 @@ func (ctl Ctrl) UpdateCollection(
 ) error {
 	ctl.log.Info("try to update collection", subjectID.Zap(), u.ID.Zap(), zap.Reflect("'req", req))
 
-	collect, err := ctl.collection.GetSubjectCollection(ctx, u.ID, subjectID)
+	original, err := ctl.collection.GetSubjectCollection(ctx, u.ID, subjectID)
 	if err != nil {
 		return errgo.Wrap(err, "collectionRepo.GetSubjectCollection")
 	}
@@ -72,7 +70,7 @@ func (ctl Ctrl) UpdateCollection(
 		}
 	}
 
-	if comment := req.Comment.Default(collect.Comment); comment != "" {
+	if comment := req.Comment.Default(original.Comment); comment != "" {
 		if ctl.dam.NeedReview(comment) {
 			privacy = null.New(model.CollectPrivacyBan)
 		}
@@ -83,116 +81,51 @@ func (ctl Ctrl) UpdateCollection(
 	}
 
 	txErr := ctl.tx.Transaction(func(tx *query.Query) error {
-		err := ctl.collection.WithQuery(tx).
-			UpdateSubjectCollection(ctx, u.ID, subjectID, collection.Update{
-				IP:        req.IP,
-				Comment:   req.Comment,
-				Tags:      req.Tags,
-				VolStatus: req.VolStatus,
-				EpStatus:  req.EpStatus,
-				Type:      req.Type,
-				Rate:      req.Rate,
-				Privacy:   privacy,
-			}, time.Now())
-		if err != nil {
-			ctl.log.Error("failed to update user collection info", zap.Error(err))
-			return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
-		}
-		err = ctl.saveTimeLineSubject(ctx, u, subjectID, req, tx)
-		if err != nil {
-			ctl.log.Error("failed to create associated timeline", zap.Error(err))
-			return errgo.Wrap(err, "timelineRepo.Create")
-		}
-		return nil
+		return ctl.updateSubjectCollection(ctx, tx, u, subjectID, original, req, privacy)
 	})
 
 	return txErr
 }
 
-func (ctl Ctrl) saveTimeLineSubject(
+// should run in tx.
+func (ctl Ctrl) updateSubjectCollection(
 	ctx context.Context,
+	tx *query.Query,
 	u auth.Auth,
 	subjectID model.SubjectID,
+	originalCollection model.UserSubjectCollection,
 	req UpdateCollectionRequest,
-	tx *query.Query,
+	privacy null.Null[model.CollectPrivacy],
 ) error {
-	if !(req.VolStatus.Set || req.EpStatus.Set) {
-		return nil
-	}
-
-	if !req.Type.Set {
-		return nil
-	}
-
-	sj, err := ctl.GetSubject(ctx, u, subjectID)
+	err := ctl.collection.WithQuery(tx).UpdateSubjectCollection(ctx, u.ID, subjectID, collection.Update{
+		IP:        req.IP,
+		Comment:   req.Comment,
+		Tags:      req.Tags,
+		VolStatus: req.VolStatus,
+		EpStatus:  req.EpStatus,
+		Type:      req.Type,
+		Rate:      req.Rate,
+		Privacy:   privacy,
+	}, time.Now())
 	if err != nil {
-		return err
-	}
-	err = ctl.timeline.WithQuery(tx).Create(ctx, makeTimeLineSubject(req, sj))
-	return errgo.Wrap(err, "timeline.Create")
-}
-
-func makeTimeLineSubject(req UpdateCollectionRequest, sj model.Subject) *model.TimeLine {
-	sidStr := strconv.Itoa(int(sj.ID))
-
-	tlMeta := &model.TimeLineMeta{
-		UID:      req.UID,
-		Related:  sidStr,
-		Dateline: uint32(time.Now().Unix()),
+		ctl.log.Error("failed to update user collection info", zap.Error(err))
+		return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 	}
 
-	tlMemo := &model.TimeLineMemo{
-		Cat:  model.TimeLineCatSubject,
-		Type: convSubjectType(req, sj),
-		Content: &model.TimeLineMemoContent{
-			TimeLineSubjectMemo: &model.TimeLineSubjectMemo{
-				ID:             sidStr,
-				TypeID:         strconv.FormatUint(uint64(sj.TypeID), 10),
-				Name:           sj.Name,
-				NameCN:         sj.NameCN,
-				Series:         strconv.Itoa(generic.BtoI(sj.Series)),
-				CollectComment: req.Comment.Default(""),
-				CollectRate:    int(req.Rate.Default(0)),
-			},
-		},
+	if req.Type.Set && (req.Type.Value != originalCollection.Type) {
+		sj, err := ctl.GetSubject(ctx, u, subjectID)
+		if err != nil {
+			return err
+		}
+		err = ctl.timeline.WithQuery(tx).
+			ChangeSubjectCollection(ctx, u, sj, req.Type.Default(0), req.Comment.Value, req.Rate.Value)
+		if err != nil {
+			ctl.log.Error("failed to create associated timeline", zap.Error(err))
+			return errgo.Wrap(err, "timelineRepo.Create")
+		}
 	}
 
-	tlImg := model.TimeLineImage{
-		SubjectID: &sidStr,
-		Images:    &sj.Image,
-	}
-
-	return &model.TimeLine{
-		TimeLineMeta:   tlMeta,
-		TimeLineMemo:   tlMemo,
-		TimeLineImages: model.TimeLineImages{tlImg},
-	}
-}
-
-func convSubjectType(req UpdateCollectionRequest, sj model.Subject) uint16 {
-	original := req.Type.Default(0)
-
-	if original < 1 || original > 5 {
-		return 0
-	}
-
-	st := sj.TypeID
-	l, ok := subjectTypeMap()[st]
-	if !ok {
-		return 0
-	}
-
-	return l[original]
-}
-
-func subjectTypeMap() map[model.SubjectType][]uint16 {
-	return map[model.SubjectType][]uint16{
-		model.SubjectTypeBook:  {0, 1, 5, 9, 13, 14},
-		model.SubjectTypeAnime: {0, 2, 6, 10, 13, 14},
-		model.SubjectTypeMusic: {0, 3, 7, 11, 13, 14},
-		model.SubjectTypeGame:  {0, 4, 8, 12, 13, 14},
-		model.SubjectTypeReal:  {0, 2, 6, 10, 13, 14},
-	}
+	return nil
 }
 
 func (ctl Ctrl) UpdateEpisodesCollection(

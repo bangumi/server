@@ -26,6 +26,28 @@ import (
 	"github.com/bangumi/server/internal/pkg/util"
 )
 
+type Subject struct {
+	SubjectID model.SubjectID `php:"subject_id" ms:"subject_id,string"`
+	Images    string          `php:"images" ms:"images"`
+}
+
+type User struct {
+	UID    model.UserID `php:"uid" ms:"uid"`
+	Images string       `php:"images" ms:"images"`
+}
+
+type Group struct {
+	GrpID   uint32 `php:"grp_id" ms:"grp_id"`
+	GrpName string `php:"grp_name" ms:"grp_name"`
+	Images  string `php:"images" ms:"images"`
+}
+
+type Eden struct {
+	EdenID   uint32 `php:"eden_id" ms:"eden_id"`
+	EdenName string `php:"eden_name" ms:"eden_name"`
+	Images   string `php:"images" ms:"images"`
+}
+
 type Image struct {
 	Cat       *int64  `php:"cat,omitempty"`
 	GroupID   *string `php:"grp_id,omitempty"`

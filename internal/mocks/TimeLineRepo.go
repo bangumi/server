@@ -5,8 +5,11 @@ package mocks
 import (
 	context "context"
 
-	model "github.com/bangumi/server/internal/model"
+	auth "github.com/bangumi/server/internal/auth"
+
 	mock "github.com/stretchr/testify/mock"
+
+	model "github.com/bangumi/server/internal/model"
 
 	query "github.com/bangumi/server/dal/query"
 
@@ -24,6 +27,48 @@ type TimeLineRepo_Expecter struct {
 
 func (_m *TimeLineRepo) EXPECT() *TimeLineRepo_Expecter {
 	return &TimeLineRepo_Expecter{mock: &_m.Mock}
+}
+
+// ChangeSubjectCollection provides a mock function with given fields: ctx, u, sbj, collect, comment, rate
+func (_m *TimeLineRepo) ChangeSubjectCollection(ctx context.Context, u auth.Auth, sbj model.Subject, collect model.SubjectCollection, comment string, rate uint8) error {
+	ret := _m.Called(ctx, u, sbj, collect, comment, rate)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, auth.Auth, model.Subject, model.SubjectCollection, string, uint8) error); ok {
+		r0 = rf(ctx, u, sbj, collect, comment, rate)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// TimeLineRepo_ChangeSubjectCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ChangeSubjectCollection'
+type TimeLineRepo_ChangeSubjectCollection_Call struct {
+	*mock.Call
+}
+
+// ChangeSubjectCollection is a helper method to define mock.On call
+//   - ctx context.Context
+//   - u auth.Auth
+//   - sbj model.Subject
+//   - collect model.SubjectCollection
+//   - comment string
+//   - rate uint8
+func (_e *TimeLineRepo_Expecter) ChangeSubjectCollection(ctx interface{}, u interface{}, sbj interface{}, collect interface{}, comment interface{}, rate interface{}) *TimeLineRepo_ChangeSubjectCollection_Call {
+	return &TimeLineRepo_ChangeSubjectCollection_Call{Call: _e.mock.On("ChangeSubjectCollection", ctx, u, sbj, collect, comment, rate)}
+}
+
+func (_c *TimeLineRepo_ChangeSubjectCollection_Call) Run(run func(ctx context.Context, u auth.Auth, sbj model.Subject, collect model.SubjectCollection, comment string, rate uint8)) *TimeLineRepo_ChangeSubjectCollection_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(auth.Auth), args[2].(model.Subject), args[3].(model.SubjectCollection), args[4].(string), args[5].(uint8))
+	})
+	return _c
+}
+
+func (_c *TimeLineRepo_ChangeSubjectCollection_Call) Return(_a0 error) *TimeLineRepo_ChangeSubjectCollection_Call {
+	_c.Call.Return(_a0)
+	return _c
 }
 
 // Create provides a mock function with given fields: ctx, tl

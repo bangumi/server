@@ -45,6 +45,12 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	a := mocks.NewAuthService(t)
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
+	tl := mocks.NewTimeLineRepo(t)
+	tl.EXPECT().WithQuery(mock.Anything).Return(tl)
+	tl.EXPECT().
+		ChangeSubjectCollection(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(nil)
+
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, uid, mock.Anything).
 		Return(model.UserSubjectCollection{}, nil)
@@ -57,7 +63,7 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
 	require.NoError(t, err)
 
-	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d})
+	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d, TimeLineRepo: tl})
 
 	test.New(t).
 		Header(fiber.HeaderAuthorization, "Bearer t").
