@@ -95,12 +95,11 @@ func (ctl Ctrl) UpdateCollection(
 		return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 	}
 
-	if req.Type.Set && (req.Type.Value != original.Type) {
+	if req.Type.Set {
 		sj, err := ctl.GetSubject(ctx, u, subjectID)
 		if err != nil {
 			return err
 		}
-		// TODO handle same type in timeline srv
 		err = ctl.timeline.ChangeSubjectCollection(ctx, u, sj, req.Type.Default(0), req.Comment.Value, req.Rate.Value)
 		if err != nil {
 			ctl.log.Error("failed to create associated timeline", zap.Error(err))
