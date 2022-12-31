@@ -1,20 +1,16 @@
-/*
- *
- * Copyright 2015 gRPC authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>
 
 package timeline
 
@@ -22,14 +18,35 @@ import (
 	"context"
 	"fmt"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/dal/query"
 	pb "github.com/bangumi/server/generated/proto/go/api/v1"
+	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/collection"
+	"github.com/bangumi/server/internal/episode"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
+
+func NewMysqlRepo(q *query.Query, log *zap.Logger, cfg config.AppConfig) (Repo, error) {
+	rpc, err := newGrpcClient(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return mysqlRepo{q: q, log: log.Named("timeline.mysqlRepo"), rpc: rpc}, nil
+}
+
+type mysqlRepo struct {
+	q   *query.Query
+	log *zap.Logger
+	rpc pb.TimeLineServiceClient
+}
 
 func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
 	if cfg.MicroServiceTimelineAddr == "" {
@@ -82,4 +99,46 @@ func (n noopClient) SubjectProgress(ctx context.Context, in *pb.SubjectProgressR
 func (n noopClient) EpisodeCollect(ctx context.Context, in *pb.EpisodeCollectRequest,
 	opts ...grpc.CallOption) (*pb.EpisodeCollectResponse, error) {
 	return &pb.EpisodeCollectResponse{Ok: true}, nil
+}
+
+func (m mysqlRepo) ChangeSubjectCollection(
+	ctx context.Context,
+	u auth.Auth,
+	sbj model.Subject,
+	collect model.SubjectCollection,
+	comment string,
+	rate uint8,
+) error {
+	_, err := m.rpc.SubjectCollect(ctx, &pb.SubjectCollectRequest{
+		UserId: uint64(u.ID),
+		Subject: &pb.Subject{
+			Id:        uint32(sbj.ID),
+			Type:      uint32(sbj.TypeID),
+			Name:      sbj.Name,
+			NameCn:    sbj.NameCN,
+			Image:     sbj.Image,
+			Series:    false,
+			VolsTotal: sbj.Volumes,
+			EpsTotal:  sbj.Eps,
+		},
+		Collection: uint32(collect),
+		Comment:    comment,
+		Rate:       uint32(rate),
+	})
+
+	if err != nil {
+		return errgo.Wrap(err, "grpc: timeline.SubjectCollect")
+	}
+
+	return nil
+}
+func (m mysqlRepo) ChangeEpisodeStatus(
+	ctx context.Context,
+	u auth.Auth,
+	sbj model.Subject,
+	episode episode.Episode,
+	update collection.Update,
+) error {
+	// TODO
+	return nil
 }

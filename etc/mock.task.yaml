@@ -24,7 +24,6 @@ tasks:
       - task: GroupRepo
       - task: CollectionRepo
       - task: TopicRepo
-      - task: TimeLineRepo
       - task: SearchClient
       - task: PrivateMessageRepo
       - task: NotificationRepo
@@ -268,19 +267,6 @@ tasks:
           SRC_DIR: ./internal/topic
           MOCK_STRUCT: TopicRepo
           INTERFACE: Repo
-
-  TimeLineRepo:
-    sources:
-      - internal/timeline/domain.go
-      - ./internal/pkg/tools/go.mod
-    generates:
-      - internal/mocks/TimeLineRepo.go
-    cmds:
-      - task: base-mock
-        vars:
-          SRC_DIR: ./internal/timeline
-          INTERFACE: Repo
-          MOCK_STRUCT: TimeLineRepo
 
   SearchClient:
     sources:

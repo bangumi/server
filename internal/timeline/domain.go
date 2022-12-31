@@ -17,7 +17,6 @@ package timeline
 import (
 	"context"
 
-	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/episode"
@@ -25,12 +24,6 @@ import (
 )
 
 type Repo interface {
-	// WithQuery is used to replace repo's query to txn
-	WithQuery(query *query.Query) Repo
-	GetByID(ctx context.Context, id model.TimeLineID) (*model.TimeLine, error)
-	ListByUID(ctx context.Context, uid model.UserID, limit int, since model.TimeLineID) ([]*model.TimeLine, error)
-	Create(ctx context.Context, tl *model.TimeLine) error
-
 	ChangeSubjectCollection(
 		ctx context.Context,
 		u auth.Auth,
