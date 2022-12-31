@@ -327,8 +327,6 @@ func MockSubjectRepo(m subject.Repo) fx.Option {
 func MockTimeLineRepo(m timeline.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.TimeLineRepo{}
-		mocker.EXPECT().WithQuery(mock.Anything).Return(mocker)
-		mocker.EXPECT().Create(mock.Anything, mock.Anything).Return(nil)
 
 		m = mocker
 	}
