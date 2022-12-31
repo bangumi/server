@@ -57,7 +57,9 @@ type AppConfig struct {
 	DisableWords string `yaml:"disable_words"`
 	BannedDomain string `yaml:"banned_domain"`
 
-	MicroServiceTimelineAddr string `yaml:"ms_timeline_addr" env:"MS_TIMELINE_ADDR"`
+	// "http://localhost:2379"
+	EtcdAddr      string `yaml:"etcd_addr" env:"ETCD_ADDR"`
+	EtcdNamespace string `yaml:"etcd_namespace" env:"ETCD_NAMESPACE"  env-default:"/chii/services"`
 
 	AppType string
 }

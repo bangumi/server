@@ -16,7 +16,10 @@ package timeline
 
 import (
 	"context"
+	"fmt"
 
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3/naming/resolver"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -48,15 +51,26 @@ type mysqlRepo struct {
 }
 
 func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
-	if cfg.MicroServiceTimelineAddr == "" {
+	if cfg.EtcdAddr == "" {
 		logger.Info("no etcd, using nope timeline service")
 		return noopClient{}, nil
 	}
 
-	logger.Info("using timeline service " + cfg.MicroServiceTimelineAddr)
+	logger.Info("using etcd to discovery timeline services " + cfg.EtcdAddr)
+
+	cli, err := clientv3.NewFromURL(cfg.EtcdAddr)
+	if err != nil {
+		return nil, errgo.Wrap(err, "etcd new client")
+	}
+
+	etcdResolver, err := resolver.NewBuilder(cli)
+	if err != nil {
+		return nil, errgo.Wrap(err, "etcd grpc resolver")
+	}
 
 	conn, err := grpc.Dial(
-		cfg.MicroServiceTimelineAddr,
+		fmt.Sprintf("etcd:///%s/timeline", cfg.EtcdNamespace),
+		grpc.WithResolvers(etcdResolver),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
