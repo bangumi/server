@@ -144,7 +144,7 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 	}
 
 	episodes = lo.Filter(episodes, func(item episode.Episode, _ int) bool {
-		return item.Type == episode.TypeNormal
+		return item.Type == episode.TypeNormal && lo.Contains(episodeIDs, item.ID)
 	})
 
 	if len(episodes) == 0 {
