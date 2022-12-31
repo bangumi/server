@@ -96,12 +96,33 @@ func (ctl Ctrl) UpdateCollection(
 		return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 	}
 
+	return ctl.mayCreateTimeline(ctx, u, req, subjectID)
+}
+
+func (ctl Ctrl) mayCreateTimeline(
+	ctx context.Context,
+	u auth.Auth,
+	req UpdateCollectionRequest,
+	subjectID model.SubjectID,
+) error {
 	if req.Type.Set {
 		sj, err := ctl.GetSubject(ctx, u, subjectID)
 		if err != nil {
 			return err
 		}
 		err = ctl.timeline.ChangeSubjectCollection(ctx, u, sj, req.Type.Default(0), req.Comment.Value, req.Rate.Value)
+		if err != nil {
+			ctl.log.Error("failed to create associated timeline", zap.Error(err))
+			return errgo.Wrap(err, "timelineRepo.Create")
+		}
+	}
+
+	if req.EpStatus.Set || req.VolStatus.Set {
+		sj, err := ctl.GetSubject(ctx, u, subjectID)
+		if err != nil {
+			return err
+		}
+		err = ctl.timeline.ChangeSubjectProgress(ctx, u, sj, req.EpStatus.Value, req.VolStatus.Value)
 		if err != nil {
 			ctl.log.Error("failed to create associated timeline", zap.Error(err))
 			return errgo.Wrap(err, "timelineRepo.Create")

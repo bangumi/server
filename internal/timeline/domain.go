@@ -38,4 +38,12 @@ type Repo interface {
 		sbj model.Subject,
 		episode episode.Episode,
 	) error
+
+	ChangeSubjectProgress(
+		ctx context.Context,
+		u auth.Auth,
+		sbj model.Subject,
+		epsUpdate uint32,
+		volsUpdate uint32,
+	) error
 }

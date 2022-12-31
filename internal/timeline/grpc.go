@@ -49,36 +49,25 @@ type mysqlRepo struct {
 	rpc pb.TimeLineServiceClient
 }
 
-func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
-	if cfg.EtcdAddr == "" {
-		logger.Info("no etcd, using nope timeline service")
-		return noopClient{}, nil
-	}
+func (m mysqlRepo) ChangeSubjectProgress(ctx context.Context, u auth.Auth, sbj model.Subject,
+	epsUpdate uint32, volsUpdate uint32) error {
+	_, err := m.rpc.SubjectProgress(ctx, &pb.SubjectProgressRequest{
+		UserId: uint64(u.ID),
+		Subject: &pb.Subject{
+			Id:        uint32(sbj.ID),
+			Type:      uint32(sbj.TypeID),
+			Name:      sbj.Name,
+			NameCn:    sbj.NameCN,
+			Image:     sbj.Image,
+			Series:    sbj.Series,
+			VolsTotal: sbj.Volumes,
+			EpsTotal:  sbj.Eps,
+		},
+		EpsUpdate:  epsUpdate,
+		VolsUpdate: volsUpdate,
+	})
 
-	logger.Info("using etcd to discovery timeline services " + cfg.EtcdAddr)
-
-	cli, err := clientv3.NewFromURL(cfg.EtcdAddr)
-	if err != nil {
-		return nil, errgo.Wrap(err, "etcd new client")
-	}
-
-	etcdResolver, err := resolver.NewBuilder(cli)
-	if err != nil {
-		return nil, errgo.Wrap(err, "etcd grpc resolver")
-	}
-
-	conn, err := grpc.Dial(
-		fmt.Sprintf("etcd:///%s/timeline", cfg.EtcdNamespace),
-		grpc.WithResolvers(etcdResolver),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, errgo.Wrap(err, "grpc dail")
-	}
-
-	c := pb.NewTimeLineServiceClient(conn)
-
-	return c, nil
+	return errgo.Wrap(err, "grpc")
 }
 
 func (m mysqlRepo) ChangeSubjectCollection(
@@ -141,4 +130,36 @@ func (m mysqlRepo) ChangeEpisodeStatus(
 	})
 
 	return errgo.Wrap(err, "grpc")
+}
+
+func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
+	if cfg.EtcdAddr == "" {
+		logger.Info("no etcd, using nope timeline service")
+		return noopClient{}, nil
+	}
+
+	logger.Info("using etcd to discovery timeline services " + cfg.EtcdAddr)
+
+	cli, err := clientv3.NewFromURL(cfg.EtcdAddr)
+	if err != nil {
+		return nil, errgo.Wrap(err, "etcd new client")
+	}
+
+	etcdResolver, err := resolver.NewBuilder(cli)
+	if err != nil {
+		return nil, errgo.Wrap(err, "etcd grpc resolver")
+	}
+
+	conn, err := grpc.Dial(
+		fmt.Sprintf("etcd:///%s/timeline", cfg.EtcdNamespace),
+		grpc.WithResolvers(etcdResolver),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		return nil, errgo.Wrap(err, "grpc dail")
+	}
+
+	c := pb.NewTimeLineServiceClient(conn)
+
+	return c, nil
 }

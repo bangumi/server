@@ -109,6 +109,47 @@ func (_c *TimeLineRepo_ChangeSubjectCollection_Call) Return(_a0 error) *TimeLine
 	return _c
 }
 
+// ChangeSubjectProgress provides a mock function with given fields: ctx, u, sbj, epsUpdate, volsUpdate
+func (_m *TimeLineRepo) ChangeSubjectProgress(ctx context.Context, u auth.Auth, sbj model.Subject, epsUpdate uint32, volsUpdate uint32) error {
+	ret := _m.Called(ctx, u, sbj, epsUpdate, volsUpdate)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, auth.Auth, model.Subject, uint32, uint32) error); ok {
+		r0 = rf(ctx, u, sbj, epsUpdate, volsUpdate)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// TimeLineRepo_ChangeSubjectProgress_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ChangeSubjectProgress'
+type TimeLineRepo_ChangeSubjectProgress_Call struct {
+	*mock.Call
+}
+
+// ChangeSubjectProgress is a helper method to define mock.On call
+//   - ctx context.Context
+//   - u auth.Auth
+//   - sbj model.Subject
+//   - epsUpdate uint32
+//   - volsUpdate uint32
+func (_e *TimeLineRepo_Expecter) ChangeSubjectProgress(ctx interface{}, u interface{}, sbj interface{}, epsUpdate interface{}, volsUpdate interface{}) *TimeLineRepo_ChangeSubjectProgress_Call {
+	return &TimeLineRepo_ChangeSubjectProgress_Call{Call: _e.mock.On("ChangeSubjectProgress", ctx, u, sbj, epsUpdate, volsUpdate)}
+}
+
+func (_c *TimeLineRepo_ChangeSubjectProgress_Call) Run(run func(ctx context.Context, u auth.Auth, sbj model.Subject, epsUpdate uint32, volsUpdate uint32)) *TimeLineRepo_ChangeSubjectProgress_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(auth.Auth), args[2].(model.Subject), args[3].(uint32), args[4].(uint32))
+	})
+	return _c
+}
+
+func (_c *TimeLineRepo_ChangeSubjectProgress_Call) Return(_a0 error) *TimeLineRepo_ChangeSubjectProgress_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
 type mockConstructorTestingTNewTimeLineRepo interface {
 	mock.TestingT
 	Cleanup(func())
