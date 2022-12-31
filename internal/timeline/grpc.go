@@ -36,6 +36,7 @@ import (
 func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
 	if cfg.EtcdAddr == "" {
 		logger.Info("no etcd, using nope timeline service")
+		return noopClient{}, nil
 	}
 
 	cli, err := clientv3.NewFromURL(cfg.EtcdAddr)
@@ -67,14 +68,17 @@ var _ pb.TimeLineServiceClient = noopClient{}
 type noopClient struct {
 }
 
-func (n noopClient) SubjectCollect(ctx context.Context, in *pb.SubjectCollectRequest, opts ...grpc.CallOption) (*pb.SubjectCollectResponse, error) {
+func (n noopClient) SubjectCollect(ctx context.Context, in *pb.SubjectCollectRequest,
+	opts ...grpc.CallOption) (*pb.SubjectCollectResponse, error) {
 	return &pb.SubjectCollectResponse{Ok: true}, nil
 }
 
-func (n noopClient) SubjectProgress(ctx context.Context, in *pb.SubjectProgressRequest, opts ...grpc.CallOption) (*pb.SubjectProgressResponse, error) {
+func (n noopClient) SubjectProgress(ctx context.Context, in *pb.SubjectProgressRequest,
+	opts ...grpc.CallOption) (*pb.SubjectProgressResponse, error) {
 	return &pb.SubjectProgressResponse{Ok: true}, nil
 }
 
-func (n noopClient) EpisodeCollect(ctx context.Context, in *pb.EpisodeCollectRequest, opts ...grpc.CallOption) (*pb.EpisodeCollectResponse, error) {
+func (n noopClient) EpisodeCollect(ctx context.Context, in *pb.EpisodeCollectRequest,
+	opts ...grpc.CallOption) (*pb.EpisodeCollectResponse, error) {
 	return &pb.EpisodeCollectResponse{Ok: true}, nil
 }
