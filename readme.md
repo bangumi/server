@@ -93,6 +93,10 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 如果你不使用 docker ，请自行启动 mysql 和 redis 并导入 `bangumi/dev-env` 仓库内的数据。
 
+### 依赖的微服务
+
+- 时间胶囊 https://github.com/bangumi/service-timeline
+
 ### 贡献指南
 
 更多的细节介绍请查看[贡献指南](./.github/contributing.md)。
