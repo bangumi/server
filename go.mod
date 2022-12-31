@@ -21,7 +21,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13
 	github.com/meilisearch/meilisearch-go v0.22.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/prometheus/client_golang v1.11.1
+	github.com/prometheus/client_golang v1.14.0
 	github.com/samber/lo v1.37.0
 	github.com/segmentio/kafka-go v0.4.38
 	github.com/spf13/cobra v1.6.1
@@ -77,7 +77,7 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
-	github.com/prometheus/common v0.26.0 // indirect
+	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
