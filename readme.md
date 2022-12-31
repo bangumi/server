@@ -90,62 +90,6 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 如果你不使用 docker ，请自行启动 mysql 和 redis 并导入 `bangumi/dev-env` 仓库内的数据。
 
-## 后端构架
-
-```mermaid
-flowchart LR
-  Users --> Cloudflare --> Old
-
-  subgraph Old[old server]
-    nginx
-    nginx --> |旧主站|php[old php server];
-  end
-
-
-  nginx ---> |转发api.bgm.tv/v0/的请求| Nginx(nginx on new server);
-  Cloudflare --> |next.bgm.tv 直接解析到新服务器|Nginx;
-```
-
-```mermaid
-flowchart TD
-  Nginx(nginx on new server);
-
-  Nginx -->|static new frontend files|FS[(file system)];
-
-  Nginx -->|HTTP API Request|B;
-  B --> |HTTP Search request|meilisearch;
-
-  C --> |增量更新数据|meilisearch;
-
-  B --> mysql
-  B --> |缓存|redis
-  C --> |清除失效缓存|redis
-  C --> |清除失效数据|mysql
-  kafka --> C;
-
-
-  subgraph B
-    direction BT
-    B1[chii web];
-    B2[chii web];
-    ...
-  end
-
-  subgraph C[canal]
-    C1[kafka consumer];
-  end
-
-  meilisearch[(new search engine)];
-
-  subgraph Components[database]
-    direction BT
-    redis[(redis 缓存)]
-    mysql[(mysql)]
-    kafka[(kafka)]
-    mysql --> |binlog|kafka;
-  end
-```
-
 ### 贡献指南
 
 更多的细节介绍请查看[贡献指南](./.github/contributing.md)。
