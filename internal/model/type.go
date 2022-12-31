@@ -16,6 +16,7 @@ package model
 
 import (
 	"database/sql/driver"
+	"strconv"
 
 	"go.uber.org/zap"
 )
@@ -98,4 +99,8 @@ func (v EpisodeID) Zap() zap.Field {
 
 func (v TopicID) Zap() zap.Field {
 	return zap.Uint32("topic_id", uint32(v))
+}
+
+func (v SubjectID) String() string {
+	return strconv.FormatUint(uint64(v), 10)
 }

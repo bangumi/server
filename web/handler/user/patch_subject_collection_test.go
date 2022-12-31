@@ -46,7 +46,6 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
 	tl := mocks.NewTimeLineRepo(t)
-	tl.EXPECT().WithQuery(mock.Anything).Return(tl)
 	tl.EXPECT().
 		ChangeSubjectCollection(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(nil)
@@ -54,7 +53,6 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, uid, mock.Anything).
 		Return(model.UserSubjectCollection{}, nil)
-	c.EXPECT().WithQuery(mock.Anything).Return(c)
 	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).
 		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data collection.Update, _ time.Time) {
 			call = data
@@ -101,7 +99,6 @@ func TestUser_PatchSubjectCollection_privacy(t *testing.T) {
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, uid, mock.Anything).
 		Return(model.UserSubjectCollection{Comment: "办证"}, nil)
-	c.EXPECT().WithQuery(mock.Anything).Return(c)
 	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).
 		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data collection.Update, _ time.Time) {
 			call = data

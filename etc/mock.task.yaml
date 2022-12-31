@@ -1,17 +1,7 @@
 version: "3"
 
 tasks:
-  mockery:
-    generates:
-      - ./.bin/mockery.exe
-    sources:
-      - ./internal/pkg/tools/go.mod
-    cmds:
-      - cd ./internal/pkg/tools; go build -o ../../../.bin/mockery.exe github.com/vektra/mockery/v2
-    run: once
-
   all:
-    - task: mockery
     - task: gen
 
   gen:
@@ -40,10 +30,8 @@ tasks:
       - task: NotificationRepo
 
   base-mock:
-    deps:
-      - mockery
     cmds:
-      - cmd: ./.bin/mockery.exe --dir {{.SRC_DIR}} --filename '{{.MOCK_STRUCT|default .INTERFACE}}.go' --name '{{.INTERFACE | default "Manager"}}' --structname {{.MOCK_STRUCT|default .INTERFACE}} --output ./internal/mocks --with-expecter
+      - cmd: mockery --dir {{.SRC_DIR}} --filename '{{.MOCK_STRUCT|default .INTERFACE}}.go' --name '{{.INTERFACE | default "Manager"}}' --structname {{.MOCK_STRUCT|default .INTERFACE}} --output ./internal/mocks --with-expecter
 
   session-repo:
     sources:

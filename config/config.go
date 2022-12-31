@@ -57,6 +57,8 @@ type AppConfig struct {
 	DisableWords string `yaml:"disable_words"`
 	BannedDomain string `yaml:"banned_domain"`
 
+	MicroServiceTimelineAddr string `yaml:"ms_timeline_addr" env:"MS_TIMELINE_ADDR"`
+
 	AppType string
 }
 
