@@ -38,6 +38,8 @@ task
 
 - `MS_TIMELINE_ADDR` 时间线微服务，用于生成，h2c 协议，留空的情况下会使用 noop mock。example：`timeline.ms.grpc.chii:5000`
 
+https://github.com/bangumi/service-timeline
+
 搜索功能相关的环境变量
 
 - `MEILISEARCH_URL` meilisearch 地址，默认为空。不设置的话不会初始化搜索客户端。
