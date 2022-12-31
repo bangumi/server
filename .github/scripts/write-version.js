@@ -45,7 +45,7 @@ function writeVersionFile() {
       "",
       "package config",
       "",
-      `const Version = "v${version}"`,
+      `const Version = "${version}"`,
       "",
     ].join("\n")
   );
