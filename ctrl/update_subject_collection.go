@@ -80,24 +80,7 @@ func (ctl Ctrl) UpdateCollection(
 		privacy = null.New(model.CollectPrivacyBan)
 	}
 
-	txErr := ctl.tx.Transaction(func(tx *query.Query) error {
-		return ctl.updateSubjectCollection(ctx, tx, u, subjectID, original, req, privacy)
-	})
-
-	return txErr
-}
-
-// should run in tx.
-func (ctl Ctrl) updateSubjectCollection(
-	ctx context.Context,
-	tx *query.Query,
-	u auth.Auth,
-	subjectID model.SubjectID,
-	originalCollection model.UserSubjectCollection,
-	req UpdateCollectionRequest,
-	privacy null.Null[model.CollectPrivacy],
-) error {
-	err := ctl.collection.WithQuery(tx).UpdateSubjectCollection(ctx, u.ID, subjectID, collection.Update{
+	err = ctl.collection.UpdateSubjectCollection(ctx, u.ID, subjectID, collection.Update{
 		IP:        req.IP,
 		Comment:   req.Comment,
 		Tags:      req.Tags,
@@ -107,18 +90,18 @@ func (ctl Ctrl) updateSubjectCollection(
 		Rate:      req.Rate,
 		Privacy:   privacy,
 	}, time.Now())
+
 	if err != nil {
-		ctl.log.Error("failed to update user collection info", zap.Error(err))
 		return errgo.Wrap(err, "collectionRepo.UpdateSubjectCollection")
 	}
 
-	if req.Type.Set && (req.Type.Value != originalCollection.Type) {
+	if req.Type.Set && (req.Type.Value != original.Type) {
 		sj, err := ctl.GetSubject(ctx, u, subjectID)
 		if err != nil {
 			return err
 		}
-		err = ctl.timeline.WithQuery(tx).
-			ChangeSubjectCollection(ctx, u, sj, req.Type.Default(0), req.Comment.Value, req.Rate.Value)
+		// TODO handle same type in timeline srv
+		err = ctl.timeline.ChangeSubjectCollection(ctx, u, sj, req.Type.Default(0), req.Comment.Value, req.Rate.Value)
 		if err != nil {
 			ctl.log.Error("failed to create associated timeline", zap.Error(err))
 			return errgo.Wrap(err, "timelineRepo.Create")

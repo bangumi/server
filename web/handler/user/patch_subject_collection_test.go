@@ -46,7 +46,6 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
 	tl := mocks.NewTimeLineRepo(t)
-	tl.EXPECT().WithQuery(mock.Anything).Return(tl)
 	tl.EXPECT().
 		ChangeSubjectCollection(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(nil)
