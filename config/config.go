@@ -57,9 +57,7 @@ type AppConfig struct {
 	DisableWords string `yaml:"disable_words"`
 	BannedDomain string `yaml:"banned_domain"`
 
-	EtcdAddr string `yaml:"etcd_address" env:"ETCD_ADDR"`
-
-	EtcdServiceNamespace string `json:"etcd_service_namespace"`
+	MicroServiceTimelineAddr string `yaml:"ms_timeline_addr" env:"MS_TIMELINE_ADDR"`
 
 	AppType string
 }

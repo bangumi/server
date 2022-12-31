@@ -22,8 +22,6 @@ import (
 	"context"
 	"fmt"
 
-	clientv3 "go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/client/v3/naming/resolver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -34,24 +32,15 @@ import (
 )
 
 func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
-	if cfg.EtcdAddr == "" {
+	if cfg.MicroServiceTimelineAddr == "" {
 		logger.Info("no etcd, using nope timeline service")
 		return noopClient{}, nil
 	}
 
-	cli, err := clientv3.NewFromURL(cfg.EtcdAddr)
-	if err != nil {
-		return nil, errgo.Wrap(err, "new etcd client")
-	}
-
-	etcdResolver, err := resolver.NewBuilder(cli)
-	if err != nil {
-		return nil, errgo.Wrap(err, "new etcd resolver")
-	}
+	fmt.Printf("using timeline service %s\n", cfg.MicroServiceTimelineAddr)
 
 	conn, err := grpc.Dial(
-		fmt.Sprintf("etcd://%s/timeline.v1", cfg.EtcdServiceNamespace),
-		grpc.WithResolvers(etcdResolver),
+		cfg.MicroServiceTimelineAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -60,12 +49,24 @@ func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
 
 	c := pb.NewTimeLineServiceClient(conn)
 
+	r, err := c.Hello(context.Background(), &pb.HelloRequest{Name: "t"})
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(r.GetMessage())
+
 	return c, nil
 }
 
+// var _ endpoints.Endpoint
 var _ pb.TimeLineServiceClient = noopClient{}
 
 type noopClient struct {
+}
+
+func (n noopClient) Hello(ctx context.Context, in *pb.HelloRequest, opts ...grpc.CallOption) (*pb.HelloResponse, error) {
+	return &pb.HelloResponse{}, nil
 }
 
 func (n noopClient) SubjectCollect(ctx context.Context, in *pb.SubjectCollectRequest,

@@ -7,11 +7,22 @@ package api.v1;
 option go_package = "github.com/bangumi/server/api";
 
 service TimeLineService {
+  // Debug function
+  rpc Hello(HelloRequest)returns (HelloResponse){}
+
   rpc SubjectCollect(SubjectCollectRequest) returns (SubjectCollectResponse) {}
 
   rpc SubjectProgress(SubjectProgressRequest) returns (SubjectProgressResponse) {}
 
   rpc EpisodeCollect(EpisodeCollectRequest) returns (EpisodeCollectResponse) {}
+}
+
+message HelloRequest {
+  string name = 1 ;
+}
+
+message HelloResponse {
+  string message = 1 ;
 }
 
 message SubjectCollectResponse {
