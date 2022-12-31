@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/samber/lo"
@@ -129,19 +130,41 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 		return errgo.Wrap(err, "episodeRepo.List")
 	}
 
-	eIDs := set.FromSlice(slice.Map(episodes, func(e episode.Episode) model.EpisodeID {
-		return e.ID
-	}))
-
+	eIDs := set.FromSlice(slice.Map(episodes, episode.Episode.GetID))
 	for _, d := range episodeIDs {
 		if !eIDs.Has(d) {
 			return fmt.Errorf("%w: episode %d is not episodes of subject %d", ErrInvalidInput, d, subjectID)
 		}
 	}
 
-	return ctl.tx.Transaction(
-		ctl.updateEpisodesCollectionTx(ctx, u, subjectID, episodeIDs, t, time.Now()),
-	)
+	err = ctl.tx.Transaction(ctl.updateEpisodesCollectionTx(ctx, u, subjectID, episodeIDs, t, time.Now()))
+
+	if err != nil {
+		return err
+	}
+
+	episodes = lo.Filter(episodes, func(item episode.Episode, _ int) bool {
+		return item.Type == episode.TypeNormal
+	})
+
+	if len(episodes) == 0 {
+		return nil
+	}
+
+	sort.Slice(episodes, func(i, j int) bool {
+		return episodes[i].Less(episodes[j])
+	})
+
+	e := episodes[0]
+
+	s, err := ctl.GetSubject(ctx, u, e.SubjectID)
+	if err != nil {
+		return err
+	}
+
+	err = ctl.timeline.ChangeEpisodeStatus(ctx, u, s, e)
+
+	return errgo.Wrap(err, "timeline.ChangeEpisodeStatus")
 }
 
 func (ctl Ctrl) UpdateEpisodeCollection(
@@ -161,9 +184,22 @@ func (ctl Ctrl) UpdateEpisodeCollection(
 		return errgo.Wrap(err, "episode.Get")
 	}
 
-	return ctl.tx.Transaction(
+	err = ctl.tx.Transaction(
 		ctl.updateEpisodesCollectionTx(ctx, u, e.SubjectID, []model.EpisodeID{episodeID}, t, time.Now()),
 	)
+
+	if err != nil {
+		return err
+	}
+
+	s, err := ctl.GetSubject(ctx, u, e.SubjectID)
+	if err != nil {
+		return err
+	}
+
+	err = ctl.timeline.ChangeEpisodeStatus(ctx, u, s, e)
+
+	return errgo.Wrap(err, "timeline.ChangeEpisodeStatus")
 }
 
 func (ctl Ctrl) updateEpisodesCollectionTx(

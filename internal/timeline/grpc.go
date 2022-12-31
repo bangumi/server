@@ -28,7 +28,6 @@ import (
 	"github.com/bangumi/server/dal/query"
 	pb "github.com/bangumi/server/generated/proto/go/api/v1"
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -82,30 +81,6 @@ func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
 	return c, nil
 }
 
-var _ pb.TimeLineServiceClient = noopClient{}
-
-type noopClient struct {
-}
-
-func (n noopClient) Hello(_ context.Context, _ *pb.HelloRequest, _ ...grpc.CallOption) (*pb.HelloResponse, error) {
-	return &pb.HelloResponse{}, nil
-}
-
-func (n noopClient) SubjectCollect(ctx context.Context, in *pb.SubjectCollectRequest,
-	opts ...grpc.CallOption) (*pb.SubjectCollectResponse, error) {
-	return &pb.SubjectCollectResponse{Ok: true}, nil
-}
-
-func (n noopClient) SubjectProgress(ctx context.Context, in *pb.SubjectProgressRequest,
-	opts ...grpc.CallOption) (*pb.SubjectProgressResponse, error) {
-	return &pb.SubjectProgressResponse{Ok: true}, nil
-}
-
-func (n noopClient) EpisodeCollect(ctx context.Context, in *pb.EpisodeCollectRequest,
-	opts ...grpc.CallOption) (*pb.EpisodeCollectResponse, error) {
-	return &pb.EpisodeCollectResponse{Ok: true}, nil
-}
-
 func (m mysqlRepo) ChangeSubjectCollection(
 	ctx context.Context,
 	u auth.Auth,
@@ -137,13 +112,33 @@ func (m mysqlRepo) ChangeSubjectCollection(
 
 	return nil
 }
+
 func (m mysqlRepo) ChangeEpisodeStatus(
 	ctx context.Context,
 	u auth.Auth,
 	sbj model.Subject,
 	episode episode.Episode,
-	update collection.Update,
 ) error {
-	// TODO
-	return nil
+	_, err := m.rpc.EpisodeCollect(ctx, &pb.EpisodeCollectRequest{
+		UserId: uint64(u.ID),
+		Last: &pb.Episode{
+			Id:     uint32(episode.ID),
+			Type:   uint32(episode.Type),
+			Name:   episode.Name,
+			NameCn: episode.NameCN,
+			Sort:   float64(episode.Sort),
+		},
+		Subject: &pb.Subject{
+			Id:        uint32(sbj.ID),
+			Type:      uint32(sbj.TypeID),
+			Name:      sbj.Name,
+			NameCn:    sbj.Name,
+			Image:     sbj.Image,
+			Series:    sbj.Series,
+			VolsTotal: sbj.Volumes,
+			EpsTotal:  sbj.Eps,
+		},
+	})
+
+	return errgo.Wrap(err, "grpc")
 }

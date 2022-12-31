@@ -328,6 +328,9 @@ func MockTimeLineRepo(m timeline.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.TimeLineRepo{}
 
+		mocker.EXPECT().ChangeEpisodeStatus(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		mocker.EXPECT().ChangeEpisodeStatus(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
 		m = mocker
 	}
 

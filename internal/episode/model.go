@@ -51,3 +51,7 @@ func (e Episode) Less(o Episode) bool {
 
 	return e.Type <= o.Type
 }
+
+func (e Episode) GetID() model.EpisodeID {
+	return e.ID
+}

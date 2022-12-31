@@ -3,10 +3,9 @@
 package mocks
 
 import (
-	auth "github.com/bangumi/server/internal/auth"
-	collection "github.com/bangumi/server/internal/collection"
-
 	context "context"
+
+	auth "github.com/bangumi/server/internal/auth"
 
 	episode "github.com/bangumi/server/internal/episode"
 
@@ -28,13 +27,13 @@ func (_m *TimeLineRepo) EXPECT() *TimeLineRepo_Expecter {
 	return &TimeLineRepo_Expecter{mock: &_m.Mock}
 }
 
-// ChangeEpisodeStatus provides a mock function with given fields: ctx, u, sbj, _a3, update
-func (_m *TimeLineRepo) ChangeEpisodeStatus(ctx context.Context, u auth.Auth, sbj model.Subject, _a3 episode.Episode, update collection.Update) error {
-	ret := _m.Called(ctx, u, sbj, _a3, update)
+// ChangeEpisodeStatus provides a mock function with given fields: ctx, u, sbj, _a3
+func (_m *TimeLineRepo) ChangeEpisodeStatus(ctx context.Context, u auth.Auth, sbj model.Subject, _a3 episode.Episode) error {
+	ret := _m.Called(ctx, u, sbj, _a3)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, auth.Auth, model.Subject, episode.Episode, collection.Update) error); ok {
-		r0 = rf(ctx, u, sbj, _a3, update)
+	if rf, ok := ret.Get(0).(func(context.Context, auth.Auth, model.Subject, episode.Episode) error); ok {
+		r0 = rf(ctx, u, sbj, _a3)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -52,14 +51,13 @@ type TimeLineRepo_ChangeEpisodeStatus_Call struct {
 //   - u auth.Auth
 //   - sbj model.Subject
 //   - _a3 episode.Episode
-//   - update collection.Update
-func (_e *TimeLineRepo_Expecter) ChangeEpisodeStatus(ctx interface{}, u interface{}, sbj interface{}, _a3 interface{}, update interface{}) *TimeLineRepo_ChangeEpisodeStatus_Call {
-	return &TimeLineRepo_ChangeEpisodeStatus_Call{Call: _e.mock.On("ChangeEpisodeStatus", ctx, u, sbj, _a3, update)}
+func (_e *TimeLineRepo_Expecter) ChangeEpisodeStatus(ctx interface{}, u interface{}, sbj interface{}, _a3 interface{}) *TimeLineRepo_ChangeEpisodeStatus_Call {
+	return &TimeLineRepo_ChangeEpisodeStatus_Call{Call: _e.mock.On("ChangeEpisodeStatus", ctx, u, sbj, _a3)}
 }
 
-func (_c *TimeLineRepo_ChangeEpisodeStatus_Call) Run(run func(ctx context.Context, u auth.Auth, sbj model.Subject, _a3 episode.Episode, update collection.Update)) *TimeLineRepo_ChangeEpisodeStatus_Call {
+func (_c *TimeLineRepo_ChangeEpisodeStatus_Call) Run(run func(ctx context.Context, u auth.Auth, sbj model.Subject, _a3 episode.Episode)) *TimeLineRepo_ChangeEpisodeStatus_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(auth.Auth), args[2].(model.Subject), args[3].(episode.Episode), args[4].(collection.Update))
+		run(args[0].(context.Context), args[1].(auth.Auth), args[2].(model.Subject), args[3].(episode.Episode))
 	})
 	return _c
 }

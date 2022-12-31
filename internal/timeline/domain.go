@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 )
@@ -38,6 +37,5 @@ type Repo interface {
 		u auth.Auth,
 		sbj model.Subject,
 		episode episode.Episode,
-		update collection.Update,
 	) error
 }
