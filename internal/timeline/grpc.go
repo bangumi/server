@@ -16,7 +16,6 @@ package timeline
 
 import (
 	"context"
-	"fmt"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -54,7 +53,7 @@ func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
 		return noopClient{}, nil
 	}
 
-	fmt.Printf("using timeline service %s\n", cfg.MicroServiceTimelineAddr)
+	logger.Info("using timeline service " + cfg.MicroServiceTimelineAddr)
 
 	conn, err := grpc.Dial(
 		cfg.MicroServiceTimelineAddr,
@@ -66,23 +65,15 @@ func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
 
 	c := pb.NewTimeLineServiceClient(conn)
 
-	r, err := c.Hello(context.Background(), &pb.HelloRequest{Name: "t"})
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println(r.GetMessage())
-
 	return c, nil
 }
 
-// var _ endpoints.Endpoint
 var _ pb.TimeLineServiceClient = noopClient{}
 
 type noopClient struct {
 }
 
-func (n noopClient) Hello(ctx context.Context, in *pb.HelloRequest, opts ...grpc.CallOption) (*pb.HelloResponse, error) {
+func (n noopClient) Hello(_ context.Context, _ *pb.HelloRequest, _ ...grpc.CallOption) (*pb.HelloResponse, error) {
 	return &pb.HelloResponse{}, nil
 }
 
