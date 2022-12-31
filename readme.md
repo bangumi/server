@@ -11,6 +11,8 @@
 
 ## Optional Requirements:
 
+- [buf](https://buf.build/) 基于 ProtoBuffer 生成 grpc 相关文件。
+- [mockery](https://github.com/vektra/mockery) 生成 mock
 - nodejs: 用于生成 openapi 文件。
 
 ## Init
