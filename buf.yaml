@@ -1,0 +1,10 @@
+version: v1
+
+breaking:
+  use:
+    - FILE
+    - PACKAGE
+
+lint:
+  use:
+    - DEFAULT

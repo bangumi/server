@@ -57,6 +57,10 @@ type AppConfig struct {
 	DisableWords string `yaml:"disable_words"`
 	BannedDomain string `yaml:"banned_domain"`
 
+	EtcdAddr string `yaml:"etcd_address" env:"ETCD_ADDR"`
+
+	EtcdServiceNamespace string `json:"etcd_service_namespace"`
+
 	AppType string
 }
 

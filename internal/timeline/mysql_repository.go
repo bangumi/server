@@ -23,22 +23,30 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain"
+	pb "github.com/bangumi/server/generated/proto/go/api/v1"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/timeline/image"
 	"github.com/bangumi/server/internal/timeline/memo"
 )
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
-	return mysqlRepo{q: q, log: log.Named("timeline.mysqlRepo")}, nil
+func NewMysqlRepo(q *query.Query, log *zap.Logger, cfg config.AppConfig) (Repo, error) {
+	rpc, err := newGrpcClient(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return mysqlRepo{q: q, log: log.Named("timeline.mysqlRepo"), rpc: rpc}, nil
 }
 
 type mysqlRepo struct {
 	q   *query.Query
 	log *zap.Logger
+	rpc pb.TimeLineServiceClient
 }
 
 func (m mysqlRepo) WithQuery(query *query.Query) Repo {
