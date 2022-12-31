@@ -19,6 +19,7 @@
 package timeline
 
 import (
+	"context"
 	"fmt"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -29,9 +30,14 @@ import (
 	"github.com/bangumi/server/config"
 	pb "github.com/bangumi/server/generated/proto/go/api/v1"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
+	if cfg.EtcdAddr == "" {
+		logger.Info("no etcd, using nope timeline service")
+	}
+
 	cli, err := clientv3.NewFromURL(cfg.EtcdAddr)
 	if err != nil {
 		return nil, errgo.Wrap(err, "new etcd client")
@@ -54,4 +60,21 @@ func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
 	c := pb.NewTimeLineServiceClient(conn)
 
 	return c, nil
+}
+
+var _ pb.TimeLineServiceClient = noopClient{}
+
+type noopClient struct {
+}
+
+func (n noopClient) SubjectCollect(ctx context.Context, in *pb.SubjectCollectRequest, opts ...grpc.CallOption) (*pb.SubjectCollectResponse, error) {
+	return &pb.SubjectCollectResponse{Ok: true}, nil
+}
+
+func (n noopClient) SubjectProgress(ctx context.Context, in *pb.SubjectProgressRequest, opts ...grpc.CallOption) (*pb.SubjectProgressResponse, error) {
+	return &pb.SubjectProgressResponse{Ok: true}, nil
+}
+
+func (n noopClient) EpisodeCollect(ctx context.Context, in *pb.EpisodeCollectRequest, opts ...grpc.CallOption) (*pb.EpisodeCollectResponse, error) {
+	return &pb.EpisodeCollectResponse{Ok: true}, nil
 }
