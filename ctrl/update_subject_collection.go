@@ -152,7 +152,7 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 	}
 
 	sort.Slice(episodes, func(i, j int) bool {
-		return episodes[i].Less(episodes[j])
+		return !episodes[i].Less(episodes[j])
 	})
 
 	e := episodes[0]
