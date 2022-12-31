@@ -38,7 +38,8 @@ task
 
 #### 微服务相关
 
-- `MS_TIMELINE_ADDR` 时间线微服务，用于生成，h2c 协议，留空的情况下会使用 noop mock。example：`timeline.ms.grpc.chii:5000`
+- `ETCD_ADDR` etcd, 用于微服务的服务发现，留空（默认）的情况下各个微服务会使用 noop mock。example：`http://127.0.0.1:2379`
+- `ETCD_NAMESPACE` etcd 服务注册的 key 前缀。大多数情况下不需要设置。
 
 https://github.com/bangumi/service-timeline
 
