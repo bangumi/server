@@ -3,4 +3,4 @@
 	url = https://github.com/bangumi/wiki-syntax-spec.git
 [submodule "proto"]
 	path = proto
-	url = git@github.com:bangumi/proto.git
+	url = https://github.com/bangumi/proto.git
