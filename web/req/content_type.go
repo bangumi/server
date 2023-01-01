@@ -23,8 +23,8 @@ import (
 )
 
 func JSON(c *fiber.Ctx) error {
-	if string(c.Request().Header.ContentType()) == fiber.MIMEApplicationJSON ||
-		string(c.Request().Header.ContentType()) == fiber.MIMEApplicationJSONCharsetUTF8 {
+	contentType := string(c.Request().Header.ContentType())
+	if contentType == fiber.MIMEApplicationJSON || contentType == fiber.MIMEApplicationJSONCharsetUTF8 {
 		return c.Next()
 	}
 
