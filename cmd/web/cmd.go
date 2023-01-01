@@ -29,7 +29,6 @@ import (
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/notification"
 	"github.com/bangumi/server/internal/oauth"
@@ -89,7 +88,7 @@ func start() error {
 
 			dam.New,
 
-			auth.NewService, person.NewService, group.NewMysqlRepo, search.New,
+			auth.NewService, person.NewService, search.New,
 		),
 
 		ctrl.Module,

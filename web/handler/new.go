@@ -20,7 +20,6 @@ import (
 
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/pkg/cache"
@@ -37,7 +36,6 @@ func New(
 	common common.Common,
 	a auth.Service,
 	r revision.Repo,
-	g group.Repo,
 	index index.Repo,
 	cache cache.RedisCache,
 	ctrl ctrl.Ctrl,
@@ -61,7 +59,6 @@ func New(
 		search:    search,
 		r:         r,
 		captcha:   captcha,
-		g:         g,
 		oauth:     oauth,
 		template:  engine,
 		buffPool:  buffer.NewPool(),
@@ -71,7 +68,6 @@ func New(
 type Handler struct {
 	ctrl ctrl.Ctrl
 	common.Common
-	g         group.Repo
 	oauth     oauth.Manager
 	r         revision.Repo
 	cache     cache.RedisCache

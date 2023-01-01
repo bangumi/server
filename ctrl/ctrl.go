@@ -73,7 +73,6 @@ type Ctrl struct {
 	dam dam.Dam
 
 	user           user.Repo
-	topic          topic.Repo
 	person         person.Repo
 	episode        episode.Repo
 	subject        subject.Repo

@@ -126,18 +126,6 @@ func AddRouters(
 	private.Post("/login", req.JSON, h.PrivateLogin)
 	private.Post("/logout", h.PrivateLogout)
 	private.Get("/me", userHandler.GetCurrent)
-	private.Get("/groups/:name", h.GetGroupProfileByNamePrivate)
-	private.Get("/groups/:name/members", h.ListGroupMembersPrivate)
-
-	private.Get("/groups/:name/topics", h.ListGroupTopics)
-	private.Get("/subjects/:id/topics", h.ListSubjectTopics)
-
-	private.Get("/groups/-/topics/:topic_id", h.GetGroupTopic)
-	private.Get("/subjects/:id/topics/:topic_id", h.GetSubjectTopic)
-	private.Get("/indices/:id/comments", h.GetIndexComments)
-	private.Get("/episodes/:id/comments", h.GetEpisodeComments)
-	private.Get("/characters/:id/comments", h.GetCharacterComments)
-	private.Get("/persons/:id/comments", h.GetPersonComments)
 
 	private.Get("/pms/list", h.NeedLogin, pmHandler.List)
 	private.Get("/pms/related-msgs/:id", h.NeedLogin, pmHandler.ListRelated)
