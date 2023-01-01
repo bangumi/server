@@ -18,27 +18,23 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/ctrl"
-	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/web/handler/common"
 )
 
 type Person struct {
 	common.Common
-	ctrl  ctrl.Ctrl
-	topic topic.Repo
-	log   *zap.Logger
+	ctrl ctrl.Ctrl
+	log  *zap.Logger
 }
 
 func New(
 	common common.Common,
-	topic topic.Repo,
 	ctrl ctrl.Ctrl,
 	log *zap.Logger,
 ) (Person, error) {
 	return Person{
 		Common: common,
 		ctrl:   ctrl,
-		topic:  topic,
 		log:    log.Named("handler.Person"),
 	}, nil
 }

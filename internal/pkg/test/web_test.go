@@ -29,7 +29,6 @@ func TestGetWebApp(t *testing.T) {
 			SubjectRepo: mocks.NewSubjectRepo(t),
 			AuthRepo:    mocks.NewAuthRepo(t),
 			EpisodeRepo: mocks.NewEpisodeRepo(t),
-			TopicRepo:   mocks.NewTopicRepo(t),
 			Cache:       mocks.NewRedisCache(t),
 		},
 	)

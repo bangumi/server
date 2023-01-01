@@ -21,7 +21,6 @@ import (
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/person"
-	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/handler/common"
 )
@@ -30,7 +29,6 @@ type User struct {
 	common.Common
 	ctrl    ctrl.Ctrl
 	person  person.Service
-	topic   topic.Repo
 	collect collection.Repo
 	log     *zap.Logger
 	user    user.Repo
@@ -41,7 +39,6 @@ func New(
 	common common.Common,
 	p person.Service,
 	user user.Repo,
-	topic topic.Repo,
 	ctrl ctrl.Ctrl,
 	collect collection.Repo,
 	log *zap.Logger,
@@ -52,7 +49,6 @@ func New(
 		collect: collect,
 		user:    user,
 		person:  p,
-		topic:   topic,
 		log:     log.Named("handler.User"),
 		cfg:     config.AppConfig{},
 	}, nil

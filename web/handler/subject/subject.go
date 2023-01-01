@@ -20,7 +20,6 @@ import (
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/person"
-	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/web/handler/common"
 )
 
@@ -28,7 +27,6 @@ type Subject struct {
 	common.Common
 	ctrl   ctrl.Ctrl
 	person person.Service
-	topic  topic.Repo
 	log    *zap.Logger
 	cfg    config.AppConfig
 }
@@ -36,7 +34,6 @@ type Subject struct {
 func New(
 	common common.Common,
 	p person.Service,
-	topic topic.Repo,
 	ctrl ctrl.Ctrl,
 	log *zap.Logger,
 ) (Subject, error) {
@@ -44,7 +41,6 @@ func New(
 		Common: common,
 		ctrl:   ctrl,
 		person: p,
-		topic:  topic,
 		log:    log.Named("handler.Subject"),
 		cfg:    config.AppConfig{},
 	}, nil
