@@ -23,14 +23,15 @@ import (
 )
 
 func JSON(c *fiber.Ctx) error {
-	if string(c.Request().Header.ContentType()) != fiber.MIMEApplicationJSON {
-		return res.JSON(c.Status(http.StatusUnsupportedMediaType),
-			res.Error{
-				Title:       "Unsupported Media Type",
-				Description: `request with body must set "content-type" header to "application/json"`,
-			},
-		)
+	if string(c.Request().Header.ContentType()) == fiber.MIMEApplicationJSON ||
+		string(c.Request().Header.ContentType()) == fiber.MIMEApplicationJSONCharsetUTF8 {
+		return c.Next()
 	}
 
-	return c.Next()
+	return res.JSON(c.Status(http.StatusUnsupportedMediaType),
+		res.Error{
+			Title:       "Unsupported Media Type",
+			Description: `request with body must set "content-type" header to "application/json"`,
+		},
+	)
 }
