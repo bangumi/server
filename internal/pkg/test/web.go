@@ -32,7 +32,6 @@ import (
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -47,7 +46,6 @@ import (
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/timeline"
-	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web"
 	"github.com/bangumi/server/web/captcha"
@@ -64,8 +62,6 @@ type Mock struct {
 	AuthRepo           auth.Repo
 	AuthService        auth.Service
 	EpisodeRepo        episode.Repo
-	TopicRepo          topic.Repo
-	GroupRepo          group.Repo
 	UserRepo           user.Repo
 	IndexRepo          index.Repo
 	RevisionRepo       revision.Repo
@@ -109,7 +105,6 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
-		fx.Provide(func() topic.Repo { return m.TopicRepo }),
 		MockAuthRepo(m.AuthRepo),
 		MockOAuthManager(m.OAuthManager),
 		MockAuthService(m.AuthService),
@@ -124,7 +119,6 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockTimeLineRepo(m.TimeLineRepo),
 
 		// don't need a default mock for these repositories.
-		fx.Provide(func() group.Repo { return m.GroupRepo }),
 		fx.Provide(func() collection.Repo { return m.CollectionRepo }),
 		fx.Provide(func() search.Handler { return search.NoopClient{} }),
 

@@ -17,3 +17,4 @@ package ctrl
 import "errors"
 
 var ErrOffsetTooBig = errors.New("limit too big")
+var ErrInvalidInput = errors.New("invalid input")

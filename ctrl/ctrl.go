@@ -28,7 +28,6 @@ import (
 	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/timeline"
-	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
 )
 
@@ -42,7 +41,6 @@ func New(
 	index index.Repo,
 	timeline timeline.Repo,
 	user user.Repo,
-	topic topic.Repo,
 	tx dal.Transaction,
 	dam dam.Dam,
 	privateMessage pm.Repo,
@@ -56,7 +54,6 @@ func New(
 		dam: dam,
 
 		user:           user,
-		topic:          topic,
 		person:         person,
 		episode:        episode,
 		subject:        subject,
@@ -76,7 +73,6 @@ type Ctrl struct {
 	dam dam.Dam
 
 	user           user.Repo
-	topic          topic.Repo
 	person         person.Repo
 	episode        episode.Repo
 	subject        subject.Repo

@@ -29,7 +29,6 @@ import (
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/group"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/notification"
 	"github.com/bangumi/server/internal/oauth"
@@ -44,7 +43,6 @@ import (
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/timeline"
-	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web"
 )
@@ -86,11 +84,11 @@ func start() error {
 
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
-			topic.NewMysqlRepo, timeline.NewMysqlRepo, pm.NewMysqlRepo, notification.NewMysqlRepo,
+			timeline.NewMysqlRepo, pm.NewMysqlRepo, notification.NewMysqlRepo,
 
 			dam.New,
 
-			auth.NewService, person.NewService, group.NewMysqlRepo, search.New,
+			auth.NewService, person.NewService, search.New,
 		),
 
 		ctrl.Module,

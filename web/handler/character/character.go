@@ -23,7 +23,6 @@ import (
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/null"
-	"github.com/bangumi/server/internal/topic"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/handler/common"
 	"github.com/bangumi/server/web/res"
@@ -33,7 +32,6 @@ type Character struct {
 	ctrl ctrl.Ctrl
 	common.Common
 	person person.Service
-	topic  topic.Repo
 	log    *zap.Logger
 	cfg    config.AppConfig
 }
@@ -41,7 +39,6 @@ type Character struct {
 func New(
 	common common.Common,
 	p person.Service,
-	topic topic.Repo,
 	ctrl ctrl.Ctrl,
 	log *zap.Logger,
 ) (Character, error) {
@@ -49,7 +46,6 @@ func New(
 		Common: common,
 		ctrl:   ctrl,
 		person: p,
-		topic:  topic,
 		log:    log.Named("handler.Character"),
 		cfg:    config.AppConfig{},
 	}, nil
