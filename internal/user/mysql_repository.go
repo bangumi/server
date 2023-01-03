@@ -152,7 +152,7 @@ func fromDao(m *dao.Member) User {
 		NickName:         m.Nickname,
 		UserGroup:        m.Groupid,
 		Avatar:           m.Avatar,
-		Sign:             m.Sign,
+		Sign:             string(m.Sign),
 		ID:               m.ID,
 		RegistrationTime: time.Unix(m.Regdate, 0),
 	}

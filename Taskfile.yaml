@@ -88,15 +88,6 @@ tasks:
       - cmd: buf generate
       - task: gorm
       - task: mock
-      - task: dal:comment
-
-  dal:comment:
-    sources:
-      - ./cmd/gen/dal/**/*.go
-    generates:
-      - ./dal/dao/comment*.gen.go
-    cmds:
-      - go run ./cmd/gen/dal/comment.go
 
   mock:
     desc: Generate Mocks.

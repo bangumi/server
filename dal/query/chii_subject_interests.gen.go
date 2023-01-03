@@ -34,7 +34,7 @@ func newSubjectCollection(db *gorm.DB, opts ...gen.DOOption) subjectCollection {
 	_subjectCollection.Rate = field.NewUint8(tableName, "interest_rate")
 	_subjectCollection.Type = field.NewUint8(tableName, "interest_type")
 	_subjectCollection.HasComment = field.NewBool(tableName, "interest_has_comment")
-	_subjectCollection.Comment = field.NewString(tableName, "interest_comment")
+	_subjectCollection.Comment = field.NewField(tableName, "interest_comment")
 	_subjectCollection.Tag = field.NewString(tableName, "interest_tag")
 	_subjectCollection.EpStatus = field.NewUint32(tableName, "interest_ep_status")
 	_subjectCollection.VolStatus = field.NewUint32(tableName, "interest_vol_status")
@@ -64,7 +64,7 @@ type subjectCollection struct {
 	Rate         field.Uint8
 	Type         field.Uint8
 	HasComment   field.Bool
-	Comment      field.String
+	Comment      field.Field
 	Tag          field.String
 	EpStatus     field.Uint32
 	VolStatus    field.Uint32 // 卷数
@@ -100,7 +100,7 @@ func (s *subjectCollection) updateTableName(table string) *subjectCollection {
 	s.Rate = field.NewUint8(table, "interest_rate")
 	s.Type = field.NewUint8(table, "interest_type")
 	s.HasComment = field.NewBool(table, "interest_has_comment")
-	s.Comment = field.NewString(table, "interest_comment")
+	s.Comment = field.NewField(table, "interest_comment")
 	s.Tag = field.NewString(table, "interest_tag")
 	s.EpStatus = field.NewUint32(table, "interest_ep_status")
 	s.VolStatus = field.NewUint32(table, "interest_vol_status")

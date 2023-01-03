@@ -175,7 +175,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 
 	require.EqualValues(t, now.Unix(), r.UpdatedTime)
 	require.True(t, r.HasComment)
-	require.Equal(t, "c", r.Comment)
+	require.Equal(t, "c", string(r.Comment))
 	require.Equal(t, uint8(1), r.Rate)
 	require.EqualValues(t, now.Unix(), r.DroppedTime)
 	require.Zero(t, r.WishTime)

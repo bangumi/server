@@ -5,6 +5,7 @@
 package dao
 
 import (
+	"github.com/bangumi/server/dal/utiltype"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -12,24 +13,24 @@ const TableNameMember = "chii_members"
 
 // Member mapped from table <chii_members>
 type Member struct {
-	ID            model.UserID `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	Username      string       `gorm:"column:username;type:char(15);not null"`
-	Nickname      string       `gorm:"column:nickname;type:varchar(30);not null"`
-	Avatar        string       `gorm:"column:avatar;type:varchar(255);not null"`
-	Groupid       uint8        `gorm:"column:groupid;type:smallint(6) unsigned;not null"`
-	Regdate       int64        `gorm:"column:regdate;type:int(10) unsigned;not null"`
-	Lastvisit     uint32       `gorm:"column:lastvisit;type:int(10) unsigned;not null"`
-	Lastactivity  uint32       `gorm:"column:lastactivity;type:int(10) unsigned;not null"`
-	Lastpost      uint32       `gorm:"column:lastpost;type:int(10) unsigned;not null"`
-	Dateformat    string       `gorm:"column:dateformat;type:char(10);not null"`
-	Timeformat    bool         `gorm:"column:timeformat;type:tinyint(1);not null"`
-	Timeoffset    string       `gorm:"column:timeoffset;type:char(4);not null"`
-	Newpm         bool         `gorm:"column:newpm;type:tinyint(1);not null"`
-	NewNotify     uint16       `gorm:"column:new_notify;type:smallint(6) unsigned;not null"` // 新提醒
-	Sign          string       `gorm:"column:sign;type:varchar(255);not null"`
-	PasswordCrypt []byte       `gorm:"column:password_crypt;type:char(64);not null"`
-	Email         string       `gorm:"column:email;type:char(50);not null"`
-	Fields        MemberField  `gorm:"foreignKey:uid;references:uid" json:"fields"`
+	ID            model.UserID               `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
+	Username      string                     `gorm:"column:username;type:char(15);not null"`
+	Nickname      string                     `gorm:"column:nickname;type:varchar(30);not null"`
+	Avatar        string                     `gorm:"column:avatar;type:varchar(255);not null"`
+	Groupid       uint8                      `gorm:"column:groupid;type:smallint(6) unsigned;not null"`
+	Regdate       int64                      `gorm:"column:regdate;type:int(10) unsigned;not null"`
+	Lastvisit     uint32                     `gorm:"column:lastvisit;type:int(10) unsigned;not null"`
+	Lastactivity  uint32                     `gorm:"column:lastactivity;type:int(10) unsigned;not null"`
+	Lastpost      uint32                     `gorm:"column:lastpost;type:int(10) unsigned;not null"`
+	Dateformat    string                     `gorm:"column:dateformat;type:char(10);not null"`
+	Timeformat    bool                       `gorm:"column:timeformat;type:tinyint(1);not null"`
+	Timeoffset    string                     `gorm:"column:timeoffset;type:char(4);not null"`
+	Newpm         bool                       `gorm:"column:newpm;type:tinyint(1);not null"`
+	NewNotify     uint16                     `gorm:"column:new_notify;type:smallint(6) unsigned;not null"` // 新提醒
+	Sign          utiltype.HTMLEscapedString `gorm:"column:sign;type:varchar(255);not null"`
+	PasswordCrypt []byte                     `gorm:"column:password_crypt;type:char(64);not null"`
+	Email         string                     `gorm:"column:email;type:char(50);not null"`
+	Fields        MemberField                `gorm:"foreignKey:uid;references:uid" json:"fields"`
 }
 
 // TableName Member's table name

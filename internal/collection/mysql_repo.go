@@ -18,7 +18,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"html"
 	"sort"
 	"strings"
 	"time"
@@ -32,6 +31,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
+	"github.com/bangumi/server/dal/utiltype"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -121,7 +121,7 @@ func (r mysqlRepo) ListSubjectCollection(
 	for i, c := range collections {
 		results[i] = model.UserSubjectCollection{
 			UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
-			Comment:     html.UnescapeString(c.Comment),
+			Comment:     string(c.Comment),
 			Tags:        gstr.Split(c.Tag, " "),
 			SubjectType: c.SubjectType,
 			Rate:        c.Rate,
@@ -152,7 +152,7 @@ func (r mysqlRepo) GetSubjectCollection(
 
 	return model.UserSubjectCollection{
 		UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
-		Comment:     html.UnescapeString(c.Comment),
+		Comment:     string(c.Comment),
 		Tags:        gstr.Split(c.Tag, " "),
 		SubjectType: c.SubjectType,
 		Rate:        c.Rate,
@@ -211,7 +211,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 
 	if data.Comment.Set {
 		updater = append(updater,
-			t.Comment.Value(html.EscapeString(data.Comment.Value)),
+			t.Comment.Value(utiltype.HTMLEscapedString(data.Comment.Value)),
 			t.HasComment.Value(data.Comment.Value != ""))
 	}
 	if data.Tags != nil {

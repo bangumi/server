@@ -75,7 +75,10 @@ func main() {
 		// WithUnitTest: true,
 	})
 
-	g.WithImportPkgPath("github.com/bangumi/server/internal/model")
+	g.WithImportPkgPath(
+		"github.com/bangumi/server/internal/model",
+		"github.com/bangumi/server/dal/utiltype",
+	)
 	g.WithJSONTagNameStrategy(func(_ string) string {
 		return ""
 	})
@@ -141,6 +144,7 @@ func main() {
 	modelMember := g.GenerateModelAs("chii_members", "Member",
 		gen.FieldRename("uid", "ID"),
 		gen.FieldType("uid", userIDTypeString),
+		gen.FieldType("sign", "utiltype.HTMLEscapedString"),
 		gen.FieldType("regdate", "int64"),
 		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
@@ -191,6 +195,7 @@ func main() {
 		gen.FieldType("interest_subject_type", subjectTypeIDTypeString),
 		gen.FieldType("interest_type", "uint8"),
 		gen.FieldType("interest_uid", userIDTypeString),
+		gen.FieldType("interest_comment", "utiltype.HTMLEscapedString"),
 		gen.FieldRename("interest_uid", "UserID"),
 
 		gen.FieldRename("interest_create_ip", "CreateIP"),
