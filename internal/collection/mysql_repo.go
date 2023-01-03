@@ -121,7 +121,7 @@ func (r mysqlRepo) ListSubjectCollection(
 	for i, c := range collections {
 		results[i] = model.UserSubjectCollection{
 			UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
-			Comment:     c.Comment,
+			Comment:     html.UnescapeString(c.Comment),
 			Tags:        gstr.Split(c.Tag, " "),
 			SubjectType: c.SubjectType,
 			Rate:        c.Rate,
@@ -152,7 +152,7 @@ func (r mysqlRepo) GetSubjectCollection(
 
 	return model.UserSubjectCollection{
 		UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
-		Comment:     c.Comment,
+		Comment:     html.UnescapeString(c.Comment),
 		Tags:        gstr.Split(c.Tag, " "),
 		SubjectType: c.SubjectType,
 		Rate:        c.Rate,
