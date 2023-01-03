@@ -205,11 +205,11 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		return errgo.Wrap(err, "failed to get old collection record")
 	}
 
-	var updater = make([]field.AssignExpr, 0, 10)
+	var updater = make([]field.AssignExpr, 0, 11)
 	updater = append(updater, t.UpdatedTime.Value(uint32(at.Unix())), t.LastUpdateIP.Value(data.IP))
 
 	if data.Comment.Set {
-		updater = append(updater, t.Comment.Value(data.Comment.Value), t.HasComment.Value(true))
+		updater = append(updater, t.Comment.Value(data.Comment.Value), t.HasComment.Value(data.Comment.Value != ""))
 	}
 	if data.Tags != nil {
 		updater = append(updater, t.Tag.Value(strings.Join(data.Tags, " ")))
