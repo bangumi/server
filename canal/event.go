@@ -61,7 +61,7 @@ type eventHandler struct {
 	log     *zap.Logger
 	search  search.Client
 	redis   *redis.Client
-	s3      *minio.Client
+	s3      *minio.Client // optional, check nil before use
 	reader  *kafka.Reader
 }
 
