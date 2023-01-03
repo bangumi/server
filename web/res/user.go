@@ -32,8 +32,8 @@ func UserAvatar(s string) Avatar {
 
 	return Avatar{
 		Large:  "https://lain.bgm.tv/pic/user/l/" + s,
-		Medium: "https://lain.bgm.tv/pic/user/m/" + s,
-		Small:  "https://lain.bgm.tv/pic/user/s/" + s,
+		Medium: "https://lain.bgm.tv/r/200/pic/user/l/" + s,
+		Small:  "https://lain.bgm.tv/r/100/pic/user/l/" + s,
 	}
 }
 
