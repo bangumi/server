@@ -210,7 +210,9 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	updater = append(updater, t.UpdatedTime.Value(uint32(at.Unix())), t.LastUpdateIP.Value(data.IP))
 
 	if data.Comment.Set {
-		updater = append(updater, t.Comment.Value(html.EscapeString(data.Comment.Value)), t.HasComment.Value(data.Comment.Value != ""))
+		updater = append(updater,
+			t.Comment.Value(html.EscapeString(data.Comment.Value)),
+			t.HasComment.Value(data.Comment.Value != ""))
 	}
 	if data.Tags != nil {
 		updater = append(updater, t.Tag.Value(strings.Join(data.Tags, " ")))
