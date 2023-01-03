@@ -23,6 +23,7 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/go-redis/redis/v8"
+	"github.com/minio/minio-go/v7"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 
@@ -40,6 +41,7 @@ func newEventHandler(
 	reader *kafka.Reader,
 	redis *redis.Client,
 	search search.Client,
+	s3 *minio.Client,
 ) *eventHandler {
 	return &eventHandler{
 		config:  appConfig,
@@ -47,6 +49,7 @@ func newEventHandler(
 		reader:  reader,
 		search:  search,
 		redis:   redis,
+		s3:      s3,
 		log:     log.Named("eventHandler"),
 	}
 }
@@ -58,6 +61,7 @@ type eventHandler struct {
 	log     *zap.Logger
 	search  search.Client
 	redis   *redis.Client
+	s3      *minio.Client
 	reader  *kafka.Reader
 }
 

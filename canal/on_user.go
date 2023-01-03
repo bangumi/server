@@ -19,8 +19,10 @@ import (
 	"encoding"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/bytedance/sonic"
+	"github.com/minio/minio-go/v7"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
@@ -48,7 +50,10 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error 
 		}
 
 		if before.Password != after.Password {
-			return e.OnUserPasswordChange(k.ID)
+			err := e.OnUserPasswordChange(k.ID)
+			if err != nil {
+				e.log.Error("failed to clear cache", zap.Error(err))
+			}
 		}
 
 		if before.NewNotify != after.NewNotify {
@@ -57,9 +62,45 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error 
 				NewNotify: after.NewNotify,
 			})
 		}
+
+		if before.Avatar != after.Avatar {
+			if e.s3 == nil {
+				break
+			}
+
+			e.log.Debug("clear user avatar cache", k.ID.Zap())
+			go e.clearImageCache(after.Avatar)
+		}
 	}
 
 	return nil
+}
+
+func (e *eventHandler) clearImageCache(avatar string) {
+	p, q, ok := strings.Cut(avatar, "?")
+	if !ok {
+		p = avatar
+	}
+
+	p = "/pic/user/l/" + p
+
+	if strings.Contains(q, "hd=1") {
+		p = "/hd" + p
+	}
+
+	e.log.Debug("clear image for prefix", zap.String("avatar", avatar), zap.String("prefix", p))
+
+	files := e.s3.ListObjects(context.Background(), e.config.S3ImageResizeBucket, minio.ListObjectsOptions{
+		Prefix:    p,
+		Recursive: true,
+	})
+
+	for err := range e.s3.RemoveObjects(
+		context.Background(), e.config.S3ImageResizeBucket, files,
+		minio.RemoveObjectsOptions{},
+	) {
+		e.log.Error("failed to clear s3 cached image", zap.String("name", err.ObjectName), zap.Error(err.Err))
+	}
 }
 
 var _ encoding.BinaryMarshaler = redisUserChannel{}
@@ -80,4 +121,5 @@ type UserKey struct {
 type userPayload struct {
 	Password  string `json:"password_crypt"`
 	NewNotify uint16 `json:"new_notify"`
+	Avatar    string `json:"avatar"`
 }

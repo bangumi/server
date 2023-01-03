@@ -31,7 +31,7 @@
     ],
     "legacyWatch": true,
     "delay": 2000,
-    "exec": "godotenv go run main.go web --config config.yaml",
+    "exec": "godotenv go run main.go canal --config config.yaml",
     "ext": "go,json,html"
   }
 }

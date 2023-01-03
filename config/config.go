@@ -61,6 +61,11 @@ type AppConfig struct {
 	EtcdAddr      string `yaml:"etcd_addr" env:"ETCD_ADDR"`
 	EtcdNamespace string `yaml:"etcd_namespace" env:"ETCD_NAMESPACE"  env-default:"/chii/services"`
 
+	S3EntryPoint        string `yaml:"s3_entry_point" env:"S3_ENTRY_POINT"`
+	S3AccessKey         string `yaml:"s3_access_key" env:"S3_ACCESS_KEY"`
+	S3SecretKey         string `yaml:"s3_secret_key" env:"S3_SECRET_KEY"`
+	S3ImageResizeBucket string `yaml:"s3_image_resize_bucket" env:"S3_IMAGE_RESIZE_BUCKET" env-default:"img-resize"`
+
 	AppType string
 }
 

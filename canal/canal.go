@@ -47,6 +47,7 @@ func Main() error {
 			driver.NewMysqlConnectionPool,
 			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
 			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
+			driver.NewS3,
 
 			newKafkaReader, newEventHandler,
 		),
