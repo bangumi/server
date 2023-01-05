@@ -21,7 +21,6 @@ import (
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
@@ -38,7 +37,6 @@ func New(
 	person person.Repo,
 	character character.Repo,
 	collection collection.Repo,
-	index index.Repo,
 	timeline timeline.Repo,
 	user user.Repo,
 	tx dal.Transaction,
@@ -58,7 +56,6 @@ func New(
 		episode:        episode,
 		subject:        subject,
 		character:      character,
-		index:          index,
 		collection:     collection,
 		timeline:       timeline,
 		privateMessage: privateMessage,
@@ -78,7 +75,6 @@ type Ctrl struct {
 	subject        subject.Repo
 	character      character.Repo
 	collection     collection.Repo
-	index          index.Repo
 	timeline       timeline.Repo
 	privateMessage pm.Repo
 }

@@ -15,17 +15,20 @@
 package index
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"time"
 
 	"github.com/bytedance/sonic/decoder"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/accessor"
+	"github.com/bangumi/server/web/internal/cachekey"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
@@ -38,7 +41,7 @@ func (h Handler) GetIndex(c echo.Context) error {
 		return err
 	}
 
-	r, ok, err := h.ctrl.GetIndexWithCache(c.Request().Context(), id)
+	r, ok, err := h.getIndexWithCache(c.Request().Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get index")
 	}
@@ -48,6 +51,43 @@ func (h Handler) GetIndex(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, r)
+}
+
+func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, bool, error) {
+	var key = cachekey.Index(id)
+
+	var r res.Index
+	ok, err := h.cache.Get(c, key, &r)
+	if err != nil {
+		return r, ok, errgo.Wrap(err, "cache.Get")
+	}
+
+	if ok {
+		return r, ok, nil
+	}
+
+	i, err := h.i.Get(c, id)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return res.Index{}, false, nil
+		}
+
+		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
+	}
+
+	u, err := h.u.GetByID(c, i.CreatorID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			h.log.Error("index missing creator", zap.Uint32("index_id", id), i.CreatorID.Zap())
+		}
+		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
+	}
+
+	r = res.IndexModelToResponse(&i, u)
+
+	_ = h.cache.Set(c, key, r, time.Hour)
+
+	return r, true, nil
 }
 
 func (h Handler) GetIndexSubjects(c echo.Context) error {
@@ -68,7 +108,7 @@ func (h Handler) GetIndexSubjects(c echo.Context) error {
 		return err
 	}
 
-	r, ok, err := h.ctrl.GetIndexWithCache(c.Request().Context(), id)
+	r, ok, err := h.getIndexWithCache(c.Request().Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get index")
 	}
