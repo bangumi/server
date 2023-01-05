@@ -15,35 +15,25 @@
 package person
 
 import (
-	"go.uber.org/zap"
-
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
-	"github.com/bangumi/server/web/handler/common"
 )
 
 type Person struct {
-	common.Common
-	person person.Repo
-	ctrl   ctrl.Ctrl
-	log    *zap.Logger
-
+	person  person.Repo
+	ctrl    ctrl.Ctrl
 	subject subject.Repo
 }
 
 func New(
-	common common.Common,
 	ctrl ctrl.Ctrl,
-	log *zap.Logger,
 	person person.Repo,
 	subject subject.Repo,
 ) (Person, error) {
 	return Person{
-		Common:  common,
 		person:  person,
 		ctrl:    ctrl,
 		subject: subject,
-		log:     log.Named("handler.Person"),
 	}, nil
 }
