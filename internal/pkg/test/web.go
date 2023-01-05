@@ -90,7 +90,7 @@ func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 		fx.Supply(httpClient),
 
 		fx.Provide(
-			logger.Copy, config.NewAppConfig, dal.NewDB, web.NewTestingApp,
+			logger.Copy, config.NewAppConfig, web.NewTestingApp,
 			person.NewService,
 		),
 
