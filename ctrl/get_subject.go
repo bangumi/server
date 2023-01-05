@@ -26,7 +26,6 @@ import (
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
 )
 
@@ -41,31 +40,6 @@ func (ctl Ctrl) GetSubject(ctx context.Context, user auth.Auth, subjectID model.
 	}
 
 	return s, nil
-}
-
-func (ctl Ctrl) GetSubjectNoRedirect(
-	ctx context.Context,
-	user auth.Auth,
-	subjectID model.SubjectID,
-) (model.Subject, error) {
-	s, err := ctl.getSubject(ctx, subjectID)
-	if err != nil {
-		return model.Subject{}, err
-	}
-
-	if s.Redirect != 0 {
-		return model.Subject{}, domain.ErrSubjectNotFound
-	}
-
-	if !auth.AllowReadSubject(user, s) {
-		return model.Subject{}, domain.ErrSubjectNotFound
-	}
-
-	return s, nil
-}
-
-type SubjectFilter struct {
-	NSFW null.Bool
 }
 
 func (ctl Ctrl) getSubject(ctx context.Context, id model.SubjectID) (model.Subject, error) {

@@ -18,7 +18,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/dal"
-	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/person"
@@ -35,7 +34,6 @@ func New(
 	cache cache.RedisCache,
 	subject subject.Repo,
 	person person.Repo,
-	character character.Repo,
 	collection collection.Repo,
 	timeline timeline.Repo,
 	user user.Repo,
@@ -55,7 +53,6 @@ func New(
 		person:         person,
 		episode:        episode,
 		subject:        subject,
-		character:      character,
 		collection:     collection,
 		timeline:       timeline,
 		privateMessage: privateMessage,
@@ -73,7 +70,6 @@ type Ctrl struct {
 	person         person.Repo
 	episode        episode.Repo
 	subject        subject.Repo
-	character      character.Repo
 	collection     collection.Repo
 	timeline       timeline.Repo
 	privateMessage pm.Repo
