@@ -21,32 +21,32 @@ const validator = require("oas-validator");
 const colors = require("colors/safe");
 
 async function main() {
-  for (const filePath of ["v0.yaml", "private.yaml"]) {
-    console.log("try to bundle", filePath);
-    const openapi = await $RefParser.bundle(path.join(__dirname, filePath));
+  const filePath = "v0.yaml";
 
-    try {
-      console.log("try to lint", filePath);
-      // JSON deep copy to remove anchor
-      await validator.validate(JSON.parse(JSON.stringify(openapi)), {
-        lint: true,
-        lintSkip: ["info-contact", "contact-properties", "tag-description"],
-      });
-    } catch (e) {
-      if (!e.options.warnings.length) {
-        throw e;
-      }
+  console.log("try to bundle", filePath);
+  const openapi = await $RefParser.bundle(path.join(__dirname, filePath));
 
-      for (const {
-        pointer,
-        ruleName,
-        rule: { description },
-      } of e.options.warnings) {
-        const path = dataPathToJSONPath(pointer);
-        console.error(ruleName, colors.red(`${description}:`), path);
-      }
-      throw new Error(`${e.options.warnings.length} errors, failed to validate ${filePath}`);
+  try {
+    console.log("try to lint", filePath);
+    // JSON deep copy to remove anchor
+    await validator.validate(JSON.parse(JSON.stringify(openapi)), {
+      lint: true,
+      lintSkip: ["info-contact", "contact-properties", "tag-description"],
+    });
+  } catch (e) {
+    if (!e.options.warnings.length) {
+      throw e;
     }
+
+    for (const {
+      pointer,
+      ruleName,
+      rule: { description },
+    } of e.options.warnings) {
+      const path = dataPathToJSONPath(pointer);
+      console.error(ruleName, colors.red(`${description}:`), path);
+    }
+    throw new Error(`${e.options.warnings.length} errors, failed to validate ${filePath}`);
   }
 }
 

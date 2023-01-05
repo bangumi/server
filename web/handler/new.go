@@ -24,9 +24,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
-	"github.com/bangumi/server/web/captcha"
 	"github.com/bangumi/server/web/handler/common"
-	"github.com/bangumi/server/web/rate"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -37,39 +35,33 @@ func New(
 	index index.Repo,
 	cache cache.RedisCache,
 	ctrl ctrl.Ctrl,
-	captcha captcha.Manager,
 	session session.Manager,
-	rateLimit rate.Manager,
 	search search.Handler,
 	log *zap.Logger,
 ) Handler {
 	return Handler{
-		Common:    common,
-		ctrl:      ctrl,
-		cache:     cache,
-		log:       log.Named("web.handler"),
-		rateLimit: rateLimit,
-		session:   session,
-		a:         a,
-		i:         index,
-		search:    search,
-		r:         r,
-		captcha:   captcha,
-		buffPool:  buffer.NewPool(),
+		Common:   common,
+		ctrl:     ctrl,
+		cache:    cache,
+		log:      log.Named("web.handler"),
+		session:  session,
+		a:        a,
+		i:        index,
+		search:   search,
+		r:        r,
+		buffPool: buffer.NewPool(),
 	}
 }
 
 type Handler struct {
 	ctrl ctrl.Ctrl
 	common.Common
-	r         revision.Repo
-	cache     cache.RedisCache
-	a         auth.Service
-	session   session.Manager
-	captcha   captcha.Manager
-	rateLimit rate.Manager
-	i         index.Repo
-	search    search.Handler
-	buffPool  buffer.Pool
-	log       *zap.Logger
+	r        revision.Repo
+	cache    cache.RedisCache
+	a        auth.Service
+	session  session.Manager
+	i        index.Repo
+	search   search.Handler
+	buffPool buffer.Pool
+	log      *zap.Logger
 }

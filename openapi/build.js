@@ -9,24 +9,17 @@ const lodash = require("lodash");
 async function main() {
   await fs.mkdir(path.join(__dirname, "..", "dist"), { recursive: true });
 
-  for (const filePath of ["v0.yaml", "private.yaml"]) {
-    console.log(`build openapi ${filePath} => dist/${filePath}`);
+  const filePath = "v0.yaml";
 
-    const input = path.join(__dirname, filePath);
-    let schema = await $RefParser.bundle(input);
+  console.log(`build openapi ${filePath} => dist/${filePath}`);
 
-    schema = lodash.omit(schema, "x-parameters");
+  const input = path.join(__dirname, filePath);
+  let schema = await $RefParser.bundle(input);
 
-    if (input.endsWith("private.yaml")) {
-      schema["servers"] = [
-        { url: "https://next.bgm.tv", description: "Production server" },
-        { url: "https://dev.bgm38.com/", description: "开发用服务器" },
-      ];
-    }
+  schema = lodash.omit(schema, "x-parameters");
 
-    const out = path.join(__dirname, "..", "dist", filePath);
-    await fs.writeFile(out, yaml.dump(schema, { noRefs: true }));
-  }
+  const out = path.join(__dirname, "..", "dist", filePath);
+  await fs.writeFile(out, yaml.dump(schema, { noRefs: true }));
 }
 
 main().catch((e) => {

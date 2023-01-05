@@ -19,7 +19,6 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:                db,
 		AccessToken:       newAccessToken(db, opts...),
-		App:               newApp(db, opts...),
 		Cast:              newCast(db, opts...),
 		Character:         newCharacter(db, opts...),
 		CharacterSubjects: newCharacterSubjects(db, opts...),
@@ -31,7 +30,6 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Member:            newMember(db, opts...),
 		Notification:      newNotification(db, opts...),
 		NotificationField: newNotificationField(db, opts...),
-		OAuthClient:       newOAuthClient(db, opts...),
 		Person:            newPerson(db, opts...),
 		PersonField:       newPersonField(db, opts...),
 		PersonSubjects:    newPersonSubjects(db, opts...),
@@ -52,7 +50,6 @@ type Query struct {
 	db *gorm.DB
 
 	AccessToken       accessToken
-	App               app
 	Cast              cast
 	Character         character
 	CharacterSubjects characterSubjects
@@ -64,7 +61,6 @@ type Query struct {
 	Member            member
 	Notification      notification
 	NotificationField notificationField
-	OAuthClient       oAuthClient
 	Person            person
 	PersonField       personField
 	PersonSubjects    personSubjects
@@ -86,7 +82,6 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:                db,
 		AccessToken:       q.AccessToken.clone(db),
-		App:               q.App.clone(db),
 		Cast:              q.Cast.clone(db),
 		Character:         q.Character.clone(db),
 		CharacterSubjects: q.CharacterSubjects.clone(db),
@@ -98,7 +93,6 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Member:            q.Member.clone(db),
 		Notification:      q.Notification.clone(db),
 		NotificationField: q.NotificationField.clone(db),
-		OAuthClient:       q.OAuthClient.clone(db),
 		Person:            q.Person.clone(db),
 		PersonField:       q.PersonField.clone(db),
 		PersonSubjects:    q.PersonSubjects.clone(db),
@@ -127,7 +121,6 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:                db,
 		AccessToken:       q.AccessToken.replaceDB(db),
-		App:               q.App.replaceDB(db),
 		Cast:              q.Cast.replaceDB(db),
 		Character:         q.Character.replaceDB(db),
 		CharacterSubjects: q.CharacterSubjects.replaceDB(db),
@@ -139,7 +132,6 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Member:            q.Member.replaceDB(db),
 		Notification:      q.Notification.replaceDB(db),
 		NotificationField: q.NotificationField.replaceDB(db),
-		OAuthClient:       q.OAuthClient.replaceDB(db),
 		Person:            q.Person.replaceDB(db),
 		PersonField:       q.PersonField.replaceDB(db),
 		PersonSubjects:    q.PersonSubjects.replaceDB(db),
@@ -158,7 +150,6 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 
 type queryCtx struct {
 	AccessToken       *accessTokenDo
-	App               *appDo
 	Cast              *castDo
 	Character         *characterDo
 	CharacterSubjects *characterSubjectsDo
@@ -170,7 +161,6 @@ type queryCtx struct {
 	Member            *memberDo
 	Notification      *notificationDo
 	NotificationField *notificationFieldDo
-	OAuthClient       *oAuthClientDo
 	Person            *personDo
 	PersonField       *personFieldDo
 	PersonSubjects    *personSubjectsDo
@@ -189,7 +179,6 @@ type queryCtx struct {
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		AccessToken:       q.AccessToken.WithContext(ctx),
-		App:               q.App.WithContext(ctx),
 		Cast:              q.Cast.WithContext(ctx),
 		Character:         q.Character.WithContext(ctx),
 		CharacterSubjects: q.CharacterSubjects.WithContext(ctx),
@@ -201,7 +190,6 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Member:            q.Member.WithContext(ctx),
 		Notification:      q.Notification.WithContext(ctx),
 		NotificationField: q.NotificationField.WithContext(ctx),
-		OAuthClient:       q.OAuthClient.WithContext(ctx),
 		Person:            q.Person.WithContext(ctx),
 		PersonField:       q.PersonField.WithContext(ctx),
 		PersonSubjects:    q.PersonSubjects.WithContext(ctx),

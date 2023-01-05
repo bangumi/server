@@ -47,9 +47,7 @@ import (
 	"github.com/bangumi/server/internal/timeline"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web"
-	"github.com/bangumi/server/web/captcha"
 	"github.com/bangumi/server/web/handler"
-	"github.com/bangumi/server/web/rate"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -65,10 +63,8 @@ type Mock struct {
 	RevisionRepo       revision.Repo
 	CollectionRepo     collection.Repo
 	TimeLineRepo       timeline.Repo
-	CaptchaManager     captcha.Manager
 	SessionManager     session.Manager
 	Cache              cache.RedisCache
-	RateLimiter        rate.Manager
 	PrivateMessageRepo pm.Repo
 	NotificationRepo   notification.Repo
 	HTTPMock           *httpmock.MockTransport
@@ -109,9 +105,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockRevisionRepo(m.RevisionRepo),
 		MockPrivateMessageRepo(m.PrivateMessageRepo),
 		MockNoticationRepo(m.NotificationRepo),
-		MockCaptchaManager(m.CaptchaManager),
 		MockSessionManager(m.SessionManager),
-		MockRateLimiter(m.RateLimiter),
 		MockTimeLineRepo(m.TimeLineRepo),
 
 		// don't need a default mock for these repositories.
@@ -177,18 +171,6 @@ func MockNoticationRepo(repo notification.Repo) fx.Option {
 	return fx.Supply(fx.Annotate(repo, fx.As(new(notification.Repo))))
 }
 
-func MockRateLimiter(repo rate.Manager) fx.Option {
-	if repo == nil {
-		mocker := &mocks.RateLimiter{}
-		mocker.EXPECT().Login(mock.Anything, mock.Anything).Return(true, 5, nil) //nolint:gomnd
-		mocker.EXPECT().Reset(mock.Anything, mock.Anything).Return(nil)
-
-		repo = mocker
-	}
-
-	return fx.Provide(func() rate.Manager { return repo })
-}
-
 func MockSessionManager(repo session.Manager) fx.Option {
 	if repo == nil {
 		mocker := &mocks.SessionManager{}
@@ -199,17 +181,6 @@ func MockSessionManager(repo session.Manager) fx.Option {
 	}
 
 	return fx.Provide(func() session.Manager { return repo })
-}
-
-func MockCaptchaManager(repo captcha.Manager) fx.Option {
-	if repo == nil {
-		mocker := &mocks.CaptchaManager{}
-		mocker.EXPECT().Verify(mock.Anything, mock.Anything).Return(true, nil)
-
-		repo = mocker
-	}
-
-	return fx.Provide(func() captcha.Manager { return repo })
 }
 
 func MockUserRepo(repo user.Repo) fx.Option {

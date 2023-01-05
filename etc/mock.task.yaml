@@ -6,8 +6,6 @@ tasks:
 
   gen:
     cmds:
-      - task: rate-limit
-      - task: captcha-manager
       - task: session-manager
       - task: session-repo
       - task: cache
@@ -67,30 +65,6 @@ tasks:
         vars:
           MOCK_STRUCT: SessionManager
           SRC_DIR: ./web/session
-
-  captcha-manager:
-    sources:
-      - ./web/captcha/manager.go
-      - ./internal/pkg/tools/go.mod
-    generates:
-      - internal/mocks/CaptchaManager.go
-    cmds:
-      - task: base-mock
-        vars:
-          MOCK_STRUCT: CaptchaManager
-          SRC_DIR: ./web/captcha
-
-  rate-limit:
-    sources:
-      - ./web/rate/new.go
-      - ./internal/pkg/tools/go.mod
-    generates:
-      - internal/mocks/RateLimiter.go
-    cmds:
-      - task: base-mock
-        vars:
-          SRC_DIR: ./web/rate
-          MOCK_STRUCT: RateLimiter
 
   "Auth":
     sources:

@@ -42,7 +42,6 @@ var personIDTypeString = "model.PersonID"       // reflect.TypeOf(new(model.Pers
 var characterIDTypeString = "model.CharacterID" // reflect.TypeOf(new(model.CharacterID)).Elem().Name()
 var episodeIDTypeString = "model.EpisodeID"     // reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
 var subjectIDTypeString = "model.SubjectID"     // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
-var groupIDTypeString = "model." + reflect.TypeOf(new(model.GroupID)).Elem().Name()
 var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
 var episodeTypeTypeString = reflect.TypeOf(new(episode.Type)).Elem().Name()
 var notificationIDTypeString = "model." + reflect.TypeOf(new(model.NotificationID)).Elem().Name()
@@ -163,25 +162,6 @@ func main() {
 		gen.FieldType("usr_grp_id", "uint8"),
 		gen.FieldType("usr_grp_perm", "[]byte"),
 	))
-
-	var oauthApp = g.GenerateModelAs("chii_apps", "App",
-		gen.FieldTrimPrefix("app_"),
-		gen.FieldType("app_id", "uint32"),
-		gen.FieldRename("app_desc", "description"),
-		gen.FieldType("app_type", "uint8"),
-		gen.FieldRename("app_lasttouch", "UpdatedTime"),
-		gen.FieldRename("app_timestamp", createdTime),
-		gen.FieldType("app_creator", userIDTypeString),
-	)
-
-	g.ApplyBasic(g.GenerateModelAs("chii_oauth_clients", "OAuthClient",
-		gen.FieldType("app_id", "uint32"),
-		gen.FieldRelate(field.BelongsTo, "App", oauthApp, &field.RelateConfig{
-			GORMTag: "foreignKey:app_id;references:app_id",
-		}),
-	))
-
-	g.ApplyBasic(oauthApp)
 
 	g.ApplyBasic(g.GenerateModelAs("chii_oauth_access_tokens", "AccessToken",
 		gen.FieldType("type", "uint8"),
