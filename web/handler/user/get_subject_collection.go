@@ -23,6 +23,8 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -46,7 +48,7 @@ func (h User) getSubjectCollection(c echo.Context, username string, subjectID mo
 	const notFoundMessage = "subject is not collected by user"
 	v := accessor.FromCtx(c)
 
-	s, err := h.ctrl.GetSubject(c.Request().Context(), v.Auth, subjectID)
+	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{NSFW: null.Bool{Set: !v.AllowNSFW()}})
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

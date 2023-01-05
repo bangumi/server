@@ -18,11 +18,10 @@ import (
 	"strconv"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 )
 
-const resPrefix = config.RedisKeyPrefix + "app:"
+const resPrefix = config.RedisKeyPrefix + "repo:"
 
 func Character(id model.CharacterID) string {
 	return resPrefix + "character:" + strconv.FormatUint(uint64(id), 10)
@@ -34,15 +33,6 @@ func Person(id model.PersonID) string {
 
 func Subject(id model.SubjectID) string {
 	return resPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func EpisodeCount(id model.SubjectID, epType *episode.Type) string {
-	if epType == nil {
-		return resPrefix + "episode:count:" + strconv.FormatUint(uint64(id), 10)
-	}
-
-	return resPrefix + "episode:count:" + strconv.FormatUint(uint64(id), 10) +
-		strconv.FormatUint(uint64(*epType), 10)
 }
 
 func Episode(id model.EpisodeID) string {

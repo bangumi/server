@@ -28,6 +28,14 @@ type Filter struct {
 }
 
 type Repo interface {
+	read
+}
+
+type CachedRepo interface {
+	read
+}
+
+type read interface {
 	// Get return a repository model.
 	Get(ctx context.Context, id model.SubjectID, filter Filter) (model.Subject, error)
 	GetByIDs(ctx context.Context, ids []model.SubjectID, filter Filter) (map[model.SubjectID]model.Subject, error)

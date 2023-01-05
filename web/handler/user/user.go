@@ -31,7 +31,7 @@ type User struct {
 	episode episode.Repo
 	person  person.Service
 	collect collection.Repo
-	subject subject.Repo
+	subject subject.CachedRepo
 	log     *zap.Logger
 	user    user.Repo
 	cfg     config.AppConfig

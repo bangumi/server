@@ -26,6 +26,8 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -56,7 +58,7 @@ func (h User) patchSubjectCollection(
 ) error {
 	u := accessor.FromCtx(c)
 
-	s, err := h.ctrl.GetSubject(c.Request().Context(), u.Auth, subjectID)
+	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{NSFW: null.Bool{Set: !u.AllowNSFW()}})
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("subject not found")

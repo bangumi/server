@@ -53,6 +53,7 @@ import (
 
 type Mock struct {
 	SubjectRepo        subject.Repo
+	SubjectCachedRepo  subject.CachedRepo
 	PersonRepo         person.Repo
 	CharacterRepo      character.Repo
 	AuthRepo           auth.Repo
@@ -97,6 +98,7 @@ func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 		MockPersonRepo(m.PersonRepo),
 		MockCharacterRepo(m.CharacterRepo),
 		MockSubjectRepo(m.SubjectRepo),
+		MockSubjectReadRepo(m.SubjectCachedRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
 		MockAuthRepo(m.AuthRepo),
 		MockAuthService(m.AuthService),
@@ -275,6 +277,17 @@ func MockSubjectRepo(m subject.Repo) fx.Option {
 	}
 
 	return fx.Provide(func() subject.Repo { return m })
+}
+
+func MockSubjectReadRepo(m subject.CachedRepo) fx.Option {
+	if m == nil {
+		mocker := &mocks.SubjectCachedRepo{}
+		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(model.Subject{}, nil)
+
+		m = mocker
+	}
+
+	return fx.Provide(func() subject.CachedRepo { return m })
 }
 
 func MockTimeLineRepo(m timeline.Repo) fx.Option {

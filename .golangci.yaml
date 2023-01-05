@@ -225,42 +225,6 @@ linters-settings:
     disable:
       - fieldalignment
   #      - shadow
-  wrapcheck:
-    # An array of strings that specify substrings of signatures to ignore.
-    # If this set, it will override the default set of ignored signatures.
-    # See https://github.com/tomarrell/wrapcheck#configuration for more information.
-    ignoreSigs:
-      - fmt.Errorf(
-      - errors.New(
-      - errors.Unwrap(
-      - .Wrapf(
-      - "errgo.Msg(err error, msg string) error"
-      - "errgo.Wrap(err error, msg string) error"
-      - "func (github.com/labstack/echo/v4.Context).JSON("
-      - "func (github.com/labstack/echo/v4.Context).String("
-      - "func (github.com/labstack/echo/v4.Context).Redirect("
-      - "func (github.com/labstack/echo/v4.Context).NoContent("
-      - "func (github.com/labstack/echo/v4.Context).HTML("
-      - "func os.Open(name string)"
-      - "func github.com/bangumi/server/web/req.GetPageQuery("
-      - "func (github.com/bangumi/server/web/req.PageQuery).Check("
-      - "func github.com/bangumi/server/web/res.NewError("
-      - "func github.com/bangumi/server/web/res.Response("
-      - "func github.com/bangumi/server/web/res.FromError("
-      - "func github.com/bangumi/server/web/res.JSONError("
-      - "func github.com/bangumi/server/web/res.InternalError("
-      - "func github.com/bangumi/server/web/res.Forbidden("
-      - "func github.com/bangumi/server/web/res.NotFound("
-      - "func github.com/bangumi/server/web/res.Unauthorized("
-      - "func github.com/bangumi/server/web/res.BadRequest("
-      - "func github.com/bangumi/server/web/res.JSON("
-      - "func (github.com/bangumi/server/web/handler/common.Common)."
-      - "func (*github.com/bangumi/server/dal/query.Query).Transaction("
-      - "func (github.com/bangumi/server/dal.Transaction).Transaction("
-      - "func (*golang.org/x/sync/errgroup.Group).Wait()"
-    ignoreSigRegexps:
-      - 'func \(github.com/bangumi/server/web/req\..*\)\.Validate\('
-      - 'func github.com/bangumi/server/web/req\.Parse.*\('
 
   nlreturn:
     block-size: 3
@@ -309,6 +273,7 @@ linters:
     - rowserrcheck
     - nilerr
     - dupword
+    - wrapcheck
     # 1.18
     - wastedassign
     - nosnakecase # false positive for variable and const defined in other lib

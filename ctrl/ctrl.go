@@ -32,6 +32,7 @@ func New(
 	episode episode.Repo,
 	cache cache.RedisCache,
 	subject subject.Repo,
+	subjectCached subject.CachedRepo,
 	collection collection.Repo,
 	timeline timeline.Repo,
 	user user.Repo,
@@ -47,6 +48,7 @@ func New(
 		tx:  tx,
 		dam: dam,
 
+		subjectCached:  subjectCached,
 		user:           user,
 		episode:        episode,
 		subject:        subject,
@@ -63,6 +65,7 @@ type Ctrl struct {
 	tx  dal.Transaction
 	dam dam.Dam
 
+	subjectCached  subject.CachedRepo
 	user           user.Repo
 	episode        episode.Repo
 	subject        subject.Repo

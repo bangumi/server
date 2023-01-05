@@ -16,11 +16,7 @@ package ctrl
 
 import (
 	"context"
-	"time"
 
-	"go.uber.org/zap"
-
-	"github.com/bangumi/server/ctrl/internal/cachekey"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -28,24 +24,9 @@ import (
 )
 
 func (ctl Ctrl) CountEpisode(ctx context.Context, subjectID model.SubjectID, epType *episode.Type) (int64, error) {
-	key := cachekey.EpisodeCount(subjectID, epType)
-	var count int64
-	ok, err := ctl.cache.Get(ctx, key, &count)
-	if err != nil {
-		return 0, errgo.Wrap(err, "cache.Get")
-	}
-
-	if ok {
-		return count, nil
-	}
-
-	count, err = ctl.episode.Count(ctx, subjectID, episode.Filter{Type: null.NewFromPtr(epType)})
+	count, err := ctl.episode.Count(ctx, subjectID, episode.Filter{Type: null.NewFromPtr(epType)})
 	if err != nil {
 		return 0, errgo.Wrap(err, "episode.Count")
-	}
-
-	if err := ctl.cache.Set(ctx, key, count, time.Hour); err != nil {
-		ctl.log.Error("failed to set cache", zap.Error(err))
 	}
 
 	return count, nil

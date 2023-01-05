@@ -130,12 +130,19 @@ tasks:
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/SubjectRepo.go
+      - internal/mocks/SubjectCachedRepo.go
     cmds:
       - task: base-mock
         vars:
           SRC_DIR: ./internal/subject
           INTERFACE: "Repo"
           MOCK_STRUCT: SubjectRepo
+
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/subject
+          INTERFACE: "CachedRepo"
+          MOCK_STRUCT: SubjectCachedRepo
 
   "UserRepo":
     sources:

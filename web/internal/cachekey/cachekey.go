@@ -23,26 +23,6 @@ import (
 
 const resPrefix = config.RedisKeyPrefix + "res:"
 
-func Character(id model.CharacterID) string {
-	return resPrefix + "character:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func Person(id model.PersonID) string {
-	return resPrefix + "person:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func Subject(id model.SubjectID) string {
-	return resPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func Episode(id model.EpisodeID) string {
-	return resPrefix + "episode:" + strconv.FormatUint(uint64(id), 10)
-}
-
 func Index(id model.IndexID) string {
 	return resPrefix + "index:" + strconv.FormatUint(uint64(id), 10)
-}
-
-func User(id model.UserID) string {
-	return resPrefix + "user:" + strconv.FormatUint(uint64(id), 10)
 }

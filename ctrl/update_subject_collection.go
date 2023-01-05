@@ -34,6 +34,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/set"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 )
 
 type UpdateCollectionRequest struct {
@@ -106,7 +107,7 @@ func (ctl Ctrl) mayCreateTimeline(
 	subjectID model.SubjectID,
 ) error {
 	if req.Type.Set {
-		sj, err := ctl.GetSubject(ctx, u, subjectID)
+		sj, err := ctl.subjectCached.Get(ctx, subjectID, subject.Filter{})
 		if err != nil {
 			return err
 		}
@@ -118,7 +119,7 @@ func (ctl Ctrl) mayCreateTimeline(
 	}
 
 	if req.EpStatus.Set || req.VolStatus.Set {
-		sj, err := ctl.GetSubject(ctx, u, subjectID)
+		sj, err := ctl.subjectCached.Get(ctx, subjectID, subject.Filter{})
 		if err != nil {
 			return err
 		}
@@ -139,7 +140,7 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 	episodeIDs []model.EpisodeID,
 	t model.EpisodeCollection,
 ) error {
-	if _, err := ctl.GetSubject(ctx, u, subjectID); err != nil {
+	if _, err := ctl.subjectCached.Get(ctx, subjectID, subject.Filter{}); err != nil {
 		return err
 	}
 
@@ -178,7 +179,7 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 
 	e := episodes[0]
 
-	s, err := ctl.GetSubject(ctx, u, e.SubjectID)
+	s, err := ctl.subjectCached.Get(ctx, e.SubjectID, subject.Filter{})
 	if err != nil {
 		return err
 	}
@@ -213,7 +214,7 @@ func (ctl Ctrl) UpdateEpisodeCollection(
 		return err
 	}
 
-	s, err := ctl.GetSubject(ctx, u, e.SubjectID)
+	s, err := ctl.subjectCached.Get(ctx, e.SubjectID, subject.Filter{})
 	if err != nil {
 		return err
 	}

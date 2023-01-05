@@ -22,7 +22,7 @@ import (
 )
 
 func User(userID model.UserID) string {
-	return config.RedisKeyPrefix + "service:user:" + strconv.FormatUint(uint64(userID), 10)
+	return config.RedisKeyPrefix + "auth:user:" + strconv.FormatUint(uint64(userID), 10)
 }
 
 func Auth(token string) string {
