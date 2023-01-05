@@ -20,6 +20,7 @@ import (
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/pkg/cache"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/handler/common"
 )
 
@@ -27,6 +28,7 @@ type Handler struct {
 	common.Common
 	ctrl  ctrl.Ctrl
 	cache cache.RedisCache
+	u     user.Repo
 	i     index.Repo
 	log   *zap.Logger
 }
@@ -35,12 +37,14 @@ func New(
 	common common.Common,
 	index index.Repo,
 	log *zap.Logger,
+	u user.Repo,
 	cache cache.RedisCache,
 	ctrl ctrl.Ctrl,
 ) Handler {
 	return Handler{
 		Common: common,
 		ctrl:   ctrl,
+		u:      u,
 		cache:  cache,
 		log:    log.Named("web.handler"),
 		i:      index,

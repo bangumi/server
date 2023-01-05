@@ -145,7 +145,7 @@ func (h Handler) NewIndex(c echo.Context) error {
 	if err := h.i.New(ctx, i); err != nil {
 		return errgo.Wrap(err, "failed to create a new index")
 	}
-	u, err := h.ctrl.GetUser(ctx, i.CreatorID)
+	u, err := h.u.GetByID(ctx, i.CreatorID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get user info")
 	}

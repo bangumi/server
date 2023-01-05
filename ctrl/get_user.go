@@ -16,47 +16,11 @@ package ctrl
 
 import (
 	"context"
-	"errors"
-	"time"
 
-	"go.uber.org/zap"
-
-	"github.com/bangumi/server/ctrl/internal/cachekey"
-	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/user"
 )
-
-func (ctl Ctrl) GetUser(ctx context.Context, userID model.UserID) (user.User, error) {
-	var key = cachekey.User(userID)
-
-	// try to read from cache
-	var r user.User
-	ok, err := ctl.cache.Get(ctx, key, &r)
-	if err != nil {
-		return r, errgo.Wrap(err, "cache.Get")
-	}
-
-	if ok {
-		return r, nil
-	}
-
-	r, err = ctl.user.GetByID(ctx, userID)
-	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return r, domain.ErrUserNotFound
-		}
-
-		return r, errgo.Wrap(err, "userRepo.Get")
-	}
-
-	if e := ctl.cache.Set(ctx, key, r, time.Hour); e != nil {
-		ctl.log.Error("can't set response to cache", zap.Error(e))
-	}
-
-	return r, nil
-}
 
 func (ctl Ctrl) GetUsersByIDs(ctx context.Context, userIDs []model.UserID) (map[model.UserID]user.User, error) {
 	if len(userIDs) == 0 {

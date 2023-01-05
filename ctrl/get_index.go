@@ -49,7 +49,7 @@ func (ctl Ctrl) GetIndexWithCache(c context.Context, id uint32) (res.Index, bool
 		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
 	}
 
-	u, err := ctl.GetUser(c, i.CreatorID)
+	u, err := ctl.user.GetByID(c, i.CreatorID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			ctl.log.Error("index missing creator", zap.Uint32("index_id", id), i.CreatorID.Zap())
