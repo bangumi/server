@@ -23,6 +23,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -60,9 +61,9 @@ func (h Subject) Get(c echo.Context) error {
 		return c.Redirect(http.StatusFound, fmt.Sprintf("/v0/subjects/%d", s.Redirect))
 	}
 
-	totalEpisode, err := h.ctrl.CountEpisode(c.Request().Context(), id, nil)
+	totalEpisode, err := h.episode.Count(c.Request().Context(), id, episode.Filter{})
 	if err != nil {
-		return errgo.Wrap(err, "failed to count episodes of subject")
+		return errgo.Wrap(err, "episode.Count")
 	}
 
 	return c.JSON(http.StatusOK, convertModelSubject(s, totalEpisode))
