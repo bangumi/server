@@ -19,7 +19,6 @@ import (
 
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/web/captcha"
-	"github.com/bangumi/server/web/frontend"
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/rate"
 	"github.com/bangumi/server/web/session"
@@ -33,7 +32,6 @@ var Module = fx.Module("web",
 		rate.New,
 		captcha.New,
 		session.New,
-		frontend.NewTemplateEngine,
 		func(c search.Client) search.Handler { return c },
 	),
 	fx.Invoke(AddRouters),

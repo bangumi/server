@@ -123,10 +123,7 @@ func AddRouters(
 	// frontend private api
 	private := app.Group("/p/", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
 
-	private.Post("/login", req.JSON, h.PrivateLogin)
-	private.Post("/logout", h.PrivateLogout)
-	private.Get("/me", userHandler.GetCurrent)
-
+	// TODO migrate this to bangumi/graphql
 	private.Get("/pms/list", h.NeedLogin, pmHandler.List)
 	private.Get("/pms/related-msgs/:id", h.NeedLogin, pmHandler.ListRelated)
 	private.Get("/pms/counts", h.NeedLogin, pmHandler.CountTypes)
@@ -136,19 +133,6 @@ func AddRouters(
 	private.Delete("/pms", req.JSON, h.NeedLogin, pmHandler.Delete)
 
 	private.Get("/notifications/count", h.NeedLogin, notificationHandler.Count)
-
-	// un-documented
-	private.Post("/access-tokens", req.JSON, h.CreatePersonalAccessToken)
-	private.Delete("/access-tokens", req.JSON, h.DeletePersonalAccessToken)
-
-	if c.WebDomain != "" {
-		CORSBlockMiddleware = []fiber.Handler{originMiddleware}
-	}
-
-	privateHTML := app.Group("/demo/", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
-	privateHTML.Get("/login", h.PageLogin)
-	privateHTML.Get("/access-token", h.PageListAccessToken)
-	privateHTML.Get("/access-token/create", h.PageCreateAccessToken)
 
 	// default 404 Handler, all router should be added before this router
 	app.Use(func(c *fiber.Ctx) error {

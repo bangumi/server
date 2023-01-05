@@ -36,7 +36,6 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/notification"
-	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
@@ -49,7 +48,6 @@ import (
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web"
 	"github.com/bangumi/server/web/captcha"
-	"github.com/bangumi/server/web/frontend"
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/rate"
 	"github.com/bangumi/server/web/session"
@@ -71,7 +69,6 @@ type Mock struct {
 	SessionManager     session.Manager
 	Cache              cache.RedisCache
 	RateLimiter        rate.Manager
-	OAuthManager       oauth.Manager
 	PrivateMessageRepo pm.Repo
 	NotificationRepo   notification.Repo
 	HTTPMock           *httpmock.MockTransport
@@ -98,7 +95,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 		fx.Provide(
 			logger.Copy, config.NewAppConfig, dal.NewDB, web.New,
-			person.NewService, frontend.NewTemplateEngine,
+			person.NewService,
 		),
 
 		MockPersonRepo(m.PersonRepo),
@@ -106,7 +103,6 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		MockSubjectRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
 		MockAuthRepo(m.AuthRepo),
-		MockOAuthManager(m.OAuthManager),
 		MockAuthService(m.AuthService),
 		MockUserRepo(m.UserRepo),
 		MockIndexRepo(m.IndexRepo),
@@ -297,14 +293,6 @@ func MockAuthService(m auth.Service) fx.Option {
 	}
 
 	return fx.Provide(func() auth.Service { return m })
-}
-
-func MockOAuthManager(m oauth.Manager) fx.Option {
-	if m == nil {
-		m = &mocks.OAuthManger{}
-	}
-
-	return fx.Provide(func() oauth.Manager { return m })
 }
 
 func MockSubjectRepo(m subject.Repo) fx.Option {

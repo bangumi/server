@@ -28,7 +28,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/res"
-	"github.com/bangumi/server/web/session"
 )
 
 func TestUser_Get(t *testing.T) {
@@ -90,32 +89,6 @@ func TestUser_Get_404(t *testing.T) {
 
 	resp := test.New(t).Get("/v0/users/u").Execute(app)
 	require.Equal(t, http.StatusNotFound, resp.StatusCode, resp.BodyString())
-}
-
-func TestUser_Get_private_200(t *testing.T) {
-	t.Parallel()
-	const uid model.UserID = 7
-	const sessionID = "ss"
-
-	u := mocks.NewUserRepo(t)
-	u.EXPECT().GetByID(mock.Anything, uid).Return(user.User{ID: uid}, nil)
-
-	s := mocks.NewSessionManager(t)
-	s.EXPECT().Get(mock.Anything, sessionID).Return(session.Session{UserID: uid}, nil)
-
-	app := test.GetWebApp(t,
-		test.Mock{
-			UserRepo:       u,
-			SessionManager: s,
-		},
-	)
-
-	var r res.User
-	resp := test.New(t).Get("/p/me").Cookie(session.CookieKey, sessionID).
-		Execute(app).JSON(&r)
-
-	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
-	require.Equal(t, uid, r.ID, resp.BodyString())
 }
 
 func TestUser_GetAvatar_302(t *testing.T) {

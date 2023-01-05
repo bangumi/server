@@ -31,7 +31,6 @@ import (
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/notification"
-	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
@@ -79,8 +78,6 @@ func start() error {
 
 		fx.Provide(
 			logger.Copy, cache.NewRedisCache,
-
-			oauth.NewMysqlRepo,
 
 			character.NewMysqlRepo, subject.NewMysqlRepo, user.NewUserRepo, person.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,

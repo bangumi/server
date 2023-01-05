@@ -21,12 +21,10 @@ import (
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/index"
-	"github.com/bangumi/server/internal/oauth"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/web/captcha"
-	"github.com/bangumi/server/web/frontend"
 	"github.com/bangumi/server/web/handler/common"
 	"github.com/bangumi/server/web/rate"
 	"github.com/bangumi/server/web/session"
@@ -44,8 +42,6 @@ func New(
 	rateLimit rate.Manager,
 	search search.Handler,
 	log *zap.Logger,
-	engine frontend.TemplateEngine,
-	oauth oauth.Manager,
 ) Handler {
 	return Handler{
 		Common:    common,
@@ -59,8 +55,6 @@ func New(
 		search:    search,
 		r:         r,
 		captcha:   captcha,
-		oauth:     oauth,
-		template:  engine,
 		buffPool:  buffer.NewPool(),
 	}
 }
@@ -68,7 +62,6 @@ func New(
 type Handler struct {
 	ctrl ctrl.Ctrl
 	common.Common
-	oauth     oauth.Manager
 	r         revision.Repo
 	cache     cache.RedisCache
 	a         auth.Service
@@ -77,7 +70,6 @@ type Handler struct {
 	rateLimit rate.Manager
 	i         index.Repo
 	search    search.Handler
-	template  frontend.TemplateEngine
 	buffPool  buffer.Pool
 	log       *zap.Logger
 }
