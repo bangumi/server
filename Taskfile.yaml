@@ -56,13 +56,6 @@ tasks:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
 
-  test-http:
-    desc: Run mocked tests, and tests require external HTTP resources, alias for `TEST_HTTP=1 task test`
-    cmds:
-      - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
-    env:
-      TEST_HTTP: "1"
-
   test-all:
     desc: Run all tests.
     cmds:
@@ -70,7 +63,6 @@ tasks:
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
-      TEST_HTTP: "1"
 
   coverage:
     desc: Run tests with coverage report, used in CI.
@@ -79,7 +71,6 @@ tasks:
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
-      TEST_HTTP: "1"
 
   # generated files
   gen:
