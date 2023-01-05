@@ -12,20 +12,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package common
+package accessor
 
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/res"
 )
 
 var errNeedLogin = res.Unauthorized("this API need authorization")
 
-func (h Common) NeedLogin(next echo.HandlerFunc) echo.HandlerFunc {
+func NeedLogin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if u := accessor.FromCtx(c); !u.Login {
+		if u := FromCtx(c); !u.Login {
 			return errNeedLogin
 		}
 

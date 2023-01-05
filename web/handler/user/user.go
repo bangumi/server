@@ -20,15 +20,15 @@ import (
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/collection"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/user"
-	"github.com/bangumi/server/web/handler/common"
 )
 
 type User struct {
-	common.Common
 	ctrl    ctrl.Ctrl
+	episode episode.Repo
 	person  person.Service
 	collect collection.Repo
 	subject subject.Repo
@@ -38,17 +38,17 @@ type User struct {
 }
 
 func New(
-	common common.Common,
 	p person.Service,
 	user user.Repo,
 	ctrl ctrl.Ctrl,
 	subject subject.Repo,
 	collect collection.Repo,
+	episode episode.Repo,
 	log *zap.Logger,
 ) (User, error) {
 	return User{
-		Common:  common,
 		ctrl:    ctrl,
+		episode: episode,
 		collect: collect,
 		subject: subject,
 		user:    user,

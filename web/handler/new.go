@@ -20,18 +20,17 @@ import (
 
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/user"
-	"github.com/bangumi/server/web/handler/common"
 	"github.com/bangumi/server/web/session"
 )
 
 func New(
-	common common.Common,
 	a auth.Service,
 	r revision.Repo,
 	index index.Repo,
@@ -41,11 +40,12 @@ func New(
 	subject subject.Repo,
 	search search.Handler,
 	u user.Repo,
+	episode episode.Repo,
 	log *zap.Logger,
 ) Handler {
 	return Handler{
-		Common:   common,
 		ctrl:     ctrl,
+		episode:  episode,
 		cache:    cache,
 		log:      log.Named("web.handler"),
 		session:  session,
@@ -60,8 +60,8 @@ func New(
 }
 
 type Handler struct {
-	ctrl ctrl.Ctrl
-	common.Common
+	ctrl     ctrl.Ctrl
+	episode  episode.Repo
 	r        revision.Repo
 	cache    cache.RedisCache
 	subject  subject.Repo

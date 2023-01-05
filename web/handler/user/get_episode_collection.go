@@ -41,7 +41,7 @@ func (h User) GetEpisodeCollection(c echo.Context) error {
 		return err
 	}
 
-	e, err := h.ctrl.GetEpisode(c.Request().Context(), episodeID)
+	e, err := h.episode.Get(c.Request().Context(), episodeID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

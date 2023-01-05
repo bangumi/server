@@ -21,8 +21,10 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/handler/character"
+	"github.com/bangumi/server/web/handler/common"
 	"github.com/bangumi/server/web/handler/index"
 	"github.com/bangumi/server/web/handler/notification"
 	"github.com/bangumi/server/web/handler/person"
@@ -43,6 +45,7 @@ import (
 func AddRouters(
 	app *echo.Echo,
 	c config.AppConfig,
+	common common.Common,
 	h handler.Handler,
 	userHandler user.User,
 	personHandler person.Person,
@@ -56,7 +59,7 @@ func AddRouters(
 
 	app.Use(ua.DisableDefaultHTTPLibrary)
 
-	v0 := app.Group("/v0", h.MiddlewareAccessTokenAuth)
+	v0 := app.Group("/v0", common.MiddlewareAccessTokenAuth)
 
 	v0.POST("/search/subjects", h.Search)
 
@@ -81,12 +84,12 @@ func AddRouters(
 	v0.GET("/users/:username", userHandler.Get)
 	v0.GET("/users/:username/collections", userHandler.ListSubjectCollection)
 	v0.GET("/users/:username/collections/:subject_id", userHandler.GetSubjectCollection)
-	v0.GET("/users/-/collections/-/episodes/:episode_id", userHandler.GetEpisodeCollection, h.NeedLogin)
-	v0.PUT("/users/-/collections/-/episodes/:episode_id", userHandler.PutEpisodeCollection, req.JSON, h.NeedLogin)
-	v0.GET("/users/-/collections/:subject_id/episodes", userHandler.GetSubjectEpisodeCollection, h.NeedLogin)
-	v0.PATCH("/users/-/collections/:subject_id", userHandler.PatchSubjectCollection, req.JSON, h.NeedLogin)
+	v0.GET("/users/-/collections/-/episodes/:episode_id", userHandler.GetEpisodeCollection, accessor.NeedLogin)
+	v0.PUT("/users/-/collections/-/episodes/:episode_id", userHandler.PutEpisodeCollection, req.JSON, accessor.NeedLogin)
+	v0.GET("/users/-/collections/:subject_id/episodes", userHandler.GetSubjectEpisodeCollection, accessor.NeedLogin)
+	v0.PATCH("/users/-/collections/:subject_id", userHandler.PatchSubjectCollection, req.JSON, accessor.NeedLogin)
 	v0.PATCH("/users/-/collections/:subject_id/episodes",
-		userHandler.PatchEpisodeCollectionBatch, req.JSON, h.NeedLogin)
+		userHandler.PatchEpisodeCollectionBatch, req.JSON, accessor.NeedLogin)
 
 	v0.GET("/users/:username/avatar", userHandler.GetAvatar)
 
@@ -95,12 +98,12 @@ func AddRouters(
 		v0.GET("/indices/:id", i.GetIndex)
 		v0.GET("/indices/:id/subjects", i.GetIndexSubjects)
 		// indices
-		v0.POST("/indices", i.NewIndex, req.JSON, h.NeedLogin)
-		v0.PUT("/indices/:id", i.UpdateIndex, req.JSON, h.NeedLogin)
+		v0.POST("/indices", i.NewIndex, req.JSON, accessor.NeedLogin)
+		v0.PUT("/indices/:id", i.UpdateIndex, req.JSON, accessor.NeedLogin)
 		// indices subjects
-		v0.POST("/indices/:id/subjects", i.AddIndexSubject, req.JSON, h.NeedLogin)
-		v0.PUT("/indices/:id/subjects/:subject_id", i.UpdateIndexSubject, req.JSON, h.NeedLogin)
-		v0.DELETE("/indices/:id/subjects/:subject_id", i.RemoveIndexSubject, h.NeedLogin)
+		v0.POST("/indices/:id/subjects", i.AddIndexSubject, req.JSON, accessor.NeedLogin)
+		v0.PUT("/indices/:id/subjects/:subject_id", i.UpdateIndexSubject, req.JSON, accessor.NeedLogin)
+		v0.DELETE("/indices/:id/subjects/:subject_id", i.RemoveIndexSubject, accessor.NeedLogin)
 	}
 
 	v0.GET("/revisions/persons/:id", h.GetPersonRevision)
@@ -122,18 +125,18 @@ func AddRouters(
 	}
 
 	// frontend private api
-	private := app.Group("/p", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
+	private := app.Group("/p", append(CORSBlockMiddleware, common.MiddlewareSessionAuth)...)
 
 	// TODO migrate this to bangumi/graphql
-	private.GET("/pms/list", pmHandler.List, h.NeedLogin)
-	private.GET("/pms/related-msgs/:id", pmHandler.ListRelated, h.NeedLogin)
-	private.GET("/pms/counts", pmHandler.CountTypes, h.NeedLogin)
-	private.GET("/pms/contacts/recent", pmHandler.ListRecentContact, h.NeedLogin)
+	private.GET("/pms/list", pmHandler.List, accessor.NeedLogin)
+	private.GET("/pms/related-msgs/:id", pmHandler.ListRelated, accessor.NeedLogin)
+	private.GET("/pms/counts", pmHandler.CountTypes, accessor.NeedLogin)
+	private.GET("/pms/contacts/recent", pmHandler.ListRecentContact, accessor.NeedLogin)
 	private.PATCH("/pms/read", pmHandler.MarkRead)
 	private.POST("/pms", pmHandler.Create)
-	private.DELETE("/pms", pmHandler.Delete, req.JSON, h.NeedLogin)
+	private.DELETE("/pms", pmHandler.Delete, req.JSON, accessor.NeedLogin)
 
-	private.GET("/notifications/count", notificationHandler.Count, h.NeedLogin)
+	private.GET("/notifications/count", notificationHandler.Count, accessor.NeedLogin)
 
 	// default 404 Handler, all router should be added before this router
 	app.RouteNotFound("/*", func(c echo.Context) error {

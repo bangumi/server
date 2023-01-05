@@ -40,7 +40,7 @@ func (h Handler) GetEpisode(c echo.Context) error {
 		return err
 	}
 
-	e, err := h.ctrl.GetEpisode(c.Request().Context(), id)
+	e, err := h.episode.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
