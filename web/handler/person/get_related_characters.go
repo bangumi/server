@@ -32,7 +32,7 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetPerson(c.Request().Context(), id)
+	r, err := h.person.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

@@ -15,13 +15,17 @@
 package person
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -33,7 +37,7 @@ func (h Person) GetRelatedSubjects(c echo.Context) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetPerson(c.Request().Context(), id)
+	r, err := h.person.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -46,7 +50,7 @@ func (h Person) GetRelatedSubjects(c echo.Context) error {
 		return res.ErrNotFound
 	}
 
-	relations, err := h.ctrl.GetPersonRelated(c.Request().Context(), id)
+	relations, err := h.getPersonRelated(c.Request().Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
@@ -63,4 +67,40 @@ func (h Person) GetRelatedSubjects(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h Person) getPersonRelated(
+	ctx context.Context, personID model.PersonID,
+) ([]model.SubjectPersonRelation, error) {
+	person, err := h.person.Get(ctx, personID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "failed to get user")
+	}
+
+	relations, err := h.subject.GetPersonRelated(ctx, personID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
+	}
+
+	subjects, err := h.subject.GetByIDs(ctx,
+		slice.Map(relations, func(r domain.SubjectPersonRelation) model.SubjectID { return r.SubjectID }),
+		subject.Filter{})
+	if err != nil {
+		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
+	}
+
+	var results = make([]model.SubjectPersonRelation, 0, len(relations))
+	for _, rel := range relations {
+		s, ok := subjects[rel.SubjectID]
+		if !ok {
+			continue
+		}
+		results = append(results, model.SubjectPersonRelation{
+			Person:  person,
+			Subject: s,
+			TypeID:  rel.TypeID,
+		})
+	}
+
+	return results, nil
 }

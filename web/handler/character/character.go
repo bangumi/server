@@ -26,13 +26,11 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/pkg/wiki"
-	"github.com/bangumi/server/web/handler/common"
 	"github.com/bangumi/server/web/res"
 )
 
 type Character struct {
-	ctrl ctrl.Ctrl
-	common.Common
+	ctrl    ctrl.Ctrl
 	person  person.Service
 	c       character.Repo
 	subject subject.Repo
@@ -41,7 +39,6 @@ type Character struct {
 }
 
 func New(
-	common common.Common,
 	p person.Service,
 	ctrl ctrl.Ctrl,
 	c character.Repo,
@@ -49,7 +46,6 @@ func New(
 	log *zap.Logger,
 ) (Character, error) {
 	return Character{
-		Common:  common,
 		ctrl:    ctrl,
 		c:       c,
 		subject: subject,
