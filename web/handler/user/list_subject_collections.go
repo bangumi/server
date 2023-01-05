@@ -26,12 +26,13 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/user"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h User) ListSubjectCollection(c echo.Context) error {
-	v := h.GetHTTPAccessor(c)
+	v := accessor.FromCtx(c)
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err

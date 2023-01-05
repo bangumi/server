@@ -31,12 +31,13 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h Subject) Get(c echo.Context) error {
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 
 	id, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil {
@@ -82,7 +83,7 @@ func platformString(s model.Subject) *string {
 }
 
 func (h Subject) GetImage(c echo.Context) error {
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 
 	id, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil || id == 0 {

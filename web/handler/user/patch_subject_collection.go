@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
@@ -53,7 +54,7 @@ func (h User) patchSubjectCollection(
 	subjectID model.SubjectID,
 	r req.SubjectEpisodeCollectionPatch,
 ) error {
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 
 	s, err := h.ctrl.GetSubject(c.Request().Context(), u.Auth, subjectID)
 	if err != nil {

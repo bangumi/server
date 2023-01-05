@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
@@ -70,7 +71,7 @@ func (h User) PatchEpisodeCollectionBatch(c echo.Context) error {
 		return err
 	}
 
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 	err = h.ctrl.UpdateEpisodesCollection(c.Request().Context(), u.Auth, subjectID, r.EpisodeID, r.Type)
 	if err != nil {
 		switch {
@@ -102,7 +103,7 @@ func (h User) PutEpisodeCollection(c echo.Context) error {
 		return res.JSONError(c, err)
 	}
 
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 	err = h.ctrl.UpdateEpisodeCollection(c.Request().Context(), u.Auth, episodeID, r.Type)
 	if err != nil {
 		switch {

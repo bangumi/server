@@ -19,11 +19,12 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h PrivateMessage) CountTypes(c echo.Context) error {
-	accessor := h.Common.GetHTTPAccessor(c)
+	accessor := accessor.FromCtx(c)
 	counts, err := h.pmRepo.CountTypes(c.Request().Context(), accessor.ID)
 	if err != nil {
 		return res.InternalError(c, err, "failed to count private message types")

@@ -20,11 +20,12 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/web/accessor"
 )
 
 func (h Notification) Count(c echo.Context) error {
-	accessor := h.Common.GetHTTPAccessor(c)
-	count, err := h.notificationRepo.Count(c.Request().Context(), accessor.ID)
+	auth := accessor.FromCtx(c)
+	count, err := h.notificationRepo.Count(c.Request().Context(), auth.ID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to count notification")
 	}

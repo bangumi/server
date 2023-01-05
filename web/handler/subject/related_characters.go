@@ -24,12 +24,13 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h Subject) GetRelatedCharacters(c echo.Context) error {
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 	subjectID, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil {
 		return err

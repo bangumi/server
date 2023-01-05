@@ -22,7 +22,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/pkg/wiki"
-	"github.com/bangumi/server/web/handler/internal/cachekey"
+	"github.com/bangumi/server/web/internal/cachekey"
 	"github.com/bangumi/server/web/res"
 )
 

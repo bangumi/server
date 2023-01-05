@@ -25,12 +25,13 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h Handler) GetIndex(c echo.Context) error {
-	user := h.GetHTTPAccessor(c)
+	user := accessor.FromCtx(c)
 
 	id, err := req.ParseIndexID(c.Param("id"))
 	if err != nil {
@@ -50,7 +51,7 @@ func (h Handler) GetIndex(c echo.Context) error {
 }
 
 func (h Handler) GetIndexSubjects(c echo.Context) error {
-	user := h.GetHTTPAccessor(c)
+	user := accessor.FromCtx(c)
 
 	id, err := req.ParseIndexID(c.Param("id"))
 	if err != nil {
@@ -126,7 +127,7 @@ func (h Handler) NewIndex(c echo.Context) error {
 	if err := h.ensureValidStrings(reqData.Description, reqData.Title); err != nil {
 		return err
 	}
-	accessor := h.GetHTTPAccessor(c)
+	accessor := accessor.FromCtx(c)
 	now := time.Now()
 	i := &model.Index{
 		ID:          0,
@@ -155,7 +156,7 @@ func (h Handler) NewIndex(c echo.Context) error {
 
 // 确保目录存在, 并且当前请求的用户持有权限.
 func (h Handler) ensureIndexPermission(c echo.Context, indexID uint32) (*model.Index, error) {
-	accessor := h.GetHTTPAccessor(c)
+	accessor := accessor.FromCtx(c)
 	index, err := h.i.Get(c.Request().Context(), indexID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {

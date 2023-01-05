@@ -25,7 +25,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/cookie"
-	"github.com/bangumi/server/web/handler/internal/ctxkey"
+	"github.com/bangumi/server/web/internal/ctxkey"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/session"
 	"github.com/bangumi/server/web/util"

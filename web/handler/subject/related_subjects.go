@@ -22,6 +22,7 @@ import (
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
@@ -32,7 +33,7 @@ func (h Subject) GetRelatedSubjects(c echo.Context) error {
 		return err
 	}
 
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 
 	relations, err := h.ctrl.GetSubjectRelatedSubjects(c.Request().Context(), u.Auth, id)
 	if err != nil {

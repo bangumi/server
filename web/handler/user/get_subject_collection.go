@@ -23,6 +23,7 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
@@ -43,7 +44,7 @@ func (h User) GetSubjectCollection(c echo.Context) error {
 
 func (h User) getSubjectCollection(c echo.Context, username string, subjectID model.SubjectID) error {
 	const notFoundMessage = "subject is not collected by user"
-	v := h.GetHTTPAccessor(c)
+	v := accessor.FromCtx(c)
 
 	s, err := h.ctrl.GetSubject(c.Request().Context(), v.Auth, subjectID)
 	if err != nil {

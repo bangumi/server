@@ -24,12 +24,13 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pm"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h PrivateMessage) ListRelated(c echo.Context) error {
-	accessor := h.Common.GetHTTPAccessor(c)
+	accessor := accessor.FromCtx(c)
 	relatedID, err := req.ParsePrivateMessageID(c.Param("id"))
 	if err != nil {
 		return err

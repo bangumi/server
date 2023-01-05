@@ -17,6 +17,7 @@ package common
 import (
 	"github.com/labstack/echo/v4"
 
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -24,7 +25,7 @@ var errNeedLogin = res.Unauthorized("this API need authorization")
 
 func (h Common) NeedLogin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if u := h.GetHTTPAccessor(c); !u.Login {
+		if u := accessor.FromCtx(c); !u.Login {
 			return errNeedLogin
 		}
 

@@ -21,11 +21,12 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h PrivateMessage) ListRecentContact(c echo.Context) error {
-	accessor := h.Common.GetHTTPAccessor(c)
+	accessor := accessor.FromCtx(c)
 	contactIDs, err := h.pmRepo.ListRecentContact(c.Request().Context(), accessor.ID)
 	if err != nil {
 		return res.InternalError(c, err, "failed to list recent contact")

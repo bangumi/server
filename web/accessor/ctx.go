@@ -12,36 +12,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package user
+package accessor
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/web/accessor"
-	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/web/internal/ctxkey"
 )
 
-func (h User) GetCurrent(c echo.Context) error {
-	u := accessor.FromCtx(c)
-	if !u.Login || u.ID == 0 {
-		return res.Unauthorized("need Login")
+func FromCtx(c echo.Context) *Accessor {
+	raw := c.Get(ctxkey.User)
+	if raw == nil {
+		return &Accessor{}
 	}
 
-	user, err := h.user.GetByID(c.Request().Context(), u.ID)
-	if err != nil {
-		return errgo.Wrap(err, "failed to get user")
+	u, ok := raw.(*Accessor)
+	if !ok {
+		logger.Error("failed to get http accessor, expecting accessor got another type instead", zap.Any("raw", raw))
+		panic("can't convert type")
 	}
 
-	return c.JSON(http.StatusOK, res.User{
-		ID:        user.ID,
-		URL:       "https://bgm.tv/user/" + user.UserName,
-		Username:  user.UserName,
-		Nickname:  user.NickName,
-		UserGroup: user.UserGroup,
-		Avatar:    res.UserAvatar(user.Avatar),
-		Sign:      user.Sign,
-	})
+	return u
 }

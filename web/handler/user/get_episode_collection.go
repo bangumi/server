@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
@@ -34,7 +35,7 @@ type ResUserEpisodeCollection struct {
 }
 
 func (h User) GetEpisodeCollection(c echo.Context) error {
-	v := h.GetHTTPAccessor(c)
+	v := accessor.FromCtx(c)
 	episodeID, err := req.ParseEpisodeID(c.Param("episode_id"))
 	if err != nil {
 		return err
@@ -63,7 +64,7 @@ func (h User) GetEpisodeCollection(c echo.Context) error {
 
 // GetSubjectEpisodeCollection return episodes with user's collection info.
 func (h User) GetSubjectEpisodeCollection(c echo.Context) error {
-	v := h.GetHTTPAccessor(c)
+	v := accessor.FromCtx(c)
 	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
 	if err != nil {
 		return err

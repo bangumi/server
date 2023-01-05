@@ -25,12 +25,13 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h Handler) GetEpisode(c echo.Context) error {
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 
 	id, err := req.ParseEpisodeID(c.Param("id"))
 	if err != nil {
@@ -59,7 +60,7 @@ func (h Handler) GetEpisode(c echo.Context) error {
 }
 
 func (h Handler) ListEpisode(c echo.Context) error {
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 
 	page, err := req.GetPageQuery(c, req.EpisodeDefaultLimit, req.EpisodeMaxLimit)
 	if err != nil {

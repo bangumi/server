@@ -23,12 +23,13 @@ import (
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h Character) Get(c echo.Context) error {
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err
@@ -51,7 +52,7 @@ func (h Character) Get(c echo.Context) error {
 }
 
 func (h Character) GetImage(c echo.Context) error {
-	u := h.GetHTTPAccessor(c)
+	u := accessor.FromCtx(c)
 	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err
