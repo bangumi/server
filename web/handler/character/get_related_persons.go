@@ -22,19 +22,17 @@ import (
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h Character) GetRelatedPersons(c echo.Context) error {
-	u := accessor.FromCtx(c)
 	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	_, err = h.ctrl.GetCharacterNoRedirect(c.Request().Context(), u.Auth, id)
+	_, err = h.c.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

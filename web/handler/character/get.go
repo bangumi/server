@@ -22,6 +22,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
@@ -35,7 +36,7 @@ func (h Character) Get(c echo.Context) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetCharacter(c.Request().Context(), u.Auth, id)
+	r, err := h.c.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -48,17 +49,20 @@ func (h Character) Get(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "/v0/characters/"+strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
+	if !auth.AllowReadCharacter(u.Auth, r) {
+		return res.ErrNotFound
+	}
+
 	return c.JSON(http.StatusOK, convertModelCharacter(r))
 }
 
 func (h Character) GetImage(c echo.Context) error {
-	u := accessor.FromCtx(c)
 	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	p, err := h.ctrl.GetCharacterNoRedirect(c.Request().Context(), u.Auth, id)
+	p, err := h.c.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

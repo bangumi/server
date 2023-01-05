@@ -15,26 +15,28 @@
 package character
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/web/accessor"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h Character) GetRelatedSubjects(c echo.Context) error {
-	u := accessor.FromCtx(c)
 	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	_, relations, err := h.ctrl.GetCharacterRelatedSubjects(c.Request().Context(), u.Auth, id)
+	_, relations, err := h.getCharacterRelatedSubjects(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -44,17 +46,60 @@ func (h Character) GetRelatedSubjects(c echo.Context) error {
 
 	var response = make([]res.CharacterRelatedSubject, len(relations))
 	for i, relation := range relations {
-		subject := relation.Subject
+		s := relation.Subject
 		response[i] = res.CharacterRelatedSubject{
-			ID:     subject.ID,
-			Name:   subject.Name,
-			NameCn: subject.NameCN,
+			ID:     s.ID,
+			Name:   s.Name,
+			NameCn: s.NameCN,
 			Staff:  characterStaffString(relation.TypeID),
-			Image:  res.SubjectImage(subject.Image).Large,
+			Image:  res.SubjectImage(s.Image).Large,
 		}
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h Character) getCharacterRelatedSubjects(
+	ctx context.Context,
+	characterID model.CharacterID,
+) (model.Character, []model.SubjectCharacterRelation, error) {
+	character, err := h.c.Get(ctx, characterID)
+	if err != nil {
+		return model.Character{}, nil, errgo.Wrap(err, "get character")
+	}
+
+	if character.Redirect != 0 {
+		return model.Character{}, nil, domain.ErrCharacterNotFound
+	}
+
+	relations, err := h.subject.GetCharacterRelated(ctx, characterID)
+	if err != nil {
+		return model.Character{}, nil, errgo.Wrap(err, "SubjectRepo.GetCharacterRelated")
+	}
+
+	var subjectIDs = slice.Map(relations, func(item domain.SubjectCharacterRelation) model.SubjectID {
+		return item.SubjectID
+	})
+
+	subjects, err := h.subject.GetByIDs(ctx, subjectIDs, subject.Filter{})
+	if err != nil {
+		return model.Character{}, nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
+	}
+
+	var results = make([]model.SubjectCharacterRelation, 0, len(relations))
+	for _, rel := range relations {
+		s, ok := subjects[rel.SubjectID]
+		if !ok {
+			continue
+		}
+		results = append(results, model.SubjectCharacterRelation{
+			Subject:   s,
+			TypeID:    rel.TypeID,
+			Character: character,
+		})
+	}
+
+	return character, results, nil
 }
 
 func characterStaffString(i uint8) string {
