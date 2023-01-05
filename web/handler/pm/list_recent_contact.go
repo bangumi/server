@@ -30,7 +30,7 @@ func (h PrivateMessage) ListRecentContact(c echo.Context) error {
 	if err != nil {
 		return res.InternalError(c, err, "failed to list recent contact")
 	}
-	contacts, err := h.ctrl.GetUsersByIDs(c.Request().Context(), contactIDs)
+	contacts, err := h.u.GetByIDs(c.Request().Context(), contactIDs)
 	if err != nil {
 		return res.InternalError(c, err, "failed to get contacts")
 	}

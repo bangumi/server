@@ -64,7 +64,7 @@ func (h PrivateMessage) List(c echo.Context) error {
 	}
 	userIDs[len(userIDs)-1] = accessor.ID
 	userIDs = lo.Uniq(userIDs)
-	users, err := h.ctrl.GetUsersByIDs(c.Request().Context(), userIDs)
+	users, err := h.u.GetByIDs(c.Request().Context(), userIDs)
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}

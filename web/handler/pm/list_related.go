@@ -46,7 +46,7 @@ func (h PrivateMessage) ListRelated(c echo.Context) error {
 		return res.InternalError(c, err, "failed to list related private messages")
 	}
 	userIDs := []model.UserID{list[0].SenderID, list[0].ReceiverID}
-	users, err := h.ctrl.GetUsersByIDs(c.Request().Context(), userIDs)
+	users, err := h.u.GetByIDs(c.Request().Context(), userIDs)
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}

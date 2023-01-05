@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/handler/common"
 	"github.com/bangumi/server/web/session"
 )
@@ -37,6 +38,7 @@ func New(
 	ctrl ctrl.Ctrl,
 	session session.Manager,
 	search search.Handler,
+	u user.Repo,
 	log *zap.Logger,
 ) Handler {
 	return Handler{
@@ -45,6 +47,7 @@ func New(
 		cache:    cache,
 		log:      log.Named("web.handler"),
 		session:  session,
+		u:        u,
 		a:        a,
 		i:        index,
 		search:   search,
@@ -60,6 +63,7 @@ type Handler struct {
 	cache    cache.RedisCache
 	a        auth.Service
 	session  session.Manager
+	u        user.Repo
 	i        index.Repo
 	search   search.Handler
 	buffPool buffer.Pool

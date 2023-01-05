@@ -19,6 +19,7 @@ import (
 
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/pm"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/handler/common"
 )
 
@@ -26,6 +27,7 @@ type PrivateMessage struct {
 	ctrl ctrl.Ctrl
 	common.Common
 	pmRepo pm.Repo
+	u      user.Repo
 	log    *zap.Logger
 }
 
@@ -33,11 +35,13 @@ func New(
 	common common.Common,
 	pmRepo pm.Repo,
 	ctrl ctrl.Ctrl,
+	user user.Repo,
 	log *zap.Logger,
 ) (PrivateMessage, error) {
 	return PrivateMessage{
 		Common: common,
 		ctrl:   ctrl,
+		u:      user,
 		pmRepo: pmRepo,
 		log:    log.Named("handler.PrivateMessage"),
 	}, nil

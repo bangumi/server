@@ -65,7 +65,7 @@ func (h PrivateMessage) Create(c echo.Context) error {
 	userIDs := make([]model.UserID, len(r.ReceiverIDs)+1)
 	copy(userIDs, receiverIDs)
 	userIDs[len(userIDs)-1] = accessor.ID
-	users, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(userIDs))
+	users, err := h.u.GetByIDs(c.Request().Context(), lo.Uniq(userIDs))
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}

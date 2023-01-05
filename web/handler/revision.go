@@ -78,7 +78,7 @@ func (h Handler) listPersonRevision(c echo.Context, personID model.PersonID, pag
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
+	creatorMap, err := h.u.GetByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -105,7 +105,7 @@ func (h Handler) GetPersonRevision(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get person related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.u.GetByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -158,7 +158,7 @@ func (h Handler) listCharacterRevision(c echo.Context, characterID model.Charact
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
+	creatorMap, err := h.u.GetByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -189,7 +189,7 @@ func (h Handler) GetCharacterRevision(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get character related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.u.GetByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -243,7 +243,7 @@ func (h Handler) listSubjectRevision(c echo.Context, subjectID model.SubjectID, 
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
+	creatorMap, err := h.u.GetByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -269,7 +269,7 @@ func (h Handler) GetSubjectRevision(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get subject related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.u.GetByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}

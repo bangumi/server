@@ -48,7 +48,7 @@ func (h Handler) GetEpisodeRevision(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get episode related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.u.GetByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -101,7 +101,7 @@ func (h Handler) listEpisodeRevision(c echo.Context, episodeID model.EpisodeID, 
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
+	creatorMap, err := h.u.GetByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
