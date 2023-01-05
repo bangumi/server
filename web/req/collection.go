@@ -15,6 +15,9 @@
 package req
 
 import (
+	"strings"
+	"unicode/utf8"
+
 	"github.com/samber/lo"
 
 	"github.com/bangumi/server/internal/model"
@@ -37,7 +40,7 @@ type SubjectEpisodeCollectionPatch struct {
 	Private   null.Bool                          `json:"private"`
 }
 
-func (v SubjectEpisodeCollectionPatch) Validate() error {
+func (v *SubjectEpisodeCollectionPatch) Validate() error {
 	if v.Rate.Set {
 		if v.Rate.Value > 10 {
 			return res.BadRequest("rate overflow")
@@ -53,6 +56,11 @@ func (v SubjectEpisodeCollectionPatch) Validate() error {
 	if v.Comment.Set {
 		if !dam.AllPrintableChar(v.Comment.Value) {
 			return res.BadRequest("invisible character are included in comment")
+		}
+
+		v.Comment.Value = strings.TrimSpace(v.Comment.Value)
+		if utf8.RuneCountInString(v.Comment.Value) > 200 {
+			return res.BadRequest("comment too lang, only allow less equal than 200 characters")
 		}
 	}
 

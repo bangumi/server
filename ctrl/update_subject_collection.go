@@ -19,7 +19,6 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/samber/lo"
@@ -71,10 +70,6 @@ func (ctl Ctrl) UpdateCollection(
 		} else {
 			privacy = null.New(model.CollectPrivacyNone)
 		}
-	}
-
-	if req.Comment.Set {
-		req.Comment.Value = strings.TrimSpace(req.Comment.Value)
 	}
 
 	if comment := req.Comment.Default(original.Comment); comment != "" {
