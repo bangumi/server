@@ -46,3 +46,16 @@ func TestClientFullExample(t *testing.T) {
 	require.Equal(t, 5, r.I)
 	require.Equal(t, "v", r.Q)
 }
+
+func TestPathWithQuery(t *testing.T) {
+	t.Parallel()
+	app := echo.New()
+
+	app.GET("/test", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, res{I: 5, Q: c.QueryParam("q")})
+	})
+
+	req := test.New(t).Get("/test?a=1").Query("a", "2").Query("b", "3")
+
+	require.Equal(t, "/test?a=1&a=2&b=3", req.StdRequest().RequestURI)
+}

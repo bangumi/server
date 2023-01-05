@@ -62,19 +62,19 @@ func (r *Request) newRequest(httpVerb string, endpoint string) *Request {
 	return r
 }
 
-func (r *Request) Get(path string) *Request {
+func (r *Request) Get(entrypoint string) *Request {
 	r.t.Helper()
-	return r.newRequest(http.MethodGet, path)
+	return r.newRequest(http.MethodGet, entrypoint)
 }
 
-func (r *Request) Post(path string) *Request {
+func (r *Request) Post(entrypoint string) *Request {
 	r.t.Helper()
-	return r.newRequest(http.MethodPost, path)
+	return r.newRequest(http.MethodPost, entrypoint)
 }
 
-func (r *Request) Put(path string) *Request {
+func (r *Request) Put(entrypoint string) *Request {
 	r.t.Helper()
-	return r.newRequest(http.MethodPut, path)
+	return r.newRequest(http.MethodPut, entrypoint)
 }
 
 func (r *Request) Patch(path string) *Request {
@@ -82,9 +82,9 @@ func (r *Request) Patch(path string) *Request {
 	return r.newRequest(http.MethodPatch, path)
 }
 
-func (r *Request) Delete(path string) *Request {
+func (r *Request) Delete(entrypoint string) *Request {
 	r.t.Helper()
-	return r.newRequest(http.MethodDelete, path)
+	return r.newRequest(http.MethodDelete, entrypoint)
 }
 
 func (r *Request) Cookie(key, value string) *Request {
@@ -153,12 +153,21 @@ func (r *Request) StdRequest() *http.Request {
 
 	path := r.endpoint
 	if len(r.urlQuery) > 0 {
-		var sep = "?"
-		if strings.Contains(r.endpoint, "?") {
-			sep = "&"
+		u, err := url.ParseRequestURI(r.endpoint)
+		require.NoError(r.t, err)
+
+		q, err := url.ParseQuery(u.RawQuery)
+		require.NoError(r.t, err)
+
+		for key, values := range r.urlQuery {
+			for _, value := range values {
+				q.Add(key, value)
+			}
 		}
 
-		path = r.endpoint + sep + r.urlQuery.Encode()
+		u.RawQuery = q.Encode()
+
+		path = u.Path + "?" + q.Encode()
 	}
 
 	req := httptest.NewRequest(r.httpVerb, path, body)
