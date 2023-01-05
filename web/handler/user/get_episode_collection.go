@@ -22,8 +22,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -97,9 +99,15 @@ func (h User) GetSubjectEpisodeCollection(c echo.Context) error {
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 
-	episodes, count, err := h.ctrl.ListEpisode(c.Request().Context(), subjectID, episodeType, page.Limit, page.Offset)
+	count, err := h.episode.Count(c.Request().Context(), subjectID, episode.Filter{Type: null.NewFromPtr(episodeType)})
 	if err != nil {
-		return errgo.Wrap(err, "query.ListEpisode")
+		return errgo.Wrap(err, "count episodes")
+	}
+
+	episodes, err := h.episode.List(c.Request().Context(), subjectID,
+		episode.Filter{Type: null.NewFromPtr(episodeType)}, page.Limit, page.Offset)
+	if err != nil {
+		return errgo.Wrap(err, "list episodes")
 	}
 
 	var data []ResUserEpisodeCollection

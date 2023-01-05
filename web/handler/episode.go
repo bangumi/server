@@ -21,8 +21,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -92,17 +92,29 @@ func (h Handler) ListEpisode(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get subject")
 	}
 
-	episodes, count, err := h.ctrl.ListEpisode(c.Request().Context(), subjectID, epType, page.Limit, page.Offset)
+	filter := episode.Filter{Type: null.NewFromPtr(epType)}
+
+	count, err := h.episode.Count(c.Request().Context(), subjectID, filter)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrOffsetTooBig) {
-			return res.BadRequest("offset should be less than or equal to " + strconv.FormatInt(count, 10))
-		}
-		return errgo.Wrap(err, "failed to list episode")
+		return errgo.Wrap(err, "failed to count episode")
 	}
 
-	var data = make([]res.Episode, len(episodes))
-	for i, episode := range episodes {
-		data[i] = res.ConvertModelEpisode(episode)
+	if count == 0 {
+		return c.JSON(http.StatusOK, res.Paged{
+			Limit:  page.Limit,
+			Offset: page.Offset,
+			Data:   res.EmptySlice(),
+			Total:  count,
+		})
+	}
+
+	if int64(page.Offset) > count {
+		return res.BadRequest("offset should be less than or equal to " + strconv.FormatInt(count, 10))
+	}
+
+	episodes, err := h.episode.List(c.Request().Context(), subjectID, filter, page.Limit, page.Offset)
+	if err != nil {
+		return errgo.Wrap(err, "failed to list episode")
 	}
 
 	return c.JSON(http.StatusOK, res.PagedG[res.Episode]{
