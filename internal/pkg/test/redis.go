@@ -27,6 +27,8 @@ import (
 func GetRedis(tb testing.TB) *redis.Client {
 	tb.Helper()
 
+	RequireEnv(tb, EnvRedis)
+
 	cfg, err := config.NewAppConfig()
 	require.NoError(tb, err)
 	db, err := driver.NewRedisClient(cfg)

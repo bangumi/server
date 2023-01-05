@@ -125,7 +125,6 @@ func TestRedisCache_Get_Broken(t *testing.T) {
 
 func TestRedisCache_Real(t *testing.T) {
 	t.Parallel()
-	test.RequireEnv(t, "redis")
 
 	var key = t.Name() + "redis_key"
 
@@ -146,7 +145,6 @@ func TestRedisCache_Real(t *testing.T) {
 
 func TestRedisCache_Del(t *testing.T) {
 	t.Parallel()
-	test.RequireEnv(t, test.EnvRedis)
 
 	var key = t.Name() + "redis_test "
 

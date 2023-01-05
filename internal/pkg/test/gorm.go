@@ -32,6 +32,8 @@ import (
 
 func GetQuery(tb testing.TB) *query.Query {
 	tb.Helper()
+	RequireEnv(tb, EnvRedis)
+
 	cfg, err := config.NewAppConfig()
 	require.NoError(tb, err)
 	db, err := newGorm(tb, cfg)
@@ -42,6 +44,8 @@ func GetQuery(tb testing.TB) *query.Query {
 
 func GetGorm(tb testing.TB) *gorm.DB {
 	tb.Helper()
+	RequireEnv(tb, EnvRedis)
+
 	cfg, err := config.NewAppConfig()
 	require.NoError(tb, err)
 	db, err := newGorm(tb, cfg)

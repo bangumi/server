@@ -29,6 +29,8 @@ import (
 
 const defaultRedisPoolSize = 4
 
+// NewRedisClient create a redis client
+// use [test.GetRedis] in tests.
 func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
 	redisOptions, err := redis.ParseURL(c.RedisURL)
 	if err != nil {
