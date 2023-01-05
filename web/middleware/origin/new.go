@@ -28,12 +28,12 @@ func New(allowed string) echo.MiddlewareFunc {
 		return dev(allowed)
 	}
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(ctx echo.Context) error {
-			if ctx.Request().Method == http.MethodGet {
-				return next(ctx)
+		return func(c echo.Context) error {
+			if c.Request().Method == http.MethodGet {
+				return next(c)
 			}
 
-			origin := ctx.Get(echo.HeaderOrigin)
+			origin := c.Get(echo.HeaderOrigin)
 			if origin == "" {
 				return res.BadRequest("empty origin is not allowed")
 			}
@@ -41,15 +41,15 @@ func New(allowed string) echo.MiddlewareFunc {
 				return res.BadRequest("cross-site request is not allowed")
 			}
 
-			return next(ctx)
+			return next(c)
 		}
 	}
 }
 
 func dev(allowed string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(ctx echo.Context) error {
-			return next(ctx)
+		return func(c echo.Context) error {
+			return next(c)
 		}
 	}
 }

@@ -48,7 +48,7 @@ type Client interface {
 // Handler
 // TODO: 想个办法挪到 web 里面去.
 type Handler interface {
-	Handle(ctx echo.Context, auth *accessor.Accessor) error
+	Handle(c echo.Context, auth *accessor.Accessor) error
 }
 
 const defaultLimit = 50

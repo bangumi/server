@@ -29,14 +29,14 @@ import (
 )
 
 func (h Common) MiddlewareAccessTokenAuth(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		var a = accessor.NewFromCtx(ctx)
+	return func(c echo.Context) error {
+		var a = accessor.NewFromCtx(c)
 		defer a.Free()
 
-		authorization := ctx.Request().Header.Get(echo.HeaderAuthorization)
+		authorization := c.Request().Header.Get(echo.HeaderAuthorization)
 		if authorization == "" {
-			ctx.Set(ctxkey.User, a)
-			return next(ctx)
+			c.Set(ctxkey.User, a)
+			return next(c)
 		}
 
 		key, token, found := strings.Cut(authorization, " ")
@@ -48,7 +48,7 @@ func (h Common) MiddlewareAccessTokenAuth(next echo.HandlerFunc) echo.HandlerFun
 			return res.Unauthorized("http Authorization header has wrong scope")
 		}
 
-		auth, err := h.auth.GetByToken(ctx.Request().Context(), token)
+		auth, err := h.auth.GetByToken(c.Request().Context(), token)
 		if err != nil {
 			if errors.Is(err, domain.ErrNotFound) || errors.Is(err, session.ErrExpired) {
 				return res.Unauthorized("access token has been expired or doesn't exist")
@@ -59,7 +59,7 @@ func (h Common) MiddlewareAccessTokenAuth(next echo.HandlerFunc) echo.HandlerFun
 
 		a.SetAuth(auth)
 
-		ctx.Set(ctxkey.User, a)
-		return next(ctx)
+		c.Set(ctxkey.User, a)
+		return next(c)
 	}
 }
