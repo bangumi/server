@@ -15,13 +15,19 @@
 package subject
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -35,7 +41,7 @@ func (h Subject) GetRelatedSubjects(c echo.Context) error {
 
 	u := accessor.FromCtx(c)
 
-	relations, err := h.ctrl.GetSubjectRelatedSubjects(c.Request().Context(), u.Auth, id)
+	relations, err := h.getSubjectRelatedSubjects(c.Request().Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -57,4 +63,49 @@ func (h Subject) GetRelatedSubjects(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h Subject) getSubjectRelatedSubjects(
+	ctx context.Context,
+	user auth.Auth,
+	subjectID model.SubjectID,
+) ([]model.SubjectInternalRelation, error) {
+	currentSubject, err := h.subject.Get(ctx, subjectID, subject.Filter{NSFW: null.Bool{
+		Value: false, Set: !user.AllowNSFW(),
+	}})
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return nil, res.ErrNotFound
+		}
+		return nil, errgo.Wrap(err, "failed to get subject")
+	}
+
+	relations, err := h.subject.GetSubjectRelated(ctx, subjectID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "SubjectRepo.GetSubjectRelated")
+	}
+
+	subjects, err := h.subject.GetByIDs(ctx,
+		slice.Map(relations, func(r domain.SubjectInternalRelation) model.SubjectID { return r.DestinationID }),
+		subject.Filter{NSFW: null.Bool{Value: false, Set: !user.AllowNSFW()}},
+	)
+	if err != nil {
+		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
+	}
+
+	var results = make([]model.SubjectInternalRelation, 0, len(relations))
+	for _, rel := range relations {
+		s, ok := subjects[rel.DestinationID]
+		if !ok {
+			continue
+		}
+
+		results = append(results, model.SubjectInternalRelation{
+			Destination: s,
+			TypeID:      rel.TypeID,
+			Source:      currentSubject,
+		})
+	}
+
+	return results, nil
 }

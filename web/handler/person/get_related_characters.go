@@ -15,13 +15,16 @@
 package person
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
@@ -45,7 +48,7 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 		return res.ErrNotFound
 	}
 
-	relations, err := h.ctrl.GetPersonRelatedCharacters(c.Request().Context(), id)
+	relations, err := h.getPersonRelatedCharacters(c.Request().Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
@@ -64,4 +67,50 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h Person) getPersonRelatedCharacters(
+	ctx context.Context, personID model.PersonID,
+) ([]model.PersonCharacterRelation, error) {
+	relations, err := h.c.GetPersonRelated(ctx, personID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "CharacterRepo.GetPersonRelated")
+	}
+
+	if len(relations) == 0 {
+		return []model.PersonCharacterRelation{}, nil
+	}
+
+	var characterIDs = make([]model.CharacterID, len(relations))
+	var subjectIDs = make([]model.SubjectID, len(relations))
+	for i, relation := range relations {
+		characterIDs[i] = relation.CharacterID
+		subjectIDs[i] = relation.SubjectID
+	}
+
+	characters, err := h.c.GetByIDs(ctx, characterIDs)
+	if err != nil {
+		return nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
+	}
+
+	subjects, err := h.subject.GetByIDs(ctx, subjectIDs, subject.Filter{})
+	if err != nil {
+		return nil, errgo.Wrap(err, "SubjectRepo.GetByIDs")
+	}
+
+	person, err := h.person.Get(ctx, personID)
+	if err != nil {
+		return nil, errgo.Wrap(err, "PersonRepo.GetByIDs")
+	}
+
+	var results = make([]model.PersonCharacterRelation, len(relations))
+	for i, rel := range relations {
+		results[i] = model.PersonCharacterRelation{
+			Character: characters[rel.CharacterID],
+			Person:    person,
+			Subject:   subjects[rel.SubjectID],
+		}
+	}
+
+	return results, nil
 }

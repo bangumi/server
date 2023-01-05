@@ -16,6 +16,7 @@ package subject
 
 import (
 	"github.com/bangumi/server/ctrl"
+	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
 )
@@ -24,15 +25,18 @@ type Subject struct {
 	ctrl    ctrl.Ctrl
 	person  person.Service
 	subject subject.Repo
+	c       character.Repo
 }
 
 func New(
 	p person.Service,
 	ctrl ctrl.Ctrl,
 	subject subject.Repo,
+	c character.Repo,
 ) (Subject, error) {
 	return Subject{
 		ctrl:    ctrl,
+		c:       c,
 		subject: subject,
 		person:  p,
 	}, nil

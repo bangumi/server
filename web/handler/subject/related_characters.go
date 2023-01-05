@@ -15,15 +15,19 @@
 package subject
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -36,7 +40,7 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 		return err
 	}
 
-	_, relations, err := h.ctrl.GetSubjectRelatedCharacters(c.Request().Context(), u.Auth, subjectID)
+	_, relations, err := h.getSubjectRelatedCharacters(c.Request().Context(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -67,6 +71,46 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h Subject) getSubjectRelatedCharacters(
+	ctx context.Context,
+	user auth.Auth,
+	subjectID model.SubjectID,
+) (model.Subject, []model.SubjectCharacterRelation, error) {
+	s, err := h.subject.Get(ctx, subjectID, subject.Filter{NSFW: null.Bool{
+		Value: false, Set: !user.AllowNSFW(),
+	}})
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return s, nil, res.ErrNotFound
+		}
+		return s, nil, errgo.Wrap(err, "failed to get subject")
+	}
+
+	relations, err := h.c.GetSubjectRelated(ctx, subjectID)
+	if err != nil {
+		return s, nil, errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
+	}
+
+	var characterIDs = slice.Map(relations, func(item domain.SubjectCharacterRelation) model.CharacterID {
+		return item.CharacterID
+	})
+
+	characters, err := h.c.GetByIDs(ctx, characterIDs)
+	if err != nil {
+		return s, nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
+	}
+
+	var results = make([]model.SubjectCharacterRelation, len(relations))
+	for i, rel := range relations {
+		results[i] = model.SubjectCharacterRelation{
+			Character: characters[rel.CharacterID],
+			TypeID:    rel.TypeID,
+		}
+	}
+
+	return s, results, nil
 }
 
 func toActors(persons []model.Person) []res.Actor {
