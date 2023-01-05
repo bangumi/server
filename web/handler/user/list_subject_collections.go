@@ -32,7 +32,7 @@ import (
 )
 
 func (h User) ListSubjectCollection(c echo.Context) error {
-	v := accessor.FromCtx(c)
+	v := accessor.GetFromCtx(c)
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err

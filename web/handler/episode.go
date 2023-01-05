@@ -33,7 +33,7 @@ import (
 )
 
 func (h Handler) GetEpisode(c echo.Context) error {
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 
 	id, err := req.ParseEpisodeID(c.Param("id"))
 	if err != nil {
@@ -64,7 +64,7 @@ func (h Handler) GetEpisode(c echo.Context) error {
 }
 
 func (h Handler) ListEpisode(c echo.Context) error {
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 
 	page, err := req.GetPageQuery(c, req.EpisodeDefaultLimit, req.EpisodeMaxLimit)
 	if err != nil {

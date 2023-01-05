@@ -22,10 +22,16 @@ import (
 	"github.com/bangumi/server/web/internal/ctxkey"
 )
 
-func FromCtx(c echo.Context) *Accessor {
+func NewFromCtx(c echo.Context) *Accessor {
+	a := Get()
+	a.fillBasicInfo(c)
+	return a
+}
+
+func GetFromCtx(c echo.Context) *Accessor {
 	raw := c.Get(ctxkey.User)
 	if raw == nil {
-		return &Accessor{}
+		return NewFromCtx(c)
 	}
 
 	u, ok := raw.(*Accessor)

@@ -33,9 +33,8 @@ import (
 
 func (h Common) MiddlewareSessionAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var a = accessor.Get()
-		defer accessor.Put(a)
-		a.FillBasicInfo(c)
+		var a = accessor.NewFromCtx(c)
+		defer a.Free()
 
 		co, err := c.Cookie(session.CookieKey)
 		if err != nil {

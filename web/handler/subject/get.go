@@ -39,7 +39,7 @@ import (
 )
 
 func (h Subject) Get(c echo.Context) error {
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 
 	id, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil {
@@ -87,7 +87,7 @@ func platformString(s model.Subject) *string {
 }
 
 func (h Subject) GetImage(c echo.Context) error {
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 
 	id, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil || id == 0 {

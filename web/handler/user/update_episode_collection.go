@@ -71,7 +71,7 @@ func (h User) PatchEpisodeCollectionBatch(c echo.Context) error {
 		return err
 	}
 
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 	err = h.ctrl.UpdateEpisodesCollection(c.Request().Context(), u.Auth, subjectID, r.EpisodeID, r.Type)
 	if err != nil {
 		switch {
@@ -103,7 +103,7 @@ func (h User) PutEpisodeCollection(c echo.Context) error {
 		return res.JSONError(c, err)
 	}
 
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 	err = h.ctrl.UpdateEpisodeCollection(c.Request().Context(), u.Auth, episodeID, r.Type)
 	if err != nil {
 		switch {

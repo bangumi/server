@@ -31,7 +31,7 @@ import (
 )
 
 func (h Subject) GetRelatedPersons(c echo.Context) error {
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 
 	id, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil || id == 0 {

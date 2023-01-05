@@ -30,7 +30,7 @@ import (
 )
 
 func (h PrivateMessage) ListRelated(c echo.Context) error {
-	accessor := accessor.FromCtx(c)
+	accessor := accessor.GetFromCtx(c)
 	relatedID, err := req.ParsePrivateMessageID(c.Param("id"))
 	if err != nil {
 		return err

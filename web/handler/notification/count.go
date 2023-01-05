@@ -24,7 +24,7 @@ import (
 )
 
 func (h Notification) Count(c echo.Context) error {
-	auth := accessor.FromCtx(c)
+	auth := accessor.GetFromCtx(c)
 	count, err := h.notificationRepo.Count(c.Request().Context(), auth.ID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to count notification")

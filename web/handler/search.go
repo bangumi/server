@@ -21,5 +21,5 @@ import (
 )
 
 func (h Handler) Search(c echo.Context) error {
-	return h.search.Handle(c, accessor.FromCtx(c)) //nolint:wrapcheck
+	return h.search.Handle(c, accessor.GetFromCtx(c)) //nolint:wrapcheck
 }

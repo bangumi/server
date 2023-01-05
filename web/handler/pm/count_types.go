@@ -24,7 +24,7 @@ import (
 )
 
 func (h PrivateMessage) CountTypes(c echo.Context) error {
-	accessor := accessor.FromCtx(c)
+	accessor := accessor.GetFromCtx(c)
 	counts, err := h.pmRepo.CountTypes(c.Request().Context(), accessor.ID)
 	if err != nil {
 		return res.InternalError(c, err, "failed to count private message types")

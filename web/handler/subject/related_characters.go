@@ -35,7 +35,7 @@ import (
 )
 
 func (h Subject) GetRelatedCharacters(c echo.Context) error {
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 	subjectID, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil {
 		return err

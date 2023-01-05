@@ -46,7 +46,7 @@ func (h User) GetSubjectCollection(c echo.Context) error {
 
 func (h User) getSubjectCollection(c echo.Context, username string, subjectID model.SubjectID) error {
 	const notFoundMessage = "subject is not collected by user"
-	v := accessor.FromCtx(c)
+	v := accessor.GetFromCtx(c)
 
 	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{NSFW: null.Bool{Set: !v.AllowNSFW()}})
 	if err != nil {

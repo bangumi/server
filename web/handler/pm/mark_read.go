@@ -29,7 +29,7 @@ import (
 )
 
 func (h PrivateMessage) MarkRead(c echo.Context) error {
-	accessor := accessor.FromCtx(c)
+	accessor := accessor.GetFromCtx(c)
 	var r req.PrivateMessageMarkRead
 	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
 		return res.JSONError(c, err)

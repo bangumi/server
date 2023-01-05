@@ -25,7 +25,7 @@ import (
 )
 
 func (h User) GetCurrent(c echo.Context) error {
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 	if !u.Login || u.ID == 0 {
 		return res.Unauthorized("need Login")
 	}

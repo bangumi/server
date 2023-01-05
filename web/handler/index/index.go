@@ -34,7 +34,7 @@ import (
 )
 
 func (h Handler) GetIndex(c echo.Context) error {
-	user := accessor.FromCtx(c)
+	user := accessor.GetFromCtx(c)
 
 	id, err := req.ParseIndexID(c.Param("id"))
 	if err != nil {
@@ -91,7 +91,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 }
 
 func (h Handler) GetIndexSubjects(c echo.Context) error {
-	user := accessor.FromCtx(c)
+	user := accessor.GetFromCtx(c)
 
 	id, err := req.ParseIndexID(c.Param("id"))
 	if err != nil {
@@ -167,7 +167,7 @@ func (h Handler) NewIndex(c echo.Context) error {
 	if err := h.ensureValidStrings(reqData.Description, reqData.Title); err != nil {
 		return err
 	}
-	accessor := accessor.FromCtx(c)
+	accessor := accessor.GetFromCtx(c)
 	now := time.Now()
 	i := &model.Index{
 		ID:          0,
@@ -196,7 +196,7 @@ func (h Handler) NewIndex(c echo.Context) error {
 
 // 确保目录存在, 并且当前请求的用户持有权限.
 func (h Handler) ensureIndexPermission(c echo.Context, indexID uint32) (*model.Index, error) {
-	accessor := accessor.FromCtx(c)
+	accessor := accessor.GetFromCtx(c)
 	index, err := h.i.Get(c.Request().Context(), indexID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {

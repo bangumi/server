@@ -24,7 +24,7 @@ var errNeedLogin = res.Unauthorized("this API need authorization")
 
 func NeedLogin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if u := FromCtx(c); !u.Login {
+		if u := GetFromCtx(c); !u.Login {
 			return errNeedLogin
 		}
 

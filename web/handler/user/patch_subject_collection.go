@@ -56,7 +56,7 @@ func (h User) patchSubjectCollection(
 	subjectID model.SubjectID,
 	r req.SubjectEpisodeCollectionPatch,
 ) error {
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 
 	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{NSFW: null.Bool{Set: !u.AllowNSFW()}})
 	if err != nil {

@@ -29,7 +29,7 @@ import (
 )
 
 func (h PrivateMessage) List(c echo.Context) error {
-	accessor := accessor.FromCtx(c)
+	accessor := accessor.GetFromCtx(c)
 	folder, err := req.ParsePrivateMessageFolder(c.QueryParam("folder"))
 	if err != nil {
 		return err

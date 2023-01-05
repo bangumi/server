@@ -26,7 +26,7 @@ import (
 )
 
 func (h PrivateMessage) ListRecentContact(c echo.Context) error {
-	accessor := accessor.FromCtx(c)
+	accessor := accessor.GetFromCtx(c)
 	contactIDs, err := h.pmRepo.ListRecentContact(c.Request().Context(), accessor.ID)
 	if err != nil {
 		return res.InternalError(c, err, "failed to list recent contact")

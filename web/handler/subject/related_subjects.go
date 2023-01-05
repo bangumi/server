@@ -39,7 +39,7 @@ func (h Subject) GetRelatedSubjects(c echo.Context) error {
 		return err
 	}
 
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 
 	relations, err := h.getSubjectRelatedSubjects(c.Request().Context(), u.Auth, id)
 	if err != nil {

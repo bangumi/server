@@ -34,7 +34,7 @@ func (a *Accessor) AllowNSFW() bool {
 	return a.Login && a.Auth.AllowNSFW()
 }
 
-func (a *Accessor) FillBasicInfo(c echo.Context) {
+func (a *Accessor) fillBasicInfo(c echo.Context) {
 	a.Login = false
 	a.RequestID = c.Request().Header.Get(cf.HeaderRequestID)
 	a.IP = c.RealIP()
@@ -64,4 +64,8 @@ func (a *Accessor) reset() {
 	a.IP = ""
 	a.Login = false
 	a.Auth = auth.Auth{}
+}
+
+func (a *Accessor) Free() {
+	Put(a)
 }

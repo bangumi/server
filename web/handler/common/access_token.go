@@ -30,9 +30,8 @@ import (
 
 func (h Common) MiddlewareAccessTokenAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		var a = accessor.Get()
-		defer accessor.Put(a)
-		a.FillBasicInfo(ctx)
+		var a = accessor.NewFromCtx(ctx)
+		defer a.Free()
 
 		authorization := ctx.Request().Header.Get(echo.HeaderAuthorization)
 		if authorization == "" {

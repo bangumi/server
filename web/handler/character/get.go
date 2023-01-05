@@ -30,7 +30,7 @@ import (
 )
 
 func (h Character) Get(c echo.Context) error {
-	u := accessor.FromCtx(c)
+	u := accessor.GetFromCtx(c)
 	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err

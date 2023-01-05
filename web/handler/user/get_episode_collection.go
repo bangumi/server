@@ -38,7 +38,7 @@ type ResUserEpisodeCollection struct {
 }
 
 func (h User) GetEpisodeCollection(c echo.Context) error {
-	v := accessor.FromCtx(c)
+	v := accessor.GetFromCtx(c)
 	episodeID, err := req.ParseEpisodeID(c.Param("episode_id"))
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (h User) GetEpisodeCollection(c echo.Context) error {
 
 // GetSubjectEpisodeCollection return episodes with user's collection info.
 func (h User) GetSubjectEpisodeCollection(c echo.Context) error {
-	v := accessor.FromCtx(c)
+	v := accessor.GetFromCtx(c)
 	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
 	if err != nil {
 		return err
