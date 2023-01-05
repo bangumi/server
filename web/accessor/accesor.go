@@ -21,7 +21,6 @@ import (
 
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/web/req/cf"
-	"github.com/bangumi/server/web/util"
 )
 
 type Accessor struct {
@@ -38,7 +37,7 @@ func (a *Accessor) AllowNSFW() bool {
 func (a *Accessor) FillBasicInfo(c echo.Context) {
 	a.Login = false
 	a.RequestID = c.Request().Header.Get(cf.HeaderRequestID)
-	a.IP = util.RequestIP(c)
+	a.IP = c.RealIP()
 }
 
 func (a *Accessor) SetAuth(auth auth.Auth) {

@@ -167,7 +167,7 @@ func (r *Request) StdRequest() *http.Request {
 		req.AddCookie(&http.Cookie{Name: name, Value: value})
 	}
 
-	req.RemoteAddr = "0.0.0.0"
+	req.RemoteAddr = "0.0.0.0:3000"
 
 	return req
 }

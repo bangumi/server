@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/pprof"
 	"strconv"
@@ -74,6 +75,16 @@ func New() *echo.Echo {
 	app.HideBanner = true
 	app.HidePort = true
 
+	app.IPExtractor = func(request *http.Request) string {
+		ip := request.Header.Get(cf.HeaderRequestIP)
+		if ip == "" {
+			ra, _, _ := net.SplitHostPort(request.RemoteAddr)
+			return ra
+		}
+
+		return ip
+	}
+
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			metrics.RequestCount.Inc()
@@ -94,7 +105,6 @@ func New() *echo.Echo {
 			return func(c echo.Context) error {
 				devRequestID := "fake-ray-" + random.Base62String(10)
 				c.Request().Header.Set(cf.HeaderRequestID, devRequestID)
-				c.Request().Header.Set(cf.HeaderRequestIP, c.Request().RemoteAddr)
 				c.Set(cf.HeaderRequestID, devRequestID)
 
 				return next(c)
@@ -112,7 +122,7 @@ func New() *echo.Echo {
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			reqID := c.Request().Header.Get(cf.HeaderRequestID)
-			reqIP := c.Request().Header.Get(cf.HeaderRequestIP)
+			reqIP := c.RealIP()
 
 			c.SetRequest(c.Request().
 				WithContext(context.WithValue(context.Background(), logger.RequestKey, &logger.RequestTrace{
@@ -137,6 +147,11 @@ func New() *echo.Echo {
 	if env.Development {
 		// fasthttp bug, it uses an internal global variable and causing data race here
 		app.Static("/openapi/", "./openapi/")
+		app.GET("/debug", func(c echo.Context) error {
+			return c.JSON(http.StatusOK, echo.Map{
+				"ip": c.RealIP(),
+			})
+		})
 	} else {
 		app.StaticFS("/openapi/", openapi.Static)
 	}
