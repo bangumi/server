@@ -16,11 +16,9 @@ package web
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
-	"net/http/pprof"
 	"strconv"
 	"strings"
 	"time"
@@ -30,8 +28,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/config/env"
@@ -39,12 +35,9 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/pkg/random"
 	"github.com/bangumi/server/openapi"
 	"github.com/bangumi/server/web/middleware/recovery"
 	"github.com/bangumi/server/web/req/cf"
-	"github.com/bangumi/server/web/res"
-	"github.com/bangumi/server/web/util"
 )
 
 const headerProcessTime = "x-process-time-ms"
@@ -101,15 +94,7 @@ func New() *echo.Echo {
 	})
 
 	if env.Development {
-		app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				devRequestID := "fake-ray-" + random.Base62String(10)
-				c.Request().Header.Set(cf.HeaderRequestID, devRequestID)
-				c.Set(cf.HeaderRequestID, devRequestID)
-
-				return next(c)
-			}
-		})
+		app.Use(genFakeRequestID)
 	}
 
 	app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -159,12 +144,18 @@ func New() *echo.Echo {
 	return app
 }
 
-func addProfile(app *echo.Echo) {
-	app.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
-	app.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
-	app.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
-	app.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
-	app.Any("/debug/pprof/", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
+// NewTestingApp create a base echo App for testing
+// default production echo app handle panic, this doesn't.
+func NewTestingApp() *echo.Echo {
+	app := echo.New()
+	app.JSONSerializer = echoJSONSerializer{}
+	app.HTTPErrorHandler = getDefaultErrorHandler()
+	app.HideBanner = true
+	app.HidePort = true
+
+	app.Use(genFakeRequestID)
+
+	return app
 }
 
 func Start(c config.AppConfig, app *echo.Echo) error {
@@ -175,54 +166,4 @@ func Start(c config.AppConfig, app *echo.Echo) error {
 	}
 
 	return errgo.Wrap(app.Start(c.ListenAddr()), "echo.Start")
-}
-
-func getDefaultErrorHandler() echo.HTTPErrorHandler {
-	var log = logger.Named("http.err").
-		WithOptions(zap.AddStacktrace(zapcore.PanicLevel), zap.WithCaller(false))
-
-	return func(err error, c echo.Context) {
-		{
-			var e res.HTTPError
-			if errors.As(err, &e) {
-				// handle expected http error
-				_ = c.JSON(e.Code, res.Error{
-					Title:       http.StatusText(e.Code),
-					Description: e.Msg,
-					Details:     util.Detail(c),
-				})
-				return
-			}
-		}
-
-		{
-			//nolint:forbidigo,errorlint
-			if e, ok := err.(*echo.HTTPError); ok {
-				log.Error("unexpected echo error",
-					zap.Int("code", e.Code),
-					zap.Any("message", e.Message),
-					zap.String("path", c.Request().URL.Path),
-					zap.String("query", c.Request().URL.RawQuery),
-					zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
-				)
-
-				_ = c.JSON(http.StatusInternalServerError, res.Error{
-					Title:       http.StatusText(e.Code),
-					Description: e.Error(),
-					Details:     util.DetailWithErr(c, err),
-				})
-				return
-			}
-		}
-
-		log.Error("unexpected error",
-			zap.Error(err),
-			zap.String("path", c.Path()),
-			zap.String("query", c.Request().URL.RawQuery),
-			zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
-		)
-
-		// unexpected error, return internal server error
-		_ = res.InternalError(c, err, "Unexpected Internal Server Error")
-	}
 }
