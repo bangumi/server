@@ -33,7 +33,7 @@ func TestEpisodeCollection_UnmarshalJSON(t *testing.T) {
 	}{
 		{Raw: []byte("1"), Expected: 1},
 		{Raw: []byte("3"), Expected: 3},
-		{Raw: []byte("0"), Err: true},
+		{Raw: []byte("4"), Err: true},
 	}
 
 	for _, tc := range testCases {
