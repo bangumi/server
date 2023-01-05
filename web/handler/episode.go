@@ -84,7 +84,8 @@ func (h Handler) ListEpisode(c echo.Context) error {
 		return res.BadRequest("missing required query `subject_id`")
 	}
 
-	_, err = h.ctrl.GetSubject(c.Request().Context(), u.Auth, subjectID)
+	_, err = h.subject.Get(c.Request().Context(), subjectID, subject.Filter{
+		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()}})
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
