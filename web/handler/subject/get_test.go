@@ -23,10 +23,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -108,21 +111,14 @@ func TestSubject_Get_NSFW_404(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewSubjectRepo(t)
-	m.EXPECT().Get(mock.Anything, model.SubjectID(7), mock.Anything).Return(model.Subject{NSFW: true}, nil)
-
-	mockAuth := mocks.NewAuthRepo(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.UserInfo{}, nil)
-	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(auth.Permission{}, nil)
+	m.EXPECT().Get(mock.Anything, model.SubjectID(7), subject.Filter{NSFW: null.NewBool(false)}).
+		Return(model.Subject{}, domain.ErrSubjectNotFound)
 
 	app := test.GetWebApp(t,
-		test.Mock{
-			AuthRepo:    mockAuth,
-			SubjectRepo: m,
-		},
+		test.Mock{SubjectRepo: m},
 	)
 
-	resp := test.New(t).Get("/v0/subjects/7").Header("authorization", "Bearer token").
+	resp := test.New(t).Get("/v0/subjects/7").
 		Execute(app)
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode, "404 for unauthorized user")

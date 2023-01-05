@@ -77,7 +77,7 @@ const nsfwThreshold = gtime.OneDay * 60
 
 // AllowNSFW return if current user is allowed to see NSFW resource.
 func (u Auth) AllowNSFW() bool {
-	return u.RegisteredLongerThan(nsfwThreshold)
+	return u.ID != 0 && u.RegisteredLongerThan(nsfwThreshold)
 }
 
 func (u Auth) RegisteredLongerThan(t time.Duration) bool {

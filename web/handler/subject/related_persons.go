@@ -22,6 +22,8 @@ import (
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
@@ -36,7 +38,9 @@ func (h Subject) GetRelatedPersons(c echo.Context) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetSubjectNoRedirect(c.Request().Context(), u.Auth, id)
+	r, err := h.subject.Get(c.Request().Context(), id, subject.Filter{
+		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
+	})
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

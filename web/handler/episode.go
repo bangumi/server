@@ -25,6 +25,8 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -47,7 +49,9 @@ func (h Handler) GetEpisode(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get episode")
 	}
 
-	_, err = h.ctrl.GetSubject(c.Request().Context(), u.Auth, e.SubjectID)
+	_, err = h.subject.Get(c.Request().Context(), e.SubjectID, subject.Filter{
+		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
+	})
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound

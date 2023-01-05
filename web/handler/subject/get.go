@@ -29,6 +29,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/accessor"
@@ -44,7 +45,9 @@ func (h Subject) Get(c echo.Context) error {
 		return err
 	}
 
-	s, err := h.ctrl.GetSubject(c.Request().Context(), u.Auth, id)
+	s, err := h.subject.Get(c.Request().Context(), id, subject.Filter{
+		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
+	})
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -90,7 +93,7 @@ func (h Subject) GetImage(c echo.Context) error {
 		return err
 	}
 
-	r, err := h.ctrl.GetSubject(c.Request().Context(), u.Auth, id)
+	r, err := h.subject.Get(c.Request().Context(), id, subject.Filter{NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()}})
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
