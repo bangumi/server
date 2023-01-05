@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -166,6 +167,19 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 		test.New(t).
 			Header(echo.HeaderAuthorization, "Bearer t").
 			JSON(echo.Map{"tags": "vv qq"}).
+			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+			Execute(app).
+			ExpectCode(http.StatusBadRequest)
+	})
+
+	t.Run("too long comment", func(t *testing.T) {
+		t.Parallel()
+
+		app := test.GetWebApp(t, test.Mock{AuthService: a})
+
+		test.New(t).
+			Header(echo.HeaderAuthorization, "Bearer t").
+			JSON(echo.Map{"comment": strings.Repeat("vv qq", 200)}).
 			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			Execute(app).
 			ExpectCode(http.StatusBadRequest)
