@@ -68,7 +68,9 @@ func (s *EpisodeCollection) UnmarshalJSON(bytes []byte) error {
 	var n = EpisodeCollection(v)
 
 	switch n { //nolint:exhaustive
-	case EpisodeCollectionWish,
+	case
+		EpisodeCollectionNone,
+		EpisodeCollectionWish,
 		EpisodeCollectionDone,
 		EpisodeCollectionDropped:
 		*s = n
