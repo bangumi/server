@@ -15,7 +15,6 @@
 package test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/bytedance/sonic"
@@ -187,29 +186,7 @@ func MockSessionManager(repo session.Manager) fx.Option {
 
 func MockUserRepo(repo user.Repo) fx.Option {
 	if repo == nil {
-		mocker := &mocks.UserRepo{}
-		mocker.EXPECT().GetByID(mock.Anything, mock.Anything).Return(user.User{}, nil)
-		mocker.On("GetByIDs", mock.Anything, mock.Anything).
-			Return(func(ctx context.Context, ids []model.UserID) map[model.UserID]user.User {
-				var ret = make(map[model.UserID]user.User, len(ids))
-				for _, id := range ids {
-					ret[id] = user.User{}
-				}
-				return ret
-			}, func(ctx context.Context, ids []model.UserID) error {
-				return nil
-			})
-		mocker.On("GetFieldsByIDs", mock.Anything, mock.Anything, mock.Anything).
-			Return(func(ctx context.Context, ids []model.UserID) map[model.UserID]user.Fields {
-				var ret = make(map[model.UserID]user.Fields, len(ids))
-				for _, id := range ids {
-					ret[id] = user.Fields{}
-				}
-				return ret
-			}, func(ctx context.Context, ids []model.UserID) error {
-				return nil
-			})
-		repo = mocker
+		return fx.Provide(AnyUserMock)
 	}
 
 	return fx.Supply(fx.Annotate(repo, fx.As(new(user.Repo))))
