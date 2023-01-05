@@ -43,7 +43,7 @@ type SubjectV0 struct {
 	Tags          []SubjectTag          `json:"tags"`
 	Infobox       v0wiki                `json:"infobox"`
 	Rating        Rating                `json:"rating"`
-	TotalEpisodes int64                 `json:"total_episodes"`
+	TotalEpisodes int64                 `json:"total_episodes" doc:"episodes count in database"`
 	Collection    SubjectCollectionStat `json:"collection"`
 	ID            model.SubjectID       `json:"id"`
 	Eps           uint32                `json:"eps"`

@@ -33,8 +33,8 @@ type Subject struct {
 	OnHold        uint32
 	Dropped       uint32
 	Series        bool
-	Volumes       uint32
-	Eps           uint32
+	Volumes       uint32 // book volumes count from episode
+	Eps           uint32 // episode count from episode
 	Wish          uint32
 	Collect       uint32
 	Doing         uint32
