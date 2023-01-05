@@ -18,8 +18,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/web/util"
 )
@@ -48,26 +47,16 @@ func (e HTTPError) Error() string {
 	return strconv.Itoa(e.Code) + ": " + e.Msg
 }
 
-func FromError(c *fiber.Ctx, err error, code int, message string) error {
-	return JSON(c.Status(code), Error{
-		Title:       utils.StatusMessage(code),
-		Description: message,
-		Details:     util.DetailWithErr(c, err),
-	})
-}
-
-func JSONError(c *fiber.Ctx, err error) error {
-	c.Status(http.StatusBadRequest)
-
-	return JSON(c, Error{
+func JSONError(c echo.Context, err error) error {
+	return c.JSON(http.StatusBadRequest, Error{
 		Title:       "JSON Error",
 		Description: "can't decode request body as json or value doesn't match expected type",
 		Details:     util.DetailWithErr(c, err),
 	})
 }
 
-func InternalError(c *fiber.Ctx, err error, message string) error {
-	return JSON(c.Status(http.StatusInternalServerError), Error{
+func InternalError(c echo.Context, err error, message string) error {
+	return c.JSON(http.StatusInternalServerError, Error{
 		Title:       "Internal Server Error",
 		Description: message,
 		Details:     util.DetailWithErr(c, err),

@@ -18,8 +18,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/bytedance/sonic/decoder"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pm"
@@ -27,22 +27,22 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h PrivateMessage) MarkRead(c *fiber.Ctx) error {
+func (h PrivateMessage) MarkRead(c echo.Context) error {
 	accessor := h.Common.GetHTTPAccessor(c)
 	var r req.PrivateMessageMarkRead
-	if err := sonic.Unmarshal(c.Body(), &r); err != nil {
+	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
 		return res.JSONError(c, err)
 	}
 
 	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
-	err := h.pmRepo.MarkRead(c.Context(), accessor.ID, model.PrivateMessageID(r.ID))
+	err := h.pmRepo.MarkRead(c.Request().Context(), accessor.ID, model.PrivateMessageID(r.ID))
 	if err != nil {
 		if errors.Is(err, pm.ErrPmInvalidOperation) {
 			return res.BadRequest(err.Error())
 		}
 		return res.InternalError(c, err, "failed to mark private message(s) read")
 	}
-	return c.SendStatus(http.StatusNoContent)
+	return c.NoContent(http.StatusNoContent)
 }

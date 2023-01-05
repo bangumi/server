@@ -15,9 +15,11 @@
 package cookie
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
-func Clear(c *fiber.Ctx, key string) {
-	c.Cookie(&fiber.Cookie{Name: key, Value: "", SameSite: fiber.CookieSameSiteLaxMode, HTTPOnly: true})
+func Clear(c echo.Context, key string) {
+	c.SetCookie(&http.Cookie{Name: key, Value: "", SameSite: http.SameSiteLaxMode, HttpOnly: true})
 }

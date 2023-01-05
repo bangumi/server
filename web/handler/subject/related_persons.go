@@ -16,8 +16,9 @@ package subject
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -26,15 +27,15 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Subject) GetRelatedPersons(c *fiber.Ctx) error {
+func (h Subject) GetRelatedPersons(c echo.Context) error {
 	u := h.GetHTTPAccessor(c)
 
-	id, err := req.ParseSubjectID(c.Params("id"))
+	id, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil || id == 0 {
 		return err
 	}
 
-	r, err := h.ctrl.GetSubjectNoRedirect(c.UserContext(), u.Auth, id)
+	r, err := h.ctrl.GetSubjectNoRedirect(c.Request().Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -42,7 +43,7 @@ func (h Subject) GetRelatedPersons(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get subject")
 	}
 
-	relations, err := h.person.GetSubjectRelated(c.UserContext(), id)
+	relations, err := h.person.GetSubjectRelated(c.Request().Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
@@ -59,5 +60,5 @@ func (h Subject) GetRelatedPersons(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.JSON(response)
+	return c.JSON(http.StatusOK, response)
 }

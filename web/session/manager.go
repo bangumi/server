@@ -31,7 +31,7 @@ import (
 )
 
 const defaultKeyLength = 32
-const CookieKey = "sessionID"
+const CookieKey = "chiiNextSessionID"
 const redisKeyPrefix = "chii:web:session:"
 
 var ErrExpired = errors.New("your session has been expired")

@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -74,7 +74,7 @@ func TestCharacter_Get_NSFW(t *testing.T) {
 	})
 
 	var r res.CharacterV0
-	resp := test.New(t).Get("/v0/characters/7").Header(fiber.HeaderAuthorization, "Bearer v").
+	resp := test.New(t).Get("/v0/characters/7").Header(echo.HeaderAuthorization, "Bearer v").
 		Execute(app).
 		JSON(&r)
 

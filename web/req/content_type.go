@@ -17,21 +17,23 @@ package req
 import (
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/web/res"
 )
 
-func JSON(c *fiber.Ctx) error {
-	contentType := string(c.Request().Header.ContentType())
-	if contentType == fiber.MIMEApplicationJSON || contentType == fiber.MIMEApplicationJSONCharsetUTF8 {
-		return c.Next()
-	}
+func JSON(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		contentType := c.Request().Header.Get(echo.HeaderContentType)
+		if contentType == echo.MIMEApplicationJSON || contentType == echo.MIMEApplicationJSONCharsetUTF8 {
+			return next(c)
+		}
 
-	return res.JSON(c.Status(http.StatusUnsupportedMediaType),
-		res.Error{
-			Title:       "Unsupported Media Type",
-			Description: `request with body must set "content-type" header to "application/json"`,
-		},
-	)
+		return c.JSON(http.StatusUnsupportedMediaType,
+			res.Error{
+				Title:       "Unsupported Media Type",
+				Description: `request with body must set "content-type" header to "application/json"`,
+			},
+		)
+	}
 }

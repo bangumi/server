@@ -16,8 +16,9 @@ package person
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -25,13 +26,13 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Person) GetRelatedCharacters(c *fiber.Ctx) error {
-	id, err := req.ParsePersonID(c.Params("id"))
+func (h Person) GetRelatedCharacters(c echo.Context) error {
+	id, err := req.ParsePersonID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	r, err := h.ctrl.GetPerson(c.UserContext(), id)
+	r, err := h.ctrl.GetPerson(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -44,7 +45,7 @@ func (h Person) GetRelatedCharacters(c *fiber.Ctx) error {
 		return res.ErrNotFound
 	}
 
-	relations, err := h.ctrl.GetPersonRelatedCharacters(c.UserContext(), id)
+	relations, err := h.ctrl.GetPersonRelatedCharacters(c.Request().Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
@@ -62,5 +63,5 @@ func (h Person) GetRelatedCharacters(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.JSON(response)
+	return c.JSON(http.StatusOK, response)
 }

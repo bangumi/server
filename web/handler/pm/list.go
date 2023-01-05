@@ -15,7 +15,9 @@
 package pm
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 
 	"github.com/bangumi/server/internal/model"
@@ -25,9 +27,9 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h PrivateMessage) List(c *fiber.Ctx) error {
+func (h PrivateMessage) List(c echo.Context) error {
 	accessor := h.Common.GetHTTPAccessor(c)
-	folder, err := req.ParsePrivateMessageFolder(c.Query("folder"))
+	folder, err := req.ParsePrivateMessageFolder(c.QueryParam("folder"))
 	if err != nil {
 		return err
 	}
@@ -35,7 +37,7 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	ctx := c.UserContext()
+	ctx := c.Request().Context()
 	count, err := h.pmRepo.CountByFolder(ctx, accessor.ID, folder)
 	if err != nil {
 		return res.InternalError(c, err, "failed to count private messages")
@@ -45,7 +47,7 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 		return res.InternalError(c, err, "failed to list private messages")
 	}
 	if len(list) == 0 {
-		return res.JSON(c, res.Paged{
+		return c.JSON(http.StatusOK, res.Paged{
 			Data:   make([]res.PrivateMessage, 0),
 			Total:  count,
 			Limit:  page.Limit,
@@ -62,14 +64,14 @@ func (h PrivateMessage) List(c *fiber.Ctx) error {
 	}
 	userIDs[len(userIDs)-1] = accessor.ID
 	userIDs = lo.Uniq(userIDs)
-	users, err := h.ctrl.GetUsersByIDs(c.Context(), userIDs)
+	users, err := h.ctrl.GetUsersByIDs(c.Request().Context(), userIDs)
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}
 	data := slice.Map(list, func(v pm.PrivateMessageListItem) res.PrivateMessage {
 		return res.ConvertModelPrivateMessageListItem(v, users)
 	})
-	return res.JSON(c, res.Paged{
+	return c.JSON(http.StatusOK, res.Paged{
 		Data:   data,
 		Total:  count,
 		Limit:  page.Limit,

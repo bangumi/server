@@ -17,7 +17,7 @@ package web
 import (
 	"github.com/bytedance/sonic"
 	"github.com/go-resty/resty/v2"
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
 	"go.uber.org/dig"
 	"go.uber.org/fx"
@@ -55,7 +55,7 @@ var Command = &cobra.Command{
 }
 
 func start() error {
-	var f *fiber.App
+	var e *echo.Echo
 	var cfg config.AppConfig
 
 	err := fx.New(
@@ -91,12 +91,12 @@ func start() error {
 		ctrl.Module,
 		web.Module,
 
-		fx.Populate(&f, &cfg),
+		fx.Populate(&e, &cfg),
 	).Err()
 
 	if err != nil {
 		return dig.RootCause(err) //nolint:wrapcheck
 	}
 
-	return errgo.Wrap(web.Start(cfg, f), "failed to start app")
+	return errgo.Wrap(web.Start(cfg, e), "failed to start app")
 }

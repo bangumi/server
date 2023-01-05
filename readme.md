@@ -71,7 +71,7 @@ MEILISEARCH_URL="http://127.0.0.1:7700/"
 
 bangumi 相关项目整体说明 [bangumi/dev-docs](https://github.com/bangumi/dev-docs)
 
-Web 框架: [fiber](https://github.com/gofiber/fiber)
+Web 框架: [echo](https://echo.labstack.com/)
 
 ORM: [GORM](https://github.com/go-gorm/gorm) 和 [GORM Gen](https://github.com/go-gorm/gen)
 

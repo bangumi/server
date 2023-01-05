@@ -14,7 +14,9 @@
 
 package null
 
-import "github.com/gofiber/fiber/v2/utils"
+import (
+	"strings"
+)
 
 func NilUint8(i uint8) *uint8 {
 	if i == 0 {
@@ -37,7 +39,7 @@ func NilString(s string) *string {
 		return nil
 	}
 
-	s = utils.CopyString(s)
+	s = strings.Clone(s)
 
 	return &s
 }

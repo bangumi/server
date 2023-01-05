@@ -15,18 +15,20 @@
 package pm
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/web/res"
 )
 
-func (h PrivateMessage) CountTypes(c *fiber.Ctx) error {
+func (h PrivateMessage) CountTypes(c echo.Context) error {
 	accessor := h.Common.GetHTTPAccessor(c)
-	counts, err := h.pmRepo.CountTypes(c.Context(), accessor.ID)
+	counts, err := h.pmRepo.CountTypes(c.Request().Context(), accessor.ID)
 	if err != nil {
 		return res.InternalError(c, err, "failed to count private message types")
 	}
-	return res.JSON(c, res.PrivateMessageTypeCounts{
+	return c.JSON(http.StatusOK, res.PrivateMessageTypeCounts{
 		Unread: counts.Unread,
 		Inbox:  counts.Inbox,
 		Outbox: counts.Outbox,

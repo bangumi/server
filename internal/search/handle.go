@@ -19,11 +19,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/bytedance/sonic/decoder"
+	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
 
 	"github.com/bangumi/server/internal/model"
@@ -46,7 +48,7 @@ type Client interface {
 // Handler
 // TODO: 想个办法挪到 web 里面去.
 type Handler interface {
-	Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error
+	Handle(ctx echo.Context, auth *accessor.Accessor) error
 }
 
 const defaultLimit = 50
@@ -67,14 +69,14 @@ type ReqFilter struct {
 	NSFW    null.Bool           `json:"nsfw"`
 }
 
-func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
+func (c *client) Handle(ctx echo.Context, auth *accessor.Accessor) error {
 	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
 	if err != nil {
 		return err
 	}
 
 	var r Req
-	if err = sonic.Unmarshal(ctx.Body(), &r); err != nil {
+	if err = decoder.NewStreamDecoder(ctx.Request().Body).Decode(&r); err != nil {
 		return res.JSONError(ctx, err)
 	}
 
@@ -100,7 +102,7 @@ func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 		ids = append(ids, hit.ID)
 	}
 
-	subjects, err := c.subjectRepo.GetByIDs(ctx.UserContext(), ids, subject.Filter{NSFW: r.Filter.NSFW})
+	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, subject.Filter{NSFW: r.Filter.NSFW})
 	if err != nil {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
@@ -122,7 +124,7 @@ func (c *client) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
 		}
 	})
 
-	return res.JSON(ctx, res.Paged{
+	return ctx.JSON(http.StatusOK, res.Paged{
 		Data:   data,
 		Total:  result.EstimatedTotalHits,
 		Limit:  q.Limit,

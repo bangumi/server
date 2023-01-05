@@ -15,24 +15,23 @@
 package util
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+	"github.com/labstack/echo/v4"
 )
 
-func DetailWithErr(c *fiber.Ctx, err error) D {
+func DetailWithErr(c echo.Context, err error) D {
 	return D{
 		Path:        c.Path(),
 		Error:       err.Error(),
-		Method:      c.Method(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
+		Method:      c.Request().Method,
+		QueryString: c.QueryString(),
 	}
 }
 
-func Detail(c *fiber.Ctx) D {
+func Detail(c echo.Context) D {
 	return D{
 		Path:        c.Path(),
-		Method:      c.Method(),
-		QueryString: utils.UnsafeString(c.Request().URI().QueryString()),
+		Method:      c.Request().Method,
+		QueryString: c.QueryString(),
 	}
 }
 

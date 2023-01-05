@@ -16,9 +16,9 @@ package common
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
@@ -28,43 +28,54 @@ import (
 	"github.com/bangumi/server/web/handler/internal/ctxkey"
 	"github.com/bangumi/server/web/res"
 	"github.com/bangumi/server/web/session"
+	"github.com/bangumi/server/web/util"
 )
 
-func (h Common) MiddlewareSessionAuth(c *fiber.Ctx) error {
-	var a = accessor.Get()
-	defer accessor.Put(a)
-	a.FillBasicInfo(c)
+func (h Common) MiddlewareSessionAuth(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var a = accessor.Get()
+		defer accessor.Put(a)
+		a.FillBasicInfo(c)
 
-	value := utils.UnsafeString(c.Context().Request.Header.Cookie(session.CookieKey))
-	if value != "" {
-		s, err := h.getSession(c, value)
+		co, err := c.Cookie(session.CookieKey)
 		if err != nil {
-			if errors.Is(err, session.ErrExpired) || errors.Is(err, domain.ErrNotFound) {
-				cookie.Clear(c, session.CookieKey)
-				goto Next
+			return errgo.Wrap(err, "get cookie")
+		}
+
+		if co.Value != "" {
+			s, err := h.getSession(c, co.Value)
+			if err != nil {
+				if errors.Is(err, session.ErrExpired) || errors.Is(err, domain.ErrNotFound) {
+					cookie.Clear(c, session.CookieKey)
+					goto Next
+				}
+
+				h.log.Error("failed to get session", zap.Error(err), a.Log())
+				return c.JSON(http.StatusInternalServerError,
+					res.Error{
+						Title:       "internal server error",
+						Details:     util.DetailWithErr(c, err),
+						Description: "failed to read session, please try clear your browser cookies and re-try",
+					})
 			}
 
-			h.log.Error("failed to get session", zap.Error(err), a.Log())
-			return res.InternalError(c, err, "failed to read session, please try clear your browser cookies and re-try")
+			auth, err := h.auth.GetByID(c.Request().Context(), s.UserID)
+			if err != nil {
+				return errgo.Wrap(err, "failed to user with permission")
+			}
+
+			a.SetAuth(auth)
 		}
 
-		auth, err := h.auth.GetByID(c.UserContext(), s.UserID)
-		if err != nil {
-			return errgo.Wrap(err, "failed to user with permission")
-		}
+	Next:
+		c.Set(ctxkey.User, a)
 
-		a.SetAuth(auth)
+		return next(c)
 	}
-
-Next:
-
-	c.Context().SetUserValue(ctxkey.User, a)
-
-	return c.Next()
 }
 
-func (h Common) getSession(c *fiber.Ctx, value string) (session.Session, error) {
-	s, err := h.session.Get(c.UserContext(), value)
+func (h Common) getSession(c echo.Context, value string) (session.Session, error) {
+	s, err := h.session.Get(c.Request().Context(), value)
 	if err != nil {
 		return session.Session{}, errgo.Wrap(err, "sessionManager.Get")
 	}

@@ -15,18 +15,16 @@
 package util
 
 import (
-	"net"
-
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/web/req/cf"
 )
 
-func RequestIP(c *fiber.Ctx) net.IP {
-	ip := c.Get(cf.HeaderRequestIP)
+func RequestIP(c echo.Context) string {
+	ip := c.Request().Header.Get(cf.HeaderRequestIP)
 	if ip == "" {
-		return c.Context().RemoteIP()
+		return c.Request().RemoteAddr
 	}
 
-	return net.ParseIP(ip)
+	return ip
 }

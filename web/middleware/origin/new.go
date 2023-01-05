@@ -17,35 +17,39 @@ package origin
 import (
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/web/res"
 )
 
-func New(allowed string) fiber.Handler {
+func New(allowed string) echo.MiddlewareFunc {
 	if !env.Production {
 		return dev(allowed)
 	}
-	return func(ctx *fiber.Ctx) error {
-		if ctx.Method() == http.MethodGet {
-			return ctx.Next()
-		}
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			if ctx.Request().Method == http.MethodGet {
+				return next(ctx)
+			}
 
-		origin := ctx.Get(fiber.HeaderOrigin)
-		if origin == "" {
-			return res.BadRequest("empty origin is not allowed")
-		}
-		if origin != allowed {
-			return res.BadRequest("cross-site request is not allowed")
-		}
+			origin := ctx.Get(echo.HeaderOrigin)
+			if origin == "" {
+				return res.BadRequest("empty origin is not allowed")
+			}
+			if origin != allowed {
+				return res.BadRequest("cross-site request is not allowed")
+			}
 
-		return ctx.Next()
+			return next(ctx)
+		}
 	}
 }
 
-func dev(allowed string) fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
-		return ctx.Next()
+func dev(allowed string) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			return next(ctx)
+		}
 	}
 }

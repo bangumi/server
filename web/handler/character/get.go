@@ -16,9 +16,10 @@ package character
 
 import (
 	"errors"
+	"net/http"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -26,14 +27,14 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Character) Get(c *fiber.Ctx) error {
+func (h Character) Get(c echo.Context) error {
 	u := h.GetHTTPAccessor(c)
-	id, err := req.ParseCharacterID(c.Params("id"))
+	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	r, err := h.ctrl.GetCharacter(c.UserContext(), u.Auth, id)
+	r, err := h.ctrl.GetCharacter(c.Request().Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -43,20 +44,20 @@ func (h Character) Get(c *fiber.Ctx) error {
 	}
 
 	if r.Redirect != 0 {
-		return c.Redirect("/v0/characters/" + strconv.FormatUint(uint64(r.Redirect), 10))
+		return c.Redirect(http.StatusFound, "/v0/characters/"+strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
-	return res.JSON(c, convertModelCharacter(r))
+	return c.JSON(http.StatusOK, convertModelCharacter(r))
 }
 
-func (h Character) GetImage(c *fiber.Ctx) error {
+func (h Character) GetImage(c echo.Context) error {
 	u := h.GetHTTPAccessor(c)
-	id, err := req.ParseCharacterID(c.Params("id"))
+	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	p, err := h.ctrl.GetCharacterNoRedirect(c.UserContext(), u.Auth, id)
+	p, err := h.ctrl.GetCharacterNoRedirect(c.Request().Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -64,14 +65,14 @@ func (h Character) GetImage(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get character")
 	}
 
-	l, ok := res.PersonImage(p.Image).Select(c.Query("type"))
+	l, ok := res.PersonImage(p.Image).Select(c.QueryParam("type"))
 	if !ok {
-		return res.BadRequest("bad image type: " + c.Query("type"))
+		return res.BadRequest("bad image type: " + c.QueryParam("type"))
 	}
 
 	if l == "" {
-		return c.Redirect(res.DefaultImageURL)
+		return c.Redirect(http.StatusFound, res.DefaultImageURL)
 	}
 
-	return c.Redirect(l)
+	return c.Redirect(http.StatusFound, l)
 }

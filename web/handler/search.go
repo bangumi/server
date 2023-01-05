@@ -15,9 +15,9 @@
 package handler
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 )
 
-func (h Handler) Search(c *fiber.Ctx) error {
+func (h Handler) Search(c echo.Context) error {
 	return h.search.Handle(c, h.GetHTTPAccessor(c)) //nolint:wrapcheck
 }

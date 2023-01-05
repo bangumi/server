@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -55,7 +55,7 @@ func TestSubject_Get(t *testing.T) {
 	)
 
 	var r res.SubjectV0
-	resp := test.New(t).Get("/v0/subjects/7").Header(fiber.HeaderAuthorization, "Bearer token").
+	resp := test.New(t).Get("/v0/subjects/7").Header(echo.HeaderAuthorization, "Bearer token").
 		Execute(app).JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -98,7 +98,7 @@ func TestSubject_Get_NSFW_200(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Get("/v0/subjects/7").Header(fiber.HeaderAuthorization, "Bearer token").
+	resp := test.New(t).Get("/v0/subjects/7").Header(echo.HeaderAuthorization, "Bearer token").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, "200 for authorized user")

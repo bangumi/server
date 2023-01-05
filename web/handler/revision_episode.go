@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 
 	"github.com/bangumi/server/domain"
@@ -31,15 +31,15 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Handler) GetEpisodeRevision(c *fiber.Ctx) error {
-	id, err := gstr.ParseUint32(c.Params("id"))
+func (h Handler) GetEpisodeRevision(c echo.Context) error {
+	id, err := gstr.ParseUint32(c.Param("id"))
 	if err != nil || id <= 0 {
 		return res.NewError(
 			http.StatusBadRequest,
-			fmt.Sprintf("bad param id: %s", strconv.Quote(c.Params("id"))),
+			fmt.Sprintf("bad param id: %s", strconv.Quote(c.Param("id"))),
 		)
 	}
-	r, err := h.r.GetEpisodeRelated(c.UserContext(), id)
+	r, err := h.r.GetEpisodeRelated(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -48,21 +48,21 @@ func (h Handler) GetEpisodeRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get episode related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	return c.JSON(convertModelEpisodeRevision(&r, creatorMap))
+	return c.JSON(http.StatusOK, convertModelEpisodeRevision(&r, creatorMap))
 }
 
-func (h Handler) ListEpisodeRevision(c *fiber.Ctx) error {
+func (h Handler) ListEpisodeRevision(c echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
 
-	episodeID, err := req.ParseEpisodeID(c.Query("episode_id"))
+	episodeID, err := req.ParseEpisodeID(c.QueryParam("episode_id"))
 	if err != nil {
 		return err
 	}
@@ -70,19 +70,19 @@ func (h Handler) ListEpisodeRevision(c *fiber.Ctx) error {
 	return h.listEpisodeRevision(c, episodeID, page)
 }
 
-func (h Handler) listEpisodeRevision(c *fiber.Ctx, episodeID model.EpisodeID, page req.PageQuery) error {
+func (h Handler) listEpisodeRevision(c echo.Context, episodeID model.EpisodeID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	}
-	count, err := h.r.CountEpisodeRelated(c.UserContext(), episodeID)
+	count, err := h.r.CountEpisodeRelated(c.Request().Context(), episodeID)
 	if err != nil {
 		return errgo.Wrap(err, "revision.CountEpisodeRelated")
 	}
 
 	if count == 0 {
 		response.Data = []int{}
-		return c.JSON(response)
+		return c.JSON(http.StatusOK, response)
 	}
 
 	if err = page.Check(count); err != nil {
@@ -91,7 +91,7 @@ func (h Handler) listEpisodeRevision(c *fiber.Ctx, episodeID model.EpisodeID, pa
 
 	response.Total = count
 
-	revisions, err := h.r.ListEpisodeRelated(c.UserContext(), episodeID, page.Limit, page.Offset)
+	revisions, err := h.r.ListEpisodeRelated(c.Request().Context(), episodeID, page.Limit, page.Offset)
 
 	if err != nil {
 		return errgo.Wrap(err, "revision.ListEpisodeRelated")
@@ -101,7 +101,7 @@ func (h Handler) listEpisodeRevision(c *fiber.Ctx, episodeID model.EpisodeID, pa
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), lo.Uniq(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -112,5 +112,5 @@ func (h Handler) listEpisodeRevision(c *fiber.Ctx, episodeID model.EpisodeID, pa
 		data[i] = convertModelEpisodeRevision(&revisions[i], creatorMap)
 	}
 	response.Data = data
-	return c.JSON(response)
+	return c.JSON(http.StatusOK, response)
 }

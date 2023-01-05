@@ -16,9 +16,10 @@ package pm
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/bytedance/sonic/decoder"
+	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 
 	"github.com/bangumi/server/ctrl"
@@ -30,10 +31,10 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h PrivateMessage) Create(c *fiber.Ctx) error {
+func (h PrivateMessage) Create(c echo.Context) error {
 	accessor := h.Common.GetHTTPAccessor(c)
 	var r req.PrivateMessageCreate
-	if err := sonic.Unmarshal(c.Body(), &r); err != nil {
+	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -43,7 +44,7 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 	receiverIDs := slice.Map(r.ReceiverIDs, func(v uint32) model.UserID { return model.UserID(v) })
 
 	msgs, err := h.ctrl.CreatePrivateMessage(
-		c.UserContext(),
+		c.Request().Context(),
 		accessor.ID,
 		receiverIDs,
 		pm.IDFilter{Type: null.NewFromPtr((*model.PrivateMessageID)(r.RelatedID))},
@@ -64,11 +65,11 @@ func (h PrivateMessage) Create(c *fiber.Ctx) error {
 	userIDs := make([]model.UserID, len(r.ReceiverIDs)+1)
 	copy(userIDs, receiverIDs)
 	userIDs[len(userIDs)-1] = accessor.ID
-	users, err := h.ctrl.GetUsersByIDs(c.Context(), lo.Uniq(userIDs))
+	users, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(userIDs))
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}
-	return c.JSON(slice.Map(msgs, func(v pm.PrivateMessage) res.PrivateMessage {
+	return c.JSON(http.StatusOK, slice.Map(msgs, func(v pm.PrivateMessage) res.PrivateMessage {
 		return res.ConvertModelPrivateMessage(v, users)
 	}))
 }

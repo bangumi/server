@@ -16,8 +16,9 @@ package user
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
@@ -32,14 +33,14 @@ type ResUserEpisodeCollection struct {
 	Type    model.EpisodeCollection `json:"type"`
 }
 
-func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
+func (h User) GetEpisodeCollection(c echo.Context) error {
 	v := h.GetHTTPAccessor(c)
-	episodeID, err := req.ParseEpisodeID(c.Params("episode_id"))
+	episodeID, err := req.ParseEpisodeID(c.Param("episode_id"))
 	if err != nil {
 		return err
 	}
 
-	e, err := h.ctrl.GetEpisode(c.UserContext(), episodeID)
+	e, err := h.ctrl.GetEpisode(c.Request().Context(), episodeID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -49,21 +50,21 @@ func (h User) GetEpisodeCollection(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "query.GetEpisode")
 	}
 
-	m, err := h.collect.GetSubjectEpisodesCollection(c.UserContext(), v.ID, e.SubjectID)
+	m, err := h.collect.GetSubjectEpisodesCollection(c.Request().Context(), v.ID, e.SubjectID)
 	if err != nil {
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 
-	return res.JSON(c, ResUserEpisodeCollection{
+	return c.JSON(http.StatusOK, ResUserEpisodeCollection{
 		Episode: res.ConvertModelEpisode(e),
 		Type:    m[episodeID].Type,
 	})
 }
 
 // GetSubjectEpisodeCollection return episodes with user's collection info.
-func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
+func (h User) GetSubjectEpisodeCollection(c echo.Context) error {
 	v := h.GetHTTPAccessor(c)
-	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -73,12 +74,12 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		return err
 	}
 
-	episodeType, err := req.ParseEpTypeOptional(c.Query("episode_type"))
+	episodeType, err := req.ParseEpTypeOptional(c.QueryParam("episode_type"))
 	if err != nil {
 		return err
 	}
 
-	_, err = h.ctrl.GetSubject(c.UserContext(), v.Auth, subjectID)
+	_, err = h.ctrl.GetSubject(c.Request().Context(), v.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -88,14 +89,14 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 
-	ec, err := h.collect.GetSubjectEpisodesCollection(c.UserContext(), v.ID, subjectID)
+	ec, err := h.collect.GetSubjectEpisodesCollection(c.Request().Context(), v.ID, subjectID)
 	if err != nil {
 		h.log.Error("unexpected error to fetch user subject collections",
 			zap.Error(err), v.ID.Zap(), subjectID.Zap())
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 
-	episodes, count, err := h.ctrl.ListEpisode(c.UserContext(), subjectID, episodeType, page.Limit, page.Offset)
+	episodes, count, err := h.ctrl.ListEpisode(c.Request().Context(), subjectID, episodeType, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "query.ListEpisode")
 	}
@@ -109,7 +110,7 @@ func (h User) GetSubjectEpisodeCollection(c *fiber.Ctx) error {
 		})
 	}
 
-	return res.JSON(c, res.PagedG[ResUserEpisodeCollection]{
+	return c.JSON(http.StatusOK, res.PagedG[ResUserEpisodeCollection]{
 		Data:   data,
 		Total:  count,
 		Limit:  page.Limit,

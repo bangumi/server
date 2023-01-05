@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -64,7 +64,7 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d, TimeLineRepo: tl})
 
 	test.New(t).
-		Header(fiber.HeaderAuthorization, "Bearer t").
+		Header(echo.HeaderAuthorization, "Bearer t").
 		JSON(map[string]any{
 			"comment": "1 test_content 2",
 			"type":    1,
@@ -110,7 +110,7 @@ func TestUser_PatchSubjectCollection_privacy(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d})
 
 	test.New(t).
-		Header(fiber.HeaderAuthorization, "Bearer t").
+		Header(echo.HeaderAuthorization, "Bearer t").
 		JSON(map[string]any{
 			"private": false,
 		}).
@@ -138,8 +138,8 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 		app := test.GetWebApp(t, test.Mock{AuthService: a})
 
 		test.New(t).
-			Header(fiber.HeaderAuthorization, "Bearer t").
-			JSON(fiber.Map{"rate": 11}).
+			Header(echo.HeaderAuthorization, "Bearer t").
+			JSON(echo.Map{"rate": 11}).
 			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			Execute(app).
 			ExpectCode(http.StatusBadRequest)
@@ -151,8 +151,8 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 		app := test.GetWebApp(t, test.Mock{AuthService: a})
 
 		test.New(t).
-			Header(fiber.HeaderAuthorization, "Bearer t").
-			JSON(fiber.Map{"type": 0}).
+			Header(echo.HeaderAuthorization, "Bearer t").
+			JSON(echo.Map{"type": 0}).
 			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			Execute(app).
 			ExpectCode(http.StatusBadRequest)
@@ -164,8 +164,8 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 		app := test.GetWebApp(t, test.Mock{AuthService: a})
 
 		test.New(t).
-			Header(fiber.HeaderAuthorization, "Bearer t").
-			JSON(fiber.Map{"tags": "vv qq"}).
+			Header(echo.HeaderAuthorization, "Bearer t").
+			JSON(echo.Map{"tags": "vv qq"}).
 			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			Execute(app).
 			ExpectCode(http.StatusBadRequest)

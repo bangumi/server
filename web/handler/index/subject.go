@@ -16,9 +16,10 @@ package index
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/bytedance/sonic/decoder"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -26,20 +27,20 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Handler) AddIndexSubject(c *fiber.Ctx) error {
+func (h Handler) AddIndexSubject(c echo.Context) error {
 	var reqData req.IndexAddSubject
-	if err := sonic.Unmarshal(c.Body(), &reqData); err != nil {
+	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 	return h.addOrUpdateIndexSubject(c, reqData)
 }
 
-func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
+func (h Handler) UpdateIndexSubject(c echo.Context) error {
 	var reqData req.IndexSubjectInfo
-	if err := sonic.Unmarshal(c.Body(), &reqData); err != nil {
+	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&reqData); err != nil {
 		return res.JSONError(c, err)
 	}
-	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
 	if err != nil {
 		return errgo.Wrap(err, "subject id is invalid")
 	}
@@ -49,11 +50,11 @@ func (h Handler) UpdateIndexSubject(c *fiber.Ctx) error {
 	})
 }
 
-func (h Handler) addOrUpdateIndexSubject(c *fiber.Ctx, payload req.IndexAddSubject) error {
+func (h Handler) addOrUpdateIndexSubject(c echo.Context, payload req.IndexAddSubject) error {
 	if err := h.ensureValidStrings(payload.Comment); err != nil {
 		return err
 	}
-	indexID, err := req.ParseIndexID(c.Params("id"))
+	indexID, err := req.ParseIndexID(c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -61,7 +62,7 @@ func (h Handler) addOrUpdateIndexSubject(c *fiber.Ctx, payload req.IndexAddSubje
 	if err != nil {
 		return err
 	}
-	indexSubject, err := h.i.AddOrUpdateIndexSubject(c.UserContext(),
+	indexSubject, err := h.i.AddOrUpdateIndexSubject(c.Request().Context(),
 		index.ID, payload.SubjectID, payload.SortKey, payload.Comment)
 	if err != nil {
 		if errors.Is(err, domain.ErrSubjectNotFound) {
@@ -69,11 +70,11 @@ func (h Handler) addOrUpdateIndexSubject(c *fiber.Ctx, payload req.IndexAddSubje
 		}
 		return errgo.Wrap(err, "failed to edit subject in the index")
 	}
-	return c.JSON(indexSubjectToResp(*indexSubject))
+	return c.JSON(http.StatusOK, indexSubjectToResp(*indexSubject))
 }
 
-func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
-	indexID, err := req.ParseIndexID(c.Params("id"))
+func (h Handler) RemoveIndexSubject(c echo.Context) error {
+	indexID, err := req.ParseIndexID(c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -81,11 +82,11 @@ func (h Handler) RemoveIndexSubject(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
 	if err != nil {
 		return errgo.Wrap(err, "subject id is invalid")
 	}
-	if err = h.i.DeleteIndexSubject(c.UserContext(), index.ID, subjectID); err != nil {
+	if err = h.i.DeleteIndexSubject(c.Request().Context(), index.ID, subjectID); err != nil {
 		return errgo.Wrap(err, "failed to delete subject from index")
 	}
 	return nil

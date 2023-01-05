@@ -26,7 +26,7 @@ import (
 	"testing"
 
 	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 )
 
@@ -50,7 +50,7 @@ func New(t *testing.T) *Request {
 		urlQuery: url.Values{},
 		cookies:  make(map[string]string),
 		formData: url.Values{},
-		headers:  http.Header{fiber.HeaderUserAgent: {"chii-test-client"}},
+		headers:  http.Header{http.CanonicalHeaderKey("user-agent"): {"chii-test-client"}},
 	}
 }
 
@@ -111,10 +111,10 @@ func (r *Request) Header(key, value string) *Request {
 func (r *Request) Form(key, value string) *Request {
 	r.t.Helper()
 	if r.contentType == "" {
-		r.contentType = fiber.MIMEApplicationForm
+		r.contentType = echo.MIMEApplicationForm
 	}
 
-	if r.contentType != fiber.MIMEApplicationForm {
+	if r.contentType != echo.MIMEApplicationForm {
 		r.t.Error("content-type should be empty or 'application/x-www-form-urlencoded'," +
 			" can't mix .Form(...) with .JSON(...)")
 		r.t.FailNow()
@@ -134,7 +134,7 @@ func (r *Request) JSON(v any) *Request {
 	r.httpBody, err = sonic.Marshal(v)
 	require.NoError(r.t, err)
 
-	r.contentType = fiber.MIMEApplicationJSON
+	r.contentType = echo.MIMEApplicationJSON
 
 	return r
 }
@@ -143,9 +143,9 @@ func (r *Request) StdRequest() *http.Request {
 	r.t.Helper()
 	var body io.ReadCloser = http.NoBody
 	if r.httpBody != nil {
-		r.headers.Set(fiber.HeaderContentLength, strconv.Itoa(len(r.httpBody)))
-		if r.headers.Get(fiber.HeaderContentType) == "" {
-			r.headers.Set(fiber.HeaderContentType, r.contentType)
+		r.headers.Set(echo.HeaderContentLength, strconv.Itoa(len(r.httpBody)))
+		if r.headers.Get(echo.HeaderContentType) == "" {
+			r.headers.Set(echo.HeaderContentType, r.contentType)
 		}
 
 		body = io.NopCloser(bytes.NewBuffer(r.httpBody))
@@ -167,26 +167,39 @@ func (r *Request) StdRequest() *http.Request {
 		req.AddCookie(&http.Cookie{Name: name, Value: value})
 	}
 
+	req.RemoteAddr = "0.0.0.0"
+
 	return req
 }
 
-func (r *Request) Execute(app *fiber.App, msTimeout ...int) *Response {
+func (r *Request) Execute(app *echo.Echo) *Response {
 	r.t.Helper()
 
-	resp, err := app.Test(r.StdRequest(), msTimeout...)
-	require.NoError(r.t, err)
-	defer resp.Body.Close()
+	resp := httptest.NewRecorder()
 
-	body, err := io.ReadAll(resp.Body)
-	require.NoError(r.t, err)
+	app.ServeHTTP(resp, r.StdRequest())
 
 	return &Response{
 		t:          r.t,
-		StatusCode: resp.StatusCode,
-		Header:     resp.Header,
-		Body:       body,
-		cookies:    resp.Cookies(),
+		StatusCode: resp.Code,
+		Header:     resp.Header(),
+		Body:       resp.Body.Bytes(),
+		cookies:    parseCookies(r.t, resp.Header().Get(echo.HeaderSetCookie)),
 	}
+}
+
+func parseCookies(t *testing.T, rawCookies string) []*http.Cookie {
+	t.Helper()
+
+	if rawCookies == "" {
+		return nil
+	}
+
+	r := http.Response{
+		Header: http.Header{echo.HeaderSetCookie: {rawCookies}},
+	}
+
+	return r.Cookies()
 }
 
 type Response struct {
@@ -200,7 +213,7 @@ type Response struct {
 func (r *Response) JSON(v any) *Response {
 	r.t.Helper()
 
-	if strings.HasPrefix(r.Header.Get(fiber.HeaderContentType), fiber.MIMEApplicationJSON) {
+	if strings.HasPrefix(r.Header.Get(echo.HeaderContentType), echo.MIMEApplicationJSON) {
 		require.NoError(r.t, sonic.Unmarshal(r.Body, v))
 	}
 

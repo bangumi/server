@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -65,7 +65,7 @@ func TestHandler_NewIndex_NoPermission(t *testing.T) {
 
 	resp := test.New(t).
 		Post("/v0/indices").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
@@ -90,7 +90,7 @@ func TestHandler_NewIndex_With_Permission(t *testing.T) {
 
 	resp := test.New(t).
 		Post("/v0/indices").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
@@ -108,7 +108,7 @@ func TestHandler_UpdateIndex_NoPermission(t *testing.T) {
 
 	resp := test.New(t).
 		Put("/v0/indices/7").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
@@ -134,7 +134,7 @@ func TestHandler_UpdateIndex_With_Permission(t *testing.T) {
 
 	resp := test.New(t).
 		Put("/v0/indices/7").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
@@ -149,14 +149,14 @@ func TestHandler_UpdateIndex_Invalid_Request_Data(t *testing.T) {
 
 	resp := test.New(t).
 		Put("/v0/indices/7").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		Execute(app)
 
 	require.Equal(t, http.StatusUnsupportedMediaType, resp.StatusCode)
 
 	resp = test.New(t).
 		Put("/v0/indices/7").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{}).
 		Execute(app)
 
@@ -172,7 +172,7 @@ func TestHandler_UpdateIndex_NonExists(t *testing.T) {
 
 	resp := test.New(t).
 		Put("/v0/indices/7").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
@@ -187,7 +187,7 @@ func TestHandler_New_Index_Invalid_Input(t *testing.T) {
 
 	resp := test.New(t).
 		Post("/v0/indices").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
 			"title":       "测试\001测试",
 			"description": "测试123",
@@ -209,7 +209,7 @@ func TestHandler_Update_Index_Invalid_Input(t *testing.T) {
 
 	resp := test.New(t).
 		Put("/v0/indices/7").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]string{
 			"title":       "测试\000",
 			"description": "测试123",

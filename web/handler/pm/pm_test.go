@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -60,7 +60,7 @@ func TestPrivateMessage_List(t *testing.T) {
 
 	resp := test.New(t).
 		Get("/p/pms/list?offset=0&limit=10&folder=inbox").
-		Header(fiber.HeaderCookie, "sessionID=11").
+		Header(echo.HeaderCookie, "chiiNextSessionID=11").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -85,7 +85,7 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 
 	resp := test.New(t).
 		Get("/p/pms/related-msgs/1").
-		Header(fiber.HeaderCookie, "sessionID=11").
+		Header(echo.HeaderCookie, "chiiNextSessionID=11").
 		Execute(app)
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
@@ -109,7 +109,7 @@ func TestPrivateMessage_ListRecentContact(t *testing.T) {
 
 	resp := test.New(t).
 		Get("/p/pms/contacts/recent").
-		Header(fiber.HeaderCookie, "sessionID=11").
+		Header(echo.HeaderCookie, "chiiNextSessionID=11").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -133,7 +133,7 @@ func TestPrivateMessage_CountTypes(t *testing.T) {
 
 	resp := test.New(t).
 		Get("/p/pms/counts").
-		Header(fiber.HeaderCookie, "sessionID=111").
+		Header(echo.HeaderCookie, "chiiNextSessionID=111").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -158,7 +158,7 @@ func TestPrivateMessage_MarkRead(t *testing.T) {
 
 	resp := test.New(t).
 		Patch("/p/pms/read").
-		Header(fiber.HeaderCookie, "sessionID=11").
+		Header(echo.HeaderCookie, "chiiNextSessionID=11").
 		JSON(req.PrivateMessageMarkRead{ID: 1}).
 		Execute(app)
 
@@ -187,7 +187,7 @@ func TestPrivateMessage_Create(t *testing.T) {
 
 	resp := test.New(t).
 		Post("/p/pms").
-		Header(fiber.HeaderCookie, "sessionID=111").
+		Header(echo.HeaderCookie, "chiiNextSessionID=111").
 		JSON(req.PrivateMessageCreate{Title: "测试标题", Content: "测试内容", ReceiverIDs: []uint32{382951}}).
 		Execute(app)
 
@@ -213,7 +213,7 @@ func TestPrivateMessage_Delete(t *testing.T) {
 
 	resp := test.New(t).
 		Delete("/p/pms").
-		Header(fiber.HeaderCookie, "sessionID=111").
+		Header(echo.HeaderCookie, "chiiNextSessionID=111").
 		JSON(req.PrivateMessageDelete{IDs: []uint32{1}}).
 		Execute(app)
 

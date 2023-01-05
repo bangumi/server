@@ -6,8 +6,7 @@ import (
 	context "context"
 
 	accessor "github.com/bangumi/server/web/accessor"
-
-	fiber "github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -55,11 +54,11 @@ func (_c *SearchClient_Close_Call) Return() *SearchClient_Close_Call {
 }
 
 // Handle provides a mock function with given fields: ctx, auth
-func (_m *SearchClient) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
+func (_m *SearchClient) Handle(ctx echo.Context, auth *accessor.Accessor) error {
 	ret := _m.Called(ctx, auth)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*fiber.Ctx, *accessor.Accessor) error); ok {
+	if rf, ok := ret.Get(0).(func(echo.Context, *accessor.Accessor) error); ok {
 		r0 = rf(ctx, auth)
 	} else {
 		r0 = ret.Error(0)
@@ -74,15 +73,15 @@ type SearchClient_Handle_Call struct {
 }
 
 // Handle is a helper method to define mock.On call
-//   - ctx *fiber.Ctx
+//   - ctx echo.Context
 //   - auth *accessor.Accessor
 func (_e *SearchClient_Expecter) Handle(ctx interface{}, auth interface{}) *SearchClient_Handle_Call {
 	return &SearchClient_Handle_Call{Call: _e.mock.On("Handle", ctx, auth)}
 }
 
-func (_c *SearchClient_Handle_Call) Run(run func(ctx *fiber.Ctx, auth *accessor.Accessor)) *SearchClient_Handle_Call {
+func (_c *SearchClient_Handle_Call) Run(run func(ctx echo.Context, auth *accessor.Accessor)) *SearchClient_Handle_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*fiber.Ctx), args[1].(*accessor.Accessor))
+		run(args[0].(echo.Context), args[1].(*accessor.Accessor))
 	})
 	return _c
 }

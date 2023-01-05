@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/pkg/test"
@@ -31,10 +31,10 @@ type res struct {
 
 func TestClientFullExample(t *testing.T) {
 	t.Parallel()
-	app := fiber.New()
+	app := echo.New()
 
-	app.Get("/test", func(c *fiber.Ctx) error {
-		return c.JSON(res{I: 5, Q: c.Query("q")})
+	app.GET("/test", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, res{I: 5, Q: c.QueryParam("q")})
 	})
 
 	var r res

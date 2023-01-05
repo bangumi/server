@@ -85,12 +85,9 @@ linters-settings:
   forbidigo:
     # Forbid the following identifiers (identifiers are written using regexp):
     forbid:
-      - ^fiber\.Status.*$
       - ^print.*$
       - ^fmt\.Println$
       - ^fmt\.Print$
-      - ^fiber\.Err.*$
-      - ^fiber\.NewErr.*$
 
   gofmt:
     simplify: true
@@ -239,12 +236,12 @@ linters-settings:
       - .Wrapf(
       - "errgo.Msg(err error, msg string) error"
       - "errgo.Wrap(err error, msg string) error"
-      - "func (*github.com/gofiber/fiber/v2.Ctx).Send"
-      - "func (*github.com/gofiber/fiber/v2.Ctx).Render("
-      - "func (*github.com/gofiber/fiber/v2.Ctx).Redirect("
-      - "func (*github.com/gofiber/fiber/v2.Ctx).JSON("
+      - "func (github.com/labstack/echo/v4.Context).JSON("
+      - "func (github.com/labstack/echo/v4.Context).String("
+      - "func (github.com/labstack/echo/v4.Context).Redirect("
+      - "func (github.com/labstack/echo/v4.Context).NoContent("
+      - "func (github.com/labstack/echo/v4.Context).HTML("
       - "func os.Open(name string)"
-      - "func (*github.com/gofiber/fiber/v2.Ctx).Next() (err error)"
       - "func github.com/bangumi/server/web/req.GetPageQuery("
       - "func (github.com/bangumi/server/web/req.PageQuery).Check("
       - "func github.com/bangumi/server/web/res.NewError("

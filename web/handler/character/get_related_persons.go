@@ -16,8 +16,9 @@ package character
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -25,14 +26,14 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Character) GetRelatedPersons(c *fiber.Ctx) error {
+func (h Character) GetRelatedPersons(c echo.Context) error {
 	u := h.GetHTTPAccessor(c)
-	id, err := req.ParseCharacterID(c.Params("id"))
+	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	_, err = h.ctrl.GetCharacterNoRedirect(c.UserContext(), u.Auth, id)
+	_, err = h.ctrl.GetCharacterNoRedirect(c.Request().Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -40,7 +41,7 @@ func (h Character) GetRelatedPersons(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get character")
 	}
 
-	casts, err := h.person.GetCharacterRelated(c.UserContext(), id)
+	casts, err := h.person.GetCharacterRelated(c.Request().Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "repo.GetCharacterRelated")
 	}
@@ -58,5 +59,5 @@ func (h Character) GetRelatedPersons(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.JSON(response)
+	return c.JSON(http.StatusOK, response)
 }

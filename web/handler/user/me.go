@@ -15,24 +15,26 @@
 package user
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) GetCurrent(c *fiber.Ctx) error {
+func (h User) GetCurrent(c echo.Context) error {
 	u := h.GetHTTPAccessor(c)
 	if !u.Login || u.ID == 0 {
 		return res.Unauthorized("need Login")
 	}
 
-	user, err := h.user.GetByID(c.UserContext(), u.ID)
+	user, err := h.user.GetByID(c.Request().Context(), u.ID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get user")
 	}
 
-	return res.JSON(c, res.User{
+	return c.JSON(http.StatusOK, res.User{
 		ID:        user.ID,
 		URL:       "https://bgm.tv/user/" + user.UserName,
 		Username:  user.UserName,

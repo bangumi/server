@@ -16,8 +16,9 @@ package character
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -25,14 +26,14 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Character) GetRelatedSubjects(c *fiber.Ctx) error {
+func (h Character) GetRelatedSubjects(c echo.Context) error {
 	u := h.GetHTTPAccessor(c)
-	id, err := req.ParseCharacterID(c.Params("id"))
+	id, err := req.ParseCharacterID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	_, relations, err := h.ctrl.GetCharacterRelatedSubjects(c.UserContext(), u.Auth, id)
+	_, relations, err := h.ctrl.GetCharacterRelatedSubjects(c.Request().Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -52,7 +53,7 @@ func (h Character) GetRelatedSubjects(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.JSON(response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func characterStaffString(i uint8) string {

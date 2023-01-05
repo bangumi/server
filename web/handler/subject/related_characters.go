@@ -16,8 +16,9 @@ package subject
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
@@ -27,14 +28,14 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Subject) GetRelatedCharacters(c *fiber.Ctx) error {
+func (h Subject) GetRelatedCharacters(c echo.Context) error {
 	u := h.GetHTTPAccessor(c)
-	subjectID, err := req.ParseSubjectID(c.Params("id"))
+	subjectID, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	_, relations, err := h.ctrl.GetSubjectRelatedCharacters(c.UserContext(), u.Auth, subjectID)
+	_, relations, err := h.ctrl.GetSubjectRelatedCharacters(c.Request().Context(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -46,7 +47,7 @@ func (h Subject) GetRelatedCharacters(c *fiber.Ctx) error {
 	if len(relations) != 0 {
 		var characterIDs = slice.Map(relations,
 			func(item model.SubjectCharacterRelation) model.CharacterID { return item.Character.ID })
-		actors, err = h.ctrl.GetActors(c.UserContext(), subjectID, characterIDs...)
+		actors, err = h.ctrl.GetActors(c.Request().Context(), subjectID, characterIDs...)
 		if err != nil {
 			return errgo.Wrap(err, "query.GetActors")
 		}
@@ -64,7 +65,7 @@ func (h Subject) GetRelatedCharacters(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.JSON(response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func toActors(persons []model.Person) []res.Actor {

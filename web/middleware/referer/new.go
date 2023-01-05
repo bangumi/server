@@ -17,25 +17,31 @@ package referer
 import (
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/web/res"
 )
 
-func New(referer string) fiber.Handler {
-	if env.Production {
-		return func(c *fiber.Ctx) error {
-			ref := c.Get(fiber.HeaderReferer)
-			if ref == "" || strings.HasPrefix(ref, referer) {
-				return c.Next()
-			}
+const HeaderReferer = "Referer"
 
-			return res.BadRequest("bad referer, cross-site api request is not allowed")
+func New(referer string) echo.MiddlewareFunc {
+	if env.Production {
+		return func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				ref := c.Request().Header.Get(HeaderReferer)
+				if ref == "" || strings.HasPrefix(ref, referer) {
+					return next(c)
+				}
+
+				return res.BadRequest("bad referer, cross-site api request is not allowed")
+			}
 		}
 	}
 
-	return func(ctx *fiber.Ctx) error {
-		return ctx.Next()
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			return next(ctx)
+		}
 	}
 }

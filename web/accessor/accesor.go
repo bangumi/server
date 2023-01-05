@@ -15,9 +15,7 @@
 package accessor
 
 import (
-	"net"
-
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -28,7 +26,7 @@ import (
 
 type Accessor struct {
 	RequestID string
-	IP        net.IP
+	IP        string
 	auth.Auth
 	Login bool
 }
@@ -37,9 +35,9 @@ func (a *Accessor) AllowNSFW() bool {
 	return a.Login && a.Auth.AllowNSFW()
 }
 
-func (a *Accessor) FillBasicInfo(c *fiber.Ctx) {
+func (a *Accessor) FillBasicInfo(c echo.Context) {
 	a.Login = false
-	a.RequestID = c.Get(cf.HeaderRequestID)
+	a.RequestID = c.Request().Header.Get(cf.HeaderRequestID)
 	a.IP = util.RequestIP(c)
 }
 
@@ -54,7 +52,7 @@ func (a Accessor) Log() zap.Field {
 
 func (a Accessor) MarshalLogObject(encoder zapcore.ObjectEncoder) error {
 	encoder.AddString("id", a.RequestID)
-	encoder.AddString("IP", a.IP.String())
+	encoder.AddString("IP", a.IP)
 	if a.Login {
 		encoder.AddUint32("user_id", uint32(a.Auth.ID))
 	}
@@ -64,7 +62,7 @@ func (a Accessor) MarshalLogObject(encoder zapcore.ObjectEncoder) error {
 // reset struct to zero value before put it back to pool.
 func (a *Accessor) reset() {
 	a.RequestID = ""
-	a.IP = nil
+	a.IP = ""
 	a.Login = false
 	a.Auth = auth.Auth{}
 }

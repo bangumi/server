@@ -16,9 +16,10 @@ package subject
 
 import (
 	"errors"
-	"strconv"
+	"fmt"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
@@ -34,15 +35,15 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Subject) Get(c *fiber.Ctx) error {
+func (h Subject) Get(c echo.Context) error {
 	u := h.GetHTTPAccessor(c)
 
-	id, err := req.ParseSubjectID(c.Params("id"))
+	id, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	s, err := h.ctrl.GetSubject(c.UserContext(), u.Auth, id)
+	s, err := h.ctrl.GetSubject(c.Request().Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -52,15 +53,15 @@ func (h Subject) Get(c *fiber.Ctx) error {
 	}
 
 	if s.Redirect != 0 {
-		return c.Redirect("/v0/subjects/" + strconv.FormatUint(uint64(s.Redirect), 10))
+		return c.Redirect(http.StatusFound, fmt.Sprintf("/v0/subjects/%d", s.Redirect))
 	}
 
-	totalEpisode, err := h.ctrl.CountEpisode(c.UserContext(), id, nil)
+	totalEpisode, err := h.ctrl.CountEpisode(c.Request().Context(), id, nil)
 	if err != nil {
 		return errgo.Wrap(err, "failed to count episodes of subject")
 	}
 
-	return res.JSON(c, convertModelSubject(s, totalEpisode))
+	return c.JSON(http.StatusOK, convertModelSubject(s, totalEpisode))
 }
 
 func platformString(s model.Subject) *string {
@@ -80,15 +81,15 @@ func platformString(s model.Subject) *string {
 	return &v
 }
 
-func (h Subject) GetImage(c *fiber.Ctx) error {
+func (h Subject) GetImage(c echo.Context) error {
 	u := h.GetHTTPAccessor(c)
 
-	id, err := req.ParseSubjectID(c.Params("id"))
+	id, err := req.ParseSubjectID(c.Param("id"))
 	if err != nil || id == 0 {
 		return err
 	}
 
-	r, err := h.ctrl.GetSubject(c.UserContext(), u.Auth, id)
+	r, err := h.ctrl.GetSubject(c.Request().Context(), u.Auth, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -96,16 +97,16 @@ func (h Subject) GetImage(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get subject")
 	}
 
-	l, ok := res.SubjectImage(r.Image).Select(c.Query("type"))
+	l, ok := res.SubjectImage(r.Image).Select(c.QueryParam("type"))
 	if !ok {
-		return res.BadRequest("bad image type: " + c.Query("type"))
+		return res.BadRequest("bad image type: " + c.QueryParam("type"))
 	}
 
 	if l == "" {
-		return c.Redirect(res.DefaultImageURL)
+		return c.Redirect(http.StatusFound, res.DefaultImageURL)
 	}
 
-	return c.Redirect(l)
+	return c.Redirect(http.StatusFound, l)
 }
 
 func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {

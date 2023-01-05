@@ -16,10 +16,11 @@ package index
 
 import (
 	"errors"
+	"net/http"
 	"time"
 
-	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/bytedance/sonic/decoder"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
@@ -28,15 +29,15 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Handler) GetIndex(c *fiber.Ctx) error {
+func (h Handler) GetIndex(c echo.Context) error {
 	user := h.GetHTTPAccessor(c)
 
-	id, err := req.ParseIndexID(c.Params("id"))
+	id, err := req.ParseIndexID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	r, ok, err := h.ctrl.GetIndexWithCache(c.UserContext(), id)
+	r, ok, err := h.ctrl.GetIndexWithCache(c.Request().Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get index")
 	}
@@ -45,18 +46,18 @@ func (h Handler) GetIndex(c *fiber.Ctx) error {
 		return res.NotFound("index not found")
 	}
 
-	return c.JSON(r)
+	return c.JSON(http.StatusOK, r)
 }
 
-func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
+func (h Handler) GetIndexSubjects(c echo.Context) error {
 	user := h.GetHTTPAccessor(c)
 
-	id, err := req.ParseIndexID(c.Params("id"))
+	id, err := req.ParseIndexID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	subjectType, err := req.ParseSubjectType(c.Query("type"))
+	subjectType, err := req.ParseSubjectType(c.QueryParam("type"))
 	if err != nil {
 		return errgo.Wrap(err, "invalid query `type` for subject type")
 	}
@@ -66,7 +67,7 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	r, ok, err := h.ctrl.GetIndexWithCache(c.UserContext(), id)
+	r, ok, err := h.ctrl.GetIndexWithCache(c.Request().Context(), id)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get index")
 	}
@@ -79,15 +80,15 @@ func (h Handler) GetIndexSubjects(c *fiber.Ctx) error {
 }
 
 func (h Handler) getIndexSubjects(
-	c *fiber.Ctx, id model.IndexID, subjectType uint8, page req.PageQuery,
+	c echo.Context, id model.IndexID, subjectType uint8, page req.PageQuery,
 ) error {
-	count, err := h.i.CountSubjects(c.UserContext(), id, subjectType)
+	count, err := h.i.CountSubjects(c.Request().Context(), id, subjectType)
 	if err != nil {
 		return errgo.Wrap(err, "Index.CountSubjects")
 	}
 
 	if count == 0 {
-		return c.JSON(res.Paged{
+		return c.JSON(http.StatusOK, res.Paged{
 			Data:   []int{},
 			Total:  0,
 			Limit:  page.Limit,
@@ -99,7 +100,7 @@ func (h Handler) getIndexSubjects(
 		return err
 	}
 
-	subjects, err := h.i.ListSubjects(c.UserContext(), id, subjectType, page.Limit, page.Offset)
+	subjects, err := h.i.ListSubjects(c.Request().Context(), id, subjectType, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "Index.ListSubjects")
 	}
@@ -109,7 +110,7 @@ func (h Handler) getIndexSubjects(
 		data[i] = indexSubjectToResp(s)
 	}
 
-	return c.JSON(res.Paged{
+	return c.JSON(http.StatusOK, res.Paged{
 		Data:   data,
 		Total:  count,
 		Limit:  page.Limit,
@@ -117,9 +118,9 @@ func (h Handler) getIndexSubjects(
 	})
 }
 
-func (h Handler) NewIndex(c *fiber.Ctx) error {
+func (h Handler) NewIndex(c echo.Context) error {
 	var reqData req.IndexBasicInfo
-	if err := sonic.Unmarshal(c.Body(), &reqData); err != nil {
+	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 	if err := h.ensureValidStrings(reqData.Description, reqData.Title); err != nil {
@@ -140,7 +141,7 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 		Ban:         false,
 		NSFW:        false,
 	}
-	ctx := c.UserContext()
+	ctx := c.Request().Context()
 	if err := h.i.New(ctx, i); err != nil {
 		return errgo.Wrap(err, "failed to create a new index")
 	}
@@ -149,13 +150,13 @@ func (h Handler) NewIndex(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get user info")
 	}
 	resp := res.IndexModelToResponse(i, u)
-	return c.JSON(resp)
+	return c.JSON(http.StatusOK, resp)
 }
 
 // 确保目录存在, 并且当前请求的用户持有权限.
-func (h Handler) ensureIndexPermission(c *fiber.Ctx, indexID uint32) (*model.Index, error) {
+func (h Handler) ensureIndexPermission(c echo.Context, indexID uint32) (*model.Index, error) {
 	accessor := h.GetHTTPAccessor(c)
-	index, err := h.i.Get(c.UserContext(), indexID)
+	index, err := h.i.Get(c.Request().Context(), indexID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, res.NotFound("index not found")
@@ -168,13 +169,13 @@ func (h Handler) ensureIndexPermission(c *fiber.Ctx, indexID uint32) (*model.Ind
 	return &index, nil
 }
 
-func (h Handler) UpdateIndex(c *fiber.Ctx) error {
-	indexID, err := req.ParseIndexID(c.Params("id"))
+func (h Handler) UpdateIndex(c echo.Context) error {
+	indexID, err := req.ParseIndexID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 	var reqData req.IndexBasicInfo
-	if err = sonic.Unmarshal(c.Body(), &reqData); err != nil {
+	if err = decoder.NewStreamDecoder(c.Request().Body).Decode(&reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -190,9 +191,9 @@ func (h Handler) UpdateIndex(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	if err = h.i.Update(c.UserContext(), index.ID, reqData.Title, reqData.Description); err != nil {
+	if err = h.i.Update(c.Request().Context(), index.ID, reqData.Title, reqData.Description); err != nil {
 		return errgo.Wrap(err, "update index failed")
 	}
-	h.invalidateIndexCache(c.UserContext(), index.ID)
+	h.invalidateIndexCache(c.Request().Context(), index.ID)
 	return nil
 }

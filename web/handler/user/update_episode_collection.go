@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/bytedance/sonic/decoder"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/domain"
@@ -55,9 +55,9 @@ func (r ReqEpisodeCollectionBatch) Validate() error {
 // PatchEpisodeCollectionBatch
 //
 //	/v0/users/-/collections/:subject_id/episodes"
-func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
+func (h User) PatchEpisodeCollectionBatch(c echo.Context) error {
 	var r ReqEpisodeCollectionBatch
-	if err := sonic.Unmarshal(c.Body(), &r); err != nil {
+	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -65,13 +65,13 @@ func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 		return err
 	}
 
-	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
 
 	u := h.GetHTTPAccessor(c)
-	err = h.ctrl.UpdateEpisodesCollection(c.UserContext(), u.Auth, subjectID, r.EpisodeID, r.Type)
+	err = h.ctrl.UpdateEpisodesCollection(c.Request().Context(), u.Auth, subjectID, r.EpisodeID, r.Type)
 	if err != nil {
 		switch {
 		case errors.Is(err, domain.ErrSubjectNotCollected):
@@ -85,26 +85,25 @@ func (h User) PatchEpisodeCollectionBatch(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to update episode")
 	}
 
-	c.Status(http.StatusNoContent)
-	return nil
+	return c.NoContent(http.StatusNoContent)
 }
 
 // PutEpisodeCollection
 //
 //	/v0/users/-/collections/-/episodes/:episode_id
-func (h User) PutEpisodeCollection(c *fiber.Ctx) error {
-	episodeID, err := req.ParseEpisodeID(c.Params("episode_id"))
+func (h User) PutEpisodeCollection(c echo.Context) error {
+	episodeID, err := req.ParseEpisodeID(c.Param("episode_id"))
 	if err != nil {
 		return err
 	}
 
 	var r req.UpdateUserEpisodeCollection
-	if err = sonic.Unmarshal(c.Body(), &r); err != nil {
+	if err = decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
 		return res.JSONError(c, err)
 	}
 
 	u := h.GetHTTPAccessor(c)
-	err = h.ctrl.UpdateEpisodeCollection(c.UserContext(), u.Auth, episodeID, r.Type)
+	err = h.ctrl.UpdateEpisodeCollection(c.Request().Context(), u.Auth, episodeID, r.Type)
 	if err != nil {
 		switch {
 		case errors.Is(err, domain.ErrSubjectNotCollected):
@@ -118,6 +117,5 @@ func (h User) PutEpisodeCollection(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to update episode")
 	}
 
-	c.Status(http.StatusNoContent)
-	return nil
+	return c.NoContent(http.StatusNoContent)
 }

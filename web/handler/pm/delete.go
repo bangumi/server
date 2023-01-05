@@ -18,8 +18,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/bytedance/sonic/decoder"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -28,10 +28,10 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h PrivateMessage) Delete(c *fiber.Ctx) error {
+func (h PrivateMessage) Delete(c echo.Context) error {
 	accessor := h.Common.GetHTTPAccessor(c)
 	var r req.PrivateMessageDelete
-	if err := sonic.Unmarshal(c.Body(), &r); err != nil {
+	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -40,7 +40,7 @@ func (h PrivateMessage) Delete(c *fiber.Ctx) error {
 	}
 	err := h.pmRepo.
 		Delete(
-			c.UserContext(),
+			c.Request().Context(),
 			accessor.ID,
 			slice.Map(r.IDs, func(v uint32) model.PrivateMessageID {
 				return model.PrivateMessageID(v)
@@ -51,5 +51,5 @@ func (h PrivateMessage) Delete(c *fiber.Ctx) error {
 		}
 		return res.InternalError(c, err, "failed to delete private message(s)")
 	}
-	return c.SendStatus(http.StatusNoContent)
+	return c.NoContent(http.StatusNoContent)
 }

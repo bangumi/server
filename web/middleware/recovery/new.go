@@ -18,7 +18,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config/env"
@@ -28,7 +28,7 @@ import (
 var errInternal = errors.New("internal server error")
 
 // New creates a new middleware handler.
-func New() fiber.Handler {
+func New() echo.MiddlewareFunc {
 	if !env.Production {
 		return dev()
 	}
@@ -36,20 +36,22 @@ func New() fiber.Handler {
 	// Set default config
 	log := logger.Named("http.recovery")
 	// Return new handler
-	return func(c *fiber.Ctx) (err error) {
-		defer func() {
-			if r := recover(); r != nil {
-				log.Error("recovery", zap.Any("recovery", r), logger.Ctx(c.UserContext()))
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("recovery", zap.Any("recovery", r), logger.Ctx(c.Request().Context()))
 
-				var ok bool
-				if err, ok = r.(error); !ok {
-					// Set error that will call the global error handler
-					err = fmt.Errorf("%w: %v", errInternal, r)
+					var ok bool
+					if err, ok = r.(error); !ok {
+						// Set error that will call the global error handler
+						err = fmt.Errorf("%w: %v", errInternal, r)
+					}
 				}
-			}
-		}()
+			}()
 
-		// Return errInternal if exist, else move to next handler
-		return c.Next()
+			// Return errInternal if exist, else move to next handler
+			return next(c)
+		}
 	}
 }

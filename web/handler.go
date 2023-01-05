@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/web/handler"
@@ -41,7 +41,7 @@ import (
 //
 //nolint:funlen
 func AddRouters(
-	app *fiber.App,
+	app *echo.Echo,
 	c config.AppConfig,
 	h handler.Handler,
 	userHandler user.User,
@@ -52,91 +52,92 @@ func AddRouters(
 	subjectHandler subject.Subject,
 	indexHandler index.Handler,
 ) {
-	app.Get("/", indexPage())
+	app.GET("/", indexPage())
 
 	app.Use(ua.DisableDefaultHTTPLibrary)
 
-	v0 := app.Group("/v0/", h.MiddlewareAccessTokenAuth)
+	v0 := app.Group("/v0", h.MiddlewareAccessTokenAuth)
 
-	v0.Post("/search/subjects", h.Search)
+	v0.POST("/search/subjects", h.Search)
 
-	v0.Get("/subjects/:id", subjectHandler.Get)
-	v0.Get("/subjects/:id/image", subjectHandler.GetImage)
-	v0.Get("/subjects/:id/persons", subjectHandler.GetRelatedPersons)
-	v0.Get("/subjects/:id/subjects", subjectHandler.GetRelatedSubjects)
-	v0.Get("/subjects/:id/characters", subjectHandler.GetRelatedCharacters)
-	v0.Get("/persons/:id", personHandler.Get)
-	v0.Get("/persons/:id/image", personHandler.GetImage)
-	v0.Get("/persons/:id/subjects", personHandler.GetRelatedSubjects)
-	v0.Get("/persons/:id/characters", personHandler.GetRelatedCharacters)
-	v0.Get("/characters/:id", characterHandler.Get)
-	v0.Get("/characters/:id/image", characterHandler.GetImage)
-	v0.Get("/characters/:id/subjects", characterHandler.GetRelatedSubjects)
-	v0.Get("/characters/:id/persons", characterHandler.GetRelatedPersons)
-	v0.Get("/episodes/:id", h.GetEpisode)
-	v0.Get("/episodes", h.ListEpisode)
+	v0.GET("/subjects/:id", subjectHandler.Get)
+	v0.GET("/subjects/:id/image", subjectHandler.GetImage)
+	v0.GET("/subjects/:id/persons", subjectHandler.GetRelatedPersons)
+	v0.GET("/subjects/:id/subjects", subjectHandler.GetRelatedSubjects)
+	v0.GET("/subjects/:id/characters", subjectHandler.GetRelatedCharacters)
+	v0.GET("/persons/:id", personHandler.Get)
+	v0.GET("/persons/:id/image", personHandler.GetImage)
+	v0.GET("/persons/:id/subjects", personHandler.GetRelatedSubjects)
+	v0.GET("/persons/:id/characters", personHandler.GetRelatedCharacters)
+	v0.GET("/characters/:id", characterHandler.Get)
+	v0.GET("/characters/:id/image", characterHandler.GetImage)
+	v0.GET("/characters/:id/subjects", characterHandler.GetRelatedSubjects)
+	v0.GET("/characters/:id/persons", characterHandler.GetRelatedPersons)
+	v0.GET("/episodes/:id", h.GetEpisode)
+	v0.GET("/episodes", h.ListEpisode)
 
-	v0.Get("/me", userHandler.GetCurrent)
-	v0.Get("/users/:username", userHandler.Get)
-	v0.Get("/users/:username/collections", userHandler.ListSubjectCollection)
-	v0.Get("/users/:username/collections/:subject_id", userHandler.GetSubjectCollection)
-	v0.Get("/users/-/collections/-/episodes/:episode_id", h.NeedLogin, userHandler.GetEpisodeCollection)
-	v0.Put("/users/-/collections/-/episodes/:episode_id", req.JSON, h.NeedLogin, userHandler.PutEpisodeCollection)
-	v0.Get("/users/-/collections/:subject_id/episodes", h.NeedLogin, userHandler.GetSubjectEpisodeCollection)
-	v0.Patch("/users/-/collections/:subject_id", req.JSON, h.NeedLogin, userHandler.PatchSubjectCollection)
-	v0.Patch("/users/-/collections/:subject_id/episodes",
-		req.JSON, h.NeedLogin, userHandler.PatchEpisodeCollectionBatch,
-	)
-	v0.Get("/users/:username/avatar", userHandler.GetAvatar)
+	// echo 中间件从前往后运行按顺序
+	v0.GET("/me", userHandler.GetCurrent)
+	v0.GET("/users/:username", userHandler.Get)
+	v0.GET("/users/:username/collections", userHandler.ListSubjectCollection)
+	v0.GET("/users/:username/collections/:subject_id", userHandler.GetSubjectCollection)
+	v0.GET("/users/-/collections/-/episodes/:episode_id", userHandler.GetEpisodeCollection, h.NeedLogin)
+	v0.PUT("/users/-/collections/-/episodes/:episode_id", userHandler.PutEpisodeCollection, req.JSON, h.NeedLogin)
+	v0.GET("/users/-/collections/:subject_id/episodes", userHandler.GetSubjectEpisodeCollection, h.NeedLogin)
+	v0.PATCH("/users/-/collections/:subject_id", userHandler.PatchSubjectCollection, req.JSON, h.NeedLogin)
+	v0.PATCH("/users/-/collections/:subject_id/episodes",
+		userHandler.PatchEpisodeCollectionBatch, req.JSON, h.NeedLogin)
+
+	v0.GET("/users/:username/avatar", userHandler.GetAvatar)
 
 	{
 		i := indexHandler
-		v0.Get("/indices/:id", i.GetIndex)
-		v0.Get("/indices/:id/subjects", i.GetIndexSubjects)
+		v0.GET("/indices/:id", i.GetIndex)
+		v0.GET("/indices/:id/subjects", i.GetIndexSubjects)
 		// indices
-		v0.Post("/indices", req.JSON, i.NeedLogin, i.NewIndex)
-		v0.Put("/indices/:id", req.JSON, i.NeedLogin, i.UpdateIndex)
+		v0.POST("/indices", i.NewIndex, req.JSON, h.NeedLogin)
+		v0.PUT("/indices/:id", i.UpdateIndex, req.JSON, h.NeedLogin)
 		// indices subjects
-		v0.Post("/indices/:id/subjects", req.JSON, i.NeedLogin, i.AddIndexSubject)
-		v0.Put("/indices/:id/subjects/:subject_id", req.JSON, i.NeedLogin, i.UpdateIndexSubject)
-		v0.Delete("/indices/:id/subjects/:subject_id", i.NeedLogin, i.RemoveIndexSubject)
+		v0.POST("/indices/:id/subjects", i.AddIndexSubject, req.JSON, h.NeedLogin)
+		v0.PUT("/indices/:id/subjects/:subject_id", i.UpdateIndexSubject, req.JSON, h.NeedLogin)
+		v0.DELETE("/indices/:id/subjects/:subject_id", i.RemoveIndexSubject, h.NeedLogin)
 	}
 
-	v0.Get("/revisions/persons/:id", h.GetPersonRevision)
-	v0.Get("/revisions/persons", h.ListPersonRevision)
-	v0.Get("/revisions/subjects/:id", h.GetSubjectRevision)
-	v0.Get("/revisions/subjects", h.ListSubjectRevision)
-	v0.Get("/revisions/characters/:id", h.GetCharacterRevision)
-	v0.Get("/revisions/characters", h.ListCharacterRevision)
+	v0.GET("/revisions/persons/:id", h.GetPersonRevision)
+	v0.GET("/revisions/persons", h.ListPersonRevision)
+	v0.GET("/revisions/subjects/:id", h.GetSubjectRevision)
+	v0.GET("/revisions/subjects", h.ListSubjectRevision)
+	v0.GET("/revisions/characters/:id", h.GetCharacterRevision)
+	v0.GET("/revisions/characters", h.ListCharacterRevision)
 
-	v0.Get("/revisions/episodes/:id", h.GetEpisodeRevision)
-	v0.Get("/revisions/episodes", h.ListEpisodeRevision)
+	v0.GET("/revisions/episodes/:id", h.GetEpisodeRevision)
+	v0.GET("/revisions/episodes", h.ListEpisodeRevision)
 
 	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.WebDomain))
 	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.WebDomain))
 
-	var CORSBlockMiddleware []fiber.Handler
+	var CORSBlockMiddleware []echo.MiddlewareFunc
 	if c.WebDomain != "" {
-		CORSBlockMiddleware = []fiber.Handler{originMiddleware, refererMiddleware}
+		CORSBlockMiddleware = []echo.MiddlewareFunc{originMiddleware, refererMiddleware}
 	}
 
 	// frontend private api
-	private := app.Group("/p/", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
+	private := app.Group("/p", append(CORSBlockMiddleware, h.MiddlewareSessionAuth)...)
 
 	// TODO migrate this to bangumi/graphql
-	private.Get("/pms/list", h.NeedLogin, pmHandler.List)
-	private.Get("/pms/related-msgs/:id", h.NeedLogin, pmHandler.ListRelated)
-	private.Get("/pms/counts", h.NeedLogin, pmHandler.CountTypes)
-	private.Get("/pms/contacts/recent", h.NeedLogin, pmHandler.ListRecentContact)
-	private.Patch("/pms/read", req.JSON, h.NeedLogin, pmHandler.MarkRead)
-	private.Post("/pms", req.JSON, h.NeedLogin, pmHandler.Create)
-	private.Delete("/pms", req.JSON, h.NeedLogin, pmHandler.Delete)
+	private.GET("/pms/list", pmHandler.List, h.NeedLogin)
+	private.GET("/pms/related-msgs/:id", pmHandler.ListRelated, h.NeedLogin)
+	private.GET("/pms/counts", pmHandler.CountTypes, h.NeedLogin)
+	private.GET("/pms/contacts/recent", pmHandler.ListRecentContact, h.NeedLogin)
+	private.PATCH("/pms/read", pmHandler.MarkRead)
+	private.POST("/pms", pmHandler.Create)
+	private.DELETE("/pms", pmHandler.Delete, req.JSON, h.NeedLogin)
 
-	private.Get("/notifications/count", h.NeedLogin, notificationHandler.Count)
+	private.GET("/notifications/count", notificationHandler.Count, h.NeedLogin)
 
 	// default 404 Handler, all router should be added before this router
-	app.Use(func(c *fiber.Ctx) error {
-		return res.JSON(c.Status(http.StatusNotFound), res.Error{
+	app.RouteNotFound("/*", func(c echo.Context) error {
+		return c.JSON(http.StatusNotFound, res.Error{
 			Title:       "Not Found",
 			Description: "This is default response, if you see this response, please check your request",
 			Details:     util.Detail(c),

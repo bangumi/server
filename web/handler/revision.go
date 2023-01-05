@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 
 	"github.com/bangumi/server/domain"
@@ -32,12 +32,12 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
+func (h Handler) ListPersonRevision(c echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
-	personID, err := req.ParsePersonID(c.Query("person_id"))
+	personID, err := req.ParsePersonID(c.QueryParam("person_id"))
 	if err != nil {
 		return err
 	}
@@ -45,19 +45,19 @@ func (h Handler) ListPersonRevision(c *fiber.Ctx) error {
 	return h.listPersonRevision(c, personID, page)
 }
 
-func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page req.PageQuery) error {
+func (h Handler) listPersonRevision(c echo.Context, personID model.PersonID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	}
-	count, err := h.r.CountPersonRelated(c.UserContext(), personID)
+	count, err := h.r.CountPersonRelated(c.Request().Context(), personID)
 	if err != nil {
 		return errgo.Wrap(err, "revision.CountPersonRelated")
 	}
 
 	if count == 0 {
 		response.Data = []int{}
-		return c.JSON(response)
+		return c.JSON(http.StatusOK, response)
 	}
 
 	if err = page.Check(count); err != nil {
@@ -66,7 +66,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 
 	response.Total = count
 
-	revisions, err := h.r.ListPersonRelated(c.UserContext(), personID, page.Limit, page.Offset)
+	revisions, err := h.r.ListPersonRelated(c.Request().Context(), personID, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "revision.ListPersonRelated")
 	}
@@ -78,7 +78,7 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), lo.Uniq(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
@@ -88,15 +88,15 @@ func (h Handler) listPersonRevision(c *fiber.Ctx, personID model.PersonID, page 
 	}
 	response.Data = data
 
-	return c.JSON(response)
+	return c.JSON(http.StatusOK, response)
 }
 
-func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
-	id, err := gstr.ParseUint32(c.Params("id"))
+func (h Handler) GetPersonRevision(c echo.Context) error {
+	id, err := gstr.ParseUint32(c.Param("id"))
 	if err != nil || id <= 0 {
-		return res.BadRequest(fmt.Sprintf("bad param id: %s", c.Params("id")))
+		return res.BadRequest(fmt.Sprintf("bad param id: %s", c.Param("id")))
 	}
-	r, err := h.r.GetPersonRelated(c.UserContext(), id)
+	r, err := h.r.GetPersonRelated(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -105,21 +105,21 @@ func (h Handler) GetPersonRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get person related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	return c.JSON(convertModelPersonRevision(&r, creatorMap))
+	return c.JSON(http.StatusOK, convertModelPersonRevision(&r, creatorMap))
 }
 
-func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
+func (h Handler) ListCharacterRevision(c echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
 
-	characterID, err := req.ParseCharacterID(c.Query("character_id"))
+	characterID, err := req.ParseCharacterID(c.QueryParam("character_id"))
 	if err != nil {
 		return err
 	}
@@ -127,19 +127,19 @@ func (h Handler) ListCharacterRevision(c *fiber.Ctx) error {
 	return h.listCharacterRevision(c, characterID, page)
 }
 
-func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.CharacterID, page req.PageQuery) error {
+func (h Handler) listCharacterRevision(c echo.Context, characterID model.CharacterID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	}
-	count, err := h.r.CountCharacterRelated(c.UserContext(), characterID)
+	count, err := h.r.CountCharacterRelated(c.Request().Context(), characterID)
 	if err != nil {
 		return errgo.Wrap(err, "revision.CountCharacterRelated")
 	}
 
 	if count == 0 {
 		response.Data = []int{}
-		return c.JSON(response)
+		return c.JSON(http.StatusOK, response)
 	}
 
 	if err = page.Check(count); err != nil {
@@ -148,7 +148,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 
 	response.Total = count
 
-	revisions, err := h.r.ListCharacterRelated(c.UserContext(), characterID, page.Limit, page.Offset)
+	revisions, err := h.r.ListCharacterRelated(c.Request().Context(), characterID, page.Limit, page.Offset)
 
 	if err != nil {
 		return errgo.Wrap(err, "revision.ListCharacterRelated")
@@ -158,7 +158,7 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), lo.Uniq(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -169,18 +169,18 @@ func (h Handler) listCharacterRevision(c *fiber.Ctx, characterID model.Character
 		data[i] = convertModelCharacterRevision(&revisions[i], creatorMap)
 	}
 	response.Data = data
-	return c.JSON(response)
+	return c.JSON(http.StatusOK, response)
 }
 
-func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
-	id, err := gstr.ParseUint32(c.Params("id"))
+func (h Handler) GetCharacterRevision(c echo.Context) error {
+	id, err := gstr.ParseUint32(c.Param("id"))
 	if err != nil || id <= 0 {
 		return res.NewError(
 			http.StatusBadRequest,
-			fmt.Sprintf("bad param id: %s", strconv.Quote(c.Params("id"))),
+			fmt.Sprintf("bad param id: %s", strconv.Quote(c.Param("id"))),
 		)
 	}
-	r, err := h.r.GetCharacterRelated(c.UserContext(), id)
+	r, err := h.r.GetCharacterRelated(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -189,20 +189,20 @@ func (h Handler) GetCharacterRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get character related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	return c.JSON(convertModelCharacterRevision(&r, creatorMap))
+	return c.JSON(http.StatusOK, convertModelCharacterRevision(&r, creatorMap))
 }
 
-func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
+func (h Handler) ListSubjectRevision(c echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
-	subjectID, err := req.ParseSubjectID(c.Query("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.QueryParam("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -210,19 +210,19 @@ func (h Handler) ListSubjectRevision(c *fiber.Ctx) error {
 	return h.listSubjectRevision(c, subjectID, page)
 }
 
-func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, page req.PageQuery) error {
+func (h Handler) listSubjectRevision(c echo.Context, subjectID model.SubjectID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
 	}
-	count, err := h.r.CountSubjectRelated(c.UserContext(), subjectID)
+	count, err := h.r.CountSubjectRelated(c.Request().Context(), subjectID)
 	if err != nil {
 		return errgo.Wrap(err, "revision.CountSubjectRelated")
 	}
 
 	if count == 0 {
 		response.Data = []int{}
-		return c.JSON(response)
+		return c.JSON(http.StatusOK, response)
 	}
 
 	if err = page.Check(count); err != nil {
@@ -231,7 +231,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 
 	response.Total = count
 
-	revisions, err := h.r.ListSubjectRelated(c.UserContext(), subjectID, page.Limit, page.Offset)
+	revisions, err := h.r.ListSubjectRelated(c.Request().Context(), subjectID, page.Limit, page.Offset)
 
 	if err != nil {
 		return errgo.Wrap(err, "revision.ListSubjectRelated")
@@ -243,7 +243,7 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 	for _, revision := range revisions {
 		creatorIDs = append(creatorIDs, revision.CreatorID)
 	}
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), lo.Uniq(creatorIDs))
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), lo.Uniq(creatorIDs))
 
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
@@ -252,15 +252,15 @@ func (h Handler) listSubjectRevision(c *fiber.Ctx, subjectID model.SubjectID, pa
 		data[i] = convertModelSubjectRevision(&revisions[i], creatorMap)
 	}
 	response.Data = data
-	return c.JSON(response)
+	return c.JSON(http.StatusOK, response)
 }
 
-func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
-	id, err := gstr.ParseUint32(c.Params("id"))
+func (h Handler) GetSubjectRevision(c echo.Context) error {
+	id, err := gstr.ParseUint32(c.Param("id"))
 	if err != nil || id == 0 {
-		return res.BadRequest("bad param id: " + strconv.Quote(c.Params("id")))
+		return res.BadRequest("bad param id: " + strconv.Quote(c.Param("id")))
 	}
-	r, err := h.r.GetSubjectRelated(c.UserContext(), id)
+	r, err := h.r.GetSubjectRelated(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -269,12 +269,12 @@ func (h Handler) GetSubjectRevision(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get subject related revision")
 	}
 
-	creatorMap, err := h.ctrl.GetUsersByIDs(c.UserContext(), []model.UserID{r.CreatorID})
+	creatorMap, err := h.ctrl.GetUsersByIDs(c.Request().Context(), []model.UserID{r.CreatorID})
 	if err != nil {
 		return errgo.Wrap(err, "user.GetByIDs")
 	}
 
-	return c.JSON(convertModelSubjectRevision(&r, creatorMap))
+	return c.JSON(http.StatusOK, convertModelSubjectRevision(&r, creatorMap))
 }
 
 func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.UserID]user.User) res.PersonRevision {

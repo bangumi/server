@@ -16,9 +16,10 @@ package person
 
 import (
 	"errors"
+	"net/http"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -26,13 +27,13 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Person) Get(c *fiber.Ctx) error {
-	id, err := req.ParsePersonID(c.Params("id"))
+func (h Person) Get(c echo.Context) error {
+	id, err := req.ParsePersonID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	r, err := h.ctrl.GetPerson(c.UserContext(), id)
+	r, err := h.ctrl.GetPerson(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -42,19 +43,19 @@ func (h Person) Get(c *fiber.Ctx) error {
 	}
 
 	if r.Redirect != 0 {
-		return c.Redirect("/v0/persons/" + strconv.FormatUint(uint64(r.Redirect), 10))
+		return c.Redirect(http.StatusFound, "/v0/persons/"+strconv.FormatUint(uint64(r.Redirect), 10))
 	}
 
-	return res.JSON(c, res.ConvertModelPerson(r))
+	return c.JSON(http.StatusOK, res.ConvertModelPerson(r))
 }
 
-func (h Person) GetImage(c *fiber.Ctx) error {
-	id, err := req.ParsePersonID(c.Params("id"))
+func (h Person) GetImage(c echo.Context) error {
+	id, err := req.ParsePersonID(c.Param("id"))
 	if err != nil {
 		return err
 	}
 
-	r, err := h.ctrl.GetPerson(c.UserContext(), id)
+	r, err := h.ctrl.GetPerson(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -63,14 +64,14 @@ func (h Person) GetImage(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get person")
 	}
 
-	l, ok := res.PersonImage(r.Image).Select(c.Query("type"))
+	l, ok := res.PersonImage(r.Image).Select(c.QueryParam("type"))
 	if !ok {
-		return res.BadRequest("bad image type: " + c.Query("type"))
+		return res.BadRequest("bad image type: " + c.QueryParam("type"))
 	}
 
 	if l == "" {
-		return c.Redirect(res.DefaultImageURL)
+		return c.Redirect(http.StatusFound, res.DefaultImageURL)
 	}
 
-	return c.Redirect(l)
+	return c.Redirect(http.StatusFound, l)
 }

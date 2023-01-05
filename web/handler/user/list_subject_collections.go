@@ -16,8 +16,9 @@ package user
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/domain"
@@ -29,29 +30,29 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) ListSubjectCollection(c *fiber.Ctx) error {
+func (h User) ListSubjectCollection(c echo.Context) error {
 	v := h.GetHTTPAccessor(c)
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
 	}
 
-	username := c.Params("username")
+	username := c.Param("username")
 	if username == "" {
 		return res.BadRequest("missing require parameters `username`")
 	}
 
-	subjectType, err := req.ParseSubjectType(c.Query("subject_type"))
+	subjectType, err := req.ParseSubjectType(c.QueryParam("subject_type"))
 	if err != nil {
 		return res.BadRequest(err.Error())
 	}
 
-	collectionType, err := req.ParseCollectionType(c.Query("type"))
+	collectionType, err := req.ParseCollectionType(c.QueryParam("type"))
 	if err != nil {
 		return err
 	}
 
-	u, err := h.user.GetByName(c.UserContext(), username)
+	u, err := h.user.GetByName(c.Request().Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("user doesn't exist or has been removed")
@@ -66,27 +67,27 @@ func (h User) ListSubjectCollection(c *fiber.Ctx) error {
 }
 
 func (h User) listCollection(
-	c *fiber.Ctx,
+	c echo.Context,
 	u user.User,
 	subjectType model.SubjectType,
 	collectionType model.SubjectCollection,
 	page req.PageQuery,
 	showPrivate bool,
 ) error {
-	count, err := h.collect.CountSubjectCollections(c.UserContext(), u.ID, subjectType, collectionType, showPrivate)
+	count, err := h.collect.CountSubjectCollections(c.Request().Context(), u.ID, subjectType, collectionType, showPrivate)
 	if err != nil {
 		return errgo.Wrap(err, "failed to count user's subject collections")
 	}
 
 	if count == 0 {
-		return c.JSON(res.Paged{Data: []int{}, Total: count, Limit: page.Limit, Offset: page.Offset})
+		return c.JSON(http.StatusOK, res.Paged{Data: []int{}, Total: count, Limit: page.Limit, Offset: page.Offset})
 	}
 
 	if err = page.Check(count); err != nil {
 		return err
 	}
 
-	collections, err := h.collect.ListSubjectCollection(c.UserContext(),
+	collections, err := h.collect.ListSubjectCollection(c.Request().Context(),
 		u.ID, subjectType, collectionType, showPrivate, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "failed to list user's subject collections")
@@ -96,7 +97,7 @@ func (h User) listCollection(
 		return item.SubjectID
 	})
 
-	subjectMap, err := h.ctrl.GetSubjectByIDs(c.UserContext(), subjectIDs, ctrl.SubjectFilter{})
+	subjectMap, err := h.ctrl.GetSubjectByIDs(c.Request().Context(), subjectIDs, ctrl.SubjectFilter{})
 	if err != nil {
 		return errgo.Wrap(err, "failed to get subjects")
 	}
@@ -111,7 +112,7 @@ func (h User) listCollection(
 		data = append(data, res.ConvertModelSubjectCollection(collection, res.ToSlimSubjectV0(s)))
 	}
 
-	return c.JSON(res.Paged{
+	return c.JSON(http.StatusOK, res.Paged{
 		Data:   data,
 		Total:  count,
 		Limit:  page.Limit,

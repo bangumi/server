@@ -16,8 +16,9 @@ package search
 
 import (
 	"context"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/web/accessor"
@@ -28,8 +29,8 @@ var _ Client = NoopClient{}
 type NoopClient struct {
 }
 
-func (n NoopClient) Handle(ctx *fiber.Ctx, auth *accessor.Accessor) error {
-	return ctx.SendString("search is not enable")
+func (n NoopClient) Handle(c echo.Context, auth *accessor.Accessor) error {
+	return c.String(http.StatusOK, "search is not enable")
 }
 
 func (n NoopClient) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {

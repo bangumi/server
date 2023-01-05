@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -65,7 +65,7 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
 
 	test.New(t).
-		Header(fiber.HeaderAuthorization, "Bearer t").
+		Header(echo.HeaderAuthorization, "Bearer t").
 		JSON(map[string]any{
 			"episode_id": []int{1, 2, 3},
 			"type":       model.EpisodeCollectionDone,
@@ -107,7 +107,7 @@ func TestUser_PutEpisodeCollection(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
 
 	test.New(t).
-		Header(fiber.HeaderAuthorization, "Bearer t").
+		Header(echo.HeaderAuthorization, "Bearer t").
 		JSON(map[string]any{"type": model.EpisodeCollectionDone}).
 		Put(fmt.Sprintf("/v0/users/-/collections/-/episodes/%d", eid)).
 		Execute(app).

@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -33,20 +33,23 @@ import (
 var _debugHTML string
 
 // New creates a new middleware handler with debug info.
-func dev() fiber.Handler {
+func dev() echo.MiddlewareFunc {
 	log := logger.Copy().WithOptions(zap.AddCallerSkip(2))
 	// Return new handler
-	return func(c *fiber.Ctx) (err error) { //nolint:nonamedreturns
-		defer func() {
-			if r := recover(); r != nil {
-				c.Status(http.StatusInternalServerError).
-					Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
-				_, err = fmt.Fprintf(c, _debugHTML, r, takeStacktrace(2))
-				log.Error("panic: " + fmt.Sprintln(r))
-			}
-		}()
+	return func(next echo.HandlerFunc) echo.HandlerFunc { //nolint:nonamedreturns
+		return func(c echo.Context) (err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
+					c.Response().Status = http.StatusInternalServerError
 
-		return c.Next()
+					_, err = fmt.Fprintf(c.Response(), _debugHTML, r, takeStacktrace(2))
+					log.Error("panic: " + fmt.Sprintln(r))
+				}
+			}()
+
+			return next(c)
+		}
 	}
 }
 

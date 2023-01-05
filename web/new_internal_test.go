@@ -20,8 +20,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/bytedance/sonic/decoder"
-	"github.com/gofiber/fiber/v2"
+	"github.com/bytedance/sonic"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/web/res"
@@ -30,36 +30,41 @@ import (
 func TestDefaultErrorHandler_resError(t *testing.T) {
 	t.Parallel()
 
-	app := fiber.New(fiber.Config{ErrorHandler: getDefaultErrorHandler()})
-	app.Get("/", func(c *fiber.Ctx) error {
+	app := echo.New()
+	app.HTTPErrorHandler = getDefaultErrorHandler()
+
+	app.GET("/", func(c echo.Context) error {
 		return res.BadRequest("mm")
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	resp, err := app.Test(req, -1)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := httptest.NewRecorder()
+	app.ServeHTTP(resp, req)
+	require.Equal(t, http.StatusBadRequest, resp.Code)
 
-	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	content := resp.Body.Bytes()
 
 	var body res.Error
-	require.NoError(t, decoder.NewStreamDecoder(resp.Body).Decode(&body))
+	require.NoError(t, sonic.Unmarshal(content, &body))
 
 	require.Equal(t, "mm", body.Description)
+	require.EqualValues(t, http.StatusBadRequest, resp.Code)
 }
 
 func TestDefaultErrorHandler_internal(t *testing.T) {
 	t.Parallel()
 
-	app := fiber.New(fiber.Config{ErrorHandler: getDefaultErrorHandler()})
-	app.Get("/", func(c *fiber.Ctx) error {
+	app := echo.New()
+
+	app.HTTPErrorHandler = getDefaultErrorHandler()
+
+	app.GET("/", func(c echo.Context) error {
 		return errors.New("mm") //nolint:goerr113
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	resp, err := app.Test(req, -1)
-	require.NoError(t, err)
-	defer resp.Body.Close()
+	resp := httptest.NewRecorder()
+	app.ServeHTTP(resp, req)
 
-	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	require.Equal(t, http.StatusInternalServerError, resp.Code)
 }

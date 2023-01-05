@@ -17,7 +17,7 @@ package req
 import (
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/web/res"
 )
@@ -35,11 +35,11 @@ func (q PageQuery) Check(count int64) error {
 	return nil
 }
 
-func GetPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (PageQuery, error) {
+func GetPageQuery(c echo.Context, defaultLimit int, maxLimit int) (PageQuery, error) {
 	q := PageQuery{Limit: defaultLimit}
 	var err error
 
-	raw := c.Query("limit")
+	raw := c.QueryParam("limit")
 	if raw != "" {
 		q.Limit, err = strconv.Atoi(raw)
 		if err != nil {
@@ -54,7 +54,7 @@ func GetPageQuery(c *fiber.Ctx, defaultLimit int, maxLimit int) (PageQuery, erro
 		}
 	}
 
-	raw = c.Query("offset")
+	raw = c.QueryParam("offset")
 	if raw != "" {
 		q.Offset, err = strconv.Atoi(raw)
 		if err != nil {

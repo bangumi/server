@@ -16,24 +16,24 @@ package web
 
 import (
 	_ "embed" //nolint:revive
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/config/env"
 )
 
 //go:embed index.html
-var indexPageHTML []byte
+var indexPageHTML string
 
-func indexPage() fiber.Handler {
+func indexPage() echo.HandlerFunc {
 	if env.Production {
-		return func(c *fiber.Ctx) error {
-			return c.Redirect("https://github.com/bangumi/")
+		return func(c echo.Context) error {
+			return c.Redirect(http.StatusFound, "https://github.com/bangumi/")
 		}
 	}
 
-	return func(c *fiber.Ctx) error {
-		c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
-		return c.Send(indexPageHTML)
+	return func(c echo.Context) error {
+		return c.HTML(http.StatusOK, indexPageHTML)
 	}
 }

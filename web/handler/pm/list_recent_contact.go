@@ -15,24 +15,26 @@
 package pm
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/web/res"
 )
 
-func (h PrivateMessage) ListRecentContact(c *fiber.Ctx) error {
+func (h PrivateMessage) ListRecentContact(c echo.Context) error {
 	accessor := h.Common.GetHTTPAccessor(c)
-	contactIDs, err := h.pmRepo.ListRecentContact(c.UserContext(), accessor.ID)
+	contactIDs, err := h.pmRepo.ListRecentContact(c.Request().Context(), accessor.ID)
 	if err != nil {
 		return res.InternalError(c, err, "failed to list recent contact")
 	}
-	contacts, err := h.ctrl.GetUsersByIDs(c.UserContext(), contactIDs)
+	contacts, err := h.ctrl.GetUsersByIDs(c.Request().Context(), contactIDs)
 	if err != nil {
 		return res.InternalError(c, err, "failed to get contacts")
 	}
-	return res.JSON(c, slice.MapFilter(contactIDs, func(v model.UserID) (res.User, bool) {
+	return c.JSON(http.StatusOK, slice.MapFilter(contactIDs, func(v model.UserID) (res.User, bool) {
 		if m, ok := contacts[v]; ok {
 			return res.ConvertModelUser(m), ok
 		}

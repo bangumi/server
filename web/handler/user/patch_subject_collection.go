@@ -18,8 +18,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/bytedance/sonic/decoder"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/ctrl"
@@ -30,14 +30,14 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
-	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+func (h User) PatchSubjectCollection(c echo.Context) error {
+	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
 
 	var r req.SubjectEpisodeCollectionPatch
-	if err = sonic.Unmarshal(c.Body(), &r); err != nil {
+	if err = decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -49,13 +49,13 @@ func (h User) PatchSubjectCollection(c *fiber.Ctx) error {
 }
 
 func (h User) patchSubjectCollection(
-	c *fiber.Ctx,
+	c echo.Context,
 	subjectID model.SubjectID,
 	r req.SubjectEpisodeCollectionPatch,
 ) error {
 	u := h.GetHTTPAccessor(c)
 
-	s, err := h.ctrl.GetSubject(c.UserContext(), u.Auth, subjectID)
+	s, err := h.ctrl.GetSubject(c.Request().Context(), u.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("subject not found")
@@ -71,8 +71,8 @@ func (h User) patchSubjectCollection(
 		}
 	}
 
-	err = h.ctrl.UpdateCollection(c.UserContext(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
-		IP:        u.IP.String(),
+	err = h.ctrl.UpdateCollection(c.Request().Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
+		IP:        u.IP,
 		UID:       u.ID,
 		VolStatus: r.VolStatus,
 		EpStatus:  r.EpStatus,
@@ -92,6 +92,5 @@ func (h User) patchSubjectCollection(
 		return errgo.Wrap(err, "ctrl.UpdateCollection")
 	}
 
-	c.Status(http.StatusNoContent)
-	return nil
+	return c.NoContent(http.StatusNoContent)
 }

@@ -15,7 +15,7 @@
 package metrics
 
 import (
-	"github.com/globocom/go-redis-prometheus"
+	redisprom "github.com/globocom/go-redis-prometheus"
 	"github.com/go-redis/redis/v8"
 )
 

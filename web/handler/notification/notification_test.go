@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -48,7 +48,7 @@ func TestNotification_Count(t *testing.T) {
 
 	resp := test.New(t).
 		Get("/p/notifications/count").
-		Header(fiber.HeaderCookie, "sessionID=11").
+		Header(echo.HeaderCookie, "chiiNextSessionID=11").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)

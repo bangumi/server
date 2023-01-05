@@ -16,17 +16,18 @@ package user
 
 import (
 	"errors"
+	"net/http"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) Get(c *fiber.Ctx) error {
-	username := c.Params("username")
+func (h User) Get(c echo.Context) error {
+	username := c.Param("username")
 	if username == "" {
 		return res.BadRequest("missing require parameters `username`")
 	}
@@ -34,7 +35,7 @@ func (h User) Get(c *fiber.Ctx) error {
 		return res.BadRequest("username is too long")
 	}
 
-	user, err := h.user.GetByName(c.UserContext(), username)
+	user, err := h.user.GetByName(c.Request().Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("can't find user with username " + strconv.Quote(username))
@@ -45,11 +46,11 @@ func (h User) Get(c *fiber.Ctx) error {
 
 	var r = res.ConvertModelUser(user)
 
-	return res.JSON(c, r)
+	return c.JSON(http.StatusOK, r)
 }
 
-func (h User) GetAvatar(c *fiber.Ctx) error {
-	username := c.Params("username")
+func (h User) GetAvatar(c echo.Context) error {
+	username := c.Param("username")
 	if username == "" {
 		return res.BadRequest("missing require parameters `username`")
 	}
@@ -57,7 +58,7 @@ func (h User) GetAvatar(c *fiber.Ctx) error {
 		return res.BadRequest("username is too long")
 	}
 
-	user, err := h.user.GetByName(c.UserContext(), username)
+	user, err := h.user.GetByName(c.Request().Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("can't find user with username " + strconv.Quote(username))
@@ -66,10 +67,10 @@ func (h User) GetAvatar(c *fiber.Ctx) error {
 		return errgo.Wrap(err, "failed to get user by username")
 	}
 
-	l, ok := res.UserAvatar(user.Avatar).Select(c.Query("type"))
+	l, ok := res.UserAvatar(user.Avatar).Select(c.QueryParam("type"))
 	if !ok {
-		return res.BadRequest("bad avatar type: " + c.Query("type"))
+		return res.BadRequest("bad avatar type: " + c.QueryParam("type"))
 	}
 
-	return c.Redirect(l)
+	return c.Redirect(http.StatusFound, l)
 }

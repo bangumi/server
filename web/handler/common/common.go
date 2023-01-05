@@ -17,7 +17,7 @@ package common
 import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
@@ -60,12 +60,12 @@ type Common struct {
 	validatorTranslation ut.Translator
 }
 
-func (h Common) GetHTTPAccessor(c *fiber.Ctx) *accessor.Accessor {
-	u, ok := c.Context().UserValue(ctxkey.User).(*accessor.Accessor)
+func (h Common) GetHTTPAccessor(c echo.Context) *accessor.Accessor {
+	u, ok := c.Get(ctxkey.User).(*accessor.Accessor)
 	if !ok {
 		h.log.Error(
 			"failed to get http accessor, expecting *accessor got another type instead",
-			zap.Any("accessor", c.Context().UserValue(ctxkey.User)))
+			zap.Any("accessor", c.Get(ctxkey.User)))
 		panic("can't convert type")
 	}
 

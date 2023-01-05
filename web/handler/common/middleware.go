@@ -15,17 +15,19 @@
 package common
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/web/res"
 )
 
 var errNeedLogin = res.Unauthorized("this API need authorization")
 
-func (h Common) NeedLogin(c *fiber.Ctx) error {
-	if u := h.GetHTTPAccessor(c); !u.Login {
-		return errNeedLogin
-	}
+func (h Common) NeedLogin(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if u := h.GetHTTPAccessor(c); !u.Login {
+			return errNeedLogin
+		}
 
-	return c.Next()
+		return next(c)
+	}
 }

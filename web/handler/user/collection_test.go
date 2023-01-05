@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -117,7 +117,7 @@ func TestUser_ListSubjectCollection_other_user(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{UserRepo: m, AuthService: a, CollectionRepo: c})
 
 	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
-		Header(fiber.HeaderAuthorization, "Bearer v").
+		Header(echo.HeaderAuthorization, "Bearer v").
 		Execute(app)
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode, resp.BodyString())

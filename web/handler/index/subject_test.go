@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -51,7 +51,7 @@ func TestHandler_Add_Index_Subject(t *testing.T) {
 
 	resp := test.New(t).
 		Post("/v0/indices/7/subjects").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]any{
 			"subject_id": 5,
 			"sort":       48,
@@ -81,7 +81,7 @@ func TestHandler_Add_Index_Subject_NoPermission(t *testing.T) {
 
 	resp := test.New(t).
 		Post("/v0/indices/7/subjects").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]any{
 			"subject_id": 5,
 			"sort":       48,
@@ -114,7 +114,7 @@ func TestHandler_Update_Index_Subject(t *testing.T) {
 
 	resp := test.New(t).
 		Put("/v0/indices/7/subjects/5").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]any{
 			"sort":    48,
 			"comment": "test123",
@@ -143,7 +143,7 @@ func TestHandler_Update_Index_Subject_NoPermission(t *testing.T) {
 
 	resp := test.New(t).
 		Put("/v0/indices/7/subjects/5").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]any{
 			"sort":    48,
 			"comment": "test123",
@@ -174,7 +174,7 @@ func TestHandler_Update_Index_Subject_NonExists(t *testing.T) {
 
 	resp := test.New(t).
 		Put("/v0/indices/7/subjects/5").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]any{
 			"sort":    48,
 			"comment": "test123",
@@ -206,7 +206,7 @@ func TestHandler_Delete_Index_Subject(t *testing.T) {
 
 	resp := test.New(t).
 		Delete("/v0/indices/7/subjects/5").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		Execute(app)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -231,7 +231,7 @@ func TestHandler_Delete_Index_Subject_NoPermission(t *testing.T) {
 
 	resp := test.New(t).
 		Delete("/v0/indices/7/subjects/5").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		Execute(app)
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
@@ -250,7 +250,7 @@ func TestHandler_Update_Index_Invalid_Comment(t *testing.T) {
 
 	resp := test.New(t).
 		Put("/v0/indices/7/subjects/5").
-		Header(fiber.HeaderAuthorization, "Bearer token").
+		Header(echo.HeaderAuthorization, "Bearer token").
 		JSON(map[string]any{
 			"sort":    48,
 			"comment": "test123\000",

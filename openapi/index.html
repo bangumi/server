@@ -15,17 +15,27 @@
   -->
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
   <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-    />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <meta charset="utf-8" />
+    <title>Bangumi API</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui-bundle.js"></script>
+
+    <link rel="shortcut icon" href="https://bgm.tv/img/favicon.ico" type="image/x-icon" />
   </head>
   <body>
-    <h1><a href="./v0.html">v0.html</a></h1>
+    <div id="swagger-ui"></div>
+
+    <script>
+      window.onload = function () {
+        window.ui = SwaggerUIBundle({
+          url: "./v0.yaml",
+          dom_id: "#swagger-ui",
+          layout: "BaseLayout",
+          deepLinking: true,
+        });
+      };
+    </script>
   </body>
 </html>

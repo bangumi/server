@@ -19,7 +19,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/web/middleware/recovery"
@@ -27,20 +27,18 @@ import (
 
 func TestPanicMiddleware(t *testing.T) {
 	t.Parallel()
-	var app = fiber.New()
+	var app = echo.New()
 
 	app.Use(recovery.New())
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.GET("/", func(c echo.Context) error {
 		panic("errInternal")
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	resp := httptest.NewRecorder()
 
-	resp, err := app.Test(req)
-	require.Nil(t, err, "panic should be caught")
-	defer resp.Body.Close()
+	app.ServeHTTP(resp, req)
 
-	require.Equal(t, http.StatusInternalServerError,
-		resp.StatusCode, "middleware should catch internal error")
+	require.Equal(t, http.StatusInternalServerError, resp.Code, "middleware should catch internal error")
 }

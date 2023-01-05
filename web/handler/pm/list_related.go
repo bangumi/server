@@ -16,8 +16,9 @@ package pm
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
@@ -27,13 +28,13 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h PrivateMessage) ListRelated(c *fiber.Ctx) error {
+func (h PrivateMessage) ListRelated(c echo.Context) error {
 	accessor := h.Common.GetHTTPAccessor(c)
-	relatedID, err := req.ParsePrivateMessageID(c.Params("id"))
+	relatedID, err := req.ParsePrivateMessageID(c.Param("id"))
 	if err != nil {
 		return err
 	}
-	list, err := h.pmRepo.ListRelated(c.Context(), accessor.ID, relatedID)
+	list, err := h.pmRepo.ListRelated(c.Request().Context(), accessor.ID, relatedID)
 	if err != nil {
 		switch {
 		case errors.Is(err, domain.ErrNotFound):
@@ -45,12 +46,12 @@ func (h PrivateMessage) ListRelated(c *fiber.Ctx) error {
 		return res.InternalError(c, err, "failed to list related private messages")
 	}
 	userIDs := []model.UserID{list[0].SenderID, list[0].ReceiverID}
-	users, err := h.ctrl.GetUsersByIDs(c.Context(), userIDs)
+	users, err := h.ctrl.GetUsersByIDs(c.Request().Context(), userIDs)
 	if err != nil {
 		return res.InternalError(c, err, "failed to get users")
 	}
 	data := slice.Map(list, func(v pm.PrivateMessage) res.PrivateMessage {
 		return res.ConvertModelPrivateMessage(v, users)
 	})
-	return res.JSON(c, data)
+	return c.JSON(http.StatusOK, data)
 }

@@ -15,16 +15,18 @@
 package notification
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
 
-	"github.com/bangumi/server/web/res"
+	"github.com/labstack/echo/v4"
+
+	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
-func (h Notification) Count(c *fiber.Ctx) error {
+func (h Notification) Count(c echo.Context) error {
 	accessor := h.Common.GetHTTPAccessor(c)
-	count, err := h.notificationRepo.Count(c.Context(), accessor.ID)
+	count, err := h.notificationRepo.Count(c.Request().Context(), accessor.ID)
 	if err != nil {
-		return res.InternalError(c, err, "failed to count notification")
+		return errgo.Wrap(err, "failed to count notification")
 	}
-	return c.JSON(count)
+	return c.JSON(http.StatusOK, count)
 }

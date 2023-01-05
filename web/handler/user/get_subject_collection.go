@@ -16,8 +16,9 @@ package user
 
 import (
 	"errors"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
@@ -26,13 +27,13 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) GetSubjectCollection(c *fiber.Ctx) error {
-	username := c.Params("username")
+func (h User) GetSubjectCollection(c echo.Context) error {
+	username := c.Param("username")
 	if username == "" {
 		return res.BadRequest("missing require parameters `username`")
 	}
 
-	subjectID, err := req.ParseSubjectID(c.Params("subject_id"))
+	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -40,11 +41,11 @@ func (h User) GetSubjectCollection(c *fiber.Ctx) error {
 	return h.getSubjectCollection(c, username, subjectID)
 }
 
-func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID model.SubjectID) error {
+func (h User) getSubjectCollection(c echo.Context, username string, subjectID model.SubjectID) error {
 	const notFoundMessage = "subject is not collected by user"
 	v := h.GetHTTPAccessor(c)
 
-	s, err := h.ctrl.GetSubject(c.UserContext(), v.Auth, subjectID)
+	s, err := h.ctrl.GetSubject(c.Request().Context(), v.Auth, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
@@ -53,7 +54,7 @@ func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID mode
 		return errgo.Wrap(err, "failed to subject info")
 	}
 
-	u, err := h.user.GetByName(c.UserContext(), username)
+	u, err := h.user.GetByName(c.Request().Context(), username)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("user doesn't exist or has been removed")
@@ -64,7 +65,7 @@ func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID mode
 
 	var showPrivate = u.ID == v.ID
 
-	collection, err := h.collect.GetSubjectCollection(c.UserContext(), u.ID, subjectID)
+	collection, err := h.collect.GetSubjectCollection(c.Request().Context(), u.ID, subjectID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound(notFoundMessage)
@@ -77,5 +78,5 @@ func (h User) getSubjectCollection(c *fiber.Ctx, username string, subjectID mode
 		return res.NotFound(notFoundMessage)
 	}
 
-	return res.JSON(c, res.ConvertModelSubjectCollection(collection, res.ToSlimSubjectV0(s)))
+	return c.JSON(http.StatusOK, res.ConvertModelSubjectCollection(collection, res.ToSlimSubjectV0(s)))
 }

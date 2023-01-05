@@ -20,8 +20,8 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/go-resty/resty/v2"
-	"github.com/gofiber/fiber/v2"
 	"github.com/jarcoal/httpmock"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/fx"
 
@@ -72,9 +72,9 @@ type Mock struct {
 }
 
 //nolint:funlen
-func GetWebApp(tb testing.TB, m Mock) *fiber.App {
+func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 	tb.Helper()
-	var f *fiber.App
+	var e *echo.Echo
 
 	httpClient := resty.New().SetJSONEscapeHTML(false)
 	httpClient.JSONUnmarshal = sonic.Unmarshal
@@ -114,7 +114,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 
 		fx.Invoke(web.AddRouters),
 
-		fx.Populate(&f),
+		fx.Populate(&e),
 	}
 
 	if m.Dam != nil {
@@ -137,7 +137,7 @@ func GetWebApp(tb testing.TB, m Mock) *fiber.App {
 		httpClient.GetClient().Transport = m.HTTPMock
 	}
 
-	return f
+	return e
 }
 
 func MockRevisionRepo(repo revision.Repo) fx.Option {

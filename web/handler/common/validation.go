@@ -25,14 +25,14 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Common) ValidationError(c *fiber.Ctx, err error) error {
-	return res.JSON(c.Status(http.StatusBadRequest), res.Error{
+func (h Common) ValidationError(c echo.Context, err error) error {
+	return c.JSON(http.StatusBadRequest, res.Error{
 		Title:       "Bad Request",
 		Description: "can't validate request body",
 		Details:     h.translationValidationError(err),

@@ -22,15 +22,12 @@ import (
 	"net/http/pprof"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
-	"github.com/bytedance/sonic"
-	"github.com/gofiber/adaptor/v2"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"github.com/gofiber/fiber/v2/utils"
+	"github.com/bytedance/sonic/decoder"
+	"github.com/bytedance/sonic/encoder"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -52,141 +49,165 @@ import (
 const headerProcessTime = "x-process-time-ms"
 const headerServerVersion = "x-server-version"
 
-func New() *fiber.App {
-	app := fiber.New(fiber.Config{
-		DisableStartupMessage: true,
-		StrictRouting:         true,
-		CaseSensitive:         true,
-		ErrorHandler:          getDefaultErrorHandler(),
-		JSONEncoder:           sonic.Marshal,
-	})
+type echoJSONSerializer struct {
+}
 
-	app.Use(func(c *fiber.Ctx) error {
-		metrics.RequestCount.Inc()
-		start := time.Now()
+func (e echoJSONSerializer) Serialize(c echo.Context, i any, indent string) error {
+	enc := encoder.NewStreamEncoder(c.Response())
 
-		err := c.Next()
+	enc.SetIndent("", indent)
 
-		sub := time.Since(start)
-		metrics.RequestHistogram.Observe(sub.Seconds())
-		c.Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
-		c.Set(headerServerVersion, config.Version)
-		return err
+	return enc.Encode(i) //nolint:wrapcheck
+}
+
+func (e echoJSONSerializer) Deserialize(c echo.Context, i any) error {
+	return decoder.NewStreamDecoder(c.Request().Body).Decode(i) //nolint:wrapcheck
+}
+
+var _ echo.JSONSerializer = echoJSONSerializer{}
+
+//nolint:funlen
+func New() *echo.Echo {
+	app := echo.New()
+	app.JSONSerializer = echoJSONSerializer{}
+	app.HTTPErrorHandler = getDefaultErrorHandler()
+	app.HideBanner = true
+	app.HidePort = true
+
+	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			metrics.RequestCount.Inc()
+			start := time.Now()
+
+			err := next(c)
+
+			sub := time.Since(start)
+			metrics.RequestHistogram.Observe(sub.Seconds())
+			c.Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
+			c.Set(headerServerVersion, config.Version)
+			return err
+		}
 	})
 
 	if env.Development {
-		app.Use(func(c *fiber.Ctx) error {
-			devRequestID := "fake-ray-" + random.Base62String(10)
-			c.Request().Header.Set(cf.HeaderRequestID, devRequestID)
-			c.Request().Header.Set(cf.HeaderRequestIP, c.Context().RemoteIP().String())
-			c.Set(cf.HeaderRequestID, devRequestID)
+		app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				devRequestID := "fake-ray-" + random.Base62String(10)
+				c.Request().Header.Set(cf.HeaderRequestID, devRequestID)
+				c.Request().Header.Set(cf.HeaderRequestIP, c.Request().RemoteAddr)
+				c.Set(cf.HeaderRequestID, devRequestID)
 
-			return c.Next()
+				return next(c)
+			}
 		})
-		app.Use(cors.New(cors.Config{
-			MaxAge:        gtime.OneWeekSec,
-			ExposeHeaders: strings.Join([]string{headerProcessTime, headerServerVersion, cf.HeaderRequestID}, ","),
-		}))
 	}
 
-	app.Use(setUserContext)
+	app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:  []string{"*"},
+		AllowHeaders:  []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		ExposeHeaders: []string{headerProcessTime, headerServerVersion, cf.HeaderRequestID},
+		MaxAge:        gtime.OneWeekSec,
+	}))
+
+	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			reqID := c.Request().Header.Get(cf.HeaderRequestID)
+			reqIP := c.Request().Header.Get(cf.HeaderRequestIP)
+
+			c.SetRequest(c.Request().
+				WithContext(context.WithValue(context.Background(), logger.RequestKey, &logger.RequestTrace{
+					IP:    reqIP,
+					ReqID: reqID,
+				})))
+
+			return next(c)
+		}
+	})
 
 	app.Use(recovery.New())
-	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
+
+	app.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+
 	addProfile(app)
 
-	app.Get("/openapi", func(c *fiber.Ctx) error {
-		return c.Redirect("/openapi/")
+	app.GET("/openapi", func(c echo.Context) error {
+		return c.Redirect(http.StatusFound, "/openapi/")
 	})
 
 	if env.Development {
 		// fasthttp bug, it uses an internal global variable and causing data race here
-		m.Lock()
 		app.Static("/openapi/", "./openapi/")
-		m.Unlock()
 	} else {
-		app.Use("/openapi/", filesystem.New(filesystem.Config{
-			Root:  http.FS(openapi.Static),
-			Index: "index.html",
-		}))
+		app.StaticFS("/openapi/", openapi.Static)
 	}
 
 	return app
 }
 
-var m sync.Mutex //nolint:gochecknoglobals
-
-// set user context with request trace.
-func setUserContext(c *fiber.Ctx) error {
-	reqID := c.Get(cf.HeaderRequestID)
-	reqIP := c.Get(cf.HeaderRequestIP)
-
-	c.SetUserContext(context.WithValue(context.Background(), logger.RequestKey, &logger.RequestTrace{
-		IP:    reqIP,
-		ReqID: reqID,
-	}))
-
-	return c.Next()
+func addProfile(app *echo.Echo) {
+	app.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
+	app.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
+	app.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
+	app.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
+	app.Any("/debug/pprof/", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
 }
 
-func addProfile(app *fiber.App) {
-	app.Get("/debug/pprof/cmdline", adaptor.HTTPHandlerFunc(pprof.Cmdline))
-	app.Get("/debug/pprof/profile", adaptor.HTTPHandlerFunc(pprof.Profile))
-	app.Get("/debug/pprof/symbol", adaptor.HTTPHandlerFunc(pprof.Symbol))
-	app.Get("/debug/pprof/trace", adaptor.HTTPHandlerFunc(pprof.Trace))
-	app.Use("/debug/pprof/", adaptor.HTTPHandlerFunc(pprof.Index))
-}
-
-func Start(c config.AppConfig, app *fiber.App) error {
+func Start(c config.AppConfig, app *echo.Echo) error {
 	addr := c.ListenAddr()
 	logger.Infoln("http server listening at", addr)
 	if env.Development {
 		fmt.Printf("\nvisit http://%s/\n\n", strings.ReplaceAll(addr, "0.0.0.0", "127.0.0.1"))
 	}
 
-	return errgo.Wrap(app.Listen(c.ListenAddr()), "fiber.App.Listen")
+	return errgo.Wrap(app.Start(c.ListenAddr()), "echo.Start")
 }
 
-func getDefaultErrorHandler() func(*fiber.Ctx, error) error {
+func getDefaultErrorHandler() echo.HTTPErrorHandler {
 	var log = logger.Named("http.err").
 		WithOptions(zap.AddStacktrace(zapcore.PanicLevel), zap.WithCaller(false))
 
-	return func(ctx *fiber.Ctx, err error) error {
-		var e res.HTTPError
-		if errors.As(err, &e) {
-			// handle expected http error
-			return res.JSON(ctx.Status(e.Code), res.Error{
-				Title:       utils.StatusMessage(e.Code),
-				Description: e.Msg,
-				Details:     util.Detail(ctx),
-			})
+	return func(err error, c echo.Context) {
+		{
+			var e res.HTTPError
+			if errors.As(err, &e) {
+				// handle expected http error
+				_ = c.JSON(e.Code, res.Error{
+					Title:       http.StatusText(e.Code),
+					Description: e.Msg,
+					Details:     util.Detail(c),
+				})
+				return
+			}
 		}
 
-		//nolint:forbidigo,errorlint
-		if fErr, ok := err.(*fiber.Error); ok {
-			log.Error("unexpected fiber error",
-				zap.Int("code", fErr.Code),
-				zap.String("message", fErr.Message),
-				zap.String("path", ctx.Path()),
-				zap.ByteString("query", ctx.Request().URI().QueryString()),
-				zap.String("cf-ray", ctx.Get(cf.HeaderRequestID)),
-			)
+		{
+			//nolint:forbidigo,errorlint
+			if e, ok := err.(*echo.HTTPError); ok {
+				log.Error("unexpected echo error",
+					zap.Int("code", e.Code),
+					zap.Any("message", e.Message),
+					zap.String("path", c.Request().URL.Path),
+					zap.String("query", c.Request().URL.RawQuery),
+					zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
+				)
 
-			return res.JSON(ctx.Status(http.StatusInternalServerError), res.Error{
-				Title:       utils.StatusMessage(fErr.Code),
-				Description: fErr.Message,
-				Details:     util.DetailWithErr(ctx, err),
-			})
+				_ = c.JSON(http.StatusInternalServerError, res.Error{
+					Title:       http.StatusText(e.Code),
+					Description: e.Error(),
+					Details:     util.DetailWithErr(c, err),
+				})
+				return
+			}
 		}
 
 		log.Error("unexpected error",
 			zap.Error(err),
-			zap.String("path", ctx.Path()),
-			zap.ByteString("query", ctx.Request().URI().QueryString()),
-			zap.String("cf-ray", ctx.Get(cf.HeaderRequestID)),
+			zap.String("path", c.Path()),
+			zap.String("query", c.Request().URL.RawQuery),
+			zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
 		)
 
 		// unexpected error, return internal server error
-		return res.InternalError(ctx, err, "Unexpected Internal Server Error")
+		_ = res.InternalError(c, err, "Unexpected Internal Server Error")
 	}
 }

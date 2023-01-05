@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -49,7 +49,7 @@ func TestUser_GetEpisodeCollection(t *testing.T) {
 		Type uint8 `json:"type"`
 	}
 	test.New(t).Get("/v0/users/-/collections/-/episodes/1").
-		Header(fiber.HeaderAuthorization, "Bearer t").
+		Header(echo.HeaderAuthorization, "Bearer t").
 		Execute(app).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
@@ -76,7 +76,7 @@ func TestUser_GetSubjectEpisodeCollection(t *testing.T) {
 		Type uint8 `json:"type"`
 	}]
 	test.New(t).Get("/v0/users/-/collections/8/episodes").
-		Header(fiber.HeaderAuthorization, "Bearer t").
+		Header(echo.HeaderAuthorization, "Bearer t").
 		Execute(app).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
