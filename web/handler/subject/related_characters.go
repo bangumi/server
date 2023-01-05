@@ -20,6 +20,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/samber/lo"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/auth"
@@ -52,9 +53,9 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 	if len(relations) != 0 {
 		var characterIDs = slice.Map(relations,
 			func(item model.SubjectCharacterRelation) model.CharacterID { return item.Character.ID })
-		actors, err = h.ctrl.GetActors(c.Request().Context(), subjectID, characterIDs...)
+		actors, err = h.getActors(c.Request().Context(), subjectID, characterIDs...)
 		if err != nil {
-			return errgo.Wrap(err, "query.GetActors")
+			return errgo.Wrap(err, "query.getActors")
 		}
 	}
 
@@ -71,6 +72,34 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h Subject) getActors(
+	ctx context.Context,
+	subjectID model.SubjectID,
+	characterIDs ...model.CharacterID,
+) (map[model.CharacterID][]model.Person, error) {
+	actors, err := h.subject.GetActors(ctx, subjectID, characterIDs)
+	if err != nil {
+		return nil, errgo.Wrap(err, "subjectRepo.getActors")
+	}
+
+	vs := lo.Uniq(lo.Flatten(lo.Values(actors)))
+
+	persons, err := h.personRepo.GetByIDs(ctx, vs)
+	if err != nil {
+		return nil, errgo.Wrap(err, "failed to get persons")
+	}
+
+	var result = make(map[model.CharacterID][]model.Person, len(actors))
+
+	for characterID, ids := range actors {
+		result[characterID] = slice.Map(ids, func(item model.PersonID) model.Person {
+			return persons[item]
+		})
+	}
+
+	return result, nil
 }
 
 func (h Subject) getSubjectRelatedCharacters(

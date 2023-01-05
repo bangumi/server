@@ -20,7 +20,6 @@ import (
 	"github.com/bangumi/server/dal"
 	"github.com/bangumi/server/internal/collection"
 	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pm"
@@ -33,7 +32,6 @@ func New(
 	episode episode.Repo,
 	cache cache.RedisCache,
 	subject subject.Repo,
-	person person.Repo,
 	collection collection.Repo,
 	timeline timeline.Repo,
 	user user.Repo,
@@ -50,7 +48,6 @@ func New(
 		dam: dam,
 
 		user:           user,
-		person:         person,
 		episode:        episode,
 		subject:        subject,
 		collection:     collection,
@@ -67,7 +64,6 @@ type Ctrl struct {
 	dam dam.Dam
 
 	user           user.Repo
-	person         person.Repo
 	episode        episode.Repo
 	subject        subject.Repo
 	collection     collection.Repo

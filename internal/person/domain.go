@@ -29,6 +29,8 @@ type Repo interface {
 	GetCharacterRelated(ctx context.Context, subjectID model.CharacterID) ([]domain.PersonCharacterRelation, error)
 }
 
+// Service
+// TODO: should use repo.
 type Service interface {
 	Get(ctx context.Context, id model.PersonID) (model.Person, error)
 

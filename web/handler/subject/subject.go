@@ -22,22 +22,25 @@ import (
 )
 
 type Subject struct {
-	ctrl    ctrl.Ctrl
-	person  person.Service
-	subject subject.Repo
-	c       character.Repo
+	ctrl       ctrl.Ctrl
+	person     person.Service
+	personRepo person.Repo
+	subject    subject.Repo
+	c          character.Repo
 }
 
 func New(
 	p person.Service,
 	ctrl ctrl.Ctrl,
 	subject subject.Repo,
+	personRepo person.Repo,
 	c character.Repo,
 ) (Subject, error) {
 	return Subject{
-		ctrl:    ctrl,
-		c:       c,
-		subject: subject,
-		person:  p,
+		ctrl:       ctrl,
+		c:          c,
+		personRepo: personRepo,
+		subject:    subject,
+		person:     p,
 	}, nil
 }

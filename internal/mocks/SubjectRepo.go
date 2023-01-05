@@ -95,7 +95,7 @@ func (_m *SubjectRepo) GetActors(ctx context.Context, subjectID model.SubjectID,
 	return r0, r1
 }
 
-// SubjectRepo_GetActors_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActors'
+// SubjectRepo_GetActors_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'getActors'
 type SubjectRepo_GetActors_Call struct {
 	*mock.Call
 }
@@ -105,7 +105,7 @@ type SubjectRepo_GetActors_Call struct {
 //   - subjectID model.SubjectID
 //   - characterIDs []model.CharacterID
 func (_e *SubjectRepo_Expecter) GetActors(ctx interface{}, subjectID interface{}, characterIDs interface{}) *SubjectRepo_GetActors_Call {
-	return &SubjectRepo_GetActors_Call{Call: _e.mock.On("GetActors", ctx, subjectID, characterIDs)}
+	return &SubjectRepo_GetActors_Call{Call: _e.mock.On("getActors", ctx, subjectID, characterIDs)}
 }
 
 func (_c *SubjectRepo_GetActors_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, characterIDs []model.CharacterID)) *SubjectRepo_GetActors_Call {
