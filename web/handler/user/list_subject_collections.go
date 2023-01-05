@@ -20,11 +20,11 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -97,7 +97,7 @@ func (h User) listCollection(
 		return item.SubjectID
 	})
 
-	subjectMap, err := h.ctrl.GetSubjectByIDs(c.Request().Context(), subjectIDs, ctrl.SubjectFilter{})
+	subjectMap, err := h.subject.GetByIDs(c.Request().Context(), subjectIDs, subject.Filter{})
 	if err != nil {
 		return errgo.Wrap(err, "failed to get subjects")
 	}

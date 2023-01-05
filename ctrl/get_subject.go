@@ -68,23 +68,6 @@ type SubjectFilter struct {
 	NSFW null.Bool
 }
 
-func (ctl Ctrl) GetSubjectByIDs(
-	ctx context.Context,
-	subjectIDs []model.SubjectID,
-	filter SubjectFilter,
-) (map[model.SubjectID]model.Subject, error) {
-	if len(subjectIDs) == 0 {
-		return map[model.SubjectID]model.Subject{}, nil
-	}
-
-	notCachedSubjects, err := ctl.subject.GetByIDs(ctx, subjectIDs, subject.Filter{NSFW: filter.NSFW})
-	if err != nil {
-		return nil, errgo.Wrap(err, "failed to get subjects")
-	}
-
-	return notCachedSubjects, nil
-}
-
 func (ctl Ctrl) getSubject(ctx context.Context, id model.SubjectID) (model.Subject, error) {
 	var key = cachekey.Subject(id)
 
