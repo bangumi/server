@@ -22,12 +22,14 @@ import (
 	"net/http/pprof"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
@@ -40,6 +42,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/random"
+	"github.com/bangumi/server/openapi"
 	"github.com/bangumi/server/web/middleware/recovery"
 	"github.com/bangumi/server/web/req/cf"
 	"github.com/bangumi/server/web/res"
@@ -92,12 +95,26 @@ func New() *fiber.App {
 	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 	addProfile(app)
 
+	app.Get("/openapi", func(c *fiber.Ctx) error {
+		return c.Redirect("/openapi/")
+	})
+
 	if env.Development {
-		app.Use("/openapi/", openapiHandler)
+		// fasthttp bug, it uses an internal global variable and causing data race here
+		m.Lock()
+		app.Static("/openapi/", "./openapi/")
+		m.Unlock()
+	} else {
+		app.Use("/openapi/", filesystem.New(filesystem.Config{
+			Root:  http.FS(openapi.Static),
+			Index: "index.html",
+		}))
 	}
 
 	return app
 }
+
+var m sync.Mutex //nolint:gochecknoglobals
 
 // set user context with request trace.
 func setUserContext(c *fiber.Ctx) error {

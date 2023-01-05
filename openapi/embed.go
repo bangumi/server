@@ -12,18 +12,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package web
+package openapi
 
 import (
-	"net/http"
-
-	"github.com/gofiber/fiber/v2"
+	"embed"
 )
 
-func openapiHandler(c *fiber.Ctx) error {
-	if c.Method() != http.MethodGet {
-		return c.SendStatus(http.StatusMethodNotAllowed)
-	}
-
-	return c.SendFile("." + c.Path())
-}
+//go:embed *
+var Static embed.FS
