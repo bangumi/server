@@ -28,7 +28,6 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
-	"github.com/bangumi/server/internal/pkg/generic/slice"
 )
 
 type mysqlRepo struct {
@@ -207,7 +206,7 @@ func (r mysqlRepo) GetByIDs(
 	if len(ids) == 0 {
 		return map[model.SubjectID]model.Subject{}, nil
 	}
-	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(slice.ToValuer(ids)...))
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Where(r.q.Subject.ID.In(ids...))
 
 	if filter.NSFW.Set {
 		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
@@ -237,7 +236,7 @@ func (r mysqlRepo) GetActors(
 	characterIDs []model.CharacterID,
 ) (map[model.CharacterID][]model.PersonID, error) {
 	relations, err := r.q.Cast.WithContext(ctx).
-		Where(r.q.Cast.CharacterID.In(slice.ToValuer(characterIDs)...), r.q.Cast.SubjectID.Eq(subjectID)).
+		Where(r.q.Cast.CharacterID.In(characterIDs...), r.q.Cast.SubjectID.Eq(subjectID)).
 		Order(r.q.Cast.PersonID).
 		Find()
 	if err != nil {

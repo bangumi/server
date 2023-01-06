@@ -27,6 +27,7 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
 func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error {
@@ -68,7 +69,7 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error 
 				break
 			}
 
-			e.log.Debug("clear user avatar cache", k.ID.Zap())
+			e.log.Debug("clear user avatar cache", log.User(k.ID))
 			go e.clearImageCache(after.Avatar)
 		}
 	}

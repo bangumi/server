@@ -28,7 +28,7 @@ func newWebSession(db *gorm.DB, opts ...gen.DOOption) webSession {
 	tableName := _webSession.webSessionDo.TableName()
 	_webSession.ALL = field.NewAsterisk(tableName)
 	_webSession.Key = field.NewString(tableName, "key")
-	_webSession.UserID = field.NewField(tableName, "user_id")
+	_webSession.UserID = field.NewUint32(tableName, "user_id")
 	_webSession.Value = field.NewBytes(tableName, "value")
 	_webSession.CreatedAt = field.NewInt64(tableName, "created_at")
 	_webSession.ExpiredAt = field.NewInt64(tableName, "expired_at")
@@ -43,7 +43,7 @@ type webSession struct {
 
 	ALL       field.Asterisk
 	Key       field.String // session key
-	UserID    field.Field  // uint32 user id
+	UserID    field.Uint32 // uint32 user id
 	Value     field.Bytes  // json encoded session data
 	CreatedAt field.Int64  // int64 unix timestamp, when session is created
 	ExpiredAt field.Int64  // int64 unix timestamp, when session is expired
@@ -64,7 +64,7 @@ func (w webSession) As(alias string) *webSession {
 func (w *webSession) updateTableName(table string) *webSession {
 	w.ALL = field.NewAsterisk(table)
 	w.Key = field.NewString(table, "key")
-	w.UserID = field.NewField(table, "user_id")
+	w.UserID = field.NewUint32(table, "user_id")
 	w.Value = field.NewBytes(table, "value")
 	w.CreatedAt = field.NewInt64(table, "created_at")
 	w.ExpiredAt = field.NewInt64(table, "expired_at")

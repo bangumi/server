@@ -4,38 +4,34 @@
 
 package dao
 
-import (
-	"github.com/bangumi/server/internal/model"
-)
-
 const TableNamePerson = "chii_persons"
 
 // Person mapped from table <chii_persons>
 type Person struct {
-	ID          model.PersonID `gorm:"column:prsn_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	Name        string         `gorm:"column:prsn_name;type:varchar(255);not null"`
-	Type        uint8          `gorm:"column:prsn_type;type:tinyint(4) unsigned;not null"` // 个人，公司，组合
-	Infobox     string         `gorm:"column:prsn_infobox;type:mediumtext;not null"`
-	Producer    bool           `gorm:"column:prsn_producer;type:tinyint(1);not null"`
-	Mangaka     bool           `gorm:"column:prsn_mangaka;type:tinyint(1);not null"`
-	Artist      bool           `gorm:"column:prsn_artist;type:tinyint(1);not null"`
-	Seiyu       bool           `gorm:"column:prsn_seiyu;type:tinyint(1);not null"`
-	Writer      bool           `gorm:"column:prsn_writer;type:tinyint(4);not null"`      // 作家
-	Illustrator bool           `gorm:"column:prsn_illustrator;type:tinyint(4);not null"` // 绘师
-	Actor       bool           `gorm:"column:prsn_actor;type:tinyint(1);not null"`       // 演员
-	Summary     string         `gorm:"column:prsn_summary;type:mediumtext;not null"`
-	Img         string         `gorm:"column:prsn_img;type:varchar(255);not null"`
-	ImgAnidb    string         `gorm:"column:prsn_img_anidb;type:varchar(255);not null"` // Deprecated
-	Comment     uint32         `gorm:"column:prsn_comment;type:mediumint(9) unsigned;not null"`
-	Collects    uint32         `gorm:"column:prsn_collects;type:mediumint(8) unsigned;not null"`
-	Dateline    uint32         `gorm:"column:prsn_dateline;type:int(10) unsigned;not null"`
-	Lastpost    uint32         `gorm:"column:prsn_lastpost;type:int(11) unsigned;not null"`
-	Lock        int8           `gorm:"column:prsn_lock;type:tinyint(4);not null"`
-	AnidbID     uint32         `gorm:"column:prsn_anidb_id;type:mediumint(8) unsigned;not null"` // Deprecated
-	Ban         uint8          `gorm:"column:prsn_ban;type:tinyint(3) unsigned;not null"`
-	Redirect    model.PersonID `gorm:"column:prsn_redirect;type:int(10) unsigned;not null"`
-	Nsfw        bool           `gorm:"column:prsn_nsfw;type:tinyint(1) unsigned;not null"`
-	Fields      PersonField    `gorm:"foreignKey:prsn_id;polymorphic:Owner;polymorphicValue:prsn" json:"fields"`
+	ID          uint32      `gorm:"column:prsn_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
+	Name        string      `gorm:"column:prsn_name;type:varchar(255);not null"`
+	Type        uint8       `gorm:"column:prsn_type;type:tinyint(4) unsigned;not null"` // 个人，公司，组合
+	Infobox     string      `gorm:"column:prsn_infobox;type:mediumtext;not null"`
+	Producer    bool        `gorm:"column:prsn_producer;type:tinyint(1);not null"`
+	Mangaka     bool        `gorm:"column:prsn_mangaka;type:tinyint(1);not null"`
+	Artist      bool        `gorm:"column:prsn_artist;type:tinyint(1);not null"`
+	Seiyu       bool        `gorm:"column:prsn_seiyu;type:tinyint(1);not null"`
+	Writer      bool        `gorm:"column:prsn_writer;type:tinyint(4);not null"`      // 作家
+	Illustrator bool        `gorm:"column:prsn_illustrator;type:tinyint(4);not null"` // 绘师
+	Actor       bool        `gorm:"column:prsn_actor;type:tinyint(1);not null"`       // 演员
+	Summary     string      `gorm:"column:prsn_summary;type:mediumtext;not null"`
+	Img         string      `gorm:"column:prsn_img;type:varchar(255);not null"`
+	ImgAnidb    string      `gorm:"column:prsn_img_anidb;type:varchar(255);not null"` // Deprecated
+	Comment     uint32      `gorm:"column:prsn_comment;type:mediumint(9) unsigned;not null"`
+	Collects    uint32      `gorm:"column:prsn_collects;type:mediumint(8) unsigned;not null"`
+	Dateline    uint32      `gorm:"column:prsn_dateline;type:int(10) unsigned;not null"`
+	Lastpost    uint32      `gorm:"column:prsn_lastpost;type:int(11) unsigned;not null"`
+	Lock        int8        `gorm:"column:prsn_lock;type:tinyint(4);not null"`
+	AnidbID     uint32      `gorm:"column:prsn_anidb_id;type:mediumint(8) unsigned;not null"` // Deprecated
+	Ban         uint8       `gorm:"column:prsn_ban;type:tinyint(3) unsigned;not null"`
+	Redirect    uint32      `gorm:"column:prsn_redirect;type:int(10) unsigned;not null"`
+	Nsfw        bool        `gorm:"column:prsn_nsfw;type:tinyint(1) unsigned;not null"`
+	Fields      PersonField `gorm:"foreignKey:prsn_id;polymorphic:Owner;polymorphicValue:prsn" json:"fields"`
 }
 
 // TableName Person's table name

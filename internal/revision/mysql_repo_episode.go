@@ -32,7 +32,7 @@ import (
 func (r mysqlRepo) CountEpisodeRelated(ctx context.Context, episodeID model.EpisodeID) (int64, error) {
 	c, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(
-			r.q.RevisionHistory.Mid.Eq(uint32(episodeID)),
+			r.q.RevisionHistory.Mid.Eq(episodeID),
 			r.q.RevisionHistory.Type.In(model.EpisodeRevisionTypes()...),
 		).Count()
 	return c, wrapGORMError(err)
@@ -45,7 +45,7 @@ func (r mysqlRepo) ListEpisodeRelated(
 ) ([]model.EpisodeRevision, error) {
 	revisions, err := r.q.RevisionHistory.WithContext(ctx).
 		Where(
-			r.q.RevisionHistory.Mid.Eq(uint32(episodeID)),
+			r.q.RevisionHistory.Mid.Eq(episodeID),
 			r.q.RevisionHistory.Type.In(model.EpisodeRevisionTypes()...),
 		).
 		Order(r.q.RevisionHistory.ID.Desc()).

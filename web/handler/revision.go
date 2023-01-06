@@ -37,7 +37,7 @@ func (h Handler) ListPersonRevision(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	personID, err := req.ParsePersonID(c.QueryParam("person_id"))
+	personID, err := req.ParseID(c.QueryParam("person_id"))
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (h Handler) ListCharacterRevision(c echo.Context) error {
 		return err
 	}
 
-	characterID, err := req.ParseCharacterID(c.QueryParam("character_id"))
+	characterID, err := req.ParseID(c.QueryParam("character_id"))
 	if err != nil {
 		return err
 	}
@@ -202,7 +202,7 @@ func (h Handler) ListSubjectRevision(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	subjectID, err := req.ParseSubjectID(c.QueryParam("subject_id"))
+	subjectID, err := req.ParseID(c.QueryParam("subject_id"))
 	if err != nil {
 		return err
 	}

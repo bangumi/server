@@ -155,8 +155,6 @@ func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 		if errors.Is(err, domain.ErrNotFound) {
 			return c.DeleteSubject(ctx, id)
 		}
-
-		c.log.Error("unexpected error get subject from mysql", zap.Error(err), id.Zap())
 		return errgo.Wrap(err, "subjectRepo.Get")
 	}
 

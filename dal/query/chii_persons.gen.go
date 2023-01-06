@@ -27,7 +27,7 @@ func newPerson(db *gorm.DB, opts ...gen.DOOption) person {
 
 	tableName := _person.personDo.TableName()
 	_person.ALL = field.NewAsterisk(tableName)
-	_person.ID = field.NewField(tableName, "prsn_id")
+	_person.ID = field.NewUint32(tableName, "prsn_id")
 	_person.Name = field.NewString(tableName, "prsn_name")
 	_person.Type = field.NewUint8(tableName, "prsn_type")
 	_person.Infobox = field.NewString(tableName, "prsn_infobox")
@@ -48,7 +48,7 @@ func newPerson(db *gorm.DB, opts ...gen.DOOption) person {
 	_person.Lock = field.NewInt8(tableName, "prsn_lock")
 	_person.AnidbID = field.NewUint32(tableName, "prsn_anidb_id")
 	_person.Ban = field.NewUint8(tableName, "prsn_ban")
-	_person.Redirect = field.NewField(tableName, "prsn_redirect")
+	_person.Redirect = field.NewUint32(tableName, "prsn_redirect")
 	_person.Nsfw = field.NewBool(tableName, "prsn_nsfw")
 	_person.Fields = personHasOneFields{
 		db: db.Session(&gorm.Session{}),
@@ -65,7 +65,7 @@ type person struct {
 	personDo personDo
 
 	ALL         field.Asterisk
-	ID          field.Field
+	ID          field.Uint32
 	Name        field.String
 	Type        field.Uint8 // 个人，公司，组合
 	Infobox     field.String
@@ -86,7 +86,7 @@ type person struct {
 	Lock        field.Int8
 	AnidbID     field.Uint32 // Deprecated
 	Ban         field.Uint8
-	Redirect    field.Field
+	Redirect    field.Uint32
 	Nsfw        field.Bool
 	Fields      personHasOneFields
 
@@ -105,7 +105,7 @@ func (p person) As(alias string) *person {
 
 func (p *person) updateTableName(table string) *person {
 	p.ALL = field.NewAsterisk(table)
-	p.ID = field.NewField(table, "prsn_id")
+	p.ID = field.NewUint32(table, "prsn_id")
 	p.Name = field.NewString(table, "prsn_name")
 	p.Type = field.NewUint8(table, "prsn_type")
 	p.Infobox = field.NewString(table, "prsn_infobox")
@@ -126,7 +126,7 @@ func (p *person) updateTableName(table string) *person {
 	p.Lock = field.NewInt8(table, "prsn_lock")
 	p.AnidbID = field.NewUint32(table, "prsn_anidb_id")
 	p.Ban = field.NewUint8(table, "prsn_ban")
-	p.Redirect = field.NewField(table, "prsn_redirect")
+	p.Redirect = field.NewUint32(table, "prsn_redirect")
 	p.Nsfw = field.NewBool(table, "prsn_nsfw")
 
 	p.fillFieldMap()

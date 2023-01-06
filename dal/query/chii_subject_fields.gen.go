@@ -27,7 +27,7 @@ func newSubjectField(db *gorm.DB, opts ...gen.DOOption) subjectField {
 
 	tableName := _subjectField.subjectFieldDo.TableName()
 	_subjectField.ALL = field.NewAsterisk(tableName)
-	_subjectField.Sid = field.NewField(tableName, "field_sid")
+	_subjectField.Sid = field.NewUint32(tableName, "field_sid")
 	_subjectField.Tid = field.NewUint16(tableName, "field_tid")
 	_subjectField.Tags = field.NewBytes(tableName, "field_tags")
 	_subjectField.Rate1 = field.NewUint32(tableName, "field_rate_1")
@@ -46,7 +46,7 @@ func newSubjectField(db *gorm.DB, opts ...gen.DOOption) subjectField {
 	_subjectField.Mon = field.NewInt8(tableName, "field_mon")
 	_subjectField.WeekDay = field.NewInt8(tableName, "field_week_day")
 	_subjectField.Date = field.NewTime(tableName, "field_date")
-	_subjectField.Redirect = field.NewField(tableName, "field_redirect")
+	_subjectField.Redirect = field.NewUint32(tableName, "field_redirect")
 
 	_subjectField.fillFieldMap()
 
@@ -57,7 +57,7 @@ type subjectField struct {
 	subjectFieldDo subjectFieldDo
 
 	ALL      field.Asterisk
-	Sid      field.Field
+	Sid      field.Uint32
 	Tid      field.Uint16
 	Tags     field.Bytes
 	Rate1    field.Uint32
@@ -76,7 +76,7 @@ type subjectField struct {
 	Mon      field.Int8  // 放送月份
 	WeekDay  field.Int8  // 放送日(星期X)
 	Date     field.Time  // 放送日期
-	Redirect field.Field
+	Redirect field.Uint32
 
 	fieldMap map[string]field.Expr
 }
@@ -93,7 +93,7 @@ func (s subjectField) As(alias string) *subjectField {
 
 func (s *subjectField) updateTableName(table string) *subjectField {
 	s.ALL = field.NewAsterisk(table)
-	s.Sid = field.NewField(table, "field_sid")
+	s.Sid = field.NewUint32(table, "field_sid")
 	s.Tid = field.NewUint16(table, "field_tid")
 	s.Tags = field.NewBytes(table, "field_tags")
 	s.Rate1 = field.NewUint32(table, "field_rate_1")
@@ -112,7 +112,7 @@ func (s *subjectField) updateTableName(table string) *subjectField {
 	s.Mon = field.NewInt8(table, "field_mon")
 	s.WeekDay = field.NewInt8(table, "field_week_day")
 	s.Date = field.NewTime(table, "field_date")
-	s.Redirect = field.NewField(table, "field_redirect")
+	s.Redirect = field.NewUint32(table, "field_redirect")
 
 	s.fillFieldMap()
 

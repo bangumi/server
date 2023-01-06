@@ -46,7 +46,7 @@ func ConvertModelPrivateMessage(item pm.PrivateMessage, users map[model.UserID]u
 		CreatedAt: item.CreatedTime,
 		Title:     item.Title,
 		Content:   item.Content,
-		ID:        uint32(item.ID),
+		ID:        item.ID,
 		New:       item.New,
 	}
 	if users != nil {

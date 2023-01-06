@@ -41,7 +41,7 @@ import (
 func (h Subject) Get(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
-	id, err := req.ParseSubjectID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func platformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
 	if !ok && s.TypeID != 0 {
 		logger.Warn("unknown platform",
-			s.ID.Zap(),
+			zap.Uint32("subject", s.ID),
 			zap.Uint8("type", s.TypeID),
 			zap.Uint16("platform", s.PlatformID),
 		)
@@ -89,7 +89,7 @@ func platformString(s model.Subject) *string {
 func (h Subject) GetImage(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
-	id, err := req.ParseSubjectID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil || id == 0 {
 		return err
 	}

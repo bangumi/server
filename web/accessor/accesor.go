@@ -53,7 +53,7 @@ func (a Accessor) MarshalLogObject(encoder zapcore.ObjectEncoder) error {
 	encoder.AddString("id", a.RequestID)
 	encoder.AddString("IP", a.IP)
 	if a.Login {
-		encoder.AddUint32("user_id", uint32(a.Auth.ID))
+		encoder.AddUint32("user_id", a.Auth.ID)
 	}
 	return nil
 }

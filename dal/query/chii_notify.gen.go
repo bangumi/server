@@ -27,9 +27,9 @@ func newNotification(db *gorm.DB, opts ...gen.DOOption) notification {
 
 	tableName := _notification.notificationDo.TableName()
 	_notification.ALL = field.NewAsterisk(tableName)
-	_notification.ID = field.NewField(tableName, "nt_id")
-	_notification.ReceiverID = field.NewField(tableName, "nt_uid")
-	_notification.SenderID = field.NewField(tableName, "nt_from_uid")
+	_notification.ID = field.NewUint32(tableName, "nt_id")
+	_notification.ReceiverID = field.NewUint32(tableName, "nt_uid")
+	_notification.SenderID = field.NewUint32(tableName, "nt_from_uid")
 	_notification.Status = field.NewUint8(tableName, "nt_status")
 	_notification.Type = field.NewUint8(tableName, "nt_type")
 	_notification.FieldID = field.NewUint32(tableName, "nt_mid")
@@ -45,9 +45,9 @@ type notification struct {
 	notificationDo notificationDo
 
 	ALL         field.Asterisk
-	ID          field.Field
-	ReceiverID  field.Field
-	SenderID    field.Field
+	ID          field.Uint32
+	ReceiverID  field.Uint32
+	SenderID    field.Uint32
 	Status      field.Uint8
 	Type        field.Uint8
 	FieldID     field.Uint32 // ID in notify_field
@@ -69,9 +69,9 @@ func (n notification) As(alias string) *notification {
 
 func (n *notification) updateTableName(table string) *notification {
 	n.ALL = field.NewAsterisk(table)
-	n.ID = field.NewField(table, "nt_id")
-	n.ReceiverID = field.NewField(table, "nt_uid")
-	n.SenderID = field.NewField(table, "nt_from_uid")
+	n.ID = field.NewUint32(table, "nt_id")
+	n.ReceiverID = field.NewUint32(table, "nt_uid")
+	n.SenderID = field.NewUint32(table, "nt_from_uid")
 	n.Status = field.NewUint8(table, "nt_status")
 	n.Type = field.NewUint8(table, "nt_type")
 	n.FieldID = field.NewUint32(table, "nt_mid")

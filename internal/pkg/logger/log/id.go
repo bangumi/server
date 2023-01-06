@@ -12,38 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package auth_test
+package log
 
 import (
-	"testing"
-	"time"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/internal/auth"
+	"go.uber.org/zap"
 )
 
-func TestAllowNsfw(t *testing.T) {
-	t.Parallel()
-
-	reg, err := time.Parse("2006-01-02", "2006-01-02")
-	require.NoError(t, err)
-	u := auth.Auth{
-		Login:   true,
-		RegTime: reg,
-		ID:      1,
-	}
-
-	require.True(t, u.AllowNSFW())
-}
-
-func TestNotAllowNsfw(t *testing.T) {
-	t.Parallel()
-
-	u := auth.Auth{
-		RegTime: time.Now(),
-		ID:      0,
-	}
-
-	require.False(t, u.AllowNSFW())
+func User(id uint32) zap.Field {
+	return zap.Uint32("user_id", id)
 }

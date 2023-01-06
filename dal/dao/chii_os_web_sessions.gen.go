@@ -4,19 +4,15 @@
 
 package dao
 
-import (
-	"github.com/bangumi/server/internal/model"
-)
-
 const TableNameWebSession = "chii_os_web_sessions"
 
 // WebSession mapped from table <chii_os_web_sessions>
 type WebSession struct {
-	Key       string       `gorm:"column:key;type:char(64);primaryKey"`           // session key
-	UserID    model.UserID `gorm:"column:user_id;type:int(10) unsigned;not null"` // uint32 user id
-	Value     []byte       `gorm:"column:value;type:mediumblob;not null"`         // json encoded session data
-	CreatedAt int64        `gorm:"column:created_at;type:bigint(20);not null"`    // int64 unix timestamp, when session is created
-	ExpiredAt int64        `gorm:"column:expired_at;type:bigint(20);not null"`    // int64 unix timestamp, when session is expired
+	Key       string `gorm:"column:key;type:char(64);primaryKey"`           // session key
+	UserID    uint32 `gorm:"column:user_id;type:int(10) unsigned;not null"` // uint32 user id
+	Value     []byte `gorm:"column:value;type:mediumblob;not null"`         // json encoded session data
+	CreatedAt int64  `gorm:"column:created_at;type:bigint(20);not null"`    // int64 unix timestamp, when session is created
+	ExpiredAt int64  `gorm:"column:expired_at;type:bigint(20);not null"`    // int64 unix timestamp, when session is expired
 }
 
 // TableName WebSession's table name

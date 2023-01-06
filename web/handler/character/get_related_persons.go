@@ -27,7 +27,7 @@ import (
 )
 
 func (h Character) GetRelatedPersons(c echo.Context) error {
-	id, err := req.ParseCharacterID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}

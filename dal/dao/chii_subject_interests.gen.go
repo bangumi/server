@@ -6,7 +6,6 @@ package dao
 
 import (
 	"github.com/bangumi/server/dal/utiltype"
-	"github.com/bangumi/server/internal/model"
 )
 
 const TableNameSubjectCollection = "chii_subject_interests"
@@ -14,8 +13,8 @@ const TableNameSubjectCollection = "chii_subject_interests"
 // SubjectCollection mapped from table <chii_subject_interests>
 type SubjectCollection struct {
 	ID           uint32                     `gorm:"column:interest_id;type:int(10) unsigned;primaryKey;autoIncrement:true"`
-	UserID       model.UserID               `gorm:"column:interest_uid;type:mediumint(8) unsigned;not null"`
-	SubjectID    model.SubjectID            `gorm:"column:interest_subject_id;type:mediumint(8) unsigned;not null"`
+	UserID       uint32                     `gorm:"column:interest_uid;type:mediumint(8) unsigned;not null"`
+	SubjectID    uint32                     `gorm:"column:interest_subject_id;type:mediumint(8) unsigned;not null"`
 	SubjectType  uint8                      `gorm:"column:interest_subject_type;type:smallint(6) unsigned;not null"`
 	Rate         uint8                      `gorm:"column:interest_rate;type:tinyint(3) unsigned;not null"`
 	Type         uint8                      `gorm:"column:interest_type;type:tinyint(1) unsigned;not null"`

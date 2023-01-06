@@ -27,6 +27,15 @@ func ToUint8[S ~[]T, T ~uint8](s S) []uint8 {
 	return out
 }
 
+func ToUint32[S ~[]T, T ~uint32](s S) []uint32 {
+	var out = make([]uint32, len(s))
+	for i, t := range s {
+		out[i] = uint32(t)
+	}
+
+	return out
+}
+
 func ToValuer[S ~[]T, T driver.Valuer](s S) []driver.Valuer {
 	var out = make([]driver.Valuer, len(s))
 	for i, t := range s {

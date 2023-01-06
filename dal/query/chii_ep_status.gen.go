@@ -28,8 +28,8 @@ func newEpCollection(db *gorm.DB, opts ...gen.DOOption) epCollection {
 	tableName := _epCollection.epCollectionDo.TableName()
 	_epCollection.ALL = field.NewAsterisk(tableName)
 	_epCollection.ID = field.NewUint32(tableName, "ep_stt_id")
-	_epCollection.UserID = field.NewField(tableName, "ep_stt_uid")
-	_epCollection.SubjectID = field.NewField(tableName, "ep_stt_sid")
+	_epCollection.UserID = field.NewUint32(tableName, "ep_stt_uid")
+	_epCollection.SubjectID = field.NewUint32(tableName, "ep_stt_sid")
 	_epCollection.OnPrg = field.NewBool(tableName, "ep_stt_on_prg")
 	_epCollection.Status = field.NewBytes(tableName, "ep_stt_status")
 	_epCollection.UpdatedTime = field.NewUint32(tableName, "ep_stt_lasttouch")
@@ -44,8 +44,8 @@ type epCollection struct {
 
 	ALL         field.Asterisk
 	ID          field.Uint32
-	UserID      field.Field
-	SubjectID   field.Field
+	UserID      field.Uint32
+	SubjectID   field.Uint32
 	OnPrg       field.Bool
 	Status      field.Bytes
 	UpdatedTime field.Uint32
@@ -66,8 +66,8 @@ func (e epCollection) As(alias string) *epCollection {
 func (e *epCollection) updateTableName(table string) *epCollection {
 	e.ALL = field.NewAsterisk(table)
 	e.ID = field.NewUint32(table, "ep_stt_id")
-	e.UserID = field.NewField(table, "ep_stt_uid")
-	e.SubjectID = field.NewField(table, "ep_stt_sid")
+	e.UserID = field.NewUint32(table, "ep_stt_uid")
+	e.SubjectID = field.NewUint32(table, "ep_stt_sid")
 	e.OnPrg = field.NewBool(table, "ep_stt_on_prg")
 	e.Status = field.NewBytes(table, "ep_stt_status")
 	e.UpdatedTime = field.NewUint32(table, "ep_stt_lasttouch")

@@ -28,7 +28,7 @@ import (
 )
 
 func (h Person) Get(c echo.Context) error {
-	id, err := req.ParsePersonID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (h Person) Get(c echo.Context) error {
 }
 
 func (h Person) GetImage(c echo.Context) error {
-	id, err := req.ParsePersonID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}

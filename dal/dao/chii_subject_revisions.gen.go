@@ -4,29 +4,25 @@
 
 package dao
 
-import (
-	"github.com/bangumi/server/internal/model"
-)
-
 const TableNameSubjectRevision = "chii_subject_revisions"
 
 // SubjectRevision mapped from table <chii_subject_revisions>
 type SubjectRevision struct {
-	ID           uint32          `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	Type         uint8           `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;default:1"` // 修订类型
-	SubjectID    model.SubjectID `gorm:"column:rev_subject_id;type:mediumint(8) unsigned;not null"`
-	TypeID       uint16          `gorm:"column:rev_type_id;type:smallint(6) unsigned;not null"`
-	CreatorID    model.UserID    `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null"`
-	Dateline     uint32          `gorm:"column:rev_dateline;type:int(10) unsigned;not null"`
-	Name         string          `gorm:"column:rev_name;type:varchar(80);not null"`
-	NameCN       string          `gorm:"column:rev_name_cn;type:varchar(80);not null"`
-	FieldInfobox string          `gorm:"column:rev_field_infobox;type:mediumtext;not null"`
-	FieldSummary string          `gorm:"column:rev_field_summary;type:mediumtext;not null"`
-	VoteField    string          `gorm:"column:rev_vote_field;type:mediumtext;not null"`
-	FieldEps     uint32          `gorm:"column:rev_field_eps;type:mediumint(8) unsigned;not null"`
-	EditSummary  string          `gorm:"column:rev_edit_summary;type:varchar(200);not null"`
-	Platform     uint16          `gorm:"column:rev_platform;type:smallint(6) unsigned;not null"`
-	Subject      Subject         `gorm:"foreignKey:rev_subject_id;references:subject_id" json:"subject"`
+	ID           uint32  `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
+	Type         uint8   `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;default:1"` // 修订类型
+	SubjectID    uint32  `gorm:"column:rev_subject_id;type:mediumint(8) unsigned;not null"`
+	TypeID       uint16  `gorm:"column:rev_type_id;type:smallint(6) unsigned;not null"`
+	CreatorID    uint32  `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null"`
+	Dateline     uint32  `gorm:"column:rev_dateline;type:int(10) unsigned;not null"`
+	Name         string  `gorm:"column:rev_name;type:varchar(80);not null"`
+	NameCN       string  `gorm:"column:rev_name_cn;type:varchar(80);not null"`
+	FieldInfobox string  `gorm:"column:rev_field_infobox;type:mediumtext;not null"`
+	FieldSummary string  `gorm:"column:rev_field_summary;type:mediumtext;not null"`
+	VoteField    string  `gorm:"column:rev_vote_field;type:mediumtext;not null"`
+	FieldEps     uint32  `gorm:"column:rev_field_eps;type:mediumint(8) unsigned;not null"`
+	EditSummary  string  `gorm:"column:rev_edit_summary;type:varchar(200);not null"`
+	Platform     uint16  `gorm:"column:rev_platform;type:smallint(6) unsigned;not null"`
+	Subject      Subject `gorm:"foreignKey:rev_subject_id;references:subject_id" json:"subject"`
 }
 
 // TableName SubjectRevision's table name

@@ -81,7 +81,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		return UserInfo{}, errgo.Wrap(err, "parsing user id")
 	}
 
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(model.UserID(id))).First()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			m.log.Error("can't find user of access token",

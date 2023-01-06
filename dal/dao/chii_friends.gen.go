@@ -4,19 +4,15 @@
 
 package dao
 
-import (
-	"github.com/bangumi/server/internal/model"
-)
-
 const TableNameFriend = "chii_friends"
 
 // Friend mapped from table <chii_friends>
 type Friend struct {
-	UserID      model.UserID `gorm:"column:frd_uid;type:mediumint(8) unsigned;not null"`
-	FriendID    model.UserID `gorm:"column:frd_fid;type:mediumint(8) unsigned;not null"`
-	Grade       uint8        `gorm:"column:frd_grade;type:tinyint(3) unsigned;not null;default:1"`
-	CreatedTime uint32       `gorm:"column:frd_dateline;type:int(10) unsigned;not null"`
-	Description string       `gorm:"column:frd_description;type:char(255);not null"`
+	UserID      uint32 `gorm:"column:frd_uid;type:mediumint(8) unsigned;not null"`
+	FriendID    uint32 `gorm:"column:frd_fid;type:mediumint(8) unsigned;not null"`
+	Grade       uint8  `gorm:"column:frd_grade;type:tinyint(3) unsigned;not null;default:1"`
+	CreatedTime uint32 `gorm:"column:frd_dateline;type:int(10) unsigned;not null"`
+	Description string `gorm:"column:frd_description;type:char(255);not null"`
 }
 
 // TableName Friend's table name

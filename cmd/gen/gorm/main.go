@@ -24,7 +24,6 @@ NOTICE:
 package main
 
 import (
-	"reflect"
 	"strings"
 
 	"gorm.io/gen"
@@ -32,23 +31,21 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal"
-	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/driver"
 )
 
-var userIDTypeString = "model.UserID"           // reflect.TypeOf(new(model.UserID)).Elem().Name()
-var personIDTypeString = "model.PersonID"       // reflect.TypeOf(new(model.PersonID)).Elem().Name()
-var characterIDTypeString = "model.CharacterID" // reflect.TypeOf(new(model.CharacterID)).Elem().Name()
-var episodeIDTypeString = "model.EpisodeID"     // reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
-var subjectIDTypeString = "model.SubjectID"     // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
-var subjectTypeIDTypeString = reflect.TypeOf(new(model.SubjectType)).Elem().Name()
-var episodeTypeTypeString = reflect.TypeOf(new(episode.Type)).Elem().Name()
-var notificationIDTypeString = "model." + reflect.TypeOf(new(model.NotificationID)).Elem().Name()
+var userIDTypeString = "uint32"         // reflect.TypeOf(new(model.UserID)).Elem().Name()
+var personIDTypeString = "uint32"       // reflect.TypeOf(new(model.PersonID)).Elem().Name()
+var characterIDTypeString = "uint32"    // reflect.TypeOf(new(model.CharacterID)).Elem().Name()
+var episodeIDTypeString = "uint32"      // reflect.TypeOf(new(model.EpisodeID)).Elem().Name()
+var subjectIDTypeString = "uint32"      // reflect.TypeOf(new(model.SubjectID)).Elem().Name()
+var subjectTypeIDTypeString = "uint8"   // reflect.TypeOf(new(model.SubjectType)).Elem().Name()
+var episodeTypeTypeString = "uint8"     // reflect.TypeOf(new(episode.Type)).Elem().Name()
+var notificationIDTypeString = "uint32" // reflect.TypeOf(new(model.NotificationID)).Elem().Name()
 var notificationFieldIDTypeString = "uint32"
 var notificationTypeTypeString = "uint8"
 var notificationStatusTypeString = "uint8"
-var privateMessageIDTypeString = "model." + reflect.TypeOf(new(model.PrivateMessageID)).Elem().Name()
+var privateMessageIDTypeString = "uint32"
 var privateMessageFolderTypeTypeString = "string"
 
 func DeprecatedFiled(s string) gen.ModelOpt {

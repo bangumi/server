@@ -146,7 +146,6 @@ func (r mysqlRepo) GetSubjectCollection(
 			return model.UserSubjectCollection{}, domain.ErrSubjectNotCollected
 		}
 
-		r.log.Error("unexpected error happened", zap.Error(err), userID.Zap(), subjectID.Zap())
 		return model.UserSubjectCollection{}, errgo.Wrap(err, "dal")
 	}
 
@@ -177,16 +176,11 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.UserSubjectEpisodesCollection{}, nil
 		}
-
-		r.log.Error("failed to get episode collection record", zap.Error(err),
-			userID.Zap(), subjectID.Zap())
 		return nil, errgo.Wrap(err, "query.EpCollection.Find")
 	}
 
 	e, err := deserializePhpEpStatus(d.Status)
 	if err != nil {
-		r.log.Error("failed to deserialize php-serialized bytes to go data",
-			zap.Error(err), userID.Zap(), subjectID.Zap())
 		return nil, err
 	}
 
@@ -253,11 +247,11 @@ func (r mysqlRepo) UpdateSubjectCollection(
 
 func (r mysqlRepo) updateSubject(ctx context.Context, subjectID model.SubjectID) {
 	if err := r.updateSubjectTags(ctx, subjectID); err != nil {
-		r.log.Error("failed to update subject tags", zap.Error(err), subjectID.Zap())
+		r.log.Error("failed to update subject tags", zap.Error(err))
 	}
 
 	if err := r.reCountSubjectCollection(ctx, subjectID); err != nil {
-		r.log.Error("failed to update collection counts", zap.Error(err), subjectID.Zap())
+		r.log.Error("failed to update collection counts", zap.Error(err))
 	}
 }
 
@@ -390,13 +384,13 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 			return r.createEpisodeCollection(ctx, userID, subjectID, episodeIDs, collectionType, at)
 		}
 
-		r.log.Error("failed to get episode collection record", zap.Error(err), userID.Zap(), subjectID.Zap())
+		r.log.Error("failed to get episode collection record", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
 	e, err := deserializePhpEpStatus(d.Status)
 	if err != nil {
-		r.log.Error("failed to deserialize php-serialized bytes to go data", zap.Error(err), userID.Zap(), subjectID.Zap())
+		r.log.Error("failed to deserialize php-serialized bytes to go data", zap.Error(err))
 		return nil, err
 	}
 
@@ -442,7 +436,7 @@ func (r mysqlRepo) createEpisodeCollection(
 		UpdatedTime: uint32(at.Unix()),
 	})
 	if err != nil {
-		r.log.Error("failed to create episode collection record", zap.Error(err), userID.Zap(), subjectID.Zap())
+		r.log.Error("failed to create episode collection record", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 

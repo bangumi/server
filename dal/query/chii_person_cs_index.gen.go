@@ -28,9 +28,9 @@ func newPersonSubjects(db *gorm.DB, opts ...gen.DOOption) personSubjects {
 	tableName := _personSubjects.personSubjectsDo.TableName()
 	_personSubjects.ALL = field.NewAsterisk(tableName)
 	_personSubjects.PrsnType = field.NewString(tableName, "prsn_type")
-	_personSubjects.PersonID = field.NewField(tableName, "prsn_id")
+	_personSubjects.PersonID = field.NewUint32(tableName, "prsn_id")
 	_personSubjects.PrsnPosition = field.NewUint16(tableName, "prsn_position")
-	_personSubjects.SubjectID = field.NewField(tableName, "subject_id")
+	_personSubjects.SubjectID = field.NewUint32(tableName, "subject_id")
 	_personSubjects.SubjectTypeID = field.NewUint8(tableName, "subject_type_id")
 	_personSubjects.Summary = field.NewString(tableName, "summary")
 	_personSubjects.PrsnAppearEps = field.NewString(tableName, "prsn_appear_eps")
@@ -66,9 +66,9 @@ type personSubjects struct {
 
 	ALL           field.Asterisk
 	PrsnType      field.String
-	PersonID      field.Field
+	PersonID      field.Uint32
 	PrsnPosition  field.Uint16 // 监督，原案，脚本,..
-	SubjectID     field.Field
+	SubjectID     field.Uint32
 	SubjectTypeID field.Uint8
 	Summary       field.String
 	PrsnAppearEps field.String // 可选，人物参与的章节
@@ -92,9 +92,9 @@ func (p personSubjects) As(alias string) *personSubjects {
 func (p *personSubjects) updateTableName(table string) *personSubjects {
 	p.ALL = field.NewAsterisk(table)
 	p.PrsnType = field.NewString(table, "prsn_type")
-	p.PersonID = field.NewField(table, "prsn_id")
+	p.PersonID = field.NewUint32(table, "prsn_id")
 	p.PrsnPosition = field.NewUint16(table, "prsn_position")
-	p.SubjectID = field.NewField(table, "subject_id")
+	p.SubjectID = field.NewUint32(table, "subject_id")
 	p.SubjectTypeID = field.NewUint8(table, "subject_type_id")
 	p.Summary = field.NewString(table, "summary")
 	p.PrsnAppearEps = field.NewString(table, "prsn_appear_eps")

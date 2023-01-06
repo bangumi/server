@@ -27,16 +27,16 @@ func newPrivateMessage(db *gorm.DB, opts ...gen.DOOption) privateMessage {
 
 	tableName := _privateMessage.privateMessageDo.TableName()
 	_privateMessage.ALL = field.NewAsterisk(tableName)
-	_privateMessage.ID = field.NewField(tableName, "msg_id")
-	_privateMessage.SenderID = field.NewField(tableName, "msg_sid")
-	_privateMessage.ReceiverID = field.NewField(tableName, "msg_rid")
+	_privateMessage.ID = field.NewUint32(tableName, "msg_id")
+	_privateMessage.SenderID = field.NewUint32(tableName, "msg_sid")
+	_privateMessage.ReceiverID = field.NewUint32(tableName, "msg_rid")
 	_privateMessage.Folder = field.NewString(tableName, "msg_folder")
 	_privateMessage.New = field.NewBool(tableName, "msg_new")
 	_privateMessage.Title = field.NewString(tableName, "msg_title")
 	_privateMessage.CreatedTime = field.NewUint32(tableName, "msg_dateline")
 	_privateMessage.Content = field.NewString(tableName, "msg_message")
-	_privateMessage.MainMessageID = field.NewField(tableName, "msg_related_main")
-	_privateMessage.RelatedMessageID = field.NewField(tableName, "msg_related")
+	_privateMessage.MainMessageID = field.NewUint32(tableName, "msg_related_main")
+	_privateMessage.RelatedMessageID = field.NewUint32(tableName, "msg_related")
 	_privateMessage.DeletedBySender = field.NewBool(tableName, "msg_sdeleted")
 	_privateMessage.DeletedByReceiver = field.NewBool(tableName, "msg_rdeleted")
 
@@ -49,16 +49,16 @@ type privateMessage struct {
 	privateMessageDo privateMessageDo
 
 	ALL               field.Asterisk
-	ID                field.Field
-	SenderID          field.Field
-	ReceiverID        field.Field
+	ID                field.Uint32
+	SenderID          field.Uint32
+	ReceiverID        field.Uint32
 	Folder            field.String
 	New               field.Bool
 	Title             field.String
 	CreatedTime       field.Uint32
 	Content           field.String
-	MainMessageID     field.Field
-	RelatedMessageID  field.Field
+	MainMessageID     field.Uint32
+	RelatedMessageID  field.Uint32
 	DeletedBySender   field.Bool
 	DeletedByReceiver field.Bool
 
@@ -77,16 +77,16 @@ func (p privateMessage) As(alias string) *privateMessage {
 
 func (p *privateMessage) updateTableName(table string) *privateMessage {
 	p.ALL = field.NewAsterisk(table)
-	p.ID = field.NewField(table, "msg_id")
-	p.SenderID = field.NewField(table, "msg_sid")
-	p.ReceiverID = field.NewField(table, "msg_rid")
+	p.ID = field.NewUint32(table, "msg_id")
+	p.SenderID = field.NewUint32(table, "msg_sid")
+	p.ReceiverID = field.NewUint32(table, "msg_rid")
 	p.Folder = field.NewString(table, "msg_folder")
 	p.New = field.NewBool(table, "msg_new")
 	p.Title = field.NewString(table, "msg_title")
 	p.CreatedTime = field.NewUint32(table, "msg_dateline")
 	p.Content = field.NewString(table, "msg_message")
-	p.MainMessageID = field.NewField(table, "msg_related_main")
-	p.RelatedMessageID = field.NewField(table, "msg_related")
+	p.MainMessageID = field.NewUint32(table, "msg_related_main")
+	p.RelatedMessageID = field.NewUint32(table, "msg_related")
 	p.DeletedBySender = field.NewBool(table, "msg_sdeleted")
 	p.DeletedByReceiver = field.NewBool(table, "msg_rdeleted")
 

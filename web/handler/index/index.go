@@ -36,7 +36,7 @@ import (
 func (h Handler) GetIndex(c echo.Context) error {
 	user := accessor.GetFromCtx(c)
 
-	id, err := req.ParseIndexID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 	u, err := h.u.GetByID(c, i.CreatorID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			h.log.Error("index missing creator", zap.Uint32("index_id", id), i.CreatorID.Zap())
+			h.log.Error("index missing creator", zap.Uint32("index_id", id), zap.Uint32("creator", i.CreatorID))
 		}
 		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
 	}
@@ -93,7 +93,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 func (h Handler) GetIndexSubjects(c echo.Context) error {
 	user := accessor.GetFromCtx(c)
 
-	id, err := req.ParseIndexID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -211,7 +211,7 @@ func (h Handler) ensureIndexPermission(c echo.Context, indexID uint32) (*model.I
 }
 
 func (h Handler) UpdateIndex(c echo.Context) error {
-	indexID, err := req.ParseIndexID(c.Param("id"))
+	indexID, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}

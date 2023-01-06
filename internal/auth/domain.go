@@ -67,6 +67,7 @@ type UserInfo struct {
 
 // Auth is the basic authorization represent a user.
 type Auth struct {
+	Login      bool
 	RegTime    time.Time
 	ID         model.UserID // user id
 	GroupID    user.GroupID
@@ -77,7 +78,7 @@ const nsfwThreshold = gtime.OneDay * 60
 
 // AllowNSFW return if current user is allowed to see NSFW resource.
 func (u Auth) AllowNSFW() bool {
-	return u.ID != 0 && u.RegisteredLongerThan(nsfwThreshold)
+	return u.Login && u.RegisteredLongerThan(nsfwThreshold)
 }
 
 func (u Auth) RegisteredLongerThan(t time.Duration) bool {

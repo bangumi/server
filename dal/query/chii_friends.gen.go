@@ -27,8 +27,8 @@ func newFriend(db *gorm.DB, opts ...gen.DOOption) friend {
 
 	tableName := _friend.friendDo.TableName()
 	_friend.ALL = field.NewAsterisk(tableName)
-	_friend.UserID = field.NewField(tableName, "frd_uid")
-	_friend.FriendID = field.NewField(tableName, "frd_fid")
+	_friend.UserID = field.NewUint32(tableName, "frd_uid")
+	_friend.FriendID = field.NewUint32(tableName, "frd_fid")
 	_friend.Grade = field.NewUint8(tableName, "frd_grade")
 	_friend.CreatedTime = field.NewUint32(tableName, "frd_dateline")
 	_friend.Description = field.NewString(tableName, "frd_description")
@@ -42,8 +42,8 @@ type friend struct {
 	friendDo friendDo
 
 	ALL         field.Asterisk
-	UserID      field.Field
-	FriendID    field.Field
+	UserID      field.Uint32
+	FriendID    field.Uint32
 	Grade       field.Uint8
 	CreatedTime field.Uint32
 	Description field.String
@@ -63,8 +63,8 @@ func (f friend) As(alias string) *friend {
 
 func (f *friend) updateTableName(table string) *friend {
 	f.ALL = field.NewAsterisk(table)
-	f.UserID = field.NewField(table, "frd_uid")
-	f.FriendID = field.NewField(table, "frd_fid")
+	f.UserID = field.NewUint32(table, "frd_uid")
+	f.FriendID = field.NewUint32(table, "frd_fid")
 	f.Grade = field.NewUint8(table, "frd_grade")
 	f.CreatedTime = field.NewUint32(table, "frd_dateline")
 	f.Description = field.NewString(table, "frd_description")

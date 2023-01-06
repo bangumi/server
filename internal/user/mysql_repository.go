@@ -69,7 +69,7 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (User, error)
 }
 
 func (m mysqlRepo) GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]User, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(slice.ToValuer(ids)...)).Find()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(ids...)).Find()
 	if err != nil {
 		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
@@ -104,7 +104,7 @@ func (m mysqlRepo) CheckIsFriendToOthers(
 	otherIDs ...model.UserID) (bool, error) {
 	count, err := m.q.Friend.
 		WithContext(ctx).
-		Where(m.q.Friend.UserID.In(slice.ToValuer(otherIDs)...), m.q.Friend.FriendID.Eq(selfID)).Count()
+		Where(m.q.Friend.UserID.In(otherIDs...), m.q.Friend.FriendID.Eq(selfID)).Count()
 	if err != nil {
 		return false, errgo.Wrap(err, "dal")
 	}
@@ -119,7 +119,7 @@ func (m mysqlRepo) GetFieldsByIDs(ctx context.Context,
 	users, err := m.q.Member.
 		WithContext(ctx).
 		Joins(m.q.Member.Fields).Select(m.q.Member.ID).
-		Where(m.q.Member.ID.In(slice.ToValuer(userIDs)...)).Find()
+		Where(m.q.Member.ID.In(userIDs...)).Find()
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
 	}
@@ -137,7 +137,7 @@ func (m mysqlRepo) GetFieldsByIDs(ctx context.Context,
 				if err != nil {
 					return 0, false
 				}
-				return model.UserID(id), true
+				return id, true
 			}),
 			Privacy: privacySettings,
 		}

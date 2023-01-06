@@ -33,6 +33,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/set"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
 )
@@ -56,7 +57,7 @@ func (ctl Ctrl) UpdateCollection(
 	subjectID model.SubjectID,
 	req UpdateCollectionRequest,
 ) error {
-	ctl.log.Info("try to update collection", subjectID.Zap(), u.ID.Zap(), zap.Reflect("'req", req))
+	ctl.log.Info("try to update collection", zap.Uint32("subject_id", subjectID), log.User(u.ID))
 
 	original, err := ctl.collection.GetSubjectCollection(ctx, u.ID, subjectID)
 	if err != nil {
@@ -144,8 +145,8 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 		return err
 	}
 
-	ctl.log.Info("try to update collection info", subjectID.Zap(),
-		u.ID.Zap(), zap.Reflect("episode_ids", episodeIDs))
+	ctl.log.Info("try to update collection info", zap.Uint32("subject", subjectID),
+		log.User(u.ID), zap.Reflect("episodes", episodeIDs))
 
 	episodes, err := ctl.episode.List(ctx, subjectID, episode.Filter{}, 0, 0)
 	if err != nil {
@@ -195,7 +196,7 @@ func (ctl Ctrl) UpdateEpisodeCollection(
 	episodeID model.EpisodeID,
 	t model.EpisodeCollection,
 ) error {
-	ctl.log.Info("try to update episode collection info", u.ID.Zap(), episodeID.Zap())
+	ctl.log.Info("try to update episode collection info", log.User(u.ID), zap.Uint32("episode", episodeID))
 
 	e, err := ctl.episode.Get(ctx, episodeID)
 	if err != nil {

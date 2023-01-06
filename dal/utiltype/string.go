@@ -25,7 +25,7 @@ import (
 )
 
 var _ driver.Valuer = HTMLEscapedString("")
-var _ sql.Scanner = lo.ToPtr(HTMLEscapedString(""))
+var _ sql.Scanner = lo.ToPtr[HTMLEscapedString]("")
 
 type HTMLEscapedString string
 

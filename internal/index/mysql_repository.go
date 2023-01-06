@@ -184,7 +184,7 @@ func (r mysqlRepo) AddOrUpdateIndexSubject(
 	}
 
 	indexSubject, err := r.q.IndexSubject.WithContext(ctx).
-		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(uint32(subjectID))).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
 		FirstOrInit()
 
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -203,7 +203,7 @@ func (r mysqlRepo) AddOrUpdateIndexSubject(
 			CreatedTime: uint32(now.Unix()),
 			IndexID:     id,
 			SubjectType: subjectDO.TypeID,
-			SubjectID:   uint32(subjectID),
+			SubjectID:   subjectID,
 		})
 	}
 
@@ -223,7 +223,7 @@ func (r mysqlRepo) updateIndexSubject(
 	subjectID model.SubjectID, sort uint32, comment string,
 ) error {
 	result, err := r.q.IndexSubject.WithContext(ctx).
-		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(uint32(subjectID))).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
 		Updates(dao.IndexSubject{
 			Order:   sort,
 			Comment: comment,
@@ -258,7 +258,7 @@ func (r mysqlRepo) DeleteIndexSubject(
 			return err
 		}
 		result, err := r.q.IndexSubject.WithContext(ctx).
-			Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(uint32(subjectID))).
+			Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
 			Delete()
 		if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
 			return err

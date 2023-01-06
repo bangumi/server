@@ -35,7 +35,7 @@ import (
 func (h Handler) GetEpisode(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
-	id, err := req.ParseEpisodeID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (h Handler) ListEpisode(c echo.Context) error {
 		return err
 	}
 
-	subjectID, err := req.ParseSubjectID(c.QueryParam("subject_id"))
+	subjectID, err := req.ParseID(c.QueryParam("subject_id"))
 	if err != nil {
 		return err
 	}

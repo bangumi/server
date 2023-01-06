@@ -25,13 +25,7 @@ import (
 )
 
 // these errors result in to 400 http response.
-var errMissingSubjectID = res.BadRequest("subject ID is required")
-var errMissingCharacterID = res.BadRequest("character ID is required")
-var errMissingPersonID = res.BadRequest("person ID is required")
-var errMissingEpisodeID = res.BadRequest("episode ID is required")
-var errMissingIndexID = res.BadRequest("index ID is required")
-var errMissingTopicID = res.BadRequest("topic ID is required")
-var errMissingPrivateMessageID = res.BadRequest("pm ID is required")
+var errMissingID = res.BadRequest("character ID is required")
 
 func ParseSubjectType(s string) (model.SubjectType, error) {
 	if s == "" {
@@ -52,88 +46,18 @@ func ParseSubjectType(s string) (model.SubjectType, error) {
 	return 0, res.BadRequest(strconv.Quote(s) + " is not a valid subject type")
 }
 
-func ParseSubjectID(s string) (model.SubjectID, error) {
+func ParseID(s string) (model.CharacterID, error) {
 	if s == "" {
-		return 0, errMissingSubjectID
+		return 0, errMissingID
 	}
 
 	v, err := gstr.ParseUint32(s)
 
 	if err != nil || v == 0 {
-		return 0, res.BadRequest(strconv.Quote(s) + " is not valid subject ID")
-	}
-
-	return model.SubjectID(v), nil
-}
-
-func ParseCharacterID(s string) (model.CharacterID, error) {
-	if s == "" {
-		return 0, errMissingCharacterID
-	}
-
-	v, err := gstr.ParseUint32(s)
-
-	if err != nil || v == 0 {
-		return 0, res.BadRequest(strconv.Quote(s) + " is not valid character ID")
-	}
-
-	return model.CharacterID(v), nil
-}
-
-func ParsePersonID(s string) (model.PersonID, error) {
-	if s == "" {
-		return 0, errMissingPersonID
-	}
-
-	v, err := gstr.ParseUint32(s)
-
-	if err != nil || v == 0 {
-		return 0, res.BadRequest(strconv.Quote(s) + " is not valid person ID")
-	}
-
-	return model.PersonID(v), nil
-}
-
-func ParseEpisodeID(s string) (model.EpisodeID, error) {
-	if s == "" {
-		return 0, errMissingEpisodeID
-	}
-
-	v, err := gstr.ParseUint32(s)
-
-	if err != nil || v == 0 {
-		return 0, res.BadRequest(strconv.Quote(s) + " is not a valid episode ID")
-	}
-
-	return model.EpisodeID(v), nil
-}
-
-func ParseIndexID(s string) (model.IndexID, error) {
-	if s == "" {
-		return 0, errMissingIndexID
-	}
-
-	v, err := gstr.ParseUint32(s)
-
-	if err != nil || v == 0 {
-		return 0, res.BadRequest(strconv.Quote(s) + " is not a valid index ID")
+		return 0, res.BadRequest(strconv.Quote(s) + " is not valid ID")
 	}
 
 	return v, nil
-}
-
-func ParseTopicID(s string) (model.TopicID, error) {
-	if s == "" {
-		return 0, errMissingTopicID
-	}
-
-	v, err := gstr.ParseUint32(s)
-
-	if err != nil || v == 0 {
-		return 0, res.BadRequest(strconv.Quote(s) + " is not valid topic ID")
-	}
-
-	return model.TopicID(v), nil
 }
 
 func ParseCollectionType(s string) (model.SubjectCollection, error) {
@@ -192,18 +116,4 @@ func ParsePrivateMessageFolder(s string) (pm.FolderType, error) {
 			string(pm.FolderTypeInbox) +
 			" or " +
 			string(pm.FolderTypeOutbox))
-}
-
-func ParsePrivateMessageID(s string) (model.PrivateMessageID, error) {
-	if s == "" {
-		return 0, errMissingPrivateMessageID
-	}
-
-	v, err := gstr.ParseUint32(s)
-
-	if err != nil || v == 0 {
-		return 0, res.BadRequest(strconv.Quote(s) + " is not valid private message ID")
-	}
-
-	return model.PrivateMessageID(v), nil
 }

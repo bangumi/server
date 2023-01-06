@@ -20,7 +20,6 @@ import (
 
 	"github.com/bytedance/sonic/decoder"
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/domain"
@@ -34,7 +33,7 @@ import (
 )
 
 func (h User) PatchSubjectCollection(c echo.Context) error {
-	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
+	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -63,8 +62,6 @@ func (h User) patchSubjectCollection(
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.NotFound("subject not found")
 		}
-
-		h.log.Error("failed to get subject", zap.Error(err), subjectID.Zap())
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 

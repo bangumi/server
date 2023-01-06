@@ -4,26 +4,22 @@
 
 package dao
 
-import (
-	"github.com/bangumi/server/internal/model"
-)
-
 const TableNameIndex = "chii_index"
 
 // Index mapped from table <chii_index>
 type Index struct {
-	ID           uint32       `gorm:"column:idx_id;type:mediumint(8);primaryKey;autoIncrement:true"` // 自动id
-	Type         uint8        `gorm:"column:idx_type;type:tinyint(3) unsigned;not null"`
-	Title        string       `gorm:"column:idx_title;type:varchar(80);not null"`                   // 标题
-	Desc         string       `gorm:"column:idx_desc;type:mediumtext;not null"`                     // 简介
-	ReplyCount   uint32       `gorm:"column:idx_replies;type:mediumint(8) unsigned;not null"`       // 回复数
-	SubjectCount uint32       `gorm:"column:idx_subject_total;type:mediumint(8) unsigned;not null"` // 内含条目总数
-	CollectCount uint32       `gorm:"column:idx_collects;type:mediumint(8);not null"`               // 收藏数
-	Stats        string       `gorm:"column:idx_stats;type:mediumtext;not null"`
-	CreatedTime  int32        `gorm:"column:idx_dateline;type:int(10);not null"` // 创建时间
-	UpdatedTime  uint32       `gorm:"column:idx_lasttouch;type:int(10) unsigned;not null"`
-	CreatorID    model.UserID `gorm:"column:idx_uid;type:mediumint(8);not null"` // 创建人UID
-	Ban          bool         `gorm:"column:idx_ban;type:tinyint(1) unsigned;not null"`
+	ID           uint32 `gorm:"column:idx_id;type:mediumint(8);primaryKey;autoIncrement:true"` // 自动id
+	Type         uint8  `gorm:"column:idx_type;type:tinyint(3) unsigned;not null"`
+	Title        string `gorm:"column:idx_title;type:varchar(80);not null"`                   // 标题
+	Desc         string `gorm:"column:idx_desc;type:mediumtext;not null"`                     // 简介
+	ReplyCount   uint32 `gorm:"column:idx_replies;type:mediumint(8) unsigned;not null"`       // 回复数
+	SubjectCount uint32 `gorm:"column:idx_subject_total;type:mediumint(8) unsigned;not null"` // 内含条目总数
+	CollectCount uint32 `gorm:"column:idx_collects;type:mediumint(8);not null"`               // 收藏数
+	Stats        string `gorm:"column:idx_stats;type:mediumtext;not null"`
+	CreatedTime  int32  `gorm:"column:idx_dateline;type:int(10);not null"` // 创建时间
+	UpdatedTime  uint32 `gorm:"column:idx_lasttouch;type:int(10) unsigned;not null"`
+	CreatorID    uint32 `gorm:"column:idx_uid;type:mediumint(8);not null"` // 创建人UID
+	Ban          bool   `gorm:"column:idx_ban;type:tinyint(1) unsigned;not null"`
 }
 
 // TableName Index's table name

@@ -34,7 +34,7 @@ import (
 )
 
 func (h Subject) GetRelatedSubjects(c echo.Context) error {
-	id, err := req.ParseSubjectID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}

@@ -36,7 +36,7 @@ func (h User) GetSubjectCollection(c echo.Context) error {
 		return res.BadRequest("missing require parameters `username`")
 	}
 
-	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
+	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}

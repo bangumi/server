@@ -16,7 +16,6 @@ package pm
 
 import (
 	"context"
-	"database/sql/driver"
 	"time"
 
 	"github.com/samber/lo"
@@ -77,7 +76,7 @@ func (r mysqlRepo) List(
 		return v.RelatedMessageID
 	}))
 
-	mainMsgList, err := do.Where(r.q.PrivateMessage.ID.In(slice.ToValuer(mainIDs)...)).Find()
+	mainMsgList, err := do.Where(r.q.PrivateMessage.ID.In(mainIDs...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error", zap.Error(err))
 		return make([]PrivateMessageListItem, 0), errgo.Wrap(err, "dal")
@@ -335,7 +334,7 @@ func (r mysqlRepo) Create(
 		if err != nil {
 			return errgo.Wrap(err, "dal")
 		}
-		_, err = txCtx.Member.Where(tx.Member.ID.In(slice.ToValuer(receiverIDs)...)).Update(tx.Member.Newpm, true)
+		_, err = txCtx.Member.Where(tx.Member.ID.In(receiverIDs...)).Update(tx.Member.Newpm, true)
 		if err != nil {
 			return errgo.Wrap(err, "dal")
 		}
@@ -367,7 +366,7 @@ func (r mysqlRepo) Delete(
 	do := r.q.PrivateMessage.WithContext(ctx)
 	pms, err := do.
 		Where(
-			r.q.PrivateMessage.ID.In(slice.ToValuer(ids)...),
+			r.q.PrivateMessage.ID.In(ids...),
 			do.Where(
 				r.q.PrivateMessage.SenderID.Eq(userID)).Or(r.q.PrivateMessage.ReceiverID.Eq(userID)),
 		).Find()
@@ -401,19 +400,19 @@ func (r mysqlRepo) Delete(
 }
 
 func handleReplyDeletes(ctx context.Context, tx *query.Query, pms []*dao.PrivateMessage, userID model.UserID) error {
-	senderDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
+	senderDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (uint32, bool) {
 		ok := !v.DeletedBySender && v.MainMessageID == 0 && v.SenderID == userID
 		if ok {
-			return driver.Valuer(v.ID), ok
+			return v.ID, ok
 		}
-		return nil, false
+		return 0, false
 	})
-	receiverDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
+	receiverDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (uint32, bool) {
 		ok := !v.DeletedByReceiver && v.MainMessageID == 0 && v.ReceiverID == userID
 		if ok {
-			return driver.Valuer(v.ID), ok
+			return v.ID, ok
 		}
-		return nil, false
+		return 0, false
 	})
 	txCtx := tx.WithContext(ctx)
 	if len(senderDeletes) != 0 {
@@ -436,19 +435,19 @@ func handleReplyDeletes(ctx context.Context, tx *query.Query, pms []*dao.Private
 }
 
 func handleMainDeletes(ctx context.Context, tx *query.Query, pms []*dao.PrivateMessage, userID model.UserID) error {
-	senderDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
+	senderDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (uint32, bool) {
 		ok := v.MainMessageID != 0 && v.SenderID == userID
 		if ok {
-			return driver.Valuer(v.ID), ok
+			return v.ID, ok
 		}
-		return nil, false
+		return 0, false
 	})
-	receiverDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (driver.Valuer, bool) {
+	receiverDeletes := slice.MapFilter(pms, func(v *dao.PrivateMessage) (uint32, bool) {
 		ok := v.MainMessageID != 0 && v.ReceiverID == userID
 		if ok {
-			return driver.Valuer(v.ID), ok
+			return v.ID, ok
 		}
-		return nil, false
+		return 0, false
 	})
 	txCtx := tx.WithContext(ctx)
 	if len(senderDeletes) != 0 {

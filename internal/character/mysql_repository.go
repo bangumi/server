@@ -56,7 +56,7 @@ func (r mysqlRepo) GetByIDs(
 	ctx context.Context, ids []model.CharacterID,
 ) (map[model.CharacterID]model.Character, error) {
 	records, err := r.q.Character.WithContext(ctx).Preload(r.q.Character.Fields).
-		Where(r.q.Character.ID.In(slice.ToValuer(ids)...)).Find()
+		Where(r.q.Character.ID.In(slice.ToUint32(ids)...)).Find()
 	if err != nil {
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")

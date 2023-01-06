@@ -32,7 +32,7 @@ import (
 )
 
 func (h Person) GetRelatedSubjects(c echo.Context) error {
-	id, err := req.ParsePersonID(c.Param("id"))
+	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}

@@ -42,13 +42,13 @@ func (h PrivateMessage) Create(c echo.Context) error {
 	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
-	receiverIDs := slice.Map(r.ReceiverIDs, func(v uint32) model.UserID { return model.UserID(v) })
+	receiverIDs := slice.Map(r.ReceiverIDs, func(v uint32) model.UserID { return v })
 
 	msgs, err := h.ctrl.CreatePrivateMessage(
 		c.Request().Context(),
 		accessor.ID,
 		receiverIDs,
-		pm.IDFilter{Type: null.NewFromPtr((*model.PrivateMessageID)(r.RelatedID))},
+		pm.IDFilter{Type: null.NewFromPtr(r.RelatedID)},
 		r.Title,
 		r.Content)
 	if err != nil {

@@ -44,7 +44,7 @@ func (h PrivateMessage) Delete(c echo.Context) error {
 			c.Request().Context(),
 			accessor.ID,
 			slice.Map(r.IDs, func(v uint32) model.PrivateMessageID {
-				return model.PrivateMessageID(v)
+				return v
 			}))
 	if err != nil {
 		if errors.Is(err, pm.ErrPmUserIrrelevant) {

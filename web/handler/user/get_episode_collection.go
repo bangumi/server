@@ -19,7 +19,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/episode"
@@ -39,7 +38,7 @@ type ResUserEpisodeCollection struct {
 
 func (h User) GetEpisodeCollection(c echo.Context) error {
 	v := accessor.GetFromCtx(c)
-	episodeID, err := req.ParseEpisodeID(c.Param("episode_id"))
+	episodeID, err := req.ParseID(c.Param("episode_id"))
 	if err != nil {
 		return err
 	}
@@ -49,8 +48,6 @@ func (h User) GetEpisodeCollection(c echo.Context) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-
-		h.log.Error("failed to get episode", episodeID.Zap())
 		return errgo.Wrap(err, "query.GetEpisode")
 	}
 
@@ -68,7 +65,7 @@ func (h User) GetEpisodeCollection(c echo.Context) error {
 // GetSubjectEpisodeCollection return episodes with user's collection info.
 func (h User) GetSubjectEpisodeCollection(c echo.Context) error {
 	v := accessor.GetFromCtx(c)
-	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
+	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -88,15 +85,11 @@ func (h User) GetSubjectEpisodeCollection(c echo.Context) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return res.ErrNotFound
 		}
-
-		h.log.Error("failed to fetch subject", zap.Error(err), subjectID.Zap(), v.Log())
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 
 	ec, err := h.collect.GetSubjectEpisodesCollection(c.Request().Context(), v.ID, subjectID)
 	if err != nil {
-		h.log.Error("unexpected error to fetch user subject collections",
-			zap.Error(err), v.ID.Zap(), subjectID.Zap())
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 

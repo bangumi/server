@@ -4,20 +4,16 @@
 
 package dao
 
-import (
-	"github.com/bangumi/server/internal/model"
-)
-
 const TableNameMemberField = "chii_memberfields"
 
 // MemberField mapped from table <chii_memberfields>
 type MemberField struct {
-	UID       model.UserID `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey"`
-	Site      string       `gorm:"column:site;type:varchar(75);not null"`
-	Location  string       `gorm:"column:location;type:varchar(30);not null"`
-	Bio       string       `gorm:"column:bio;type:text;not null"`
-	Privacy   []byte       `gorm:"column:privacy;type:mediumtext;not null"`
-	Blocklist string       `gorm:"column:blocklist;type:mediumtext;not null"`
+	UID       uint32 `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey"`
+	Site      string `gorm:"column:site;type:varchar(75);not null"`
+	Location  string `gorm:"column:location;type:varchar(30);not null"`
+	Bio       string `gorm:"column:bio;type:text;not null"`
+	Privacy   []byte `gorm:"column:privacy;type:mediumtext;not null"`
+	Blocklist string `gorm:"column:blocklist;type:mediumtext;not null"`
 }
 
 // TableName MemberField's table name

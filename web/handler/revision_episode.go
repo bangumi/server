@@ -62,7 +62,7 @@ func (h Handler) ListEpisodeRevision(c echo.Context) error {
 		return err
 	}
 
-	episodeID, err := req.ParseEpisodeID(c.QueryParam("episode_id"))
+	episodeID, err := req.ParseID(c.QueryParam("episode_id"))
 	if err != nil {
 		return err
 	}

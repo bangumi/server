@@ -40,7 +40,7 @@ func (h Handler) UpdateIndexSubject(c echo.Context) error {
 	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&reqData); err != nil {
 		return res.JSONError(c, err)
 	}
-	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
+	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return errgo.Wrap(err, "subject id is invalid")
 	}
@@ -54,7 +54,7 @@ func (h Handler) addOrUpdateIndexSubject(c echo.Context, payload req.IndexAddSub
 	if err := h.ensureValidStrings(payload.Comment); err != nil {
 		return err
 	}
-	indexID, err := req.ParseIndexID(c.Param("id"))
+	indexID, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func (h Handler) addOrUpdateIndexSubject(c echo.Context, payload req.IndexAddSub
 }
 
 func (h Handler) RemoveIndexSubject(c echo.Context) error {
-	indexID, err := req.ParseIndexID(c.Param("id"))
+	indexID, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func (h Handler) RemoveIndexSubject(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
+	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return errgo.Wrap(err, "subject id is invalid")
 	}

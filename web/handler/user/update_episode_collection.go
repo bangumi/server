@@ -66,7 +66,7 @@ func (h User) PatchEpisodeCollectionBatch(c echo.Context) error {
 		return err
 	}
 
-	subjectID, err := req.ParseSubjectID(c.Param("subject_id"))
+	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (h User) PatchEpisodeCollectionBatch(c echo.Context) error {
 //
 //	/v0/users/-/collections/-/episodes/:episode_id
 func (h User) PutEpisodeCollection(c echo.Context) error {
-	episodeID, err := req.ParseEpisodeID(c.Param("episode_id"))
+	episodeID, err := req.ParseID(c.Param("episode_id"))
 	if err != nil {
 		return err
 	}

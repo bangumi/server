@@ -21,7 +21,6 @@ import (
 	"github.com/bytedance/sonic/decoder"
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
@@ -38,7 +37,7 @@ func (h PrivateMessage) MarkRead(c echo.Context) error {
 	if err := h.Common.V.Struct(r); err != nil {
 		return h.ValidationError(c, err)
 	}
-	err := h.pmRepo.MarkRead(c.Request().Context(), accessor.ID, model.PrivateMessageID(r.ID))
+	err := h.pmRepo.MarkRead(c.Request().Context(), accessor.ID, r.ID)
 	if err != nil {
 		if errors.Is(err, pm.ErrPmInvalidOperation) {
 			return res.BadRequest(err.Error())

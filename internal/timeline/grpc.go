@@ -54,7 +54,7 @@ func (m mysqlRepo) ChangeSubjectProgress(ctx context.Context, u auth.Auth, sbj m
 	_, err := m.rpc.SubjectProgress(ctx, &pb.SubjectProgressRequest{
 		UserId: uint64(u.ID),
 		Subject: &pb.Subject{
-			Id:        uint32(sbj.ID),
+			Id:        sbj.ID,
 			Type:      uint32(sbj.TypeID),
 			Name:      sbj.Name,
 			NameCn:    sbj.NameCN,
@@ -81,7 +81,7 @@ func (m mysqlRepo) ChangeSubjectCollection(
 	_, err := m.rpc.SubjectCollect(ctx, &pb.SubjectCollectRequest{
 		UserId: uint64(u.ID),
 		Subject: &pb.Subject{
-			Id:        uint32(sbj.ID),
+			Id:        sbj.ID,
 			Type:      uint32(sbj.TypeID),
 			Name:      sbj.Name,
 			NameCn:    sbj.NameCN,
@@ -111,14 +111,14 @@ func (m mysqlRepo) ChangeEpisodeStatus(
 	_, err := m.rpc.EpisodeCollect(ctx, &pb.EpisodeCollectRequest{
 		UserId: uint64(u.ID),
 		Last: &pb.Episode{
-			Id:     uint32(episode.ID),
+			Id:     episode.ID,
 			Type:   uint32(episode.Type),
 			Name:   episode.Name,
 			NameCn: episode.NameCN,
 			Sort:   float64(episode.Sort),
 		},
 		Subject: &pb.Subject{
-			Id:        uint32(sbj.ID),
+			Id:        sbj.ID,
 			Type:      uint32(sbj.TypeID),
 			Name:      sbj.Name,
 			NameCn:    sbj.Name,

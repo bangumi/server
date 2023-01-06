@@ -84,6 +84,7 @@ func (s service) GetByID(ctx context.Context, userID model.UserID) (Auth, error)
 	}
 
 	return Auth{
+		Login:      true,
 		RegTime:    a.RegTime,
 		ID:         a.ID,
 		GroupID:    a.GroupID,
@@ -147,6 +148,7 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 	}
 
 	return Auth{
+		Login:      true,
 		RegTime:    a.RegTime,
 		ID:         a.ID,
 		GroupID:    a.GroupID,

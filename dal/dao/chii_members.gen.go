@@ -6,14 +6,13 @@ package dao
 
 import (
 	"github.com/bangumi/server/dal/utiltype"
-	"github.com/bangumi/server/internal/model"
 )
 
 const TableNameMember = "chii_members"
 
 // Member mapped from table <chii_members>
 type Member struct {
-	ID            model.UserID               `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
+	ID            uint32                     `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
 	Username      string                     `gorm:"column:username;type:char(15);not null"`
 	Nickname      string                     `gorm:"column:nickname;type:varchar(30);not null"`
 	Avatar        string                     `gorm:"column:avatar;type:varchar(255);not null"`
