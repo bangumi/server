@@ -19,7 +19,6 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
-	"go.uber.org/dig"
 	"go.uber.org/fx"
 
 	"github.com/bangumi/server/config"
@@ -40,6 +39,7 @@ import (
 	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
+	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/timeline"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web"
@@ -80,11 +80,11 @@ func start() error {
 
 			character.NewMysqlRepo,
 
-			user.NewUserRepo,
+			user.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, collection.NewMysqlRepo,
 			timeline.NewMysqlRepo, pm.NewMysqlRepo, notification.NewMysqlRepo,
 
-			dam.New,
+			dam.New, subject.NewMysqlRepo, subject.NewCachedRepo, person.NewMysqlRepo,
 
 			auth.NewService, person.NewService, search.New,
 		),
@@ -96,7 +96,7 @@ func start() error {
 	).Err()
 
 	if err != nil {
-		return dig.RootCause(err) //nolint:wrapcheck
+		return err //nolint:wrapcheck
 	}
 
 	return errgo.Wrap(web.Start(cfg, e), "failed to start app")

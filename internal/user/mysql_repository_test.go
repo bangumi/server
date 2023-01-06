@@ -30,7 +30,7 @@ import (
 
 func getRepo(t *testing.T) user.Repo {
 	t.Helper()
-	repo, err := user.NewUserRepo(query.Use(test.GetGorm(t)), zap.NewNop())
+	repo, err := user.NewMysqlRepo(query.Use(test.GetGorm(t)), zap.NewNop())
 	require.NoError(t, err)
 
 	return repo

@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/gstr"
 )
 
-func NewUserRepo(q *query.Query, log *zap.Logger) (Repo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
 	return mysqlRepo{q: q, log: log.Named("user.mysqlRepo")}, nil
 }
 
