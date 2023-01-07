@@ -28,6 +28,14 @@ import (
 	"github.com/bangumi/server/web/util"
 )
 
+func globalNotFoundHandler(c echo.Context) error {
+	return c.JSON(http.StatusNotFound, res.Error{
+		Title:       "Not Found",
+		Description: "This is default response, if you see this response, please check your request",
+		Details:     util.Detail(c),
+	})
+}
+
 func getDefaultErrorHandler() echo.HTTPErrorHandler {
 	var log = logger.Named("http.err").
 		WithOptions(zap.AddStacktrace(zapcore.PanicLevel), zap.WithCaller(false))

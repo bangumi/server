@@ -16,7 +16,6 @@ package web
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 
@@ -35,8 +34,6 @@ import (
 	"github.com/bangumi/server/web/middleware/referer"
 	"github.com/bangumi/server/web/middleware/ua"
 	"github.com/bangumi/server/web/req"
-	"github.com/bangumi/server/web/res"
-	"github.com/bangumi/server/web/util"
 )
 
 // AddRouters add all router and default 404 Handler to app.
@@ -115,6 +112,7 @@ func AddRouters(
 
 	v0.GET("/revisions/episodes/:id", h.GetEpisodeRevision)
 	v0.GET("/revisions/episodes", h.ListEpisodeRevision)
+	v0.Any("/*", globalNotFoundHandler)
 
 	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.WebDomain))
 	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.WebDomain))
@@ -137,13 +135,8 @@ func AddRouters(
 	private.DELETE("/pms", pmHandler.Delete, req.JSON, accessor.NeedLogin)
 
 	private.GET("/notifications/count", notificationHandler.Count, accessor.NeedLogin)
+	private.Any("/*", globalNotFoundHandler)
 
 	// default 404 Handler, all router should be added before this router
-	app.RouteNotFound("/*", func(c echo.Context) error {
-		return c.JSON(http.StatusNotFound, res.Error{
-			Title:       "Not Found",
-			Description: "This is default response, if you see this response, please check your request",
-			Details:     util.Detail(c),
-		})
-	})
+	app.Any("/*", globalNotFoundHandler)
 }

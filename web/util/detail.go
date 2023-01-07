@@ -20,7 +20,7 @@ import (
 
 func DetailWithErr(c echo.Context, err error) D {
 	return D{
-		Path:        c.Path(),
+		Path:        c.Request().URL.Path,
 		Error:       err.Error(),
 		Method:      c.Request().Method,
 		QueryString: c.QueryString(),
@@ -29,7 +29,7 @@ func DetailWithErr(c echo.Context, err error) D {
 
 func Detail(c echo.Context) D {
 	return D{
-		Path:        c.Path(),
+		Path:        c.Request().URL.Path,
 		Method:      c.Request().Method,
 		QueryString: c.QueryString(),
 	}
