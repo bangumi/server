@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -41,7 +42,7 @@ func TestHandler_ListPersonRevision_HappyPath(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
 	var r res.Paged
-	resp := test.New(t).Get("/v0/revisions/persons?person_id=9").Execute(app).JSON(&r)
+	resp := htest.New(t, app).Get("/v0/revisions/persons?person_id=9").JSON(&r)
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
 	result, ok := r.Data.([]any)[0].(map[string]any)
@@ -64,8 +65,11 @@ func TestHandler_ListPersonRevision_Bad_ID(t *testing.T) {
 		id := id
 		t.Run(id, func(t *testing.T) {
 			t.Parallel()
-			resp := test.New(t).Get("/v0/revisions/persons").Query("person_id", id).Execute(app)
-			require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+
+			htest.New(t, app).
+				Query("person_id", id).
+				Get("/v0/revisions/persons").
+				ExpectCode(http.StatusBadRequest)
 		})
 	}
 }
@@ -79,7 +83,7 @@ func TestHandler_GetPersonRevision_HappyPath(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
 	var r res.PersonRevision
-	resp := test.New(t).Get("/v0/revisions/persons/348475").Execute(app).JSON(&r)
+	resp := htest.New(t, app).Get("/v0/revisions/persons/348475").JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.Equal(t, uint32(348475), r.ID)
@@ -97,7 +101,7 @@ func TestHandler_ListSubjectRevision_HappyPath(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
 	var r res.Paged
-	resp := test.New(t).Get("/v0/revisions/subjects?subject_id=26").Execute(app).JSON(&r)
+	resp := htest.New(t, app).Get("/v0/revisions/subjects?subject_id=26").JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -122,8 +126,10 @@ func TestHandler_ListSubjectRevision_Bad_ID(t *testing.T) {
 		t.Run(id, func(t *testing.T) {
 			t.Parallel()
 
-			resp := test.New(t).Get("/v0/revisions/subjects").Query("subject_id", id).Execute(app)
-			require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			htest.New(t, app).
+				Query("subject_id", id).
+				Get("/v0/revisions/subjects").
+				ExpectCode(http.StatusBadRequest)
 		})
 	}
 }
@@ -137,7 +143,7 @@ func TestHandler_GetSubjectRevision_HappyPath(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
 	var r res.SubjectRevision
-	resp := test.New(t).Get("/v0/revisions/subjects/665556").Execute(app).JSON(&r)
+	resp := htest.New(t, app).Get("/v0/revisions/subjects/665556").JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.Equal(t, uint32(665556), r.ID)
@@ -157,9 +163,9 @@ func TestHandler_ListCharacterRevision_HappyPath(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
 	var r res.Paged
-	resp := test.New(t).Get("/v0/revisions/characters").
+	resp := htest.New(t, app).
 		Query("character_id", strconv.FormatUint(uint64(cid), 10)).
-		Execute(app).
+		Get("/v0/revisions/characters").
 		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -188,8 +194,8 @@ func TestHandler_GetCharacterRevision_HappyPath(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{RevisionRepo: m})
 
 	var r res.CharacterRevision
-	resp := test.New(t).Get(fmt.Sprintf("/v0/revisions/characters/%d", mockRID)).
-		Execute(app).
+	resp := htest.New(t, app).
+		Get(fmt.Sprintf("/v0/revisions/characters/%d", mockRID)).
 		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)

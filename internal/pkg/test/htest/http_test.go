@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test_test
+package htest_test
 
 import (
 	"net/http"
@@ -21,7 +21,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 )
 
 type res struct {
@@ -38,8 +38,9 @@ func TestClientFullExample(t *testing.T) {
 	})
 
 	var r res
-	test.New(t).Get("/test").Query("q", "v").
-		Execute(app).
+	htest.New(t, app).
+		Query("q", "v").
+		Get("/test").
 		JSON(&r).
 		ExpectCode(http.StatusOK)
 
@@ -55,7 +56,7 @@ func TestPathWithQuery(t *testing.T) {
 		return c.JSON(http.StatusOK, res{I: 5, Q: c.QueryParam("q")})
 	})
 
-	req := test.New(t).Get("/test?a=1").Query("a", "2").Query("b", "3")
+	res := htest.New(t, app).Query("a", "2").Query("b", "3").Get("/test?a=1")
 
-	require.Equal(t, "/test?a=1&a=2&b=3", req.StdRequest().RequestURI)
+	require.Equal(t, "/test?a=1&a=2&b=3", res.Req.RequestURI)
 }

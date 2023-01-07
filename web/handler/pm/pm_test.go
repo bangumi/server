@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/session"
@@ -58,10 +59,9 @@ func TestPrivateMessage_List(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
-	resp := test.New(t).
-		Get("/p/pms/list?offset=0&limit=10&folder=inbox").
+	resp := htest.New(t, app).
 		Header(echo.HeaderCookie, "chiiNextSessionID=11").
-		Execute(app)
+		Get("/p/pms/list?offset=0&limit=10&folder=inbox")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -83,10 +83,9 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
-	resp := test.New(t).
-		Get("/p/pms/related-msgs/1").
+	resp := htest.New(t, app).
 		Header(echo.HeaderCookie, "chiiNextSessionID=11").
-		Execute(app)
+		Get("/p/pms/related-msgs/1")
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
@@ -107,10 +106,9 @@ func TestPrivateMessage_ListRecentContact(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
-	resp := test.New(t).
-		Get("/p/pms/contacts/recent").
+	resp := htest.New(t, app).
 		Header(echo.HeaderCookie, "chiiNextSessionID=11").
-		Execute(app)
+		Get("/p/pms/contacts/recent")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -131,10 +129,9 @@ func TestPrivateMessage_CountTypes(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
-	resp := test.New(t).
-		Get("/p/pms/counts").
+	resp := htest.New(t, app).
 		Header(echo.HeaderCookie, "chiiNextSessionID=111").
-		Execute(app)
+		Get("/p/pms/counts")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -156,11 +153,10 @@ func TestPrivateMessage_MarkRead(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
-	resp := test.New(t).
-		Patch("/p/pms/read").
+	resp := htest.New(t, app).
 		Header(echo.HeaderCookie, "chiiNextSessionID=11").
-		JSON(req.PrivateMessageMarkRead{ID: 1}).
-		Execute(app)
+		BodyJSON(req.PrivateMessageMarkRead{ID: 1}).
+		Patch("/p/pms/read")
 
 	require.Equal(t, http.StatusNoContent, resp.StatusCode)
 }
@@ -185,11 +181,10 @@ func TestPrivateMessage_Create(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
-	resp := test.New(t).
-		Post("/p/pms").
+	resp := htest.New(t, app).
 		Header(echo.HeaderCookie, "chiiNextSessionID=111").
-		JSON(req.PrivateMessageCreate{Title: "测试标题", Content: "测试内容", ReceiverIDs: []uint32{382951}}).
-		Execute(app)
+		BodyJSON(req.PrivateMessageCreate{Title: "测试标题", Content: "测试内容", ReceiverIDs: []uint32{382951}}).
+		Post("/p/pms")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -211,11 +206,10 @@ func TestPrivateMessage_Delete(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{PrivateMessageRepo: m, AuthService: mockAuth, SessionManager: s})
 
-	resp := test.New(t).
-		Delete("/p/pms").
+	resp := htest.New(t, app).
 		Header(echo.HeaderCookie, "chiiNextSessionID=111").
-		JSON(req.PrivateMessageDelete{IDs: []uint32{1}}).
-		Execute(app)
+		BodyJSON(req.PrivateMessageDelete{IDs: []uint32{1}}).
+		Delete("/p/pms")
 
 	require.Equal(t, http.StatusNoContent, resp.StatusCode)
 }

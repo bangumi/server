@@ -29,6 +29,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/res"
 )
@@ -58,8 +59,10 @@ func TestSubject_Get(t *testing.T) {
 	)
 
 	var r res.SubjectV0
-	resp := test.New(t).Get("/v0/subjects/7").Header(echo.HeaderAuthorization, "Bearer token").
-		Execute(app).JSON(&r)
+	resp := htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer token").
+		Get("/v0/subjects/7").
+		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.EqualValues(t, 7, r.ID)
@@ -76,7 +79,7 @@ func TestSubject_Get_Redirect(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Get("/v0/subjects/8").Execute(app)
+	resp := htest.New(t, app).Get("/v0/subjects/8")
 
 	require.Equal(t, http.StatusFound, resp.StatusCode, "302 for redirect repository")
 	require.Equal(t, "/v0/subjects/2", resp.Header.Get("location"))
@@ -101,8 +104,7 @@ func TestSubject_Get_NSFW_200(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Get("/v0/subjects/7").Header(echo.HeaderAuthorization, "Bearer token").
-		Execute(app)
+	resp := htest.New(t, app).Header(echo.HeaderAuthorization, "Bearer token").Get("/v0/subjects/7")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, "200 for authorized user")
 }
@@ -118,8 +120,7 @@ func TestSubject_Get_NSFW_404(t *testing.T) {
 		test.Mock{SubjectRepo: m},
 	)
 
-	resp := test.New(t).Get("/v0/subjects/7").
-		Execute(app)
+	resp := htest.New(t, app).Get("/v0/subjects/7")
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode, "404 for unauthorized user")
 }
@@ -135,7 +136,8 @@ func TestSubject_Get_bad_id(t *testing.T) {
 		t.Run(path, func(t *testing.T) {
 			t.Parallel()
 
-			resp := test.New(t).Get(path).Execute(app)
+			resp := htest.New(t, app).Get(path)
+
 			require.Equal(t, http.StatusBadRequest, resp.StatusCode, "400 for redirect subject id")
 		})
 	}
@@ -154,13 +156,13 @@ func TestSubject_GetImage_302(t *testing.T) {
 		t.Run(imageType, func(t *testing.T) {
 			t.Parallel()
 
-			resp := test.New(t).Get("/v0/subjects/1/image?type=" + imageType).Execute(app)
+			resp := htest.New(t, app).Get("/v0/subjects/1/image?type=" + imageType)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
 			expected, _ := res.SubjectImage("temp").Select(imageType)
 			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
 
 			// should redirect to default image
-			resp = test.New(t).Get("/v0/subjects/3/image?type=" + imageType).Execute(app)
+			resp = htest.New(t, app).Get("/v0/subjects/3/image?type=" + imageType)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
 			require.Equal(t, res.DefaultImageURL, resp.Header.Get("Location"), "should redirect to default image")
 		})
@@ -174,6 +176,5 @@ func TestSubject_GetImage_400(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 
-	resp := test.New(t).Get("/v0/subjects/1/image").Execute(app)
-	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
+	htest.New(t, app).Get("/v0/subjects/1/image").ExpectCode(http.StatusBadRequest)
 }

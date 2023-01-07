@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -38,8 +39,7 @@ func TestCharacter_Get(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
 	var r res.CharacterV0
-	test.New(t).Get("/v0/characters/7").
-		Execute(app).
+	htest.New(t, app).Get("/v0/characters/7").
 		JSON(&r).
 		ExpectCode(http.StatusOK)
 	require.EqualValues(t, 7, r.ID)
@@ -52,7 +52,7 @@ func TestCharacter_Get_redirect(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
-	resp := test.New(t).Get("/v0/characters/7").Execute(app).ExpectCode(http.StatusFound)
+	resp := htest.New(t, app).Get("/v0/characters/7").ExpectCode(http.StatusFound)
 
 	require.Equal(t, "/v0/characters/8", resp.Header.Get("Location"))
 }
@@ -74,8 +74,9 @@ func TestCharacter_Get_NSFW(t *testing.T) {
 	})
 
 	var r res.CharacterV0
-	resp := test.New(t).Get("/v0/characters/7").Header(echo.HeaderAuthorization, "Bearer v").
-		Execute(app).
+	resp := htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer v").
+		Get("/v0/characters/7").
 		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode, resp.BodyString())
@@ -95,13 +96,13 @@ func TestCharacter_GetImage(t *testing.T) {
 		t.Run(imageType, func(t *testing.T) {
 			t.Parallel()
 
-			resp := test.New(t).Get("/v0/characters/7/image?type=" + imageType).Execute(app)
+			resp := htest.New(t, app).Get("/v0/characters/7/image?type=" + imageType)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
 			expected, _ := res.PersonImage("temp").Select(imageType)
 			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
 
 			// should redirect to default image
-			resp = test.New(t).Get("/v0/characters/8/image?type=" + imageType).Execute(app)
+			resp = htest.New(t, app).Get("/v0/characters/8/image?type=" + imageType)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
 			require.Equal(t, res.DefaultImageURL, resp.Header.Get("Location"), "should redirect to default image")
 		})
@@ -115,6 +116,6 @@ func TestCharacter_GetImage_400(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
-	resp := test.New(t).Get("/v0/characters/7/image").Execute(app)
+	resp := htest.New(t, app).Get("/v0/characters/7/image")
 	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
 }

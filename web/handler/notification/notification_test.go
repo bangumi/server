@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -46,12 +47,11 @@ func TestNotification_Count(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{NotificationRepo: m, AuthService: mockAuth, SessionManager: s})
 
-	resp := test.New(t).
-		Get("/p/notifications/count").
+	resp := htest.New(t, app).
 		Header(echo.HeaderCookie, "chiiNextSessionID=11").
-		Execute(app)
+		Get("/p/notifications/count").
+		ExpectCode(http.StatusOK)
 
-	require.Equal(t, http.StatusOK, resp.StatusCode)
 	var v int
 	err := sonic.Unmarshal(resp.Body, &v)
 	require.NoError(t, err)

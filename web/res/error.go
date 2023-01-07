@@ -49,7 +49,7 @@ func (e HTTPError) Error() string {
 
 func JSONError(c echo.Context, err error) error {
 	return c.JSON(http.StatusBadRequest, Error{
-		Title:       "JSON Error",
+		Title:       "BodyJSON Error",
 		Description: "can't decode request body as json or value doesn't match expected type",
 		Details:     util.DetailWithErr(c, err),
 	})

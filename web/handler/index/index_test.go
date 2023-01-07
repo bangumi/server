@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 )
 
 func TestHandler_GetIndex_HappyPath(t *testing.T) {
@@ -37,7 +38,7 @@ func TestHandler_GetIndex_HappyPath(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: m})
 
-	resp := test.New(t).Get("/v0/indices/7").Execute(app)
+	resp := htest.New(t, app).Get("/v0/indices/7")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -49,7 +50,7 @@ func TestHandler_GetIndex_NSFW(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: m})
 
-	resp := test.New(t).Get("/v0/indices/7").Execute(app)
+	resp := htest.New(t, app).Get("/v0/indices/7")
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
@@ -63,13 +64,13 @@ func TestHandler_NewIndex_NoPermission(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Post("/v0/indices").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]string{
+		BodyJSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
-		}).Execute(app)
+		}).
+		Post("/v0/indices")
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }
@@ -88,13 +89,13 @@ func TestHandler_NewIndex_With_Permission(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Post("/v0/indices").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]string{
+		BodyJSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
-		}).Execute(app)
+		}).
+		Post("/v0/indices")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -106,13 +107,13 @@ func TestHandler_UpdateIndex_NoPermission(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex})
 
-	resp := test.New(t).
-		Put("/v0/indices/7").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]string{
+		BodyJSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
-		}).Execute(app)
+		}).
+		Put("/v0/indices/7")
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }
@@ -132,13 +133,13 @@ func TestHandler_UpdateIndex_With_Permission(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Put("/v0/indices/7").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]string{
+		BodyJSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
-		}).Execute(app)
+		}).
+		Put("/v0/indices/7")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -147,18 +148,16 @@ func TestHandler_UpdateIndex_Invalid_Request_Data(t *testing.T) {
 	t.Parallel()
 	app := test.GetWebApp(t, test.Mock{})
 
-	resp := test.New(t).
-		Put("/v0/indices/7").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		Execute(app)
+		Put("/v0/indices/7")
 
 	require.Equal(t, http.StatusUnsupportedMediaType, resp.StatusCode)
 
-	resp = test.New(t).
-		Put("/v0/indices/7").
+	resp = htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]string{}).
-		Execute(app)
+		BodyJSON(map[string]string{}).
+		Put("/v0/indices/7")
 
 	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }
@@ -170,13 +169,13 @@ func TestHandler_UpdateIndex_NonExists(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex})
 
-	resp := test.New(t).
-		Put("/v0/indices/7").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]string{
+		BodyJSON(map[string]string{
 			"title":       "测试",
 			"description": "测试123",
-		}).Execute(app)
+		}).
+		Put("/v0/indices/7")
 
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
@@ -185,13 +184,13 @@ func TestHandler_New_Index_Invalid_Input(t *testing.T) {
 	t.Parallel()
 	app := test.GetWebApp(t, test.Mock{})
 
-	resp := test.New(t).
-		Post("/v0/indices").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]string{
+		BodyJSON(map[string]string{
 			"title":       "测试\001测试",
 			"description": "测试123",
-		}).Execute(app)
+		}).
+		Post("/v0/indices")
 
 	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }
@@ -207,13 +206,13 @@ func TestHandler_Update_Index_Invalid_Input(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Put("/v0/indices/7").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]string{
+		BodyJSON(map[string]string{
 			"title":       "测试\000",
 			"description": "测试123",
-		}).Execute(app)
+		}).
+		Put("/v0/indices/7")
 
 	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }

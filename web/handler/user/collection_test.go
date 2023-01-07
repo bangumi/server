@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/res"
 )
@@ -54,9 +55,10 @@ func TestUser_ListCollection(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, SubjectRepo: s})
 
-	var r test.PagedResponse
-	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections", username)).Query("limit", "10").
-		Execute(app).
+	var r htest.PagedResponse
+	resp := htest.New(t, app).
+		Query("limit", "10").
+		Get(fmt.Sprintf("/v0/users/%s/collections", username)).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
 
@@ -89,8 +91,8 @@ func TestUser_GetSubjectCollection(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, SubjectRepo: s})
 
 	var r res.SubjectCollection
-	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
-		Execute(app).
+	resp := htest.New(t, app).
+		Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
 		JSON(&r).
 		ExpectCode(http.StatusOK)
 
@@ -116,9 +118,8 @@ func TestUser_ListSubjectCollection_other_user(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{UserRepo: m, AuthService: a, CollectionRepo: c})
 
-	resp := test.New(t).Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
+	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer v").
-		Execute(app)
-
-	require.Equal(t, http.StatusNotFound, resp.StatusCode, resp.BodyString())
+		Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
+		ExpectCode(http.StatusNotFound)
 }

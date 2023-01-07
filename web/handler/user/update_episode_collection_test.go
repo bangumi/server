@@ -30,6 +30,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 )
 
 func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
@@ -64,14 +65,13 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
 
-	test.New(t).
+	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
-		JSON(map[string]any{
+		BodyJSON(map[string]any{
 			"episode_id": []int{1, 2, 3},
 			"type":       model.EpisodeCollectionDone,
 		}).
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d/episodes", sid)).
-		Execute(app).
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, []model.EpisodeID{1, 2, 3}, eIDs)
@@ -106,11 +106,10 @@ func TestUser_PutEpisodeCollection(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
 
-	test.New(t).
+	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
-		JSON(map[string]any{"type": model.EpisodeCollectionDone}).
+		BodyJSON(map[string]any{"type": model.EpisodeCollectionDone}).
 		Put(fmt.Sprintf("/v0/users/-/collections/-/episodes/%d", eid)).
-		Execute(app).
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, []model.EpisodeID{eid}, eIDs)

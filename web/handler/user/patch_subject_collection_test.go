@@ -34,6 +34,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 )
 
 func TestUser_PatchSubjectCollection(t *testing.T) {
@@ -64,9 +65,9 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d, TimeLineRepo: tl})
 
-	test.New(t).
+	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
-		JSON(map[string]any{
+		BodyJSON(map[string]any{
 			"comment": "1 test_content 2",
 			"type":    1,
 			"private": true,
@@ -74,7 +75,6 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 			"tags":    []string{"q", "vv"},
 		}).
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
-		Execute(app).
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, collection.Update{
@@ -110,13 +110,12 @@ func TestUser_PatchSubjectCollection_privacy(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d})
 
-	test.New(t).
+	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
-		JSON(map[string]any{
+		BodyJSON(map[string]any{
 			"private": false,
 		}).
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
-		Execute(app).
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, collection.Update{
@@ -138,11 +137,10 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 
 		app := test.GetWebApp(t, test.Mock{AuthService: a})
 
-		test.New(t).
+		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
-			JSON(echo.Map{"rate": 11}).
+			BodyJSON(echo.Map{"rate": 11}).
 			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
-			Execute(app).
 			ExpectCode(http.StatusBadRequest)
 	})
 
@@ -151,11 +149,10 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 
 		app := test.GetWebApp(t, test.Mock{AuthService: a})
 
-		test.New(t).
+		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
-			JSON(echo.Map{"type": 0}).
+			BodyJSON(echo.Map{"type": 0}).
 			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
-			Execute(app).
 			ExpectCode(http.StatusBadRequest)
 	})
 
@@ -164,11 +161,10 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 
 		app := test.GetWebApp(t, test.Mock{AuthService: a})
 
-		test.New(t).
+		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
-			JSON(echo.Map{"tags": "vv qq"}).
+			BodyJSON(echo.Map{"tags": "vv qq"}).
 			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
-			Execute(app).
 			ExpectCode(http.StatusBadRequest)
 	})
 
@@ -177,11 +173,10 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 
 		app := test.GetWebApp(t, test.Mock{AuthService: a})
 
-		test.New(t).
+		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
-			JSON(echo.Map{"comment": strings.Repeat("vv qq", 200)}).
+			BodyJSON(echo.Map{"comment": strings.Repeat("vv qq", 200)}).
 			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
-			Execute(app).
 			ExpectCode(http.StatusBadRequest)
 	})
 }

@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -48,9 +49,9 @@ func TestUser_GetEpisodeCollection(t *testing.T) {
 	var r struct {
 		Type uint8 `json:"type"`
 	}
-	test.New(t).Get("/v0/users/-/collections/-/episodes/1").
+	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
-		Execute(app).
+		Get("/v0/users/-/collections/-/episodes/1").
 		JSON(&r).
 		ExpectCode(http.StatusOK)
 }
@@ -75,9 +76,9 @@ func TestUser_GetSubjectEpisodeCollection(t *testing.T) {
 	var r res.PagedG[struct {
 		Type uint8 `json:"type"`
 	}]
-	test.New(t).Get("/v0/users/-/collections/8/episodes").
+	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
-		Execute(app).
+		Get("/v0/users/-/collections/8/episodes").
 		JSON(&r).
 		ExpectCode(http.StatusOK)
 

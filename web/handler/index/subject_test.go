@@ -27,6 +27,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 )
 
 func TestHandler_Add_Index_Subject(t *testing.T) {
@@ -49,15 +50,14 @@ func TestHandler_Add_Index_Subject(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Post("/v0/indices/7/subjects").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]any{
+		BodyJSON(map[string]any{
 			"subject_id": 5,
 			"sort":       48,
 			"comment":    "test123",
 		}).
-		Execute(app)
+		Post("/v0/indices/7/subjects")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -79,15 +79,14 @@ func TestHandler_Add_Index_Subject_NoPermission(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Post("/v0/indices/7/subjects").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]any{
+		BodyJSON(map[string]any{
 			"subject_id": 5,
 			"sort":       48,
 			"comment":    "test123",
 		}).
-		Execute(app)
+		Post("/v0/indices/7/subjects")
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }
@@ -112,14 +111,13 @@ func TestHandler_Update_Index_Subject(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Put("/v0/indices/7/subjects/5").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]any{
+		BodyJSON(map[string]any{
 			"sort":    48,
 			"comment": "test123",
 		}).
-		Execute(app)
+		Put("/v0/indices/7/subjects/5")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -141,14 +139,13 @@ func TestHandler_Update_Index_Subject_NoPermission(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Put("/v0/indices/7/subjects/5").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]any{
+		BodyJSON(map[string]any{
 			"sort":    48,
 			"comment": "test123",
 		}).
-		Execute(app)
+		Put("/v0/indices/7/subjects/5")
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }
@@ -172,14 +169,13 @@ func TestHandler_Update_Index_Subject_NonExists(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Put("/v0/indices/7/subjects/5").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]any{
+		BodyJSON(map[string]any{
 			"sort":    48,
 			"comment": "test123",
 		}).
-		Execute(app)
+		Put("/v0/indices/7/subjects/5")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -204,10 +200,9 @@ func TestHandler_Delete_Index_Subject(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Delete("/v0/indices/7/subjects/5").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		Execute(app)
+		Delete("/v0/indices/7/subjects/5")
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -229,10 +224,9 @@ func TestHandler_Delete_Index_Subject_NoPermission(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Delete("/v0/indices/7/subjects/5").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		Execute(app)
+		Delete("/v0/indices/7/subjects/5")
 
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }
@@ -248,14 +242,13 @@ func TestHandler_Update_Index_Invalid_Comment(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{AuthRepo: mockAuth})
 
-	resp := test.New(t).
-		Put("/v0/indices/7/subjects/5").
+	resp := htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		JSON(map[string]any{
+		BodyJSON(map[string]any{
 			"sort":    48,
 			"comment": "test123\000",
 		}).
-		Execute(app)
+		Put("/v0/indices/7/subjects/5")
 
 	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }

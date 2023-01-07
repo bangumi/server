@@ -25,6 +25,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -38,9 +39,10 @@ func TestHandler_GetEpisode(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: m, SubjectRepo: s})
 
 	var e res.Episode
-	resp := test.New(t).Get("/v0/episodes/7").Execute(app).JSON(&e)
-
-	require.Equal(t, http.StatusOK, resp.StatusCode)
+	htest.New(t, app).
+		Get("/v0/episodes/7").
+		JSON(&e).
+		ExpectCode(http.StatusOK)
 
 	require.EqualValues(t, 7, e.ID)
 }

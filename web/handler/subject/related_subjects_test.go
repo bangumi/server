@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/res"
 )
@@ -50,8 +51,9 @@ func TestSubject_GetRelatedSubjects(t *testing.T) {
 	)
 
 	var r []res.SubjectRelatedSubject
-	resp := test.New(t).Get("/v0/subjects/7/subjects").
-		Execute(app).JSON(&r)
+	resp := htest.New(t, app).
+		Get("/v0/subjects/7/subjects").
+		JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.Len(t, r, 1)

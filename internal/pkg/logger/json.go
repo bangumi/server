@@ -54,7 +54,7 @@ func jsonLogger(level zapcore.Level) *zap.Logger {
 
 func defaultReflectedEncoder(w io.Writer) zapcore.ReflectedEncoder {
 	enc := encoder.NewStreamEncoder(w)
-	// For consistency with our custom JSON encoder.
+	// For consistency with our custom BodyJSON encoder.
 	enc.SetEscapeHTML(false)
 	return enc
 }

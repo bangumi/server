@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package test
+package htest
 
 import (
 	"bytes"
@@ -40,12 +40,14 @@ type Request struct {
 	contentType string
 	endpoint    string
 	httpBody    []byte
+	srv         http.Handler
 }
 
-func New(t *testing.T) *Request {
+func New(t *testing.T, server http.Handler) *Request {
 	t.Helper()
 
 	return &Request{
+		srv:      server,
 		t:        t,
 		urlQuery: url.Values{},
 		cookies:  make(map[string]string),
@@ -54,35 +56,35 @@ func New(t *testing.T) *Request {
 	}
 }
 
-func (r *Request) newRequest(httpVerb string, endpoint string) *Request {
+func (r *Request) newRequest(httpVerb string, endpoint string) *Response {
 	r.t.Helper()
 	r.httpVerb = httpVerb
 	r.endpoint = endpoint
 
-	return r
+	return r.execute()
 }
 
-func (r *Request) Get(entrypoint string) *Request {
+func (r *Request) Get(entrypoint string) *Response {
 	r.t.Helper()
 	return r.newRequest(http.MethodGet, entrypoint)
 }
 
-func (r *Request) Post(entrypoint string) *Request {
+func (r *Request) Post(entrypoint string) *Response {
 	r.t.Helper()
 	return r.newRequest(http.MethodPost, entrypoint)
 }
 
-func (r *Request) Put(entrypoint string) *Request {
+func (r *Request) Put(entrypoint string) *Response {
 	r.t.Helper()
 	return r.newRequest(http.MethodPut, entrypoint)
 }
 
-func (r *Request) Patch(path string) *Request {
+func (r *Request) Patch(path string) *Response {
 	r.t.Helper()
 	return r.newRequest(http.MethodPatch, path)
 }
 
-func (r *Request) Delete(entrypoint string) *Request {
+func (r *Request) Delete(entrypoint string) *Response {
 	r.t.Helper()
 	return r.newRequest(http.MethodDelete, entrypoint)
 }
@@ -116,7 +118,7 @@ func (r *Request) Form(key, value string) *Request {
 
 	if r.contentType != echo.MIMEApplicationForm {
 		r.t.Error("content-type should be empty or 'application/x-www-form-urlencoded'," +
-			" can't mix .Form(...) with .JSON(...)")
+			" can't mix .Form(...) with .BodyJSON(...)")
 		r.t.FailNow()
 	}
 
@@ -126,7 +128,7 @@ func (r *Request) Form(key, value string) *Request {
 	return r
 }
 
-func (r *Request) JSON(v any) *Request {
+func (r *Request) BodyJSON(v any) *Request {
 	r.t.Helper()
 	require.Empty(r.t, r.contentType, "content-type should not be empty")
 
@@ -181,14 +183,16 @@ func (r *Request) StdRequest() *http.Request {
 	return req
 }
 
-func (r *Request) Execute(app *echo.Echo) *Response {
+func (r *Request) execute() *Response {
 	r.t.Helper()
 
 	resp := httptest.NewRecorder()
 
-	app.ServeHTTP(resp, r.StdRequest())
+	req := r.StdRequest()
+	r.srv.ServeHTTP(resp, req)
 
 	return &Response{
+		Req:        req,
 		t:          r.t,
 		StatusCode: resp.Code,
 		Header:     resp.Header(),
@@ -217,13 +221,14 @@ type Response struct {
 	Body       []byte
 	cookies    []*http.Cookie
 	StatusCode int
+	Req        *http.Request
 }
 
 func (r *Response) JSON(v any) *Response {
 	r.t.Helper()
 
 	if strings.HasPrefix(r.Header.Get(echo.HeaderContentType), echo.MIMEApplicationJSON) {
-		require.NoError(r.t, sonic.Unmarshal(r.Body, v))
+		require.NoError(r.t, json.Unmarshal(r.Body, v))
 	}
 
 	return r
@@ -236,7 +241,7 @@ func (r *Response) BodyString() string {
 func (r *Response) ExpectCode(t int) *Response {
 	r.t.Helper()
 
-	require.Equalf(r.t, t, r.StatusCode, "expecting http response status code %d %s", t, r.BodyString())
+	require.Equalf(r.t, t, r.StatusCode, "expecting http response status code %d, body: %s", t, r.BodyString())
 
 	return r
 }

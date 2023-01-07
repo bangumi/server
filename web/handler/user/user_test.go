@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/res"
 )
@@ -49,10 +50,12 @@ func TestUser_Get(t *testing.T) {
 	)
 
 	var r res.User
-	resp := test.New(t).Get("/v0/me").Header("authorization", "Bearer token").
-		Execute(app).JSON(&r)
+	resp := htest.New(t, app).
+		Header("authorization", "Bearer token").
+		Get("/v0/me").
+		JSON(&r).
+		ExpectCode(http.StatusOK)
 
-	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.EqualValues(t, uid, r.ID, resp.BodyString())
 }
 
@@ -69,7 +72,7 @@ func TestUser_Get_200(t *testing.T) {
 	)
 
 	var r res.User
-	resp := test.New(t).Get("/v0/users/u").Execute(app).JSON(&r)
+	resp := htest.New(t, app).Get("/v0/users/u").JSON(&r)
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.Equal(t, uid, r.ID)
@@ -87,8 +90,7 @@ func TestUser_Get_404(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Get("/v0/users/u").Execute(app)
-	require.Equal(t, http.StatusNotFound, resp.StatusCode, resp.BodyString())
+	htest.New(t, app).Get("/v0/users/u").ExpectCode(http.StatusNotFound)
 }
 
 func TestUser_GetAvatar_302(t *testing.T) {
@@ -103,7 +105,7 @@ func TestUser_GetAvatar_302(t *testing.T) {
 		t.Run(imageType, func(t *testing.T) {
 			t.Parallel()
 
-			resp := test.New(t).Get("/v0/users/u/avatar?type=" + imageType).Execute(app)
+			resp := htest.New(t, app).Get("/v0/users/u/avatar?type=" + imageType)
 			require.Equal(t, http.StatusFound, resp.StatusCode, resp.BodyString())
 			expected, _ := res.UserAvatar("temp").Select(imageType)
 			require.Equal(t, expected, resp.Header.Get("Location"), "expect redirect to image url")
@@ -122,6 +124,6 @@ func TestUser_GetAvatar_400(t *testing.T) {
 		},
 	)
 
-	resp := test.New(t).Get("/v0/users/u/avatar").Execute(app)
+	resp := htest.New(t, app).Get("/v0/users/u/avatar")
 	require.Equal(t, http.StatusBadRequest, resp.StatusCode, resp.BodyString())
 }
