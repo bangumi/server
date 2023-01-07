@@ -15,6 +15,7 @@
 package user_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -23,12 +24,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/trim21/htest"
 
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/res"
 )
@@ -55,7 +56,13 @@ func TestUser_ListCollection(t *testing.T) {
 
 	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, SubjectRepo: s})
 
-	var r htest.PagedResponse
+	var r struct {
+		Data   json.RawMessage `json:"data"`
+		Total  int64           `json:"total"`
+		Limit  int             `json:"limit"`
+		Offset int             `json:"offset"`
+	}
+
 	resp := htest.New(t, app).
 		Query("limit", "10").
 		Get(fmt.Sprintf("/v0/users/%s/collections", username)).

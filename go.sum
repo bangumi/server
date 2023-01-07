@@ -622,6 +622,8 @@ github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/trim21/go-phpserialize v0.0.15 h1:m5Dd6P46ssSBc0DEZkNi6FJhByibaUERdxO6qrlSvfA=
 github.com/trim21/go-phpserialize v0.0.15/go.mod h1:P8ULk1Go0OQQLb2+LGihbE5cqkiX+yOUV3SZ5CoGfuI=
+github.com/trim21/htest v0.0.3 h1:1y3qw/vdeNyTlV5kZ/xCFLqo94eyC2mKmItaf60NaHA=
+github.com/trim21/htest v0.0.3/go.mod h1:c1SxijYYVv4b8XUoT02xgZhaEJtfqduubO9OEPRIPEg=
 github.com/trim21/pkg v0.0.3 h1:uAqfoFmmYiIMOSretKj8/tvrQs3KG57020Ff0cx8UtE=
 github.com/trim21/pkg v0.0.3/go.mod h1:JrRIFidkCLeuU5j0vBP5ZN0NOp2JavagHZNr4D3AH6Q=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=

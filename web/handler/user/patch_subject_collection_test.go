@@ -25,6 +25,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/trim21/htest"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/auth"
@@ -34,7 +35,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/pkg/test/htest"
 )
 
 func TestUser_PatchSubjectCollection(t *testing.T) {

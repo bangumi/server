@@ -21,13 +21,13 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/trim21/htest"
 
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
-	"github.com/bangumi/server/internal/pkg/test/htest"
 	"github.com/bangumi/server/web/res"
 )
 

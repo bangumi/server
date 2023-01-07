@@ -27,6 +27,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.1
 	github.com/trim21/go-phpserialize v0.0.15
+	github.com/trim21/htest v0.0.3
 	github.com/trim21/pkg v0.0.3
 	github.com/valyala/bytebufferpool v1.0.0
 	go.etcd.io/etcd/client/v3 v3.5.6
