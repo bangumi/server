@@ -20,7 +20,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bytedance/sonic/decoder"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
@@ -161,7 +160,7 @@ func (h Handler) getIndexSubjects(
 
 func (h Handler) NewIndex(c echo.Context) error {
 	var reqData req.IndexBasicInfo
-	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&reqData); err != nil {
+	if err := c.Echo().JSONSerializer.Deserialize(c, &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 	if err := h.ensureValidStrings(reqData.Description, reqData.Title); err != nil {
@@ -216,7 +215,7 @@ func (h Handler) UpdateIndex(c echo.Context) error {
 		return err
 	}
 	var reqData req.IndexBasicInfo
-	if err = decoder.NewStreamDecoder(c.Request().Body).Decode(&reqData); err != nil {
+	if err = c.Echo().JSONSerializer.Deserialize(c, &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 

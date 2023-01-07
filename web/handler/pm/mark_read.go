@@ -18,7 +18,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/bytedance/sonic/decoder"
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/pm"
@@ -30,7 +29,7 @@ import (
 func (h PrivateMessage) MarkRead(c echo.Context) error {
 	accessor := accessor.GetFromCtx(c)
 	var r req.PrivateMessageMarkRead
-	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
+	if err := c.Echo().JSONSerializer.Deserialize(c, &r); err != nil {
 		return res.JSONError(c, err)
 	}
 

@@ -18,7 +18,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/bytedance/sonic/decoder"
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
@@ -29,7 +28,7 @@ import (
 
 func (h Handler) AddIndexSubject(c echo.Context) error {
 	var reqData req.IndexAddSubject
-	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&reqData); err != nil {
+	if err := c.Echo().JSONSerializer.Deserialize(c, &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 	return h.addOrUpdateIndexSubject(c, reqData)
@@ -37,7 +36,7 @@ func (h Handler) AddIndexSubject(c echo.Context) error {
 
 func (h Handler) UpdateIndexSubject(c echo.Context) error {
 	var reqData req.IndexSubjectInfo
-	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&reqData); err != nil {
+	if err := c.Echo().JSONSerializer.Deserialize(c, &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
 	subjectID, err := req.ParseID(c.Param("subject_id"))

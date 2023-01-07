@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bytedance/sonic/decoder"
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/ctrl"
@@ -58,7 +57,7 @@ func (r ReqEpisodeCollectionBatch) Validate() error {
 //	/v0/users/-/collections/:subject_id/episodes"
 func (h User) PatchEpisodeCollectionBatch(c echo.Context) error {
 	var r ReqEpisodeCollectionBatch
-	if err := decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
+	if err := c.Echo().JSONSerializer.Deserialize(c, &r); err != nil {
 		return res.JSONError(c, err)
 	}
 
@@ -99,7 +98,7 @@ func (h User) PutEpisodeCollection(c echo.Context) error {
 	}
 
 	var r req.UpdateUserEpisodeCollection
-	if err = decoder.NewStreamDecoder(c.Request().Body).Decode(&r); err != nil {
+	if err = c.Echo().JSONSerializer.Deserialize(c, &r); err != nil {
 		return res.JSONError(c, err)
 	}
 
