@@ -22,6 +22,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -38,7 +39,7 @@ func (h Character) GetRelatedSubjects(c echo.Context) error {
 
 	_, relations, err := h.getCharacterRelatedSubjects(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 		return errgo.Wrap(err, "repo.GetCharacterRelated")
@@ -69,7 +70,7 @@ func (h Character) getCharacterRelatedSubjects(
 	}
 
 	if character.Redirect != 0 {
-		return model.Character{}, nil, domain.ErrCharacterNotFound
+		return model.Character{}, nil, gerr.ErrCharacterNotFound
 	}
 
 	relations, err := h.subject.GetCharacterRelated(ctx, characterID)

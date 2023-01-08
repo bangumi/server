@@ -20,7 +20,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -34,7 +34,7 @@ func (h Character) GetRelatedPersons(c echo.Context) error {
 
 	_, err = h.c.Get(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 		return errgo.Wrap(err, "failed to get character")

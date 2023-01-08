@@ -22,11 +22,6 @@ var accessorPool = pool.New(func() *Accessor {
 	return &Accessor{}
 })
 
-func Get() *Accessor {
+func get() *Accessor {
 	return accessorPool.Get()
-}
-
-func Put(a *Accessor) {
-	a.reset()
-	accessorPool.Put(a)
 }

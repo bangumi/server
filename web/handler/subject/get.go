@@ -22,7 +22,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/compat"
@@ -50,7 +50,7 @@ func (h Subject) Get(c echo.Context) error {
 		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
 	})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
@@ -96,7 +96,7 @@ func (h Subject) GetImage(c echo.Context) error {
 
 	r, err := h.subject.Get(c.Request().Context(), id, subject.Filter{NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()}})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 		return errgo.Wrap(err, "failed to get subject")

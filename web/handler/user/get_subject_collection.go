@@ -20,7 +20,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -50,7 +50,7 @@ func (h User) getSubjectCollection(c echo.Context, username string, subjectID mo
 
 	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{NSFW: null.Bool{Set: !v.AllowNSFW()}})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
@@ -59,7 +59,7 @@ func (h User) getSubjectCollection(c echo.Context, username string, subjectID mo
 
 	u, err := h.user.GetByName(c.Request().Context(), username)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("user doesn't exist or has been removed")
 		}
 
@@ -70,7 +70,7 @@ func (h User) getSubjectCollection(c echo.Context, username string, subjectID mo
 
 	collection, err := h.collect.GetSubjectCollection(c.Request().Context(), u.ID, subjectID)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound(notFoundMessage)
 		}
 

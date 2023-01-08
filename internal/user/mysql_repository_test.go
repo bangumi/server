@@ -22,7 +22,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/user"
@@ -62,7 +62,7 @@ func TestGetByID_notfound(t *testing.T) {
 
 	_, err := repo.GetByID(context.Background(), id)
 	require.Error(t, err)
-	require.ErrorIs(t, err, domain.ErrNotFound)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 func TestGetByName(t *testing.T) {
@@ -88,7 +88,7 @@ func TestGetByName_notfound(t *testing.T) {
 
 	_, err := repo.GetByName(context.Background(), "382951000")
 	require.Error(t, err)
-	require.ErrorIs(t, err, domain.ErrNotFound)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 func TestMysqlRepo_GetFriends(t *testing.T) {

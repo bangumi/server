@@ -25,7 +25,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
@@ -48,7 +48,7 @@ func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (Episode,
 		Where(r.q.Episode.ID.Eq(episodeID), r.q.Episode.Ban.Eq(0)).Limit(1).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return Episode{}, domain.ErrNotFound
+			return Episode{}, gerr.ErrNotFound
 		}
 
 		return Episode{}, errgo.Wrap(err, "dal")
@@ -88,7 +88,7 @@ func (r mysqlRepo) List(
 ) ([]Episode, error) {
 	first, err := r.firstEpisode(ctx, subjectID)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return []Episode{}, nil
 		}
 

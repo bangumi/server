@@ -20,9 +20,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/episode"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
@@ -32,8 +32,8 @@ import (
 )
 
 type ResUserEpisodeCollection struct {
-	Episode res.Episode             `json:"episode"`
-	Type    model.EpisodeCollection `json:"type"`
+	Episode res.Episode                  `json:"episode"`
+	Type    collection.EpisodeCollection `json:"type"`
 }
 
 func (h User) GetEpisodeCollection(c echo.Context) error {
@@ -45,7 +45,7 @@ func (h User) GetEpisodeCollection(c echo.Context) error {
 
 	e, err := h.episode.Get(c.Request().Context(), episodeID)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 		return errgo.Wrap(err, "query.GetEpisode")
@@ -82,7 +82,7 @@ func (h User) GetSubjectEpisodeCollection(c echo.Context) error {
 
 	_, err = h.subject.Get(c.Request().Context(), subjectID, subject.Filter{NSFW: null.Bool{Set: !v.AllowNSFW()}})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 		return errgo.Wrap(err, "query.GetSubject")

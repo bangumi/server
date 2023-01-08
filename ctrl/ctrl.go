@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/dal"
-	"github.com/bangumi/server/internal/collection"
+	"github.com/bangumi/server/internal/collections"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
@@ -33,8 +33,8 @@ func New(
 	cache cache.RedisCache,
 	subject subject.Repo,
 	subjectCached subject.CachedRepo,
-	collection collection.Repo,
-	timeline timeline.Repo,
+	collection collections.Repo,
+	timeline timeline.Service,
 	user user.Repo,
 	tx dal.Transaction,
 	dam dam.Dam,
@@ -69,7 +69,7 @@ type Ctrl struct {
 	user           user.Repo
 	episode        episode.Repo
 	subject        subject.Repo
-	collection     collection.Repo
-	timeline       timeline.Repo
+	collection     collections.Repo
+	timeline       timeline.Service
 	privateMessage pm.Repo
 }

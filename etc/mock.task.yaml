@@ -19,7 +19,7 @@ tasks:
       - task: PersonRepo
       - task: PersonService
       - task: CollectionRepo
-      - task: TimeLineRepo
+      - task: TimeLineService
       - task: SearchClient
       - task: PrivateMessageRepo
       - task: NotificationRepo
@@ -211,29 +211,29 @@ tasks:
 
   CollectionRepo:
     sources:
-      - internal/collection/domain.go
+      - internal/collections/domain.go
       - ./internal/pkg/tools/go.mod
     generates:
       - internal/mocks/CollectionRepo.go
     cmds:
       - task: base-mock
         vars:
-          SRC_DIR: ./internal/collection
+          SRC_DIR: ./internal/collections
           MOCK_STRUCT: CollectionRepo
           INTERFACE: Repo
 
-  TimeLineRepo:
+  TimeLineService:
     sources:
       - internal/timeline/domain.go
       - ./internal/pkg/tools/go.mod
     generates:
-      - internal/mocks/TimeLineRepo.go
+      - internal/mocks/TimeLineService.go
     cmds:
       - task: base-mock
         vars:
           SRC_DIR: ./internal/timeline
-          INTERFACE: Repo
-          MOCK_STRUCT: TimeLineRepo
+          INTERFACE: Service
+          MOCK_STRUCT: TimeLineService
 
   SearchClient:
     sources:

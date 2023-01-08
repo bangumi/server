@@ -23,6 +23,7 @@ import (
 
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -55,7 +56,7 @@ func TestMysqlRepo_Get_err_not_found(t *testing.T) {
 	repo := getRepo(t)
 
 	_, err := repo.Get(context.Background(), 10000)
-	require.ErrorIs(t, err, domain.ErrCharacterNotFound)
+	require.ErrorIs(t, err, gerr.ErrCharacterNotFound)
 }
 
 func TestMysqlRepo_GetByIDs(t *testing.T) {

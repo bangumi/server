@@ -21,7 +21,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -35,7 +35,7 @@ func (h Person) Get(c echo.Context) error {
 
 	r, err := h.person.Get(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
@@ -57,7 +57,7 @@ func (h Person) GetImage(c echo.Context) error {
 
 	r, err := h.person.Get(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 

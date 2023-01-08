@@ -22,7 +22,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -59,7 +59,7 @@ func TestMysqlRepo_Get_filter(t *testing.T) {
 	repo := getRepo(t)
 
 	_, err := repo.Get(context.Background(), 16, subject.Filter{NSFW: null.New(false)})
-	require.ErrorIs(t, err, domain.ErrNotFound)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 func TestMysqlRepo_GetByIDs(t *testing.T) {

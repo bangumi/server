@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/trim21/htest"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -82,7 +82,7 @@ func TestUser_Get_404(t *testing.T) {
 	t.Parallel()
 
 	m := mocks.NewUserRepo(t)
-	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(user.User{}, domain.ErrNotFound)
+	m.EXPECT().GetByName(mock.Anything, mock.Anything).Return(user.User{}, gerr.ErrNotFound)
 
 	app := test.GetWebApp(t,
 		test.Mock{

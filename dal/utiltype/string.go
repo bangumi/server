@@ -49,3 +49,7 @@ func (s *HTMLEscapedString) Scan(src any) error {
 func (s HTMLEscapedString) Value() (driver.Value, error) {
 	return html.EscapeString(string(s)), nil
 }
+
+func (s *HTMLEscapedString) String() string {
+	return string(*s)
+}

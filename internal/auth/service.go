@@ -24,7 +24,7 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth/internal/cachekey"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/cache"
@@ -95,7 +95,7 @@ func (s service) GetByID(ctx context.Context, userID model.UserID) (Auth, error)
 func (s service) Login(ctx context.Context, email, password string) (Auth, bool, error) {
 	var a, hashedPassword, err = s.repo.GetByEmail(ctx, email)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return Auth{}, false, nil
 		}
 

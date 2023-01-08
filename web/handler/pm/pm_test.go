@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/trim21/htest"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -73,7 +73,7 @@ func TestPrivateMessage_ListRelated(t *testing.T) {
 		mock.Anything,
 		model.UserID(1),
 		model.PrivateMessageID(1),
-	).Return([]pm.PrivateMessage{}, domain.ErrNotFound)
+	).Return([]pm.PrivateMessage{}, gerr.ErrNotFound)
 
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetByID(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)

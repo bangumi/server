@@ -57,3 +57,20 @@ func MsgNoTrace(err error, msg string) error {
 
 	return &msgError{msg: msg, err: err}
 }
+
+// Trace add trace to error, without change error message.
+func Trace(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if e, ok := err.(*withStackError); ok { //nolint:errorlint
+		// keep Stack
+		return &withStackError{
+			Err:   e.Err,
+			Stack: e.Stack,
+		}
+	}
+
+	return &withStackError{Err: err, Stack: callers()}
+}

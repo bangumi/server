@@ -20,7 +20,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -55,7 +56,7 @@ func (h User) ListSubjectCollection(c echo.Context) error {
 
 	u, err := h.user.GetByName(c.Request().Context(), username)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("user doesn't exist or has been removed")
 		}
 
@@ -71,7 +72,7 @@ func (h User) listCollection(
 	c echo.Context,
 	u user.User,
 	subjectType model.SubjectType,
-	collectionType model.SubjectCollection,
+	collectionType collection.SubjectCollection,
 	page req.PageQuery,
 	showPrivate bool,
 ) error {
@@ -94,7 +95,7 @@ func (h User) listCollection(
 		return errgo.Wrap(err, "failed to list user's subject collections")
 	}
 
-	subjectIDs := slice.Map(collections, func(item model.UserSubjectCollection) model.SubjectID {
+	subjectIDs := slice.Map(collections, func(item collection.UserSubjectCollection) model.SubjectID {
 		return item.SubjectID
 	})
 
@@ -104,13 +105,13 @@ func (h User) listCollection(
 	}
 
 	var data = make([]res.SubjectCollection, 0, len(collections))
-	for _, collection := range collections {
-		s, ok := subjectMap[collection.SubjectID]
+	for _, collect := range collections {
+		s, ok := subjectMap[collect.SubjectID]
 		if !ok {
 			continue
 		}
 
-		data = append(data, res.ConvertModelSubjectCollection(collection, res.ToSlimSubjectV0(s)))
+		data = append(data, res.ConvertModelSubjectCollection(collect, res.ToSlimSubjectV0(s)))
 	}
 
 	return c.JSON(http.StatusOK, res.Paged{

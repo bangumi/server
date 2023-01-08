@@ -21,7 +21,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/ctrl"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -58,7 +58,7 @@ func (h User) patchSubjectCollection(
 
 	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{NSFW: null.Bool{Set: !u.AllowNSFW()}})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("subject not found")
 		}
 		return errgo.Wrap(err, "query.GetSubject")
@@ -70,7 +70,7 @@ func (h User) patchSubjectCollection(
 		}
 	}
 
-	err = h.ctrl.UpdateCollection(c.Request().Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
+	err = h.ctrl.UpdateSubjectCollection(c.Request().Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
 		IP:        u.IP,
 		UID:       u.ID,
 		VolStatus: r.VolStatus,
@@ -83,12 +83,12 @@ func (h User) patchSubjectCollection(
 	})
 	if err != nil {
 		switch {
-		case errors.Is(err, domain.ErrSubjectNotCollected):
+		case errors.Is(err, gerr.ErrSubjectNotCollected):
 			return res.NotFound("subject not collected")
-		case errors.Is(err, domain.ErrSubjectNotFound):
+		case errors.Is(err, gerr.ErrSubjectNotFound):
 			return res.NotFound("subject not found")
 		}
-		return errgo.Wrap(err, "ctrl.UpdateCollection")
+		return errgo.Wrap(err, "ctrl.UpdateSubjectCollection")
 	}
 
 	return c.NoContent(http.StatusNoContent)

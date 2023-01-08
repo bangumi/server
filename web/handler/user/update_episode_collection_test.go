@@ -27,6 +27,7 @@ import (
 	"github.com/trim21/htest"
 
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -39,7 +40,7 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 	const uid model.UserID = 1
 
 	var eIDs []model.EpisodeID
-	var eType model.EpisodeCollection
+	var eType collection.EpisodeCollection
 
 	a := mocks.NewAuthService(t)
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
@@ -56,12 +57,12 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 	c.EXPECT().WithQuery(mock.Anything).Return(c)
 	c.EXPECT().UpdateEpisodeCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID,
-			episodeIDs []model.EpisodeID, collection model.EpisodeCollection, _ time.Time) {
+			episodeIDs []model.EpisodeID, collection collection.EpisodeCollection, _ time.Time) {
 			eIDs = episodeIDs
 			eType = collection
-		}).Return(model.UserSubjectEpisodesCollection{}, nil)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).Return(nil)
-	c.EXPECT().GetSubjectCollection(mock.Anything, uid, sid).Return(model.UserSubjectCollection{SubjectID: sid}, nil)
+		}).Return(collection.UserSubjectEpisodesCollection{}, nil)
+	c.EXPECT().UpdateSubjectCollection2(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	c.EXPECT().GetSubjectCollection(mock.Anything, uid, sid).Return(collection.UserSubjectCollection{SubjectID: sid}, nil)
 
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
 
@@ -69,13 +70,13 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 		Header(echo.HeaderAuthorization, "Bearer t").
 		BodyJSON(map[string]any{
 			"episode_id": []int{1, 2, 3},
-			"type":       model.EpisodeCollectionDone,
+			"type":       collection.EpisodeCollectionDone,
 		}).
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d/episodes", sid)).
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, []model.EpisodeID{1, 2, 3}, eIDs)
-	require.Equal(t, model.EpisodeCollectionDone, eType)
+	require.Equal(t, collection.EpisodeCollectionDone, eType)
 }
 
 func TestUser_PutEpisodeCollection(t *testing.T) {
@@ -85,7 +86,7 @@ func TestUser_PutEpisodeCollection(t *testing.T) {
 	const uid model.UserID = 1
 
 	var eIDs []model.EpisodeID
-	var eType model.EpisodeCollection
+	var eType collection.EpisodeCollection
 
 	a := mocks.NewAuthService(t)
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
@@ -95,23 +96,23 @@ func TestUser_PutEpisodeCollection(t *testing.T) {
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().WithQuery(mock.Anything).Return(c)
-	c.EXPECT().GetSubjectCollection(mock.Anything, uid, sid).Return(model.UserSubjectCollection{SubjectID: sid}, nil)
+	c.EXPECT().GetSubjectCollection(mock.Anything, uid, sid).Return(collection.UserSubjectCollection{SubjectID: sid}, nil)
 	c.EXPECT().UpdateEpisodeCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID,
-			episodeIDs []model.EpisodeID, collection model.EpisodeCollection, _ time.Time) {
+			episodeIDs []model.EpisodeID, collection collection.EpisodeCollection, _ time.Time) {
 			eIDs = episodeIDs
 			eType = collection
-		}).Return(model.UserSubjectEpisodesCollection{}, nil)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).Return(nil)
+		}).Return(collection.UserSubjectEpisodesCollection{}, nil)
+	c.EXPECT().UpdateSubjectCollection2(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
 
 	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
-		BodyJSON(map[string]any{"type": model.EpisodeCollectionDone}).
+		BodyJSON(map[string]any{"type": collection.EpisodeCollectionDone}).
 		Put(fmt.Sprintf("/v0/users/-/collections/-/episodes/%d", eid)).
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, []model.EpisodeID{eid}, eIDs)
-	require.Equal(t, model.EpisodeCollectionDone, eType)
+	require.Equal(t, collection.EpisodeCollectionDone, eType)
 }

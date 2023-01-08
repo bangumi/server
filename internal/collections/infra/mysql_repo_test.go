@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package collection_test
+package infra_test
 
 import (
 	"context"
@@ -26,16 +26,17 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/internal/collection"
+	"github.com/bangumi/server/internal/collections"
+	"github.com/bangumi/server/internal/collections/domain/collection"
+	"github.com/bangumi/server/internal/collections/infra"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getRepo(t *testing.T) (collection.Repo, *query.Query) {
+func getRepo(t *testing.T) (collections.Repo, *query.Query) {
 	t.Helper()
 	q := test.GetQuery(t)
-	repo, err := collection.NewMysqlRepo(q, zap.NewNop())
+	repo, err := infra.NewMysqlRepo(q, zap.NewNop())
 	require.NoError(t, err)
 
 	return repo, q
@@ -93,7 +94,7 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 	}
 
 	count, err := repo.CountSubjectCollections(context.Background(), id,
-		model.SubjectTypeAll, model.SubjectCollectionAll, true)
+		model.SubjectTypeAll, collection.SubjectCollectionAll, true)
 	require.NoError(t, err)
 	require.EqualValues(t, 5, count)
 }
@@ -107,7 +108,7 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 	repo, _ := getRepo(t)
 
 	data, err := repo.ListSubjectCollection(context.Background(), id,
-		model.SubjectTypeGame, model.SubjectCollectionAll, true, 5, 0)
+		model.SubjectTypeGame, collection.SubjectCollectionAll, true, 5, 0)
 	require.NoError(t, err)
 	require.Len(t, data, 5)
 }
@@ -150,24 +151,26 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 
 	err := table.WithContext(context.Background()).Create(
 		&dao.SubjectCollection{
-			UserID: uid, SubjectID: sid, Rate: 8, Type: uint8(model.SubjectCollectionDoing),
+			UserID: uid, SubjectID: sid, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
 		},
 		&dao.SubjectCollection{
-			UserID: uid, SubjectID: sid + 1, Rate: 8, Type: uint8(model.SubjectCollectionDoing),
+			UserID: uid, SubjectID: sid + 1, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
 		},
 		&dao.SubjectCollection{
-			UserID: uid + 1, SubjectID: sid, Rate: 8, Type: uint8(model.SubjectCollectionDoing),
+			UserID: uid + 1, SubjectID: sid, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
 		},
 	)
 	require.NoError(t, err)
 
 	now := time.Now()
 
-	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, collection.Update{
-		Comment: null.New("c"),
-		Rate:    null.New[uint8](1),
-		Type:    null.New(model.SubjectCollectionDropped),
-	}, now)
+	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, now, "",
+		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
+			require.NoError(t, s.UpdateComment("c"))
+			require.NoError(t, s.UpdateRate(1))
+			s.UpdateType(collection.SubjectCollectionDropped)
+			return s, nil
+		})
 	require.NoError(t, err)
 
 	r, err := table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
@@ -218,7 +221,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	now := time.Now()
 
 	_, err = repo.UpdateEpisodeCollection(context.Background(),
-		uid, sid, []model.EpisodeID{1, 2}, model.EpisodeCollectionDone, now)
+		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionDone, now)
 	require.NoError(t, err)
 
 	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
@@ -232,13 +235,13 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	require.NoError(t, phpserialize.Unmarshal(r.Status, &m))
 	require.Len(t, m, 2)
 	require.Contains(t, m, uint32(1))
-	require.EqualValues(t, model.EpisodeCollectionDone, m[1].Type)
+	require.EqualValues(t, collection.EpisodeCollectionDone, m[1].Type)
 	require.Contains(t, m, uint32(2))
-	require.EqualValues(t, model.EpisodeCollectionDone, m[2].Type)
+	require.EqualValues(t, collection.EpisodeCollectionDone, m[2].Type)
 
 	// testing remove episode collection
 	_, err = repo.UpdateEpisodeCollection(context.Background(),
-		uid, sid, []model.EpisodeID{1, 2}, model.EpisodeCollectionNone, now)
+		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionNone, now)
 	require.NoError(t, err)
 
 	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
@@ -270,7 +273,7 @@ func TestMysqlRepo_UpdateEpisodeCollection_create_ep_status(t *testing.T) {
 	now := time.Now()
 
 	_, err := repo.UpdateEpisodeCollection(context.Background(),
-		uid, sid, []model.EpisodeID{1, 2}, model.EpisodeCollectionDone, now)
+		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionDone, now)
 	require.NoError(t, err)
 
 	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
@@ -282,7 +285,7 @@ func TestMysqlRepo_UpdateEpisodeCollection_create_ep_status(t *testing.T) {
 	require.NoError(t, phpserialize.Unmarshal(r.Status, &m))
 	require.Len(t, m, 2)
 	require.Contains(t, m, uint32(1))
-	require.EqualValues(t, model.EpisodeCollectionDone, m[1].Type)
+	require.EqualValues(t, collection.EpisodeCollectionDone, m[1].Type)
 	require.Contains(t, m, uint32(2))
-	require.EqualValues(t, model.EpisodeCollectionDone, m[2].Type)
+	require.EqualValues(t, collection.EpisodeCollectionDone, m[2].Type)
 }

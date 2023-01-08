@@ -21,7 +21,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/cookie"
@@ -44,7 +44,7 @@ func (h Common) MiddlewareSessionAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		if co.Value != "" {
 			s, err := h.getSession(c, co.Value)
 			if err != nil {
-				if errors.Is(err, session.ErrExpired) || errors.Is(err, domain.ErrNotFound) {
+				if errors.Is(err, session.ErrExpired) || errors.Is(err, gerr.ErrNotFound) {
 					cookie.Clear(c, session.CookieKey)
 					goto Next
 				}
@@ -76,7 +76,7 @@ func (h Common) MiddlewareSessionAuth(next echo.HandlerFunc) echo.HandlerFunc {
 func (h Common) getSession(c echo.Context, value string) (session.Session, error) {
 	s, err := h.session.Get(c.Request().Context(), value)
 	if err != nil {
-		return session.Session{}, errgo.Wrap(err, "sessionManager.Get")
+		return session.Session{}, errgo.Wrap(err, "sessionManager.get")
 	}
 
 	return s, nil

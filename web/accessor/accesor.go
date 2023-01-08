@@ -67,5 +67,6 @@ func (a *Accessor) reset() {
 }
 
 func (a *Accessor) Free() {
-	Put(a)
+	a.reset()
+	accessorPool.Put(a)
 }

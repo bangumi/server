@@ -9,8 +9,6 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	model "github.com/bangumi/server/internal/model"
-
 	time "time"
 )
 
@@ -73,18 +71,18 @@ func (_c *AuthService_ComparePassword_Call) Return(_a0 bool, _a1 error) *AuthSer
 }
 
 // CreateAccessToken provides a mock function with given fields: ctx, userID, name, expiration
-func (_m *AuthService) CreateAccessToken(ctx context.Context, userID model.UserID, name string, expiration time.Duration) (string, error) {
+func (_m *AuthService) CreateAccessToken(ctx context.Context, userID uint32, name string, expiration time.Duration) (string, error) {
 	ret := _m.Called(ctx, userID, name, expiration)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, string, time.Duration) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, string, time.Duration) string); ok {
 		r0 = rf(ctx, userID, name, expiration)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, string, time.Duration) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, string, time.Duration) error); ok {
 		r1 = rf(ctx, userID, name, expiration)
 	} else {
 		r1 = ret.Error(1)
@@ -100,16 +98,16 @@ type AuthService_CreateAccessToken_Call struct {
 
 // CreateAccessToken is a helper method to define mock.On call
 //   - ctx context.Context
-//   - userID model.UserID
+//   - userID uint32
 //   - name string
 //   - expiration time.Duration
 func (_e *AuthService_Expecter) CreateAccessToken(ctx interface{}, userID interface{}, name interface{}, expiration interface{}) *AuthService_CreateAccessToken_Call {
 	return &AuthService_CreateAccessToken_Call{Call: _e.mock.On("CreateAccessToken", ctx, userID, name, expiration)}
 }
 
-func (_c *AuthService_CreateAccessToken_Call) Run(run func(ctx context.Context, userID model.UserID, name string, expiration time.Duration)) *AuthService_CreateAccessToken_Call {
+func (_c *AuthService_CreateAccessToken_Call) Run(run func(ctx context.Context, userID uint32, name string, expiration time.Duration)) *AuthService_CreateAccessToken_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID), args[2].(string), args[3].(time.Duration))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(string), args[3].(time.Duration))
 	})
 	return _c
 }
@@ -165,18 +163,18 @@ func (_c *AuthService_DeleteAccessToken_Call) Return(_a0 bool, _a1 error) *AuthS
 }
 
 // GetByID provides a mock function with given fields: ctx, userID
-func (_m *AuthService) GetByID(ctx context.Context, userID model.UserID) (auth.Auth, error) {
+func (_m *AuthService) GetByID(ctx context.Context, userID uint32) (auth.Auth, error) {
 	ret := _m.Called(ctx, userID)
 
 	var r0 auth.Auth
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) auth.Auth); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) auth.Auth); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		r0 = ret.Get(0).(auth.Auth)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserID) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
 		r1 = rf(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
@@ -192,14 +190,14 @@ type AuthService_GetByID_Call struct {
 
 // GetByID is a helper method to define mock.On call
 //   - ctx context.Context
-//   - userID model.UserID
+//   - userID uint32
 func (_e *AuthService_Expecter) GetByID(ctx interface{}, userID interface{}) *AuthService_GetByID_Call {
 	return &AuthService_GetByID_Call{Call: _e.mock.On("GetByID", ctx, userID)}
 }
 
-func (_c *AuthService_GetByID_Call) Run(run func(ctx context.Context, userID model.UserID)) *AuthService_GetByID_Call {
+func (_c *AuthService_GetByID_Call) Run(run func(ctx context.Context, userID uint32)) *AuthService_GetByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		run(args[0].(context.Context), args[1].(uint32))
 	})
 	return _c
 }
@@ -300,11 +298,11 @@ func (_c *AuthService_GetTokenByID_Call) Return(_a0 auth.AccessToken, _a1 error)
 }
 
 // ListAccessToken provides a mock function with given fields: ctx, userID
-func (_m *AuthService) ListAccessToken(ctx context.Context, userID model.UserID) ([]auth.AccessToken, error) {
+func (_m *AuthService) ListAccessToken(ctx context.Context, userID uint32) ([]auth.AccessToken, error) {
 	ret := _m.Called(ctx, userID)
 
 	var r0 []auth.AccessToken
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) []auth.AccessToken); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) []auth.AccessToken); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
@@ -313,7 +311,7 @@ func (_m *AuthService) ListAccessToken(ctx context.Context, userID model.UserID)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserID) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
 		r1 = rf(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
@@ -329,14 +327,14 @@ type AuthService_ListAccessToken_Call struct {
 
 // ListAccessToken is a helper method to define mock.On call
 //   - ctx context.Context
-//   - userID model.UserID
+//   - userID uint32
 func (_e *AuthService_Expecter) ListAccessToken(ctx interface{}, userID interface{}) *AuthService_ListAccessToken_Call {
 	return &AuthService_ListAccessToken_Call{Call: _e.mock.On("ListAccessToken", ctx, userID)}
 }
 
-func (_c *AuthService_ListAccessToken_Call) Run(run func(ctx context.Context, userID model.UserID)) *AuthService_ListAccessToken_Call {
+func (_c *AuthService_ListAccessToken_Call) Run(run func(ctx context.Context, userID uint32)) *AuthService_ListAccessToken_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		run(args[0].(context.Context), args[1].(uint32))
 	})
 	return _c
 }

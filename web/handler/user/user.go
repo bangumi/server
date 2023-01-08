@@ -19,7 +19,7 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/ctrl"
-	"github.com/bangumi/server/internal/collection"
+	"github.com/bangumi/server/internal/collections"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
@@ -30,7 +30,7 @@ type User struct {
 	ctrl    ctrl.Ctrl
 	episode episode.Repo
 	person  person.Service
-	collect collection.Repo
+	collect collections.Repo
 	subject subject.CachedRepo
 	log     *zap.Logger
 	user    user.Repo
@@ -42,7 +42,7 @@ func New(
 	user user.Repo,
 	ctrl ctrl.Ctrl,
 	subject subject.Repo,
-	collect collection.Repo,
+	collect collections.Repo,
 	episode episode.Repo,
 	log *zap.Logger,
 ) (User, error) {

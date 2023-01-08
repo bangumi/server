@@ -22,7 +22,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/web/middleware/recovery"
+	"github.com/bangumi/server/web/mw/recovery"
 )
 
 func TestPanicMiddleware(t *testing.T) {

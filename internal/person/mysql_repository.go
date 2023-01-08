@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
@@ -41,7 +42,7 @@ func (r mysqlRepo) Get(ctx context.Context, id model.PersonID) (model.Person, er
 	p, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).Where(r.q.Person.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Person{}, domain.ErrNotFound
+			return model.Person{}, gerr.ErrNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))

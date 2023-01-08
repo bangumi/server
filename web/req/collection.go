@@ -20,7 +20,7 @@ import (
 
 	"github.com/samber/lo"
 
-	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/web/res"
@@ -31,13 +31,13 @@ type UpdateEpisodeCollection struct {
 }
 
 type SubjectEpisodeCollectionPatch struct {
-	Comment   null.String                        `json:"comment"`
-	Tags      []string                           `json:"tags"`
-	VolStatus null.Uint32                        `json:"vol_status" doc:"只能用于书籍条目"`
-	EpStatus  null.Uint32                        `json:"ep_status" doc:"只能用于书籍条目"`
-	Type      null.Null[model.SubjectCollection] `json:"type"`
-	Rate      null.Uint8                         `json:"rate"`
-	Private   null.Bool                          `json:"private"`
+	Comment   null.String                             `json:"comment"`
+	Tags      []string                                `json:"tags"`
+	VolStatus null.Uint32                             `json:"vol_status" doc:"只能用于书籍条目"`
+	EpStatus  null.Uint32                             `json:"ep_status" doc:"只能用于书籍条目"`
+	Type      null.Null[collection.SubjectCollection] `json:"type"`
+	Rate      null.Uint8                              `json:"rate"`
+	Private   null.Bool                               `json:"private"`
 }
 
 func (v *SubjectEpisodeCollectionPatch) Validate() error {
@@ -68,5 +68,5 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 }
 
 type UpdateUserEpisodeCollection struct {
-	Type model.EpisodeCollection `json:"type"`
+	Type collection.EpisodeCollection `json:"type"`
 }

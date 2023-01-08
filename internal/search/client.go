@@ -33,7 +33,7 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/subject"
@@ -152,7 +152,7 @@ func (c *client) Close() {
 func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
 	s, err := c.subjectRepo.Get(ctx, id, subject.Filter{})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return c.DeleteSubject(ctx, id)
 		}
 		return errgo.Wrap(err, "subjectRepo.Get")

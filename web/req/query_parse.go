@@ -17,6 +17,7 @@ package req
 import (
 	"strconv"
 
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gstr"
@@ -60,9 +61,9 @@ func ParseID(s string) (model.CharacterID, error) {
 	return v, nil
 }
 
-func ParseCollectionType(s string) (model.SubjectCollection, error) {
+func ParseCollectionType(s string) (collection.SubjectCollection, error) {
 	if s == "" {
-		return model.SubjectCollectionAll, nil
+		return collection.SubjectCollectionAll, nil
 	}
 
 	t, err := gstr.ParseUint8(s)
@@ -70,14 +71,14 @@ func ParseCollectionType(s string) (model.SubjectCollection, error) {
 		return 0, res.BadRequest("bad collection type: " + strconv.Quote(s))
 	}
 
-	v := model.SubjectCollection(t)
+	v := collection.SubjectCollection(t)
 	switch v {
-	case model.SubjectCollectionAll,
-		model.SubjectCollectionWish,
-		model.SubjectCollectionDone,
-		model.SubjectCollectionDoing,
-		model.SubjectCollectionOnHold,
-		model.SubjectCollectionDropped:
+	case collection.SubjectCollectionAll,
+		collection.SubjectCollectionWish,
+		collection.SubjectCollectionDone,
+		collection.SubjectCollectionDoing,
+		collection.SubjectCollectionOnHold,
+		collection.SubjectCollectionDropped:
 		return v, nil
 	}
 

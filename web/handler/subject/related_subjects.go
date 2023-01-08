@@ -22,6 +22,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -43,7 +44,7 @@ func (h Subject) GetRelatedSubjects(c echo.Context) error {
 
 	relations, err := h.getSubjectRelatedSubjects(c.Request().Context(), u.Auth, id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
@@ -74,7 +75,7 @@ func (h Subject) getSubjectRelatedSubjects(
 		Value: false, Set: !user.AllowNSFW(),
 	}})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return nil, res.ErrNotFound
 		}
 		return nil, errgo.Wrap(err, "failed to get subject")

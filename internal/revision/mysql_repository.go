@@ -31,7 +31,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
@@ -82,7 +82,7 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.RevisionID) (m
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.PersonRevision{}, domain.ErrNotFound
+			return model.PersonRevision{}, gerr.ErrNotFound
 		}
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.PersonRevision{}, errgo.Wrap(err, "dal")
@@ -92,7 +92,7 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.RevisionID) (m
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
-			return model.PersonRevision{}, domain.ErrNotFound
+			return model.PersonRevision{}, gerr.ErrNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))
@@ -146,7 +146,7 @@ func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.RevisionID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
-			return model.CharacterRevision{}, domain.ErrNotFound
+			return model.CharacterRevision{}, gerr.ErrNotFound
 		}
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.CharacterRevision{}, errgo.Wrap(err, "dal")
@@ -156,7 +156,7 @@ func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.RevisionID)
 
 func wrapGORMError(err error) error {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return domain.ErrNotFound
+		return gerr.ErrNotFound
 	}
 	return errgo.Wrap(err, "dal")
 }
@@ -196,7 +196,7 @@ func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.RevisionID) (
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.SubjectRevision{}, domain.ErrNotFound
+			return model.SubjectRevision{}, gerr.ErrNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))

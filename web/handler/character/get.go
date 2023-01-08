@@ -21,7 +21,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/accessor"
@@ -38,7 +38,7 @@ func (h Character) Get(c echo.Context) error {
 
 	r, err := h.c.Get(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
@@ -64,7 +64,7 @@ func (h Character) GetImage(c echo.Context) error {
 
 	p, err := h.c.Get(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 		return errgo.Wrap(err, "failed to get character")

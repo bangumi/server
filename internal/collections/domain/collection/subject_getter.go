@@ -12,22 +12,44 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package accessor
+package collection
 
 import (
-	"github.com/labstack/echo/v4"
-
-	"github.com/bangumi/server/web/res"
+	"github.com/bangumi/server/internal/model"
 )
 
-var errNeedLogin = res.Unauthorized("this API need authorization")
+func (s *Subject) User() model.UserID {
+	return s.user
+}
 
-func NeedLogin(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		if u := GetFromCtx(c); !u.Login {
-			return errNeedLogin
-		}
+func (s *Subject) Rate() uint8 {
+	return s.rate
+}
 
-		return next(c)
-	}
+func (s *Subject) TypeID() SubjectCollection {
+	return s.typeID
+}
+
+func (s *Subject) Comment() string {
+	return s.comment
+}
+
+func (s *Subject) Privacy() CollectPrivacy {
+	return s.privacy
+}
+
+func (s *Subject) Tags() []string {
+	return s.tags
+}
+
+func (s *Subject) Vols() uint32 {
+	return s.vols
+}
+
+func (s *Subject) Eps() uint32 {
+	return s.eps
+}
+
+func (s *Subject) Subject() model.SubjectID {
+	return s.subject
 }

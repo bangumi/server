@@ -24,7 +24,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/dal/dao"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
@@ -74,7 +74,7 @@ func (r mysqlRepo) GetEpisodeRelated(ctx context.Context, id model.RevisionID) (
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
-			return model.EpisodeRevision{}, domain.ErrNotFound
+			return model.EpisodeRevision{}, gerr.ErrNotFound
 		}
 		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.EpisodeRevision{}, errgo.Wrap(err, "dal")

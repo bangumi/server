@@ -24,7 +24,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -166,7 +166,7 @@ func TestMysqlRepo_DeleteIndex(t *testing.T) {
 
 	_, err = repo.Get(context.Background(), index.ID)
 	require.Error(t, err)
-	require.ErrorIs(t, err, domain.ErrNotFound)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 // 删除目录会把所属的 subject 全部删掉
@@ -211,7 +211,7 @@ func TestMysqlRepo_DeleteIndex2(t *testing.T) {
 	require.NoError(t, err)
 
 	i, err = repo.Get(ctx, index.ID)
-	require.Equal(t, err, domain.ErrNotFound)
+	require.Equal(t, err, gerr.ErrNotFound)
 
 	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
 	require.NoError(t, err)
@@ -343,7 +343,7 @@ func TestMysqlRepo_DeleteNonExistsIndexSubject(t *testing.T) {
 
 	err := repo.DeleteIndexSubject(ctx, 99999999, 15)
 	require.Error(t, err)
-	require.Error(t, err, domain.ErrNotFound)
+	require.Error(t, err, gerr.ErrNotFound)
 }
 
 func TestMysqlRepo_FailedAddedToNonExists(t *testing.T) {
@@ -357,7 +357,7 @@ func TestMysqlRepo_FailedAddedToNonExists(t *testing.T) {
 
 	_, err := repo.AddOrUpdateIndexSubject(ctx, 99999999, 5, 5, "test")
 	require.Error(t, err)
-	require.Equal(t, err, domain.ErrNotFound)
+	require.Equal(t, err, gerr.ErrNotFound)
 }
 
 func TestMysqlRepo_UpdateSubjectInfo(t *testing.T) {
@@ -441,5 +441,5 @@ func TestMysqlRepo_AddNoneExistsSubject(t *testing.T) {
 
 	_, err := repo.AddOrUpdateIndexSubject(ctx, 15045, 999999999, 5, "test")
 	require.Error(t, err)
-	require.Equal(t, err, domain.ErrSubjectNotFound)
+	require.Equal(t, err, gerr.ErrSubjectNotFound)
 }

@@ -23,7 +23,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/accessor"
@@ -67,7 +67,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 
 	i, err := h.i.Get(c, id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.Index{}, false, nil
 		}
 
@@ -76,7 +76,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 
 	u, err := h.u.GetByID(c, i.CreatorID)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			h.log.Error("index missing creator", zap.Uint32("index_id", id), zap.Uint32("creator", i.CreatorID))
 		}
 		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
@@ -198,7 +198,7 @@ func (h Handler) ensureIndexPermission(c echo.Context, indexID uint32) (*model.I
 	accessor := accessor.GetFromCtx(c)
 	index, err := h.i.Get(c.Request().Context(), indexID)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return nil, res.NotFound("index not found")
 		}
 		return nil, res.InternalError(c, err, "failed to get index")

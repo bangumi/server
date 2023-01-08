@@ -12,10 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model
+package collection
 
 import (
 	"time"
+
+	"github.com/bangumi/server/internal/model"
 )
 
 type CollectPrivacy uint8
@@ -35,7 +37,7 @@ type UserSubjectCollection struct {
 	Tags        []string
 	VolStatus   uint32
 	EpStatus    uint32
-	SubjectID   SubjectID
+	SubjectID   model.SubjectID
 	SubjectType uint8
 	Rate        uint8
 	Type        SubjectCollection
@@ -43,8 +45,8 @@ type UserSubjectCollection struct {
 }
 
 type UserEpisodeCollection struct {
-	ID   EpisodeID
+	ID   model.EpisodeID
 	Type EpisodeCollection
 }
 
-type UserSubjectEpisodesCollection map[EpisodeID]UserEpisodeCollection
+type UserSubjectEpisodesCollection map[model.EpisodeID]UserEpisodeCollection

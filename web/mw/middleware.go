@@ -12,33 +12,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package accessor
+package mw
 
 import (
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/web/internal/ctxkey"
+	"github.com/bangumi/server/web/accessor"
+	"github.com/bangumi/server/web/res"
 )
 
-func NewFromCtx(c echo.Context) *Accessor {
-	a := get()
-	a.fillBasicInfo(c)
-	return a
-}
+var errNeedLogin = res.Unauthorized("this API need authorization")
 
-func GetFromCtx(c echo.Context) *Accessor {
-	raw := c.Get(ctxkey.User)
-	if raw == nil {
-		return NewFromCtx(c)
+func NeedLogin(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if u := accessor.GetFromCtx(c); !u.Login {
+			return errNeedLogin
+		}
+
+		return next(c)
 	}
-
-	u, ok := raw.(*Accessor)
-	if !ok {
-		logger.Error("failed to get http accessor, expecting accessor got another type instead", zap.Any("raw", raw))
-		panic("can't convert type")
-	}
-
-	return u
 }

@@ -12,20 +12,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package collection
+package infra
 
 // handle php serialization
 
 import (
 	"github.com/trim21/go-phpserialize"
 
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 type mysqlEpCollectionItem struct {
-	EpisodeID model.EpisodeID         `php:"eid,string"`
-	Type      model.EpisodeCollection `php:"type"`
+	EpisodeID model.EpisodeID              `php:"eid,string"`
+	Type      collection.EpisodeCollection `php:"type"`
 }
 
 type mysqlEpCollection map[model.EpisodeID]mysqlEpCollectionItem
@@ -44,10 +45,10 @@ func serializePhpEpStatus(data mysqlEpCollection) ([]byte, error) {
 	return b, errgo.Wrap(err, "php serialize")
 }
 
-func (c mysqlEpCollection) toModel() model.UserSubjectEpisodesCollection {
-	var d = make(model.UserSubjectEpisodesCollection, len(c))
+func (c mysqlEpCollection) toModel() collection.UserSubjectEpisodesCollection {
+	var d = make(collection.UserSubjectEpisodesCollection, len(c))
 	for key, value := range c {
-		d[key] = model.UserEpisodeCollection{
+		d[key] = collection.UserEpisodeCollection{
 			ID:   value.EpisodeID,
 			Type: value.Type,
 		}

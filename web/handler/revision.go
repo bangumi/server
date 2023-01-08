@@ -23,7 +23,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gstr"
@@ -98,7 +98,7 @@ func (h Handler) GetPersonRevision(c echo.Context) error {
 	}
 	r, err := h.r.GetPersonRelated(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
@@ -182,7 +182,7 @@ func (h Handler) GetCharacterRevision(c echo.Context) error {
 	}
 	r, err := h.r.GetCharacterRelated(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
@@ -262,7 +262,7 @@ func (h Handler) GetSubjectRevision(c echo.Context) error {
 	}
 	r, err := h.r.GetSubjectRelated(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 

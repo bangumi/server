@@ -20,7 +20,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -64,7 +64,7 @@ func (h Handler) addOrUpdateIndexSubject(c echo.Context, payload req.IndexAddSub
 	indexSubject, err := h.i.AddOrUpdateIndexSubject(c.Request().Context(),
 		index.ID, payload.SubjectID, payload.SortKey, payload.Comment)
 	if err != nil {
-		if errors.Is(err, domain.ErrSubjectNotFound) {
+		if errors.Is(err, gerr.ErrSubjectNotFound) {
 			return res.NotFound("subject not found")
 		}
 		return errgo.Wrap(err, "failed to edit subject in the index")

@@ -36,7 +36,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/openapi"
-	"github.com/bangumi/server/web/middleware/recovery"
+	"github.com/bangumi/server/web/mw/recovery"
 	"github.com/bangumi/server/web/req/cf"
 )
 

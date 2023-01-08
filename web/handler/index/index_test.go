@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/trim21/htest"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -60,7 +60,7 @@ func TestHandler_NewIndex_NoPermission(t *testing.T) {
 
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(auth.UserInfo{}, domain.ErrNotFound)
+		Return(auth.UserInfo{}, gerr.ErrNotFound)
 
 	app := test.GetWebApp(t, test.Mock{AuthRepo: mockAuth})
 
@@ -165,7 +165,7 @@ func TestHandler_UpdateIndex_Invalid_Request_Data(t *testing.T) {
 func TestHandler_UpdateIndex_NonExists(t *testing.T) {
 	t.Parallel()
 	mockIndex := mocks.NewIndexRepo(t)
-	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{}, domain.ErrNotFound)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{}, gerr.ErrNotFound)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex})
 

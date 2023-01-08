@@ -22,7 +22,8 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/ctrl"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/accessor"
@@ -31,8 +32,8 @@ import (
 )
 
 type ReqEpisodeCollectionBatch struct {
-	EpisodeID []model.EpisodeID       `json:"episode_id"`
-	Type      model.EpisodeCollection `json:"type"`
+	EpisodeID []model.EpisodeID            `json:"episode_id"`
+	Type      collection.EpisodeCollection `json:"type"`
 }
 
 func (r ReqEpisodeCollectionBatch) Validate() error {
@@ -41,10 +42,10 @@ func (r ReqEpisodeCollectionBatch) Validate() error {
 	}
 
 	switch r.Type {
-	case model.EpisodeCollectionAll,
-		model.EpisodeCollectionWish,
-		model.EpisodeCollectionDone,
-		model.EpisodeCollectionDropped:
+	case collection.EpisodeCollectionAll,
+		collection.EpisodeCollectionWish,
+		collection.EpisodeCollectionDone,
+		collection.EpisodeCollectionDropped:
 	default:
 		return res.BadRequest(fmt.Sprintf("not valid episode collection type %d", r.Type))
 	}
@@ -74,11 +75,11 @@ func (h User) PatchEpisodeCollectionBatch(c echo.Context) error {
 	err = h.ctrl.UpdateEpisodesCollection(c.Request().Context(), u.Auth, subjectID, r.EpisodeID, r.Type)
 	if err != nil {
 		switch {
-		case errors.Is(err, domain.ErrSubjectNotCollected):
+		case errors.Is(err, gerr.ErrSubjectNotCollected):
 			return res.BadRequest("you need to add subject to your collection first")
 		case errors.Is(err, ctrl.ErrInvalidInput):
 			return res.BadRequest(err.Error())
-		case errors.Is(err, domain.ErrNotFound):
+		case errors.Is(err, gerr.ErrNotFound):
 			return res.ErrNotFound
 		}
 
@@ -106,11 +107,11 @@ func (h User) PutEpisodeCollection(c echo.Context) error {
 	err = h.ctrl.UpdateEpisodeCollection(c.Request().Context(), u.Auth, episodeID, r.Type)
 	if err != nil {
 		switch {
-		case errors.Is(err, domain.ErrSubjectNotCollected):
+		case errors.Is(err, gerr.ErrSubjectNotCollected):
 			return res.BadRequest("you need to add subject to your collection first")
 		case errors.Is(err, ctrl.ErrInvalidInput):
 			return res.BadRequest(err.Error())
-		case errors.Is(err, domain.ErrNotFound):
+		case errors.Is(err, gerr.ErrNotFound):
 			return res.ErrNotFound
 		}
 

@@ -15,7 +15,8 @@
 package subject
 
 import (
-	"github.com/bangumi/server/ctrl"
+	"github.com/labstack/echo/v4"
+
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/person"
@@ -23,7 +24,6 @@ import (
 )
 
 type Subject struct {
-	ctrl       ctrl.Ctrl
 	person     person.Service
 	episode    episode.Repo
 	personRepo person.Repo
@@ -33,18 +33,24 @@ type Subject struct {
 
 func New(
 	p person.Service,
-	ctrl ctrl.Ctrl,
 	subject subject.Repo,
 	personRepo person.Repo,
 	c character.Repo,
 	episode episode.Repo,
 ) (Subject, error) {
 	return Subject{
-		ctrl:       ctrl,
 		c:          c,
 		episode:    episode,
 		personRepo: personRepo,
 		subject:    subject,
 		person:     p,
 	}, nil
+}
+
+func (h *Subject) Routes(g *echo.Group) {
+	g.GET("/subjects/:id", h.Get)
+	g.GET("/subjects/:id/image", h.GetImage)
+	g.GET("/subjects/:id/persons", h.GetRelatedPersons)
+	g.GET("/subjects/:id/subjects", h.GetRelatedSubjects)
+	g.GET("/subjects/:id/characters", h.GetRelatedCharacters)
 }

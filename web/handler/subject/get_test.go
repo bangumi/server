@@ -24,13 +24,16 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/trim21/htest"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/web/accessor"
+	subjectHandler "github.com/bangumi/server/web/handler/subject"
+	"github.com/bangumi/server/web/internal/ctxkey"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -38,33 +41,32 @@ func TestSubject_Get(t *testing.T) {
 	t.Parallel()
 	var subjectID model.SubjectID = 7
 
+	e := echo.New()
+
+	g := e.Group("", func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set(ctxkey.User, &accessor.Accessor{Auth: auth.Auth{Login: true, RegTime: time.Time{}, ID: 1}, Login: true})
+			return next(c)
+		}
+	})
+
 	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, subjectID, mock.Anything).Return(model.Subject{ID: subjectID}, nil)
-
-	mockAuth := mocks.NewAuthRepo(t)
-	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
-		Return(auth.UserInfo{RegTime: time.Unix(1e10, 0)}, nil)
-	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
-		Return(auth.Permission{}, nil)
 
 	ep := mocks.NewEpisodeRepo(t)
 	ep.EXPECT().Count(mock.Anything, subjectID, mock.Anything).Return(3, nil)
 
-	app := test.GetWebApp(t,
-		test.Mock{
-			AuthRepo:    mockAuth,
-			SubjectRepo: m,
-			EpisodeRepo: ep,
-		},
-	)
+	s, err := subjectHandler.New(nil, m, nil, nil, ep)
+	require.NoError(t, err)
+	s.Routes(g)
 
 	var r res.SubjectV0
-	resp := htest.New(t, app).
+	htest.New(t, e).
 		Header(echo.HeaderAuthorization, "Bearer token").
-		Get("/v0/subjects/7").
-		JSON(&r)
+		Get("/subjects/7").
+		JSON(&r).
+		ExpectCode(http.StatusOK)
 
-	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.EqualValues(t, 7, r.ID)
 }
 
@@ -114,7 +116,7 @@ func TestSubject_Get_NSFW_404(t *testing.T) {
 
 	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, model.SubjectID(7), subject.Filter{NSFW: null.NewBool(false)}).
-		Return(model.Subject{}, domain.ErrSubjectNotFound)
+		Return(model.Subject{}, gerr.ErrSubjectNotFound)
 
 	app := test.GetWebApp(t,
 		test.Mock{SubjectRepo: m},

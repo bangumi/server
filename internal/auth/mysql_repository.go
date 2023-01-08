@@ -26,7 +26,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gstr"
@@ -47,7 +47,7 @@ func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (UserInfo, []by
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Email.Eq(email)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return UserInfo{}, nil, domain.ErrNotFound
+			return UserInfo{}, nil, gerr.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
@@ -67,7 +67,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return UserInfo{}, domain.ErrNotFound
+			return UserInfo{}, gerr.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
@@ -87,7 +87,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 			m.log.Error("can't find user of access token",
 				zap.String("token", token), zap.String("uid", access.UserID))
 
-			return UserInfo{}, domain.ErrNotFound
+			return UserInfo{}, gerr.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
@@ -236,7 +236,7 @@ func (m mysqlRepo) GetTokenByID(ctx context.Context, id uint32) (AccessToken, er
 	record, err := m.q.AccessToken.WithContext(ctx).Where(m.q.AccessToken.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return AccessToken{}, domain.ErrNotFound
+			return AccessToken{}, gerr.ErrNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))

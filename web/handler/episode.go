@@ -21,7 +21,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -42,7 +42,7 @@ func (h Handler) GetEpisode(c echo.Context) error {
 
 	e, err := h.episode.Get(c.Request().Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
@@ -53,7 +53,7 @@ func (h Handler) GetEpisode(c echo.Context) error {
 		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
 	})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 
@@ -87,7 +87,7 @@ func (h Handler) ListEpisode(c echo.Context) error {
 	_, err = h.subject.Get(c.Request().Context(), subjectID, subject.Filter{
 		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()}})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 		return errgo.Wrap(err, "failed to get subject")

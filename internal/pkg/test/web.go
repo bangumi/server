@@ -29,7 +29,7 @@ import (
 	"github.com/bangumi/server/dal"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/character"
-	"github.com/bangumi/server/internal/collection"
+	"github.com/bangumi/server/internal/collections"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/mocks"
@@ -61,8 +61,8 @@ type Mock struct {
 	UserRepo           user.Repo
 	IndexRepo          index.Repo
 	RevisionRepo       revision.Repo
-	CollectionRepo     collection.Repo
-	TimeLineRepo       timeline.Repo
+	CollectionRepo     collections.Repo
+	TimeLineSrv        timeline.Service
 	SessionManager     session.Manager
 	Cache              cache.RedisCache
 	PrivateMessageRepo pm.Repo
@@ -107,10 +107,10 @@ func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 		MockPrivateMessageRepo(m.PrivateMessageRepo),
 		MockNoticationRepo(m.NotificationRepo),
 		MockSessionManager(m.SessionManager),
-		MockTimeLineRepo(m.TimeLineRepo),
+		MockTimeLineSrv(m.TimeLineSrv),
 
 		// don't need a default mock for these repositories.
-		fx.Provide(func() collection.Repo { return m.CollectionRepo }),
+		fx.Provide(func() collections.Repo { return m.CollectionRepo }),
 		fx.Provide(func() search.Handler { return search.NoopClient{} }),
 
 		fx.Invoke(web.AddRouters),
@@ -267,9 +267,9 @@ func MockSubjectReadRepo(m subject.CachedRepo) fx.Option {
 	return fx.Provide(func() subject.CachedRepo { return m })
 }
 
-func MockTimeLineRepo(m timeline.Repo) fx.Option {
+func MockTimeLineSrv(m timeline.Service) fx.Option {
 	if m == nil {
-		mocker := &mocks.TimeLineRepo{}
+		mocker := &mocks.TimeLineService{}
 
 		mocker.EXPECT().ChangeSubjectCollection(mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -280,7 +280,7 @@ func MockTimeLineRepo(m timeline.Repo) fx.Option {
 		m = mocker
 	}
 
-	return fx.Supply(fx.Annotate(m, fx.As(new(timeline.Repo))))
+	return fx.Supply(fx.Annotate(m, fx.As(new(timeline.Service))))
 }
 
 func MockCache(mock cache.RedisCache) fx.Option {

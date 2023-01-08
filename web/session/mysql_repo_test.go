@@ -23,7 +23,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -135,7 +135,7 @@ func TestManager_Get_notfound(t *testing.T) {
 	r, _ := getRepo(t)
 
 	_, err := r.Get(context.Background(), key)
-	require.ErrorIs(t, err, domain.ErrNotFound)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 func TestMysqlRepo_Revoke(t *testing.T) {

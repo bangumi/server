@@ -23,7 +23,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/revision"
@@ -97,7 +97,7 @@ func TestGetCharacterRelatedNotFound(t *testing.T) {
 	repo := getRepo(t)
 
 	_, err := repo.GetCharacterRelated(context.Background(), rid)
-	require.ErrorIs(t, err, domain.ErrNotFound)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 func TestListCharacterRelated(t *testing.T) {

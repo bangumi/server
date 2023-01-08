@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
@@ -49,7 +50,7 @@ func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID, filter Filter) (
 	s, err := q.First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Subject{}, fmt.Errorf("%w: %d", domain.ErrNotFound, id)
+			return model.Subject{}, fmt.Errorf("%w: %d", gerr.ErrNotFound, id)
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))

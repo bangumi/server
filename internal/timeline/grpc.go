@@ -28,13 +28,14 @@ import (
 	"github.com/bangumi/server/dal/query"
 	pb "github.com/bangumi/server/generated/proto/go/api/v1"
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger, cfg config.AppConfig) (Repo, error) {
+func NewMysqlRepo(q *query.Query, log *zap.Logger, cfg config.AppConfig) (Service, error) {
 	rpc, err := newGrpcClient(cfg)
 	if err != nil {
 		return nil, err
@@ -49,10 +50,10 @@ type mysqlRepo struct {
 	rpc pb.TimeLineServiceClient
 }
 
-func (m mysqlRepo) ChangeSubjectProgress(ctx context.Context, u auth.Auth, sbj model.Subject,
+func (m mysqlRepo) ChangeSubjectProgress(ctx context.Context, u model.UserID, sbj model.Subject,
 	epsUpdate uint32, volsUpdate uint32) error {
 	_, err := m.rpc.SubjectProgress(ctx, &pb.SubjectProgressRequest{
-		UserId: uint64(u.ID),
+		UserId: uint64(u),
 		Subject: &pb.Subject{
 			Id:        sbj.ID,
 			Type:      uint32(sbj.TypeID),
@@ -72,14 +73,14 @@ func (m mysqlRepo) ChangeSubjectProgress(ctx context.Context, u auth.Auth, sbj m
 
 func (m mysqlRepo) ChangeSubjectCollection(
 	ctx context.Context,
-	u auth.Auth,
+	u model.UserID,
 	sbj model.Subject,
-	collect model.SubjectCollection,
+	collect collection.SubjectCollection,
 	comment string,
 	rate uint8,
 ) error {
 	_, err := m.rpc.SubjectCollect(ctx, &pb.SubjectCollectRequest{
-		UserId: uint64(u.ID),
+		UserId: uint64(u),
 		Subject: &pb.Subject{
 			Id:        sbj.ID,
 			Type:      uint32(sbj.TypeID),

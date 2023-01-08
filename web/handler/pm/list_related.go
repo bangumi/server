@@ -20,7 +20,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pm"
@@ -38,7 +38,7 @@ func (h PrivateMessage) ListRelated(c echo.Context) error {
 	list, err := h.pmRepo.ListRelated(c.Request().Context(), accessor.ID, relatedID)
 	if err != nil {
 		switch {
-		case errors.Is(err, domain.ErrNotFound):
+		case errors.Is(err, gerr.ErrNotFound):
 			return res.ErrNotFound
 		case errors.Is(err, pm.ErrPmDeleted):
 		case errors.Is(err, pm.ErrPmNotOwned):

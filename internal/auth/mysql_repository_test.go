@@ -25,7 +25,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/test"
@@ -46,7 +46,7 @@ func TestMysqlRepo_GetByToken_NotFound(t *testing.T) {
 	repo, _ := getRepo(t)
 
 	_, err := repo.GetByToken(context.Background(), "not exist token")
-	require.ErrorIs(t, err, domain.ErrNotFound)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 func TestMysqlRepo_GetByToken(t *testing.T) {
@@ -68,7 +68,7 @@ func TestMysqlRepo_GetByToken_expired(t *testing.T) {
 	repo, _ := getRepo(t)
 
 	_, err := repo.GetByToken(context.Background(), "a_expired_token")
-	require.ErrorIs(t, err, domain.ErrNotFound)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 func TestMysqlRepo_CreateAccessToken(t *testing.T) {

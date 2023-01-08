@@ -20,7 +20,6 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/handler/character"
 	"github.com/bangumi/server/web/handler/common"
@@ -30,9 +29,10 @@ import (
 	"github.com/bangumi/server/web/handler/pm"
 	"github.com/bangumi/server/web/handler/subject"
 	"github.com/bangumi/server/web/handler/user"
-	"github.com/bangumi/server/web/middleware/origin"
-	"github.com/bangumi/server/web/middleware/referer"
-	"github.com/bangumi/server/web/middleware/ua"
+	"github.com/bangumi/server/web/mw"
+	"github.com/bangumi/server/web/mw/origin"
+	"github.com/bangumi/server/web/mw/referer"
+	"github.com/bangumi/server/web/mw/ua"
 	"github.com/bangumi/server/web/req"
 )
 
@@ -60,11 +60,8 @@ func AddRouters(
 
 	v0.POST("/search/subjects", h.Search)
 
-	v0.GET("/subjects/:id", subjectHandler.Get)
-	v0.GET("/subjects/:id/image", subjectHandler.GetImage)
-	v0.GET("/subjects/:id/persons", subjectHandler.GetRelatedPersons)
-	v0.GET("/subjects/:id/subjects", subjectHandler.GetRelatedSubjects)
-	v0.GET("/subjects/:id/characters", subjectHandler.GetRelatedCharacters)
+	subjectHandler.Routes(v0)
+
 	v0.GET("/persons/:id", personHandler.Get)
 	v0.GET("/persons/:id/image", personHandler.GetImage)
 	v0.GET("/persons/:id/subjects", personHandler.GetRelatedSubjects)
@@ -81,12 +78,12 @@ func AddRouters(
 	v0.GET("/users/:username", userHandler.Get)
 	v0.GET("/users/:username/collections", userHandler.ListSubjectCollection)
 	v0.GET("/users/:username/collections/:subject_id", userHandler.GetSubjectCollection)
-	v0.GET("/users/-/collections/-/episodes/:episode_id", userHandler.GetEpisodeCollection, accessor.NeedLogin)
-	v0.PUT("/users/-/collections/-/episodes/:episode_id", userHandler.PutEpisodeCollection, req.JSON, accessor.NeedLogin)
-	v0.GET("/users/-/collections/:subject_id/episodes", userHandler.GetSubjectEpisodeCollection, accessor.NeedLogin)
-	v0.PATCH("/users/-/collections/:subject_id", userHandler.PatchSubjectCollection, req.JSON, accessor.NeedLogin)
+	v0.GET("/users/-/collections/-/episodes/:episode_id", userHandler.GetEpisodeCollection, mw.NeedLogin)
+	v0.PUT("/users/-/collections/-/episodes/:episode_id", userHandler.PutEpisodeCollection, req.JSON, mw.NeedLogin)
+	v0.GET("/users/-/collections/:subject_id/episodes", userHandler.GetSubjectEpisodeCollection, mw.NeedLogin)
+	v0.PATCH("/users/-/collections/:subject_id", userHandler.PatchSubjectCollection, req.JSON, mw.NeedLogin)
 	v0.PATCH("/users/-/collections/:subject_id/episodes",
-		userHandler.PatchEpisodeCollectionBatch, req.JSON, accessor.NeedLogin)
+		userHandler.PatchEpisodeCollectionBatch, req.JSON, mw.NeedLogin)
 
 	v0.GET("/users/:username/avatar", userHandler.GetAvatar)
 
@@ -95,12 +92,12 @@ func AddRouters(
 		v0.GET("/indices/:id", i.GetIndex)
 		v0.GET("/indices/:id/subjects", i.GetIndexSubjects)
 		// indices
-		v0.POST("/indices", i.NewIndex, req.JSON, accessor.NeedLogin)
-		v0.PUT("/indices/:id", i.UpdateIndex, req.JSON, accessor.NeedLogin)
+		v0.POST("/indices", i.NewIndex, req.JSON, mw.NeedLogin)
+		v0.PUT("/indices/:id", i.UpdateIndex, req.JSON, mw.NeedLogin)
 		// indices subjects
-		v0.POST("/indices/:id/subjects", i.AddIndexSubject, req.JSON, accessor.NeedLogin)
-		v0.PUT("/indices/:id/subjects/:subject_id", i.UpdateIndexSubject, req.JSON, accessor.NeedLogin)
-		v0.DELETE("/indices/:id/subjects/:subject_id", i.RemoveIndexSubject, accessor.NeedLogin)
+		v0.POST("/indices/:id/subjects", i.AddIndexSubject, req.JSON, mw.NeedLogin)
+		v0.PUT("/indices/:id/subjects/:subject_id", i.UpdateIndexSubject, req.JSON, mw.NeedLogin)
+		v0.DELETE("/indices/:id/subjects/:subject_id", i.RemoveIndexSubject, mw.NeedLogin)
 	}
 
 	v0.GET("/revisions/persons/:id", h.GetPersonRevision)
@@ -126,15 +123,15 @@ func AddRouters(
 	private := app.Group("/p", append(CORSBlockMiddleware, common.MiddlewareSessionAuth)...)
 
 	// TODO migrate this to bangumi/graphql
-	private.GET("/pms/list", pmHandler.List, accessor.NeedLogin)
-	private.GET("/pms/related-msgs/:id", pmHandler.ListRelated, accessor.NeedLogin)
-	private.GET("/pms/counts", pmHandler.CountTypes, accessor.NeedLogin)
-	private.GET("/pms/contacts/recent", pmHandler.ListRecentContact, accessor.NeedLogin)
+	private.GET("/pms/list", pmHandler.List, mw.NeedLogin)
+	private.GET("/pms/related-msgs/:id", pmHandler.ListRelated, mw.NeedLogin)
+	private.GET("/pms/counts", pmHandler.CountTypes, mw.NeedLogin)
+	private.GET("/pms/contacts/recent", pmHandler.ListRecentContact, mw.NeedLogin)
 	private.PATCH("/pms/read", pmHandler.MarkRead)
 	private.POST("/pms", pmHandler.Create)
-	private.DELETE("/pms", pmHandler.Delete, req.JSON, accessor.NeedLogin)
+	private.DELETE("/pms", pmHandler.Delete, req.JSON, mw.NeedLogin)
 
-	private.GET("/notifications/count", notificationHandler.Count, accessor.NeedLogin)
+	private.GET("/notifications/count", notificationHandler.Count, mw.NeedLogin)
 	private.Any("/*", globalNotFoundHandler)
 
 	// default 404 Handler, all router should be added before this router

@@ -24,7 +24,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -137,11 +137,11 @@ func (r mysqlRepo) getMainMsg(
 		return nil, errgo.Wrap(err, "dal")
 	}
 	if msg == nil {
-		return nil, domain.ErrNotFound
+		return nil, gerr.ErrNotFound
 	}
 	if msg.MainMessageID == 0 {
 		if msg.RelatedMessageID == 0 {
-			return nil, domain.ErrNotFound
+			return nil, gerr.ErrNotFound
 		}
 		return r.getMainMsg(ctx, msg.RelatedMessageID)
 	}

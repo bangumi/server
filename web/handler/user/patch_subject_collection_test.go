@@ -23,17 +23,17 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/trim21/htest"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/internal/collection"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/dam"
-	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
@@ -42,28 +42,30 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
 
-	var call collection.Update
+	var s = &collection.Subject{}
 
 	a := mocks.NewAuthService(t)
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
-	tl := mocks.NewTimeLineRepo(t)
+	tl := mocks.NewTimeLineService(t)
 	tl.EXPECT().
 		ChangeSubjectCollection(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(nil)
 
 	c := mocks.NewCollectionRepo(t)
-	c.EXPECT().GetSubjectCollection(mock.Anything, uid, mock.Anything).
-		Return(model.UserSubjectCollection{}, nil)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).
-		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data collection.Update, _ time.Time) {
-			call = data
+	c.EXPECT().UpdateSubjectCollection2(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+		Run(func(ctx context.Context, userID uint32,
+			subjectID uint32, at time.Time, ip string,
+			update func(context.Context, *collection.Subject) (*collection.Subject, error)) {
+			require.Equal(t, "0.0.0.0", ip)
+
+			s = lo.Must(update(context.Background(), s))
 		}).Return(nil)
 
 	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
 	require.NoError(t, err)
 
-	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d, TimeLineRepo: tl})
+	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d, TimeLineSrv: tl})
 
 	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
@@ -77,51 +79,10 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 		ExpectCode(http.StatusNoContent)
 
-	require.Equal(t, collection.Update{
-		IP:      "0.0.0.0",
-		Comment: null.New("1 test_content 2"),
-		Tags:    []string{"q", "vv"},
-		Rate:    null.New[uint8](8),
-		Type:    null.New(model.SubjectCollection(1)),
-		Privacy: null.New(model.CollectPrivacyBan),
-	}, call)
-}
-
-func TestUser_PatchSubjectCollection_privacy(t *testing.T) {
-	t.Parallel()
-	const sid model.SubjectID = 8
-	const uid model.UserID = 1
-
-	var call collection.Update
-
-	a := mocks.NewAuthService(t)
-	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
-
-	c := mocks.NewCollectionRepo(t)
-	c.EXPECT().GetSubjectCollection(mock.Anything, uid, mock.Anything).
-		Return(model.UserSubjectCollection{Comment: "办证"}, nil)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything).
-		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID, data collection.Update, _ time.Time) {
-			call = data
-		}).Return(nil)
-
-	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "办证", BannedDomain: ""})
-	require.NoError(t, err)
-
-	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d})
-
-	htest.New(t, app).
-		Header(echo.HeaderAuthorization, "Bearer t").
-		BodyJSON(map[string]any{
-			"private": false,
-		}).
-		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
-		ExpectCode(http.StatusNoContent)
-
-	require.Equal(t, collection.Update{
-		IP:      "0.0.0.0",
-		Privacy: null.New(model.CollectPrivacyBan),
-	}, call)
+	require.Equal(t, collection.CollectPrivacySelf, s.Privacy())
+	require.Equal(t, "1 test_content 2", s.Comment())
+	require.EqualValues(t, []string{"q", "vv"}, s.Tags())
+	require.EqualValues(t, 8, s.Rate())
 }
 
 func TestUser_PatchSubjectCollection_bad(t *testing.T) {

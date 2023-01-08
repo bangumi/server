@@ -20,7 +20,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/internal/ctxkey"
@@ -50,7 +50,7 @@ func (h Common) MiddlewareAccessTokenAuth(next echo.HandlerFunc) echo.HandlerFun
 
 		auth, err := h.auth.GetByToken(c.Request().Context(), token)
 		if err != nil {
-			if errors.Is(err, domain.ErrNotFound) || errors.Is(err, session.ErrExpired) {
+			if errors.Is(err, gerr.ErrNotFound) || errors.Is(err, session.ErrExpired) {
 				return res.Unauthorized("access token has been expired or doesn't exist")
 			}
 

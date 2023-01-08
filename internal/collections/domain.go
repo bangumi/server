@@ -12,13 +12,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package collection
+package collections
 
 import (
 	"context"
 	"time"
 
 	"github.com/bangumi/server/dal/query"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 )
@@ -30,7 +31,7 @@ type Repo interface {
 		ctx context.Context,
 		userID model.UserID,
 		subjectType model.SubjectType,
-		collectionType model.SubjectCollection,
+		collectionType collection.SubjectCollection,
 		showPrivate bool,
 	) (int64, error)
 
@@ -38,30 +39,31 @@ type Repo interface {
 		ctx context.Context,
 		userID model.UserID,
 		subjectType model.SubjectType,
-		collectionType model.SubjectCollection,
+		collectionType collection.SubjectCollection,
 		showPrivate bool,
 		limit, offset int,
-	) ([]model.UserSubjectCollection, error)
+	) ([]collection.UserSubjectCollection, error)
 
 	GetSubjectCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-	) (model.UserSubjectCollection, error)
+	) (collection.UserSubjectCollection, error)
 
 	GetSubjectEpisodesCollection(
 		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
-	) (model.UserSubjectEpisodesCollection, error)
+	) (collection.UserSubjectEpisodesCollection, error)
 
 	UpdateSubjectCollection(
-		ctx context.Context, userID model.UserID, subjectID model.SubjectID, data Update,
-		at time.Time,
+		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
+		at time.Time, ip string,
+		update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 	) error
 
 	UpdateEpisodeCollection(
 		ctx context.Context,
 		userID model.UserID, subjectID model.SubjectID,
-		episodeIDs []model.EpisodeID, collection model.EpisodeCollection,
+		episodeIDs []model.EpisodeID, collection collection.EpisodeCollection,
 		at time.Time,
-	) (model.UserSubjectEpisodesCollection, error)
+	) (collection.UserSubjectEpisodesCollection, error)
 }
 
 type Update struct {
@@ -71,7 +73,7 @@ type Update struct {
 	Tags      []string // nil 表示无数据，[]string{} 表示清空tag
 	VolStatus null.Uint32
 	EpStatus  null.Uint32
-	Type      null.Null[model.SubjectCollection]
+	Type      null.Null[collection.SubjectCollection]
 	Rate      null.Uint8
-	Privacy   null.Null[model.CollectPrivacy]
+	Privacy   null.Null[collection.CollectPrivacy]
 }

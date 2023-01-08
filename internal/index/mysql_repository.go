@@ -25,7 +25,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/subject"
@@ -57,7 +57,7 @@ func (r mysqlRepo) Get(ctx context.Context, id model.IndexID) (model.Index, erro
 		Where(r.q.Index.ID.Eq(id), r.q.Index.Ban.Is(false)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Index{}, domain.ErrNotFound
+			return model.Index{}, gerr.ErrNotFound
 		}
 
 		return model.Index{}, errgo.Wrap(err, "dal")
@@ -173,7 +173,7 @@ func (r mysqlRepo) AddOrUpdateIndexSubject(
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, domain.ErrSubjectNotFound
+			return nil, gerr.ErrSubjectNotFound
 		}
 		return nil, errgo.Wrap(err, "dal")
 	}
@@ -276,7 +276,7 @@ func (r mysqlRepo) DeleteIndexSubject(
 func (r mysqlRepo) WrapResult(result gen.ResultInfo, err error, msg string) error {
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.ErrNotFound
+			return gerr.ErrNotFound
 		}
 		return errgo.Wrap(err, msg)
 	}

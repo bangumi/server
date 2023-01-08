@@ -23,6 +23,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
@@ -43,7 +44,7 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 
 	_, relations, err := h.getSubjectRelatedCharacters(c.Request().Context(), u.Auth, subjectID)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
 		return errgo.Wrap(err, "CharacterRepo.GetSubjectRelated")
@@ -111,7 +112,7 @@ func (h Subject) getSubjectRelatedCharacters(
 		Value: false, Set: !user.AllowNSFW(),
 	}})
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return s, nil, res.ErrNotFound
 		}
 		return s, nil, errgo.Wrap(err, "failed to get subject")

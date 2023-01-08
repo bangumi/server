@@ -18,16 +18,17 @@ import (
 	"context"
 
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 )
 
-type Repo interface {
+type Service interface {
 	ChangeSubjectCollection(
 		ctx context.Context,
-		u auth.Auth,
+		u model.UserID,
 		sbj model.Subject,
-		collect model.SubjectCollection,
+		collect collection.SubjectCollection,
 		comment string,
 		rate uint8,
 	) error
@@ -41,7 +42,7 @@ type Repo interface {
 
 	ChangeSubjectProgress(
 		ctx context.Context,
-		u auth.Auth,
+		u model.UserID,
 		sbj model.Subject,
 		epsUpdate uint32,
 		volsUpdate uint32,

@@ -24,7 +24,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -44,7 +44,7 @@ func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (User, erro
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(userID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return User{}, domain.ErrUserNotFound
+			return User{}, gerr.ErrUserNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))
@@ -58,7 +58,7 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (User, error)
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Username.Eq(username)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return User{}, domain.ErrUserNotFound
+			return User{}, gerr.ErrUserNotFound
 		}
 
 		m.log.Error("unexpected error happened", zap.Error(err))

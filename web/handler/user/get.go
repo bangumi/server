@@ -21,7 +21,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/res"
 )
@@ -37,7 +37,7 @@ func (h User) Get(c echo.Context) error {
 
 	user, err := h.user.GetByName(c.Request().Context(), username)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("can't find user with username " + strconv.Quote(username))
 		}
 
@@ -60,7 +60,7 @@ func (h User) GetAvatar(c echo.Context) error {
 
 	user, err := h.user.GetByName(c.Request().Context(), username)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("can't find user with username " + strconv.Quote(username))
 		}
 

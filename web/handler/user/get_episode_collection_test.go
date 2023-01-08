@@ -24,6 +24,7 @@ import (
 	"github.com/trim21/htest"
 
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
@@ -39,7 +40,7 @@ func TestUser_GetEpisodeCollection(t *testing.T) {
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectEpisodesCollection(mock.Anything, mock.Anything, mock.Anything).
-		Return(map[model.EpisodeID]model.UserEpisodeCollection{}, nil)
+		Return(map[model.EpisodeID]collection.UserEpisodeCollection{}, nil)
 
 	e := mocks.NewEpisodeRepo(t)
 	e.EXPECT().Get(mock.Anything, model.EpisodeID(1)).Return(episode.Episode{}, nil)
@@ -64,7 +65,7 @@ func TestUser_GetSubjectEpisodeCollection(t *testing.T) {
 
 	c := mocks.NewCollectionRepo(t)
 	c.EXPECT().GetSubjectEpisodesCollection(mock.Anything, mock.Anything, mock.Anything).
-		Return(map[model.EpisodeID]model.UserEpisodeCollection{}, nil)
+		Return(map[model.EpisodeID]collection.UserEpisodeCollection{}, nil)
 
 	e := mocks.NewEpisodeRepo(t)
 	e.EXPECT().Count(mock.Anything, mock.Anything, mock.Anything).Return(20, nil)

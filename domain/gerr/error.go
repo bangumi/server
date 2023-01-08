@@ -12,10 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package domain
+package gerr
 
 import (
 	"errors"
+
+	"gorm.io/gorm"
 
 	"github.com/bangumi/server/internal/pkg/errgo"
 )
@@ -31,5 +33,16 @@ var ErrUserNotFound = errgo.MsgNoTrace(ErrNotFound, "user not found")
 var ErrSubjectNotCollected = errgo.MsgNoTrace(ErrNotFound, "subject is not collected by user")
 
 var ErrInput = errors.New("input not valid")
+var ErrInvisibleChar = errors.New("input contains invisible chars")
 
 var ErrExists = errors.New("item already exists")
+
+var ErrInvalidData = errors.New("invalid data")
+
+func WrapGormError(err error) error {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return ErrNotFound
+	}
+
+	return errgo.Trace(err)
+}

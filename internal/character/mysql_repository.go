@@ -24,6 +24,7 @@ import (
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain"
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
@@ -42,7 +43,7 @@ func (r mysqlRepo) Get(ctx context.Context, id model.CharacterID) (model.Charact
 	s, err := r.q.Character.WithContext(ctx).Preload(r.q.Character.Fields).Where(r.q.Character.ID.Eq(id)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Character{}, domain.ErrCharacterNotFound
+			return model.Character{}, gerr.ErrCharacterNotFound
 		}
 
 		r.log.Error("unexpected error happened", zap.Error(err))

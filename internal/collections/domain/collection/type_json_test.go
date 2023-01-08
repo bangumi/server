@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package model_test
+package collection_test
 
 import (
 	"testing"
@@ -20,7 +20,7 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/collections/domain/collection"
 )
 
 func TestEpisodeCollection_UnmarshalJSON(t *testing.T) {
@@ -28,7 +28,7 @@ func TestEpisodeCollection_UnmarshalJSON(t *testing.T) {
 
 	testCases := []struct {
 		Raw      []byte
-		Expected model.EpisodeCollection
+		Expected collection.EpisodeCollection
 		Err      bool
 	}{
 		{Raw: []byte("1"), Expected: 1},
@@ -37,7 +37,7 @@ func TestEpisodeCollection_UnmarshalJSON(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		var r model.EpisodeCollection
+		var r collection.EpisodeCollection
 		if tc.Err {
 			require.Error(t, sonic.Unmarshal(tc.Raw, &r))
 			continue
@@ -53,7 +53,7 @@ func TestSubjectCollection_UnmarshalJSON(t *testing.T) {
 
 	testCases := []struct {
 		Raw      []byte
-		Expected model.SubjectCollection
+		Expected collection.SubjectCollection
 		Err      bool
 	}{
 		{Raw: []byte("1"), Expected: 1},
@@ -62,7 +62,7 @@ func TestSubjectCollection_UnmarshalJSON(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		var r model.SubjectCollection
+		var r collection.SubjectCollection
 		if tc.Err {
 			require.Error(t, sonic.Unmarshal(tc.Raw, &r))
 			continue
