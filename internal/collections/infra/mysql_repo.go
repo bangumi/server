@@ -100,7 +100,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		t.UpdatedTime.Value(uint32(at.Unix())), t.Comment.Value(utiltype.HTMLEscapedString(s.Comment())),
 		t.HasComment.Value(s.Comment() != ""), t.Tag.Value(strings.Join(s.Tags(), " ")),
 		t.EpStatus.Value(s.Eps()), t.VolStatus.Value(s.Vols()), t.Rate.Value(s.Rate()),
-		t.Private.Value(uint8(s.Privacy())),
+		t.Private.Value(uint8(s.Privacy())), t.Type.Value(uint8(s.TypeID())),
 	}
 
 	if s.TypeID() != original.TypeID() {
