@@ -87,6 +87,9 @@ func (r mysqlRepo) UpdateSubjectCollection(
 ) error {
 	s, err := r.getSubjectCollection(ctx, userID, subjectID)
 	if err != nil {
+		if errors.Is(err, gerr.ErrNotFound) {
+			return gerr.ErrSubjectNotCollected
+		}
 		return err
 	}
 	original := *s
