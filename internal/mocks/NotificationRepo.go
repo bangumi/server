@@ -5,7 +5,6 @@ package mocks
 import (
 	context "context"
 
-	model "github.com/bangumi/server/internal/model"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -23,18 +22,18 @@ func (_m *NotificationRepo) EXPECT() *NotificationRepo_Expecter {
 }
 
 // Count provides a mock function with given fields: ctx, userID
-func (_m *NotificationRepo) Count(ctx context.Context, userID model.UserID) (int64, error) {
+func (_m *NotificationRepo) Count(ctx context.Context, userID uint32) (int64, error) {
 	ret := _m.Called(ctx, userID)
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) int64); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) int64); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserID) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
 		r1 = rf(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
@@ -50,14 +49,14 @@ type NotificationRepo_Count_Call struct {
 
 // Count is a helper method to define mock.On call
 //   - ctx context.Context
-//   - userID model.UserID
+//   - userID uint32
 func (_e *NotificationRepo_Expecter) Count(ctx interface{}, userID interface{}) *NotificationRepo_Count_Call {
 	return &NotificationRepo_Count_Call{Call: _e.mock.On("Count", ctx, userID)}
 }
 
-func (_c *NotificationRepo_Count_Call) Run(run func(ctx context.Context, userID model.UserID)) *NotificationRepo_Count_Call {
+func (_c *NotificationRepo_Count_Call) Run(run func(ctx context.Context, userID uint32)) *NotificationRepo_Count_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		run(args[0].(context.Context), args[1].(uint32))
 	})
 	return _c
 }

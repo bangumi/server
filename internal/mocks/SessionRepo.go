@@ -5,10 +5,8 @@ package mocks
 import (
 	context "context"
 
-	model "github.com/bangumi/server/internal/model"
-	mock "github.com/stretchr/testify/mock"
-
 	session "github.com/bangumi/server/web/session"
+	mock "github.com/stretchr/testify/mock"
 
 	time "time"
 )
@@ -27,25 +25,25 @@ func (_m *SessionRepo) EXPECT() *SessionRepo_Expecter {
 }
 
 // Create provides a mock function with given fields: ctx, userID, regTime, keyGen
-func (_m *SessionRepo) Create(ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string) (string, session.Session, error) {
+func (_m *SessionRepo) Create(ctx context.Context, userID uint32, regTime time.Time, keyGen func() string) (string, session.Session, error) {
 	ret := _m.Called(ctx, userID, regTime, keyGen)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID, time.Time, func() string) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, time.Time, func() string) string); ok {
 		r0 = rf(ctx, userID, regTime, keyGen)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 session.Session
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserID, time.Time, func() string) session.Session); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, time.Time, func() string) session.Session); ok {
 		r1 = rf(ctx, userID, regTime, keyGen)
 	} else {
 		r1 = ret.Get(1).(session.Session)
 	}
 
 	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, model.UserID, time.Time, func() string) error); ok {
+	if rf, ok := ret.Get(2).(func(context.Context, uint32, time.Time, func() string) error); ok {
 		r2 = rf(ctx, userID, regTime, keyGen)
 	} else {
 		r2 = ret.Error(2)
@@ -61,16 +59,16 @@ type SessionRepo_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - userID model.UserID
+//   - userID uint32
 //   - regTime time.Time
 //   - keyGen func() string
 func (_e *SessionRepo_Expecter) Create(ctx interface{}, userID interface{}, regTime interface{}, keyGen interface{}) *SessionRepo_Create_Call {
 	return &SessionRepo_Create_Call{Call: _e.mock.On("Create", ctx, userID, regTime, keyGen)}
 }
 
-func (_c *SessionRepo_Create_Call) Run(run func(ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string)) *SessionRepo_Create_Call {
+func (_c *SessionRepo_Create_Call) Run(run func(ctx context.Context, userID uint32, regTime time.Time, keyGen func() string)) *SessionRepo_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID), args[2].(time.Time), args[3].(func() string))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(time.Time), args[3].(func() string))
 	})
 	return _c
 }
@@ -164,11 +162,11 @@ func (_c *SessionRepo_Revoke_Call) Return(_a0 error) *SessionRepo_Revoke_Call {
 }
 
 // RevokeUser provides a mock function with given fields: ctx, userID
-func (_m *SessionRepo) RevokeUser(ctx context.Context, userID model.UserID) ([]string, error) {
+func (_m *SessionRepo) RevokeUser(ctx context.Context, userID uint32) ([]string, error) {
 	ret := _m.Called(ctx, userID)
 
 	var r0 []string
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) []string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) []string); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
@@ -177,7 +175,7 @@ func (_m *SessionRepo) RevokeUser(ctx context.Context, userID model.UserID) ([]s
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserID) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
 		r1 = rf(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
@@ -193,14 +191,14 @@ type SessionRepo_RevokeUser_Call struct {
 
 // RevokeUser is a helper method to define mock.On call
 //   - ctx context.Context
-//   - userID model.UserID
+//   - userID uint32
 func (_e *SessionRepo_Expecter) RevokeUser(ctx interface{}, userID interface{}) *SessionRepo_RevokeUser_Call {
 	return &SessionRepo_RevokeUser_Call{Call: _e.mock.On("RevokeUser", ctx, userID)}
 }
 
-func (_c *SessionRepo_RevokeUser_Call) Run(run func(ctx context.Context, userID model.UserID)) *SessionRepo_RevokeUser_Call {
+func (_c *SessionRepo_RevokeUser_Call) Run(run func(ctx context.Context, userID uint32)) *SessionRepo_RevokeUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		run(args[0].(context.Context), args[1].(uint32))
 	})
 	return _c
 }

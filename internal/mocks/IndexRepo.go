@@ -25,11 +25,11 @@ func (_m *IndexRepo) EXPECT() *IndexRepo_Expecter {
 }
 
 // AddOrUpdateIndexSubject provides a mock function with given fields: ctx, id, subjectID, sort, comment
-func (_m *IndexRepo) AddOrUpdateIndexSubject(ctx context.Context, id uint32, subjectID model.SubjectID, sort uint32, comment string) (*index.Subject, error) {
+func (_m *IndexRepo) AddOrUpdateIndexSubject(ctx context.Context, id uint32, subjectID uint32, sort uint32, comment string) (*index.Subject, error) {
 	ret := _m.Called(ctx, id, subjectID, sort, comment)
 
 	var r0 *index.Subject
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.SubjectID, uint32, string) *index.Subject); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32, uint32, string) *index.Subject); ok {
 		r0 = rf(ctx, id, subjectID, sort, comment)
 	} else {
 		if ret.Get(0) != nil {
@@ -38,7 +38,7 @@ func (_m *IndexRepo) AddOrUpdateIndexSubject(ctx context.Context, id uint32, sub
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint32, model.SubjectID, uint32, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint32, uint32, string) error); ok {
 		r1 = rf(ctx, id, subjectID, sort, comment)
 	} else {
 		r1 = ret.Error(1)
@@ -55,16 +55,16 @@ type IndexRepo_AddOrUpdateIndexSubject_Call struct {
 // AddOrUpdateIndexSubject is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id uint32
-//   - subjectID model.SubjectID
+//   - subjectID uint32
 //   - sort uint32
 //   - comment string
 func (_e *IndexRepo_Expecter) AddOrUpdateIndexSubject(ctx interface{}, id interface{}, subjectID interface{}, sort interface{}, comment interface{}) *IndexRepo_AddOrUpdateIndexSubject_Call {
 	return &IndexRepo_AddOrUpdateIndexSubject_Call{Call: _e.mock.On("AddOrUpdateIndexSubject", ctx, id, subjectID, sort, comment)}
 }
 
-func (_c *IndexRepo_AddOrUpdateIndexSubject_Call) Run(run func(ctx context.Context, id uint32, subjectID model.SubjectID, sort uint32, comment string)) *IndexRepo_AddOrUpdateIndexSubject_Call {
+func (_c *IndexRepo_AddOrUpdateIndexSubject_Call) Run(run func(ctx context.Context, id uint32, subjectID uint32, sort uint32, comment string)) *IndexRepo_AddOrUpdateIndexSubject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(model.SubjectID), args[3].(uint32), args[4].(string))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32), args[3].(uint32), args[4].(string))
 	})
 	return _c
 }
@@ -159,11 +159,11 @@ func (_c *IndexRepo_Delete_Call) Return(_a0 error) *IndexRepo_Delete_Call {
 }
 
 // DeleteIndexSubject provides a mock function with given fields: ctx, id, subjectID
-func (_m *IndexRepo) DeleteIndexSubject(ctx context.Context, id uint32, subjectID model.SubjectID) error {
+func (_m *IndexRepo) DeleteIndexSubject(ctx context.Context, id uint32, subjectID uint32) error {
 	ret := _m.Called(ctx, id, subjectID)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.SubjectID) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) error); ok {
 		r0 = rf(ctx, id, subjectID)
 	} else {
 		r0 = ret.Error(0)
@@ -180,14 +180,14 @@ type IndexRepo_DeleteIndexSubject_Call struct {
 // DeleteIndexSubject is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id uint32
-//   - subjectID model.SubjectID
+//   - subjectID uint32
 func (_e *IndexRepo_Expecter) DeleteIndexSubject(ctx interface{}, id interface{}, subjectID interface{}) *IndexRepo_DeleteIndexSubject_Call {
 	return &IndexRepo_DeleteIndexSubject_Call{Call: _e.mock.On("DeleteIndexSubject", ctx, id, subjectID)}
 }
 
-func (_c *IndexRepo_DeleteIndexSubject_Call) Run(run func(ctx context.Context, id uint32, subjectID model.SubjectID)) *IndexRepo_DeleteIndexSubject_Call {
+func (_c *IndexRepo_DeleteIndexSubject_Call) Run(run func(ctx context.Context, id uint32, subjectID uint32)) *IndexRepo_DeleteIndexSubject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(model.SubjectID))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32))
 	})
 	return _c
 }

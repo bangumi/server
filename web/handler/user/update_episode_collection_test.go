@@ -61,7 +61,7 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 			eIDs = episodeIDs
 			eType = collection
 		}).Return(collection.UserSubjectEpisodesCollection{}, nil)
-	c.EXPECT().UpdateSubjectCollection2(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	c.EXPECT().GetSubjectCollection(mock.Anything, uid, sid).Return(collection.UserSubjectCollection{SubjectID: sid}, nil)
 
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
@@ -103,7 +103,7 @@ func TestUser_PutEpisodeCollection(t *testing.T) {
 			eIDs = episodeIDs
 			eType = collection
 		}).Return(collection.UserSubjectEpisodesCollection{}, nil)
-	c.EXPECT().UpdateSubjectCollection2(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
 

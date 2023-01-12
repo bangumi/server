@@ -53,7 +53,7 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		Return(nil)
 
 	c := mocks.NewCollectionRepo(t)
-	c.EXPECT().UpdateSubjectCollection2(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(ctx context.Context, userID uint32,
 			subjectID uint32, at time.Time, ip string,
 			update func(context.Context, *collection.Subject) (*collection.Subject, error)) {

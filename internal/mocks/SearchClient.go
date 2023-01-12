@@ -5,10 +5,7 @@ package mocks
 import (
 	context "context"
 
-	accessor "github.com/bangumi/server/web/accessor"
-
 	echo "github.com/labstack/echo/v4"
-
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -52,13 +49,13 @@ func (_c *SearchClient_Close_Call) Return() *SearchClient_Close_Call {
 	return _c
 }
 
-// Handle provides a mock function with given fields: c, auth
-func (_m *SearchClient) Handle(c echo.Context, auth *accessor.Accessor) error {
-	ret := _m.Called(c, auth)
+// Handle provides a mock function with given fields: c
+func (_m *SearchClient) Handle(c echo.Context) error {
+	ret := _m.Called(c)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(echo.Context, *accessor.Accessor) error); ok {
-		r0 = rf(c, auth)
+	if rf, ok := ret.Get(0).(func(echo.Context) error); ok {
+		r0 = rf(c)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -73,14 +70,13 @@ type SearchClient_Handle_Call struct {
 
 // Handle is a helper method to define mock.On call
 //   - c echo.Context
-//   - auth *accessor.Accessor
-func (_e *SearchClient_Expecter) Handle(c interface{}, auth interface{}) *SearchClient_Handle_Call {
-	return &SearchClient_Handle_Call{Call: _e.mock.On("Handle", c, auth)}
+func (_e *SearchClient_Expecter) Handle(c interface{}) *SearchClient_Handle_Call {
+	return &SearchClient_Handle_Call{Call: _e.mock.On("Handle", c)}
 }
 
-func (_c *SearchClient_Handle_Call) Run(run func(c echo.Context, auth *accessor.Accessor)) *SearchClient_Handle_Call {
+func (_c *SearchClient_Handle_Call) Run(run func(c echo.Context)) *SearchClient_Handle_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(echo.Context), args[1].(*accessor.Accessor))
+		run(args[0].(echo.Context))
 	})
 	return _c
 }

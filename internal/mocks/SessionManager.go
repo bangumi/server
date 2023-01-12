@@ -9,8 +9,6 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	model "github.com/bangumi/server/internal/model"
-
 	session "github.com/bangumi/server/web/session"
 )
 
@@ -163,11 +161,11 @@ func (_c *SessionManager_Revoke_Call) Return(_a0 error) *SessionManager_Revoke_C
 }
 
 // RevokeUser provides a mock function with given fields: ctx, id
-func (_m *SessionManager) RevokeUser(ctx context.Context, id model.UserID) error {
+func (_m *SessionManager) RevokeUser(ctx context.Context, id uint32) error {
 	ret := _m.Called(ctx, id)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserID) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) error); ok {
 		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Error(0)
@@ -183,14 +181,14 @@ type SessionManager_RevokeUser_Call struct {
 
 // RevokeUser is a helper method to define mock.On call
 //   - ctx context.Context
-//   - id model.UserID
+//   - id uint32
 func (_e *SessionManager_Expecter) RevokeUser(ctx interface{}, id interface{}) *SessionManager_RevokeUser_Call {
 	return &SessionManager_RevokeUser_Call{Call: _e.mock.On("RevokeUser", ctx, id)}
 }
 
-func (_c *SessionManager_RevokeUser_Call) Run(run func(ctx context.Context, id model.UserID)) *SessionManager_RevokeUser_Call {
+func (_c *SessionManager_RevokeUser_Call) Run(run func(ctx context.Context, id uint32)) *SessionManager_RevokeUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		run(args[0].(context.Context), args[1].(uint32))
 	})
 	return _c
 }

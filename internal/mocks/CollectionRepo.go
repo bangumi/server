@@ -273,7 +273,7 @@ func (_c *CollectionRepo_UpdateEpisodeCollection_Call) Return(_a0 collection.Use
 	return _c
 }
 
-// UpdateSubjectCollection2 provides a mock function with given fields: ctx, userID, subjectID, at, ip, update
+// UpdateSubjectCollection provides a mock function with given fields: ctx, userID, subjectID, at, ip, update
 func (_m *CollectionRepo) UpdateSubjectCollection(ctx context.Context, userID uint32, subjectID uint32, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error)) error {
 	ret := _m.Called(ctx, userID, subjectID, at, ip, update)
 
@@ -287,30 +287,30 @@ func (_m *CollectionRepo) UpdateSubjectCollection(ctx context.Context, userID ui
 	return r0
 }
 
-// CollectionRepo_UpdateSubjectCollection2_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateSubjectCollection'
-type CollectionRepo_UpdateSubjectCollection2_Call struct {
+// CollectionRepo_UpdateSubjectCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateSubjectCollection'
+type CollectionRepo_UpdateSubjectCollection_Call struct {
 	*mock.Call
 }
 
-// UpdateSubjectCollection2 is a helper method to define mock.On call
+// UpdateSubjectCollection is a helper method to define mock.On call
 //   - ctx context.Context
 //   - userID uint32
 //   - subjectID uint32
 //   - at time.Time
 //   - ip string
 //   - update func(context.Context , *collection.Subject)(*collection.Subject , error)
-func (_e *CollectionRepo_Expecter) UpdateSubjectCollection2(ctx interface{}, userID interface{}, subjectID interface{}, at interface{}, ip interface{}, update interface{}) *CollectionRepo_UpdateSubjectCollection2_Call {
-	return &CollectionRepo_UpdateSubjectCollection2_Call{Call: _e.mock.On("UpdateSubjectCollection", ctx, userID, subjectID, at, ip, update)}
+func (_e *CollectionRepo_Expecter) UpdateSubjectCollection(ctx interface{}, userID interface{}, subjectID interface{}, at interface{}, ip interface{}, update interface{}) *CollectionRepo_UpdateSubjectCollection_Call {
+	return &CollectionRepo_UpdateSubjectCollection_Call{Call: _e.mock.On("UpdateSubjectCollection", ctx, userID, subjectID, at, ip, update)}
 }
 
-func (_c *CollectionRepo_UpdateSubjectCollection2_Call) Run(run func(ctx context.Context, userID uint32, subjectID uint32, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error))) *CollectionRepo_UpdateSubjectCollection2_Call {
+func (_c *CollectionRepo_UpdateSubjectCollection_Call) Run(run func(ctx context.Context, userID uint32, subjectID uint32, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error))) *CollectionRepo_UpdateSubjectCollection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32), args[3].(time.Time), args[4].(string), args[5].(func(context.Context, *collection.Subject) (*collection.Subject, error)))
 	})
 	return _c
 }
 
-func (_c *CollectionRepo_UpdateSubjectCollection2_Call) Return(_a0 error) *CollectionRepo_UpdateSubjectCollection2_Call {
+func (_c *CollectionRepo_UpdateSubjectCollection_Call) Return(_a0 error) *CollectionRepo_UpdateSubjectCollection_Call {
 	_c.Call.Return(_a0)
 	return _c
 }

@@ -8,8 +8,6 @@ import (
 	episode "github.com/bangumi/server/internal/episode"
 	mock "github.com/stretchr/testify/mock"
 
-	model "github.com/bangumi/server/internal/model"
-
 	query "github.com/bangumi/server/dal/query"
 )
 
@@ -27,18 +25,18 @@ func (_m *EpisodeRepo) EXPECT() *EpisodeRepo_Expecter {
 }
 
 // Count provides a mock function with given fields: ctx, subjectID, filter
-func (_m *EpisodeRepo) Count(ctx context.Context, subjectID model.SubjectID, filter episode.Filter) (int64, error) {
+func (_m *EpisodeRepo) Count(ctx context.Context, subjectID uint32, filter episode.Filter) (int64, error) {
 	ret := _m.Called(ctx, subjectID, filter)
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, episode.Filter) int64); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, episode.Filter) int64); ok {
 		r0 = rf(ctx, subjectID, filter)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, episode.Filter) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, episode.Filter) error); ok {
 		r1 = rf(ctx, subjectID, filter)
 	} else {
 		r1 = ret.Error(1)
@@ -54,15 +52,15 @@ type EpisodeRepo_Count_Call struct {
 
 // Count is a helper method to define mock.On call
 //   - ctx context.Context
-//   - subjectID model.SubjectID
+//   - subjectID uint32
 //   - filter episode.Filter
 func (_e *EpisodeRepo_Expecter) Count(ctx interface{}, subjectID interface{}, filter interface{}) *EpisodeRepo_Count_Call {
 	return &EpisodeRepo_Count_Call{Call: _e.mock.On("Count", ctx, subjectID, filter)}
 }
 
-func (_c *EpisodeRepo_Count_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, filter episode.Filter)) *EpisodeRepo_Count_Call {
+func (_c *EpisodeRepo_Count_Call) Run(run func(ctx context.Context, subjectID uint32, filter episode.Filter)) *EpisodeRepo_Count_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(episode.Filter))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(episode.Filter))
 	})
 	return _c
 }
@@ -73,18 +71,18 @@ func (_c *EpisodeRepo_Count_Call) Return(_a0 int64, _a1 error) *EpisodeRepo_Coun
 }
 
 // Get provides a mock function with given fields: ctx, episodeID
-func (_m *EpisodeRepo) Get(ctx context.Context, episodeID model.EpisodeID) (episode.Episode, error) {
+func (_m *EpisodeRepo) Get(ctx context.Context, episodeID uint32) (episode.Episode, error) {
 	ret := _m.Called(ctx, episodeID)
 
 	var r0 episode.Episode
-	if rf, ok := ret.Get(0).(func(context.Context, model.EpisodeID) episode.Episode); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) episode.Episode); ok {
 		r0 = rf(ctx, episodeID)
 	} else {
 		r0 = ret.Get(0).(episode.Episode)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.EpisodeID) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
 		r1 = rf(ctx, episodeID)
 	} else {
 		r1 = ret.Error(1)
@@ -100,14 +98,14 @@ type EpisodeRepo_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
-//   - episodeID model.EpisodeID
+//   - episodeID uint32
 func (_e *EpisodeRepo_Expecter) Get(ctx interface{}, episodeID interface{}) *EpisodeRepo_Get_Call {
 	return &EpisodeRepo_Get_Call{Call: _e.mock.On("Get", ctx, episodeID)}
 }
 
-func (_c *EpisodeRepo_Get_Call) Run(run func(ctx context.Context, episodeID model.EpisodeID)) *EpisodeRepo_Get_Call {
+func (_c *EpisodeRepo_Get_Call) Run(run func(ctx context.Context, episodeID uint32)) *EpisodeRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.EpisodeID))
+		run(args[0].(context.Context), args[1].(uint32))
 	})
 	return _c
 }
@@ -118,11 +116,11 @@ func (_c *EpisodeRepo_Get_Call) Return(_a0 episode.Episode, _a1 error) *EpisodeR
 }
 
 // List provides a mock function with given fields: ctx, subjectID, filter, limit, offset
-func (_m *EpisodeRepo) List(ctx context.Context, subjectID model.SubjectID, filter episode.Filter, limit int, offset int) ([]episode.Episode, error) {
+func (_m *EpisodeRepo) List(ctx context.Context, subjectID uint32, filter episode.Filter, limit int, offset int) ([]episode.Episode, error) {
 	ret := _m.Called(ctx, subjectID, filter, limit, offset)
 
 	var r0 []episode.Episode
-	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectID, episode.Filter, int, int) []episode.Episode); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, episode.Filter, int, int) []episode.Episode); ok {
 		r0 = rf(ctx, subjectID, filter, limit, offset)
 	} else {
 		if ret.Get(0) != nil {
@@ -131,7 +129,7 @@ func (_m *EpisodeRepo) List(ctx context.Context, subjectID model.SubjectID, filt
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, model.SubjectID, episode.Filter, int, int) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, episode.Filter, int, int) error); ok {
 		r1 = rf(ctx, subjectID, filter, limit, offset)
 	} else {
 		r1 = ret.Error(1)
@@ -147,7 +145,7 @@ type EpisodeRepo_List_Call struct {
 
 // List is a helper method to define mock.On call
 //   - ctx context.Context
-//   - subjectID model.SubjectID
+//   - subjectID uint32
 //   - filter episode.Filter
 //   - limit int
 //   - offset int
@@ -155,9 +153,9 @@ func (_e *EpisodeRepo_Expecter) List(ctx interface{}, subjectID interface{}, fil
 	return &EpisodeRepo_List_Call{Call: _e.mock.On("List", ctx, subjectID, filter, limit, offset)}
 }
 
-func (_c *EpisodeRepo_List_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, filter episode.Filter, limit int, offset int)) *EpisodeRepo_List_Call {
+func (_c *EpisodeRepo_List_Call) Run(run func(ctx context.Context, subjectID uint32, filter episode.Filter, limit int, offset int)) *EpisodeRepo_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(episode.Filter), args[3].(int), args[4].(int))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(episode.Filter), args[3].(int), args[4].(int))
 	})
 	return _c
 }
