@@ -69,6 +69,10 @@ type ReqFilter struct {
 	NSFW    null.Bool           `json:"nsfw"`
 }
 
+type hit struct {
+	ID model.SubjectID `json:"id"`
+}
+
 func (c *client) Handle(ctx echo.Context) error {
 	auth := accessor.GetFromCtx(ctx)
 	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
@@ -90,18 +94,11 @@ func (c *client) Handle(ctx echo.Context) error {
 		return errgo.Wrap(err, "search")
 	}
 
-	ids := make([]model.SubjectID, 0, len(result.Hits))
-	for _, h := range result.Hits {
-		var hit struct {
-			ID model.SubjectID `json:"id"`
-		}
-
-		if err = sonic.Unmarshal(h, &hit); err != nil {
-			return errgo.Wrap(err, "json.Unmarshal")
-		}
-
-		ids = append(ids, hit.ID)
+	var hits []hit
+	if err = sonic.Unmarshal(result.Hits, &hits); err != nil {
+		return errgo.Wrap(err, "json.Unmarshal")
 	}
+	ids := slice.Map(hits, func(h hit) model.SubjectID { return h.ID })
 
 	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, subject.Filter{NSFW: r.Filter.NSFW})
 	if err != nil {
@@ -177,8 +174,8 @@ func (c *client) doSearch(
 }
 
 type meiliSearchResponse struct {
-	Hits               []json.RawMessage `json:"hits"`
-	EstimatedTotalHits int64             `json:"estimatedTotalHits"` //nolint:tagliatelle
+	Hits               json.RawMessage `json:"hits"`
+	EstimatedTotalHits int64           `json:"estimatedTotalHits"` //nolint:tagliatelle
 }
 
 func filterToMeiliFilter(req ReqFilter) [][]string {
