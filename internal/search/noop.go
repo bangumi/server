@@ -21,7 +21,6 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/web/accessor"
 )
 
 var _ Client = NoopClient{}
@@ -29,7 +28,7 @@ var _ Client = NoopClient{}
 type NoopClient struct {
 }
 
-func (n NoopClient) Handle(c echo.Context, auth *accessor.Accessor) error {
+func (n NoopClient) Handle(c echo.Context) error {
 	return c.String(http.StatusOK, "search is not enable")
 }
 

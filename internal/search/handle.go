@@ -48,7 +48,7 @@ type Client interface {
 // Handler
 // TODO: 想个办法挪到 web 里面去.
 type Handler interface {
-	Handle(c echo.Context, auth *accessor.Accessor) error
+	Handle(c echo.Context) error
 }
 
 const defaultLimit = 50
@@ -69,7 +69,8 @@ type ReqFilter struct {
 	NSFW    null.Bool           `json:"nsfw"`
 }
 
-func (c *client) Handle(ctx echo.Context, auth *accessor.Accessor) error {
+func (c *client) Handle(ctx echo.Context) error {
+	auth := accessor.GetFromCtx(ctx)
 	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
 	if err != nil {
 		return err
@@ -183,12 +184,10 @@ type meiliSearchResponse struct {
 func filterToMeiliFilter(req ReqFilter) [][]string {
 	var filter = make([][]string, 0, 5+len(req.Tag))
 
+	// OR
+
 	if len(req.AirDate) != 0 {
 		filter = append(filter, parseDateFilter(req.AirDate)...)
-	}
-
-	for _, tag := range req.Tag {
-		filter = append(filter, []string{"tag = " + strconv.Quote(tag)})
 	}
 
 	if len(req.Type) != 0 {
@@ -196,21 +195,22 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 			return fmt.Sprintf("type = %d", s)
 		}))
 	}
-
-	if len(req.Rank) != 0 {
-		filter = append(filter, slice.Map(req.Rank, func(s string) string {
-			return "rank" + s
-		}))
-	}
-
-	if len(req.Score) != 0 {
-		filter = append(filter, slice.Map(req.Score, func(s string) string {
-			return "score " + s
-		}))
-	}
-
 	if req.NSFW.Set {
 		filter = append(filter, []string{"nsfw = " + strconv.FormatBool(req.NSFW.Value)})
+	}
+
+	// AND
+
+	for _, tag := range req.Tag {
+		filter = append(filter, []string{"tag = " + strconv.Quote(tag)})
+	}
+
+	for _, s := range req.Rank {
+		filter = append(filter, []string{"rank" + s})
+	}
+
+	for _, s := range req.Score {
+		filter = append(filter, []string{"score " + s})
 	}
 
 	return filter

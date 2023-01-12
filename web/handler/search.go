@@ -16,10 +16,8 @@ package handler
 
 import (
 	"github.com/labstack/echo/v4"
-
-	"github.com/bangumi/server/web/accessor"
 )
 
 func (h Handler) Search(c echo.Context) error {
-	return h.search.Handle(c, accessor.GetFromCtx(c)) //nolint:wrapcheck
+	return h.search.Handle(c) //nolint:wrapcheck
 }
