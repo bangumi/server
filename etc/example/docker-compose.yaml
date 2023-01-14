@@ -63,7 +63,7 @@ services:
   kafka:
     # you also need a zookeeper
     container_name: "chii-base-kafka"
-    image: confluentinc/cp-kafka:7.2.1
+    image: confluentinc/cp-kafka:7.3.1
     # set full config as you needed
 
   debezium-server:
