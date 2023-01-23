@@ -150,7 +150,7 @@ func (c *client) doSearch(
 	case "heat":
 		sortOpt = []string{"heat:desc"}
 	case "rank":
-		sortOpt = []string{"rank:desc"}
+		sortOpt = []string{"rank:asc"}
 	default:
 		return nil, res.BadRequest("sort not supported")
 	}
