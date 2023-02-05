@@ -60,9 +60,9 @@ func main() {
 	// ### if you want to query without context constrain, set mode gen.WithoutContext ###
 	const dalBase = "./dal"
 	g := gen.NewGenerator(gen.Config{
-		OutPath:      dalBase + "/query",
-		OutFile:      dalBase + "/query/gen.go",
-		ModelPkgPath: dalBase + "/dao",
+		OutPath:      "./dal/query",
+		OutFile:      "./dal/query/gen.go",
+		ModelPkgPath: "./dao",
 		// if you want the nullable field generation property to be pointer type, set FieldNullable true
 		FieldNullable: false,
 		// if you want to generate type tags from database, set FieldWithTypeTag true
