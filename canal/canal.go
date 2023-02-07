@@ -21,13 +21,13 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/segmentio/kafka-go"
+	"github.com/trim21/errgo"
 	"go.uber.org/fx"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/driver"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/sys"
 	"github.com/bangumi/server/internal/search"

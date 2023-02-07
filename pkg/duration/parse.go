@@ -21,7 +21,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/trim21/errgo"
 )
 
 // ErrOverFlow is the error when int components too big like `1:61:00`.

@@ -17,9 +17,8 @@ package gerr
 import (
 	"errors"
 
+	"github.com/trim21/errgo"
 	"gorm.io/gorm"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 // ErrNotFound should be returned when a repo or service can't find an authorization.

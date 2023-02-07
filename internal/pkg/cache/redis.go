@@ -19,9 +19,9 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 

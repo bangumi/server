@@ -19,9 +19,9 @@ import (
 	"encoding/json"
 
 	"github.com/bytedance/sonic"
+	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {

@@ -26,6 +26,7 @@ import (
 	"github.com/bytedance/sonic/encoder"
 	"github.com/go-sql-driver/mysql"
 	"github.com/spf13/cobra"
+	"github.com/trim21/errgo"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -36,7 +37,6 @@ import (
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/driver"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 

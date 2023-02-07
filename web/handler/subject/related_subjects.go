@@ -20,12 +20,12 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"

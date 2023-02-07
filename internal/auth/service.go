@@ -21,6 +21,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
@@ -28,7 +29,6 @@ import (
 	"github.com/bangumi/server/internal/auth/internal/cachekey"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/cache"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/user"
 )
 

@@ -28,6 +28,7 @@ import (
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/samber/lo"
+	"github.com/trim21/errgo"
 	"github.com/trim21/pkg/queue"
 	"go.uber.org/zap"
 
@@ -35,7 +36,6 @@ import (
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/subject"
 )
 

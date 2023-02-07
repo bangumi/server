@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -28,7 +29,6 @@ import (
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 type mysqlRepo struct {

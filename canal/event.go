@@ -25,12 +25,13 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/minio/minio-go/v7"
 	"github.com/segmentio/kafka-go"
+	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/pkg/utils"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/web/session"
 )
@@ -74,7 +75,7 @@ func (e *eventHandler) start() error {
 
 		msg, err := e.reader.FetchMessage(context.Background())
 		if err != nil {
-			if errors.Is(err, io.EOF) || errgo.IsNetworkError(err) {
+			if errors.Is(err, io.EOF) || utils.IsNetworkError(err) {
 				return errgo.Wrap(err, "read message")
 			}
 

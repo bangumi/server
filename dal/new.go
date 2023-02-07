@@ -19,12 +19,12 @@ import (
 	"log"
 	"os"
 
+	"github.com/trim21/errgo"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 

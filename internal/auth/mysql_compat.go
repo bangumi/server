@@ -15,9 +15,8 @@
 package auth
 
 import (
+	"github.com/trim21/errgo"
 	"github.com/trim21/go-phpserialize"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func parseBool(s string) bool {

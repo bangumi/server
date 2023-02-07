@@ -19,6 +19,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 	"gorm.io/gen"
 	"gorm.io/gorm"
@@ -27,7 +28,6 @@ import (
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/subject"
 )
 

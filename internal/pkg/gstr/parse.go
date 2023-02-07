@@ -17,7 +17,7 @@ package gstr
 import (
 	"strconv"
 
-	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/trim21/errgo"
 )
 
 func ParseUint8(s string) (uint8, error) {

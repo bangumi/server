@@ -28,11 +28,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/internal/metrics"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/openapi"

@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/trim21/errgo"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
@@ -27,7 +28,6 @@ import (
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/pkg/driver"
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func GetQuery(tb testing.TB) *query.Query {

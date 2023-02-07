@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/trim21/errgo"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/naming/resolver"
 	"go.uber.org/zap"
@@ -31,7 +32,6 @@ import (
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 

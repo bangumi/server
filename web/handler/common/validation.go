@@ -26,8 +26,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
 	"github.com/labstack/echo/v4"
+	"github.com/trim21/errgo"
 
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/res"
 )
 

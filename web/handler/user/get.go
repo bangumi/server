@@ -20,9 +20,9 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/web/res"
 )
 

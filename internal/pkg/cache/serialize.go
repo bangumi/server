@@ -16,8 +16,7 @@ package cache
 
 import (
 	"github.com/bytedance/sonic"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
+	"github.com/trim21/errgo"
 )
 
 func marshalBytes(v any) ([]byte, error) {

@@ -20,13 +20,13 @@ import (
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func (r mysqlRepo) CountEpisodeRelated(ctx context.Context, episodeID model.EpisodeID) (int64, error) {

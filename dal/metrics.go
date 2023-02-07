@@ -18,9 +18,8 @@ import (
 	"database/sql"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/trim21/errgo"
 	"gorm.io/gorm"
-
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func setupMetrics(db *gorm.DB, conn *sql.DB) error {

@@ -19,9 +19,9 @@ import (
 	"errors"
 
 	"github.com/samber/lo"
+	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/user"

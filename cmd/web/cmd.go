@@ -19,6 +19,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
+	"github.com/trim21/errgo"
 	"go.uber.org/fx"
 
 	"github.com/bangumi/server/config"
@@ -34,7 +35,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/driver"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/revision"

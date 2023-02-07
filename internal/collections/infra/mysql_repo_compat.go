@@ -17,11 +17,11 @@ package infra
 // handle php serialization
 
 import (
+	"github.com/trim21/errgo"
 	"github.com/trim21/go-phpserialize"
 
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 type mysqlEpCollectionItem struct {

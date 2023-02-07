@@ -18,13 +18,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/cache"
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func NewCachedRepo(c cache.RedisCache, r Repo, log *zap.Logger) CachedRepo {

@@ -22,10 +22,10 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 

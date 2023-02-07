@@ -19,8 +19,9 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/trim21/errgo"
+
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 type Dam struct {

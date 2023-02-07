@@ -17,9 +17,9 @@ package driver
 import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/internal/pkg/errgo"
 )
 
 func NewS3(c config.AppConfig) (*minio.Client, error) {

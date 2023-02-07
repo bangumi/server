@@ -22,10 +22,10 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
+	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/errgo"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/req"
