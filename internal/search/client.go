@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/avast/retry-go/v4"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/samber/lo"
@@ -175,7 +176,22 @@ func (c *client) OnSubjectDelete(_ context.Context, id model.SubjectID) error {
 // UpsertSubject add subject to search backend.
 func (c *client) sendBatch(items []subjectIndex) {
 	c.log.Debug("send batch to meilisearch", zap.Int("len", len(items)))
-	_, err := c.subjectIndex.UpdateDocuments(items, "id")
+	err := retry.Do(
+		func() error {
+			_, err := c.subjectIndex.UpdateDocuments(items, "id")
+			return err
+		},
+		retry.OnRetry(func(n uint, err error) {
+			c.log.Warn("failed to send batch", zap.Uint("attempt", n), zap.Error(err))
+		}),
+
+		retry.DelayType(retry.BackOffDelay),
+		retry.Delay(time.Microsecond*100),
+		retry.Attempts(5), //nolint:gomnd
+		retry.RetryIf(func(err error) bool {
+			return errors.As(err, &meilisearch.Error{})
+		}),
+	)
 
 	if err != nil {
 		c.log.Error("failed to send batch", zap.Error(err))
