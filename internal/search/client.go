@@ -270,7 +270,7 @@ func (c *client) firstRun() {
 
 	ctx := context.Background()
 
-	maxSubject, err := c.q.Subject.WithContext(ctx).Limit(1).Order(c.q.Subject.ID.Desc()).First()
+	maxSubject, err := c.q.Subject.WithContext(ctx).Limit(1).Order(c.q.Subject.ID.Desc()).Take()
 	if err != nil {
 		c.log.Fatal("failed to get current max subject id", zap.Error(err))
 		return

@@ -59,7 +59,7 @@ func (r mysqlRepo) getSubjectCollection(
 	ctx context.Context, user model.UserID, subject model.SubjectID,
 ) (*collection.Subject, error) {
 	s, err := r.q.SubjectCollection.WithContext(ctx).
-		Where(r.q.SubjectCollection.UserID.Eq(user), r.q.SubjectCollection.SubjectID.Eq(subject)).First()
+		Where(r.q.SubjectCollection.UserID.Eq(user), r.q.SubjectCollection.SubjectID.Eq(subject)).Take()
 	if err != nil {
 		return nil, gerr.WrapGormError(err)
 	}
@@ -214,7 +214,7 @@ func (r mysqlRepo) GetSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 ) (collection.UserSubjectCollection, error) {
 	c, err := r.q.SubjectCollection.WithContext(ctx).
-		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).First()
+		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return collection.UserSubjectCollection{}, gerr.ErrSubjectNotCollected
@@ -245,7 +245,7 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 	d, err := r.q.EpCollection.WithContext(ctx).Where(
 		r.q.EpCollection.UserID.Eq(userID),
 		r.q.EpCollection.SubjectID.Eq(subjectID),
-	).First()
+	).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return collection.UserSubjectEpisodesCollection{}, nil
@@ -393,7 +393,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 	table := r.q.EpCollection
 	where := []gen.Condition{table.UserID.Eq(userID), table.SubjectID.Eq(subjectID)}
 
-	d, err := table.WithContext(ctx).Where(where...).First()
+	d, err := table.WithContext(ctx).Where(where...).Take()
 	if err != nil {
 		// 章节表在用到时才会创建
 		if errors.Is(err, gorm.ErrRecordNotFound) {

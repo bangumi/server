@@ -44,7 +44,7 @@ type mysqlRepo struct {
 }
 
 func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (UserInfo, []byte, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Email.Eq(email)).First()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Email.Eq(email)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return UserInfo{}, nil, gerr.ErrNotFound
@@ -81,7 +81,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		return UserInfo{}, errgo.Wrap(err, "parsing user id")
 	}
 
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(id)).First()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(id)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			m.log.Error("can't find user of access token",
@@ -103,7 +103,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 }
 
 func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission, error) {
-	r, err := m.q.UserGroup.WithContext(ctx).Where(m.q.UserGroup.ID.Eq(groupID)).First()
+	r, err := m.q.UserGroup.WithContext(ctx).Where(m.q.UserGroup.ID.Eq(groupID)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			m.log.Error("can't find permission for group", zap.Uint8("user_group_id", groupID))
@@ -233,7 +233,7 @@ func (m mysqlRepo) DeleteAccessToken(ctx context.Context, id uint32) (bool, erro
 }
 
 func (m mysqlRepo) GetTokenByID(ctx context.Context, id uint32) (AccessToken, error) {
-	record, err := m.q.AccessToken.WithContext(ctx).Where(m.q.AccessToken.ID.Eq(id)).First()
+	record, err := m.q.AccessToken.WithContext(ctx).Where(m.q.AccessToken.ID.Eq(id)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return AccessToken{}, gerr.ErrNotFound

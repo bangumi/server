@@ -47,7 +47,7 @@ func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID, filter Filter) (
 		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
 	}
 
-	s, err := q.First()
+	s, err := q.Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Subject{}, fmt.Errorf("%w: %d", gerr.ErrNotFound, id)

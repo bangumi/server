@@ -48,7 +48,7 @@ func (r mysqlRepo) count(ctx context.Context, userID model.UserID) (int64, error
 func (r mysqlRepo) Count(ctx context.Context, userID model.UserID) (int64, error) {
 	member, err := r.q.Member.WithContext(ctx).Where(
 		r.q.Member.ID.Eq(userID),
-	).Select(r.q.Member.ID, r.q.Member.NewNotify).First()
+	).Select(r.q.Member.ID, r.q.Member.NewNotify).Take()
 	if err != nil {
 		r.log.Error("unexpected error", zap.Error(err))
 		return 0, errgo.Wrap(err, "dal")

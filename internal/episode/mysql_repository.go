@@ -45,7 +45,7 @@ func (r mysqlRepo) WithQuery(query *query.Query) Repo {
 
 func (r mysqlRepo) Get(ctx context.Context, episodeID model.EpisodeID) (Episode, error) {
 	episode, err := r.q.Episode.WithContext(ctx).
-		Where(r.q.Episode.ID.Eq(episodeID), r.q.Episode.Ban.Eq(0)).Limit(1).First()
+		Where(r.q.Episode.ID.Eq(episodeID), r.q.Episode.Ban.Eq(0)).Limit(1).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return Episode{}, gerr.ErrNotFound
@@ -120,7 +120,7 @@ func (r mysqlRepo) firstEpisode(ctx context.Context, subjectID model.SubjectID) 
 			r.q.Episode.Type.Eq(TypeNormal),
 			r.q.Episode.Ban.Eq(0),
 		).
-		Order(r.q.Episode.Disc, r.q.Episode.Sort).Limit(1).First()
+		Order(r.q.Episode.Disc, r.q.Episode.Sort).Limit(1).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return 0, nil

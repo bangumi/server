@@ -132,7 +132,7 @@ func (r mysqlRepo) getMainMsg(
 	id model.PrivateMessageID,
 ) (*dao.PrivateMessage, error) {
 	do := r.q.PrivateMessage.WithContext(ctx)
-	msg, err := do.Where(r.q.PrivateMessage.ID.Eq(id)).First()
+	msg, err := do.Where(r.q.PrivateMessage.ID.Eq(id)).Take()
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
 	}

@@ -143,19 +143,19 @@ func start(out string) {
 }
 
 func getMaxID(q *query.Query) {
-	lastSubject, err := q.WithContext(ctx).Subject.Order(q.Subject.ID.Desc()).First()
+	lastSubject, err := q.WithContext(ctx).Subject.Order(q.Subject.ID.Desc()).Take()
 	if err != nil {
 		panic(err)
 	}
 	maxSubjectID = lastSubject.ID
 
-	lastCharacter, err := q.WithContext(ctx).Character.Order(q.Character.ID.Desc()).First()
+	lastCharacter, err := q.WithContext(ctx).Character.Order(q.Character.ID.Desc()).Take()
 	if err != nil {
 		panic(err)
 	}
 	maxCharacterID = lastCharacter.ID
 
-	lastPerson, err := q.WithContext(ctx).Person.Order(q.Person.ID.Desc()).First()
+	lastPerson, err := q.WithContext(ctx).Person.Order(q.Person.ID.Desc()).Take()
 	if err != nil {
 		panic(err)
 	}
@@ -305,7 +305,7 @@ type Episode struct {
 }
 
 func exportEpisodes(q *query.Query, w io.Writer) {
-	lastEpisode, err := q.WithContext(ctx).Episode.Order(q.Episode.ID.Desc()).First()
+	lastEpisode, err := q.WithContext(ctx).Episode.Order(q.Episode.ID.Desc()).Take()
 	if err != nil {
 		panic(err)
 	}

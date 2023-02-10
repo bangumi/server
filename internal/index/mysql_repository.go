@@ -54,7 +54,7 @@ func (r mysqlRepo) isNsfw(ctx context.Context, id model.IndexID) (bool, error) {
 
 func (r mysqlRepo) Get(ctx context.Context, id model.IndexID) (model.Index, error) {
 	i, err := r.q.Index.WithContext(ctx).
-		Where(r.q.Index.ID.Eq(id), r.q.Index.Ban.Is(false)).First()
+		Where(r.q.Index.ID.Eq(id), r.q.Index.Ban.Is(false)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Index{}, gerr.ErrNotFound

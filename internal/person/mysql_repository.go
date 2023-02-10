@@ -39,7 +39,7 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) Repo {
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id model.PersonID) (model.Person, error) {
-	p, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).Where(r.q.Person.ID.Eq(id)).First()
+	p, err := r.q.Person.WithContext(ctx).Joins(r.q.Person.Fields).Where(r.q.Person.ID.Eq(id)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Person{}, gerr.ErrNotFound

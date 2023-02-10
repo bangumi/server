@@ -41,7 +41,7 @@ type mysqlRepo struct {
 }
 
 func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (User, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(userID)).First()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(userID)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return User{}, gerr.ErrUserNotFound
@@ -55,7 +55,7 @@ func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (User, erro
 }
 
 func (m mysqlRepo) GetByName(ctx context.Context, username string) (User, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Username.Eq(username)).First()
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Username.Eq(username)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return User{}, gerr.ErrUserNotFound

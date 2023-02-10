@@ -91,7 +91,7 @@ func (r mysqlRepo) Create(
 
 func (r mysqlRepo) Get(ctx context.Context, key string) (Session, error) {
 	record, err := r.q.WithContext(ctx).WebSession.
-		Where(r.q.WebSession.Key.Eq(key), r.q.WebSession.ExpiredAt.Gte(time.Now().Unix())).First()
+		Where(r.q.WebSession.Key.Eq(key), r.q.WebSession.ExpiredAt.Gte(time.Now().Unix())).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return Session{}, gerr.ErrNotFound

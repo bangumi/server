@@ -88,7 +88,7 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.RevisionID) (m
 		return model.PersonRevision{}, errgo.Wrap(err, "dal")
 	}
 	data, err := r.q.RevisionText.WithContext(ctx).
-		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).First()
+		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
@@ -142,7 +142,7 @@ func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.RevisionID)
 	}
 
 	data, err := r.q.RevisionText.WithContext(ctx).
-		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).First()
+		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))

@@ -173,7 +173,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	r, err := table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	r, err := table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, now.Unix(), r.UpdatedTime)
@@ -186,12 +186,12 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	require.Zero(t, r.DoneTime)
 	require.Zero(t, r.OnHoldTime)
 
-	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid+1), table.UserID.Eq(uid)).First()
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid+1), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
 
-	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid+1)).First()
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid+1)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
@@ -224,7 +224,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionDone, now)
 	require.NoError(t, err)
 
-	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, now.Unix(), r.UpdatedTime)
@@ -244,7 +244,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionNone, now)
 	require.NoError(t, err)
 
-	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	var m2 map[uint32]struct {
@@ -276,7 +276,7 @@ func TestMysqlRepo_UpdateEpisodeCollection_create_ep_status(t *testing.T) {
 		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionDone, now)
 	require.NoError(t, err)
 
-	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).First()
+	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	var m map[uint32]struct {

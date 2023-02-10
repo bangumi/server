@@ -70,7 +70,7 @@ func (r mysqlRepo) GetEpisodeRelated(ctx context.Context, id model.RevisionID) (
 		return model.EpisodeRevision{}, wrapGORMError(err)
 	}
 
-	data, err := r.q.RevisionText.WithContext(ctx).Where(r.q.RevisionText.TextID.Eq(revision.TextID)).First()
+	data, err := r.q.RevisionText.WithContext(ctx).Where(r.q.RevisionText.TextID.Eq(revision.TextID)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))

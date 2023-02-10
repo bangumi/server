@@ -159,7 +159,7 @@ func TestMysqlRepo_Revoke(t *testing.T) {
 	require.NoError(t, err)
 	end := time.Now()
 
-	s, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).First()
+	s, err := q.WithContext(ctx).WebSession.Where(q.WebSession.Key.Eq(key)).Take()
 	require.NoError(t, err)
 	require.LessOrEqual(t, start.Unix(), s.ExpiredAt)
 	require.LessOrEqual(t, s.ExpiredAt, end.Unix())
