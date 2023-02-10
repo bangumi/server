@@ -44,15 +44,37 @@ func DisableDefaultHTTPLibrary(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func isDefaultUA(u string) bool {
-	return strings.HasPrefix(u, "Java/") ||
-		strings.HasPrefix(u, "axios/") ||
-		strings.HasPrefix(u, "okhttp/") ||
-		strings.HasPrefix(u, "go-resty/") ||
-		strings.HasPrefix(u, "Faraday v") ||
-		strings.HasPrefix(u, "node-fetch/") ||
-		strings.HasPrefix(u, "Go-http-client/") ||
-		strings.HasPrefix(u, "python-requests/") ||
-		strings.HasPrefix(u, "Apache-HttpClient/") ||
-		u == "node-fetch" ||
-		u == "database"
+	for _, s := range disabledUA {
+		if u == s {
+			return true
+		}
+	}
+
+	for _, prefix := range disabledPrefix {
+		if strings.HasPrefix(u, prefix) {
+			return true
+		}
+	}
+
+	return false
+}
+
+//nolint:gochecknoglobals
+var disabledUA = []string{
+	"undici",
+	"database",
+	"node-fetch",
+}
+
+//nolint:gochecknoglobals
+var disabledPrefix = []string{
+	"Java/",
+	"axios/",
+	"okhttp/",
+	"go-resty/",
+	"Faraday v",
+	"node-fetch/",
+	"Go-http-client/",
+	"python-requests/",
+	"Apache-HttpClient/",
 }
