@@ -54,15 +54,15 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	var compositeIds = make([]character.CompositeId, len(relations))
+	var compositeIds = make([]character.SubjectCompositeId, len(relations))
 	for i, relation := range relations {
-		compositeIds[i] = character.CompositeId{
+		compositeIds[i] = character.SubjectCompositeId{
 			CharacterID: relation.Character.ID,
 			SubjectID:   relation.Subject.ID,
 		}
 	}
 
-	subjectRelations, err := h.c.GetRelations(c.Request().Context(), compositeIds)
+	subjectRelations, err := h.c.GetSubjectRelationByIDs(c.Request().Context(), compositeIds)
 	if err != nil {
 		return errgo.Wrap(err, "CharacterRepo.GetRelations")
 	}

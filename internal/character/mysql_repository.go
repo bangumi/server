@@ -119,8 +119,8 @@ func (r mysqlRepo) GetSubjectRelated(
 	return rel, nil
 }
 
-func (r mysqlRepo) GetRelations(
-	ctx context.Context, ids []CompositeId,
+func (r mysqlRepo) GetSubjectRelationByIDs(
+	ctx context.Context, ids []SubjectCompositeId,
 ) ([]domain.SubjectCharacterRelation, error) {
 	cs := r.q.CharacterSubjects
 	inOperand := make([][2]uint32, len(ids))

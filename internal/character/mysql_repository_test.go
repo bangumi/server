@@ -112,7 +112,7 @@ func TestMysqlRepo_GetRelations(t *testing.T) {
 	t.Parallel()
 
 	repo := getRepo(t)
-	r, err := repo.GetRelations(context.TODO(), []character.CompositeId{
+	r, err := repo.GetSubjectRelationByIDs(context.TODO(), []character.SubjectCompositeId{
 		{CharacterID: 1, SubjectID: 8},
 		{CharacterID: 1, SubjectID: 793},
 		{CharacterID: 1, SubjectID: 32214},
