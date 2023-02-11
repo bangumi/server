@@ -22,6 +22,7 @@ import (
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
@@ -42,7 +43,16 @@ func (h Character) GetRelatedPersons(c echo.Context) error {
 
 	casts, err := h.person.GetCharacterRelated(c.Request().Context(), id)
 	if err != nil {
-		return errgo.Wrap(err, "repo.GetCharacterRelated")
+		return errgo.Wrap(err, "personRepo.GetCharacterRelated")
+	}
+
+	subjects, err := h.subject.GetCharacterRelated(c.Request().Context(), id)
+	if err != nil {
+		return errgo.Wrap(err, "subjectRepo.GetCharacterRelated")
+	}
+	mSubjectRelations := make(map[model.SubjectID]uint8, len(subjects))
+	for _, rel := range subjects {
+		mSubjectRelations[rel.SubjectID] = rel.TypeID
 	}
 
 	var response = make([]res.CharacterRelatedPerson, len(casts))
@@ -55,6 +65,7 @@ func (h Character) GetRelatedPersons(c echo.Context) error {
 			SubjectID:     cast.Subject.ID,
 			SubjectName:   cast.Subject.Name,
 			SubjectNameCn: cast.Subject.NameCN,
+			Staff:         res.CharacterStaffString(mSubjectRelations[cast.Subject.ID]),
 		}
 	}
 

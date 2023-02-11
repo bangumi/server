@@ -27,4 +27,11 @@ type Repo interface {
 
 	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]domain.PersonCharacterRelation, error)
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]domain.SubjectCharacterRelation, error)
+
+	GetRelations(ctx context.Context, ids []CompositeId) ([]domain.SubjectCharacterRelation, error)
+}
+
+type CompositeId struct {
+	CharacterID model.CharacterID
+	SubjectID   model.SubjectID
 }

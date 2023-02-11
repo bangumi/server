@@ -144,6 +144,7 @@ type PersonRelatedCharacter struct {
 	SubjectName   string            `json:"subject_name"`
 	SubjectNameCn string            `json:"subject_name_cn"`
 	SubjectID     model.SubjectID   `json:"subject_id"`
+	Staff         string            `json:"staff"`
 	ID            model.CharacterID `json:"id"`
 	Type          uint8             `json:"type" doc:"character type"`
 }
@@ -154,6 +155,7 @@ type CharacterRelatedPerson struct {
 	SubjectName   string          `json:"subject_name"`
 	SubjectNameCn string          `json:"subject_name_cn"`
 	SubjectID     model.SubjectID `json:"subject_id"`
+	Staff         string          `json:"staff"`
 	ID            model.PersonID  `json:"id"`
 	Type          uint8           `json:"type" doc:"person type"`
 }

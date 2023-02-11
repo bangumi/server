@@ -23,6 +23,7 @@ import (
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/req"
@@ -53,8 +54,33 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
+	var compositeIds = make([]character.CompositeId, len(relations))
+	for i, relation := range relations {
+		compositeIds[i] = character.CompositeId{
+			CharacterID: relation.Character.ID,
+			SubjectID:   relation.Subject.ID,
+		}
+	}
+
+	subjectRelations, err := h.c.GetRelations(c.Request().Context(), compositeIds)
+	if err != nil {
+		return errgo.Wrap(err, "CharacterRepo.GetRelations")
+	}
+
+	var mSubjectRelations = make(map[model.CharacterID]map[model.SubjectID]uint8)
+	for _, rel := range subjectRelations {
+		if mSubjectRelations[rel.CharacterID] == nil {
+			mSubjectRelations[rel.CharacterID] = make(map[model.SubjectID]uint8)
+		}
+		mSubjectRelations[rel.CharacterID][rel.SubjectID] = rel.TypeID
+	}
+
 	var response = make([]res.PersonRelatedCharacter, len(relations))
 	for i, rel := range relations {
+		var subjectTypeId uint8
+		if m2 := mSubjectRelations[rel.Character.ID]; m2 != nil {
+			subjectTypeId = m2[rel.Subject.ID]
+		}
 		response[i] = res.PersonRelatedCharacter{
 			ID:            rel.Character.ID,
 			Name:          rel.Character.Name,
@@ -63,6 +89,7 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 			SubjectID:     rel.Subject.ID,
 			SubjectName:   rel.Subject.Name,
 			SubjectNameCn: rel.Subject.NameCN,
+			Staff:         res.CharacterStaffString(subjectTypeId),
 		}
 	}
 

@@ -39,3 +39,16 @@ var GenderMap = map[uint8]string{
 	1: "male",
 	2: "female",
 }
+
+func CharacterStaffString(i uint8) string {
+	switch i {
+	case 1:
+		return "主角"
+	case 2:
+		return "配角"
+	case 3:
+		return "客串"
+	}
+
+	return ""
+}
