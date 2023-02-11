@@ -246,15 +246,15 @@ func (_c *CharacterRepo_GetSubjectRelated_Call) RunAndReturn(run func(context.Co
 }
 
 // GetSubjectRelationByIDs provides a mock function with given fields: ctx, ids
-func (_m *CharacterRepo) GetSubjectRelationByIDs(ctx context.Context, ids []character.SubjectCompositeId) ([]domain.SubjectCharacterRelation, error) {
+func (_m *CharacterRepo) GetSubjectRelationByIDs(ctx context.Context, ids []character.SubjectCompositeID) ([]domain.SubjectCharacterRelation, error) {
 	ret := _m.Called(ctx, ids)
 
 	var r0 []domain.SubjectCharacterRelation
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, []character.SubjectCompositeId) ([]domain.SubjectCharacterRelation, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, []character.SubjectCompositeID) ([]domain.SubjectCharacterRelation, error)); ok {
 		return rf(ctx, ids)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, []character.SubjectCompositeId) []domain.SubjectCharacterRelation); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, []character.SubjectCompositeID) []domain.SubjectCharacterRelation); ok {
 		r0 = rf(ctx, ids)
 	} else {
 		if ret.Get(0) != nil {
@@ -262,7 +262,7 @@ func (_m *CharacterRepo) GetSubjectRelationByIDs(ctx context.Context, ids []char
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, []character.SubjectCompositeId) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, []character.SubjectCompositeID) error); ok {
 		r1 = rf(ctx, ids)
 	} else {
 		r1 = ret.Error(1)
@@ -283,9 +283,9 @@ func (_e *CharacterRepo_Expecter) GetSubjectRelationByIDs(ctx interface{}, ids i
 	return &CharacterRepo_GetSubjectRelationByIDs_Call{Call: _e.mock.On("GetSubjectRelationByIDs", ctx, ids)}
 }
 
-func (_c *CharacterRepo_GetSubjectRelationByIDs_Call) Run(run func(ctx context.Context, ids []character.SubjectCompositeId)) *CharacterRepo_GetSubjectRelationByIDs_Call {
+func (_c *CharacterRepo_GetSubjectRelationByIDs_Call) Run(run func(ctx context.Context, ids []character.SubjectCompositeID)) *CharacterRepo_GetSubjectRelationByIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]character.SubjectCompositeId))
+		run(args[0].(context.Context), args[1].([]character.SubjectCompositeID))
 	})
 	return _c
 }
@@ -295,7 +295,7 @@ func (_c *CharacterRepo_GetSubjectRelationByIDs_Call) Return(_a0 []domain.Subjec
 	return _c
 }
 
-func (_c *CharacterRepo_GetSubjectRelationByIDs_Call) RunAndReturn(run func(context.Context, []character.SubjectCompositeId) ([]domain.SubjectCharacterRelation, error)) *CharacterRepo_GetSubjectRelationByIDs_Call {
+func (_c *CharacterRepo_GetSubjectRelationByIDs_Call) RunAndReturn(run func(context.Context, []character.SubjectCompositeID) ([]domain.SubjectCharacterRelation, error)) *CharacterRepo_GetSubjectRelationByIDs_Call {
 	_c.Call.Return(run)
 	return _c
 }

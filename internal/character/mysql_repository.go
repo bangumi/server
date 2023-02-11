@@ -120,13 +120,13 @@ func (r mysqlRepo) GetSubjectRelated(
 }
 
 func (r mysqlRepo) GetSubjectRelationByIDs(
-	ctx context.Context, ids []SubjectCompositeId,
+	ctx context.Context, ids []SubjectCompositeID,
 ) ([]domain.SubjectCharacterRelation, error) {
 	cs := r.q.CharacterSubjects
 	inOperand := make([][2]uint32, len(ids))
 	for k, id := range ids {
 		inOperand[k][0], inOperand[k][1] =
-			uint32(id.CharacterID), uint32(id.SubjectID)
+			id.CharacterID, id.SubjectID
 	}
 	relations, err := cs.WithContext(ctx).
 		Where(cs.WithContext(ctx).Columns(cs.CharacterID, cs.SubjectID).

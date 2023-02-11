@@ -41,7 +41,6 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
-
 		return errgo.Wrap(err, "failed to get person")
 	}
 
@@ -54,19 +53,17 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 		return errgo.Wrap(err, "SubjectRepo.GetPersonRelated")
 	}
 
-	var compositeIds = make([]character.SubjectCompositeId, len(relations))
+	var compositeIDs = make([]character.SubjectCompositeID, len(relations))
 	for i, relation := range relations {
-		compositeIds[i] = character.SubjectCompositeId{
+		compositeIDs[i] = character.SubjectCompositeID{
 			CharacterID: relation.Character.ID,
 			SubjectID:   relation.Subject.ID,
 		}
 	}
-
-	subjectRelations, err := h.c.GetSubjectRelationByIDs(c.Request().Context(), compositeIds)
+	subjectRelations, err := h.c.GetSubjectRelationByIDs(c.Request().Context(), compositeIDs)
 	if err != nil {
 		return errgo.Wrap(err, "CharacterRepo.GetRelations")
 	}
-
 	var mSubjectRelations = make(map[model.CharacterID]map[model.SubjectID]uint8)
 	for _, rel := range subjectRelations {
 		if mSubjectRelations[rel.CharacterID] == nil {
@@ -77,9 +74,9 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 
 	var response = make([]res.PersonRelatedCharacter, len(relations))
 	for i, rel := range relations {
-		var subjectTypeId uint8
+		var subjectTypeID uint8
 		if m2 := mSubjectRelations[rel.Character.ID]; m2 != nil {
-			subjectTypeId = m2[rel.Subject.ID]
+			subjectTypeID = m2[rel.Subject.ID]
 		}
 		response[i] = res.PersonRelatedCharacter{
 			ID:            rel.Character.ID,
@@ -89,7 +86,7 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 			SubjectID:     rel.Subject.ID,
 			SubjectName:   rel.Subject.Name,
 			SubjectNameCn: rel.Subject.NameCN,
-			Staff:         res.CharacterStaffString(subjectTypeId),
+			Staff:         res.CharacterStaffString(subjectTypeID),
 		}
 	}
 

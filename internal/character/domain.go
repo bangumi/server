@@ -28,10 +28,10 @@ type Repo interface {
 	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]domain.PersonCharacterRelation, error)
 	GetSubjectRelated(ctx context.Context, subjectID model.SubjectID) ([]domain.SubjectCharacterRelation, error)
 
-	GetSubjectRelationByIDs(ctx context.Context, ids []SubjectCompositeId) ([]domain.SubjectCharacterRelation, error)
+	GetSubjectRelationByIDs(ctx context.Context, ids []SubjectCompositeID) ([]domain.SubjectCharacterRelation, error)
 }
 
-type SubjectCompositeId struct {
+type SubjectCompositeID struct {
 	CharacterID model.CharacterID
 	SubjectID   model.SubjectID
 }
