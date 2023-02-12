@@ -278,7 +278,7 @@ type CharacterRepo_GetSubjectRelationByIDs_Call struct {
 
 // GetSubjectRelationByIDs is a helper method to define mock.On call
 //   - ctx context.Context
-//   - ids []character.SubjectCompositeId
+//   - ids []character.SubjectCompositeID
 func (_e *CharacterRepo_Expecter) GetSubjectRelationByIDs(ctx interface{}, ids interface{}) *CharacterRepo_GetSubjectRelationByIDs_Call {
 	return &CharacterRepo_GetSubjectRelationByIDs_Call{Call: _e.mock.On("GetSubjectRelationByIDs", ctx, ids)}
 }
