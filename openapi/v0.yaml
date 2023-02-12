@@ -1779,6 +1779,9 @@ components:
         subject_name_cn:
           title: Subject Name Cn
           type: string
+        staff:
+          title: Staff
+          type: string
     CharacterType:
       title: CharacterType
       enum:
@@ -2386,6 +2389,9 @@ components:
           type: string
         subject_name_cn:
           title: Subject Name Cn
+          type: string
+        staff:
+          title: Staff
           type: string
     PersonDetail:
       title: PersonDetail
