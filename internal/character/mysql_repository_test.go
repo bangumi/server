@@ -116,6 +116,7 @@ func TestMysqlRepo_GetRelations(t *testing.T) {
 		{CharacterID: 1, SubjectID: 8},
 		{CharacterID: 1, SubjectID: 793},
 		{CharacterID: 1, SubjectID: 32214},
+		{CharacterID: 1, SubjectID: 9},
 	})
 	require.NoError(t, err)
 
@@ -126,6 +127,13 @@ func TestMysqlRepo_GetRelations(t *testing.T) {
 			{TypeID: 1, SubjectID: 793, CharacterID: 1},
 			{TypeID: 1, SubjectID: 32214, CharacterID: 1},
 		},
+		r,
+	)
+
+	r, err = repo.GetSubjectRelationByIDs(context.TODO(), []character.SubjectCompositeID{})
+	require.NoError(t, err)
+	require.Equal(t,
+		[]domain.SubjectCharacterRelation{},
 		r,
 	)
 }

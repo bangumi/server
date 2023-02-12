@@ -122,6 +122,9 @@ func (r mysqlRepo) GetSubjectRelated(
 func (r mysqlRepo) GetSubjectRelationByIDs(
 	ctx context.Context, ids []SubjectCompositeID,
 ) ([]domain.SubjectCharacterRelation, error) {
+	if len(ids) == 0 {
+		return []domain.SubjectCharacterRelation{}, nil
+	}
 	cs := r.q.CharacterSubjects
 	inOperand := make([][2]uint32, len(ids))
 	for k, id := range ids {
