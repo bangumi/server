@@ -49,7 +49,7 @@ services:
 
   meilisearch:
     container_name: "chii-meilisearch"
-    image: "getmeili/meilisearch:v0.30"
+    image: "getmeili/meilisearch:v1.0"
     command: meilisearch --env production
     environment:
       MEILI_ENABLE_METRICS_ROUTE: "true"
