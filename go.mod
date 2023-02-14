@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/avast/retry-go/v4 v4.3.3
-	github.com/bytedance/sonic v1.7.0
+	github.com/bytedance/sonic v1.8.0
 	github.com/elliotchance/phpserialize v1.3.3
 	github.com/globocom/go-redis-prometheus v0.4.0
 	github.com/go-playground/locales v0.14.1
