@@ -21,8 +21,8 @@ import (
 	"io"
 	"sync/atomic"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/minio/minio-go/v7"
+	"github.com/redis/go-redis/v9"
 	"github.com/segmentio/kafka-go"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"

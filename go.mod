@@ -5,12 +5,10 @@ go 1.19
 require (
 	github.com/avast/retry-go/v4 v4.3.3
 	github.com/elliotchance/phpserialize v1.3.3
-	github.com/globocom/go-redis-prometheus v0.4.0
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.11.2
-	github.com/go-redis/redis/v8 v8.11.5
-	github.com/go-redis/redismock/v8 v8.11.5
+	github.com/go-redis/redismock/v9 v9.0.2
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/gookit/goutil v0.6.4
@@ -22,6 +20,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.48
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.14.0
+	github.com/redis/go-redis/v9 v9.0.2
 	github.com/samber/lo v1.37.0
 	github.com/segmentio/kafka-go v0.4.38
 	github.com/spf13/cobra v1.6.1
@@ -29,6 +28,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	github.com/trim21/errgo v0.0.2
 	github.com/trim21/go-phpserialize v0.0.16
+	github.com/trim21/go-redis-prometheus v0.0.0
 	github.com/trim21/htest v0.0.3
 	github.com/trim21/pkg v0.0.3
 	go.etcd.io/etcd/client/v3 v3.5.7

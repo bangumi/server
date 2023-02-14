@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-redis/redismock/v8"
+	redismock "github.com/go-redis/redismock/v9"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/pkg/cache"
