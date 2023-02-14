@@ -15,9 +15,9 @@
 package collection_test
 
 import (
+	"encoding/json"
 	"testing"
 
-	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/collections/domain/collection"
@@ -39,11 +39,11 @@ func TestEpisodeCollection_UnmarshalJSON(t *testing.T) {
 	for _, tc := range testCases {
 		var r collection.EpisodeCollection
 		if tc.Err {
-			require.Error(t, sonic.Unmarshal(tc.Raw, &r))
+			require.Error(t, json.Unmarshal(tc.Raw, &r))
 			continue
 		}
 
-		require.NoError(t, sonic.Unmarshal(tc.Raw, &r))
+		require.NoError(t, json.Unmarshal(tc.Raw, &r))
 		require.Equal(t, tc.Expected, r)
 	}
 }
@@ -64,11 +64,11 @@ func TestSubjectCollection_UnmarshalJSON(t *testing.T) {
 	for _, tc := range testCases {
 		var r collection.SubjectCollection
 		if tc.Err {
-			require.Error(t, sonic.Unmarshal(tc.Raw, &r))
+			require.Error(t, json.Unmarshal(tc.Raw, &r))
 			continue
 		}
 
-		require.NoError(t, sonic.Unmarshal(tc.Raw, &r))
+		require.NoError(t, json.Unmarshal(tc.Raw, &r))
 		require.Equal(t, tc.Expected, r)
 	}
 }

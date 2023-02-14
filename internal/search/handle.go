@@ -23,8 +23,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bytedance/sonic"
-	"github.com/bytedance/sonic/decoder"
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/trim21/errgo"
@@ -81,7 +79,7 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 
 	var r Req
-	if err = decoder.NewStreamDecoder(ctx.Request().Body).Decode(&r); err != nil {
+	if err = json.NewDecoder(ctx.Request().Body).Decode(&r); err != nil {
 		return res.JSONError(ctx, err)
 	}
 
@@ -95,7 +93,7 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 
 	var hits []hit
-	if err = sonic.Unmarshal(result.Hits, &hits); err != nil {
+	if err = json.Unmarshal(result.Hits, &hits); err != nil {
 		return errgo.Wrap(err, "json.Unmarshal")
 	}
 	ids := slice.Map(hits, func(h hit) model.SubjectID { return h.ID })
@@ -166,7 +164,7 @@ func (c *client) doSearch(
 	}
 
 	var r meiliSearchResponse
-	if err := sonic.Unmarshal(*raw, &r); err != nil {
+	if err := json.Unmarshal(*raw, &r); err != nil {
 		return nil, errgo.Wrap(err, "json.Unmarshal")
 	}
 

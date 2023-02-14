@@ -15,10 +15,10 @@
 package notification_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"testing"
 
-	"github.com/bytedance/sonic"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -53,6 +53,6 @@ func TestNotification_Count(t *testing.T) {
 		ExpectCode(http.StatusOK)
 
 	var v int
-	err := sonic.Unmarshal(resp.Body, &v)
+	err := json.Unmarshal(resp.Body, &v)
 	require.NoError(t, err)
 }

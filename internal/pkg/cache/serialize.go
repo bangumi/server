@@ -15,23 +15,24 @@
 package cache
 
 import (
-	"github.com/bytedance/sonic"
+	"encoding/json"
+
 	"github.com/trim21/errgo"
 )
 
 func marshalBytes(v any) ([]byte, error) {
-	b, err := sonic.Marshal(v)
+	b, err := json.Marshal(v)
 	if err != nil {
-		return nil, errgo.Wrap(err, "sonic.Marshal")
+		return nil, errgo.Wrap(err, "json.Marshal")
 	}
 
 	return b, nil
 }
 
 func unmarshalBytes(b []byte, v any) error {
-	err := sonic.Unmarshal(b, v)
+	err := json.Unmarshal(b, v)
 	if err != nil {
-		return errgo.Wrap(err, "sonic.Unmarshal")
+		return errgo.Wrap(err, "json.Unmarshal")
 	}
 
 	return nil

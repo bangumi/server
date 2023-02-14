@@ -15,9 +15,9 @@
 package null_test
 
 import (
+	"encoding/json"
 	"testing"
 
-	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/pkg/null"
@@ -57,10 +57,10 @@ func TestNull_UnmarshalJSON(t *testing.T) {
 	t.Parallel()
 
 	var n null.Int
-	require.NoError(t, sonic.Unmarshal([]byte("10"), &n))
+	require.NoError(t, json.Unmarshal([]byte("10"), &n))
 	require.EqualValues(t, 10, n.Value)
 
 	n = null.Int{}
-	require.NoError(t, sonic.Unmarshal([]byte(" null "), &n))
+	require.NoError(t, json.Unmarshal([]byte(" null "), &n))
 	require.False(t, false, n.Set)
 }

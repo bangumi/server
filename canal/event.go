@@ -21,7 +21,6 @@ import (
 	"io"
 	"sync/atomic"
 
-	"github.com/bytedance/sonic"
 	"github.com/go-redis/redis/v8"
 	"github.com/minio/minio-go/v7"
 	"github.com/segmentio/kafka-go"
@@ -121,12 +120,12 @@ func (e *eventHandler) onMessage(msg kafka.Message) error {
 	}
 
 	var k messageKey
-	if err := sonic.Unmarshal(msg.Key, &k); err != nil {
+	if err := json.Unmarshal(msg.Key, &k); err != nil {
 		return nil
 	}
 
 	var v messageValue
-	if err := sonic.Unmarshal(msg.Value, &v); err != nil {
+	if err := json.Unmarshal(msg.Value, &v); err != nil {
 		return nil
 	}
 

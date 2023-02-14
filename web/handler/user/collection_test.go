@@ -20,7 +20,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bytedance/sonic"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -71,7 +70,7 @@ func TestUser_ListCollection(t *testing.T) {
 		ExpectCode(http.StatusOK)
 
 	var data []res.SubjectCollection
-	require.NoError(t, sonic.Unmarshal(r.Data, &data))
+	require.NoError(t, json.Unmarshal(r.Data, &data))
 
 	require.Len(t, data, 1)
 

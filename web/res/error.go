@@ -15,6 +15,8 @@
 package res
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -47,7 +49,23 @@ func (e HTTPError) Error() string {
 	return strconv.Itoa(e.Code) + ": " + e.Msg
 }
 
+//nolint:errorlint
 func JSONError(c echo.Context, err error) error {
+	if ute, ok := err.(*json.UnmarshalTypeError); ok {
+		return c.JSON(http.StatusInternalServerError, Error{
+			Title: "Internal Server Error",
+			Description: fmt.Sprintf("Unmarshal type error: expected=%v, got=%v, field=%v, offset=%v",
+				ute.Type, ute.Value, ute.Field, ute.Offset),
+		})
+	}
+
+	if se, ok := err.(*json.SyntaxError); ok {
+		return c.JSON(http.StatusInternalServerError, Error{
+			Title:       "Internal Server Error",
+			Description: fmt.Sprintf("Syntax error: offset=%v, error=%v", se.Offset, se.Error()),
+		})
+	}
+
 	return c.JSON(http.StatusBadRequest, Error{
 		Title:       "BodyJSON Error",
 		Description: "can't decode request body as json or value doesn't match expected type",

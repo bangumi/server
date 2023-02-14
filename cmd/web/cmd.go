@@ -15,7 +15,8 @@
 package web
 
 import (
-	"github.com/bytedance/sonic"
+	"encoding/json"
+
 	"github.com/go-resty/resty/v2"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
@@ -67,8 +68,8 @@ func start() error {
 			driver.NewMysqlConnectionPool, // mysql
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
-				httpClient.JSONUnmarshal = sonic.Unmarshal
-				httpClient.JSONMarshal = sonic.Marshal
+				httpClient.JSONUnmarshal = json.Unmarshal
+				httpClient.JSONMarshal = json.Marshal
 				return httpClient
 			},
 		),

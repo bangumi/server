@@ -16,8 +16,6 @@ package null
 
 import (
 	"encoding/json"
-
-	"github.com/bytedance/sonic"
 )
 
 var _ json.Unmarshaler = (*Null[any])(nil)
@@ -71,12 +69,12 @@ func (t Null[T]) Interface() any {
 	return nil
 }
 
-// UnmarshalJSON implements sonic.Unmarshaler.
+// UnmarshalJSON implements json.Unmarshaler.
 func (t *Null[T]) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
 		return nil
 	}
 
 	t.Set = true
-	return sonic.Unmarshal(data, &t.Value) //nolint:wrapcheck
+	return json.Unmarshal(data, &t.Value) //nolint:wrapcheck
 }

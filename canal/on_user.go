@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bytedance/sonic"
 	"github.com/minio/minio-go/v7"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -32,9 +31,9 @@ import (
 
 func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error {
 	var k UserKey
-	if err := sonic.Unmarshal(key, &k); err != nil {
+	if err := json.Unmarshal(key, &k); err != nil {
 		e.log.Error("failed to unmarshal json", zap.Error(err))
-		return errgo.Wrap(err, "sonic.Unmarshal")
+		return errgo.Wrap(err, "json.Unmarshal")
 	}
 
 	switch payload.Op {
@@ -42,11 +41,11 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error 
 		return nil
 	case opUpdate:
 		var before userPayload
-		if err := sonic.Unmarshal(payload.Before, &before); err != nil {
+		if err := json.Unmarshal(payload.Before, &before); err != nil {
 			return errgo.Wrap(err, "json")
 		}
 		var after userPayload
-		if err := sonic.Unmarshal(payload.After, &after); err != nil {
+		if err := json.Unmarshal(payload.After, &after); err != nil {
 			return errgo.Wrap(err, "json")
 		}
 
@@ -112,7 +111,7 @@ type redisUserChannel struct {
 }
 
 func (r redisUserChannel) MarshalBinary() ([]byte, error) {
-	return sonic.Marshal(r) //nolint:wrapcheck
+	return json.Marshal(r) //nolint:wrapcheck
 }
 
 type UserKey struct {

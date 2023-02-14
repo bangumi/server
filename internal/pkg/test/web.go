@@ -15,9 +15,9 @@
 package test
 
 import (
+	"encoding/json"
 	"testing"
 
-	"github.com/bytedance/sonic"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/labstack/echo/v4"
@@ -77,8 +77,8 @@ func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 	var e *echo.Echo
 
 	httpClient := resty.New().SetJSONEscapeHTML(false)
-	httpClient.JSONUnmarshal = sonic.Unmarshal
-	httpClient.JSONMarshal = sonic.Marshal
+	httpClient.JSONUnmarshal = json.Unmarshal
+	httpClient.JSONMarshal = json.Marshal
 
 	var options = []fx.Option{
 		fx.NopLogger,

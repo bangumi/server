@@ -16,10 +16,10 @@ package session
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -46,9 +46,9 @@ func (r mysqlRepo) Create(
 	createdAt := time.Now().Unix()
 	expiredAt := createdAt + gtime.OneWeekSec
 	s := Session{RegTime: regTime, UserID: userID, ExpiredAt: expiredAt}
-	encodedJSON, err := sonic.Marshal(s)
+	encodedJSON, err := json.Marshal(s)
 	if err != nil {
-		return "", Session{}, errgo.Wrap(err, "sonic.MarshalWithOption")
+		return "", Session{}, errgo.Wrap(err, "json.Marshal")
 	}
 
 	tx := r.q.Begin()
@@ -101,8 +101,8 @@ func (r mysqlRepo) Get(ctx context.Context, key string) (Session, error) {
 	}
 
 	var s Session
-	if err = sonic.Unmarshal(record.Value, &s); err != nil {
-		return Session{}, errgo.Wrap(err, "sonic.Unmarshal")
+	if err = json.Unmarshal(record.Value, &s); err != nil {
+		return Session{}, errgo.Wrap(err, "json.Unmarshal")
 	}
 
 	s.UserID = record.UserID

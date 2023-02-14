@@ -16,11 +16,11 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"strconv"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -141,7 +141,7 @@ func (m mysqlRepo) CreateAccessToken(
 		expiredAt = time.Time{}
 	}
 
-	infoByte, err := sonic.Marshal(info)
+	infoByte, err := json.Marshal(info)
 	if err != nil {
 		// marshal simple struct should never fail
 		m.log.Fatal("marshal simple struct should never fail",
@@ -198,7 +198,7 @@ func convertAccessToken(t *dao.AccessToken) AccessToken {
 	case TokenTypeAccessToken:
 		if len(t.Info) > 0 {
 			var info TokenInfo
-			if err := sonic.Unmarshal(t.Info, &info); err != nil {
+			if err := json.Unmarshal(t.Info, &info); err != nil {
 				logger.Fatal("unexpected error when trying to unmarshal json data",
 					zap.Error(err), zap.ByteString("raw", t.Info))
 			}

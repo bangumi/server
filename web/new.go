@@ -23,8 +23,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic/decoder"
-	"github.com/bytedance/sonic/encoder"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -43,27 +41,9 @@ import (
 const headerProcessTime = "x-process-time-ms"
 const headerServerVersion = "x-server-version"
 
-type echoJSONSerializer struct {
-}
-
-func (e echoJSONSerializer) Serialize(c echo.Context, i any, indent string) error {
-	enc := encoder.NewStreamEncoder(c.Response())
-
-	enc.SetIndent("", indent)
-
-	return enc.Encode(i) //nolint:wrapcheck
-}
-
-func (e echoJSONSerializer) Deserialize(c echo.Context, i any) error {
-	return decoder.NewStreamDecoder(c.Request().Body).Decode(i) //nolint:wrapcheck
-}
-
-var _ echo.JSONSerializer = echoJSONSerializer{}
-
 //nolint:funlen
 func New() *echo.Echo {
 	app := echo.New()
-	app.JSONSerializer = echoJSONSerializer{}
 	app.HTTPErrorHandler = getDefaultErrorHandler()
 	app.HideBanner = true
 	app.HidePort = true
@@ -148,7 +128,6 @@ func New() *echo.Echo {
 // default production echo app handle panic, this doesn't.
 func NewTestingApp() *echo.Echo {
 	app := echo.New()
-	app.JSONSerializer = echoJSONSerializer{}
 	app.HTTPErrorHandler = getDefaultErrorHandler()
 	app.HideBanner = true
 	app.HidePort = true

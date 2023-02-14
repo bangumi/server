@@ -15,12 +15,12 @@
 package web
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/bytedance/sonic"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 
@@ -45,7 +45,7 @@ func TestDefaultErrorHandler_resError(t *testing.T) {
 	content := resp.Body.Bytes()
 
 	var body res.Error
-	require.NoError(t, sonic.Unmarshal(content, &body))
+	require.NoError(t, json.Unmarshal(content, &body))
 
 	require.Equal(t, "mm", body.Description)
 	require.EqualValues(t, http.StatusBadRequest, resp.Code)

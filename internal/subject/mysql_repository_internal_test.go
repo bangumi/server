@@ -15,11 +15,11 @@
 package subject
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
 
-	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/require"
 )
 
@@ -34,7 +34,7 @@ func TestParseTags(t *testing.T) {
 	require.NoError(t, err)
 
 	var testCases []testData
-	require.NoError(t, sonic.Unmarshal(raw, &testCases))
+	require.NoError(t, json.Unmarshal(raw, &testCases))
 
 	for i, tc := range testCases {
 		tags, err := parseTags([]byte(tc.FieldTags))

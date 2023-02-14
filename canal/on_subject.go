@@ -18,7 +18,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/bytedance/sonic"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/internal/model"
@@ -26,7 +25,7 @@ import (
 
 func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {
 	var k SubjectKey
-	if err := sonic.Unmarshal(key, &k); err != nil {
+	if err := json.Unmarshal(key, &k); err != nil {
 		return nil
 	}
 
@@ -35,7 +34,7 @@ func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {
 
 func (e *eventHandler) OnSubjectField(key json.RawMessage, payload payload) error {
 	var k SubjectFieldKey
-	if err := sonic.Unmarshal(key, &k); err != nil {
+	if err := json.Unmarshal(key, &k); err != nil {
 		return nil
 	}
 

@@ -18,12 +18,12 @@ package archive
 import (
 	"archive/zip"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
-	"github.com/bytedance/sonic/encoder"
 	"github.com/go-sql-driver/mysql"
 	"github.com/spf13/cobra"
 	"github.com/trim21/errgo"
@@ -439,7 +439,7 @@ func exportPersonCharacterRelations(q *query.Query, w io.Writer) {
 }
 
 func encode(w io.Writer, object any) {
-	if err := encoder.NewStreamEncoder(w).Encode(object); err != nil {
+	if err := json.NewEncoder(w).Encode(object); err != nil {
 		panic(err)
 	}
 }

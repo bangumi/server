@@ -19,9 +19,8 @@ package vars
 
 import (
 	_ "embed"
+	"encoding/json"
 	"log"
-
-	"github.com/bytedance/sonic"
 
 	"github.com/bangumi/server/internal/model"
 )
@@ -55,17 +54,17 @@ var (
 
 //nolint:gochecknoinits
 func init() {
-	if err := sonic.Unmarshal(staffRaw, &StaffMap); err != nil {
+	if err := json.Unmarshal(staffRaw, &StaffMap); err != nil {
 		log.Panicln("can't unmarshal raw staff json to go type", err)
 	}
 	staffRaw = nil
 
-	if err := sonic.Unmarshal(platformRaw, &PlatformMap); err != nil {
+	if err := json.Unmarshal(platformRaw, &PlatformMap); err != nil {
 		log.Panicln("can't unmarshal raw platform json to go type", err)
 	}
 	platformRaw = nil
 
-	if err := sonic.Unmarshal(relationRaw, &RelationMap); err != nil {
+	if err := json.Unmarshal(relationRaw, &RelationMap); err != nil {
 		log.Panicln("can't unmarshal raw relation json to go type", err)
 	}
 	relationRaw = nil

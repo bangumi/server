@@ -15,11 +15,11 @@
 package logger
 
 import (
+	"encoding/json"
 	"io"
 	"os"
 	"time"
 
-	"github.com/bytedance/sonic/encoder"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -53,7 +53,7 @@ func jsonLogger(level zapcore.Level) *zap.Logger {
 }
 
 func defaultReflectedEncoder(w io.Writer) zapcore.ReflectedEncoder {
-	enc := encoder.NewStreamEncoder(w)
+	enc := json.NewEncoder(w)
 	// For consistency with our custom BodyJSON encoder.
 	enc.SetEscapeHTML(false)
 	return enc
