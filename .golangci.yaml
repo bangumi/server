@@ -298,7 +298,7 @@ issues:
       linters: [gochecknoglobals, gochecknoinits, wrapcheck]
 
     - path: '.*_test\.go'
-      linters: [gocritic, gochecknoglobals, godot, nosnakecase, funlen]
+      linters: [gocritic, gochecknoglobals, godot, nosnakecase, funlen, musttag]
 
     - source: "var .* = pool.New"
       linters: [gochecknoglobals]

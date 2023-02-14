@@ -58,7 +58,7 @@ type Req struct {
 	Filter  ReqFilter `json:"filter"`
 }
 
-type ReqFilter struct {
+type ReqFilter struct { //nolint:musttag
 	Type    []model.SubjectType `json:"type"`     // or
 	Tag     []string            `json:"tag"`      // and
 	AirDate []string            `json:"air_date"` // and
