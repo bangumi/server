@@ -106,3 +106,34 @@ func TestMysqlRepo_GetSubjectRelated(t *testing.T) {
 		c,
 	)
 }
+
+func TestMysqlRepo_GetRelations(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	r, err := repo.GetSubjectRelationByIDs(context.TODO(), []character.SubjectCompositeID{
+		{CharacterID: 1, SubjectID: 8},
+		{CharacterID: 1, SubjectID: 793},
+		{CharacterID: 1, SubjectID: 32214},
+		{CharacterID: 1, SubjectID: 9},
+	})
+	require.NoError(t, err)
+
+	require.Len(t, r, 3)
+	require.Equal(t,
+		[]domain.SubjectCharacterRelation{
+			{TypeID: 1, SubjectID: 8, CharacterID: 1},
+			{TypeID: 1, SubjectID: 793, CharacterID: 1},
+			{TypeID: 1, SubjectID: 32214, CharacterID: 1},
+		},
+		r,
+	)
+
+	r, err = repo.GetSubjectRelationByIDs(context.TODO(), []character.SubjectCompositeID{})
+	require.NoError(t, err)
+	require.Equal(t,
+		[]domain.SubjectCharacterRelation{},
+		r,
+	)
+}

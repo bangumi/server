@@ -20,6 +20,7 @@ import (
 
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
+	"gorm.io/gen/field"
 	"gorm.io/gorm"
 
 	"github.com/bangumi/server/dal/dao"
@@ -113,6 +114,40 @@ func (r mysqlRepo) GetSubjectRelated(
 			SubjectID:   relation.SubjectID,
 			TypeID:      relation.CrtType,
 		}
+	}
+
+	return rel, nil
+}
+
+func (r mysqlRepo) GetSubjectRelationByIDs(
+	ctx context.Context, ids []SubjectCompositeID,
+) ([]domain.SubjectCharacterRelation, error) {
+	if len(ids) == 0 {
+		return []domain.SubjectCharacterRelation{}, nil
+	}
+	cs := r.q.CharacterSubjects
+	inOperand := make([][2]uint32, len(ids))
+	for k, id := range ids {
+		inOperand[k][0], inOperand[k][1] =
+			id.CharacterID, id.SubjectID
+	}
+	relations, err := cs.WithContext(ctx).
+		Where(cs.WithContext(ctx).Columns(cs.CharacterID, cs.SubjectID).
+			In(field.Values(inOperand))).
+		Find()
+
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var rel = make([]domain.SubjectCharacterRelation, 0, len(relations))
+	for _, relation := range relations {
+		rel = append(rel, domain.SubjectCharacterRelation{
+			SubjectID:   relation.SubjectID,
+			CharacterID: relation.CharacterID,
+			TypeID:      relation.CrtType,
+		})
 	}
 
 	return rel, nil

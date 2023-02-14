@@ -52,7 +52,7 @@ func (h Character) GetRelatedSubjects(c echo.Context) error {
 			ID:     s.ID,
 			Name:   s.Name,
 			NameCn: s.NameCN,
-			Staff:  characterStaffString(relation.TypeID),
+			Staff:  res.CharacterStaffString(relation.TypeID),
 			Image:  res.SubjectImage(s.Image).Large,
 		}
 	}
@@ -101,17 +101,4 @@ func (h Character) getCharacterRelatedSubjects(
 	}
 
 	return character, results, nil
-}
-
-func characterStaffString(i uint8) string {
-	switch i {
-	case 1:
-		return "主角"
-	case 2:
-		return "配角"
-	case 3:
-		return "客串"
-	}
-
-	return ""
 }
