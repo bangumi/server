@@ -35,7 +35,7 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.7
 	go.uber.org/fx v1.19.1
 	go.uber.org/zap v1.24.0
-	golang.org/x/crypto v0.5.0
+	golang.org/x/crypto v0.6.0
 	google.golang.org/grpc v1.52.3
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v3 v3.0.1
@@ -102,8 +102,8 @@ require (
 	golang.org/x/arch v0.2.0 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/mod v0.7.0 // indirect
-	golang.org/x/net v0.5.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/net v0.6.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.2.0 // indirect
 	golang.org/x/tools v0.4.0 // indirect
