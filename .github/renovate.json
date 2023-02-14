@@ -16,6 +16,10 @@
       "enabled": false
     },
     {
+      "matchManagers": ["gomod"],
+      "semanticCommitType": "build"
+    },
+    {
       "groupName": "npm",
       "matchManagers": ["npm"],
       "enabled": true,
