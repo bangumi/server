@@ -68,7 +68,7 @@ services:
 
   debezium-server:
     container_name: chii-debezium
-    image: debezium/server:2.1
+    image: debezium/server:2.2
     environment:
       # set full config as you needed
       - "JAVA_OPTS=-Xms256m -Xmx1536m"
