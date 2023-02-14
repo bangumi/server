@@ -16,16 +16,17 @@ package episode_test
 
 import (
 	"context"
-	"fmt"
 	"sort"
 	"testing"
 
+	"github.com/gookit/goutil/dump"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 )
@@ -97,9 +98,9 @@ func TestMysqlRepo_List(t *testing.T) {
 		episodes, err := repo.List(context.TODO(), 253, tc.filter, 100, 0)
 		require.NoError(t, err)
 
+		orig := slice.Clone(episodes)
 		sorted := sort.SliceIsSorted(episodes, func(i, j int) bool { return episodes[i].Less(episodes[j]) })
-
-		require.True(t, sorted, "episode sorted by `sort` "+fmt.Sprintf("%#v", episodes))
+		require.True(t, sorted, "episode should be sorted"+dump.Format(orig))
 
 		require.Len(t, episodes, tc.len)
 	}

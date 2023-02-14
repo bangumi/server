@@ -45,11 +45,15 @@ type Episode struct {
 }
 
 func (e Episode) Less(o Episode) bool {
-	if e.Type == o.Type {
-		return e.Sort <= o.Sort
+	if e.Disc < o.Disc {
+		return true
 	}
 
-	return e.Type <= o.Type
+	if e.Type < o.Type {
+		return true
+	}
+
+	return e.Type < o.Type
 }
 
 func (e Episode) GetID() model.EpisodeID {
