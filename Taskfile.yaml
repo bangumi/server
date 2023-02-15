@@ -26,7 +26,7 @@ tasks:
     generates:
       - ./dist/chii.exe
     cmds:
-      - go build -trimpath -o dist/chii.exe main.go
+      - go build -ldflags '-w -s' -trimpath -o dist/chii.exe main.go
     env:
       CGO_ENABLED: "0"
 
