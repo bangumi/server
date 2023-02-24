@@ -33,6 +33,7 @@ var setLoggerOnce = sync.Once{}
 
 func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
 	const maxIdleTime = time.Hour * 6
+	const maxLifeTime = time.Hour * 8
 
 	setLoggerOnce.Do(func() {
 		_ = mysql.SetLogger(logger.StdAt(zap.ErrorLevel))
@@ -64,6 +65,7 @@ func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
 	db.SetMaxOpenConns(c.MySQLMaxConn)
 	// default mysql has 7 hour timeout
 	db.SetConnMaxIdleTime(maxIdleTime)
+	db.SetConnMaxLifetime(maxLifeTime)
 
 	return db, nil
 }
