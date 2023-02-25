@@ -82,7 +82,7 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 			ID:            rel.Character.ID,
 			Name:          rel.Character.Name,
 			Type:          rel.Character.Type,
-			Images:        res.PersonImage(rel.Subject.Image),
+			Images:        res.PersonImage(rel.Character.Image),
 			SubjectID:     rel.Subject.ID,
 			SubjectName:   rel.Subject.Name,
 			SubjectNameCn: rel.Subject.NameCN,
