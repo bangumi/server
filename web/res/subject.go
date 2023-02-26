@@ -150,8 +150,8 @@ type PersonRelatedCharacter struct {
 }
 
 type CharacterRelatedPerson struct {
-	Images        PersonImages `json:"images"`
-	Name          string
+	Images        PersonImages    `json:"images"`
+	Name          string          `json:"name"`
 	SubjectName   string          `json:"subject_name"`
 	SubjectNameCn string          `json:"subject_name_cn"`
 	SubjectID     model.SubjectID `json:"subject_id"`
