@@ -32,6 +32,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version-file: "go.mod"
+          cache: false
 
       - name: Go Build Cache (lint)
         uses: actions/cache@v3
