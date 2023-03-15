@@ -20,10 +20,10 @@ jobs:
           fetch-depth: 0
 
       - name: Install Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version-file: "go.mod"
-          check-latest: true
+          cache: false
 
       - name: Go Build Cache (build)
         uses: actions/cache@v3
