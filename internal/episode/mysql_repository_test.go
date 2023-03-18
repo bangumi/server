@@ -19,7 +19,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/gookit/goutil/dump"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
@@ -100,7 +100,7 @@ func TestMysqlRepo_List(t *testing.T) {
 
 		orig := slice.Clone(episodes)
 		sorted := sort.SliceIsSorted(episodes, func(i, j int) bool { return episodes[i].Less(episodes[j]) })
-		require.True(t, sorted, "episode should be sorted"+dump.Format(orig))
+		require.True(t, sorted, "episode should be sorted"+spew.Sdump(orig))
 
 		require.Len(t, episodes, tc.len)
 	}
