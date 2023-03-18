@@ -37,6 +37,12 @@ type Repo interface {
 	DeleteIndexSubject(
 		ctx context.Context, id model.IndexID, subjectID model.SubjectID,
 	) error
+
+	// AddIndexCollect add an index collect to given user
+	AddIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error
+
+	// DeleteIndexCollect remove index collect from given user
+	DeleteIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error
 }
 
 type Subject struct {

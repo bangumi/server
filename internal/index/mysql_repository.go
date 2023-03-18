@@ -273,6 +273,14 @@ func (r mysqlRepo) DeleteIndexSubject(
 	})
 }
 
+func (r mysqlRepo) AddIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error {
+	return nil
+}
+
+func (r mysqlRepo) DeleteIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error {
+	return nil
+}
+
 func (r mysqlRepo) WrapResult(result gen.ResultInfo, err error, msg string) error {
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
