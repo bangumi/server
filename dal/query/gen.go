@@ -26,6 +26,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Episode:           newEpisode(db, opts...),
 		Friend:            newFriend(db, opts...),
 		Index:             newIndex(db, opts...),
+		IndexCollect:      newIndexCollect(db, opts...),
 		IndexSubject:      newIndexSubject(db, opts...),
 		Member:            newMember(db, opts...),
 		Notification:      newNotification(db, opts...),
@@ -57,6 +58,7 @@ type Query struct {
 	Episode           episode
 	Friend            friend
 	Index             index
+	IndexCollect      indexCollect
 	IndexSubject      indexSubject
 	Member            member
 	Notification      notification
@@ -89,6 +91,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Episode:           q.Episode.clone(db),
 		Friend:            q.Friend.clone(db),
 		Index:             q.Index.clone(db),
+		IndexCollect:      q.IndexCollect.clone(db),
 		IndexSubject:      q.IndexSubject.clone(db),
 		Member:            q.Member.clone(db),
 		Notification:      q.Notification.clone(db),
@@ -128,6 +131,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Episode:           q.Episode.replaceDB(db),
 		Friend:            q.Friend.replaceDB(db),
 		Index:             q.Index.replaceDB(db),
+		IndexCollect:      q.IndexCollect.replaceDB(db),
 		IndexSubject:      q.IndexSubject.replaceDB(db),
 		Member:            q.Member.replaceDB(db),
 		Notification:      q.Notification.replaceDB(db),
@@ -157,6 +161,7 @@ type queryCtx struct {
 	Episode           *episodeDo
 	Friend            *friendDo
 	Index             *indexDo
+	IndexCollect      *indexCollectDo
 	IndexSubject      *indexSubjectDo
 	Member            *memberDo
 	Notification      *notificationDo
@@ -186,6 +191,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Episode:           q.Episode.WithContext(ctx),
 		Friend:            q.Friend.WithContext(ctx),
 		Index:             q.Index.WithContext(ctx),
+		IndexCollect:      q.IndexCollect.WithContext(ctx),
 		IndexSubject:      q.IndexSubject.WithContext(ctx),
 		Member:            q.Member.WithContext(ctx),
 		Notification:      q.Notification.WithContext(ctx),
