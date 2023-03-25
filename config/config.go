@@ -27,16 +27,18 @@ type AppConfig struct {
 		Gorm bool `yaml:"gorm"`
 	} `yaml:"debug"`
 
-	RedisURL      string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
-	MySQLHost     string `yaml:"mysql_host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
-	MySQLPort     string `yaml:"mysql_port" env:"MYSQL_PORT" env-default:"3306"`
-	MySQLUserName string `yaml:"mysql_user" env:"MYSQL_USER" env-default:"user"`
-	MySQLPassword string `yaml:"mysql_pass" env:"MYSQL_PASS" env-default:"password"`
-	MySQLDatabase string `yaml:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
-	MySQLMaxConn  int    `yaml:"mysql_max_connection" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
+	RedisURL string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
 
-	MysqlMaxIdleTime time.Duration `yaml:"mysql_conn_max_idle_time" env-default:"4h"`
-	MysqlMaxLifeTime time.Duration `yaml:"mysql_conn_max_life_time" env-default:"6h"`
+	Mysql struct {
+		Host        string        `yaml:"host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
+		Port        string        `yaml:"port" env:"MYSQL_PORT" env-default:"3306"`
+		UserName    string        `yaml:"user" env:"MYSQL_USER" env-default:"user"`
+		Password    string        `yaml:"password" env:"MYSQL_PASS" env-default:"password"`
+		Database    string        `yaml:"db" env:"MYSQL_DB" env-default:"bangumi"`
+		MaxConn     int           `yaml:"max_connection" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
+		MaxIdleTime time.Duration `yaml:"conn_max_idle_time" env-default:"4h"`
+		MaxLifeTime time.Duration `yaml:"conn_max_life_time" env-default:"6h"`
+	} `yaml:"mysql"`
 
 	WebDomain string `yaml:"web_domain" env:"WEB_DOMAIN"` // new frontend web page domain
 	HTTPHost  string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`

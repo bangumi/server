@@ -36,14 +36,14 @@ func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
 		_ = mysql.SetLogger(logger.StdAt(zap.ErrorLevel))
 	})
 
-	logger.Infoln("creating sql connection pool with size", c.MySQLMaxConn)
+	logger.Infoln("creating sql connection pool with size", c.Mysql.MaxConn)
 
 	u := mysql.NewConfig()
-	u.User = c.MySQLUserName
-	u.Passwd = c.MySQLPassword
+	u.User = c.Mysql.UserName
+	u.Passwd = c.Mysql.Password
 	u.Net = "tcp"
-	u.Addr = net.JoinHostPort(c.MySQLHost, c.MySQLPort)
-	u.DBName = c.MySQLDatabase
+	u.Addr = net.JoinHostPort(c.Mysql.Host, c.Mysql.Port)
+	u.DBName = c.Mysql.Database
 	u.Loc = time.UTC
 	u.ParseTime = true
 
@@ -59,9 +59,9 @@ func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
 		return nil, errgo.Wrap(err, "mysql: failed to ping")
 	}
 
-	db.SetMaxOpenConns(c.MySQLMaxConn)
-	db.SetConnMaxIdleTime(c.MysqlMaxIdleTime)
-	db.SetConnMaxLifetime(c.MysqlMaxLifeTime)
+	db.SetMaxOpenConns(c.Mysql.MaxConn)
+	db.SetConnMaxIdleTime(c.Mysql.MaxIdleTime)
+	db.SetConnMaxLifetime(c.Mysql.MaxLifeTime)
 
 	return db, nil
 }

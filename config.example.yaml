@@ -4,12 +4,13 @@ web_domain: next.bgm.tv
 
 redis_url: "redis://:redis-pass@127.0.0.1:6379/0"
 
-mysql_max_connection: 4
-mysql_host: 127.0.0.1
-mysql_port: "3306"
-mysql_user: user
-mysql_pass: password
-mysql_db: bangumi
+mysql:
+  host: 127.0.0.1
+  port: "3306"
+  user: user
+  password: password
+  db: bangumi
+  max_connection: 4
 
 hcaptcha_secret_key: 0x0000000000000000000000000000000000000000
 
