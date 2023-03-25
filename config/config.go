@@ -35,6 +35,9 @@ type AppConfig struct {
 	MySQLDatabase string `yaml:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
 	MySQLMaxConn  int    `yaml:"mysql_max_connection" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
 
+	MysqlMaxIdleTime time.Duration `yaml:"mysql_conn_max_idle_time" env-default:"4h"`
+	MysqlMaxLifeTime time.Duration `yaml:"mysql_conn_max_life_time" env-default:"6h"`
+
 	WebDomain string `yaml:"web_domain" env:"WEB_DOMAIN"` // new frontend web page domain
 	HTTPHost  string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
 	HTTPPort  int    `yaml:"http_port" env:"HTTP_PORT" env-default:"3000"`
