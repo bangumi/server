@@ -1,3 +1,5 @@
+# 完整选项见 config/config.go
+
 http_host: 127.0.0.1
 http_port: 3000
 web_domain: next.bgm.tv
@@ -14,9 +16,11 @@ mysql:
 
 hcaptcha_secret_key: 0x0000000000000000000000000000000000000000
 
-# 如果为空字符串则不会启用搜索相关的功能。
-meilisearch_url: ""
-meilisearch_key: ""
+search:
+  # 如果为空字符串则不会启用搜索相关的功能。
+  meilisearch:
+    url: ""
+    key: ""
 
 # log slow sql, in go time.Duration format string
 # empty or zero value will disable slow sql logging
