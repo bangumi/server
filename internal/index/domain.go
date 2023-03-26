@@ -38,6 +38,9 @@ type Repo interface {
 		ctx context.Context, id model.IndexID, subjectID model.SubjectID,
 	) error
 
+	// GetIndexCollect get and index colelct item if exists
+	GetIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) (*IndexCollect, error)
+
 	// AddIndexCollect add an index collect to given user
 	AddIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error
 
@@ -49,4 +52,11 @@ type Subject struct {
 	Comment string
 	AddedAt time.Time
 	Subject model.Subject
+}
+
+type IndexCollect struct {
+	ID          uint32
+	IndexID     model.IndexID
+	UserID      model.UserID
+	CreatedTime time.Time
 }

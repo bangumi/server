@@ -273,6 +273,26 @@ func (r mysqlRepo) DeleteIndexSubject(
 	})
 }
 
+func (r mysqlRepo) GetIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) (*IndexCollect, error) {
+	collect, err := r.q.IndexCollect.WithContext(ctx).
+		Where(
+			r.q.IndexCollect.IndexID.Eq(id),
+			r.q.IndexCollect.UserID.Eq(uid),
+		).Take()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, gerr.ErrNotFound
+		}
+		return nil, err
+	}
+	return &IndexCollect{
+		ID:          collect.CltID,
+		IndexID:     collect.IndexID,
+		UserID:      collect.UserID,
+		CreatedTime: time.Unix(int64(collect.CreatedTime), 0),
+	}, nil
+}
+
 func (r mysqlRepo) AddIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error {
 	return r.q.IndexCollect.WithContext(ctx).Create(
 		&dao.IndexCollect{

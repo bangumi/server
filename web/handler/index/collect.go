@@ -50,6 +50,16 @@ func (h *Handler) collectIndex(c echo.Context, indexID uint32, uid uint32) error
 		}
 		return res.InternalError(c, err, "get index error")
 	}
+	// check if the user has collected the index
+	if _, err := h.i.GetIndexCollect(ctx, indexID, uid); err == nil {
+		return nil // algread collected
+	} else {
+		if !errors.Is(err, gerr.ErrNotFound) {
+			return res.InternalError(c, err, "get index collect error")
+		}
+	}
+
+	// add the collect
 	if err := h.i.AddIndexCollect(ctx, indexID, uid); err != nil {
 		return res.InternalError(c, err, "add index collect failed")
 	}
@@ -64,6 +74,14 @@ func (h *Handler) uncollectIndex(c echo.Context, indexID uint32, uid uint32) err
 		}
 		return res.InternalError(c, err, "get index error")
 	}
+	// check if the user has collected the index
+	if _, err := h.i.GetIndexCollect(ctx, indexID, uid); err != nil {
+		if errors.Is(err, gerr.ErrNotFound) {
+			return res.NotFound("index not collected")
+		}
+		return res.InternalError(c, err, "get index collect error")
+	}
+	// delete the collect
 	if err := h.i.DeleteIndexCollect(ctx, indexID, uid); err != nil {
 		return res.InternalError(c, err, "delete index collect failed")
 	}

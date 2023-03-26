@@ -364,6 +364,62 @@ func (_c *IndexRepo_Get_Call) RunAndReturn(run func(context.Context, uint32) (mo
 	return _c
 }
 
+// GetIndexCollect provides a mock function with given fields: ctx, id, uid
+func (_m *IndexRepo) GetIndexCollect(ctx context.Context, id uint32, uid uint32) (*index.IndexCollect, error) {
+	ret := _m.Called(ctx, id, uid)
+
+	var r0 *index.IndexCollect
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) (*index.IndexCollect, error)); ok {
+		return rf(ctx, id, uid)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) *index.IndexCollect); ok {
+		r0 = rf(ctx, id, uid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*index.IndexCollect)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint32) error); ok {
+		r1 = rf(ctx, id, uid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// IndexRepo_GetIndexCollect_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetIndexCollect'
+type IndexRepo_GetIndexCollect_Call struct {
+	*mock.Call
+}
+
+// GetIndexCollect is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - uid uint32
+func (_e *IndexRepo_Expecter) GetIndexCollect(ctx interface{}, id interface{}, uid interface{}) *IndexRepo_GetIndexCollect_Call {
+	return &IndexRepo_GetIndexCollect_Call{Call: _e.mock.On("GetIndexCollect", ctx, id, uid)}
+}
+
+func (_c *IndexRepo_GetIndexCollect_Call) Run(run func(ctx context.Context, id uint32, uid uint32)) *IndexRepo_GetIndexCollect_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_GetIndexCollect_Call) Return(_a0 *index.IndexCollect, _a1 error) *IndexRepo_GetIndexCollect_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *IndexRepo_GetIndexCollect_Call) RunAndReturn(run func(context.Context, uint32, uint32) (*index.IndexCollect, error)) *IndexRepo_GetIndexCollect_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListSubjects provides a mock function with given fields: ctx, id, subjectType, limit, offset
 func (_m *IndexRepo) ListSubjects(ctx context.Context, id uint32, subjectType uint8, limit int, offset int) ([]index.Subject, error) {
 	ret := _m.Called(ctx, id, subjectType, limit, offset)
