@@ -39,7 +39,7 @@ func TestUncollectIndex(t *testing.T) {
 	mockIndex := mocks.NewIndexRepo(t)
 	mockIndex.EXPECT().Get(mock.Anything, uint32(322)).Return(model.Index{ID: 322}, nil)
 	mockIndex.EXPECT().GetIndexCollect(mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
-	// mockIndex.EXPECT().DeleteIndexCollect(mock.Anything, uint32(322), uint32(6)).Return(nil)
+	mockIndex.EXPECT().DeleteIndexCollect(mock.Anything, uint32(322), uint32(6)).Return(nil)
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(auth.Permission{}, nil)

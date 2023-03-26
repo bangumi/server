@@ -294,20 +294,19 @@ func (r mysqlRepo) GetIndexCollect(ctx context.Context, id model.IndexID, uid mo
 }
 
 func (r mysqlRepo) AddIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error {
-	return r.q.IndexCollect.WithContext(ctx).Create(
+	if err := r.q.IndexCollect.WithContext(ctx).Create(
 		&dao.IndexCollect{
 			IndexID:     id,
 			UserID:      uid,
 			CreatedTime: uint32(time.Now().Unix()),
-		})
+		}); err != nil {
+		return errgo.Wrap(err, "failed to create index collect in db")
+	}
+	return nil
 }
 
 func (r mysqlRepo) DeleteIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error {
-	_, err := r.q.IndexCollect.WithContext(ctx).Delete(
-		&dao.IndexCollect{
-			IndexID: id,
-			UserID:  uid,
-		})
+	_, err := r.q.IndexCollect.WithContext(ctx).Where(r.q.IndexCollect.IndexID.Eq(id), r.q.IndexCollect.UserID.Eq(uid)).Delete()
 
 	if err != nil {
 		return err

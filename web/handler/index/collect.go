@@ -39,11 +39,12 @@ func (h *Handler) UncollectIndex(c echo.Context) error {
 		return err
 	}
 	uid := accessor.GetFromCtx(c).ID
-	return h.collectIndex(c, iid, uid)
+	return h.uncollectIndex(c, iid, uid)
 }
 
 func (h *Handler) collectIndex(c echo.Context, indexID uint32, uid uint32) error {
 	ctx := c.Request().Context()
+	// check if the index exists
 	if _, err := h.i.Get(ctx, indexID); err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("index not found")
@@ -53,12 +54,9 @@ func (h *Handler) collectIndex(c echo.Context, indexID uint32, uid uint32) error
 	// check if the user has collected the index
 	if _, err := h.i.GetIndexCollect(ctx, indexID, uid); err == nil {
 		return nil // algread collected
-	} else {
-		if !errors.Is(err, gerr.ErrNotFound) {
-			return res.InternalError(c, err, "get index collect error")
-		}
+	} else if !errors.Is(err, gerr.ErrNotFound) {
+		return res.InternalError(c, err, "get index collect error")
 	}
-
 	// add the collect
 	if err := h.i.AddIndexCollect(ctx, indexID, uid); err != nil {
 		return res.InternalError(c, err, "add index collect failed")
@@ -68,6 +66,7 @@ func (h *Handler) collectIndex(c echo.Context, indexID uint32, uid uint32) error
 
 func (h *Handler) uncollectIndex(c echo.Context, indexID uint32, uid uint32) error {
 	ctx := c.Request().Context()
+	// check if the index exists
 	if _, err := h.i.Get(ctx, indexID); err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("index not found")

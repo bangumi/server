@@ -443,3 +443,46 @@ func TestMysqlRepo_AddNoneExistsSubject(t *testing.T) {
 	require.Error(t, err)
 	require.Equal(t, err, gerr.ErrSubjectNotFound)
 }
+
+func TestMysqlRepo_AddIndexCollect(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	ctx := context.Background()
+
+	err := repo.AddIndexCollect(ctx, 15465, 233)
+	require.NoError(t, err)
+}
+
+func TestMysqlRepo_GetIndexCollect(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	err := repo.AddIndexCollect(context.Background(), 15465, 2233)
+	require.NoError(t, err)
+
+	i, err := repo.GetIndexCollect(context.Background(), 15465, 2233)
+	require.NoError(t, err)
+
+	require.EqualValues(t, 15465, i.IndexID)
+	require.EqualValues(t, 2233, i.UserID)
+}
+
+func TestMysqlRepo_DeleteIndexCollect(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	ctx := context.Background()
+
+	err := repo.AddIndexCollect(ctx, 15465, 322)
+	require.NoError(t, err)
+
+	err = repo.DeleteIndexCollect(ctx, 15465, 322)
+	require.NoError(t, err)
+}

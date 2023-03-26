@@ -109,12 +109,6 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 ## 测试
 
-拉取测试数据
-
-```bash
-git submodule update --init --recursive
-```
-
 使用 [mock](./internal/mocks/) 进行部分测试。
 
 ```bash
