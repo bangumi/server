@@ -109,9 +109,15 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 ## 测试
 
+拉取测试数据
+
+```bash
+git submodule update --init --recursive
+```
+
 使用 [mock](./internal/mocks/) 进行部分测试。
 
-```
+```bash
 task test       # Run mocked unit tests, need nothing.
 task test-db    # Run mocked tests, and tests require mysql and redis. alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
 task test-all   # Run all tests.
