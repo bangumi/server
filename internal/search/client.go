@@ -49,20 +49,20 @@ func New(
 	log *zap.Logger,
 	query *query.Query,
 ) (Client, error) {
-	if cfg.MeiliSearchURL == "" {
+	if cfg.Search.MeiliSearch.URL == "" {
 		return NoopClient{}, nil
 	}
 
 	if subjectRepo == nil {
 		panic("nil SubjectRepo")
 	}
-	if _, err := url.Parse(cfg.MeiliSearchURL); err != nil {
+	if _, err := url.Parse(cfg.Search.MeiliSearch.URL); err != nil {
 		return nil, errgo.Wrap(err, "url.Parse")
 	}
 
 	meili := meilisearch.NewClient(meilisearch.ClientConfig{
-		Host:    cfg.MeiliSearchURL,
-		APIKey:  cfg.MeiliSearchKey,
+		Host:    cfg.Search.MeiliSearch.URL,
+		APIKey:  cfg.Search.MeiliSearch.Key,
 		Timeout: time.Second,
 	})
 
@@ -87,20 +87,20 @@ func New(
 }
 
 func (c *client) canalInit(cfg config.AppConfig) error {
-	if cfg.SearchBatchSize <= 0 {
+	if cfg.Search.SearchBatchSize <= 0 {
 		// nolint: goerr113
-		return fmt.Errorf("config.SearchBatchSize should >= 0, current %d", cfg.SearchBatchSize)
+		return fmt.Errorf("config.SearchBatchSize should >= 0, current %d", cfg.Search.SearchBatchSize)
 	}
 
-	if cfg.SearchBatchInterval <= 0 {
+	if cfg.Search.SearchBatchInterval <= 0 {
 		// nolint: goerr113
-		return fmt.Errorf("config.SearchBatchInterval should >= 0, current %d", cfg.SearchBatchInterval)
+		return fmt.Errorf("config.SearchBatchInterval should >= 0, current %d", cfg.Search.SearchBatchInterval)
 	}
 
 	c.queue = queue.NewBatchedDedupe[subjectIndex](
 		c.sendBatch,
-		cfg.SearchBatchSize,
-		cfg.SearchBatchInterval,
+		cfg.Search.SearchBatchSize,
+		cfg.Search.SearchBatchInterval,
 		func(items []subjectIndex) []subjectIndex {
 			// lo.UniqBy 会保留第一次出现的元素，reverse 之后会保留新的数据
 			return lo.UniqBy(lo.Reverse(items), func(item subjectIndex) model.SubjectID {

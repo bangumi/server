@@ -30,30 +30,35 @@ type AppConfig struct {
 	RedisURL      string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
 	RedisPassword string `yaml:"redis_pass" env:"REDIS_PASS" env-default:"redis-pass"`
 
-	MySQLHost     string `yaml:"mysql_host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
-	MySQLPort     string `yaml:"mysql_port" env:"MYSQL_PORT" env-default:"3306"`
-	MySQLUserName string `yaml:"mysql_user" env:"MYSQL_USER" env-default:"user"`
-	MySQLPassword string `yaml:"mysql_pass" env:"MYSQL_PASS" env-default:"password"`
-	MySQLDatabase string `yaml:"mysql_db" env:"MYSQL_DB" env-default:"bangumi"`
-	MySQLMaxConn  int    `yaml:"mysql_max_connection" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
+	Mysql struct {
+		Host        string        `yaml:"host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
+		Port        string        `yaml:"port" env:"MYSQL_PORT" env-default:"3306"`
+		UserName    string        `yaml:"user" env:"MYSQL_USER" env-default:"user"`
+		Password    string        `yaml:"password" env:"MYSQL_PASS" env-default:"password"`
+		Database    string        `yaml:"db" env:"MYSQL_DB" env-default:"bangumi"`
+		MaxConn     int           `yaml:"max_connection" env:"MYSQL_MAX_CONNECTION" env-default:"4"`
+		MaxIdleTime time.Duration `yaml:"conn_max_idle_time" env-default:"4h"`
+		MaxLifeTime time.Duration `yaml:"conn_max_life_time" env-default:"6h"`
+
+		SlowSQLDuration time.Duration `yaml:"slow_sql_duration" env:"SLOW_SQL_DURATION"`
+	} `yaml:"mysql"`
 
 	WebDomain string `yaml:"web_domain" env:"WEB_DOMAIN"` // new frontend web page domain
 	HTTPHost  string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
 	HTTPPort  int    `yaml:"http_port" env:"HTTP_PORT" env-default:"3000"`
 
-	KafkaBroker      string   `yaml:"kafka_broker" env:"KAFKA_BROKER"`
-	KafkaCanalTopics []string `yaml:"kafka_canal_topics"`
+	Search struct {
+		KafkaBroker      string   `yaml:"kafka_broker" env:"KAFKA_BROKER"`
+		KafkaCanalTopics []string `yaml:"kafka_canal_topics"`
 
-	MeiliSearchURL string `yaml:"meilisearch_url" env:"MEILISEARCH_URL"`
-	MeiliSearchKey string `yaml:"meilisearch_key" env:"MEILISEARCH_KEY"`
+		MeiliSearch struct {
+			URL string `yaml:"url" env:"MEILISEARCH_URL"`
+			Key string `yaml:"key" env:"MEILISEARCH_KEY"`
+		} `yaml:"meilisearch"`
 
-	TurnstileSecretKey string `env:"TURNSTILE_SECRET_KEY" env-default:"1x0000000000000000000000000000000AA"`
-	TurnstileSiteKey   string `env:"TURNSTILE_SITE_KEY" env-default:"1x00000000000000000000AA"`
-
-	SearchBatchSize     int           `env:"SEARCH_BATCH_SIZE" yaml:"search_batch_size" env-default:"100"`
-	SearchBatchInterval time.Duration `env:"SEARCH_BATCH_INTERVAL" yaml:"search_batch_interval" env-default:"10m"`
-
-	SlowSQLDuration time.Duration `yaml:"slow_sql_duration" env:"SLOW_SQL_DURATION"`
+		SearchBatchSize     int           `env:"SEARCH_BATCH_SIZE" yaml:"batch_size" env-default:"100"`
+		SearchBatchInterval time.Duration `env:"SEARCH_BATCH_INTERVAL" yaml:"batch_interval" env-default:"10m"`
+	} `yaml:"search"`
 
 	NsfwWord     string `yaml:"nsfw_word"`
 	DisableWords string `yaml:"disable_words"`

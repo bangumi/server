@@ -84,8 +84,8 @@ const groupID = "my-group"
 
 func newKafkaReader(c config.AppConfig) *kafka.Reader {
 	return kafka.NewReader(kafka.ReaderConfig{
-		Brokers:     []string{c.KafkaBroker},
+		Brokers:     []string{c.Search.KafkaBroker},
 		GroupID:     groupID,
-		GroupTopics: c.KafkaCanalTopics,
+		GroupTopics: c.Search.KafkaCanalTopics,
 	})
 }

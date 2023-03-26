@@ -33,7 +33,7 @@ import (
 // production gorm logger log do sql time monitoring and error logging to zap logger.
 func newProdLog(cfg config.AppConfig) gormLogger.Interface {
 	return &metricsLog{
-		slowThreshold: cfg.SlowSQLDuration,
+		slowThreshold: cfg.Mysql.SlowSQLDuration,
 		log:           logger.Named("gorm").WithOptions(zap.AddStacktrace(zap.DPanicLevel)),
 		h:             metrics.SQLHistogram,
 	}
