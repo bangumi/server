@@ -28,6 +28,8 @@ type AppConfig struct {
 	} `yaml:"debug"`
 
 	RedisURL      string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
+	RedisPassword string `yaml:"redis_pass" env:"REDIS_PASS" env-default:"redis-pass"`
+
 	MySQLHost     string `yaml:"mysql_host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
 	MySQLPort     string `yaml:"mysql_port" env:"MYSQL_PORT" env-default:"3306"`
 	MySQLUserName string `yaml:"mysql_user" env:"MYSQL_USER" env-default:"user"`
