@@ -46,7 +46,7 @@ func New(allowed string) echo.MiddlewareFunc {
 	}
 }
 
-func dev(allowed string) echo.MiddlewareFunc {
+func dev(_ string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			return next(c)

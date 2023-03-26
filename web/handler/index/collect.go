@@ -17,11 +17,12 @@ package index
 import (
 	"errors"
 
+	"github.com/labstack/echo/v4"
+
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
-	"github.com/labstack/echo/v4"
 )
 
 func (h *Handler) CollectIndex(c echo.Context) error {
