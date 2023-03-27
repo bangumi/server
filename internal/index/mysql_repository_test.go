@@ -454,6 +454,13 @@ func TestMysqlRepo_AddIndexCollect(t *testing.T) {
 
 	err := repo.AddIndexCollect(ctx, 15465, 233)
 	require.NoError(t, err)
+
+	// test if it added
+	i, err := repo.GetIndexCollect(ctx, 15465, 233)
+	require.NoError(t, err)
+
+	require.EqualValues(t, 15465, i.IndexID)
+	require.EqualValues(t, 2233, i.UserID)
 }
 
 func TestMysqlRepo_GetIndexCollect(t *testing.T) {

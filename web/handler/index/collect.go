@@ -54,7 +54,7 @@ func (h *Handler) collectIndex(c echo.Context, indexID uint32, uid uint32) error
 	}
 	// check if the user has collected the index
 	if _, err := h.i.GetIndexCollect(ctx, indexID, uid); err == nil {
-		return nil // algread collected
+		return nil // already collected
 	} else if !errors.Is(err, gerr.ErrNotFound) {
 		return res.InternalError(c, err, "get index collect error")
 	}
