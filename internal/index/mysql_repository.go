@@ -98,10 +98,7 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 			return err
 		}
 		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.IndexID.Eq(id)).Delete()
-		if err = r.WrapResult(result, err, "failed to delete subjects in the index"); err != nil {
-			return err
-		}
-		return nil
+		return r.WrapResult(result, err, "failed to delete subjects in the index")
 	})
 }
 
@@ -266,10 +263,7 @@ func (r mysqlRepo) DeleteIndexSubject(
 		result, err = r.q.Index.WithContext(ctx).Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
 			SubjectCount: index.Total - 1,
 		})
-		if err = r.WrapResult(result, err, "failed to update index info"); err != nil {
-			return err
-		}
-		return nil
+		return r.WrapResult(result, err, "failed to update index info")
 	})
 }
 
