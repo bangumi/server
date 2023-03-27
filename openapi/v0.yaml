@@ -2474,8 +2474,7 @@ components:
         last_modified:
           title: Last Modified
           type: string
-          description:
-            currently it's latest user comment time, it will be replaced
+          description: currently it's latest user comment time, it will be replaced
             by wiki modified date in the future
           format: date-time
         infobox:
