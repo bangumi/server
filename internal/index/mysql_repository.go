@@ -277,7 +277,7 @@ func (r mysqlRepo) GetIndexCollect(ctx context.Context, id model.IndexID, uid mo
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, gerr.ErrNotFound
 		}
-		return nil, err
+		return nil, errgo.Trace(err)
 	}
 	return &IndexCollect{
 		ID:          collect.CltID,
