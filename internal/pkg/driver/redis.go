@@ -41,10 +41,6 @@ func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
 		redisOptions.PoolSize = defaultRedisPoolSize
 	}
 
-	if len(c.RedisPassword) > 0 {
-		redisOptions.Password = c.RedisPassword
-	}
-
 	cli := redis.NewClient(redisOptions)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)

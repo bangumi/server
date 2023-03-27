@@ -27,8 +27,7 @@ type AppConfig struct {
 		Gorm bool `yaml:"gorm"`
 	} `yaml:"debug"`
 
-	RedisURL      string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://127.0.0.1:6379/0"`
-	RedisPassword string `yaml:"redis_pass" env:"REDIS_PASS" env-default:"redis-pass"`
+	RedisURL string `yaml:"redis_url" env:"REDIS_URI" env-default:"redis://:redis-pass@127.0.0.1:6379/0"`
 
 	Mysql struct {
 		Host        string        `yaml:"host" env:"MYSQL_HOST" env-default:"127.0.0.1"`
