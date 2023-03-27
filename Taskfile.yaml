@@ -13,10 +13,10 @@ tasks:
 
   install:
     cmds:
-      - go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-      - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-      - go install github.com/vektra/mockery/v2@latest
-      - echo "install buf by yourself https://docs.buf.build/installation"
+      - go install google.golang.org/protobuf/cmd/protoc-gen-go
+      - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+      - go install github.com/vektra/mockery/v2
+      - echo "please install buf by yourself https://docs.buf.build/installation"
 
   build:
     desc: Build Web Server Binary
