@@ -460,7 +460,7 @@ func TestMysqlRepo_AddIndexCollect(t *testing.T) {
 	require.NoError(t, err)
 
 	require.EqualValues(t, 15465, i.IndexID)
-	require.EqualValues(t, 2233, i.UserID)
+	require.EqualValues(t, 233, i.UserID)
 }
 
 func TestMysqlRepo_GetIndexCollect(t *testing.T) {
