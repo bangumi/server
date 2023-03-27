@@ -307,7 +307,7 @@ func (r mysqlRepo) DeleteIndexCollect(ctx context.Context, id model.IndexID, uid
 		).Delete()
 
 	if err != nil {
-		return err
+		return errgo.Trace(err)
 	}
 
 	return nil
