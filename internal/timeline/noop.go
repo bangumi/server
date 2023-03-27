@@ -31,17 +31,17 @@ func (n noopClient) Hello(_ context.Context, _ *pb.HelloRequest, _ ...grpc.CallO
 	return &pb.HelloResponse{}, nil
 }
 
-func (n noopClient) SubjectCollect(ctx context.Context, in *pb.SubjectCollectRequest,
-	opts ...grpc.CallOption) (*pb.SubjectCollectResponse, error) {
+func (n noopClient) SubjectCollect(_ context.Context, _ *pb.SubjectCollectRequest,
+	_ ...grpc.CallOption) (*pb.SubjectCollectResponse, error) {
 	return &pb.SubjectCollectResponse{Ok: true}, nil
 }
 
-func (n noopClient) SubjectProgress(ctx context.Context, in *pb.SubjectProgressRequest,
-	opts ...grpc.CallOption) (*pb.SubjectProgressResponse, error) {
+func (n noopClient) SubjectProgress(_ context.Context, _ *pb.SubjectProgressRequest,
+	_ ...grpc.CallOption) (*pb.SubjectProgressResponse, error) {
 	return &pb.SubjectProgressResponse{Ok: true}, nil
 }
 
-func (n noopClient) EpisodeCollect(ctx context.Context, in *pb.EpisodeCollectRequest,
-	opts ...grpc.CallOption) (*pb.EpisodeCollectResponse, error) {
+func (n noopClient) EpisodeCollect(_ context.Context, _ *pb.EpisodeCollectRequest,
+	_ ...grpc.CallOption) (*pb.EpisodeCollectResponse, error) {
 	return &pb.EpisodeCollectResponse{Ok: true}, nil
 }

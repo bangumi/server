@@ -32,11 +32,11 @@ func (n NoopClient) Handle(c echo.Context) error {
 	return c.String(http.StatusOK, "search is not enable")
 }
 
-func (n NoopClient) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
+func (n NoopClient) OnSubjectUpdate(_ context.Context, _ model.SubjectID) error {
 	return nil
 }
 
-func (n NoopClient) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
+func (n NoopClient) OnSubjectDelete(_ context.Context, _ model.SubjectID) error {
 	return nil
 }
 
