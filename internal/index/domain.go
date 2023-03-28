@@ -22,11 +22,20 @@ import (
 )
 
 type Repo interface {
+	IndexRepo
+	SubjectRepo
+	CollectRepo
+}
+
+//nolint:revive
+type IndexRepo interface {
 	Get(ctx context.Context, id model.IndexID) (model.Index, error)
 	New(ctx context.Context, i *model.Index) error
 	Update(ctx context.Context, id model.IndexID, title string, desc string) error
 	Delete(ctx context.Context, id model.IndexID) error
+}
 
+type SubjectRepo interface {
 	CountSubjects(ctx context.Context, id model.IndexID, subjectType model.SubjectType) (int64, error)
 	ListSubjects(
 		ctx context.Context, id model.IndexID, subjectType model.SubjectType, limit, offset int,
@@ -39,8 +48,27 @@ type Repo interface {
 	) error
 }
 
+type CollectRepo interface {
+	// GetIndexCollect get and index colelct item if exists
+	GetIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) (*IndexCollect, error)
+
+	// AddIndexCollect add an index collect to given user
+	AddIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error
+
+	// DeleteIndexCollect remove index collect from given user
+	DeleteIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error
+}
+
 type Subject struct {
 	Comment string
 	AddedAt time.Time
 	Subject model.Subject
+}
+
+//nolint:revive
+type IndexCollect struct {
+	ID          uint32
+	IndexID     model.IndexID
+	UserID      model.UserID
+	CreatedTime time.Time
 }

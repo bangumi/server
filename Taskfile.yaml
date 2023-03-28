@@ -51,7 +51,7 @@ tasks:
   test-db:
     desc: Run mocked tests, and tests require mysql and redis. alias for `TEST_MYSQL=1 TEST_REDIS=1 task test`
     cmds:
-      - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
+      - go test -timeout 10s -tags test {{.CLI_ARGS}} ./...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"

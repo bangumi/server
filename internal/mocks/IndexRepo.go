@@ -24,6 +24,50 @@ func (_m *IndexRepo) EXPECT() *IndexRepo_Expecter {
 	return &IndexRepo_Expecter{mock: &_m.Mock}
 }
 
+// AddIndexCollect provides a mock function with given fields: ctx, id, uid
+func (_m *IndexRepo) AddIndexCollect(ctx context.Context, id uint32, uid uint32) error {
+	ret := _m.Called(ctx, id, uid)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) error); ok {
+		r0 = rf(ctx, id, uid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// IndexRepo_AddIndexCollect_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddIndexCollect'
+type IndexRepo_AddIndexCollect_Call struct {
+	*mock.Call
+}
+
+// AddIndexCollect is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - uid uint32
+func (_e *IndexRepo_Expecter) AddIndexCollect(ctx interface{}, id interface{}, uid interface{}) *IndexRepo_AddIndexCollect_Call {
+	return &IndexRepo_AddIndexCollect_Call{Call: _e.mock.On("AddIndexCollect", ctx, id, uid)}
+}
+
+func (_c *IndexRepo_AddIndexCollect_Call) Run(run func(ctx context.Context, id uint32, uid uint32)) *IndexRepo_AddIndexCollect_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_AddIndexCollect_Call) Return(_a0 error) *IndexRepo_AddIndexCollect_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *IndexRepo_AddIndexCollect_Call) RunAndReturn(run func(context.Context, uint32, uint32) error) *IndexRepo_AddIndexCollect_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // AddOrUpdateIndexSubject provides a mock function with given fields: ctx, id, subjectID, sort, comment
 func (_m *IndexRepo) AddOrUpdateIndexSubject(ctx context.Context, id uint32, subjectID uint32, sort uint32, comment string) (*index.Subject, error) {
 	ret := _m.Called(ctx, id, subjectID, sort, comment)
@@ -179,6 +223,50 @@ func (_c *IndexRepo_Delete_Call) RunAndReturn(run func(context.Context, uint32) 
 	return _c
 }
 
+// DeleteIndexCollect provides a mock function with given fields: ctx, id, uid
+func (_m *IndexRepo) DeleteIndexCollect(ctx context.Context, id uint32, uid uint32) error {
+	ret := _m.Called(ctx, id, uid)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) error); ok {
+		r0 = rf(ctx, id, uid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// IndexRepo_DeleteIndexCollect_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteIndexCollect'
+type IndexRepo_DeleteIndexCollect_Call struct {
+	*mock.Call
+}
+
+// DeleteIndexCollect is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - uid uint32
+func (_e *IndexRepo_Expecter) DeleteIndexCollect(ctx interface{}, id interface{}, uid interface{}) *IndexRepo_DeleteIndexCollect_Call {
+	return &IndexRepo_DeleteIndexCollect_Call{Call: _e.mock.On("DeleteIndexCollect", ctx, id, uid)}
+}
+
+func (_c *IndexRepo_DeleteIndexCollect_Call) Run(run func(ctx context.Context, id uint32, uid uint32)) *IndexRepo_DeleteIndexCollect_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_DeleteIndexCollect_Call) Return(_a0 error) *IndexRepo_DeleteIndexCollect_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *IndexRepo_DeleteIndexCollect_Call) RunAndReturn(run func(context.Context, uint32, uint32) error) *IndexRepo_DeleteIndexCollect_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteIndexSubject provides a mock function with given fields: ctx, id, subjectID
 func (_m *IndexRepo) DeleteIndexSubject(ctx context.Context, id uint32, subjectID uint32) error {
 	ret := _m.Called(ctx, id, subjectID)
@@ -272,6 +360,62 @@ func (_c *IndexRepo_Get_Call) Return(_a0 model.Index, _a1 error) *IndexRepo_Get_
 }
 
 func (_c *IndexRepo_Get_Call) RunAndReturn(run func(context.Context, uint32) (model.Index, error)) *IndexRepo_Get_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetIndexCollect provides a mock function with given fields: ctx, id, uid
+func (_m *IndexRepo) GetIndexCollect(ctx context.Context, id uint32, uid uint32) (*index.IndexCollect, error) {
+	ret := _m.Called(ctx, id, uid)
+
+	var r0 *index.IndexCollect
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) (*index.IndexCollect, error)); ok {
+		return rf(ctx, id, uid)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) *index.IndexCollect); ok {
+		r0 = rf(ctx, id, uid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*index.IndexCollect)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint32) error); ok {
+		r1 = rf(ctx, id, uid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// IndexRepo_GetIndexCollect_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetIndexCollect'
+type IndexRepo_GetIndexCollect_Call struct {
+	*mock.Call
+}
+
+// GetIndexCollect is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - uid uint32
+func (_e *IndexRepo_Expecter) GetIndexCollect(ctx interface{}, id interface{}, uid interface{}) *IndexRepo_GetIndexCollect_Call {
+	return &IndexRepo_GetIndexCollect_Call{Call: _e.mock.On("GetIndexCollect", ctx, id, uid)}
+}
+
+func (_c *IndexRepo_GetIndexCollect_Call) Run(run func(ctx context.Context, id uint32, uid uint32)) *IndexRepo_GetIndexCollect_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32))
+	})
+	return _c
+}
+
+func (_c *IndexRepo_GetIndexCollect_Call) Return(_a0 *index.IndexCollect, _a1 error) *IndexRepo_GetIndexCollect_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *IndexRepo_GetIndexCollect_Call) RunAndReturn(run func(context.Context, uint32, uint32) (*index.IndexCollect, error)) *IndexRepo_GetIndexCollect_Call {
 	_c.Call.Return(run)
 	return _c
 }

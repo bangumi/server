@@ -267,6 +267,52 @@ func (r mysqlRepo) DeleteIndexSubject(
 	})
 }
 
+func (r mysqlRepo) GetIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) (*IndexCollect, error) {
+	collect, err := r.q.IndexCollect.WithContext(ctx).
+		Where(
+			r.q.IndexCollect.IndexID.Eq(id),
+			r.q.IndexCollect.UserID.Eq(uid),
+		).Take()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, gerr.ErrNotFound
+		}
+		return nil, errgo.Trace(err)
+	}
+	return &IndexCollect{
+		ID:          collect.CltID,
+		IndexID:     collect.IndexID,
+		UserID:      collect.UserID,
+		CreatedTime: time.Unix(int64(collect.CreatedTime), 0),
+	}, nil
+}
+
+func (r mysqlRepo) AddIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error {
+	if err := r.q.IndexCollect.WithContext(ctx).Create(
+		&dao.IndexCollect{
+			IndexID:     id,
+			UserID:      uid,
+			CreatedTime: uint32(time.Now().Unix()),
+		}); err != nil {
+		return errgo.Wrap(err, "failed to create index collect in db")
+	}
+	return nil
+}
+
+func (r mysqlRepo) DeleteIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error {
+	_, err := r.q.IndexCollect.WithContext(ctx).
+		Where(
+			r.q.IndexCollect.IndexID.Eq(id),
+			r.q.IndexCollect.UserID.Eq(uid),
+		).Delete()
+
+	if err != nil {
+		return errgo.Trace(err)
+	}
+
+	return nil
+}
+
 func (r mysqlRepo) WrapResult(result gen.ResultInfo, err error, msg string) error {
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

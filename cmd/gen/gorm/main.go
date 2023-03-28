@@ -62,7 +62,7 @@ func main() {
 	g := gen.NewGenerator(gen.Config{
 		OutPath:      "./dal/query",
 		OutFile:      "./dal/query/gen.go",
-		ModelPkgPath: "./dao",
+		ModelPkgPath: "./dal/dao",
 		// if you want the nullable field generation property to be pointer type, set FieldNullable true
 		FieldNullable: false,
 		// if you want to generate type tags from database, set FieldWithTypeTag true
@@ -200,6 +200,17 @@ func main() {
 		gen.FieldRename("idx_replies", "ReplyCount"),
 		gen.FieldRename("idx_collects", "CollectCount"),
 		gen.FieldRename("idx_subject_total", "SubjectCount"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_index_collects", "IndexCollect",
+		gen.FieldTrimPrefix("idx_"),
+		gen.FieldType("idx_clt_id", "uint32"),
+		gen.FieldType("idx_clt_mid", "uint32"),
+		gen.FieldType("idx_clt_uid", userIDTypeString),
+
+		gen.FieldRename("idx_clt_uid", "UserID"),
+		gen.FieldRename("idx_clt_mid", "IndexID"),
+		gen.FieldRename("idx_clt_dateline", createdTime),
 	))
 
 	modelPersonField := g.GenerateModelAs("chii_person_fields", "PersonField",
