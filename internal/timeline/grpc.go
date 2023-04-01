@@ -17,6 +17,7 @@ package timeline
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/trim21/errgo"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -35,6 +36,8 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
+const defaultTimeout = time.Second * 5
+
 func NewMysqlRepo(q *query.Query, log *zap.Logger, cfg config.AppConfig) (Service, error) {
 	rpc, err := newGrpcClient(cfg)
 	if err != nil {
@@ -52,6 +55,9 @@ type mysqlRepo struct {
 
 func (m mysqlRepo) ChangeSubjectProgress(ctx context.Context, u model.UserID, sbj model.Subject,
 	epsUpdate uint32, volsUpdate uint32) error {
+	ctx, canal := context.WithTimeout(ctx, defaultTimeout)
+	defer canal()
+
 	_, err := m.rpc.SubjectProgress(ctx, &pb.SubjectProgressRequest{
 		UserId: uint64(u),
 		Subject: &pb.Subject{
@@ -79,6 +85,9 @@ func (m mysqlRepo) ChangeSubjectCollection(
 	comment string,
 	rate uint8,
 ) error {
+	ctx, canal := context.WithTimeout(ctx, defaultTimeout)
+	defer canal()
+
 	_, err := m.rpc.SubjectCollect(ctx, &pb.SubjectCollectRequest{
 		UserId: uint64(u),
 		Subject: &pb.Subject{
@@ -109,6 +118,9 @@ func (m mysqlRepo) ChangeEpisodeStatus(
 	sbj model.Subject,
 	episode episode.Episode,
 ) error {
+	ctx, canal := context.WithTimeout(ctx, defaultTimeout)
+	defer canal()
+
 	_, err := m.rpc.EpisodeCollect(ctx, &pb.EpisodeCollectRequest{
 		UserId: uint64(u.ID),
 		Last: &pb.Episode{
