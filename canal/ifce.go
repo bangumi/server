@@ -15,31 +15,18 @@
 package canal
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/internal/mocks"
-	"github.com/bangumi/server/internal/pkg/logger"
+	"context"
 )
 
-func TestOnSubjectChange(t *testing.T) {
-	t.Parallel()
-	session := mocks.NewSessionManager(t)
+type Msg struct {
+	ID     string
+	Stream string
+	Key    []byte
+	Value  []byte
+}
 
-	c, err := config.NewAppConfig()
-	require.NoError(t, err)
-
-	search := mocks.NewSearchClient(t)
-
-	eh := &eventHandler{
-		config:  c,
-		session: session,
-		search:  search,
-		log:     logger.Named("eventHandler"),
-	}
-
-	err = eh.onMessage([]byte(""), []byte(""))
-	require.NoError(t, err)
+type Stream interface {
+	Read(ctx context.Context) (<-chan Msg, error)
+	Ack(ctx context.Context, msg Msg) error
+	Close() error
 }

@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/segmentio/kafka-go"
 	"github.com/trim21/errgo"
 	"go.uber.org/fx"
 
@@ -34,6 +33,8 @@ import (
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/session"
 )
+
+const groupID = "my-group"
 
 func Main() error {
 	var h *eventHandler
@@ -49,7 +50,7 @@ func Main() error {
 			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
 			driver.NewS3,
 
-			newKafkaReader, newEventHandler,
+			newEventHandler,
 		),
 
 		fx.Populate(&h),
@@ -68,7 +69,7 @@ func Main() error {
 	go func() { errChan <- errgo.Wrap(srv.ListenAndServe(), "http") }()
 	defer srv.Shutdown(context.Background()) //nolint:errcheck
 
-	go func() { errChan <- errgo.Wrap(h.start(), "kafka") }()
+	go func() { errChan <- errgo.Wrap(h.start(), "start") }()
 	defer h.Close()
 
 	select {
@@ -78,14 +79,4 @@ func Main() error {
 		logger.Info("receive signal, shutdown")
 		return nil
 	}
-}
-
-const groupID = "my-group"
-
-func newKafkaReader(c config.AppConfig) *kafka.Reader {
-	return kafka.NewReader(kafka.ReaderConfig{
-		Brokers:     []string{c.Search.KafkaBroker},
-		GroupID:     groupID,
-		GroupTopics: c.Search.KafkaCanalTopics,
-	})
 }

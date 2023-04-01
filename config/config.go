@@ -47,8 +47,8 @@ type AppConfig struct {
 	HTTPPort  int    `yaml:"http_port" env:"HTTP_PORT" env-default:"3000"`
 
 	Search struct {
-		KafkaBroker      string   `yaml:"kafka_broker" env:"KAFKA_BROKER"`
-		KafkaCanalTopics []string `yaml:"kafka_canal_topics"`
+		KafkaBroker string   `yaml:"kafka_broker" env:"KAFKA_BROKER"`
+		Topics      []string `yaml:"topics"`
 
 		MeiliSearch struct {
 			URL string `yaml:"url" env:"MEILISEARCH_URL"`

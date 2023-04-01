@@ -17,20 +17,17 @@ package canal
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"io"
+	"fmt"
 	"sync/atomic"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/redis/go-redis/v9"
-	"github.com/segmentio/kafka-go"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/logger/log"
-	"github.com/bangumi/server/internal/pkg/utils"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/web/session"
 )
@@ -39,7 +36,6 @@ func newEventHandler(
 	log *zap.Logger,
 	appConfig config.AppConfig,
 	session session.Manager,
-	reader *kafka.Reader,
 	redis *redis.Client,
 	search search.Client,
 	s3 *minio.Client,
@@ -47,7 +43,6 @@ func newEventHandler(
 	return &eventHandler{
 		config:  appConfig,
 		session: session,
-		reader:  reader,
 		search:  search,
 		redis:   redis,
 		s3:      s3,
@@ -63,42 +58,47 @@ type eventHandler struct {
 	search  search.Client
 	redis   *redis.Client
 	s3      *minio.Client // optional, check nil before use
-	reader  *kafka.Reader
 }
 
+var errNoTopic = fmt.Errorf("missing search events topic")
+
 func (e *eventHandler) start() error {
+	if len(e.config.Search.Topics) == 0 {
+		return errNoTopic
+	}
+
+	s, err := newRedisStream(e.config, e.redis)
+	if err != nil {
+		return errgo.Trace(err)
+	}
+
+	ch, err := s.Read(context.TODO())
+	if err != nil {
+		return errgo.Trace(err)
+	}
+
 	for {
-		if e.closed.Load() {
+		msg, ok := <-ch
+		if !ok {
+			// chan closed
 			return nil
 		}
+		e.log.Debug("new message", zap.String("stream", msg.Stream), zap.String("id", msg.ID))
 
-		msg, err := e.reader.FetchMessage(context.Background())
+		err = e.onMessage(msg.Key, msg.Value)
 		if err != nil {
-			if errors.Is(err, io.EOF) || utils.IsNetworkError(err) {
-				return errgo.Wrap(err, "read message")
-			}
-
-			e.log.Error("error fetching msg", zap.Error(err))
+			e.log.Error("failed to handle kafka msg", zap.Error(err), zap.String("stream", msg.Stream))
 			continue
 		}
 
-		e.log.Debug("new message", zap.String("topic", msg.Topic))
-
-		err = e.onMessage(msg)
-		if err != nil {
-			e.log.Error("failed to handle kafka msg", zap.Error(err), zap.String("topic", msg.Topic))
-			continue
-		}
-
-		_ = e.reader.CommitMessages(context.Background(), msg)
+		_ = s.Ack(context.TODO(), msg)
 	}
 }
 
 func (e *eventHandler) Close() error {
 	e.closed.Store(true)
-	err := errgo.Wrap(e.reader.Close(), "kafka.Close")
 	e.search.Close()
-	return err
+	return nil
 }
 
 func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
@@ -112,22 +112,24 @@ func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
 	return nil
 }
 
-func (e *eventHandler) onMessage(msg kafka.Message) error {
-	if len(msg.Value) == 0 {
+func (e *eventHandler) onMessage(key, value []byte) error {
+	if len(value) == 0 {
 		// fake event, just ignore
 		// https://debezium.io/documentation/reference/stable/connectors/mysql.html#mysql-tombstone-events
 		return nil
 	}
 
 	var k messageKey
-	if err := json.Unmarshal(msg.Key, &k); err != nil {
+	if err := json.Unmarshal(key, &k); err != nil {
 		return nil
 	}
 
 	var v messageValue
-	if err := json.Unmarshal(msg.Value, &v); err != nil {
+	if err := json.Unmarshal(value, &v); err != nil {
 		return nil
 	}
+
+	e.log.Debug("new message", zap.String("table", v.Payload.Source.Table))
 
 	var err error
 	switch v.Payload.Source.Table {
