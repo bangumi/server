@@ -81,9 +81,10 @@ func (s *kafkaStream) Read(ctx context.Context, onMessage func(msg Msg) error) e
 		}
 
 		if err := onMessage(m); err != nil {
-			if e := s.k.CommitMessages(ctx, msg); e != nil {
-				return errgo.Trace(err)
-			}
+			return errgo.Trace(err)
+		}
+
+		if err := s.k.CommitMessages(ctx, msg); err != nil {
 			return errgo.Trace(err)
 		}
 	}

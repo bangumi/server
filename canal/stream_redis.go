@@ -123,9 +123,10 @@ func (r *redisStream) Read(ctx context.Context, onMessage func(msg Msg) error) e
 			}
 
 			if err := onMessage(Msg{ID: msg.ID, Stream: msg.Stream, Key: []byte(key), Value: []byte(value)}); err != nil {
-				if e := r.reader.Ack(ctx, msg); e != nil {
-					return errgo.Trace(err)
-				}
+				return errgo.Trace(err)
+			}
+
+			if err := r.reader.Ack(ctx, msg); err != nil {
 				return errgo.Trace(err)
 			}
 		}
