@@ -16,6 +16,7 @@ package stream
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -160,7 +161,10 @@ func (c *Consumer) Ack(ctx context.Context, msgs ...Message) error {
 
 	if len(msgs) == 1 {
 		msg := msgs[0]
-		return c.client.XAck(ctx, msg.Stream, c.cfg.group, msg.ID).Err()
+		return errors.Join(
+			c.client.XAck(ctx, msg.Stream, c.cfg.group, msg.ID).Err(),
+			c.client.XDel(ctx, msg.Stream, msg.ID).Err(),
+		)
 	}
 
 	ids := map[string][]string{}
@@ -171,6 +175,7 @@ func (c *Consumer) Ack(ctx context.Context, msgs ...Message) error {
 	_, err := c.client.Pipelined(ctx, func(p redis.Pipeliner) error {
 		for stream, msgIDs := range ids {
 			p.XAck(ctx, stream, c.cfg.group, msgIDs...)
+			p.XDel(ctx, stream, msgIDs...)
 		}
 		return nil
 	})
