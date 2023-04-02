@@ -64,8 +64,8 @@ func start() error {
 		// driver and connector
 		fx.Provide(
 			config.AppConfigReader(config.AppTypeHTTP),
-			driver.NewRedisClient,         // redis
-			driver.NewMysqlConnectionPool, // mysql
+			driver.NewRedisClientWithMetrics, // redis
+			driver.NewMysqlConnectionPool,    // mysql
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
 				httpClient.JSONUnmarshal = json.Unmarshal

@@ -50,7 +50,16 @@ func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
 		return nil, errgo.Wrap(err, "redis: failed to ping")
 	}
 
-	cli.AddHook(metrics.RedisHook(redisOptions.Addr))
+	return cli, nil
+}
+
+func NewRedisClientWithMetrics(c config.AppConfig) (*redis.Client, error) {
+	cli, err := NewRedisClient(c)
+	if err != nil {
+		return cli, err
+	}
+
+	cli.AddHook(metrics.RedisHook(cli.Options().Addr))
 
 	return cli, nil
 }
