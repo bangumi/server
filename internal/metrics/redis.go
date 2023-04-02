@@ -22,7 +22,7 @@ import (
 func RedisHook(instance string) redis.Hook {
 	return redisprom.NewHook(
 		redisprom.WithNamespace("chii"),
-		redisprom.WithDurationBuckets([]float64{.001, .002, .003, .004, .005, .0075, .01, .05, .1}),
+		redisprom.WithDurationBuckets([]float64{.001, .002, .003, .004, .005, .0075, .01, .05, .1, .3, .5, .75, 1, 2}),
 		redisprom.WithInstanceName(instance),
 	)
 }
