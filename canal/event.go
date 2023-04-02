@@ -17,7 +17,6 @@ package canal
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"sync/atomic"
 
 	"github.com/minio/minio-go/v7"
@@ -37,15 +36,17 @@ func newEventHandler(
 	appConfig config.AppConfig,
 	session session.Manager,
 	redis *redis.Client,
+	stream Stream,
 	search search.Client,
 	s3 *minio.Client,
 ) *eventHandler {
 	return &eventHandler{
+		redis:   redis,
 		config:  appConfig,
 		session: session,
 		search:  search,
-		redis:   redis,
 		s3:      s3,
+		stream:  stream,
 		log:     log.Named("eventHandler"),
 	}
 }
@@ -56,43 +57,26 @@ type eventHandler struct {
 	session session.Manager
 	log     *zap.Logger
 	search  search.Client
-	redis   *redis.Client
+	stream  Stream
 	s3      *minio.Client // optional, check nil before use
+	redis   *redis.Client
 }
 
-var errNoTopic = fmt.Errorf("missing search events topic")
-
 func (e *eventHandler) start() error {
-	if len(e.config.Search.Topics) == 0 {
-		return errNoTopic
-	}
-
-	s, err := newRedisStream(e.config, e.redis)
-	if err != nil {
-		return errgo.Trace(err)
-	}
-
-	ch, err := s.Read(context.TODO())
-	if err != nil {
-		return errgo.Trace(err)
-	}
-
-	for {
-		msg, ok := <-ch
-		if !ok {
-			// chan closed
-			return nil
-		}
+	ee := e.stream.Read(context.Background(), func(msg Msg) error {
 		e.log.Debug("new message", zap.String("stream", msg.Stream), zap.String("id", msg.ID))
 
-		err = e.onMessage(msg.Key, msg.Value)
+		err := e.onMessage(msg.Key, msg.Value)
 		if err != nil {
-			e.log.Error("failed to handle kafka msg", zap.Error(err), zap.String("stream", msg.Stream))
-			continue
+			e.log.Error("failed to handle stream msg",
+				zap.Error(err), zap.String("stream", msg.Stream), zap.String("id", msg.ID))
+			return errgo.Trace(err)
 		}
 
-		_ = s.Ack(context.TODO(), msg)
-	}
+		return nil
+	})
+
+	return errgo.Trace(ee)
 }
 
 func (e *eventHandler) Close() error {

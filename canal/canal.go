@@ -16,6 +16,7 @@ package canal
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -36,15 +37,38 @@ import (
 
 const groupID = "my-group"
 
+var errNoTopic = fmt.Errorf("missing search events topic")
+
+// nolint: funlen
 func Main() error {
+	cfg, err := config.AppConfigReader(config.AppTypeCanal)()
+	if err != nil {
+		return errgo.Trace(err)
+	}
+
+	if len(cfg.Canal.Topics) == 0 {
+		return errNoTopic
+	}
+
+	var opt fx.Option
+	switch cfg.Canal.Broker {
+	case "redis":
+		opt = fx.Provide(newRedisStream)
+	case "kafka":
+		opt = fx.Provide(newKafkaStream)
+	default:
+		return fmt.Errorf("broker not supported, only support redis/kafka as debezium broker") // nolint: goerr113
+	}
+
 	var h *eventHandler
 	di := fx.New(
 		fx.NopLogger,
 		dal.Module,
 
+		fx.Provide(func() config.AppConfig { return cfg }),
+
 		// driver and connector
 		fx.Provide(
-			config.AppConfigReader(config.AppTypeCanal),
 			driver.NewMysqlConnectionPool,
 			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
 			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
@@ -52,6 +76,8 @@ func Main() error {
 
 			newEventHandler,
 		),
+
+		opt,
 
 		fx.Populate(&h),
 	)

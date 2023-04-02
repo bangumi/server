@@ -37,7 +37,7 @@ func newRedisStream(cfg config.AppConfig, redisClient *redis.Client) (Stream, er
 		redisClient,
 		groupID,
 		"canal",
-		lo.Map(cfg.Search.Topics, func(item string, _ int) stream.Option {
+		lo.Map(cfg.Canal.Topics, func(item string, _ int) stream.Option {
 			return stream.WithStream(item)
 		})...,
 	)
@@ -50,7 +50,7 @@ func newRedisStream(cfg config.AppConfig, redisClient *redis.Client) (Stream, er
 		reader: reader,
 	}
 
-	for _, s := range r.cfg.Search.Topics {
+	for _, s := range r.cfg.Canal.Topics {
 		var infos, err = r.redis.XInfoGroups(context.Background(), s).Result()
 		if err != nil {
 			if err.Error() != "ERR no such key" {
@@ -82,57 +82,58 @@ type redisStream struct {
 	reader *stream.Consumer
 }
 
-func (r *redisStream) Read(ctx context.Context) (<-chan Msg, error) {
-	go func() {
-		for {
-			if r.closed.Load() {
-				return
-			}
+func (r *redisStream) Read(ctx context.Context, onMessage func(msg Msg) error) error {
+	for {
+		if r.closed.Load() {
+			return nil
+		}
 
-			rr, err := r.reader.Read(ctx)
-			if err != nil {
-				r.log.Error("failed to read new messages", zap.Error(err))
-				time.Sleep(time.Second)
+		rr, err := r.reader.Read(ctx)
+		if err != nil {
+			r.log.Error("failed to read new messages", zap.Error(err))
+			time.Sleep(time.Second)
+			continue
+		}
+
+		for _, msg := range rr {
+			r.log.Debug("new message", zap.String("id", msg.ID), zap.String("s", msg.Stream))
+
+			rawKey := msg.Values["key"]
+			rawValue := msg.Values["value"]
+
+			if rawKey == nil || rawValue == nil {
+				_ = r.reader.Ack(context.Background(), msg)
 				continue
 			}
 
-			for _, msg := range rr {
-				r.log.Debug("new message", zap.String("id", msg.ID), zap.String("s", msg.Stream))
+			value, ok := rawValue.(string)
+			if !ok {
+				r.log.Error("failed to handle event", zap.String("id", msg.ID),
+					zap.String("value-type", reflect.TypeOf(rawKey).String()))
+				_ = r.reader.Ack(context.Background(), msg)
+				continue
+			}
 
-				rawKey := msg.Values["key"]
-				rawValue := msg.Values["value"]
+			key, ok := rawKey.(string)
+			if !ok {
+				r.log.Error("failed to handle event", zap.String("id", msg.ID),
+					zap.String("key-type", reflect.TypeOf(rawKey).String()))
+				_ = r.reader.Ack(context.Background(), msg)
+				continue
+			}
 
-				if rawKey == nil || rawValue == nil {
-					_ = r.reader.Ack(context.Background(), msg)
-					continue
+			if err := onMessage(Msg{ID: msg.ID, Stream: msg.Stream, Key: []byte(key), Value: []byte(value)}); err != nil {
+				if e := r.reader.Ack(ctx, msg); e != nil {
+					return errgo.Trace(err)
 				}
-
-				value, ok := rawValue.(string)
-				if !ok {
-					r.log.Error("failed to handle event", zap.String("id", msg.ID),
-						zap.String("value-type", reflect.TypeOf(rawKey).String()))
-					_ = r.reader.Ack(context.Background(), msg)
-					continue
-				}
-
-				key, ok := rawKey.(string)
-				if !ok {
-					r.log.Error("failed to handle event", zap.String("id", msg.ID),
-						zap.String("key-type", reflect.TypeOf(rawKey).String()))
-					_ = r.reader.Ack(context.Background(), msg)
-					continue
-				}
-
-				r.ch <- Msg{ID: msg.ID, Stream: msg.Stream, Key: []byte(key), Value: []byte(value)}
+				return errgo.Trace(err)
 			}
 		}
-	}()
-
-	return r.ch, nil
+	}
 }
 
 func (r *redisStream) Close() error {
-	close(r.ch)
+	r.closed.Store(true)
 	return nil
 }
 

@@ -26,7 +26,7 @@ type Msg struct {
 }
 
 type Stream interface {
-	Read(ctx context.Context) (<-chan Msg, error)
-	Ack(ctx context.Context, msg Msg) error
+	Read(ctx context.Context, onMessage func(msg Msg) error) error
+	// Ack(ctx context.Context, msg Msg) error
 	Close() error
 }

@@ -16,15 +16,20 @@ mysql:
 
 hcaptcha_secret_key: 0x0000000000000000000000000000000000000000
 
+canal:
+  broker: "kafka" # or redis (stream)
+
+  kafka_broker: "kafka://192.168.1.3:29092"
+  topics: # kafka topic of redis stream keys
+    - debezium.bangumi.chii_subject_fields
+    - debezium.bangumi.chii_subjects
+    - debezium.bangumi.chii_members
+
 search:
   # 如果为空字符串则不会启用搜索相关的功能。
   meilisearch:
     url: ""
     key: ""
-  topics:
-    - debezium.bangumi.chii_subject_fields
-    - debezium.bangumi.chii_subjects
-    - debezium.bangumi.chii_members
 
 # log slow sql, in go time.Duration format string
 # empty or zero value will disable slow sql logging
