@@ -31,7 +31,7 @@ require (
 	github.com/trim21/go-redis-prometheus v0.0.0
 	github.com/trim21/htest v0.0.3
 	github.com/trim21/pkg v0.0.3
-	github.com/vektra/mockery/v2 v2.23.1
+	github.com/vektra/mockery/v2 v2.23.2
 	go.etcd.io/etcd/client/v3 v3.5.7
 	go.uber.org/fx v1.19.2
 	go.uber.org/zap v1.24.0
