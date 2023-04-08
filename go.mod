@@ -23,7 +23,7 @@ require (
 	github.com/redis/go-redis/v9 v9.0.2
 	github.com/samber/lo v1.38.1
 	github.com/segmentio/kafka-go v0.4.39
-	github.com/spf13/cobra v1.6.1
+	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.2
 	github.com/trim21/errgo v0.0.2
