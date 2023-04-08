@@ -442,8 +442,8 @@ github.com/meilisearch/meilisearch-go v0.23.1/go.mod h1:SxuSqDcPBIykjWz1PX+KzsYz
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
 github.com/minio/md5-simd v1.1.2 h1:Gdi1DZK69+ZVMoNHRXJyNcxrMA4dSxoYHZSQbirFg34=
 github.com/minio/md5-simd v1.1.2/go.mod h1:MzdKDxYpY2BT9XQFocsiZf/NKVtR7nkE4RoEpN+20RM=
-github.com/minio/minio-go/v7 v7.0.50 h1:4IL4V8m/kI90ZL6GupCARZVrBv8/XrcKcJhaJ3iz68k=
-github.com/minio/minio-go/v7 v7.0.50/go.mod h1:IbbodHyjUAguneyucUaahv+VMNs/EOTV9du7A7/Z3HU=
+github.com/minio/minio-go/v7 v7.0.51 h1:eSewrwc23TqUDEH8aw8Bwp4f+JDdozRrPWcKR7DZhmY=
+github.com/minio/minio-go/v7 v7.0.51/go.mod h1:IbbodHyjUAguneyucUaahv+VMNs/EOTV9du7A7/Z3HU=
 github.com/minio/sha256-simd v1.0.0 h1:v1ta+49hkWZyvaKwrQB8elexRqm6Y0aMLjCNsrYxo6g=
 github.com/minio/sha256-simd v1.0.0/go.mod h1:OuYzVNI5vcoYIAmbIvHPl3N3jUzVedXbKy5RFepssQM=
 github.com/mitchellh/cli v1.0.0/go.mod h1:hNIlj7HEI86fIcpObd7a0FcrxTWetlwJDGcceTlRvqc=
