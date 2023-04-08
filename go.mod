@@ -20,7 +20,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.51
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.14.0
-	github.com/redis/go-redis/v9 v9.0.2
+	github.com/redis/go-redis/v9 v9.0.3
 	github.com/samber/lo v1.38.1
 	github.com/segmentio/kafka-go v0.4.39
 	github.com/spf13/cobra v1.6.1
