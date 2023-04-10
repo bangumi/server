@@ -1,0 +1,44 @@
+title: UserSubjectCollectionModifyPayload
+type: object
+description: 所有的字段均可选
+properties:
+  type:
+    description: 修改条目收藏类型
+    allOf:
+      - $ref: "./subject_collection_type.yaml"
+
+  rate:
+    description: 评分，`0` 表示删除评分
+    type: integer
+    maximum: 10
+    minimum: 0
+    exclusiveMaximum: false
+    exclusiveMinimum: false
+
+  ep_status:
+    description: "只能用于修改书籍条目进度"
+    type: integer
+    minimum: 0
+    exclusiveMinimum: false
+
+  vol_status:
+    description: "只能用于修改书籍条目进度"
+    type: integer
+    minimum: 0
+    exclusiveMinimum: false
+
+  comment:
+    description: "评价"
+    type: string
+
+  private:
+    description: "仅自己可见"
+    type: boolean
+
+  tags:
+    title: 标签
+    description: 不传或者 `null` 都会被忽略，传 `[]` 则会删除所有 tag。
+    type: array
+    items:
+      type: string
+      description: 不能包含空格
