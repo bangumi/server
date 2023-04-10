@@ -70,14 +70,16 @@ func rankRule() *[]string {
 }
 
 type Record struct {
-	Date   string           `json:"date"`
-	Image  string           `json:"image"`
-	Name   string           `json:"name"`
-	NameCN string           `json:"name_cn"`
-	Tags   []res.SubjectTag `json:"tags"`
-	Score  float64          `json:"score"`
-	ID     model.SubjectID  `json:"id"`
-	Rank   uint32           `json:"rank"`
+	Date    string           `json:"date"`
+	Image   string           `json:"image"`
+	Type    uint8            `json:"type"`
+	Summary string           `json:"summary"`
+	Name    string           `json:"name"`
+	NameCN  string           `json:"name_cn"`
+	Tags    []res.SubjectTag `json:"tags"`
+	Score   float64          `json:"score"`
+	ID      model.SubjectID  `json:"id"`
+	Rank    uint32           `json:"rank"`
 }
 
 func extractSubject(s *model.Subject) subjectIndex {

@@ -107,10 +107,12 @@ func (c *client) Handle(ctx echo.Context) error {
 		s := subjects[id]
 
 		return Record{
-			Date:   s.Date,
-			Image:  res.SubjectImage(s.Image).Large,
-			Name:   s.Name,
-			NameCN: s.NameCN,
+			Date:    s.Date,
+			Image:   res.SubjectImage(s.Image).Large,
+			Type:    s.TypeID,
+			Summary: s.Summary,
+			Name:    s.Name,
+			NameCN:  s.NameCN,
 			Tags: slice.Map(s.Tags, func(item model.Tag) res.SubjectTag {
 				return res.SubjectTag{Name: item.Name, Count: item.Count}
 			}),
