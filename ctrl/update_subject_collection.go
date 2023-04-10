@@ -96,7 +96,6 @@ func (ctl Ctrl) UpdateSubjectCollection(
 					return nil, e
 				}
 			}
-
 			return s, nil
 		},
 	)
