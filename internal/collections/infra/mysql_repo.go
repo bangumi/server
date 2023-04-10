@@ -92,8 +92,58 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		}
 		return err
 	}
+	return r.updateOrCreateSubjectCollection(ctx, userID, subjectID, at, ip, update, s)
+}
+
+func (r mysqlRepo) createSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+) (*collection.Subject, error) {
+	t := r.q.SubjectCollection
+	err := t.WithContext(ctx).Create(&dao.SubjectCollection{
+		UserID:    userID,
+		SubjectID: subjectID,
+	})
+	if err != nil {
+		return nil, gerr.WrapGormError(err)
+	}
+	s := collection.NewEmptySubjectCollection(userID, subjectID)
+	return s, nil
+}
+
+func (r mysqlRepo) UpdateOrCreateSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	at time.Time,
+	ip string,
+	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
+) error {
+	s, err := r.getSubjectCollection(ctx, userID, subjectID)
+	if err != nil {
+		if !errors.Is(err, gerr.ErrNotFound) {
+			return err
+		}
+		s, err = r.createSubjectCollection(ctx, userID, subjectID)
+		if err != nil {
+			return errgo.Wrap(err, "create subject collection failed")
+		}
+	}
+	return r.updateOrCreateSubjectCollection(ctx, userID, subjectID, at, ip, update, s)
+}
+
+func (r mysqlRepo) updateOrCreateSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	at time.Time,
+	ip string,
+	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
+	s *collection.Subject,
+) error {
 	original := *s
-	s, err = update(ctx, s)
+	s, err := update(ctx, s)
 	if err != nil {
 		return errgo.Trace(err)
 	}

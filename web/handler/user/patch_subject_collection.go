@@ -46,13 +46,33 @@ func (h User) PatchSubjectCollection(c echo.Context) error {
 		return err
 	}
 
-	return h.patchSubjectCollection(c, subjectID, r)
+	return h.patchSubjectCollection(c, subjectID, r, false)
 }
 
 func (h User) patchSubjectCollection(
 	c echo.Context,
 	subjectID model.SubjectID,
 	r req.SubjectEpisodeCollectionPatch,
+	allowCreate bool, // 如果不存在 record 是否允许创建
+) error {
+	if err := h.updateOrCreateSubjectCollection(c, subjectID, r, allowCreate); err != nil {
+		switch {
+		case errors.Is(err, gerr.ErrSubjectNotCollected):
+			return res.NotFound("subject not collected")
+		case errors.Is(err, gerr.ErrSubjectNotFound):
+			return res.NotFound("subject not found")
+		}
+		return errgo.Wrap(err, "ctrl.UpdateSubjectCollection")
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
+func (h User) updateOrCreateSubjectCollection(
+	c echo.Context,
+	subjectID model.SubjectID,
+	r req.SubjectEpisodeCollectionPatch,
+	allowCreate bool, // 如果不存在 record 是否允许创建
 ) error {
 	u := accessor.GetFromCtx(c)
 
@@ -70,7 +90,7 @@ func (h User) patchSubjectCollection(
 		}
 	}
 
-	err = h.ctrl.UpdateSubjectCollection(c.Request().Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
+	return h.ctrl.UpdateSubjectCollection(c.Request().Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
 		IP:        u.IP,
 		UID:       u.ID,
 		VolStatus: r.VolStatus,
@@ -80,16 +100,5 @@ func (h User) patchSubjectCollection(
 		Comment:   r.Comment,
 		Rate:      r.Rate,
 		Private:   r.Private,
-	})
-	if err != nil {
-		switch {
-		case errors.Is(err, gerr.ErrSubjectNotCollected):
-			return res.NotFound("subject not collected")
-		case errors.Is(err, gerr.ErrSubjectNotFound):
-			return res.NotFound("subject not found")
-		}
-		return errgo.Wrap(err, "ctrl.UpdateSubjectCollection")
-	}
-
-	return c.NoContent(http.StatusNoContent)
+	}, allowCreate)
 }
