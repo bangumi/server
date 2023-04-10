@@ -19,7 +19,6 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/pkg/wiki"
-	"github.com/bangumi/server/web/res"
 )
 
 // 最终 meilisearch 索引的文档.
@@ -67,19 +66,6 @@ func rankRule() *[]string {
 		"score:desc",
 		"nsfw:asc",
 	}
-}
-
-type Record struct {
-	Date    string           `json:"date"`
-	Image   string           `json:"image"`
-	Type    uint8            `json:"type"`
-	Summary string           `json:"summary"`
-	Name    string           `json:"name"`
-	NameCN  string           `json:"name_cn"`
-	Tags    []res.SubjectTag `json:"tags"`
-	Score   float64          `json:"score"`
-	ID      model.SubjectID  `json:"id"`
-	Rank    uint32           `json:"rank"`
 }
 
 func extractSubject(s *model.Subject) subjectIndex {
