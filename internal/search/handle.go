@@ -71,6 +71,19 @@ type hit struct {
 	ID model.SubjectID `json:"id"`
 }
 
+type ReponseSubject struct {
+	Date    string           `json:"date"`
+	Image   string           `json:"image"`
+	Type    uint8            `json:"type"`
+	Summary string           `json:"summary"`
+	Name    string           `json:"name"`
+	NameCN  string           `json:"name_cn"`
+	Tags    []res.SubjectTag `json:"tags"`
+	Score   float64          `json:"score"`
+	ID      model.SubjectID  `json:"id"`
+	Rank    uint32           `json:"rank"`
+}
+
 func (c *client) Handle(ctx echo.Context) error {
 	auth := accessor.GetFromCtx(ctx)
 	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
@@ -103,14 +116,16 @@ func (c *client) Handle(ctx echo.Context) error {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
 
-	data := slice.Map(ids, func(id model.SubjectID) Record {
+	data := slice.Map(ids, func(id model.SubjectID) ReponseSubject {
 		s := subjects[id]
 
-		return Record{
-			Date:   s.Date,
-			Image:  res.SubjectImage(s.Image).Large,
-			Name:   s.Name,
-			NameCN: s.NameCN,
+		return ReponseSubject{
+			Date:    s.Date,
+			Image:   res.SubjectImage(s.Image).Large,
+			Type:    s.TypeID,
+			Summary: s.Summary,
+			Name:    s.Name,
+			NameCN:  s.NameCN,
 			Tags: slice.Map(s.Tags, func(item model.Tag) res.SubjectTag {
 				return res.SubjectTag{Name: item.Name, Count: item.Count}
 			}),
