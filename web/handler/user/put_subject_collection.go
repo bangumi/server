@@ -15,33 +15,11 @@
 package user
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
-
-	"github.com/bangumi/server/web/req"
-	"github.com/bangumi/server/web/res"
 )
 
-func (h User) PostSubjectCollection(c echo.Context) error {
-	subjectID, err := req.ParseID(c.Param("subject_id"))
-	if err != nil {
-		return err
-	}
-
-	var r req.SubjectEpisodeCollectionPatch
-	if err = c.Echo().JSONSerializer.Deserialize(c, &r); err != nil {
-		return res.JSONError(c, err)
-	}
-
-	if err = r.Validate(); err != nil {
-		return err
-	}
-
-	// 与 PatchSubjectCollection 一致
-	// 但允许创建，如果不存在
-	if err := h.updateOrCreateSubjectCollection(c, subjectID, r, true); err != nil {
-		return err
-	}
-	return c.NoContent(http.StatusAccepted)
+func (h User) PutSubjectCollection(c echo.Context) error {
+	// 与 PostSubjectCollection 一致
+	// 留个占位
+	return h.PostSubjectCollection(c)
 }

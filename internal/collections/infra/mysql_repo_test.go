@@ -134,6 +134,83 @@ func TestMysqlRepo_GetEpisodeCollection(t *testing.T) {
 	}
 }
 
+func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 40000
+	const sid model.SubjectID = 1000
+
+	repo, q := getRepo(t)
+	table := q.SubjectCollection
+
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete()
+		require.NoError(t, err)
+	})
+
+	err := table.WithContext(context.Background()).Create(
+		&dao.SubjectCollection{
+			UserID: uid, SubjectID: sid + 1, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
+		},
+		&dao.SubjectCollection{
+			UserID: uid + 1, SubjectID: sid, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
+		},
+	)
+	require.NoError(t, err)
+
+	now := time.Now()
+
+	// DB 里没有数据
+	_, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
+	require.Error(t, err)
+
+	// 创建
+	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, sid, now, "",
+		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
+			return s, nil
+		})
+	require.NoError(t, err)
+
+	// DB 里有数据
+	_, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
+	require.NoError(t, err)
+
+	// 更新
+	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, sid, now, "",
+		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
+			require.NoError(t, s.UpdateComment("c"))
+			require.NoError(t, s.UpdateRate(1))
+			s.UpdateType(collection.SubjectCollectionDropped)
+			return s, nil
+		})
+	require.NoError(t, err)
+
+	r, err := table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
+	require.NoError(t, err)
+
+	require.EqualValues(t, now.Unix(), r.UpdatedTime)
+	require.True(t, r.HasComment)
+	require.Equal(t, "c", string(r.Comment))
+	require.Equal(t, uint8(1), r.Rate)
+	require.EqualValues(t, now.Unix(), r.DroppedTime)
+	require.Zero(t, r.WishTime)
+	require.Zero(t, r.DoingTime)
+	require.Zero(t, r.DoneTime)
+	require.Zero(t, r.OnHoldTime)
+
+	// 确认不会影响到其他用户或 subject
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid+1), table.UserID.Eq(uid)).Take()
+	require.NoError(t, err)
+
+	require.EqualValues(t, 8, r.Rate)
+
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid+1)).Take()
+	require.NoError(t, err)
+
+	require.EqualValues(t, 8, r.Rate)
+}
+
 func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
