@@ -85,6 +85,72 @@ func TestUser_PostSubjectCollection(t *testing.T) {
 	require.EqualValues(t, 8, s.Rate())
 }
 
+func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
+	t.Parallel()
+	const sid model.SubjectID = 8
+	const uid model.UserID = 1
+
+	var s = &collection.Subject{}
+
+	a := mocks.NewAuthService(t)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
+
+	tl := mocks.NewTimeLineService(t)
+	tl.EXPECT().
+		ChangeSubjectCollection(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(nil)
+
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().UpdateOrCreateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+		Run(func(ctx context.Context, userID uint32,
+			subjectID uint32, at time.Time, ip string,
+			update func(context.Context, *collection.Subject) (*collection.Subject, error)) {
+			require.Equal(t, "0.0.0.0", ip)
+			s = lo.Must(update(context.Background(), s))
+		}).
+		Return(nil)
+
+	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
+	require.NoError(t, err)
+
+	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d, TimeLineSrv: tl})
+
+	htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer t").
+		BodyJSON(map[string]any{
+			"type":    3,
+			"comment": "1 test_content 2",
+		}).
+		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+		ExpectCode(http.StatusAccepted)
+
+	require.Equal(t, "1 test_content 2", s.Comment())
+	require.EqualValues(t, []string(nil), s.Tags())
+	require.Equal(t, collection.SubjectCollectionDoing, s.TypeID())
+
+	htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer t").
+		BodyJSON(map[string]any{
+			"type": 2,
+		}).
+		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+		ExpectCode(http.StatusAccepted)
+
+	require.Equal(t, collection.SubjectCollectionDone, s.TypeID())
+	require.Equal(t, "1 test_content 2", s.Comment())
+	require.EqualValues(t, []string(nil), s.Tags())
+
+	htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer t").
+		BodyJSON(map[string]any{
+			"tags": []string{"q", "vv"},
+		}).
+		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+		ExpectCode(http.StatusAccepted)
+
+	require.EqualValues(t, []string{"q", "vv"}, s.Tags())
+}
+
 func TestUser_PostSubjectCollection_badID(t *testing.T) {
 	t.Parallel()
 
