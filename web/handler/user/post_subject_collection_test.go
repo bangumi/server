@@ -85,6 +85,40 @@ func TestUser_PostSubjectCollection(t *testing.T) {
 	require.EqualValues(t, 8, s.Rate())
 }
 
+func TestUser_PostSubjectCollection_badID(t *testing.T) {
+	t.Parallel()
+
+	a := mocks.NewAuthService(t)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
+
+	tl := mocks.NewTimeLineService(t)
+	c := mocks.NewCollectionRepo(t)
+
+	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
+	require.NoError(t, err)
+
+	app := test.GetWebApp(t, test.Mock{CollectionRepo: c, AuthService: a, Dam: &d, TimeLineSrv: tl})
+
+	badURLs := []string{
+		"/v0/users/-/collections/abc",
+		"/v0/users/-/collections/123_",
+		"/v0/users/-/collections/s123",
+		"/v0/users/-/collections/_123",
+		"/v0/users/-/collections/_abc",
+		"/v0/users/-/collections/_",
+	}
+
+	for _, url := range badURLs {
+		htest.New(t, app).
+			Header(echo.HeaderAuthorization, "Bearer t").
+			BodyJSON(map[string]any{
+				"comment": "1 test_content 2",
+			}).
+			Post(url).
+			ExpectCode(http.StatusBadRequest)
+	}
+}
+
 func TestUser_PostSubjectCollection_bad(t *testing.T) {
 	t.Parallel()
 	const uid model.UserID = 1
