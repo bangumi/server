@@ -8,13 +8,3 @@
 ```bash
 npm test
 ```
-
-## 编辑
-
-https://github.com/swagger-api/swagger-editor#docker
-
-```
-$ docker run -p 8061:8080 -v $(pwd)/openapi:/tmp -e SWAGGER_FILE=/tmp/v0.yaml swaggerapi/swagger-editor
-# or
-$ docker run -p 8061:8080 -v $(pwd)/openapi:/tmp -e SWAGGER_FILE=/tmp/private.yaml swaggerapi/swagger-editor
-```
