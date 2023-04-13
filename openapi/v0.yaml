@@ -878,7 +878,7 @@ paths:
     post:
       tags:
         - 收藏
-      summary: 修改用户单个收藏
+      summary: 新增或修改用户单个收藏
       description: |
         修改条目收藏状态, 如果不存在则创建，如果存在则修改
 
