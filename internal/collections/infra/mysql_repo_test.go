@@ -111,8 +111,10 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 	const uid model.UserID = 32000
 
 	repo, q := getRepo(t)
+
+	var err error
 	test.RunAndCleanup(t, func() {
-		_, err := q.SubjectCollection.
+		_, err = q.SubjectCollection.
 			WithContext(context.Background()).
 			Where(q.SubjectCollection.UserID.Eq(uid)).
 			Delete()
@@ -125,7 +127,7 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 	require.Len(t, data, 0)
 
 	for i := 0; i < 5; i++ {
-		err := q.SubjectCollection.
+		err = q.SubjectCollection.
 			WithContext(context.Background()).
 			Create(&dao.SubjectCollection{
 				UserID:      uid,
@@ -137,7 +139,7 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 	}
 
 	for i := 0; i < 2; i++ {
-		err := q.SubjectCollection.
+		err = q.SubjectCollection.
 			WithContext(context.Background()).
 			Create(&dao.SubjectCollection{
 				UserID:      uid,
@@ -390,7 +392,6 @@ func TestMysqlRepo_UpdateSubjectCollectionType(t *testing.T) {
 	require.Zero(t, r.WishTime)
 	require.Zero(t, r.DoneTime)
 	require.Zero(t, r.OnHoldTime)
-
 }
 func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)

@@ -138,7 +138,7 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
-	original := *collectionSubject
+	original := collectionSubject
 
 	// Update subject collection
 	s, err := update(ctx, collectionSubject)
@@ -146,31 +146,8 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
-	{
-		obj.UpdatedTime = uint32(at.Unix())
-		obj.Comment = utiltype.HTMLEscapedString(s.Comment())
-		obj.HasComment = s.Comment() != ""
-		obj.Tag = strings.Join(s.Tags(), " ")
-		obj.EpStatus = s.Eps()
-		obj.VolStatus = s.Vols()
-		obj.Rate = s.Rate()
-		obj.Private = uint8(s.Privacy())
-		obj.Type = uint8(s.TypeID())
-	}
-
-	if s.TypeID() != original.TypeID() {
-		err = r.updateCollectionTime(obj, s.TypeID(), at)
-		if err != nil {
-			return errgo.Trace(err)
-		}
-	}
-
-	// Update IP
-	if ip != "" {
-		obj.LastUpdateIP = ip
-		if created {
-			obj.CreateIP = ip
-		}
+	if err = r.updateSubjectCollection(obj, original, s, at, ip, created); err != nil {
+		return errgo.Trace(err)
 	}
 
 	T := r.q.SubjectCollection
@@ -185,6 +162,43 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 	}
 
 	r.updateSubject(ctx, subjectID)
+	return nil
+}
+
+// 根据新旧 collection.Subject 状态
+// 更新 dao.SubjectCollection
+func (r mysqlRepo) updateSubjectCollection(
+	obj *dao.SubjectCollection,
+	original *collection.Subject,
+	s *collection.Subject,
+	at time.Time,
+	ip string,
+	isNew bool,
+) error {
+	obj.UpdatedTime = uint32(at.Unix())
+	obj.Comment = utiltype.HTMLEscapedString(s.Comment())
+	obj.HasComment = s.Comment() != ""
+	obj.Tag = strings.Join(s.Tags(), " ")
+	obj.EpStatus = s.Eps()
+	obj.VolStatus = s.Vols()
+	obj.Rate = s.Rate()
+	obj.Private = uint8(s.Privacy())
+	obj.Type = uint8(s.TypeID())
+
+	if s.TypeID() != original.TypeID() {
+		err := r.updateCollectionTime(obj, s.TypeID(), at)
+		if err != nil {
+			return errgo.Trace(err)
+		}
+	}
+
+	// Update IP
+	if ip != "" {
+		obj.LastUpdateIP = ip
+		if isNew {
+			obj.CreateIP = ip
+		}
+	}
 	return nil
 }
 
