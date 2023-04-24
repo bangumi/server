@@ -166,7 +166,7 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 }
 
 // 根据新旧 collection.Subject 状态
-// 更新 dao.SubjectCollection
+// 更新 dao.SubjectCollection.
 func (r mysqlRepo) updateSubjectCollection(
 	obj *dao.SubjectCollection,
 	original *collection.Subject,
