@@ -29,7 +29,6 @@ import (
 	"github.com/trim21/htest"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/mocks"
@@ -38,7 +37,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func TestUser_PatchSubjectCollection(t *testing.T) {
+func TestUser_PostSubjectCollection(t *testing.T) {
 	t.Parallel()
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
@@ -54,14 +53,14 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		Return(nil)
 
 	c := mocks.NewCollectionRepo(t)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+	c.EXPECT().UpdateOrCreateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(ctx context.Context, userID uint32,
 			subjectID uint32, at time.Time, ip string,
 			update func(context.Context, *collection.Subject) (*collection.Subject, error)) {
 			require.Equal(t, "0.0.0.0", ip)
-
 			s = lo.Must(update(context.Background(), s))
-		}).Return(nil)
+		}).
+		Return(nil)
 
 	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
 	require.NoError(t, err)
@@ -77,8 +76,8 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 			"rate":    8,
 			"tags":    []string{"q", "vv"},
 		}).
-		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
-		ExpectCode(http.StatusNoContent)
+		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+		ExpectCode(http.StatusAccepted)
 
 	require.Equal(t, collection.CollectPrivacySelf, s.Privacy())
 	require.Equal(t, "1 test_content 2", s.Comment())
@@ -86,19 +85,30 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	require.EqualValues(t, 8, s.Rate())
 }
 
-func TestUser_PatchToNonExistsSubjectCollection(t *testing.T) {
+func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
 	t.Parallel()
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
+
+	var s = &collection.Subject{}
 
 	a := mocks.NewAuthService(t)
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
 	tl := mocks.NewTimeLineService(t)
+	tl.EXPECT().
+		ChangeSubjectCollection(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(nil)
 
 	c := mocks.NewCollectionRepo(t)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
-		Return(gerr.ErrSubjectNotCollected)
+	c.EXPECT().UpdateOrCreateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+		Run(func(ctx context.Context, userID uint32,
+			subjectID uint32, at time.Time, ip string,
+			update func(context.Context, *collection.Subject) (*collection.Subject, error)) {
+			require.Equal(t, "0.0.0.0", ip)
+			s = lo.Must(update(context.Background(), s))
+		}).
+		Return(nil)
 
 	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
 	require.NoError(t, err)
@@ -108,17 +118,40 @@ func TestUser_PatchToNonExistsSubjectCollection(t *testing.T) {
 	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
 		BodyJSON(map[string]any{
+			"type":    3,
 			"comment": "1 test_content 2",
-			"type":    1,
-			"private": true,
-			"rate":    8,
-			"tags":    []string{"q", "vv"},
 		}).
-		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
-		ExpectCode(http.StatusNotFound)
+		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+		ExpectCode(http.StatusAccepted)
+
+	require.Equal(t, "1 test_content 2", s.Comment())
+	require.EqualValues(t, []string(nil), s.Tags())
+	require.Equal(t, collection.SubjectCollectionDoing, s.TypeID())
+
+	htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer t").
+		BodyJSON(map[string]any{
+			"type": 2,
+		}).
+		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+		ExpectCode(http.StatusAccepted)
+
+	require.Equal(t, collection.SubjectCollectionDone, s.TypeID())
+	require.Equal(t, "1 test_content 2", s.Comment())
+	require.EqualValues(t, []string(nil), s.Tags())
+
+	htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer t").
+		BodyJSON(map[string]any{
+			"tags": []string{"q", "vv"},
+		}).
+		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+		ExpectCode(http.StatusAccepted)
+
+	require.EqualValues(t, []string{"q", "vv"}, s.Tags())
 }
 
-func TestUser_PatchSubjectCollection_badID(t *testing.T) {
+func TestUser_PostSubjectCollection_badID(t *testing.T) {
 	t.Parallel()
 
 	a := mocks.NewAuthService(t)
@@ -147,12 +180,12 @@ func TestUser_PatchSubjectCollection_badID(t *testing.T) {
 			BodyJSON(map[string]any{
 				"comment": "1 test_content 2",
 			}).
-			Patch(url).
+			Post(url).
 			ExpectCode(http.StatusBadRequest)
 	}
 }
 
-func TestUser_PatchSubjectCollection_bad(t *testing.T) {
+func TestUser_PostSubjectCollection_bad(t *testing.T) {
 	t.Parallel()
 	const uid model.UserID = 1
 	const sid model.SubjectID = 8
@@ -168,7 +201,7 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
 			BodyJSON(echo.Map{"rate": 11}).
-			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+			Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			ExpectCode(http.StatusBadRequest)
 	})
 
@@ -180,7 +213,7 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
 			BodyJSON(echo.Map{"type": 0}).
-			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+			Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			ExpectCode(http.StatusBadRequest)
 	})
 
@@ -192,7 +225,7 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
 			BodyJSON(echo.Map{"tags": "vv qq"}).
-			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+			Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			ExpectCode(http.StatusBadRequest)
 	})
 
@@ -204,7 +237,7 @@ func TestUser_PatchSubjectCollection_bad(t *testing.T) {
 		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
 			BodyJSON(echo.Map{"comment": strings.Repeat("vv qq", 200)}).
-			Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
+			Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			ExpectCode(http.StatusBadRequest)
 	})
 }

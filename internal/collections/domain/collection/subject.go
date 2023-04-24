@@ -67,6 +67,13 @@ func NewSubjectCollection(
 	}, nil
 }
 
+func NewEmptySubjectCollection(subject model.SubjectID, user model.UserID) *Subject {
+	return &Subject{
+		subject: subject,
+		user:    user,
+	}
+}
+
 type Subject struct {
 	subject model.SubjectID
 	user    model.UserID

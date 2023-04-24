@@ -57,13 +57,17 @@ type mysqlRepo struct {
 
 func (r mysqlRepo) getSubjectCollection(
 	ctx context.Context, user model.UserID, subject model.SubjectID,
-) (*collection.Subject, error) {
+) (*dao.SubjectCollection, error) {
 	s, err := r.q.SubjectCollection.WithContext(ctx).
 		Where(r.q.SubjectCollection.UserID.Eq(user), r.q.SubjectCollection.SubjectID.Eq(subject)).Take()
 	if err != nil {
 		return nil, gerr.WrapGormError(err)
 	}
 
+	return s, nil
+}
+
+func (r mysqlRepo) convertToSubjectCollection(s *dao.SubjectCollection) (*collection.Subject, error) {
 	return collection.NewSubjectCollection(
 		s.SubjectID,
 		s.UserID,
@@ -92,38 +96,109 @@ func (r mysqlRepo) UpdateSubjectCollection(
 		}
 		return err
 	}
-	original := *s
-	s, err = update(ctx, s)
+	return r.updateOrCreateSubjectCollection(ctx, userID, subjectID, at, ip, update, s)
+}
+
+func (r mysqlRepo) UpdateOrCreateSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	at time.Time,
+	ip string,
+	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
+) error {
+	s, err := r.getSubjectCollection(ctx, userID, subjectID)
+	if err != nil {
+		if !errors.Is(err, gerr.ErrNotFound) {
+			return err
+		}
+		s = nil
+	}
+	return r.updateOrCreateSubjectCollection(ctx, userID, subjectID, at, ip, update, s)
+}
+
+func (r mysqlRepo) updateOrCreateSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+	at time.Time,
+	ip string,
+	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
+	obj *dao.SubjectCollection,
+) error {
+	created := obj == nil
+	if created {
+		obj = &dao.SubjectCollection{
+			SubjectID: subjectID,
+			UserID:    userID,
+		}
+	}
+	collectionSubject, err := r.convertToSubjectCollection(obj)
 	if err != nil {
 		return errgo.Trace(err)
 	}
 
-	t := r.q.SubjectCollection
-	var updater = []field.AssignExpr{
-		t.UpdatedTime.Value(uint32(at.Unix())), t.Comment.Value(utiltype.HTMLEscapedString(s.Comment())),
-		t.HasComment.Value(s.Comment() != ""), t.Tag.Value(strings.Join(s.Tags(), " ")),
-		t.EpStatus.Value(s.Eps()), t.VolStatus.Value(s.Vols()), t.Rate.Value(s.Rate()),
-		t.Private.Value(uint8(s.Privacy())), t.Type.Value(uint8(s.TypeID())),
+	original := *collectionSubject
+
+	// Update subject collection
+	s, err := update(ctx, collectionSubject)
+	if err != nil {
+		return errgo.Trace(err)
 	}
 
-	if s.TypeID() != original.TypeID() {
-		u, e := r.subjectCollectionUpdater(s.TypeID(), at)
-		if e != nil {
-			return errgo.Trace(e)
-		}
-		updater = append(updater, u)
+	if err = r.updateSubjectCollection(obj, &original, s, at, ip, created); err != nil {
+		return errgo.Trace(err)
 	}
 
-	if ip != "" {
-		updater = append(updater, t.LastUpdateIP.Value(ip))
+	T := r.q.SubjectCollection
+	if created {
+		err = T.WithContext(ctx).Create(obj)
+	} else {
+		err = T.WithContext(ctx).Save(obj)
 	}
 
-	_, err = t.WithContext(ctx).Where(t.SubjectID.Eq(subjectID), t.UserID.Eq(userID)).UpdateSimple(updater...)
 	if err != nil {
 		return errgo.Trace(err)
 	}
 
 	r.updateSubject(ctx, subjectID)
+	return nil
+}
+
+// 根据新旧 collection.Subject 状态
+// 更新 dao.SubjectCollection.
+func (r mysqlRepo) updateSubjectCollection(
+	obj *dao.SubjectCollection,
+	original *collection.Subject,
+	s *collection.Subject,
+	at time.Time,
+	ip string,
+	isNew bool,
+) error {
+	obj.UpdatedTime = uint32(at.Unix())
+	obj.Comment = utiltype.HTMLEscapedString(s.Comment())
+	obj.HasComment = s.Comment() != ""
+	obj.Tag = strings.Join(s.Tags(), " ")
+	obj.EpStatus = s.Eps()
+	obj.VolStatus = s.Vols()
+	obj.Rate = s.Rate()
+	obj.Private = uint8(s.Privacy())
+	obj.Type = uint8(s.TypeID())
+
+	if s.TypeID() != original.TypeID() {
+		err := r.updateCollectionTime(obj, s.TypeID(), at)
+		if err != nil {
+			return errgo.Trace(err)
+		}
+	}
+
+	// Update IP
+	if ip != "" {
+		obj.LastUpdateIP = ip
+		if isNew {
+			obj.CreateIP = ip
+		}
+	}
 	return nil
 }
 
@@ -363,23 +438,25 @@ func (r mysqlRepo) updateSubjectTags(ctx context.Context, subjectID model.Subjec
 	return errgo.Wrap(err, "failed to update subject field")
 }
 
-func (r mysqlRepo) subjectCollectionUpdater(t collection.SubjectCollection, at time.Time) (field.AssignExpr, error) {
+func (r mysqlRepo) updateCollectionTime(obj *dao.SubjectCollection,
+	t collection.SubjectCollection, at time.Time) error {
 	switch t {
 	case collection.SubjectCollectionAll:
-		return nil, errgo.Wrap(gerr.ErrInput, "can't set collection type to SubjectCollectionAll")
+		return errgo.Wrap(gerr.ErrInput, "can't set collection type to SubjectCollectionAll")
 	case collection.SubjectCollectionWish:
-		return r.q.SubjectCollection.WishTime.Value(uint32(at.Unix())), nil
+		obj.WishTime = uint32(at.Unix())
 	case collection.SubjectCollectionDone:
-		return r.q.SubjectCollection.DoneTime.Value(uint32(at.Unix())), nil
+		obj.DoneTime = uint32(at.Unix())
 	case collection.SubjectCollectionDoing:
-		return r.q.SubjectCollection.DoingTime.Value(uint32(at.Unix())), nil
+		obj.DoingTime = uint32(at.Unix())
 	case collection.SubjectCollectionDropped:
-		return r.q.SubjectCollection.DroppedTime.Value(uint32(at.Unix())), nil
+		obj.DroppedTime = uint32(at.Unix())
 	case collection.SubjectCollectionOnHold:
-		return r.q.SubjectCollection.OnHoldTime.Value(uint32(at.Unix())), nil
+		obj.OnHoldTime = uint32(at.Unix())
+	default:
+		return errgo.Wrap(gerr.ErrInput, fmt.Sprintln("invalid subject collection type", t))
 	}
-
-	return nil, errgo.Wrap(gerr.ErrInput, fmt.Sprintln("invalid subject collection type", t))
+	return nil
 }
 
 func (r mysqlRepo) UpdateEpisodeCollection(

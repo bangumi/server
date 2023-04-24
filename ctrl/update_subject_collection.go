@@ -48,9 +48,14 @@ func (ctl Ctrl) UpdateSubjectCollection(
 	u auth.Auth,
 	subjectID model.SubjectID,
 	req UpdateCollectionRequest,
+	allowCreate bool,
 ) error {
 	ctl.log.Info("try to update collection", zap.Uint32("subject_id", subjectID), log.User(u.ID))
-	err := ctl.collection.UpdateSubjectCollection(ctx, u.ID, subjectID, time.Now(), req.IP,
+	met := ctl.collection.UpdateSubjectCollection
+	if allowCreate {
+		met = ctl.collection.UpdateOrCreateSubjectCollection
+	}
+	err := met(ctx, u.ID, subjectID, time.Now(), req.IP,
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			if req.Comment.Set {
 				s.ShadowBan(ctl.dam.NeedReview(req.Comment.Value))
@@ -91,7 +96,6 @@ func (ctl Ctrl) UpdateSubjectCollection(
 					return nil, e
 				}
 			}
-
 			return s, nil
 		},
 	)
