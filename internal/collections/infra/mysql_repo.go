@@ -138,7 +138,7 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
-	original := collectionSubject
+	original := *collectionSubject
 
 	// Update subject collection
 	s, err := update(ctx, collectionSubject)
@@ -146,7 +146,7 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
-	if err = r.updateSubjectCollection(obj, original, s, at, ip, created); err != nil {
+	if err = r.updateSubjectCollection(obj, &original, s, at, ip, created); err != nil {
 		return errgo.Trace(err)
 	}
 
