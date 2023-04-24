@@ -108,26 +108,80 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const id model.UserID = 32000
+	const uid model.UserID = 32000
 
-	repo, _ := getRepo(t)
+	repo, q := getRepo(t)
+	test.RunAndCleanup(t, func() {
+		_, err := q.SubjectCollection.
+			WithContext(context.Background()).
+			Where(q.SubjectCollection.UserID.Eq(uid)).
+			Delete()
+		require.NoError(t, err)
+	})
 
-	data, err := repo.ListSubjectCollection(context.Background(), id,
-		model.SubjectTypeGame, collection.SubjectCollectionAll, true, 5, 0)
+	data, err := repo.ListSubjectCollection(context.Background(), uid,
+		model.SubjectTypeAll, collection.SubjectCollectionAll, true, 5, 0)
 	require.NoError(t, err)
-	require.Len(t, data, 5)
+	require.Len(t, data, 0)
+
+	for i := 0; i < 5; i++ {
+		err := q.SubjectCollection.
+			WithContext(context.Background()).
+			Create(&dao.SubjectCollection{
+				UserID:      uid,
+				SubjectID:   model.SubjectID(100 + i),
+				SubjectType: model.SubjectTypeAnime,
+				UpdatedTime: uint32(time.Now().Unix()),
+			})
+		require.NoError(t, err)
+	}
+
+	for i := 0; i < 2; i++ {
+		err := q.SubjectCollection.
+			WithContext(context.Background()).
+			Create(&dao.SubjectCollection{
+				UserID:      uid,
+				SubjectID:   model.SubjectID(200 + i),
+				SubjectType: model.SubjectTypeGame,
+				UpdatedTime: uint32(time.Now().Unix()),
+			})
+		require.NoError(t, err)
+	}
+
+	getList := func(subjectType model.SubjectType) []collection.UserSubjectCollection {
+		data, err = repo.ListSubjectCollection(context.Background(), uid,
+			subjectType, collection.SubjectCollectionAll, true, 10, 0)
+		require.NoError(t, err)
+		return data
+	}
+	require.Len(t, getList(model.SubjectTypeAll), 7)
+	require.Len(t, getList(model.SubjectTypeGame), 2)
+	require.Len(t, getList(model.SubjectTypeAnime), 5)
+	require.Len(t, getList(model.SubjectTypeBook), 0)
 }
 
 func TestMysqlRepo_GetEpisodeCollection(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const userID model.UserID = 33000
-	const subjectID model.SubjectID = 11000
+	const uid model.UserID = 33000
+	const sid model.SubjectID = 11000
 
-	repo, _ := getRepo(t)
+	repo, q := getRepo(t)
+	table := q.SubjectCollection
 
-	ep, err := repo.GetSubjectEpisodesCollection(context.Background(), userID, subjectID)
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete()
+		require.NoError(t, err)
+	})
+
+	now := time.Now()
+
+	_, err := repo.UpdateEpisodeCollection(context.Background(),
+		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionDone, now)
+	require.NoError(t, err)
+
+	ep, err := repo.GetSubjectEpisodesCollection(context.Background(), uid, sid)
 	require.NoError(t, err)
 
 	require.NotZero(t, len(ep))
