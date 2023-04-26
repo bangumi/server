@@ -21,7 +21,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/minio/minio-go/v7"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
@@ -90,16 +91,30 @@ func (e *eventHandler) clearImageCache(avatar string) {
 
 	e.log.Debug("clear image for prefix", zap.String("avatar", avatar), zap.String("prefix", p))
 
-	files := e.s3.ListObjects(context.Background(), e.config.S3ImageResizeBucket, minio.ListObjectsOptions{
-		Prefix:    p,
-		Recursive: true,
-	})
+	err := e.s3.ListObjectsV2PagesWithContext(context.Background(),
+		&s3.ListObjectsV2Input{Bucket: &e.config.S3ImageResizeBucket, Prefix: &p},
+		func(output *s3.ListObjectsV2Output, b bool) bool {
+			_, err := e.s3.DeleteObjects(&s3.DeleteObjectsInput{
+				Bucket: &e.config.S3ImageResizeBucket,
+				Delete: &s3.Delete{
+					Objects: lo.Map(output.Contents, func(item *s3.Object, index int) *s3.ObjectIdentifier {
+						return &s3.ObjectIdentifier{
+							Key: item.Key,
+						}
+					}),
+				},
+			})
 
-	for err := range e.s3.RemoveObjects(
-		context.Background(), e.config.S3ImageResizeBucket, files,
-		minio.RemoveObjectsOptions{},
-	) {
-		e.log.Error("failed to clear s3 cached image", zap.String("name", err.ObjectName), zap.Error(err.Err))
+			if err != nil {
+				e.log.Error("failed to clear s3 cached image", zap.Error(err))
+			}
+
+			return true
+		},
+	)
+
+	if err != nil {
+		e.log.Error("failed to clear s3 cached image", zap.Error(err))
 	}
 }
 

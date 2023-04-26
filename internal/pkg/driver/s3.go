@@ -15,25 +15,30 @@
 package driver
 
 import (
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/trim21/errgo"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/samber/lo"
 
 	"github.com/bangumi/server/config"
 )
 
-func NewS3(c config.AppConfig) (*minio.Client, error) {
+func NewS3(c config.AppConfig) (*s3.S3, error) {
 	if c.S3EntryPoint == "" {
 		return nil, nil //nolint:nilnil
 	}
 
-	// Initialize minio client object.
-	minioClient, err := minio.New(c.S3EntryPoint, &minio.Options{
-		Creds: credentials.NewStaticV4(c.S3AccessKey, c.S3SecretKey, ""),
-	})
-	if err != nil {
-		return nil, errgo.Wrap(err, "s3: failed to connect to s3")
-	}
+	cred := credentials.NewStaticCredentials(c.S3AccessKey, c.S3SecretKey, "")
+	s := lo.Must(session.NewSession(&aws.Config{
+		Credentials:      cred,
+		Endpoint:         &c.S3EntryPoint,
+		Region:           lo.ToPtr("us-east-1"),
+		DisableSSL:       lo.ToPtr(true),
+		S3ForcePathStyle: lo.ToPtr(true),
+	}))
 
-	return minioClient, nil
+	svc := s3.New(s)
+
+	return svc, nil
 }

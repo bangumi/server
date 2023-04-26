@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"sync/atomic"
 
-	"github.com/minio/minio-go/v7"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/redis/go-redis/v9"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -38,7 +38,7 @@ func newEventHandler(
 	redis *redis.Client,
 	stream Stream,
 	search search.Client,
-	s3 *minio.Client,
+	s3 *s3.S3,
 ) *eventHandler {
 	return &eventHandler{
 		redis:   redis,
@@ -58,7 +58,7 @@ type eventHandler struct {
 	log     *zap.Logger
 	search  search.Client
 	stream  Stream
-	s3      *minio.Client // optional, check nil before use
+	s3      *s3.S3 // optional, check nil before use
 	redis   *redis.Client
 }
 

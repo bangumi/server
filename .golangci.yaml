@@ -286,6 +286,7 @@ linters:
     - ifshort
     - scopelint
     - golint
+    - revive
 
   fast: false
 
