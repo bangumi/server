@@ -40,9 +40,9 @@ require (
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/driver/mysql v1.4.7
+	gorm.io/driver/mysql v1.5.0
 	gorm.io/gen v0.3.21
-	gorm.io/gorm v1.24.6
+	gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11
 	gorm.io/plugin/dbresolver v1.4.1
 )
 
