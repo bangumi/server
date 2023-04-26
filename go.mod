@@ -29,7 +29,7 @@ require (
 	github.com/trim21/errgo v0.0.2
 	github.com/trim21/go-phpserialize v0.0.18
 	github.com/trim21/go-redis-prometheus v0.0.0
-	github.com/trim21/htest v0.0.3
+	github.com/trim21/htest v0.0.4
 	github.com/trim21/pkg v0.0.3
 	github.com/vektra/mockery/v2 v2.23.2
 	go.etcd.io/etcd/client/v3 v3.5.8
