@@ -22,7 +22,7 @@ type SubjectCollection struct {
 	Comment      utiltype.HTMLEscapedString `gorm:"column:interest_comment;type:mediumtext;not null"`
 	Tag          string                     `gorm:"column:interest_tag;type:mediumtext;not null"`
 	EpStatus     uint32                     `gorm:"column:interest_ep_status;type:mediumint(8) unsigned;not null"`
-	VolStatus    uint32                     `gorm:"column:interest_vol_status;type:mediumint(8) unsigned;not null"` // 卷数
+	VolStatus    uint32                     `gorm:"column:interest_vol_status;type:mediumint(8) unsigned;not null;comment:卷数"` // 卷数
 	WishTime     uint32                     `gorm:"column:interest_wish_dateline;type:int(10) unsigned;not null"`
 	DoingTime    uint32                     `gorm:"column:interest_doing_dateline;type:int(10) unsigned;not null"`
 	DoneTime     uint32                     `gorm:"column:interest_collect_dateline;type:int(10) unsigned;not null"`

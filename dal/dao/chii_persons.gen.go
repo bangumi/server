@@ -10,15 +10,15 @@ const TableNamePerson = "chii_persons"
 type Person struct {
 	ID          uint32      `gorm:"column:prsn_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
 	Name        string      `gorm:"column:prsn_name;type:varchar(255);not null"`
-	Type        uint8       `gorm:"column:prsn_type;type:tinyint(4) unsigned;not null"` // 个人，公司，组合
+	Type        uint8       `gorm:"column:prsn_type;type:tinyint(4) unsigned;not null;comment:个人，公司，组合"` // 个人，公司，组合
 	Infobox     string      `gorm:"column:prsn_infobox;type:mediumtext;not null"`
 	Producer    bool        `gorm:"column:prsn_producer;type:tinyint(1);not null"`
 	Mangaka     bool        `gorm:"column:prsn_mangaka;type:tinyint(1);not null"`
 	Artist      bool        `gorm:"column:prsn_artist;type:tinyint(1);not null"`
 	Seiyu       bool        `gorm:"column:prsn_seiyu;type:tinyint(1);not null"`
-	Writer      bool        `gorm:"column:prsn_writer;type:tinyint(4);not null"`      // 作家
-	Illustrator bool        `gorm:"column:prsn_illustrator;type:tinyint(4);not null"` // 绘师
-	Actor       bool        `gorm:"column:prsn_actor;type:tinyint(1);not null"`       // 演员
+	Writer      bool        `gorm:"column:prsn_writer;type:tinyint(4);not null;comment:作家"`      // 作家
+	Illustrator bool        `gorm:"column:prsn_illustrator;type:tinyint(4);not null;comment:绘师"` // 绘师
+	Actor       bool        `gorm:"column:prsn_actor;type:tinyint(1);not null;comment:演员"`       // 演员
 	Summary     string      `gorm:"column:prsn_summary;type:mediumtext;not null"`
 	Img         string      `gorm:"column:prsn_img;type:varchar(255);not null"`
 	ImgAnidb    string      `gorm:"column:prsn_img_anidb;type:varchar(255);not null"` // Deprecated

@@ -12,7 +12,7 @@ type Episode struct {
 	SubjectID uint32  `gorm:"column:ep_subject_id;type:mediumint(8) unsigned;not null"`
 	Sort      float32 `gorm:"column:ep_sort;type:float unsigned;not null"`
 	Type      uint8   `gorm:"column:ep_type;type:tinyint(1) unsigned;not null"`
-	Disc      uint8   `gorm:"column:ep_disc;type:tinyint(3) unsigned;not null"` // 碟片数
+	Disc      uint8   `gorm:"column:ep_disc;type:tinyint(3) unsigned;not null;comment:碟片数"` // 碟片数
 	Name      string  `gorm:"column:ep_name;type:varchar(80);not null"`
 	NameCn    string  `gorm:"column:ep_name_cn;type:varchar(80);not null"`
 	Rate      int8    `gorm:"column:ep_rate;type:tinyint(3);not null"`

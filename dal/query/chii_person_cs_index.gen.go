@@ -171,6 +171,11 @@ func (a personSubjectsHasOneSubject) WithContext(ctx context.Context) *personSub
 	return &a
 }
 
+func (a personSubjectsHasOneSubject) Session(session *gorm.Session) *personSubjectsHasOneSubject {
+	a.db = a.db.Session(session)
+	return &a
+}
+
 func (a personSubjectsHasOneSubject) Model(m *dao.PersonSubjects) *personSubjectsHasOneSubjectTx {
 	return &personSubjectsHasOneSubjectTx{a.db.Model(m).Association(a.Name())}
 }
@@ -238,6 +243,11 @@ func (a personSubjectsHasOnePerson) Where(conds ...field.Expr) *personSubjectsHa
 
 func (a personSubjectsHasOnePerson) WithContext(ctx context.Context) *personSubjectsHasOnePerson {
 	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a personSubjectsHasOnePerson) Session(session *gorm.Session) *personSubjectsHasOnePerson {
+	a.db = a.db.Session(session)
 	return &a
 }
 

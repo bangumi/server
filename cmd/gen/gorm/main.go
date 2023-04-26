@@ -28,6 +28,7 @@ import (
 
 	"gorm.io/gen"
 	"gorm.io/gen/field"
+	"gorm.io/gorm"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal"
@@ -56,19 +57,20 @@ const createdTime = "CreatedTime"
 
 // generate code.
 func main() {
-	// specify the output directory (default: "./query")
-	// ### if you want to query without context constrain, set mode gen.WithoutContext ###
-	const dalBase = "./dal"
 	g := gen.NewGenerator(gen.Config{
-		OutPath:      "./dal/query",
-		OutFile:      "./dal/query/gen.go",
-		ModelPkgPath: "./dal/dao",
+		OutPath:      "./dal/query/",
+		OutFile:      "./gen.go",
+		ModelPkgPath: "./dao/",
+
+		WithUnitTest: false,
 		// if you want the nullable field generation property to be pointer type, set FieldNullable true
-		FieldNullable: false,
+		FieldNullable:     false,
+		FieldCoverable:    false,
+		FieldSignable:     false,
+		FieldWithIndexTag: false,
 		// if you want to generate type tags from database, set FieldWithTypeTag true
 		FieldWithTypeTag: true,
-		// if you need unit tests for query code, set WithUnitTest true
-		// WithUnitTest: true,
+		Mode:             0,
 	})
 
 	g.WithImportPkgPath(
@@ -97,34 +99,53 @@ func main() {
 	}
 
 	g.UseDB(db)
-	dataMap := map[string]func(detailType string) (dataType string){
+	dataMap := map[string]func(detailType gorm.ColumnType) (dataType string){
 		// bool mapping
-		"tinyint": func(detailType string) (dataType string) {
-			if strings.HasPrefix(detailType, "tinyint(1)") {
+		"tinyint": func(t gorm.ColumnType) (dataType string) {
+			dt, ok := t.ColumnType()
+			if !ok {
+				panic("failed to get column type")
+			}
+			if strings.HasPrefix(dt, "tinyint(1)") {
 				return "bool"
 			}
-			if strings.HasSuffix(detailType, "unsigned") {
+			if strings.HasSuffix(dt, "unsigned") {
 				return "uint8"
 			}
 			return "int8"
 		},
 
-		"smallint": func(detailType string) (dataType string) {
-			if strings.HasSuffix(detailType, "unsigned") {
+		"smallint": func(t gorm.ColumnType) (dataType string) {
+			dt, ok := t.ColumnType()
+			if !ok {
+				panic("failed to get column type")
+			}
+
+			if strings.HasSuffix(dt, "unsigned") {
 				return "uint16"
 			}
 			return "int16"
 		},
 
-		"mediumint": func(detailType string) (dataType string) {
-			if strings.HasSuffix(detailType, "unsigned") {
+		"mediumint": func(t gorm.ColumnType) (dataType string) {
+			dt, ok := t.ColumnType()
+			if !ok {
+				panic("failed to get column type")
+			}
+
+			if strings.HasSuffix(dt, "unsigned") {
 				return "uint32"
 			}
 			return "int32"
 		},
 
-		"int": func(detailType string) (dataType string) {
-			if strings.HasSuffix(detailType, "unsigned") {
+		"int": func(t gorm.ColumnType) (dataType string) {
+			dt, ok := t.ColumnType()
+			if !ok {
+				panic("failed to get column type")
+			}
+
+			if strings.HasSuffix(dt, "unsigned") {
 				return "uint32"
 			}
 			return "int32"
@@ -145,7 +166,7 @@ func main() {
 		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
-			GORMTag: "foreignKey:uid;references:uid",
+			GORMTag: field.GormTag{"foreignKey": "uid", "references": "uid"},
 		}))
 
 	g.ApplyBasic(modelMember)
@@ -233,7 +254,7 @@ func main() {
 		gen.FieldType("prsn_writer", "bool"),
 		gen.FieldType("prsn_redirect", personIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
-			GORMTag: "foreignKey:prsn_id;polymorphic:Owner;polymorphicValue:prsn",
+			GORMTag: field.GormTag{"foreignKey": "prsn_id", "polymorphic": "Owner", "polymorphicValue": "prsn"},
 		}),
 	)
 	g.ApplyBasic(modelPerson)
@@ -245,7 +266,7 @@ func main() {
 		gen.FieldType("crt_id", characterIDTypeString),
 		gen.FieldType("crt_redirect", characterIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
-			GORMTag: "foreignKey:crt_id;polymorphic:Owner;polymorphicValue:crt",
+			GORMTag: field.GormTag{"foreignKey": "crt_id", "polymorphic": "Owner", "polymorphicValue": "crt"},
 		}),
 	)
 
@@ -278,7 +299,7 @@ func main() {
 		gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 		gen.FieldType("subject_airtime", "uint8"),
 		gen.FieldRelate(field.HasOne, "Fields", modelSubjectFields, &field.RelateConfig{
-			GORMTag: "foreignKey:subject_id;references:field_sid",
+			GORMTag: field.GormTag{"foreignKey": "subject_id", "references": "field_sid"},
 		}),
 	)
 	g.ApplyBasic(modelSubject)
@@ -290,7 +311,7 @@ func main() {
 		gen.FieldType("ep_type", episodeTypeTypeString),
 		gen.FieldType("ep_subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: "foreignKey:ep_subject_id;references:subject_id",
+			GORMTag: field.GormTag{"foreignKey": "ep_subject_id", "references": "subject_id"},
 		}),
 	))
 
@@ -312,7 +333,7 @@ func main() {
 		gen.FieldType("rlt_subject_type_id", subjectTypeIDTypeString),
 		gen.FieldType("rlt_related_subject_type_id", subjectTypeIDTypeString),
 		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: "foreignKey:rlt_related_subject_id;references:subject_id",
+			GORMTag: field.GormTag{"foreignKey": "rlt_related_subject_id", "references": "subject_id"},
 		}),
 	))
 
@@ -323,7 +344,7 @@ func main() {
 		gen.FieldType("rev_creator", userIDTypeString),
 		gen.FieldType("rev_subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: "foreignKey:rev_subject_id;references:subject_id",
+			GORMTag: field.GormTag{"foreignKey": "rev_subject_id", "references": "subject_id"},
 		}),
 	))
 
@@ -334,13 +355,13 @@ func main() {
 		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
-			GORMTag: "foreignKey:crt_id;references:crt_id",
+			GORMTag: field.GormTag{"foreignKey": "crt_id", "references": "crt_id"},
 		}),
 		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: "foreignKey:subject_id;references:subject_id",
+			GORMTag: field.GormTag{"foreignKey": "subject_id", "references": "subject_id"},
 		}),
 		gen.FieldRelate(field.HasOne, "Person", modelPerson, &field.RelateConfig{
-			GORMTag: "foreignKey:prsn_id;references:prsn_id",
+			GORMTag: field.GormTag{"foreignKey": "prsn_id", "references": "prsn_id"},
 		}),
 	))
 
@@ -351,10 +372,10 @@ func main() {
 			gen.FieldType("subject_id", subjectIDTypeString),
 			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 			gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
-				GORMTag: "foreignKey:crt_id;references:crt_id",
+				GORMTag: field.GormTag{"foreignKey": "crt_id", "references": "crt_id"},
 			}),
 			gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-				GORMTag: "foreignKey:subject_id;references:subject_id",
+				GORMTag: field.GormTag{"foreignKey": "subject_id", "references": "subject_id"},
 			}),
 		),
 	)
@@ -365,10 +386,10 @@ func main() {
 		gen.FieldType("subject_id", subjectIDTypeString),
 		gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: "foreignKey:subject_id;references:subject_id",
+			GORMTag: field.GormTag{"foreignKey": "subject_id", "references": "subject_id"},
 		}),
 		gen.FieldRelate(field.HasOne, "Person", modelPerson, &field.RelateConfig{
-			GORMTag: "foreignKey:prsn_id;references:prsn_id",
+			GORMTag: field.GormTag{"foreignKey": "prsn_id", "references": "prsn_id"},
 		}),
 	),
 	)
@@ -377,7 +398,7 @@ func main() {
 		gen.FieldTrimPrefix("idx_rlt_"),
 		gen.FieldType("idx_rlt_type", "uint8"),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: "foreignKey:idx_rlt_sid;references:subject_id",
+			GORMTag: field.GormTag{"foreignKey": "idx_rlt_sid", "references": "subject_id"},
 		}),
 		// 变量重命名
 		gen.FieldRename("idx_rlt_rid", "IndexID"),

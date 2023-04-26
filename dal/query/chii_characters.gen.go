@@ -185,6 +185,11 @@ func (a characterHasOneFields) WithContext(ctx context.Context) *characterHasOne
 	return &a
 }
 
+func (a characterHasOneFields) Session(session *gorm.Session) *characterHasOneFields {
+	a.db = a.db.Session(session)
+	return &a
+}
+
 func (a characterHasOneFields) Model(m *dao.Character) *characterHasOneFieldsTx {
 	return &characterHasOneFieldsTx{a.db.Model(m).Association(a.Name())}
 }

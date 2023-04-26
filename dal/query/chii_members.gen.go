@@ -187,6 +187,11 @@ func (a memberHasOneFields) WithContext(ctx context.Context) *memberHasOneFields
 	return &a
 }
 
+func (a memberHasOneFields) Session(session *gorm.Session) *memberHasOneFields {
+	a.db = a.db.Session(session)
+	return &a
+}
+
 func (a memberHasOneFields) Model(m *dao.Member) *memberHasOneFieldsTx {
 	return &memberHasOneFieldsTx{a.db.Model(m).Association(a.Name())}
 }
