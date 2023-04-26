@@ -162,6 +162,11 @@ func (a indexSubjectBelongsToSubject) WithContext(ctx context.Context) *indexSub
 	return &a
 }
 
+func (a indexSubjectBelongsToSubject) Session(session *gorm.Session) *indexSubjectBelongsToSubject {
+	a.db = a.db.Session(session)
+	return &a
+}
+
 func (a indexSubjectBelongsToSubject) Model(m *dao.IndexSubject) *indexSubjectBelongsToSubjectTx {
 	return &indexSubjectBelongsToSubjectTx{a.db.Model(m).Association(a.Name())}
 }

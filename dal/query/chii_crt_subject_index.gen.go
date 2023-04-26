@@ -167,6 +167,11 @@ func (a characterSubjectsHasOneCharacter) WithContext(ctx context.Context) *char
 	return &a
 }
 
+func (a characterSubjectsHasOneCharacter) Session(session *gorm.Session) *characterSubjectsHasOneCharacter {
+	a.db = a.db.Session(session)
+	return &a
+}
+
 func (a characterSubjectsHasOneCharacter) Model(m *dao.CharacterSubjects) *characterSubjectsHasOneCharacterTx {
 	return &characterSubjectsHasOneCharacterTx{a.db.Model(m).Association(a.Name())}
 }
@@ -234,6 +239,11 @@ func (a characterSubjectsHasOneSubject) Where(conds ...field.Expr) *characterSub
 
 func (a characterSubjectsHasOneSubject) WithContext(ctx context.Context) *characterSubjectsHasOneSubject {
 	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a characterSubjectsHasOneSubject) Session(session *gorm.Session) *characterSubjectsHasOneSubject {
+	a.db = a.db.Session(session)
 	return &a
 }
 

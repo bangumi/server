@@ -158,6 +158,11 @@ func (a subjectRelationHasOneSubject) WithContext(ctx context.Context) *subjectR
 	return &a
 }
 
+func (a subjectRelationHasOneSubject) Session(session *gorm.Session) *subjectRelationHasOneSubject {
+	a.db = a.db.Session(session)
+	return &a
+}
+
 func (a subjectRelationHasOneSubject) Model(m *dao.SubjectRelation) *subjectRelationHasOneSubjectTx {
 	return &subjectRelationHasOneSubjectTx{a.db.Model(m).Association(a.Name())}
 }

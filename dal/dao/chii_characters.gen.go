@@ -10,7 +10,7 @@ const TableNameCharacter = "chii_characters"
 type Character struct {
 	ID       uint32      `gorm:"column:crt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
 	Name     string      `gorm:"column:crt_name;type:varchar(255);not null"`
-	Role     uint8       `gorm:"column:crt_role;type:tinyint(4) unsigned;not null"` // 角色，机体，组织。。
+	Role     uint8       `gorm:"column:crt_role;type:tinyint(4) unsigned;not null;comment:角色，机体，组织。。"` // 角色，机体，组织。。
 	Infobox  string      `gorm:"column:crt_infobox;type:mediumtext;not null"`
 	Summary  string      `gorm:"column:crt_summary;type:mediumtext;not null"`
 	Img      string      `gorm:"column:crt_img;type:varchar(255);not null"`

@@ -200,6 +200,11 @@ func (a episodeBelongsToSubject) WithContext(ctx context.Context) *episodeBelong
 	return &a
 }
 
+func (a episodeBelongsToSubject) Session(session *gorm.Session) *episodeBelongsToSubject {
+	a.db = a.db.Session(session)
+	return &a
+}
+
 func (a episodeBelongsToSubject) Model(m *dao.Episode) *episodeBelongsToSubjectTx {
 	return &episodeBelongsToSubjectTx{a.db.Model(m).Association(a.Name())}
 }

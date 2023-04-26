@@ -186,6 +186,11 @@ func (a subjectRevisionBelongsToSubject) WithContext(ctx context.Context) *subje
 	return &a
 }
 
+func (a subjectRevisionBelongsToSubject) Session(session *gorm.Session) *subjectRevisionBelongsToSubject {
+	a.db = a.db.Session(session)
+	return &a
+}
+
 func (a subjectRevisionBelongsToSubject) Model(m *dao.SubjectRevision) *subjectRevisionBelongsToSubjectTx {
 	return &subjectRevisionBelongsToSubjectTx{a.db.Model(m).Association(a.Name())}
 }

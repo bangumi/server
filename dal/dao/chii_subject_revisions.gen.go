@@ -9,7 +9,7 @@ const TableNameSubjectRevision = "chii_subject_revisions"
 // SubjectRevision mapped from table <chii_subject_revisions>
 type SubjectRevision struct {
 	ID           uint32  `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	Type         uint8   `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;default:1"` // 修订类型
+	Type         uint8   `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;default:1;comment:修订类型"` // 修订类型
 	SubjectID    uint32  `gorm:"column:rev_subject_id;type:mediumint(8) unsigned;not null"`
 	TypeID       uint16  `gorm:"column:rev_type_id;type:smallint(6) unsigned;not null"`
 	CreatorID    uint32  `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null"`
