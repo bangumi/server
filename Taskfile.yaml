@@ -15,7 +15,6 @@ tasks:
     cmds:
       - go install google.golang.org/protobuf/cmd/protoc-gen-go
       - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
-      - go install github.com/vektra/mockery/v2
       - echo "please install buf by yourself https://docs.buf.build/installation"
 
   build:
