@@ -12,7 +12,7 @@ require (
 	github.com/go-playground/validator/v10 v10.12.0
 	github.com/go-redis/redismock/v9 v9.0.2
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/go-sql-driver/mysql v1.7.0
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/ilyakaznacheev/cleanenv v1.4.2
 	github.com/jarcoal/httpmock v1.3.0
 	github.com/labstack/echo/v4 v4.10.2
