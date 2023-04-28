@@ -149,7 +149,7 @@ func (s *Subject) UpdateRate(r uint8, state SubjectCollection) error {
 		return errgo.Wrap(gerr.ErrInput, "rate overflow")
 	}
 
-	if state == 1 {
+	if state == SubjectCollectionWish {
 		s.rate = 0
 	} else {
 		s.rate = r

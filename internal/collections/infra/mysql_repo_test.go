@@ -241,7 +241,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, sid, now, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			require.NoError(t, s.UpdateComment("c"))
-			require.NoError(t, s.UpdateRate(1))
+			require.NoError(t, s.UpdateRate(1, collection.SubjectCollectionDropped))
 			s.UpdateType(collection.SubjectCollectionDropped)
 			return s, nil
 		})
@@ -259,6 +259,19 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.Zero(t, r.DoingTime)
 	require.Zero(t, r.DoneTime)
 	require.Zero(t, r.OnHoldTime)
+
+	// When update to wish state
+	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, sid, now, "",
+		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
+			require.NoError(t, s.UpdateRate(1, collection.SubjectCollectionWish))
+			s.UpdateType(collection.SubjectCollectionWish)
+			return s, nil
+		})
+	require.NoError(t, err)
+
+	r, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
+	require.NoError(t, err)
+	require.Equal(t, uint8(0), r.Rate)
 
 	// 确认不会影响到其他用户或 subject
 	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid+1), table.UserID.Eq(uid)).Take()
@@ -305,7 +318,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, now, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			require.NoError(t, s.UpdateComment("c"))
-			require.NoError(t, s.UpdateRate(1))
+			require.NoError(t, s.UpdateRate(1, collection.SubjectCollectionDropped))
 			s.UpdateType(collection.SubjectCollectionDropped)
 			return s, nil
 		})
