@@ -72,7 +72,7 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		Header(echo.HeaderAuthorization, "Bearer t").
 		BodyJSON(map[string]any{
 			"comment": "1 test_content 2",
-			"type":    1,
+			"type":    2,
 			"private": true,
 			"rate":    8,
 			"tags":    []string{"q", "vv"},
