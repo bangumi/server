@@ -251,7 +251,7 @@ func (r mysqlRepo) DeleteIndexSubject(
 		if err != nil {
 			return err
 		}
-		result, err := r.q.IndexSubject.WithContext(ctx).Debug().
+		result, err := r.q.IndexSubject.WithContext(ctx).
 			Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
 			Delete()
 		if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
