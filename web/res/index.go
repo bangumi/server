@@ -30,8 +30,10 @@ type Index struct {
 	Total       uint32        `json:"total"`
 	ID          model.IndexID `json:"id"`
 	Stat        Stat          `json:"stat"`
-	Ban         bool          `json:"ban"`
 	NSFW        bool          `json:"nsfw" doc:"if index contains any nsfw subjects"`
+
+	// Deprecated: this will always be false.
+	Ban bool `json:"ban"`
 }
 
 func IndexModelToResponse(i *model.Index, u user.User) Index {
@@ -50,7 +52,6 @@ func IndexModelToResponse(i *model.Index, u user.User) Index {
 			Comments: i.Comments,
 			Collects: i.Collects,
 		},
-		Ban:  i.Ban,
 		NSFW: i.NSFW,
 	}
 }

@@ -178,7 +178,6 @@ func (h Handler) NewIndex(c echo.Context) error {
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
-		Ban:         false,
 		NSFW:        false,
 	}
 	ctx := c.Request().Context()
