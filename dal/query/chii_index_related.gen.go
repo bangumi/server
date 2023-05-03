@@ -35,6 +35,7 @@ func newIndexSubject(db *gorm.DB, opts ...gen.DOOption) indexSubject {
 	_indexSubject.Order = field.NewUint32(tableName, "idx_rlt_order")
 	_indexSubject.Comment = field.NewString(tableName, "idx_rlt_comment")
 	_indexSubject.CreatedTime = field.NewUint32(tableName, "idx_rlt_dateline")
+	_indexSubject.Deleted = field.NewField(tableName, "idx_rlt_ban")
 	_indexSubject.Subject = indexSubjectBelongsToSubject{
 		db: db.Session(&gorm.Session{}),
 
@@ -63,6 +64,7 @@ type indexSubject struct {
 	Order       field.Uint32
 	Comment     field.String
 	CreatedTime field.Uint32
+	Deleted     field.Field
 	Subject     indexSubjectBelongsToSubject
 
 	fieldMap map[string]field.Expr
@@ -88,6 +90,7 @@ func (i *indexSubject) updateTableName(table string) *indexSubject {
 	i.Order = field.NewUint32(table, "idx_rlt_order")
 	i.Comment = field.NewString(table, "idx_rlt_comment")
 	i.CreatedTime = field.NewUint32(table, "idx_rlt_dateline")
+	i.Deleted = field.NewField(table, "idx_rlt_ban")
 
 	i.fillFieldMap()
 
@@ -112,7 +115,7 @@ func (i *indexSubject) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (i *indexSubject) fillFieldMap() {
-	i.fieldMap = make(map[string]field.Expr, 9)
+	i.fieldMap = make(map[string]field.Expr, 10)
 	i.fieldMap["idx_rlt_id"] = i.ID
 	i.fieldMap["idx_rlt_cat"] = i.Cat
 	i.fieldMap["idx_rlt_rid"] = i.IndexID
@@ -121,6 +124,7 @@ func (i *indexSubject) fillFieldMap() {
 	i.fieldMap["idx_rlt_order"] = i.Order
 	i.fieldMap["idx_rlt_comment"] = i.Comment
 	i.fieldMap["idx_rlt_dateline"] = i.CreatedTime
+	i.fieldMap["idx_rlt_ban"] = i.Deleted
 
 }
 

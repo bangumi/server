@@ -53,8 +53,7 @@ func (r mysqlRepo) isNsfw(ctx context.Context, id model.IndexID) (bool, error) {
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id model.IndexID) (model.Index, error) {
-	i, err := r.q.Index.WithContext(ctx).
-		Where(r.q.Index.ID.Eq(id), r.q.Index.Ban.Is(false)).Take()
+	i, err := r.q.Index.WithContext(ctx).Where(r.q.Index.ID.Eq(id)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Index{}, gerr.ErrNotFound
@@ -97,7 +96,8 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
 			return err
 		}
-		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.IndexID.Eq(id)).Delete()
+		result, err = tx.IndexSubject.WithContext(ctx).
+			Where(tx.IndexSubject.IndexID.Eq(id)).Delete()
 		return r.WrapResult(result, err, "failed to delete subjects in the index")
 	})
 }
@@ -221,10 +221,7 @@ func (r mysqlRepo) updateIndexSubject(
 ) error {
 	result, err := r.q.IndexSubject.WithContext(ctx).
 		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
-		Updates(dao.IndexSubject{
-			Order:   sort,
-			Comment: comment,
-		})
+		UpdateColumnSimple(r.q.IndexSubject.Order.Value(sort), r.q.IndexSubject.Comment.Value(comment))
 	return r.WrapResult(result, err, "failed to update index subject")
 }
 
@@ -335,7 +332,6 @@ func daoToModel(index *dao.Index) *model.Index {
 		Total:       index.SubjectCount,
 		Comments:    index.ReplyCount,
 		Collects:    index.CollectCount,
-		Ban:         index.Ban,
 		NSFW:        false, // check nsfw outSubjectIDe of this function
 		CreatedAt:   time.Unix(int64(index.CreatedTime), 0),
 		UpdatedAt:   time.Unix(int64(index.UpdatedTime), 0),
@@ -349,7 +345,6 @@ func modelToDAO(index *model.Index) *dao.Index {
 		Title:       index.Title,
 		Desc:        index.Description,
 		CreatorID:   index.CreatorID,
-		Ban:         index.Ban,
 		CreatedTime: int32(index.CreatedAt.Unix()),
 		UpdatedTime: uint32(index.UpdatedAt.Unix()),
 	}

@@ -44,6 +44,7 @@ require (
 	gorm.io/gen v0.3.23-0.20230420060613-fe1f9eac3ff7
 	gorm.io/gorm v1.25.0
 	gorm.io/plugin/dbresolver v1.4.1
+	gorm.io/plugin/soft_delete v1.2.1
 )
 
 require (
