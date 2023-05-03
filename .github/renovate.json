@@ -5,7 +5,16 @@
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
   "postUpdateOptions": ["gomodTidy1.17"],
+  "dockerfile": {
+    "fileMatch": [".*dockerfile$"],
+    "enabled": true
+  },
   "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchPackagePrefixes": ["gcr.io/"],
+      "pinDigests": true
+    },
     {
       "matchManagers": ["docker-compose"],
       "matchPackageNames": ["mysql"],
