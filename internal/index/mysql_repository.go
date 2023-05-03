@@ -97,7 +97,7 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
 			return err
 		}
-		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.IndexID.Eq(id)).Delete()
+		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.IndexID.Eq(id)).UpdateColumnSimple(tx.IndexSubject.Ban.Value(true))
 		return r.WrapResult(result, err, "failed to delete subjects in the index")
 	})
 }
@@ -105,7 +105,7 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 func (r mysqlRepo) CountSubjects(
 	ctx context.Context, id model.IndexID, subjectType model.SubjectType,
 ) (int64, error) {
-	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.IndexID.Eq(id))
+	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.Ban.Is(false))
 	if subjectType != 0 {
 		q = q.Where(r.q.IndexSubject.SubjectType.Eq(subjectType))
 	}
@@ -126,7 +126,7 @@ func (r mysqlRepo) ListSubjects(
 ) ([]Subject, error) {
 	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).
 		Preload(r.q.IndexSubject.Subject.Fields).
-		Where(r.q.IndexSubject.IndexID.Eq(id)).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.Ban.Is(false)).
 		Order(r.q.IndexSubject.Order).
 		Limit(limit).Offset(offset)
 	if subjectType != 0 {

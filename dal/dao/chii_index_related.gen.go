@@ -16,6 +16,7 @@ type IndexSubject struct {
 	Order       uint32  `gorm:"column:idx_rlt_order;type:mediumint(8) unsigned;not null"`
 	Comment     string  `gorm:"column:idx_rlt_comment;type:mediumtext;not null"`
 	CreatedTime uint32  `gorm:"column:idx_rlt_dateline;type:int(10) unsigned;not null"`
+	Ban         bool    `gorm:"column:idx_rlt_ban;type:tinyint(1) unsigned;not null"`
 	Subject     Subject `gorm:"foreignKey:idx_rlt_sid;references:subject_id" json:"subject"`
 }
 
