@@ -93,7 +93,7 @@ func (r mysqlRepo) Update(ctx context.Context, id model.IndexID, title string, d
 
 func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 	return r.q.Transaction(func(tx *query.Query) error {
-		result, err := tx.Index.WithContext(ctx).Where(tx.Index.ID.Eq(id)).Delete()
+		result, err := tx.Index.WithContext(ctx).Where(tx.Index.ID.Eq(id)).UpdateColumnSimple(tx.Index.Ban.Value(true))
 		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
 			return err
 		}
