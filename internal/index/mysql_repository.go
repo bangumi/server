@@ -221,10 +221,11 @@ func (r mysqlRepo) updateIndexSubject(
 ) error {
 	result, err := r.q.IndexSubject.WithContext(ctx).
 		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
-		Updates(dao.IndexSubject{
-			Order:   sort,
-			Comment: comment,
-		})
+		UpdateColumnSimple(
+			r.q.IndexSubject.Order.Value(sort),
+			r.q.IndexSubject.Comment.Value(comment),
+			r.q.IndexSubject.Ban.Value(false),
+		)
 	return r.WrapResult(result, err, "failed to update index subject")
 }
 
@@ -256,7 +257,7 @@ func (r mysqlRepo) DeleteIndexSubject(
 		}
 		result, err := r.q.IndexSubject.WithContext(ctx).
 			Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
-			Delete()
+			UpdateColumnSimple(r.q.IndexSubject.Ban.Value(true))
 		if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
 			return err
 		}
