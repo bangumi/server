@@ -83,7 +83,6 @@ func TestMysqlRepo_NewIndex(t *testing.T) {
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
-		Ban:         false,
 		NSFW:        false,
 	}
 	err := repo.New(context.Background(), index)
@@ -118,7 +117,6 @@ func TestMysqlRepo_UpdateIndex(t *testing.T) {
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
-		Ban:         false,
 		NSFW:        false,
 	}
 	err := repo.New(ctx, index)
@@ -151,7 +149,6 @@ func TestMysqlRepo_DeleteIndex(t *testing.T) {
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
-		Ban:         false,
 		NSFW:        false,
 	}
 	_ = repo.New(context.Background(), index)
@@ -184,7 +181,6 @@ func TestMysqlRepo_DeleteIndex2(t *testing.T) {
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
-		Ban:         false,
 		NSFW:        false,
 	}
 
@@ -237,7 +233,6 @@ func TestMysqlRepo_AddOrUpdateIndexSubject(t *testing.T) {
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
-		Ban:         false,
 		NSFW:        false,
 	}
 
@@ -288,7 +283,6 @@ func TestMysqlRepo_DeleteIndexSubject(t *testing.T) {
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
-		Ban:         false,
 		NSFW:        false,
 	}
 
@@ -374,7 +368,6 @@ func TestMysqlRepo_UpdateSubjectInfo(t *testing.T) {
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
-		Ban:         false,
 		NSFW:        false,
 	}
 	ctx := context.Background()
@@ -415,7 +408,6 @@ func TestMysqlRepo_AddExists(t *testing.T) {
 		Total:       0,
 		Comments:    0,
 		Collects:    0,
-		Ban:         false,
 		NSFW:        false,
 	}
 	ctx := context.Background()

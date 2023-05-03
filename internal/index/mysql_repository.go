@@ -24,7 +24,6 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gorm"
 
-	"github.com/bangumi/server/dal"
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain/gerr"
@@ -333,7 +332,6 @@ func daoToModel(index *dao.Index) *model.Index {
 		Total:       index.SubjectCount,
 		Comments:    index.ReplyCount,
 		Collects:    index.CollectCount,
-		Ban:         index.Deleted == dal.FlagDeleted,
 		NSFW:        false, // check nsfw outSubjectIDe of this function
 		CreatedAt:   time.Unix(int64(index.CreatedTime), 0),
 		UpdatedAt:   time.Unix(int64(index.UpdatedTime), 0),
@@ -347,7 +345,6 @@ func modelToDAO(index *model.Index) *dao.Index {
 		Title:       index.Title,
 		Desc:        index.Description,
 		CreatorID:   index.CreatorID,
-		Deleted:     dal.SoftDelete(index.Ban),
 		CreatedTime: int32(index.CreatedAt.Unix()),
 		UpdatedTime: uint32(index.UpdatedAt.Unix()),
 	}
