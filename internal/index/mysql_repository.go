@@ -97,7 +97,8 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
 			return err
 		}
-		result, err = tx.IndexSubject.WithContext(ctx).Where(tx.IndexSubject.IndexID.Eq(id)).UpdateColumnSimple(tx.IndexSubject.Ban.Value(true))
+		result, err = tx.IndexSubject.WithContext(ctx).
+			Where(tx.IndexSubject.IndexID.Eq(id)).UpdateColumnSimple(tx.IndexSubject.Ban.Value(true))
 		return r.WrapResult(result, err, "failed to delete subjects in the index")
 	})
 }
