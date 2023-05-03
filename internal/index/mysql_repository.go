@@ -98,7 +98,7 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 			return err
 		}
 		result, err = tx.IndexSubject.WithContext(ctx).
-			Where(tx.IndexSubject.IndexID.Eq(id)).UpdateColumnSimple(tx.IndexSubject.Ban.Value(true))
+			Where(tx.IndexSubject.IndexID.Eq(id)).Delete()
 		return r.WrapResult(result, err, "failed to delete subjects in the index")
 	})
 }
@@ -106,7 +106,7 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 func (r mysqlRepo) CountSubjects(
 	ctx context.Context, id model.IndexID, subjectType model.SubjectType,
 ) (int64, error) {
-	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.Ban.Is(false))
+	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.IndexID.Eq(id))
 	if subjectType != 0 {
 		q = q.Where(r.q.IndexSubject.SubjectType.Eq(subjectType))
 	}
@@ -127,7 +127,7 @@ func (r mysqlRepo) ListSubjects(
 ) ([]Subject, error) {
 	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).
 		Preload(r.q.IndexSubject.Subject.Fields).
-		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.Ban.Is(false)).
+		Where(r.q.IndexSubject.IndexID.Eq(id)).
 		Order(r.q.IndexSubject.Order).
 		Limit(limit).Offset(offset)
 	if subjectType != 0 {
@@ -222,11 +222,7 @@ func (r mysqlRepo) updateIndexSubject(
 ) error {
 	result, err := r.q.IndexSubject.WithContext(ctx).
 		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
-		UpdateColumnSimple(
-			r.q.IndexSubject.Order.Value(sort),
-			r.q.IndexSubject.Comment.Value(comment),
-			r.q.IndexSubject.Ban.Value(false),
-		)
+		UpdateColumnSimple(r.q.IndexSubject.Order.Value(sort), r.q.IndexSubject.Comment.Value(comment))
 	return r.WrapResult(result, err, "failed to update index subject")
 }
 
@@ -258,7 +254,7 @@ func (r mysqlRepo) DeleteIndexSubject(
 		}
 		result, err := r.q.IndexSubject.WithContext(ctx).
 			Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
-			UpdateColumnSimple(r.q.IndexSubject.Ban.Value(true))
+			Delete()
 		if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
 			return err
 		}

@@ -35,7 +35,7 @@ func newIndexSubject(db *gorm.DB, opts ...gen.DOOption) indexSubject {
 	_indexSubject.Order = field.NewUint32(tableName, "idx_rlt_order")
 	_indexSubject.Comment = field.NewString(tableName, "idx_rlt_comment")
 	_indexSubject.CreatedTime = field.NewUint32(tableName, "idx_rlt_dateline")
-	_indexSubject.Ban = field.NewBool(tableName, "idx_rlt_ban")
+	_indexSubject.Deleted = field.NewField(tableName, "idx_rlt_ban")
 	_indexSubject.Subject = indexSubjectBelongsToSubject{
 		db: db.Session(&gorm.Session{}),
 
@@ -64,7 +64,7 @@ type indexSubject struct {
 	Order       field.Uint32
 	Comment     field.String
 	CreatedTime field.Uint32
-	Ban         field.Bool
+	Deleted     field.Field
 	Subject     indexSubjectBelongsToSubject
 
 	fieldMap map[string]field.Expr
@@ -90,7 +90,7 @@ func (i *indexSubject) updateTableName(table string) *indexSubject {
 	i.Order = field.NewUint32(table, "idx_rlt_order")
 	i.Comment = field.NewString(table, "idx_rlt_comment")
 	i.CreatedTime = field.NewUint32(table, "idx_rlt_dateline")
-	i.Ban = field.NewBool(table, "idx_rlt_ban")
+	i.Deleted = field.NewField(table, "idx_rlt_ban")
 
 	i.fillFieldMap()
 
@@ -124,7 +124,7 @@ func (i *indexSubject) fillFieldMap() {
 	i.fieldMap["idx_rlt_order"] = i.Order
 	i.fieldMap["idx_rlt_comment"] = i.Comment
 	i.fieldMap["idx_rlt_dateline"] = i.CreatedTime
-	i.fieldMap["idx_rlt_ban"] = i.Ban
+	i.fieldMap["idx_rlt_ban"] = i.Deleted
 
 }
 

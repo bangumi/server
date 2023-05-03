@@ -76,6 +76,7 @@ func main() {
 	g.WithImportPkgPath(
 		"github.com/bangumi/server/internal/model",
 		"github.com/bangumi/server/dal/utiltype",
+		"gorm.io/plugin/soft_delete",
 	)
 	g.WithJSONTagNameStrategy(func(_ string) string {
 		return ""
@@ -405,6 +406,12 @@ func main() {
 		gen.FieldRename("idx_rlt_sid", "SubjectID"),
 		gen.FieldRename("idx_rlt_type", "SubjectType"),
 		gen.FieldRename("idx_rlt_dateline", "CreatedTime"),
+		gen.FieldType("idx_rlt_ban", "soft_delete.DeletedAt"),
+		gen.FieldRename("idx_rlt_ban", "Deleted"),
+		gen.FieldGORMTag("idx_rlt_ban", func(tag field.GormTag) field.GormTag {
+			tag["softDelete"] = "flag"
+			return tag
+		}),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_rev_text", "RevisionText",
