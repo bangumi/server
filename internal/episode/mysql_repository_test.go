@@ -105,3 +105,20 @@ func TestMysqlRepo_List(t *testing.T) {
 		require.Len(t, episodes, tc.len)
 	}
 }
+
+func TestMysqlRepo_List_Empty_Return(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	/*
+		GORM v1.25.0 起修复了一个 bug，但是被当成 feature 使用了
+		see PR: https://github.com/go-gorm/gorm/pull/6191
+
+		在 v1.25.0 版本之前，Limit 0 认为不适合合法的 Limit，会被从 SQL 语句中忽略
+	*/
+	episodes, err := repo.List(context.TODO(), 253, episode.Filter{}, 0, 0)
+	require.NoError(t, err)
+	require.Len(t, episodes, 0)
+}
