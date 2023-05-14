@@ -105,3 +105,20 @@ func TestMysqlRepo_List(t *testing.T) {
 		require.Len(t, episodes, tc.len)
 	}
 }
+
+func TestMysqlRepo_List_Limit(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	nums := []int{0, 10, 22, 30, 100}
+	expected := []int{31, 10, 22, 30, 31}
+
+	for i, num := range nums {
+		episodes, err := repo.List(context.TODO(), 253, episode.Filter{}, num, 0)
+		require.NoError(t, err)
+		require.Len(t, episodes, expected[i])
+	}
+
+}
