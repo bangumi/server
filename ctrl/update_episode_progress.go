@@ -54,7 +54,7 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 	/*
 		GORM v1.25.0 起修复了一个 bug，但是被当成 feature 使用了。在该版本之前，Limit 0 认为不是合法的 Limit，会被从 SQL 语句中忽略
 		see PR: go-gorm/gorm/pull/6191
-		因此这里需要传入 -1 作为 Limit，从而返回全部数据。GORM 会对负数过过滤，不会被当成 Limit。经过测试， SQL 也会对 -1 过滤
+		因此这里需要传入 -1 作为 Limit，从而返回全部数据。GORM 会对负数过过滤，不会出现在最终的 SQL 中。
 	*/
 	episodes, err := ctl.episode.List(ctx, subjectID, episode.Filter{}, -1, 0)
 	if err != nil {
