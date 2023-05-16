@@ -112,8 +112,8 @@ func TestMysqlRepo_List_Limit(t *testing.T) {
 
 	repo := getRepo(t)
 
-	nums := []int{0, 10, 22, 30, 100}
-	expected := []int{31, 10, 22, 30, 31}
+	nums := []int{-1, 0, 10, 22, 30, 100}
+	expected := []int{31, 0, 10, 22, 30, 31}
 
 	for i, num := range nums {
 		episodes, err := repo.List(context.TODO(), 253, episode.Filter{}, num, 0)

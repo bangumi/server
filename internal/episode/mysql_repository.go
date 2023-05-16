@@ -102,24 +102,7 @@ func (r mysqlRepo) List(
 
 	q = q.Order(r.q.Episode.Disc, r.q.Episode.Type, r.q.Episode.Sort)
 
-	/*
-		GORM v1.25.0 起修复了一个 bug，但是被当成 feature 使用了
-		see PR: https://github.com/go-gorm/gorm/pull/6191
-
-		在 v1.25.0 版本之前，Limit 0 认为不是合法的 Limit，会被从 SQL 语句中忽略
-
-		因此这里需要显性的对 Limit 判断
-	*/
-
-	if limit > 0 {
-		q = q.Limit(limit)
-	}
-
-	if offset > 0 {
-		q = q.Offset(offset)
-	}
-
-	episodes, err := q.Find()
+	episodes, err := q.Limit(limit).Offset(offset).Find()
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
 	}
