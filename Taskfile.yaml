@@ -3,7 +3,9 @@ version: "3"
 dotenv: [".env", ".envrc"]
 
 includes:
-  mock: "./etc/mock.task.yaml"
+  mock:
+    taskfile: "./etc/mock.task.yaml"
+    internal: true
 
 tasks:
   default:
