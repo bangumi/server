@@ -73,7 +73,11 @@ tasks:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
 
-  # generated files
+  mod:
+    desc: "go mod tidy"
+    cmds:
+      - go mod tidy
+
   gen:
     desc: Generate all generated GO files
     cmds:
@@ -98,5 +102,6 @@ tasks:
 
   clean:
     cmds:
+      - rm -rf ./dist/
       - rm -rf .task
       - rm -rf .bin

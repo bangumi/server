@@ -1,10 +1,10 @@
 version: "3"
 
+vars:
+  BIN: "{{.ROOT_DIR}}/.bin"
+
 tasks:
   all:
-    - task: gen
-
-  gen:
     cmds:
       - task: session-manager
       - task: session-repo
@@ -25,8 +25,21 @@ tasks:
       - task: NotificationRepo
 
   base-mock:
+    deps:
+      - "install:mockery"
     cmds:
-      - cmd: go run github.com/vektra/mockery/v2 --dir {{.SRC_DIR}} --filename '{{.MOCK_STRUCT|default .INTERFACE}}.go' --name '{{.INTERFACE | default "Manager"}}' --structname {{.MOCK_STRUCT|default .INTERFACE}} --output ./internal/mocks --with-expecter
+      - './.bin/mockery{{exeExt}} --dir {{.SRC_DIR}} --filename "{{.MOCK_STRUCT|default .INTERFACE}}.go" --name "{{.INTERFACE | default "Manager"}}" --structname {{.MOCK_STRUCT|default .INTERFACE}} --output ./internal/mocks --with-expecter'
+
+  install:mockery:
+    desc: Installs mockery
+    vars:
+      MOCKERY_VERSION: v2.26.1
+    env:
+      GOBIN: "{{.BIN}}"
+    status:
+      - go version -m {{.BIN}}/mockery{{exeExt}} | grep "github.com/vektra/mockery" | grep "version={{.MOCKERY_VERSION}}"
+    cmds:
+      - go install github.com/vektra/mockery/v2@{{.MOCKERY_VERSION}}
 
   session-repo:
     sources:
