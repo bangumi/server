@@ -48,6 +48,8 @@ func New() *echo.Echo {
 	app.HideBanner = true
 	app.HidePort = true
 
+	app.JSONSerializer = jsonSerializer{}
+
 	app.IPExtractor = func(request *http.Request) string {
 		ip := request.Header.Get(cf.HeaderRequestIP)
 		if ip == "" {
