@@ -52,16 +52,16 @@ func (e HTTPError) Error() string {
 //nolint:errorlint
 func JSONError(c echo.Context, err error) error {
 	if ute, ok := err.(*json.UnmarshalTypeError); ok {
-		return c.JSON(http.StatusInternalServerError, Error{
-			Title: "Internal Server Error",
+		return c.JSON(http.StatusBadRequest, Error{
+			Title: "JSON Error",
 			Description: fmt.Sprintf("Unmarshal type error: expected=%v, got=%v, field=%v, offset=%v",
 				ute.Type, ute.Value, ute.Field, ute.Offset),
 		})
 	}
 
 	if se, ok := err.(*json.SyntaxError); ok {
-		return c.JSON(http.StatusInternalServerError, Error{
-			Title:       "Internal Server Error",
+		return c.JSON(http.StatusBadRequest, Error{
+			Title:       "JSON Error",
 			Description: fmt.Sprintf("Syntax error: offset=%v, error=%v", se.Offset, se.Error()),
 		})
 	}
