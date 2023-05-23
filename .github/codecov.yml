@@ -1,3 +1,5 @@
+comment: false
+
 ignore:
   - "**/mock_*.go"
   - "**/*_test.go"
