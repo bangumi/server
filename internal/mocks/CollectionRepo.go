@@ -10,6 +10,8 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
+	model "github.com/bangumi/server/internal/model"
+
 	query "github.com/bangumi/server/dal/query"
 
 	time "time"
@@ -313,13 +315,13 @@ func (_c *CollectionRepo_UpdateEpisodeCollection_Call) RunAndReturn(run func(con
 	return _c
 }
 
-// UpdateOrCreateSubjectCollection provides a mock function with given fields: ctx, userID, subjectID, at, ip, update
-func (_m *CollectionRepo) UpdateOrCreateSubjectCollection(ctx context.Context, userID uint32, subjectID uint32, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error)) error {
-	ret := _m.Called(ctx, userID, subjectID, at, ip, update)
+// UpdateOrCreateSubjectCollection provides a mock function with given fields: ctx, userID, subject, at, ip, update
+func (_m *CollectionRepo) UpdateOrCreateSubjectCollection(ctx context.Context, userID uint32, subject model.Subject, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error)) error {
+	ret := _m.Called(ctx, userID, subject, at, ip, update)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32, time.Time, string, func(context.Context, *collection.Subject) (*collection.Subject, error)) error); ok {
-		r0 = rf(ctx, userID, subjectID, at, ip, update)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.Subject, time.Time, string, func(context.Context, *collection.Subject) (*collection.Subject, error)) error); ok {
+		r0 = rf(ctx, userID, subject, at, ip, update)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -335,17 +337,17 @@ type CollectionRepo_UpdateOrCreateSubjectCollection_Call struct {
 // UpdateOrCreateSubjectCollection is a helper method to define mock.On call
 //   - ctx context.Context
 //   - userID uint32
-//   - subjectID uint32
+//   - subject model.Subject
 //   - at time.Time
 //   - ip string
 //   - update func(context.Context , *collection.Subject)(*collection.Subject , error)
-func (_e *CollectionRepo_Expecter) UpdateOrCreateSubjectCollection(ctx interface{}, userID interface{}, subjectID interface{}, at interface{}, ip interface{}, update interface{}) *CollectionRepo_UpdateOrCreateSubjectCollection_Call {
-	return &CollectionRepo_UpdateOrCreateSubjectCollection_Call{Call: _e.mock.On("UpdateOrCreateSubjectCollection", ctx, userID, subjectID, at, ip, update)}
+func (_e *CollectionRepo_Expecter) UpdateOrCreateSubjectCollection(ctx interface{}, userID interface{}, subject interface{}, at interface{}, ip interface{}, update interface{}) *CollectionRepo_UpdateOrCreateSubjectCollection_Call {
+	return &CollectionRepo_UpdateOrCreateSubjectCollection_Call{Call: _e.mock.On("UpdateOrCreateSubjectCollection", ctx, userID, subject, at, ip, update)}
 }
 
-func (_c *CollectionRepo_UpdateOrCreateSubjectCollection_Call) Run(run func(ctx context.Context, userID uint32, subjectID uint32, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error))) *CollectionRepo_UpdateOrCreateSubjectCollection_Call {
+func (_c *CollectionRepo_UpdateOrCreateSubjectCollection_Call) Run(run func(ctx context.Context, userID uint32, subject model.Subject, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error))) *CollectionRepo_UpdateOrCreateSubjectCollection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32), args[3].(time.Time), args[4].(string), args[5].(func(context.Context, *collection.Subject) (*collection.Subject, error)))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(model.Subject), args[3].(time.Time), args[4].(string), args[5].(func(context.Context, *collection.Subject) (*collection.Subject, error)))
 	})
 	return _c
 }
@@ -355,18 +357,18 @@ func (_c *CollectionRepo_UpdateOrCreateSubjectCollection_Call) Return(_a0 error)
 	return _c
 }
 
-func (_c *CollectionRepo_UpdateOrCreateSubjectCollection_Call) RunAndReturn(run func(context.Context, uint32, uint32, time.Time, string, func(context.Context, *collection.Subject) (*collection.Subject, error)) error) *CollectionRepo_UpdateOrCreateSubjectCollection_Call {
+func (_c *CollectionRepo_UpdateOrCreateSubjectCollection_Call) RunAndReturn(run func(context.Context, uint32, model.Subject, time.Time, string, func(context.Context, *collection.Subject) (*collection.Subject, error)) error) *CollectionRepo_UpdateOrCreateSubjectCollection_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// UpdateSubjectCollection provides a mock function with given fields: ctx, userID, subjectID, at, ip, update
-func (_m *CollectionRepo) UpdateSubjectCollection(ctx context.Context, userID uint32, subjectID uint32, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error)) error {
-	ret := _m.Called(ctx, userID, subjectID, at, ip, update)
+// UpdateSubjectCollection provides a mock function with given fields: ctx, userID, subject, at, ip, update
+func (_m *CollectionRepo) UpdateSubjectCollection(ctx context.Context, userID uint32, subject model.Subject, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error)) error {
+	ret := _m.Called(ctx, userID, subject, at, ip, update)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32, time.Time, string, func(context.Context, *collection.Subject) (*collection.Subject, error)) error); ok {
-		r0 = rf(ctx, userID, subjectID, at, ip, update)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.Subject, time.Time, string, func(context.Context, *collection.Subject) (*collection.Subject, error)) error); ok {
+		r0 = rf(ctx, userID, subject, at, ip, update)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -382,17 +384,17 @@ type CollectionRepo_UpdateSubjectCollection_Call struct {
 // UpdateSubjectCollection is a helper method to define mock.On call
 //   - ctx context.Context
 //   - userID uint32
-//   - subjectID uint32
+//   - subject model.Subject
 //   - at time.Time
 //   - ip string
 //   - update func(context.Context , *collection.Subject)(*collection.Subject , error)
-func (_e *CollectionRepo_Expecter) UpdateSubjectCollection(ctx interface{}, userID interface{}, subjectID interface{}, at interface{}, ip interface{}, update interface{}) *CollectionRepo_UpdateSubjectCollection_Call {
-	return &CollectionRepo_UpdateSubjectCollection_Call{Call: _e.mock.On("UpdateSubjectCollection", ctx, userID, subjectID, at, ip, update)}
+func (_e *CollectionRepo_Expecter) UpdateSubjectCollection(ctx interface{}, userID interface{}, subject interface{}, at interface{}, ip interface{}, update interface{}) *CollectionRepo_UpdateSubjectCollection_Call {
+	return &CollectionRepo_UpdateSubjectCollection_Call{Call: _e.mock.On("UpdateSubjectCollection", ctx, userID, subject, at, ip, update)}
 }
 
-func (_c *CollectionRepo_UpdateSubjectCollection_Call) Run(run func(ctx context.Context, userID uint32, subjectID uint32, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error))) *CollectionRepo_UpdateSubjectCollection_Call {
+func (_c *CollectionRepo_UpdateSubjectCollection_Call) Run(run func(ctx context.Context, userID uint32, subject model.Subject, at time.Time, ip string, update func(context.Context, *collection.Subject) (*collection.Subject, error))) *CollectionRepo_UpdateSubjectCollection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32), args[3].(time.Time), args[4].(string), args[5].(func(context.Context, *collection.Subject) (*collection.Subject, error)))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(model.Subject), args[3].(time.Time), args[4].(string), args[5].(func(context.Context, *collection.Subject) (*collection.Subject, error)))
 	})
 	return _c
 }
@@ -402,7 +404,7 @@ func (_c *CollectionRepo_UpdateSubjectCollection_Call) Return(_a0 error) *Collec
 	return _c
 }
 
-func (_c *CollectionRepo_UpdateSubjectCollection_Call) RunAndReturn(run func(context.Context, uint32, uint32, time.Time, string, func(context.Context, *collection.Subject) (*collection.Subject, error)) error) *CollectionRepo_UpdateSubjectCollection_Call {
+func (_c *CollectionRepo_UpdateSubjectCollection_Call) RunAndReturn(run func(context.Context, uint32, model.Subject, time.Time, string, func(context.Context, *collection.Subject) (*collection.Subject, error)) error) *CollectionRepo_UpdateSubjectCollection_Call {
 	_c.Call.Return(run)
 	return _c
 }

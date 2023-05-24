@@ -38,6 +38,7 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 	t.Parallel()
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
+	subject := model.Subject{ID: sid, TypeID: model.SubjectTypeAll}
 
 	var eIDs []model.EpisodeID
 	var eType collection.EpisodeCollection
@@ -61,7 +62,8 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 			eIDs = episodeIDs
 			eType = collection
 		}).Return(collection.UserSubjectEpisodesCollection{}, nil)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, subject, mock.Anything, mock.Anything, mock.Anything).
+		Return(nil)
 	c.EXPECT().GetSubjectCollection(mock.Anything, uid, sid).Return(collection.UserSubjectCollection{SubjectID: sid}, nil)
 
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
@@ -84,6 +86,7 @@ func TestUser_PutEpisodeCollection(t *testing.T) {
 	const sid model.SubjectID = 8
 	const eid model.EpisodeID = 10
 	const uid model.UserID = 1
+	subject := model.Subject{ID: sid, TypeID: model.SubjectTypeAll}
 
 	var eIDs []model.EpisodeID
 	var eType collection.EpisodeCollection
@@ -103,7 +106,8 @@ func TestUser_PutEpisodeCollection(t *testing.T) {
 			eIDs = episodeIDs
 			eType = collection
 		}).Return(collection.UserSubjectEpisodesCollection{}, nil)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, subject, mock.Anything, mock.Anything, mock.Anything).
+		Return(nil)
 
 	app := test.GetWebApp(t, test.Mock{EpisodeRepo: e, CollectionRepo: c, AuthService: a})
 

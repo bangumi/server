@@ -42,6 +42,7 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	t.Parallel()
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
+	subject := model.Subject{ID: sid, TypeID: model.SubjectTypeAll}
 
 	var s = &collection.Subject{}
 
@@ -54,9 +55,9 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 		Return(nil)
 
 	c := mocks.NewCollectionRepo(t)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, subject, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(ctx context.Context, userID uint32,
-			subjectID uint32, at time.Time, ip string,
+			subject model.Subject, at time.Time, ip string,
 			update func(context.Context, *collection.Subject) (*collection.Subject, error)) {
 			require.Equal(t, "0.0.0.0", ip)
 
@@ -90,6 +91,7 @@ func TestUser_PatchToNonExistsSubjectCollection(t *testing.T) {
 	t.Parallel()
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
+	subject := model.Subject{ID: sid, TypeID: model.SubjectTypeAll}
 
 	a := mocks.NewAuthService(t)
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
@@ -97,7 +99,7 @@ func TestUser_PatchToNonExistsSubjectCollection(t *testing.T) {
 	tl := mocks.NewTimeLineService(t)
 
 	c := mocks.NewCollectionRepo(t)
-	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, subject, mock.Anything, mock.Anything, mock.Anything).
 		Return(gerr.ErrSubjectNotCollected)
 
 	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})

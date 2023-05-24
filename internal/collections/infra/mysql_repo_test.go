@@ -201,6 +201,9 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 
 	const uid model.UserID = 34000
 	const sid model.SubjectID = 12000
+	const subjectType = model.SubjectTypeMusic
+
+	subject := model.Subject{ID: sid, TypeID: subjectType}
 
 	repo, q := getRepo(t)
 	table := q.SubjectCollection
@@ -227,7 +230,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.Error(t, err)
 
 	// 创建
-	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, sid, now, "",
+	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, subject, now, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			return s, nil
 		})
@@ -238,7 +241,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.NoError(t, err)
 
 	// 更新
-	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, sid, now, "",
+	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, subject, now, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			require.NoError(t, s.UpdateComment("c"))
 			require.NoError(t, s.UpdateRate(1, collection.SubjectCollectionDropped))
@@ -261,7 +264,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.Zero(t, r.OnHoldTime)
 
 	// When update to wish state
-	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, sid, now, "",
+	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, subject, now, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			require.NoError(t, s.UpdateRate(1, collection.SubjectCollectionWish))
 			s.UpdateType(collection.SubjectCollectionWish)
@@ -291,6 +294,9 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 
 	const uid model.UserID = 35000
 	const sid model.SubjectID = 13000
+	const subjectType = model.SubjectTypeMusic
+
+	subject := model.Subject{ID: sid, TypeID: subjectType}
 
 	repo, q := getRepo(t)
 	table := q.SubjectCollection
@@ -315,7 +321,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 
 	now := time.Now()
 
-	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, now, "",
+	err = repo.UpdateSubjectCollection(context.Background(), uid, subject, now, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			require.NoError(t, s.UpdateComment("c"))
 			require.NoError(t, s.UpdateRate(1, collection.SubjectCollectionDropped))
@@ -354,6 +360,9 @@ func TestMysqlRepo_UpdateSubjectCollectionType(t *testing.T) {
 
 	const uid model.UserID = 36000
 	const sid model.SubjectID = 14000
+	const subjectType = model.SubjectTypeBook
+
+	subject := model.Subject{ID: sid, TypeID: subjectType}
 
 	repo, q := getRepo(t)
 	table := q.SubjectCollection
@@ -372,7 +381,7 @@ func TestMysqlRepo_UpdateSubjectCollectionType(t *testing.T) {
 
 	now := time.Now()
 
-	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, now, "",
+	err = repo.UpdateSubjectCollection(context.Background(), uid, subject, now, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			s.UpdateType(collection.SubjectCollectionDropped)
 			return s, nil
@@ -390,7 +399,7 @@ func TestMysqlRepo_UpdateSubjectCollectionType(t *testing.T) {
 
 	t2 := now.Add(time.Duration(10) * time.Second)
 
-	err = repo.UpdateSubjectCollection(context.Background(), uid, sid, t2, "",
+	err = repo.UpdateSubjectCollection(context.Background(), uid, subject, t2, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			s.UpdateType(collection.SubjectCollectionDoing)
 			return s, nil

@@ -41,6 +41,7 @@ func TestUser_PostSubjectCollection(t *testing.T) {
 	t.Parallel()
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
+	subject := model.Subject{ID: sid, TypeID: model.SubjectTypeAll}
 
 	var s = &collection.Subject{}
 
@@ -53,9 +54,9 @@ func TestUser_PostSubjectCollection(t *testing.T) {
 		Return(nil)
 
 	c := mocks.NewCollectionRepo(t)
-	c.EXPECT().UpdateOrCreateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+	c.EXPECT().UpdateOrCreateSubjectCollection(mock.Anything, uid, subject, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(ctx context.Context, userID uint32,
-			subjectID uint32, at time.Time, ip string,
+			subject model.Subject, at time.Time, ip string,
 			update func(context.Context, *collection.Subject) (*collection.Subject, error)) {
 			require.Equal(t, "0.0.0.0", ip)
 			s = lo.Must(update(context.Background(), s))
@@ -89,6 +90,7 @@ func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
 	t.Parallel()
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
+	subject := model.Subject{ID: sid, TypeID: model.SubjectTypeAll}
 
 	var s = &collection.Subject{}
 
@@ -101,9 +103,9 @@ func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
 		Return(nil)
 
 	c := mocks.NewCollectionRepo(t)
-	c.EXPECT().UpdateOrCreateSubjectCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
+	c.EXPECT().UpdateOrCreateSubjectCollection(mock.Anything, uid, subject, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(ctx context.Context, userID uint32,
-			subjectID uint32, at time.Time, ip string,
+			subject model.Subject, at time.Time, ip string,
 			update func(context.Context, *collection.Subject) (*collection.Subject, error)) {
 			require.Equal(t, "0.0.0.0", ip)
 			s = lo.Must(update(context.Background(), s))
