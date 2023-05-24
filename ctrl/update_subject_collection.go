@@ -46,16 +46,16 @@ type UpdateCollectionRequest struct {
 func (ctl Ctrl) UpdateSubjectCollection(
 	ctx context.Context,
 	u auth.Auth,
-	subjectID model.SubjectID,
+	subject model.Subject,
 	req UpdateCollectionRequest,
 	allowCreate bool,
 ) error {
-	ctl.log.Info("try to update collection", zap.Uint32("subject_id", subjectID), log.User(u.ID))
+	ctl.log.Info("try to update collection", zap.Uint32("subject_id", subject.ID), log.User(u.ID))
 	met := ctl.collection.UpdateSubjectCollection
 	if allowCreate {
 		met = ctl.collection.UpdateOrCreateSubjectCollection
 	}
-	err := met(ctx, u.ID, subjectID, time.Now(), req.IP,
+	err := met(ctx, u.ID, subject, time.Now(), req.IP,
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 			if req.Comment.Set {
 				s.ShadowBan(ctl.dam.NeedReview(req.Comment.Value))
@@ -102,8 +102,7 @@ func (ctl Ctrl) UpdateSubjectCollection(
 	if err != nil {
 		return err
 	}
-
-	return ctl.mayCreateTimeline(ctx, u, req, subjectID)
+	return ctl.mayCreateTimeline(ctx, u, req, subject.ID)
 }
 
 func (ctl Ctrl) mayCreateTimeline(

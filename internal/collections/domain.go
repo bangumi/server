@@ -53,13 +53,13 @@ type Repo interface {
 	) (collection.UserSubjectEpisodesCollection, error)
 
 	UpdateSubjectCollection(
-		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
+		ctx context.Context, userID model.UserID, subject model.Subject,
 		at time.Time, ip string,
 		update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 	) error
 
 	UpdateOrCreateSubjectCollection(
-		ctx context.Context, userID model.UserID, subjectID model.SubjectID,
+		ctx context.Context, userID model.UserID, subject model.Subject,
 		at time.Time, ip string,
 		update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 	) error

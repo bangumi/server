@@ -144,7 +144,7 @@ func (ctl Ctrl) updateEpisodesCollectionTx(
 	return func(tx *query.Query) error {
 		collectionTx := ctl.collection.WithQuery(tx)
 
-		_, err := collectionTx.GetSubjectCollection(ctx, u.ID, subjectID)
+		sc, err := collectionTx.GetSubjectCollection(ctx, u.ID, subjectID)
 		if err != nil {
 			if errors.Is(err, gerr.ErrNotFound) {
 				return gerr.ErrSubjectNotCollected
@@ -160,7 +160,8 @@ func (ctl Ctrl) updateEpisodesCollectionTx(
 
 		epStatus := len(ec)
 
-		err = collectionTx.UpdateSubjectCollection(ctx, u.ID, subjectID, time.Now(), "",
+		err = collectionTx.UpdateSubjectCollection(ctx, u.ID,
+			model.Subject{ID: subjectID, TypeID: sc.SubjectType}, time.Now(), "",
 			func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 				s.UpdateEps(uint32(epStatus))
 				return s, nil

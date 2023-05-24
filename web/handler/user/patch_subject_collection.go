@@ -90,15 +90,17 @@ func (h User) updateOrCreateSubjectCollection(
 		}
 	}
 
-	return h.ctrl.UpdateSubjectCollection(c.Request().Context(), u.Auth, subjectID, ctrl.UpdateCollectionRequest{
-		IP:        u.IP,
-		UID:       u.ID,
-		VolStatus: r.VolStatus,
-		EpStatus:  r.EpStatus,
-		Type:      r.Type,
-		Tags:      r.Tags,
-		Comment:   r.Comment,
-		Rate:      r.Rate,
-		Private:   r.Private,
-	}, allowCreate)
+	return h.ctrl.UpdateSubjectCollection(c.Request().Context(), u.Auth,
+		model.Subject{ID: subjectID, TypeID: s.TypeID},
+		ctrl.UpdateCollectionRequest{
+			IP:        u.IP,
+			UID:       u.ID,
+			VolStatus: r.VolStatus,
+			EpStatus:  r.EpStatus,
+			Type:      r.Type,
+			Tags:      r.Tags,
+			Comment:   r.Comment,
+			Rate:      r.Rate,
+			Private:   r.Private,
+		}, allowCreate)
 }

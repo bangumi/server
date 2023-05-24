@@ -84,43 +84,43 @@ func (r mysqlRepo) convertToSubjectCollection(s *dao.SubjectCollection) (*collec
 func (r mysqlRepo) UpdateSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
-	subjectID model.SubjectID,
+	subject model.Subject,
 	at time.Time,
 	ip string,
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 ) error {
-	s, err := r.getSubjectCollection(ctx, userID, subjectID)
+	s, err := r.getSubjectCollection(ctx, userID, subject.ID)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return gerr.ErrSubjectNotCollected
 		}
 		return err
 	}
-	return r.updateOrCreateSubjectCollection(ctx, userID, subjectID, at, ip, update, s)
+	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
 }
 
 func (r mysqlRepo) UpdateOrCreateSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
-	subjectID model.SubjectID,
+	subject model.Subject,
 	at time.Time,
 	ip string,
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 ) error {
-	s, err := r.getSubjectCollection(ctx, userID, subjectID)
+	s, err := r.getSubjectCollection(ctx, userID, subject.ID)
 	if err != nil {
 		if !errors.Is(err, gerr.ErrNotFound) {
 			return err
 		}
 		s = nil
 	}
-	return r.updateOrCreateSubjectCollection(ctx, userID, subjectID, at, ip, update, s)
+	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
 }
 
 func (r mysqlRepo) updateOrCreateSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
-	subjectID model.SubjectID,
+	subject model.Subject,
 	at time.Time,
 	ip string,
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
@@ -129,8 +129,9 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 	created := obj == nil
 	if created {
 		obj = &dao.SubjectCollection{
-			SubjectID: subjectID,
-			UserID:    userID,
+			SubjectID:   subject.ID,
+			SubjectType: subject.TypeID,
+			UserID:      userID,
 		}
 	}
 	collectionSubject, err := r.convertToSubjectCollection(obj)
@@ -161,7 +162,7 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
-	r.updateSubject(ctx, subjectID)
+	r.updateSubject(ctx, subject.ID)
 	return nil
 }
 
