@@ -45,22 +45,6 @@ output:
 
 # all available settings of specific linters
 linters-settings:
-  goheader:
-    template: |-
-      SPDX-License-Identifier: AGPL-3.0-only
-
-      This program is free software: you can redistribute it and/or modify
-      it under the terms of the GNU Affero General Public License as published
-      by the Free Software Foundation, version 3.
-
-      This program is distributed in the hope that it will be useful,
-      but WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-      See the GNU Affero General Public License for more details.
-
-      You should have received a copy of the GNU Affero General Public License
-      along with this program. If not, see <https://www.gnu.org/licenses/>
-
   errcheck:
     # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
     # default is false: such cases aren't reported by default.
@@ -249,43 +233,75 @@ linters-settings:
         yaml: snake
 
 linters:
-  enable-all: true
-  disable:
-    - nolintlint
-    - ireturn
-    - contextcheck
-    - bodyclose
-    - wsl # noisy
-    - varnamelen # noisy
-    - exhaustivestruct # too noisy, default zero value is a good thing.
-    - exhaustruct # too noisy
-    - gofumpt # break import grouping
-    - prealloc # perf
-    - maligned # replaced by go vert
-    - dupl
-    - cyclop # we have gocyclo
-    - goimports # we have gci already
-    - nlreturn
-    - godox
-    - execinquery
-    - nonamedreturns
-    # useless
-    - sqlclosecheck
-    - rowserrcheck
-    - nilerr
-    - dupword
-    - wrapcheck
-    # 1.18
-    - wastedassign
-    - nosnakecase # false positive for variable and const defined in other lib
-    - structcheck
-    # deprecated
-    - varcheck
-    - deadcode
-    - interfacer
-    - ifshort
-    - scopelint
-    - golint
+  disable-all: true
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - containedctx
+    - depguard
+    - dogsled
+    - durationcheck
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - gci
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - goerr113
+    - gofmt
+    - gomnd
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - grouper
+    - importas
+    - ineffassign
+    - interfacebloat
+    - lll
+    - loggercheck
+    - maintidx
+    - makezero
+    - misspell
+    #    - musttag
+    - nakedret
+    - nestif
+    - nilnil
+    - noctx
+    #    - nosprintfhostport
+    - paralleltest
+    - predeclared
+    - promlinter
+    - reassign
+    #    - staticcheck
+    - stylecheck
+    - tagliatelle
+    - tenv
+    - testableexamples
+    - testpackage
+    - thelper
+    - tparallel
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - whitespace
     - revive
 
   fast: false
@@ -299,7 +315,7 @@ issues:
       linters: [gochecknoglobals, gochecknoinits, wrapcheck]
 
     - path: '.*_test\.go'
-      linters: [gocritic, gochecknoglobals, godot, nosnakecase, funlen, musttag]
+      linters: [gocritic, gochecknoglobals, godot, nosnakecase, funlen]
 
     - source: "var .* = pool.New"
       linters: [gochecknoglobals]
