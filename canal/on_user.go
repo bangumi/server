@@ -94,6 +94,10 @@ func (e *eventHandler) clearImageCache(avatar string) {
 	err := e.s3.ListObjectsV2PagesWithContext(context.Background(),
 		&s3.ListObjectsV2Input{Bucket: &e.config.S3ImageResizeBucket, Prefix: &p},
 		func(output *s3.ListObjectsV2Output, b bool) bool {
+			if len(output.Contents) == 0 {
+				return false
+			}
+
 			_, err := e.s3.DeleteObjects(&s3.DeleteObjectsInput{
 				Bucket: &e.config.S3ImageResizeBucket,
 				Delete: &s3.Delete{
