@@ -44,6 +44,7 @@ func newMember(db *gorm.DB, opts ...gen.DOOption) member {
 	_member.Sign = field.NewField(tableName, "sign")
 	_member.PasswordCrypt = field.NewBytes(tableName, "password_crypt")
 	_member.Email = field.NewString(tableName, "email")
+	_member.Acl = field.NewString(tableName, "acl")
 	_member.Fields = memberHasOneFields{
 		db: db.Session(&gorm.Session{}),
 
@@ -76,6 +77,7 @@ type member struct {
 	Sign          field.Field
 	PasswordCrypt field.Bytes
 	Email         field.String
+	Acl           field.String
 	Fields        memberHasOneFields
 
 	fieldMap map[string]field.Expr
@@ -110,6 +112,7 @@ func (m *member) updateTableName(table string) *member {
 	m.Sign = field.NewField(table, "sign")
 	m.PasswordCrypt = field.NewBytes(table, "password_crypt")
 	m.Email = field.NewString(table, "email")
+	m.Acl = field.NewString(table, "acl")
 
 	m.fillFieldMap()
 
@@ -132,7 +135,7 @@ func (m *member) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (m *member) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 18)
+	m.fieldMap = make(map[string]field.Expr, 19)
 	m.fieldMap["uid"] = m.ID
 	m.fieldMap["username"] = m.Username
 	m.fieldMap["nickname"] = m.Nickname
@@ -150,6 +153,7 @@ func (m *member) fillFieldMap() {
 	m.fieldMap["sign"] = m.Sign
 	m.fieldMap["password_crypt"] = m.PasswordCrypt
 	m.fieldMap["email"] = m.Email
+	m.fieldMap["acl"] = m.Acl
 
 }
 

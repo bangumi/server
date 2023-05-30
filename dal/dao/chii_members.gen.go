@@ -29,6 +29,7 @@ type Member struct {
 	Sign          utiltype.HTMLEscapedString `gorm:"column:sign;type:varchar(255);not null"`
 	PasswordCrypt []byte                     `gorm:"column:password_crypt;type:char(64);not null"`
 	Email         string                     `gorm:"column:email;type:char(50);not null"`
+	Acl           string                     `gorm:"column:acl;type:mediumtext;not null"`
 	Fields        MemberField                `gorm:"foreignKey:uid;references:uid" json:"fields"`
 }
 
