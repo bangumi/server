@@ -40,7 +40,7 @@ require (
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.1
-	gorm.io/gen v0.3.23-0.20230420060613-fe1f9eac3ff7
+	gorm.io/gen v0.3.23-0.20230607091832-e1b2ee26d7ac
 	gorm.io/gorm v1.25.1
 	gorm.io/plugin/dbresolver v1.4.1
 	gorm.io/plugin/soft_delete v1.2.1
