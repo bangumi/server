@@ -36,7 +36,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-const defaultTimeout = time.Second * 5
+const defaultTimeout = time.Second * 30
 
 func NewMysqlRepo(q *query.Query, log *zap.Logger, cfg config.AppConfig) (Service, error) {
 	rpc, err := newGrpcClient(cfg)
