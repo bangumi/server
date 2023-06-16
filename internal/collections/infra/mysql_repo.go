@@ -153,13 +153,13 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 
 	T := r.q.SubjectCollection
 	if created {
-		err = T.WithContext(ctx).Create(obj)
+		err = errgo.Trace(T.WithContext(ctx).Create(obj))
 	} else {
-		err = T.WithContext(ctx).Save(obj)
+		err = errgo.Trace(T.WithContext(ctx).Save(obj))
 	}
 
 	if err != nil {
-		return errgo.Trace(err)
+		return err
 	}
 
 	r.updateSubject(ctx, subject.ID)
