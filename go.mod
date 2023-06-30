@@ -37,7 +37,7 @@ require (
 	golang.org/x/crypto v0.9.0
 	google.golang.org/grpc v1.52.3
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
-	google.golang.org/protobuf v1.30.0
+	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gen v0.3.23-0.20230420060613-fe1f9eac3ff7
