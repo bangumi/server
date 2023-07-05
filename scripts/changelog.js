@@ -50,7 +50,7 @@ const s = conventionalChangelog(
 
       return commit;
     },
-  }
+  },
 );
 
 let changelog = "";
