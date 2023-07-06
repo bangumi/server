@@ -63,7 +63,7 @@ func New(
 	meili := meilisearch.NewClient(meilisearch.ClientConfig{
 		Host:    cfg.Search.MeiliSearch.URL,
 		APIKey:  cfg.Search.MeiliSearch.Key,
-		Timeout: time.Second,
+		Timeout: cfg.Search.MeiliSearch.Timeout,
 	})
 
 	if _, err := meili.GetVersion(); err != nil {

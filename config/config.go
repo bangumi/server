@@ -55,8 +55,9 @@ type AppConfig struct {
 
 	Search struct {
 		MeiliSearch struct {
-			URL string `yaml:"url" env:"MEILISEARCH_URL"`
-			Key string `yaml:"key" env:"MEILISEARCH_KEY"`
+			URL     string        `yaml:"url" env:"MEILISEARCH_URL"`
+			Key     string        `yaml:"key" env:"MEILISEARCH_KEY"`
+			Timeout time.Duration `yaml:"key" env:"MEILISEARCH_REQUEST_TIMEOUT" env-default:"2s"`
 		} `yaml:"meilisearch"`
 
 		SearchBatchSize     int           `env:"SEARCH_BATCH_SIZE" yaml:"batch_size" env-default:"100"`
