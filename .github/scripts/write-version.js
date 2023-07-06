@@ -47,7 +47,7 @@ function writeVersionFile() {
       "",
       `const Version = "${version}"`,
       "",
-    ].join("\n")
+    ].join("\n"),
   );
 }
 
