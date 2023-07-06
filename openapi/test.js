@@ -23,7 +23,7 @@ const colors = require("colors/safe");
 async function main() {
   const filePath = "v0.yaml";
 
-  console.log("try to bundle", filePath);
+  console.log("try to bundle", path.join(__dirname, filePath));
   const openapi = await $RefParser.bundle(path.join(__dirname, filePath));
 
   try {
