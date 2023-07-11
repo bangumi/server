@@ -62,7 +62,7 @@ jobs:
         with:
           images: ${{ env.IMAGE }}
           tags: |
-            type=semver,event=tag,pattern={{version}}
+            type=semver,event=tag,pattern=v{{version}}
 
             type=ref,event=branch
             type=ref,event=branch,suffix=-${{ env.SHA }}
