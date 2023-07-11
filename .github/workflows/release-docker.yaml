@@ -6,6 +6,10 @@ on:
       - "v*.*.*"
     branches:
       - master
+
+permissions:
+  packages: write
+
 jobs:
   docker:
     name: "docker"
@@ -58,13 +62,10 @@ jobs:
         with:
           images: ${{ env.IMAGE }}
           tags: |
-            type=semver,pattern=v{{version}}
+            type=semver,event=tag,pattern=v{{version}}
 
             type=ref,event=branch
             type=ref,event=branch,suffix=-${{ env.SHA }}
-            type=raw,event=branch,value=${{ env.SHA }}
-
-            type=sha
 
       - uses: docker/login-action@v2
         with:
