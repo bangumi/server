@@ -21,8 +21,8 @@ const { execFileSync } = require("child_process");
 const pkg = require("../../package.json");
 
 function getVersion() {
-  if (process.env.TAG) {
-    return process.env.TAG;
+  if (process.env.SHA) {
+    return process.env.SHA;
   }
 
   return pkg.version;
