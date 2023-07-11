@@ -64,13 +64,16 @@ func New() *echo.Echo {
 		return func(c echo.Context) error {
 			metrics.RequestCount.Inc()
 			start := time.Now()
+			c.Response().Header().Set(headerServerVersion, config.Version)
+
+			c.Response().Before(func() {
+				sub := time.Since(start)
+				metrics.RequestHistogram.Observe(sub.Seconds())
+				c.Response().Header().Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
+			})
 
 			err := next(c)
 
-			sub := time.Since(start)
-			metrics.RequestHistogram.Observe(sub.Seconds())
-			c.Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
-			c.Set(headerServerVersion, config.Version)
 			return err
 		}
 	})
