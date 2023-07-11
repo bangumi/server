@@ -25,7 +25,7 @@ function getVersion() {
     return process.env.SHA;
   }
 
-  return pkg.version;
+  return "v" + pkg.version;
 }
 
 const version = getVersion();
