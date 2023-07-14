@@ -130,6 +130,8 @@ func (e episode) TableName() string { return e.episodeDo.TableName() }
 
 func (e episode) Alias() string { return e.episodeDo.Alias() }
 
+func (e episode) Columns(cols ...field.Expr) gen.Columns { return e.episodeDo.Columns(cols...) }
+
 func (e *episode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := e.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -291,10 +293,6 @@ func (e episodeDo) Select(conds ...field.Expr) *episodeDo {
 
 func (e episodeDo) Where(conds ...gen.Condition) *episodeDo {
 	return e.withDO(e.DO.Where(conds...))
-}
-
-func (e episodeDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *episodeDo {
-	return e.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (e episodeDo) Order(conds ...field.Expr) *episodeDo {

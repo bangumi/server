@@ -91,6 +91,8 @@ func (a accessToken) TableName() string { return a.accessTokenDo.TableName() }
 
 func (a accessToken) Alias() string { return a.accessTokenDo.Alias() }
 
+func (a accessToken) Columns(cols ...field.Expr) gen.Columns { return a.accessTokenDo.Columns(cols...) }
+
 func (a *accessToken) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := a.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -166,10 +168,6 @@ func (a accessTokenDo) Select(conds ...field.Expr) *accessTokenDo {
 
 func (a accessTokenDo) Where(conds ...gen.Condition) *accessTokenDo {
 	return a.withDO(a.DO.Where(conds...))
-}
-
-func (a accessTokenDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *accessTokenDo {
-	return a.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (a accessTokenDo) Order(conds ...field.Expr) *accessTokenDo {

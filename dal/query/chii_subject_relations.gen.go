@@ -99,6 +99,10 @@ func (s subjectRelation) TableName() string { return s.subjectRelationDo.TableNa
 
 func (s subjectRelation) Alias() string { return s.subjectRelationDo.Alias() }
 
+func (s subjectRelation) Columns(cols ...field.Expr) gen.Columns {
+	return s.subjectRelationDo.Columns(cols...)
+}
+
 func (s *subjectRelation) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := s.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -249,10 +253,6 @@ func (s subjectRelationDo) Select(conds ...field.Expr) *subjectRelationDo {
 
 func (s subjectRelationDo) Where(conds ...gen.Condition) *subjectRelationDo {
 	return s.withDO(s.DO.Where(conds...))
-}
-
-func (s subjectRelationDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *subjectRelationDo {
-	return s.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (s subjectRelationDo) Order(conds ...field.Expr) *subjectRelationDo {

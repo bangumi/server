@@ -120,6 +120,10 @@ func (s subjectRevision) TableName() string { return s.subjectRevisionDo.TableNa
 
 func (s subjectRevision) Alias() string { return s.subjectRevisionDo.Alias() }
 
+func (s subjectRevision) Columns(cols ...field.Expr) gen.Columns {
+	return s.subjectRevisionDo.Columns(cols...)
+}
+
 func (s *subjectRevision) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := s.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -277,10 +281,6 @@ func (s subjectRevisionDo) Select(conds ...field.Expr) *subjectRevisionDo {
 
 func (s subjectRevisionDo) Where(conds ...gen.Condition) *subjectRevisionDo {
 	return s.withDO(s.DO.Where(conds...))
-}
-
-func (s subjectRevisionDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *subjectRevisionDo {
-	return s.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (s subjectRevisionDo) Order(conds ...field.Expr) *subjectRevisionDo {

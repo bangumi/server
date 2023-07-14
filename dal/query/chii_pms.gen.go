@@ -103,6 +103,10 @@ func (p privateMessage) TableName() string { return p.privateMessageDo.TableName
 
 func (p privateMessage) Alias() string { return p.privateMessageDo.Alias() }
 
+func (p privateMessage) Columns(cols ...field.Expr) gen.Columns {
+	return p.privateMessageDo.Columns(cols...)
+}
+
 func (p *privateMessage) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := p.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -182,10 +186,6 @@ func (p privateMessageDo) Select(conds ...field.Expr) *privateMessageDo {
 
 func (p privateMessageDo) Where(conds ...gen.Condition) *privateMessageDo {
 	return p.withDO(p.DO.Where(conds...))
-}
-
-func (p privateMessageDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *privateMessageDo {
-	return p.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (p privateMessageDo) Order(conds ...field.Expr) *privateMessageDo {

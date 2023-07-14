@@ -73,6 +73,10 @@ func (r revisionText) TableName() string { return r.revisionTextDo.TableName() }
 
 func (r revisionText) Alias() string { return r.revisionTextDo.Alias() }
 
+func (r revisionText) Columns(cols ...field.Expr) gen.Columns {
+	return r.revisionTextDo.Columns(cols...)
+}
+
 func (r *revisionText) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := r.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -142,10 +146,6 @@ func (r revisionTextDo) Select(conds ...field.Expr) *revisionTextDo {
 
 func (r revisionTextDo) Where(conds ...gen.Condition) *revisionTextDo {
 	return r.withDO(r.DO.Where(conds...))
-}
-
-func (r revisionTextDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *revisionTextDo {
-	return r.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (r revisionTextDo) Order(conds ...field.Expr) *revisionTextDo {

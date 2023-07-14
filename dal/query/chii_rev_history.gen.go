@@ -88,6 +88,10 @@ func (r revisionHistory) TableName() string { return r.revisionHistoryDo.TableNa
 
 func (r revisionHistory) Alias() string { return r.revisionHistoryDo.Alias() }
 
+func (r revisionHistory) Columns(cols ...field.Expr) gen.Columns {
+	return r.revisionHistoryDo.Columns(cols...)
+}
+
 func (r *revisionHistory) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := r.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -162,10 +166,6 @@ func (r revisionHistoryDo) Select(conds ...field.Expr) *revisionHistoryDo {
 
 func (r revisionHistoryDo) Where(conds ...gen.Condition) *revisionHistoryDo {
 	return r.withDO(r.DO.Where(conds...))
-}
-
-func (r revisionHistoryDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *revisionHistoryDo {
-	return r.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (r revisionHistoryDo) Order(conds ...field.Expr) *revisionHistoryDo {

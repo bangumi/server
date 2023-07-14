@@ -109,6 +109,10 @@ func (c characterSubjects) TableName() string { return c.characterSubjectsDo.Tab
 
 func (c characterSubjects) Alias() string { return c.characterSubjectsDo.Alias() }
 
+func (c characterSubjects) Columns(cols ...field.Expr) gen.Columns {
+	return c.characterSubjectsDo.Columns(cols...)
+}
+
 func (c *characterSubjects) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := c.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -333,10 +337,6 @@ func (c characterSubjectsDo) Select(conds ...field.Expr) *characterSubjectsDo {
 
 func (c characterSubjectsDo) Where(conds ...gen.Condition) *characterSubjectsDo {
 	return c.withDO(c.DO.Where(conds...))
-}
-
-func (c characterSubjectsDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *characterSubjectsDo {
-	return c.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (c characterSubjectsDo) Order(conds ...field.Expr) *characterSubjectsDo {
