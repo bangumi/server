@@ -20,7 +20,7 @@ run:
 
   skip-files: []
 
-  go: "1.18"
+  go: "1.20"
 
 # output configuration options
 output:
@@ -106,33 +106,26 @@ linters-settings:
       - newLine
 
   depguard:
-    list-type: denylist
-    # Check the list against standard lib.
-    # Default: false
-    include-go-root: true
-    # A list of packages for the list type specified.
-    # Default: []
-    packages:
-      - "github.com/sirupsen/logrus"
-      - "github.com/golang/mock/gomock"
-    # A list of packages for the list type specified.
-    # Specify an error message to output when a denied package is used.
-    # Default: []
-    packages-with-error-message:
-      - "github.com/goccy/go-json": 'use "github.com/bytedance/sonic"'
-      - "github.com/sirupsen/logrus": 'use "app/pkg/logger"'
-      - "github.com/golang/mock": 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
-    # Create additional guards that follow the same configuration pattern.
-    # Results from all guards are aggregated together.
-    additional-guards:
-      - list-type: denylist
-        include-go-root: false
-        packages:
-          - github.com/stretchr/testify
-        # Specify rules by which the linter ignores certain files for consideration.
-        ignore-file-rules:
-          - "!**/*_test.go"
-          - "!/mocks/**/*.go"
+    rules:
+      main:
+        files:
+          - "$all"
+          - "!$test"
+          - "!**/internal/pkg/test/**.go"
+        deny:
+          - pkg: "github.com/sirupsen/logrus"
+            desc: 'use "app/pkg/logger"'
+          - pkg: "github.com/golang/mock"
+            desc: 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
+          - pkg: "github.com/stretchr/testify"
+            desc: "test assert package not allowed"
+      test:
+        files:
+          - "$test"
+          - "**/internal/pkg/test/**.go"
+        deny:
+          - pkg: "github.com/golang/mock"
+            desc: 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
 
   gomnd:
     settings:
@@ -149,7 +142,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.18"
+    go: "1.20"
     # https://staticcheck.io/docs/options#checks
     checks: ["all"]
 
@@ -181,13 +174,13 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.18"
+    go: "1.20"
     # https://staticcheck.io/docs/options#checks
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.18"
+    go: "1.20"
 
   testpackage:
     # regexp pattern to skip files
@@ -195,7 +188,7 @@ linters-settings:
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.18"
+    go: "1.20"
 
   exhaustive:
     # check switch statements in generated files also
