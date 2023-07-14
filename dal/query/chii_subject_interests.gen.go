@@ -127,6 +127,10 @@ func (s subjectCollection) TableName() string { return s.subjectCollectionDo.Tab
 
 func (s subjectCollection) Alias() string { return s.subjectCollectionDo.Alias() }
 
+func (s subjectCollection) Columns(cols ...field.Expr) gen.Columns {
+	return s.subjectCollectionDo.Columns(cols...)
+}
+
 func (s *subjectCollection) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := s.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -214,10 +218,6 @@ func (s subjectCollectionDo) Select(conds ...field.Expr) *subjectCollectionDo {
 
 func (s subjectCollectionDo) Where(conds ...gen.Condition) *subjectCollectionDo {
 	return s.withDO(s.DO.Where(conds...))
-}
-
-func (s subjectCollectionDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *subjectCollectionDo {
-	return s.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (s subjectCollectionDo) Order(conds ...field.Expr) *subjectCollectionDo {

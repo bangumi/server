@@ -167,7 +167,7 @@ func main() {
 		gen.FieldType("password_crypt", "[]byte"),
 		gen.FieldType("groupid", "uint8"),
 		gen.FieldRelate(field.HasOne, "Fields", modelField, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "uid", "references": "uid"},
+			GORMTag: field.GormTag{"foreignKey": []string{"uid"}, "references": []string{"uid"}},
 		}))
 
 	g.ApplyBasic(modelMember)
@@ -226,7 +226,7 @@ func main() {
 		gen.FieldType("idx_ban", "soft_delete.DeletedAt"),
 		gen.FieldRename("idx_ban", "Deleted"),
 		gen.FieldGORMTag("idx_ban", func(tag field.GormTag) field.GormTag {
-			tag["softDelete"] = "flag"
+			tag["softDelete"] = []string{"flag"}
 			return tag
 		}),
 	))
@@ -262,7 +262,7 @@ func main() {
 		gen.FieldType("prsn_writer", "bool"),
 		gen.FieldType("prsn_redirect", personIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "prsn_id", "polymorphic": "Owner", "polymorphicValue": "prsn"},
+			GORMTag: field.GormTag{"foreignKey": []string{"prsn_id"}, "polymorphic": []string{"Owner"}, "polymorphicValue": []string{"prsn"}},
 		}),
 	)
 	g.ApplyBasic(modelPerson)
@@ -274,7 +274,7 @@ func main() {
 		gen.FieldType("crt_id", characterIDTypeString),
 		gen.FieldType("crt_redirect", characterIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "crt_id", "polymorphic": "Owner", "polymorphicValue": "crt"},
+			GORMTag: field.GormTag{"foreignKey": []string{"crt_id"}, "polymorphic": []string{"Owner"}, "polymorphicValue": []string{"crt"}},
 		}),
 	)
 
@@ -307,7 +307,7 @@ func main() {
 		gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 		gen.FieldType("subject_airtime", "uint8"),
 		gen.FieldRelate(field.HasOne, "Fields", modelSubjectFields, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "subject_id", "references": "field_sid"},
+			GORMTag: field.GormTag{"foreignKey": []string{"subject_id"}, "references": []string{"field_sid"}},
 		}),
 	)
 	g.ApplyBasic(modelSubject)
@@ -319,7 +319,7 @@ func main() {
 		gen.FieldType("ep_type", episodeTypeTypeString),
 		gen.FieldType("ep_subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "ep_subject_id", "references": "subject_id"},
+			GORMTag: field.GormTag{"foreignKey": []string{"ep_subject_id"}, "references": []string{"subject_id"}},
 		}),
 	))
 
@@ -341,7 +341,7 @@ func main() {
 		gen.FieldType("rlt_subject_type_id", subjectTypeIDTypeString),
 		gen.FieldType("rlt_related_subject_type_id", subjectTypeIDTypeString),
 		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "rlt_related_subject_id", "references": "subject_id"},
+			GORMTag: field.GormTag{"foreignKey": []string{"rlt_related_subject_id"}, "references": []string{"subject_id"}},
 		}),
 	))
 
@@ -352,7 +352,7 @@ func main() {
 		gen.FieldType("rev_creator", userIDTypeString),
 		gen.FieldType("rev_subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "rev_subject_id", "references": "subject_id"},
+			GORMTag: field.GormTag{"foreignKey": []string{"rev_subject_id"}, "references": []string{"subject_id"}},
 		}),
 	))
 
@@ -363,13 +363,13 @@ func main() {
 		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("subject_id", subjectIDTypeString),
 		gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "crt_id", "references": "crt_id"},
+			GORMTag: field.GormTag{"foreignKey": []string{"crt_id"}, "references": []string{"crt_id"}},
 		}),
 		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "subject_id", "references": "subject_id"},
+			GORMTag: field.GormTag{"foreignKey": []string{"subject_id"}, "references": []string{"subject_id"}},
 		}),
 		gen.FieldRelate(field.HasOne, "Person", modelPerson, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "prsn_id", "references": "prsn_id"},
+			GORMTag: field.GormTag{"foreignKey": []string{"prsn_id"}, "references": []string{"prsn_id"}},
 		}),
 	))
 
@@ -380,10 +380,10 @@ func main() {
 			gen.FieldType("subject_id", subjectIDTypeString),
 			gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 			gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
-				GORMTag: field.GormTag{"foreignKey": "crt_id", "references": "crt_id"},
+				GORMTag: field.GormTag{"foreignKey": []string{"crt_id"}, "references": []string{"crt_id"}},
 			}),
 			gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-				GORMTag: field.GormTag{"foreignKey": "subject_id", "references": "subject_id"},
+				GORMTag: field.GormTag{"foreignKey": []string{"subject_id"}, "references": []string{"subject_id"}},
 			}),
 		),
 	)
@@ -394,10 +394,10 @@ func main() {
 		gen.FieldType("subject_id", subjectIDTypeString),
 		gen.FieldType("subject_type_id", subjectTypeIDTypeString),
 		gen.FieldRelate(field.HasOne, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "subject_id", "references": "subject_id"},
+			GORMTag: field.GormTag{"foreignKey": []string{"subject_id"}, "references": []string{"subject_id"}},
 		}),
 		gen.FieldRelate(field.HasOne, "Person", modelPerson, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "prsn_id", "references": "prsn_id"},
+			GORMTag: field.GormTag{"foreignKey": []string{"prsn_id"}, "references": []string{"prsn_id"}},
 		}),
 	),
 	)
@@ -406,7 +406,7 @@ func main() {
 		gen.FieldTrimPrefix("idx_rlt_"),
 		gen.FieldType("idx_rlt_type", "uint8"),
 		gen.FieldRelate(field.BelongsTo, "Subject", modelSubject, &field.RelateConfig{
-			GORMTag: field.GormTag{"foreignKey": "idx_rlt_sid", "references": "subject_id"},
+			GORMTag: field.GormTag{"foreignKey": []string{"idx_rlt_sid"}, "references": []string{"subject_id"}},
 		}),
 		// 变量重命名
 		gen.FieldRename("idx_rlt_rid", "IndexID"),
@@ -416,7 +416,7 @@ func main() {
 		gen.FieldType("idx_rlt_ban", "soft_delete.DeletedAt"),
 		gen.FieldRename("idx_rlt_ban", "Deleted"),
 		gen.FieldGORMTag("idx_rlt_ban", func(tag field.GormTag) field.GormTag {
-			tag["softDelete"] = "flag"
+			tag["softDelete"] = []string{"flag"}
 			return tag
 		}),
 	))

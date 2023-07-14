@@ -117,6 +117,8 @@ func (c cast) TableName() string { return c.castDo.TableName() }
 
 func (c cast) Alias() string { return c.castDo.Alias() }
 
+func (c cast) Columns(cols ...field.Expr) gen.Columns { return c.castDo.Columns(cols...) }
+
 func (c *cast) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := c.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -415,10 +417,6 @@ func (c castDo) Select(conds ...field.Expr) *castDo {
 
 func (c castDo) Where(conds ...gen.Condition) *castDo {
 	return c.withDO(c.DO.Where(conds...))
-}
-
-func (c castDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *castDo {
-	return c.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (c castDo) Order(conds ...field.Expr) *castDo {

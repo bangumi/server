@@ -85,6 +85,10 @@ func (e epCollection) TableName() string { return e.epCollectionDo.TableName() }
 
 func (e epCollection) Alias() string { return e.epCollectionDo.Alias() }
 
+func (e epCollection) Columns(cols ...field.Expr) gen.Columns {
+	return e.epCollectionDo.Columns(cols...)
+}
+
 func (e *epCollection) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := e.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -158,10 +162,6 @@ func (e epCollectionDo) Select(conds ...field.Expr) *epCollectionDo {
 
 func (e epCollectionDo) Where(conds ...gen.Condition) *epCollectionDo {
 	return e.withDO(e.DO.Where(conds...))
-}
-
-func (e epCollectionDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *epCollectionDo {
-	return e.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (e epCollectionDo) Order(conds ...field.Expr) *epCollectionDo {

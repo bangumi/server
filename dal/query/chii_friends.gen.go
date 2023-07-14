@@ -80,6 +80,8 @@ func (f friend) TableName() string { return f.friendDo.TableName() }
 
 func (f friend) Alias() string { return f.friendDo.Alias() }
 
+func (f friend) Columns(cols ...field.Expr) gen.Columns { return f.friendDo.Columns(cols...) }
+
 func (f *friend) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := f.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -152,10 +154,6 @@ func (f friendDo) Select(conds ...field.Expr) *friendDo {
 
 func (f friendDo) Where(conds ...gen.Condition) *friendDo {
 	return f.withDO(f.DO.Where(conds...))
-}
-
-func (f friendDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *friendDo {
-	return f.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (f friendDo) Order(conds ...field.Expr) *friendDo {

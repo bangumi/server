@@ -82,6 +82,8 @@ func (w webSession) TableName() string { return w.webSessionDo.TableName() }
 
 func (w webSession) Alias() string { return w.webSessionDo.Alias() }
 
+func (w webSession) Columns(cols ...field.Expr) gen.Columns { return w.webSessionDo.Columns(cols...) }
+
 func (w *webSession) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := w.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -154,10 +156,6 @@ func (w webSessionDo) Select(conds ...field.Expr) *webSessionDo {
 
 func (w webSessionDo) Where(conds ...gen.Condition) *webSessionDo {
 	return w.withDO(w.DO.Where(conds...))
-}
-
-func (w webSessionDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *webSessionDo {
-	return w.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (w webSessionDo) Order(conds ...field.Expr) *webSessionDo {

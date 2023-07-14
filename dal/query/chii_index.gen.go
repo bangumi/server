@@ -101,6 +101,8 @@ func (i index) TableName() string { return i.indexDo.TableName() }
 
 func (i index) Alias() string { return i.indexDo.Alias() }
 
+func (i index) Columns(cols ...field.Expr) gen.Columns { return i.indexDo.Columns(cols...) }
+
 func (i *index) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := i.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -180,10 +182,6 @@ func (i indexDo) Select(conds ...field.Expr) *indexDo {
 
 func (i indexDo) Where(conds ...gen.Condition) *indexDo {
 	return i.withDO(i.DO.Where(conds...))
-}
-
-func (i indexDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *indexDo {
-	return i.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (i indexDo) Order(conds ...field.Expr) *indexDo {

@@ -91,6 +91,10 @@ func (n notification) TableName() string { return n.notificationDo.TableName() }
 
 func (n notification) Alias() string { return n.notificationDo.Alias() }
 
+func (n notification) Columns(cols ...field.Expr) gen.Columns {
+	return n.notificationDo.Columns(cols...)
+}
+
 func (n *notification) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := n.fieldMap[fieldName]
 	if !ok || _f == nil {
@@ -166,10 +170,6 @@ func (n notificationDo) Select(conds ...field.Expr) *notificationDo {
 
 func (n notificationDo) Where(conds ...gen.Condition) *notificationDo {
 	return n.withDO(n.DO.Where(conds...))
-}
-
-func (n notificationDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *notificationDo {
-	return n.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
 func (n notificationDo) Order(conds ...field.Expr) *notificationDo {
