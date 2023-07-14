@@ -4,27 +4,13 @@ on:
   push:
     branches-ignore:
       - renovate/**
-    paths:
-      - "**.go"
-      - "**.go.json"
-      - "go.mod"
-      - "go.sum"
-      - ".golangci.yaml"
-      - ".github/workflows/lint.yaml"
   pull_request:
     branches:
       - master
-    paths:
-      - "**.go"
-      - "**.go.json"
-      - "go.mod"
-      - "go.sum"
-      - ".golangci.yaml"
-      - ".github/workflows/lint.yaml"
 
 jobs:
-  lint:
-    runs-on: ubuntu-22.04
+  golang:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -53,3 +39,19 @@ jobs:
           version: v1.52.2
           skip-pkg-cache: true
           skip-build-cache: true
+
+  others:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+
+      - run: npm ci
+
+      - run: npx prettier --write --list-different ./
+
+      - name: suggester / prettier
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: prettier
