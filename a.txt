@@ -1,0 +1,3 @@
+topk(10, sum ({job="nginx"} |= `api.bgm.tv` | json [1h]) by (remote_addr))
+
+topk(10,sum(rate({job="nginx"}|= `api.bgm.tv` | json[5m])) by (remote_addr))
