@@ -1,8 +1,7 @@
 name: autofix.ci
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  pull_request:
     branches:
       - master
 
