@@ -1,57 +1,33 @@
 name: Lint Review
 
 on:
-  push:
-    branches-ignore:
-      - renovate/**
   pull_request_target:
     types: [opened, synchronize, reopened]
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Install Node LTS
         uses: actions/setup-node@v3
 
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.20"
-          cache: false
+          go-version-file: "go.mod"
 
-      - run: npm i -g prettier@^3
+      - run: npm ci
 
-      - name: Checkout code
-        uses: actions/checkout@v3
-        if: ${{ github.event_name != 'push' }}
-        with:
-          ref: "refs/pull/${{ github.event.number }}/head"
+      - run: npm run format
 
-      - run: "gh pr checkout ${{ github.event.number }}"
-        if: ${{ github.event_name != 'push' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: gofmt -w -s .
 
-      - name: Checkout code
-        uses: actions/checkout@v3
-        if: ${{ github.event_name == 'push' }}
-
-      - name: prettier
-        run: prettier --write --list-different ./
-
-      - name: gofmt
-        run: gofmt -w -s .
-
-      - run: git diff --exit-code
-
-      - name: create review
-        if: ${{ failure() && github.event_name != 'push' }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m 'style: ci auto format code'
-          git push
+      - uses: autofix-ci/action@8caa572fd27b0019a65e4c695447089c8d3138b9
