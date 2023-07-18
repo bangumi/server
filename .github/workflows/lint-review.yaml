@@ -1,4 +1,4 @@
-name: Lint Review
+name: autofix.ci
 
 on:
   pull_request_target:
