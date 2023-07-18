@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/avast/retry-go/v4 v4.3.4
-	github.com/aws/aws-sdk-go v1.44.294
+	github.com/aws/aws-sdk-go v1.44.301
 	github.com/davecgh/go-spew v1.1.1
 	github.com/elliotchance/phpserialize v1.3.3
 	github.com/go-playground/locales v0.14.1
@@ -15,14 +15,14 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/ilyakaznacheev/cleanenv v1.4.2
 	github.com/jarcoal/httpmock v1.3.0
-	github.com/labstack/echo/v4 v4.10.2
+	github.com/labstack/echo/v4 v4.11.1
 	github.com/mattn/go-colorable v0.1.13
 	github.com/meilisearch/meilisearch-go v0.25.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/samber/lo v1.38.1
-	github.com/segmentio/kafka-go v0.4.40
+	github.com/segmentio/kafka-go v0.4.42
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
@@ -70,7 +70,7 @@ require (
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mattn/go-isatty v0.0.17 // indirect
+	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
