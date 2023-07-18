@@ -3,7 +3,7 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/Bangumi/server?style=flat-square)
 [![Codecov](https://img.shields.io/codecov/c/github/Bangumi/server?style=flat-square)](https://app.codecov.io/gh/Bangumi/server)
 
-##   Requirements 1
+##         Requirements 1
 
 - [Go 1.20](https://go.dev/)
 - [go-task](https://taskfile.dev/installation/)，使用 `task` 查看所有的构建目标。
