@@ -59,8 +59,8 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 		}
 
 		v.Comment.Value = strings.TrimSpace(v.Comment.Value)
-		if utf8.RuneCountInString(v.Comment.Value) > 200 {
-			return res.BadRequest("comment too lang, only allow less equal than 200 characters")
+		if utf8.RuneCountInString(v.Comment.Value) > 380 {
+			return res.BadRequest("comment too lang, only allow less equal than 380 characters")
 		}
 	}
 
