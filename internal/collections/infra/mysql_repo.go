@@ -91,10 +91,10 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 ) error {
 	return r.q.Transaction(func(txn *query.Query) error {
-		s, err := r.q.SubjectCollection.WithContext(ctx).
+		s, err := txn.SubjectCollection.WithContext(ctx).
 			Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where(r.q.SubjectCollection.UserID.Eq(userID),
-				r.q.SubjectCollection.SubjectID.Eq(subject.ID)).
+			Where(txn.SubjectCollection.UserID.Eq(userID),
+				txn.SubjectCollection.SubjectID.Eq(subject.ID)).
 			Take()
 		if err != nil {
 			if errors.Is(err, gerr.ErrNotFound) {
@@ -102,7 +102,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 			}
 			return err
 		}
-		return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
+		return r.updateOrCreateSubjectCollection(ctx, txn, userID, subject, at, ip, update, s)
 	})
 }
 
@@ -115,10 +115,10 @@ func (r mysqlRepo) UpdateOrCreateSubjectCollection(
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 ) error {
 	return r.q.Transaction(func(txn *query.Query) error {
-		s, err := r.q.SubjectCollection.WithContext(ctx).
+		s, err := txn.SubjectCollection.WithContext(ctx).
 			Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where(r.q.SubjectCollection.UserID.Eq(userID),
-				r.q.SubjectCollection.SubjectID.Eq(subject.ID)).
+			Where(txn.SubjectCollection.UserID.Eq(userID),
+				txn.SubjectCollection.SubjectID.Eq(subject.ID)).
 			Take()
 		if err != nil {
 			if !errors.Is(err, gerr.ErrNotFound) {
@@ -126,12 +126,13 @@ func (r mysqlRepo) UpdateOrCreateSubjectCollection(
 			}
 			s = nil
 		}
-		return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
+		return r.updateOrCreateSubjectCollection(ctx, txn, userID, subject, at, ip, update, s)
 	})
 }
 
 func (r mysqlRepo) updateOrCreateSubjectCollection(
 	ctx context.Context,
+	txn *query.Query,
 	userID model.UserID,
 	subject model.Subject,
 	at time.Time,
@@ -164,7 +165,7 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
-	T := r.q.SubjectCollection
+	T := txn.SubjectCollection
 	if created {
 		err = errgo.Trace(T.WithContext(ctx).Create(obj))
 	} else {
