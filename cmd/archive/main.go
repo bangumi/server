@@ -21,10 +21,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
+	"sort"
+	"unicode/utf8"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/trim21/errgo"
 	"go.uber.org/fx"
@@ -38,6 +42,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/driver"
 	"github.com/bangumi/server/internal/pkg/logger"
+	subjectDto "github.com/bangumi/server/internal/subject"
 )
 
 const defaultStep = 50
@@ -162,6 +167,19 @@ func getMaxID(q *query.Query) {
 	maxPersonID = lastPerson.ID
 }
 
+type Score struct {
+	Field1  uint32 `json:"1"`
+	Field2  uint32 `json:"2"`
+	Field3  uint32 `json:"3"`
+	Field4  uint32 `json:"4"`
+	Field5  uint32 `json:"5"`
+	Field6  uint32 `json:"6"`
+	Field7  uint32 `json:"7"`
+	Field8  uint32 `json:"8"`
+	Field9  uint32 `json:"9"`
+	Field10 uint32 `json:"10"`
+}
+
 type Subject struct {
 	ID       model.SubjectID   `json:"id"`
 	Type     model.SubjectType `json:"type"`
@@ -171,17 +189,55 @@ type Subject struct {
 	Platform uint16            `json:"platform"`
 	Summary  string            `json:"summary"`
 	Nsfw     bool              `json:"nsfw"`
+
+	Tags         []Tag   `json:"tags"`
+	Score        float64 `json:"score"`
+	ScoreDetails Score   `json:"score_details"`
+	Rank         uint32  `json:"rank"`
+}
+
+type Tag struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
 }
 
 func exportSubjects(q *query.Query, w io.Writer) {
 	for i := model.SubjectID(0); i < maxSubjectID; i += defaultStep {
-		subjects, err := q.WithContext(ctx).Subject.
+		subjects, err := q.WithContext(ctx).Subject.Preload(q.Subject.Fields).
 			Where(q.Subject.ID.Gt(i), q.Subject.ID.Lte(i+defaultStep), q.Subject.Ban.Eq(0)).Find()
 		if err != nil {
 			panic(err)
 		}
 
 		for _, subject := range subjects {
+			tags, err := subjectDto.ParseTags(subject.Fields.Tags)
+			if err != nil {
+				tags = []model.Tag{}
+			}
+
+			sort.Slice(tags, func(i, j int) bool {
+				return tags[i].Count >= tags[j].Count
+			})
+
+			tags = lo.Filter(lo.Slice(tags, 0, 11), func(item model.Tag, index int) bool { //nolint:gomnd
+				return utf8.RuneCountInString(item.Name) < 10 || item.Count >= 10
+			})
+
+			encodedTags := lo.Map(tags, func(item model.Tag, index int) Tag {
+				return Tag{
+					Name:  item.Name,
+					Count: item.Count,
+				}
+			})
+
+			f := subject.Fields
+			var total = f.Rate1 + f.Rate2 + f.Rate3 + f.Rate4 + f.Rate5 + f.Rate6 + f.Rate7 + f.Rate8 + f.Rate9 + f.Rate10
+			var score float64
+			if total != 0 {
+				score = float64(1*f.Rate1+2*f.Rate2+3*f.Rate3+4*f.Rate4+5*f.Rate5+
+					6*f.Rate6+7*f.Rate7+8*f.Rate8+9*f.Rate9+10*f.Rate10) / float64(total)
+			}
+
 			encode(w, Subject{
 				ID:       subject.ID,
 				Type:     subject.TypeID,
@@ -191,6 +247,21 @@ func exportSubjects(q *query.Query, w io.Writer) {
 				Platform: subject.Platform,
 				Summary:  subject.Summary,
 				Nsfw:     subject.Nsfw,
+				Rank:     subject.Fields.Rank,
+				Tags:     encodedTags,
+				Score:    math.Round(score*10) / 10,
+				ScoreDetails: Score{
+					Field1:  subject.Fields.Rate1,
+					Field2:  subject.Fields.Rate2,
+					Field3:  subject.Fields.Rate3,
+					Field4:  subject.Fields.Rate4,
+					Field5:  subject.Fields.Rate5,
+					Field6:  subject.Fields.Rate6,
+					Field7:  subject.Fields.Rate7,
+					Field8:  subject.Fields.Rate8,
+					Field9:  subject.Fields.Rate9,
+					Field10: subject.Fields.Rate10,
+				},
 			})
 		}
 	}

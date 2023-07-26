@@ -37,7 +37,7 @@ func TestParseTags(t *testing.T) {
 	require.NoError(t, json.Unmarshal(raw, &testCases))
 
 	for i, tc := range testCases {
-		tags, err := parseTags([]byte(tc.FieldTags))
+		tags, err := ParseTags([]byte(tc.FieldTags))
 		require.NoError(t, err)
 
 		require.Truef(t, len(tags) > 0, "should parse tags")

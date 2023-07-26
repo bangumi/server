@@ -66,7 +66,7 @@ func ConvertDao(s *dao.Subject) (model.Subject, error) {
 		date = s.Fields.Date.Format("2006-01-02")
 	}
 
-	tags, err := parseTags(s.Fields.Tags)
+	tags, err := ParseTags(s.Fields.Tags)
 	if err != nil {
 		return model.Subject{}, err
 	}
