@@ -29,6 +29,7 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
@@ -89,14 +90,20 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	ip string,
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 ) error {
-	s, err := r.getSubjectCollection(ctx, userID, subject.ID)
-	if err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return gerr.ErrSubjectNotCollected
+	return r.q.Transaction(func(txn *query.Query) error {
+		s, err := r.q.SubjectCollection.WithContext(ctx).
+			Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where(r.q.SubjectCollection.UserID.Eq(userID),
+				r.q.SubjectCollection.SubjectID.Eq(subject.ID)).
+			Take()
+		if err != nil {
+			if errors.Is(err, gerr.ErrNotFound) {
+				return gerr.ErrSubjectNotCollected
+			}
+			return err
 		}
-		return err
-	}
-	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
+		return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
+	})
 }
 
 func (r mysqlRepo) UpdateOrCreateSubjectCollection(
@@ -107,14 +114,20 @@ func (r mysqlRepo) UpdateOrCreateSubjectCollection(
 	ip string,
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 ) error {
-	s, err := r.getSubjectCollection(ctx, userID, subject.ID)
-	if err != nil {
-		if !errors.Is(err, gerr.ErrNotFound) {
-			return err
+	return r.q.Transaction(func(txn *query.Query) error {
+		s, err := r.q.SubjectCollection.WithContext(ctx).
+			Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where(r.q.SubjectCollection.UserID.Eq(userID),
+				r.q.SubjectCollection.SubjectID.Eq(subject.ID)).
+			Take()
+		if err != nil {
+			if !errors.Is(err, gerr.ErrNotFound) {
+				return err
+			}
+			s = nil
 		}
-		s = nil
-	}
-	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
+		return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
+	})
 }
 
 func (r mysqlRepo) updateOrCreateSubjectCollection(
