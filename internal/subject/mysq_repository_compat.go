@@ -27,11 +27,11 @@ type Tag struct {
 	Count int     `php:"result,string"`
 }
 
-func parseTags(b []byte) ([]model.Tag, error) {
+func ParseTags(b []byte) ([]model.Tag, error) {
 	var tags []Tag
 	err := phpserialize.Unmarshal(b, &tags)
 	if err != nil {
-		return nil, errgo.Wrap(err, "parseTags: phpserialize.Unmarshal")
+		return nil, errgo.Wrap(err, "ParseTags: phpserialize.Unmarshal")
 	}
 
 	return slice.MapFilter(tags, func(item Tag) (model.Tag, bool) {
