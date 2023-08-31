@@ -3,7 +3,7 @@ module github.com/bangumi/server
 go 1.20
 
 require (
-	github.com/avast/retry-go/v4 v4.3.4
+	github.com/avast/retry-go/v4 v4.5.0
 	github.com/aws/aws-sdk-go v1.44.313
 	github.com/davecgh/go-spew v1.1.1
 	github.com/elliotchance/phpserialize v1.3.3
