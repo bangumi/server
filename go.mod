@@ -33,7 +33,7 @@ require (
 	github.com/trim21/pkg v0.0.3
 	go.etcd.io/etcd/client/v3 v3.5.9
 	go.uber.org/fx v1.20.0
-	go.uber.org/zap v1.24.0
+	go.uber.org/zap v1.25.0
 	golang.org/x/crypto v0.12.0
 	google.golang.org/grpc v1.52.3
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
@@ -86,7 +86,7 @@ require (
 	go.etcd.io/etcd/client/pkg/v3 v3.5.9 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/dig v1.17.0 // indirect
-	go.uber.org/multierr v1.8.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.12.0 // indirect
