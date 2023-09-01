@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.1.2",
-    "conventional-changelog": "^4.0.0",
+    "conventional-changelog": "^5.0.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21"
   },
