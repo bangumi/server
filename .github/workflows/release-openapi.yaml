@@ -10,7 +10,7 @@ jobs:
   openapi:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -18,7 +18,7 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: "bangumi/api"
           path: api
@@ -35,7 +35,7 @@ jobs:
           branch: "update-upstream"
           author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: "bangumi/dev-docs"
           path: dev-docs
