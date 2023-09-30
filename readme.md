@@ -107,6 +107,8 @@ redis 和 mysql 都在此 docker-compose 内 <https://github.com/bangumi/dev-env
 
 如果已经存在相关的 issue，可以先在 issue 内回复一下自己的意向，或者创建一个 Draft PR 关联对应的 issue，避免撞车问题。
 
+PR 标题需要遵守 [conventional commits 风格](https://www.conventionalcommits.org/en/v1.0.0/)。
+
 ## 测试
 
 使用 [mock](./internal/mocks/) 进行部分测试。

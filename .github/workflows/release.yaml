@@ -13,17 +13,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v3
+      - name: Generate Changelog
+        id: changelog
+        uses: requarks/changelog-action@v1.9.0
         with:
-          node-version: 16
-
-      - run: npm ci
-
-      - run: node scripts/changelog.js > changelog.md
-
-      - run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
+          writeToFile: false
+          includeTypes: feat,fix,revert
 
       - name: Upload GitHub Release
-        run: gh release create "$TAG" --title "$TAG" -F changelog.md
+        run: gh release create "${GITHUB_REF}" --notes "${CHANGELOG}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHANGELOG: "${{ steps.changelog.outputs.changes }}"
