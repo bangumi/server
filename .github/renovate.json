@@ -29,6 +29,11 @@
       "semanticCommitType": "build"
     },
     {
+      "groupName": "gomod-redis",
+      "matchManagers": ["gomod"],
+      "matchPackagePrefixes": ["github.com/go-redis/redismock", "github.com/redis/go-redis"]
+    },
+    {
       "groupName": "npm",
       "matchManagers": ["npm"],
       "enabled": true,
