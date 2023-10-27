@@ -10,7 +10,7 @@ require (
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.15.4
-	github.com/go-redis/redismock/v9 v9.0.3
+	github.com/go-redis/redismock/v9 v9.2.0
 	github.com/go-resty/resty/v2 v2.9.1
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/ilyakaznacheev/cleanenv v1.5.0
@@ -20,7 +20,7 @@ require (
 	github.com/meilisearch/meilisearch-go v0.25.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.17.0
-	github.com/redis/go-redis/v9 v9.1.0
+	github.com/redis/go-redis/v9 v9.2.0
 	github.com/samber/lo v1.38.1
 	github.com/segmentio/kafka-go v0.4.43
 	github.com/spf13/cobra v1.7.0
