@@ -39,7 +39,7 @@ require (
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/driver/mysql v1.5.1
+	gorm.io/driver/mysql v1.5.2
 	gorm.io/gen v0.3.23
 	gorm.io/gorm v1.25.5
 	gorm.io/plugin/dbresolver v1.4.7
