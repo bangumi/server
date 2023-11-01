@@ -32,7 +32,7 @@ require (
 	github.com/trim21/htest v0.0.4
 	github.com/trim21/pkg v0.0.3
 	go.etcd.io/etcd/client/v3 v3.5.10
-	go.uber.org/fx v1.20.0
+	go.uber.org/fx v1.20.1
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.14.0
 	google.golang.org/grpc v1.59.0
