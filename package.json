@@ -19,7 +19,7 @@
   "devDependencies": {
     "colors": "^1.4.0",
     "oas-validator": "^5.0.8",
-    "prettier": "^3.0.3"
+    "prettier": "^3.1.0"
   },
   "nodemonConfig": {
     "restartable": "rs",
