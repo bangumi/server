@@ -17,7 +17,7 @@ require (
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/labstack/echo/v4 v4.11.2
 	github.com/mattn/go-colorable v0.1.13
-	github.com/meilisearch/meilisearch-go v0.25.1
+	github.com/meilisearch/meilisearch-go v0.26.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.17.0
 	github.com/redis/go-redis/v9 v9.3.0
