@@ -20,6 +20,7 @@ package vars
 import (
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/bangumi/server/internal/model"
@@ -99,7 +100,7 @@ type Relation struct {
 	Description string `json:"description"`
 }
 
-func (r Relation) String() string {
+func (r Relation) String(id uint16) string {
 	switch {
 	case r.CN != "":
 		return r.CN
@@ -108,6 +109,6 @@ func (r Relation) String() string {
 	case r.EN != "":
 		return r.EN
 	default:
-		return "unknown"
+		return fmt.Sprintf("unknown(%d)", id)
 	}
 }
