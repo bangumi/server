@@ -336,6 +336,34 @@
       "search_string": "XSX|XSS|(Xbox Series X)|(Xbox Series S)",
       "type": "Xbox Series X/S",
       "type_cn": "Xbox Series X/S"
+    },
+    "4001": {
+      "id": 4001,
+      "type": "games",
+      "type_cn": "游戏",
+      "alias": "games",
+      "enable_header": true
+    },
+    "4003": {
+      "id": 4003,
+      "type": "dlc",
+      "type_cn": "扩展包",
+      "alias": "dlc",
+      "enable_header": true
+    },
+    "4002": {
+      "id": 4002,
+      "type": "software",
+      "type_cn": "软件",
+      "alias": "software",
+      "enable_header": true
+    },
+    "4005": {
+      "id": 4005,
+      "type": "tabletop",
+      "type_cn": "桌游",
+      "alias": "tabletop",
+      "enable_header": true
     }
   },
   "6": {
