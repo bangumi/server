@@ -84,7 +84,7 @@ func (ctl Ctrl) UpdateSubjectCollection(
 			}
 
 			if req.EpStatus.Set {
-				s.UpdateVols(req.EpStatus.Value)
+				s.UpdateEps(req.EpStatus.Value)
 			}
 
 			if req.Type.Set {
