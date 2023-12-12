@@ -20,7 +20,7 @@ jobs:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
           writeToFile: false
-          includeTypes: feat,fix,revert
+          restrictToTypes: feat,fix,revert
 
       - name: Upload GitHub Release
         run: gh release create "${GITHUB_REF}" --notes "${CHANGELOG}"
