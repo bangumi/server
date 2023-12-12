@@ -80,21 +80,11 @@
       "JP": "コンテ  ストーリーボード  画コンテ  絵コンテ",
       "RDF": ""
     },
-    "89": {
-      "EN": "Chief Episode Direction",
-      "CN": "主演出'",
-      "JP": "チーフ演出"
-    },
     "5": {
       "CN": "演出",
       "EN": "Episode Director",
       "JP": "",
       "RDF": ""
-    },
-    "91": {
-      "en": "Assistant Episode Direction",
-      "cn": "演出助理",
-      "jp": "演出助手 演出補佐 演出協力"
     },
     "6": {
       "CN": "音乐",
@@ -515,6 +505,72 @@
       "EN": "Action Animation Direction",
       "JP": "アクション作画監督",
       "RDF": ""
+    },
+    "80": {
+      "cn": "监制",
+      "jp": "",
+      "en": "Supervising Producer"
+    },
+    "81": {
+      "en": "Assistance",
+      "cn": "协力",
+      "jp": "協力"
+    },
+    "82": {
+      "en": "Photography",
+      "cn": "摄影",
+      "jp": "撮影"
+    },
+    "83": {
+      "en": "Assistant Production Manager Assistance",
+      "cn": "制作进行协力",
+      "jp": "制作進行協力"
+    },
+    "84": {
+      "en": "Design Manager",
+      "cn": "设定制作",
+      "jp": "設定制作 制作設定",
+      "desc": "有时需要额外的设计工作，联系负责部门并监督工作确保交付"
+    },
+    "85": {
+      "en": "Music Producer",
+      "cn": "音乐制作人",
+      "jp": "音楽プロデューサー"
+    },
+    "86": {
+      "en": "3DCG Director",
+      "cn": "3DCG 导演",
+      "jp": "3DCG 監督"
+    },
+    "87": {
+      "en": "Animation Producer",
+      "cn": "动画制片人",
+      "jp": "アニメプロデューサー  アニメーションプロデューサー"
+    },
+    "88": {
+      "en": "Special Effects Animation Direction",
+      "cn": "特效作画监督",
+      "jp": "エフェクト作画監督"
+    },
+    "89": {
+      "en": "Chief Episode Direction",
+      "cn": "主演出",
+      "jp": "チーフ演出"
+    },
+    "90": {
+      "en": "Assistant Animation Direction",
+      "cn": "作画监督助理",
+      "jp": "作画監督補佐"
+    },
+    "91": {
+      "en": "Assistant Episode Direction",
+      "cn": "演出助理",
+      "jp": "演出助手 演出補佐 演出協力"
+    },
+    "92": {
+      "en": "Main Animator",
+      "cn": "主动画师",
+      "jp": "メインアニメーター"
     }
   },
   "3": {

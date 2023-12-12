@@ -170,5 +170,5 @@ func readableRelation(destSubjectType model.SubjectType, relation uint16) string
 		return model.SubjectTypeString(destSubjectType)
 	}
 
-	return r.String()
+	return r.String(relation)
 }
