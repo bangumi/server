@@ -1,6 +1,6 @@
 {
   "name": "chii",
-  "version": "0.33.16",
+  "version": "0.33.17",
   "description": "tools to bundle openapi spec, not used in our server",
   "private": true,
   "scripts": {
