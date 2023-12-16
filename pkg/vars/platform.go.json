@@ -164,6 +164,38 @@
       "type": "cn",
       "type_cn": "华语剧",
       "wiki_tpl": "TV"
+    },
+    "6001": {
+      "id": 6001,
+      "type": "tv",
+      "type_cn": "电视剧",
+      "alias": "tv",
+      "enable_header": true,
+      "wiki_tpl": "TV"
+    },
+    "6002": {
+      "id": 6002,
+      "type": "movie",
+      "type_cn": "电影",
+      "alias": "movie",
+      "enable_header": true,
+      "wiki_tpl": "realMovie"
+    },
+    "6003": {
+      "id": 6003,
+      "type": "live",
+      "type_cn": "演出",
+      "alias": "live",
+      "enable_header": true,
+      "wiki_tpl": "TV"
+    },
+    "6004": {
+      "id": 6004,
+      "type": "show",
+      "type_cn": "综艺",
+      "alias": "show",
+      "enable_header": true,
+      "wiki_tpl": "TV"
     }
   }
 }
