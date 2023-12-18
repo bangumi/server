@@ -88,6 +88,7 @@ func (m grpcClient) ChangeSubjectCollection(
 		UserId: uint64(u),
 		Subject: &pb.Subject{
 			Id:        sbj.ID,
+			Type:      uint32(sbj.TypeID),
 			VolsTotal: sbj.Volumes,
 			EpsTotal:  sbj.Eps,
 		},
