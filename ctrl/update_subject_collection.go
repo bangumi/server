@@ -102,6 +102,7 @@ func (ctl Ctrl) UpdateSubjectCollection(
 	if err != nil {
 		return err
 	}
+
 	return ctl.mayCreateTimeline(ctx, u, req, subject.ID)
 }
 
@@ -111,15 +112,19 @@ func (ctl Ctrl) mayCreateTimeline(
 	req UpdateCollectionRequest,
 	subjectID model.SubjectID,
 ) error {
+	collect, err := ctl.collection.GetSubjectCollection(ctx, u.ID, subjectID)
+	if err != nil {
+		ctl.log.Error("failed to create associated timeline, can't get collection ID", zap.Error(err))
+		return err
+	}
+
+	if collect.Private {
+		return nil
+	}
+
 	if req.Type.Set {
 		sj, err := ctl.subjectCached.Get(ctx, subjectID, subject.Filter{})
 		if err != nil {
-			return err
-		}
-
-		collect, err := ctl.collection.GetSubjectCollection(ctx, u.ID, sj.ID)
-		if err != nil {
-			ctl.log.Error("failed to create associated timeline, can't get collection ID", zap.Error(err))
 			return err
 		}
 
