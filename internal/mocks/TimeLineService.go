@@ -73,13 +73,13 @@ func (_c *TimeLineService_ChangeEpisodeStatus_Call) RunAndReturn(run func(contex
 	return _c
 }
 
-// ChangeSubjectCollection provides a mock function with given fields: ctx, u, sbj, collect, comment, rate
-func (_m *TimeLineService) ChangeSubjectCollection(ctx context.Context, u uint32, sbj model.Subject, collect collection.SubjectCollection, comment string, rate uint8) error {
-	ret := _m.Called(ctx, u, sbj, collect, comment, rate)
+// ChangeSubjectCollection provides a mock function with given fields: ctx, u, sbj, collect, collectID, comment, rate
+func (_m *TimeLineService) ChangeSubjectCollection(ctx context.Context, u uint32, sbj model.Subject, collect collection.SubjectCollection, collectID uint64, comment string, rate uint8) error {
+	ret := _m.Called(ctx, u, sbj, collect, collectID, comment, rate)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.Subject, collection.SubjectCollection, string, uint8) error); ok {
-		r0 = rf(ctx, u, sbj, collect, comment, rate)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, model.Subject, collection.SubjectCollection, uint64, string, uint8) error); ok {
+		r0 = rf(ctx, u, sbj, collect, collectID, comment, rate)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -97,15 +97,16 @@ type TimeLineService_ChangeSubjectCollection_Call struct {
 //   - u uint32
 //   - sbj model.Subject
 //   - collect collection.SubjectCollection
+//   - collectID uint64
 //   - comment string
 //   - rate uint8
-func (_e *TimeLineService_Expecter) ChangeSubjectCollection(ctx interface{}, u interface{}, sbj interface{}, collect interface{}, comment interface{}, rate interface{}) *TimeLineService_ChangeSubjectCollection_Call {
-	return &TimeLineService_ChangeSubjectCollection_Call{Call: _e.mock.On("ChangeSubjectCollection", ctx, u, sbj, collect, comment, rate)}
+func (_e *TimeLineService_Expecter) ChangeSubjectCollection(ctx interface{}, u interface{}, sbj interface{}, collect interface{}, collectID interface{}, comment interface{}, rate interface{}) *TimeLineService_ChangeSubjectCollection_Call {
+	return &TimeLineService_ChangeSubjectCollection_Call{Call: _e.mock.On("ChangeSubjectCollection", ctx, u, sbj, collect, collectID, comment, rate)}
 }
 
-func (_c *TimeLineService_ChangeSubjectCollection_Call) Run(run func(ctx context.Context, u uint32, sbj model.Subject, collect collection.SubjectCollection, comment string, rate uint8)) *TimeLineService_ChangeSubjectCollection_Call {
+func (_c *TimeLineService_ChangeSubjectCollection_Call) Run(run func(ctx context.Context, u uint32, sbj model.Subject, collect collection.SubjectCollection, collectID uint64, comment string, rate uint8)) *TimeLineService_ChangeSubjectCollection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(model.Subject), args[3].(collection.SubjectCollection), args[4].(string), args[5].(uint8))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(model.Subject), args[3].(collection.SubjectCollection), args[4].(uint64), args[5].(string), args[6].(uint8))
 	})
 	return _c
 }
@@ -115,7 +116,7 @@ func (_c *TimeLineService_ChangeSubjectCollection_Call) Return(_a0 error) *TimeL
 	return _c
 }
 
-func (_c *TimeLineService_ChangeSubjectCollection_Call) RunAndReturn(run func(context.Context, uint32, model.Subject, collection.SubjectCollection, string, uint8) error) *TimeLineService_ChangeSubjectCollection_Call {
+func (_c *TimeLineService_ChangeSubjectCollection_Call) RunAndReturn(run func(context.Context, uint32, model.Subject, collection.SubjectCollection, uint64, string, uint8) error) *TimeLineService_ChangeSubjectCollection_Call {
 	_c.Call.Return(run)
 	return _c
 }

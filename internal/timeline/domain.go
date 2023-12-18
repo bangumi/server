@@ -29,6 +29,7 @@ type Service interface {
 		u model.UserID,
 		sbj model.Subject,
 		collect collection.SubjectCollection,
+		collectID uint64,
 		comment string,
 		rate uint8,
 	) error
