@@ -116,7 +116,15 @@ func (ctl Ctrl) mayCreateTimeline(
 		if err != nil {
 			return err
 		}
-		err = ctl.timeline.ChangeSubjectCollection(ctx, u.ID, sj, req.Type.Default(0), req.Comment.Value, req.Rate.Value)
+
+		collect, err := ctl.collection.GetSubjectCollection(ctx, u.ID, sj.ID)
+		if err != nil {
+			ctl.log.Error("failed to create associated timeline, can't get collection ID", zap.Error(err))
+			return err
+		}
+
+		err = ctl.timeline.ChangeSubjectCollection(ctx,
+			u.ID, sj, req.Type.Value, collect.ID, req.Comment.Value, req.Rate.Value)
 		if err != nil {
 			ctl.log.Error("failed to create associated timeline", zap.Error(err))
 			return errgo.Wrap(err, "timelineRepo.Create")

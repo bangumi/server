@@ -44,16 +44,16 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger, cfg config.AppConfig) (Servic
 		return nil, err
 	}
 
-	return mysqlRepo{q: q, log: log.Named("timeline.mysqlRepo"), rpc: rpc}, nil
+	return grpcClient{q: q, log: log.Named("timeline.grpcClient"), rpc: rpc}, nil
 }
 
-type mysqlRepo struct {
+type grpcClient struct {
 	q   *query.Query
 	log *zap.Logger
 	rpc pb.TimeLineServiceClient
 }
 
-func (m mysqlRepo) ChangeSubjectProgress(ctx context.Context, u model.UserID, sbj model.Subject,
+func (m grpcClient) ChangeSubjectProgress(ctx context.Context, u model.UserID, sbj model.Subject,
 	epsUpdate uint32, volsUpdate uint32) error {
 	ctx, canal := context.WithTimeout(ctx, defaultTimeout)
 	defer canal()
@@ -62,11 +62,6 @@ func (m mysqlRepo) ChangeSubjectProgress(ctx context.Context, u model.UserID, sb
 		UserId: uint64(u),
 		Subject: &pb.Subject{
 			Id:        sbj.ID,
-			Type:      uint32(sbj.TypeID),
-			Name:      sbj.Name,
-			NameCn:    sbj.NameCN,
-			Image:     sbj.Image,
-			Series:    sbj.Series,
 			VolsTotal: sbj.Volumes,
 			EpsTotal:  sbj.Eps,
 		},
@@ -77,11 +72,12 @@ func (m mysqlRepo) ChangeSubjectProgress(ctx context.Context, u model.UserID, sb
 	return errgo.Wrap(err, "grpc")
 }
 
-func (m mysqlRepo) ChangeSubjectCollection(
+func (m grpcClient) ChangeSubjectCollection(
 	ctx context.Context,
 	u model.UserID,
 	sbj model.Subject,
 	collect collection.SubjectCollection,
+	collectID uint64,
 	comment string,
 	rate uint8,
 ) error {
@@ -92,17 +88,13 @@ func (m mysqlRepo) ChangeSubjectCollection(
 		UserId: uint64(u),
 		Subject: &pb.Subject{
 			Id:        sbj.ID,
-			Type:      uint32(sbj.TypeID),
-			Name:      sbj.Name,
-			NameCn:    sbj.NameCN,
-			Image:     sbj.Image,
-			Series:    false,
 			VolsTotal: sbj.Volumes,
 			EpsTotal:  sbj.Eps,
 		},
-		Collection: uint32(collect),
-		Comment:    comment,
-		Rate:       uint32(rate),
+		Collection:   uint32(collect),
+		CollectionId: collectID,
+		Comment:      comment,
+		Rate:         uint32(rate),
 	})
 
 	if err != nil {
@@ -112,7 +104,7 @@ func (m mysqlRepo) ChangeSubjectCollection(
 	return nil
 }
 
-func (m mysqlRepo) ChangeEpisodeStatus(
+func (m grpcClient) ChangeEpisodeStatus(
 	ctx context.Context,
 	u auth.Auth,
 	sbj model.Subject,
@@ -124,19 +116,10 @@ func (m mysqlRepo) ChangeEpisodeStatus(
 	_, err := m.rpc.EpisodeCollect(ctx, &pb.EpisodeCollectRequest{
 		UserId: uint64(u.ID),
 		Last: &pb.Episode{
-			Id:     episode.ID,
-			Type:   uint32(episode.Type),
-			Name:   episode.Name,
-			NameCn: episode.NameCN,
-			Sort:   float64(episode.Sort),
+			Id: episode.ID,
 		},
 		Subject: &pb.Subject{
 			Id:        sbj.ID,
-			Type:      uint32(sbj.TypeID),
-			Name:      sbj.Name,
-			NameCn:    sbj.Name,
-			Image:     sbj.Image,
-			Series:    sbj.Series,
 			VolsTotal: sbj.Volumes,
 			EpsTotal:  sbj.Eps,
 		},

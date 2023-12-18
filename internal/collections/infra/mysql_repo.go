@@ -300,6 +300,7 @@ func (r mysqlRepo) GetSubjectCollection(
 	}
 
 	return collection.UserSubjectCollection{
+		ID:          uint64(c.ID),
 		UpdatedAt:   time.Unix(int64(c.UpdatedTime), 0),
 		Comment:     string(c.Comment),
 		Tags:        gstr.Split(c.Tag, " "),

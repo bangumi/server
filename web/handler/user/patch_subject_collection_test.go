@@ -51,7 +51,8 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 
 	tl := mocks.NewTimeLineService(t)
 	tl.EXPECT().
-		ChangeSubjectCollection(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		ChangeSubjectCollection(mock.Anything,
+			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(nil)
 
 	c := mocks.NewCollectionRepo(t)

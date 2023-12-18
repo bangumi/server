@@ -32,6 +32,7 @@ const (
 )
 
 type UserSubjectCollection struct {
+	ID          uint64
 	UpdatedAt   time.Time
 	Comment     string
 	Tags        []string
