@@ -65,6 +65,9 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 			s = lo.Must(update(context.Background(), s))
 		}).Return(nil)
 
+	c.EXPECT().GetSubjectCollection(mock.Anything, mock.Anything, mock.Anything).
+		Return(collection.UserSubjectCollection{}, nil)
+
 	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
 	require.NoError(t, err)
 
