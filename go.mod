@@ -34,7 +34,7 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.10
 	go.uber.org/fx v1.20.1
 	go.uber.org/zap v1.26.0
-	golang.org/x/crypto v0.16.0
+	golang.org/x/crypto v0.17.0
 	google.golang.org/grpc v1.59.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
 	google.golang.org/protobuf v1.31.0
