@@ -61,7 +61,7 @@ func (h Character) GetRelatedPersons(c echo.Context) error {
 			ID:            cast.Person.ID,
 			Name:          cast.Person.Name,
 			Type:          cast.Person.Type,
-			Images:        res.PersonImage(cast.Subject.Image),
+			Images:        res.PersonImage(cast.Person.Image),
 			SubjectID:     cast.Subject.ID,
 			SubjectName:   cast.Subject.Name,
 			SubjectNameCn: cast.Subject.NameCN,
