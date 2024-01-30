@@ -126,7 +126,7 @@ func (r mysqlRepo) ListSubjects(
 ) ([]Subject, error) {
 	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).
 		Preload(r.q.IndexSubject.Subject.Fields).
-		Where(r.q.IndexSubject.IndexID.Eq(id)).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.Cat.Eq(0)).
 		Order(r.q.IndexSubject.Order).
 		Limit(limit).Offset(offset)
 	if subjectType != 0 {
