@@ -43,7 +43,7 @@ type mysqlRepo struct {
 func (r mysqlRepo) isNsfw(ctx context.Context, id model.IndexID) (bool, error) {
 	i, err := r.q.IndexSubject.WithContext(ctx).
 		Join(r.q.Subject, r.q.IndexSubject.SubjectID.EqCol(r.q.Subject.ID)).
-		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.Subject.Nsfw.Is(true)).Count()
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.Cat.Eq(0), r.q.Subject.Nsfw.Is(true)).Count()
 	if err != nil {
 		r.log.Error("unexpected error when checking index nsfw", zap.Uint32("index_id", id))
 		return false, errgo.Wrap(err, "dal")
@@ -105,7 +105,7 @@ func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 func (r mysqlRepo) CountSubjects(
 	ctx context.Context, id model.IndexID, subjectType model.SubjectType,
 ) (int64, error) {
-	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.IndexID.Eq(id))
+	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.Cat.Eq(0))
 	if subjectType != 0 {
 		q = q.Where(r.q.IndexSubject.SubjectType.Eq(subjectType))
 	}
