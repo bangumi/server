@@ -61,6 +61,7 @@ func newPersonSubjects(db *gorm.DB, opts ...gen.DOOption) personSubjects {
 	return _personSubjects
 }
 
+// personSubjects subjects' credits/creator & staff (c&s)index
 type personSubjects struct {
 	personSubjectsDo personSubjectsDo
 

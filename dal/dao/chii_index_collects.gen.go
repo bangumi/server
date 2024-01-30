@@ -6,7 +6,7 @@ package dao
 
 const TableNameIndexCollect = "chii_index_collects"
 
-// IndexCollect mapped from table <chii_index_collects>
+// IndexCollect 目录收藏
 type IndexCollect struct {
 	CltID       uint32 `gorm:"column:idx_clt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
 	IndexID     uint32 `gorm:"column:idx_clt_mid;type:mediumint(8) unsigned;not null;comment:目录ID"`  // 目录ID

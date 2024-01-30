@@ -37,6 +37,7 @@ func newIndexCollect(db *gorm.DB, opts ...gen.DOOption) indexCollect {
 	return _indexCollect
 }
 
+// indexCollect 目录收藏
 type indexCollect struct {
 	indexCollectDo indexCollectDo
 

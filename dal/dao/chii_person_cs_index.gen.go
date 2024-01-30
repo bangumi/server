@@ -6,7 +6,7 @@ package dao
 
 const TableNamePersonSubjects = "chii_person_cs_index"
 
-// PersonSubjects mapped from table <chii_person_cs_index>
+// PersonSubjects subjects' credits/creator & staff (c&s)index
 type PersonSubjects struct {
 	PrsnType      string  `gorm:"column:prsn_type;type:enum('prsn','crt');primaryKey"`
 	PersonID      uint32  `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey"`

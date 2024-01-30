@@ -6,7 +6,7 @@ package dao
 
 const TableNameSubjectRelation = "chii_subject_relations"
 
-// SubjectRelation mapped from table <chii_subject_relations>
+// SubjectRelation 条目关联表
 type SubjectRelation struct {
 	SubjectID            uint32  `gorm:"column:rlt_subject_id;type:mediumint(8) unsigned;primaryKey;comment:关联主 ID"` // 关联主 ID
 	SubjectTypeID        uint8   `gorm:"column:rlt_subject_type_id;type:tinyint(3) unsigned;not null"`

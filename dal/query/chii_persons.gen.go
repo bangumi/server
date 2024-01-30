@@ -61,6 +61,7 @@ func newPerson(db *gorm.DB, opts ...gen.DOOption) person {
 	return _person
 }
 
+// person （现实）人物表
 type person struct {
 	personDo personDo
 

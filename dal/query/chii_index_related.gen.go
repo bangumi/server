@@ -52,6 +52,7 @@ func newIndexSubject(db *gorm.DB, opts ...gen.DOOption) indexSubject {
 	return _indexSubject
 }
 
+// indexSubject 目录关联表
 type indexSubject struct {
 	indexSubjectDo indexSubjectDo
 

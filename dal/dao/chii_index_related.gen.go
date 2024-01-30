@@ -10,7 +10,7 @@ import (
 
 const TableNameIndexSubject = "chii_index_related"
 
-// IndexSubject mapped from table <chii_index_related>
+// IndexSubject 目录关联表
 type IndexSubject struct {
 	ID          uint32                `gorm:"column:idx_rlt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
 	Cat         int8                  `gorm:"column:idx_rlt_cat;type:tinyint(3);not null"`
