@@ -50,6 +50,7 @@ func newSubjectRelation(db *gorm.DB, opts ...gen.DOOption) subjectRelation {
 	return _subjectRelation
 }
 
+// subjectRelation 条目关联表
 type subjectRelation struct {
 	subjectRelationDo subjectRelationDo
 

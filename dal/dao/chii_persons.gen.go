@@ -6,7 +6,7 @@ package dao
 
 const TableNamePerson = "chii_persons"
 
-// Person mapped from table <chii_persons>
+// Person （现实）人物表
 type Person struct {
 	ID          uint32      `gorm:"column:prsn_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
 	Name        string      `gorm:"column:prsn_name;type:varchar(255);not null"`
