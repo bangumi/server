@@ -70,6 +70,6 @@ jobs:
           MYSQL_DB: bangumi
           REDIS_URI: "redis://:redis-pass@127.0.0.1:6379/0"
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           files: coverage.out
