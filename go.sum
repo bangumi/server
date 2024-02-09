@@ -76,7 +76,7 @@ github.com/envoyproxy/go-control-plane v0.6.9/go.mod h1:SBwIajubJHhxtWwsL9s8ss4s
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
-github.com/fatih/color v1.15.0 h1:kOqh6YHBtK8aywxGerMG2Eq3H6Qgoqeo13Bk2Mv/nBs=
+github.com/fatih/color v1.16.0 h1:zmkK9Ngbjj+K0yRhTVONQh1p/HknKYSlNT+vZCzyokM=
 github.com/franela/goblin v0.0.0-20200105215937-c9ffbefa60db/go.mod h1:7dvUGVsVBjqR7JHJk0brhHOZYGmfBYOrK0ZhYMEtBr4=
 github.com/franela/goreq v0.0.0-20171204163338-bcd34c9993f8/go.mod h1:ZhphrRTfi2rbfLwlschooIH4+wKKDR4Pdxhh+TRoA20=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
@@ -402,8 +402,8 @@ github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXl
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/trim21/errgo v0.0.2 h1:OlaTR0PaSzBGFgBMEhwwTtnpN2q03WNNr3YossUCHCY=
 github.com/trim21/errgo v0.0.2/go.mod h1:T9MN4yD51VA68yqmod0e6z4ZjTBd8buD0aCFjfQ+hUM=
-github.com/trim21/go-phpserialize v0.0.20 h1:0ZirMrbc1oqK/shAhU5hGO7KgG8b+FDfwmyCSoo9nHw=
-github.com/trim21/go-phpserialize v0.0.20/go.mod h1:dChIuKK9wuBHDd5yqaYm0oFxtcmB+qIzbC8pvj06tIQ=
+github.com/trim21/go-phpserialize v0.0.21 h1:/RaseAU8bDOVJRzmogTD/WNLjcqKJlGueKTs5eF1FJE=
+github.com/trim21/go-phpserialize v0.0.21/go.mod h1:vNqVtkwoZtQuK3VMD0KoytIGUEmofWvujEwxvPKjHyo=
 github.com/trim21/go-redis-prometheus v0.0.0 h1:9svVIZkKaDGE1bSRbtTQdsKBzW+QEWfwc35QIF8JsfA=
 github.com/trim21/go-redis-prometheus v0.0.0/go.mod h1:UTXPI/fofnsXF9/X/WtvwhAdbSOBVjLg17xDjQj9VgU=
 github.com/trim21/htest v0.0.4 h1:dDIzKNdIClgtB158DlO+Xf0sfwNycmx3kfo/FJuY+eE=
