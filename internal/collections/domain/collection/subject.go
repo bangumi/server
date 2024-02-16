@@ -131,7 +131,7 @@ func (s *Subject) UpdateTags(tags []string) error {
 
 	slice.Map(tags, strings.TrimSpace)
 
-	if !lo.ContainsBy(tags, dam.AllPrintableChar) {
+	if lo.ContainsBy(tags, func(item string) bool { return !dam.AllPrintableChar(item) }) {
 		return gerr.ErrInvisibleChar
 	}
 
