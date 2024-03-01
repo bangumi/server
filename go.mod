@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/avast/retry-go/v4 v4.5.1
-	github.com/aws/aws-sdk-go v1.50.9
+	github.com/aws/aws-sdk-go v1.50.30
 	github.com/davecgh/go-spew v1.1.1
 	github.com/elliotchance/phpserialize v1.4.0
 	github.com/go-playground/locales v0.14.1
