@@ -11,7 +11,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.19.0
 	github.com/go-redis/redismock/v9 v9.2.0
-	github.com/go-resty/resty/v2 v2.11.0
+	github.com/go-resty/resty/v2 v2.12.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jarcoal/httpmock v1.3.1
@@ -87,7 +87,7 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
