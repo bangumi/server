@@ -35,7 +35,7 @@ require (
 	go.uber.org/fx v1.20.1
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.20.0
-	google.golang.org/grpc v1.62.0
+	google.golang.org/grpc v1.62.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
 	google.golang.org/protobuf v1.33.0
 	gopkg.in/yaml.v3 v3.0.1
