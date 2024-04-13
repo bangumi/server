@@ -602,7 +602,7 @@ paths:
   "/v0/persons/{person_id}/image":
     get:
       tags:
-        - 角色
+        - 人物
       summary: Get Person Image
       operationId: getPersonImageById
       parameters:
