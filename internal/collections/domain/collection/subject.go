@@ -144,12 +144,12 @@ func (s *Subject) UpdateType(r SubjectCollection) {
 	s.typeID = r
 }
 
-func (s *Subject) UpdateRate(r uint8, state SubjectCollection) error {
+func (s *Subject) UpdateRate(r uint8) error {
 	if r > 10 {
 		return errgo.Wrap(gerr.ErrInput, "rate overflow")
 	}
 
-	if state == SubjectCollectionWish {
+	if s.typeID == SubjectCollectionWish {
 		s.rate = 0
 	} else {
 		s.rate = r

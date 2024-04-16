@@ -91,8 +91,8 @@ func (ctl Ctrl) UpdateSubjectCollection(
 				s.UpdateType(req.Type.Value)
 			}
 
-			if req.Rate.Set && req.Type.Set {
-				if e := s.UpdateRate(req.Rate.Value, req.Type.Value); e != nil {
+			if req.Rate.Set {
+				if e := s.UpdateRate(req.Rate.Value); e != nil {
 					return nil, e
 				}
 			}
