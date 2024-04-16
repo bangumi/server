@@ -243,9 +243,9 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	// 更新
 	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, subject, now, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
+			s.UpdateType(collection.SubjectCollectionDropped)
 			require.NoError(t, s.UpdateComment("c"))
 			require.NoError(t, s.UpdateRate(1))
-			s.UpdateType(collection.SubjectCollectionDropped)
 			return s, nil
 		})
 	require.NoError(t, err)
@@ -266,8 +266,8 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	// When update to wish state
 	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, subject, now, "",
 		func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
-			require.NoError(t, s.UpdateRate(1))
 			s.UpdateType(collection.SubjectCollectionWish)
+			require.NoError(t, s.UpdateRate(1))
 			return s, nil
 		})
 	require.NoError(t, err)
