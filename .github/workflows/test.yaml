@@ -40,7 +40,7 @@ jobs:
           cache: false
 
       - name: Install Task
-        uses: arduino/setup-task@v1
+        uses: arduino/setup-task@v2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
