@@ -20,7 +20,7 @@ run:
 
   skip-files: []
 
-  go: "1.21"
+  go: "1.22"
 
 # output configuration options
 output:
