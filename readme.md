@@ -5,7 +5,7 @@
 
 ## Requirements
 
-- [Go 1.20](https://go.dev/)
+- [Go 1.22](https://go.dev/)
 - [go-task](https://taskfile.dev/installation/)，使用 `task` 查看所有的构建目标。
 - [golangci-lint](https://golangci-lint.run/)，使用 `task lint` 运行 linter。
 
