@@ -8,12 +8,12 @@ const TableNameEpCollection = "chii_ep_status"
 
 // EpCollection mapped from table <chii_ep_status>
 type EpCollection struct {
-	ID          uint32 `gorm:"column:ep_stt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	UserID      uint32 `gorm:"column:ep_stt_uid;type:mediumint(8) unsigned;not null"`
-	SubjectID   uint32 `gorm:"column:ep_stt_sid;type:mediumint(8) unsigned;not null"`
-	OnPrg       bool   `gorm:"column:ep_stt_on_prg;type:tinyint(1) unsigned;not null"`
-	Status      []byte `gorm:"column:ep_stt_status;type:mediumtext;not null"`
-	UpdatedTime uint32 `gorm:"column:ep_stt_lasttouch;type:int(10) unsigned;not null"`
+	ID          uint32 `gorm:"column:ep_stt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:""`
+	UserID      uint32 `gorm:"column:ep_stt_uid;type:mediumint(8) unsigned;not null" json:""`
+	SubjectID   uint32 `gorm:"column:ep_stt_sid;type:mediumint(8) unsigned;not null" json:""`
+	OnPrg       bool   `gorm:"column:ep_stt_on_prg;type:tinyint(1) unsigned;not null" json:""`
+	Status      []byte `gorm:"column:ep_stt_status;type:mediumtext;not null" json:""`
+	UpdatedTime uint32 `gorm:"column:ep_stt_lasttouch;type:int(10) unsigned;not null" json:""`
 }
 
 // TableName EpCollection's table name

@@ -8,13 +8,13 @@ const TableNamePersonSubjects = "chii_person_cs_index"
 
 // PersonSubjects subjects' credits/creator & staff (c&s)index
 type PersonSubjects struct {
-	PrsnType      string  `gorm:"column:prsn_type;type:enum('prsn','crt');primaryKey"`
-	PersonID      uint32  `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey"`
-	PrsnPosition  uint16  `gorm:"column:prsn_position;type:smallint(5) unsigned;primaryKey;comment:监督，原案，脚本,.."` // 监督，原案，脚本,..
-	SubjectID     uint32  `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey"`
-	SubjectTypeID uint8   `gorm:"column:subject_type_id;type:tinyint(4) unsigned;not null"`
-	Summary       string  `gorm:"column:summary;type:mediumtext;not null"`
-	PrsnAppearEps string  `gorm:"column:prsn_appear_eps;type:mediumtext;not null;comment:可选，人物参与的章节"` // 可选，人物参与的章节
+	PrsnType      string  `gorm:"column:prsn_type;type:enum('prsn','crt');primaryKey" json:""`
+	PersonID      uint32  `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey" json:""`
+	PrsnPosition  uint16  `gorm:"column:prsn_position;type:smallint(5) unsigned;primaryKey;comment:监督，原案，脚本,.." json:""` // 监督，原案，脚本,..
+	SubjectID     uint32  `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey" json:""`
+	SubjectTypeID uint8   `gorm:"column:subject_type_id;type:tinyint(4) unsigned;not null" json:""`
+	Summary       string  `gorm:"column:summary;type:mediumtext;not null" json:""`
+	PrsnAppearEps string  `gorm:"column:prsn_appear_eps;type:mediumtext;not null;comment:可选，人物参与的章节" json:""` // 可选，人物参与的章节
 	Subject       Subject `gorm:"foreignKey:subject_id;references:subject_id" json:"subject"`
 	Person        Person  `gorm:"foreignKey:prsn_id;references:prsn_id" json:"person"`
 }

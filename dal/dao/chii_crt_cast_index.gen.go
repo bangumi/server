@@ -8,11 +8,11 @@ const TableNameCast = "chii_crt_cast_index"
 
 // Cast mapped from table <chii_crt_cast_index>
 type Cast struct {
-	CharacterID   uint32    `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey"`
-	PersonID      uint32    `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey"`
-	SubjectID     uint32    `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey"`
-	SubjectTypeID uint8     `gorm:"column:subject_type_id;type:tinyint(3) unsigned;not null;comment:根据人物归类查询角色，动画，书籍，游戏"` // 根据人物归类查询角色，动画，书籍，游戏
-	Summary       string    `gorm:"column:summary;type:varchar(255);not null;comment:幼年，男乱马，女乱马，变身形态，少女形态。。"`             // 幼年，男乱马，女乱马，变身形态，少女形态。。
+	CharacterID   uint32    `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey" json:""`
+	PersonID      uint32    `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey" json:""`
+	SubjectID     uint32    `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey" json:""`
+	SubjectTypeID uint8     `gorm:"column:subject_type_id;type:tinyint(3) unsigned;not null;comment:根据人物归类查询角色，动画，书籍，游戏" json:""` // 根据人物归类查询角色，动画，书籍，游戏
+	Summary       string    `gorm:"column:summary;type:varchar(255);not null;comment:幼年，男乱马，女乱马，变身形态，少女形态。。" json:""`             // 幼年，男乱马，女乱马，变身形态，少女形态。。
 	Character     Character `gorm:"foreignKey:crt_id;references:crt_id" json:"character"`
 	Subject       Subject   `gorm:"foreignKey:subject_id;references:subject_id" json:"subject"`
 	Person        Person    `gorm:"foreignKey:prsn_id;references:prsn_id" json:"person"`
