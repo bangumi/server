@@ -6,7 +6,7 @@ toolchain go1.22.2
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0
-	github.com/aws/aws-sdk-go v1.51.11
+	github.com/aws/aws-sdk-go v1.51.25
 	github.com/davecgh/go-spew v1.1.1
 	github.com/elliotchance/phpserialize v1.4.0
 	github.com/go-playground/locales v0.14.1
