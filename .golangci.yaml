@@ -20,13 +20,13 @@ run:
 
   skip-files: []
 
-  go: "1.20"
+  go: "1.21"
 
 # output configuration options
 output:
   # colored-line-number|line-number|json|tab|checkstyle|code-climate|junit-xml|github-actions
   # default is "colored-line-number"
-  format: colored-line-number
+  formats: colored-line-number
 
   # print lines of code with issue, default is true
   print-issued-lines: true
@@ -45,6 +45,10 @@ output:
 
 # all available settings of specific linters
 linters-settings:
+  revive:
+    rules:
+      - name: unused-parameter
+        disabled: true
   errcheck:
     # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
     # default is false: such cases aren't reported by default.
@@ -128,21 +132,20 @@ linters-settings:
             desc: 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
 
   gomnd:
-    settings:
-      mnd:
-        # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
-        checks:
-          - argument
-          - case
-          - operation
-          - return
-          - assign
-        ignored-functions: strconv\..*,time\..*,make,math\..*,strings\..*
-        ignored-numbers: 1,2,3,10,100,1000,10000
+    # settings:
+    # mnd:
+    # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
+    checks:
+      - argument
+      - case
+      - operation
+      - return
+      - assign
+    ignored-functions: strconv\..*,time\..*,make,math\..*,strings\..*
+    ignored-numbers: 1,2,3,10,100,1000,10000
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.20"
     # https://staticcheck.io/docs/options#checks
     checks: ["all"]
 
@@ -174,21 +177,15 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.20"
     # https://staticcheck.io/docs/options#checks
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.20"
 
   testpackage:
     # regexp pattern to skip files
     skip-regexp: (export|internal)_test\.go
-
-  unused:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.20"
 
   exhaustive:
     # check switch statements in generated files also
