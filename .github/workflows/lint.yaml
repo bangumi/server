@@ -50,6 +50,6 @@ jobs:
       - name: Run linters
         uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.53.3
+          version: v1.57.2
           skip-pkg-cache: true
           skip-build-cache: true
