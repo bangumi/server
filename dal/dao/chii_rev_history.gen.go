@@ -8,13 +8,13 @@ const TableNameRevisionHistory = "chii_rev_history"
 
 // RevisionHistory mapped from table <chii_rev_history>
 type RevisionHistory struct {
-	ID          uint32 `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	Type        uint8  `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;comment:条目，角色，人物"`    // 条目，角色，人物
-	Mid         uint32 `gorm:"column:rev_mid;type:mediumint(8) unsigned;not null;comment:对应条目，人物的ID"` // 对应条目，人物的ID
-	TextID      uint32 `gorm:"column:rev_text_id;type:mediumint(9) unsigned;not null"`
-	CreatedTime uint32 `gorm:"column:rev_dateline;type:int(10) unsigned;not null"`
-	CreatorID   uint32 `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null"`
-	Summary     string `gorm:"column:rev_edit_summary;type:varchar(200);not null"`
+	ID          uint32 `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:""`
+	Type        uint8  `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;comment:条目，角色，人物" json:""`    // 条目，角色，人物
+	Mid         uint32 `gorm:"column:rev_mid;type:mediumint(8) unsigned;not null;comment:对应条目，人物的ID" json:""` // 对应条目，人物的ID
+	TextID      uint32 `gorm:"column:rev_text_id;type:mediumint(9) unsigned;not null" json:""`
+	CreatedTime uint32 `gorm:"column:rev_dateline;type:int(10) unsigned;not null" json:""`
+	CreatorID   uint32 `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null" json:""`
+	Summary     string `gorm:"column:rev_edit_summary;type:varchar(200);not null" json:""`
 }
 
 // TableName RevisionHistory's table name

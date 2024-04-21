@@ -12,15 +12,15 @@ const TableNameIndexSubject = "chii_index_related"
 
 // IndexSubject 目录关联表
 type IndexSubject struct {
-	ID          uint32                `gorm:"column:idx_rlt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	Cat         int8                  `gorm:"column:idx_rlt_cat;type:tinyint(3);not null"`
-	IndexID     uint32                `gorm:"column:idx_rlt_rid;type:mediumint(8) unsigned;not null;comment:关联目录"`   // 关联目录
-	SubjectType uint8                 `gorm:"column:idx_rlt_type;type:smallint(6) unsigned;not null;comment:关联条目类型"` // 关联条目类型
-	SubjectID   uint32                `gorm:"column:idx_rlt_sid;type:mediumint(8) unsigned;not null;comment:关联条目ID"` // 关联条目ID
-	Order       uint32                `gorm:"column:idx_rlt_order;type:mediumint(8) unsigned;not null"`
-	Comment     string                `gorm:"column:idx_rlt_comment;type:mediumtext;not null"`
-	CreatedTime uint32                `gorm:"column:idx_rlt_dateline;type:int(10) unsigned;not null"`
-	Deleted     soft_delete.DeletedAt `gorm:"column:idx_rlt_ban;type:tinyint(1) unsigned;not null;softDelete:flag"`
+	ID          uint32                `gorm:"column:idx_rlt_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:""`
+	Cat         int8                  `gorm:"column:idx_rlt_cat;type:tinyint(3);not null" json:""`
+	IndexID     uint32                `gorm:"column:idx_rlt_rid;type:mediumint(8) unsigned;not null;comment:关联目录" json:""`   // 关联目录
+	SubjectType uint8                 `gorm:"column:idx_rlt_type;type:smallint(6) unsigned;not null;comment:关联条目类型" json:""` // 关联条目类型
+	SubjectID   uint32                `gorm:"column:idx_rlt_sid;type:mediumint(8) unsigned;not null;comment:关联条目ID" json:""` // 关联条目ID
+	Order       uint32                `gorm:"column:idx_rlt_order;type:mediumint(8) unsigned;not null" json:""`
+	Comment     string                `gorm:"column:idx_rlt_comment;type:mediumtext;not null" json:""`
+	CreatedTime uint32                `gorm:"column:idx_rlt_dateline;type:int(10) unsigned;not null" json:""`
+	Deleted     soft_delete.DeletedAt `gorm:"column:idx_rlt_ban;type:tinyint(1) unsigned;not null;softDelete:flag" json:""`
 	Subject     Subject               `gorm:"foreignKey:idx_rlt_sid;references:subject_id" json:"subject"`
 }
 

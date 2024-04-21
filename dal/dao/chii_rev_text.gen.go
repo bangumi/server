@@ -8,8 +8,8 @@ const TableNameRevisionText = "chii_rev_text"
 
 // RevisionText mapped from table <chii_rev_text>
 type RevisionText struct {
-	TextID uint32 `gorm:"column:rev_text_id;type:mediumint(9) unsigned;primaryKey;autoIncrement:true"`
-	Text   []byte `gorm:"column:rev_text;type:mediumblob;not null"`
+	TextID uint32 `gorm:"column:rev_text_id;type:mediumint(9) unsigned;primaryKey;autoIncrement:true" json:""`
+	Text   []byte `gorm:"column:rev_text;type:mediumblob;not null" json:""`
 }
 
 // TableName RevisionText's table name

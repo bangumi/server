@@ -8,12 +8,12 @@ const TableNameMemberField = "chii_memberfields"
 
 // MemberField mapped from table <chii_memberfields>
 type MemberField struct {
-	UID       uint32 `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey"`
-	Site      string `gorm:"column:site;type:varchar(75);not null"`
-	Location  string `gorm:"column:location;type:varchar(30);not null"`
-	Bio       string `gorm:"column:bio;type:text;not null"`
-	Privacy   []byte `gorm:"column:privacy;type:mediumtext;not null"`
-	Blocklist string `gorm:"column:blocklist;type:mediumtext;not null"`
+	UID       uint32 `gorm:"column:uid;type:mediumint(8) unsigned;primaryKey" json:""`
+	Site      string `gorm:"column:site;type:varchar(75);not null" json:""`
+	Location  string `gorm:"column:location;type:varchar(30);not null" json:""`
+	Bio       string `gorm:"column:bio;type:text;not null" json:""`
+	Privacy   []byte `gorm:"column:privacy;type:mediumtext;not null" json:""`
+	Blocklist string `gorm:"column:blocklist;type:mediumtext;not null" json:""`
 }
 
 // TableName MemberField's table name

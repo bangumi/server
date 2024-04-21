@@ -8,13 +8,13 @@ const TableNameSubjectRelation = "chii_subject_relations"
 
 // SubjectRelation 条目关联表
 type SubjectRelation struct {
-	SubjectID            uint32  `gorm:"column:rlt_subject_id;type:mediumint(8) unsigned;primaryKey;comment:关联主 ID"` // 关联主 ID
-	SubjectTypeID        uint8   `gorm:"column:rlt_subject_type_id;type:tinyint(3) unsigned;not null"`
-	RelationType         uint16  `gorm:"column:rlt_relation_type;type:smallint(5) unsigned;not null;comment:关联类型"`            // 关联类型
-	RelatedSubjectID     uint32  `gorm:"column:rlt_related_subject_id;type:mediumint(8) unsigned;primaryKey;comment:关联目标 ID"` // 关联目标 ID
-	RelatedSubjectTypeID uint8   `gorm:"column:rlt_related_subject_type_id;type:tinyint(3) unsigned;not null;comment:关联目标类型"` // 关联目标类型
-	ViceVersa            bool    `gorm:"column:rlt_vice_versa;type:tinyint(1) unsigned;primaryKey"`
-	Order                uint8   `gorm:"column:rlt_order;type:tinyint(3) unsigned;not null;comment:关联排序"` // 关联排序
+	SubjectID            uint32  `gorm:"column:rlt_subject_id;type:mediumint(8) unsigned;primaryKey;comment:关联主 ID" json:""` // 关联主 ID
+	SubjectTypeID        uint8   `gorm:"column:rlt_subject_type_id;type:tinyint(3) unsigned;not null" json:""`
+	RelationType         uint16  `gorm:"column:rlt_relation_type;type:smallint(5) unsigned;not null;comment:关联类型" json:""`            // 关联类型
+	RelatedSubjectID     uint32  `gorm:"column:rlt_related_subject_id;type:mediumint(8) unsigned;primaryKey;comment:关联目标 ID" json:""` // 关联目标 ID
+	RelatedSubjectTypeID uint8   `gorm:"column:rlt_related_subject_type_id;type:tinyint(3) unsigned;not null;comment:关联目标类型" json:""` // 关联目标类型
+	ViceVersa            bool    `gorm:"column:rlt_vice_versa;type:tinyint(1) unsigned;primaryKey" json:""`
+	Order                uint8   `gorm:"column:rlt_order;type:tinyint(3) unsigned;not null;comment:关联排序" json:""` // 关联排序
 	Subject              Subject `gorm:"foreignKey:rlt_related_subject_id;references:subject_id" json:"subject"`
 }
 

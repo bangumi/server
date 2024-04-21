@@ -8,11 +8,11 @@ const TableNameWebSession = "chii_os_web_sessions"
 
 // WebSession mapped from table <chii_os_web_sessions>
 type WebSession struct {
-	Key       string `gorm:"column:key;type:char(64);primaryKey;comment:session key"`                                          // session key
-	UserID    uint32 `gorm:"column:user_id;type:int(10) unsigned;not null;comment:uint32 user id"`                             // uint32 user id
-	Value     []byte `gorm:"column:value;type:mediumblob;not null;comment:json encoded session data"`                          // json encoded session data
-	CreatedAt int64  `gorm:"column:created_at;type:bigint(20);not null;comment:int64 unix timestamp, when session is created"` // int64 unix timestamp, when session is created
-	ExpiredAt int64  `gorm:"column:expired_at;type:bigint(20);not null;comment:int64 unix timestamp, when session is expired"` // int64 unix timestamp, when session is expired
+	Key       string `gorm:"column:key;type:char(64);primaryKey;comment:session key" json:""`                                          // session key
+	UserID    uint32 `gorm:"column:user_id;type:int(10) unsigned;not null;comment:uint32 user id" json:""`                             // uint32 user id
+	Value     []byte `gorm:"column:value;type:mediumblob;not null;comment:json encoded session data" json:""`                          // json encoded session data
+	CreatedAt int64  `gorm:"column:created_at;type:bigint(20);not null;comment:int64 unix timestamp, when session is created" json:""` // int64 unix timestamp, when session is created
+	ExpiredAt int64  `gorm:"column:expired_at;type:bigint(20);not null;comment:int64 unix timestamp, when session is expired" json:""` // int64 unix timestamp, when session is expired
 }
 
 // TableName WebSession's table name

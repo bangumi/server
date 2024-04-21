@@ -8,10 +8,10 @@ const TableNameNotificationField = "chii_notify_field"
 
 // NotificationField mapped from table <chii_notify_field>
 type NotificationField struct {
-	ID          uint32 `gorm:"column:ntf_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true"`
-	RelatedType uint8  `gorm:"column:ntf_hash;type:tinyint(3) unsigned;not null"`
-	RelatedID   uint32 `gorm:"column:ntf_rid;type:int(10) unsigned;not null"`
-	Title       string `gorm:"column:ntf_title;type:varchar(255);not null"`
+	ID          uint32 `gorm:"column:ntf_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:""`
+	RelatedType uint8  `gorm:"column:ntf_hash;type:tinyint(3) unsigned;not null" json:""`
+	RelatedID   uint32 `gorm:"column:ntf_rid;type:int(10) unsigned;not null" json:""`
+	Title       string `gorm:"column:ntf_title;type:varchar(255);not null" json:""`
 }
 
 // TableName NotificationField's table name
