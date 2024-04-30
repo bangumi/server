@@ -15,7 +15,7 @@ jobs:
 
       - name: Generate Changelog
         id: changelog
-        uses: requarks/changelog-action@v1.10.1
+        uses: requarks/changelog-action@v1.10.2
         with:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
