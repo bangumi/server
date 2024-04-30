@@ -48,7 +48,7 @@ jobs:
       - run: go get -t ./...
 
       - name: Run linters
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v5
         with:
           version: v1.57.2
           skip-pkg-cache: true
