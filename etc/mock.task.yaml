@@ -33,7 +33,7 @@ tasks:
   install:mockery:
     desc: Installs mockery
     vars:
-      MOCKERY_VERSION: v2.26.1
+      MOCKERY_VERSION: v2.43.0
     env:
       GOBIN: "{{.BIN}}"
     status:
