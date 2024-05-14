@@ -117,6 +117,17 @@ func (r mysqlRepo) UpdateOrCreateSubjectCollection(
 	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
 }
 
+func (r mysqlRepo) DeleteSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+) error {
+	_, err := r.q.SubjectCollection.WithContext(ctx).
+		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).
+		Delete()
+	return err
+}
+
 func (r mysqlRepo) updateOrCreateSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,

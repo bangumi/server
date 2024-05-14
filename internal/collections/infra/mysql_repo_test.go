@@ -23,6 +23,7 @@ import (
 	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen/field"
+	"gorm.io/gorm"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
@@ -415,6 +416,38 @@ func TestMysqlRepo_UpdateSubjectCollectionType(t *testing.T) {
 	require.Zero(t, r.DoneTime)
 	require.Zero(t, r.OnHoldTime)
 }
+
+func TestMysqlRepo_DeleteSubjectCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const id model.UserID = 30000
+	const subjectID model.SubjectID = 10000
+
+	repo, q := getRepo(t)
+
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(context.Background()).SubjectCollection.
+			Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(id)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := q.WithContext(context.Background()).SubjectCollection.Create(&dao.SubjectCollection{
+		UserID:    id,
+		SubjectID: subjectID,
+		Rate:      2,
+	})
+	require.NoError(t, err)
+
+	err = repo.DeleteSubjectCollection(context.Background(), id, subjectID)
+	require.NoError(t, err)
+
+	r, err := q.WithContext(context.Background()).SubjectCollection.
+		Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(id)).Take()
+	require.ErrorIs(t, err, gorm.ErrRecordNotFound)
+	require.Nil(t, r)
+}
+
 func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()

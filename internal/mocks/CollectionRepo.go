@@ -90,6 +90,54 @@ func (_c *CollectionRepo_CountSubjectCollections_Call) RunAndReturn(run func(con
 	return _c
 }
 
+// DeleteSubjectCollection provides a mock function with given fields: ctx, userID, subjectID
+func (_m *CollectionRepo) DeleteSubjectCollection(ctx context.Context, userID uint32, subjectID uint32) error {
+	ret := _m.Called(ctx, userID, subjectID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteSubjectCollection")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) error); ok {
+		r0 = rf(ctx, userID, subjectID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// CollectionRepo_DeleteSubjectCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteSubjectCollection'
+type CollectionRepo_DeleteSubjectCollection_Call struct {
+	*mock.Call
+}
+
+// DeleteSubjectCollection is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uint32
+//   - subjectID uint32
+func (_e *CollectionRepo_Expecter) DeleteSubjectCollection(ctx interface{}, userID interface{}, subjectID interface{}) *CollectionRepo_DeleteSubjectCollection_Call {
+	return &CollectionRepo_DeleteSubjectCollection_Call{Call: _e.mock.On("DeleteSubjectCollection", ctx, userID, subjectID)}
+}
+
+func (_c *CollectionRepo_DeleteSubjectCollection_Call) Run(run func(ctx context.Context, userID uint32, subjectID uint32)) *CollectionRepo_DeleteSubjectCollection_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint32))
+	})
+	return _c
+}
+
+func (_c *CollectionRepo_DeleteSubjectCollection_Call) Return(_a0 error) *CollectionRepo_DeleteSubjectCollection_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *CollectionRepo_DeleteSubjectCollection_Call) RunAndReturn(run func(context.Context, uint32, uint32) error) *CollectionRepo_DeleteSubjectCollection_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetSubjectCollection provides a mock function with given fields: ctx, userID, subjectID
 func (_m *CollectionRepo) GetSubjectCollection(ctx context.Context, userID uint32, subjectID uint32) (collection.UserSubjectCollection, error) {
 	ret := _m.Called(ctx, userID, subjectID)
