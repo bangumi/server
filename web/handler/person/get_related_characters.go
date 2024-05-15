@@ -43,7 +43,6 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 		}
 		return errgo.Wrap(err, "failed to get person")
 	}
-
 	if r.Redirect != 0 {
 		return res.ErrNotFound
 	}
@@ -84,6 +83,7 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 			Type:          rel.Character.Type,
 			Images:        res.PersonImage(rel.Character.Image),
 			SubjectID:     rel.Subject.ID,
+			SubjectType:   rel.Subject.TypeID,
 			SubjectName:   rel.Subject.Name,
 			SubjectNameCn: rel.Subject.NameCN,
 			Staff:         res.CharacterStaffString(subjectTypeID),

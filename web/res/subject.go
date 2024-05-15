@@ -131,11 +131,12 @@ type Rating struct {
 }
 
 type PersonRelatedSubject struct {
-	Staff     string          `json:"staff"`
-	Name      string          `json:"name"`
-	NameCn    string          `json:"name_cn"`
-	Image     string          `json:"image"`
-	SubjectID model.SubjectID `json:"id"`
+	Staff     string            `json:"staff"`
+	Name      string            `json:"name"`
+	NameCn    string            `json:"name_cn"`
+	Image     string            `json:"image"`
+	Type      model.SubjectType `json:"type"`
+	SubjectID model.SubjectID   `json:"id"`
 }
 
 type PersonRelatedCharacter struct {
@@ -143,6 +144,7 @@ type PersonRelatedCharacter struct {
 	Name          string            `json:"name"`
 	SubjectName   string            `json:"subject_name"`
 	SubjectNameCn string            `json:"subject_name_cn"`
+	SubjectType   model.SubjectType `json:"subject_type"`
 	SubjectID     model.SubjectID   `json:"subject_id"`
 	Staff         string            `json:"staff"`
 	ID            model.CharacterID `json:"id"`
@@ -150,22 +152,24 @@ type PersonRelatedCharacter struct {
 }
 
 type CharacterRelatedPerson struct {
-	Images        PersonImages    `json:"images"`
-	Name          string          `json:"name"`
-	SubjectName   string          `json:"subject_name"`
-	SubjectNameCn string          `json:"subject_name_cn"`
-	SubjectID     model.SubjectID `json:"subject_id"`
-	Staff         string          `json:"staff"`
-	ID            model.PersonID  `json:"id"`
-	Type          uint8           `json:"type" doc:"person type"`
+	Images        PersonImages      `json:"images"`
+	Name          string            `json:"name"`
+	SubjectName   string            `json:"subject_name"`
+	SubjectNameCn string            `json:"subject_name_cn"`
+	SubjectType   model.SubjectType `json:"subject_type"`
+	SubjectID     model.SubjectID   `json:"subject_id"`
+	Staff         string            `json:"staff"`
+	ID            model.PersonID    `json:"id"`
+	Type          uint8             `json:"type" doc:"person type"`
 }
 
 type CharacterRelatedSubject struct {
-	Staff  string          `json:"staff"`
-	Name   string          `json:"name"`
-	NameCn string          `json:"name_cn"`
-	Image  string          `json:"image"`
-	ID     model.SubjectID `json:"id"`
+	Staff  string            `json:"staff"`
+	Name   string            `json:"name"`
+	NameCn string            `json:"name_cn"`
+	Image  string            `json:"image"`
+	Type   model.SubjectType `json:"type"`
+	ID     model.SubjectID   `json:"id"`
 }
 
 type SubjectRelatedSubject struct {
