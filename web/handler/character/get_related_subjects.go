@@ -50,6 +50,7 @@ func (h Character) GetRelatedSubjects(c echo.Context) error {
 		s := relation.Subject
 		response[i] = res.CharacterRelatedSubject{
 			ID:     s.ID,
+			Type:   s.TypeID,
 			Name:   s.Name,
 			NameCn: s.NameCN,
 			Staff:  res.CharacterStaffString(relation.TypeID),

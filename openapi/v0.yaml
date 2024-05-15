@@ -1782,6 +1782,7 @@ components:
         - name
         - type
         - subject_id
+        - subject_type
         - subject_name
         - subject_name_cn
       type: object
@@ -1806,6 +1807,8 @@ components:
         subject_id:
           title: Subject ID
           type: integer
+        subject_type:
+          $ref: "#/components/schemas/SubjectType"
         subject_name:
           title: Subject Name
           type: string
@@ -2396,6 +2399,7 @@ components:
         - name
         - type
         - subject_id
+        - subject_type
         - subject_name
         - subject_name_cn
       type: object
@@ -2419,6 +2423,8 @@ components:
         subject_id:
           title: Subject ID
           type: integer
+        subject_type:
+          $ref: "#/components/schemas/SubjectType"
         subject_name:
           title: Subject Name
           type: string
@@ -2670,13 +2676,17 @@ components:
       title: RelatedSubject
       required:
         - id
+        - type
         - staff
+        - name
         - name_cn
       type: object
       properties:
         id:
           title: ID
           type: integer
+        type:
+          $ref: "#/components/schemas/SubjectType"
         staff:
           title: Staff
           type: string
