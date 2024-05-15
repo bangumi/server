@@ -957,6 +957,40 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+    delete:
+      tags:
+        - 收藏
+      summary: 删除用户单个收藏
+      description: |
+        删除条目收藏状态
+
+        会删除当前填写的评分、tags 和吐槽，不会影响章节进度
+      operationId: deleteUserCollection
+      parameters:
+        - $ref: "#/components/parameters/path_subject_id"
+      responses:
+        "204":
+          description: Successful Response
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: 用户不存在或者条目未收藏
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
 
   "/v0/users/-/collections/{subject_id}/episodes":
     get:
