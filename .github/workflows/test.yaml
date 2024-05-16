@@ -59,6 +59,11 @@ jobs:
 
       - run: bash $HOME/dev-env/wait_mysql_ready.sh
 
+      - name: Check Gorm gen
+        run: |
+          task gorm
+          git diff --exit-code
+
       - name: Run tests
         run: task coverage
         env:
