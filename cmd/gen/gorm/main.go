@@ -24,6 +24,7 @@ NOTICE:
 package main
 
 import (
+	"path/filepath"
 	"strings"
 
 	"gorm.io/gen"
@@ -58,9 +59,9 @@ const createdTime = "CreatedTime"
 // generate code.
 func main() {
 	g := gen.NewGenerator(gen.Config{
-		OutPath:      "./dal/query/",
-		OutFile:      "./dal/query/gen.go",
-		ModelPkgPath: "./dal/dao/",
+		OutPath:      filepath.Clean("./dal/query/"),
+		OutFile:      "gen.go",
+		ModelPkgPath: "dao",
 
 		WithUnitTest: false,
 		// if you want the nullable field generation property to be pointer type, set FieldNullable true
