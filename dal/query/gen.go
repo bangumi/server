@@ -32,6 +32,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Notification:      newNotification(db, opts...),
 		NotificationField: newNotificationField(db, opts...),
 		Person:            newPerson(db, opts...),
+		PersonCollect:     newPersonCollect(db, opts...),
 		PersonField:       newPersonField(db, opts...),
 		PersonSubjects:    newPersonSubjects(db, opts...),
 		PrivateMessage:    newPrivateMessage(db, opts...),
@@ -64,6 +65,7 @@ type Query struct {
 	Notification      notification
 	NotificationField notificationField
 	Person            person
+	PersonCollect     personCollect
 	PersonField       personField
 	PersonSubjects    personSubjects
 	PrivateMessage    privateMessage
@@ -97,6 +99,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Notification:      q.Notification.clone(db),
 		NotificationField: q.NotificationField.clone(db),
 		Person:            q.Person.clone(db),
+		PersonCollect:     q.PersonCollect.clone(db),
 		PersonField:       q.PersonField.clone(db),
 		PersonSubjects:    q.PersonSubjects.clone(db),
 		PrivateMessage:    q.PrivateMessage.clone(db),
@@ -137,6 +140,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Notification:      q.Notification.replaceDB(db),
 		NotificationField: q.NotificationField.replaceDB(db),
 		Person:            q.Person.replaceDB(db),
+		PersonCollect:     q.PersonCollect.replaceDB(db),
 		PersonField:       q.PersonField.replaceDB(db),
 		PersonSubjects:    q.PersonSubjects.replaceDB(db),
 		PrivateMessage:    q.PrivateMessage.replaceDB(db),
@@ -167,6 +171,7 @@ type queryCtx struct {
 	Notification      *notificationDo
 	NotificationField *notificationFieldDo
 	Person            *personDo
+	PersonCollect     *personCollectDo
 	PersonField       *personFieldDo
 	PersonSubjects    *personSubjectsDo
 	PrivateMessage    *privateMessageDo
@@ -197,6 +202,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Notification:      q.Notification.WithContext(ctx),
 		NotificationField: q.NotificationField.WithContext(ctx),
 		Person:            q.Person.WithContext(ctx),
+		PersonCollect:     q.PersonCollect.WithContext(ctx),
 		PersonField:       q.PersonField.WithContext(ctx),
 		PersonSubjects:    q.PersonSubjects.WithContext(ctx),
 		PrivateMessage:    q.PrivateMessage.WithContext(ctx),
