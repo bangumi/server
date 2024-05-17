@@ -30,6 +30,55 @@ func (_m *CollectionRepo) EXPECT() *CollectionRepo_Expecter {
 	return &CollectionRepo_Expecter{mock: &_m.Mock}
 }
 
+// AddPersonCollect provides a mock function with given fields: ctx, userID, cat, targetID
+func (_m *CollectionRepo) AddPersonCollect(ctx context.Context, userID uint32, cat collection.PersonCollectCategory, targetID uint32) error {
+	ret := _m.Called(ctx, userID, cat, targetID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddPersonCollect")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, collection.PersonCollectCategory, uint32) error); ok {
+		r0 = rf(ctx, userID, cat, targetID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// CollectionRepo_AddPersonCollect_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddPersonCollect'
+type CollectionRepo_AddPersonCollect_Call struct {
+	*mock.Call
+}
+
+// AddPersonCollect is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uint32
+//   - cat collection.PersonCollectCategory
+//   - targetID uint32
+func (_e *CollectionRepo_Expecter) AddPersonCollect(ctx interface{}, userID interface{}, cat interface{}, targetID interface{}) *CollectionRepo_AddPersonCollect_Call {
+	return &CollectionRepo_AddPersonCollect_Call{Call: _e.mock.On("AddPersonCollect", ctx, userID, cat, targetID)}
+}
+
+func (_c *CollectionRepo_AddPersonCollect_Call) Run(run func(ctx context.Context, userID uint32, cat collection.PersonCollectCategory, targetID uint32)) *CollectionRepo_AddPersonCollect_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(collection.PersonCollectCategory), args[3].(uint32))
+	})
+	return _c
+}
+
+func (_c *CollectionRepo_AddPersonCollect_Call) Return(_a0 error) *CollectionRepo_AddPersonCollect_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *CollectionRepo_AddPersonCollect_Call) RunAndReturn(run func(context.Context, uint32, collection.PersonCollectCategory, uint32) error) *CollectionRepo_AddPersonCollect_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CountSubjectCollections provides a mock function with given fields: ctx, userID, subjectType, collectionType, showPrivate
 func (_m *CollectionRepo) CountSubjectCollections(ctx context.Context, userID uint32, subjectType uint8, collectionType collection.SubjectCollection, showPrivate bool) (int64, error) {
 	ret := _m.Called(ctx, userID, subjectType, collectionType, showPrivate)
@@ -86,6 +135,65 @@ func (_c *CollectionRepo_CountSubjectCollections_Call) Return(_a0 int64, _a1 err
 }
 
 func (_c *CollectionRepo_CountSubjectCollections_Call) RunAndReturn(run func(context.Context, uint32, uint8, collection.SubjectCollection, bool) (int64, error)) *CollectionRepo_CountSubjectCollections_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetPersonCollect provides a mock function with given fields: ctx, userID, cat, targetID
+func (_m *CollectionRepo) GetPersonCollect(ctx context.Context, userID uint32, cat collection.PersonCollectCategory, targetID uint32) (collection.UserPersonCollection, error) {
+	ret := _m.Called(ctx, userID, cat, targetID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPersonCollect")
+	}
+
+	var r0 collection.UserPersonCollection
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, collection.PersonCollectCategory, uint32) (collection.UserPersonCollection, error)); ok {
+		return rf(ctx, userID, cat, targetID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, collection.PersonCollectCategory, uint32) collection.UserPersonCollection); ok {
+		r0 = rf(ctx, userID, cat, targetID)
+	} else {
+		r0 = ret.Get(0).(collection.UserPersonCollection)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, collection.PersonCollectCategory, uint32) error); ok {
+		r1 = rf(ctx, userID, cat, targetID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// CollectionRepo_GetPersonCollect_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPersonCollect'
+type CollectionRepo_GetPersonCollect_Call struct {
+	*mock.Call
+}
+
+// GetPersonCollect is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uint32
+//   - cat collection.PersonCollectCategory
+//   - targetID uint32
+func (_e *CollectionRepo_Expecter) GetPersonCollect(ctx interface{}, userID interface{}, cat interface{}, targetID interface{}) *CollectionRepo_GetPersonCollect_Call {
+	return &CollectionRepo_GetPersonCollect_Call{Call: _e.mock.On("GetPersonCollect", ctx, userID, cat, targetID)}
+}
+
+func (_c *CollectionRepo_GetPersonCollect_Call) Run(run func(ctx context.Context, userID uint32, cat collection.PersonCollectCategory, targetID uint32)) *CollectionRepo_GetPersonCollect_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(collection.PersonCollectCategory), args[3].(uint32))
+	})
+	return _c
+}
+
+func (_c *CollectionRepo_GetPersonCollect_Call) Return(_a0 collection.UserPersonCollection, _a1 error) *CollectionRepo_GetPersonCollect_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *CollectionRepo_GetPersonCollect_Call) RunAndReturn(run func(context.Context, uint32, collection.PersonCollectCategory, uint32) (collection.UserPersonCollection, error)) *CollectionRepo_GetPersonCollect_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -268,6 +376,55 @@ func (_c *CollectionRepo_ListSubjectCollection_Call) Return(_a0 []collection.Use
 }
 
 func (_c *CollectionRepo_ListSubjectCollection_Call) RunAndReturn(run func(context.Context, uint32, uint8, collection.SubjectCollection, bool, int, int) ([]collection.UserSubjectCollection, error)) *CollectionRepo_ListSubjectCollection_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RemovePersonCollect provides a mock function with given fields: ctx, userID, cat, targetID
+func (_m *CollectionRepo) RemovePersonCollect(ctx context.Context, userID uint32, cat collection.PersonCollectCategory, targetID uint32) error {
+	ret := _m.Called(ctx, userID, cat, targetID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RemovePersonCollect")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, collection.PersonCollectCategory, uint32) error); ok {
+		r0 = rf(ctx, userID, cat, targetID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// CollectionRepo_RemovePersonCollect_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RemovePersonCollect'
+type CollectionRepo_RemovePersonCollect_Call struct {
+	*mock.Call
+}
+
+// RemovePersonCollect is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uint32
+//   - cat collection.PersonCollectCategory
+//   - targetID uint32
+func (_e *CollectionRepo_Expecter) RemovePersonCollect(ctx interface{}, userID interface{}, cat interface{}, targetID interface{}) *CollectionRepo_RemovePersonCollect_Call {
+	return &CollectionRepo_RemovePersonCollect_Call{Call: _e.mock.On("RemovePersonCollect", ctx, userID, cat, targetID)}
+}
+
+func (_c *CollectionRepo_RemovePersonCollect_Call) Run(run func(ctx context.Context, userID uint32, cat collection.PersonCollectCategory, targetID uint32)) *CollectionRepo_RemovePersonCollect_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(collection.PersonCollectCategory), args[3].(uint32))
+	})
+	return _c
+}
+
+func (_c *CollectionRepo_RemovePersonCollect_Call) Return(_a0 error) *CollectionRepo_RemovePersonCollect_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *CollectionRepo_RemovePersonCollect_Call) RunAndReturn(run func(context.Context, uint32, collection.PersonCollectCategory, uint32) error) *CollectionRepo_RemovePersonCollect_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -17,27 +17,31 @@ package person
 import (
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/character"
+	"github.com/bangumi/server/internal/collections"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
 )
 
 type Person struct {
-	person  person.Repo
-	c       character.Repo
-	ctrl    ctrl.Ctrl
-	subject subject.Repo
+	ctrl      ctrl.Ctrl
+	person    person.Repo
+	character character.Repo
+	subject   subject.Repo
+	collect   collections.Repo
 }
 
 func New(
 	ctrl ctrl.Ctrl,
 	person person.Repo,
 	subject subject.Repo,
-	c character.Repo,
+	character character.Repo,
+	collect collections.Repo,
 ) (Person, error) {
 	return Person{
-		person:  person,
-		ctrl:    ctrl,
-		c:       c,
-		subject: subject,
+		ctrl:      ctrl,
+		person:    person,
+		character: character,
+		subject:   subject,
+		collect:   collect,
 	}, nil
 }

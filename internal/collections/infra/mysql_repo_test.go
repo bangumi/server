@@ -23,6 +23,7 @@ import (
 	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen/field"
+	"gorm.io/gorm"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
@@ -415,6 +416,7 @@ func TestMysqlRepo_UpdateSubjectCollectionType(t *testing.T) {
 	require.Zero(t, r.DoneTime)
 	require.Zero(t, r.OnHoldTime)
 }
+
 func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
@@ -506,4 +508,91 @@ func TestMysqlRepo_UpdateEpisodeCollection_create_ep_status(t *testing.T) {
 	require.EqualValues(t, collection.EpisodeCollectionDone, m[1].Type)
 	require.Contains(t, m, uint32(2))
 	require.EqualValues(t, collection.EpisodeCollectionDone, m[2].Type)
+}
+
+func TestMysqlRepo_GetPersonCollect(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 39000
+	const cat = "prsn"
+	const mid model.PersonID = 12000
+
+	repo, q := getRepo(t)
+	table := q.PersonCollect
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := table.WithContext(context.Background()).Create(&dao.PersonCollect{
+		UserID:      uid,
+		Category:    cat,
+		TargetID:    mid,
+		CreatedTime: uint32(time.Now().Unix()),
+	})
+	require.NoError(t, err)
+
+	r, err := repo.GetPersonCollect(context.Background(), uid, cat, mid)
+	require.NoError(t, err)
+	require.Equal(t, uid, r.UserID)
+	require.Equal(t, mid, r.TargetID)
+	require.Equal(t, cat, r.Category)
+}
+
+func TestMysqlRepo_AddPersonCollect(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 40000
+	const cat = "prsn"
+	const mid model.PersonID = 13000
+
+	repo, q := getRepo(t)
+	table := q.PersonCollect
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := repo.AddPersonCollect(context.Background(), uid, cat, mid)
+	require.NoError(t, err)
+
+	r, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Take()
+	require.NoError(t, err)
+	require.NotZero(t, r.ID)
+}
+
+func TestMysqlRepo_RemovePersonCollect(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 41000
+	const cat = "prsn"
+	const mid model.PersonID = 14000
+
+	repo, q := getRepo(t)
+	table := q.PersonCollect
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := table.WithContext(context.Background()).Create(&dao.PersonCollect{
+		UserID:      uid,
+		Category:    cat,
+		TargetID:    mid,
+		CreatedTime: uint32(time.Now().Unix()),
+	})
+	require.NoError(t, err)
+
+	r, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Take()
+	require.NoError(t, err)
+	require.NotZero(t, r.ID)
+
+	err = repo.RemovePersonCollect(context.Background(), uid, cat, mid)
+	require.NoError(t, err)
+
+	_, err = table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Take()
+	require.ErrorIs(t, err, gorm.ErrRecordNotFound)
 }

@@ -59,7 +59,7 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 			SubjectID:   relation.Subject.ID,
 		}
 	}
-	subjectRelations, err := h.c.GetSubjectRelationByIDs(c.Request().Context(), compositeIDs)
+	subjectRelations, err := h.character.GetSubjectRelationByIDs(c.Request().Context(), compositeIDs)
 	if err != nil {
 		return errgo.Wrap(err, "CharacterRepo.GetRelations")
 	}
@@ -96,7 +96,7 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 func (h Person) getPersonRelatedCharacters(
 	ctx context.Context, personID model.PersonID,
 ) ([]model.PersonCharacterRelation, error) {
-	relations, err := h.c.GetPersonRelated(ctx, personID)
+	relations, err := h.character.GetPersonRelated(ctx, personID)
 	if err != nil {
 		return nil, errgo.Wrap(err, "CharacterRepo.GetPersonRelated")
 	}
@@ -112,7 +112,7 @@ func (h Person) getPersonRelatedCharacters(
 		subjectIDs[i] = relation.SubjectID
 	}
 
-	characters, err := h.c.GetByIDs(ctx, characterIDs)
+	characters, err := h.character.GetByIDs(ctx, characterIDs)
 	if err != nil {
 		return nil, errgo.Wrap(err, "CharacterRepo.GetByIDs")
 	}

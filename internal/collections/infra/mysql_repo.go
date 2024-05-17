@@ -461,6 +461,63 @@ func (r mysqlRepo) updateCollectionTime(obj *dao.SubjectCollection,
 	return nil
 }
 
+func (r mysqlRepo) GetPersonCollect(
+	ctx context.Context, userID model.UserID,
+	cat collection.PersonCollectCategory, targetID model.PersonID,
+) (collection.UserPersonCollection, error) {
+	c, err := r.q.PersonCollect.WithContext(ctx).
+		Where(r.q.PersonCollect.UserID.Eq(userID), r.q.PersonCollect.Category.Eq(string(cat)),
+			r.q.PersonCollect.TargetID.Eq(targetID)).Take()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return collection.UserPersonCollection{}, gerr.ErrNotFound
+		}
+		return collection.UserPersonCollection{}, errgo.Wrap(err, "dal")
+	}
+
+	return collection.UserPersonCollection{
+		ID:        c.ID,
+		Category:  c.Category,
+		TargetID:  c.TargetID,
+		UserID:    c.UserID,
+		CreatedAt: time.Unix(int64(c.CreatedTime), 0),
+	}, nil
+}
+
+func (r mysqlRepo) AddPersonCollect(
+	ctx context.Context, userID model.UserID,
+	cat collection.PersonCollectCategory, targetID model.PersonID,
+) error {
+	var table = r.q.PersonCollect
+	err := table.WithContext(ctx).Create(&dao.PersonCollect{
+		UserID:      userID,
+		Category:    string(cat),
+		TargetID:    targetID,
+		CreatedTime: uint32(time.Now().Unix()),
+	})
+	if err != nil {
+		r.log.Error("failed to create person collection record", zap.Error(err))
+		return errgo.Wrap(err, "dal")
+	}
+
+	return nil
+}
+
+func (r mysqlRepo) RemovePersonCollect(
+	ctx context.Context, userID model.UserID,
+	cat collection.PersonCollectCategory, targetID model.PersonID,
+) error {
+	_, err := r.q.PersonCollect.WithContext(ctx).
+		Where(r.q.PersonCollect.UserID.Eq(userID), r.q.PersonCollect.Category.Eq(string(cat)),
+			r.q.PersonCollect.TargetID.Eq(targetID)).Delete()
+	if err != nil {
+		r.log.Error("failed to delete person collection record", zap.Error(err))
+		return errgo.Wrap(err, "dal")
+	}
+
+	return nil
+}
+
 func (r mysqlRepo) UpdateEpisodeCollection(
 	ctx context.Context,
 	userID model.UserID,
