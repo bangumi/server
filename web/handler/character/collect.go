@@ -54,13 +54,13 @@ func (h Character) collectCharacter(c echo.Context, cid uint32, uid uint32) erro
 		return res.InternalError(c, err, "get character error")
 	}
 	// check if the user has collected the character
-	if _, err := h.collect.GetPersonCollect(ctx, uid, collection.PersonCollectCategoryCharacter, cid); err == nil {
+	if _, err := h.collect.GetPersonCollection(ctx, uid, collection.PersonCollectCategoryCharacter, cid); err == nil {
 		return nil // already collected
 	} else if !errors.Is(err, gerr.ErrNotFound) {
 		return res.InternalError(c, err, "get character collect error")
 	}
 	// add the collect
-	if err := h.collect.AddPersonCollect(ctx, uid, collection.PersonCollectCategoryCharacter, cid); err != nil {
+	if err := h.collect.AddPersonCollection(ctx, uid, collection.PersonCollectCategoryCharacter, cid); err != nil {
 		return res.InternalError(c, err, "add character collect failed")
 	}
 	return nil
@@ -76,14 +76,14 @@ func (h Character) uncollectCharacter(c echo.Context, cid uint32, uid uint32) er
 		return res.InternalError(c, err, "get character error")
 	}
 	// check if the user has collected the character
-	if _, err := h.collect.GetPersonCollect(ctx, uid, collection.PersonCollectCategoryCharacter, cid); err != nil {
+	if _, err := h.collect.GetPersonCollection(ctx, uid, collection.PersonCollectCategoryCharacter, cid); err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("character not collected")
 		}
 		return res.InternalError(c, err, "get character collect error")
 	}
 	// remove the collect
-	if err := h.collect.RemovePersonCollect(ctx, uid, collection.PersonCollectCategoryCharacter, cid); err != nil {
+	if err := h.collect.RemovePersonCollection(ctx, uid, collection.PersonCollectCategoryCharacter, cid); err != nil {
 		return res.InternalError(c, err, "remove character collect failed")
 	}
 	return nil

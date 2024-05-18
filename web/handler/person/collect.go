@@ -56,13 +56,13 @@ func (h Person) collectPerson(c echo.Context, pid uint32, uid uint32) error {
 		return res.InternalError(c, err, "get person error")
 	}
 	// check if the user has collected the person
-	if _, err := h.collect.GetPersonCollect(ctx, uid, collection.PersonCollectCategoryPerson, pid); err == nil {
+	if _, err := h.collect.GetPersonCollection(ctx, uid, collection.PersonCollectCategoryPerson, pid); err == nil {
 		return nil // already collected
 	} else if !errors.Is(err, gerr.ErrNotFound) {
 		return res.InternalError(c, err, "get person collect error")
 	}
 	// add the collect
-	if err := h.collect.AddPersonCollect(ctx, uid, collection.PersonCollectCategoryPerson, pid); err != nil {
+	if err := h.collect.AddPersonCollection(ctx, uid, collection.PersonCollectCategoryPerson, pid); err != nil {
 		return res.InternalError(c, err, "add person collect failed")
 	}
 	return nil
@@ -78,14 +78,14 @@ func (h Person) uncollectPerson(c echo.Context, pid uint32, uid uint32) error {
 		return res.InternalError(c, err, "get person error")
 	}
 	// check if the user has collected the person
-	if _, err := h.collect.GetPersonCollect(ctx, uid, collection.PersonCollectCategoryPerson, pid); err != nil {
+	if _, err := h.collect.GetPersonCollection(ctx, uid, collection.PersonCollectCategoryPerson, pid); err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("person not collected")
 		}
 		return res.InternalError(c, err, "get person collect error")
 	}
 	// remove the collect
-	if err := h.collect.RemovePersonCollect(ctx, uid, collection.PersonCollectCategoryPerson, pid); err != nil {
+	if err := h.collect.RemovePersonCollection(ctx, uid, collection.PersonCollectCategoryPerson, pid); err != nil {
 		return res.InternalError(c, err, "remove person collect failed")
 	}
 	return nil

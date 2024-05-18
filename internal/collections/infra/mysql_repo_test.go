@@ -533,7 +533,7 @@ func TestMysqlRepo_GetPersonCollect(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	r, err := repo.GetPersonCollect(context.Background(), uid, cat, mid)
+	r, err := repo.GetPersonCollection(context.Background(), uid, cat, mid)
 	require.NoError(t, err)
 	require.Equal(t, uid, r.UserID)
 	require.Equal(t, mid, r.TargetID)
@@ -555,7 +555,7 @@ func TestMysqlRepo_AddPersonCollect(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	err := repo.AddPersonCollect(context.Background(), uid, cat, mid)
+	err := repo.AddPersonCollection(context.Background(), uid, cat, mid)
 	require.NoError(t, err)
 
 	r, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Take()
@@ -590,9 +590,93 @@ func TestMysqlRepo_RemovePersonCollect(t *testing.T) {
 	require.NoError(t, err)
 	require.NotZero(t, r.ID)
 
-	err = repo.RemovePersonCollect(context.Background(), uid, cat, mid)
+	err = repo.RemovePersonCollection(context.Background(), uid, cat, mid)
 	require.NoError(t, err)
 
 	_, err = table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Take()
 	require.ErrorIs(t, err, gorm.ErrRecordNotFound)
+}
+
+func TestMysqlRepo_CountPersonCollections(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const uid model.UserID = 41000
+	const cat = "prsn"
+
+	repo, q := getRepo(t)
+	test.RunAndCleanup(t, func() {
+		_, err := q.PersonCollect.
+			WithContext(context.Background()).
+			Where(q.PersonCollect.UserID.Eq(uid)).
+			Delete()
+		require.NoError(t, err)
+	})
+
+	for i := 0; i < 5; i++ {
+		err := q.PersonCollect.
+			WithContext(context.Background()).
+			Create(&dao.PersonCollect{
+				UserID:      uid,
+				TargetID:    model.PersonID(i + 100),
+				Category:    cat,
+				CreatedTime: uint32(time.Now().Unix()),
+			})
+		require.NoError(t, err)
+	}
+
+	count, err := repo.CountPersonCollections(context.Background(), uid, cat)
+	require.NoError(t, err)
+	require.EqualValues(t, 5, count)
+}
+
+func TestMysqlRepo_ListPersonCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const uid model.UserID = 42000
+	const cat = "prsn"
+
+	repo, q := getRepo(t)
+
+	var err error
+	test.RunAndCleanup(t, func() {
+		_, err = q.PersonCollect.
+			WithContext(context.Background()).
+			Where(q.PersonCollect.UserID.Eq(uid)).
+			Delete()
+		require.NoError(t, err)
+	})
+
+	data, err := repo.ListPersonCollection(context.Background(), uid, collection.PersonCollectCategory(cat), 5, 0)
+	require.NoError(t, err)
+	require.Len(t, data, 0)
+
+	for i := 0; i < 5; i++ {
+		err = q.PersonCollect.
+			WithContext(context.Background()).
+			Create(&dao.PersonCollect{
+				UserID:      uid,
+				TargetID:    model.PersonID(i + 100),
+				Category:    cat,
+				CreatedTime: uint32(time.Now().Unix()),
+			})
+		require.NoError(t, err)
+	}
+
+	for i := 0; i < 2; i++ {
+		err = q.PersonCollect.
+			WithContext(context.Background()).
+			Create(&dao.PersonCollect{
+				UserID:      uid,
+				TargetID:    model.PersonID(i + 200),
+				Category:    cat,
+				CreatedTime: uint32(time.Now().Unix()),
+			})
+		require.NoError(t, err)
+	}
+
+	data, err = repo.ListPersonCollection(context.Background(), uid, collection.PersonCollectCategory(cat), 5, 0)
+	require.NoError(t, err)
+	require.Len(t, data, 5)
 }

@@ -60,22 +60,24 @@ type PersonCollection struct {
 	CreatedAt time.Time    `json:"created_at"`
 }
 
-// func ConvertModelPersonCollection(c collection.UserPersonCollection, person PersonV0) PersonCollection {
-// 	return PersonCollection{
-// 		ID:        person.ID,
-// 		Type:      person.Type,
-// 		Name:      person.Name,
-// 		Images:    person.Images,
-// 		CreatedAt: c.CreatedAt,
-// 	}
-// }
+func ConvertModelPersonCollection(c collection.UserPersonCollection, person model.Person) PersonCollection {
+	img := PersonImage(person.Image)
+	return PersonCollection{
+		ID:        person.ID,
+		Type:      person.Type,
+		Name:      person.Name,
+		Images:    img,
+		CreatedAt: c.CreatedAt,
+	}
+}
 
-// func convertModelCharacterCollection(c collection.UserPersonCollection, character CharacterV0) PersonCollection {
-// 	return PersonCollection{
-// 		ID:        character.ID,
-// 		Type:      character.Type,
-// 		Name:      character.Name,
-// 		Images:    character.Images,
-// 		CreatedAt: c.CreatedAt,
-// 	}
-// }
+func ConvertModelCharacterCollection(c collection.UserPersonCollection, character model.Character) PersonCollection {
+	img := PersonImage(character.Image)
+	return PersonCollection{
+		ID:        character.ID,
+		Type:      character.Type,
+		Name:      character.Name,
+		Images:    img,
+		CreatedAt: c.CreatedAt,
+	}
+}

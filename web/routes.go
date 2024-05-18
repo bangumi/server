@@ -94,10 +94,10 @@ func AddRouters(
 	v0.PATCH("/users/-/collections/:subject_id/episodes",
 		userHandler.PatchEpisodeCollectionBatch, req.JSON, mw.NeedLogin)
 
-	// v0.GET("/users/:username/collections/-/characters", userHandler.ListCharacterCollection)
-	// v0.GET("/users/:username/collections/-/characters/:character_id", userHandler.GetCharacterCollection)
-	// v0.GET("/users/:username/collections/-/persons", userHandler.ListPersonCollection)
-	// v0.GET("/users/:username/collections/-/persons/:person_id", userHandler.GetPersonCollection)
+	v0.GET("/users/:username/collections/-/characters", userHandler.ListCharacterCollection)
+	v0.GET("/users/:username/collections/-/characters/:character_id", userHandler.GetCharacterCollection)
+	v0.GET("/users/:username/collections/-/persons", userHandler.ListPersonCollection)
+	v0.GET("/users/:username/collections/-/persons/:person_id", userHandler.GetPersonCollection)
 
 	{
 		i := indexHandler

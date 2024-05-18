@@ -71,20 +71,33 @@ type Repo interface { //nolint:interfacebloat
 		at time.Time,
 	) (collection.UserSubjectEpisodesCollection, error)
 
-	GetPersonCollect(
+	GetPersonCollection(
 		ctx context.Context, userID model.UserID,
 		cat collection.PersonCollectCategory, targetID model.PersonID,
 	) (collection.UserPersonCollection, error)
 
-	AddPersonCollect(
+	AddPersonCollection(
 		ctx context.Context, userID model.UserID,
 		cat collection.PersonCollectCategory, targetID model.PersonID,
 	) error
 
-	RemovePersonCollect(
+	RemovePersonCollection(
 		ctx context.Context, userID model.UserID,
 		cat collection.PersonCollectCategory, targetID model.PersonID,
 	) error
+
+	CountPersonCollections(
+		ctx context.Context,
+		userID model.UserID,
+		cat collection.PersonCollectCategory,
+	) (int64, error)
+
+	ListPersonCollection(
+		ctx context.Context,
+		userID model.UserID,
+		cat collection.PersonCollectCategory,
+		limit, offset int,
+	) ([]collection.UserPersonCollection, error)
 }
 
 type Update struct {

@@ -461,7 +461,7 @@ func (r mysqlRepo) updateCollectionTime(obj *dao.SubjectCollection,
 	return nil
 }
 
-func (r mysqlRepo) GetPersonCollect(
+func (r mysqlRepo) GetPersonCollection(
 	ctx context.Context, userID model.UserID,
 	cat collection.PersonCollectCategory, targetID model.PersonID,
 ) (collection.UserPersonCollection, error) {
@@ -484,7 +484,7 @@ func (r mysqlRepo) GetPersonCollect(
 	}, nil
 }
 
-func (r mysqlRepo) AddPersonCollect(
+func (r mysqlRepo) AddPersonCollection(
 	ctx context.Context, userID model.UserID,
 	cat collection.PersonCollectCategory, targetID model.PersonID,
 ) error {
@@ -503,7 +503,7 @@ func (r mysqlRepo) AddPersonCollect(
 	return nil
 }
 
-func (r mysqlRepo) RemovePersonCollect(
+func (r mysqlRepo) RemovePersonCollection(
 	ctx context.Context, userID model.UserID,
 	cat collection.PersonCollectCategory, targetID model.PersonID,
 ) error {
@@ -516,6 +516,52 @@ func (r mysqlRepo) RemovePersonCollect(
 	}
 
 	return nil
+}
+
+func (r mysqlRepo) CountPersonCollections(
+	ctx context.Context,
+	userID model.UserID,
+	cat collection.PersonCollectCategory,
+) (int64, error) {
+	q := r.q.PersonCollect.WithContext(ctx).
+		Where(r.q.PersonCollect.UserID.Eq(userID), r.q.PersonCollect.Category.Eq(string(cat)))
+
+	c, err := q.Count()
+	if err != nil {
+		return 0, errgo.Wrap(err, "dal")
+	}
+
+	return c, nil
+}
+
+func (r mysqlRepo) ListPersonCollection(
+	ctx context.Context,
+	userID model.UserID,
+	cat collection.PersonCollectCategory,
+	limit, offset int,
+) ([]collection.UserPersonCollection, error) {
+	q := r.q.PersonCollect.WithContext(ctx).
+		Order(r.q.PersonCollect.CreatedTime.Desc()).
+		Where(r.q.PersonCollect.UserID.Eq(userID), r.q.PersonCollect.Category.Eq(string(cat))).Limit(limit).Offset(offset)
+
+	collections, err := q.Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var results = make([]collection.UserPersonCollection, len(collections))
+	for i, c := range collections {
+		results[i] = collection.UserPersonCollection{
+			ID:        c.ID,
+			Category:  c.Category,
+			TargetID:  c.TargetID,
+			UserID:    c.UserID,
+			CreatedAt: time.Unix(int64(c.CreatedTime), 0),
+		}
+	}
+
+	return results, nil
 }
 
 func (r mysqlRepo) UpdateEpisodeCollection(
