@@ -60,9 +60,7 @@ func (h User) listPersonCollection(c echo.Context, u user.User, page req.PageQue
 	}
 
 	if count == 0 {
-		if count == 0 {
-			return c.JSON(http.StatusOK, res.Paged{Data: []int{}, Total: count, Limit: page.Limit, Offset: page.Offset})
-		}
+		return c.JSON(http.StatusOK, res.Paged{Data: []int{}, Total: count, Limit: page.Limit, Offset: page.Offset})
 	}
 
 	if err = page.Check(count); err != nil {
