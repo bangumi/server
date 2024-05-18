@@ -130,3 +130,151 @@ func TestUser_ListSubjectCollection_other_user(t *testing.T) {
 		Get(fmt.Sprintf("/v0/users/%s/collections/%d", username, subjectID)).
 		ExpectCode(http.StatusNotFound)
 }
+
+func TestUser_GetPersonCollection(t *testing.T) {
+	t.Parallel()
+	const username = "ni"
+	const userID model.UserID = 7
+	const personID model.PersonID = 9
+
+	m := mocks.NewUserRepo(t)
+	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().GetPersonCollection(mock.Anything, userID, mock.Anything, mock.Anything).
+		Return(collection.UserPersonCollection{UserID: userID, Category: "prsn", TargetID: personID}, nil)
+
+	p := mocks.NewPersonRepo(t)
+	p.EXPECT().Get(mock.Anything, personID).Return(model.Person{
+		ID:   personID,
+		Name: "v",
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, PersonRepo: p})
+
+	var r res.PersonCollection
+	resp := htest.New(t, app).
+		Get(fmt.Sprintf("/v0/users/%s/collections/-/persons/%d", username, personID)).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
+
+	require.Equal(t, personID, r.ID, resp.BodyString())
+	require.Equal(t, "v", r.Name, resp.BodyString())
+}
+
+func TestUser_ListPersonCollection(t *testing.T) {
+	t.Parallel()
+	const username = "ni"
+	const userID model.UserID = 7
+	const personID model.PersonID = 9
+
+	m := mocks.NewUserRepo(t)
+	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
+
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().ListPersonCollection(mock.Anything, userID, mock.Anything, 10, 0).
+		Return([]collection.UserPersonCollection{{UserID: userID, Category: "prsn", TargetID: personID}}, nil)
+	c.EXPECT().CountPersonCollections(mock.Anything, userID, mock.Anything).
+		Return(1, nil)
+
+	p := mocks.NewPersonRepo(t)
+	p.EXPECT().GetByIDs(mock.Anything, mock.Anything).Return(map[model.PersonID]model.Person{
+		personID: {ID: personID, Name: "v"},
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, PersonRepo: p})
+
+	var r struct {
+		Data   json.RawMessage `json:"data"`
+		Total  int64           `json:"total"`
+		Limit  int             `json:"limit"`
+		Offset int             `json:"offset"`
+	}
+
+	resp := htest.New(t, app).
+		Query("limit", "10").
+		Get(fmt.Sprintf("/v0/users/%s/collections/-/persons", username)).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
+
+	var data []res.PersonCollection
+	require.NoError(t, json.Unmarshal(r.Data, &data))
+
+	require.Len(t, data, 1)
+
+	require.Equal(t, personID, data[0].ID, resp.BodyString())
+	require.Equal(t, "v", data[0].Name, resp.BodyString())
+}
+
+func TestUser_GetCharacterCollection(t *testing.T) {
+	t.Parallel()
+	const username = "ni"
+	const userID model.UserID = 7
+	const characterID model.CharacterID = 9
+
+	m := mocks.NewUserRepo(t)
+	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().GetPersonCollection(mock.Anything, userID, mock.Anything, mock.Anything).
+		Return(collection.UserPersonCollection{UserID: userID, Category: "crt", TargetID: characterID}, nil)
+
+	p := mocks.NewCharacterRepo(t)
+	p.EXPECT().Get(mock.Anything, characterID).Return(model.Character{
+		ID:   characterID,
+		Name: "v",
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, CharacterRepo: p})
+
+	var r res.PersonCollection
+	resp := htest.New(t, app).
+		Get(fmt.Sprintf("/v0/users/%s/collections/-/characters/%d", username, characterID)).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
+
+	require.Equal(t, characterID, r.ID, resp.BodyString())
+	require.Equal(t, "v", r.Name, resp.BodyString())
+}
+
+func TestUser_ListCharacterCollection(t *testing.T) {
+	t.Parallel()
+	const username = "ni"
+	const userID model.UserID = 7
+	const characterID model.CharacterID = 9
+
+	m := mocks.NewUserRepo(t)
+	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
+
+	c := mocks.NewCollectionRepo(t)
+	c.EXPECT().ListPersonCollection(mock.Anything, userID, mock.Anything, 10, 0).
+		Return([]collection.UserPersonCollection{{UserID: userID, Category: "crt", TargetID: characterID}}, nil)
+	c.EXPECT().CountPersonCollections(mock.Anything, userID, mock.Anything).
+		Return(1, nil)
+
+	p := mocks.NewCharacterRepo(t)
+	p.EXPECT().GetByIDs(mock.Anything, mock.Anything).Return(map[model.CharacterID]model.Character{
+		characterID: {ID: characterID, Name: "v"},
+	}, nil)
+
+	app := test.GetWebApp(t, test.Mock{UserRepo: m, CollectionRepo: c, CharacterRepo: p})
+
+	var r struct {
+		Data   json.RawMessage `json:"data"`
+		Total  int64           `json:"total"`
+		Limit  int             `json:"limit"`
+		Offset int             `json:"offset"`
+	}
+
+	resp := htest.New(t, app).
+		Query("limit", "10").
+		Get(fmt.Sprintf("/v0/users/%s/collections/-/characters", username)).
+		JSON(&r).
+		ExpectCode(http.StatusOK)
+
+	var data []res.PersonCollection
+	require.NoError(t, json.Unmarshal(r.Data, &data))
+
+	require.Len(t, data, 1)
+
+	require.Equal(t, characterID, data[0].ID, resp.BodyString())
+	require.Equal(t, "v", data[0].Name, resp.BodyString())
+}
