@@ -481,6 +481,23 @@ func main() {
 		gen.FieldRename("msg_rdeleted", "DeletedByReceiver"),
 	))
 
+	g.ApplyBasic(g.GenerateModelAs("chii_index_comments", "IndexComment",
+		gen.FieldTrimPrefix("idx_pst_"),
+		gen.FieldType("idx_pst_id", "uint32"),
+		gen.FieldType("idx_pst_mid", "uint32"),
+		gen.FieldType("idx_pst_uid", "uint32"),
+		gen.FieldType("idx_pst_related", "uint32"),
+		gen.FieldType("idx_pst_dateline", "int32"),
+		gen.FieldType("idx_pst_content", "string"),
+
+		gen.FieldRename("idx_pst_id", "PostID"),
+		gen.FieldRename("idx_pst_mid", "FieldID"),
+		gen.FieldRename("idx_pst_uid", "UserID"),
+		gen.FieldRename("idx_pst_related", "RelatedMessageID"),
+		gen.FieldRename("idx_pst_dateline", createdTime),
+		gen.FieldRename("idx_pst_content", "Content"),
+	))
+
 	// execute the action of code generation
 	g.Execute()
 }
