@@ -67,7 +67,8 @@ func AddRouters(
 	v0.GET("/persons/:id/subjects", personHandler.GetRelatedSubjects)
 	v0.GET("/persons/:id/characters", personHandler.GetRelatedCharacters)
 	v0.POST("/persons/:id/collect", personHandler.CollectPerson, mw.NeedLogin)
-	v0.DELETE("/persons/:id/collect", personHandler.UncollectPerson, mw.NeedLogin)
+	// FIXME: wait for soft delete
+	// v0.DELETE("/persons/:id/collect", personHandler.UncollectPerson, mw.NeedLogin)
 
 	v0.GET("/characters/:id", characterHandler.Get)
 	v0.GET("/characters/:id/image", characterHandler.GetImage)
