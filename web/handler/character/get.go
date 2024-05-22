@@ -36,7 +36,7 @@ func (h Character) Get(c echo.Context) error {
 		return err
 	}
 
-	r, err := h.c.Get(c.Request().Context(), id)
+	r, err := h.character.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
@@ -62,7 +62,7 @@ func (h Character) GetImage(c echo.Context) error {
 		return err
 	}
 
-	p, err := h.c.Get(c.Request().Context(), id)
+	p, err := h.character.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound

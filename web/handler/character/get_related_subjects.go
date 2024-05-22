@@ -65,7 +65,7 @@ func (h Character) getCharacterRelatedSubjects(
 	ctx context.Context,
 	characterID model.CharacterID,
 ) (model.Character, []model.SubjectCharacterRelation, error) {
-	character, err := h.c.Get(ctx, characterID)
+	character, err := h.character.Get(ctx, characterID)
 	if err != nil {
 		return model.Character{}, nil, errgo.Wrap(err, "get character")
 	}

@@ -51,3 +51,18 @@ type UserEpisodeCollection struct {
 }
 
 type UserSubjectEpisodesCollection map[model.EpisodeID]UserEpisodeCollection
+
+type PersonCollectCategory string
+
+const (
+	PersonCollectCategoryPerson    PersonCollectCategory = "prsn"
+	PersonCollectCategoryCharacter PersonCollectCategory = "crt"
+)
+
+type UserPersonCollection struct {
+	ID        uint32
+	Category  string
+	TargetID  model.PersonID
+	UserID    model.UserID
+	CreatedAt time.Time
+}

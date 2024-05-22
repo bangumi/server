@@ -33,7 +33,7 @@ func (h Character) GetRelatedPersons(c echo.Context) error {
 		return err
 	}
 
-	_, err = h.c.Get(c.Request().Context(), id)
+	_, err = h.character.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound

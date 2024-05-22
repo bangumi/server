@@ -19,6 +19,7 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/ctrl"
+	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collections"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/person"
@@ -27,18 +28,20 @@ import (
 )
 
 type User struct {
-	ctrl    ctrl.Ctrl
-	episode episode.Repo
-	person  person.Service
-	collect collections.Repo
-	subject subject.CachedRepo
-	log     *zap.Logger
-	user    user.Repo
-	cfg     config.AppConfig
+	ctrl      ctrl.Ctrl
+	episode   episode.Repo
+	character character.Repo
+	person    person.Repo
+	collect   collections.Repo
+	subject   subject.CachedRepo
+	log       *zap.Logger
+	user      user.Repo
+	cfg       config.AppConfig
 }
 
 func New(
-	p person.Service,
+	person person.Repo,
+	character character.Repo,
 	user user.Repo,
 	ctrl ctrl.Ctrl,
 	subject subject.Repo,
@@ -47,13 +50,14 @@ func New(
 	log *zap.Logger,
 ) (User, error) {
 	return User{
-		ctrl:    ctrl,
-		episode: episode,
-		collect: collect,
-		subject: subject,
-		user:    user,
-		person:  p,
-		log:     log.Named("handler.User"),
-		cfg:     config.AppConfig{},
+		ctrl:      ctrl,
+		episode:   episode,
+		collect:   collect,
+		subject:   subject,
+		user:      user,
+		person:    person,
+		character: character,
+		log:       log.Named("handler.User"),
+		cfg:       config.AppConfig{},
 	}, nil
 }

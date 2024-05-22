@@ -24,6 +24,7 @@ NOTICE:
 package main
 
 import (
+	"path/filepath"
 	"strings"
 
 	"gorm.io/gen"
@@ -58,9 +59,9 @@ const createdTime = "CreatedTime"
 // generate code.
 func main() {
 	g := gen.NewGenerator(gen.Config{
-		OutPath:      "./dal/query/",
-		OutFile:      "./gen.go",
-		ModelPkgPath: "./dao/",
+		OutPath:      filepath.Clean("./dal/query/"),
+		OutFile:      "gen.go",
+		ModelPkgPath: "dao",
 
 		WithUnitTest: false,
 		// if you want the nullable field generation property to be pointer type, set FieldNullable true
@@ -78,6 +79,7 @@ func main() {
 		"github.com/bangumi/server/dal/utiltype",
 		"gorm.io/plugin/soft_delete",
 	)
+
 	g.WithJSONTagNameStrategy(func(_ string) string {
 		return ""
 	})
@@ -208,6 +210,19 @@ func main() {
 		gen.FieldType("interest_private", "uint8"),
 		gen.FieldRename("interest_lasttouch", "UpdatedTime"),
 		gen.FieldTrimPrefix("interest_"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_person_collects", "PersonCollect",
+		gen.FieldTrimPrefix("prsn_clt_"),
+		gen.FieldType("prsn_clt_id", "uint32"),
+		gen.FieldType("prsn_clt_cat", "string"),
+		gen.FieldType("prsn_clt_uid", userIDTypeString),
+		gen.FieldType("prsn_clt_mid", "uint32"),
+		gen.FieldType("prsn_clt_dateline", "uint32"),
+		gen.FieldRename("prsn_clt_cat", "Category"),
+		gen.FieldRename("prsn_clt_uid", "UserID"),
+		gen.FieldRename("prsn_clt_mid", "TargetID"),
+		gen.FieldRename("prsn_clt_dateline", createdTime),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
