@@ -624,7 +624,7 @@ func TestMysqlRepo_CountPersonCollections(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const uid model.UserID = 41000
+	const uid model.UserID = 42000
 	const cat = "prsn"
 
 	repo, q := getRepo(t)
@@ -657,7 +657,7 @@ func TestMysqlRepo_ListPersonCollection(t *testing.T) {
 	t.Parallel()
 	test.RequireEnv(t, test.EnvMysql)
 
-	const uid model.UserID = 42000
+	const uid model.UserID = 43000
 	const cat = "prsn"
 
 	repo, q := getRepo(t)
