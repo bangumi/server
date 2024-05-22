@@ -519,13 +519,12 @@ func TestMysqlRepo_GetPersonCollect(t *testing.T) {
 	const mid model.PersonID = 12000
 
 	repo, q := getRepo(t)
-	table := q.PersonCollect
 	test.RunAndCleanup(t, func() {
-		_, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Delete()
+		_, err := q.PersonCollect.WithContext(context.TODO()).Where(q.PersonCollect.UserID.Eq(uid)).Delete()
 		require.NoError(t, err)
 	})
 
-	err := table.WithContext(context.Background()).Create(&dao.PersonCollect{
+	err := q.PersonCollect.WithContext(context.Background()).Create(&dao.PersonCollect{
 		UserID:      uid,
 		Category:    cat,
 		TargetID:    mid,
@@ -547,20 +546,33 @@ func TestMysqlRepo_AddPersonCollect(t *testing.T) {
 	const uid model.UserID = 40000
 	const cat = "prsn"
 	const mid model.PersonID = 13000
+	const collects uint32 = 10
 
 	repo, q := getRepo(t)
 	table := q.PersonCollect
 	test.RunAndCleanup(t, func() {
 		_, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Delete()
 		require.NoError(t, err)
+		_, err = q.Person.WithContext(context.TODO()).Where(q.Person.ID.Eq(mid)).Delete()
+		require.NoError(t, err)
 	})
 
-	err := repo.AddPersonCollection(context.Background(), uid, cat, mid)
+	err := q.Person.WithContext(context.Background()).Create(&dao.Person{
+		ID:       mid,
+		Collects: collects,
+	})
+	require.NoError(t, err)
+
+	err = repo.AddPersonCollection(context.Background(), uid, cat, mid)
 	require.NoError(t, err)
 
 	r, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 	require.NotZero(t, r.ID)
+
+	p, err := q.Person.WithContext(context.Background()).Where(q.Person.ID.Eq(mid)).Take()
+	require.NoError(t, err)
+	require.Equal(t, collects+1, p.Collects)
 }
 
 func TestMysqlRepo_RemovePersonCollect(t *testing.T) {
@@ -570,15 +582,22 @@ func TestMysqlRepo_RemovePersonCollect(t *testing.T) {
 	const uid model.UserID = 41000
 	const cat = "prsn"
 	const mid model.PersonID = 14000
+	const collects uint32 = 10
 
 	repo, q := getRepo(t)
-	table := q.PersonCollect
 	test.RunAndCleanup(t, func() {
-		_, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Delete()
+		_, err := q.PersonCollect.WithContext(context.TODO()).Where(q.PersonCollect.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+		_, err = q.Person.WithContext(context.TODO()).Where(q.Person.ID.Eq(mid)).Delete()
 		require.NoError(t, err)
 	})
 
-	err := table.WithContext(context.Background()).Create(&dao.PersonCollect{
+	err := q.Person.WithContext(context.Background()).Create(&dao.Person{
+		ID:       mid,
+		Collects: collects,
+	})
+	require.NoError(t, err)
+	err = q.PersonCollect.WithContext(context.Background()).Create(&dao.PersonCollect{
 		UserID:      uid,
 		Category:    cat,
 		TargetID:    mid,
@@ -586,15 +605,19 @@ func TestMysqlRepo_RemovePersonCollect(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	r, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Take()
+	r, err := q.PersonCollect.WithContext(context.TODO()).Where(q.PersonCollect.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 	require.NotZero(t, r.ID)
 
 	err = repo.RemovePersonCollection(context.Background(), uid, cat, mid)
 	require.NoError(t, err)
 
-	_, err = table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Take()
+	_, err = q.PersonCollect.WithContext(context.TODO()).Where(q.PersonCollect.UserID.Eq(uid)).Take()
 	require.ErrorIs(t, err, gorm.ErrRecordNotFound)
+
+	p, err := q.Person.WithContext(context.Background()).Where(q.Person.ID.Eq(mid)).Take()
+	require.NoError(t, err)
+	require.Equal(t, collects-1, p.Collects)
 }
 
 func TestMysqlRepo_CountPersonCollections(t *testing.T) {

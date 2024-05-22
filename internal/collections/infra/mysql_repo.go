@@ -488,18 +488,36 @@ func (r mysqlRepo) AddPersonCollection(
 	ctx context.Context, userID model.UserID,
 	cat collection.PersonCollectCategory, targetID model.PersonID,
 ) error {
-	var table = r.q.PersonCollect
-	err := table.WithContext(ctx).Create(&dao.PersonCollect{
+	collect := &dao.PersonCollect{
 		UserID:      userID,
 		Category:    string(cat),
 		TargetID:    targetID,
 		CreatedTime: uint32(time.Now().Unix()),
+	}
+	err := r.q.Transaction(func(tx *query.Query) error {
+		switch cat {
+		case collection.PersonCollectCategoryCharacter:
+			if _, err := tx.Character.WithContext(ctx).Where(
+				tx.Character.ID.Eq(targetID)).UpdateSimple(tx.Character.Collects.Add(1)); err != nil {
+				r.log.Error("failed to update character collects", zap.Error(err))
+				return err
+			}
+		case collection.PersonCollectCategoryPerson:
+			if _, err := tx.Person.WithContext(ctx).Where(
+				tx.Person.ID.Eq(targetID)).UpdateSimple(tx.Person.Collects.Add(1)); err != nil {
+				r.log.Error("failed to update person collects", zap.Error(err))
+				return err
+			}
+		}
+		if err := tx.PersonCollect.WithContext(ctx).Create(collect); err != nil {
+			r.log.Error("failed to create person collection record", zap.Error(err))
+			return err
+		}
+		return nil
 	})
 	if err != nil {
-		r.log.Error("failed to create person collection record", zap.Error(err))
 		return errgo.Wrap(err, "dal")
 	}
-
 	return nil
 }
 
@@ -507,11 +525,33 @@ func (r mysqlRepo) RemovePersonCollection(
 	ctx context.Context, userID model.UserID,
 	cat collection.PersonCollectCategory, targetID model.PersonID,
 ) error {
-	_, err := r.q.PersonCollect.WithContext(ctx).
-		Where(r.q.PersonCollect.UserID.Eq(userID), r.q.PersonCollect.Category.Eq(string(cat)),
-			r.q.PersonCollect.TargetID.Eq(targetID)).Delete()
+	err := r.q.Transaction(func(tx *query.Query) error {
+		switch cat {
+		case collection.PersonCollectCategoryCharacter:
+			if _, err := tx.Character.WithContext(ctx).Where(
+				tx.Character.ID.Eq(targetID)).UpdateSimple(tx.Character.Collects.Sub(1)); err != nil {
+				r.log.Error("failed to update character collects", zap.Error(err))
+				return err
+			}
+		case collection.PersonCollectCategoryPerson:
+			if _, err := tx.Person.WithContext(ctx).Where(
+				tx.Person.ID.Eq(targetID)).UpdateSimple(tx.Person.Collects.Sub(1)); err != nil {
+				r.log.Error("failed to update person collects", zap.Error(err))
+				return err
+			}
+		}
+		_, err := tx.PersonCollect.WithContext(ctx).Where(
+			tx.PersonCollect.UserID.Eq(userID),
+			tx.PersonCollect.Category.Eq(string(cat)),
+			tx.PersonCollect.TargetID.Eq(targetID),
+		).Delete()
+		if err != nil {
+			r.log.Error("failed to delete person collection record", zap.Error(err))
+			return err
+		}
+		return nil
+	})
 	if err != nil {
-		r.log.Error("failed to delete person collection record", zap.Error(err))
 		return errgo.Wrap(err, "dal")
 	}
 
