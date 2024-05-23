@@ -24,6 +24,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		CharacterSubjects: newCharacterSubjects(db, opts...),
 		EpCollection:      newEpCollection(db, opts...),
 		Episode:           newEpisode(db, opts...),
+		EpisodeComment:    newEpisodeComment(db, opts...),
 		Friend:            newFriend(db, opts...),
 		Index:             newIndex(db, opts...),
 		IndexCollect:      newIndexCollect(db, opts...),
@@ -57,6 +58,7 @@ type Query struct {
 	CharacterSubjects characterSubjects
 	EpCollection      epCollection
 	Episode           episode
+	EpisodeComment    episodeComment
 	Friend            friend
 	Index             index
 	IndexCollect      indexCollect
@@ -91,6 +93,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		CharacterSubjects: q.CharacterSubjects.clone(db),
 		EpCollection:      q.EpCollection.clone(db),
 		Episode:           q.Episode.clone(db),
+		EpisodeComment:    q.EpisodeComment.clone(db),
 		Friend:            q.Friend.clone(db),
 		Index:             q.Index.clone(db),
 		IndexCollect:      q.IndexCollect.clone(db),
@@ -132,6 +135,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		CharacterSubjects: q.CharacterSubjects.replaceDB(db),
 		EpCollection:      q.EpCollection.replaceDB(db),
 		Episode:           q.Episode.replaceDB(db),
+		EpisodeComment:    q.EpisodeComment.replaceDB(db),
 		Friend:            q.Friend.replaceDB(db),
 		Index:             q.Index.replaceDB(db),
 		IndexCollect:      q.IndexCollect.replaceDB(db),
@@ -163,6 +167,7 @@ type queryCtx struct {
 	CharacterSubjects *characterSubjectsDo
 	EpCollection      *epCollectionDo
 	Episode           *episodeDo
+	EpisodeComment    *episodeCommentDo
 	Friend            *friendDo
 	Index             *indexDo
 	IndexCollect      *indexCollectDo
@@ -194,6 +199,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		CharacterSubjects: q.CharacterSubjects.WithContext(ctx),
 		EpCollection:      q.EpCollection.WithContext(ctx),
 		Episode:           q.Episode.WithContext(ctx),
+		EpisodeComment:    q.EpisodeComment.WithContext(ctx),
 		Friend:            q.Friend.WithContext(ctx),
 		Index:             q.Index.WithContext(ctx),
 		IndexCollect:      q.IndexCollect.WithContext(ctx),
