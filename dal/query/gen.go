@@ -42,6 +42,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Subject:           newSubject(db, opts...),
 		SubjectCollection: newSubjectCollection(db, opts...),
 		SubjectField:      newSubjectField(db, opts...),
+		SubjectPost:       newSubjectPost(db, opts...),
 		SubjectRelation:   newSubjectRelation(db, opts...),
 		SubjectRevision:   newSubjectRevision(db, opts...),
 		UserGroup:         newUserGroup(db, opts...),
@@ -76,6 +77,7 @@ type Query struct {
 	Subject           subject
 	SubjectCollection subjectCollection
 	SubjectField      subjectField
+	SubjectPost       subjectPost
 	SubjectRelation   subjectRelation
 	SubjectRevision   subjectRevision
 	UserGroup         userGroup
@@ -111,6 +113,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Subject:           q.Subject.clone(db),
 		SubjectCollection: q.SubjectCollection.clone(db),
 		SubjectField:      q.SubjectField.clone(db),
+		SubjectPost:       q.SubjectPost.clone(db),
 		SubjectRelation:   q.SubjectRelation.clone(db),
 		SubjectRevision:   q.SubjectRevision.clone(db),
 		UserGroup:         q.UserGroup.clone(db),
@@ -153,6 +156,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Subject:           q.Subject.replaceDB(db),
 		SubjectCollection: q.SubjectCollection.replaceDB(db),
 		SubjectField:      q.SubjectField.replaceDB(db),
+		SubjectPost:       q.SubjectPost.replaceDB(db),
 		SubjectRelation:   q.SubjectRelation.replaceDB(db),
 		SubjectRevision:   q.SubjectRevision.replaceDB(db),
 		UserGroup:         q.UserGroup.replaceDB(db),
@@ -185,6 +189,7 @@ type queryCtx struct {
 	Subject           *subjectDo
 	SubjectCollection *subjectCollectionDo
 	SubjectField      *subjectFieldDo
+	SubjectPost       *subjectPostDo
 	SubjectRelation   *subjectRelationDo
 	SubjectRevision   *subjectRevisionDo
 	UserGroup         *userGroupDo
@@ -217,6 +222,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Subject:           q.Subject.WithContext(ctx),
 		SubjectCollection: q.SubjectCollection.WithContext(ctx),
 		SubjectField:      q.SubjectField.WithContext(ctx),
+		SubjectPost:       q.SubjectPost.WithContext(ctx),
 		SubjectRelation:   q.SubjectRelation.WithContext(ctx),
 		SubjectRevision:   q.SubjectRevision.WithContext(ctx),
 		UserGroup:         q.UserGroup.WithContext(ctx),
