@@ -78,13 +78,13 @@ ORM: [GORM](https://github.com/go-gorm/gorm) 和 [GORM Gen](https://github.com/g
 启动 HTTP server
 
 ```shell
-go run main.go --config config.yaml web
+task web
 ```
 
 启动 kafka consumer
 
 ```shell
-go run main.go canal --config config.yaml
+task consumer
 ```
 
 ### 后端环境

@@ -1,0 +1,43 @@
+title: SubjectRealCategory
+example: 6
+enum:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 6001
+  - 6002
+  - 6003
+  - 6004
+type: integer
+description: |-
+  电影类型
+  - `0` 为 其他
+  - `1` 为 日剧
+  - `2` 为 欧美剧
+  - `3` 为 华语剧
+  - `6001` 为 电视剧
+  - `6002` 为 电影
+  - `6003` 为 演出
+  - `6004` 为 综艺
+x-ms-enum:
+  name: SubjectRealCategory
+  modelAsString: false
+  values:
+    - Other
+    - JP
+    - EN
+    - CN
+    - TV
+    - Movie
+    - Live
+    - Show
+x-enum-varnames:
+  - Other
+  - JP
+  - EN
+  - CN
+  - TV
+  - Movie
+  - Live
+  - Show

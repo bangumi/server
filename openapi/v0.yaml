@@ -196,6 +196,80 @@ paths:
                           description: 排名
                           "type": "integer"
 
+  "/v0/subjects":
+    get:
+      tags:
+        - 条目
+      summary: 浏览条目
+      operationId: getSubjects
+      parameters:
+        - name: type
+          in: query
+          description: 条目类型
+          required: true
+          schema:
+            $ref: "#/components/schemas/SubjectType"
+        - name: cat
+          in: query
+          description: 条目分类，参照 `SubjectCategory` enum
+          required: false
+          schema:
+            $ref: "#/components/schemas/SubjectCategory"
+        - name: series
+          in: query
+          description: 是否系列，仅对书籍类型的条目有效
+          required: false
+          schema:
+            type: boolean
+        - name: platform
+          in: query
+          description: 平台，仅对游戏类型的条目有效
+          required: false
+          schema:
+            type: string
+        - name: order
+          in: query
+          description: 排序，枚举值 {date|rank}
+          required: false
+          schema:
+            title: Sort Order
+            type: string
+        - name: year
+          in: query
+          description: 年份
+          required: false
+          schema:
+            type: integer
+        - name: month
+          in: query
+          description: 月份
+          required: false
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/default_query_limit"
+        - $ref: "#/components/parameters/default_query_offset"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Paged_Subject"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+
   "/v0/subjects/{subject_id}":
     get:
       tags:
@@ -2310,9 +2384,7 @@ components:
           title: ID
           type: integer
         type:
-          title: Type
-          type: integer
-          description: "`0` 本篇，`1` SP，`2` OP，`3` ED"
+          $ref: "#/components/schemas/EpType"
         name:
           title: Name
           type: string
@@ -2481,6 +2553,28 @@ components:
     Page:
       $ref: "./components/page.yaml"
 
+    Paged_Subject:
+      title: Paged[Subject]
+      type: object
+      properties:
+        total:
+          title: Total
+          type: integer
+          default: 0
+        limit:
+          title: Limit
+          type: integer
+          default: 0
+        offset:
+          title: Offset
+          type: integer
+          default: 0
+        data:
+          title: Data
+          type: array
+          items:
+            "$ref": "#/components/schemas/Subject"
+          default: []
     Paged_Episode:
       title: Paged[Episode]
       type: object
@@ -3002,6 +3096,20 @@ components:
       $ref: "./components/subject_tags.yaml"
     SubjectType:
       $ref: "./components/subject_type.yaml"
+    SubjectBookCategory:
+      $ref: "./components/subject_cat_book.yaml"
+    SubjectAnimeCategory:
+      $ref: "./components/subject_cat_anime.yaml"
+    SubjectGameCategory:
+      $ref: "./components/subject_cat_game.yaml"
+    SubjectRealCategory:
+      $ref: "./components/subject_cat_real.yaml"
+    SubjectCategory:
+      anyOf:
+        - $ref: "#/components/schemas/SubjectBookCategory"
+        - $ref: "#/components/schemas/SubjectAnimeCategory"
+        - $ref: "#/components/schemas/SubjectGameCategory"
+        - $ref: "#/components/schemas/SubjectRealCategory"
     UserSubjectCollection:
       $ref: "./components/user_subject_collection.yaml"
     UserSubjectCollectionModifyPayload:
