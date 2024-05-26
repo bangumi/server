@@ -244,7 +244,9 @@ func (r mysqlRepo) Count(
 	if filter.Series.Set {
 		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
 	}
-	// TODO:(everpcpc): add platform filter
+	if filter.Platform.Set {
+		q = q.Where(r.q.Subject.Infobox.Like(filter.Platform.Value))
+	}
 	if filter.Year.Set {
 		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))
 	}
@@ -277,7 +279,9 @@ func (r mysqlRepo) Browse(
 	if filter.Series.Set {
 		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
 	}
-	// TODO:(everpcpc): add platform filter
+	if filter.Platform.Set {
+		q = q.Where(r.q.Subject.Infobox.Like(filter.Platform.Value))
+	}
 	if filter.Year.Set {
 		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))
 	}
