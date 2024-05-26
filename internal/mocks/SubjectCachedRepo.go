@@ -26,6 +26,67 @@ func (_m *SubjectCachedRepo) EXPECT() *SubjectCachedRepo_Expecter {
 	return &SubjectCachedRepo_Expecter{mock: &_m.Mock}
 }
 
+// Browse provides a mock function with given fields: ctx, filter, limit, offset
+func (_m *SubjectCachedRepo) Browse(ctx context.Context, filter subject.BrowseFilter, limit int, offset int) ([]model.Subject, error) {
+	ret := _m.Called(ctx, filter, limit, offset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Browse")
+	}
+
+	var r0 []model.Subject
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, subject.BrowseFilter, int, int) ([]model.Subject, error)); ok {
+		return rf(ctx, filter, limit, offset)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, subject.BrowseFilter, int, int) []model.Subject); ok {
+		r0 = rf(ctx, filter, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Subject)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, subject.BrowseFilter, int, int) error); ok {
+		r1 = rf(ctx, filter, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SubjectCachedRepo_Browse_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Browse'
+type SubjectCachedRepo_Browse_Call struct {
+	*mock.Call
+}
+
+// Browse is a helper method to define mock.On call
+//   - ctx context.Context
+//   - filter subject.BrowseFilter
+//   - limit int
+//   - offset int
+func (_e *SubjectCachedRepo_Expecter) Browse(ctx interface{}, filter interface{}, limit interface{}, offset interface{}) *SubjectCachedRepo_Browse_Call {
+	return &SubjectCachedRepo_Browse_Call{Call: _e.mock.On("Browse", ctx, filter, limit, offset)}
+}
+
+func (_c *SubjectCachedRepo_Browse_Call) Run(run func(ctx context.Context, filter subject.BrowseFilter, limit int, offset int)) *SubjectCachedRepo_Browse_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(subject.BrowseFilter), args[2].(int), args[3].(int))
+	})
+	return _c
+}
+
+func (_c *SubjectCachedRepo_Browse_Call) Return(_a0 []model.Subject, _a1 error) *SubjectCachedRepo_Browse_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SubjectCachedRepo_Browse_Call) RunAndReturn(run func(context.Context, subject.BrowseFilter, int, int) ([]model.Subject, error)) *SubjectCachedRepo_Browse_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, id, filter
 func (_m *SubjectCachedRepo) Get(ctx context.Context, id uint32, filter subject.Filter) (model.Subject, error) {
 	ret := _m.Called(ctx, id, filter)

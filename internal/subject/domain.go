@@ -27,6 +27,12 @@ type Filter struct {
 	NSFW null.Bool
 }
 
+type BrowseFilter struct {
+	SubjectType uint8
+
+	NSFW null.Bool
+}
+
 type Repo interface {
 	read
 }
@@ -39,6 +45,8 @@ type read interface {
 	// Get return a repository model.
 	Get(ctx context.Context, id model.SubjectID, filter Filter) (model.Subject, error)
 	GetByIDs(ctx context.Context, ids []model.SubjectID, filter Filter) (map[model.SubjectID]model.Subject, error)
+
+	Browse(ctx context.Context, filter BrowseFilter, limit, offset int) ([]model.Subject, error)
 
 	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]domain.SubjectPersonRelation, error)
 	GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]domain.SubjectCharacterRelation, error)

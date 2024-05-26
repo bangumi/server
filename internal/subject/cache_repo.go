@@ -71,6 +71,13 @@ func (r cacheRepo) GetByIDs(
 	return r.repo.GetByIDs(ctx, ids, filter)
 }
 
+func (r cacheRepo) Browse(
+	ctx context.Context, filter BrowseFilter, limit, offset int,
+) ([]model.Subject, error) {
+	// TODO: cache first page
+	return r.repo.Browse(ctx, filter, limit, offset)
+}
+
 func (r cacheRepo) GetPersonRelated(
 	ctx context.Context, personID model.PersonID,
 ) ([]domain.SubjectPersonRelation, error) {

@@ -231,6 +231,13 @@ func (r mysqlRepo) GetByIDs(
 	return result, nil
 }
 
+func (r mysqlRepo) Browse(
+	ctx context.Context, filter BrowseFilter, limit, offset int,
+) ([]model.Subject, error) {
+	// TODO:
+	return []model.Subject{}, nil
+}
+
 func (r mysqlRepo) GetActors(
 	ctx context.Context,
 	subjectID model.SubjectID,
