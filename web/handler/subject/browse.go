@@ -40,7 +40,7 @@ func (h Subject) Browse(c echo.Context) error {
 		return err
 	}
 
-	count, err := h.subject.Count(c.Request().Context(), filter)
+	count, err := h.subject.Count(c.Request().Context(), *filter)
 	if err != nil {
 		return errgo.Wrap(err, "failed to count subjects")
 	}
@@ -53,7 +53,7 @@ func (h Subject) Browse(c echo.Context) error {
 		return err
 	}
 
-	subjects, err := h.subject.Browse(c.Request().Context(), filter, page.Limit, page.Offset)
+	subjects, err := h.subject.Browse(c.Request().Context(), *filter, page.Limit, page.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "failed to browse subjects")
 	}
@@ -65,29 +65,26 @@ func (h Subject) Browse(c echo.Context) error {
 	return c.JSON(http.StatusOK, res.Paged{Data: data, Total: count, Limit: page.Limit, Offset: page.Offset})
 }
 
-func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
-	filter = subject.BrowseFilter{}
+func parseBrowseQuery(c echo.Context) (*subject.BrowseFilter, error) {
+	filter := subject.BrowseFilter{}
 	u := accessor.GetFromCtx(c)
 	filter.NSFW = null.Bool{Value: !u.AllowNSFW(), Set: true}
-	if stype, e := req.ParseSubjectType(c.QueryParam("type")); e != nil {
-		err = res.BadRequest(e.Error())
-		return
+	if stype, err := req.ParseSubjectType(c.QueryParam("type")); err != nil {
+		return nil, res.BadRequest(err.Error())
 	} else {
 		filter.Type = stype
 	}
 	if catStr := c.QueryParam("cat"); catStr != "" {
-		if cat, e := req.ParseSubjectCategory(filter.Type, catStr); e != nil {
-			err = res.BadRequest(e.Error())
-			return
+		if cat, err := req.ParseSubjectCategory(filter.Type, catStr); err != nil {
+			return nil, res.BadRequest(err.Error())
 		} else {
 			filter.Category = null.Uint16{Value: cat, Set: true}
 		}
 	}
 	if filter.Type == model.SubjectTypeBook {
 		if seriesStr := c.QueryParam("series"); seriesStr != "" {
-			if series, e := gstr.ParseBool(seriesStr); e != nil {
-				err = res.BadRequest(e.Error())
-				return
+			if series, err := gstr.ParseBool(seriesStr); err != nil {
+				return nil, res.BadRequest(err.Error())
 			} else {
 				filter.Series = null.Bool{Value: series, Set: true}
 			}
@@ -104,25 +101,22 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 		case "rank", "date":
 			filter.Order = null.String{Value: order, Set: true}
 		default:
-			err = res.BadRequest("unknown order: " + order)
-			return
+			return nil, res.BadRequest("unknown order: " + order)
 		}
 	}
 	if yearStr := c.QueryParam("year"); yearStr != "" {
-		if year, e := gstr.ParseInt32(yearStr); e != nil {
-			err = res.BadRequest(e.Error())
-			return
+		if year, err := gstr.ParseInt32(yearStr); err != nil {
+			return nil, res.BadRequest(err.Error())
 		} else {
 			filter.Year = null.Int32{Value: year, Set: true}
 		}
 	}
 	if monthStr := c.QueryParam("month"); monthStr != "" {
-		if month, e := gstr.ParseInt8(monthStr); e != nil {
-			err = res.BadRequest(e.Error())
-			return
+		if month, err := gstr.ParseInt8(monthStr); err != nil {
+			return nil, res.BadRequest(err.Error())
 		} else {
 			filter.Month = null.Int8{Value: month, Set: true}
 		}
 	}
-	return
+	return &filter, nil
 }
