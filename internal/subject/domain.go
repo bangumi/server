@@ -28,9 +28,14 @@ type Filter struct {
 }
 
 type BrowseFilter struct {
-	SubjectType uint8
-
-	NSFW null.Bool
+	NSFW     null.Bool
+	Type     uint8
+	Category null.Uint16
+	Series   null.Bool
+	Platform null.String
+	Order    null.String
+	Year     null.Uint16
+	Month    null.Uint8
 }
 
 type Repo interface {
@@ -46,6 +51,7 @@ type read interface {
 	Get(ctx context.Context, id model.SubjectID, filter Filter) (model.Subject, error)
 	GetByIDs(ctx context.Context, ids []model.SubjectID, filter Filter) (map[model.SubjectID]model.Subject, error)
 
+	Count(ctx context.Context, filter BrowseFilter) (int64, error)
 	Browse(ctx context.Context, filter BrowseFilter, limit, offset int) ([]model.Subject, error)
 
 	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]domain.SubjectPersonRelation, error)

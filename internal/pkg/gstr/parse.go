@@ -26,8 +26,20 @@ func ParseUint8(s string) (uint8, error) {
 	return uint8(v), errgo.Wrap(err, "strconv")
 }
 
+func ParseUint16(s string) (uint16, error) {
+	v, err := strconv.ParseUint(s, 10, 16)
+
+	return uint16(v), errgo.Wrap(err, "strconv")
+}
+
 func ParseUint32(s string) (uint32, error) {
 	v, err := strconv.ParseUint(s, 10, 32)
 
 	return uint32(v), errgo.Wrap(err, "strconv")
+}
+
+func ParseBool(s string) (bool, error) {
+	v, err := strconv.ParseBool(s)
+
+	return v, errgo.Wrap(err, "strconv")
 }

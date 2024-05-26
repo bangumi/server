@@ -87,6 +87,63 @@ func (_c *SubjectRepo_Browse_Call) RunAndReturn(run func(context.Context, subjec
 	return _c
 }
 
+// Count provides a mock function with given fields: ctx, filter
+func (_m *SubjectRepo) Count(ctx context.Context, filter subject.BrowseFilter) (int64, error) {
+	ret := _m.Called(ctx, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Count")
+	}
+
+	var r0 int64
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, subject.BrowseFilter) (int64, error)); ok {
+		return rf(ctx, filter)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, subject.BrowseFilter) int64); ok {
+		r0 = rf(ctx, filter)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, subject.BrowseFilter) error); ok {
+		r1 = rf(ctx, filter)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SubjectRepo_Count_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Count'
+type SubjectRepo_Count_Call struct {
+	*mock.Call
+}
+
+// Count is a helper method to define mock.On call
+//   - ctx context.Context
+//   - filter subject.BrowseFilter
+func (_e *SubjectRepo_Expecter) Count(ctx interface{}, filter interface{}) *SubjectRepo_Count_Call {
+	return &SubjectRepo_Count_Call{Call: _e.mock.On("Count", ctx, filter)}
+}
+
+func (_c *SubjectRepo_Count_Call) Run(run func(ctx context.Context, filter subject.BrowseFilter)) *SubjectRepo_Count_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(subject.BrowseFilter))
+	})
+	return _c
+}
+
+func (_c *SubjectRepo_Count_Call) Return(_a0 int64, _a1 error) *SubjectRepo_Count_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SubjectRepo_Count_Call) RunAndReturn(run func(context.Context, subject.BrowseFilter) (int64, error)) *SubjectRepo_Count_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, id, filter
 func (_m *SubjectRepo) Get(ctx context.Context, id uint32, filter subject.Filter) (model.Subject, error) {
 	ret := _m.Called(ctx, id, filter)

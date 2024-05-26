@@ -71,6 +71,10 @@ func (r cacheRepo) GetByIDs(
 	return r.repo.GetByIDs(ctx, ids, filter)
 }
 
+func (r cacheRepo) Count(ctx context.Context, filter BrowseFilter) (int64, error) {
+	return r.repo.Count(ctx, filter)
+}
+
 func (r cacheRepo) Browse(
 	ctx context.Context, filter BrowseFilter, limit, offset int,
 ) ([]model.Subject, error) {

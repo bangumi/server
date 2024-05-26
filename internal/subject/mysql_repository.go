@@ -231,6 +231,13 @@ func (r mysqlRepo) GetByIDs(
 	return result, nil
 }
 
+func (r mysqlRepo) Count(
+	ctx context.Context,
+	filter BrowseFilter) (int64, error) {
+	// TODO:(everpcpc)
+	return 0, nil
+}
+
 func (r mysqlRepo) Browse(
 	ctx context.Context, filter BrowseFilter, limit, offset int,
 ) ([]model.Subject, error) {

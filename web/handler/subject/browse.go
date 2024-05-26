@@ -19,6 +19,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/web/accessor"
@@ -32,6 +33,16 @@ func (h Subject) Browse(c echo.Context) error {
 		return err
 	}
 
+	filter, err := parseBrowseQuery(c)
+	if err != nil {
+		return err
+	}
+
+	subjects, err = h.subject.Browse(c.Request().Context(), filter, page.Limit, page.Offset)
+	if err != nil {
+		return err
+	}
+
 	return c.JSON(http.StatusOK, res.Paged{Data: []res.SubjectV0{}, Total: 0, Limit: page.Limit, Offset: page.Offset})
 }
 
@@ -41,49 +52,63 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 	u := accessor.GetFromCtx(c)
 	filter.NSFW = null.Bool{Value: !u.AllowNSFW(), Set: true}
 
-	filter.SubjectType, err = req.ParseSubjectType(c.QueryParam("type"))
-	if err != nil {
-		err = res.BadRequest(err.Error())
+	if stype, e := req.ParseSubjectType(c.QueryParam("type")); e != nil {
+		err = res.BadRequest(e.Error())
 		return
+	} else {
+		filter.Type = stype
+	}
+
+	if catStr := c.QueryParam("category"); catStr != "" {
+		if cat, e := req.ParseSubjectCategory(filter.Type, catStr); e != nil {
+			err = res.BadRequest(e.Error())
+			return
+		} else {
+			filter.Category = null.Uint16{Value: cat, Set: true}
+		}
+	}
+
+	if seriesStr := c.QueryParam("series"); seriesStr != "" {
+		if series, e := gstr.ParseBool(seriesStr); e != nil {
+			err = res.BadRequest(e.Error())
+			return
+		} else {
+			filter.Series = null.Bool{Value: series, Set: true}
+		}
+	}
+
+	if platform := c.QueryParam("platform"); platform != "" {
+		// TODO: check if platform is valid
+		filter.Platform = null.String{Value: platform, Set: true}
+	}
+
+	if order := c.QueryParam("order"); order != "" {
+		switch order {
+		case "rank", "date":
+			filter.Order = null.String{Value: order, Set: true}
+		default:
+			err = res.BadRequest("unknown order: " + order)
+			return
+		}
+	}
+
+	if yearStr := c.QueryParam("year"); yearStr != "" {
+		if year, e := gstr.ParseUint16(yearStr); e != nil {
+			err = res.BadRequest(e.Error())
+			return
+		} else {
+			filter.Year = null.Uint16{Value: year, Set: true}
+		}
+	}
+
+	if monthStr := c.QueryParam("month"); monthStr != "" {
+		if month, e := gstr.ParseUint8(monthStr); e != nil {
+			err = res.BadRequest(e.Error())
+			return
+		} else {
+			filter.Month = null.Uint8{Value: month, Set: true}
+		}
 	}
 
 	return
 }
-
-// - name: cat
-//   in: query
-//   description: 条目分类，参照 `SubjectCategory` enum
-//   required: false
-//   schema:
-// 	$ref: "#/components/schemas/SubjectCategory"
-// - name: series
-//   in: query
-//   description: 是否系列，仅对书籍类型的条目有效
-//   required: false
-//   schema:
-// 	type: boolean
-// - name: platform
-//   in: query
-//   description: 平台，仅对游戏类型的条目有效
-//   required: false
-//   schema:
-// 	type: string
-// - name: order
-//   in: query
-//   description: 排序，枚举值 {date|rank}
-//   required: false
-//   schema:
-// 	title: Sort Order
-// 	type: string
-// - name: year
-//   in: query
-//   description: 年份
-//   required: false
-//   schema:
-// 	type: integer
-// - name: month
-//   in: query
-//   description: 月份
-//   required: false
-//   schema:
-// 	type: integer
