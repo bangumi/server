@@ -67,17 +67,14 @@ func (h Subject) Browse(c echo.Context) error {
 
 func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 	filter = subject.BrowseFilter{}
-
 	u := accessor.GetFromCtx(c)
 	filter.NSFW = null.Bool{Value: !u.AllowNSFW(), Set: true}
-
 	if stype, e := req.ParseSubjectType(c.QueryParam("type")); e != nil {
 		err = res.BadRequest(e.Error())
 		return
 	} else {
 		filter.Type = stype
 	}
-
 	if catStr := c.QueryParam("cat"); catStr != "" {
 		if cat, e := req.ParseSubjectCategory(filter.Type, catStr); e != nil {
 			err = res.BadRequest(e.Error())
@@ -86,7 +83,6 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 			filter.Category = null.Uint16{Value: cat, Set: true}
 		}
 	}
-
 	if filter.Type == model.SubjectTypeBook {
 		if seriesStr := c.QueryParam("series"); seriesStr != "" {
 			if series, e := gstr.ParseBool(seriesStr); e != nil {
@@ -97,14 +93,12 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 			}
 		}
 	}
-
 	if filter.Type == model.SubjectTypeGame {
 		if platform := c.QueryParam("platform"); platform != "" {
 			// TODO: check if platform is valid
 			filter.Platform = null.String{Value: platform, Set: true}
 		}
 	}
-
 	if order := c.QueryParam("order"); order != "" {
 		switch order {
 		case "rank", "date":
@@ -114,7 +108,6 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 			return
 		}
 	}
-
 	if yearStr := c.QueryParam("year"); yearStr != "" {
 		if year, e := gstr.ParseInt32(yearStr); e != nil {
 			err = res.BadRequest(e.Error())
@@ -123,7 +116,6 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 			filter.Year = null.Int32{Value: year, Set: true}
 		}
 	}
-
 	if monthStr := c.QueryParam("month"); monthStr != "" {
 		if month, e := gstr.ParseInt8(monthStr); e != nil {
 			err = res.BadRequest(e.Error())
@@ -132,6 +124,5 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 			filter.Month = null.Int8{Value: month, Set: true}
 		}
 	}
-
 	return
 }
