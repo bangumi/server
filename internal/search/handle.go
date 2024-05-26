@@ -168,9 +168,6 @@ func (c *client) doSearch(
 	}
 
 	raw, err := c.subjectIndex.SearchRaw(words, &meilisearch.SearchRequest{
-		AttributesToSearchOn: []string{
-			"name",
-		},
 		Offset: int64(offset),
 		Limit:  int64(limit),
 		Filter: filter,

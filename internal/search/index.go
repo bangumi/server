@@ -43,7 +43,6 @@ type subjectIndex struct {
 func searchAbleAttribute() *[]string {
 	return &[]string{
 		"name",
-		"summary",
 		"tag",
 		"type",
 		"id",
