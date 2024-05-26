@@ -234,7 +234,7 @@ func (r mysqlRepo) GetByIDs(
 func (r mysqlRepo) Browse(
 	ctx context.Context, filter BrowseFilter, limit, offset int,
 ) ([]model.Subject, error) {
-	// TODO: everpcpc
+	// TODO:(everpcpc)
 	return []model.Subject{}, nil
 }
 
