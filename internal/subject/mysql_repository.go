@@ -234,7 +234,9 @@ func (r mysqlRepo) GetByIDs(
 func (r mysqlRepo) Count(
 	ctx context.Context,
 	filter BrowseFilter) (int64, error) {
-	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid)).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(
+		r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid),
+	).Where(r.q.Subject.TypeID.Eq(filter.Type))
 	if filter.NSFW.Set {
 		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
 	}
@@ -269,7 +271,9 @@ func (r mysqlRepo) Count(
 func (r mysqlRepo) Browse(
 	ctx context.Context, filter BrowseFilter, limit, offset int,
 ) ([]model.Subject, error) {
-	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid)).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(
+		r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid),
+	).Where(r.q.Subject.TypeID.Eq(filter.Type))
 	if filter.NSFW.Set {
 		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
 	}

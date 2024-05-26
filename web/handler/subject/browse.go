@@ -46,7 +46,8 @@ func (h Subject) Browse(c echo.Context) error {
 	}
 
 	if count == 0 {
-		return c.JSON(http.StatusOK, res.Paged{Data: []res.SubjectV0{}, Total: count, Limit: page.Limit, Offset: page.Offset})
+		return c.JSON(http.StatusOK, res.Paged{
+			Data: []res.SubjectV0{}, Total: count, Limit: page.Limit, Offset: page.Offset})
 	}
 
 	if err = page.Check(count); err != nil {
