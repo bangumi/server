@@ -10,6 +10,7 @@ required:
   - platform
   - volumes
   - eps
+  - series
   - total_episodes
   - rating
   - images
@@ -34,6 +35,10 @@ properties:
   summary:
     title: Summary
     type: string
+  series:
+    title: Series
+    type: boolean
+    description: 是否为书籍系列的主条目
   nsfw:
     title: Nsfw
     type: boolean
@@ -47,7 +52,7 @@ properties:
   platform:
     title: Platform
     type: string
-    description: TV, Web, 欧美剧, PS4...
+    description: TV, Web, 欧美剧, DLC...
   images:
     $ref: "./subject_image.yaml"
   infobox:
