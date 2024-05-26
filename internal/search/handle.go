@@ -43,8 +43,7 @@ type Client interface {
 	OnSubjectDelete(ctx context.Context, id model.SubjectID) error
 }
 
-// Handler
-// TODO: 想个办法挪到 web 里面去.
+// Handler TODO: 想个办法挪到 web 里面去.
 type Handler interface {
 	Handle(c echo.Context) error
 }
