@@ -234,15 +234,81 @@ func (r mysqlRepo) GetByIDs(
 func (r mysqlRepo) Count(
 	ctx context.Context,
 	filter BrowseFilter) (int64, error) {
-	// TODO:(everpcpc)
-	return 0, nil
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	if filter.NSFW.Set {
+		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
+	}
+	if filter.Category.Set {
+		q = q.Where(r.q.Subject.Platform.Eq(filter.Category.Value))
+	}
+	if filter.Series.Set {
+		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
+	}
+	// TODO:(everpcpc): add platform filter
+	if filter.Year.Set {
+		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))
+	}
+	if filter.Month.Set {
+		q = q.Where(r.q.SubjectField.Mon.Eq(filter.Month.Value))
+	}
+
+	if filter.Order.Set {
+		switch filter.Order.Value {
+		case "date":
+			q = q.Order(r.q.SubjectField.Date)
+		case "rank":
+			q = q.Order(r.q.SubjectField.Rank)
+		}
+	}
+
+	return q.Count()
 }
 
 func (r mysqlRepo) Browse(
 	ctx context.Context, filter BrowseFilter, limit, offset int,
 ) ([]model.Subject, error) {
-	// TODO:(everpcpc)
-	return []model.Subject{}, nil
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	if filter.NSFW.Set {
+		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
+	}
+	if filter.Category.Set {
+		q = q.Where(r.q.Subject.Platform.Eq(filter.Category.Value))
+	}
+	if filter.Series.Set {
+		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
+	}
+	// TODO:(everpcpc): add platform filter
+	if filter.Year.Set {
+		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))
+	}
+	if filter.Month.Set {
+		q = q.Where(r.q.SubjectField.Mon.Eq(filter.Month.Value))
+	}
+
+	if filter.Order.Set {
+		switch filter.Order.Value {
+		case "date":
+			q = q.Order(r.q.SubjectField.Date)
+		case "rank":
+			q = q.Order(r.q.SubjectField.Rank)
+		}
+	}
+
+	subjects, err := q.Limit(limit).Offset(offset).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var result = make([]model.Subject, len(subjects))
+	for i, subject := range subjects {
+		result[i], err = ConvertDao(subject)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
 }
 
 func (r mysqlRepo) GetActors(

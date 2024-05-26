@@ -111,20 +111,20 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 	}
 
 	if yearStr := c.QueryParam("year"); yearStr != "" {
-		if year, e := gstr.ParseUint16(yearStr); e != nil {
+		if year, e := gstr.ParseInt32(yearStr); e != nil {
 			err = res.BadRequest(e.Error())
 			return
 		} else {
-			filter.Year = null.Uint16{Value: year, Set: true}
+			filter.Year = null.Int32{Value: year, Set: true}
 		}
 	}
 
 	if monthStr := c.QueryParam("month"); monthStr != "" {
-		if month, e := gstr.ParseUint8(monthStr); e != nil {
+		if month, e := gstr.ParseInt8(monthStr); e != nil {
 			err = res.BadRequest(e.Error())
 			return
 		} else {
-			filter.Month = null.Uint8{Value: month, Set: true}
+			filter.Month = null.Int8{Value: month, Set: true}
 		}
 	}
 

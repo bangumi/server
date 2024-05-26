@@ -34,8 +34,8 @@ type BrowseFilter struct {
 	Series   null.Bool
 	Platform null.String
 	Order    null.String
-	Year     null.Uint16
-	Month    null.Uint8
+	Year     null.Int32
+	Month    null.Int8
 }
 
 type Repo interface {
