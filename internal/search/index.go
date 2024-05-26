@@ -29,7 +29,7 @@ type subjectIndex struct {
 	ID       model.SubjectID `json:"id"`
 	Summary  string          `json:"summary"`
 	Tag      []string        `json:"tag,omitempty" filterable:"true"`
-	Name     []string        `json:"name"`
+	Name     []string        `json:"name" searchable:"true"`
 	Date     int             `json:"date,omitempty" filterable:"true" sortable:"true"`
 	Score    float64         `json:"score" filterable:"true" sortable:"true"`
 	PageRank float64         `json:"page_rank" sortable:"true"`
@@ -38,15 +38,6 @@ type subjectIndex struct {
 	Platform uint16          `json:"platform,omitempty"`
 	Type     uint8           `json:"type" filterable:"true"`
 	NSFW     bool            `json:"nsfw" filterable:"true"`
-}
-
-func searchAbleAttribute() *[]string {
-	return &[]string{
-		"name",
-		"tag",
-		"type",
-		"id",
-	}
 }
 
 func rankRule() *[]string {
