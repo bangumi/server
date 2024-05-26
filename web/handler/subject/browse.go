@@ -18,6 +18,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -38,12 +39,29 @@ func (h Subject) Browse(c echo.Context) error {
 		return err
 	}
 
-	subjects, err = h.subject.Browse(c.Request().Context(), filter, page.Limit, page.Offset)
+	count, err := h.subject.Count(c.Request().Context(), filter)
 	if err != nil {
+		return errgo.Wrap(err, "failed to count subjects")
+	}
+
+	if count == 0 {
+		return c.JSON(http.StatusOK, res.Paged{Data: []res.SubjectV0{}, Total: count, Limit: page.Limit, Offset: page.Offset})
+	}
+
+	if err = page.Check(count); err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, res.Paged{Data: []res.SubjectV0{}, Total: 0, Limit: page.Limit, Offset: page.Offset})
+	subjects, err := h.subject.Browse(c.Request().Context(), filter, page.Limit, page.Offset)
+	if err != nil {
+		return errgo.Wrap(err, "failed to browse subjects")
+	}
+	data := make([]res.SubjectV0, 0, len(subjects))
+	for _, s := range subjects {
+		data = append(data, convertModelSubject(s, 0))
+	}
+
+	return c.JSON(http.StatusOK, res.Paged{Data: data, Total: count, Limit: page.Limit, Offset: page.Offset})
 }
 
 func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
