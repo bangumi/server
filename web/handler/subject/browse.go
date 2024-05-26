@@ -19,12 +19,14 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
 func (h Subject) Browse(c echo.Context) error {
-	// u := accessor.GetFromCtx(c)
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
@@ -33,10 +35,13 @@ func (h Subject) Browse(c echo.Context) error {
 	return c.JSON(http.StatusOK, res.Paged{Data: []res.SubjectV0{}, Total: 0, Limit: page.Limit, Offset: page.Offset})
 }
 
-func parseBrowseQuery(c echo.Context) (query req.BrowseSubjects, err error) {
-	query = req.BrowseSubjects{}
+func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
+	filter = subject.BrowseFilter{}
 
-	query.SubjectType, err = req.ParseSubjectType(c.QueryParam("type"))
+	u := accessor.GetFromCtx(c)
+	filter.NSFW = null.Bool{Value: !u.AllowNSFW(), Set: true}
+
+	filter.SubjectType, err = req.ParseSubjectType(c.QueryParam("type"))
 	if err != nil {
 		err = res.BadRequest(err.Error())
 		return
