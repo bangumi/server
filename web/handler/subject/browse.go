@@ -20,6 +20,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
 
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
@@ -77,7 +78,7 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 		filter.Type = stype
 	}
 
-	if catStr := c.QueryParam("category"); catStr != "" {
+	if catStr := c.QueryParam("cat"); catStr != "" {
 		if cat, e := req.ParseSubjectCategory(filter.Type, catStr); e != nil {
 			err = res.BadRequest(e.Error())
 			return
@@ -86,18 +87,22 @@ func parseBrowseQuery(c echo.Context) (filter subject.BrowseFilter, err error) {
 		}
 	}
 
-	if seriesStr := c.QueryParam("series"); seriesStr != "" {
-		if series, e := gstr.ParseBool(seriesStr); e != nil {
-			err = res.BadRequest(e.Error())
-			return
-		} else {
-			filter.Series = null.Bool{Value: series, Set: true}
+	if filter.Type == model.SubjectTypeBook {
+		if seriesStr := c.QueryParam("series"); seriesStr != "" {
+			if series, e := gstr.ParseBool(seriesStr); e != nil {
+				err = res.BadRequest(e.Error())
+				return
+			} else {
+				filter.Series = null.Bool{Value: series, Set: true}
+			}
 		}
 	}
 
-	if platform := c.QueryParam("platform"); platform != "" {
-		// TODO: check if platform is valid
-		filter.Platform = null.String{Value: platform, Set: true}
+	if filter.Type == model.SubjectTypeGame {
+		if platform := c.QueryParam("platform"); platform != "" {
+			// TODO: check if platform is valid
+			filter.Platform = null.String{Value: platform, Set: true}
+		}
 	}
 
 	if order := c.QueryParam("order"); order != "" {
