@@ -105,7 +105,7 @@ func (r cacheRepo) Browse(
 	if err != nil {
 		return nil, err
 	}
-	key := cachekey.SubjectBrowse(hash)
+	key := cachekey.SubjectBrowse(hash, limit, offset)
 
 	var subjects []model.Subject
 	ok, err := r.cache.Get(ctx, key, &subjects)
