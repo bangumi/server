@@ -62,6 +62,59 @@ func TestMysqlRepo_Get_filter(t *testing.T) {
 	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
+func TestBrowse(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	filter := subject.BrowseFilter{
+		Type: 2,
+	}
+	s, err := repo.Browse(context.Background(), filter, 30, 0)
+	require.NoError(t, err)
+	require.Equal(t, 20, len(s))
+
+	filter = subject.BrowseFilter{
+		Type:     1,
+		Category: null.New(uint16(1003)),
+	}
+	s, err = repo.Browse(context.Background(), filter, 30, 0)
+	require.NoError(t, err)
+	require.Equal(t, 2, len(s))
+
+	filter = subject.BrowseFilter{
+		Type:   1,
+		Series: null.New(true),
+	}
+	s, err = repo.Browse(context.Background(), filter, 30, 0)
+	require.NoError(t, err)
+	require.Equal(t, 4, len(s))
+
+	filter = subject.BrowseFilter{
+		Type: 2,
+		Year: null.New(int32(2008)),
+	}
+	s, err = repo.Browse(context.Background(), filter, 30, 0)
+	require.NoError(t, err)
+	require.Equal(t, 2, len(s))
+
+	filter = subject.BrowseFilter{
+		Type: 4,
+		Sort: null.New("rank"),
+	}
+	s, err = repo.Browse(context.Background(), filter, 30, 0)
+	require.NoError(t, err)
+	require.Equal(t, 7, len(s))
+	require.Equal(t, model.SubjectID(5), s[0].ID)
+	require.Equal(t, model.SubjectID(13), s[1].ID)
+	require.Equal(t, model.SubjectID(14), s[2].ID)
+	require.Equal(t, model.SubjectID(9), s[3].ID)
+	require.Equal(t, model.SubjectID(6), s[4].ID)
+	require.Equal(t, model.SubjectID(7), s[5].ID)
+	require.Equal(t, model.SubjectID(4), s[6].ID)
+}
+
 func TestMysqlRepo_GetByIDs(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
