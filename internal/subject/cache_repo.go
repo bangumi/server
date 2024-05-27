@@ -39,6 +39,11 @@ type cacheRepo struct {
 	log   *zap.Logger
 }
 
+const (
+	browseCacheTTLFirst = 24 * time.Hour
+	browseCacheTTLOther = time.Hour
+)
+
 func (r cacheRepo) Get(ctx context.Context, id model.SubjectID, filter Filter) (model.Subject, error) {
 	var key = cachekey.Subject(id)
 
@@ -120,16 +125,15 @@ func (r cacheRepo) Browse(
 	if err != nil {
 		return nil, err
 	}
-	ttl := 24 * time.Hour
+	ttl := browseCacheTTLFirst
 	if offset > 0 {
-		ttl = time.Hour
+		ttl = browseCacheTTLOther
 	}
 	if e := r.cache.Set(ctx, key, subjects, ttl); e != nil {
 		r.log.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return subjects, nil
-
 }
 
 func (r cacheRepo) GetPersonRelated(
