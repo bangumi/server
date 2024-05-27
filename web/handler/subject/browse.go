@@ -105,25 +105,46 @@ func parseBrowseQuery(c echo.Context) (*subject.BrowseFilter, error) {
 			return nil, res.BadRequest("unknown sort: " + sort)
 		}
 	}
-	if yearStr := c.QueryParam("year"); yearStr != "" {
-		if year, err := gstr.ParseInt32(yearStr); err != nil {
-			return nil, res.BadRequest(err.Error())
-		} else {
-			if year < 1900 || year > 3000 {
-				return nil, res.BadRequest("invalid year: " + yearStr)
-			}
-			filter.Year = null.Int32{Value: year, Set: true}
-		}
+	if year, err := GetYearQuery(c); err != nil {
+		return nil, err
+	} else {
+		filter.Year = year
 	}
-	if monthStr := c.QueryParam("month"); monthStr != "" {
-		if month, err := gstr.ParseInt8(monthStr); err != nil {
-			return nil, res.BadRequest(err.Error())
-		} else {
-			if month < 1 || month > 12 {
-				return nil, res.BadRequest("invalid month: " + monthStr)
-			}
-			filter.Month = null.Int8{Value: month, Set: true}
-		}
+	if month, err := GetMonthQuery(c); err != nil {
+		return nil, err
+	} else {
+		filter.Month = month
 	}
+
 	return &filter, nil
+}
+
+func GetYearQuery(c echo.Context) (null.Int32, error) {
+	yearStr := c.QueryParam("year")
+	if yearStr == "" {
+		return null.Int32{}, nil
+	}
+	if year, err := gstr.ParseInt32(yearStr); err != nil {
+		return null.Int32{}, res.BadRequest(err.Error())
+	} else {
+		if year < 1900 || year > 3000 {
+			return null.Int32{}, res.BadRequest("invalid year: " + yearStr)
+		}
+		return null.Int32{Value: year, Set: true}, nil
+	}
+}
+
+func GetMonthQuery(c echo.Context) (null.Int8, error) {
+	monthStr := c.QueryParam("month")
+	if monthStr == "" {
+		return null.Int8{}, nil
+	}
+	if month, err := gstr.ParseInt8(monthStr); err != nil {
+		return null.Int8{}, res.BadRequest(err.Error())
+	} else {
+		if month < 1 || month > 12 {
+			return null.Int8{}, res.BadRequest("invalid month: " + monthStr)
+		}
+		return null.Int8{Value: month, Set: true}, nil
+	}
 }
