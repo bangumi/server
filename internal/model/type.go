@@ -28,6 +28,7 @@ type IndexID = uint32
 type RevisionID = uint32
 type RevisionType = uint8
 type TimeLineCat = uint16
+type CommentID = uint32
 
 type PrivateMessageID = uint32
 type NotificationID = uint32

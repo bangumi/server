@@ -19,6 +19,7 @@ package episode
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -151,5 +152,66 @@ func convertDaoEpisode(e *dao.Episode, firstEpisode float32) Episode {
 		Comment:     e.Comment,
 		Disc:        e.Disc,
 		ID:          e.ID,
+	}
+}
+
+func (r mysqlRepo) GetAllComment(ctx context.Context, episodeID model.EpisodeID, offset int, limit int) ([]model.EpisodeComment, error) {
+	s, err := r.q.EpisodeComment.WithContext(ctx).
+		Where(r.q.EpisodeComment.FieldID.Eq(episodeID)).
+		Offset(offset).Limit(limit).
+		Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+	result := make([]model.EpisodeComment, len(s))
+	for _, v := range s {
+		result = append(result, conventDao2Post(v))
+	}
+	return result, nil
+}
+
+func (r mysqlRepo) AddNewComment(ctx context.Context, comment model.EpisodeComment) error {
+	s, err := r.q.WithContext(ctx).EpisodeComment.
+		Order(r.q.EpisodeComment.PostID).Last()
+	if err != nil {
+		return errgo.Wrap(err, "dal")
+	}
+	id := s.PostID + 1
+
+	err = r.q.WithContext(ctx).EpisodeComment.
+		Create(&dao.EpisodeComment{
+			PostID:           id,
+			FieldID:          comment.Field,
+			UserID:           comment.User,
+			RelatedMessageID: comment.Related,
+			CreatedTime:      int32(comment.CreatedAt.Unix()),
+			Content:          comment.Content,
+		})
+	if err != nil {
+		return errgo.Wrap(err, "dal")
+	}
+	return nil
+}
+
+func (r mysqlRepo) DeleteComment(ctx context.Context, episodeID model.EpisodeID, userId model.UserID, commentID model.CommentID) error {
+	res, err := r.q.WithContext(ctx).EpisodeComment.
+		Where(r.q.EpisodeComment.PostID.Eq(commentID)).Delete()
+	if err != nil {
+		return errgo.Wrap(err, "dal")
+	}
+	if res.Error != nil {
+		return res.Error
+	}
+	return nil
+}
+
+func conventDao2Post(dao *dao.EpisodeComment) model.EpisodeComment {
+	return model.EpisodeComment{
+		ID:        dao.PostID,
+		Field:     dao.FieldID,
+		User:      dao.UserID,
+		Related:   dao.RelatedMessageID,
+		CreatedAt: time.Unix(int64(dao.CreatedTime), 0),
+		Content:   dao.Content,
 	}
 }

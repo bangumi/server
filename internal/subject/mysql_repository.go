@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"time"
 
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -252,4 +253,75 @@ func (r mysqlRepo) GetActors(
 	}
 
 	return results, nil
+}
+
+func (r mysqlRepo) GetAllPost(ctx context.Context, id model.SubjectID, offset int, limit int) ([]model.SubjectPost, error) {
+	s, err := r.q.WithContext(ctx).SubjectPost.
+		Where(r.q.EpisodeComment.FieldID.Eq(id)).
+		Offset(offset).Limit(limit).
+		Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+	var results []model.SubjectPost
+	results = make([]model.SubjectPost, 0, len(s))
+
+	for _, v := range s {
+		results = append(results, conventDao2Post(v))
+	}
+
+	return results, nil
+}
+
+func (r mysqlRepo) NewPost(ctx context.Context, post model.SubjectPost) error {
+	// 找最后一个PostID
+	lp, err := r.q.WithContext(ctx).SubjectPost.Order(r.q.SubjectPost.PostID).Last()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return errgo.Wrap(err, "dal")
+	}
+	pid := lp.PostID + 1
+
+	err = r.q.WithContext(ctx).SubjectPost.Create(&dao.SubjectPost{
+		PostID:           pid,
+		FieldID:          post.Field,
+		UserID:           post.User,
+		RelatedMessageID: post.Related,
+		Content:          post.Content,
+		PostState:        0,
+		CreatedTime:      int32(post.CreatedAt.Unix()),
+	})
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return errgo.Wrap(err, "dal")
+	}
+	return nil
+}
+
+func (r mysqlRepo) DeletePost(ctx context.Context, id model.CommentID) error {
+	result, err := r.q.WithContext(ctx).SubjectPost.
+		Where(r.q.SubjectPost.PostID.Eq(id)).
+		Delete()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return errgo.Wrap(err, "dal")
+	}
+	if result.Error != nil {
+		r.log.Error("unexpected error happened", zap.Error(result.Error))
+		return errgo.Wrap(result.Error, "dal")
+	}
+	return nil
+}
+
+func conventDao2Post(dao *dao.SubjectPost) model.SubjectPost {
+	return model.SubjectPost{
+		ID:        dao.PostID,
+		Field:     dao.FieldID,
+		User:      dao.UserID,
+		Related:   dao.RelatedMessageID,
+		CreatedAt: time.Unix(int64(dao.CreatedTime), 0),
+		Content:   dao.Content,
+		State:     0,
+	}
 }

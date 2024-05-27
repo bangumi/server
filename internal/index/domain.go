@@ -16,6 +16,7 @@ package index
 
 import (
 	"context"
+	"github.com/bangumi/server/dal/query"
 	"time"
 
 	"github.com/bangumi/server/internal/model"
@@ -23,6 +24,7 @@ import (
 
 type Repo interface {
 	IndexRepo
+	CommentRepo
 	SubjectRepo
 	CollectRepo
 }
@@ -57,6 +59,19 @@ type CollectRepo interface {
 
 	// DeleteIndexCollect remove index collect from given user
 	DeleteIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) error
+}
+
+type CommentRepo interface {
+	// WithQuery is used to replace repo's query to txn
+	WithQuery(query *query.Query) IndexRepo
+	// GetIndexComments 查询所有 当前 Index下的 Comment
+	GetIndexComments(ctx context.Context, id model.IndexID, offset int, limit int) ([]model.IndexComment, error)
+	// GetIndexComment 相对应的获取指定 Comment
+	GetIndexComment(ctx context.Context, id model.CommentID) (*model.IndexComment, error)
+	AddIndexComment(ctx context.Context, newComment model.IndexComment) error
+	// UpdateIndexComment 目录的评论需要更新吗？我不确定，但是先写再说
+	UpdateIndexComment(ctx context.Context, indexID model.IndexID, comment string) error
+	DeleteIndexComment(ctx context.Context, id model.IndexID) error
 }
 
 type Subject struct {

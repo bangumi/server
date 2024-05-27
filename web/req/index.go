@@ -30,3 +30,9 @@ type IndexSubjectInfo struct {
 	SortKey uint32 `json:"sort"`
 	Comment string `json:"comment"`
 }
+
+type IndexComment struct {
+	ID      model.CommentID `json:"id"`
+	FieldID model.IndexID   `json:"field_id"`
+	Comment string          `json:"comment"`
+}

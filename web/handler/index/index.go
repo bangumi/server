@@ -71,7 +71,7 @@ func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, boo
 			return res.Index{}, false, nil
 		}
 
-		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
+		return res.Index{}, false, errgo.Wrap(err, "Field.Get")
 	}
 
 	u, err := h.u.GetByID(c, i.CreatorID)
@@ -124,7 +124,7 @@ func (h Handler) getIndexSubjects(
 ) error {
 	count, err := h.i.CountSubjects(c.Request().Context(), id, subjectType)
 	if err != nil {
-		return errgo.Wrap(err, "Index.CountSubjects")
+		return errgo.Wrap(err, "Field.CountSubjects")
 	}
 
 	if count == 0 {
@@ -142,7 +142,7 @@ func (h Handler) getIndexSubjects(
 
 	subjects, err := h.i.ListSubjects(c.Request().Context(), id, subjectType, page.Limit, page.Offset)
 	if err != nil {
-		return errgo.Wrap(err, "Index.ListSubjects")
+		return errgo.Wrap(err, "Field.ListSubjects")
 	}
 
 	var data = make([]res.IndexSubjectV0, len(subjects))
@@ -182,7 +182,7 @@ func (h Handler) NewIndex(c echo.Context) error {
 	}
 	ctx := c.Request().Context()
 	if err := h.i.New(ctx, i); err != nil {
-		return errgo.Wrap(err, "failed to create a new index")
+		return errgo.Wrap(err, "failed to crea te a new index")
 	}
 	u, err := h.u.GetByID(ctx, i.CreatorID)
 	if err != nil {

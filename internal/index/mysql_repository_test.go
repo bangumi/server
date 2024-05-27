@@ -76,7 +76,7 @@ func TestMysqlRepo_NewIndex(t *testing.T) {
 	index := &model.Index{
 		ID:          0,
 		Title:       "test",
-		Description: "Test Index",
+		Description: "Test Field",
 		CreatorID:   382951,
 		CreatedAt:   now,
 		UpdatedAt:   now,
@@ -94,7 +94,7 @@ func TestMysqlRepo_NewIndex(t *testing.T) {
 
 	require.EqualValues(t, 382951, i.CreatorID)
 	require.EqualValues(t, "test", i.Title)
-	require.EqualValues(t, "Test Index", i.Description)
+	require.EqualValues(t, "Test Field", i.Description)
 	require.EqualValues(t, now.Truncate(time.Second), i.CreatedAt)
 	require.EqualValues(t, now.Truncate(time.Second), i.UpdatedAt)
 }
@@ -110,7 +110,7 @@ func TestMysqlRepo_UpdateIndex(t *testing.T) {
 	index := &model.Index{
 		ID:          0,
 		Title:       "test",
-		Description: "Test Index",
+		Description: "Test Field",
 		CreatorID:   382951,
 		CreatedAt:   now,
 		UpdatedAt:   now,
@@ -143,7 +143,7 @@ func TestMysqlRepo_DeleteIndex(t *testing.T) {
 	index := &model.Index{
 		ID:          0,
 		Title:       "test",
-		Description: "Test Index",
+		Description: "Test Field",
 		CreatorID:   382951,
 		CreatedAt:   time.Now(),
 		Total:       0,
@@ -175,7 +175,7 @@ func TestMysqlRepo_DeleteIndex2(t *testing.T) {
 	index := &model.Index{
 		ID:          0,
 		Title:       "test",
-		Description: "Test Index",
+		Description: "Test Field",
 		CreatorID:   382951,
 		CreatedAt:   time.Now(),
 		Total:       0,
@@ -227,7 +227,7 @@ func TestMysqlRepo_AddOrUpdateIndexSubject(t *testing.T) {
 	idx := &model.Index{
 		ID:          0,
 		Title:       "test",
-		Description: "Test Index",
+		Description: "Test Field",
 		CreatorID:   382951,
 		CreatedAt:   time.Now(),
 		Total:       0,
@@ -277,7 +277,7 @@ func TestMysqlRepo_DeleteIndexSubject(t *testing.T) {
 	index := &model.Index{
 		ID:          0,
 		Title:       "test",
-		Description: "Test Index",
+		Description: "Test Field",
 		CreatorID:   382951,
 		CreatedAt:   time.Now(),
 		Total:       0,
@@ -362,7 +362,7 @@ func TestMysqlRepo_UpdateSubjectInfo(t *testing.T) {
 	index := &model.Index{
 		ID:          0,
 		Title:       "test",
-		Description: "Test Index",
+		Description: "Test Field",
 		CreatorID:   382951,
 		CreatedAt:   time.Now(),
 		Total:       0,
@@ -402,7 +402,7 @@ func TestMysqlRepo_AddExists(t *testing.T) {
 	index := &model.Index{
 		ID:          0,
 		Title:       "test",
-		Description: "Test Index",
+		Description: "Test Field",
 		CreatorID:   382951,
 		CreatedAt:   time.Now(),
 		Total:       0,

@@ -210,7 +210,7 @@ func main() {
 		gen.FieldTrimPrefix("interest_"),
 	))
 
-	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
+	g.ApplyBasic(g.GenerateModelAs("chii_index", "Field",
 		gen.FieldTrimPrefix("idx_"),
 		gen.FieldType("idx_id", "uint32"),
 		gen.FieldType("idx_uid", userIDTypeString),
@@ -497,6 +497,58 @@ func main() {
 		gen.FieldRename("idx_pst_dateline", createdTime),
 		gen.FieldRename("idx_pst_content", "Content"),
 	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_ep_comments", "EpisodeComment",
+		gen.FieldTrimPrefix("ep_pst_"),
+		gen.FieldType("ep_pst_id", "uint32"),
+		gen.FieldType("ep_pst_mid", "uint32"),
+		gen.FieldType("ep_pst_uid", "uint32"),
+		gen.FieldType("ep_pst_related", "uint32"),
+		gen.FieldType("ep_pst_dateline", "int32"),
+		gen.FieldType("ep_pst_content", "string"),
+
+		gen.FieldRename("ep_pst_id", "PostID"),
+		gen.FieldRename("ep_pst_mid", "FieldID"),
+		gen.FieldRename("ep_pst_uid", "UserID"),
+		gen.FieldRename("ep_pst_related", "RelatedMessageID"),
+		gen.FieldRename("ep_pst_dateline", createdTime),
+		gen.FieldRename("ep_pst_content", "Content"),
+	))
+
+	g.ApplyBasic(g.GenerateModelAs("chii_subject_posts", "SubjectPost",
+		gen.FieldTrimPrefix("sbj_pst_"),
+		gen.FieldType("sbj_pst_id", "uint32"),
+		gen.FieldType("sbj_pst_mid", "uint32"),
+		gen.FieldType("sbj_pst_uid", "uint32"),
+		gen.FieldType("sbj_pst_related", "uint32"),
+		gen.FieldType("sbj_pst_dateline", "int32"),
+		gen.FieldType("sbj_pst_content", "string"),
+		gen.FieldType("sbj_pst_state", "uint8"),
+
+		gen.FieldRename("sbj_pst_id", "PostID"),
+		gen.FieldRename("sbj_pst_mid", "FieldID"),
+		gen.FieldRename("sbj_pst_uid", "UserID"),
+		gen.FieldRename("sbj_pst_related", "RelatedMessageID"),
+		gen.FieldRename("sbj_pst_dateline", createdTime),
+		gen.FieldRename("sbj_pst_content", "Content"),
+		gen.FieldRename("sbj_pst_state", "PostState"),
+	))
+
+	//TODO: 吐槽箱
+	//g.ApplyBasic(g.GenerateModelAs("chii_subject_review", "SubjectReview"),
+	//	gen.FieldTrimPrefix("sbj_rvw_"),
+	//	gen.FieldType("sbj_rvw_id", "uint32"),
+	//	gen.FieldType("sbj_rvw_mid", "uint32"),
+	//	gen.FieldType("sbj_rvw_uid", "uint32"),
+	//	gen.FieldType("sbj_rvw_score", "uint8"),
+	//	gen.FieldType("sbj_rvw_content", "string"),
+	//
+	//	gen.FieldRename("sbj_rvw_id", "ID"),
+	//	gen.FieldRename("sbj_rvw_mid", "FieldID"),
+	//	gen.FieldRename("sbj_rvw_uid", "UserID"),
+	//	gen.FieldRename("sbj_rvw_score", "Score"),
+	//	gen.FieldRename("sbj_rvw_content", "Content"),
+	//)
 
 	// execute the action of code generation
 	g.Execute()

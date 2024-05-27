@@ -102,6 +102,10 @@ func AddRouters(
 		// collect
 		v0.POST("/indices/:id/collect", i.CollectIndex, mw.NeedLogin)
 		v0.DELETE("/indices/:id/collect", i.UncollectIndex, mw.NeedLogin)
+
+		v0.GET("/indices/:id/comment", i.GetComments, mw.NeedLogin)
+		v0.PUT("/indices/:id/comment", i.AddComment, mw.NeedLogin)
+		v0.DELETE("/indices/:id/comment", i.RemoveComment, mw.NeedLogin)
 	}
 
 	v0.GET("/revisions/persons/:id", h.GetPersonRevision)

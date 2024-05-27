@@ -349,3 +349,115 @@ func modelToDAO(index *model.Index) *dao.Index {
 		UpdatedTime: uint32(index.UpdatedAt.Unix()),
 	}
 }
+
+func (r mysqlRepo) WithQuery(query *query.Query) IndexRepo {
+	return &mysqlRepo{q: query, log: r.log}
+}
+
+func (r mysqlRepo) GetIndexComments(ctx context.Context, id model.IndexID, offset int, limit int) ([]model.IndexComment, error) {
+	s, err := r.q.WithContext(ctx).IndexComment.
+		Where(r.q.IndexComment.FieldID.Eq(id)).
+		Offset(offset).Limit(limit).
+		Find() // 这里查的是Field下所有的comment
+	if err != nil {
+		return nil, gerr.WrapGormError(err)
+	}
+	var res []model.IndexComment
+	res = make([]model.IndexComment, 0)
+	for _, v := range s {
+		res = append(res, conventIndexComment2Model(v))
+	}
+	return res, nil
+}
+
+func (r mysqlRepo) getIndexComment(ctx context.Context, id model.CommentID) (*dao.IndexComment, error) {
+	res, err := r.q.IndexComment.WithContext(ctx).
+		Where(r.q.IndexComment.PostID.Eq(id)).Take()
+	if err != nil {
+		return nil, gerr.WrapGormError(err)
+	}
+	return res, nil
+}
+
+func (r mysqlRepo) GetIndexComment(ctx context.Context, id model.CommentID) (*model.IndexComment, error) {
+	res, err := r.getIndexComment(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &model.IndexComment{
+		ID:        res.PostID,
+		Field:     res.FieldID,
+		User:      res.UserID,
+		Related:   res.RelatedMessageID,
+		CreatedAt: time.Unix(int64(res.CreatedTime), 0),
+		Content:   res.Content,
+	}, nil
+}
+
+func (r mysqlRepo) AddIndexComment(ctx context.Context, newComment model.IndexComment) error {
+	// 理论来说，这里为了防止出错，提交上来的newComment的Id字段不会起效果
+	// 所以这里会直接先检索最后一条comment的indexId
+	s, err := r.q.IndexComment.WithContext(ctx).Order(
+		r.q.IndexComment.PostID).Last()
+	if err != nil {
+		return gerr.WrapGormError(err)
+	}
+	id := s.PostID + 1
+	err = r.q.IndexComment.WithContext(ctx).Create(&dao.IndexComment{
+		PostID:           id,
+		FieldID:          newComment.Field,
+		UserID:           newComment.User,
+		RelatedMessageID: newComment.Related,
+		CreatedTime:      int32(newComment.CreatedAt.Unix()),
+		Content:          newComment.Content,
+	})
+	if err != nil {
+		return gerr.WrapGormError(err)
+	}
+	return nil
+}
+
+func (r mysqlRepo) UpdateIndexComment(ctx context.Context, indexID model.IndexID, comment string) error {
+	s, err := r.getIndexComment(ctx, indexID)
+	if err != nil {
+		return err
+	}
+	if s == nil {
+		return errors.New("comment not found")
+	}
+	res, err := r.q.IndexComment.WithContext(ctx).Where(
+		r.q.IndexComment.PostID.Eq(indexID)).Updates(dao.IndexComment{Content: comment})
+	if err != nil {
+		return gerr.WrapGormError(err)
+	}
+	if res.Error != nil {
+		return gerr.WrapGormError(res.Error)
+	}
+	return nil
+}
+
+func (r mysqlRepo) DeleteIndexComment(ctx context.Context, id model.IndexID) error {
+	d, err := r.getIndexComment(ctx, id)
+	if err != nil {
+		return err
+	}
+	res, err := r.q.IndexComment.WithContext(ctx).Delete(d)
+	if err != nil {
+		return gerr.WrapGormError(err)
+	}
+	if res.Error != nil {
+		return gerr.WrapGormError(res.Error)
+	}
+	return nil
+}
+
+func conventIndexComment2Model(dao *dao.IndexComment) model.IndexComment {
+	return model.IndexComment{
+		ID:        dao.PostID,
+		Field:     dao.FieldID,
+		User:      dao.UserID,
+		Related:   dao.RelatedMessageID,
+		CreatedAt: time.Unix(int64(dao.CreatedTime), 0),
+		Content:   dao.Content,
+	}
+}

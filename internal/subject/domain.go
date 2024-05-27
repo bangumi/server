@@ -29,6 +29,7 @@ type Filter struct {
 
 type Repo interface {
 	read
+	post
 }
 
 type CachedRepo interface {
@@ -47,4 +48,10 @@ type read interface {
 	GetActors(
 		ctx context.Context, subjectID model.SubjectID, characterIDs []model.CharacterID,
 	) (map[model.CharacterID][]model.PersonID, error)
+}
+
+type post interface {
+	GetAllPost(ctx context.Context, id model.SubjectID, offset int, limit int) ([]model.SubjectPost, error)
+	NewPost(ctx context.Context, post model.SubjectPost) error
+	DeletePost(ctx context.Context, id model.CommentID) error
 }

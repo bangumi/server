@@ -25,6 +25,11 @@ import (
 )
 
 type Repo interface {
+	EpRepo
+	CommentRepo
+}
+
+type EpRepo interface {
 	// WithQuery is used to replace repo's query to txn
 	WithQuery(query *query.Query) Repo
 
@@ -40,6 +45,13 @@ type Repo interface {
 		filter Filter,
 		limit int, offset int,
 	) ([]Episode, error)
+}
+
+type CommentRepo interface {
+	// GetAllComment 获取当前EP下所有评论
+	GetAllComment(ctx context.Context, episodeID model.EpisodeID, offset int, limit int) ([]model.EpisodeComment, error)
+	AddNewComment(ctx context.Context, comment model.EpisodeComment) error
+	DeleteComment(ctx context.Context, episodeID model.EpisodeID, userId model.UserID, commentID model.CommentID) error
 }
 
 type Filter struct {
