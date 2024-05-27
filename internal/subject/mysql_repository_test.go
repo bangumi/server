@@ -110,12 +110,15 @@ func TestBrowse(t *testing.T) {
 
 	filter = subject.BrowseFilter{
 		Type:     4,
-		Platform: null.New("PS4"),
+		Platform: null.New("PS3"),
+		Sort:     null.New("date"),
 	}
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, 1, len(s))
-	require.Equal(t, model.SubjectID(13), s[0].ID)
+	require.Equal(t, 3, len(s))
+	require.Equal(t, model.SubjectID(7), s[0].ID)
+	require.Equal(t, model.SubjectID(6), s[1].ID)
+	require.Equal(t, model.SubjectID(13), s[2].ID)
 }
 
 func TestMysqlRepo_GetByIDs(t *testing.T) {
