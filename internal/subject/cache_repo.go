@@ -91,7 +91,7 @@ func (r cacheRepo) Count(ctx context.Context, filter BrowseFilter) (int64, error
 	if err != nil {
 		return s, err
 	}
-	if e := r.cache.Set(ctx, key, s, 24*time.Hour); e != nil {
+	if e := r.cache.Set(ctx, key, s, 10*time.Minute); e != nil {
 		r.log.Error("can't set response to cache", zap.Error(e))
 	}
 
@@ -101,11 +101,6 @@ func (r cacheRepo) Count(ctx context.Context, filter BrowseFilter) (int64, error
 func (r cacheRepo) Browse(
 	ctx context.Context, filter BrowseFilter, limit, offset int,
 ) ([]model.Subject, error) {
-	// only cache the first page
-	if offset > 0 {
-		return r.repo.Browse(ctx, filter, limit, offset)
-	}
-
 	hash, err := filter.Hash()
 	if err != nil {
 		return nil, err
@@ -125,7 +120,11 @@ func (r cacheRepo) Browse(
 	if err != nil {
 		return nil, err
 	}
-	if e := r.cache.Set(ctx, key, subjects, 24*time.Hour); e != nil {
+	ttl := 24 * time.Hour
+	if offset > 0 {
+		ttl = 10 * time.Minute
+	}
+	if e := r.cache.Set(ctx, key, subjects, ttl); e != nil {
 		r.log.Error("can't set response to cache", zap.Error(e))
 	}
 
