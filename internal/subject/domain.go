@@ -16,6 +16,9 @@ package subject
 
 import (
 	"context"
+	"encoding/binary"
+	"fmt"
+	"hash/fnv"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
@@ -36,6 +39,51 @@ type BrowseFilter struct {
 	Sort     null.String
 	Year     null.Int32
 	Month    null.Int8
+}
+
+func (f BrowseFilter) Hash() (string, error) {
+	h := fnv.New64a()
+
+	if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("type:%v", f.Type))); err != nil {
+		return "", err
+	}
+	if f.NSFW.Set {
+		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("nsfw:%v", f.NSFW))); err != nil {
+			return "", err
+		}
+	}
+	if f.Category.Set {
+		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("category:%v", f.Category))); err != nil {
+			return "", err
+		}
+	}
+	if f.Series.Set {
+		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("series:%v", f.Series))); err != nil {
+			return "", err
+		}
+	}
+	if f.Platform.Set {
+		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("platform:%v", f.Platform))); err != nil {
+			return "", err
+		}
+	}
+	if f.Sort.Set {
+		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("sort:%v", f.Sort))); err != nil {
+			return "", err
+		}
+	}
+	if f.Year.Set {
+		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("year:%v", f.Year))); err != nil {
+			return "", err
+		}
+	}
+	if f.Month.Set {
+		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("month:%v", f.Month))); err != nil {
+			return "", err
+		}
+	}
+
+	return fmt.Sprintf("%x", h.Sum64()), nil
 }
 
 type Repo interface {

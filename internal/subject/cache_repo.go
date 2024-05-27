@@ -72,14 +72,65 @@ func (r cacheRepo) GetByIDs(
 }
 
 func (r cacheRepo) Count(ctx context.Context, filter BrowseFilter) (int64, error) {
-	return r.repo.Count(ctx, filter)
+	hash, err := filter.Hash()
+	if err != nil {
+		return 0, err
+	}
+	key := cachekey.SubjectBrowseCount(hash)
+
+	var s int64
+	ok, err := r.cache.Get(ctx, key, &s)
+	if err != nil {
+		return s, errgo.Wrap(err, "cache.Get")
+	}
+	if ok {
+		return s, nil
+	}
+
+	s, err = r.repo.Count(ctx, filter)
+	if err != nil {
+		return s, err
+	}
+	if e := r.cache.Set(ctx, key, s, 24*time.Hour); e != nil {
+		r.log.Error("can't set response to cache", zap.Error(e))
+	}
+
+	return s, nil
 }
 
 func (r cacheRepo) Browse(
 	ctx context.Context, filter BrowseFilter, limit, offset int,
 ) ([]model.Subject, error) {
-	// TODO:(everpcpc) cache first page
-	return r.repo.Browse(ctx, filter, limit, offset)
+	// only cache the first page
+	if offset > 0 {
+		return r.repo.Browse(ctx, filter, limit, offset)
+	}
+
+	hash, err := filter.Hash()
+	if err != nil {
+		return nil, err
+	}
+	key := cachekey.SubjectBrowse(hash)
+
+	var subjects []model.Subject
+	ok, err := r.cache.Get(ctx, key, &subjects)
+	if err != nil {
+		return nil, errgo.Wrap(err, "cache.Get")
+	}
+	if ok {
+		return subjects, nil
+	}
+
+	subjects, err = r.repo.Browse(ctx, filter, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	if e := r.cache.Set(ctx, key, subjects, 24*time.Hour); e != nil {
+		r.log.Error("can't set response to cache", zap.Error(e))
+	}
+
+	return subjects, nil
+
 }
 
 func (r cacheRepo) GetPersonRelated(
