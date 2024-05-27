@@ -16,7 +16,6 @@ package subject
 
 import (
 	"context"
-	"encoding/binary"
 	"fmt"
 	"hash/fnv"
 
@@ -43,46 +42,34 @@ type BrowseFilter struct {
 
 func (f BrowseFilter) Hash() (string, error) {
 	h := fnv.New64a()
-
-	if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("type:%v", f.Type))); err != nil {
-		return "", err
-	}
+	fields := []string{}
+	fields = append(fields, fmt.Sprintf("type:%v", f.Type))
 	if f.NSFW.Set {
-		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("nsfw:%v", f.NSFW))); err != nil {
-			return "", err
-		}
+		fields = append(fields, fmt.Sprintf("nsfw:%v", f.NSFW))
 	}
 	if f.Category.Set {
-		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("category:%v", f.Category))); err != nil {
-			return "", err
-		}
+		fields = append(fields, fmt.Sprintf("category:%v", f.Category))
 	}
 	if f.Series.Set {
-		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("series:%v", f.Series))); err != nil {
-			return "", err
-		}
+		fields = append(fields, fmt.Sprintf("series:%v", f.Series))
 	}
 	if f.Platform.Set {
-		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("platform:%v", f.Platform))); err != nil {
-			return "", err
-		}
+		fields = append(fields, fmt.Sprintf("platform:%v", f.Platform))
 	}
 	if f.Sort.Set {
-		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("sort:%v", f.Sort))); err != nil {
-			return "", err
-		}
+		fields = append(fields, fmt.Sprintf("sort:%v", f.Sort))
 	}
 	if f.Year.Set {
-		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("year:%v", f.Year))); err != nil {
-			return "", err
-		}
+		fields = append(fields, fmt.Sprintf("year:%v", f.Year))
 	}
 	if f.Month.Set {
-		if err := binary.Write(h, binary.LittleEndian, []byte(fmt.Sprintf("month:%v", f.Month))); err != nil {
+		fields = append(fields, fmt.Sprintf("month:%v", f.Month))
+	}
+	for _, field := range fields {
+		if _, err := h.Write([]byte(field)); err != nil {
 			return "", err
 		}
 	}
-
 	return fmt.Sprintf("%x", h.Sum64()), nil
 }
 
