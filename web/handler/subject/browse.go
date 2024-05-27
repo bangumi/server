@@ -109,6 +109,9 @@ func parseBrowseQuery(c echo.Context) (*subject.BrowseFilter, error) {
 		if year, err := gstr.ParseInt32(yearStr); err != nil {
 			return nil, res.BadRequest(err.Error())
 		} else {
+			if year < 1900 || year > 3000 {
+				return nil, res.BadRequest("invalid year: " + yearStr)
+			}
 			filter.Year = null.Int32{Value: year, Set: true}
 		}
 	}
@@ -116,6 +119,9 @@ func parseBrowseQuery(c echo.Context) (*subject.BrowseFilter, error) {
 		if month, err := gstr.ParseInt8(monthStr); err != nil {
 			return nil, res.BadRequest(err.Error())
 		} else {
+			if month < 1 || month > 12 {
+				return nil, res.BadRequest("invalid month: " + monthStr)
+			}
 			filter.Month = null.Int8{Value: month, Set: true}
 		}
 	}
