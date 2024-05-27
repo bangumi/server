@@ -100,19 +100,33 @@ func TestBrowse(t *testing.T) {
 	require.Equal(t, 2, len(s))
 
 	filter = subject.BrowseFilter{
-		Type: 4,
+		Type: 3,
 		Sort: null.New("rank"),
 	}
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, 7, len(s))
-	require.Equal(t, model.SubjectID(5), s[0].ID)
-	require.Equal(t, model.SubjectID(13), s[1].ID)
-	require.Equal(t, model.SubjectID(14), s[2].ID)
-	require.Equal(t, model.SubjectID(9), s[3].ID)
-	require.Equal(t, model.SubjectID(6), s[4].ID)
-	require.Equal(t, model.SubjectID(7), s[5].ID)
-	require.Equal(t, model.SubjectID(4), s[6].ID)
+	require.Equal(t, 9, len(s))
+	require.Equal(t, model.SubjectID(2), s[0].ID)
+	require.Equal(t, model.SubjectID(20), s[1].ID)
+	require.Equal(t, model.SubjectID(17), s[2].ID)
+	require.Equal(t, model.SubjectID(16), s[3].ID)
+	require.Equal(t, model.SubjectID(15), s[4].ID)
+	require.Equal(t, model.SubjectID(406604), s[5].ID)
+	require.Equal(t, model.SubjectID(19), s[6].ID)
+	require.Equal(t, model.SubjectID(315957), s[7].ID)
+	require.Equal(t, model.SubjectID(18), s[8].ID)
+
+	filter = subject.BrowseFilter{
+		Type:     4,
+		Platform: null.New("PS4"),
+		Sort:     null.New("date"),
+	}
+	s, err = repo.Browse(context.Background(), filter, 30, 0)
+	require.NoError(t, err)
+	require.Equal(t, 3, len(s))
+	require.Equal(t, model.SubjectID(7), s[0].ID)
+	require.Equal(t, model.SubjectID(6), s[1].ID)
+	require.Equal(t, model.SubjectID(13), s[2].ID)
 }
 
 func TestMysqlRepo_GetByIDs(t *testing.T) {
