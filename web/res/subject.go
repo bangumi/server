@@ -220,3 +220,23 @@ type IndexSubjectV0 struct {
 	ID      model.SubjectID   `json:"id"`
 	TypeID  model.SubjectType `json:"type"`
 }
+
+type SubjectPost struct {
+	ID      model.CommentID `json:"id"`
+	FieldID model.SubjectID `json:"field_id"`
+	Related model.CommentID `json:"related"`
+	UserID  model.UserID    `json:"user_id"`
+	Created time.Time       `json:"created"`
+	Content string          `json:"content"`
+}
+
+func ConventSubjectComment2Resp(models model.SubjectPost) SubjectPost {
+	return SubjectPost{
+		ID:      models.ID,
+		FieldID: models.Field,
+		Related: models.Related,
+		UserID:  models.User,
+		Created: models.CreatedAt,
+		Content: models.Content,
+	}
+}

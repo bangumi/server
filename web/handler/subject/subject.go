@@ -15,6 +15,7 @@
 package subject
 
 import (
+	"github.com/bangumi/server/web/mw"
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/character"
@@ -53,4 +54,9 @@ func (h *Subject) Routes(g *echo.Group) {
 	g.GET("/subjects/:id/persons", h.GetRelatedPersons)
 	g.GET("/subjects/:id/subjects", h.GetRelatedSubjects)
 	g.GET("/subjects/:id/characters", h.GetRelatedCharacters)
+
+	//comment
+	g.GET("/subjects/:id/post", h.GetComments)
+	g.PUT("/subjects/:id/post", h.AddComment, mw.NeedLogin)
+	g.DELETE("/subjects/:id/post", h.RemoveComment, mw.NeedLogin)
 }

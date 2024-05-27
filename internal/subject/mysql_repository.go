@@ -257,7 +257,7 @@ func (r mysqlRepo) GetActors(
 
 func (r mysqlRepo) GetAllPost(ctx context.Context, id model.SubjectID, offset int, limit int) ([]model.SubjectPost, error) {
 	s, err := r.q.WithContext(ctx).SubjectPost.
-		Where(r.q.EpisodeComment.FieldID.Eq(id)).
+		Where(r.q.SubjectPost.FieldID.Eq(id)).
 		Offset(offset).Limit(limit).
 		Find()
 	if err != nil {
@@ -272,6 +272,20 @@ func (r mysqlRepo) GetAllPost(ctx context.Context, id model.SubjectID, offset in
 	}
 
 	return results, nil
+}
+
+func (r mysqlRepo) GetPost(ctx context.Context, id model.CommentID) (model.SubjectPost, error) {
+	s, err := r.q.WithContext(ctx).SubjectPost.
+		Where(r.q.SubjectPost.PostID.Eq(id)).
+		Take()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return model.SubjectPost{}, errgo.Wrap(err, "dal")
+	}
+
+	result := conventDao2Post(s)
+
+	return result, nil
 }
 
 func (r mysqlRepo) NewPost(ctx context.Context, post model.SubjectPost) error {

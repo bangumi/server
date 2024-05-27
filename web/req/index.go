@@ -32,7 +32,7 @@ type IndexSubjectInfo struct {
 }
 
 type IndexComment struct {
-	ID      model.CommentID `json:"id"`
-	FieldID model.IndexID   `json:"field_id"`
+	ID      model.CommentID `json:"id,omitempty"`
+	FieldID model.IndexID   `json:"field_id,omitempty"`
 	Comment string          `json:"comment"`
 }
