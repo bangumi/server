@@ -256,10 +256,10 @@ func (r mysqlRepo) Count(
 		q = q.Where(r.q.SubjectField.Mon.Eq(filter.Month.Value))
 	}
 
-	if filter.Order.Set {
-		switch filter.Order.Value {
+	if filter.Sort.Set {
+		switch filter.Sort.Value {
 		case "date":
-			q = q.Order(r.q.SubjectField.Date)
+			q = q.Order(r.q.SubjectField.Date.Desc())
 		case "rank":
 			q = q.Order(r.q.SubjectField.Rank)
 		}
@@ -293,10 +293,10 @@ func (r mysqlRepo) Browse(
 		q = q.Where(r.q.SubjectField.Mon.Eq(filter.Month.Value))
 	}
 
-	if filter.Order.Set {
-		switch filter.Order.Value {
+	if filter.Sort.Set {
+		switch filter.Sort.Value {
 		case "date":
-			q = q.Order(r.q.SubjectField.Date)
+			q = q.Order(r.q.SubjectField.Date.Desc())
 		case "rank":
 			q = q.Order(r.q.SubjectField.Rank)
 		}

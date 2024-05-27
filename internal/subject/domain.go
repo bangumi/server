@@ -33,7 +33,7 @@ type BrowseFilter struct {
 	Category null.Uint16
 	Series   null.Bool
 	Platform null.String
-	Order    null.String
+	Sort     null.String
 	Year     null.Int32
 	Month    null.Int8
 }

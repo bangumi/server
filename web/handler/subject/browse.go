@@ -97,12 +97,12 @@ func parseBrowseQuery(c echo.Context) (*subject.BrowseFilter, error) {
 			filter.Platform = null.String{Value: platform, Set: true}
 		}
 	}
-	if order := c.QueryParam("order"); order != "" {
-		switch order {
+	if sort := c.QueryParam("sort"); sort != "" {
+		switch sort {
 		case "rank", "date":
-			filter.Order = null.String{Value: order, Set: true}
+			filter.Sort = null.String{Value: sort, Set: true}
 		default:
-			return nil, res.BadRequest("unknown order: " + order)
+			return nil, res.BadRequest("unknown sort: " + sort)
 		}
 	}
 	if yearStr := c.QueryParam("year"); yearStr != "" {
