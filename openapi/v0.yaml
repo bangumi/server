@@ -201,7 +201,7 @@ paths:
       tags:
         - 条目
       summary: 浏览条目
-      description: 第一页会 cache 24h，之后会 cache 300s
+      description: 第一页会 cache 24h，之后会 cache 1h
       operationId: getSubjects
       parameters:
         - name: type

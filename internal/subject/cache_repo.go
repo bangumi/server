@@ -122,7 +122,7 @@ func (r cacheRepo) Browse(
 	}
 	ttl := 24 * time.Hour
 	if offset > 0 {
-		ttl = 10 * time.Minute
+		ttl = time.Hour
 	}
 	if e := r.cache.Set(ctx, key, subjects, ttl); e != nil {
 		r.log.Error("can't set response to cache", zap.Error(e))
