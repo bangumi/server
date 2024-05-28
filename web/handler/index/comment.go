@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -38,6 +39,15 @@ func (h Handler) GetComments(c echo.Context) error {
 	}
 	if limitStr == "" {
 		limit = 25 // 默认25
+	}
+
+	offset, err = strconv.Atoi(offsetStr)
+	if err != nil {
+		return res.BadRequest(err.Error())
+	}
+	limit, err = strconv.Atoi(limitStr)
+	if err != nil {
+		return res.BadRequest(err.Error())
 	}
 
 	result, err := h.i.GetIndexComments(c.Request().Context(), id, offset, limit)

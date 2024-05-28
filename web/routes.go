@@ -73,6 +73,9 @@ func AddRouters(
 	v0.GET("/episodes/:id", h.GetEpisode)
 	v0.GET("/episodes", h.ListEpisode)
 
+	v0.GET("episodes/:id/comment", h.GetEpisodeComments)
+	v0.PUT("episodes/:id/comment", h.PostEpisodeComment, mw.NeedLogin)
+
 	// echo 中间件从前往后运行按顺序
 	v0.GET("/me", userHandler.GetCurrent)
 	v0.GET("/users/:username", userHandler.Get)
