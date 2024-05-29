@@ -170,6 +170,18 @@ func (r mysqlRepo) GetAllComment(ctx context.Context, episodeID model.EpisodeID,
 	return result, nil
 }
 
+func (r mysqlRepo) GetComment(ctx context.Context, comment model.CommentID) (model.EpisodeComment, error) {
+	s, err := r.q.EpisodeComment.WithContext(ctx).
+		Where(r.q.EpisodeComment.PostID.Eq(comment)).Take()
+	if err != nil {
+		return model.EpisodeComment{}, errgo.Wrap(err, "dal")
+	}
+
+	result := conventDao2Post(s)
+
+	return result, nil
+}
+
 func (r mysqlRepo) AddNewComment(ctx context.Context, comment model.EpisodeComment) error {
 	s, err := r.q.WithContext(ctx).EpisodeComment.
 		Order(r.q.EpisodeComment.PostID).Last()
@@ -193,7 +205,7 @@ func (r mysqlRepo) AddNewComment(ctx context.Context, comment model.EpisodeComme
 	return nil
 }
 
-func (r mysqlRepo) DeleteComment(ctx context.Context, episodeID model.EpisodeID, userId model.UserID, commentID model.CommentID) error {
+func (r mysqlRepo) DeleteComment(ctx context.Context, commentID model.CommentID) error {
 	res, err := r.q.WithContext(ctx).EpisodeComment.
 		Where(r.q.EpisodeComment.PostID.Eq(commentID)).Delete()
 	if err != nil {

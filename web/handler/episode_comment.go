@@ -16,6 +16,45 @@ import (
 	"time"
 )
 
+func (h *Handler) GetEpisodeComment(c echo.Context) error {
+	u := accessor.GetFromCtx(c)
+
+	id, err := req.ParseID(c.Param("id"))
+
+	commentId, err := req.ParseID(c.Param("comment_id"))
+
+	if err != nil {
+		return err
+	}
+
+	e, err := h.episode.Get(c.Request().Context(), id)
+	if err != nil {
+		if errors.Is(err, gerr.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return errgo.Wrap(err, "failed to get episode")
+	}
+
+	_, err = h.subject.Get(c.Request().Context(), e.SubjectID, subject.Filter{
+		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
+	})
+	if err != nil {
+		if errors.Is(err, gerr.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return errgo.Wrap(err, "failed to find subject of episode")
+	}
+
+	r, err := h.episode.GetComment(c.Request().Context(), commentId)
+
+	if err != nil {
+		return res.NotFound("cannot find comment")
+	}
+	return c.JSON(http.StatusOK, r)
+}
+
 func (h Handler) GetEpisodeComments(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 

@@ -75,6 +75,7 @@ func AddRouters(
 
 	v0.GET("episodes/:id/comment", h.GetEpisodeComments)
 	v0.PUT("episodes/:id/comment", h.PostEpisodeComment, mw.NeedLogin)
+	v0.GET("episodes/:id/comment/:comment_id", h.GetEpisodeComment)
 
 	// echo 中间件从前往后运行按顺序
 	v0.GET("/me", userHandler.GetCurrent)
@@ -107,8 +108,9 @@ func AddRouters(
 		v0.DELETE("/indices/:id/collect", i.UncollectIndex, mw.NeedLogin)
 
 		v0.GET("/indices/:id/comment", i.GetComments, mw.NeedLogin)
+		v0.GET("/indices/:id/comment/:comment_id", i.GetComment, mw.NeedLogin)
 		v0.PUT("/indices/:id/comment", i.AddComment, mw.NeedLogin)
-		v0.DELETE("/indices/:id/comment", i.RemoveComment, mw.NeedLogin)
+		v0.DELETE("/indices/:id/comment/:comment_id", i.RemoveComment, mw.NeedLogin)
 	}
 
 	v0.GET("/revisions/persons/:id", h.GetPersonRevision)

@@ -15,6 +15,39 @@ import (
 	"time"
 )
 
+func (h Subject) GetComment(c echo.Context) error {
+	u := accessor.GetFromCtx(c)
+
+	id, err := req.ParseID(c.Param("id"))
+	if err != nil {
+		return err
+	}
+
+	commentID, err := req.ParseID(c.Param("post_id"))
+	if err != nil {
+		return err
+	}
+
+	_, err = h.subject.Get(c.Request().Context(), id, subject.Filter{
+		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
+	})
+
+	if err != nil {
+		if errors.Is(err, gerr.ErrNotFound) {
+			return res.ErrNotFound
+		}
+		return errgo.Wrap(err, "failed to get subject")
+	}
+
+	result, err := h.subject.GetPost(c.Request().Context(), commentID)
+	if err != nil {
+		return res.BadRequest("cannot found comment")
+	}
+	resp := res.ConventSubjectComment2Resp(result)
+
+	return c.JSON(http.StatusOK, resp)
+}
+
 func (h Subject) GetComments(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
@@ -111,6 +144,11 @@ func (h Subject) RemoveComment(c echo.Context) error {
 		return err
 	}
 
+	commentID, err := req.ParseID(c.Param("post_id"))
+	if err != nil {
+		return err
+	}
+
 	_, err = h.subject.Get(c.Request().Context(), id, subject.Filter{
 		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
 	})
@@ -122,13 +160,8 @@ func (h Subject) RemoveComment(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get subject")
 	}
 
-	var reqBody = req.SubjectComment{}
-	if err := c.Echo().JSONSerializer.Deserialize(c, &reqBody); err != nil {
-		return res.JSONError(c, err)
-	}
-
 	//校验消息是否存在以及是否为本人发送
-	comment, err := h.subject.GetPost(c.Request().Context(), reqBody.ID)
+	comment, err := h.subject.GetPost(c.Request().Context(), commentID)
 	if err != nil {
 		return res.NotFound("cannot find comment")
 	}
@@ -137,7 +170,7 @@ func (h Subject) RemoveComment(c echo.Context) error {
 		return res.Forbidden("cannot remove comment")
 	}
 
-	err = h.subject.DeletePost(c.Request().Context(), comment.ID)
+	err = h.subject.DeletePost(c.Request().Context(), commentID)
 
 	if err != nil {
 		return res.BadRequest("cannot remove comment")
