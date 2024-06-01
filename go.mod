@@ -34,7 +34,7 @@ require (
 	github.com/trim21/htest v0.0.4
 	github.com/trim21/pkg v0.0.3
 	go.etcd.io/etcd/client/v3 v3.5.13
-	go.uber.org/fx v1.21.1
+	go.uber.org/fx v1.22.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.23.0
 	google.golang.org/grpc v1.64.0
