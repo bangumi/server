@@ -336,6 +336,6 @@ func conventDao2Post(dao *dao.SubjectPost) model.SubjectPost {
 		Related:   dao.RelatedMessageID,
 		CreatedAt: time.Unix(int64(dao.CreatedTime), 0),
 		Content:   dao.Content,
-		State:     0,
+		State:     dao.PostState,
 	}
 }

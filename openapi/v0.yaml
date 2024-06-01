@@ -226,6 +226,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+
   "/v0/subjects/{subject_id}/image":
     get:
       tags:
@@ -359,6 +360,133 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+    put:
+      tags:
+        - 条目
+      summary: Add Subject's Comment
+      operationId: addRelatedSubjectsBySubjectId
+      parameters:
+        - $ref: "#/components/parameters/path_subject_id"
+      responses:
+        "200":
+          description: Successful Response
+
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: [ ]
+
+  "/v0/subjects/{subject_id}/post":
+    get:
+      tags:
+        - 条目
+      summary: 获取所有评论
+      operationId: getSubjectCommentsByID
+      parameters:
+        - $ref: "#/components/parameters/path_subject_id"
+        - name: limit
+          in: query
+          description: 分页参数
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: 分页参数
+          required: false
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  - "$ref": "#/components/schemas/SubjectComment"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: [ ]
+  "/v0/subjects/{subject_id}/post/{comment_id}":
+    get:
+      tags:
+        - 条目
+      summary: 获取评论详情
+      operationId: getSubjectCommentByID
+      parameters:
+        - $ref: "#/components/parameters/path_subject_id"
+        - $ref: "#/components/parameters/path_comment_id"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SubjectComment"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+    delete:
+      tags:
+        - 条目
+      summary: 删除评论
+      operationId: delSubjectCommentByID
+      parameters:
+        - $ref: "#/components/parameters/path_subject_id"
+        - $ref: "#/components/parameters/path_comment_id"
+      responses:
+        "200":
+          description: Successful Response
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: [ ]
+
+
   "/v0/episodes":
     get:
       tags:
@@ -445,6 +573,136 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
+
+  "/v0/episodes/{episode_id}/comment":
+    get:
+      tags:
+        - 章节
+      summary: Get Episode's All comments
+      operationId: getEpisodeCommentsById
+      parameters:
+        - $ref: "#/components/parameters/path_episode_id"
+        - name: limit
+          in: query
+          description: 分页参数
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: 分页参数
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/EpisodeComment"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: [ ]
+    put:
+      tags:
+        - 章节
+      summary: Add Episode's comment
+      operationId: addEpisodeCommentById
+      parameters:
+        - $ref: "#/components/parameters/path_episode_id"
+        - $ref: "#/components/parameters/path_comment_id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CommentRequest"
+      responses:
+        "200":
+          description: Successful Response
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: [ ]
+  "/v0/episodes/{episode_id}/comment/{comment_id}":
+    get:
+      tags:
+        - 章节
+      summary: Get Episode's comments
+      operationId: getEpisodeCommentById
+      parameters:
+        - $ref: "#/components/parameters/path_episode_id"
+        - $ref: "#/components/parameters/path_comment_id"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/EpisodeComment"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+
+    delete:
+      tags:
+        - 章节
+      summary: Delete Episode's comment
+      operationId: delEpisodeCommentById
+      parameters:
+        - $ref: "#/components/parameters/path_episode_id"
+        - $ref: "#/components/parameters/path_comment_id"
+      responses:
+        "200":
+          description: Successful Response
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: [ ]
   "/v0/characters/{character_id}":
     get:
       tags:
@@ -1446,6 +1704,81 @@ paths:
           "$ref": "#/components/responses/404"
       security:
         - HTTPBearer: []
+  "/v0/indices/{index_id}/comment":
+    get:
+      tags:
+        - 目录
+      summary: Get Index's All Comments
+      operationId: getIndexComments
+      parameters:
+        - $ref: "#/components/parameters/path_index_id"
+        - $ref: "#/components/parameters/default_query_limit"
+        - $ref: "#/components/parameters/default_query_offset"
+      responses:
+        "200":
+          description: Successful Response
+        "400":
+          "$ref": "#/components/responses/400"
+        "404":
+            "$ref": "#/components/responses/404"
+      security:
+        - OptionalHTTPBearer: [ ]
+    put:
+      tags:
+        - 目录
+      summary: Add Index's Comment
+      operationId: addIndexCommentByIDs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentRequest"
+
+      parameters:
+        - $ref: "#/components/parameters/path_index_id"
+      responses:
+        "200":
+          description: Successful Response
+        "400":
+          "$ref": "#/components/responses/400"
+        "404":
+          "$ref": "#/components/responses/404"
+  "/v0/indices/{index_id}/comment/{comment_id}":
+    get:
+      tags:
+        - 目录
+      summary: Get Index's Comment
+      operationId: getIndexCommentByIDs
+      parameters:
+        - $ref: "#/components/parameters/path_index_id"
+        - $ref: "#/components/parameters/path_comment_id"
+      responses:
+        "200":
+          description: Successful Response
+        "400":
+          "$ref": "#/components/responses/400"
+        "404":
+          "$ref": "#/components/responses/404"
+      security:
+        - OptionalHTTPBearer: [ ]
+    delete:
+      tags:
+        - 目录
+      summary: Delete Index's Comment
+      operationId: delIndexCommentByIDs
+      parameters:
+        - $ref: "#/components/parameters/path_index_id"
+        - $ref: "#/components/parameters/path_comment_id"
+      responses:
+        "200":
+          description: Successful Response
+        "400":
+          "$ref": "#/components/responses/400"
+        "404":
+          "$ref": "#/components/responses/404"
+      security:
+        - OptionalHTTPBearer: [ ]
+
   "/v0/indices/{index_id}/subjects":
     get:
       tags:
@@ -1605,6 +1938,8 @@ components:
       description: 章节 ID
       in: path
 
+
+
     path_character_id:
       required: true
       description: 角色 ID
@@ -1633,6 +1968,16 @@ components:
         minimum: 1
         type: integer
       name: index_id
+      in: path
+
+    path_comment_id:
+      required: true
+      description: "评论ID"
+      schema:
+        title: Comment ID
+        minimum: 1
+        type: integer
+      name: comment_id
       in: path
 
     query_subject_id:
@@ -1948,6 +2293,7 @@ components:
           properties:
             data:
               "$ref": "#/components/schemas/SubjectRevisionData"
+
     SubjectRevisionData:
       title: SubjectRevisionData
       required:
@@ -2003,6 +2349,41 @@ components:
               title: Data
               additionalProperties:
                 "$ref": "#/components/schemas/CharacterRevisionDataItem"
+    SubjectComment:
+      title: SubjectComment
+      required:
+        - id
+        - field_id
+        - user_id
+        - related
+        - created_at
+        - content
+        - state
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+        field_id:
+          title: FieldID
+          type: integer
+        user_id:
+          title: UserID
+          type: integer
+        related:
+          title: Related
+          type: integer
+          description: 回复消息的ID，若不回复则为0
+        created_at:
+          title: Created At
+          type: string
+          format: date-time
+        content:
+          title: Content
+          type: string
+        state:
+          title: State
+          type: integer
     CharacterRevisionDataItem:
       title: CharacterRevisionDataItem
       required:
@@ -2063,6 +2444,37 @@ components:
         - Other
     Episode:
       $ref: "./components/episode.yaml"
+    EpisodeComment:
+      title: EpisodeComment
+      required:
+        - id
+        - field_id
+        - user_id
+        - related
+        - created_at
+        - content
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+        field_id:
+          title: FieldID
+          type: integer
+        user_id:
+          title: UserID
+          type: integer
+        related:
+          title: Related
+          type: integer
+          description: 回复消息的ID，若不回复则为0
+        created_at:
+          title: Created At
+          type: string
+          format: date-time
+        content:
+          title: Content
+          type: string
     EpisodeDetail:
       title: EpisodeDetail
       required:
@@ -2210,6 +2622,37 @@ components:
           type: string
           format: date-time
       description: 同名字段意义同<a href="#model-Subject">Subject</a>
+    IndexComment:
+      title: IndexComment
+      required:
+        - id
+        - field_id
+        - user_id
+        - related
+        - created_at
+        - content
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+        field_id:
+          title: FieldID
+          type: integer
+        user_id:
+          title: UserID
+          type: integer
+        related:
+          title: Related
+          type: integer
+          description: 回复消息的ID，若不回复则为0
+        created_at:
+          title: Created At
+          type: string
+          format: date-time
+        content:
+          title: Content
+          type: string
     IndexBasicInfo:
       title: IndexBasicInfo
       type: object
@@ -2658,6 +3101,19 @@ components:
         collects:
           title: Collects
           type: integer
+    CommentRequest:
+      title: Comment Request
+      required:
+        - content
+      type: object
+      properties:
+        content:
+          title: Content
+          type: string
+        field_id:
+          title: Field_id
+          description: "回复消息ID"
+          type: string
     Subject:
       $ref: "./components/subject_v0.yaml"
     SlimSubject:
@@ -2672,6 +3128,7 @@ components:
       $ref: "./components/subject_collection_modify_payload.yaml"
     UserEpisodeCollection:
       $ref: "./components/get-user-episodes-collection.yaml"
+
     v0_RelatedSubject:
       title: RelatedSubject
       required:
@@ -2762,3 +3219,4 @@ components:
         application/json:
           schema:
             "$ref": "#/components/schemas/ErrorDetail"
+

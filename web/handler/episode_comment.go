@@ -52,7 +52,10 @@ func (h *Handler) GetEpisodeComment(c echo.Context) error {
 	if err != nil {
 		return res.NotFound("cannot find comment")
 	}
-	return c.JSON(http.StatusOK, r)
+
+	resp := res.ConventEpisodeComment2Resp(r)
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func (h Handler) GetEpisodeComments(c echo.Context) error {
@@ -152,7 +155,7 @@ func (h Handler) PostEpisodeComment(c echo.Context) error {
 
 	err = h.episode.AddNewComment(c.Request().Context(), model.EpisodeComment{
 		ID:        0,
-		Field:     comment.FieldID,
+		Field:     id,
 		User:      u.ID,
 		Related:   comment.FieldID,
 		CreatedAt: time.Now(),
