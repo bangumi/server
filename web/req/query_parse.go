@@ -22,6 +22,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pm"
+	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -45,6 +46,24 @@ func ParseSubjectType(s string) (model.SubjectType, error) {
 	}
 
 	return 0, res.BadRequest(strconv.Quote(s) + " is not a valid subject type")
+}
+
+func ParseSubjectCategory(stype model.SubjectType, s string) (uint16, error) {
+	if s == "" {
+		return 0, res.BadRequest("subject category is empty")
+	}
+	platforms, ok := vars.PlatformMap[stype]
+	if !ok {
+		return 0, res.BadRequest("bad subject type: " + strconv.Quote(s))
+	}
+	v, err := gstr.ParseUint16(s)
+	if err != nil {
+		return 0, res.BadRequest("bad subject category: " + strconv.Quote(s))
+	}
+	if _, ok := platforms[v]; !ok {
+		return 0, res.BadRequest("bad subject category: " + strconv.Quote(s))
+	}
+	return v, nil
 }
 
 func ParseID(s string) (model.CharacterID, error) {

@@ -52,8 +52,12 @@ properties:
     type: integer
   score:
     description: 分数
-    title: Total
+    title: Score
     type: number
+  rank:
+    description: 排名
+    title: Rank
+    type: integer
 
   tags:
     description: 前 10 个 tag

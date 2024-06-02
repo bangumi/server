@@ -231,6 +231,94 @@ func (r mysqlRepo) GetByIDs(
 	return result, nil
 }
 
+func (r mysqlRepo) Count(
+	ctx context.Context,
+	filter BrowseFilter) (int64, error) {
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(
+		r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid),
+	).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	if filter.NSFW.Set {
+		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
+	}
+	if filter.Category.Set {
+		q = q.Where(r.q.Subject.Platform.Eq(filter.Category.Value))
+	}
+	if filter.Series.Set {
+		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
+	}
+	if filter.Platform.Set {
+		q = q.Where(r.q.Subject.Infobox.Like(fmt.Sprintf("%%[%s]%%", filter.Platform.Value)))
+	}
+	if filter.Year.Set {
+		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))
+	}
+	if filter.Month.Set {
+		q = q.Where(r.q.SubjectField.Mon.Eq(filter.Month.Value))
+	}
+
+	if filter.Sort.Set {
+		switch filter.Sort.Value {
+		case "date":
+			q = q.Order(r.q.SubjectField.Date.Desc())
+		case "rank":
+			q = q.Order(r.q.SubjectField.Rank)
+		}
+	}
+
+	return q.Count()
+}
+
+func (r mysqlRepo) Browse(
+	ctx context.Context, filter BrowseFilter, limit, offset int,
+) ([]model.Subject, error) {
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(
+		r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid),
+	).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	if filter.NSFW.Set {
+		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
+	}
+	if filter.Category.Set {
+		q = q.Where(r.q.Subject.Platform.Eq(filter.Category.Value))
+	}
+	if filter.Series.Set {
+		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
+	}
+	if filter.Platform.Set {
+		q = q.Where(r.q.Subject.Infobox.Like(fmt.Sprintf("%%[%s]%%", filter.Platform.Value)))
+	}
+	if filter.Year.Set {
+		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))
+	}
+	if filter.Month.Set {
+		q = q.Where(r.q.SubjectField.Mon.Eq(filter.Month.Value))
+	}
+
+	if filter.Sort.Set {
+		switch filter.Sort.Value {
+		case "date":
+			q = q.Order(r.q.SubjectField.Date.Desc())
+		case "rank":
+			q = q.Order(r.q.SubjectField.Rank)
+		}
+	}
+
+	subjects, err := q.Limit(limit).Offset(offset).Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var result = make([]model.Subject, len(subjects))
+	for i, subject := range subjects {
+		result[i], err = ConvertDao(subject)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
+}
+
 func (r mysqlRepo) GetActors(
 	ctx context.Context,
 	subjectID model.SubjectID,

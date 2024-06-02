@@ -35,6 +35,14 @@ func Subject(id model.SubjectID) string {
 	return resPrefix + "subject:" + strconv.FormatUint(uint64(id), 10)
 }
 
+func SubjectBrowse(s string, limit, offset int) string {
+	return resPrefix + "subject::browse:" + s + ":" + strconv.Itoa(limit) + ":" + strconv.Itoa(offset)
+}
+
+func SubjectBrowseCount(s string) string {
+	return resPrefix + "subject::browse:" + s + "::count"
+}
+
 func Episode(id model.EpisodeID) string {
 	return resPrefix + "episode:" + strconv.FormatUint(uint64(id), 10)
 }

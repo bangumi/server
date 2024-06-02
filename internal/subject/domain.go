@@ -16,6 +16,8 @@ package subject
 
 import (
 	"context"
+	"fmt"
+	"hash/fnv"
 
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/internal/model"
@@ -25,6 +27,50 @@ import (
 type Filter struct {
 	// if nsfw subject are allowed
 	NSFW null.Bool
+}
+
+type BrowseFilter struct {
+	NSFW     null.Bool
+	Type     uint8
+	Category null.Uint16
+	Series   null.Bool
+	Platform null.String
+	Sort     null.String
+	Year     null.Int32
+	Month    null.Int8
+}
+
+func (f BrowseFilter) Hash() (string, error) {
+	h := fnv.New64a()
+	fields := []string{}
+	fields = append(fields, fmt.Sprintf("type:%v", f.Type))
+	if f.NSFW.Set {
+		fields = append(fields, fmt.Sprintf("nsfw:%v", f.NSFW))
+	}
+	if f.Category.Set {
+		fields = append(fields, fmt.Sprintf("category:%v", f.Category))
+	}
+	if f.Series.Set {
+		fields = append(fields, fmt.Sprintf("series:%v", f.Series))
+	}
+	if f.Platform.Set {
+		fields = append(fields, fmt.Sprintf("platform:%v", f.Platform))
+	}
+	if f.Sort.Set {
+		fields = append(fields, fmt.Sprintf("sort:%v", f.Sort))
+	}
+	if f.Year.Set {
+		fields = append(fields, fmt.Sprintf("year:%v", f.Year))
+	}
+	if f.Month.Set {
+		fields = append(fields, fmt.Sprintf("month:%v", f.Month))
+	}
+	for _, field := range fields {
+		if _, err := h.Write([]byte(field)); err != nil {
+			return "", err
+		}
+	}
+	return fmt.Sprintf("%x", h.Sum64()), nil
 }
 
 type Repo interface {
@@ -39,6 +85,9 @@ type read interface {
 	// Get return a repository model.
 	Get(ctx context.Context, id model.SubjectID, filter Filter) (model.Subject, error)
 	GetByIDs(ctx context.Context, ids []model.SubjectID, filter Filter) (map[model.SubjectID]model.Subject, error)
+
+	Count(ctx context.Context, filter BrowseFilter) (int64, error)
+	Browse(ctx context.Context, filter BrowseFilter, limit, offset int) ([]model.Subject, error)
 
 	GetPersonRelated(ctx context.Context, personID model.PersonID) ([]domain.SubjectPersonRelation, error)
 	GetCharacterRelated(ctx context.Context, characterID model.CharacterID) ([]domain.SubjectCharacterRelation, error)

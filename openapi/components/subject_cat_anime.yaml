@@ -1,0 +1,31 @@
+title: SubjectAnimeCategory
+example: 1
+enum:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 5
+type: integer
+description: |-
+  动画类型
+  - `0` 为 其他
+  - `1` 为 TV
+  - `2` 为 OVA
+  - `3` 为 Movie
+  - `5` 为 WEB
+x-ms-enum:
+  name: SubjectAnimeCategory
+  modelAsString: false
+  values:
+    - Other
+    - TV
+    - OVA
+    - Movie
+    - WEB
+x-enum-varnames:
+  - Other
+  - TV
+  - OVA
+  - Movie
+  - WEB
