@@ -69,7 +69,7 @@ func (h Subject) Browse(c echo.Context) error {
 func parseBrowseQuery(c echo.Context) (*subject.BrowseFilter, error) {
 	filter := subject.BrowseFilter{}
 	u := accessor.GetFromCtx(c)
-	filter.NSFW = null.Bool{Value: !u.AllowNSFW(), Set: true}
+	filter.NSFW = null.Bool{Value: false, Set: !u.AllowNSFW()}
 	if stype, err := req.ParseSubjectType(c.QueryParam("type")); err != nil {
 		return nil, res.BadRequest(err.Error())
 	} else {

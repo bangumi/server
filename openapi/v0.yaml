@@ -228,7 +228,7 @@ paths:
           required: false
           schema:
             type: string
-        - name: order
+        - name: sort
           in: query
           description: 排序，枚举值 {date|rank}
           required: false
