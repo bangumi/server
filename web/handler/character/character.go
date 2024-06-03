@@ -20,6 +20,7 @@ import (
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/character"
+	"github.com/bangumi/server/internal/collections"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/compat"
@@ -30,28 +31,31 @@ import (
 )
 
 type Character struct {
-	ctrl    ctrl.Ctrl
-	person  person.Service
-	c       character.Repo
-	subject subject.Repo
-	log     *zap.Logger
-	cfg     config.AppConfig
+	ctrl      ctrl.Ctrl
+	person    person.Service
+	character character.Repo
+	subject   subject.Repo
+	collect   collections.Repo
+	log       *zap.Logger
+	cfg       config.AppConfig
 }
 
 func New(
-	p person.Service,
+	person person.Service,
 	ctrl ctrl.Ctrl,
-	c character.Repo,
+	character character.Repo,
 	subject subject.Repo,
+	collect collections.Repo,
 	log *zap.Logger,
 ) (Character, error) {
 	return Character{
-		ctrl:    ctrl,
-		c:       c,
-		subject: subject,
-		person:  p,
-		log:     log.Named("handler.Character"),
-		cfg:     config.AppConfig{},
+		ctrl:      ctrl,
+		character: character,
+		subject:   subject,
+		person:    person,
+		collect:   collect,
+		log:       log.Named("handler.Character"),
+		cfg:       config.AppConfig{},
 	}, nil
 }
 

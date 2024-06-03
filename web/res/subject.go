@@ -48,10 +48,11 @@ type SubjectV0 struct {
 	ID            model.SubjectID       `json:"id"`
 	Eps           uint32                `json:"eps"`
 	Volumes       uint32                `json:"volumes"`
-	Redirect      model.SubjectID       `json:"-"`
+	Series        bool                  `json:"series"`
 	Locked        bool                  `json:"locked"`
 	NSFW          bool                  `json:"nsfw"`
 	TypeID        model.SubjectType     `json:"type"`
+	Redirect      model.SubjectID       `json:"-"`
 }
 
 type SlimSubjectV0 struct {

@@ -49,6 +49,7 @@ func New(
 }
 
 func (h *Subject) Routes(g *echo.Group) {
+	g.GET("/subjects", h.Browse)
 	g.GET("/subjects/:id", h.Get)
 	g.GET("/subjects/:id/image", h.GetImage)
 	g.GET("/subjects/:id/persons", h.GetRelatedPersons)

@@ -461,6 +461,149 @@ func (r mysqlRepo) updateCollectionTime(obj *dao.SubjectCollection,
 	return nil
 }
 
+func (r mysqlRepo) GetPersonCollection(
+	ctx context.Context, userID model.UserID,
+	cat collection.PersonCollectCategory, targetID model.PersonID,
+) (collection.UserPersonCollection, error) {
+	c, err := r.q.PersonCollect.WithContext(ctx).
+		Where(r.q.PersonCollect.UserID.Eq(userID), r.q.PersonCollect.Category.Eq(string(cat)),
+			r.q.PersonCollect.TargetID.Eq(targetID)).Take()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return collection.UserPersonCollection{}, gerr.ErrNotFound
+		}
+		return collection.UserPersonCollection{}, errgo.Wrap(err, "dal")
+	}
+
+	return collection.UserPersonCollection{
+		ID:        c.ID,
+		Category:  c.Category,
+		TargetID:  c.TargetID,
+		UserID:    c.UserID,
+		CreatedAt: time.Unix(int64(c.CreatedTime), 0),
+	}, nil
+}
+
+func (r mysqlRepo) AddPersonCollection(
+	ctx context.Context, userID model.UserID,
+	cat collection.PersonCollectCategory, targetID model.PersonID,
+) error {
+	collect := &dao.PersonCollect{
+		UserID:      userID,
+		Category:    string(cat),
+		TargetID:    targetID,
+		CreatedTime: uint32(time.Now().Unix()),
+	}
+	err := r.q.Transaction(func(tx *query.Query) error {
+		switch cat {
+		case collection.PersonCollectCategoryCharacter:
+			if _, err := tx.Character.WithContext(ctx).Where(
+				tx.Character.ID.Eq(targetID)).UpdateSimple(tx.Character.Collects.Add(1)); err != nil {
+				r.log.Error("failed to update character collects", zap.Error(err))
+				return err
+			}
+		case collection.PersonCollectCategoryPerson:
+			if _, err := tx.Person.WithContext(ctx).Where(
+				tx.Person.ID.Eq(targetID)).UpdateSimple(tx.Person.Collects.Add(1)); err != nil {
+				r.log.Error("failed to update person collects", zap.Error(err))
+				return err
+			}
+		}
+		if err := tx.PersonCollect.WithContext(ctx).Create(collect); err != nil {
+			r.log.Error("failed to create person collection record", zap.Error(err))
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return errgo.Wrap(err, "dal")
+	}
+	return nil
+}
+
+func (r mysqlRepo) RemovePersonCollection(
+	ctx context.Context, userID model.UserID,
+	cat collection.PersonCollectCategory, targetID model.PersonID,
+) error {
+	err := r.q.Transaction(func(tx *query.Query) error {
+		switch cat {
+		case collection.PersonCollectCategoryCharacter:
+			if _, err := tx.Character.WithContext(ctx).Where(
+				tx.Character.ID.Eq(targetID)).UpdateSimple(tx.Character.Collects.Sub(1)); err != nil {
+				r.log.Error("failed to update character collects", zap.Error(err))
+				return err
+			}
+		case collection.PersonCollectCategoryPerson:
+			if _, err := tx.Person.WithContext(ctx).Where(
+				tx.Person.ID.Eq(targetID)).UpdateSimple(tx.Person.Collects.Sub(1)); err != nil {
+				r.log.Error("failed to update person collects", zap.Error(err))
+				return err
+			}
+		}
+		_, err := tx.PersonCollect.WithContext(ctx).Where(
+			tx.PersonCollect.UserID.Eq(userID),
+			tx.PersonCollect.Category.Eq(string(cat)),
+			tx.PersonCollect.TargetID.Eq(targetID),
+		).Delete()
+		if err != nil {
+			r.log.Error("failed to delete person collection record", zap.Error(err))
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return errgo.Wrap(err, "dal")
+	}
+
+	return nil
+}
+
+func (r mysqlRepo) CountPersonCollections(
+	ctx context.Context,
+	userID model.UserID,
+	cat collection.PersonCollectCategory,
+) (int64, error) {
+	q := r.q.PersonCollect.WithContext(ctx).
+		Where(r.q.PersonCollect.UserID.Eq(userID), r.q.PersonCollect.Category.Eq(string(cat)))
+
+	c, err := q.Count()
+	if err != nil {
+		return 0, errgo.Wrap(err, "dal")
+	}
+
+	return c, nil
+}
+
+func (r mysqlRepo) ListPersonCollection(
+	ctx context.Context,
+	userID model.UserID,
+	cat collection.PersonCollectCategory,
+	limit, offset int,
+) ([]collection.UserPersonCollection, error) {
+	q := r.q.PersonCollect.WithContext(ctx).
+		Order(r.q.PersonCollect.CreatedTime.Desc()).
+		Where(r.q.PersonCollect.UserID.Eq(userID), r.q.PersonCollect.Category.Eq(string(cat))).Limit(limit).Offset(offset)
+
+	collections, err := q.Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var results = make([]collection.UserPersonCollection, len(collections))
+	for i, c := range collections {
+		results[i] = collection.UserPersonCollection{
+			ID:        c.ID,
+			Category:  c.Category,
+			TargetID:  c.TargetID,
+			UserID:    c.UserID,
+			CreatedAt: time.Unix(int64(c.CreatedTime), 0),
+		}
+	}
+
+	return results, nil
+}
+
 func (r mysqlRepo) UpdateEpisodeCollection(
 	ctx context.Context,
 	userID model.UserID,

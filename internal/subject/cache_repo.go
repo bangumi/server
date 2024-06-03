@@ -39,6 +39,11 @@ type cacheRepo struct {
 	log   *zap.Logger
 }
 
+const (
+	browseCacheTTLFirst = 24 * time.Hour
+	browseCacheTTLOther = time.Hour
+)
+
 func (r cacheRepo) Get(ctx context.Context, id model.SubjectID, filter Filter) (model.Subject, error) {
 	var key = cachekey.Subject(id)
 
@@ -69,6 +74,66 @@ func (r cacheRepo) GetByIDs(
 	ctx context.Context, ids []model.SubjectID, filter Filter,
 ) (map[model.SubjectID]model.Subject, error) {
 	return r.repo.GetByIDs(ctx, ids, filter)
+}
+
+func (r cacheRepo) Count(ctx context.Context, filter BrowseFilter) (int64, error) {
+	hash, err := filter.Hash()
+	if err != nil {
+		return 0, err
+	}
+	key := cachekey.SubjectBrowseCount(hash)
+
+	var s int64
+	ok, err := r.cache.Get(ctx, key, &s)
+	if err != nil {
+		return s, errgo.Wrap(err, "cache.Get")
+	}
+	if ok {
+		return s, nil
+	}
+
+	s, err = r.repo.Count(ctx, filter)
+	if err != nil {
+		return s, err
+	}
+	if e := r.cache.Set(ctx, key, s, 10*time.Minute); e != nil {
+		r.log.Error("can't set response to cache", zap.Error(e))
+	}
+
+	return s, nil
+}
+
+func (r cacheRepo) Browse(
+	ctx context.Context, filter BrowseFilter, limit, offset int,
+) ([]model.Subject, error) {
+	hash, err := filter.Hash()
+	if err != nil {
+		return nil, err
+	}
+	key := cachekey.SubjectBrowse(hash, limit, offset)
+
+	var subjects []model.Subject
+	ok, err := r.cache.Get(ctx, key, &subjects)
+	if err != nil {
+		return nil, errgo.Wrap(err, "cache.Get")
+	}
+	if ok {
+		return subjects, nil
+	}
+
+	subjects, err = r.repo.Browse(ctx, filter, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	ttl := browseCacheTTLFirst
+	if offset > 0 {
+		ttl = browseCacheTTLOther
+	}
+	if e := r.cache.Set(ctx, key, subjects, ttl); e != nil {
+		r.log.Error("can't set response to cache", zap.Error(e))
+	}
+
+	return subjects, nil
 }
 
 func (r cacheRepo) GetPersonRelated(

@@ -24,7 +24,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 )
 
-type Repo interface {
+type Repo interface { //nolint:interfacebloat
 	// WithQuery is used to replace repo's query to txn
 	WithQuery(query *query.Query) Repo
 	CountSubjectCollections(
@@ -70,6 +70,34 @@ type Repo interface {
 		episodeIDs []model.EpisodeID, collection collection.EpisodeCollection,
 		at time.Time,
 	) (collection.UserSubjectEpisodesCollection, error)
+
+	GetPersonCollection(
+		ctx context.Context, userID model.UserID,
+		cat collection.PersonCollectCategory, targetID model.PersonID,
+	) (collection.UserPersonCollection, error)
+
+	AddPersonCollection(
+		ctx context.Context, userID model.UserID,
+		cat collection.PersonCollectCategory, targetID model.PersonID,
+	) error
+
+	RemovePersonCollection(
+		ctx context.Context, userID model.UserID,
+		cat collection.PersonCollectCategory, targetID model.PersonID,
+	) error
+
+	CountPersonCollections(
+		ctx context.Context,
+		userID model.UserID,
+		cat collection.PersonCollectCategory,
+	) (int64, error)
+
+	ListPersonCollection(
+		ctx context.Context,
+		userID model.UserID,
+		cat collection.PersonCollectCategory,
+		limit, offset int,
+	) ([]collection.UserPersonCollection, error)
 }
 
 type Update struct {

@@ -142,6 +142,7 @@ func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {
 			Doing:   s.Doing,
 		},
 		TypeID: s.TypeID,
+		Series: s.Series,
 		Locked: s.Locked(),
 		NSFW:   s.NSFW,
 		Rating: res.Rating{

@@ -66,10 +66,18 @@ func AddRouters(
 	v0.GET("/persons/:id/image", personHandler.GetImage)
 	v0.GET("/persons/:id/subjects", personHandler.GetRelatedSubjects)
 	v0.GET("/persons/:id/characters", personHandler.GetRelatedCharacters)
+	v0.POST("/persons/:id/collect", personHandler.CollectPerson, mw.NeedLogin)
+	// TODO: wait for soft delete
+	// v0.DELETE("/persons/:id/collect", personHandler.UncollectPerson, mw.NeedLogin)
+
 	v0.GET("/characters/:id", characterHandler.Get)
 	v0.GET("/characters/:id/image", characterHandler.GetImage)
 	v0.GET("/characters/:id/subjects", characterHandler.GetRelatedSubjects)
 	v0.GET("/characters/:id/persons", characterHandler.GetRelatedPersons)
+	v0.POST("/characters/:id/collect", characterHandler.CollectCharacter, mw.NeedLogin)
+	// TODO: wait for soft delete
+	// v0.DELETE("/characters/:id/collect", characterHandler.UncollectCharacter, mw.NeedLogin)
+
 	v0.GET("/episodes/:id", h.GetEpisode)
 	v0.GET("/episodes", h.ListEpisode)
 
@@ -80,8 +88,10 @@ func AddRouters(
 	// echo 中间件从前往后运行按顺序
 	v0.GET("/me", userHandler.GetCurrent)
 	v0.GET("/users/:username", userHandler.Get)
+	v0.GET("/users/:username/avatar", userHandler.GetAvatar)
 	v0.GET("/users/:username/collections", userHandler.ListSubjectCollection)
 	v0.GET("/users/:username/collections/:subject_id", userHandler.GetSubjectCollection)
+
 	v0.GET("/users/-/collections/-/episodes/:episode_id", userHandler.GetEpisodeCollection, mw.NeedLogin)
 	v0.PUT("/users/-/collections/-/episodes/:episode_id", userHandler.PutEpisodeCollection, req.JSON, mw.NeedLogin)
 	v0.GET("/users/-/collections/:subject_id/episodes", userHandler.GetSubjectEpisodeCollection, mw.NeedLogin)
@@ -90,7 +100,10 @@ func AddRouters(
 	v0.PATCH("/users/-/collections/:subject_id/episodes",
 		userHandler.PatchEpisodeCollectionBatch, req.JSON, mw.NeedLogin)
 
-	v0.GET("/users/:username/avatar", userHandler.GetAvatar)
+	v0.GET("/users/:username/collections/-/characters", userHandler.ListCharacterCollection)
+	v0.GET("/users/:username/collections/-/characters/:character_id", userHandler.GetCharacterCollection)
+	v0.GET("/users/:username/collections/-/persons", userHandler.ListPersonCollection)
+	v0.GET("/users/:username/collections/-/persons/:person_id", userHandler.GetPersonCollection)
 
 	{
 		i := indexHandler

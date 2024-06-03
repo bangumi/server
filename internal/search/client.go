@@ -254,8 +254,8 @@ func (c *client) firstRun() {
 		return
 	}
 
-	c.log.Info("set searchable attributes", zap.Strings("attributes", *searchAbleAttribute()))
-	_, err = subjectIndex.UpdateSearchableAttributes(searchAbleAttribute())
+	c.log.Info("set searchable attributes", zap.Strings("attributes", *getAttributes("searchable")))
+	_, err = subjectIndex.UpdateSearchableAttributes(getAttributes("searchable"))
 	if err != nil {
 		c.log.Fatal("failed to update search index searchable attributes", zap.Error(err))
 		return

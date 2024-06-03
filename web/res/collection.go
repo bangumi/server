@@ -51,3 +51,33 @@ func ConvertModelSubjectCollection(c collection.UserSubjectCollection, subject S
 		Subject:     subject,
 	}
 }
+
+type PersonCollection struct {
+	ID        uint32       `json:"id"`
+	Type      uint8        `json:"type"`
+	Name      string       `json:"name"`
+	Images    PersonImages `json:"images"`
+	CreatedAt time.Time    `json:"created_at"`
+}
+
+func ConvertModelPersonCollection(c collection.UserPersonCollection, person model.Person) PersonCollection {
+	img := PersonImage(person.Image)
+	return PersonCollection{
+		ID:        person.ID,
+		Type:      person.Type,
+		Name:      person.Name,
+		Images:    img,
+		CreatedAt: c.CreatedAt,
+	}
+}
+
+func ConvertModelCharacterCollection(c collection.UserPersonCollection, character model.Character) PersonCollection {
+	img := PersonImage(character.Image)
+	return PersonCollection{
+		ID:        character.ID,
+		Type:      character.Type,
+		Name:      character.Name,
+		Images:    img,
+		CreatedAt: c.CreatedAt,
+	}
+}
