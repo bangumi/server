@@ -226,7 +226,7 @@ func main() {
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Index",
-                                 
+
 		gen.FieldTrimPrefix("idx_"),
 		gen.FieldType("idx_id", "uint32"),
 		gen.FieldType("idx_uid", userIDTypeString),

@@ -459,7 +459,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: [ ]
+        - OptionalHTTPBearer: []
 
   "/v0/subjects/{subject_id}/post":
     get:
@@ -504,7 +504,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: [ ]
+        - OptionalHTTPBearer: []
   "/v0/subjects/{subject_id}/post/{comment_id}":
     get:
       tags:
@@ -535,8 +535,6 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
-
-
 
   "/v0/episodes":
     get:
@@ -650,10 +648,10 @@ paths:
           description: Successful Response
           content:
             application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/EpisodeComment"
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EpisodeComment"
         "404":
           description: Not Found
           content:
@@ -667,7 +665,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: [ ]
+        - OptionalHTTPBearer: []
     put:
       tags:
         - 章节
@@ -697,7 +695,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: [ ]
+        - OptionalHTTPBearer: []
   "/v0/episodes/{episode_id}/comment/{comment_id}":
     get:
       tags:
@@ -1973,9 +1971,9 @@ paths:
         "400":
           "$ref": "#/components/responses/400"
         "404":
-            "$ref": "#/components/responses/404"
+          "$ref": "#/components/responses/404"
       security:
-        - OptionalHTTPBearer: [ ]
+        - OptionalHTTPBearer: []
     put:
       tags:
         - 目录
@@ -2013,8 +2011,7 @@ paths:
         "404":
           "$ref": "#/components/responses/404"
       security:
-        - OptionalHTTPBearer: [ ]
-  
+        - OptionalHTTPBearer: []
 
   "/v0/indices/{index_id}/subjects":
     get:
@@ -2174,8 +2171,6 @@ components:
       name: episode_id
       description: 章节 ID
       in: path
-
-
 
     path_character_id:
       required: true
@@ -3599,4 +3594,3 @@ components:
         application/json:
           schema:
             "$ref": "#/components/schemas/ErrorDetail"
-
