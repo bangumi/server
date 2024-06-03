@@ -27,9 +27,9 @@ import (
 // 搜索字段因为带有排序，所以定义在 [search.searchAbleAttribute] 中.
 type subjectIndex struct {
 	ID       model.SubjectID `json:"id"`
-	Summary  string          `json:"summary"`
 	Tag      []string        `json:"tag,omitempty" filterable:"true"`
-	Name     []string        `json:"name" searchable:"true"`
+	Name     string          `json:"name" searchable:"true"`
+	Aliases  []string        `json:"aliases,omitempty" searchable:"true"`
 	Date     int             `json:"date,omitempty" filterable:"true" sortable:"true"`
 	Score    float64         `json:"score" filterable:"true" sortable:"true"`
 	PageRank float64         `json:"page_rank" sortable:"true"`
@@ -72,9 +72,9 @@ func extractSubject(s *model.Subject) subjectIndex {
 
 	return subjectIndex{
 		ID:       s.ID,
-		Name:     extractNames(s, w),
+		Name:     s.Name,
+		Aliases:  extractAliases(s, w),
 		Tag:      tagNames,
-		Summary:  s.Summary,
 		NSFW:     s.NSFW,
 		Type:     s.TypeID,
 		Date:     parseDateVal(s.Date),

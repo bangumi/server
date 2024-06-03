@@ -23,20 +23,19 @@ func heat(s *model.Subject) uint32 {
 	return s.OnHold + s.Doing + s.Dropped + s.Wish + s.Collect
 }
 
-func extractNames(s *model.Subject, w wiki.Wiki) []string {
-	var names = make([]string, 0, 3)
-	names = append(names, s.Name)
+func extractAliases(s *model.Subject, w wiki.Wiki) []string {
+	var aliases = make([]string, 0, 2)
 	if s.NameCN != "" {
-		names = append(names, s.NameCN)
+		aliases = append(aliases, s.NameCN)
 	}
 
 	for _, field := range w.Fields {
 		if field.Key == "别名" {
-			names = append(names, getValues(field)...)
+			aliases = append(aliases, getValues(field)...)
 		}
 	}
 
-	return names
+	return aliases
 }
 
 func getValues(f wiki.Field) []string {
