@@ -210,6 +210,19 @@ func main() {
 		gen.FieldTrimPrefix("interest_"),
 	))
 
+	g.ApplyBasic(g.GenerateModelAs("chii_person_collects", "PersonCollect",
+		gen.FieldTrimPrefix("prsn_clt_"),
+		gen.FieldType("prsn_clt_id", "uint32"),
+		gen.FieldType("prsn_clt_cat", "string"),
+		gen.FieldType("prsn_clt_uid", userIDTypeString),
+		gen.FieldType("prsn_clt_mid", "uint32"),
+		gen.FieldType("prsn_clt_dateline", "uint32"),
+		gen.FieldRename("prsn_clt_cat", "Category"),
+		gen.FieldRename("prsn_clt_uid", "UserID"),
+		gen.FieldRename("prsn_clt_mid", "TargetID"),
+		gen.FieldRename("prsn_clt_dateline", createdTime),
+	))
+
 	g.ApplyBasic(g.GenerateModelAs("chii_index", "Field",
 		gen.FieldTrimPrefix("idx_"),
 		gen.FieldType("idx_id", "uint32"),

@@ -110,7 +110,7 @@ func AddRouters(
 		v0.GET("/indices/:id/comment", i.GetComments, mw.NeedLogin)
 		v0.GET("/indices/:id/comment/:comment_id", i.GetComment, mw.NeedLogin)
 		v0.PUT("/indices/:id/comment", i.AddComment, mw.NeedLogin)
-		v0.DELETE("/indices/:id/comment/:comment_id", i.RemoveComment, mw.NeedLogin)
+		//v0.DELETE("/indices/:id/comment/:comment_id", i.RemoveComment, mw.NeedLogin)
 	}
 
 	v0.GET("/revisions/persons/:id", h.GetPersonRevision)

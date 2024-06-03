@@ -59,5 +59,5 @@ func (h *Subject) Routes(g *echo.Group) {
 	g.GET("/subjects/:id/post", h.GetComments)
 	g.GET("/subjects/:id/post/:post_id", h.GetComment)
 	g.PUT("/subjects/:id/post", h.AddComment, mw.NeedLogin)
-	g.DELETE("/subjects/:id/post/:post_id", h.RemoveComment, mw.NeedLogin)
+	//g.DELETE("/subjects/:id/post/:post_id", h.RemoveComment, mw.NeedLogin)
 }

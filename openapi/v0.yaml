@@ -460,31 +460,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
-    delete:
-      tags:
-        - 条目
-      summary: 删除评论
-      operationId: delSubjectCommentByID
-      parameters:
-        - $ref: "#/components/parameters/path_subject_id"
-        - $ref: "#/components/parameters/path_comment_id"
-      responses:
-        "200":
-          description: Successful Response
-        "400":
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ErrorDetail"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ErrorDetail"
-      security:
-        - OptionalHTTPBearer: [ ]
+
 
 
   "/v0/episodes":
@@ -678,31 +654,6 @@ paths:
       security:
         - OptionalHTTPBearer: []
 
-    delete:
-      tags:
-        - 章节
-      summary: Delete Episode's comment
-      operationId: delEpisodeCommentById
-      parameters:
-        - $ref: "#/components/parameters/path_episode_id"
-        - $ref: "#/components/parameters/path_comment_id"
-      responses:
-        "200":
-          description: Successful Response
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ErrorDetail"
-        "400":
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ErrorDetail"
-      security:
-        - OptionalHTTPBearer: [ ]
   "/v0/characters/{character_id}":
     get:
       tags:
@@ -1761,23 +1712,7 @@ paths:
           "$ref": "#/components/responses/404"
       security:
         - OptionalHTTPBearer: [ ]
-    delete:
-      tags:
-        - 目录
-      summary: Delete Index's Comment
-      operationId: delIndexCommentByIDs
-      parameters:
-        - $ref: "#/components/parameters/path_index_id"
-        - $ref: "#/components/parameters/path_comment_id"
-      responses:
-        "200":
-          description: Successful Response
-        "400":
-          "$ref": "#/components/responses/400"
-        "404":
-          "$ref": "#/components/responses/404"
-      security:
-        - OptionalHTTPBearer: [ ]
+  
 
   "/v0/indices/{index_id}/subjects":
     get:
