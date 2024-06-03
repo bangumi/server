@@ -144,6 +144,53 @@ func (_c *SubjectRepo_Count_Call) RunAndReturn(run func(context.Context, subject
 	return _c
 }
 
+// DeletePost provides a mock function with given fields: ctx, id
+func (_m *SubjectRepo) DeletePost(ctx context.Context, id uint32) error {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeletePost")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// SubjectRepo_DeletePost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeletePost'
+type SubjectRepo_DeletePost_Call struct {
+	*mock.Call
+}
+
+// DeletePost is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+func (_e *SubjectRepo_Expecter) DeletePost(ctx interface{}, id interface{}) *SubjectRepo_DeletePost_Call {
+	return &SubjectRepo_DeletePost_Call{Call: _e.mock.On("DeletePost", ctx, id)}
+}
+
+func (_c *SubjectRepo_DeletePost_Call) Run(run func(ctx context.Context, id uint32)) *SubjectRepo_DeletePost_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *SubjectRepo_DeletePost_Call) Return(_a0 error) *SubjectRepo_DeletePost_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *SubjectRepo_DeletePost_Call) RunAndReturn(run func(context.Context, uint32) error) *SubjectRepo_DeletePost_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, id, filter
 func (_m *SubjectRepo) Get(ctx context.Context, id uint32, filter subject.Filter) (model.Subject, error) {
 	ret := _m.Called(ctx, id, filter)
@@ -258,6 +305,67 @@ func (_c *SubjectRepo_GetActors_Call) Return(_a0 map[uint32][]uint32, _a1 error)
 }
 
 func (_c *SubjectRepo_GetActors_Call) RunAndReturn(run func(context.Context, uint32, []uint32) (map[uint32][]uint32, error)) *SubjectRepo_GetActors_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetAllPost provides a mock function with given fields: ctx, id, offset, limit
+func (_m *SubjectRepo) GetAllPost(ctx context.Context, id uint32, offset int, limit int) ([]model.SubjectPost, error) {
+	ret := _m.Called(ctx, id, offset, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllPost")
+	}
+
+	var r0 []model.SubjectPost
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int, int) ([]model.SubjectPost, error)); ok {
+		return rf(ctx, id, offset, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int, int) []model.SubjectPost); ok {
+		r0 = rf(ctx, id, offset, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.SubjectPost)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, int, int) error); ok {
+		r1 = rf(ctx, id, offset, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SubjectRepo_GetAllPost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAllPost'
+type SubjectRepo_GetAllPost_Call struct {
+	*mock.Call
+}
+
+// GetAllPost is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - offset int
+//   - limit int
+func (_e *SubjectRepo_Expecter) GetAllPost(ctx interface{}, id interface{}, offset interface{}, limit interface{}) *SubjectRepo_GetAllPost_Call {
+	return &SubjectRepo_GetAllPost_Call{Call: _e.mock.On("GetAllPost", ctx, id, offset, limit)}
+}
+
+func (_c *SubjectRepo_GetAllPost_Call) Run(run func(ctx context.Context, id uint32, offset int, limit int)) *SubjectRepo_GetAllPost_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(int), args[3].(int))
+	})
+	return _c
+}
+
+func (_c *SubjectRepo_GetAllPost_Call) Return(_a0 []model.SubjectPost, _a1 error) *SubjectRepo_GetAllPost_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SubjectRepo_GetAllPost_Call) RunAndReturn(run func(context.Context, uint32, int, int) ([]model.SubjectPost, error)) *SubjectRepo_GetAllPost_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -440,6 +548,63 @@ func (_c *SubjectRepo_GetPersonRelated_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
+// GetPost provides a mock function with given fields: ctx, id
+func (_m *SubjectRepo) GetPost(ctx context.Context, id uint32) (model.SubjectPost, error) {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPost")
+	}
+
+	var r0 model.SubjectPost
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) (model.SubjectPost, error)); ok {
+		return rf(ctx, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) model.SubjectPost); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(model.SubjectPost)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SubjectRepo_GetPost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPost'
+type SubjectRepo_GetPost_Call struct {
+	*mock.Call
+}
+
+// GetPost is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+func (_e *SubjectRepo_Expecter) GetPost(ctx interface{}, id interface{}) *SubjectRepo_GetPost_Call {
+	return &SubjectRepo_GetPost_Call{Call: _e.mock.On("GetPost", ctx, id)}
+}
+
+func (_c *SubjectRepo_GetPost_Call) Run(run func(ctx context.Context, id uint32)) *SubjectRepo_GetPost_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *SubjectRepo_GetPost_Call) Return(_a0 model.SubjectPost, _a1 error) *SubjectRepo_GetPost_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SubjectRepo_GetPost_Call) RunAndReturn(run func(context.Context, uint32) (model.SubjectPost, error)) *SubjectRepo_GetPost_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetSubjectRelated provides a mock function with given fields: ctx, subjectID
 func (_m *SubjectRepo) GetSubjectRelated(ctx context.Context, subjectID uint32) ([]domain.SubjectInternalRelation, error) {
 	ret := _m.Called(ctx, subjectID)
@@ -495,6 +660,53 @@ func (_c *SubjectRepo_GetSubjectRelated_Call) Return(_a0 []domain.SubjectInterna
 }
 
 func (_c *SubjectRepo_GetSubjectRelated_Call) RunAndReturn(run func(context.Context, uint32) ([]domain.SubjectInternalRelation, error)) *SubjectRepo_GetSubjectRelated_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// NewPost provides a mock function with given fields: ctx, post
+func (_m *SubjectRepo) NewPost(ctx context.Context, post model.SubjectPost) error {
+	ret := _m.Called(ctx, post)
+
+	if len(ret) == 0 {
+		panic("no return value specified for NewPost")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.SubjectPost) error); ok {
+		r0 = rf(ctx, post)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// SubjectRepo_NewPost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'NewPost'
+type SubjectRepo_NewPost_Call struct {
+	*mock.Call
+}
+
+// NewPost is a helper method to define mock.On call
+//   - ctx context.Context
+//   - post model.SubjectPost
+func (_e *SubjectRepo_Expecter) NewPost(ctx interface{}, post interface{}) *SubjectRepo_NewPost_Call {
+	return &SubjectRepo_NewPost_Call{Call: _e.mock.On("NewPost", ctx, post)}
+}
+
+func (_c *SubjectRepo_NewPost_Call) Run(run func(ctx context.Context, post model.SubjectPost)) *SubjectRepo_NewPost_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.SubjectPost))
+	})
+	return _c
+}
+
+func (_c *SubjectRepo_NewPost_Call) Return(_a0 error) *SubjectRepo_NewPost_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *SubjectRepo_NewPost_Call) RunAndReturn(run func(context.Context, model.SubjectPost) error) *SubjectRepo_NewPost_Call {
 	_c.Call.Return(run)
 	return _c
 }

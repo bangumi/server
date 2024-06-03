@@ -8,6 +8,8 @@ import (
 	episode "github.com/bangumi/server/internal/episode"
 	mock "github.com/stretchr/testify/mock"
 
+	model "github.com/bangumi/server/internal/model"
+
 	query "github.com/bangumi/server/dal/query"
 )
 
@@ -22,6 +24,53 @@ type EpisodeRepo_Expecter struct {
 
 func (_m *EpisodeRepo) EXPECT() *EpisodeRepo_Expecter {
 	return &EpisodeRepo_Expecter{mock: &_m.Mock}
+}
+
+// AddNewComment provides a mock function with given fields: ctx, comment
+func (_m *EpisodeRepo) AddNewComment(ctx context.Context, comment model.EpisodeComment) error {
+	ret := _m.Called(ctx, comment)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddNewComment")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.EpisodeComment) error); ok {
+		r0 = rf(ctx, comment)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// EpisodeRepo_AddNewComment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddNewComment'
+type EpisodeRepo_AddNewComment_Call struct {
+	*mock.Call
+}
+
+// AddNewComment is a helper method to define mock.On call
+//   - ctx context.Context
+//   - comment model.EpisodeComment
+func (_e *EpisodeRepo_Expecter) AddNewComment(ctx interface{}, comment interface{}) *EpisodeRepo_AddNewComment_Call {
+	return &EpisodeRepo_AddNewComment_Call{Call: _e.mock.On("AddNewComment", ctx, comment)}
+}
+
+func (_c *EpisodeRepo_AddNewComment_Call) Run(run func(ctx context.Context, comment model.EpisodeComment)) *EpisodeRepo_AddNewComment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.EpisodeComment))
+	})
+	return _c
+}
+
+func (_c *EpisodeRepo_AddNewComment_Call) Return(_a0 error) *EpisodeRepo_AddNewComment_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *EpisodeRepo_AddNewComment_Call) RunAndReturn(run func(context.Context, model.EpisodeComment) error) *EpisodeRepo_AddNewComment_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // Count provides a mock function with given fields: ctx, subjectID, filter
@@ -82,6 +131,53 @@ func (_c *EpisodeRepo_Count_Call) RunAndReturn(run func(context.Context, uint32,
 	return _c
 }
 
+// DeleteComment provides a mock function with given fields: ctx, commentID
+func (_m *EpisodeRepo) DeleteComment(ctx context.Context, commentID uint32) error {
+	ret := _m.Called(ctx, commentID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteComment")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) error); ok {
+		r0 = rf(ctx, commentID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// EpisodeRepo_DeleteComment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteComment'
+type EpisodeRepo_DeleteComment_Call struct {
+	*mock.Call
+}
+
+// DeleteComment is a helper method to define mock.On call
+//   - ctx context.Context
+//   - commentID uint32
+func (_e *EpisodeRepo_Expecter) DeleteComment(ctx interface{}, commentID interface{}) *EpisodeRepo_DeleteComment_Call {
+	return &EpisodeRepo_DeleteComment_Call{Call: _e.mock.On("DeleteComment", ctx, commentID)}
+}
+
+func (_c *EpisodeRepo_DeleteComment_Call) Run(run func(ctx context.Context, commentID uint32)) *EpisodeRepo_DeleteComment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *EpisodeRepo_DeleteComment_Call) Return(_a0 error) *EpisodeRepo_DeleteComment_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *EpisodeRepo_DeleteComment_Call) RunAndReturn(run func(context.Context, uint32) error) *EpisodeRepo_DeleteComment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, episodeID
 func (_m *EpisodeRepo) Get(ctx context.Context, episodeID uint32) (episode.Episode, error) {
 	ret := _m.Called(ctx, episodeID)
@@ -135,6 +231,124 @@ func (_c *EpisodeRepo_Get_Call) Return(_a0 episode.Episode, _a1 error) *EpisodeR
 }
 
 func (_c *EpisodeRepo_Get_Call) RunAndReturn(run func(context.Context, uint32) (episode.Episode, error)) *EpisodeRepo_Get_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetAllComment provides a mock function with given fields: ctx, episodeID, offset, limit
+func (_m *EpisodeRepo) GetAllComment(ctx context.Context, episodeID uint32, offset int, limit int) ([]model.EpisodeComment, error) {
+	ret := _m.Called(ctx, episodeID, offset, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllComment")
+	}
+
+	var r0 []model.EpisodeComment
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int, int) ([]model.EpisodeComment, error)); ok {
+		return rf(ctx, episodeID, offset, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int, int) []model.EpisodeComment); ok {
+		r0 = rf(ctx, episodeID, offset, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.EpisodeComment)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, int, int) error); ok {
+		r1 = rf(ctx, episodeID, offset, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// EpisodeRepo_GetAllComment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAllComment'
+type EpisodeRepo_GetAllComment_Call struct {
+	*mock.Call
+}
+
+// GetAllComment is a helper method to define mock.On call
+//   - ctx context.Context
+//   - episodeID uint32
+//   - offset int
+//   - limit int
+func (_e *EpisodeRepo_Expecter) GetAllComment(ctx interface{}, episodeID interface{}, offset interface{}, limit interface{}) *EpisodeRepo_GetAllComment_Call {
+	return &EpisodeRepo_GetAllComment_Call{Call: _e.mock.On("GetAllComment", ctx, episodeID, offset, limit)}
+}
+
+func (_c *EpisodeRepo_GetAllComment_Call) Run(run func(ctx context.Context, episodeID uint32, offset int, limit int)) *EpisodeRepo_GetAllComment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(int), args[3].(int))
+	})
+	return _c
+}
+
+func (_c *EpisodeRepo_GetAllComment_Call) Return(_a0 []model.EpisodeComment, _a1 error) *EpisodeRepo_GetAllComment_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *EpisodeRepo_GetAllComment_Call) RunAndReturn(run func(context.Context, uint32, int, int) ([]model.EpisodeComment, error)) *EpisodeRepo_GetAllComment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetComment provides a mock function with given fields: ctx, commentID
+func (_m *EpisodeRepo) GetComment(ctx context.Context, commentID uint32) (model.EpisodeComment, error) {
+	ret := _m.Called(ctx, commentID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetComment")
+	}
+
+	var r0 model.EpisodeComment
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) (model.EpisodeComment, error)); ok {
+		return rf(ctx, commentID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) model.EpisodeComment); ok {
+		r0 = rf(ctx, commentID)
+	} else {
+		r0 = ret.Get(0).(model.EpisodeComment)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, commentID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// EpisodeRepo_GetComment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetComment'
+type EpisodeRepo_GetComment_Call struct {
+	*mock.Call
+}
+
+// GetComment is a helper method to define mock.On call
+//   - ctx context.Context
+//   - commentID uint32
+func (_e *EpisodeRepo_Expecter) GetComment(ctx interface{}, commentID interface{}) *EpisodeRepo_GetComment_Call {
+	return &EpisodeRepo_GetComment_Call{Call: _e.mock.On("GetComment", ctx, commentID)}
+}
+
+func (_c *EpisodeRepo_GetComment_Call) Run(run func(ctx context.Context, commentID uint32)) *EpisodeRepo_GetComment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *EpisodeRepo_GetComment_Call) Return(_a0 model.EpisodeComment, _a1 error) *EpisodeRepo_GetComment_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *EpisodeRepo_GetComment_Call) RunAndReturn(run func(context.Context, uint32) (model.EpisodeComment, error)) *EpisodeRepo_GetComment_Call {
 	_c.Call.Return(run)
 	return _c
 }
