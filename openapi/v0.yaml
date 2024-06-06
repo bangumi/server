@@ -673,7 +673,6 @@ paths:
       operationId: addEpisodeCommentById
       parameters:
         - $ref: "#/components/parameters/path_episode_id"
-        - $ref: "#/components/parameters/path_comment_id"
       requestBody:
         content:
           application/json:
