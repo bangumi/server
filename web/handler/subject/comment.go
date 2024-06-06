@@ -110,13 +110,13 @@ func (h Subject) AddComment(c echo.Context) error {
 	}
 
 	var reqBody = req.SubjectComment{}
-	if err := c.Echo().JSONSerializer.Deserialize(c, &reqBody); err != nil {
+	if err = c.Echo().JSONSerializer.Deserialize(c, &reqBody); err != nil {
 		return res.JSONError(c, err)
 	}
 
 	// 校验回复消息是否存在
 	if reqBody.FieldID != 0 {
-		_, err := h.subject.GetPost(c.Request().Context(), reqBody.FieldID)
+		_, err = h.subject.GetPost(c.Request().Context(), reqBody.FieldID)
 		if err != nil {
 			return res.NotFound("cannot find comment to reply")
 		}

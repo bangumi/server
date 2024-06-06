@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
@@ -64,12 +65,10 @@ func (h *Handler) GetEpisodeComment(c echo.Context) error {
 
 func (h Handler) GetEpisodeComments(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
-
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}
-
 	e, err := h.episode.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
@@ -78,7 +77,6 @@ func (h Handler) GetEpisodeComments(c echo.Context) error {
 
 		return errgo.Wrap(err, "failed to get episode")
 	}
-
 	_, err = h.subject.Get(c.Request().Context(), e.SubjectID, subject.Filter{
 		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
 	})
@@ -91,25 +89,23 @@ func (h Handler) GetEpisodeComments(c echo.Context) error {
 	}
 
 	var offset, limit int
-
 	offsetStr := c.QueryParam("offset")
 	limitStr := c.QueryParam("limit")
-
 	if offsetStr == "" {
 		offset = 0 // 默认为0
+	} else {
+		offset, err = strconv.Atoi(offsetStr)
 	}
 	if limitStr == "" {
 		limit = 25 // 默认25
+	} else {
+		limit, err = strconv.Atoi(limitStr)
 	}
-	offset, err = strconv.Atoi(offsetStr)
 	if err != nil {
 		return res.BadRequest(err.Error())
 	}
-	limit, err = strconv.Atoi(limitStr)
-	if err != nil {
-		return res.BadRequest(err.Error())
-	}
-	r, err := h.episode.GetAllComment(c.Request().Context(), id, offset, limit)
+	var r []model.EpisodeComment
+	r, err = h.episode.GetAllComment(c.Request().Context(), id, offset, limit)
 	if err != nil {
 		return res.NotFound("cannot get episode comments")
 	}
@@ -124,13 +120,12 @@ func (h Handler) GetEpisodeComments(c echo.Context) error {
 
 func (h Handler) PostEpisodeComment(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
-
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
 	}
-
-	e, err := h.episode.Get(c.Request().Context(), id)
+	var e episode.Episode
+	e, err = h.episode.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
@@ -138,7 +133,6 @@ func (h Handler) PostEpisodeComment(c echo.Context) error {
 
 		return errgo.Wrap(err, "failed to get episode")
 	}
-
 	_, err = h.subject.Get(c.Request().Context(), e.SubjectID, subject.Filter{
 		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
 	})
@@ -148,12 +142,10 @@ func (h Handler) PostEpisodeComment(c echo.Context) error {
 		}
 		return errgo.Wrap(err, "failed to find subject of episode")
 	}
-
 	var comment req.EpisodeComment
-	if err := c.Echo().JSONSerializer.Deserialize(c, comment); err != nil {
+	if err = c.Echo().JSONSerializer.Deserialize(c, comment); err != nil {
 		return res.BadRequest(err.Error())
 	}
-
 	err = h.episode.AddNewComment(c.Request().Context(), model.EpisodeComment{
 		ID:        0,
 		Field:     id,
@@ -162,7 +154,6 @@ func (h Handler) PostEpisodeComment(c echo.Context) error {
 		CreatedAt: time.Now(),
 		Content:   comment.Comment,
 	})
-
 	if err != nil {
 		return res.BadRequest("cannot add new comment")
 	}
