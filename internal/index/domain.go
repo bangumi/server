@@ -16,9 +16,9 @@ package index
 
 import (
 	"context"
-	"github.com/bangumi/server/dal/query"
 	"time"
 
+	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/model"
 )
 

@@ -2,6 +2,12 @@ package subject
 
 import (
 	"errors"
+	"net/http"
+	"time"
+
+	"github.com/labstack/echo/v4"
+	"github.com/trim21/errgo"
+
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -9,10 +15,6 @@ import (
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
-	"github.com/labstack/echo/v4"
-	"github.com/trim21/errgo"
-	"net/http"
-	"time"
 )
 
 func (h Subject) GetComment(c echo.Context) error {

@@ -16,6 +16,7 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -48,7 +49,7 @@ type redisCache struct {
 func (c redisCache) Get(ctx context.Context, key string, value any) (bool, error) {
 	raw, err := c.r.Get(ctx, key).Bytes()
 	if err != nil {
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			return false, nil
 		}
 

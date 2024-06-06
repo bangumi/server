@@ -15,13 +15,13 @@
 package subject
 
 import (
-	"github.com/bangumi/server/web/mw"
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/web/mw"
 )
 
 type Subject struct {

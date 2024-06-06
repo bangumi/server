@@ -116,7 +116,7 @@ func (c *Consumer) Read(ctx context.Context) ([]Message, error) {
 		})
 
 		vals, err := cmd.Result()
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			if c.cfg.block >= 0 {
 				continue
 			}

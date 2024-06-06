@@ -1,8 +1,9 @@
 package res
 
 import (
-	"github.com/bangumi/server/internal/model"
 	"time"
+
+	"github.com/bangumi/server/internal/model"
 )
 
 type IndexCommentResp struct {

@@ -1,15 +1,17 @@
 package index
 
 import (
+	"net/http"
+	"strconv"
+	"time"
+
+	"github.com/labstack/echo/v4"
+	"github.com/trim21/errgo"
+
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
-	"github.com/labstack/echo/v4"
-	"github.com/trim21/errgo"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 func (h Handler) GetComment(c echo.Context) error {
