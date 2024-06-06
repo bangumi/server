@@ -262,7 +262,7 @@ func (r mysqlRepo) Count(
 		case "date":
 			q = q.Order(r.q.SubjectField.Date.Desc())
 		case "rank":
-			q = q.Order(r.q.SubjectField.Rank)
+			q = q.Where(r.q.SubjectField.Rank.Gt(0)).Order(r.q.SubjectField.Rank)
 		}
 	}
 
@@ -299,7 +299,7 @@ func (r mysqlRepo) Browse(
 		case "date":
 			q = q.Order(r.q.SubjectField.Date.Desc())
 		case "rank":
-			q = q.Order(r.q.SubjectField.Rank)
+			q = q.Where(r.q.SubjectField.Rank.Gt(0)).Order(r.q.SubjectField.Rank)
 		}
 	}
 

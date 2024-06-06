@@ -6,7 +6,7 @@ toolchain go1.22.2
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0
-	github.com/aws/aws-sdk-go v1.51.32
+	github.com/aws/aws-sdk-go v1.53.14
 	github.com/davecgh/go-spew v1.1.1
 	github.com/elliotchance/phpserialize v1.4.0
 	github.com/go-playground/locales v0.14.1
@@ -19,17 +19,17 @@ require (
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/mattn/go-colorable v0.1.13
-	github.com/meilisearch/meilisearch-go v0.26.2
+	github.com/meilisearch/meilisearch-go v0.26.3
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/prometheus/client_golang v1.19.0
-	github.com/redis/go-redis/v9 v9.5.1
+	github.com/prometheus/client_golang v1.19.1
+	github.com/redis/go-redis/v9 v9.5.2
 	github.com/samber/lo v1.39.0
 	github.com/segmentio/kafka-go v0.4.47
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	github.com/trim21/errgo v0.0.2
-	github.com/trim21/go-phpserialize v0.0.21
+	github.com/trim21/go-phpserialize v0.0.22
 	github.com/trim21/go-redis-prometheus v0.0.0
 	github.com/trim21/htest v0.0.4
 	github.com/trim21/pkg v0.0.3
