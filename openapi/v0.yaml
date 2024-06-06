@@ -490,7 +490,7 @@ paths:
               schema:
                 type: array
                 items:
-                  - "$ref": "#/components/schemas/SubjectComment"
+                  "$ref": "#/components/schemas/SubjectComment"
         "400":
           description: Validation Error
           content:
