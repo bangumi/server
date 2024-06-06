@@ -6,7 +6,7 @@ type IndexComment struct {
 	ID        CommentID
 	Field     IndexID
 	User      UserID
-	Related   CommentID //回复消息的ID
+	Related   CommentID // 回复消息的ID
 	CreatedAt time.Time
 	Content   string
 }
@@ -25,7 +25,7 @@ type EpisodeComment struct {
 	ID        CommentID
 	Field     EpisodeID
 	User      UserID
-	Related   CommentID //回复消息的ID
+	Related   CommentID // 回复消息的ID
 	CreatedAt time.Time
 	Content   string
 }

@@ -354,7 +354,10 @@ func (r mysqlRepo) WithQuery(query *query.Query) IndexRepo {
 	return &mysqlRepo{q: query, log: r.log}
 }
 
-func (r mysqlRepo) GetIndexComments(ctx context.Context, id model.IndexID, offset int, limit int) ([]model.IndexComment, error) {
+func (r mysqlRepo) GetIndexComments(ctx context.Context,
+	id model.IndexID,
+	offset int,
+	limit int) ([]model.IndexComment, error) {
 	s, err := r.q.WithContext(ctx).IndexComment.
 		Where(r.q.IndexComment.FieldID.Eq(id)).
 		Offset(offset).Limit(limit).
@@ -423,7 +426,7 @@ func (r mysqlRepo) UpdateIndexComment(ctx context.Context, indexID model.IndexID
 		return err
 	}
 	if s == nil {
-		return errors.New("comment not found")
+		return err
 	}
 	res, err := r.q.IndexComment.WithContext(ctx).Where(
 		r.q.IndexComment.PostID.Eq(indexID)).Updates(dao.IndexComment{Content: comment})

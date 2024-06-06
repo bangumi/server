@@ -343,7 +343,11 @@ func (r mysqlRepo) GetActors(
 	return results, nil
 }
 
-func (r mysqlRepo) GetAllPost(ctx context.Context, id model.SubjectID, offset int, limit int) ([]model.SubjectPost, error) {
+func (r mysqlRepo) GetAllPost(
+	ctx context.Context,
+	id model.SubjectID,
+	offset int,
+	limit int) ([]model.SubjectPost, error) {
 	s, err := r.q.WithContext(ctx).SubjectPost.
 		Where(r.q.SubjectPost.FieldID.Eq(id)).
 		Offset(offset).Limit(limit).

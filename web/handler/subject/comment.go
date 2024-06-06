@@ -83,7 +83,7 @@ func (h Subject) GetComments(c echo.Context) error {
 	if err != nil {
 		return res.BadRequest("cannot found comment")
 	}
-	resp := make([]res.SubjectPost, len(result))
+	resp := make([]res.SubjectPost, 0)
 	for _, v := range result {
 		resp = append(resp, res.ConventSubjectComment2Resp(v))
 	}
@@ -114,7 +114,7 @@ func (h Subject) AddComment(c echo.Context) error {
 		return res.JSONError(c, err)
 	}
 
-	//校验回复消息是否存在
+	// 校验回复消息是否存在
 	if reqBody.FieldID != 0 {
 		_, err := h.subject.GetPost(c.Request().Context(), reqBody.FieldID)
 		if err != nil {
@@ -160,7 +160,7 @@ func (h Subject) RemoveComment(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get subject")
 	}
 
-	//校验消息是否存在以及是否为本人发送
+	// 校验消息是否存在以及是否为本人发送
 	comment, err := h.subject.GetPost(c.Request().Context(), commentID)
 	if err != nil {
 		return res.NotFound("cannot find comment")
@@ -177,5 +177,4 @@ func (h Subject) RemoveComment(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusOK)
-
 }

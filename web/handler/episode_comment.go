@@ -21,7 +21,11 @@ func (h *Handler) GetEpisodeComment(c echo.Context) error {
 
 	id, err := req.ParseID(c.Param("id"))
 
-	commentId, err := req.ParseID(c.Param("comment_id"))
+	if err != nil {
+		return err
+	}
+
+	commentID, err := req.ParseID(c.Param("comment_id"))
 
 	if err != nil {
 		return err
@@ -47,7 +51,7 @@ func (h *Handler) GetEpisodeComment(c echo.Context) error {
 		return errgo.Wrap(err, "failed to find subject of episode")
 	}
 
-	r, err := h.episode.GetComment(c.Request().Context(), commentId)
+	r, err := h.episode.GetComment(c.Request().Context(), commentID)
 
 	if err != nil {
 		return res.NotFound("cannot find comment")
@@ -97,7 +101,6 @@ func (h Handler) GetEpisodeComments(c echo.Context) error {
 	if limitStr == "" {
 		limit = 25 // 默认25
 	}
-
 	offset, err = strconv.Atoi(offsetStr)
 	if err != nil {
 		return res.BadRequest(err.Error())
@@ -106,13 +109,12 @@ func (h Handler) GetEpisodeComments(c echo.Context) error {
 	if err != nil {
 		return res.BadRequest(err.Error())
 	}
-
 	r, err := h.episode.GetAllComment(c.Request().Context(), id, offset, limit)
 	if err != nil {
 		return res.NotFound("cannot get episode comments")
 	}
 
-	result := make([]res.EpisodeCommentResp, len(r))
+	result := make([]res.EpisodeCommentResp, 0)
 
 	for _, v := range r {
 		result = append(result, res.ConventEpisodeComment2Resp(v))
@@ -144,7 +146,6 @@ func (h Handler) PostEpisodeComment(c echo.Context) error {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.ErrNotFound
 		}
-
 		return errgo.Wrap(err, "failed to find subject of episode")
 	}
 

@@ -155,7 +155,11 @@ func convertDaoEpisode(e *dao.Episode, firstEpisode float32) Episode {
 	}
 }
 
-func (r mysqlRepo) GetAllComment(ctx context.Context, episodeID model.EpisodeID, offset int, limit int) ([]model.EpisodeComment, error) {
+func (r mysqlRepo) GetAllComment(
+	ctx context.Context,
+	episodeID model.EpisodeID,
+	offset int,
+	limit int) ([]model.EpisodeComment, error) {
 	s, err := r.q.EpisodeComment.WithContext(ctx).
 		Where(r.q.EpisodeComment.FieldID.Eq(episodeID)).
 		Offset(offset).Limit(limit).
@@ -163,7 +167,7 @@ func (r mysqlRepo) GetAllComment(ctx context.Context, episodeID model.EpisodeID,
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
 	}
-	result := make([]model.EpisodeComment, len(s))
+	result := make([]model.EpisodeComment, 0)
 	for _, v := range s {
 		result = append(result, conventDao2Post(v))
 	}

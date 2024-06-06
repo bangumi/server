@@ -61,19 +61,15 @@ func (h Handler) GetComments(c echo.Context) error {
 	if !ok || r.NSFW && !user.AllowNSFW() {
 		return res.NotFound("index not found")
 	}
-
 	var offset, limit int
-
 	offsetStr := c.QueryParam("offset")
 	limitStr := c.QueryParam("limit")
-
 	if offsetStr == "" {
 		offset = 0 // 默认为0
 	}
 	if limitStr == "" {
 		limit = 25 // 默认25
 	}
-
 	offset, err = strconv.Atoi(offsetStr)
 	if err != nil {
 		return res.BadRequest(err.Error())
@@ -82,8 +78,8 @@ func (h Handler) GetComments(c echo.Context) error {
 	if err != nil {
 		return res.BadRequest(err.Error())
 	}
-
 	result, err := h.i.GetIndexComments(c.Request().Context(), id, offset, limit)
+
 	if err != nil {
 		return res.NotFound("comment not found")
 	}
@@ -123,7 +119,7 @@ func (h Handler) AddComment(c echo.Context) error {
 	}
 
 	if comment.FieldID != 0 {
-		//验证回复的消息是否存在
+		// 验证回复的消息是否存在
 		_, err := h.i.GetIndexComment(c.Request().Context(), comment.FieldID)
 		if err != nil {
 			return res.NotFound("comment to reply is not found")
@@ -142,7 +138,6 @@ func (h Handler) AddComment(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusOK)
-
 }
 
 func (h Handler) RemoveComment(c echo.Context) error {
@@ -166,7 +161,7 @@ func (h Handler) RemoveComment(c echo.Context) error {
 		return res.NotFound("index not found")
 	}
 
-	//验证消息是否存在，且是否为当前用户所发
+	// 验证消息是否存在，且是否为当前用户所发
 	cmt, err := h.i.GetIndexComment(c.Request().Context(), commentID)
 	if err != nil {
 		return res.NotFound("comment not found")
