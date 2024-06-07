@@ -554,25 +554,58 @@ func Test_mysqlRepo_UpdateIndexComment(t *testing.T) {
 	repo := getRepo(t)
 	ctx := context.Background()
 
-	const id = 3680
+	comment := model.IndexComment{
+		Field:     114514,
+		User:      1919810,
+		Related:   0,
+		CreatedAt: time.Now(),
+		Content:   "Test",
+	}
 
-	err := repo.UpdateIndexComment(ctx, id, "New test")
+	err := repo.AddIndexComment(ctx, comment)
 	require.NoError(t, err)
-	r, err := repo.GetIndexComment(ctx, id)
+
+	r, err := repo.GetIndexComments(ctx, 114514, 0, 25)
 	require.NoError(t, err)
-	require.EqualValues(t, r.Content, "New test")
+
+	id := r[0].ID
+
+	err = repo.UpdateIndexComment(ctx, id, "New test")
+	require.NoError(t, err)
+	res, err := repo.GetIndexComment(ctx, id)
+	require.NoError(t, err)
+	require.EqualValues(t, res.Content, "New test")
+
+	err = repo.DeleteIndexComment(ctx, id)
+	require.NoError(t, err)
 }
 
 func Test_mysqlRepo_DeleteIndexComment(t *testing.T) {
+
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 	repo := getRepo(t)
 	ctx := context.Background()
 
-	const id = 3680
-	err := repo.DeleteIndexComment(ctx, id)
+	comment := model.IndexComment{
+		Field:     114514,
+		User:      1919810,
+		Related:   0,
+		CreatedAt: time.Now(),
+		Content:   "Test",
+	}
+
+	err := repo.AddIndexComment(ctx, comment)
 	require.NoError(t, err)
-	r, err := repo.GetIndexComment(ctx, id)
+
+	r, err := repo.GetIndexComments(ctx, 114514, 0, 25)
+	require.NoError(t, err)
+
+	id := r[0].ID
+
+	err = repo.DeleteIndexComment(ctx, id)
+	require.NoError(t, err)
+	res, err := repo.GetIndexComment(ctx, id)
 	require.ErrorIs(t, err, gerr.ErrNotFound)
-	require.Nil(t, r)
+	require.Nil(t, res)
 }
