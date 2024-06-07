@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -90,24 +89,13 @@ func (h Handler) GetEpisodeComments(c echo.Context) error {
 		return errgo.Wrap(err, "failed to find subject of episode")
 	}
 
-	var offset, limit int
-	offsetStr := c.QueryParam("offset")
-	limitStr := c.QueryParam("limit")
-	if offsetStr == "" {
-		offset = 0 // 默认为0
-	} else {
-		offset, err = strconv.Atoi(offsetStr)
-	}
-	if limitStr == "" {
-		limit = 25 // 默认25
-	} else {
-		limit, err = strconv.Atoi(limitStr)
-	}
+	pq, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
-		return res.BadRequest(err.Error())
+		return res.BadRequest("cannot get offset and limit")
 	}
+
 	var r []model.EpisodeComment
-	r, err = h.episode.GetAllComment(c.Request().Context(), id, offset, limit)
+	r, err = h.episode.GetAllComment(c.Request().Context(), id, pq.Offset, pq.Limit)
 	if err != nil {
 		return res.NotFound("cannot get episode comments")
 	}

@@ -69,19 +69,12 @@ func (h Subject) GetComments(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get subject")
 	}
 
-	var offset, limit int
-
-	offsetStr := c.QueryParam("offset")
-	limitStr := c.QueryParam("limit")
-
-	if offsetStr == "" {
-		offset = 0 // 默认为0
-	}
-	if limitStr == "" {
-		limit = 25 // 默认25
+	pq, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
+	if err != nil {
+		return res.BadRequest("cannot get offset and limit")
 	}
 
-	result, err := h.subject.GetAllPost(c.Request().Context(), s.ID, offset, limit)
+	result, err := h.subject.GetAllPost(c.Request().Context(), s.ID, pq.Offset, pq.Limit)
 	if err != nil {
 		return res.BadRequest("cannot found comment")
 	}

@@ -2,7 +2,6 @@ package index
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -63,24 +62,12 @@ func (h Handler) GetComments(c echo.Context) error {
 	if !ok || r.NSFW && !user.AllowNSFW() {
 		return res.NotFound("index not found")
 	}
-	var offset, limit int
-	offsetStr := c.QueryParam("offset")
-	limitStr := c.QueryParam("limit")
-	if offsetStr == "" {
-		offset = 0 // 默认为0
-	} else {
-		offset, err = strconv.Atoi(offsetStr)
-	}
-	if limitStr == "" {
-		limit = 25 // 默认25
-	} else {
-		limit, err = strconv.Atoi(limitStr)
-	}
+	pq, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
-		return res.BadRequest(err.Error())
+		return res.BadRequest("cannot get offset and limit")
 	}
 	var result []model.IndexComment
-	result, err = h.i.GetIndexComments(c.Request().Context(), id, offset, limit)
+	result, err = h.i.GetIndexComments(c.Request().Context(), id, pq.Offset, pq.Limit)
 
 	if err != nil {
 		return res.NotFound("comment not found")

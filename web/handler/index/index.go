@@ -124,7 +124,7 @@ func (h Handler) getIndexSubjects(
 ) error {
 	count, err := h.i.CountSubjects(c.Request().Context(), id, subjectType)
 	if err != nil {
-		return errgo.Wrap(err, "Field.CountSubjects")
+		return errgo.Wrap(err, "Index.CountSubjects")
 	}
 
 	if count == 0 {
@@ -182,7 +182,7 @@ func (h Handler) NewIndex(c echo.Context) error {
 	}
 	ctx := c.Request().Context()
 	if err := h.i.New(ctx, i); err != nil {
-		return errgo.Wrap(err, "failed to crea te a new index")
+		return errgo.Wrap(err, "failed to create a new index")
 	}
 	u, err := h.u.GetByID(ctx, i.CreatorID)
 	if err != nil {

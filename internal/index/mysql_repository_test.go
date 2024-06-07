@@ -76,7 +76,7 @@ func TestMysqlRepo_NewIndex(t *testing.T) {
 	index := &model.Index{
 		ID:          0,
 		Title:       "test",
-		Description: "Test Field",
+		Description: "Test Index",
 		CreatorID:   382951,
 		CreatedAt:   now,
 		UpdatedAt:   now,

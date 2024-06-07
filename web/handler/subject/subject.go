@@ -21,7 +21,6 @@ import (
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
-	"github.com/bangumi/server/web/mw"
 )
 
 type Subject struct {
@@ -59,6 +58,6 @@ func (h *Subject) Routes(g *echo.Group) {
 	// comment
 	g.GET("/subjects/:id/post", h.GetComments)
 	g.GET("/subjects/:id/post/:post_id", h.GetComment)
-	g.PUT("/subjects/:id/post", h.AddComment, mw.NeedLogin)
+	// g.PUT("/subjects/:id/post", h.AddComment, mw.NeedLogin)
 	// g.DELETE("/subjects/:id/post/:post_id", h.RemoveComment, mw.NeedLogin)
 }
