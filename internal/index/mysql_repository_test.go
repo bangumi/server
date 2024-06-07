@@ -485,3 +485,94 @@ func TestMysqlRepo_DeleteIndexCollect(t *testing.T) {
 	err = repo.DeleteIndexCollect(ctx, 15465, 322)
 	require.NoError(t, err)
 }
+
+func Test_mysqlRepo_GetIndexComments(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+	repo := getRepo(t)
+	ctx := context.Background()
+
+	const lens15045 = 8
+	const lens15465 = 4
+
+	r, err := repo.GetIndexComments(ctx, 15045, 0, 25)
+	require.NoError(t, err)
+	require.Len(t, r, lens15045)
+
+	r, err = repo.GetIndexComments(ctx, 15465, 0, 25)
+	require.NoError(t, err)
+	require.Len(t, r, lens15465)
+}
+
+func Test_mysqlRepo_GetIndexComment(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+	repo := getRepo(t)
+	ctx := context.Background()
+
+	var comment = model.IndexComment{
+		ID:        1038,
+		Field:     15045,
+		User:      2331,
+		CreatedAt: time.Unix(1352385392, 0),
+		Content:   "9/101\n渣渣~",
+	}
+
+	r, err := repo.GetIndexComment(ctx, 1038)
+
+	require.NoError(t, err)
+	require.Equal(t, comment, *r)
+}
+
+func Test_mysqlRepo_AddIndexComment(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+	repo := getRepo(t)
+	ctx := context.Background()
+
+	comment := model.IndexComment{
+		Field:     114514,
+		User:      1919810,
+		Related:   0,
+		CreatedAt: time.Now(),
+		Content:   "Test",
+	}
+
+	err := repo.AddIndexComment(ctx, comment)
+	require.NoError(t, err)
+
+	r, err := repo.GetIndexComments(ctx, 114514, 0, 25)
+	require.NoError(t, err)
+	require.EqualValues(t, comment.Content, r[0].Content)
+	require.EqualValues(t, comment.User, r[0].User)
+	require.EqualValues(t, comment.Field, r[0].Field)
+}
+
+func Test_mysqlRepo_UpdateIndexComment(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+	repo := getRepo(t)
+	ctx := context.Background()
+
+	const id = 3680
+
+	err := repo.UpdateIndexComment(ctx, id, "New test")
+	require.NoError(t, err)
+	r, err := repo.GetIndexComment(ctx, id)
+	require.NoError(t, err)
+	require.EqualValues(t, r.Content, "New test")
+}
+
+func Test_mysqlRepo_DeleteIndexComment(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+	repo := getRepo(t)
+	ctx := context.Background()
+
+	const id = 3680
+	err := repo.DeleteIndexComment(ctx, id)
+	require.NoError(t, err)
+	r, err := repo.GetIndexComment(ctx, id)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
+	require.Nil(t, r)
+}

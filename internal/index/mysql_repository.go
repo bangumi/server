@@ -401,7 +401,7 @@ func (r mysqlRepo) AddIndexComment(ctx context.Context, newComment model.IndexCo
 	// 理论来说，这里为了防止出错，提交上来的newComment的Id字段不会起效果
 	// 所以这里会直接先检索最后一条comment的indexId
 	s, err := r.q.IndexComment.WithContext(ctx).Order(
-		r.q.IndexComment.PostID).Last()
+		r.q.IndexComment.PostID.Desc()).Last()
 	if err != nil {
 		return gerr.WrapGormError(err)
 	}
