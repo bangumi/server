@@ -159,6 +159,9 @@ func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 		return errgo.Wrap(err, "subjectRepo.Get")
 	}
 
+	if s.Redirect != 0 {
+		return nil
+	}
 	extracted := extractSubject(&s)
 
 	c.queue.Push(extracted)
