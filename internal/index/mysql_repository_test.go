@@ -581,7 +581,6 @@ func Test_mysqlRepo_UpdateIndexComment(t *testing.T) {
 }
 
 func Test_mysqlRepo_DeleteIndexComment(t *testing.T) {
-
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
 	repo := getRepo(t)

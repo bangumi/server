@@ -160,7 +160,3 @@ func TestMysqlRepo_GetCharacterRelated(t *testing.T) {
 
 	require.True(t, found, "character 1 should be related to subject 8")
 }
-
-func Test_mysqlRepo_GetAllPost(t *testing.T) {
-
-}
