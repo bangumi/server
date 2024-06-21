@@ -55,9 +55,11 @@ func (h *Subject) Routes(g *echo.Group) {
 	g.GET("/subjects/:id/subjects", h.GetRelatedSubjects)
 	g.GET("/subjects/:id/characters", h.GetRelatedCharacters)
 
-	// comment
-	g.GET("/subjects/:id/post", h.GetComments)
-	g.GET("/subjects/:id/post/:post_id", h.GetComment)
+	// posts
+	g.GET("/subjects/:subject_id/posts", h.GetPaginatedPosts)
+	g.GET("/subjects/:subject_id/posts/:replies_limit", h.GetPostsWithReplies)
+	g.GET("/subjects/post/:post_id", h.GetPost)
+	g.GET("/subjects/post/:post_id/replies", h.GetPostReplies)
 	// g.PUT("/subjects/:id/post", h.AddComment, mw.NeedLogin)
 	// g.DELETE("/subjects/:id/post/:post_id", h.RemoveComment, mw.NeedLogin)
 }

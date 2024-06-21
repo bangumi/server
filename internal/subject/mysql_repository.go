@@ -343,7 +343,7 @@ func (r mysqlRepo) GetActors(
 	return results, nil
 }
 
-func (r mysqlRepo) GetAllPost(
+func (r mysqlRepo) GetPaginatedPostsBySubjectID(
 	ctx context.Context,
 	id model.SubjectID,
 	offset int,
@@ -366,7 +366,7 @@ func (r mysqlRepo) GetAllPost(
 	return results, nil
 }
 
-func (r mysqlRepo) GetPost(ctx context.Context, id model.CommentID) (model.SubjectPost, error) {
+func (r mysqlRepo) GetPostByID(ctx context.Context, id model.CommentID) (model.SubjectPost, error) {
 	s, err := r.q.WithContext(ctx).SubjectPost.
 		Where(r.q.SubjectPost.PostID.Eq(id)).
 		Take()
@@ -380,8 +380,8 @@ func (r mysqlRepo) GetPost(ctx context.Context, id model.CommentID) (model.Subje
 	return result, nil
 }
 
-// GetTopPost retrieves top-level posts for a subject.
-func (r mysqlRepo) GetTopPost(
+// GetPaginatedTopLevelPostsBySubjectID retrieves top-level posts for a subject.
+func (r mysqlRepo) GetPaginatedTopLevelPostsBySubjectID(
 	ctx context.Context, id model.SubjectID,
 	offset int, limit int,
 ) ([]model.SubjectPost, error) {
@@ -400,8 +400,8 @@ func (r mysqlRepo) GetTopPost(
 	return results, nil
 }
 
-// GetReplies retrieves replies for a specific comment.
-func (r mysqlRepo) GetReplies(
+// GetPaginatedRepliesByPostID retrieves replies for a specific comment.
+func (r mysqlRepo) GetPaginatedRepliesByPostID(
 	ctx context.Context, id model.CommentID,
 	offset int, limit int,
 ) ([]model.SubjectPost, error) {
@@ -447,7 +447,7 @@ func (r mysqlRepo) NewPost(ctx context.Context, post model.SubjectPost) error {
 	return nil
 }
 
-func (r mysqlRepo) DeletePost(ctx context.Context, id model.CommentID) error {
+func (r mysqlRepo) DeletePostByID(ctx context.Context, id model.CommentID) error {
 	result, err := r.q.WithContext(ctx).SubjectPost.
 		Where(r.q.SubjectPost.PostID.Eq(id)).
 		Delete()

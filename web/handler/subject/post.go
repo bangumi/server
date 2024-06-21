@@ -18,40 +18,22 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Subject) GetComment(c echo.Context) error {
-	u := accessor.GetFromCtx(c)
-
-	id, err := req.ParseID(c.Param("id"))
+func (h Subject) GetPost(c echo.Context) error {
+	postID, err := req.ParseID(c.Param("post_id"))
 	if err != nil {
 		return err
 	}
 
-	commentID, err := req.ParseID(c.Param("post_id"))
+	result, err := h.subject.GetPostByID(c.Request().Context(), postID)
 	if err != nil {
-		return err
-	}
-
-	_, err = h.subject.Get(c.Request().Context(), id, subject.Filter{
-		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
-	})
-
-	if err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return res.ErrNotFound
-		}
-		return errgo.Wrap(err, "failed to get subject")
-	}
-
-	result, err := h.subject.GetPost(c.Request().Context(), commentID)
-	if err != nil {
-		return res.BadRequest("cannot found comment")
+		return res.BadRequest("cannot found subject post")
 	}
 	resp := res.ConventSubjectComment2Resp(result)
 
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (h Subject) GetCommentReplies(c echo.Context) error {
+func (h Subject) GetPostReplies(c echo.Context) error {
 	postID, err := req.ParseID(c.Param("post_id"))
 	if err != nil {
 		return err
@@ -62,7 +44,7 @@ func (h Subject) GetCommentReplies(c echo.Context) error {
 		return res.BadRequest("cannot get offset and limit")
 	}
 
-	replies, err := h.subject.GetReplies(c.Request().Context(), postID, pq.Offset, pq.Limit)
+	replies, err := h.subject.GetPaginatedRepliesByPostID(c.Request().Context(), postID, pq.Offset, pq.Limit)
 	if err != nil {
 		return res.BadRequest("cannot to get comment replies")
 	}
@@ -73,15 +55,15 @@ func (h Subject) GetCommentReplies(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (h Subject) GetComments(c echo.Context) error {
+func (h Subject) GetPaginatedPosts(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
-	id, err := req.ParseID(c.Param("id"))
+	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
 
-	s, err := h.subject.Get(c.Request().Context(), id, subject.Filter{
+	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{
 		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
 	})
 	if err != nil {
@@ -97,7 +79,7 @@ func (h Subject) GetComments(c echo.Context) error {
 		return res.BadRequest("cannot get offset and limit")
 	}
 
-	result, err := h.subject.GetAllPost(c.Request().Context(), s.ID, pq.Offset, pq.Limit)
+	result, err := h.subject.GetPaginatedPostsBySubjectID(c.Request().Context(), s.ID, pq.Offset, pq.Limit)
 	if err != nil {
 		return res.BadRequest("cannot found comment")
 	}
@@ -108,10 +90,10 @@ func (h Subject) GetComments(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (h Subject) GetCommentsWithReplies(c echo.Context) error {
+func (h Subject) GetPostsWithReplies(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
-	id, err := req.ParseID(c.Param("id"))
+	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
@@ -122,7 +104,7 @@ func (h Subject) GetCommentsWithReplies(c echo.Context) error {
 		return res.BadRequest("can't parse query args replies_limit as int: " + strconv.Quote(repliesLimitRaw))
 	}
 
-	s, err := h.subject.Get(c.Request().Context(), id, subject.Filter{
+	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{
 		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
 	})
 	if err != nil {
@@ -138,15 +120,15 @@ func (h Subject) GetCommentsWithReplies(c echo.Context) error {
 		return res.BadRequest("cannot get offset and limit")
 	}
 
-	topPosts, err := h.subject.GetTopPost(c.Request().Context(), s.ID, pq.Offset, pq.Limit)
+	topPosts, err := h.subject.GetPaginatedTopLevelPostsBySubjectID(c.Request().Context(), s.ID, pq.Offset, pq.Limit)
 	if err != nil {
-		return res.BadRequest("cannot found comment")
+		return res.BadRequest("cannot found subject post")
 	}
 	resp := make([]model.SubjectPost, 0, len(topPosts))
 	for _, post := range topPosts {
-		replies, err := h.subject.GetReplies(c.Request().Context(), post.ID, 0, repliesLimit)
+		replies, err := h.subject.GetPaginatedRepliesByPostID(c.Request().Context(), post.ID, 0, repliesLimit)
 		if err != nil {
-			return res.BadRequest("failed to get replies")
+			return res.BadRequest("failed to get post replies")
 		}
 		post.Replies = replies
 		resp = append(resp, post)
@@ -158,12 +140,12 @@ func (h Subject) GetCommentsWithReplies(c echo.Context) error {
 func (h Subject) AddComment(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
-	id, err := req.ParseID(c.Param("id"))
+	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err
 	}
 
-	s, err := h.subject.Get(c.Request().Context(), id, subject.Filter{
+	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{
 		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
 	})
 	if err != nil {
@@ -181,7 +163,7 @@ func (h Subject) AddComment(c echo.Context) error {
 
 	// 校验回复消息是否存在
 	if reqBody.FieldID != 0 {
-		_, err = h.subject.GetPost(c.Request().Context(), reqBody.FieldID)
+		_, err = h.subject.GetPostByID(c.Request().Context(), reqBody.FieldID)
 		if err != nil {
 			return res.NotFound("cannot find comment to reply")
 		}
@@ -201,44 +183,28 @@ func (h Subject) AddComment(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h Subject) RemoveComment(c echo.Context) error {
+func (h Subject) RemovePost(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
-	id, err := req.ParseID(c.Param("id"))
+	postID, err := req.ParseID(c.Param("post_id"))
 	if err != nil {
 		return err
-	}
-
-	commentID, err := req.ParseID(c.Param("post_id"))
-	if err != nil {
-		return err
-	}
-
-	_, err = h.subject.Get(c.Request().Context(), id, subject.Filter{
-		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
-	})
-	if err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return res.ErrNotFound
-		}
-
-		return errgo.Wrap(err, "failed to get subject")
 	}
 
 	// 校验消息是否存在以及是否为本人发送
-	comment, err := h.subject.GetPost(c.Request().Context(), commentID)
+	comment, err := h.subject.GetPostByID(c.Request().Context(), postID)
 	if err != nil {
-		return res.NotFound("cannot find comment")
+		return res.NotFound("cannot find post")
 	}
 
 	if comment.User != u.ID {
-		return res.Forbidden("cannot remove comment")
+		return res.Forbidden("no permission to delete post not sent by oneself")
 	}
 
-	err = h.subject.DeletePost(c.Request().Context(), commentID)
+	err = h.subject.DeletePostByID(c.Request().Context(), postID)
 
 	if err != nil {
-		return res.BadRequest("cannot remove comment")
+		return res.BadRequest("cannot remove post")
 	}
 
 	return c.NoContent(http.StatusOK)

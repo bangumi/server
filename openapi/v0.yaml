@@ -461,12 +461,12 @@ paths:
       security:
         - OptionalHTTPBearer: []
 
-  "/v0/subjects/{subject_id}/post":
+  "/v0/subjects/{subject_id}/posts":
     get:
       tags:
         - 条目
-      summary: 获取所有评论
-      operationId: getSubjectCommentsByID
+      summary: 分页获取一个条目的所有评论
+      operationId: getSubjectPaginatedPosts
       parameters:
         - $ref: "#/components/parameters/path_subject_id"
         - name: limit
@@ -490,7 +490,7 @@ paths:
               schema:
                 type: array
                 items:
-                  "$ref": "#/components/schemas/SubjectComment"
+                  "$ref": "#/components/schemas/SubjectPost"
         "400":
           description: Validation Error
           content:
@@ -505,22 +505,21 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
-  "/v0/subjects/{subject_id}/post/{comment_id}":
+  "/v0/subjects/post/{post_id}":
     get:
       tags:
         - 条目
       summary: 获取评论详情
-      operationId: getSubjectCommentByID
+      operationId: getSubjectPostByID
       parameters:
-        - $ref: "#/components/parameters/path_subject_id"
-        - $ref: "#/components/parameters/path_comment_id"
+        - $ref: "#/components/parameters/path_post_id"
       responses:
         "200":
           description: Successful Response
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/SubjectComment"
+                "$ref": "#/components/schemas/SubjectPost"
         "400":
           description: Validation Error
           content:
@@ -535,13 +534,12 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
-
-  "/v0/subjects/{subject_id}/post/{replies_limit}":
+  "/v0/subjects/{subject_id}/posts/{replies_limit}":
     get:
       tags:
         - 条目
-      summary: 分页获取评论（含回复）
-      operationId: getSubjectCommentWithRepliesBySubjectIDAndRepliesLimit
+      summary: 分页获取一个条目的所有评论（含回复）
+      operationId: getSubjectPostWithRepliesBySubjectIDAndRepliesLimit
       parameters:
         - name: limit
           in: query
@@ -563,7 +561,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/SubjectComment"
+                "$ref": "#/components/schemas/SubjectPost"
         "400":
           description: Validation Error
           content:
@@ -578,12 +576,12 @@ paths:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
         - OptionalHTTPBearer: []
-  "/v0/subjects/post/{comment_id}/replies":
+  "/v0/subjects/post/{post_id}/replies":
     get:
       tags:
         - 条目
-      summary: 分页获取某个评论的回复
-      operationId: getSubjectCommentRepliesByCommentID
+      summary: 分页获取某个评论下的回复
+      operationId: getSubjectPostRepliesByPostID
       parameters:
         - name: limit
           in: query
@@ -597,14 +595,14 @@ paths:
           required: false
           schema:
             type: integer
-        - $ref: "#/components/parameters/path_comment_id"
+        - $ref: "#/components/parameters/path_post_id"
       responses:
         "200":
           description: Successful Response
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/SubjectComment"
+                "$ref": "#/components/schemas/SubjectPost"
         "400":
           description: Validation Error
           content:
@@ -2303,6 +2301,16 @@ components:
       name: comment_id
       in: path
 
+    path_post_id:
+      required: true
+      description: "帖子ID"
+      schema:
+        title: Post ID
+        minimum: 1
+        type: integer
+      name: post_id
+      in: path
+
     query_subject_id:
       required: true
       name: subject_id
@@ -2677,8 +2685,8 @@ components:
               title: Data
               additionalProperties:
                 "$ref": "#/components/schemas/CharacterRevisionDataItem"
-    SubjectComment:
-      title: SubjectComment
+    SubjectPost:
+      title: SubjectPost
       required:
         - id
         - field_id

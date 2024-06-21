@@ -100,10 +100,10 @@ type read interface {
 }
 
 type post interface {
-	GetAllPost(ctx context.Context, id model.SubjectID, offset int, limit int) ([]model.SubjectPost, error)
-	GetPost(ctx context.Context, id model.CommentID) (model.SubjectPost, error)
 	NewPost(ctx context.Context, post model.SubjectPost) error
-	DeletePost(ctx context.Context, id model.CommentID) error
-	GetTopPost(ctx context.Context, id model.SubjectID, offset int, limit int) ([]model.SubjectPost, error)
-	GetReplies(ctx context.Context, id model.CommentID, offset int, limit int) ([]model.SubjectPost, error)
+	GetPaginatedPostsBySubjectID(ctx context.Context, id model.SubjectID, offset int, limit int) ([]model.SubjectPost, error)
+	GetPostByID(ctx context.Context, id model.PostID) (model.SubjectPost, error)
+	DeletePostByID(ctx context.Context, id model.PostID) error
+	GetPaginatedRepliesByPostID(ctx context.Context, id model.PostID, offset int, limit int) ([]model.SubjectPost, error)
+	GetPaginatedTopLevelPostsBySubjectID(ctx context.Context, id model.SubjectID, offset int, limit int) ([]model.SubjectPost, error)
 }
