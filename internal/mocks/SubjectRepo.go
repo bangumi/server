@@ -605,6 +605,67 @@ func (_c *SubjectRepo_GetPost_Call) RunAndReturn(run func(context.Context, uint3
 	return _c
 }
 
+// GetReplies provides a mock function with given fields: ctx, id, offset, limit
+func (_m *SubjectRepo) GetReplies(ctx context.Context, id uint32, offset int, limit int) ([]model.SubjectPost, error) {
+	ret := _m.Called(ctx, id, offset, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetReplies")
+	}
+
+	var r0 []model.SubjectPost
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int, int) ([]model.SubjectPost, error)); ok {
+		return rf(ctx, id, offset, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int, int) []model.SubjectPost); ok {
+		r0 = rf(ctx, id, offset, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.SubjectPost)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, int, int) error); ok {
+		r1 = rf(ctx, id, offset, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SubjectRepo_GetReplies_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetReplies'
+type SubjectRepo_GetReplies_Call struct {
+	*mock.Call
+}
+
+// GetReplies is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - offset int
+//   - limit int
+func (_e *SubjectRepo_Expecter) GetReplies(ctx interface{}, id interface{}, offset interface{}, limit interface{}) *SubjectRepo_GetReplies_Call {
+	return &SubjectRepo_GetReplies_Call{Call: _e.mock.On("GetReplies", ctx, id, offset, limit)}
+}
+
+func (_c *SubjectRepo_GetReplies_Call) Run(run func(ctx context.Context, id uint32, offset int, limit int)) *SubjectRepo_GetReplies_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(int), args[3].(int))
+	})
+	return _c
+}
+
+func (_c *SubjectRepo_GetReplies_Call) Return(_a0 []model.SubjectPost, _a1 error) *SubjectRepo_GetReplies_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SubjectRepo_GetReplies_Call) RunAndReturn(run func(context.Context, uint32, int, int) ([]model.SubjectPost, error)) *SubjectRepo_GetReplies_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetSubjectRelated provides a mock function with given fields: ctx, subjectID
 func (_m *SubjectRepo) GetSubjectRelated(ctx context.Context, subjectID uint32) ([]domain.SubjectInternalRelation, error) {
 	ret := _m.Called(ctx, subjectID)
@@ -660,6 +721,67 @@ func (_c *SubjectRepo_GetSubjectRelated_Call) Return(_a0 []domain.SubjectInterna
 }
 
 func (_c *SubjectRepo_GetSubjectRelated_Call) RunAndReturn(run func(context.Context, uint32) ([]domain.SubjectInternalRelation, error)) *SubjectRepo_GetSubjectRelated_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetTopPost provides a mock function with given fields: ctx, id, offset, limit
+func (_m *SubjectRepo) GetTopPost(ctx context.Context, id uint32, offset int, limit int) ([]model.SubjectPost, error) {
+	ret := _m.Called(ctx, id, offset, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTopPost")
+	}
+
+	var r0 []model.SubjectPost
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int, int) ([]model.SubjectPost, error)); ok {
+		return rf(ctx, id, offset, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, int, int) []model.SubjectPost); ok {
+		r0 = rf(ctx, id, offset, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.SubjectPost)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, int, int) error); ok {
+		r1 = rf(ctx, id, offset, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SubjectRepo_GetTopPost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTopPost'
+type SubjectRepo_GetTopPost_Call struct {
+	*mock.Call
+}
+
+// GetTopPost is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+//   - offset int
+//   - limit int
+func (_e *SubjectRepo_Expecter) GetTopPost(ctx interface{}, id interface{}, offset interface{}, limit interface{}) *SubjectRepo_GetTopPost_Call {
+	return &SubjectRepo_GetTopPost_Call{Call: _e.mock.On("GetTopPost", ctx, id, offset, limit)}
+}
+
+func (_c *SubjectRepo_GetTopPost_Call) Run(run func(ctx context.Context, id uint32, offset int, limit int)) *SubjectRepo_GetTopPost_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32), args[2].(int), args[3].(int))
+	})
+	return _c
+}
+
+func (_c *SubjectRepo_GetTopPost_Call) Return(_a0 []model.SubjectPost, _a1 error) *SubjectRepo_GetTopPost_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SubjectRepo_GetTopPost_Call) RunAndReturn(run func(context.Context, uint32, int, int) ([]model.SubjectPost, error)) *SubjectRepo_GetTopPost_Call {
 	_c.Call.Return(run)
 	return _c
 }
