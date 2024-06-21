@@ -3,6 +3,7 @@ package subject
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -50,6 +51,28 @@ func (h Subject) GetComment(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+func (h Subject) GetCommentReplies(c echo.Context) error {
+	postID, err := req.ParseID(c.Param("post_id"))
+	if err != nil {
+		return err
+	}
+
+	pq, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
+	if err != nil {
+		return res.BadRequest("cannot get offset and limit")
+	}
+
+	replies, err := h.subject.GetReplies(c.Request().Context(), postID, pq.Offset, pq.Limit)
+	if err != nil {
+		return res.BadRequest("cannot to get comment replies")
+	}
+	resp := make([]res.SubjectPost, 0)
+	for _, v := range replies {
+		resp = append(resp, res.ConventSubjectComment2Resp(v))
+	}
+	return c.JSON(http.StatusOK, resp)
+}
+
 func (h Subject) GetComments(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
@@ -82,6 +105,53 @@ func (h Subject) GetComments(c echo.Context) error {
 	for _, v := range result {
 		resp = append(resp, res.ConventSubjectComment2Resp(v))
 	}
+	return c.JSON(http.StatusOK, resp)
+}
+
+func (h Subject) GetCommentsWithReplies(c echo.Context) error {
+	u := accessor.GetFromCtx(c)
+
+	id, err := req.ParseID(c.Param("id"))
+	if err != nil {
+		return err
+	}
+
+	repliesLimitRaw := c.Param("replies_limit")
+	repliesLimit, err := strconv.Atoi(repliesLimitRaw)
+	if err != nil {
+		return res.BadRequest("can't parse query args replies_limit as int: " + strconv.Quote(repliesLimitRaw))
+	}
+
+	s, err := h.subject.Get(c.Request().Context(), id, subject.Filter{
+		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()},
+	})
+	if err != nil {
+		if errors.Is(err, gerr.ErrNotFound) {
+			return res.ErrNotFound
+		}
+
+		return errgo.Wrap(err, "failed to get subject")
+	}
+
+	pq, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
+	if err != nil {
+		return res.BadRequest("cannot get offset and limit")
+	}
+
+	topPosts, err := h.subject.GetTopPost(c.Request().Context(), s.ID, pq.Offset, pq.Limit)
+	if err != nil {
+		return res.BadRequest("cannot found comment")
+	}
+	resp := make([]model.SubjectPost, 0, len(topPosts))
+	for _, post := range topPosts {
+		replies, err := h.subject.GetReplies(c.Request().Context(), post.ID, 0, repliesLimit)
+		if err != nil {
+			return res.BadRequest("failed to get replies")
+		}
+		post.Replies = replies
+		resp = append(resp, post)
+	}
+
 	return c.JSON(http.StatusOK, resp)
 }
 

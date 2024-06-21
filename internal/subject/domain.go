@@ -104,4 +104,6 @@ type post interface {
 	GetPost(ctx context.Context, id model.CommentID) (model.SubjectPost, error)
 	NewPost(ctx context.Context, post model.SubjectPost) error
 	DeletePost(ctx context.Context, id model.CommentID) error
+	GetTopPost(ctx context.Context, id model.SubjectID, offset int, limit int) ([]model.SubjectPost, error)
+	GetReplies(ctx context.Context, id model.CommentID, offset int, limit int) ([]model.SubjectPost, error)
 }

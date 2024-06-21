@@ -3,29 +3,30 @@ package model
 import "time"
 
 type IndexComment struct {
-	ID        CommentID
-	Field     IndexID
-	User      UserID
-	Related   CommentID // 回复消息的ID
-	CreatedAt time.Time
-	Content   string
+	ID        CommentID `json:"id"`
+	Field     IndexID   `json:"field"`
+	User      UserID    `json:"user"`
+	Related   CommentID `json:"related"` // 回复消息的ID
+	CreatedAt time.Time `json:"created_at"`
+	Content   string    `json:"content"`
 }
 
 type SubjectPost struct {
-	ID        CommentID
-	Field     SubjectID
-	User      UserID
-	Related   CommentID
-	CreatedAt time.Time
-	Content   string
-	State     uint8
+	ID        CommentID     `json:"id"`
+	Field     SubjectID     `json:"field"`
+	User      UserID        `json:"user"`
+	Related   CommentID     `json:"related"`
+	CreatedAt time.Time     `json:"created_at"`
+	Content   string        `json:"content"`
+	State     uint8         `json:"state"`
+	Replies   []SubjectPost `json:"replies"`
 }
 
 type EpisodeComment struct {
-	ID        CommentID
-	Field     EpisodeID
-	User      UserID
-	Related   CommentID // 回复消息的ID
-	CreatedAt time.Time
-	Content   string
+	ID        CommentID `json:"id"`
+	Field     EpisodeID `json:"field"`
+	User      UserID    `json:"user"`
+	Related   CommentID `json:"related"` // 回复消息的ID
+	CreatedAt time.Time `json:"created_at"`
+	Content   string    `json:"content"`
 }

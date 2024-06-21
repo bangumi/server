@@ -536,6 +536,90 @@ paths:
       security:
         - OptionalHTTPBearer: []
 
+  "/v0/subjects/{subject_id}/post/{replies_limit}":
+    get:
+      tags:
+        - 条目
+      summary: 分页获取评论（含回复）
+      operationId: getSubjectCommentWithRepliesBySubjectIDAndRepliesLimit
+      parameters:
+        - name: limit
+          in: query
+          description: 分页参数
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: 分页参数
+          required: false
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/path_subject_id"
+        - $ref: "#/components/parameters/path_replies_limit"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SubjectComment"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+  "/v0/subjects/post/{comment_id}/replies":
+    get:
+      tags:
+        - 条目
+      summary: 分页获取某个评论的回复
+      operationId: getSubjectCommentRepliesByCommentID
+      parameters:
+        - name: limit
+          in: query
+          description: 分页参数
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: 分页参数
+          required: false
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/path_comment_id"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SubjectComment"
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - OptionalHTTPBearer: []
+
   "/v0/episodes":
     get:
       tags:
@@ -2144,6 +2228,14 @@ paths:
         - HTTPBearer: []
 components:
   parameters:
+    path_replies_limit:
+      required: true
+      name: replies_limit
+      description: 返回的条目评论回复数量
+      schema:
+        $ref: "#/components/schemas/RepliesLimit"
+      in: path
+
     path_subject_id:
       required: true
       name: subject_id
@@ -2253,6 +2345,11 @@ components:
       in: path
 
   schemas:
+    RepliesLimit:
+      title: Replies Limit
+      minimum: 0
+      description: 返回的条目评论回复数量
+      type: integer
     SubjectID:
       title: Subject ID
       minimum: 1
@@ -2590,6 +2687,7 @@ components:
         - created_at
         - content
         - state
+        - replies
       type: object
       properties:
         id:
@@ -2615,6 +2713,9 @@ components:
         state:
           title: State
           type: integer
+        replies:
+          title: Replies
+          type: object
     CharacterRevisionDataItem:
       title: CharacterRevisionDataItem
       required:

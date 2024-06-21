@@ -380,6 +380,48 @@ func (r mysqlRepo) GetPost(ctx context.Context, id model.CommentID) (model.Subje
 	return result, nil
 }
 
+// GetTopPost retrieves top-level posts for a subject.
+func (r mysqlRepo) GetTopPost(
+	ctx context.Context, id model.SubjectID,
+	offset int, limit int,
+) ([]model.SubjectPost, error) {
+	s, err := r.q.WithContext(ctx).SubjectPost.
+		Where(r.q.SubjectPost.FieldID.Eq(id), r.q.SubjectPost.RelatedMessageID.Eq(0)).
+		Offset(offset).Limit(limit).
+		Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+	results := make([]model.SubjectPost, 0, len(s))
+	for _, v := range s {
+		results = append(results, conventDao2Post(v))
+	}
+	return results, nil
+}
+
+// GetReplies retrieves replies for a specific comment.
+func (r mysqlRepo) GetReplies(
+	ctx context.Context, id model.CommentID,
+	offset int, limit int,
+) ([]model.SubjectPost, error) {
+	s, err := r.q.WithContext(ctx).SubjectPost.
+		Where(r.q.SubjectPost.RelatedMessageID.Eq(id)).
+		Offset(offset).Limit(limit).
+		Find()
+	if err != nil {
+		r.log.Error("unexpected error happened", zap.Error(err))
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	results := make([]model.SubjectPost, 0, len(s))
+	for _, v := range s {
+		results = append(results, conventDao2Post(v))
+	}
+
+	return results, nil
+}
+
 func (r mysqlRepo) NewPost(ctx context.Context, post model.SubjectPost) error {
 	// 找最后一个PostID
 	lp, err := r.q.WithContext(ctx).SubjectPost.Order(r.q.SubjectPost.PostID).Last()
