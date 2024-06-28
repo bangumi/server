@@ -17,6 +17,7 @@ package subject
 import (
 	"context"
 	"errors"
+	"github.com/bangumi/server/pkg/wiki"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -69,6 +70,14 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 			Actors:   toActors(actors[rel.Character.ID]),
 			Type:     rel.Character.Type,
 			ID:       rel.Character.ID,
+		}
+		if infobox, err := wiki.Parse(rel.Character.Infobox); err == nil {
+			for _, v := range infobox.Fields {
+				if v.Key == "简体中文名" {
+					response[i].NameCN = v.Value
+					break
+				}
+			}
 		}
 	}
 
@@ -155,6 +164,14 @@ func toActors(persons []model.Person) []res.Actor {
 			ID:           actor.ID,
 			Type:         actor.Type,
 			Locked:       actor.Locked,
+		}
+		if infobox, err := wiki.Parse(actor.Infobox); err == nil {
+			for _, v := range infobox.Fields {
+				if v.Key == "简体中文名" {
+					actors[j].NameCN = v.Value
+					break
+				}
+			}
 		}
 	}
 

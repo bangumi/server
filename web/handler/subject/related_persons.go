@@ -16,6 +16,7 @@ package subject
 
 import (
 	"errors"
+	"github.com/bangumi/server/pkg/wiki"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -62,6 +63,14 @@ func (h Subject) GetRelatedPersons(c echo.Context) error {
 			Career:   rel.Person.Careers(),
 			Type:     rel.Person.Type,
 			ID:       rel.Person.ID,
+		}
+		if infobox, err := wiki.Parse(rel.Person.Infobox); err == nil {
+			for _, v := range infobox.Fields {
+				if v.Key == "简体中文名" {
+					response[i].NameCN = v.Value
+					break
+				}
+			}
 		}
 	}
 

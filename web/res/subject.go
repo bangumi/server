@@ -185,6 +185,7 @@ type SubjectRelatedSubject struct {
 type SubjectRelatedCharacter struct {
 	Images   PersonImages      `json:"images"`
 	Name     string            `json:"name"`
+	NameCN   string            `json:"name_cn"`
 	Relation string            `json:"relation"`
 	Actors   []Actor           `json:"actors"`
 	Type     uint8             `json:"type"`
@@ -194,6 +195,7 @@ type SubjectRelatedCharacter struct {
 type SubjectRelatedPerson struct {
 	Images   PersonImages   `json:"images"`
 	Name     string         `json:"name" doc:"person name"`
+	NameCN   string         `json:"name_cn"`
 	Relation string         `json:"relation"`
 	Career   []string       `json:"career"`
 	Type     uint8          `json:"type"`
@@ -203,6 +205,7 @@ type SubjectRelatedPerson struct {
 type Actor struct {
 	Images       PersonImages   `json:"images"`
 	Name         string         `json:"name"`
+	NameCN       string         `json:"name_cn"`
 	ShortSummary string         `json:"short_summary"`
 	Career       []string       `json:"career"`
 	ID           model.PersonID `json:"id"`
