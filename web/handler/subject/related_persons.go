@@ -59,18 +59,11 @@ func (h Subject) GetRelatedPersons(c echo.Context) error {
 		response[i] = res.SubjectRelatedPerson{
 			Images:   res.PersonImage(rel.Person.Image),
 			Name:     rel.Person.Name,
+			NameCN:   wiki.ParseNameCN(rel.Person.Infobox),
 			Relation: vars.StaffMap[r.TypeID][rel.TypeID].String(),
 			Career:   rel.Person.Careers(),
 			Type:     rel.Person.Type,
 			ID:       rel.Person.ID,
-		}
-		if infobox, err := wiki.Parse(rel.Person.Infobox); err == nil {
-			for _, v := range infobox.Fields {
-				if v.Key == "简体中文名" {
-					response[i].NameCN = v.Value
-					break
-				}
-			}
 		}
 	}
 

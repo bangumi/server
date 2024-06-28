@@ -208,3 +208,14 @@ func readStartLine(line string) (string, string, error) {
 
 	return trimRightSpace(before), trimLeftSpace(after), nil
 }
+
+func ParseNameCN(s string) string {
+	if infobox, err := Parse(s); err == nil {
+		for _, v := range infobox.Fields {
+			if v.Key == "简体中文名" {
+				return v.Value
+			}
+		}
+	}
+	return ""
+}

@@ -66,18 +66,11 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 		response[i] = res.SubjectRelatedCharacter{
 			Images:   res.PersonImage(rel.Character.Image),
 			Name:     rel.Character.Name,
+			NameCN:   wiki.ParseNameCN(rel.Character.Infobox),
 			Relation: characterStaffString(rel.TypeID),
 			Actors:   toActors(actors[rel.Character.ID]),
 			Type:     rel.Character.Type,
 			ID:       rel.Character.ID,
-		}
-		if infobox, err := wiki.Parse(rel.Character.Infobox); err == nil {
-			for _, v := range infobox.Fields {
-				if v.Key == "简体中文名" {
-					response[i].NameCN = v.Value
-					break
-				}
-			}
 		}
 	}
 
@@ -159,19 +152,12 @@ func toActors(persons []model.Person) []res.Actor {
 		actors[j] = res.Actor{
 			Images:       res.PersonImage(actor.Image),
 			Name:         actor.Name,
+			NameCN:       wiki.ParseNameCN(actor.Infobox),
 			ShortSummary: actor.Summary,
 			Career:       actor.Careers(),
 			ID:           actor.ID,
 			Type:         actor.Type,
 			Locked:       actor.Locked,
-		}
-		if infobox, err := wiki.Parse(actor.Infobox); err == nil {
-			for _, v := range infobox.Fields {
-				if v.Key == "简体中文名" {
-					actors[j].NameCN = v.Value
-					break
-				}
-			}
 		}
 	}
 
