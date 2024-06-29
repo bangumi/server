@@ -205,7 +205,9 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 		}))
 	}
 	if req.NSFW.Set {
-		filter = append(filter, []string{"nsfw = " + strconv.FormatBool(req.NSFW.Value)})
+		if !req.NSFW.Value {
+			filter = append(filter, []string{"nsfw = false"})
+		}
 	}
 
 	// AND
