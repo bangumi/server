@@ -110,15 +110,19 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 	ids := slice.Map(hits, func(h hit) model.SubjectID { return h.ID })
 
-	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, subject.Filter{NSFW: r.Filter.NSFW})
+	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, subject.Filter{})
 	if err != nil {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
 
-	data := slice.Map(ids, func(id model.SubjectID) ReponseSubject {
-		s := subjects[id]
+	var data = make([]ReponseSubject, 0, len(subjects))
+	for _, id := range ids {
+		s, ok := subjects[id]
+		if !ok {
+			continue
+		}
 
-		return ReponseSubject{
+		data = append(data, ReponseSubject{
 			Date:    s.Date,
 			Image:   res.SubjectImage(s.Image).Large,
 			Type:    s.TypeID,
@@ -131,8 +135,9 @@ func (c *client) Handle(ctx echo.Context) error {
 			Score: s.Rating.Score,
 			ID:    s.ID,
 			Rank:  s.Rating.Rank,
-		}
-	})
+		})
+
+	}
 
 	return ctx.JSON(http.StatusOK, res.Paged{
 		Data:   data,
