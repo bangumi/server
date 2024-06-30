@@ -65,7 +65,7 @@ type ReqFilter struct { //nolint:musttag
 	Rank    []string            `json:"rank"`     // and
 
 	// if NSFW subject is enabled
-	NSFW bool `json:"nsfw"`
+	NSFW null.Bool `json:"nsfw"`
 }
 
 type hit struct {
@@ -98,7 +98,7 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 
 	if !auth.AllowNSFW() {
-		r.Filter.NSFW = false
+		r.Filter.NSFW = null.New(false)
 	}
 
 	result, err := c.doSearch(r.Keyword, filterToMeiliFilter(r.Filter), r.Sort, q.Limit, q.Offset)
@@ -112,10 +112,10 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 	ids := slice.Map(hits, func(h hit) model.SubjectID { return h.ID })
 
-	var sf subject.Filter
+	var sf = subject.Filter{NSFW: null.NewBool(false)}
 
-	if !r.Filter.NSFW {
-		sf.NSFW = null.Bool{Set: true, Value: false}
+	if r.Filter.NSFW.Set && r.Filter.NSFW.Value {
+		sf.NSFW = null.Bool{Set: false}
 	}
 
 	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, sf)
@@ -218,7 +218,11 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 		}))
 	}
 
-	if !req.NSFW {
+	if req.NSFW.Set {
+		if !req.NSFW.Value {
+			filter = append(filter, []string{"nsfw = false"})
+		}
+	} else {
 		filter = append(filter, []string{"nsfw = false"})
 	}
 
