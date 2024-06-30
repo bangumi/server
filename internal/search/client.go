@@ -160,8 +160,9 @@ func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 	}
 
 	if s.Redirect != 0 {
-		return nil
+		return c.DeleteSubject(ctx, id)
 	}
+
 	extracted := extractSubject(&s)
 
 	c.queue.Push(extracted)
