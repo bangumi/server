@@ -83,6 +83,7 @@ type ReponseSubject struct {
 	Score   float64          `json:"score"`
 	ID      model.SubjectID  `json:"id"`
 	Rank    uint32           `json:"rank"`
+	NSFW    bool             `json:"nsfw"`
 }
 
 //nolint:funlen
@@ -144,6 +145,7 @@ func (c *client) Handle(ctx echo.Context) error {
 			Score: s.Rating.Score,
 			ID:    s.ID,
 			Rank:  s.Rating.Rank,
+			NSFW:  s.NSFW,
 		})
 	}
 
