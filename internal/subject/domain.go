@@ -25,7 +25,6 @@ import (
 )
 
 type Filter struct {
-	// if nsfw subject are allowed
 	NSFW null.Bool
 }
 
@@ -42,34 +41,30 @@ type BrowseFilter struct {
 
 func (f BrowseFilter) Hash() (string, error) {
 	h := fnv.New64a()
-	fields := []string{}
-	fields = append(fields, fmt.Sprintf("type:%v", f.Type))
+
+	fmt.Fprintf(h, "type:%v", f.Type)
 	if f.NSFW.Set {
-		fields = append(fields, fmt.Sprintf("nsfw:%v", f.NSFW))
+		fmt.Fprintf(h, "nsfw:%v", f.NSFW)
 	}
 	if f.Category.Set {
-		fields = append(fields, fmt.Sprintf("category:%v", f.Category))
+		fmt.Fprintf(h, "category:%v", f.Category)
 	}
 	if f.Series.Set {
-		fields = append(fields, fmt.Sprintf("series:%v", f.Series))
+		fmt.Fprintf(h, "series:%v", f.Series)
 	}
 	if f.Platform.Set {
-		fields = append(fields, fmt.Sprintf("platform:%v", f.Platform))
+		fmt.Fprintf(h, "platform:%v", f.Platform)
 	}
 	if f.Sort.Set {
-		fields = append(fields, fmt.Sprintf("sort:%v", f.Sort))
+		fmt.Fprintf(h, "sort:%v", f.Sort)
 	}
 	if f.Year.Set {
-		fields = append(fields, fmt.Sprintf("year:%v", f.Year))
+		fmt.Fprintf(h, "year:%v", f.Year)
 	}
 	if f.Month.Set {
-		fields = append(fields, fmt.Sprintf("month:%v", f.Month))
+		fmt.Fprintf(h, "month:%v", f.Month)
 	}
-	for _, field := range fields {
-		if _, err := h.Write([]byte(field)); err != nil {
-			return "", err
-		}
-	}
+
 	return fmt.Sprintf("%x", h.Sum64()), nil
 }
 
