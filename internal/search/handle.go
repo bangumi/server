@@ -85,6 +85,7 @@ type ReponseSubject struct {
 	Rank    uint32           `json:"rank"`
 }
 
+//nolint:funlen
 func (c *client) Handle(ctx echo.Context) error {
 	auth := accessor.GetFromCtx(ctx)
 	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
@@ -98,7 +99,7 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 
 	if !auth.AllowNSFW() {
-		r.Filter.NSFW = null.New(false)
+		r.Filter.NSFW.Set = false
 	}
 
 	result, err := c.doSearch(r.Keyword, filterToMeiliFilter(r.Filter), r.Sort, q.Limit, q.Offset)
@@ -112,10 +113,10 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 	ids := slice.Map(hits, func(h hit) model.SubjectID { return h.ID })
 
-	var sf = subject.Filter{NSFW: null.NewBool(false)}
+	var sf = subject.Filter{}
 
-	if r.Filter.NSFW.Set && r.Filter.NSFW.Value {
-		sf.NSFW = null.Bool{Set: false}
+	if !r.Filter.NSFW.Set || !r.Filter.NSFW.Value {
+		sf.NSFW = null.Bool{Set: true, Value: false}
 	}
 
 	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, sf)
@@ -144,7 +145,6 @@ func (c *client) Handle(ctx echo.Context) error {
 			ID:    s.ID,
 			Rank:  s.Rating.Rank,
 		})
-
 	}
 
 	return ctx.JSON(http.StatusOK, res.Paged{
@@ -218,11 +218,7 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 		}))
 	}
 
-	if req.NSFW.Set {
-		if !req.NSFW.Value {
-			filter = append(filter, []string{"nsfw = false"})
-		}
-	} else {
+	if !req.NSFW.Set || !req.NSFW.Value {
 		filter = append(filter, []string{"nsfw = false"})
 	}
 
