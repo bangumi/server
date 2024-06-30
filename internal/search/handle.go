@@ -63,7 +63,9 @@ type ReqFilter struct { //nolint:musttag
 	AirDate []string            `json:"air_date"` // and
 	Score   []string            `json:"rating"`   // and
 	Rank    []string            `json:"rank"`     // and
-	NSFW    null.Bool           `json:"nsfw"`
+
+	// if NSFW subject is enabled
+	NSFW bool `json:"nsfw"`
 }
 
 type hit struct {
@@ -96,7 +98,7 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 
 	if !auth.AllowNSFW() {
-		r.Filter.NSFW = null.New(false)
+		r.Filter.NSFW = false
 	}
 
 	result, err := c.doSearch(r.Keyword, filterToMeiliFilter(r.Filter), r.Sort, q.Limit, q.Offset)
@@ -112,7 +114,7 @@ func (c *client) Handle(ctx echo.Context) error {
 
 	var sf subject.Filter
 
-	if r.Filter.NSFW.Set && !r.Filter.NSFW.Value {
+	if !r.Filter.NSFW {
 		sf.NSFW = null.Bool{Set: true, Value: false}
 	}
 
@@ -215,10 +217,9 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 			return fmt.Sprintf("type = %d", s)
 		}))
 	}
-	if req.NSFW.Set {
-		if !req.NSFW.Value {
-			filter = append(filter, []string{"nsfw = false"})
-		}
+
+	if !req.NSFW {
+		filter = append(filter, []string{"nsfw = false"})
 	}
 
 	// AND
