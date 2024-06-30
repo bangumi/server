@@ -31,6 +31,7 @@ func Test_ReqFilterToMeiliFilter(t *testing.T) {
 	})
 
 	require.Equal(t, [][]string{
+		{`nsfw = false`},
 		{`tag = "a"`},
 		{`tag = "b"`},
 	}, actual)
