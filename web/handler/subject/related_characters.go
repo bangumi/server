@@ -17,6 +17,7 @@ package subject
 import (
 	"context"
 	"errors"
+	"github.com/bangumi/server/pkg/wiki"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -65,6 +66,7 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 		response[i] = res.SubjectRelatedCharacter{
 			Images:   res.PersonImage(rel.Character.Image),
 			Name:     rel.Character.Name,
+			NameCN:   wiki.ParseNameCN(rel.Character.Infobox),
 			Relation: characterStaffString(rel.TypeID),
 			Actors:   toActors(actors[rel.Character.ID]),
 			Type:     rel.Character.Type,
@@ -150,6 +152,7 @@ func toActors(persons []model.Person) []res.Actor {
 		actors[j] = res.Actor{
 			Images:       res.PersonImage(actor.Image),
 			Name:         actor.Name,
+			NameCN:       wiki.ParseNameCN(actor.Infobox),
 			ShortSummary: actor.Summary,
 			Career:       actor.Careers(),
 			ID:           actor.ID,
