@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"html"
 	"math"
 
 	"github.com/trim21/errgo"
@@ -75,8 +76,8 @@ func ConvertDao(s *dao.Subject) (model.Subject, error) {
 		Redirect:   s.Fields.Redirect,
 		Date:       date,
 		ID:         s.ID,
-		Name:       s.Name,
-		NameCN:     s.NameCN,
+		Name:       html.UnescapeString(s.Name),
+		NameCN:     html.UnescapeString(s.NameCN),
 		TypeID:     s.TypeID,
 		Image:      s.Image,
 		PlatformID: s.Platform,
