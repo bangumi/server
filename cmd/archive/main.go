@@ -180,6 +180,14 @@ type Score struct {
 	Field10 uint32 `json:"10"`
 }
 
+type Favorite struct {
+	Wish    uint32 `json:"wish"`
+	Done    uint32 `json:"done"`
+	Doing   uint32 `json:"doing"`
+	OnHold  uint32 `json:"on_hold"`
+	Dropped uint32 `json:"dropped"`
+}
+
 type Subject struct {
 	ID       model.SubjectID   `json:"id"`
 	Type     model.SubjectType `json:"type"`
@@ -190,10 +198,12 @@ type Subject struct {
 	Summary  string            `json:"summary"`
 	Nsfw     bool              `json:"nsfw"`
 
-	Tags         []Tag   `json:"tags"`
-	Score        float64 `json:"score"`
-	ScoreDetails Score   `json:"score_details"`
-	Rank         uint32  `json:"rank"`
+	Tags         []Tag    `json:"tags"`
+	Score        float64  `json:"score"`
+	ScoreDetails Score    `json:"score_details"`
+	Rank         uint32   `json:"rank"`
+	Date         string   `json:"date"`
+	Favorite     Favorite `json:"favorite"`
 }
 
 type Tag struct {
@@ -238,6 +248,11 @@ func exportSubjects(q *query.Query, w io.Writer) {
 					6*f.Rate6+7*f.Rate7+8*f.Rate8+9*f.Rate9+10*f.Rate10) / float64(total)
 			}
 
+			encodedDate := ""
+			if !subject.Fields.Date.IsZero() {
+				encodedDate = subject.Fields.Date.Format("2006-01-02")
+			}
+
 			encode(w, Subject{
 				ID:       subject.ID,
 				Type:     subject.TypeID,
@@ -262,18 +277,28 @@ func exportSubjects(q *query.Query, w io.Writer) {
 					Field9:  subject.Fields.Rate9,
 					Field10: subject.Fields.Rate10,
 				},
+				Date: encodedDate,
+				Favorite: Favorite{
+					Wish:    subject.Wish,
+					Done:    subject.Done,
+					Doing:   subject.Doing,
+					OnHold:  subject.OnHold,
+					Dropped: subject.Dropped,
+				},
 			})
 		}
 	}
 }
 
 type Person struct {
-	ID      model.PersonID `json:"id"`
-	Name    string         `json:"name"`
-	Type    uint8          `json:"type"`
-	Career  []string       `json:"career"`
-	Infobox string         `json:"infobox"`
-	Summary string         `json:"summary"`
+	ID       model.PersonID `json:"id"`
+	Name     string         `json:"name"`
+	Type     uint8          `json:"type"`
+	Career   []string       `json:"career"`
+	Infobox  string         `json:"infobox"`
+	Summary  string         `json:"summary"`
+	Comments uint32         `json:"comments"`
+	Collects uint32         `json:"collects"`
 }
 
 func exportPersons(q *query.Query, w io.Writer) {
@@ -286,12 +311,14 @@ func exportPersons(q *query.Query, w io.Writer) {
 
 		for _, p := range persons {
 			encode(w, Person{
-				ID:      p.ID,
-				Name:    p.Name,
-				Type:    p.Type,
-				Career:  careers(p),
-				Infobox: p.Infobox,
-				Summary: p.Summary,
+				ID:       p.ID,
+				Name:     p.Name,
+				Type:     p.Type,
+				Career:   careers(p),
+				Infobox:  p.Infobox,
+				Summary:  p.Summary,
+				Comments: p.Comment,
+				Collects: p.Collects,
 			})
 		}
 	}
@@ -336,11 +363,13 @@ func careers(p *dao.Person) []string {
 }
 
 type Character struct {
-	ID      model.CharacterID `json:"id"`
-	Role    uint8             `json:"role"`
-	Name    string            `json:"name"`
-	Infobox string            `json:"infobox"`
-	Summary string            `json:"summary"`
+	ID       model.CharacterID `json:"id"`
+	Role     uint8             `json:"role"`
+	Name     string            `json:"name"`
+	Infobox  string            `json:"infobox"`
+	Summary  string            `json:"summary"`
+	Comments uint32            `json:"comments"`
+	Collects uint32            `json:"collects"`
 }
 
 func exportCharacters(q *query.Query, w io.Writer) {
@@ -353,11 +382,13 @@ func exportCharacters(q *query.Query, w io.Writer) {
 
 		for _, c := range characters {
 			encode(w, Character{
-				ID:      c.ID,
-				Name:    c.Name,
-				Role:    c.Role,
-				Infobox: c.Infobox,
-				Summary: c.Summary,
+				ID:       c.ID,
+				Name:     c.Name,
+				Role:     c.Role,
+				Infobox:  c.Infobox,
+				Summary:  c.Summary,
+				Comments: c.Comment,
+				Collects: c.Collects,
 			})
 		}
 	}
