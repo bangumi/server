@@ -28,7 +28,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
-	github.com/trim21/errgo v0.0.2
+	github.com/trim21/errgo v0.0.3
 	github.com/trim21/go-phpserialize v0.0.22
 	github.com/trim21/go-redis-prometheus v0.0.0
 	github.com/trim21/htest v0.0.4
