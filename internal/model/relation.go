@@ -24,6 +24,7 @@ type SubjectPersonRelation struct {
 	Person  Person
 	Subject Subject
 	TypeID  uint16
+	Eps     string
 }
 
 type SubjectCharacterRelation struct {

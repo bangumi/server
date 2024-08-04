@@ -65,6 +65,7 @@ func (s service) GetSubjectRelated(
 			Person:  persons[rel.PersonID],
 			Subject: sub,
 			TypeID:  rel.TypeID,
+			Eps:     rel.Eps,
 		}
 	}
 

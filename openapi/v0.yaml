@@ -2961,6 +2961,7 @@ components:
         - type
         - career
         - relation
+        - eps
       type: object
       properties:
         id:
@@ -2987,6 +2988,10 @@ components:
         relation:
           title: Relation
           type: string
+        eps:
+          title: Eps
+          type: string
+          description: 参与章节/曲目
     UserCharacterCollection:
       title: UserCharacterCollection
       required:

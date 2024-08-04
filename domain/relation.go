@@ -29,6 +29,7 @@ type SubjectPersonRelation struct {
 
 	PersonID  model.PersonID
 	SubjectID model.SubjectID
+	Eps       string
 }
 
 type SubjectCharacterRelation struct {

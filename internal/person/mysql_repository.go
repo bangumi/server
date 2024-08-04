@@ -68,6 +68,7 @@ func (r mysqlRepo) GetSubjectRelated(
 		rel[i] = domain.SubjectPersonRelation{
 			PersonID: relation.PersonID,
 			TypeID:   relation.PrsnPosition,
+			Eps:      relation.PrsnAppearEps,
 		}
 	}
 

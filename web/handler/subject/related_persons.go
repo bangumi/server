@@ -62,6 +62,7 @@ func (h Subject) GetRelatedPersons(c echo.Context) error {
 			Career:   rel.Person.Careers(),
 			Type:     rel.Person.Type,
 			ID:       rel.Person.ID,
+			Eps:      rel.Eps,
 		}
 	}
 
