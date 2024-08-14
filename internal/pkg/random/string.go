@@ -28,8 +28,8 @@ var p = pool.New(func() *bufio.Reader {
 
 // we may never need to change these values.
 const base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-const base62CharsLength = 62                               // len(base62Chars)
-const base62MaxByte byte = 255 - (256 % base62CharsLength) //nolint:gomnd
+const base62CharsLength = byte(len(base62Chars))
+const base62MaxByte = byte(255 - (256 % len(base62Chars)))
 
 // Base62String generate a cryptographically secure base62 string in given length.
 // Will panic if it can't read from 'crypto/rand'.
