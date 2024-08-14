@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - run: git clone https://github.com/bangumi/dev-env $HOME/dev-env
-      - run: cd ~/dev-env && docker-compose up -d
+      - run: cd ~/dev-env && docker compose up -d
 
       - uses: actions/checkout@v4
         with:
