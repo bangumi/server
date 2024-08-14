@@ -490,7 +490,7 @@ type SubjectCharacter struct {
 	CharacterID model.CharacterID `json:"character_id"`
 	SubjectID   model.SubjectID   `json:"subject_id"`
 	Type        uint8             `json:"type"`
-	Order       uint8             `json:"order"`
+	Order       uint16            `json:"order"`
 }
 
 func exportSubjectCharacterRelations(q *query.Query, w io.Writer) {
