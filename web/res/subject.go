@@ -198,6 +198,7 @@ type SubjectRelatedPerson struct {
 	Career   []string       `json:"career"`
 	Type     uint8          `json:"type"`
 	ID       model.PersonID `json:"id" doc:"person ID"`
+	Eps      string         `json:"eps" doc:"episodes participated"`
 }
 
 type Actor struct {
