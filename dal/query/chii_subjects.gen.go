@@ -29,14 +29,14 @@ func newSubject(db *gorm.DB, opts ...gen.DOOption) subject {
 	_subject.ALL = field.NewAsterisk(tableName)
 	_subject.ID = field.NewUint32(tableName, "subject_id")
 	_subject.TypeID = field.NewUint8(tableName, "subject_type_id")
-	_subject.Name = field.NewString(tableName, "subject_name")
-	_subject.NameCN = field.NewString(tableName, "subject_name_cn")
+	_subject.Name = field.NewField(tableName, "subject_name")
+	_subject.NameCN = field.NewField(tableName, "subject_name_cn")
 	_subject.UID = field.NewString(tableName, "subject_uid")
 	_subject.Creator = field.NewUint32(tableName, "subject_creator")
 	_subject.Dateline = field.NewUint32(tableName, "subject_dateline")
 	_subject.Image = field.NewString(tableName, "subject_image")
 	_subject.Platform = field.NewUint16(tableName, "subject_platform")
-	_subject.Infobox = field.NewString(tableName, "field_infobox")
+	_subject.Infobox = field.NewField(tableName, "field_infobox")
 	_subject.Summary = field.NewString(tableName, "field_summary")
 	_subject.Field5 = field.NewString(tableName, "field_5")
 	_subject.Volumes = field.NewUint32(tableName, "field_volumes")
@@ -69,14 +69,14 @@ type subject struct {
 	ALL         field.Asterisk
 	ID          field.Uint32
 	TypeID      field.Uint8
-	Name        field.String
-	NameCN      field.String
+	Name        field.Field
+	NameCN      field.Field
 	UID         field.String // isbn / imdb
 	Creator     field.Uint32
 	Dateline    field.Uint32
 	Image       field.String
 	Platform    field.Uint16
-	Infobox     field.String
+	Infobox     field.Field
 	Summary     field.String // summary
 	Field5      field.String // author summary
 	Volumes     field.Uint32 // 卷数
@@ -111,14 +111,14 @@ func (s *subject) updateTableName(table string) *subject {
 	s.ALL = field.NewAsterisk(table)
 	s.ID = field.NewUint32(table, "subject_id")
 	s.TypeID = field.NewUint8(table, "subject_type_id")
-	s.Name = field.NewString(table, "subject_name")
-	s.NameCN = field.NewString(table, "subject_name_cn")
+	s.Name = field.NewField(table, "subject_name")
+	s.NameCN = field.NewField(table, "subject_name_cn")
 	s.UID = field.NewString(table, "subject_uid")
 	s.Creator = field.NewUint32(table, "subject_creator")
 	s.Dateline = field.NewUint32(table, "subject_dateline")
 	s.Image = field.NewString(table, "subject_image")
 	s.Platform = field.NewUint16(table, "subject_platform")
-	s.Infobox = field.NewString(table, "field_infobox")
+	s.Infobox = field.NewField(table, "field_infobox")
 	s.Summary = field.NewString(table, "field_summary")
 	s.Field5 = field.NewString(table, "field_5")
 	s.Volumes = field.NewUint32(table, "field_volumes")
