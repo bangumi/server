@@ -18,7 +18,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"html"
 	"math"
 
 	"github.com/trim21/errgo"
@@ -27,6 +26,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
+	"github.com/bangumi/server/dal/utiltype"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
@@ -76,12 +76,12 @@ func ConvertDao(s *dao.Subject) (model.Subject, error) {
 		Redirect:   s.Fields.Redirect,
 		Date:       date,
 		ID:         s.ID,
-		Name:       html.UnescapeString(s.Name),
-		NameCN:     html.UnescapeString(s.NameCN),
+		Name:       string(s.Name),
+		NameCN:     string(s.NameCN),
 		TypeID:     s.TypeID,
 		Image:      s.Image,
 		PlatformID: s.Platform,
-		Infobox:    s.Infobox,
+		Infobox:    string(s.Infobox),
 		Summary:    s.Summary,
 		Volumes:    s.Volumes,
 		Eps:        s.Eps,
@@ -248,7 +248,7 @@ func (r mysqlRepo) Count(
 		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
 	}
 	if filter.Platform.Set {
-		q = q.Where(r.q.Subject.Infobox.Like(fmt.Sprintf("%%[%s]%%", filter.Platform.Value)))
+		q = q.Where(r.q.Subject.Infobox.Like(utiltype.HTMLEscapedString(fmt.Sprintf("%%[%s]%%", filter.Platform.Value))))
 	}
 	if filter.Year.Set {
 		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))
@@ -285,7 +285,7 @@ func (r mysqlRepo) Browse(
 		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
 	}
 	if filter.Platform.Set {
-		q = q.Where(r.q.Subject.Infobox.Like(fmt.Sprintf("%%[%s]%%", filter.Platform.Value)))
+		q = q.Where(r.q.Subject.Infobox.Like(utiltype.HTMLEscapedString(fmt.Sprintf("%%[%s]%%", filter.Platform.Value))))
 	}
 	if filter.Year.Set {
 		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))

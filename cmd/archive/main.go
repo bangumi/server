@@ -256,9 +256,9 @@ func exportSubjects(q *query.Query, w io.Writer) {
 			encode(w, Subject{
 				ID:       subject.ID,
 				Type:     subject.TypeID,
-				Name:     subject.Name,
-				NameCN:   subject.NameCN,
-				Infobox:  subject.Infobox,
+				Name:     string(subject.Name),
+				NameCN:   string(subject.NameCN),
+				Infobox:  string(subject.Infobox),
 				Platform: subject.Platform,
 				Summary:  subject.Summary,
 				Nsfw:     subject.Nsfw,
