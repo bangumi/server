@@ -204,6 +204,8 @@ type Subject struct {
 	Rank         uint32   `json:"rank"`
 	Date         string   `json:"date"`
 	Favorite     Favorite `json:"favorite"`
+
+	Series bool `json:"series"`
 }
 
 type Tag struct {
@@ -277,7 +279,8 @@ func exportSubjects(q *query.Query, w io.Writer) {
 					Field9:  subject.Fields.Rate9,
 					Field10: subject.Fields.Rate10,
 				},
-				Date: encodedDate,
+				Date:   encodedDate,
+				Series: subject.Series,
 				Favorite: Favorite{
 					Wish:    subject.Wish,
 					Done:    subject.Done,
