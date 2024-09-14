@@ -404,6 +404,7 @@ type Episode struct {
 	Description string          `json:"description"`
 	AirDate     string          `json:"airdate"`
 	Disc        uint8           `json:"disc"`
+	Duration    string          `json:"duration"`
 	SubjectID   model.SubjectID `json:"subject_id"`
 	Sort        float32         `json:"sort"`
 	Type        episode.Type    `json:"type"`
@@ -428,6 +429,7 @@ func exportEpisodes(q *query.Query, w io.Writer) {
 				NameCn:      e.NameCn,
 				Sort:        e.Sort,
 				SubjectID:   e.SubjectID,
+				Duration:    e.Duration,
 				Description: e.Desc,
 				Type:        e.Type,
 				AirDate:     e.Airdate,
