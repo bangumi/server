@@ -6,6 +6,8 @@ on:
       - "v*.*.*"
     branches:
       - master
+    branches-ignore:
+      - "renovate/**"
 
 permissions:
   packages: write
