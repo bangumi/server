@@ -20,8 +20,6 @@ import (
 	"time"
 
 	"github.com/trim21/errgo"
-	clientv3 "go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/client/v3/naming/resolver"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -130,26 +128,13 @@ func (m grpcClient) ChangeEpisodeStatus(
 }
 
 func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
-	if cfg.EtcdAddr == "" {
-		logger.Info("no etcd, using nope timeline service")
+	if cfg.SrvTimelineDomain == "" || cfg.SrvTimelinePort == 0 {
+		logger.Info("no srv_timeline_domain and srv_timeline_port, using nope timeline service")
 		return noopClient{}, nil
 	}
 
-	logger.Info("using etcd to discovery timeline services " + cfg.EtcdAddr)
-
-	cli, err := clientv3.NewFromURL(cfg.EtcdAddr)
-	if err != nil {
-		return nil, errgo.Wrap(err, "etcd new client")
-	}
-
-	etcdResolver, err := resolver.NewBuilder(cli)
-	if err != nil {
-		return nil, errgo.Wrap(err, "etcd grpc resolver")
-	}
-
-	conn, err := grpc.Dial(
-		fmt.Sprintf("etcd:///%s/timeline", cfg.EtcdNamespace),
-		grpc.WithResolvers(etcdResolver),
+	conn, err := grpc.NewClient(
+		fmt.Sprintf("dns:%s:%d", cfg.SrvTimelineDomain, cfg.SrvTimelinePort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
