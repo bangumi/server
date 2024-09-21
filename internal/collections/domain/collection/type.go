@@ -17,12 +17,12 @@ package collection
 type SubjectCollection uint8
 
 const (
-	SubjectCollectionAll     = 0 // 全部
-	SubjectCollectionWish    = 1 // 想看
-	SubjectCollectionDone    = 2 // 看过
-	SubjectCollectionDoing   = 3 // 在看
-	SubjectCollectionOnHold  = 4 // 搁置
-	SubjectCollectionDropped = 5 // 抛弃
+	SubjectCollectionAll     SubjectCollection = 0 // 全部
+	SubjectCollectionWish    SubjectCollection = 1 // 想看
+	SubjectCollectionDone    SubjectCollection = 2 // 看过
+	SubjectCollectionDoing   SubjectCollection = 3 // 在看
+	SubjectCollectionOnHold  SubjectCollection = 4 // 搁置
+	SubjectCollectionDropped SubjectCollection = 5 // 抛弃
 )
 
 type EpisodeCollection uint8
