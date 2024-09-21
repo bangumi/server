@@ -134,7 +134,7 @@ func newGrpcClient(cfg config.AppConfig) (pb.TimeLineServiceClient, error) {
 	}
 
 	conn, err := grpc.NewClient(
-		fmt.Sprintf("dns:%s:%d", cfg.SrvTimelineDomain, cfg.SrvTimelinePort),
+		fmt.Sprintf("dns:///%s:%d", cfg.SrvTimelineDomain, cfg.SrvTimelinePort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
