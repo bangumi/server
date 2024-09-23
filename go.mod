@@ -19,7 +19,7 @@ require (
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/mattn/go-colorable v0.1.13
-	github.com/meilisearch/meilisearch-go v0.27.2
+	github.com/meilisearch/meilisearch-go v0.28.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.20.3
 	github.com/redis/go-redis/v9 v9.6.1
@@ -50,7 +50,6 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -77,7 +76,6 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.37.1-0.20220607072126-8a320890c08d // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.uber.org/dig v1.18.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect

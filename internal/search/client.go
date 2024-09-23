@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"reflect"
@@ -60,13 +61,13 @@ func New(
 		return nil, errgo.Wrap(err, "url.Parse")
 	}
 
-	meili := meilisearch.NewClient(meilisearch.ClientConfig{
-		Host:    cfg.Search.MeiliSearch.URL,
-		APIKey:  cfg.Search.MeiliSearch.Key,
-		Timeout: cfg.Search.MeiliSearch.Timeout,
-	})
+	meili := meilisearch.New(
+		cfg.Search.MeiliSearch.URL,
+		meilisearch.WithAPIKey(cfg.Search.MeiliSearch.Key),
+		meilisearch.WithCustomClient(&http.Client{Timeout: cfg.Search.MeiliSearch.Timeout}),
+	)
 
-	if _, err := meili.GetVersion(); err != nil {
+	if _, err := meili.Version(); err != nil {
 		return nil, errgo.Wrap(err, "meilisearch")
 	}
 
@@ -135,9 +136,9 @@ func (c *client) canalInit(cfg config.AppConfig) error {
 
 type client struct {
 	subjectRepo  subject.Repo
-	meili        *meilisearch.Client
+	meili        meilisearch.ServiceManager
 	q            *query.Query
-	subjectIndex *meilisearch.Index
+	subjectIndex meilisearch.IndexManager
 	log          *zap.Logger
 	subject      string
 	queue        *queue.Batched[subjectIndex]
@@ -193,7 +194,8 @@ func (c *client) sendBatch(items []subjectIndex) {
 		retry.Delay(time.Microsecond*100),
 		retry.Attempts(5), //nolint:gomnd
 		retry.RetryIf(func(err error) bool {
-			return errors.As(err, &meilisearch.Error{})
+			var r = &meilisearch.Error{}
+			return errors.As(err, &r)
 		}),
 	)
 
