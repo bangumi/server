@@ -35,7 +35,7 @@ import (
 	"github.com/bangumi/server/web/session"
 )
 
-const groupID = "my-group"
+const groupID = "go-canal"
 
 var errNoTopic = fmt.Errorf("missing search events topic")
 
@@ -48,16 +48,6 @@ func Main() error {
 
 	if len(cfg.Canal.Topics) == 0 {
 		return errNoTopic
-	}
-
-	var opt fx.Option
-	switch cfg.Canal.Broker {
-	case "redis":
-		opt = fx.Provide(newRedisStream)
-	case "kafka":
-		opt = fx.Provide(newKafkaStream)
-	default:
-		return fmt.Errorf("broker not supported, only support redis/kafka as debezium broker") // nolint: goerr113
 	}
 
 	var h *eventHandler
@@ -77,7 +67,7 @@ func Main() error {
 			newEventHandler,
 		),
 
-		opt,
+		fx.Provide(newKafkaStream),
 
 		fx.Populate(&h),
 	)
