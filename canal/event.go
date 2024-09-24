@@ -64,12 +64,12 @@ type eventHandler struct {
 
 func (e *eventHandler) start() error {
 	ee := e.stream.Read(context.Background(), func(msg Msg) error {
-		e.log.Debug("new message", zap.String("stream", msg.Stream), zap.String("id", msg.ID))
+		e.log.Debug("new message", zap.String("topic", msg.Topic), zap.String("id", msg.ID))
 
 		err := e.onMessage(msg.Key, msg.Value)
 		if err != nil {
 			e.log.Error("failed to handle stream msg",
-				zap.Error(err), zap.String("stream", msg.Stream), zap.String("id", msg.ID))
+				zap.Error(err), zap.String("stream", msg.Topic), zap.String("id", msg.ID))
 			return errgo.Trace(err)
 		}
 
@@ -103,26 +103,21 @@ func (e *eventHandler) onMessage(key, value []byte) error {
 		return nil
 	}
 
-	var k messageKey
-	if err := json.Unmarshal(key, &k); err != nil {
+	var p Payload
+	if err := json.Unmarshal(value, &p); err != nil {
 		return nil
 	}
 
-	var v messageValue
-	if err := json.Unmarshal(value, &v); err != nil {
-		return nil
-	}
-
-	e.log.Debug("new message", zap.String("table", v.Payload.Source.Table))
+	e.log.Debug("new message", zap.String("table", p.Source.Table))
 
 	var err error
-	switch v.Payload.Source.Table {
+	switch p.Source.Table {
 	case "chii_subject_fields":
-		err = e.OnSubjectField(k.Payload, v.Payload)
+		err = e.OnSubjectField(key, p)
 	case "chii_subjects":
-		err = e.OnSubject(k.Payload, v.Payload)
+		err = e.OnSubject(key, p)
 	case "chii_members":
-		err = e.OnUserChange(k.Payload, v.Payload)
+		err = e.OnUserChange(key, p)
 	}
 
 	return err
@@ -138,15 +133,7 @@ const (
 // https://debezium.io/documentation/reference/connectors/mysql.html
 // Table 9. Overview of change event basic content
 
-type messageKey struct {
-	Payload json.RawMessage `json:"payload"`
-}
-
-type messageValue struct {
-	Payload payload `json:"payload"`
-}
-
-type payload struct {
+type Payload struct {
 	Before json.RawMessage `json:"before"`
 	After  json.RawMessage `json:"after"`
 	Source source          `json:"source"`

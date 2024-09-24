@@ -74,10 +74,10 @@ func (s *kafkaStream) Read(ctx context.Context, onMessage func(msg Msg) error) e
 		s.log.Debug("new message", zap.String("topic", msg.Topic))
 
 		m := Msg{
-			ID:     strconv.FormatInt(msg.Offset, 10),
-			Stream: msg.Topic,
-			Key:    msg.Key,
-			Value:  msg.Value,
+			ID:    strconv.FormatInt(msg.Offset, 10),
+			Topic: msg.Topic,
+			Key:   msg.Key,
+			Value: msg.Value,
 		}
 
 		if err := onMessage(m); err != nil {

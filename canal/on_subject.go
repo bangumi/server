@@ -23,7 +23,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {
+func (e *eventHandler) OnSubject(key json.RawMessage, payload Payload) error {
 	var k SubjectKey
 	if err := json.Unmarshal(key, &k); err != nil {
 		return nil
@@ -32,7 +32,7 @@ func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {
 	return e.onSubjectChange(k.ID, payload.Op)
 }
 
-func (e *eventHandler) OnSubjectField(key json.RawMessage, payload payload) error {
+func (e *eventHandler) OnSubjectField(key json.RawMessage, payload Payload) error {
 	var k SubjectFieldKey
 	if err := json.Unmarshal(key, &k); err != nil {
 		return nil

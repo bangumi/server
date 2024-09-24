@@ -19,10 +19,10 @@ import (
 )
 
 type Msg struct {
-	ID     string
-	Stream string
-	Key    []byte
-	Value  []byte
+	ID    string
+	Topic string
+	Key   []byte
+	Value []byte
 }
 
 type Stream interface {

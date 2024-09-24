@@ -30,7 +30,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
-func (e *eventHandler) OnUserChange(key json.RawMessage, payload payload) error {
+func (e *eventHandler) OnUserChange(key json.RawMessage, payload Payload) error {
 	var k UserKey
 	if err := json.Unmarshal(key, &k); err != nil {
 		e.log.Error("failed to unmarshal json", zap.Error(err))
