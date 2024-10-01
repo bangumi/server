@@ -36,7 +36,7 @@ func TestUser_Get(t *testing.T) {
 	const uid model.UserID = 7
 
 	u := mocks.NewUserRepo(t)
-	u.EXPECT().GetByID(mock.Anything, uid).Return(user.User{ID: uid}, nil)
+	u.EXPECT().GetFullUser(mock.Anything, uid).Return(user.FullUser{ID: uid}, nil)
 
 	a := mocks.NewAuthRepo(t)
 	a.EXPECT().GetByToken(mock.Anything, "token").Return(auth.UserInfo{ID: uid}, nil)
