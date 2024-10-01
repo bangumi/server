@@ -64,15 +64,18 @@ func (m mysqlRepo) GetFullUser(ctx context.Context, userID model.UserID) (FullUs
 	}, nil
 }
 
+// GMT+8
+const defaultTimeOffset = 8
+
 func parseTimeOffset(s string) int8 {
 	switch s {
 	case "", "9999":
-		return 8
+		return defaultTimeOffset
 	}
 
 	v, err := strconv.ParseInt(s, 10, 8)
 	if err != nil {
-		return 8
+		return defaultTimeOffset
 	}
 
 	return int8(v)
