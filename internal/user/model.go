@@ -22,6 +22,18 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
+// FullUser is for current user or admin only.
+type FullUser struct {
+	RegistrationTime time.Time
+	NickName         string
+	Avatar           string
+	Sign             string
+	UserName         string
+	ID               model.UserID
+	UserGroup        GroupID
+	TimeOffset       int8
+}
+
 type GroupID = uint8
 
 // User is visible for everyone.

@@ -20,9 +20,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
 
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/res"
 )
+
+type CurrentUser struct {
+	Avatar     res.Avatar   `json:"avatar"`
+	Sign       string       `json:"sign"`
+	URL        string       `json:"url"`
+	Username   string       `json:"username"`
+	Nickname   string       `json:"nickname"`
+	ID         model.UserID `json:"id"`
+	UserGroup  uint8        `json:"user_group"`
+	TimeOffset int8         `json:"time_offset"`
+}
 
 func (h User) GetCurrent(c echo.Context) error {
 	u := accessor.GetFromCtx(c)
@@ -30,18 +42,19 @@ func (h User) GetCurrent(c echo.Context) error {
 		return res.Unauthorized("need Login")
 	}
 
-	user, err := h.user.GetByID(c.Request().Context(), u.ID)
+	user, err := h.user.GetFullUser(c.Request().Context(), u.ID)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get user")
 	}
 
-	return c.JSON(http.StatusOK, res.User{
-		ID:        user.ID,
-		URL:       "https://bgm.tv/user/" + user.UserName,
-		Username:  user.UserName,
-		Nickname:  user.NickName,
-		UserGroup: user.UserGroup,
-		Avatar:    res.UserAvatar(user.Avatar),
-		Sign:      user.Sign,
+	return c.JSON(http.StatusOK, CurrentUser{
+		ID:         user.ID,
+		URL:        "https://bgm.tv/user/" + user.UserName,
+		Username:   user.UserName,
+		Nickname:   user.NickName,
+		UserGroup:  user.UserGroup,
+		Avatar:     res.UserAvatar(user.Avatar),
+		Sign:       user.Sign,
+		TimeOffset: user.TimeOffset,
 	})
 }

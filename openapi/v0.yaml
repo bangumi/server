@@ -982,7 +982,13 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/User"
+                allOf:
+                  - "$ref": "#/components/schemas/User"
+                  - type: object
+                    properties:
+                      time_offset:
+                        description: "用户设置的时区偏移，以小时为单位。比如 GMT+8（shanghai/beijing）为 8"
+                        type: integer
         "403":
           description: unauthorized
           content:

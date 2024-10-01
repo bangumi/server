@@ -21,6 +21,9 @@ import (
 )
 
 type Repo interface {
+	// GetFullUser find a user by uid.
+	GetFullUser(ctx context.Context, userID model.UserID) (FullUser, error)
+
 	// GetByID find a user by uid.
 	GetByID(ctx context.Context, userID model.UserID) (User, error)
 	// GetByName find a user by username.
