@@ -36,6 +36,7 @@ func newSubjectRevision(db *gorm.DB, opts ...gen.DOOption) subjectRevision {
 	_subjectRevision.Name = field.NewString(tableName, "rev_name")
 	_subjectRevision.NameCN = field.NewString(tableName, "rev_name_cn")
 	_subjectRevision.FieldInfobox = field.NewString(tableName, "rev_field_infobox")
+	_subjectRevision.FieldMetaTags = field.NewString(tableName, "rev_field_meta_tags")
 	_subjectRevision.FieldSummary = field.NewString(tableName, "rev_field_summary")
 	_subjectRevision.VoteField = field.NewString(tableName, "rev_vote_field")
 	_subjectRevision.FieldEps = field.NewUint32(tableName, "rev_field_eps")
@@ -60,22 +61,23 @@ func newSubjectRevision(db *gorm.DB, opts ...gen.DOOption) subjectRevision {
 type subjectRevision struct {
 	subjectRevisionDo subjectRevisionDo
 
-	ALL          field.Asterisk
-	ID           field.Uint32
-	Type         field.Uint8 // 修订类型
-	SubjectID    field.Uint32
-	TypeID       field.Uint16
-	CreatorID    field.Uint32
-	Dateline     field.Uint32
-	Name         field.String
-	NameCN       field.String
-	FieldInfobox field.String
-	FieldSummary field.String
-	VoteField    field.String
-	FieldEps     field.Uint32
-	EditSummary  field.String
-	Platform     field.Uint16
-	Subject      subjectRevisionBelongsToSubject
+	ALL           field.Asterisk
+	ID            field.Uint32
+	Type          field.Uint8 // 修订类型
+	SubjectID     field.Uint32
+	TypeID        field.Uint16
+	CreatorID     field.Uint32
+	Dateline      field.Uint32
+	Name          field.String
+	NameCN        field.String
+	FieldInfobox  field.String
+	FieldMetaTags field.String
+	FieldSummary  field.String
+	VoteField     field.String
+	FieldEps      field.Uint32
+	EditSummary   field.String
+	Platform      field.Uint16
+	Subject       subjectRevisionBelongsToSubject
 
 	fieldMap map[string]field.Expr
 }
@@ -101,6 +103,7 @@ func (s *subjectRevision) updateTableName(table string) *subjectRevision {
 	s.Name = field.NewString(table, "rev_name")
 	s.NameCN = field.NewString(table, "rev_name_cn")
 	s.FieldInfobox = field.NewString(table, "rev_field_infobox")
+	s.FieldMetaTags = field.NewString(table, "rev_field_meta_tags")
 	s.FieldSummary = field.NewString(table, "rev_field_summary")
 	s.VoteField = field.NewString(table, "rev_vote_field")
 	s.FieldEps = field.NewUint32(table, "rev_field_eps")
@@ -134,7 +137,7 @@ func (s *subjectRevision) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (s *subjectRevision) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 15)
+	s.fieldMap = make(map[string]field.Expr, 16)
 	s.fieldMap["rev_id"] = s.ID
 	s.fieldMap["rev_type"] = s.Type
 	s.fieldMap["rev_subject_id"] = s.SubjectID
@@ -144,6 +147,7 @@ func (s *subjectRevision) fillFieldMap() {
 	s.fieldMap["rev_name"] = s.Name
 	s.fieldMap["rev_name_cn"] = s.NameCN
 	s.fieldMap["rev_field_infobox"] = s.FieldInfobox
+	s.fieldMap["rev_field_meta_tags"] = s.FieldMetaTags
 	s.fieldMap["rev_field_summary"] = s.FieldSummary
 	s.fieldMap["rev_vote_field"] = s.VoteField
 	s.fieldMap["rev_field_eps"] = s.FieldEps

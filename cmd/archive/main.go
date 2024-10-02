@@ -443,7 +443,7 @@ type SubjectRelation struct {
 	SubjectID        model.SubjectID `json:"subject_id"`
 	RelationType     uint16          `json:"relation_type"`
 	RelatedSubjectID model.SubjectID `json:"related_subject_id"`
-	Order            uint8           `json:"order"`
+	Order            uint16          `json:"order"`
 }
 
 func exportSubjectRelations(q *query.Query, w io.Writer) {

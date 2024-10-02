@@ -24,6 +24,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gen/field"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
@@ -32,11 +33,13 @@ import (
 	"github.com/bangumi/server/internal/collections/infra"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	subject2 "github.com/bangumi/server/internal/subject"
 )
 
 func getRepo(t *testing.T) (collections.Repo, *query.Query) {
 	t.Helper()
 	q := test.GetQuery(t)
+
 	repo, err := infra.NewMysqlRepo(q, zap.NewNop())
 	require.NoError(t, err)
 
@@ -209,12 +212,26 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	repo, q := getRepo(t)
 	table := q.SubjectCollection
 
+	err := q.Subject.WithContext(context.TODO()).Clauses(clause.OnConflict{DoNothing: true}).Where(q.Subject.ID.Eq(sid)).Create(&dao.Subject{ID: sid})
+	require.NoError(t, err)
+
+	err = q.SubjectField.WithContext(context.TODO()).Clauses(clause.OnConflict{DoNothing: true}).Where(q.Subject.ID.Eq(sid)).Create(&dao.SubjectField{Sid: sid, Tags: []byte("")})
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		_, err := q.Subject.WithContext(context.TODO()).Where(q.Subject.ID.Eq(sid)).Delete()
+		require.NoError(t, err)
+
+		_, err = q.SubjectField.WithContext(context.TODO()).Where(q.SubjectField.Sid.Eq(sid)).Delete()
+		require.NoError(t, err)
+	})
+
 	test.RunAndCleanup(t, func() {
 		_, err := table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete()
 		require.NoError(t, err)
 	})
 
-	err := table.WithContext(context.Background()).Create(
+	err = table.WithContext(context.Background()).Create(
 		&dao.SubjectCollection{
 			UserID: uid, SubjectID: sid + 1, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
 		},
@@ -247,6 +264,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 			s.UpdateType(collection.SubjectCollectionDropped)
 			require.NoError(t, s.UpdateComment("c"))
 			require.NoError(t, s.UpdateRate(1))
+			require.NoError(t, s.UpdateTags([]string{"1", "2", "3"}))
 			return s, nil
 		})
 	require.NoError(t, err)
@@ -287,6 +305,14 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
+
+	s, err := q.WithContext(context.Background()).Subject.Preload(q.Subject.Fields).Where(q.Subject.ID.Eq(sid)).First()
+	require.NoError(t, err)
+
+	tags, err := subject2.ParseTags(s.Fields.Tags)
+	require.NoError(t, err)
+
+	require.Len(t, tags, 3)
 }
 
 func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {

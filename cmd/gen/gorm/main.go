@@ -55,6 +55,7 @@ func DeprecatedFiled(s string) gen.ModelOpt {
 }
 
 const createdTime = "CreatedTime"
+const updateTime = "UpdatedTime"
 
 // generate code.
 func main() {
@@ -159,10 +160,33 @@ func main() {
 	modelField := g.GenerateModelAs("chii_memberfields", "MemberField",
 		gen.FieldType("uid", userIDTypeString),
 		gen.FieldType("privacy", "[]byte"),
+		gen.FieldIgnore("index_sort"),
+		gen.FieldIgnore("user_agent"),
+		gen.FieldIgnore("ignorepm"),
+		gen.FieldIgnore("groupterms"),
+		gen.FieldIgnore("authstr"),
+		gen.FieldIgnoreReg("^(homepage|reg_source|invite_num|email_verified|reset_password_dateline|reset_password_token)$"),
+		gen.FieldIgnoreReg("^(reset_password_force|email_verify_dateline|email_verify_token|email_verify_score)$"),
 	)
 
 	modelMember := g.GenerateModelAs("chii_members", "Member",
 		gen.FieldRename("uid", "ID"),
+		// gen.FieldIgnore("password_crypt"),
+		gen.FieldIgnore("secques"),
+		gen.FieldIgnore("gender"),
+		gen.FieldIgnore("adminid"),
+		gen.FieldIgnore("regip"),
+		gen.FieldIgnore("lastip"),
+
+		// gen.FieldIgnore("email"),
+		gen.FieldIgnore("bday"),
+		gen.FieldIgnore("styleid"),
+		gen.FieldIgnore("newsletter"),
+		gen.FieldIgnore("ukagaka_settings"),
+		gen.FieldIgnore("username_lock"),
+		gen.FieldIgnore("invited"),
+		gen.FieldIgnore("img_chart"),
+
 		gen.FieldType("uid", userIDTypeString),
 		gen.FieldType("sign", "utiltype.HTMLEscapedString"),
 		gen.FieldType("regdate", "int64"),
@@ -497,6 +521,23 @@ func main() {
 		gen.FieldRename("msg_related", "RelatedMessageID"),
 		gen.FieldRename("msg_sdeleted", "DeletedBySender"),
 		gen.FieldRename("msg_rdeleted", "DeletedByReceiver"),
+	))
+
+	modelTagIndex := g.GenerateModelAs("chii_tag_neue_index", "TagIndex",
+		gen.FieldTrimPrefix("tag_"),
+		gen.FieldRename("tag_dateline", createdTime),
+		gen.FieldRename("tag_lasttouch", updateTime),
+	)
+
+	g.ApplyBasic(modelTagIndex)
+
+	g.ApplyBasic(g.GenerateModelAs("chii_tag_neue_list", "TagList",
+		gen.FieldTrimPrefix("tlt_"),
+		gen.FieldRename("tlt_dateline", createdTime),
+
+		gen.FieldRelate(field.HasOne, "Tag", modelTagIndex, &field.RelateConfig{
+			GORMTag: field.GormTag{"foreignKey": []string{"tag_id"}, "references": []string{"tlt_tid"}},
+		}),
 	))
 
 	// execute the action of code generation
