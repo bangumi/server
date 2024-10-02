@@ -292,7 +292,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, id m
 
 	for name, c := range count {
 		phpTags = append(phpTags, subject.Tag{
-			Name:  &name,
+			Name:  lo.ToPtr(name),
 			Count: c,
 		})
 	}
