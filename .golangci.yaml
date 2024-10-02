@@ -250,7 +250,6 @@ linters:
     - gocritic
     - gocyclo
     - godot
-    - goerr113
     - gofmt
     - gomnd
     - gomoddirectives

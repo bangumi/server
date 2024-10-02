@@ -213,10 +213,12 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	repo, q := getRepo(t)
 	table := q.SubjectCollection
 
-	err := q.Subject.WithContext(context.TODO()).Clauses(clause.OnConflict{DoNothing: true}).Where(q.Subject.ID.Eq(sid)).Create(&dao.Subject{ID: sid})
+	err := q.Subject.WithContext(context.TODO()).Clauses(clause.OnConflict{DoNothing: true}).
+		Where(q.Subject.ID.Eq(sid)).Create(&dao.Subject{ID: sid})
 	require.NoError(t, err)
 
-	err = q.SubjectField.WithContext(context.TODO()).Clauses(clause.OnConflict{DoNothing: true}).Where(q.Subject.ID.Eq(sid)).Create(&dao.SubjectField{Sid: sid, Tags: []byte("")})
+	err = q.SubjectField.WithContext(context.TODO()).Clauses(clause.OnConflict{DoNothing: true}).
+		Where(q.Subject.ID.Eq(sid)).Create(&dao.SubjectField{Sid: sid, Tags: []byte("")})
 	require.NoError(t, err)
 
 	t.Cleanup(func() {

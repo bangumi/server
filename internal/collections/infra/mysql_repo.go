@@ -172,6 +172,7 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 	return nil
 }
 
+//nolint:funlen
 func (r mysqlRepo) updateUserTags(
 	ctx context.Context,
 	userID model.UserID,
