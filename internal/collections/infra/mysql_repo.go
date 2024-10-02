@@ -194,7 +194,8 @@ func (r mysqlRepo) updateUserTags(
 		}
 
 		tags, err := tx.TagIndex.Select().
-			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject)).Find()
+			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
+				q.TagIndex.Type.Eq(int8(subject.TypeID))).Find()
 		if err != nil {
 			return errgo.Trace(err)
 		}
@@ -228,7 +229,8 @@ func (r mysqlRepo) updateUserTags(
 		}
 
 		tags, err = tx.TagIndex.Select().
-			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject)).Find()
+			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
+				q.TagIndex.Type.Eq(int8(subject.TypeID))).Find()
 		if err != nil {
 			return errgo.Trace(err)
 		}
@@ -266,7 +268,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, id m
 							set tag_results = (
 								select count(1)
                    from chii_tag_neue_list
-                   where tlt_tid = chii_tag_neue_index.tag_id
+                   where tlt_tid = chii_tag_neue_index.tag_id and tlt_type = tag_type
 							 )
 						where tag_id in ?
 	`, lo.Map(tags, func(item *dao.TagList, index int) uint32 {
