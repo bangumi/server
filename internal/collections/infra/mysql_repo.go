@@ -170,7 +170,6 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 
 	r.updateSubject(ctx, subject.ID)
 	return nil
-
 }
 
 func (r mysqlRepo) updateUserTags(

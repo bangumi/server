@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
@@ -219,16 +220,12 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
-		_, err := q.Subject.WithContext(context.TODO()).Where(q.Subject.ID.Eq(sid)).Delete()
-		require.NoError(t, err)
-
-		_, err = q.SubjectField.WithContext(context.TODO()).Where(q.SubjectField.Sid.Eq(sid)).Delete()
-		require.NoError(t, err)
+		lo.Must(q.Subject.WithContext(context.TODO()).Where(q.Subject.ID.Eq(sid)).Delete())
+		lo.Must(q.SubjectField.WithContext(context.TODO()).Where(q.SubjectField.Sid.Eq(sid)).Delete())
 	})
 
 	test.RunAndCleanup(t, func() {
-		_, err := table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete()
-		require.NoError(t, err)
+		lo.Must(table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete())
 	})
 
 	err = table.WithContext(context.Background()).Create(
