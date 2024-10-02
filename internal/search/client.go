@@ -192,7 +192,7 @@ func (c *client) sendBatch(items []subjectIndex) {
 
 		retry.DelayType(retry.BackOffDelay),
 		retry.Delay(time.Microsecond*100),
-		retry.Attempts(5), //nolint:gomnd
+		retry.Attempts(5), //nolint:mnd
 		retry.RetryIf(func(err error) bool {
 			var r = &meilisearch.Error{}
 			return errors.As(err, &r)

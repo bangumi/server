@@ -302,7 +302,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, id m
 		return cmp.Compare(a.Count, b.Count)
 	})
 
-	newTag, err := phpserialize.Marshal(lo.Slice(phpTags, 0, 30)) //nolint:gomnd
+	newTag, err := phpserialize.Marshal(lo.Slice(phpTags, 0, 30)) //nolint:mnd
 	if err != nil {
 		return errgo.Wrap(err, "php.Marshal")
 	}

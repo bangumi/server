@@ -131,7 +131,7 @@ linters-settings:
           - pkg: "github.com/golang/mock"
             desc: 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
 
-  gomnd:
+  mnd:
     # settings:
     # mnd:
     # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
@@ -251,7 +251,7 @@ linters:
     - gocyclo
     - godot
     - gofmt
-    - gomnd
+    - mnd
     - gomoddirectives
     - gomodguard
     - goprintffuncname
@@ -318,7 +318,7 @@ issues:
     - source: 'var .* sync\.Once'
       linters: [gochecknoglobals]
 
-    - linters: [goerr113, errorlint]
+    - linters: [err113, errorlint]
       source: "if err == redis.Nil {"
 
     # https://github.com/kunwardeep/paralleltest/issues/8

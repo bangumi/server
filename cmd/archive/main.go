@@ -231,7 +231,7 @@ func exportSubjects(q *query.Query, w io.Writer) {
 				return tags[i].Count >= tags[j].Count
 			})
 
-			tags = lo.Filter(lo.Slice(tags, 0, 11), func(item model.Tag, index int) bool { //nolint:gomnd
+			tags = lo.Filter(lo.Slice(tags, 0, 11), func(item model.Tag, index int) bool { //nolint:mnd
 				return utf8.RuneCountInString(item.Name) < 10 || item.Count >= 10
 			})
 
