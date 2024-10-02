@@ -163,9 +163,11 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return err
 	}
 
-	err = r.updateUserTags(ctx, userID, subject, at, s)
-	if err != nil {
-		return errgo.Trace(err)
+	if s.Privacy() == collection.CollectPrivacyNone {
+		err = r.updateUserTags(ctx, userID, subject, at, s)
+		if err != nil {
+			return errgo.Trace(err)
+		}
 	}
 
 	r.updateSubject(ctx, subject.ID)
@@ -301,7 +303,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, id m
 	}
 
 	slices.SortFunc(phpTags, func(a, b subject.Tag) int {
-		return cmp.Compare(a.Count, b.Count)
+		return -cmp.Compare(a.Count, b.Count)
 	})
 
 	newTag, err := phpserialize.Marshal(lo.Slice(phpTags, 0, 30)) //nolint:mnd
