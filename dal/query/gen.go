@@ -43,6 +43,8 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		SubjectField:      newSubjectField(db, opts...),
 		SubjectRelation:   newSubjectRelation(db, opts...),
 		SubjectRevision:   newSubjectRevision(db, opts...),
+		TagIndex:          newTagIndex(db, opts...),
+		TagList:           newTagList(db, opts...),
 		UserGroup:         newUserGroup(db, opts...),
 		WebSession:        newWebSession(db, opts...),
 	}
@@ -76,6 +78,8 @@ type Query struct {
 	SubjectField      subjectField
 	SubjectRelation   subjectRelation
 	SubjectRevision   subjectRevision
+	TagIndex          tagIndex
+	TagList           tagList
 	UserGroup         userGroup
 	WebSession        webSession
 }
@@ -110,6 +114,8 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		SubjectField:      q.SubjectField.clone(db),
 		SubjectRelation:   q.SubjectRelation.clone(db),
 		SubjectRevision:   q.SubjectRevision.clone(db),
+		TagIndex:          q.TagIndex.clone(db),
+		TagList:           q.TagList.clone(db),
 		UserGroup:         q.UserGroup.clone(db),
 		WebSession:        q.WebSession.clone(db),
 	}
@@ -151,6 +157,8 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		SubjectField:      q.SubjectField.replaceDB(db),
 		SubjectRelation:   q.SubjectRelation.replaceDB(db),
 		SubjectRevision:   q.SubjectRevision.replaceDB(db),
+		TagIndex:          q.TagIndex.replaceDB(db),
+		TagList:           q.TagList.replaceDB(db),
 		UserGroup:         q.UserGroup.replaceDB(db),
 		WebSession:        q.WebSession.replaceDB(db),
 	}
@@ -182,6 +190,8 @@ type queryCtx struct {
 	SubjectField      *subjectFieldDo
 	SubjectRelation   *subjectRelationDo
 	SubjectRevision   *subjectRevisionDo
+	TagIndex          *tagIndexDo
+	TagList           *tagListDo
 	UserGroup         *userGroupDo
 	WebSession        *webSessionDo
 }
@@ -213,6 +223,8 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		SubjectField:      q.SubjectField.WithContext(ctx),
 		SubjectRelation:   q.SubjectRelation.WithContext(ctx),
 		SubjectRevision:   q.SubjectRevision.WithContext(ctx),
+		TagIndex:          q.TagIndex.WithContext(ctx),
+		TagList:           q.TagList.WithContext(ctx),
 		UserGroup:         q.UserGroup.WithContext(ctx),
 		WebSession:        q.WebSession.WithContext(ctx),
 	}

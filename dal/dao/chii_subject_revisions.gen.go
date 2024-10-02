@@ -8,21 +8,22 @@ const TableNameSubjectRevision = "chii_subject_revisions"
 
 // SubjectRevision mapped from table <chii_subject_revisions>
 type SubjectRevision struct {
-	ID           uint32  `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:""`
-	Type         uint8   `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;default:1;comment:修订类型" json:""` // 修订类型
-	SubjectID    uint32  `gorm:"column:rev_subject_id;type:mediumint(8) unsigned;not null" json:""`
-	TypeID       uint16  `gorm:"column:rev_type_id;type:smallint(6) unsigned;not null" json:""`
-	CreatorID    uint32  `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null" json:""`
-	Dateline     uint32  `gorm:"column:rev_dateline;type:int(10) unsigned;not null" json:""`
-	Name         string  `gorm:"column:rev_name;type:varchar(80);not null" json:""`
-	NameCN       string  `gorm:"column:rev_name_cn;type:varchar(80);not null" json:""`
-	FieldInfobox string  `gorm:"column:rev_field_infobox;type:mediumtext;not null" json:""`
-	FieldSummary string  `gorm:"column:rev_field_summary;type:mediumtext;not null" json:""`
-	VoteField    string  `gorm:"column:rev_vote_field;type:mediumtext;not null" json:""`
-	FieldEps     uint32  `gorm:"column:rev_field_eps;type:mediumint(8) unsigned;not null" json:""`
-	EditSummary  string  `gorm:"column:rev_edit_summary;type:varchar(200);not null" json:""`
-	Platform     uint16  `gorm:"column:rev_platform;type:smallint(6) unsigned;not null" json:""`
-	Subject      Subject `gorm:"foreignKey:rev_subject_id;references:subject_id" json:"subject"`
+	ID            uint32  `gorm:"column:rev_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:""`
+	Type          uint8   `gorm:"column:rev_type;type:tinyint(3) unsigned;not null;default:1;comment:修订类型" json:""` // 修订类型
+	SubjectID     uint32  `gorm:"column:rev_subject_id;type:mediumint(8) unsigned;not null" json:""`
+	TypeID        uint16  `gorm:"column:rev_type_id;type:smallint(6) unsigned;not null" json:""`
+	CreatorID     uint32  `gorm:"column:rev_creator;type:mediumint(8) unsigned;not null" json:""`
+	Dateline      uint32  `gorm:"column:rev_dateline;type:int(10) unsigned;not null" json:""`
+	Name          string  `gorm:"column:rev_name;type:varchar(80);not null" json:""`
+	NameCN        string  `gorm:"column:rev_name_cn;type:varchar(80);not null" json:""`
+	FieldInfobox  string  `gorm:"column:rev_field_infobox;type:mediumtext;not null" json:""`
+	FieldMetaTags string  `gorm:"column:rev_field_meta_tags;type:mediumtext;not null" json:""`
+	FieldSummary  string  `gorm:"column:rev_field_summary;type:mediumtext;not null" json:""`
+	VoteField     string  `gorm:"column:rev_vote_field;type:mediumtext;not null" json:""`
+	FieldEps      uint32  `gorm:"column:rev_field_eps;type:mediumint(8) unsigned;not null" json:""`
+	EditSummary   string  `gorm:"column:rev_edit_summary;type:varchar(200);not null" json:""`
+	Platform      uint16  `gorm:"column:rev_platform;type:smallint(6) unsigned;not null" json:""`
+	Subject       Subject `gorm:"foreignKey:rev_subject_id;references:subject_id" json:"subject"`
 }
 
 // TableName SubjectRevision's table name

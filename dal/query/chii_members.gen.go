@@ -30,21 +30,21 @@ func newMember(db *gorm.DB, opts ...gen.DOOption) member {
 	_member.ID = field.NewUint32(tableName, "uid")
 	_member.Username = field.NewString(tableName, "username")
 	_member.Nickname = field.NewString(tableName, "nickname")
+	_member.PasswordCrypt = field.NewBytes(tableName, "password_crypt")
 	_member.Avatar = field.NewString(tableName, "avatar")
 	_member.Groupid = field.NewUint8(tableName, "groupid")
 	_member.Regdate = field.NewInt64(tableName, "regdate")
 	_member.Lastvisit = field.NewUint32(tableName, "lastvisit")
 	_member.Lastactivity = field.NewUint32(tableName, "lastactivity")
 	_member.Lastpost = field.NewUint32(tableName, "lastpost")
+	_member.Email = field.NewString(tableName, "email")
 	_member.Dateformat = field.NewString(tableName, "dateformat")
 	_member.Timeformat = field.NewBool(tableName, "timeformat")
 	_member.Timeoffset = field.NewString(tableName, "timeoffset")
 	_member.Newpm = field.NewBool(tableName, "newpm")
 	_member.NewNotify = field.NewUint16(tableName, "new_notify")
-	_member.Sign = field.NewField(tableName, "sign")
-	_member.PasswordCrypt = field.NewBytes(tableName, "password_crypt")
-	_member.Email = field.NewString(tableName, "email")
 	_member.Acl = field.NewString(tableName, "acl")
+	_member.Sign = field.NewField(tableName, "sign")
 	_member.Fields = memberHasOneFields{
 		db: db.Session(&gorm.Session{}),
 
@@ -63,21 +63,21 @@ type member struct {
 	ID            field.Uint32
 	Username      field.String
 	Nickname      field.String
+	PasswordCrypt field.Bytes
 	Avatar        field.String
 	Groupid       field.Uint8
 	Regdate       field.Int64
 	Lastvisit     field.Uint32
 	Lastactivity  field.Uint32
 	Lastpost      field.Uint32
+	Email         field.String
 	Dateformat    field.String
 	Timeformat    field.Bool
 	Timeoffset    field.String
 	Newpm         field.Bool
 	NewNotify     field.Uint16 // 新提醒
-	Sign          field.Field
-	PasswordCrypt field.Bytes
-	Email         field.String
 	Acl           field.String
+	Sign          field.Field
 	Fields        memberHasOneFields
 
 	fieldMap map[string]field.Expr
@@ -98,21 +98,21 @@ func (m *member) updateTableName(table string) *member {
 	m.ID = field.NewUint32(table, "uid")
 	m.Username = field.NewString(table, "username")
 	m.Nickname = field.NewString(table, "nickname")
+	m.PasswordCrypt = field.NewBytes(table, "password_crypt")
 	m.Avatar = field.NewString(table, "avatar")
 	m.Groupid = field.NewUint8(table, "groupid")
 	m.Regdate = field.NewInt64(table, "regdate")
 	m.Lastvisit = field.NewUint32(table, "lastvisit")
 	m.Lastactivity = field.NewUint32(table, "lastactivity")
 	m.Lastpost = field.NewUint32(table, "lastpost")
+	m.Email = field.NewString(table, "email")
 	m.Dateformat = field.NewString(table, "dateformat")
 	m.Timeformat = field.NewBool(table, "timeformat")
 	m.Timeoffset = field.NewString(table, "timeoffset")
 	m.Newpm = field.NewBool(table, "newpm")
 	m.NewNotify = field.NewUint16(table, "new_notify")
-	m.Sign = field.NewField(table, "sign")
-	m.PasswordCrypt = field.NewBytes(table, "password_crypt")
-	m.Email = field.NewString(table, "email")
 	m.Acl = field.NewString(table, "acl")
+	m.Sign = field.NewField(table, "sign")
 
 	m.fillFieldMap()
 
@@ -141,21 +141,21 @@ func (m *member) fillFieldMap() {
 	m.fieldMap["uid"] = m.ID
 	m.fieldMap["username"] = m.Username
 	m.fieldMap["nickname"] = m.Nickname
+	m.fieldMap["password_crypt"] = m.PasswordCrypt
 	m.fieldMap["avatar"] = m.Avatar
 	m.fieldMap["groupid"] = m.Groupid
 	m.fieldMap["regdate"] = m.Regdate
 	m.fieldMap["lastvisit"] = m.Lastvisit
 	m.fieldMap["lastactivity"] = m.Lastactivity
 	m.fieldMap["lastpost"] = m.Lastpost
+	m.fieldMap["email"] = m.Email
 	m.fieldMap["dateformat"] = m.Dateformat
 	m.fieldMap["timeformat"] = m.Timeformat
 	m.fieldMap["timeoffset"] = m.Timeoffset
 	m.fieldMap["newpm"] = m.Newpm
 	m.fieldMap["new_notify"] = m.NewNotify
-	m.fieldMap["sign"] = m.Sign
-	m.fieldMap["password_crypt"] = m.PasswordCrypt
-	m.fieldMap["email"] = m.Email
 	m.fieldMap["acl"] = m.Acl
+	m.fieldMap["sign"] = m.Sign
 
 }
 

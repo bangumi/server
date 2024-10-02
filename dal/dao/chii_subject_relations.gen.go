@@ -14,7 +14,7 @@ type SubjectRelation struct {
 	RelatedSubjectID     uint32  `gorm:"column:rlt_related_subject_id;type:mediumint(8) unsigned;primaryKey;comment:关联目标 ID" json:""` // 关联目标 ID
 	RelatedSubjectTypeID uint8   `gorm:"column:rlt_related_subject_type_id;type:tinyint(3) unsigned;not null;comment:关联目标类型" json:""` // 关联目标类型
 	ViceVersa            bool    `gorm:"column:rlt_vice_versa;type:tinyint(1) unsigned;primaryKey" json:""`
-	Order                uint8   `gorm:"column:rlt_order;type:tinyint(3) unsigned;not null;comment:关联排序" json:""` // 关联排序
+	Order                uint16  `gorm:"column:rlt_order;type:smallint(6) unsigned;not null;comment:关联排序" json:""` // 关联排序
 	Subject              Subject `gorm:"foreignKey:rlt_related_subject_id;references:subject_id" json:"subject"`
 }
 

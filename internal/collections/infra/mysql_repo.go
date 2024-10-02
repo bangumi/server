@@ -15,10 +15,11 @@
 package infra
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -27,8 +28,8 @@ import (
 	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen"
-	"gorm.io/gen/field"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
@@ -162,8 +163,154 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return err
 	}
 
+	err = r.updateUserTags(ctx, userID, subject, at, s)
+	if err != nil {
+		return errgo.Trace(err)
+	}
+
 	r.updateSubject(ctx, subject.ID)
 	return nil
+}
+
+//nolint:funlen
+func (r mysqlRepo) updateUserTags(
+	ctx context.Context,
+	userID model.UserID,
+	subject model.Subject,
+	at time.Time,
+	s *collection.Subject,
+) error {
+	return r.q.Transaction(func(q *query.Query) error {
+		tx := q.WithContext(ctx)
+
+		if (len(s.Tags())) == 0 {
+			_, err := tx.TagList.Where(q.TagList.UID.Eq(userID),
+				q.TagList.Mid.Eq(subject.ID),
+				q.TagList.Cat.Eq(model.TagCatSubject)).Delete()
+			if err != nil {
+				return errgo.Trace(err)
+			}
+			return r.reCountSubjectTags(ctx, q, subject.ID)
+		}
+
+		tags, err := tx.TagIndex.Select().
+			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject)).Find()
+		if err != nil {
+			return errgo.Trace(err)
+		}
+
+		var existsTags = lo.SliceToMap(tags, func(item *dao.TagIndex) (string, bool) {
+			return item.Name, true
+		})
+
+		var missingTags []string
+		for _, tag := range s.Tags() {
+			if !existsTags[tag] {
+				missingTags = append(missingTags, tag)
+			}
+		}
+
+		if len(missingTags) > 0 {
+			err = tx.TagIndex.Create(lo.Map(missingTags, func(item string, index int) *dao.TagIndex {
+				return &dao.TagIndex{
+					Name:        item,
+					Cat:         model.TagCatSubject,
+					Type:        int8(subject.TypeID),
+					Results:     1,
+					CreatedTime: uint32(at.Unix()),
+					UpdatedTime: uint32(at.Unix()),
+				}
+			})...)
+
+			if err != nil {
+				return errgo.Trace(err)
+			}
+		}
+
+		tags, err = tx.TagIndex.Select().
+			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject)).Find()
+		if err != nil {
+			return errgo.Trace(err)
+		}
+
+		err = tx.TagList.Clauses(clause.OnConflict{DoNothing: true}).
+			Create(lo.Map(tags, func(item *dao.TagIndex, index int) *dao.TagList {
+				return &dao.TagList{
+					Tid:         item.ID,
+					UID:         s.User(),
+					Cat:         model.TagCatSubject,
+					Type:        subject.TypeID,
+					Mid:         subject.ID,
+					CreatedTime: uint32(at.Unix()),
+				}
+			})...)
+		if err != nil {
+			return errgo.Trace(err)
+		}
+
+		return r.reCountSubjectTags(ctx, q, subject.ID)
+	})
+}
+
+func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, id model.SubjectID) error {
+	tags, err := tx.WithContext(ctx).TagList.Select().
+		Where(tx.TagList.Cat.Eq(model.TagCatSubject), tx.TagList.Mid.Eq(id)).Find()
+	if err != nil {
+		return err
+	}
+
+	db := tx.DB().WithContext(ctx)
+
+	err = db.Exec(`
+						update chii_tag_neue_index
+							set tag_results = (
+								select count(1)
+                   from chii_tag_neue_list
+                   where tlt_tid = chii_tag_neue_index.tag_id
+							 )
+						where tag_id in ?
+	`, lo.Map(tags, func(item *dao.TagList, index int) uint32 {
+		return item.Tid
+	})).Error
+
+	if err != nil {
+		return errgo.Trace(err)
+	}
+
+	tagList, err := tx.WithContext(ctx).TagList.Preload(tx.TagList.Tag).
+		Where(tx.TagList.Cat.Eq(model.TagCatSubject), tx.TagList.Mid.Eq(id)).Find()
+	if err != nil {
+		return errgo.Trace(err)
+	}
+
+	var count = make(map[string]int)
+
+	for _, tag := range tagList {
+		count[tag.Tag.Name]++
+	}
+
+	var phpTags = make([]subject.Tag, 0, len(count))
+
+	for name, c := range count {
+		phpTags = append(phpTags, subject.Tag{
+			Name:  lo.ToPtr(name),
+			Count: c,
+		})
+	}
+
+	slices.SortFunc(phpTags, func(a, b subject.Tag) int {
+		return cmp.Compare(a.Count, b.Count)
+	})
+
+	newTag, err := phpserialize.Marshal(lo.Slice(phpTags, 0, 30)) //nolint:gomnd
+	if err != nil {
+		return errgo.Wrap(err, "php.Marshal")
+	}
+
+	_, err = tx.WithContext(ctx).SubjectField.Where(r.q.SubjectField.Sid.Eq(id)).
+		UpdateSimple(r.q.SubjectField.Tags.Value(newTag))
+
+	return errgo.Wrap(err, "failed to update subject field")
 }
 
 // 根据新旧 collection.Subject 状态
@@ -339,105 +486,32 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 }
 
 func (r mysqlRepo) updateSubject(ctx context.Context, subjectID model.SubjectID) {
-	if err := r.updateSubjectTags(ctx, subjectID); err != nil {
-		r.log.Error("failed to update subject tags", zap.Error(err))
-	}
-
 	if err := r.reCountSubjectCollection(ctx, subjectID); err != nil {
 		r.log.Error("failed to update collection counts", zap.Error(err))
 	}
 }
 
 func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model.SubjectID) error {
-	var counts []struct {
-		Type  uint8  `gorm:"type"`
-		Total uint32 `gorm:"total"`
-	}
-
-	err := r.q.SubjectCollection.WithContext(ctx).
-		Select(r.q.SubjectCollection.Type.As("type"), r.q.SubjectCollection.Type.Count().As("total")).
-		Group(r.q.SubjectCollection.Type).
-		Where(r.q.SubjectCollection.SubjectID.Eq(subjectID)).Group(r.q.SubjectCollection.Type).Scan(&counts)
-	if err != nil {
-		return errgo.Wrap(err, "dal")
-	}
-
-	var updater = make([]field.AssignExpr, 0, 5)
-
-	for _, count := range counts {
-		switch collection.SubjectCollection(count.Type) { //nolint:exhaustive
-		case collection.SubjectCollectionDropped:
-			updater = append(updater, r.q.Subject.Dropped.Value(count.Total))
-
-		case collection.SubjectCollectionWish:
-			updater = append(updater, r.q.Subject.Wish.Value(count.Total))
-
-		case collection.SubjectCollectionDoing:
-			updater = append(updater, r.q.Subject.Doing.Value(count.Total))
-
-		case collection.SubjectCollectionOnHold:
-			updater = append(updater, r.q.Subject.OnHold.Value(count.Total))
-
-		case collection.SubjectCollectionDone:
-			updater = append(updater, r.q.Subject.Done.Value(count.Total))
-		}
-	}
-
-	_, err = r.q.Subject.WithContext(ctx).Where(r.q.Subject.ID.Eq(subjectID)).UpdateSimple(updater...)
-	if err != nil {
-		return errgo.Wrap(err, "dal")
-	}
-
-	return nil
-}
-
-func (r mysqlRepo) updateSubjectTags(ctx context.Context, subjectID model.SubjectID) error {
-	collections, err := r.q.SubjectCollection.WithContext(ctx).
-		Where(
-			r.q.SubjectCollection.SubjectID.Eq(subjectID),
-			r.q.SubjectCollection.Private.Neq(uint8(collection.CollectPrivacyBan)),
-		).Find()
-	if err != nil {
-		return errgo.Wrap(err, "failed to get all collection")
-	}
-
-	var tags = make(map[string]int)
-	for _, collection := range collections {
-		for _, s := range strings.Split(collection.Tag, " ") {
-			if s == "" {
-				continue
-			}
-			tags[s]++
-		}
-	}
-
-	var phpTags = make([]subject.Tag, 0, len(tags))
-
-	for name, count := range tags {
-		name := name
-		phpTags = append(phpTags, subject.Tag{
-			Name:  &name,
-			Count: count,
-		})
-	}
-
-	sort.Slice(phpTags, func(i, j int) bool {
-		if phpTags[i].Count != phpTags[j].Count {
-			return phpTags[i].Count > phpTags[j].Count
-		}
-
-		return *phpTags[i].Name > *phpTags[j].Name
-	})
-
-	newTag, err := phpserialize.Marshal(lo.Slice(phpTags, 0, 30)) //nolint:gomnd
-	if err != nil {
-		return errgo.Wrap(err, "php.Marshal")
-	}
-
-	_, err = r.q.SubjectField.WithContext(ctx).Where(r.q.SubjectField.Sid.Eq(subjectID)).
-		UpdateSimple(r.q.SubjectField.Tags.Value(newTag))
-
-	return errgo.Wrap(err, "failed to update subject field")
+	err := r.q.DB().WithContext(ctx).Exec(`
+		update chii_subjects
+		set subject_wish    = (select count(1)
+													 from chii_subject_interests
+													 where interest_subject_id = 1 and interest_type = subject_id),
+				subject_collect = (select count(1)
+													 from chii_subject_interests
+													 where interest_subject_id = 2 and interest_type = subject_id),
+				subject_doing   = (select count(1)
+													 from chii_subject_interests
+													 where interest_subject_id = 3 and interest_type = subject_id),
+				subject_on_hold = (select count(1)
+													 from chii_subject_interests
+													 where interest_subject_id = 4 and interest_type = subject_id),
+				subject_dropped = (select count(1)
+													 from chii_subject_interests
+													 where interest_subject_id = 5 and interest_type = subject_id)
+		where chii_subjects.subject_id = ?
+`, subjectID).Error
+	return errgo.Trace(err)
 }
 
 func (r mysqlRepo) updateCollectionTime(obj *dao.SubjectCollection,
