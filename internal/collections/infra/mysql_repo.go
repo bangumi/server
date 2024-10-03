@@ -257,25 +257,17 @@ func (r mysqlRepo) updateUserTags(
 }
 
 func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, id model.SubjectID) error {
-	tags, err := tx.WithContext(ctx).TagList.Select().
-		Where(tx.TagList.Cat.Eq(model.TagCatSubject), tx.TagList.Mid.Eq(id)).Find()
-	if err != nil {
-		return err
-	}
-
 	db := tx.DB().WithContext(ctx)
 
-	err = db.Exec(`
+	err := db.Exec(`
 						update chii_tag_neue_index
 							set tag_results = (
 								select count(1)
                    from chii_tag_neue_list
                    where tlt_cat = ? AND tlt_tid = chii_tag_neue_index.tag_id and tlt_type = chii_tag_neue_index.tag_type
 							 )
-						where tag_cat = ? AND tag_id IN ?
-	`, model.TagCatSubject, model.TagCatSubject, lo.Uniq(lo.Map(tags, func(item *dao.TagList, index int) uint32 {
-		return item.Tid
-	}))).Error
+						where tag_cat = ? AND tag_id IN (select distinct tag_id from chii_tag_neue_list as tl where tl.tlt_cat = ? and tl.tlt_mid = ?)
+	`, model.TagCatSubject, model.TagCatSubject, model.TagCatSubject, id).Error
 
 	if err != nil {
 		return errgo.Trace(err)
