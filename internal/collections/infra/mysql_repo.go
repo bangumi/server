@@ -118,6 +118,7 @@ func (r mysqlRepo) UpdateOrCreateSubjectCollection(
 	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
 }
 
+//nolint:funlen
 func (r mysqlRepo) updateOrCreateSubjectCollection(
 	ctx context.Context,
 	userID model.UserID,
@@ -267,9 +268,12 @@ func (r mysqlRepo) updateUserTags(ctx context.Context,
 	})
 }
 
-func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, s model.Subject, relatedTags []string) error {
+//nolint:funlen
+func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
+	s model.Subject, relatedTags []string) error {
 	tagIndexs, err := tx.WithContext(ctx).TagIndex.Select().
-		Where(tx.TagIndex.Cat.Eq(model.TagCatSubject), tx.TagIndex.Name.In(relatedTags...), tx.TagIndex.Type.Eq(s.TypeID)).Find()
+		Where(tx.TagIndex.Cat.Eq(model.TagCatSubject), tx.TagIndex.Name.In(relatedTags...),
+			tx.TagIndex.Type.Eq(s.TypeID)).Find()
 	if err != nil {
 		return err
 	}
