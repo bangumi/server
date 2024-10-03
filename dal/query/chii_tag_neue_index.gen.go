@@ -30,7 +30,7 @@ func newTagIndex(db *gorm.DB, opts ...gen.DOOption) tagIndex {
 	_tagIndex.ID = field.NewUint32(tableName, "tag_id")
 	_tagIndex.Name = field.NewString(tableName, "tag_name")
 	_tagIndex.Cat = field.NewInt8(tableName, "tag_cat")
-	_tagIndex.Type = field.NewInt8(tableName, "tag_type")
+	_tagIndex.Type = field.NewUint8(tableName, "tag_type")
 	_tagIndex.Results = field.NewUint32(tableName, "tag_results")
 	_tagIndex.CreatedTime = field.NewUint32(tableName, "tag_dateline")
 	_tagIndex.UpdatedTime = field.NewUint32(tableName, "tag_lasttouch")
@@ -47,7 +47,7 @@ type tagIndex struct {
 	ID          field.Uint32
 	Name        field.String
 	Cat         field.Int8 // 0=条目 1=日志 2=天窗
-	Type        field.Int8
+	Type        field.Uint8
 	Results     field.Uint32
 	CreatedTime field.Uint32
 	UpdatedTime field.Uint32
@@ -70,7 +70,7 @@ func (t *tagIndex) updateTableName(table string) *tagIndex {
 	t.ID = field.NewUint32(table, "tag_id")
 	t.Name = field.NewString(table, "tag_name")
 	t.Cat = field.NewInt8(table, "tag_cat")
-	t.Type = field.NewInt8(table, "tag_type")
+	t.Type = field.NewUint8(table, "tag_type")
 	t.Results = field.NewUint32(table, "tag_results")
 	t.CreatedTime = field.NewUint32(table, "tag_dateline")
 	t.UpdatedTime = field.NewUint32(table, "tag_lasttouch")

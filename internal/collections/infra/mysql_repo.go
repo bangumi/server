@@ -142,6 +142,8 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 
 	original := *collectionSubject
 
+	relatedTags := slices.Clone(original.Tags())
+
 	// Update subject collection
 	s, err := update(ctx, collectionSubject)
 	if err != nil {
@@ -163,11 +165,18 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return err
 	}
 
-	if s.Privacy() == collection.CollectPrivacyNone {
-		err = r.updateUserTags(ctx, userID, subject, at, s)
-		if err != nil {
-			return errgo.Trace(err)
-		}
+	relatedTags = append(relatedTags, s.Tags()...)
+
+	err = r.updateUserTags(ctx, userID, subject, at, s)
+	if err != nil {
+		return errgo.Trace(err)
+	}
+
+	err = r.q.Transaction(func(tx *query.Query) error {
+		return r.reCountSubjectTags(ctx, tx, subject, relatedTags)
+	})
+	if err != nil {
+		return errgo.Trace(err)
 	}
 
 	r.updateSubject(ctx, subject.ID)
@@ -175,13 +184,9 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 }
 
 //nolint:funlen
-func (r mysqlRepo) updateUserTags(
-	ctx context.Context,
-	userID model.UserID,
-	subject model.Subject,
-	at time.Time,
-	s *collection.Subject,
-) error {
+func (r mysqlRepo) updateUserTags(ctx context.Context,
+	userID model.UserID, subject model.Subject,
+	at time.Time, s *collection.Subject) error {
 	return r.q.Transaction(func(q *query.Query) error {
 		tx := q.WithContext(ctx)
 
@@ -189,15 +194,12 @@ func (r mysqlRepo) updateUserTags(
 			_, err := tx.TagList.Where(q.TagList.UID.Eq(userID),
 				q.TagList.Mid.Eq(subject.ID),
 				q.TagList.Cat.Eq(model.TagCatSubject)).Delete()
-			if err != nil {
-				return errgo.Trace(err)
-			}
-			return r.reCountSubjectTags(ctx, q, subject.ID)
+			return errgo.Trace(err)
 		}
 
 		tags, err := tx.TagIndex.Select().
 			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
-				q.TagIndex.Type.Eq(int8(subject.TypeID))).Find()
+				q.TagIndex.Type.Eq(subject.TypeID)).Find()
 		if err != nil {
 			return errgo.Trace(err)
 		}
@@ -218,7 +220,7 @@ func (r mysqlRepo) updateUserTags(
 				return &dao.TagIndex{
 					Name:        item,
 					Cat:         model.TagCatSubject,
-					Type:        int8(subject.TypeID),
+					Type:        subject.TypeID,
 					Results:     1,
 					CreatedTime: uint32(at.Unix()),
 					UpdatedTime: uint32(at.Unix()),
@@ -232,7 +234,7 @@ func (r mysqlRepo) updateUserTags(
 
 		tags, err = tx.TagIndex.Select().
 			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
-				q.TagIndex.Type.Eq(int8(subject.TypeID))).Find()
+				q.TagIndex.Type.Eq(subject.TypeID)).Find()
 		if err != nil {
 			return errgo.Trace(err)
 		}
@@ -252,31 +254,38 @@ func (r mysqlRepo) updateUserTags(
 			return errgo.Trace(err)
 		}
 
-		return r.reCountSubjectTags(ctx, q, subject.ID)
+		return nil
 	})
 }
 
-func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, id model.SubjectID) error {
+func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, s model.Subject, relatedTags []string) error {
+	tagIndexs, err := tx.WithContext(ctx).TagIndex.Select().
+		Where(tx.TagIndex.Cat.Eq(model.TagCatSubject), tx.TagIndex.Name.In(relatedTags...), tx.TagIndex.Type.Eq(s.TypeID)).Find()
+	if err != nil {
+		return err
+	}
+
 	db := tx.DB().WithContext(ctx)
 
-	err := db.Exec(`
-						update chii_tag_neue_index
+	err = db.Exec(`
+						update chii_tag_neue_index as ti
 							set tag_results = (
 								select count(1)
-								 from chii_tag_neue_list
-								 where tlt_cat = ? AND tlt_tid = chii_tag_neue_index.tag_id and tlt_type = chii_tag_neue_index.tag_type
+                   from chii_tag_neue_list as tl
+                   where tl.tlt_cat = ti.tag_cat AND tl.tlt_tid = ti.tag_id and tl.tlt_type = ti.tag_type
 							 )
-						where tag_cat = ? AND tag_id IN (
-							select distinct tl.tlt_tid from chii_tag_neue_list as tl where tl.tlt_cat = ? and tl.tlt_mid = ?
-					  )
-	`, model.TagCatSubject, model.TagCatSubject, model.TagCatSubject, id).Error
-
+						where ti.tag_cat = ? AND ti.tag_type = ? AND ti.tag_id IN ?
+	`, model.TagCatSubject, s.TypeID,
+		lo.Uniq(lo.Map(tagIndexs, func(item *dao.TagIndex, index int) uint32 {
+			return item.ID
+		})),
+	).Error
 	if err != nil {
 		return errgo.Trace(err)
 	}
 
 	tagList, err := tx.WithContext(ctx).TagList.Preload(tx.TagList.Tag).
-		Where(tx.TagList.Cat.Eq(model.TagCatSubject), tx.TagList.Mid.Eq(id)).Find()
+		Where(tx.TagList.Cat.Eq(model.TagCatSubject), tx.TagList.Mid.Eq(s.ID)).Find()
 	if err != nil {
 		return errgo.Trace(err)
 	}

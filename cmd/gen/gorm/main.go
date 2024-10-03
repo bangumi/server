@@ -527,6 +527,7 @@ func main() {
 		gen.FieldTrimPrefix("tag_"),
 		gen.FieldRename("tag_dateline", createdTime),
 		gen.FieldRename("tag_lasttouch", updateTime),
+		gen.FieldType("tag_type", "uint8"),
 	)
 
 	g.ApplyBasic(modelTagIndex)
