@@ -165,7 +165,11 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return err
 	}
 
-	relatedTags = append(relatedTags, s.Tags()...)
+	if slices.Equal(relatedTags, s.Tags()) {
+		relatedTags = nil
+	} else {
+		relatedTags = append(relatedTags, s.Tags()...)
+	}
 
 	err = r.updateUserTags(ctx, userID, subject, at, s)
 	if err != nil {
@@ -259,6 +263,10 @@ func (r mysqlRepo) updateUserTags(ctx context.Context,
 }
 
 func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, s model.Subject, relatedTags []string) error {
+	if len(relatedTags) == 0 {
+		return nil
+	}
+
 	tagIndexs, err := tx.WithContext(ctx).TagIndex.Select().
 		Where(tx.TagIndex.Cat.Eq(model.TagCatSubject), tx.TagIndex.Name.In(relatedTags...), tx.TagIndex.Type.Eq(s.TypeID)).Find()
 	if err != nil {
