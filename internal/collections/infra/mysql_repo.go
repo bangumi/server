@@ -500,19 +500,19 @@ func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model
 		update chii_subjects
 		set subject_wish    = (select count(1)
 													 from chii_subject_interests
-													 where interest_subject_id = 1 and interest_type = subject_id),
+													 where interest_type = 1 and interest_subject_id = subject_id),
 				subject_collect = (select count(1)
 													 from chii_subject_interests
-													 where interest_subject_id = 2 and interest_type = subject_id),
+													 where interest_type = 2 and interest_subject_id = subject_id),
 				subject_doing   = (select count(1)
 													 from chii_subject_interests
-													 where interest_subject_id = 3 and interest_type = subject_id),
+													 where interest_type = 3 and interest_subject_id = subject_id),
 				subject_on_hold = (select count(1)
 													 from chii_subject_interests
-													 where interest_subject_id = 4 and interest_type = subject_id),
+													 where interest_type = 4 and interest_subject_id = subject_id),
 				subject_dropped = (select count(1)
 													 from chii_subject_interests
-													 where interest_subject_id = 5 and interest_type = subject_id)
+													 where interest_type = 5 and interest_subject_id = subject_id)
 		where chii_subjects.subject_id = ?
 `, subjectID).Error
 	return errgo.Trace(err)
