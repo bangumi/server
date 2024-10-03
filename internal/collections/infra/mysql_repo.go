@@ -263,10 +263,12 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, id m
 						update chii_tag_neue_index
 							set tag_results = (
 								select count(1)
-                   from chii_tag_neue_list
-                   where tlt_cat = ? AND tlt_tid = chii_tag_neue_index.tag_id and tlt_type = chii_tag_neue_index.tag_type
+								 from chii_tag_neue_list
+								 where tlt_cat = ? AND tlt_tid = chii_tag_neue_index.tag_id and tlt_type = chii_tag_neue_index.tag_type
 							 )
-						where tag_cat = ? AND tag_id IN (select distinct tag_id from chii_tag_neue_list as tl where tl.tlt_cat = ? and tl.tlt_mid = ?)
+						where tag_cat = ? AND tag_id IN (
+							select distinct tl.tlt_tid from chii_tag_neue_list as tl where tl.tlt_cat = ? and tl.tlt_mid = ?
+					  )
 	`, model.TagCatSubject, model.TagCatSubject, model.TagCatSubject, id).Error
 
 	if err != nil {
