@@ -143,6 +143,7 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 	original := *collectionSubject
 
 	relatedTags := slices.Clone(original.Tags())
+	slices.Sort(relatedTags)
 
 	// Update subject collection
 	s, err := update(ctx, collectionSubject)
@@ -154,21 +155,23 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
-	T := r.q.SubjectCollection
 	if created {
-		err = errgo.Trace(T.WithContext(ctx).Create(obj))
+		err = errgo.Trace(r.q.SubjectCollection.WithContext(ctx).Clauses(clause.OnConflict{UpdateAll: true}).Create(obj))
 	} else {
-		err = errgo.Trace(T.WithContext(ctx).Save(obj))
+		err = errgo.Trace(r.q.SubjectCollection.WithContext(ctx).Save(obj))
 	}
 
 	if err != nil {
 		return err
 	}
 
-	if slices.Equal(relatedTags, s.Tags()) {
+	newTags := slices.Clone(s.Tags())
+	slices.Sort(newTags)
+
+	if slices.Equal(relatedTags, newTags) {
 		relatedTags = nil
 	} else {
-		relatedTags = append(relatedTags, s.Tags()...)
+		relatedTags = lo.Uniq(append(relatedTags, newTags...))
 	}
 
 	err = r.updateUserTags(ctx, userID, subject, at, s)
@@ -176,11 +179,13 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
-	err = r.q.Transaction(func(tx *query.Query) error {
-		return r.reCountSubjectTags(ctx, tx, subject, relatedTags)
-	})
-	if err != nil {
-		return errgo.Trace(err)
+	if len(relatedTags) != 0 {
+		err = r.q.Transaction(func(tx *query.Query) error {
+			return r.reCountSubjectTags(ctx, tx, subject, relatedTags)
+		})
+		if err != nil {
+			return errgo.Trace(err)
+		}
 	}
 
 	r.updateSubject(ctx, subject.ID)
@@ -263,10 +268,6 @@ func (r mysqlRepo) updateUserTags(ctx context.Context,
 }
 
 func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, s model.Subject, relatedTags []string) error {
-	if len(relatedTags) == 0 {
-		return nil
-	}
-
 	tagIndexs, err := tx.WithContext(ctx).TagIndex.Select().
 		Where(tx.TagIndex.Cat.Eq(model.TagCatSubject), tx.TagIndex.Name.In(relatedTags...), tx.TagIndex.Type.Eq(s.TypeID)).Find()
 	if err != nil {
