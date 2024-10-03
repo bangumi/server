@@ -270,12 +270,12 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, id m
 							set tag_results = (
 								select count(1)
                    from chii_tag_neue_list
-                   where tlt_tid = chii_tag_neue_index.tag_id and tlt_type = tag_type
+                   where tlt_tid = chii_tag_neue_index.tag_id and tlt_type = chii_tag_neue_index.tag_type
 							 )
-						where tag_id in ?
-	`, lo.Map(tags, func(item *dao.TagList, index int) uint32 {
+						where tag_id IN ?
+	`, lo.Uniq(lo.Map(tags, func(item *dao.TagList, index int) uint32 {
 		return item.Tid
-	})).Error
+	}))).Error
 
 	if err != nil {
 		return errgo.Trace(err)
