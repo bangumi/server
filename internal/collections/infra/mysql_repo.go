@@ -322,7 +322,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query, s mo
 		return errgo.Wrap(err, "php.Marshal")
 	}
 
-	_, err = tx.WithContext(ctx).SubjectField.Where(r.q.SubjectField.Sid.Eq(id)).
+	_, err = tx.WithContext(ctx).SubjectField.Where(r.q.SubjectField.Sid.Eq(s.ID)).
 		UpdateSimple(r.q.SubjectField.Tags.Value(newTag))
 
 	return errgo.Wrap(err, "failed to update subject field")
