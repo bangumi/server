@@ -38,6 +38,7 @@ import (
 	"github.com/bangumi/server/internal/collections"
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/subject"
 )
@@ -306,6 +307,14 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 	var count = make(map[string]int)
 
 	for _, tag := range tagList {
+		if len(tag.Tag.Name) == 0 {
+			continue
+		}
+
+		if dam.ZeroWithPattern.MatchString(tag.Tag.Name) {
+			continue
+		}
+
 		count[tag.Tag.Name]++
 	}
 

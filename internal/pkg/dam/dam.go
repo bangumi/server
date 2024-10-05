@@ -96,3 +96,5 @@ func AllPrintableChar(text string) bool {
 
 	return true
 }
+
+var ZeroWithPattern = regexp.MustCompile(`\p{Cf}|\p{Cc}|\p{Co}`)
