@@ -45,7 +45,10 @@ var RequestHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 		0.200,
 		0.300,
 		0.500,
-		1.000,
+		1,
+		2,
+		5,
+		10,
 	},
 })
 
@@ -68,6 +71,9 @@ var SQLHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 		0.200,
 		0.300,
 		0.500,
-		1.000,
+		1,
+		2,
+		5,
+		10,
 	},
 })

@@ -290,13 +290,13 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 	db := tx.DB().WithContext(ctx)
 
 	err = db.Exec(`
-						update chii_tag_neue_index as ti
-							set tag_results = (
-								select count(1)
-                   from chii_tag_neue_list as tl
-                   where tl.tlt_cat = ti.tag_cat AND tl.tlt_tid = ti.tag_id and tl.tlt_type = ti.tag_type
-							 )
-						where ti.tag_cat = ? AND ti.tag_type = ? AND ti.tag_id IN ?
+			update chii_tag_neue_index as ti
+				set tag_results = (
+					select count(1)
+						 from chii_tag_neue_list as tl
+						 where tl.tlt_cat = ti.tag_cat AND tl.tlt_tid = ti.tag_id and tl.tlt_type = ti.tag_type
+				 )
+			where ti.tag_cat = ? AND ti.tag_type = ? AND ti.tag_id IN ?
 	`, model.TagCatSubject, s.TypeID,
 		lo.Uniq(lo.Map(tagIndexs, func(item *dao.TagIndex, index int) uint32 {
 			return item.ID
