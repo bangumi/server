@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -198,7 +199,11 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 func (r mysqlRepo) updateUserTags(ctx context.Context,
 	userID model.UserID, subject model.Subject,
 	at time.Time, s *collection.Subject) error {
-	r.log.Info("user collections with tags", zap.Strings("tags", s.Tags()))
+	r.log.Info("user collections with tags", zap.Strings("tags", lo.Map(s.Tags(), func(item string, index int) string {
+		ss := strconv.Quote(item)
+		return ss[1 : len(ss)-1]
+	})))
+
 	return r.q.Transaction(func(q *query.Query) error {
 		tx := q.WithContext(ctx)
 
