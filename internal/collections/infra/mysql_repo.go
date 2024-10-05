@@ -199,11 +199,11 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 func (r mysqlRepo) updateUserTags(ctx context.Context,
 	userID model.UserID, subject model.Subject,
 	at time.Time, s *collection.Subject) error {
-	r.log.Info("user collections with tags", zap.Uint32("user_id", userID), zap.Uint32("subject_id", subject.ID),
-		zap.Strings("tags", lo.Map(s.Tags(), func(item string, index int) string {
-			ss := strconv.Quote(item)
-			return ss[1 : len(ss)-1]
-		})))
+	log := r.log.With(zap.Uint32("user_id", userID), zap.Uint32("subject_id", subject.ID))
+	log.Info("user collections with tags", zap.Strings("tags", lo.Map(s.Tags(), func(item string, index int) string {
+		ss := strconv.Quote(item)
+		return ss[1 : len(ss)-1]
+	})))
 
 	return r.q.Transaction(func(q *query.Query) error {
 		tx := q.WithContext(ctx)
@@ -234,6 +234,7 @@ func (r mysqlRepo) updateUserTags(ctx context.Context,
 		}
 
 		if len(missingTags) > 0 {
+			log.Info("create missing tags", zap.Strings("missing_tags", missingTags))
 			err = tx.TagIndex.Create(lo.Map(missingTags, func(item string, index int) *dao.TagIndex {
 				return &dao.TagIndex{
 					Name:        item,
