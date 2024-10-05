@@ -29,6 +29,7 @@ import (
 	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen"
+	"gorm.io/gen/field"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -528,26 +529,51 @@ func (r mysqlRepo) updateSubject(ctx context.Context, subjectID model.SubjectID)
 }
 
 func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model.SubjectID) error {
-	err := r.q.DB().WithContext(ctx).Exec(`
-		update chii_subjects
-		set subject_wish    = (select count(1)
-													 from chii_subject_interests
-													 where interest_type = 1 and interest_subject_id = subject_id),
-				subject_collect = (select count(1)
-													 from chii_subject_interests
-													 where interest_type = 2 and interest_subject_id = subject_id),
-				subject_doing   = (select count(1)
-													 from chii_subject_interests
-													 where interest_type = 3 and interest_subject_id = subject_id),
-				subject_on_hold = (select count(1)
-													 from chii_subject_interests
-													 where interest_type = 4 and interest_subject_id = subject_id),
-				subject_dropped = (select count(1)
-													 from chii_subject_interests
-													 where interest_type = 5 and interest_subject_id = subject_id)
-		where chii_subjects.subject_id = ?
-`, subjectID).Error
-	return errgo.Trace(err)
+	return r.q.Transaction(func(tx *query.Query) error {
+		var counts = make([]struct {
+			Type  uint8  `gorm:"type"`
+			Total uint32 `gorm:"total"`
+		}, 5)
+
+		for i, t := range []collection.SubjectCollection{
+			collection.SubjectCollectionDropped,
+			collection.SubjectCollectionDoing,
+			collection.SubjectCollectionDone,
+			collection.SubjectCollectionDropped,
+			collection.SubjectCollectionWish,
+		} {
+			err := tx.DB().WithContext(ctx).Exec(`
+				select interest_type as type,  count(1) as total from chii_subject_interests 
+				where interest_subject_id = ? and interest_type = ?
+		`, subjectID, t).Scan(&counts[i]).Error
+			if err != nil {
+				return errgo.Wrap(err, "dal")
+			}
+		}
+
+		var updater = make([]field.AssignExpr, 0, 5)
+		for _, count := range counts {
+			switch collection.SubjectCollection(count.Type) { //nolint:exhaustive
+			case collection.SubjectCollectionDropped:
+				updater = append(updater, r.q.Subject.Dropped.Value(count.Total))
+
+			case collection.SubjectCollectionWish:
+				updater = append(updater, r.q.Subject.Wish.Value(count.Total))
+
+			case collection.SubjectCollectionDoing:
+				updater = append(updater, r.q.Subject.Doing.Value(count.Total))
+
+			case collection.SubjectCollectionOnHold:
+				updater = append(updater, r.q.Subject.OnHold.Value(count.Total))
+
+			case collection.SubjectCollectionDone:
+				updater = append(updater, r.q.Subject.Done.Value(count.Total))
+			}
+		}
+
+		_, err := tx.Subject.WithContext(ctx).Where(r.q.Subject.ID.Eq(subjectID)).UpdateSimple(updater...)
+		return errgo.Wrap(err, "dal")
+	})
 }
 
 func (r mysqlRepo) updateCollectionTime(obj *dao.SubjectCollection,
