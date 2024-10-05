@@ -305,6 +305,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 	}
 
 	var count = make(map[string]int)
+	var countMap = make(map[string]uint32)
 
 	for _, tag := range tagList {
 		if len(tag.Tag.Name) == 0 {
@@ -316,14 +317,16 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 		}
 
 		count[tag.Tag.Name]++
+		countMap[tag.Tag.Name] = tag.Tag.Results
 	}
 
 	var phpTags = make([]subject.Tag, 0, len(count))
 
 	for name, c := range count {
 		phpTags = append(phpTags, subject.Tag{
-			Name:  lo.ToPtr(name),
-			Count: c,
+			Name:       lo.ToPtr(name),
+			Count:      c,
+			TotalCount: int(countMap[name]),
 		})
 	}
 
