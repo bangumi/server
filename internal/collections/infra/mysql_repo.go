@@ -529,26 +529,19 @@ func (r mysqlRepo) updateSubject(ctx context.Context, subjectID model.SubjectID)
 }
 
 func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model.SubjectID) error {
-	return r.q.Transaction(func(tx *query.Query) error {
-		var counts = make([]struct {
-			Type  uint8  `gorm:"type"`
-			Total uint32 `gorm:"total"`
-		}, 5)
+	var counts []struct {
+		Type  uint8  `gorm:"type"`
+		Total uint32 `gorm:"total"`
+	}
 
-		for i, t := range []collection.SubjectCollection{
-			collection.SubjectCollectionDropped,
-			collection.SubjectCollectionDoing,
-			collection.SubjectCollectionDone,
-			collection.SubjectCollectionDropped,
-			collection.SubjectCollectionWish,
-		} {
-			err := tx.DB().WithContext(ctx).Exec(`
-				select interest_type as type,  count(1) as total from chii_subject_interests 
-				where interest_subject_id = ? and interest_type = ?
-		`, subjectID, t).Scan(&counts[i]).Error
-			if err != nil {
-				return errgo.Wrap(err, "dal")
-			}
+	return r.q.Transaction(func(tx *query.Query) error {
+		err := tx.DB().WithContext(ctx).Exec(`
+			select interest_type as type, count(interest_type) as total from chii_subject_interests 
+			where interest_subject_id = ?
+			group by interest_type
+		`, subjectID).Scan(&counts).Error
+		if err != nil {
+			return errgo.Wrap(err, "dal")
 		}
 
 		var updater = make([]field.AssignExpr, 0, 5)
@@ -571,8 +564,12 @@ func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model
 			}
 		}
 
-		_, err := tx.Subject.WithContext(ctx).Where(r.q.Subject.ID.Eq(subjectID)).UpdateSimple(updater...)
-		return errgo.Wrap(err, "dal")
+		_, err = tx.Subject.WithContext(ctx).Where(r.q.Subject.ID.Eq(subjectID)).UpdateSimple(updater...)
+		if err != nil {
+			return errgo.Wrap(err, "dal")
+		}
+
+		return nil
 	})
 }
 
