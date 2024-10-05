@@ -308,11 +308,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 	var countMap = make(map[string]uint32)
 
 	for _, tag := range tagList {
-		if len(tag.Tag.Name) == 0 {
-			continue
-		}
-
-		if dam.ZeroWithPattern.MatchString(tag.Tag.Name) {
+		if !dam.ValidateTag(tag.Tag.Name) {
 			continue
 		}
 

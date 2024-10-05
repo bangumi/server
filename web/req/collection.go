@@ -15,10 +15,9 @@
 package req
 
 import (
+	"fmt"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/samber/lo"
 
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/pkg/dam"
@@ -47,15 +46,9 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 		}
 	}
 
-	if len(v.Tags) > 0 {
-		if !lo.EveryBy(v.Tags, dam.AllPrintableChar) {
-			return res.BadRequest("invisible character are included in tags")
-		}
-
-		if lo.ContainsBy(v.Tags, func(item string) bool {
-			return len(item) == 0
-		}) {
-			return res.BadRequest("zero length tags are included in tags")
+	for _, tag := range v.Tags {
+		if !dam.ValidateTag(tag) {
+			return res.BadRequest(fmt.Sprintf("invalid tag: %q", tag))
 		}
 	}
 
