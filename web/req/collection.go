@@ -51,6 +51,12 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 		if !lo.EveryBy(v.Tags, dam.AllPrintableChar) {
 			return res.BadRequest("invisible character are included in tags")
 		}
+
+		if lo.ContainsBy(v.Tags, func(item string) bool {
+			return len(item) == 0
+		}) {
+			return res.BadRequest("zero length tags are included in tags")
+		}
 	}
 
 	if v.Comment.Set {
