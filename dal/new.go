@@ -16,10 +16,9 @@ package dal
 
 import (
 	"database/sql"
-	"log"
-	"os"
 
 	"github.com/trim21/errgo"
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
@@ -33,7 +32,7 @@ func NewDB(conn *sql.DB, c config.AppConfig) (*gorm.DB, error) {
 	if c.Debug.Gorm {
 		logger.Info("enable gorm debug mode, will log all sql")
 		gLog = gormLogger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			logger.StdAt(zap.DebugLevel),
 			gormLogger.Config{
 				LogLevel:                  gormLogger.Info,
 				IgnoreRecordNotFoundError: true,
