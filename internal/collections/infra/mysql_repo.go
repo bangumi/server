@@ -546,7 +546,10 @@ func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model
 
 		var updater = make([]field.AssignExpr, 0, 5)
 		for _, count := range counts {
-			switch collection.SubjectCollection(count.Type) { //nolint:exhaustive
+			switch collection.SubjectCollection(count.Type) {
+			case collection.SubjectCollectionAll:
+				continue
+
 			case collection.SubjectCollectionDropped:
 				updater = append(updater, r.q.Subject.Dropped.Value(count.Total))
 
