@@ -524,7 +524,7 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 
 func (r mysqlRepo) updateSubject(ctx context.Context, subjectID model.SubjectID) {
 	if err := r.reCountSubjectCollection(ctx, subjectID); err != nil {
-		r.log.Error("failed to update collection counts", zap.Error(err))
+		r.log.Error("failed to update collection counts", zap.Error(err), zap.Uint32("subject_id", subjectID))
 	}
 }
 
