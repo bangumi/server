@@ -16,7 +16,6 @@ package dam
 
 import (
 	"regexp"
-	"strings"
 	"unicode"
 
 	"github.com/trim21/errgo"
@@ -34,21 +33,21 @@ func New(c config.AppConfig) (Dam, error) {
 	var cc Dam
 	var err error
 	if c.NsfwWord != "" {
-		cc.nsfwWord, err = regexp.Compile(c.NsfwWord)
+		cc.nsfwWord, err = regexp.Compile("(?i)" + c.NsfwWord)
 		if err != nil {
 			return Dam{}, errgo.Wrap(err, "nsfw_word")
 		}
 	}
 
 	if c.DisableWords != "" {
-		cc.disableWord, err = regexp.Compile(c.DisableWords)
+		cc.disableWord, err = regexp.Compile("(?i)" + c.DisableWords)
 		if err != nil {
 			return Dam{}, errgo.Wrap(err, "disable_words")
 		}
 	}
 
 	if c.BannedDomain != "" {
-		cc.bannedDomain, err = regexp.Compile(c.BannedDomain)
+		cc.bannedDomain, err = regexp.Compile("(?i)" + c.BannedDomain)
 		if err != nil {
 			return Dam{}, errgo.Wrap(err, "banned_domain")
 		}
@@ -64,8 +63,6 @@ func (d Dam) NeedReview(text string) bool {
 	if d.disableWord == nil {
 		return false
 	}
-
-	text = strings.ToLower(text)
 
 	return d.disableWord.MatchString(text)
 }
