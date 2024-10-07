@@ -19,6 +19,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/samber/lo"
+	"golang.org/x/text/unicode/norm"
+
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/null"
@@ -46,6 +49,10 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 		}
 	}
 
+	v.Tags = lo.Map(v.Tags, func(item string, index int) string {
+		return norm.NFKC.String(item)
+	})
+
 	for _, tag := range v.Tags {
 		if !dam.ValidateTag(tag) {
 			return res.BadRequest(fmt.Sprintf("invalid tag: %q", tag))
@@ -53,11 +60,12 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 	}
 
 	if v.Comment.Set {
+		v.Comment.Value = norm.NFKC.String(v.Comment.Value)
+		v.Comment.Value = strings.TrimSpace(v.Comment.Value)
 		if !dam.AllPrintableChar(v.Comment.Value) {
 			return res.BadRequest("invisible character are included in comment")
 		}
 
-		v.Comment.Value = strings.TrimSpace(v.Comment.Value)
 		if utf8.RuneCountInString(v.Comment.Value) > 380 {
 			return res.BadRequest("comment too long, only allow less equal than 380 characters")
 		}
