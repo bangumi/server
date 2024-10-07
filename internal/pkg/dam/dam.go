@@ -97,7 +97,7 @@ func AllPrintableChar(text string) bool {
 	return true
 }
 
-var ZeroWidthPattern = regexp.MustCompile(`\p{Cf}|\p{Cc}|\p{Co}`)
+var ZeroWidthPattern = regexp.MustCompile(`[^\t\r\n\p{L}\p{M}\p{N}\p{P}\p{S}\p{Z}]`)
 var ExtraSpacePattern = regexp.MustCompile("[\u3000 ]")
 
 func ValidateTag(t string) bool {
@@ -106,6 +106,10 @@ func ValidateTag(t string) bool {
 	}
 
 	if !AllPrintableChar(t) {
+		return false
+	}
+
+	if ZeroWidthPattern.MatchString(t) {
 		return false
 	}
 
