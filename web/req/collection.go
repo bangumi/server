@@ -49,9 +49,11 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 		}
 	}
 
-	v.Tags = lo.Map(v.Tags, func(item string, index int) string {
-		return norm.NFKC.String(item)
-	})
+	if v.Tags != nil {
+		v.Tags = lo.Map(v.Tags, func(item string, index int) string {
+			return norm.NFKC.String(item)
+		})
+	}
 
 	for _, tag := range v.Tags {
 		if !dam.ValidateTag(tag) {
