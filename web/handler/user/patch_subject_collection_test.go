@@ -80,14 +80,14 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 			"type":    2,
 			"private": true,
 			"rate":    8,
-			"tags":    []string{"q", "vv"},
+			"tags":    []string{"qq", "vv"},
 		}).
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 		ExpectCode(http.StatusNoContent)
 
 	require.Equal(t, collection.CollectPrivacySelf, s.Privacy())
 	require.Equal(t, "1 test_content 2", s.Comment())
-	require.EqualValues(t, []string{"q", "vv"}, s.Tags())
+	require.EqualValues(t, []string{"qq", "vv"}, s.Tags())
 	require.EqualValues(t, 8, s.Rate())
 }
 
@@ -118,7 +118,7 @@ func TestUser_PatchToNonExistsSubjectCollection(t *testing.T) {
 			"type":    1,
 			"private": true,
 			"rate":    8,
-			"tags":    []string{"q", "vv"},
+			"tags":    []string{"qq", "vv"},
 		}).
 		Patch(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 		ExpectCode(http.StatusNotFound)
