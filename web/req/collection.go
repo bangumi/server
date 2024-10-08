@@ -56,6 +56,10 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 	}
 
 	for _, tag := range v.Tags {
+		if utf8.RuneCountInString(tag) < 2 {
+			return res.BadRequest("tag 最短为两个字")
+		}
+
 		if !dam.ValidateTag(tag) {
 			return res.BadRequest(fmt.Sprintf("invalid tag: %q", tag))
 		}
