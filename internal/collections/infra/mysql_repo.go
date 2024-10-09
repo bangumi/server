@@ -224,12 +224,12 @@ func (r mysqlRepo) updateUserTags(ctx context.Context,
 		}
 
 		var existsTags = lo.SliceToMap(tags, func(item *dao.TagIndex) (string, bool) {
-			return item.Name, true
+			return strings.ToLower(item.Name), true
 		})
 
 		var missingTags []string
 		for _, tag := range s.Tags() {
-			if !existsTags[tag] {
+			if !existsTags[strings.ToLower(tag)] {
 				missingTags = append(missingTags, tag)
 			}
 		}
@@ -282,11 +282,26 @@ func (r mysqlRepo) updateUserTags(ctx context.Context,
 func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 	s model.Subject, relatedTags []string) error {
 	tagIndexs, err := tx.WithContext(ctx).TagIndex.Select().
-		Where(tx.TagIndex.Cat.Eq(model.TagCatSubject), tx.TagIndex.Name.In(relatedTags...),
-			tx.TagIndex.Type.Eq(s.TypeID)).Find()
+		Where(
+			tx.TagIndex.Cat.Eq(model.TagCatSubject),
+			tx.TagIndex.Name.In(relatedTags...),
+			tx.TagIndex.Type.Eq(s.TypeID),
+		).Order(tx.TagIndex.ID.Asc()).Find()
 	if err != nil {
 		return err
 	}
+
+	// tag in (...) 操作不区分大小写，使用第一次出现的 tag
+	// 比如 {name="Galgame"} {name="galgame"} 在过滤后会只保留 {name="Galgame"}
+	seen := make(map[string]bool)
+	tagIndexs = lo.Filter(tagIndexs, func(item *dao.TagIndex, index int) bool {
+		n := strings.ToLower(item.Name)
+		if seen[n] {
+			return false
+		}
+		seen[n] = true
+		return true
+	})
 
 	db := tx.DB().WithContext(ctx)
 
