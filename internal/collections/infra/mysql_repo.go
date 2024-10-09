@@ -164,9 +164,9 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 	slices.Sort(newTags)
 
 	err = r.q.Transaction(func(tx *query.Query) error {
-		sanitizedTags, err := r.updateUserTags(ctx, tx, userID, subject, at, s)
-		if err != nil {
-			return errgo.Trace(err)
+		sanitizedTags, txErr := r.updateUserTags(ctx, tx, userID, subject, at, s)
+		if txErr != nil {
+			return errgo.Trace(txErr)
 		}
 
 		sort.Strings(sanitizedTags)
@@ -175,6 +175,9 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 
 		return errgo.Trace(r.q.SubjectCollection.WithContext(ctx).Clauses(clause.OnConflict{UpdateAll: true}).Create(obj))
 	})
+	if err != nil {
+		return err
+	}
 
 	if slices.Equal(relatedTags, newTags) {
 		relatedTags = nil
