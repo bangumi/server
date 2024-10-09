@@ -22,6 +22,9 @@ on:
       - ".golangci.yaml"
       - ".github/workflows/lint.yaml"
 
+env:
+  GOTOOLCHAIN: "local"
+
 jobs:
   lint:
     runs-on: ubuntu-24.04

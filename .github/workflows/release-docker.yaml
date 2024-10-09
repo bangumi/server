@@ -10,6 +10,9 @@ on:
 permissions:
   packages: write
 
+env:
+  GOTOOLCHAIN: "local"
+
 jobs:
   docker:
     name: "docker"

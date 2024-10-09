@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+env:
+  GOTOOLCHAIN: "local"
+
 jobs:
   github:
     runs-on: ubuntu-24.04

@@ -24,6 +24,9 @@ on:
       - "**.go.json"
       - "etc/Dockerfile"
 
+env:
+  GOTOOLCHAIN: "local"
+
 jobs:
   docker:
     runs-on: ubuntu-24.04

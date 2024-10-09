@@ -6,6 +6,9 @@ on:
       - "v*.*.*"
   workflow_dispatch:
 
+env:
+  GOTOOLCHAIN: "local"
+
 jobs:
   openapi:
     runs-on: ubuntu-24.04
