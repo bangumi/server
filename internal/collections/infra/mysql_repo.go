@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -159,28 +160,26 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
-	if created {
-		err = errgo.Trace(r.q.SubjectCollection.WithContext(ctx).Clauses(clause.OnConflict{UpdateAll: true}).Create(obj))
-	} else {
-		err = errgo.Trace(r.q.SubjectCollection.WithContext(ctx).Save(obj))
-	}
-
-	if err != nil {
-		return err
-	}
-
 	newTags := slices.Clone(s.Tags())
 	slices.Sort(newTags)
+
+	err = r.q.Transaction(func(tx *query.Query) error {
+		sanitizedTags, err := r.updateUserTags(ctx, tx, userID, subject, at, s)
+		if err != nil {
+			return errgo.Trace(err)
+		}
+
+		sort.Strings(sanitizedTags)
+
+		obj.Tag = strings.Join(sanitizedTags, " ")
+
+		return errgo.Trace(r.q.SubjectCollection.WithContext(ctx).Clauses(clause.OnConflict{UpdateAll: true}).Create(obj))
+	})
 
 	if slices.Equal(relatedTags, newTags) {
 		relatedTags = nil
 	} else {
 		relatedTags = lo.Uniq(append(relatedTags, newTags...))
-	}
-
-	err = r.updateUserTags(ctx, userID, subject, at, s)
-	if err != nil {
-		return errgo.Trace(err)
 	}
 
 	if len(relatedTags) != 0 {
@@ -198,84 +197,85 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 
 //nolint:funlen
 func (r mysqlRepo) updateUserTags(ctx context.Context,
+	q *query.Query,
 	userID model.UserID, subject model.Subject,
-	at time.Time, s *collection.Subject) error {
+	at time.Time, s *collection.Subject) ([]string, error) {
 	log := r.log.With(zap.Uint32("user_id", userID), zap.Uint32("subject_id", subject.ID))
 	log.Info("user collections with tags", zap.Strings("tags", lo.Map(s.Tags(), func(item string, index int) string {
 		ss := strconv.Quote(item)
 		return ss[1 : len(ss)-1]
 	})))
 
-	return r.q.Transaction(func(q *query.Query) error {
-		tx := q.WithContext(ctx)
+	tx := q.WithContext(ctx)
 
-		if (len(s.Tags())) == 0 {
-			_, err := tx.TagList.Where(q.TagList.UID.Eq(userID),
-				q.TagList.Mid.Eq(subject.ID),
-				q.TagList.Cat.Eq(model.TagCatSubject)).Delete()
-			return errgo.Trace(err)
-		}
+	if (len(s.Tags())) == 0 {
+		_, err := tx.TagList.Where(q.TagList.UID.Eq(userID),
+			q.TagList.Mid.Eq(subject.ID),
+			q.TagList.Cat.Eq(model.TagCatSubject)).Delete()
+		return nil, errgo.Trace(err)
+	}
 
-		tags, err := tx.TagIndex.Select().
-			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
-				q.TagIndex.Type.Eq(subject.TypeID)).Find()
-		if err != nil {
-			return errgo.Trace(err)
-		}
+	tags, err := tx.TagIndex.Select().
+		Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
+			q.TagIndex.Type.Eq(subject.TypeID)).Find()
+	if err != nil {
+		return nil, errgo.Trace(err)
+	}
 
-		var existsTags = lo.SliceToMap(tags, func(item *dao.TagIndex) (string, bool) {
-			return strings.ToLower(item.Name), true
-		})
-
-		var missingTags []string
-		for _, tag := range s.Tags() {
-			if !existsTags[strings.ToLower(tag)] {
-				missingTags = append(missingTags, tag)
-			}
-		}
-
-		if len(missingTags) > 0 {
-			log.Info("create missing tags", zap.Strings("missing_tags", missingTags))
-			err = tx.TagIndex.Create(lo.Map(missingTags, func(item string, index int) *dao.TagIndex {
-				return &dao.TagIndex{
-					Name:        item,
-					Cat:         model.TagCatSubject,
-					Type:        subject.TypeID,
-					Results:     1,
-					CreatedTime: uint32(at.Unix()),
-					UpdatedTime: uint32(at.Unix()),
-				}
-			})...)
-
-			if err != nil {
-				return errgo.Trace(err)
-			}
-		}
-
-		tags, err = tx.TagIndex.Select().
-			Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
-				q.TagIndex.Type.Eq(subject.TypeID)).Find()
-		if err != nil {
-			return errgo.Trace(err)
-		}
-
-		err = tx.TagList.Clauses(clause.OnConflict{DoNothing: true}).
-			Create(lo.Map(tags, func(item *dao.TagIndex, index int) *dao.TagList {
-				return &dao.TagList{
-					Tid:         item.ID,
-					UID:         s.User(),
-					Cat:         model.TagCatSubject,
-					Type:        subject.TypeID,
-					Mid:         subject.ID,
-					CreatedTime: uint32(at.Unix()),
-				}
-			})...)
-		if err != nil {
-			return errgo.Trace(err)
-		}
-
-		return nil
+	var existsTags = lo.SliceToMap(tags, func(item *dao.TagIndex) (string, bool) {
+		return strings.ToLower(item.Name), true
 	})
+
+	var missingTags []string
+	for _, tag := range s.Tags() {
+		if !existsTags[strings.ToLower(tag)] {
+			missingTags = append(missingTags, tag)
+		}
+	}
+
+	if len(missingTags) > 0 {
+		log.Info("create missing tags", zap.Strings("missing_tags", missingTags))
+		err = tx.TagIndex.Create(lo.Map(missingTags, func(item string, index int) *dao.TagIndex {
+			return &dao.TagIndex{
+				Name:        item,
+				Cat:         model.TagCatSubject,
+				Type:        subject.TypeID,
+				Results:     1,
+				CreatedTime: uint32(at.Unix()),
+				UpdatedTime: uint32(at.Unix()),
+			}
+		})...)
+
+		if err != nil {
+			return nil, errgo.Trace(err)
+		}
+	}
+
+	tags, err = tx.TagIndex.Select().
+		Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
+			q.TagIndex.Type.Eq(subject.TypeID)).Find()
+	if err != nil {
+		return nil, errgo.Trace(err)
+	}
+
+	err = tx.TagList.Clauses(clause.OnConflict{DoNothing: true}).
+		Create(lo.Map(tags, func(item *dao.TagIndex, index int) *dao.TagList {
+			return &dao.TagList{
+				Tid:         item.ID,
+				UID:         s.User(),
+				Cat:         model.TagCatSubject,
+				Type:        subject.TypeID,
+				Mid:         subject.ID,
+				CreatedTime: uint32(at.Unix()),
+			}
+		})...)
+	if err != nil {
+		return nil, errgo.Trace(err)
+	}
+
+	return lo.Map(tags, func(item *dao.TagIndex, index int) string {
+		return item.Name
+	}), nil
 }
 
 //nolint:funlen
