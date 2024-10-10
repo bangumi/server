@@ -880,7 +880,8 @@ func (r mysqlRepo) createEpisodeCollection(
 	}
 
 	table := r.q.EpCollection
-	err = table.WithContext(ctx).Where(table.UserID.Eq(userID), table.SubjectID.Eq(subjectID)).Create(&dao.EpCollection{
+	err = table.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).
+		Where(table.UserID.Eq(userID), table.SubjectID.Eq(subjectID)).Create(&dao.EpCollection{
 		UserID:      userID,
 		SubjectID:   subjectID,
 		Status:      bytes,
