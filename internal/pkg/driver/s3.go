@@ -15,26 +15,12 @@
 package driver
 
 import (
-	"context"
-	"net/url"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	transport "github.com/aws/smithy-go/endpoints"
-	"github.com/samber/lo"
 
 	"github.com/bangumi/server/config"
 )
-
-type resolver struct {
-	URL *url.URL
-}
-
-func (r *resolver) ResolveEndpoint(_ context.Context, params s3.EndpointParameters) (transport.Endpoint, error) {
-	u := *r.URL
-	u.Path += "/" + *params.Bucket
-	return transport.Endpoint{URI: u}, nil
-}
 
 func NewS3(c config.AppConfig) (*s3.Client, error) {
 	if c.S3EntryPoint == "" {
@@ -42,15 +28,10 @@ func NewS3(c config.AppConfig) (*s3.Client, error) {
 	}
 
 	svc := s3.New(s3.Options{
-		EndpointResolverV2: &resolver{URL: lo.Must(url.Parse(c.S3EntryPoint))},
-		Region:             "us-east-1",
-		UsePathStyle:       true,
-		Credentials: aws.CredentialsProviderFunc(func(ctx context.Context) (aws.Credentials, error) {
-			return aws.Credentials{
-				AccessKeyID:     c.S3AccessKey,
-				SecretAccessKey: c.S3SecretKey,
-			}, nil
-		}),
+		BaseEndpoint: aws.String(c.S3EntryPoint),
+		Region:       "us-east-1",
+		UsePathStyle: true,
+		Credentials:  credentials.NewStaticCredentialsProvider(c.S3AccessKey, c.S3SecretKey, ""),
 	})
 
 	return svc, nil
