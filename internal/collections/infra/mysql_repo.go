@@ -155,6 +155,8 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 		return errgo.Trace(err)
 	}
 
+	originalCollection := *obj
+
 	if err = r.updateSubjectCollection(obj, &original, s, at, ip, created); err != nil {
 		return errgo.Trace(err)
 	}
@@ -194,6 +196,11 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 	}
 
 	r.updateSubject(ctx, subject.ID)
+
+	if obj.Rate != originalCollection.Rate {
+		r.reCountSubjectRate(ctx, subject.ID, originalCollection.Rate, obj.Rate)
+	}
+
 	return nil
 }
 
@@ -579,6 +586,59 @@ func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model
 		}
 
 		_, err = tx.Subject.WithContext(ctx).Where(r.q.Subject.ID.Eq(subjectID)).UpdateSimple(updater...)
+		if err != nil {
+			return errgo.Wrap(err, "dal")
+		}
+
+		return nil
+	})
+}
+
+func (r mysqlRepo) reCountSubjectRate(ctx context.Context, subjectID model.SubjectID, before uint8, after uint8) error {
+	var counts []struct {
+		Rate  uint8  `gorm:"rate"`
+		Total uint32 `gorm:"total"`
+	}
+
+	return r.q.Transaction(func(tx *query.Query) error {
+		err := tx.DB().WithContext(ctx).Raw(`
+			select interest_rate as rate, count(interest_rate) as total from chii_subject_interests
+			where interest_subject_id = ? and interest_private = 0 and interest_rate != 0 and ((interest_rate = ?) or (interest_rate = ?))
+			group by interest_rate
+		`, subjectID, before, after).Scan(&counts).Error
+		if err != nil {
+			return errgo.Wrap(err, "dal")
+		}
+
+		var updater = make([]field.AssignExpr, 0, 2)
+		for _, count := range counts {
+			switch count.Rate {
+			case 0:
+				continue
+			case 1:
+				updater = append(updater, tx.SubjectField.Rate1.Value(count.Total))
+			case 2:
+				updater = append(updater, tx.SubjectField.Rate2.Value(count.Total))
+			case 3:
+				updater = append(updater, tx.SubjectField.Rate3.Value(count.Total))
+			case 4:
+				updater = append(updater, tx.SubjectField.Rate4.Value(count.Total))
+			case 5:
+				updater = append(updater, tx.SubjectField.Rate5.Value(count.Total))
+			case 6:
+				updater = append(updater, tx.SubjectField.Rate6.Value(count.Total))
+			case 7:
+				updater = append(updater, tx.SubjectField.Rate7.Value(count.Total))
+			case 8:
+				updater = append(updater, tx.SubjectField.Rate8.Value(count.Total))
+			case 9:
+				updater = append(updater, tx.SubjectField.Rate9.Value(count.Total))
+			case 10:
+				updater = append(updater, tx.SubjectField.Rate10.Value(count.Total))
+			}
+		}
+
+		_, err = tx.SubjectField.WithContext(ctx).Where(r.q.SubjectField.Sid.Eq(subjectID)).UpdateSimple(updater...)
 		if err != nil {
 			return errgo.Wrap(err, "dal")
 		}
