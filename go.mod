@@ -1,6 +1,6 @@
 module github.com/bangumi/server
 
-go 1.22.6
+go 1.23.1
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0
@@ -27,7 +27,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	github.com/trim21/errgo v0.0.3
-	github.com/trim21/go-phpserialize v0.0.22
+	github.com/trim21/go-phpserialize v0.1.0-alpha.3
 	github.com/trim21/go-redis-prometheus v0.0.0
 	github.com/trim21/htest v0.0.4
 	github.com/trim21/pkg v0.0.3
@@ -79,6 +79,7 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.uber.org/dig v1.18.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect

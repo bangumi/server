@@ -77,9 +77,11 @@ type PrivacySettings struct {
 
 func (settings *PrivacySettings) Unmarshal(s []byte) {
 	rawMap := make(map[PrivacySettingsField]ReceiveFilter, 4)
-	err := phpserialize.Unmarshal(s, &rawMap)
-	if err != nil {
-		return
+	if len(s) != 0 {
+		err := phpserialize.Unmarshal(s, &rawMap)
+		if err != nil {
+			return
+		}
 	}
 
 	settings.ReceivePrivateMessage = rawMap[PrivacyReceivePrivateMessage]
