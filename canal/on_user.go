@@ -20,8 +20,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -91,34 +93,37 @@ func (e *eventHandler) clearImageCache(avatar string) {
 
 	e.log.Debug("clear image for prefix", zap.String("avatar", avatar), zap.String("prefix", p))
 
-	err := e.s3.ListObjectsV2PagesWithContext(context.Background(),
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	pages := s3.NewListObjectsV2Paginator(
+		e.s3,
 		&s3.ListObjectsV2Input{Bucket: &e.config.S3ImageResizeBucket, Prefix: &p},
-		func(output *s3.ListObjectsV2Output, b bool) bool {
-			if len(output.Contents) == 0 {
-				return false
-			}
-
-			_, err := e.s3.DeleteObjects(&s3.DeleteObjectsInput{
-				Bucket: &e.config.S3ImageResizeBucket,
-				Delete: &s3.Delete{
-					Objects: lo.Map(output.Contents, func(item *s3.Object, index int) *s3.ObjectIdentifier {
-						return &s3.ObjectIdentifier{
-							Key: item.Key,
-						}
-					}),
-				},
-			})
-
-			if err != nil {
-				e.log.Error("failed to clear s3 cached image", zap.Error(err))
-			}
-
-			return true
-		},
 	)
 
-	if err != nil {
-		e.log.Error("failed to clear s3 cached image", zap.Error(err))
+	for pages.HasMorePages() {
+		output, err := pages.NextPage(ctx)
+		if err != nil {
+			break
+		}
+
+		if len(output.Contents) == 0 {
+			break
+		}
+
+		_, err = e.s3.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+			Bucket: &e.config.S3ImageResizeBucket,
+			Delete: &types.Delete{
+				Objects: lo.Map(output.Contents, func(item types.Object, index int) types.ObjectIdentifier {
+					return types.ObjectIdentifier{
+						Key: item.Key,
+					}
+				}),
+			},
+		})
+		if err != nil {
+			e.log.Error("failed to clear s3 cached image", zap.Error(err))
+		}
 	}
 }
 

@@ -15,30 +15,24 @@
 package driver
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/samber/lo"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/bangumi/server/config"
 )
 
-func NewS3(c config.AppConfig) (*s3.S3, error) {
+func NewS3(c config.AppConfig) (*s3.Client, error) {
 	if c.S3EntryPoint == "" {
 		return nil, nil //nolint:nilnil
 	}
 
-	cred := credentials.NewStaticCredentials(c.S3AccessKey, c.S3SecretKey, "")
-	s := lo.Must(session.NewSession(&aws.Config{
-		Credentials:      cred,
-		Endpoint:         &c.S3EntryPoint,
-		Region:           lo.ToPtr("us-east-1"),
-		DisableSSL:       lo.ToPtr(true),
-		S3ForcePathStyle: lo.ToPtr(true),
-	}))
-
-	svc := s3.New(s)
+	svc := s3.New(s3.Options{
+		BaseEndpoint: aws.String(c.S3EntryPoint),
+		Region:       "us-east-1",
+		UsePathStyle: true,
+		Credentials:  credentials.NewStaticCredentialsProvider(c.S3AccessKey, c.S3SecretKey, ""),
+	})
 
 	return svc, nil
 }
