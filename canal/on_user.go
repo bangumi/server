@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -91,7 +91,7 @@ func (e *eventHandler) clearImageCache(avatar string) {
 
 	e.log.Debug("clear image for prefix", zap.String("avatar", avatar), zap.String("prefix", p))
 
-	err := e.s3.ListObjectsV2PagesWithContext(context.Background(),
+	err := e.s3.ListObjectsV2(context.Background(),
 		&s3.ListObjectsV2Input{Bucket: &e.config.S3ImageResizeBucket, Prefix: &p},
 		func(output *s3.ListObjectsV2Output, b bool) bool {
 			if len(output.Contents) == 0 {
