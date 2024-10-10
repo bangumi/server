@@ -32,7 +32,6 @@ func TestLoginPass(t *testing.T) {
 	}
 	validate := validator.New()
 	for i, login := range testCase {
-		login := login
 		t.Run(fmt.Sprintf("success %d", i), func(t *testing.T) {
 			t.Parallel()
 			require.NoError(t, validate.Struct(login))
@@ -50,7 +49,6 @@ func TestLoginErr(t *testing.T) {
 	}
 	validate := validator.New()
 	for i, login := range testCase {
-		login := login
 		t.Run(fmt.Sprintf("fail %d", i), func(t *testing.T) {
 			t.Parallel()
 			require.Error(t, validate.Struct(login))

@@ -92,7 +92,6 @@ func TestCharacter_GetImage(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{CharacterRepo: m})
 
 	for _, imageType := range []string{"large", "grid", "medium", "small"} {
-		imageType := imageType
 		t.Run(imageType, func(t *testing.T) {
 			t.Parallel()
 

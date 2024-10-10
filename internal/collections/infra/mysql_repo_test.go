@@ -143,12 +143,12 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	for i := 0; i < 2; i++ {
+	for i := uint32(0); i < 2; i++ {
 		err = q.SubjectCollection.
 			WithContext(context.Background()).
 			Create(&dao.SubjectCollection{
 				UserID:      uid,
-				SubjectID:   model.SubjectID(200 + i),
+				SubjectID:   200 + i,
 				SubjectType: model.SubjectTypeGame,
 				UpdatedTime: uint32(time.Now().Unix()),
 			})

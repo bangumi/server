@@ -134,7 +134,6 @@ func TestSubject_Get_bad_id(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 
 	for _, path := range []string{"/v0/subjects/0", "/v0/subjects/-1", "/v0/subjects/a"} {
-		path := path
 		t.Run(path, func(t *testing.T) {
 			t.Parallel()
 
@@ -154,7 +153,6 @@ func TestSubject_GetImage_302(t *testing.T) {
 	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
 
 	for _, imageType := range []string{"small", "grid", "large", "medium", "common"} {
-		imageType := imageType
 		t.Run(imageType, func(t *testing.T) {
 			t.Parallel()
 

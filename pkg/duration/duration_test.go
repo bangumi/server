@@ -64,7 +64,6 @@ func TestParse(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			actual, err := duration.Parse(tc.Input)

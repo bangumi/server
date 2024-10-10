@@ -62,7 +62,6 @@ func TestHandler_ListPersonRevision_Bad_ID(t *testing.T) {
 	badIDs := []string{"-1", "a", "0"}
 
 	for _, id := range badIDs {
-		id := id
 		t.Run(id, func(t *testing.T) {
 			t.Parallel()
 
@@ -122,7 +121,6 @@ func TestHandler_ListSubjectRevision_Bad_ID(t *testing.T) {
 	badIDs := []string{"-1", "a", "0"}
 
 	for _, id := range badIDs {
-		id := id
 		t.Run(id, func(t *testing.T) {
 			t.Parallel()
 

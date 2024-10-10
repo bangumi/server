@@ -43,7 +43,6 @@ func TestFromSlice(t *testing.T) {
 		{"init without values", []string{}},
 	}
 	for _, tc := range testcases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			s := set.FromSlice[string](tc.input)

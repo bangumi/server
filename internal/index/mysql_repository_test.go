@@ -189,9 +189,8 @@ func TestMysqlRepo_DeleteIndex2(t *testing.T) {
 	err := repo.New(ctx, index)
 	require.NoError(t, err)
 
-	for i := 10; i < 20; i++ {
-		_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, model.SubjectID(i),
-			uint32(i), fmt.Sprintf("comment %d", i))
+	for i := uint32(10); i < 20; i++ {
+		_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, i, i, fmt.Sprintf("comment %d", i))
 		require.NoError(t, err)
 	}
 
@@ -292,9 +291,8 @@ func TestMysqlRepo_DeleteIndexSubject(t *testing.T) {
 	require.NotEqual(t, 0, index.ID)
 	require.NoError(t, err)
 
-	for i := 10; i < 20; i++ {
-		_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, model.SubjectID(i),
-			uint32(i), fmt.Sprintf("comment %d", i))
+	for i := uint32(10); i < 20; i++ {
+		_, err = repo.AddOrUpdateIndexSubject(ctx, index.ID, i, i, fmt.Sprintf("comment %d", i))
 		require.NoError(t, err)
 	}
 
