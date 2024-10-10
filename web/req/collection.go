@@ -50,6 +50,10 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 	}
 
 	if v.Tags != nil {
+		if len(v.Tags) > 10 {
+			return res.BadRequest("最多允许 10 个标签")
+		}
+
 		v.Tags = lo.Map(v.Tags, func(item string, index int) string {
 			return norm.NFKC.String(item)
 		})
