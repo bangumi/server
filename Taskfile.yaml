@@ -35,7 +35,7 @@ tasks:
     silent: true
     desc: Run 'golangci-lint'
     cmds:
-      - golangci-lint run --fix
+      - golangci-lint --path-prefix  "{{ .USER_WORKING_DIR }}" run --fix
 
   test:
     desc: Run mocked tests, need nothing.

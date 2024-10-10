@@ -198,7 +198,9 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 	r.updateSubject(ctx, subject.ID)
 
 	if obj.Rate != originalCollection.Rate {
-		r.reCountSubjectRate(ctx, subject.ID, originalCollection.Rate, obj.Rate)
+		if err := r.reCountSubjectRate(ctx, subject.ID, originalCollection.Rate, obj.Rate); err != nil {
+			r.log.Error("failed to update collection counts", zap.Error(err), zap.Uint32("subject_id", subject.ID))
+		}
 	}
 
 	return nil
@@ -594,6 +596,7 @@ func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model
 	})
 }
 
+//nolint:mnd
 func (r mysqlRepo) reCountSubjectRate(ctx context.Context, subjectID model.SubjectID, before uint8, after uint8) error {
 	var counts []struct {
 		Rate  uint8  `gorm:"rate"`
@@ -603,7 +606,9 @@ func (r mysqlRepo) reCountSubjectRate(ctx context.Context, subjectID model.Subje
 	return r.q.Transaction(func(tx *query.Query) error {
 		err := tx.DB().WithContext(ctx).Raw(`
 			select interest_rate as rate, count(interest_rate) as total from chii_subject_interests
-			where interest_subject_id = ? and interest_private = 0 and interest_rate != 0 and ((interest_rate = ?) or (interest_rate = ?))
+			where interest_subject_id = ? and
+			      interest_private = 0 and
+			      interest_rate != 0 and ((interest_rate = ?) or (interest_rate = ?))
 			group by interest_rate
 		`, subjectID, before, after).Scan(&counts).Error
 		if err != nil {
