@@ -433,8 +433,8 @@ github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/trim21/errgo v0.0.3 h1:q0cUPTs+4c5NxByA4f0HUGRvlNyBlUtdxFiTKQdTE68=
 github.com/trim21/errgo v0.0.3/go.mod h1:AH1KzogdvSkSPXbZq9QAuqSt1L1Eu5W8eYK32zPYv9s=
-github.com/trim21/go-phpserialize v0.1.0-alpha.3 h1:6Z09BQa5Sr3ODyWxOHVHeiGezkIxam2asocjJ2xkfQo=
-github.com/trim21/go-phpserialize v0.1.0-alpha.3/go.mod h1:/3zMYuOzpcKOevwP3ZN0WxdVRaB3CzJh5T2i41QPgRQ=
+github.com/trim21/go-phpserialize v0.1.0-alpha.4 h1:ZFeFZ1F1NE1CTPCO4RpY8N4RVjGsCxhc4K3P655n8Ag=
+github.com/trim21/go-phpserialize v0.1.0-alpha.4/go.mod h1:/3zMYuOzpcKOevwP3ZN0WxdVRaB3CzJh5T2i41QPgRQ=
 github.com/trim21/go-redis-prometheus v0.0.0 h1:9svVIZkKaDGE1bSRbtTQdsKBzW+QEWfwc35QIF8JsfA=
 github.com/trim21/go-redis-prometheus v0.0.0/go.mod h1:UTXPI/fofnsXF9/X/WtvwhAdbSOBVjLg17xDjQj9VgU=
 github.com/trim21/htest v0.0.4 h1:dDIzKNdIClgtB158DlO+Xf0sfwNycmx3kfo/FJuY+eE=
