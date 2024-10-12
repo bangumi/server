@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/http/pprof"
 	"strconv"
 	"strings"
 	"time"
@@ -107,6 +108,11 @@ func New() *echo.Echo {
 	app.Use(recovery.New())
 
 	app.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+	app.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
+	app.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
+	app.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
+	app.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
+	app.GET("/debug/pprof/*", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
 
 	addProfile(app)
 
