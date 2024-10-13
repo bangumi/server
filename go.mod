@@ -33,7 +33,7 @@ require (
 	github.com/trim21/go-redis-prometheus v0.0.0
 	github.com/trim21/htest v0.0.4
 	github.com/trim21/pkg v0.0.3
-	go.uber.org/fx v1.22.2
+	go.uber.org/fx v1.23.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.28.0
 	golang.org/x/text v0.19.0
