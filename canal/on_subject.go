@@ -23,32 +23,32 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
-func (e *eventHandler) OnSubject(key json.RawMessage, payload Payload) error {
+func (e *eventHandler) OnSubject(ctx context.Context, key json.RawMessage, payload Payload) error {
 	var k SubjectKey
 	if err := json.Unmarshal(key, &k); err != nil {
 		return nil
 	}
 
-	return e.onSubjectChange(k.ID, payload.Op)
+	return e.onSubjectChange(ctx, k.ID, payload.Op)
 }
 
-func (e *eventHandler) OnSubjectField(key json.RawMessage, payload Payload) error {
+func (e *eventHandler) OnSubjectField(ctx context.Context, key json.RawMessage, payload Payload) error {
 	var k SubjectFieldKey
 	if err := json.Unmarshal(key, &k); err != nil {
 		return nil
 	}
 
-	return e.onSubjectChange(k.ID, payload.Op)
+	return e.onSubjectChange(ctx, k.ID, payload.Op)
 }
 
-func (e *eventHandler) onSubjectChange(subjectID model.SubjectID, op string) error {
+func (e *eventHandler) onSubjectChange(ctx context.Context, subjectID model.SubjectID, op string) error {
 	switch op {
 	case opCreate, opUpdate, opSnapshot:
-		if err := e.search.OnSubjectUpdate(context.TODO(), subjectID); err != nil {
+		if err := e.search.OnSubjectUpdate(ctx, subjectID); err != nil {
 			return errgo.Wrap(err, "search.OnSubjectUpdate")
 		}
 	case opDelete:
-		if err := e.search.OnSubjectDelete(context.TODO(), subjectID); err != nil {
+		if err := e.search.OnSubjectDelete(ctx, subjectID); err != nil {
 			return errgo.Wrap(err, "search.OnSubjectDelete")
 		}
 	}

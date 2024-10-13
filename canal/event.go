@@ -85,10 +85,10 @@ func (e *eventHandler) Close() error {
 	return nil
 }
 
-func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
+func (e *eventHandler) OnUserPasswordChange(ctx context.Context, id model.UserID) error {
 	e.log.Info("user change password", log.User(id))
 
-	if err := e.session.RevokeUser(context.Background(), id); err != nil {
+	if err := e.session.RevokeUser(ctx, id); err != nil {
 		e.log.Error("failed to revoke user", log.User(id), zap.Error(err))
 		return errgo.Wrap(err, "session.RevokeUser")
 	}
@@ -110,14 +110,17 @@ func (e *eventHandler) onMessage(key, value []byte) error {
 
 	e.log.Debug("new message", zap.String("table", p.Source.Table))
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	var err error
 	switch p.Source.Table {
 	case "chii_subject_fields":
-		err = e.OnSubjectField(key, p)
+		err = e.OnSubjectField(ctx, key, p)
 	case "chii_subjects":
-		err = e.OnSubject(key, p)
+		err = e.OnSubject(ctx, key, p)
 	case "chii_members":
-		err = e.OnUserChange(key, p)
+		err = e.OnUserChange(ctx, key, p)
 	}
 
 	return err

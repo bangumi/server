@@ -32,7 +32,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger/log"
 )
 
-func (e *eventHandler) OnUserChange(key json.RawMessage, payload Payload) error {
+func (e *eventHandler) OnUserChange(ctx context.Context, key json.RawMessage, payload Payload) error {
 	var k UserKey
 	if err := json.Unmarshal(key, &k); err != nil {
 		e.log.Error("failed to unmarshal json", zap.Error(err))
@@ -53,14 +53,14 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload Payload) error 
 		}
 
 		if before.Password != after.Password {
-			err := e.OnUserPasswordChange(k.ID)
+			err := e.OnUserPasswordChange(ctx, k.ID)
 			if err != nil {
 				e.log.Error("failed to clear cache", zap.Error(err))
 			}
 		}
 
 		if before.NewNotify != after.NewNotify {
-			e.redis.Publish(context.Background(), fmt.Sprintf("event-user-notify-%d", k.ID), redisUserChannel{
+			e.redis.Publish(ctx, fmt.Sprintf("event-user-notify-%d", k.ID), redisUserChannel{
 				UserID:    k.ID,
 				NewNotify: after.NewNotify,
 			})
@@ -72,14 +72,14 @@ func (e *eventHandler) OnUserChange(key json.RawMessage, payload Payload) error 
 			}
 
 			e.log.Debug("clear user avatar cache", log.User(k.ID))
-			go e.clearImageCache(after.Avatar)
+			go e.clearImageCache(context.Background(), after.Avatar)
 		}
 	}
 
 	return nil
 }
 
-func (e *eventHandler) clearImageCache(avatar string) {
+func (e *eventHandler) clearImageCache(ctx context.Context, avatar string) {
 	p, q, ok := strings.Cut(avatar, "?")
 	if !ok {
 		p = avatar
@@ -93,7 +93,7 @@ func (e *eventHandler) clearImageCache(avatar string) {
 
 	e.log.Debug("clear image for prefix", zap.String("avatar", avatar), zap.String("prefix", p))
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	pages := s3.NewListObjectsV2Paginator(
