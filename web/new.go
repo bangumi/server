@@ -96,7 +96,7 @@ func New() *echo.Echo {
 			reqIP := c.RealIP()
 
 			c.SetRequest(c.Request().
-				WithContext(context.WithValue(context.Background(), logger.RequestKey, &logger.RequestTrace{
+				WithContext(context.WithValue(c.Request().Context(), logger.RequestKey, &logger.RequestTrace{
 					IP:    reqIP,
 					ReqID: reqID,
 				})))
