@@ -79,6 +79,13 @@ func New() *echo.Echo {
 		}
 	})
 
+	app.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+	app.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
+	app.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
+	app.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
+	app.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
+	app.GET("/debug/pprof/*", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
+
 	if env.Development {
 		app.Use(genFakeRequestID)
 	}
@@ -106,15 +113,6 @@ func New() *echo.Echo {
 	})
 
 	app.Use(recovery.New())
-
-	app.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
-	app.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
-	app.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
-	app.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
-	app.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
-	app.GET("/debug/pprof/*", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
-
-	addProfile(app)
 
 	app.GET("/openapi", func(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "/openapi/")
