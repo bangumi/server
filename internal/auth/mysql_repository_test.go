@@ -17,9 +17,12 @@ package auth_test
 import (
 	"context"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
@@ -34,7 +37,7 @@ import (
 func getRepo(t *testing.T) (auth.Repo, *query.Query) {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
-	repo := auth.NewMysqlRepo(q, zap.NewNop())
+	repo := auth.NewMysqlRepo(q, zap.NewNop(), sqlx.NewDb(lo.Must(q.DB().DB()), "mysql"))
 
 	return repo, q
 }
@@ -59,6 +62,16 @@ func TestMysqlRepo_GetByToken(t *testing.T) {
 	require.NoError(t, err)
 
 	require.EqualValues(t, 382951, u.ID)
+}
+
+func TestMysqlRepo_GetByToken_case_sensitive(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo, _ := getRepo(t)
+
+	_, err := repo.GetByToken(context.Background(), strings.ToUpper("a_development_access_token"))
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 func TestMysqlRepo_GetByToken_expired(t *testing.T) {
