@@ -8,6 +8,7 @@ required:
   - nsfw
   - locked
   - platform
+  - meta_tags
   - volumes
   - eps
   - series
@@ -137,5 +138,10 @@ properties:
       dropped:
         title: Dropped
         type: integer
+  meta_tags:
+    description: 由维基人维护的 tag
+    type: array
+    items:
+      type: string
   tags:
     $ref: "./subject_tags.yaml"
