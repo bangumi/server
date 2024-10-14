@@ -74,7 +74,8 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		UserID string `db:"user_id"`
 	}
 	err := m.db.GetContext(ctx, &access,
-		`select user_id from chii_oauth_access_tokens where access_token = ? collate utf8_bin and expires > ? limit 1`, token, time.Now())
+		`select user_id from chii_oauth_access_tokens
+               where access_token = ? collate utf8_bin and expires > ? limit 1`, token, time.Now())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return UserInfo{}, gerr.ErrNotFound
