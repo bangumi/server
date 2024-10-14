@@ -15,6 +15,7 @@
 package web
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -72,6 +73,10 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 				})
 				return
 			}
+		}
+
+		if errors.Is(err, context.Canceled) {
+			return
 		}
 
 		log.Error("unexpected error",
