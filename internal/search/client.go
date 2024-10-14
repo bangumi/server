@@ -178,9 +178,6 @@ func (c *client) OnSubjectDelete(_ context.Context, id model.SubjectID) error {
 	return errgo.Wrap(err, "search")
 }
 
-func (c *client) flush() {
-}
-
 // UpsertSubject add subject to search backend.
 func (c *client) sendBatch(items []subjectIndex) {
 	c.log.Debug("send batch to meilisearch", zap.Int("len", len(items)))
