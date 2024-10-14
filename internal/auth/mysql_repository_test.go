@@ -20,6 +20,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
@@ -34,7 +36,7 @@ import (
 func getRepo(t *testing.T) (auth.Repo, *query.Query) {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
-	repo := auth.NewMysqlRepo(q, zap.NewNop())
+	repo := auth.NewMysqlRepo(q, zap.NewNop(), sqlx.NewDb(lo.Must(q.DB().DB()), "mysql"))
 
 	return repo, q
 }
