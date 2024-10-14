@@ -299,7 +299,7 @@ func (c *client) firstRun() {
 	c.log.Info(fmt.Sprintf("run full search index with max subject id %d", maxSubject.ID))
 
 	width := len(strconv.Itoa(int(maxSubject.ID)))
-	for i := model.SubjectID(1); i < maxSubject.ID; i++ {
+	for i := model.SubjectID(1); i <= maxSubject.ID; i++ {
 		if i%10000 == 0 {
 			c.log.Info(fmt.Sprintf("progress %*d/%d", width, i, maxSubject.ID))
 		}
