@@ -84,8 +84,8 @@ func (h User) updateOrCreateSubjectCollection(
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 
-	if s.Locked() {
-		return res.NotFound("subject locked")
+	if s.Ban != 0 {
+		return res.NotFound("subject locked or merged")
 	}
 
 	if s.TypeID != model.SubjectTypeBook {
