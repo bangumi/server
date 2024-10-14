@@ -46,7 +46,6 @@ jobs:
           key: go-cache-122-${{ hashFiles('**/go.sum') }}-lint
           restore-keys: |
             go-cache-122-${{ hashFiles('**/go.sum') }}-
-            go-cache-122-
 
       - run: go get -t ./...
 

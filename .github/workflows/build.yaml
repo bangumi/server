@@ -49,7 +49,6 @@ jobs:
           key: go-cache-122-${{ hashFiles('**/go.sum') }}-build
           restore-keys: |
             go-cache-122-${{ hashFiles('**/go.sum') }}-
-            go-cache-122-
 
       - name: Install Task
         uses: arduino/setup-task@v2
