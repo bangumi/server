@@ -43,6 +43,7 @@ import (
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/internal/timeline"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web"
@@ -56,6 +57,7 @@ type Mock struct {
 	PersonRepo         person.Repo
 	CharacterRepo      character.Repo
 	AuthRepo           auth.Repo
+	TagRepo            tag.Repo
 	AuthService        auth.Service
 	EpisodeRepo        episode.Repo
 	UserRepo           user.Repo
@@ -108,6 +110,7 @@ func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 		MockNoticationRepo(m.NotificationRepo),
 		MockSessionManager(m.SessionManager),
 		MockTimeLineSrv(m.TimeLineSrv),
+		MockTagRepo(m.TagRepo),
 
 		// don't need a default mock for these repositories.
 		fx.Provide(func() collections.Repo { return m.CollectionRepo }),
@@ -235,6 +238,18 @@ func MockAuthRepo(m auth.Repo) fx.Option {
 	}
 
 	return fx.Provide(func() auth.Repo { return m })
+}
+
+func MockTagRepo(m tag.Repo) fx.Option {
+	if m == nil {
+		mocker := &mocks.TagRepo{}
+		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return([]tag.Tag{}, nil)
+		mocker.EXPECT().GetByIDs(mock.Anything, mock.Anything).Return(map[model.SubjectID][]tag.Tag{}, nil)
+
+		m = mocker
+	}
+
+	return fx.Provide(func() tag.Repo { return m }, func() tag.CachedRepo { return m })
 }
 
 func MockAuthService(m auth.Service) fx.Option {

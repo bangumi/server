@@ -85,7 +85,7 @@ tasks:
   test-all:
     desc: Run all tests.
     cmds:
-      - go test -timeout 10s -tags test ./...
+      - go test -timeout 10s -tags test -failfast ./...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"

@@ -5,7 +5,8 @@ package mocks
 import (
 	context "context"
 
-	rueidis "github.com/redis/rueidis"
+	cache "github.com/bangumi/server/internal/pkg/cache"
+
 	mock "github.com/stretchr/testify/mock"
 
 	time "time"
@@ -143,6 +144,53 @@ func (_c *RedisCache_Get_Call) RunAndReturn(run func(context.Context, string, in
 	return _c
 }
 
+// MGet provides a mock function with given fields: ctx, key
+func (_m *RedisCache) MGet(ctx context.Context, key []string) cache.MGetResult {
+	ret := _m.Called(ctx, key)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MGet")
+	}
+
+	var r0 cache.MGetResult
+	if rf, ok := ret.Get(0).(func(context.Context, []string) cache.MGetResult); ok {
+		r0 = rf(ctx, key)
+	} else {
+		r0 = ret.Get(0).(cache.MGetResult)
+	}
+
+	return r0
+}
+
+// RedisCache_MGet_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MGet'
+type RedisCache_MGet_Call struct {
+	*mock.Call
+}
+
+// MGet is a helper method to define mock.On call
+//   - ctx context.Context
+//   - key []string
+func (_e *RedisCache_Expecter) MGet(ctx interface{}, key interface{}) *RedisCache_MGet_Call {
+	return &RedisCache_MGet_Call{Call: _e.mock.On("MGet", ctx, key)}
+}
+
+func (_c *RedisCache_MGet_Call) Run(run func(ctx context.Context, key []string)) *RedisCache_MGet_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].([]string))
+	})
+	return _c
+}
+
+func (_c *RedisCache_MGet_Call) Return(_a0 cache.MGetResult) *RedisCache_MGet_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *RedisCache_MGet_Call) RunAndReturn(run func(context.Context, []string) cache.MGetResult) *RedisCache_MGet_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Set provides a mock function with given fields: ctx, key, value, ttl
 func (_m *RedisCache) Set(ctx context.Context, key string, value interface{}, ttl time.Duration) error {
 	ret := _m.Called(ctx, key, value, ttl)
@@ -188,53 +236,6 @@ func (_c *RedisCache_Set_Call) Return(_a0 error) *RedisCache_Set_Call {
 }
 
 func (_c *RedisCache_Set_Call) RunAndReturn(run func(context.Context, string, interface{}, time.Duration) error) *RedisCache_Set_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// mget provides a mock function with given fields: ctx, key
-func (_m *RedisCache) mget(ctx context.Context, key []string) rueidis.RedisResult {
-	ret := _m.Called(ctx, key)
-
-	if len(ret) == 0 {
-		panic("no return value specified for mget")
-	}
-
-	var r0 rueidis.RedisResult
-	if rf, ok := ret.Get(0).(func(context.Context, []string) rueidis.RedisResult); ok {
-		r0 = rf(ctx, key)
-	} else {
-		r0 = ret.Get(0).(rueidis.RedisResult)
-	}
-
-	return r0
-}
-
-// RedisCache_mget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'mget'
-type RedisCache_mget_Call struct {
-	*mock.Call
-}
-
-// mget is a helper method to define mock.On call
-//   - ctx context.Context
-//   - key []string
-func (_e *RedisCache_Expecter) mget(ctx interface{}, key interface{}) *RedisCache_mget_Call {
-	return &RedisCache_mget_Call{Call: _e.mock.On("mget", ctx, key)}
-}
-
-func (_c *RedisCache_mget_Call) Run(run func(ctx context.Context, key []string)) *RedisCache_mget_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]string))
-	})
-	return _c
-}
-
-func (_c *RedisCache_mget_Call) Return(_a0 rueidis.RedisResult) *RedisCache_mget_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *RedisCache_mget_Call) RunAndReturn(run func(context.Context, []string) rueidis.RedisResult) *RedisCache_mget_Call {
 	_c.Call.Return(run)
 	return _c
 }

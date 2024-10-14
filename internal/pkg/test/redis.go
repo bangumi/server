@@ -17,22 +17,15 @@ package test
 import (
 	"testing"
 
-	"github.com/redis/go-redis/v9"
-	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/internal/pkg/driver"
+	"github.com/redis/rueidis"
+	"go.uber.org/fx"
 )
 
-func GetRedis(tb testing.TB) *redis.Client {
-	tb.Helper()
+func GetRedis(t testing.TB) (r rueidis.Client) {
+	t.Helper()
+	RequireEnv(t, EnvRedis)
 
-	RequireEnv(tb, EnvRedis)
+	Fx(t, fx.Populate(&r))
 
-	cfg, err := config.NewAppConfig()
-	require.NoError(tb, err)
-	db, err := driver.NewRedisClient(cfg)
-	require.NoError(tb, err)
-
-	return db
+	return
 }

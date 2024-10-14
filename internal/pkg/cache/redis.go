@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	"github.com/redis/rueidis"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -35,34 +34,39 @@ type RedisCache interface {
 	Get(ctx context.Context, key string, value any) (bool, error)
 	Set(ctx context.Context, key string, value any, ttl time.Duration) error
 	Del(ctx context.Context, keys ...string) error
+	MGet(ctx context.Context, key []string) MGetResult
+}
 
-	mget(ctx context.Context, key []string) rueidis.RedisResult
+type MGetResult struct {
+	rueidis.RedisResult
 }
 
 // NewRedisCache create a redis backed cache.
-func NewRedisCache(cli *redis.Client, ru rueidis.Client) RedisCache {
-	return redisCache{r: cli, ru: ru}
+func NewRedisCache(ru rueidis.Client) RedisCache {
+	return redisCache{ru: ru}
 }
 
 type redisCache struct {
-	r  *redis.Client
 	ru rueidis.Client
 }
 
 func (c redisCache) Get(ctx context.Context, key string, value any) (bool, error) {
-	raw, err := c.r.Get(ctx, key).Bytes()
-	if err != nil {
-		if err == redis.Nil {
-			return false, nil
-		}
-
+	result := c.ru.Do(ctx, c.ru.B().Get().Key(key).Build())
+	if err := result.NonRedisError(); err != nil {
 		return false, errgo.Wrap(err, "redis get")
+	}
+
+	raw, err := result.AsBytes()
+	// redis.Nil
+	if err != nil {
+		return false, nil
 	}
 
 	err = unmarshalBytes(raw, value)
 	if err != nil {
 		logger.Warn("can't unmarshal redis cached data as json", zap.String("key", key))
-		c.r.Del(ctx, key)
+
+		c.ru.Do(ctx, c.ru.B().Del().Key(key).Build())
 
 		return false, nil
 	}
@@ -70,21 +74,17 @@ func (c redisCache) Get(ctx context.Context, key string, value any) (bool, error
 	return true, nil
 }
 
-func (c redisCache) mget(ctx context.Context, keys []string) rueidis.RedisResult {
-	return c.ru.Do(ctx, c.ru.B().Mget().Key(keys...).Build())
+func (c redisCache) MGet(ctx context.Context, keys []string) MGetResult {
+	return MGetResult{c.ru.Do(ctx, c.ru.B().Mget().Key(keys...).Build())}
 }
 
 func MGet[T any](c RedisCache, ctx context.Context, keys []string, value *[]T) error {
-	return rueidis.DecodeSliceOfJSON(c.mget(ctx, keys), value)
+	return rueidis.DecodeSliceOfJSON(c.MGet(ctx, keys).RedisResult, value)
 }
 
 func (c redisCache) Set(ctx context.Context, key string, value any, ttl time.Duration) error {
-	b, err := marshalBytes(value)
+	err := c.ru.Do(ctx, c.ru.B().Set().Key(key).Value(rueidis.JSON(value)).Ex(ttl).Build()).Error()
 	if err != nil {
-		return err
-	}
-
-	if err := c.r.Set(ctx, key, b, ttl).Err(); err != nil {
 		return errgo.Wrap(err, "redis set")
 	}
 
@@ -92,6 +92,6 @@ func (c redisCache) Set(ctx context.Context, key string, value any, ttl time.Dur
 }
 
 func (c redisCache) Del(ctx context.Context, keys ...string) error {
-	err := c.r.Del(ctx, keys...).Err()
+	err := c.ru.Do(ctx, c.ru.B().Del().Key(keys...).Build()).Error()
 	return errgo.Wrap(err, "redis.Del")
 }

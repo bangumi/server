@@ -29,7 +29,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/driver"
 )
 
-func Fx(t *testing.T, target ...fx.Option) {
+func Fx(t testing.TB, target ...fx.Option) {
 	t.Helper()
 	err := fx.New(
 		append(target, fx.NopLogger,
