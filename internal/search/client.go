@@ -161,7 +161,7 @@ func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 	}
 
 	if s.Redirect != 0 || s.Ban != 0 {
-		return c.DeleteSubject(ctx, id)
+		return c.OnSubjectDelete(ctx, id)
 	}
 
 	extracted := extractSubject(&s)
@@ -172,8 +172,8 @@ func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 }
 
 // OnSubjectDelete is the hook called by canal.
-func (c *client) OnSubjectDelete(_ context.Context, id model.SubjectID) error {
-	_, err := c.subjectIndex.DeleteDocument(strconv.FormatUint(uint64(id), 10))
+func (c *client) OnSubjectDelete(ctx context.Context, id model.SubjectID) error {
+	_, err := c.subjectIndex.DeleteDocumentWithContext(ctx, strconv.FormatUint(uint64(id), 10))
 
 	return errgo.Wrap(err, "search")
 }
@@ -202,12 +202,6 @@ func (c *client) sendBatch(items []subjectIndex) {
 	if err != nil {
 		c.log.Error("failed to send batch", zap.Error(err))
 	}
-}
-
-func (c *client) DeleteSubject(_ context.Context, id model.SubjectID) error {
-	_, err := c.subjectIndex.Delete(strconv.FormatUint(uint64(id), 10))
-
-	return errgo.Wrap(err, "delete")
 }
 
 func (c *client) needFirstRun() (bool, error) {

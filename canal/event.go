@@ -109,6 +109,7 @@ func (e *eventHandler) onMessage(key, value []byte) error {
 
 	var p Payload
 	if err := json.Unmarshal(value, &p); err != nil {
+		e.log.Warn("failed to parse kafka value", zap.String("table", p.Source.Table), zap.Error(err))
 		return nil
 	}
 
