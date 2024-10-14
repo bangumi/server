@@ -12,30 +12,47 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dal_test
+package test
 
 import (
+	"encoding/json"
 	"testing"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal"
+	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/driver"
-	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func TestNewDB(t *testing.T) {
-	t.Parallel()
-	test.RequireEnv(t, test.EnvMysql)
-	cfg, err := config.NewAppConfig()
-	require.NoError(t, err)
+func Fx(t *testing.T, target ...fx.Option) {
+	t.Helper()
+	err := fx.New(
+		append(target, fx.NopLogger,
 
-	conn, err := driver.NewMysqlSqlDB(cfg)
-	require.NoError(t, err)
-	db, err := dal.NewGormDB(conn, cfg)
-	require.NoError(t, err)
+			// driver and connector
+			fx.Provide(
+				config.AppConfigReader(config.AppTypeHTTP),
+				driver.NewRedisClient,   // redis
+				driver.NewRueidisClient, // redis
+				driver.NewMysqlSqlDB,    // mysql
+				func() *resty.Client {
+					httpClient := resty.New().SetJSONEscapeHTML(false)
+					httpClient.JSONUnmarshal = json.Unmarshal
+					httpClient.JSONMarshal = json.Marshal
+					return httpClient
+				},
+			),
 
-	err = db.Exec("select 0;").Error
+			dal.Module,
+
+			fx.Provide(cache.NewRedisCache, zap.NewNop),
+		)...,
+	).Err()
+
 	require.NoError(t, err)
 }

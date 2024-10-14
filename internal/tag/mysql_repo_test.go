@@ -12,30 +12,48 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dal_test
+package tag_test
 
 import (
+	"context"
 	"testing"
 
+	"github.com/jmoiron/sqlx"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 
-	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/dal"
-	"github.com/bangumi/server/internal/pkg/driver"
+	"github.com/bangumi/server/dal/query"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/tag"
 )
 
-func TestNewDB(t *testing.T) {
-	t.Parallel()
+func getRepo(t *testing.T) tag.Repo {
+	t.Helper()
+	q := query.Use(test.GetGorm(t))
+	repo, err := tag.NewMysqlRepo(q, zap.NewNop(), sqlx.NewDb(lo.Must(q.DB().DB()), "mysql"))
+	require.NoError(t, err)
+
+	return repo
+}
+
+func TestGet(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
-	cfg, err := config.NewAppConfig()
-	require.NoError(t, err)
+	t.Parallel()
 
-	conn, err := driver.NewMysqlSqlDB(cfg)
-	require.NoError(t, err)
-	db, err := dal.NewGormDB(conn, cfg)
-	require.NoError(t, err)
+	repo := getRepo(t)
 
-	err = db.Exec("select 0;").Error
+	_, err := repo.Get(context.Background(), 8)
+	require.NoError(t, err)
+}
+
+func TestGetTags(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	_, err := repo.GetByIDs(context.Background(), []model.SubjectID{1, 2, 8})
 	require.NoError(t, err)
 }

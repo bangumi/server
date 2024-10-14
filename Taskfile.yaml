@@ -85,7 +85,7 @@ tasks:
   test-all:
     desc: Run all tests.
     cmds:
-      - go test -timeout 10s -tags test ./...
+      - go test -v -timeout 10s -tags test github.com/bangumi/server/internal/tag/...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"

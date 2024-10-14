@@ -27,7 +27,7 @@ import (
 
 var Module = fx.Module("dal",
 	fx.Provide(
-		NewDB,
+		NewGormDB,
 		query.Use,
 		NewMysqlTransaction,
 		func(db *sql.DB) *sqlx.DB {

@@ -80,7 +80,7 @@ func start(out string) {
 	err := fx.New(
 		fx.NopLogger,
 		fx.Provide(
-			driver.NewMysqlConnectionPool, dal.NewDB,
+			driver.NewMysqlSqlDB, dal.NewGormDB,
 
 			config.NewAppConfig, logger.Copy,
 
@@ -210,7 +210,7 @@ type Subject struct {
 
 type Tag struct {
 	Name  string `json:"name"`
-	Count int    `json:"count"`
+	Count uint   `json:"count"`
 }
 
 func exportSubjects(q *query.Query, w io.Writer) {

@@ -54,3 +54,7 @@ func Index(id model.IndexID) string {
 func User(id model.UserID) string {
 	return resPrefix + "user:" + strconv.FormatUint(uint64(id), 10)
 }
+
+func SubjectMetaTag(id model.SubjectID) string {
+	return resPrefix + "subject:meta-tags:" + strconv.FormatUint(uint64(id), 10)
+}

@@ -17,6 +17,8 @@ package cache
 import (
 	"context"
 	"time"
+
+	"github.com/redis/rueidis"
 )
 
 func NewNoop() RedisCache {
@@ -35,4 +37,8 @@ func (n noop) Set(context.Context, string, any, time.Duration) error {
 
 func (n noop) Del(context.Context, ...string) error {
 	return nil
+}
+
+func (n noop) mget(ctx context.Context, key []string) rueidis.RedisResult {
+	return rueidis.RedisResult{}
 }

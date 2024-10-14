@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/rueidis"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
@@ -34,15 +35,18 @@ type RedisCache interface {
 	Get(ctx context.Context, key string, value any) (bool, error)
 	Set(ctx context.Context, key string, value any, ttl time.Duration) error
 	Del(ctx context.Context, keys ...string) error
+
+	mget(ctx context.Context, key []string) rueidis.RedisResult
 }
 
 // NewRedisCache create a redis backed cache.
-func NewRedisCache(cli *redis.Client) RedisCache {
-	return redisCache{r: cli}
+func NewRedisCache(cli *redis.Client, ru rueidis.Client) RedisCache {
+	return redisCache{r: cli, ru: ru}
 }
 
 type redisCache struct {
-	r *redis.Client
+	r  *redis.Client
+	ru rueidis.Client
 }
 
 func (c redisCache) Get(ctx context.Context, key string, value any) (bool, error) {
@@ -64,6 +68,14 @@ func (c redisCache) Get(ctx context.Context, key string, value any) (bool, error
 	}
 
 	return true, nil
+}
+
+func (c redisCache) mget(ctx context.Context, keys []string) rueidis.RedisResult {
+	return c.ru.Do(ctx, c.ru.B().Mget().Key(keys...).Build())
+}
+
+func MGet[T any](c RedisCache, ctx context.Context, keys []string, value *[]T) error {
+	return rueidis.DecodeSliceOfJSON(c.mget(ctx, keys), value)
 }
 
 func (c redisCache) Set(ctx context.Context, key string, value any, ttl time.Duration) error {
