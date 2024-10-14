@@ -44,7 +44,7 @@ func GetQuery(tb testing.TB) *query.Query {
 
 func GetGorm(tb testing.TB) *gorm.DB {
 	tb.Helper()
-	RequireEnv(tb, EnvRedis)
+	RequireEnv(tb, EnvMysql)
 
 	cfg, err := config.NewAppConfig()
 	require.NoError(tb, err)

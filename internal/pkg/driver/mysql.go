@@ -46,7 +46,6 @@ func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
 	u.DBName = c.Mysql.Database
 	u.Loc = time.UTC
 	u.ParseTime = true
-	u.Params = map[string]string{"charset": "utf8mb4,utf8"}
 
 	db, err := sql.Open("mysql", u.FormatDSN())
 	if err != nil {

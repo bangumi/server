@@ -17,6 +17,7 @@ package auth_test
 import (
 	"context"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -61,6 +62,16 @@ func TestMysqlRepo_GetByToken(t *testing.T) {
 	require.NoError(t, err)
 
 	require.EqualValues(t, 382951, u.ID)
+}
+
+func TestMysqlRepo_GetByToken_case_sensitive(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo, _ := getRepo(t)
+
+	_, err := repo.GetByToken(context.Background(), strings.ToUpper("a_development_access_token"))
+	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
 
 func TestMysqlRepo_GetByToken_expired(t *testing.T) {
