@@ -16,6 +16,7 @@ package cache
 
 import (
 	"context"
+	"reflect"
 	"time"
 
 	"github.com/redis/rueidis"
@@ -34,11 +35,13 @@ type RedisCache interface {
 	Get(ctx context.Context, key string, value any) (bool, error)
 	Set(ctx context.Context, key string, value any, ttl time.Duration) error
 	Del(ctx context.Context, keys ...string) error
-	MGet(ctx context.Context, key []string) MGetResult
-}
 
-type MGetResult struct {
-	rueidis.RedisResult
+	// MGet result should be `*[]T`
+	// for example
+	//
+	//	var s []struct{}
+	//	cache.MGet(ctx, keys, &s)
+	MGet(ctx context.Context, key []string, result any) error
 }
 
 // NewRedisCache create a redis backed cache.
@@ -74,12 +77,45 @@ func (c redisCache) Get(ctx context.Context, key string, value any) (bool, error
 	return true, nil
 }
 
-func (c redisCache) MGet(ctx context.Context, keys []string) MGetResult {
-	return MGetResult{c.ru.Do(ctx, c.ru.B().Mget().Key(keys...).Build())}
-}
+// MGet result should be `*[]T`
+// for example
+//
+//	var s []struct{}
+//	cache.MGet(ctx, keys, &s)
+func (c redisCache) MGet(ctx context.Context, keys []string, result any) error {
+	results, err := c.ru.Do(ctx, c.ru.B().Mget().Key(keys...).Build()).ToArray()
+	if err != nil {
+		if err == rueidis.Nil {
+			return nil
+		}
 
-func MGet[T any](c RedisCache, ctx context.Context, keys []string, value *[]T) error {
-	return rueidis.DecodeSliceOfJSON(c.MGet(ctx, keys).RedisResult, value)
+		return errgo.Wrap(err, "redis mget")
+	}
+
+	// no more ideal way to do this
+	// reflect.ValueOf(*[]T)
+	rv := reflect.ValueOf(result)
+	if !(rv.Kind() == reflect.Ptr && rv.Elem().Kind() == reflect.Slice) {
+		panic("only allow *[]T as input")
+	}
+
+	// reflect.ValueOf([]T)
+	vv := rv.Elem()
+
+	vv.Set(reflect.MakeSlice(rv.Elem().Type(), 0, len(results)))
+	elementType := rv.Elem().Type().Elem()
+	for _, message := range results {
+		var v = reflect.New(elementType)
+
+		e := message.DecodeJSON(v.Interface())
+		if e != nil {
+			continue
+		}
+
+		reflect.Append(vv, v.Elem())
+	}
+
+	return nil
 }
 
 func (c redisCache) Set(ctx context.Context, key string, value any, ttl time.Duration) error {

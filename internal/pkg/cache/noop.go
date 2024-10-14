@@ -37,6 +37,6 @@ func (n noop) Del(context.Context, ...string) error {
 	return nil
 }
 
-func (n noop) MGet(ctx context.Context, key []string) MGetResult {
-	return MGetResult{}
+func (n noop) MGet(ctx context.Context, key []string, result any) error {
+	return nil
 }

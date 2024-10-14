@@ -74,7 +74,7 @@ func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 
 func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID][]Tag, error) {
 	var tags []cachedTags
-	err := cache.MGet(r.cache, ctx, lo.Map(ids, func(item model.SubjectID, index int) string {
+	err := r.cache.MGet(ctx, lo.Map(ids, func(item model.SubjectID, index int) string {
 		return cachekey.SubjectMetaTag(item)
 	}), &tags)
 	if err != nil {
