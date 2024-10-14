@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 
 	"github.com/trim21/errgo"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
 )
@@ -26,7 +27,7 @@ import (
 func (e *eventHandler) OnSubject(ctx context.Context, key json.RawMessage, payload Payload) error {
 	var k SubjectKey
 	if err := json.Unmarshal(key, &k); err != nil {
-		return nil
+		return err
 	}
 
 	return e.onSubjectChange(ctx, k.ID, payload.Op)
@@ -35,7 +36,7 @@ func (e *eventHandler) OnSubject(ctx context.Context, key json.RawMessage, paylo
 func (e *eventHandler) OnSubjectField(ctx context.Context, key json.RawMessage, payload Payload) error {
 	var k SubjectFieldKey
 	if err := json.Unmarshal(key, &k); err != nil {
-		return nil
+		return err
 	}
 
 	return e.onSubjectChange(ctx, k.ID, payload.Op)
@@ -51,6 +52,8 @@ func (e *eventHandler) onSubjectChange(ctx context.Context, subjectID model.Subj
 		if err := e.search.OnSubjectDelete(ctx, subjectID); err != nil {
 			return errgo.Wrap(err, "search.OnSubjectDelete")
 		}
+	default:
+		e.log.Warn("unexpected operator", zap.String("op", op))
 	}
 
 	return nil
