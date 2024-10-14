@@ -48,7 +48,7 @@ type SubjectV0 struct {
 	Collection    SubjectCollectionStat `json:"collection"`
 	ID            model.SubjectID       `json:"id"`
 	Eps           uint32                `json:"eps"`
-	MetaTags      []SubjectTag          `json:"meta_tags"`
+	MetaTags      []string              `json:"meta_tags"`
 	Volumes       uint32                `json:"volumes"`
 	Series        bool                  `json:"series"`
 	Locked        bool                  `json:"locked"`

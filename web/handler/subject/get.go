@@ -135,12 +135,8 @@ func convertModelSubject(s model.Subject, totalEpisode int64, metaTags []tag.Tag
 		Volumes:       s.Volumes,
 		Redirect:      s.Redirect,
 		Eps:           s.Eps,
-		MetaTags: lo.Map(metaTags, func(item tag.Tag, index int) res.SubjectTag {
-			return res.SubjectTag{
-				Name:      item.Name,
-				Count:     item.Count,
-				TotalCont: item.TotalCount,
-			}
+		MetaTags: lo.Map(metaTags, func(item tag.Tag, index int) string {
+			return item.Name
 		}),
 		Tags: slice.Map(s.Tags, func(tag model.Tag) res.SubjectTag {
 			return res.SubjectTag{
