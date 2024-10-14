@@ -85,6 +85,7 @@ func (c redisCache) Get(ctx context.Context, key string, value any) (bool, error
 func (c redisCache) MGet(ctx context.Context, keys []string, result any) error {
 	results, err := c.ru.Do(ctx, c.ru.B().Mget().Key(keys...).Build()).ToArray()
 	if err != nil {
+		//nolint:errorlint
 		if err == rueidis.Nil {
 			return nil
 		}
