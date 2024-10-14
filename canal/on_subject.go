@@ -44,7 +44,11 @@ func (e *eventHandler) OnSubjectField(ctx context.Context, key json.RawMessage, 
 
 func (e *eventHandler) onSubjectChange(ctx context.Context, subjectID model.SubjectID, op string) error {
 	switch op {
-	case opCreate, opUpdate, opSnapshot:
+	case opCreate:
+		if err := e.search.OnSubjectAdded(ctx, subjectID); err != nil {
+			return errgo.Wrap(err, "search.OnSubjectAdded")
+		}
+	case opUpdate, opSnapshot:
 		if err := e.search.OnSubjectUpdate(ctx, subjectID); err != nil {
 			return errgo.Wrap(err, "search.OnSubjectUpdate")
 		}

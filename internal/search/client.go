@@ -150,6 +150,26 @@ func (c *client) Close() {
 	}
 }
 
+// OnSubjectAdded is the hook called by canal.
+func (c *client) OnSubjectAdded(ctx context.Context, id model.SubjectID) error {
+	s, err := c.subjectRepo.Get(ctx, id, subject.Filter{})
+	if err != nil {
+		if errors.Is(err, gerr.ErrNotFound) {
+			return nil
+		}
+		return errgo.Wrap(err, "subjectRepo.Get")
+	}
+
+	if s.Redirect != 0 || s.Ban != 0 {
+		return c.OnSubjectDelete(ctx, id)
+	}
+
+	extracted := extractSubject(&s)
+
+	_, err = c.subjectIndex.UpdateDocumentsWithContext(ctx, extracted, "id")
+	return err
+}
+
 // OnSubjectUpdate is the hook called by canal.
 func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error {
 	s, err := c.subjectRepo.Get(ctx, id, subject.Filter{})

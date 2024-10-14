@@ -195,8 +195,8 @@ github.com/trim21/go-phpserialize v0.1.0-alpha.5 h1:bMsUpfwAgPggQzDKdafNBvkPWDCM
 github.com/trim21/go-phpserialize v0.1.0-alpha.5/go.mod h1:/3zMYuOzpcKOevwP3ZN0WxdVRaB3CzJh5T2i41QPgRQ=
 github.com/trim21/htest v0.0.4 h1:dDIzKNdIClgtB158DlO+Xf0sfwNycmx3kfo/FJuY+eE=
 github.com/trim21/htest v0.0.4/go.mod h1:W+zaYAGCBqx38eMrMGvXrALnbcXR6OBtZiRiHahgo+E=
-github.com/trim21/pkg v0.0.3 h1:uAqfoFmmYiIMOSretKj8/tvrQs3KG57020Ff0cx8UtE=
-github.com/trim21/pkg v0.0.3/go.mod h1:JrRIFidkCLeuU5j0vBP5ZN0NOp2JavagHZNr4D3AH6Q=
+github.com/trim21/pkg v0.0.4 h1:0nYODKdqNUzmUaPFvqSiR420u2uXQgIYyVyiNfH7olc=
+github.com/trim21/pkg v0.0.4/go.mod h1:edl6xdqBOJrhMuIGvcY2lg5L9cqp/hVuwHRM/kdzbMg=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=

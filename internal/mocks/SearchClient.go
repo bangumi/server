@@ -100,6 +100,53 @@ func (_c *SearchClient_Handle_Call) RunAndReturn(run func(echo.Context) error) *
 	return _c
 }
 
+// OnSubjectAdded provides a mock function with given fields: ctx, id
+func (_m *SearchClient) OnSubjectAdded(ctx context.Context, id uint32) error {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for OnSubjectAdded")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// SearchClient_OnSubjectAdded_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'OnSubjectAdded'
+type SearchClient_OnSubjectAdded_Call struct {
+	*mock.Call
+}
+
+// OnSubjectAdded is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uint32
+func (_e *SearchClient_Expecter) OnSubjectAdded(ctx interface{}, id interface{}) *SearchClient_OnSubjectAdded_Call {
+	return &SearchClient_OnSubjectAdded_Call{Call: _e.mock.On("OnSubjectAdded", ctx, id)}
+}
+
+func (_c *SearchClient_OnSubjectAdded_Call) Run(run func(ctx context.Context, id uint32)) *SearchClient_OnSubjectAdded_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *SearchClient_OnSubjectAdded_Call) Return(_a0 error) *SearchClient_OnSubjectAdded_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *SearchClient_OnSubjectAdded_Call) RunAndReturn(run func(context.Context, uint32) error) *SearchClient_OnSubjectAdded_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // OnSubjectDelete provides a mock function with given fields: ctx, id
 func (_m *SearchClient) OnSubjectDelete(ctx context.Context, id uint32) error {
 	ret := _m.Called(ctx, id)

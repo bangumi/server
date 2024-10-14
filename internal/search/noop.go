@@ -28,6 +28,8 @@ var _ Client = NoopClient{}
 type NoopClient struct {
 }
 
+func (n NoopClient) OnSubjectAdded(ctx context.Context, id model.SubjectID) error { return nil }
+
 func (n NoopClient) Handle(c echo.Context) error {
 	return c.String(http.StatusOK, "search is not enable")
 }
