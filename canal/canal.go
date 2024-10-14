@@ -60,7 +60,7 @@ func Main() error {
 		// driver and connector
 		fx.Provide(
 			driver.NewMysqlSqlDB,
-			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
+			driver.NewRueidisClient, logger.Copy, cache.NewRedisCache,
 			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
 			driver.NewS3,
 

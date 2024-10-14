@@ -37,7 +37,6 @@ func Fx(tb testing.TB, target ...fx.Option) {
 			// driver and connector
 			fx.Provide(
 				config.AppConfigReader(config.AppTypeHTTP),
-				driver.NewRedisClient,   // redis
 				driver.NewRueidisClient, // redis
 				driver.NewMysqlSqlDB,    // mysql
 				func() *resty.Client {

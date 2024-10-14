@@ -24,6 +24,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"github.com/redis/rueidis"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -60,10 +61,12 @@ func (e *eventHandler) OnUserChange(ctx context.Context, key json.RawMessage, pa
 		}
 
 		if before.NewNotify != after.NewNotify {
-			e.redis.Publish(ctx, fmt.Sprintf("event-user-notify-%d", k.ID), redisUserChannel{
-				UserID:    k.ID,
-				NewNotify: after.NewNotify,
-			})
+			e.redis.Do(ctx, e.redis.B().Publish().
+				Channel(fmt.Sprintf("event-user-notify-%d", k.ID)).
+				Message(rueidis.JSON(redisUserChannel{
+					UserID:    k.ID,
+					NewNotify: after.NewNotify,
+				})).Build())
 		}
 
 		if before.Avatar != after.Avatar {

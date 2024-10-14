@@ -15,57 +15,13 @@
 package driver
 
 import (
-	"context"
 	"fmt"
 	"net/url"
-	"time"
 
-	"github.com/redis/go-redis/v9"
 	"github.com/redis/rueidis"
-	"github.com/trim21/errgo"
-	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/internal/metrics"
-	"github.com/bangumi/server/internal/pkg/logger"
 )
-
-const defaultRedisPoolSize = 4
-
-// NewRedisClient create a redis client
-// use [test.GetRedis] in tests.
-func NewRedisClient(c config.AppConfig) (*redis.Client, error) {
-	redisOptions, err := redis.ParseURL(c.RedisURL)
-	if err != nil {
-		logger.Fatal("redis: failed to parse redis url", zap.String("url", c.RedisURL))
-	}
-
-	if redisOptions.PoolSize == 0 {
-		redisOptions.PoolSize = defaultRedisPoolSize
-	}
-
-	cli := redis.NewClient(redisOptions)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	if err := cli.Ping(ctx).Err(); err != nil {
-		return nil, errgo.Wrap(err, "redis: failed to ping")
-	}
-
-	return cli, nil
-}
-
-func NewRedisClientWithMetrics(c config.AppConfig) (*redis.Client, error) {
-	cli, err := NewRedisClient(c)
-	if err != nil {
-		return cli, err
-	}
-
-	cli.AddHook(metrics.RedisHook(cli.Options().Addr))
-
-	return cli, nil
-}
 
 func NewRueidisClient(c config.AppConfig) (rueidis.Client, error) {
 	u, err := url.Parse(c.RedisURL)
@@ -77,6 +33,8 @@ func NewRueidisClient(c config.AppConfig) (rueidis.Client, error) {
 	cli, err := rueidis.NewClient(rueidis.ClientOption{
 		InitAddress: []string{fmt.Sprintf("%s:%s", u.Hostname(), u.Port())},
 		Password:    password,
+		// 1<<2 = 4 connection for each node
+		PipelineMultiplex: 2,
 	})
 	if err != nil {
 		return cli, err

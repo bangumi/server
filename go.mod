@@ -23,7 +23,6 @@ require (
 	github.com/meilisearch/meilisearch-go v0.28.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.20.4
-	github.com/redis/go-redis/v9 v9.6.1
 	github.com/redis/rueidis v1.0.47
 	github.com/samber/lo v1.47.0
 	github.com/segmentio/kafka-go v0.4.47
@@ -32,7 +31,6 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/trim21/errgo v0.0.3
 	github.com/trim21/go-phpserialize v0.1.0-alpha.5
-	github.com/trim21/go-redis-prometheus v0.0.0
 	github.com/trim21/htest v0.0.4
 	github.com/trim21/pkg v0.0.3
 	go.uber.org/fx v1.23.0
@@ -67,7 +65,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
-	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect

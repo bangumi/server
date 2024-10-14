@@ -20,7 +20,7 @@ import (
 	"sync/atomic"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/redis/go-redis/v9"
+	"github.com/redis/rueidis"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
@@ -35,7 +35,7 @@ func newEventHandler(
 	log *zap.Logger,
 	appConfig config.AppConfig,
 	session session.Manager,
-	redis *redis.Client,
+	redis rueidis.Client,
 	stream Stream,
 	search search.Client,
 	s3 *s3.Client,
@@ -59,7 +59,7 @@ type eventHandler struct {
 	search  search.Client
 	stream  Stream
 	s3      *s3.Client // optional, check nil before use
-	redis   *redis.Client
+	redis   rueidis.Client
 }
 
 func (e *eventHandler) start() error {
