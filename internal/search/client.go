@@ -155,12 +155,12 @@ func (c *client) OnSubjectUpdate(ctx context.Context, id model.SubjectID) error 
 	s, err := c.subjectRepo.Get(ctx, id, subject.Filter{})
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
-			return c.DeleteSubject(ctx, id)
+			return nil
 		}
 		return errgo.Wrap(err, "subjectRepo.Get")
 	}
 
-	if s.Redirect != 0 {
+	if s.Redirect != 0 || s.Ban != 0 {
 		return c.DeleteSubject(ctx, id)
 	}
 
@@ -176,6 +176,9 @@ func (c *client) OnSubjectDelete(_ context.Context, id model.SubjectID) error {
 	_, err := c.subjectIndex.DeleteDocument(strconv.FormatUint(uint64(id), 10))
 
 	return errgo.Wrap(err, "search")
+}
+
+func (c *client) flush() {
 }
 
 // UpsertSubject add subject to search backend.
