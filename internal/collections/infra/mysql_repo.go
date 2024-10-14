@@ -351,7 +351,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 		phpTags = append(phpTags, subject.Tag{
 			Name:       lo.ToPtr(name),
 			Count:      c,
-			TotalCount: uint(countMap[name]),
+			TotalCount: countMap[name],
 		})
 	}
 
