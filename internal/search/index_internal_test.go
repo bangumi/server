@@ -25,7 +25,7 @@ func TestIndexFilter(t *testing.T) {
 	t.Parallel()
 
 	actual := *(getAttributes("filterable"))
-	expected := []string{"date", "score", "rank", "type", "nsfw", "tag"}
+	expected := []string{"date", "meta_tag", "score", "rank", "type", "nsfw", "tag"}
 
 	sort.Strings(expected)
 	sort.Strings(actual)

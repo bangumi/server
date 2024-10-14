@@ -32,6 +32,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/sys"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -63,6 +64,8 @@ func Main() error {
 			driver.NewRueidisClient, logger.Copy, cache.NewRedisCache,
 			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
 			driver.NewS3,
+
+			tag.NewMysqlRepo,
 
 			newEventHandler,
 		),

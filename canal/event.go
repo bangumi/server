@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/search"
+	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -37,6 +38,7 @@ func newEventHandler(
 	session session.Manager,
 	redis rueidis.Client,
 	stream Stream,
+	tag tag.Repo,
 	search search.Client,
 	s3 *s3.Client,
 ) *eventHandler {
@@ -48,6 +50,7 @@ func newEventHandler(
 		s3:      s3,
 		stream:  stream,
 		log:     log.Named("eventHandler"),
+		tag:     tag,
 	}
 }
 
@@ -60,6 +63,7 @@ type eventHandler struct {
 	stream  Stream
 	s3      *s3.Client // optional, check nil before use
 	redis   rueidis.Client
+	tag     tag.Repo
 }
 
 func (e *eventHandler) start() error {

@@ -58,11 +58,12 @@ type Req struct {
 }
 
 type ReqFilter struct { //nolint:musttag
-	Type    []model.SubjectType `json:"type"`     // or
-	Tag     []string            `json:"tag"`      // and
-	AirDate []string            `json:"air_date"` // and
-	Score   []string            `json:"rating"`   // and
-	Rank    []string            `json:"rank"`     // and
+	Type     []model.SubjectType `json:"type"`      // or
+	Tag      []string            `json:"tag"`       // and
+	AirDate  []string            `json:"air_date"`  // and
+	Score    []string            `json:"rating"`    // and
+	Rank     []string            `json:"rank"`      // and
+	MetaTags []string            `json:"meta_tags"` // and
 
 	// if NSFW subject is enabled
 	NSFW null.Bool `json:"nsfw"`
@@ -222,6 +223,10 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 
 	if !req.NSFW.Set || !req.NSFW.Value {
 		filter = append(filter, []string{"nsfw = false"})
+	}
+
+	for _, tag := range req.MetaTags {
+		filter = append(filter, []string{"meta_tag = " + strconv.Quote(tag)})
 	}
 
 	// AND

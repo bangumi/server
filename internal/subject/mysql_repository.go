@@ -78,6 +78,7 @@ func ConvertDao(s *dao.Subject) (model.Subject, error) {
 		ID:         s.ID,
 		Name:       string(s.Name),
 		NameCN:     string(s.NameCN),
+		MetaTags:   s.FieldMetaTags,
 		TypeID:     s.TypeID,
 		Image:      s.Image,
 		PlatformID: s.Platform,
