@@ -19,7 +19,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -77,7 +76,6 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 	err := m.db.GetContext(ctx, &access,
 		`select user_id from chii_oauth_access_tokens where access_token = ? collate utf8_bin and expires > ? limit 1`, token, time.Now())
 	if err != nil {
-		fmt.Println("1", err)
 		if errors.Is(err, sql.ErrNoRows) {
 			return UserInfo{}, gerr.ErrNotFound
 		}
@@ -87,7 +85,6 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 
 	id, err := gstr.ParseUint32(access.UserID)
 	if err != nil || id == 0 {
-		fmt.Println("2", err)
 		m.log.Error("wrong UserID in OAuth Access table", zap.String("user_id", access.UserID))
 		return UserInfo{}, errgo.Wrap(err, "parsing user id")
 	}
@@ -100,7 +97,6 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 	err = m.db.QueryRowContext(ctx, `select regdate, groupid from chii_members where uid = ? limit 1`, id).
 		Scan(&u.Regdate, &u.GroupID)
 	if err != nil {
-		fmt.Println("3", err)
 		if errors.Is(err, sql.ErrNoRows) {
 			return UserInfo{}, gerr.ErrNotFound
 		}
