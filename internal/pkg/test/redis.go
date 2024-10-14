@@ -21,11 +21,11 @@ import (
 	"go.uber.org/fx"
 )
 
-func GetRedis(t testing.TB) (r rueidis.Client) {
-	t.Helper()
-	RequireEnv(t, EnvRedis)
+func GetRedis(tb testing.TB) (r rueidis.Client) {
+	tb.Helper()
+	RequireEnv(tb, EnvRedis)
 
-	Fx(t, fx.Populate(&r))
+	Fx(tb, fx.Populate(&r))
 
 	return
 }
