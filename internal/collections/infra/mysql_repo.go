@@ -333,8 +333,8 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 		return errgo.Trace(err)
 	}
 
-	var count = make(map[string]int)
-	var countMap = make(map[string]uint32)
+	var count = make(map[string]uint)
+	var countMap = make(map[string]uint)
 
 	for _, tag := range tagList {
 		if !dam.ValidateTag(tag.Tag.Name) {
@@ -342,7 +342,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 		}
 
 		count[tag.Tag.Name]++
-		countMap[tag.Tag.Name] = tag.Tag.Results
+		countMap[tag.Tag.Name] = uint(tag.Tag.Results)
 	}
 
 	var phpTags = make([]subject.Tag, 0, len(count))
@@ -351,7 +351,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 		phpTags = append(phpTags, subject.Tag{
 			Name:       lo.ToPtr(name),
 			Count:      c,
-			TotalCount: int(countMap[name]),
+			TotalCount: countMap[name],
 		})
 	}
 

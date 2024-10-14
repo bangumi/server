@@ -31,6 +31,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/web/accessor"
 	subjectHandler "github.com/bangumi/server/web/handler/subject"
 	"github.com/bangumi/server/web/internal/ctxkey"
@@ -56,7 +57,10 @@ func TestSubject_Get(t *testing.T) {
 	ep := mocks.NewEpisodeRepo(t)
 	ep.EXPECT().Count(mock.Anything, subjectID, mock.Anything).Return(3, nil)
 
-	s, err := subjectHandler.New(nil, m, nil, nil, ep)
+	tagRepo := mocks.NewTagRepo(t)
+	tagRepo.EXPECT().Get(mock.Anything, mock.Anything).Return([]tag.Tag{}, nil)
+
+	s, err := subjectHandler.New(nil, m, nil, nil, ep, tagRepo)
 	require.NoError(t, err)
 	s.Routes(g)
 

@@ -41,6 +41,7 @@ import (
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/internal/timeline"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web"
@@ -65,7 +66,8 @@ func start() error {
 		fx.Provide(
 			config.AppConfigReader(config.AppTypeHTTP),
 			driver.NewRedisClientWithMetrics, // redis
-			driver.NewMysqlConnectionPool,    // mysql
+			driver.NewMysqlSqlDB,             // mysql
+			driver.NewRueidisClient,
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
 				httpClient.JSONUnmarshal = json.Unmarshal
@@ -73,6 +75,8 @@ func start() error {
 				return httpClient
 			},
 		),
+
+		fx.Invoke(dal.SetupMetrics),
 
 		dal.Module,
 
@@ -86,6 +90,8 @@ func start() error {
 			timeline.NewMysqlRepo, pm.NewMysqlRepo, notification.NewMysqlRepo,
 
 			dam.New, subject.NewMysqlRepo, subject.NewCachedRepo, person.NewMysqlRepo,
+
+			tag.NewCachedRepo, tag.NewMysqlRepo,
 
 			auth.NewService, person.NewService, search.New,
 		),

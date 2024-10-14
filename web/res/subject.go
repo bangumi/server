@@ -29,8 +29,9 @@ const defaultShortSummaryLength = 120
 type v0wiki = []any
 
 type SubjectTag struct {
-	Name  string `json:"name"`
-	Count int    `json:"count"`
+	Name      string `json:"name"`
+	Count     uint   `json:"count"`
+	TotalCont uint   `json:"total_cont"`
 }
 
 type SubjectV0 struct {
@@ -47,6 +48,7 @@ type SubjectV0 struct {
 	Collection    SubjectCollectionStat `json:"collection"`
 	ID            model.SubjectID       `json:"id"`
 	Eps           uint32                `json:"eps"`
+	MetaTags      []SubjectTag          `json:"meta_tags"`
 	Volumes       uint32                `json:"volumes"`
 	Series        bool                  `json:"series"`
 	Locked        bool                  `json:"locked"`

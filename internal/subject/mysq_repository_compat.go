@@ -24,8 +24,8 @@ import (
 
 type Tag struct {
 	Name       *string `php:"tag_name"`
-	Count      int     `php:"result,string"`
-	TotalCount int     `php:"tag_results,string"`
+	Count      uint    `php:"result,string"`
+	TotalCount uint    `php:"tag_results,string"`
 }
 
 func ParseTags(b []byte) ([]model.Tag, error) {

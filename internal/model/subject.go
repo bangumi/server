@@ -17,8 +17,9 @@ package model
 const subjectLocked = 2
 
 type Tag struct {
-	Name  string
-	Count int
+	Name       string
+	Count      uint
+	TotalCount uint
 }
 
 type Subject struct {

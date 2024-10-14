@@ -60,7 +60,7 @@ func (h Subject) Browse(c echo.Context) error {
 	}
 	data := make([]res.SubjectV0, 0, len(subjects))
 	for _, s := range subjects {
-		data = append(data, convertModelSubject(s, 0))
+		data = append(data, convertModelSubject(s, 0, nil))
 	}
 
 	return c.JSON(http.StatusOK, res.Paged{Data: data, Total: count, Limit: page.Limit, Offset: page.Offset})

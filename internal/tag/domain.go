@@ -12,4 +12,36 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package subject
+package tag
+
+import (
+	"context"
+
+	"github.com/bangumi/server/internal/model"
+)
+
+// CatSubject 条目tag.
+const CatSubject = 0
+
+// CatMeta 官方tag.
+const CatMeta = 3
+
+type Tag struct {
+	Name  string
+	Count uint
+	// TotalCount count for all tags including all subject
+	TotalCount uint
+}
+
+type CachedRepo interface {
+	read
+}
+
+type Repo interface {
+	read
+}
+
+type read interface {
+	Get(ctx context.Context, id model.SubjectID) ([]Tag, error)
+	GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID][]Tag, error)
+}

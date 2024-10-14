@@ -12,30 +12,46 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package dal_test
+package tag_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/fx"
 
-	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/dal"
-	"github.com/bangumi/server/internal/pkg/driver"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/internal/tag"
 )
 
-func TestNewDB(t *testing.T) {
+func getCacheRepo(t *testing.T) tag.CachedRepo {
+	t.Helper()
+
+	var r tag.CachedRepo
+
+	test.Fx(t, fx.Provide(tag.NewCachedRepo, tag.NewMysqlRepo), fx.Populate(&r))
+
+	return r
+}
+
+func TestCacheGet(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql, test.EnvRedis)
 	t.Parallel()
-	test.RequireEnv(t, test.EnvMysql)
-	cfg, err := config.NewAppConfig()
-	require.NoError(t, err)
 
-	conn, err := driver.NewMysqlSqlDB(cfg)
-	require.NoError(t, err)
-	db, err := dal.NewGormDB(conn, cfg)
-	require.NoError(t, err)
+	repo := getCacheRepo(t)
 
-	err = db.Exec("select 0;").Error
+	_, err := repo.Get(context.Background(), 8)
+	require.NoError(t, err)
+}
+
+func TestCacheGetTags(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql, test.EnvRedis)
+	t.Parallel()
+
+	repo := getCacheRepo(t)
+
+	_, err := repo.GetByIDs(context.Background(), []model.SubjectID{1, 2, 8})
 	require.NoError(t, err)
 }

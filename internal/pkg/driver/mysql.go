@@ -31,7 +31,8 @@ import (
 
 var setLoggerOnce = sync.Once{}
 
-func NewMysqlConnectionPool(c config.AppConfig) (*sql.DB, error) {
+//nolint:stylecheck
+func NewMysqlSqlDB(c config.AppConfig) (*sql.DB, error) {
 	setLoggerOnce.Do(func() {
 		_ = mysql.SetLogger(logger.StdAt(zap.ErrorLevel))
 	})

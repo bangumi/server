@@ -27,7 +27,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
-func NewDB(conn *sql.DB, c config.AppConfig) (*gorm.DB, error) {
+func NewGormDB(conn *sql.DB, c config.AppConfig) (*gorm.DB, error) {
 	var gLog gormLogger.Interface
 	if c.Debug.Gorm {
 		logger.Info("enable gorm debug mode, will log all sql")
@@ -49,10 +49,6 @@ func NewDB(conn *sql.DB, c config.AppConfig) (*gorm.DB, error) {
 	)
 	if err != nil {
 		return nil, errgo.Wrap(err, "create dal")
-	}
-
-	if err = setupMetrics(db, conn); err != nil {
-		return nil, errgo.Wrap(err, "setup metrics")
 	}
 
 	return db, nil

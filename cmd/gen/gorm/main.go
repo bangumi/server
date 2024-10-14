@@ -92,12 +92,12 @@ func main() {
 		panic("failed to read config: " + err.Error())
 	}
 
-	conn, err := driver.NewMysqlConnectionPool(c)
+	conn, err := driver.NewMysqlSqlDB(c)
 	if err != nil {
 		panic(err)
 	}
 
-	db, err := dal.NewDB(conn, c)
+	db, err := dal.NewGormDB(conn, c)
 	if err != nil {
 		panic(err)
 	}

@@ -20,6 +20,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
@@ -31,6 +32,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/accessor"
@@ -66,7 +68,12 @@ func (h Subject) Get(c echo.Context) error {
 		return errgo.Wrap(err, "episode.Count")
 	}
 
-	return c.JSON(http.StatusOK, convertModelSubject(s, totalEpisode))
+	metaTags, err := h.tag.Get(c.Request().Context(), s.ID)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, convertModelSubject(s, totalEpisode, metaTags))
 }
 
 func platformString(s model.Subject) *string {
@@ -114,7 +121,7 @@ func (h Subject) GetImage(c echo.Context) error {
 	return c.Redirect(http.StatusFound, l)
 }
 
-func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {
+func convertModelSubject(s model.Subject, totalEpisode int64, metaTags []tag.Tag) res.SubjectV0 {
 	return res.SubjectV0{
 		TotalEpisodes: totalEpisode,
 		ID:            s.ID,
@@ -128,6 +135,13 @@ func convertModelSubject(s model.Subject, totalEpisode int64) res.SubjectV0 {
 		Volumes:       s.Volumes,
 		Redirect:      s.Redirect,
 		Eps:           s.Eps,
+		MetaTags: lo.Map(metaTags, func(item tag.Tag, index int) res.SubjectTag {
+			return res.SubjectTag{
+				Name:      item.Name,
+				Count:     item.Count,
+				TotalCont: item.TotalCount,
+			}
+		}),
 		Tags: slice.Map(s.Tags, func(tag model.Tag) res.SubjectTag {
 			return res.SubjectTag{
 				Name:  tag.Name,

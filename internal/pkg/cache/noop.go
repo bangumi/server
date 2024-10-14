@@ -36,3 +36,7 @@ func (n noop) Set(context.Context, string, any, time.Duration) error {
 func (n noop) Del(context.Context, ...string) error {
 	return nil
 }
+
+func (n noop) MGet(ctx context.Context, key []string) MGetResult {
+	return MGetResult{}
+}

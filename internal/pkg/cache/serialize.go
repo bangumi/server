@@ -20,15 +20,6 @@ import (
 	"github.com/trim21/errgo"
 )
 
-func marshalBytes(v any) ([]byte, error) {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return nil, errgo.Wrap(err, "json.Marshal")
-	}
-
-	return b, nil
-}
-
 func unmarshalBytes(b []byte, v any) error {
 	err := json.Unmarshal(b, v)
 	if err != nil {

@@ -16,9 +16,12 @@ package driver
 
 import (
 	"context"
+	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/rueidis"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
@@ -60,6 +63,24 @@ func NewRedisClientWithMetrics(c config.AppConfig) (*redis.Client, error) {
 	}
 
 	cli.AddHook(metrics.RedisHook(cli.Options().Addr))
+
+	return cli, nil
+}
+
+func NewRueidisClient(c config.AppConfig) (rueidis.Client, error) {
+	u, err := url.Parse(c.RedisURL)
+	if err != nil {
+		return nil, err
+	}
+
+	password, _ := u.User.Password()
+	cli, err := rueidis.NewClient(rueidis.ClientOption{
+		InitAddress: []string{fmt.Sprintf("%s:%s", u.Hostname(), u.Port())},
+		Password:    password,
+	})
+	if err != nil {
+		return cli, err
+	}
 
 	return cli, nil
 }
