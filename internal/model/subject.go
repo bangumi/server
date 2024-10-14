@@ -26,6 +26,7 @@ type Subject struct {
 	Image         string
 	Summary       string
 	Name          string
+	MetaTags      string
 	Date          string // first release date
 	NameCN        string
 	Infobox       string

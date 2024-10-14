@@ -16,6 +16,7 @@ package search
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/pkg/wiki"
@@ -28,6 +29,7 @@ import (
 type subjectIndex struct {
 	ID       model.SubjectID `json:"id"`
 	Tag      []string        `json:"tag,omitempty" filterable:"true"`
+	MetaTags []string        `json:"meta_tag" filterable:"true"`
 	Name     string          `json:"name" searchable:"true"`
 	Aliases  []string        `json:"aliases,omitempty" searchable:"true"`
 	Date     int             `json:"date,omitempty" filterable:"true" sortable:"true"`
@@ -74,6 +76,7 @@ func extractSubject(s *model.Subject) subjectIndex {
 		ID:       s.ID,
 		Name:     s.Name,
 		Aliases:  extractAliases(s, w),
+		MetaTags: strings.Split(s.MetaTags, " "),
 		Tag:      tagNames,
 		NSFW:     s.NSFW,
 		Type:     s.TypeID,
