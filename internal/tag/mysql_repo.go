@@ -16,8 +16,11 @@ package tag
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/dal/query"
@@ -35,18 +38,31 @@ type mysqlRepo struct {
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
+	// this is not necessary information for query data, but it will help mysql to hit cache
+	var subjectType model.SubjectType
+	err := r.db.QueryRowContext(ctx, `
+			select chii_subjects.subject_type_id from chii_subjects where subject_id = ?
+		`, id).Scan(&subjectType)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return []Tag{}, nil
+		}
+
+		return nil, errgo.Trace(err)
+	}
+
 	var s []struct {
 		Tid        uint   `db:"tlt_tid"`
 		Name       string `db:"tag_name"`
 		TotalCount uint   `db:"tag_results"`
 	}
 
-	err := r.db.SelectContext(ctx, &s, `
+	err = r.db.SelectContext(ctx, &s, `
 		select tlt_tid, tag_name, tag_results
 		from chii_tag_neue_list
-		inner join chii_tag_neue_index on tlt_tid = tag_id and tlt_type = tag_type
+		inner join chii_tag_neue_index on tlt_tid = tag_id and tlt_type = ?
 		where tlt_uid = 0 and tag_cat = ? and tlt_mid = ?
-		`, CatSubject, id)
+		`, subjectType, CatSubject, id)
 	if err != nil {
 		return nil, err
 	}
