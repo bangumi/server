@@ -467,7 +467,6 @@ func (r mysqlRepo) ListSubjectCollection(
 
 	collections, err := q.Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -799,7 +798,6 @@ func (r mysqlRepo) ListPersonCollection(
 
 	collections, err := q.Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 

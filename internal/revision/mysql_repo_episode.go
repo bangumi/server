@@ -76,7 +76,7 @@ func (r mysqlRepo) GetEpisodeRelated(ctx context.Context, id model.RevisionID) (
 			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
 			return model.EpisodeRevision{}, gerr.ErrNotFound
 		}
-		r.log.Error("unexpected error happened", zap.Error(err))
+
 		return model.EpisodeRevision{}, errgo.Wrap(err, "dal")
 	}
 

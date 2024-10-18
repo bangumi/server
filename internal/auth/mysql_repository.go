@@ -58,7 +58,6 @@ func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (UserInfo, []by
 			return UserInfo{}, nil, gerr.ErrNotFound
 		}
 
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return UserInfo{}, nil, errgo.Wrap(err, "gorm")
 	}
 
@@ -169,7 +168,6 @@ func (m mysqlRepo) CreateAccessToken(
 		Info:        infoByte,
 	})
 	if err != nil {
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return "", errgo.Wrap(err, "dal")
 	}
 
@@ -186,7 +184,6 @@ func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UserID) ([]
 		Where(m.q.AccessToken.UserID.Eq(strconv.FormatUint(uint64(userID), 10)),
 			m.q.AccessToken.ExpiredAt.Gte(time.Now())).Find()
 	if err != nil {
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 

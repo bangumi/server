@@ -112,7 +112,6 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (User, error)
 func (m mysqlRepo) GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]User, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(ids...)).Find()
 	if err != nil {
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
