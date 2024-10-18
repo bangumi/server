@@ -99,13 +99,11 @@ func New() *echo.Echo {
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			reqID := c.Request().Header.Get(cf.HeaderRequestID)
-			reqIP := c.RealIP()
-
 			c.SetRequest(c.Request().
 				WithContext(context.WithValue(c.Request().Context(), logger.RequestKey, &logger.RequestTrace{
-					IP:    reqIP,
-					ReqID: reqID,
+					IP:    c.RealIP(),
+					ReqID: c.Request().Header.Get(cf.HeaderRequestID),
+					Path:  c.Request().RequestURI,
 				})))
 
 			return next(c)
