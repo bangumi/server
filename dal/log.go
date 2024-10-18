@@ -82,7 +82,7 @@ func (l *metricsLog) Trace(_ context.Context, begin time.Time, fc func() (sql st
 	l.h.Observe(elapsed.Seconds())
 
 	switch {
-	case err != nil && !errors.Is(err, gorm.ErrRecordNotFound):
+	case err != nil && !errors.Is(err, gorm.ErrRecordNotFound) && !errors.Is(err, context.Canceled):
 		sql, rows := fc()
 		l.log.Error("gorm error", zap.String("sql", sql), zap.Error(err),
 			zap.Duration("duration", elapsed), zap.Int64("rows", rows))
