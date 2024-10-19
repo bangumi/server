@@ -47,8 +47,6 @@ func (m mysqlRepo) GetFullUser(ctx context.Context, userID model.UserID) (FullUs
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return FullUser{}, gerr.ErrUserNotFound
 		}
-
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return FullUser{}, errgo.Wrap(err, "dal")
 	}
 
@@ -87,8 +85,6 @@ func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (User, erro
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return User{}, gerr.ErrUserNotFound
 		}
-
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return User{}, errgo.Wrap(err, "dal")
 	}
 
@@ -101,8 +97,6 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (User, error)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return User{}, gerr.ErrUserNotFound
 		}
-
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return User{}, errgo.Wrap(err, "dal")
 	}
 
