@@ -43,6 +43,8 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 		WithOptions(zap.AddStacktrace(zapcore.PanicLevel), zap.WithCaller(false))
 
 	return func(err error, c echo.Context) {
+		reqID := c.Request().Header.Get(cf.HeaderRequestID)
+
 		{
 			var e res.HTTPError
 			if errors.As(err, &e) {
@@ -50,7 +52,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 				_ = c.JSON(e.Code, res.Error{
 					Title:       http.StatusText(e.Code),
 					Description: e.Msg,
-					RequestID:   c.Request().Header.Get(cf.HeaderRequestID),
+					RequestID:   reqID,
 					Details:     util.Detail(c),
 				})
 				return
@@ -63,15 +65,16 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 				log.Error("unexpected echo error",
 					zap.Int("code", e.Code),
 					zap.Any("message", e.Message),
-					zap.String("path", c.Request().URL.Path),
-					zap.String("query", c.Request().URL.RawQuery),
-					zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
+					zap.String("request_method", c.Request().Method),
+					zap.String("request_uri", c.Request().URL.Path),
+					zap.String("request_query", c.Request().URL.RawQuery),
+					zap.String("request_id", reqID),
 				)
 
 				_ = c.JSON(http.StatusInternalServerError, res.Error{
 					Title:       http.StatusText(e.Code),
 					Description: e.Error(),
-					RequestID:   c.Request().Header.Get(cf.HeaderRequestID),
+					RequestID:   reqID,
 					Details:     util.DetailWithErr(c, err),
 				})
 				return
@@ -84,7 +87,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 				zap.String("request_method", c.Request().Method),
 				zap.String("request_uri", c.Request().URL.Path),
 				zap.String("request_query", c.Request().URL.RawQuery),
-				zap.String("request_id", c.Request().Header.Get(cf.HeaderRequestID)),
+				zap.String("request_id", reqID),
 			)
 
 			_ = c.JSON(http.StatusInternalServerError, res.Error{
@@ -100,7 +103,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 			zap.String("request_method", c.Request().Method),
 			zap.String("request_uri", c.Request().URL.Path),
 			zap.String("request_query", c.Request().URL.RawQuery),
-			zap.String("request_id", c.Request().Header.Get(cf.HeaderRequestID)),
+			zap.String("request_id", reqID),
 		)
 
 		// unexpected error, return internal server error
