@@ -37,6 +37,7 @@ func globalNotFoundHandler(c echo.Context) error {
 	})
 }
 
+//nolint:funlen
 func getDefaultErrorHandler() echo.HTTPErrorHandler {
 	var log = logger.Named("http.err").
 		WithOptions(zap.AddStacktrace(zapcore.PanicLevel), zap.WithCaller(false))
@@ -49,6 +50,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 				_ = c.JSON(e.Code, res.Error{
 					Title:       http.StatusText(e.Code),
 					Description: e.Msg,
+					RequestID:   c.Request().Header.Get(cf.HeaderRequestID),
 					Details:     util.Detail(c),
 				})
 				return
@@ -69,6 +71,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 				_ = c.JSON(http.StatusInternalServerError, res.Error{
 					Title:       http.StatusText(e.Code),
 					Description: e.Error(),
+					RequestID:   c.Request().Header.Get(cf.HeaderRequestID),
 					Details:     util.DetailWithErr(c, err),
 				})
 				return
@@ -76,6 +79,19 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 		}
 
 		if errors.Is(err, context.Canceled) {
+			log.Error("unexpected echo error",
+				zap.Int("code", http.StatusInternalServerError),
+				zap.Any("message", "request timeout"),
+				zap.String("path", c.Request().URL.Path),
+				zap.String("query", c.Request().URL.RawQuery),
+				zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
+			)
+
+			_ = c.JSON(http.StatusInternalServerError, res.Error{
+				Title:       "request timeout",
+				Description: "request timeout",
+				RequestID:   c.Request().Header.Get(cf.HeaderRequestID),
+			})
 			return
 		}
 

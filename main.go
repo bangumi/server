@@ -17,11 +17,14 @@ package main
 import (
 	"fmt"
 
+	"github.com/google/uuid"
+
 	"github.com/bangumi/server/cmd"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
 
 func main() {
+	uuid.EnableRandPool()
 	if err := cmd.Root.Execute(); err != nil {
 		logger.Fatal("failed to start app:\n" + fmt.Sprintf("\n%+v", err))
 	}

@@ -118,8 +118,6 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission
 			m.log.Error("can't find permission for group", zap.Uint8("user_group_id", groupID))
 			return Permission{}, nil
 		}
-
-		m.log.Error("unexpected error", zap.Error(err))
 		return Permission{}, errgo.Wrap(err, "dal")
 	}
 

@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -99,12 +100,20 @@ func New() *echo.Echo {
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			c.SetRequest(c.Request().
-				WithContext(context.WithValue(c.Request().Context(), logger.RequestKey, &logger.RequestTrace{
-					IP:    c.RealIP(),
-					ReqID: c.Request().Header.Get(cf.HeaderRequestID),
-					Path:  c.Request().RequestURI,
-				})))
+			ctx, cancel := context.WithTimeout(context.WithoutCancel(c.Request().Context()), time.Minute)
+			defer cancel()
+
+			reqID := c.Request().Header.Get(cf.HeaderRequestID)
+
+			if reqID == "" {
+				reqID = uuid.Must(uuid.NewV7()).String()
+			}
+
+			c.SetRequest(c.Request().WithContext(context.WithValue(ctx, logger.RequestKey, &logger.RequestTrace{
+				IP:    c.RealIP(),
+				ReqID: reqID,
+				Path:  c.Request().RequestURI,
+			})))
 
 			return next(c)
 		}
