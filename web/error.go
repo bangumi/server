@@ -97,9 +97,10 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 
 		log.Error("unexpected error",
 			zap.Error(err),
-			zap.String("path", c.Path()),
-			zap.String("query", c.Request().URL.RawQuery),
-			zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
+			zap.String("request_method", c.Request().Method),
+			zap.String("request_uri", c.Request().URL.Path),
+			zap.String("request_query", c.Request().URL.RawQuery),
+			zap.String("request_id", c.Request().Header.Get(cf.HeaderRequestID)),
 		)
 
 		// unexpected error, return internal server error
