@@ -80,8 +80,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 
 		if errors.Is(err, context.Canceled) {
 			log.Error("request timeout",
-				zap.Int("code", http.StatusInternalServerError),
-				zap.Any("message", "request timeout"),
+				zap.String("message", err.Error()),
 				zap.String("path", c.Request().URL.Path),
 				zap.String("query", c.Request().URL.RawQuery),
 				zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
