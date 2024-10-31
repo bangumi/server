@@ -40,7 +40,7 @@ require (
 	golang.org/x/text v0.19.0
 	google.golang.org/grpc v1.67.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/protobuf v1.35.1
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gen v0.3.26
