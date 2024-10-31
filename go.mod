@@ -23,7 +23,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13
 	github.com/meilisearch/meilisearch-go v0.29.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/prometheus/client_golang v1.20.4
+	github.com/prometheus/client_golang v1.20.5
 	github.com/redis/rueidis v1.0.48
 	github.com/samber/lo v1.47.0
 	github.com/segmentio/kafka-go v0.4.47
