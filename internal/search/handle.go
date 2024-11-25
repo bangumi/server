@@ -103,7 +103,7 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 
 	if !auth.AllowNSFW() {
-		r.Filter.NSFW.Set = false
+		r.Filter.NSFW = null.Bool{Set: true, Value: false}
 	}
 
 	result, err := c.doSearch(r.Keyword, filterToMeiliFilter(r.Filter), r.Sort, q.Limit, q.Offset)
@@ -119,7 +119,7 @@ func (c *client) Handle(ctx echo.Context) error {
 
 	var sf = subject.Filter{}
 
-	if !r.Filter.NSFW.Set || !r.Filter.NSFW.Value {
+	if r.Filter.NSFW.Set && !r.Filter.NSFW.Value {
 		sf.NSFW = null.Bool{Set: true, Value: false}
 	}
 
@@ -223,8 +223,8 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 		}))
 	}
 
-	if !req.NSFW.Set || !req.NSFW.Value {
-		filter = append(filter, []string{"nsfw = false"})
+	if req.NSFW.Set {
+		filter = append(filter, []string{fmt.Sprintf("nsfw = %t", req.NSFW.Value)})
 	}
 
 	for _, tag := range req.MetaTags {
