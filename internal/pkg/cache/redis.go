@@ -108,6 +108,11 @@ func (c redisCache) MGet(ctx context.Context, keys []string, result any) error {
 	for _, message := range results {
 		var v = reflect.New(elementType)
 
+		//nolint:errorlint
+		if message.Error() == rueidis.Nil {
+			continue
+		}
+
 		e := message.DecodeJSON(v.Interface())
 		if e != nil {
 			logger.Warn("unexpected failure when decoding json", zap.Error(e))
