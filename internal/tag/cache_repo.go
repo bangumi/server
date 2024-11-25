@@ -100,13 +100,14 @@ func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 }
 
 func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID][]Tag, error) {
-	TotalCount.Add(float64(len(ids)))
-
-	var tags []cachedTags
 	result := make(map[model.SubjectID][]Tag, len(ids))
 	if len(ids) == 0 {
 		return result, nil
 	}
+
+	TotalCount.Add(float64(len(ids)))
+
+	var tags []cachedTags
 
 	err := r.cache.MGet(ctx, lo.Map(ids, func(item model.SubjectID, index int) string {
 		return cachekey.SubjectMetaTag(item)
@@ -127,20 +128,22 @@ func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[mod
 		}
 	}
 
-	if len(missing) != 0 {
-		missingFromCache, err := r.repo.GetByIDs(ctx, missing)
+	if len(missing) == 0 {
+		return result, nil
+	}
+
+	missingFromCache, err := r.repo.GetByIDs(ctx, missing)
+	if err != nil {
+		return nil, err
+	}
+	for id, tag := range missingFromCache {
+		result[id] = tag
+		err = r.cache.Set(ctx, cachekey.SubjectMetaTag(id), cachedTags{
+			ID:   id,
+			Tags: tag,
+		}, time.Hour)
 		if err != nil {
-			return nil, err
-		}
-		for id, tag := range missingFromCache {
-			result[id] = tag
-			err = r.cache.Set(ctx, cachekey.SubjectMetaTag(id), cachedTags{
-				ID:   id,
-				Tags: tag,
-			}, time.Hour)
-			if err != nil {
-				return nil, errgo.Wrap(err, "cache.Set")
-			}
+			return nil, errgo.Wrap(err, "cache.Set")
 		}
 	}
 
