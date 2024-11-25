@@ -28,6 +28,8 @@ import (
 	"github.com/bangumi/server/internal/pkg/cache"
 )
 
+const cacheTTL = time.Hour * 4
+
 func NewCachedRepo(c cache.RedisCache, r Repo, log *zap.Logger) CachedRepo {
 	return cacheRepo{cache: c, repo: r, log: log.Named("subject.CachedRepo")}
 }
@@ -89,10 +91,7 @@ func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 		return tags, err
 	}
 
-	if e := r.cache.Set(ctx, key, cachedTags{
-		ID:   id,
-		Tags: tags,
-	}, time.Hour); e != nil {
+	if e := r.cache.Set(ctx, key, cachedTags{ID: id, Tags: tags}, cacheTTL); e != nil {
 		r.log.Error("can't set response to cache", zap.Error(e))
 	}
 
@@ -141,7 +140,7 @@ func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[mod
 		err = r.cache.Set(ctx, cachekey.SubjectMetaTag(id), cachedTags{
 			ID:   id,
 			Tags: tag,
-		}, time.Hour)
+		}, cacheTTL)
 		if err != nil {
 			return nil, errgo.Wrap(err, "cache.Set")
 		}

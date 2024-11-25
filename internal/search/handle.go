@@ -130,13 +130,7 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 	ids := slice.Map(hits, func(h hit) model.SubjectID { return h.ID })
 
-	var sf = subject.Filter{}
-
-	if r.Filter.NSFW.Set && !r.Filter.NSFW.Value {
-		sf.NSFW = null.Bool{Set: true, Value: false}
-	}
-
-	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, sf)
+	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, subject.Filter{})
 	if err != nil {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
