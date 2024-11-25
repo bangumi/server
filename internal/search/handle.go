@@ -141,10 +141,10 @@ func (c *client) Handle(ctx echo.Context) error {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
 
-	tags, err := c.tagRepo.GetByIDs(ctx.Request().Context(), ids)
-	if err != nil {
-		return errgo.Wrap(err, "tagRepo.GetByIDs")
-	}
+	// tags, err := c.tagRepo.GetByIDs(ctx.Request().Context(), ids)
+	// if err != nil {
+	// 	return errgo.Wrap(err, "tagRepo.GetByIDs")
+	// }
 
 	var data = make([]ReponseSubject, 0, len(subjects))
 	for _, id := range ids {
@@ -152,7 +152,13 @@ func (c *client) Handle(ctx echo.Context) error {
 		if !ok {
 			continue
 		}
-		metaTags := tags[id]
+		// metaTags := tags[id]
+		var metaTags []tag.Tag
+
+		for _, t := range strings.Split(s.MetaTags, " ") {
+			metaTags = append(metaTags, tag.Tag{Name: t, Count: 1})
+		}
+
 		subject := toResponseSubject(s, metaTags)
 		data = append(data, subject)
 	}
