@@ -54,8 +54,8 @@ type Handler interface {
 	Handle(c echo.Context) error
 }
 
-const defaultLimit = 50
-const maxLimit = 200
+const defaultLimit = 10
+const maxLimit = 20
 
 type Req struct {
 	Keyword string    `json:"keyword"`
