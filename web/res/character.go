@@ -25,7 +25,7 @@ type CharacterV0 struct {
 	Images    PersonImages      `json:"images"`
 	Summary   string            `json:"summary"`
 	Name      string            `json:"name"`
-	Infobox   v0wiki            `json:"infobox"`
+	Infobox   V0wiki            `json:"infobox"`
 	Stat      Stat              `json:"stat"`
 	ID        model.CharacterID `json:"id"`
 	Redirect  model.CharacterID `json:"-"`

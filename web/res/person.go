@@ -34,7 +34,7 @@ type PersonV0 struct {
 	Summary      string         `json:"summary"`
 	Name         string         `json:"name"`
 	Img          string         `json:"img"`
-	Infobox      v0wiki         `json:"infobox"`
+	Infobox      V0wiki         `json:"infobox"`
 	Career       []string       `json:"career"`
 	Stat         Stat           `json:"stat"`
 	Redirect     model.PersonID `json:"-"`

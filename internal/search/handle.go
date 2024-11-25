@@ -25,12 +25,16 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
+	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
+	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
@@ -76,17 +80,26 @@ type hit struct {
 }
 
 type ReponseSubject struct {
-	Date    string           `json:"date"`
-	Image   string           `json:"image"`
-	Type    uint8            `json:"type"`
-	Summary string           `json:"summary"`
-	Name    string           `json:"name"`
-	NameCN  string           `json:"name_cn"`
-	Tags    []res.SubjectTag `json:"tags"`
-	Score   float64          `json:"score"`
-	ID      model.SubjectID  `json:"id"`
-	Rank    uint32           `json:"rank"`
-	NSFW    bool             `json:"nsfw"`
+	Date       *string                   `json:"date"`
+	Platform   *string                   `json:"platform"`
+	Images     res.SubjectImages         `json:"images"`
+	Image      string                    `json:"image"`
+	Summary    string                    `json:"summary"`
+	Name       string                    `json:"name"`
+	NameCN     string                    `json:"name_cn"`
+	Tags       []res.SubjectTag          `json:"tags"`
+	Infobox    res.V0wiki                `json:"infobox"`
+	Rating     res.Rating                `json:"rating"`
+	Collection res.SubjectCollectionStat `json:"collection"`
+	ID         model.SubjectID           `json:"id"`
+	Eps        uint32                    `json:"eps"`
+	MetaTags   []string                  `json:"meta_tags"`
+	Volumes    uint32                    `json:"volumes"`
+	Series     bool                      `json:"series"`
+	Locked     bool                      `json:"locked"`
+	NSFW       bool                      `json:"nsfw"`
+	TypeID     model.SubjectType         `json:"type"`
+	Redirect   model.SubjectID           `json:"-"`
 }
 
 //nolint:funlen
@@ -128,28 +141,20 @@ func (c *client) Handle(ctx echo.Context) error {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
 
+	tags, err := c.tagRepo.GetByIDs(ctx.Request().Context(), ids)
+	if err != nil {
+		return errgo.Wrap(err, "tagRepo.GetByIDs")
+	}
+
 	var data = make([]ReponseSubject, 0, len(subjects))
 	for _, id := range ids {
 		s, ok := subjects[id]
 		if !ok {
 			continue
 		}
-
-		data = append(data, ReponseSubject{
-			Date:    s.Date,
-			Image:   res.SubjectImage(s.Image).Large,
-			Type:    s.TypeID,
-			Summary: s.Summary,
-			Name:    s.Name,
-			NameCN:  s.NameCN,
-			Tags: slice.Map(s.Tags, func(item model.Tag) res.SubjectTag {
-				return res.SubjectTag{Name: item.Name, Count: item.Count}
-			}),
-			Score: s.Rating.Score,
-			ID:    s.ID,
-			Rank:  s.Rating.Rank,
-			NSFW:  s.NSFW,
-		})
+		metaTags := tags[id]
+		subject := toResponseSubject(s, metaTags)
+		data = append(data, subject)
 	}
 
 	return ctx.JSON(http.StatusOK, res.Paged{
@@ -322,4 +327,59 @@ func isDigitsOnly(s string) bool {
 		}
 	}
 	return true
+}
+
+func toResponseSubject(s model.Subject, metaTags []tag.Tag) ReponseSubject {
+	images := res.SubjectImage(s.Image)
+	return ReponseSubject{
+		ID:       s.ID,
+		Image:    images.Large,
+		Images:   images,
+		Summary:  s.Summary,
+		Name:     s.Name,
+		Platform: res.PlatformString(s),
+		NameCN:   s.NameCN,
+		Date:     null.NilString(s.Date),
+		Infobox:  compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
+		Volumes:  s.Volumes,
+		Redirect: s.Redirect,
+		Eps:      s.Eps,
+		MetaTags: lo.Map(metaTags, func(item tag.Tag, index int) string {
+			return item.Name
+		}),
+		Tags: slice.Map(s.Tags, func(tag model.Tag) res.SubjectTag {
+			return res.SubjectTag{
+				Name:  tag.Name,
+				Count: tag.Count,
+			}
+		}),
+		Collection: res.SubjectCollectionStat{
+			OnHold:  s.OnHold,
+			Wish:    s.Wish,
+			Dropped: s.Dropped,
+			Collect: s.Collect,
+			Doing:   s.Doing,
+		},
+		TypeID: s.TypeID,
+		Series: s.Series,
+		Locked: s.Locked(),
+		NSFW:   s.NSFW,
+		Rating: res.Rating{
+			Rank:  s.Rating.Rank,
+			Total: s.Rating.Total,
+			Count: res.Count{
+				Field1:  s.Rating.Count.Field1,
+				Field2:  s.Rating.Count.Field2,
+				Field3:  s.Rating.Count.Field3,
+				Field4:  s.Rating.Count.Field4,
+				Field5:  s.Rating.Count.Field5,
+				Field6:  s.Rating.Count.Field6,
+				Field7:  s.Rating.Count.Field7,
+				Field8:  s.Rating.Count.Field8,
+				Field9:  s.Rating.Count.Field9,
+				Field10: s.Rating.Count.Field10,
+			},
+			Score: s.Rating.Score,
+		},
+	}
 }
