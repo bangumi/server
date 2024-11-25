@@ -46,28 +46,27 @@ type cachedTags struct {
 }
 
 //nolint:gochecknoglobals
-var CacheCount = prometheus.NewCounter(prometheus.CounterOpts{
+var CachedCount = prometheus.NewCounter(prometheus.CounterOpts{
 	Subsystem:   "chii",
-	Name:        "cached_count_total",
-	Help:        "",
+	Name:        "query_cached_count_total",
 	ConstLabels: map[string]string{"repo": "meta_tags"},
 })
 
 //nolint:gochecknoglobals
-var NotCacheCount = prometheus.NewCounter(prometheus.CounterOpts{
+var TotalCount = prometheus.NewCounter(prometheus.CounterOpts{
 	Subsystem:   "chii",
-	Name:        "not_cached_count_total",
-	Help:        "",
+	Name:        "query_count_total",
 	ConstLabels: map[string]string{"repo": "meta_tags"},
 })
 
 //nolint:gochecknoinits
 func init() {
-	prometheus.MustRegister(CacheCount)
-	prometheus.MustRegister(NotCacheCount)
+	prometheus.MustRegister(CachedCount)
+	prometheus.MustRegister(TotalCount)
 }
 
 func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
+	TotalCount.Add(1)
 	var key = cachekey.SubjectMetaTag(id)
 
 	var s cachedTags
@@ -77,10 +76,9 @@ func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 	}
 
 	if ok {
-		CacheCount.Add(1)
+		CachedCount.Add(1)
 		return s.Tags, nil
 	}
-	NotCacheCount.Add(1)
 
 	tags, err := r.repo.Get(ctx, id)
 	if err != nil {
@@ -99,6 +97,8 @@ func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 
 // GetByIDs also need to change version in [cachekey.SubjectMetaTag] if schema is changed.
 func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID][]Tag, error) {
+	TotalCount.Add(float64(len(ids)))
+
 	var tags []cachedTags
 	result := make(map[model.SubjectID][]Tag, len(ids))
 	if len(ids) == 0 {
@@ -112,7 +112,7 @@ func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[mod
 		return nil, errgo.Wrap(err, "cache.MGet")
 	}
 
-	CacheCount.Add(float64(len(tags)))
+	CachedCount.Add(float64(len(tags)))
 	for _, tag := range tags {
 		result[tag.ID] = tag.Tags
 	}
@@ -124,19 +124,20 @@ func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[mod
 		}
 	}
 
-	NotCacheCount.Add(float64(len(missing)))
-	missingFromCache, err := r.repo.GetByIDs(ctx, missing)
-	if err != nil {
-		return nil, err
-	}
-	for id, tag := range missingFromCache {
-		result[id] = tag
-		err = r.cache.Set(ctx, cachekey.SubjectMetaTag(id), cachedTags{
-			ID:   id,
-			Tags: tag,
-		}, time.Hour)
+	if len(missing) != 0 {
+		missingFromCache, err := r.repo.GetByIDs(ctx, missing)
 		if err != nil {
-			return nil, errgo.Wrap(err, "cache.Set")
+			return nil, err
+		}
+		for id, tag := range missingFromCache {
+			result[id] = tag
+			err = r.cache.Set(ctx, cachekey.SubjectMetaTag(id), cachedTags{
+				ID:   id,
+				Tags: tag,
+			}, time.Hour)
+			if err != nil {
+				return nil, errgo.Wrap(err, "cache.Set")
+			}
 		}
 	}
 
