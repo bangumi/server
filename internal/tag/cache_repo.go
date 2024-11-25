@@ -67,6 +67,8 @@ func init() {
 	prometheus.MustRegister(TotalCount)
 }
 
+// also need to change version in [cachekey.SubjectMetaTag] if schema is changed.
+
 func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 	TotalCount.Add(1)
 	var key = cachekey.SubjectMetaTag(id)
@@ -90,14 +92,13 @@ func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 	if e := r.cache.Set(ctx, key, cachedTags{
 		ID:   id,
 		Tags: tags,
-	}, time.Minute); e != nil {
+	}, time.Hour); e != nil {
 		r.log.Error("can't set response to cache", zap.Error(e))
 	}
 
 	return tags, nil
 }
 
-// GetByIDs also need to change version in [cachekey.SubjectMetaTag] if schema is changed.
 func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID][]Tag, error) {
 	TotalCount.Add(float64(len(ids)))
 
