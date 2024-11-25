@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/cache"
 )
 
-const cacheTTL = time.Hour * 4
+const cacheTTL = time.Hour * 24
 
 func NewCachedRepo(c cache.RedisCache, r Repo, log *zap.Logger) CachedRepo {
 	return cacheRepo{cache: c, repo: r, log: log.Named("subject.CachedRepo")}
