@@ -65,6 +65,7 @@ jobs:
           images: ${{ env.IMAGE }}
           tags: |
             type=semver,event=tag,pattern=v{{version}}
+            type=raw,value={{commit_date 'YYYY-MM-DD'}}-{{sha}}
 
             type=ref,event=branch
             type=ref,event=branch,suffix=-${{ env.SHA }}
