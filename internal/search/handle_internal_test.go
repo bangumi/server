@@ -27,7 +27,7 @@ func Test_ReqFilterToMeiliFilter(t *testing.T) {
 
 	actual := filterToMeiliFilter(ReqFilter{
 		Tag:  []string{"a", "b"},
-		NSFW: null.Bool{Set: false},
+		NSFW: null.Bool{Set: true, Value: false},
 	})
 
 	require.Equal(t, [][]string{
