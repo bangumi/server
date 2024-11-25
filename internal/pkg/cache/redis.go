@@ -110,6 +110,7 @@ func (c redisCache) MGet(ctx context.Context, keys []string, result any) error {
 
 		e := message.DecodeJSON(v.Interface())
 		if e != nil {
+			logger.Warn("unexpected failure when decoding json", zap.Error(e))
 			continue
 		}
 
