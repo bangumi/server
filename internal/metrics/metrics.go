@@ -23,7 +23,6 @@ func init() {
 	prometheus.MustRegister(RequestCount)
 	prometheus.MustRegister(RequestHistogram)
 	prometheus.MustRegister(SQLHistogram)
-
 }
 
 var RequestCount = prometheus.NewCounter(prometheus.CounterOpts{
