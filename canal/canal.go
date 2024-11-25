@@ -64,7 +64,7 @@ func Main() error {
 			driver.NewRueidisClient, logger.Copy, cache.NewRedisCache,
 			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
 			driver.NewS3,
-
+			tag.NewCachedRepo,
 			tag.NewMysqlRepo,
 
 			newEventHandler,
