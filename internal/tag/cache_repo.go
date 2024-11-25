@@ -97,6 +97,7 @@ func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 	return tags, nil
 }
 
+// GetByIDs also need to change version in [cachekey.SubjectMetaTag] if schema is changed.
 func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID][]Tag, error) {
 	var tags []cachedTags
 	result := make(map[model.SubjectID][]Tag, len(ids))

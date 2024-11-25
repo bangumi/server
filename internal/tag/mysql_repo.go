@@ -93,5 +93,13 @@ func (r mysqlRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[mod
 		})
 	}
 
+	// set empty slice for subjects without tags
+	// this help we cache them.
+	for _, id := range ids {
+		if _, ok := tags[id]; !ok {
+			tags[id] = []Tag{}
+		}
+	}
+
 	return tags, nil
 }

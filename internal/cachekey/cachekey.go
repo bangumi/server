@@ -56,5 +56,5 @@ func User(id model.UserID) string {
 }
 
 func SubjectMetaTag(id model.SubjectID) string {
-	return resPrefix + "subject:meta-tags:" + strconv.FormatUint(uint64(id), 10)
+	return "chii:v0:subject:meta-tags:" + strconv.FormatUint(uint64(id), 10)
 }
