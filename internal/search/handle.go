@@ -75,20 +75,6 @@ type hit struct {
 	ID model.SubjectID `json:"id"`
 }
 
-type ReponseSubject struct {
-	Date    string           `json:"date"`
-	Image   string           `json:"image"`
-	Type    uint8            `json:"type"`
-	Summary string           `json:"summary"`
-	Name    string           `json:"name"`
-	NameCN  string           `json:"name_cn"`
-	Tags    []res.SubjectTag `json:"tags"`
-	Score   float64          `json:"score"`
-	ID      model.SubjectID  `json:"id"`
-	Rank    uint32           `json:"rank"`
-	NSFW    bool             `json:"nsfw"`
-}
-
 //nolint:funlen
 func (c *client) Handle(ctx echo.Context) error {
 	auth := accessor.GetFromCtx(ctx)
