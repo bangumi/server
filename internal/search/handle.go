@@ -105,7 +105,7 @@ type ReponseSubject struct {
 //nolint:funlen
 func (c *client) Handle(ctx echo.Context) error {
 	auth := accessor.GetFromCtx(ctx)
-	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
+	q, err := req.GetPageQuerySoftLimit(ctx, defaultLimit, maxLimit)
 	if err != nil {
 		return err
 	}
