@@ -45,20 +45,23 @@ type cachedTags struct {
 	Tags []Tag
 }
 
+//nolint:gochecknoglobals
 var CacheCount = prometheus.NewCounter(prometheus.CounterOpts{
 	Subsystem:   "chii",
-	Name:        "request_cached_count",
+	Name:        "cached_count_total",
 	Help:        "",
 	ConstLabels: map[string]string{"repo": "meta_tags"},
 })
 
+//nolint:gochecknoglobals
 var NotCacheCount = prometheus.NewCounter(prometheus.CounterOpts{
 	Subsystem:   "chii",
-	Name:        "request_not_cached_count",
+	Name:        "not_cached_count_total",
 	Help:        "",
 	ConstLabels: map[string]string{"repo": "meta_tags"},
 })
 
+//nolint:gochecknoinits
 func init() {
 	prometheus.MustRegister(CacheCount)
 	prometheus.MustRegister(NotCacheCount)
