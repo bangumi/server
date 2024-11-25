@@ -49,6 +49,7 @@ type cachedTags struct {
 var CachedCount = prometheus.NewCounter(prometheus.CounterOpts{
 	Subsystem:   "chii",
 	Name:        "query_cached_count_total",
+	Help:        "cached sql query count total",
 	ConstLabels: map[string]string{"repo": "meta_tags"},
 })
 
@@ -56,6 +57,7 @@ var CachedCount = prometheus.NewCounter(prometheus.CounterOpts{
 var TotalCount = prometheus.NewCounter(prometheus.CounterOpts{
 	Subsystem:   "chii",
 	Name:        "query_count_total",
+	Help:        "sql query count total",
 	ConstLabels: map[string]string{"repo": "meta_tags"},
 })
 
