@@ -33,7 +33,7 @@ import (
 
 const defaultShortSummaryLength = 120
 
-type v0wiki = []any
+type V0wiki = []any
 
 type SubjectTag struct {
 	Name      string `json:"name"`
@@ -50,7 +50,7 @@ type SubjectV0 struct {
 	Name          string                `json:"name"`
 	NameCN        string                `json:"name_cn"`
 	Tags          []SubjectTag          `json:"tags"`
-	Infobox       v0wiki                `json:"infobox"`
+	Infobox       V0wiki                `json:"infobox"`
 	Rating        Rating                `json:"rating"`
 	TotalEpisodes int64                 `json:"total_episodes" doc:"episodes count in database"`
 	Collection    SubjectCollectionStat `json:"collection"`
@@ -109,7 +109,7 @@ func ToSlimSubjectV0(s model.Subject) SlimSubjectV0 {
 	}
 }
 
-func platformString(s model.Subject) *string {
+func PlatformString(s model.Subject) *string {
 	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
 	if !ok && s.TypeID != 0 {
 		logger.Warn("unknown platform",
@@ -133,7 +133,7 @@ func ToSubjectV0(s model.Subject, totalEpisode int64, metaTags []tag.Tag) Subjec
 		Images:        images,
 		Summary:       s.Summary,
 		Name:          s.Name,
-		Platform:      platformString(s),
+		Platform:      PlatformString(s),
 		NameCN:        s.NameCN,
 		Date:          null.NilString(s.Date),
 		Infobox:       compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
@@ -299,7 +299,7 @@ type IndexSubjectV0 struct {
 	Name    string            `json:"name"`
 	NameCN  string            `json:"name_cn"`
 	Comment string            `json:"comment"`
-	Infobox v0wiki            `json:"infobox"`
+	Infobox V0wiki            `json:"infobox"`
 	ID      model.SubjectID   `json:"id"`
 	TypeID  model.SubjectType `json:"type"`
 }
