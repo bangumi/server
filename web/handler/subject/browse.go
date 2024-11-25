@@ -58,9 +58,19 @@ func (h Subject) Browse(c echo.Context) error {
 	if err != nil {
 		return errgo.Wrap(err, "failed to browse subjects")
 	}
+	ids := make([]model.SubjectID, 0, len(subjects))
+	for _, s := range subjects {
+		ids = append(ids, s.ID)
+	}
+	tags, err := h.tag.GetByIDs(c.Request().Context(), ids)
+	if err != nil {
+		return errgo.Wrap(err, "failed to get tags")
+	}
+
 	data := make([]res.SubjectV0, 0, len(subjects))
 	for _, s := range subjects {
-		data = append(data, convertModelSubject(s, 0, nil))
+		metaTags := tags[s.ID]
+		data = append(data, res.ToSubjectV0(s, 0, metaTags))
 	}
 
 	return c.JSON(http.StatusOK, res.Paged{Data: data, Total: count, Limit: page.Limit, Offset: page.Offset})

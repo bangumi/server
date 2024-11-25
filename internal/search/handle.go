@@ -128,28 +128,20 @@ func (c *client) Handle(ctx echo.Context) error {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
 
-	var data = make([]ReponseSubject, 0, len(subjects))
+	tags, err := c.tagRepo.GetByIDs(ctx.Request().Context(), ids)
+	if err != nil {
+		return errgo.Wrap(err, "tagRepo.GetByIDs")
+	}
+
+	var data = make([]res.SubjectV0, 0, len(subjects))
 	for _, id := range ids {
 		s, ok := subjects[id]
 		if !ok {
 			continue
 		}
-
-		data = append(data, ReponseSubject{
-			Date:    s.Date,
-			Image:   res.SubjectImage(s.Image).Large,
-			Type:    s.TypeID,
-			Summary: s.Summary,
-			Name:    s.Name,
-			NameCN:  s.NameCN,
-			Tags: slice.Map(s.Tags, func(item model.Tag) res.SubjectTag {
-				return res.SubjectTag{Name: item.Name, Count: item.Count}
-			}),
-			Score: s.Rating.Score,
-			ID:    s.ID,
-			Rank:  s.Rating.Rank,
-			NSFW:  s.NSFW,
-		})
+		metaTags := tags[id]
+		subject := res.ToSubjectV0(s, 0, metaTags)
+		data = append(data, subject)
 	}
 
 	return ctx.JSON(http.StatusOK, res.Paged{
