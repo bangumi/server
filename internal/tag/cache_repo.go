@@ -74,6 +74,11 @@ func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 
 func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID][]Tag, error) {
 	var tags []cachedTags
+	result := make(map[model.SubjectID][]Tag, len(ids))
+	if len(ids) == 0 {
+		return result, nil
+	}
+
 	err := r.cache.MGet(ctx, lo.Map(ids, func(item model.SubjectID, index int) string {
 		return cachekey.SubjectMetaTag(item)
 	}), &tags)
@@ -81,7 +86,6 @@ func (r cacheRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[mod
 		return nil, errgo.Wrap(err, "cache.MGet")
 	}
 
-	result := make(map[model.SubjectID][]Tag, len(ids))
 	for _, tag := range tags {
 		result[tag.ID] = tag.Tags
 	}
