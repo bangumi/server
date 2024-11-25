@@ -44,7 +44,8 @@ type SubjectTag struct {
 type SubjectV0 struct {
 	Date          *string               `json:"date"`
 	Platform      *string               `json:"platform"`
-	Image         SubjectImages         `json:"images"`
+	Images        SubjectImages         `json:"images"`
+	Image         *string               `json:"image"`
 	Summary       string                `json:"summary"`
 	Name          string                `json:"name"`
 	NameCN        string                `json:"name_cn"`
@@ -124,10 +125,12 @@ func platformString(s model.Subject) *string {
 }
 
 func ToSubjectV0(s model.Subject, totalEpisode int64, metaTags []tag.Tag) SubjectV0 {
+	images := SubjectImage(s.Image)
 	return SubjectV0{
 		TotalEpisodes: totalEpisode,
 		ID:            s.ID,
-		Image:         SubjectImage(s.Image),
+		Image:         &images.Large,
+		Images:        images,
 		Summary:       s.Summary,
 		Name:          s.Name,
 		Platform:      platformString(s),

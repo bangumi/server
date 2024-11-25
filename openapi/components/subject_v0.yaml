@@ -54,6 +54,10 @@ properties:
     title: Platform
     type: string
     description: TV, Web, 欧美剧, DLC...
+  image:
+    title: Image
+    type: string
+    description: large image url
   images:
     $ref: "./subject_image.yaml"
   infobox:
