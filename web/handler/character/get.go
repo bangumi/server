@@ -53,7 +53,7 @@ func (h Character) Get(c echo.Context) error {
 		return res.ErrNotFound
 	}
 
-	return c.JSON(http.StatusOK, convertModelCharacter(r))
+	return c.JSON(http.StatusOK, res.ConvertModelCharacter(r))
 }
 
 func (h Character) GetImage(c echo.Context) error {

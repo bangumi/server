@@ -88,7 +88,8 @@ func start() error {
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, infra.NewMysqlRepo,
 			timeline.NewMysqlRepo, pm.NewMysqlRepo, notification.NewMysqlRepo,
 
-			dam.New, subject.NewMysqlRepo, subject.NewCachedRepo, person.NewMysqlRepo,
+			dam.New, subject.NewMysqlRepo, subject.NewCachedRepo,
+			character.NewMysqlRepo, person.NewMysqlRepo,
 
 			tag.NewCachedRepo, tag.NewMysqlRepo,
 

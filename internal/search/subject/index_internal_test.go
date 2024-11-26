@@ -12,19 +12,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package search
+package subject
 
 import (
+	"reflect"
 	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/search/searcher"
 )
 
 func TestIndexFilter(t *testing.T) {
 	t.Parallel()
 
-	actual := *(getAttributes("filterable"))
+	rt := reflect.TypeOf(document{})
+	actual := *(searcher.GetAttributes(rt, "filterable"))
 	expected := []string{"date", "meta_tag", "score", "rank", "type", "nsfw", "tag"}
 
 	sort.Strings(expected)

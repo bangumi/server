@@ -26,6 +26,8 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal"
+	"github.com/bangumi/server/internal/character"
+	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/driver"
 	"github.com/bangumi/server/internal/pkg/logger"
@@ -62,7 +64,8 @@ func Main() error {
 		fx.Provide(
 			driver.NewMysqlSqlDB,
 			driver.NewRueidisClient, logger.Copy, cache.NewRedisCache,
-			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
+			subject.NewMysqlRepo, character.NewMysqlRepo, person.NewMysqlRepo,
+			search.New, session.NewMysqlRepo, session.New,
 			driver.NewS3,
 			tag.NewCachedRepo,
 			tag.NewMysqlRepo,

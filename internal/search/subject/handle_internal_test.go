@@ -12,19 +12,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package search
+package subject
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/pkg/null"
 )
 
-func Test_parseDateVal(t *testing.T) {
+func Test_ReqFilterToMeiliFilter(t *testing.T) {
 	t.Parallel()
 
-	require.Equal(t, 0, parseDateVal(""))
-	require.Equal(t, 20080120, parseDateVal("2008-01-20"))
-	require.Equal(t, 21080620, parseDateVal("2108-06-20"))
-	require.Equal(t, 0, parseDateVal("2108-06-0"))
+	actual := filterToMeiliFilter(ReqFilter{
+		Tag:  []string{"a", "b"},
+		NSFW: null.Bool{Set: true, Value: false},
+	})
+
+	require.Equal(t, [][]string{
+		{`nsfw = false`},
+		{`tag = "a"`},
+		{`tag = "b"`},
+	}, actual)
 }

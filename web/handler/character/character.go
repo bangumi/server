@@ -21,13 +21,8 @@ import (
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/collections"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/person"
-	"github.com/bangumi/server/internal/pkg/compat"
-	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
-	"github.com/bangumi/server/pkg/wiki"
-	"github.com/bangumi/server/web/res"
 )
 
 type Character struct {
@@ -57,29 +52,4 @@ func New(
 		log:       log.Named("handler.Character"),
 		cfg:       config.AppConfig{},
 	}, nil
-}
-
-func convertModelCharacter(s model.Character) res.CharacterV0 {
-	img := res.PersonImage(s.Image)
-
-	return res.CharacterV0{
-		ID:        s.ID,
-		Type:      s.Type,
-		Name:      s.Name,
-		NSFW:      s.NSFW,
-		Images:    img,
-		Summary:   s.Summary,
-		Infobox:   compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
-		Gender:    null.NilString(res.GenderMap[s.FieldGender]),
-		BloodType: null.NilUint8(s.FieldBloodType),
-		BirthYear: null.NilUint16(s.FieldBirthYear),
-		BirthMon:  null.NilUint8(s.FieldBirthMon),
-		BirthDay:  null.NilUint8(s.FieldBirthDay),
-		Stat: res.Stat{
-			Comments: s.CommentCount,
-			Collects: s.CollectCount,
-		},
-		Redirect: s.Redirect,
-		Locked:   s.Locked,
-	}
 }
