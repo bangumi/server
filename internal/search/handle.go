@@ -135,21 +135,18 @@ func (c *client) Handle(ctx echo.Context) error {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
 
-	// tags, err := c.tagRepo.GetByIDs(ctx.Request().Context(), ids)
-	// if err != nil {
-	// 	return errgo.Wrap(err, "tagRepo.GetByIDs")
-	// }
-
 	var data = make([]ReponseSubject, 0, len(subjects))
 	for _, id := range ids {
 		s, ok := subjects[id]
 		if !ok {
 			continue
 		}
-		// metaTags := tags[id]
 		var metaTags []tag.Tag
 
 		for _, t := range strings.Split(s.MetaTags, " ") {
+			if t == "" {
+				continue
+			}
 			metaTags = append(metaTags, tag.Tag{Name: t, Count: 1})
 		}
 
