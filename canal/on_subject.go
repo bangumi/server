@@ -22,7 +22,16 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/search"
 )
+
+type SubjectKey struct {
+	ID model.SubjectID `json:"subject_id"`
+}
+
+type SubjectFieldKey struct {
+	ID model.SubjectID `json:"field_sid"`
+}
 
 func (e *eventHandler) OnSubject(ctx context.Context, key json.RawMessage, payload Payload) error {
 	var k SubjectKey
@@ -45,15 +54,15 @@ func (e *eventHandler) OnSubjectField(ctx context.Context, key json.RawMessage, 
 func (e *eventHandler) onSubjectChange(ctx context.Context, subjectID model.SubjectID, op string) error {
 	switch op {
 	case opCreate:
-		if err := e.search.OnSubjectAdded(ctx, subjectID); err != nil {
+		if err := e.search.EventAdded(ctx, subjectID, search.SearchTargetSubject); err != nil {
 			return errgo.Wrap(err, "search.OnSubjectAdded")
 		}
 	case opUpdate, opSnapshot:
-		if err := e.search.OnSubjectUpdate(ctx, subjectID); err != nil {
+		if err := e.search.EventUpdate(ctx, subjectID, search.SearchTargetSubject); err != nil {
 			return errgo.Wrap(err, "search.OnSubjectUpdate")
 		}
 	case opDelete:
-		if err := e.search.OnSubjectDelete(ctx, subjectID); err != nil {
+		if err := e.search.EventDelete(ctx, subjectID, search.SearchTargetSubject); err != nil {
 			return errgo.Wrap(err, "search.OnSubjectDelete")
 		}
 	default:
@@ -61,12 +70,4 @@ func (e *eventHandler) onSubjectChange(ctx context.Context, subjectID model.Subj
 	}
 
 	return nil
-}
-
-type SubjectKey struct {
-	ID model.SubjectID `json:"subject_id"`
-}
-
-type SubjectFieldKey struct {
-	ID model.SubjectID `json:"field_sid"`
 }

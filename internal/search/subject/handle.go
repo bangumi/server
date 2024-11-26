@@ -13,10 +13,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
 // Package search 基于 meilisearch 提供搜索功能
-package search
+package subject
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -39,20 +38,6 @@ import (
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
-
-type Client interface {
-	Handler
-	Close()
-
-	OnSubjectAdded(ctx context.Context, id model.SubjectID) error
-	OnSubjectUpdate(ctx context.Context, id model.SubjectID) error
-	OnSubjectDelete(ctx context.Context, id model.SubjectID) error
-}
-
-// Handler TODO: 想个办法挪到 web 里面去.
-type Handler interface {
-	Handle(c echo.Context) error
-}
 
 const defaultLimit = 10
 const maxLimit = 20
@@ -130,7 +115,7 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 	ids := slice.Map(hits, func(h hit) model.SubjectID { return h.ID })
 
-	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, subject.Filter{})
+	subjects, err := c.repo.GetByIDs(ctx.Request().Context(), ids, subject.Filter{})
 	if err != nil {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
@@ -187,7 +172,7 @@ func (c *client) doSearch(
 		return nil, res.BadRequest("sort not supported")
 	}
 
-	raw, err := c.subjectIndex.SearchRaw(words, &meilisearch.SearchRequest{
+	raw, err := c.index.SearchRaw(words, &meilisearch.SearchRequest{
 		Offset: int64(offset),
 		Limit:  int64(limit),
 		Filter: filter,

@@ -124,6 +124,10 @@ func (e *eventHandler) onMessage(key, value []byte) error {
 		err = e.OnSubjectField(ctx, key, p)
 	case "chii_subjects":
 		err = e.OnSubject(ctx, key, p)
+	case "chii_characters":
+		err = e.OnCharacter(ctx, key, p)
+	case "chii_persons":
+		err = e.OnPerson(ctx, key, p)
 	case "chii_members":
 		err = e.OnUserChange(ctx, key, p)
 	}

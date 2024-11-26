@@ -58,7 +58,9 @@ func AddRouters(
 
 	v0 := app.Group("/v0", common.MiddlewareAccessTokenAuth)
 
-	v0.POST("/search/subjects", h.Search)
+	v0.POST("/search/subjects", h.SearchSubjects)
+	v0.POST("/search/characters", h.SearchCharacters)
+	v0.POST("/search/persons", h.SearchPersons)
 
 	subjectHandler.Routes(v0)
 

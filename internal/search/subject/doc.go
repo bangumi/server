@@ -12,13 +12,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package search
+package subject
 
 import (
 	"strconv"
 	"strings"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/search/searcher"
 	"github.com/bangumi/server/pkg/wiki"
 )
 
@@ -26,7 +27,7 @@ import (
 // 使用 `filterable:"true"`， `sortable:"true"`
 // 两种 tag 来设置是否可以被索引和排序.
 // 搜索字段因为带有排序，所以定义在 [search.searchAbleAttribute] 中.
-type subjectIndex struct {
+type document struct {
 	ID       model.SubjectID `json:"id"`
 	Tag      []string        `json:"tag,omitempty" filterable:"true"`
 	MetaTags []string        `json:"meta_tag" filterable:"true"`
@@ -40,6 +41,10 @@ type subjectIndex struct {
 	Platform uint16          `json:"platform,omitempty"`
 	Type     uint8           `json:"type" filterable:"true"`
 	NSFW     bool            `json:"nsfw" filterable:"true"`
+}
+
+func (d *document) GetID() string {
+	return strconv.FormatUint(uint64(d.ID), 10)
 }
 
 func rankRule() *[]string {
@@ -60,7 +65,11 @@ func rankRule() *[]string {
 	}
 }
 
-func extractSubject(s *model.Subject) subjectIndex {
+func heat(s *model.Subject) uint32 {
+	return s.OnHold + s.Doing + s.Dropped + s.Wish + s.Collect
+}
+
+func extract(s *model.Subject) searcher.Document {
 	tags := s.Tags
 
 	w := wiki.ParseOmitError(s.Infobox)
@@ -72,7 +81,7 @@ func extractSubject(s *model.Subject) subjectIndex {
 		tagNames[i] = tag.Name
 	}
 
-	return subjectIndex{
+	return &document{
 		ID:       s.ID,
 		Name:     s.Name,
 		Aliases:  extractAliases(s, w),
@@ -87,6 +96,21 @@ func extractSubject(s *model.Subject) subjectIndex {
 		Heat:     heat(s),
 		Score:    score,
 	}
+}
+
+func extractAliases(s *model.Subject, w wiki.Wiki) []string {
+	var aliases = make([]string, 0, 2)
+	if s.NameCN != "" {
+		aliases = append(aliases, s.NameCN)
+	}
+
+	for _, field := range w.Fields {
+		if field.Key == "别名" {
+			aliases = append(aliases, searcher.GetWikiValues(field)...)
+		}
+	}
+
+	return aliases
 }
 
 func parseDateVal(date string) int {
