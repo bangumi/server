@@ -190,12 +190,14 @@ func getJSONFieldName(f reflect.StructField) string {
 }
 
 func InitIndex(log *zap.Logger, meili meilisearch.ServiceManager, idx string, rt reflect.Type, rankRule *[]string) {
+	log = log.With(zap.String("index", idx))
+
 	_, err := meili.CreateIndex(&meilisearch.IndexConfig{
 		Uid:        idx,
 		PrimaryKey: "id",
 	})
 	if err != nil {
-		log.Fatal("failed to create search index", zap.Error(err), zap.String("index", idx))
+		log.Fatal("failed to create search index", zap.Error(err))
 		return
 	}
 
