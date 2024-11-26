@@ -12,7 +12,7 @@ import (
 )
 
 type CharacterKey struct {
-	ID model.CharacterID `json:"character_id"`
+	ID model.CharacterID `json:"crt_id"`
 }
 
 func (e *eventHandler) OnCharacter(ctx context.Context, key json.RawMessage, payload Payload) error {

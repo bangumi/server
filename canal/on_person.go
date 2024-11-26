@@ -12,7 +12,7 @@ import (
 )
 
 type PersonKey struct {
-	ID model.PersonID `json:"person_id"`
+	ID model.PersonID `json:"prsn_id"`
 }
 
 func (e *eventHandler) OnPerson(ctx context.Context, key json.RawMessage, payload Payload) error {
