@@ -21,7 +21,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// var _ Searcher = NoopClient{}
+var _ Client = NoopClient{}
 
 type NoopClient struct {
 }
