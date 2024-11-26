@@ -39,7 +39,6 @@ import (
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/subject"
-	"github.com/bangumi/server/internal/tag"
 )
 
 // New provide a search app is AppConfig.MeiliSearchURL is empty string, return nope search client.
@@ -48,7 +47,6 @@ import (
 func New(
 	cfg config.AppConfig,
 	subjectRepo subject.Repo,
-	tagRepo tag.CachedRepo,
 	log *zap.Logger,
 	query *query.Query,
 ) (Client, error) {
@@ -80,7 +78,6 @@ func New(
 		subjectIndex: meili.Index("subjects"),
 		log:          log.Named("search"),
 		subjectRepo:  subjectRepo,
-		tagRepo:      tagRepo,
 	}
 
 	if cfg.AppType != config.AppTypeCanal {
@@ -139,7 +136,6 @@ func (c *client) canalInit(cfg config.AppConfig) error {
 
 type client struct {
 	subjectRepo  subject.Repo
-	tagRepo      tag.CachedRepo
 	meili        meilisearch.ServiceManager
 	q            *query.Query
 	subjectIndex meilisearch.IndexManager
