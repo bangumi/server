@@ -19,8 +19,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/bangumi/server/internal/search/searcher"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/search/searcher"
 )
 
 func TestIndexFilter(t *testing.T) {
