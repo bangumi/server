@@ -14,7 +14,12 @@
 
 package res
 
-import "github.com/bangumi/server/internal/model"
+import (
+	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/compat"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/pkg/wiki"
+)
 
 type CharacterV0 struct {
 	BirthMon  *uint8            `json:"birth_mon"`
@@ -51,4 +56,29 @@ func CharacterStaffString(i uint8) string {
 	}
 
 	return ""
+}
+
+func ConvertModelCharacter(s model.Character) CharacterV0 {
+	img := PersonImage(s.Image)
+
+	return CharacterV0{
+		ID:        s.ID,
+		Type:      s.Type,
+		Name:      s.Name,
+		NSFW:      s.NSFW,
+		Images:    img,
+		Summary:   s.Summary,
+		Infobox:   compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
+		Gender:    null.NilString(GenderMap[s.FieldGender]),
+		BloodType: null.NilUint8(s.FieldBloodType),
+		BirthYear: null.NilUint16(s.FieldBirthYear),
+		BirthMon:  null.NilUint8(s.FieldBirthMon),
+		BirthDay:  null.NilUint8(s.FieldBirthDay),
+		Stat: Stat{
+			Comments: s.CommentCount,
+			Collects: s.CollectCount,
+		},
+		Redirect: s.Redirect,
+		Locked:   s.Locked,
+	}
 }
