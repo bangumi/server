@@ -36,7 +36,7 @@ func New(
 		meili: meili,
 		repo:  repo,
 		index: meili.Index(idx),
-		log:   log.Named("search"),
+		log:   log.Named("search").With(zap.String("index", idx)),
 		q:     query,
 	}
 
@@ -83,7 +83,7 @@ func (c *client) canalInit(cfg config.AppConfig) error {
 
 //nolint:funlen
 func (c *client) firstRun() {
-	c.log.Info("search initialize", zap.String("index", idx))
+	c.log.Info("search initialize")
 	rt := reflect.TypeOf(document{})
 	searcher.InitIndex(c.log, c.meili, idx, rt, rankRule())
 
@@ -91,7 +91,7 @@ func (c *client) firstRun() {
 
 	maxItem, err := c.q.Subject.WithContext(ctx).Limit(1).Order(c.q.Subject.ID.Desc()).Take()
 	if err != nil {
-		c.log.Fatal("failed to get current max id", zap.Error(err), zap.String("index", idx))
+		c.log.Fatal("failed to get current max id", zap.Error(err))
 		return
 	}
 
@@ -105,7 +105,7 @@ func (c *client) firstRun() {
 
 		err := c.OnUpdate(ctx, i)
 		if err != nil {
-			c.log.Error("error when updating", zap.Error(err), zap.String("index", idx))
+			c.log.Error("error when updating", zap.Error(err))
 		}
 	}
 }
