@@ -23,6 +23,8 @@ canal:
   topics: # kafka topic of redis stream keys
     - debezium.bangumi.chii_subject_fields
     - debezium.bangumi.chii_subjects
+    - debezium.bangumi.chii_characters
+    - debezium.bangumi.chii_persons
     - debezium.bangumi.chii_members
 
 search:
