@@ -82,8 +82,6 @@ func start() error {
 		fx.Provide(
 			logger.Copy, cache.NewRedisCache,
 
-			character.NewMysqlRepo,
-
 			user.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, infra.NewMysqlRepo,
 			timeline.NewMysqlRepo, pm.NewMysqlRepo, notification.NewMysqlRepo,
