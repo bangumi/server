@@ -1041,8 +1041,19 @@ paths:
               schema:
                 allOf:
                   - "$ref": "#/components/schemas/User"
+                  - required:
+                      - email
+                      - reg_time
                   - type: object
                     properties:
+                      email:
+                        description: "用户绑定的邮箱地址"
+                        type: string
+                        format: email
+                      reg_time:
+                        description: "用户注册时间。比如 2017-12-03T08:51:16+08:00"
+                        type: string
+                        format: date-time
                       time_offset:
                         description: "用户设置的时区偏移，以小时为单位。比如 GMT+8（shanghai/beijing）为 8"
                         type: integer

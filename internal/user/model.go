@@ -32,6 +32,7 @@ type FullUser struct {
 	ID               model.UserID
 	UserGroup        GroupID
 	TimeOffset       int8
+	Email            string
 }
 
 type GroupID = uint8
