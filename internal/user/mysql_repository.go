@@ -59,6 +59,7 @@ func (m mysqlRepo) GetFullUser(ctx context.Context, userID model.UserID) (FullUs
 		ID:               u.ID,
 		RegistrationTime: time.Unix(u.Regdate, 0),
 		TimeOffset:       parseTimeOffset(u.Timeoffset),
+		Email:            u.Email,
 	}, nil
 }
 
