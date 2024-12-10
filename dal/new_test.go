@@ -31,9 +31,9 @@ func TestNewDB(t *testing.T) {
 	cfg, err := config.NewAppConfig()
 	require.NoError(t, err)
 
-	conn, err := driver.NewMysqlConnectionPool(cfg)
+	conn, err := driver.NewMysqlSqlDB(cfg)
 	require.NoError(t, err)
-	db, err := dal.NewDB(conn, cfg)
+	db, err := dal.NewGormDB(conn, cfg)
 	require.NoError(t, err)
 
 	err = db.Exec("select 0;").Error

@@ -16,11 +16,10 @@ package cache_test
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
-	redismock "github.com/go-redis/redismock/v9"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/pkg/cache"
@@ -32,106 +31,15 @@ type RedisCacheTestItem struct {
 	I int
 }
 
-func mockedCache() (cache.RedisCache, redismock.ClientMock) {
-	db, mock := redismock.NewClientMock()
-	c := cache.NewRedisCache(db)
-
-	return c, mock
-}
-
-func TestRedisCache_Set(t *testing.T) {
-	t.Parallel()
-	var key = t.Name() + "redis_key"
-	c, mock := mockedCache()
-	mock.Regexp().ExpectSet(key, `.*`, time.Hour).SetVal("OK")
-
-	value := RedisCacheTestItem{
-		S: "sss",
-		I: 2,
-	}
-
-	require.NoError(t, c.Set(context.TODO(), key, value, time.Hour))
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
-}
-
-func TestRedisCache_Get_Nil(t *testing.T) {
-	t.Parallel()
-
-	var key = t.Name() + "redis_key"
-	c, mock := mockedCache()
-	mock.Regexp().ExpectGet(key).RedisNil()
-
-	var result RedisCacheTestItem
-
-	ok, err := c.Get(context.TODO(), key, &result)
-	require.NoError(t, err)
-	require.False(t, ok)
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
-}
-
-func TestRedisCache_Get_Cached(t *testing.T) {
-	t.Parallel()
-
-	var key = t.Name() + "redis_key"
-	value := RedisCacheTestItem{
-		S: "sss",
-		I: 2,
-	}
-
-	c, mock := mockedCache()
-	encoded, err := json.Marshal(value)
-	require.NoError(t, err)
-
-	mock.Regexp().ExpectGet(key).SetVal(string(encoded))
-
-	var result RedisCacheTestItem
-
-	ok, err := c.Get(context.TODO(), key, &result)
-	require.NoError(t, err)
-	require.True(t, ok)
-
-	require.Equal(t, value, result)
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
-}
-
-func TestRedisCache_Get_Broken(t *testing.T) {
-	t.Parallel()
-
-	var key = t.Name() + "redis_key"
-	c, mock := mockedCache()
-
-	mock.Regexp().ExpectGet(key).SetVal("some random broken content")
-	mock.Regexp().ExpectDel(key).SetVal(1)
-
-	var result RedisCacheTestItem
-
-	ok, err := c.Get(context.TODO(), key, &result)
-	require.NoError(t, err)
-	require.False(t, ok)
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
-}
-
 func TestRedisCache_Real(t *testing.T) {
 	t.Parallel()
 
 	var key = t.Name() + "redis_key"
 
-	db := test.GetRedis(t)
-	db.Del(context.TODO(), key)
+	r := test.GetRedis(t)
+	require.NoError(t, r.Do(context.TODO(), r.B().Del().Key(key).Build()).Error())
 
-	c := cache.NewRedisCache(db)
+	c := cache.NewRedisCache(r)
 
 	var data = RedisCacheTestItem{S: "ss", I: 5}
 	require.NoError(t, c.Set(context.TODO(), key, data, time.Hour))
@@ -146,16 +54,16 @@ func TestRedisCache_Real(t *testing.T) {
 func TestRedisCache_Del(t *testing.T) {
 	t.Parallel()
 
-	var key = t.Name() + "redis_test "
+	var key = fmt.Sprintln(t.Name(), "redis_test", time.Now())
 
-	db := test.GetRedis(t)
-	require.NoError(t, db.Set(context.Background(), key, "", 0).Err())
+	r := test.GetRedis(t)
+	require.NoError(t, r.Do(context.TODO(), r.B().Set().Key(key).Value("").Build()).Error())
 
-	c := cache.NewRedisCache(db)
+	c := cache.NewRedisCache(r)
 
 	require.NoError(t, c.Del(context.Background(), key))
 
-	v, err := db.Exists(context.Background(), key).Result()
+	exist, err := r.Do(context.TODO(), r.B().Exists().Key(key).Build()).AsBool()
 	require.NoError(t, err)
-	require.True(t, v == 0)
+	require.False(t, exist)
 }

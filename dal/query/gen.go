@@ -32,6 +32,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Notification:      newNotification(db, opts...),
 		NotificationField: newNotificationField(db, opts...),
 		Person:            newPerson(db, opts...),
+		PersonCollect:     newPersonCollect(db, opts...),
 		PersonField:       newPersonField(db, opts...),
 		PersonSubjects:    newPersonSubjects(db, opts...),
 		PrivateMessage:    newPrivateMessage(db, opts...),
@@ -42,6 +43,8 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		SubjectField:      newSubjectField(db, opts...),
 		SubjectRelation:   newSubjectRelation(db, opts...),
 		SubjectRevision:   newSubjectRevision(db, opts...),
+		TagIndex:          newTagIndex(db, opts...),
+		TagList:           newTagList(db, opts...),
 		UserGroup:         newUserGroup(db, opts...),
 		WebSession:        newWebSession(db, opts...),
 	}
@@ -64,6 +67,7 @@ type Query struct {
 	Notification      notification
 	NotificationField notificationField
 	Person            person
+	PersonCollect     personCollect
 	PersonField       personField
 	PersonSubjects    personSubjects
 	PrivateMessage    privateMessage
@@ -74,6 +78,8 @@ type Query struct {
 	SubjectField      subjectField
 	SubjectRelation   subjectRelation
 	SubjectRevision   subjectRevision
+	TagIndex          tagIndex
+	TagList           tagList
 	UserGroup         userGroup
 	WebSession        webSession
 }
@@ -97,6 +103,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Notification:      q.Notification.clone(db),
 		NotificationField: q.NotificationField.clone(db),
 		Person:            q.Person.clone(db),
+		PersonCollect:     q.PersonCollect.clone(db),
 		PersonField:       q.PersonField.clone(db),
 		PersonSubjects:    q.PersonSubjects.clone(db),
 		PrivateMessage:    q.PrivateMessage.clone(db),
@@ -107,6 +114,8 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		SubjectField:      q.SubjectField.clone(db),
 		SubjectRelation:   q.SubjectRelation.clone(db),
 		SubjectRevision:   q.SubjectRevision.clone(db),
+		TagIndex:          q.TagIndex.clone(db),
+		TagList:           q.TagList.clone(db),
 		UserGroup:         q.UserGroup.clone(db),
 		WebSession:        q.WebSession.clone(db),
 	}
@@ -137,6 +146,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Notification:      q.Notification.replaceDB(db),
 		NotificationField: q.NotificationField.replaceDB(db),
 		Person:            q.Person.replaceDB(db),
+		PersonCollect:     q.PersonCollect.replaceDB(db),
 		PersonField:       q.PersonField.replaceDB(db),
 		PersonSubjects:    q.PersonSubjects.replaceDB(db),
 		PrivateMessage:    q.PrivateMessage.replaceDB(db),
@@ -147,6 +157,8 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		SubjectField:      q.SubjectField.replaceDB(db),
 		SubjectRelation:   q.SubjectRelation.replaceDB(db),
 		SubjectRevision:   q.SubjectRevision.replaceDB(db),
+		TagIndex:          q.TagIndex.replaceDB(db),
+		TagList:           q.TagList.replaceDB(db),
 		UserGroup:         q.UserGroup.replaceDB(db),
 		WebSession:        q.WebSession.replaceDB(db),
 	}
@@ -167,6 +179,7 @@ type queryCtx struct {
 	Notification      *notificationDo
 	NotificationField *notificationFieldDo
 	Person            *personDo
+	PersonCollect     *personCollectDo
 	PersonField       *personFieldDo
 	PersonSubjects    *personSubjectsDo
 	PrivateMessage    *privateMessageDo
@@ -177,6 +190,8 @@ type queryCtx struct {
 	SubjectField      *subjectFieldDo
 	SubjectRelation   *subjectRelationDo
 	SubjectRevision   *subjectRevisionDo
+	TagIndex          *tagIndexDo
+	TagList           *tagListDo
 	UserGroup         *userGroupDo
 	WebSession        *webSessionDo
 }
@@ -197,6 +212,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Notification:      q.Notification.WithContext(ctx),
 		NotificationField: q.NotificationField.WithContext(ctx),
 		Person:            q.Person.WithContext(ctx),
+		PersonCollect:     q.PersonCollect.WithContext(ctx),
 		PersonField:       q.PersonField.WithContext(ctx),
 		PersonSubjects:    q.PersonSubjects.WithContext(ctx),
 		PrivateMessage:    q.PrivateMessage.WithContext(ctx),
@@ -207,6 +223,8 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		SubjectField:      q.SubjectField.WithContext(ctx),
 		SubjectRelation:   q.SubjectRelation.WithContext(ctx),
 		SubjectRevision:   q.SubjectRevision.WithContext(ctx),
+		TagIndex:          q.TagIndex.WithContext(ctx),
+		TagList:           q.TagList.WithContext(ctx),
 		UserGroup:         q.UserGroup.WithContext(ctx),
 		WebSession:        q.WebSession.WithContext(ctx),
 	}

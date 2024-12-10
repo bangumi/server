@@ -23,15 +23,18 @@ import (
 )
 
 type Tag struct {
-	Name  *string `php:"tag_name"`
-	Count int     `php:"result,string"`
+	Name       *string `php:"tag_name"`
+	Count      uint    `php:"result,string"`
+	TotalCount uint    `php:"tag_results,string"`
 }
 
 func ParseTags(b []byte) ([]model.Tag, error) {
 	var tags []Tag
-	err := phpserialize.Unmarshal(b, &tags)
-	if err != nil {
-		return nil, errgo.Wrap(err, "ParseTags: phpserialize.Unmarshal")
+	if len(b) != 0 {
+		err := phpserialize.Unmarshal(b, &tags)
+		if err != nil {
+			return nil, errgo.Wrap(err, "ParseTags: phpserialize.Unmarshal")
+		}
 	}
 
 	return slice.MapFilter(tags, func(item Tag) (model.Tag, bool) {

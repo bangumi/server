@@ -16,11 +16,13 @@ package auth
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"strconv"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -32,14 +34,20 @@ import (
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/random"
+	"github.com/bangumi/server/internal/user"
 )
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) Repo {
-	return mysqlRepo{q: q, log: log.Named("auth.mysqlRepo")}
+func NewMysqlRepo(q *query.Query, log *zap.Logger, db *sqlx.DB) Repo {
+	return mysqlRepo{
+		q:   q,
+		log: log.Named("auth.mysqlRepo"),
+		db:  db,
+	}
 }
 
 type mysqlRepo struct {
 	q   *query.Query
+	db  *sqlx.DB
 	log *zap.Logger
 }
 
@@ -50,7 +58,6 @@ func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (UserInfo, []by
 			return UserInfo{}, nil, gerr.ErrNotFound
 		}
 
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return UserInfo{}, nil, errgo.Wrap(err, "gorm")
 	}
 
@@ -62,15 +69,16 @@ func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (UserInfo, []by
 }
 
 func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, error) {
-	access, err := m.q.AccessToken.WithContext(ctx).
-		Where(m.q.AccessToken.AccessToken.Eq(token), m.q.AccessToken.ExpiredAt.Gte(time.Now())).
-		First()
+	var access struct {
+		UserID string `db:"user_id"`
+	}
+	err := m.db.GetContext(ctx, &access,
+		`select user_id from chii_oauth_access_tokens
+               where access_token = BINARY ? and expires > ? limit 1`, token, time.Now())
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, sql.ErrNoRows) {
 			return UserInfo{}, gerr.ErrNotFound
 		}
-
-		m.log.Error("unexpected error happened", zap.Error(err))
 
 		return UserInfo{}, errgo.Wrap(err, "gorm")
 	}
@@ -81,24 +89,25 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		return UserInfo{}, errgo.Wrap(err, "parsing user id")
 	}
 
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(id)).Take()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			m.log.Error("can't find user of access token",
-				zap.String("token", token), zap.String("uid", access.UserID))
+	var u struct {
+		Regdate int64
+		GroupID user.GroupID
+	}
 
+	err = m.db.QueryRowContext(ctx, `select regdate, groupid from chii_members where uid = ? limit 1`, id).
+		Scan(&u.Regdate, &u.GroupID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			return UserInfo{}, gerr.ErrNotFound
 		}
-
-		m.log.Error("unexpected error happened", zap.Error(err))
 
 		return UserInfo{}, errgo.Wrap(err, "gorm")
 	}
 
 	return UserInfo{
 		RegTime: time.Unix(u.Regdate, 0),
-		ID:      u.ID,
-		GroupID: u.Groupid,
+		ID:      id,
+		GroupID: u.GroupID,
 	}, nil
 }
 
@@ -109,8 +118,6 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission
 			m.log.Error("can't find permission for group", zap.Uint8("user_group_id", groupID))
 			return Permission{}, nil
 		}
-
-		m.log.Error("unexpected error", zap.Error(err))
 		return Permission{}, errgo.Wrap(err, "dal")
 	}
 
@@ -159,7 +166,6 @@ func (m mysqlRepo) CreateAccessToken(
 		Info:        infoByte,
 	})
 	if err != nil {
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return "", errgo.Wrap(err, "dal")
 	}
 
@@ -176,7 +182,6 @@ func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UserID) ([]
 		Where(m.q.AccessToken.UserID.Eq(strconv.FormatUint(uint64(userID), 10)),
 			m.q.AccessToken.ExpiredAt.Gte(time.Now())).Find()
 	if err != nil {
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 

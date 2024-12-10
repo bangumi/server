@@ -18,9 +18,7 @@ run:
   # If false (default) - golangci-lint acquires file lock on start.
   allow-parallel-runners: true
 
-  skip-files: []
-
-  go: "1.22"
+  go: "1.23"
 
 # output configuration options
 output:
@@ -106,8 +104,6 @@ linters-settings:
       - standard # Captures all standard packages if they do not match another section.
       - default # Contains all imports that could not be matched to another section type.
       - prefix(github.com/bangumi/server) # Groups all imports with the specified Prefix.
-    sectionSeparators:
-      - newLine
 
   depguard:
     rules:
@@ -131,7 +127,7 @@ linters-settings:
           - pkg: "github.com/golang/mock"
             desc: 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
 
-  gomnd:
+  mnd:
     # settings:
     # mnd:
     # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
@@ -141,8 +137,8 @@ linters-settings:
       - operation
       - return
       - assign
-    ignored-functions: strconv\..*,time\..*,make,math\..*,strings\..*
-    ignored-numbers: 1,2,3,10,100,1000,10000
+    ignored-functions: [strconv\..*, time\..*, make, math\..*, strings\..*]
+    ignored-numbers: ["1", "2", "3", "10", "100", "1000", "10000"]
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
@@ -181,7 +177,7 @@ linters-settings:
     checks: ["all"]
 
   stylecheck:
-    # Select the Go version to target. The default is '1.13'.
+  # Select the Go version to target. The default is '1.13'.
 
   testpackage:
     # regexp pattern to skip files
@@ -203,12 +199,9 @@ linters-settings:
   nlreturn:
     block-size: 3
 
-  ifshort:
-    # Maximum length of vars declaration measured in number of lines, after which linter won't suggest using short syntax.
-    # Has higher priority than max-decl-chars.
-    max-decl-lines: 1
-    # Maximum length of vars declaration measured in number of characters, after which linter won't suggest using short syntax.
-    max-decl-chars: 30
+  gosec:
+    excludes:
+      - G115
 
   tagliatelle:
     # Check the struck tag name case.
@@ -236,8 +229,9 @@ linters:
     - errchkjson
     - errname
     - errorlint
+    #    https://github.com/golangci/golangci-lint/issues/5065
     - exhaustive
-    - exportloopref
+    - copyloopvar
     - forbidigo
     - forcetypeassert
     - funlen
@@ -250,9 +244,8 @@ linters:
     - gocritic
     - gocyclo
     - godot
-    - goerr113
     - gofmt
-    - gomnd
+    - mnd
     - gomoddirectives
     - gomodguard
     - goprintffuncname
@@ -319,7 +312,7 @@ issues:
     - source: 'var .* sync\.Once'
       linters: [gochecknoglobals]
 
-    - linters: [goerr113, errorlint]
+    - linters: [err113, errorlint]
       source: "if err == redis.Nil {"
 
     # https://github.com/kunwardeep/paralleltest/issues/8

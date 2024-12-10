@@ -26,6 +26,7 @@ import (
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
+	"github.com/bangumi/server/dal/utiltype"
 	"github.com/bangumi/server/domain"
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
@@ -53,7 +54,6 @@ func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID, filter Filter) (
 			return model.Subject{}, fmt.Errorf("%w: %d", gerr.ErrNotFound, id)
 		}
 
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.Subject{}, errgo.Wrap(err, "dal")
 	}
 
@@ -75,12 +75,13 @@ func ConvertDao(s *dao.Subject) (model.Subject, error) {
 		Redirect:   s.Fields.Redirect,
 		Date:       date,
 		ID:         s.ID,
-		Name:       s.Name,
-		NameCN:     s.NameCN,
+		Name:       string(s.Name),
+		NameCN:     string(s.NameCN),
+		MetaTags:   s.FieldMetaTags,
 		TypeID:     s.TypeID,
 		Image:      s.Image,
 		PlatformID: s.Platform,
-		Infobox:    s.Infobox,
+		Infobox:    string(s.Infobox),
 		Summary:    s.Summary,
 		Volumes:    s.Volumes,
 		Eps:        s.Eps,
@@ -136,8 +137,6 @@ func (r mysqlRepo) GetPersonRelated(
 		Joins(r.q.PersonSubjects.Person).
 		Where(r.q.PersonSubjects.PersonID.Eq(personID)).Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
-
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -161,7 +160,6 @@ func (r mysqlRepo) GetCharacterRelated(
 		Joins(r.q.CharacterSubjects.Subject).
 		Where(r.q.CharacterSubjects.CharacterID.Eq(characterID)).Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -185,7 +183,6 @@ func (r mysqlRepo) GetSubjectRelated(
 		Joins(r.q.SubjectRelation.Subject).Where(r.q.SubjectRelation.SubjectID.Eq(subjectID)).
 		Order(r.q.SubjectRelation.Order).Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -215,7 +212,6 @@ func (r mysqlRepo) GetByIDs(
 
 	records, err := q.Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -223,6 +219,93 @@ func (r mysqlRepo) GetByIDs(
 
 	for _, s := range records {
 		result[s.ID], err = ConvertDao(s)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
+}
+
+func (r mysqlRepo) Count(
+	ctx context.Context,
+	filter BrowseFilter) (int64, error) {
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(
+		r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid),
+	).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	if filter.NSFW.Set {
+		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
+	}
+	if filter.Category.Set {
+		q = q.Where(r.q.Subject.Platform.Eq(filter.Category.Value))
+	}
+	if filter.Series.Set {
+		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
+	}
+	if filter.Platform.Set {
+		q = q.Where(r.q.Subject.Infobox.Like(utiltype.HTMLEscapedString(fmt.Sprintf("%%[%s]%%", filter.Platform.Value))))
+	}
+	if filter.Year.Set {
+		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))
+	}
+	if filter.Month.Set {
+		q = q.Where(r.q.SubjectField.Mon.Eq(filter.Month.Value))
+	}
+
+	if filter.Sort.Set {
+		switch filter.Sort.Value {
+		case "date":
+			q = q.Order(r.q.SubjectField.Date.Desc())
+		case "rank":
+			q = q.Where(r.q.SubjectField.Rank.Gt(0)).Order(r.q.SubjectField.Rank)
+		}
+	}
+
+	return q.Count()
+}
+
+func (r mysqlRepo) Browse(
+	ctx context.Context, filter BrowseFilter, limit, offset int,
+) ([]model.Subject, error) {
+	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(
+		r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid),
+	).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	if filter.NSFW.Set {
+		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
+	}
+	if filter.Category.Set {
+		q = q.Where(r.q.Subject.Platform.Eq(filter.Category.Value))
+	}
+	if filter.Series.Set {
+		q = q.Where(r.q.Subject.Series.Is(filter.Series.Value))
+	}
+	if filter.Platform.Set {
+		q = q.Where(r.q.Subject.Infobox.Like(utiltype.HTMLEscapedString(fmt.Sprintf("%%[%s]%%", filter.Platform.Value))))
+	}
+	if filter.Year.Set {
+		q = q.Where(r.q.SubjectField.Year.Eq(filter.Year.Value))
+	}
+	if filter.Month.Set {
+		q = q.Where(r.q.SubjectField.Mon.Eq(filter.Month.Value))
+	}
+
+	if filter.Sort.Set {
+		switch filter.Sort.Value {
+		case "date":
+			q = q.Order(r.q.SubjectField.Date.Desc())
+		case "rank":
+			q = q.Where(r.q.SubjectField.Rank.Gt(0)).Order(r.q.SubjectField.Rank)
+		}
+	}
+
+	subjects, err := q.Limit(limit).Offset(offset).Find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "dal")
+	}
+
+	var result = make([]model.Subject, len(subjects))
+	for i, subject := range subjects {
+		result[i], err = ConvertDao(subject)
 		if err != nil {
 			return nil, err
 		}
@@ -241,7 +324,6 @@ func (r mysqlRepo) GetActors(
 		Order(r.q.Cast.PersonID).
 		Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 

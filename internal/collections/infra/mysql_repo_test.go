@@ -19,11 +19,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen/field"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
@@ -32,11 +34,13 @@ import (
 	"github.com/bangumi/server/internal/collections/infra"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	subject2 "github.com/bangumi/server/internal/subject"
 )
 
 func getRepo(t *testing.T) (collections.Repo, *query.Query) {
 	t.Helper()
 	q := test.GetQuery(t)
+
 	repo, err := infra.NewMysqlRepo(q, zap.NewNop())
 	require.NoError(t, err)
 
@@ -139,12 +143,12 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	for i := 0; i < 2; i++ {
+	for i := uint32(0); i < 2; i++ {
 		err = q.SubjectCollection.
 			WithContext(context.Background()).
 			Create(&dao.SubjectCollection{
 				UserID:      uid,
-				SubjectID:   model.SubjectID(200 + i),
+				SubjectID:   200 + i,
 				SubjectType: model.SubjectTypeGame,
 				UpdatedTime: uint32(time.Now().Unix()),
 			})
@@ -209,12 +213,24 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	repo, q := getRepo(t)
 	table := q.SubjectCollection
 
-	test.RunAndCleanup(t, func() {
-		_, err := table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete()
-		require.NoError(t, err)
+	err := q.Subject.WithContext(context.TODO()).Clauses(clause.OnConflict{DoNothing: true}).
+		Where(q.Subject.ID.Eq(sid)).Create(&dao.Subject{ID: sid})
+	require.NoError(t, err)
+
+	err = q.SubjectField.WithContext(context.TODO()).Clauses(clause.OnConflict{DoNothing: true}).
+		Where(q.Subject.ID.Eq(sid)).Create(&dao.SubjectField{Sid: sid, Tags: []byte("")})
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		lo.Must(q.Subject.WithContext(context.TODO()).Where(q.Subject.ID.Eq(sid)).Delete())
+		lo.Must(q.SubjectField.WithContext(context.TODO()).Where(q.SubjectField.Sid.Eq(sid)).Delete())
 	})
 
-	err := table.WithContext(context.Background()).Create(
+	test.RunAndCleanup(t, func() {
+		lo.Must(table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete())
+	})
+
+	err = table.WithContext(context.Background()).Create(
 		&dao.SubjectCollection{
 			UserID: uid, SubjectID: sid + 1, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
 		},
@@ -247,6 +263,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 			s.UpdateType(collection.SubjectCollectionDropped)
 			require.NoError(t, s.UpdateComment("c"))
 			require.NoError(t, s.UpdateRate(1))
+			require.NoError(t, s.UpdateTags([]string{"1", "2", "3"}))
 			return s, nil
 		})
 	require.NoError(t, err)
@@ -287,6 +304,14 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
+
+	s, err := q.WithContext(context.Background()).Subject.Preload(q.Subject.Fields).Where(q.Subject.ID.Eq(sid)).First()
+	require.NoError(t, err)
+
+	tags, err := subject2.ParseTags(s.Fields.Tags)
+	require.NoError(t, err)
+
+	require.Len(t, tags, 3)
 }
 
 func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
@@ -539,4 +564,198 @@ func TestMysqlRepo_UpdateEpisodeCollection_create_ep_status(t *testing.T) {
 	require.EqualValues(t, collection.EpisodeCollectionDone, m[1].Type)
 	require.Contains(t, m, uint32(2))
 	require.EqualValues(t, collection.EpisodeCollectionDone, m[2].Type)
+}
+
+func TestMysqlRepo_GetPersonCollect(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 39000
+	const cat = "prsn"
+	const mid model.PersonID = 12000
+
+	repo, q := getRepo(t)
+	test.RunAndCleanup(t, func() {
+		_, err := q.PersonCollect.WithContext(context.TODO()).Where(q.PersonCollect.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := q.PersonCollect.WithContext(context.Background()).Create(&dao.PersonCollect{
+		UserID:      uid,
+		Category:    cat,
+		TargetID:    mid,
+		CreatedTime: uint32(time.Now().Unix()),
+	})
+	require.NoError(t, err)
+
+	r, err := repo.GetPersonCollection(context.Background(), uid, cat, mid)
+	require.NoError(t, err)
+	require.Equal(t, uid, r.UserID)
+	require.Equal(t, mid, r.TargetID)
+	require.Equal(t, cat, r.Category)
+}
+
+func TestMysqlRepo_AddPersonCollect(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 40000
+	const cat = "prsn"
+	const mid model.PersonID = 13000
+	const collects uint32 = 10
+
+	repo, q := getRepo(t)
+	table := q.PersonCollect
+	test.RunAndCleanup(t, func() {
+		_, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+		_, err = q.Person.WithContext(context.TODO()).Where(q.Person.ID.Eq(mid)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := q.Person.WithContext(context.Background()).Create(&dao.Person{
+		ID:       mid,
+		Collects: collects,
+	})
+	require.NoError(t, err)
+
+	err = repo.AddPersonCollection(context.Background(), uid, cat, mid)
+	require.NoError(t, err)
+
+	r, err := table.WithContext(context.TODO()).Where(table.UserID.Eq(uid)).Take()
+	require.NoError(t, err)
+	require.NotZero(t, r.ID)
+
+	p, err := q.Person.WithContext(context.Background()).Where(q.Person.ID.Eq(mid)).Take()
+	require.NoError(t, err)
+	require.Equal(t, collects+1, p.Collects)
+}
+
+func TestMysqlRepo_RemovePersonCollect(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid model.UserID = 41000
+	const cat = "prsn"
+	const mid model.PersonID = 14000
+	const collects uint32 = 10
+
+	repo, q := getRepo(t)
+	test.RunAndCleanup(t, func() {
+		_, err := q.PersonCollect.WithContext(context.TODO()).Where(q.PersonCollect.UserID.Eq(uid)).Delete()
+		require.NoError(t, err)
+		_, err = q.Person.WithContext(context.TODO()).Where(q.Person.ID.Eq(mid)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := q.Person.WithContext(context.Background()).Create(&dao.Person{
+		ID:       mid,
+		Collects: collects,
+	})
+	require.NoError(t, err)
+	err = q.PersonCollect.WithContext(context.Background()).Create(&dao.PersonCollect{
+		UserID:      uid,
+		Category:    cat,
+		TargetID:    mid,
+		CreatedTime: uint32(time.Now().Unix()),
+	})
+	require.NoError(t, err)
+
+	r, err := q.PersonCollect.WithContext(context.TODO()).Where(q.PersonCollect.UserID.Eq(uid)).Take()
+	require.NoError(t, err)
+	require.NotZero(t, r.ID)
+
+	err = repo.RemovePersonCollection(context.Background(), uid, cat, mid)
+	require.NoError(t, err)
+
+	_, err = q.PersonCollect.WithContext(context.TODO()).Where(q.PersonCollect.UserID.Eq(uid)).Take()
+	require.ErrorIs(t, err, gorm.ErrRecordNotFound)
+
+	p, err := q.Person.WithContext(context.Background()).Where(q.Person.ID.Eq(mid)).Take()
+	require.NoError(t, err)
+	require.Equal(t, collects-1, p.Collects)
+}
+
+func TestMysqlRepo_CountPersonCollections(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const uid model.UserID = 42000
+	const cat = "prsn"
+
+	repo, q := getRepo(t)
+	test.RunAndCleanup(t, func() {
+		_, err := q.PersonCollect.
+			WithContext(context.Background()).
+			Where(q.PersonCollect.UserID.Eq(uid)).
+			Delete()
+		require.NoError(t, err)
+	})
+
+	for i := 0; i < 5; i++ {
+		err := q.PersonCollect.
+			WithContext(context.Background()).
+			Create(&dao.PersonCollect{
+				UserID:      uid,
+				TargetID:    model.PersonID(i + 100),
+				Category:    cat,
+				CreatedTime: uint32(time.Now().Unix()),
+			})
+		require.NoError(t, err)
+	}
+
+	count, err := repo.CountPersonCollections(context.Background(), uid, cat)
+	require.NoError(t, err)
+	require.EqualValues(t, 5, count)
+}
+
+func TestMysqlRepo_ListPersonCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const uid model.UserID = 43000
+	const cat = "prsn"
+
+	repo, q := getRepo(t)
+
+	var err error
+	test.RunAndCleanup(t, func() {
+		_, err = q.PersonCollect.
+			WithContext(context.Background()).
+			Where(q.PersonCollect.UserID.Eq(uid)).
+			Delete()
+		require.NoError(t, err)
+	})
+
+	data, err := repo.ListPersonCollection(context.Background(), uid, collection.PersonCollectCategory(cat), 5, 0)
+	require.NoError(t, err)
+	require.Len(t, data, 0)
+
+	for i := 0; i < 5; i++ {
+		err = q.PersonCollect.
+			WithContext(context.Background()).
+			Create(&dao.PersonCollect{
+				UserID:      uid,
+				TargetID:    model.PersonID(i + 100),
+				Category:    cat,
+				CreatedTime: uint32(time.Now().Unix()),
+			})
+		require.NoError(t, err)
+	}
+
+	for i := 0; i < 2; i++ {
+		err = q.PersonCollect.
+			WithContext(context.Background()).
+			Create(&dao.PersonCollect{
+				UserID:      uid,
+				TargetID:    model.PersonID(i + 200),
+				Category:    cat,
+				CreatedTime: uint32(time.Now().Unix()),
+			})
+		require.NoError(t, err)
+	}
+
+	data, err = repo.ListPersonCollection(context.Background(), uid, collection.PersonCollectCategory(cat), 5, 0)
+	require.NoError(t, err)
+	require.Len(t, data, 5)
 }

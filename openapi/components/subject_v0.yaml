@@ -8,8 +8,10 @@ required:
   - nsfw
   - locked
   - platform
+  - meta_tags
   - volumes
   - eps
+  - series
   - total_episodes
   - rating
   - images
@@ -34,6 +36,10 @@ properties:
   summary:
     title: Summary
     type: string
+  series:
+    title: Series
+    type: boolean
+    description: 是否为书籍系列的主条目
   nsfw:
     title: Nsfw
     type: boolean
@@ -47,7 +53,7 @@ properties:
   platform:
     title: Platform
     type: string
-    description: TV, Web, 欧美剧, PS4...
+    description: TV, Web, 欧美剧, DLC...
   images:
     $ref: "./subject_image.yaml"
   infobox:
@@ -132,5 +138,10 @@ properties:
       dropped:
         title: Dropped
         type: integer
+  meta_tags:
+    description: 由维基人维护的 tag
+    type: array
+    items:
+      type: string
   tags:
     $ref: "./subject_tags.yaml"

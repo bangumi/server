@@ -84,7 +84,7 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.RevisionID) (m
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.PersonRevision{}, gerr.ErrNotFound
 		}
-		r.log.Error("unexpected error happened", zap.Error(err))
+
 		return model.PersonRevision{}, errgo.Wrap(err, "dal")
 	}
 	data, err := r.q.RevisionText.WithContext(ctx).
@@ -95,7 +95,6 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.RevisionID) (m
 			return model.PersonRevision{}, gerr.ErrNotFound
 		}
 
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.PersonRevision{}, errgo.Wrap(err, "dal")
 	}
 	return convertPersonRevisionDao(revision, data), nil
@@ -148,7 +147,7 @@ func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.RevisionID)
 			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
 			return model.CharacterRevision{}, gerr.ErrNotFound
 		}
-		r.log.Error("unexpected error happened", zap.Error(err))
+
 		return model.CharacterRevision{}, errgo.Wrap(err, "dal")
 	}
 	return convertCharacterRevisionDao(revision, data), nil
@@ -199,7 +198,6 @@ func (r mysqlRepo) GetSubjectRelated(ctx context.Context, id model.RevisionID) (
 			return model.SubjectRevision{}, gerr.ErrNotFound
 		}
 
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.SubjectRevision{}, errgo.Wrap(err, "dal")
 	}
 	return convertSubjectRevisionDao(revision, true), nil

@@ -47,7 +47,6 @@ func (r mysqlRepo) Get(ctx context.Context, id model.CharacterID) (model.Charact
 			return model.Character{}, gerr.ErrCharacterNotFound
 		}
 
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return model.Character{}, errgo.Wrap(err, "dal")
 	}
 
@@ -60,7 +59,6 @@ func (r mysqlRepo) GetByIDs(
 	records, err := r.q.Character.WithContext(ctx).Preload(r.q.Character.Fields).
 		Where(r.q.Character.ID.In(slice.ToUint32(ids)...)).Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -80,7 +78,6 @@ func (r mysqlRepo) GetPersonRelated(
 		Order(r.q.Cast.SubjectID).
 		Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -103,7 +100,6 @@ func (r mysqlRepo) GetSubjectRelated(
 		Where(r.q.CharacterSubjects.SubjectID.Eq(subjectID)).
 		Order(r.q.CharacterSubjects.CharacterID).Find()
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 
@@ -137,7 +133,6 @@ func (r mysqlRepo) GetSubjectRelationByIDs(
 		Find()
 
 	if err != nil {
-		r.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 

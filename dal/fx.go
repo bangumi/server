@@ -17,6 +17,9 @@
 package dal
 
 import (
+	"database/sql"
+
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/fx"
 
 	"github.com/bangumi/server/dal/query"
@@ -24,8 +27,11 @@ import (
 
 var Module = fx.Module("dal",
 	fx.Provide(
-		NewDB,
+		NewGormDB,
 		query.Use,
 		NewMysqlTransaction,
+		func(db *sql.DB) *sqlx.DB {
+			return sqlx.NewDb(db, "mysql")
+		},
 	),
 )

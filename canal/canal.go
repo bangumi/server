@@ -26,16 +26,19 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal"
+	"github.com/bangumi/server/internal/character"
+	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/driver"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/pkg/sys"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/web/session"
 )
 
-const groupID = "my-group"
+const groupID = "go-canal"
 
 var errNoTopic = fmt.Errorf("missing search events topic")
 
@@ -50,16 +53,6 @@ func Main() error {
 		return errNoTopic
 	}
 
-	var opt fx.Option
-	switch cfg.Canal.Broker {
-	case "redis":
-		opt = fx.Provide(newRedisStream)
-	case "kafka":
-		opt = fx.Provide(newKafkaStream)
-	default:
-		return fmt.Errorf("broker not supported, only support redis/kafka as debezium broker") // nolint: goerr113
-	}
-
 	var h *eventHandler
 	di := fx.New(
 		fx.NopLogger,
@@ -69,15 +62,18 @@ func Main() error {
 
 		// driver and connector
 		fx.Provide(
-			driver.NewMysqlConnectionPool,
-			driver.NewRedisClient, logger.Copy, cache.NewRedisCache,
-			subject.NewMysqlRepo, search.New, session.NewMysqlRepo, session.New,
+			driver.NewMysqlSqlDB,
+			driver.NewRueidisClient, logger.Copy, cache.NewRedisCache,
+			subject.NewMysqlRepo, character.NewMysqlRepo, person.NewMysqlRepo,
+			search.New, session.NewMysqlRepo, session.New,
 			driver.NewS3,
+			tag.NewCachedRepo,
+			tag.NewMysqlRepo,
 
 			newEventHandler,
 		),
 
-		opt,
+		fx.Provide(newKafkaStream),
 
 		fx.Populate(&h),
 	)

@@ -22,9 +22,12 @@ on:
       - ".golangci.yaml"
       - ".github/workflows/lint.yaml"
 
+env:
+  GOTOOLCHAIN: "local"
+
 jobs:
   lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -43,13 +46,10 @@ jobs:
           key: go-cache-122-${{ hashFiles('**/go.sum') }}-lint
           restore-keys: |
             go-cache-122-${{ hashFiles('**/go.sum') }}-
-            go-cache-122-
 
       - run: go get -t ./...
 
       - name: Run linters
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.57.2
-          skip-pkg-cache: true
-          skip-build-cache: true
+          version: v1.61.0

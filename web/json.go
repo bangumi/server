@@ -15,8 +15,8 @@
 package web
 
 import (
-	"encoding/json"
-
+	"github.com/bytedance/sonic/decoder"
+	"github.com/bytedance/sonic/encoder"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,7 +26,7 @@ type jsonSerializer struct {
 }
 
 func (j jsonSerializer) Serialize(c echo.Context, i any, indent string) error {
-	enc := json.NewEncoder(c.Response())
+	enc := encoder.NewStreamEncoder(c.Response())
 	if indent != "" {
 		enc.SetIndent("", indent)
 	}
@@ -34,7 +34,7 @@ func (j jsonSerializer) Serialize(c echo.Context, i any, indent string) error {
 }
 
 func (j jsonSerializer) Deserialize(c echo.Context, i any) error {
-	dec := json.NewDecoder(c.Request().Body)
+	dec := decoder.NewStreamDecoder(c.Request().Body)
 	dec.DisallowUnknownFields()
 	return dec.Decode(i)
 }

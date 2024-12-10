@@ -21,6 +21,7 @@ import (
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
 )
 
 type Subject struct {
@@ -28,6 +29,7 @@ type Subject struct {
 	episode    episode.Repo
 	personRepo person.Repo
 	subject    subject.Repo
+	tag        tag.CachedRepo
 	c          character.Repo
 }
 
@@ -37,6 +39,7 @@ func New(
 	personRepo person.Repo,
 	c character.Repo,
 	episode episode.Repo,
+	tag tag.CachedRepo,
 ) (Subject, error) {
 	return Subject{
 		c:          c,
@@ -44,10 +47,12 @@ func New(
 		personRepo: personRepo,
 		subject:    subject,
 		person:     p,
+		tag:        tag,
 	}, nil
 }
 
 func (h *Subject) Routes(g *echo.Group) {
+	g.GET("/subjects", h.Browse)
 	g.GET("/subjects/:id", h.Get)
 	g.GET("/subjects/:id/image", h.GetImage)
 	g.GET("/subjects/:id/persons", h.GetRelatedPersons)

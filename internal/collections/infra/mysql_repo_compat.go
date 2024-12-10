@@ -33,8 +33,10 @@ type mysqlEpCollection map[model.EpisodeID]mysqlEpCollectionItem
 
 func deserializePhpEpStatus(phpSerialized []byte) (mysqlEpCollection, error) {
 	var e map[model.EpisodeID]mysqlEpCollectionItem
-	if err := phpserialize.Unmarshal(phpSerialized, &e); err != nil {
-		return nil, errgo.Wrap(err, "php deserialize")
+	if len(phpSerialized) != 0 {
+		if err := phpserialize.Unmarshal(phpSerialized, &e); err != nil {
+			return nil, errgo.Wrap(err, "php deserialize")
+		}
 	}
 
 	return e, nil

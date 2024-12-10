@@ -15,9 +15,6 @@
 package web
 
 import (
-	"net/http"
-	"net/http/pprof"
-
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/internal/pkg/random"
@@ -32,12 +29,4 @@ func genFakeRequestID(next echo.HandlerFunc) echo.HandlerFunc {
 
 		return next(c)
 	}
-}
-
-func addProfile(app *echo.Echo) {
-	app.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
-	app.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
-	app.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
-	app.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
-	app.Any("/debug/pprof/", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
 }

@@ -22,6 +22,19 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
+// FullUser is for current user or admin only.
+type FullUser struct {
+	RegistrationTime time.Time
+	NickName         string
+	Avatar           string
+	Sign             string
+	UserName         string
+	ID               model.UserID
+	UserGroup        GroupID
+	TimeOffset       int8
+	Email            string
+}
+
 type GroupID = uint8
 
 // User is visible for everyone.
@@ -65,9 +78,11 @@ type PrivacySettings struct {
 
 func (settings *PrivacySettings) Unmarshal(s []byte) {
 	rawMap := make(map[PrivacySettingsField]ReceiveFilter, 4)
-	err := phpserialize.Unmarshal(s, &rawMap)
-	if err != nil {
-		return
+	if len(s) != 0 {
+		err := phpserialize.Unmarshal(s, &rawMap)
+		if err != nil {
+			return
+		}
 	}
 
 	settings.ReceivePrivateMessage = rawMap[PrivacyReceivePrivateMessage]

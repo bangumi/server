@@ -33,7 +33,7 @@ func newSubjectRelation(db *gorm.DB, opts ...gen.DOOption) subjectRelation {
 	_subjectRelation.RelatedSubjectID = field.NewUint32(tableName, "rlt_related_subject_id")
 	_subjectRelation.RelatedSubjectTypeID = field.NewUint8(tableName, "rlt_related_subject_type_id")
 	_subjectRelation.ViceVersa = field.NewBool(tableName, "rlt_vice_versa")
-	_subjectRelation.Order = field.NewUint8(tableName, "rlt_order")
+	_subjectRelation.Order = field.NewUint16(tableName, "rlt_order")
 	_subjectRelation.Subject = subjectRelationHasOneSubject{
 		db: db.Session(&gorm.Session{}),
 
@@ -61,7 +61,7 @@ type subjectRelation struct {
 	RelatedSubjectID     field.Uint32 // 关联目标 ID
 	RelatedSubjectTypeID field.Uint8  // 关联目标类型
 	ViceVersa            field.Bool
-	Order                field.Uint8 // 关联排序
+	Order                field.Uint16 // 关联排序
 	Subject              subjectRelationHasOneSubject
 
 	fieldMap map[string]field.Expr
@@ -85,7 +85,7 @@ func (s *subjectRelation) updateTableName(table string) *subjectRelation {
 	s.RelatedSubjectID = field.NewUint32(table, "rlt_related_subject_id")
 	s.RelatedSubjectTypeID = field.NewUint8(table, "rlt_related_subject_type_id")
 	s.ViceVersa = field.NewBool(table, "rlt_vice_versa")
-	s.Order = field.NewUint8(table, "rlt_order")
+	s.Order = field.NewUint16(table, "rlt_order")
 
 	s.fillFieldMap()
 

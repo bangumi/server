@@ -12,23 +12,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package search
+package query
 
 import (
-	"sort"
-	"testing"
-
-	"github.com/stretchr/testify/require"
+	"gorm.io/gorm"
 )
 
-func TestIndexFilter(t *testing.T) {
-	t.Parallel()
-
-	actual := *(getAttributes("filterable"))
-	expected := []string{"date", "score", "rank", "type", "nsfw", "tag"}
-
-	sort.Strings(expected)
-	sort.Strings(actual)
-
-	require.Equal(t, expected, actual)
+func (q *Query) DB() *gorm.DB {
+	return q.db
 }

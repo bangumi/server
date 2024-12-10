@@ -93,7 +93,7 @@ func PersonImage(s string) PersonImages {
 		Large: "https://lain.bgm.tv/pic/crt/l/" + s,
 
 		Small:  "https://lain.bgm.tv/r/100/pic/crt/l/" + s,
-		Grid:   "https://lain.bgm.tv/r/200/pic/crt/l/" + s,
+		Grid:   "https://lain.bgm.tv/pic/crt/g/" + s,
 		Medium: "https://lain.bgm.tv/r/400/pic/crt/l/" + s,
 	}
 }

@@ -1,0 +1,27 @@
+title: SubjectBookCategory
+example: 1001
+enum:
+  - 0
+  - 1001
+  - 1002
+  - 1003
+type: integer
+description: |-
+  书籍类型
+  - `0` 为 其他
+  - `1001` 为 漫画
+  - `1002` 为 小说
+  - `1003` 为 画集
+x-ms-enum:
+  name: SubjectBookCategory
+  modelAsString: false
+  values:
+    - Other
+    - Comic
+    - Novel
+    - Illustration
+x-enum-varnames:
+  - Other
+  - Comic
+  - Novel
+  - Illustration

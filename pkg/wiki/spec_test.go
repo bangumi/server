@@ -88,7 +88,6 @@ func TestAgainstInvalidSpec(t *testing.T) {
 
 	for _, file := range files {
 		// name := file.Name()
-		file := file
 		t.Run(file.Name(), func(t *testing.T) {
 			t.Parallel()
 			raw, err := os.ReadFile(filepath.Join(caseRoot, file.Name()))

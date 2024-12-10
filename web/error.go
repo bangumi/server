@@ -15,6 +15,7 @@
 package web
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -36,11 +37,14 @@ func globalNotFoundHandler(c echo.Context) error {
 	})
 }
 
+//nolint:funlen
 func getDefaultErrorHandler() echo.HTTPErrorHandler {
 	var log = logger.Named("http.err").
 		WithOptions(zap.AddStacktrace(zapcore.PanicLevel), zap.WithCaller(false))
 
 	return func(err error, c echo.Context) {
+		reqID := c.Request().Header.Get(cf.HeaderRequestID)
+
 		{
 			var e res.HTTPError
 			if errors.As(err, &e) {
@@ -48,6 +52,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 				_ = c.JSON(e.Code, res.Error{
 					Title:       http.StatusText(e.Code),
 					Description: e.Msg,
+					RequestID:   reqID,
 					Details:     util.Detail(c),
 				})
 				return
@@ -60,25 +65,45 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 				log.Error("unexpected echo error",
 					zap.Int("code", e.Code),
 					zap.Any("message", e.Message),
-					zap.String("path", c.Request().URL.Path),
-					zap.String("query", c.Request().URL.RawQuery),
-					zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
+					zap.String("request_method", c.Request().Method),
+					zap.String("request_uri", c.Request().URL.Path),
+					zap.String("request_query", c.Request().URL.RawQuery),
+					zap.String("request_id", reqID),
 				)
 
 				_ = c.JSON(http.StatusInternalServerError, res.Error{
 					Title:       http.StatusText(e.Code),
 					Description: e.Error(),
+					RequestID:   reqID,
 					Details:     util.DetailWithErr(c, err),
 				})
 				return
 			}
 		}
 
+		if errors.Is(err, context.Canceled) {
+			log.Error("request timeout",
+				zap.String("message", err.Error()),
+				zap.String("request_method", c.Request().Method),
+				zap.String("request_uri", c.Request().URL.Path),
+				zap.String("request_query", c.Request().URL.RawQuery),
+				zap.String("request_id", reqID),
+			)
+
+			_ = c.JSON(http.StatusInternalServerError, res.Error{
+				Title:       "request timeout",
+				Description: "request timeout",
+				RequestID:   c.Request().Header.Get(cf.HeaderRequestID),
+			})
+			return
+		}
+
 		log.Error("unexpected error",
 			zap.Error(err),
-			zap.String("path", c.Path()),
-			zap.String("query", c.Request().URL.RawQuery),
-			zap.String("cf-ray", c.Request().Header.Get(cf.HeaderRequestID)),
+			zap.String("request_method", c.Request().Method),
+			zap.String("request_uri", c.Request().URL.Path),
+			zap.String("request_query", c.Request().URL.RawQuery),
+			zap.String("request_id", reqID),
 		)
 
 		// unexpected error, return internal server error

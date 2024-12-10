@@ -22,6 +22,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"github.com/bangumi/server/web/req/cf"
 	"github.com/bangumi/server/web/util"
 )
 
@@ -31,6 +32,7 @@ var ErrNotFound = NewError(http.StatusNotFound, "resource can't be found in the 
 type Error struct {
 	Title       string `json:"title"`
 	Details     any    `json:"details,omitempty"`
+	RequestID   string `json:"request_id,omitempty"`
 	Description string `json:"description"`
 }
 
@@ -77,6 +79,7 @@ func InternalError(c echo.Context, err error, message string) error {
 	return c.JSON(http.StatusInternalServerError, Error{
 		Title:       "Internal Server Error",
 		Description: message,
+		RequestID:   c.Request().Header.Get(cf.HeaderRequestID),
 		Details:     util.DetailWithErr(c, err),
 	})
 }

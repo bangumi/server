@@ -68,9 +68,9 @@ type AppConfig struct {
 	DisableWords string `yaml:"disable_words"`
 	BannedDomain string `yaml:"banned_domain"`
 
-	// "http://localhost:2379"
-	EtcdAddr      string `yaml:"etcd_addr" env:"ETCD_ADDR"`
-	EtcdNamespace string `yaml:"etcd_namespace" env:"ETCD_NAMESPACE"  env-default:"/chii/services"`
+	// a timeline microservice listen domain
+	SrvTimelineDomain string `yaml:"srv_timeline_domain" env:"SRV_TIMELINE_DOMAIN"`
+	SrvTimelinePort   uint16 `yaml:"srv_timeline_port" env:"SRV_TIMELINE_PORT"`
 
 	S3EntryPoint        string `yaml:"s3_entry_point" env:"S3_ENTRY_POINT"`
 	S3AccessKey         string `yaml:"s3_access_key" env:"S3_ACCESS_KEY"`

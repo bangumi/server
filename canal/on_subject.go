@@ -19,42 +19,11 @@ import (
 	"encoding/json"
 
 	"github.com/trim21/errgo"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/search"
 )
-
-func (e *eventHandler) OnSubject(key json.RawMessage, payload payload) error {
-	var k SubjectKey
-	if err := json.Unmarshal(key, &k); err != nil {
-		return nil
-	}
-
-	return e.onSubjectChange(k.ID, payload.Op)
-}
-
-func (e *eventHandler) OnSubjectField(key json.RawMessage, payload payload) error {
-	var k SubjectFieldKey
-	if err := json.Unmarshal(key, &k); err != nil {
-		return nil
-	}
-
-	return e.onSubjectChange(k.ID, payload.Op)
-}
-
-func (e *eventHandler) onSubjectChange(subjectID model.SubjectID, op string) error {
-	switch op {
-	case opCreate, opUpdate, opSnapshot:
-		if err := e.search.OnSubjectUpdate(context.TODO(), subjectID); err != nil {
-			return errgo.Wrap(err, "search.OnSubjectUpdate")
-		}
-	case opDelete:
-		if err := e.search.OnSubjectDelete(context.TODO(), subjectID); err != nil {
-			return errgo.Wrap(err, "search.OnSubjectDelete")
-		}
-	}
-
-	return nil
-}
 
 type SubjectKey struct {
 	ID model.SubjectID `json:"subject_id"`
@@ -62,4 +31,43 @@ type SubjectKey struct {
 
 type SubjectFieldKey struct {
 	ID model.SubjectID `json:"field_sid"`
+}
+
+func (e *eventHandler) OnSubject(ctx context.Context, key json.RawMessage, payload Payload) error {
+	var k SubjectKey
+	if err := json.Unmarshal(key, &k); err != nil {
+		return err
+	}
+
+	return e.onSubjectChange(ctx, k.ID, payload.Op)
+}
+
+func (e *eventHandler) OnSubjectField(ctx context.Context, key json.RawMessage, payload Payload) error {
+	var k SubjectFieldKey
+	if err := json.Unmarshal(key, &k); err != nil {
+		return err
+	}
+
+	return e.onSubjectChange(ctx, k.ID, payload.Op)
+}
+
+func (e *eventHandler) onSubjectChange(ctx context.Context, subjectID model.SubjectID, op string) error {
+	switch op {
+	case opCreate:
+		if err := e.search.EventAdded(ctx, subjectID, search.SearchTargetSubject); err != nil {
+			return errgo.Wrap(err, "search.OnSubjectAdded")
+		}
+	case opUpdate, opSnapshot:
+		if err := e.search.EventUpdate(ctx, subjectID, search.SearchTargetSubject); err != nil {
+			return errgo.Wrap(err, "search.OnSubjectUpdate")
+		}
+	case opDelete:
+		if err := e.search.EventDelete(ctx, subjectID, search.SearchTargetSubject); err != nil {
+			return errgo.Wrap(err, "search.OnSubjectDelete")
+		}
+	default:
+		e.log.Warn("unexpected operator", zap.String("op", op))
+	}
+
+	return nil
 }

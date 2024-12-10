@@ -13,3 +13,18 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
 package subject
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
+
+func Test_parseDateVal(t *testing.T) {
+	t.Parallel()
+
+	require.Equal(t, 0, parseDateVal(""))
+	require.Equal(t, 20080120, parseDateVal("2008-01-20"))
+	require.Equal(t, 21080620, parseDateVal("2108-06-20"))
+	require.Equal(t, 0, parseDateVal("2108-06-0"))
+}

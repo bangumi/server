@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package search
+package subject
 
 import (
 	"testing"
@@ -27,10 +27,11 @@ func Test_ReqFilterToMeiliFilter(t *testing.T) {
 
 	actual := filterToMeiliFilter(ReqFilter{
 		Tag:  []string{"a", "b"},
-		NSFW: null.Bool{Set: false},
+		NSFW: null.Bool{Set: true, Value: false},
 	})
 
 	require.Equal(t, [][]string{
+		{`nsfw = false`},
 		{`tag = "a"`},
 		{`tag = "b"`},
 	}, actual)

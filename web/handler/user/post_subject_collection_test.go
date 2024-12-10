@@ -78,14 +78,14 @@ func TestUser_PostSubjectCollection(t *testing.T) {
 			"type":    2,
 			"private": true,
 			"rate":    8,
-			"tags":    []string{"q", "vv"},
+			"tags":    []string{"qq", "vv"},
 		}).
 		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 		ExpectCode(http.StatusAccepted)
 
 	require.Equal(t, collection.CollectPrivacySelf, s.Privacy())
 	require.Equal(t, "1 test_content 2", s.Comment())
-	require.EqualValues(t, []string{"q", "vv"}, s.Tags())
+	require.EqualValues(t, []string{"qq", "vv"}, s.Tags())
 	require.EqualValues(t, 8, s.Rate())
 }
 
@@ -151,12 +151,12 @@ func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
 	htest.New(t, app).
 		Header(echo.HeaderAuthorization, "Bearer t").
 		BodyJSON(map[string]any{
-			"tags": []string{"q", "vv"},
+			"tags": []string{"qq", "vv"},
 		}).
 		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 		ExpectCode(http.StatusAccepted)
 
-	require.EqualValues(t, []string{"q", "vv"}, s.Tags())
+	require.EqualValues(t, []string{"qq", "vv"}, s.Tags())
 }
 
 func TestUser_PostSubjectCollection_badID(t *testing.T) {

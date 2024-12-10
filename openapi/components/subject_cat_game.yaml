@@ -1,0 +1,31 @@
+title: SubjectGameCategory
+example: 4001
+enum:
+  - 0
+  - 4001
+  - 4003
+  - 4002
+  - 4005
+type: integer
+description: |-
+  游戏类型
+  - `0` 为 其他
+  - `4001` 为 游戏
+  - `4002` 为 软件
+  - `4003` 为 扩展包
+  - `4005` 为 桌游
+x-ms-enum:
+  name: SubjectGameCategory
+  modelAsString: false
+  values:
+    - Other
+    - Games
+    - Software
+    - DLC
+    - Tabletop
+x-enum-varnames:
+  - Other
+  - Games
+  - Software
+  - DLC
+  - Tabletop

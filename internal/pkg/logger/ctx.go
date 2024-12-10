@@ -23,17 +23,22 @@ import (
 
 // https://github.com/uber-go/zap/issues/654
 
+// make RequestKey and unique.
+type key string
+
 //nolint:gochecknoglobals
-var RequestKey = &struct{}{}
+const RequestKey key = "logger.contextKey"
 
 type RequestTrace struct {
 	IP    string
 	ReqID string
+	Path  string
 }
 
 func (r *RequestTrace) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("ip", r.IP)
 	enc.AddString("request-id", r.ReqID)
+	enc.AddString("path", r.Path)
 
 	return nil
 }

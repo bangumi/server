@@ -12,17 +12,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package metrics
+package subject
 
 import (
-	"github.com/redis/go-redis/v9"
-	redisprom "github.com/trim21/go-redis-prometheus"
+	"reflect"
+	"sort"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/bangumi/server/internal/search/searcher"
 )
 
-func RedisHook(instance string) redis.Hook {
-	return redisprom.NewHook(
-		redisprom.WithNamespace("chii"),
-		redisprom.WithDurationBuckets([]float64{.001, .002, .003, .004, .005, .0075, .01, .05, .1, .3, .5, .75, 1, 2}),
-		redisprom.WithInstanceName(instance),
-	)
+func TestIndexFilter(t *testing.T) {
+	t.Parallel()
+
+	rt := reflect.TypeOf(document{})
+	actual := *(searcher.GetAttributes(rt, "filterable"))
+	expected := []string{"date", "meta_tag", "score", "rank", "type", "nsfw", "tag"}
+
+	sort.Strings(expected)
+	sort.Strings(actual)
+
+	require.Equal(t, expected, actual)
 }

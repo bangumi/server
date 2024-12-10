@@ -4,17 +4,20 @@ on:
   push:
     tags:
       - "v*.*.*"
-    branches:
-      - master
+    branches-ignore:
+      - "renovate/**"
 
 permissions:
   packages: write
+
+env:
+  GOTOOLCHAIN: "local"
 
 jobs:
   docker:
     name: "docker"
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       IMAGE: "ghcr.io/${{ github.repository_owner }}/chii"
 
@@ -36,7 +39,6 @@ jobs:
           key: go-cache-122-${{ hashFiles('**/go.sum') }}-build
           restore-keys: |
             go-cache-122-${{ hashFiles('**/go.sum') }}-
-            go-cache-122-
 
       - run: echo "SHA=${GITHUB_REF##*/}" >> $GITHUB_ENV
         if: "${{ startsWith(github.ref, 'refs/tags/') }}"
@@ -63,6 +65,7 @@ jobs:
           images: ${{ env.IMAGE }}
           tags: |
             type=semver,event=tag,pattern=v{{version}}
+            type=raw,value={{commit_date 'YYYY-MM-DD'}}-{{sha}}
 
             type=ref,event=branch
             type=ref,event=branch,suffix=-${{ env.SHA }}
@@ -74,7 +77,7 @@ jobs:
           password: ${{ github.token }}
 
       - name: Build Final Docker Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./
           provenance: false

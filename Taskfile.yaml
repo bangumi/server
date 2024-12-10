@@ -27,7 +27,7 @@ tasks:
     generates:
       - ./dist/chii.exe
     cmds:
-      - go build -ldflags '-w -s' -trimpath -o dist/chii.exe main.go
+      - go build -trimpath -o dist/chii.exe main.go
     env:
       CGO_ENABLED: "0"
 
@@ -35,7 +35,7 @@ tasks:
     silent: true
     desc: Run 'golangci-lint'
     cmds:
-      - golangci-lint run --fix
+      - golangci-lint --path-prefix  "{{ .TASKFILE_DIR }}" run --fix
 
   test:
     desc: Run mocked tests, need nothing.
@@ -43,6 +43,31 @@ tasks:
       - go test -timeout 3s -tags test {{.CLI_ARGS}} ./...
     env:
       CGO_ENABLED: "0"
+
+  web:
+    desc: Run Web Server
+    aliases:
+      - serve
+      - server
+    cmds:
+      - go run main.go --config config.yaml web
+
+  consumer:
+    desc: Run Kafka Consumer
+    aliases:
+      - canal
+    cmds:
+      - go run main.go canal --config config.yaml
+
+  openapi-test:
+    desc: Test OpenAPI Schema
+    cmds:
+      - npm run test
+
+  openapi:
+    desc: Build OpenAPI Schema
+    cmds:
+      - npm run build
 
   bench:
     desc: Run benchmark

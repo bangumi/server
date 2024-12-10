@@ -32,7 +32,7 @@ func newCharacterSubjects(db *gorm.DB, opts ...gen.DOOption) characterSubjects {
 	_characterSubjects.SubjectTypeID = field.NewUint8(tableName, "subject_type_id")
 	_characterSubjects.CrtType = field.NewUint8(tableName, "crt_type")
 	_characterSubjects.CtrAppearEps = field.NewString(tableName, "ctr_appear_eps")
-	_characterSubjects.CrtOrder = field.NewUint8(tableName, "crt_order")
+	_characterSubjects.CrtOrder = field.NewUint16(tableName, "crt_order")
 	_characterSubjects.Character = characterSubjectsHasOneCharacter{
 		db: db.Session(&gorm.Session{}),
 
@@ -69,7 +69,7 @@ type characterSubjects struct {
 	SubjectTypeID field.Uint8
 	CrtType       field.Uint8  // 主角，配角
 	CtrAppearEps  field.String // 可选，角色出场的的章节
-	CrtOrder      field.Uint8
+	CrtOrder      field.Uint16
 	Character     characterSubjectsHasOneCharacter
 
 	Subject characterSubjectsHasOneSubject
@@ -94,7 +94,7 @@ func (c *characterSubjects) updateTableName(table string) *characterSubjects {
 	c.SubjectTypeID = field.NewUint8(table, "subject_type_id")
 	c.CrtType = field.NewUint8(table, "crt_type")
 	c.CtrAppearEps = field.NewString(table, "ctr_appear_eps")
-	c.CrtOrder = field.NewUint8(table, "crt_order")
+	c.CrtOrder = field.NewUint16(table, "crt_order")
 
 	c.fillFieldMap()
 

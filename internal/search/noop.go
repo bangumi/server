@@ -19,8 +19,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-
-	"github.com/bangumi/server/internal/model"
 )
 
 var _ Client = NoopClient{}
@@ -28,15 +26,19 @@ var _ Client = NoopClient{}
 type NoopClient struct {
 }
 
-func (n NoopClient) Handle(c echo.Context) error {
+func (n NoopClient) Handle(c echo.Context, _ SearchTarget) error {
 	return c.String(http.StatusOK, "search is not enable")
 }
 
-func (n NoopClient) OnSubjectUpdate(_ context.Context, _ model.SubjectID) error {
+func (n NoopClient) EventAdded(ctx context.Context, _ uint32, _ SearchTarget) error {
 	return nil
 }
 
-func (n NoopClient) OnSubjectDelete(_ context.Context, _ model.SubjectID) error {
+func (n NoopClient) EventUpdate(_ context.Context, _ uint32, _ SearchTarget) error {
+	return nil
+}
+
+func (n NoopClient) EventDelete(_ context.Context, _ uint32, _ SearchTarget) error {
 	return nil
 }
 

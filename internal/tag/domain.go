@@ -12,17 +12,36 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-package random
+package tag
 
 import (
-	"testing"
+	"context"
 
-	"github.com/stretchr/testify/require"
+	"github.com/bangumi/server/internal/model"
 )
 
-func TestConst(t *testing.T) {
-	t.Parallel()
+// CatSubject 条目tag.
+const CatSubject = 0
 
-	require.EqualValues(t, len(base62Chars), base62CharsLength)
-	require.EqualValues(t, 255-(256%len(base62Chars)), base62MaxByte)
+// CatMeta 官方tag.
+const CatMeta = 3
+
+type Tag struct {
+	Name  string
+	Count uint
+	// TotalCount count for all tags including all subject
+	TotalCount uint
+}
+
+type CachedRepo interface {
+	read
+}
+
+type Repo interface {
+	read
+}
+
+type read interface {
+	Get(ctx context.Context, id model.SubjectID) ([]Tag, error)
+	GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID][]Tag, error)
 }

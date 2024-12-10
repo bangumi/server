@@ -19,6 +19,7 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
+	"golang.org/x/text/unicode/norm"
 
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
@@ -118,7 +119,7 @@ func (s *Subject) UpdateComment(comment string) error {
 		return gerr.ErrInvisibleChar
 	}
 
-	s.comment = comment
+	s.comment = norm.NFKC.String(comment)
 
 	return nil
 }
@@ -133,6 +134,10 @@ func (s *Subject) UpdateTags(tags []string) error {
 
 	if lo.ContainsBy(tags, func(item string) bool { return !dam.AllPrintableChar(item) }) {
 		return gerr.ErrInvisibleChar
+	}
+
+	for i, tag := range tags {
+		tags[i] = norm.NFKC.String(tag)
 	}
 
 	s.tags = lo.Uniq(tags)

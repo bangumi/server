@@ -84,6 +84,10 @@ func (h User) updateOrCreateSubjectCollection(
 		return errgo.Wrap(err, "query.GetSubject")
 	}
 
+	if s.Ban != 0 {
+		return res.NotFound("subject locked or merged")
+	}
+
 	if s.TypeID != model.SubjectTypeBook {
 		if r.VolStatus.Set || r.EpStatus.Set {
 			return res.BadRequest("can't set 'vol_status' or 'ep_status' on non-book subject")

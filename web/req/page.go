@@ -35,6 +35,42 @@ func (q PageQuery) Check(count int64) error {
 	return nil
 }
 
+// GetPageQuerySoftLimit apply soft limit on query without error.
+func GetPageQuerySoftLimit(c echo.Context, defaultLimit int, maxLimit int) (PageQuery, error) {
+	q := PageQuery{Limit: defaultLimit}
+	var err error
+
+	raw := c.QueryParam("limit")
+	if raw != "" {
+		q.Limit, err = strconv.Atoi(raw)
+		if err != nil {
+			return q, res.BadRequest("can't parse query args limit as int: " + strconv.Quote(raw))
+		}
+
+		if q.Limit <= 0 {
+			return q, res.BadRequest("limit should be greater than zero")
+		}
+
+		if q.Limit > maxLimit {
+			q.Limit = maxLimit
+		}
+	}
+
+	raw = c.QueryParam("offset")
+	if raw != "" {
+		q.Offset, err = strconv.Atoi(raw)
+		if err != nil {
+			return q, res.BadRequest("can't parse query args offset as int: " + strconv.Quote(raw))
+		}
+
+		if q.Offset < 0 {
+			return q, res.BadRequest("offset should be greater than or equal to 0")
+		}
+	}
+
+	return q, nil
+}
+
 func GetPageQuery(c echo.Context, defaultLimit int, maxLimit int) (PageQuery, error) {
 	q := PageQuery{Limit: defaultLimit}
 	var err error

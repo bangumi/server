@@ -80,7 +80,7 @@ func start(out string) {
 	err := fx.New(
 		fx.NopLogger,
 		fx.Provide(
-			driver.NewMysqlConnectionPool, dal.NewDB,
+			driver.NewMysqlSqlDB, dal.NewGormDB,
 
 			config.NewAppConfig, logger.Copy,
 
@@ -180,6 +180,14 @@ type Score struct {
 	Field10 uint32 `json:"10"`
 }
 
+type Favorite struct {
+	Wish    uint32 `json:"wish"`
+	Done    uint32 `json:"done"`
+	Doing   uint32 `json:"doing"`
+	OnHold  uint32 `json:"on_hold"`
+	Dropped uint32 `json:"dropped"`
+}
+
 type Subject struct {
 	ID       model.SubjectID   `json:"id"`
 	Type     model.SubjectType `json:"type"`
@@ -190,15 +198,19 @@ type Subject struct {
 	Summary  string            `json:"summary"`
 	Nsfw     bool              `json:"nsfw"`
 
-	Tags         []Tag   `json:"tags"`
-	Score        float64 `json:"score"`
-	ScoreDetails Score   `json:"score_details"`
-	Rank         uint32  `json:"rank"`
+	Tags         []Tag    `json:"tags"`
+	Score        float64  `json:"score"`
+	ScoreDetails Score    `json:"score_details"`
+	Rank         uint32   `json:"rank"`
+	Date         string   `json:"date"`
+	Favorite     Favorite `json:"favorite"`
+
+	Series bool `json:"series"`
 }
 
 type Tag struct {
 	Name  string `json:"name"`
-	Count int    `json:"count"`
+	Count uint   `json:"count"`
 }
 
 func exportSubjects(q *query.Query, w io.Writer) {
@@ -219,7 +231,7 @@ func exportSubjects(q *query.Query, w io.Writer) {
 				return tags[i].Count >= tags[j].Count
 			})
 
-			tags = lo.Filter(lo.Slice(tags, 0, 11), func(item model.Tag, index int) bool { //nolint:gomnd
+			tags = lo.Filter(lo.Slice(tags, 0, 11), func(item model.Tag, index int) bool { //nolint:mnd
 				return utf8.RuneCountInString(item.Name) < 10 || item.Count >= 10
 			})
 
@@ -238,12 +250,17 @@ func exportSubjects(q *query.Query, w io.Writer) {
 					6*f.Rate6+7*f.Rate7+8*f.Rate8+9*f.Rate9+10*f.Rate10) / float64(total)
 			}
 
+			encodedDate := ""
+			if !subject.Fields.Date.IsZero() {
+				encodedDate = subject.Fields.Date.Format("2006-01-02")
+			}
+
 			encode(w, Subject{
 				ID:       subject.ID,
 				Type:     subject.TypeID,
-				Name:     subject.Name,
-				NameCN:   subject.NameCN,
-				Infobox:  subject.Infobox,
+				Name:     string(subject.Name),
+				NameCN:   string(subject.NameCN),
+				Infobox:  string(subject.Infobox),
 				Platform: subject.Platform,
 				Summary:  subject.Summary,
 				Nsfw:     subject.Nsfw,
@@ -262,18 +279,29 @@ func exportSubjects(q *query.Query, w io.Writer) {
 					Field9:  subject.Fields.Rate9,
 					Field10: subject.Fields.Rate10,
 				},
+				Date:   encodedDate,
+				Series: subject.Series,
+				Favorite: Favorite{
+					Wish:    subject.Wish,
+					Done:    subject.Done,
+					Doing:   subject.Doing,
+					OnHold:  subject.OnHold,
+					Dropped: subject.Dropped,
+				},
 			})
 		}
 	}
 }
 
 type Person struct {
-	ID      model.PersonID `json:"id"`
-	Name    string         `json:"name"`
-	Type    uint8          `json:"type"`
-	Career  []string       `json:"career"`
-	Infobox string         `json:"infobox"`
-	Summary string         `json:"summary"`
+	ID       model.PersonID `json:"id"`
+	Name     string         `json:"name"`
+	Type     uint8          `json:"type"`
+	Career   []string       `json:"career"`
+	Infobox  string         `json:"infobox"`
+	Summary  string         `json:"summary"`
+	Comments uint32         `json:"comments"`
+	Collects uint32         `json:"collects"`
 }
 
 func exportPersons(q *query.Query, w io.Writer) {
@@ -286,12 +314,14 @@ func exportPersons(q *query.Query, w io.Writer) {
 
 		for _, p := range persons {
 			encode(w, Person{
-				ID:      p.ID,
-				Name:    p.Name,
-				Type:    p.Type,
-				Career:  careers(p),
-				Infobox: p.Infobox,
-				Summary: p.Summary,
+				ID:       p.ID,
+				Name:     p.Name,
+				Type:     p.Type,
+				Career:   careers(p),
+				Infobox:  p.Infobox,
+				Summary:  p.Summary,
+				Comments: p.Comment,
+				Collects: p.Collects,
 			})
 		}
 	}
@@ -336,11 +366,13 @@ func careers(p *dao.Person) []string {
 }
 
 type Character struct {
-	ID      model.CharacterID `json:"id"`
-	Role    uint8             `json:"role"`
-	Name    string            `json:"name"`
-	Infobox string            `json:"infobox"`
-	Summary string            `json:"summary"`
+	ID       model.CharacterID `json:"id"`
+	Role     uint8             `json:"role"`
+	Name     string            `json:"name"`
+	Infobox  string            `json:"infobox"`
+	Summary  string            `json:"summary"`
+	Comments uint32            `json:"comments"`
+	Collects uint32            `json:"collects"`
 }
 
 func exportCharacters(q *query.Query, w io.Writer) {
@@ -353,11 +385,13 @@ func exportCharacters(q *query.Query, w io.Writer) {
 
 		for _, c := range characters {
 			encode(w, Character{
-				ID:      c.ID,
-				Name:    c.Name,
-				Role:    c.Role,
-				Infobox: c.Infobox,
-				Summary: c.Summary,
+				ID:       c.ID,
+				Name:     c.Name,
+				Role:     c.Role,
+				Infobox:  c.Infobox,
+				Summary:  c.Summary,
+				Comments: c.Comment,
+				Collects: c.Collects,
 			})
 		}
 	}
@@ -370,6 +404,7 @@ type Episode struct {
 	Description string          `json:"description"`
 	AirDate     string          `json:"airdate"`
 	Disc        uint8           `json:"disc"`
+	Duration    string          `json:"duration"`
 	SubjectID   model.SubjectID `json:"subject_id"`
 	Sort        float32         `json:"sort"`
 	Type        episode.Type    `json:"type"`
@@ -394,6 +429,7 @@ func exportEpisodes(q *query.Query, w io.Writer) {
 				NameCn:      e.NameCn,
 				Sort:        e.Sort,
 				SubjectID:   e.SubjectID,
+				Duration:    e.Duration,
 				Description: e.Desc,
 				Type:        e.Type,
 				AirDate:     e.Airdate,
@@ -407,7 +443,7 @@ type SubjectRelation struct {
 	SubjectID        model.SubjectID `json:"subject_id"`
 	RelationType     uint16          `json:"relation_type"`
 	RelatedSubjectID model.SubjectID `json:"related_subject_id"`
-	Order            uint8           `json:"order"`
+	Order            uint16          `json:"order"`
 }
 
 func exportSubjectRelations(q *query.Query, w io.Writer) {
@@ -459,7 +495,7 @@ type SubjectCharacter struct {
 	CharacterID model.CharacterID `json:"character_id"`
 	SubjectID   model.SubjectID   `json:"subject_id"`
 	Type        uint8             `json:"type"`
-	Order       uint8             `json:"order"`
+	Order       uint16            `json:"order"`
 }
 
 func exportSubjectCharacterRelations(q *query.Query, w io.Writer) {

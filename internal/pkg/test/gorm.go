@@ -44,7 +44,7 @@ func GetQuery(tb testing.TB) *query.Query {
 
 func GetGorm(tb testing.TB) *gorm.DB {
 	tb.Helper()
-	RequireEnv(tb, EnvRedis)
+	RequireEnv(tb, EnvMysql)
 
 	cfg, err := config.NewAppConfig()
 	require.NoError(tb, err)
@@ -56,7 +56,7 @@ func GetGorm(tb testing.TB) *gorm.DB {
 
 func newGorm(tb testing.TB, c config.AppConfig) (*gorm.DB, error) {
 	tb.Helper()
-	conn, err := driver.NewMysqlConnectionPool(c)
+	conn, err := driver.NewMysqlSqlDB(c)
 	if err != nil {
 		return nil, errgo.Wrap(err, "sql.Open")
 	}

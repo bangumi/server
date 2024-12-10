@@ -16,8 +16,18 @@ package handler
 
 import (
 	"github.com/labstack/echo/v4"
+
+	"github.com/bangumi/server/internal/search"
 )
 
-func (h Handler) Search(c echo.Context) error {
-	return h.search.Handle(c) //nolint:wrapcheck
+func (h Handler) SearchSubjects(c echo.Context) error {
+	return h.search.Handle(c, search.SearchTargetSubject) //nolint:wrapcheck
+}
+
+func (h Handler) SearchCharacters(c echo.Context) error {
+	return h.search.Handle(c, search.SearchTargetCharacter) //nolint:wrapcheck
+}
+
+func (h Handler) SearchPersons(c echo.Context) error {
+	return h.search.Handle(c, search.SearchTargetPerson) //nolint:wrapcheck
 }

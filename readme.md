@@ -1,11 +1,8 @@
 <https://bgm.tv/> 新后端服务器。
 
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/Bangumi/server?style=flat-square)
-[![Codecov](https://img.shields.io/codecov/c/github/Bangumi/server?style=flat-square)](https://app.codecov.io/gh/Bangumi/server)
-
 ## Requirements
 
-- [Go 1.22](https://go.dev/)
+- ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/Bangumi/server?style=flat-square)
 - [go-task](https://taskfile.dev/installation/)，使用 `task` 查看所有的构建目标。
 - [golangci-lint](https://golangci-lint.run/)，使用 `task lint` 运行 linter。
 
@@ -78,13 +75,13 @@ ORM: [GORM](https://github.com/go-gorm/gorm) 和 [GORM Gen](https://github.com/g
 启动 HTTP server
 
 ```shell
-go run main.go --config config.yaml web
+task web
 ```
 
 启动 kafka consumer
 
 ```shell
-go run main.go canal --config config.yaml
+task consumer
 ```
 
 ### 后端环境

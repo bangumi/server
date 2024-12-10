@@ -19,8 +19,8 @@ import (
 	"encoding/json"
 	"sync/atomic"
 
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/redis/go-redis/v9"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/redis/rueidis"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/search"
+	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -35,10 +36,11 @@ func newEventHandler(
 	log *zap.Logger,
 	appConfig config.AppConfig,
 	session session.Manager,
-	redis *redis.Client,
+	redis rueidis.Client,
 	stream Stream,
+	tag tag.Repo,
 	search search.Client,
-	s3 *s3.S3,
+	s3 *s3.Client,
 ) *eventHandler {
 	return &eventHandler{
 		redis:   redis,
@@ -48,6 +50,7 @@ func newEventHandler(
 		s3:      s3,
 		stream:  stream,
 		log:     log.Named("eventHandler"),
+		tag:     tag,
 	}
 }
 
@@ -58,18 +61,19 @@ type eventHandler struct {
 	log     *zap.Logger
 	search  search.Client
 	stream  Stream
-	s3      *s3.S3 // optional, check nil before use
-	redis   *redis.Client
+	s3      *s3.Client // optional, check nil before use
+	redis   rueidis.Client
+	tag     tag.Repo
 }
 
 func (e *eventHandler) start() error {
 	ee := e.stream.Read(context.Background(), func(msg Msg) error {
-		e.log.Debug("new message", zap.String("stream", msg.Stream), zap.String("id", msg.ID))
+		e.log.Debug("new message", zap.String("topic", msg.Topic), zap.String("id", msg.ID))
 
 		err := e.onMessage(msg.Key, msg.Value)
 		if err != nil {
 			e.log.Error("failed to handle stream msg",
-				zap.Error(err), zap.String("stream", msg.Stream), zap.String("id", msg.ID))
+				zap.Error(err), zap.String("stream", msg.Topic), zap.String("id", msg.ID))
 			return errgo.Trace(err)
 		}
 
@@ -85,10 +89,10 @@ func (e *eventHandler) Close() error {
 	return nil
 }
 
-func (e *eventHandler) OnUserPasswordChange(id model.UserID) error {
+func (e *eventHandler) OnUserPasswordChange(ctx context.Context, id model.UserID) error {
 	e.log.Info("user change password", log.User(id))
 
-	if err := e.session.RevokeUser(context.Background(), id); err != nil {
+	if err := e.session.RevokeUser(ctx, id); err != nil {
 		e.log.Error("failed to revoke user", log.User(id), zap.Error(err))
 		return errgo.Wrap(err, "session.RevokeUser")
 	}
@@ -103,26 +107,29 @@ func (e *eventHandler) onMessage(key, value []byte) error {
 		return nil
 	}
 
-	var k messageKey
-	if err := json.Unmarshal(key, &k); err != nil {
+	var p Payload
+	if err := json.Unmarshal(value, &p); err != nil {
+		e.log.Warn("failed to parse kafka value", zap.String("table", p.Source.Table), zap.Error(err))
 		return nil
 	}
 
-	var v messageValue
-	if err := json.Unmarshal(value, &v); err != nil {
-		return nil
-	}
+	e.log.Debug("new message", zap.String("table", p.Source.Table))
 
-	e.log.Debug("new message", zap.String("table", v.Payload.Source.Table))
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	var err error
-	switch v.Payload.Source.Table {
+	switch p.Source.Table {
 	case "chii_subject_fields":
-		err = e.OnSubjectField(k.Payload, v.Payload)
+		err = e.OnSubjectField(ctx, key, p)
 	case "chii_subjects":
-		err = e.OnSubject(k.Payload, v.Payload)
+		err = e.OnSubject(ctx, key, p)
+	case "chii_characters":
+		err = e.OnCharacter(ctx, key, p)
+	case "chii_persons":
+		err = e.OnPerson(ctx, key, p)
 	case "chii_members":
-		err = e.OnUserChange(k.Payload, v.Payload)
+		err = e.OnUserChange(ctx, key, p)
 	}
 
 	return err
@@ -138,15 +145,7 @@ const (
 // https://debezium.io/documentation/reference/connectors/mysql.html
 // Table 9. Overview of change event basic content
 
-type messageKey struct {
-	Payload json.RawMessage `json:"payload"`
-}
-
-type messageValue struct {
-	Payload payload `json:"payload"`
-}
-
-type payload struct {
+type Payload struct {
 	Before json.RawMessage `json:"before"`
 	After  json.RawMessage `json:"after"`
 	Source source          `json:"source"`

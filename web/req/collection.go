@@ -15,10 +15,12 @@
 package req
 
 import (
+	"fmt"
 	"strings"
 	"unicode/utf8"
 
 	"github.com/samber/lo"
+	"golang.org/x/text/unicode/norm"
 
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/pkg/dam"
@@ -47,18 +49,33 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 		}
 	}
 
-	if len(v.Tags) > 0 {
-		if !lo.EveryBy(v.Tags, dam.AllPrintableChar) {
-			return res.BadRequest("invisible character are included in tags")
+	if v.Tags != nil {
+		if len(v.Tags) > 10 {
+			return res.BadRequest("最多允许 10 个标签")
+		}
+
+		v.Tags = lo.Map(v.Tags, func(item string, index int) string {
+			return norm.NFKC.String(item)
+		})
+	}
+
+	for _, tag := range v.Tags {
+		if utf8.RuneCountInString(tag) < 2 {
+			return res.BadRequest("tag 最短为两个字")
+		}
+
+		if !dam.ValidateTag(tag) {
+			return res.BadRequest(fmt.Sprintf("invalid tag: %q", tag))
 		}
 	}
 
 	if v.Comment.Set {
+		v.Comment.Value = norm.NFKC.String(v.Comment.Value)
+		v.Comment.Value = strings.TrimSpace(v.Comment.Value)
 		if !dam.AllPrintableChar(v.Comment.Value) {
 			return res.BadRequest("invisible character are included in comment")
 		}
 
-		v.Comment.Value = strings.TrimSpace(v.Comment.Value)
 		if utf8.RuneCountInString(v.Comment.Value) > 380 {
 			return res.BadRequest("comment too long, only allow less equal than 380 characters")
 		}

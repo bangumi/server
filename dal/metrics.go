@@ -22,7 +22,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func setupMetrics(db *gorm.DB, conn *sql.DB) error {
+func SetupMetrics(db *gorm.DB, conn *sql.DB) error {
 	var DatabaseQuery = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "chii_db_execute_total",

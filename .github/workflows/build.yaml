@@ -24,9 +24,12 @@ on:
       - "**.go.json"
       - "etc/Dockerfile"
 
+env:
+  GOTOOLCHAIN: "local"
+
 jobs:
   docker:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +49,6 @@ jobs:
           key: go-cache-122-${{ hashFiles('**/go.sum') }}-build
           restore-keys: |
             go-cache-122-${{ hashFiles('**/go.sum') }}-
-            go-cache-122-
 
       - name: Install Task
         uses: arduino/setup-task@v2

@@ -13,10 +13,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
 // Package search 基于 meilisearch 提供搜索功能
-package search
+package subject
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -25,32 +24,23 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
+	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
+	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
-type Client interface {
-	Handler
-	OnSubjectUpdate(ctx context.Context, id model.SubjectID) error
-	Close()
-	OnSubjectDelete(ctx context.Context, id model.SubjectID) error
-}
-
-// Handler
-// TODO: 想个办法挪到 web 里面去.
-type Handler interface {
-	Handle(c echo.Context) error
-}
-
-const defaultLimit = 50
-const maxLimit = 200
+const defaultLimit = 10
+const maxLimit = 20
 
 type Req struct {
 	Keyword string    `json:"keyword"`
@@ -59,12 +49,15 @@ type Req struct {
 }
 
 type ReqFilter struct { //nolint:musttag
-	Type    []model.SubjectType `json:"type"`     // or
-	Tag     []string            `json:"tag"`      // and
-	AirDate []string            `json:"air_date"` // and
-	Score   []string            `json:"rating"`   // and
-	Rank    []string            `json:"rank"`     // and
-	NSFW    null.Bool           `json:"nsfw"`
+	Type     []model.SubjectType `json:"type"`      // or
+	Tag      []string            `json:"tag"`       // and
+	AirDate  []string            `json:"air_date"`  // and
+	Score    []string            `json:"rating"`    // and
+	Rank     []string            `json:"rank"`      // and
+	MetaTags []string            `json:"meta_tags"` // and
+
+	// if NSFW subject is enabled
+	NSFW null.Bool `json:"nsfw"`
 }
 
 type hit struct {
@@ -72,21 +65,32 @@ type hit struct {
 }
 
 type ReponseSubject struct {
-	Date    string           `json:"date"`
-	Image   string           `json:"image"`
-	Type    uint8            `json:"type"`
-	Summary string           `json:"summary"`
-	Name    string           `json:"name"`
-	NameCN  string           `json:"name_cn"`
-	Tags    []res.SubjectTag `json:"tags"`
-	Score   float64          `json:"score"`
-	ID      model.SubjectID  `json:"id"`
-	Rank    uint32           `json:"rank"`
+	Date       *string                   `json:"date"`
+	Platform   *string                   `json:"platform"`
+	Images     res.SubjectImages         `json:"images"`
+	Image      string                    `json:"image"`
+	Summary    string                    `json:"summary"`
+	Name       string                    `json:"name"`
+	NameCN     string                    `json:"name_cn"`
+	Tags       []res.SubjectTag          `json:"tags"`
+	Infobox    res.V0wiki                `json:"infobox"`
+	Rating     res.Rating                `json:"rating"`
+	Collection res.SubjectCollectionStat `json:"collection"`
+	ID         model.SubjectID           `json:"id"`
+	Eps        uint32                    `json:"eps"`
+	MetaTags   []string                  `json:"meta_tags"`
+	Volumes    uint32                    `json:"volumes"`
+	Series     bool                      `json:"series"`
+	Locked     bool                      `json:"locked"`
+	NSFW       bool                      `json:"nsfw"`
+	TypeID     model.SubjectType         `json:"type"`
+	Redirect   model.SubjectID           `json:"-"`
 }
 
+//nolint:funlen
 func (c *client) Handle(ctx echo.Context) error {
 	auth := accessor.GetFromCtx(ctx)
-	q, err := req.GetPageQuery(ctx, defaultLimit, maxLimit)
+	q, err := req.GetPageQuerySoftLimit(ctx, defaultLimit, maxLimit)
 	if err != nil {
 		return err
 	}
@@ -97,7 +101,7 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 
 	if !auth.AllowNSFW() {
-		r.Filter.NSFW = null.New(false)
+		r.Filter.NSFW = null.Bool{Set: true, Value: false}
 	}
 
 	result, err := c.doSearch(r.Keyword, filterToMeiliFilter(r.Filter), r.Sort, q.Limit, q.Offset)
@@ -111,29 +115,29 @@ func (c *client) Handle(ctx echo.Context) error {
 	}
 	ids := slice.Map(hits, func(h hit) model.SubjectID { return h.ID })
 
-	subjects, err := c.subjectRepo.GetByIDs(ctx.Request().Context(), ids, subject.Filter{NSFW: r.Filter.NSFW})
+	subjects, err := c.repo.GetByIDs(ctx.Request().Context(), ids, subject.Filter{})
 	if err != nil {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
 
-	data := slice.Map(ids, func(id model.SubjectID) ReponseSubject {
-		s := subjects[id]
-
-		return ReponseSubject{
-			Date:    s.Date,
-			Image:   res.SubjectImage(s.Image).Large,
-			Type:    s.TypeID,
-			Summary: s.Summary,
-			Name:    s.Name,
-			NameCN:  s.NameCN,
-			Tags: slice.Map(s.Tags, func(item model.Tag) res.SubjectTag {
-				return res.SubjectTag{Name: item.Name, Count: item.Count}
-			}),
-			Score: s.Rating.Score,
-			ID:    s.ID,
-			Rank:  s.Rating.Rank,
+	var data = make([]ReponseSubject, 0, len(subjects))
+	for _, id := range ids {
+		s, ok := subjects[id]
+		if !ok {
+			continue
 		}
-	})
+		var metaTags []tag.Tag
+
+		for _, t := range strings.Split(s.MetaTags, " ") {
+			if t == "" {
+				continue
+			}
+			metaTags = append(metaTags, tag.Tag{Name: t, Count: 1})
+		}
+
+		subject := toResponseSubject(s, metaTags)
+		data = append(data, subject)
+	}
 
 	return ctx.JSON(http.StatusOK, res.Paged{
 		Data:   data,
@@ -168,7 +172,7 @@ func (c *client) doSearch(
 		return nil, res.BadRequest("sort not supported")
 	}
 
-	raw, err := c.subjectIndex.SearchRaw(words, &meilisearch.SearchRequest{
+	raw, err := c.index.SearchRaw(words, &meilisearch.SearchRequest{
 		Offset: int64(offset),
 		Limit:  int64(limit),
 		Filter: filter,
@@ -205,8 +209,13 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 			return fmt.Sprintf("type = %d", s)
 		}))
 	}
+
 	if req.NSFW.Set {
-		filter = append(filter, []string{"nsfw = " + strconv.FormatBool(req.NSFW.Value)})
+		filter = append(filter, []string{fmt.Sprintf("nsfw = %t", req.NSFW.Value)})
+	}
+
+	for _, tag := range req.MetaTags {
+		filter = append(filter, []string{"meta_tag = " + strconv.Quote(tag)})
 	}
 
 	// AND
@@ -300,4 +309,59 @@ func isDigitsOnly(s string) bool {
 		}
 	}
 	return true
+}
+
+func toResponseSubject(s model.Subject, metaTags []tag.Tag) ReponseSubject {
+	images := res.SubjectImage(s.Image)
+	return ReponseSubject{
+		ID:       s.ID,
+		Image:    images.Large,
+		Images:   images,
+		Summary:  s.Summary,
+		Name:     s.Name,
+		Platform: res.PlatformString(s),
+		NameCN:   s.NameCN,
+		Date:     null.NilString(s.Date),
+		Infobox:  compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
+		Volumes:  s.Volumes,
+		Redirect: s.Redirect,
+		Eps:      s.Eps,
+		MetaTags: lo.Map(metaTags, func(item tag.Tag, index int) string {
+			return item.Name
+		}),
+		Tags: slice.Map(s.Tags, func(tag model.Tag) res.SubjectTag {
+			return res.SubjectTag{
+				Name:  tag.Name,
+				Count: tag.Count,
+			}
+		}),
+		Collection: res.SubjectCollectionStat{
+			OnHold:  s.OnHold,
+			Wish:    s.Wish,
+			Dropped: s.Dropped,
+			Collect: s.Collect,
+			Doing:   s.Doing,
+		},
+		TypeID: s.TypeID,
+		Series: s.Series,
+		Locked: s.Locked(),
+		NSFW:   s.NSFW,
+		Rating: res.Rating{
+			Rank:  s.Rating.Rank,
+			Total: s.Rating.Total,
+			Count: res.Count{
+				Field1:  s.Rating.Count.Field1,
+				Field2:  s.Rating.Count.Field2,
+				Field3:  s.Rating.Count.Field3,
+				Field4:  s.Rating.Count.Field4,
+				Field5:  s.Rating.Count.Field5,
+				Field6:  s.Rating.Count.Field6,
+				Field7:  s.Rating.Count.Field7,
+				Field8:  s.Rating.Count.Field8,
+				Field9:  s.Rating.Count.Field9,
+				Field10: s.Rating.Count.Field10,
+			},
+			Score: s.Rating.Score,
+		},
+	}
 }

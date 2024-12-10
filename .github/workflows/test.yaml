@@ -22,12 +22,15 @@ on:
       - "**.go"
       - "**.go.json"
 
+env:
+  GOTOOLCHAIN: "local"
+
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - run: git clone https://github.com/bangumi/dev-env $HOME/dev-env
-      - run: cd ~/dev-env && docker-compose up -d
+      - run: cd ~/dev-env && docker compose up -d
 
       - uses: actions/checkout@v4
         with:
@@ -53,7 +56,6 @@ jobs:
           key: go-cache-122-${{ hashFiles('**/go.sum') }}-test
           restore-keys: |
             go-cache-122-${{ hashFiles('**/go.sum') }}-
-            go-cache-122-
 
       - run: go get -t ./...
 
@@ -70,7 +72,7 @@ jobs:
           MYSQL_DB: bangumi
           REDIS_URI: "redis://:redis-pass@127.0.0.1:6379/0"
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           files: coverage.out
           token: ${{ secrets.CODECOV_TOKEN }} # required

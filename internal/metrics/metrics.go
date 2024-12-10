@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-//nolint:gomnd,gochecknoinits,gochecknoglobals
+//nolint:mnd,gochecknoinits,gochecknoglobals
 package metrics
 
 import (
@@ -45,7 +45,10 @@ var RequestHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 		0.200,
 		0.300,
 		0.500,
-		1.000,
+		1,
+		2,
+		5,
+		10,
 	},
 })
 
@@ -68,6 +71,9 @@ var SQLHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 		0.200,
 		0.300,
 		0.500,
-		1.000,
+		1,
+		2,
+		5,
+		10,
 	},
 })

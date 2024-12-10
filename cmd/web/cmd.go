@@ -41,6 +41,7 @@ import (
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
+	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/internal/timeline"
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web"
@@ -64,8 +65,8 @@ func start() error {
 		// driver and connector
 		fx.Provide(
 			config.AppConfigReader(config.AppTypeHTTP),
-			driver.NewRedisClientWithMetrics, // redis
-			driver.NewMysqlConnectionPool,    // mysql
+			driver.NewRueidisClient, // redis
+			driver.NewMysqlSqlDB,    // mysql
 			func() *resty.Client {
 				httpClient := resty.New().SetJSONEscapeHTML(false)
 				httpClient.JSONUnmarshal = json.Unmarshal
@@ -74,18 +75,21 @@ func start() error {
 			},
 		),
 
+		fx.Invoke(dal.SetupMetrics),
+
 		dal.Module,
 
 		fx.Provide(
 			logger.Copy, cache.NewRedisCache,
 
-			character.NewMysqlRepo,
-
 			user.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, infra.NewMysqlRepo,
 			timeline.NewMysqlRepo, pm.NewMysqlRepo, notification.NewMysqlRepo,
 
-			dam.New, subject.NewMysqlRepo, subject.NewCachedRepo, person.NewMysqlRepo,
+			dam.New, subject.NewMysqlRepo, subject.NewCachedRepo,
+			character.NewMysqlRepo, person.NewMysqlRepo,
+
+			tag.NewCachedRepo, tag.NewMysqlRepo,
 
 			auth.NewService, person.NewService, search.New,
 		),

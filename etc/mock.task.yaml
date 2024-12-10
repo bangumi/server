@@ -6,6 +6,7 @@ vars:
 tasks:
   all:
     cmds:
+      - task: Tag
       - task: session-manager
       - task: session-repo
       - task: cache
@@ -97,6 +98,19 @@ tasks:
           SRC_DIR: ./internal/auth
           MOCK_STRUCT: "AuthService"
           INTERFACE: Service
+
+  "Tag":
+    sources:
+      - internal/tag/domain.go
+      - ./internal/pkg/tools/go.mod
+    generates:
+      - internal/mocks/TagRepo.go
+    cmds:
+      - task: base-mock
+        vars:
+          SRC_DIR: ./internal/tag
+          INTERFACE: "Repo"
+          MOCK_STRUCT: "TagRepo"
 
   "CharacterRepo":
     sources:

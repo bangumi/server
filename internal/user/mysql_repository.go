@@ -17,6 +17,7 @@ package user
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/trim21/errgo"
@@ -40,14 +41,51 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
+func (m mysqlRepo) GetFullUser(ctx context.Context, userID model.UserID) (FullUser, error) {
+	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(userID)).Take()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return FullUser{}, gerr.ErrUserNotFound
+		}
+		return FullUser{}, errgo.Wrap(err, "dal")
+	}
+
+	return FullUser{
+		UserName:         u.Username,
+		NickName:         u.Nickname,
+		UserGroup:        u.Groupid,
+		Avatar:           u.Avatar,
+		Sign:             string(u.Sign),
+		ID:               u.ID,
+		RegistrationTime: time.Unix(u.Regdate, 0),
+		TimeOffset:       parseTimeOffset(u.Timeoffset),
+		Email:            u.Email,
+	}, nil
+}
+
+// default time zone GMT+8.
+const defaultTimeOffset = 8
+
+func parseTimeOffset(s string) int8 {
+	switch s {
+	case "", "9999":
+		return defaultTimeOffset
+	}
+
+	v, err := strconv.ParseInt(s, 10, 8)
+	if err != nil {
+		return defaultTimeOffset
+	}
+
+	return int8(v)
+}
+
 func (m mysqlRepo) GetByID(ctx context.Context, userID model.UserID) (User, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.Eq(userID)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return User{}, gerr.ErrUserNotFound
 		}
-
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return User{}, errgo.Wrap(err, "dal")
 	}
 
@@ -60,8 +98,6 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (User, error)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return User{}, gerr.ErrUserNotFound
 		}
-
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return User{}, errgo.Wrap(err, "dal")
 	}
 
@@ -71,7 +107,6 @@ func (m mysqlRepo) GetByName(ctx context.Context, username string) (User, error)
 func (m mysqlRepo) GetByIDs(ctx context.Context, ids []model.UserID) (map[model.UserID]User, error) {
 	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.ID.In(ids...)).Find()
 	if err != nil {
-		m.log.Error("unexpected error happened", zap.Error(err))
 		return nil, errgo.Wrap(err, "dal")
 	}
 

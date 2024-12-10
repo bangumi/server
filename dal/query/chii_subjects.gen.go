@@ -29,14 +29,15 @@ func newSubject(db *gorm.DB, opts ...gen.DOOption) subject {
 	_subject.ALL = field.NewAsterisk(tableName)
 	_subject.ID = field.NewUint32(tableName, "subject_id")
 	_subject.TypeID = field.NewUint8(tableName, "subject_type_id")
-	_subject.Name = field.NewString(tableName, "subject_name")
-	_subject.NameCN = field.NewString(tableName, "subject_name_cn")
+	_subject.Name = field.NewField(tableName, "subject_name")
+	_subject.NameCN = field.NewField(tableName, "subject_name_cn")
 	_subject.UID = field.NewString(tableName, "subject_uid")
 	_subject.Creator = field.NewUint32(tableName, "subject_creator")
 	_subject.Dateline = field.NewUint32(tableName, "subject_dateline")
 	_subject.Image = field.NewString(tableName, "subject_image")
 	_subject.Platform = field.NewUint16(tableName, "subject_platform")
-	_subject.Infobox = field.NewString(tableName, "field_infobox")
+	_subject.Infobox = field.NewField(tableName, "field_infobox")
+	_subject.FieldMetaTags = field.NewString(tableName, "field_meta_tags")
 	_subject.Summary = field.NewString(tableName, "field_summary")
 	_subject.Field5 = field.NewString(tableName, "field_5")
 	_subject.Volumes = field.NewUint32(tableName, "field_volumes")
@@ -66,33 +67,34 @@ func newSubject(db *gorm.DB, opts ...gen.DOOption) subject {
 type subject struct {
 	subjectDo subjectDo
 
-	ALL         field.Asterisk
-	ID          field.Uint32
-	TypeID      field.Uint8
-	Name        field.String
-	NameCN      field.String
-	UID         field.String // isbn / imdb
-	Creator     field.Uint32
-	Dateline    field.Uint32
-	Image       field.String
-	Platform    field.Uint16
-	Infobox     field.String
-	Summary     field.String // summary
-	Field5      field.String // author summary
-	Volumes     field.Uint32 // 卷数
-	Eps         field.Uint32
-	Wish        field.Uint32
-	Done        field.Uint32
-	Doing       field.Uint32
-	OnHold      field.Uint32 // 搁置人数
-	Dropped     field.Uint32 // 抛弃人数
-	Series      field.Bool
-	SeriesEntry field.Uint32
-	IdxCn       field.String
-	Airtime     field.Uint8
-	Nsfw        field.Bool
-	Ban         field.Uint8
-	Fields      subjectHasOneFields
+	ALL           field.Asterisk
+	ID            field.Uint32
+	TypeID        field.Uint8
+	Name          field.Field
+	NameCN        field.Field
+	UID           field.String // isbn / imdb
+	Creator       field.Uint32
+	Dateline      field.Uint32
+	Image         field.String
+	Platform      field.Uint16
+	Infobox       field.Field
+	FieldMetaTags field.String
+	Summary       field.String // summary
+	Field5        field.String // author summary
+	Volumes       field.Uint32 // 卷数
+	Eps           field.Uint32
+	Wish          field.Uint32
+	Done          field.Uint32
+	Doing         field.Uint32
+	OnHold        field.Uint32 // 搁置人数
+	Dropped       field.Uint32 // 抛弃人数
+	Series        field.Bool
+	SeriesEntry   field.Uint32
+	IdxCn         field.String
+	Airtime       field.Uint8
+	Nsfw          field.Bool
+	Ban           field.Uint8
+	Fields        subjectHasOneFields
 
 	fieldMap map[string]field.Expr
 }
@@ -111,14 +113,15 @@ func (s *subject) updateTableName(table string) *subject {
 	s.ALL = field.NewAsterisk(table)
 	s.ID = field.NewUint32(table, "subject_id")
 	s.TypeID = field.NewUint8(table, "subject_type_id")
-	s.Name = field.NewString(table, "subject_name")
-	s.NameCN = field.NewString(table, "subject_name_cn")
+	s.Name = field.NewField(table, "subject_name")
+	s.NameCN = field.NewField(table, "subject_name_cn")
 	s.UID = field.NewString(table, "subject_uid")
 	s.Creator = field.NewUint32(table, "subject_creator")
 	s.Dateline = field.NewUint32(table, "subject_dateline")
 	s.Image = field.NewString(table, "subject_image")
 	s.Platform = field.NewUint16(table, "subject_platform")
-	s.Infobox = field.NewString(table, "field_infobox")
+	s.Infobox = field.NewField(table, "field_infobox")
+	s.FieldMetaTags = field.NewString(table, "field_meta_tags")
 	s.Summary = field.NewString(table, "field_summary")
 	s.Field5 = field.NewString(table, "field_5")
 	s.Volumes = field.NewUint32(table, "field_volumes")
@@ -158,7 +161,7 @@ func (s *subject) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (s *subject) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 26)
+	s.fieldMap = make(map[string]field.Expr, 27)
 	s.fieldMap["subject_id"] = s.ID
 	s.fieldMap["subject_type_id"] = s.TypeID
 	s.fieldMap["subject_name"] = s.Name
@@ -169,6 +172,7 @@ func (s *subject) fillFieldMap() {
 	s.fieldMap["subject_image"] = s.Image
 	s.fieldMap["subject_platform"] = s.Platform
 	s.fieldMap["field_infobox"] = s.Infobox
+	s.fieldMap["field_meta_tags"] = s.FieldMetaTags
 	s.fieldMap["field_summary"] = s.Summary
 	s.fieldMap["field_5"] = s.Field5
 	s.fieldMap["field_volumes"] = s.Volumes

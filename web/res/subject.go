@@ -18,40 +18,50 @@ import (
 	"time"
 
 	"github.com/samber/lo"
+	"go.uber.org/zap"
 
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/internal/pkg/null"
+	"github.com/bangumi/server/internal/tag"
+	"github.com/bangumi/server/pkg/vars"
+	"github.com/bangumi/server/pkg/wiki"
 )
 
 const defaultShortSummaryLength = 120
 
-type v0wiki = []any
+type V0wiki = []any
 
 type SubjectTag struct {
-	Name  string `json:"name"`
-	Count int    `json:"count"`
+	Name      string `json:"name"`
+	Count     uint   `json:"count"`
+	TotalCont uint   `json:"total_cont"`
 }
 
 type SubjectV0 struct {
 	Date          *string               `json:"date"`
 	Platform      *string               `json:"platform"`
-	Image         SubjectImages         `json:"images"`
+	Images        SubjectImages         `json:"images"`
 	Summary       string                `json:"summary"`
 	Name          string                `json:"name"`
 	NameCN        string                `json:"name_cn"`
 	Tags          []SubjectTag          `json:"tags"`
-	Infobox       v0wiki                `json:"infobox"`
+	Infobox       V0wiki                `json:"infobox"`
 	Rating        Rating                `json:"rating"`
 	TotalEpisodes int64                 `json:"total_episodes" doc:"episodes count in database"`
 	Collection    SubjectCollectionStat `json:"collection"`
 	ID            model.SubjectID       `json:"id"`
 	Eps           uint32                `json:"eps"`
+	MetaTags      []string              `json:"meta_tags"`
 	Volumes       uint32                `json:"volumes"`
-	Redirect      model.SubjectID       `json:"-"`
+	Series        bool                  `json:"series"`
 	Locked        bool                  `json:"locked"`
 	NSFW          bool                  `json:"nsfw"`
 	TypeID        model.SubjectType     `json:"type"`
+	Redirect      model.SubjectID       `json:"-"`
 }
 
 type SlimSubjectV0 struct {
@@ -98,6 +108,75 @@ func ToSlimSubjectV0(s model.Subject) SlimSubjectV0 {
 	}
 }
 
+func PlatformString(s model.Subject) *string {
+	platform, ok := vars.PlatformMap[s.TypeID][s.PlatformID]
+	if !ok && s.TypeID != 0 {
+		logger.Warn("unknown platform",
+			zap.Uint32("subject", s.ID),
+			zap.Uint8("type", s.TypeID),
+			zap.Uint16("platform", s.PlatformID),
+		)
+
+		return nil
+	}
+	v := platform.String()
+	return &v
+}
+
+func ToSubjectV0(s model.Subject, totalEpisode int64, metaTags []tag.Tag) SubjectV0 {
+	return SubjectV0{
+		TotalEpisodes: totalEpisode,
+		ID:            s.ID,
+		Images:        SubjectImage(s.Image),
+		Summary:       s.Summary,
+		Name:          s.Name,
+		Platform:      PlatformString(s),
+		NameCN:        s.NameCN,
+		Date:          null.NilString(s.Date),
+		Infobox:       compat.V0Wiki(wiki.ParseOmitError(s.Infobox).NonZero()),
+		Volumes:       s.Volumes,
+		Redirect:      s.Redirect,
+		Eps:           s.Eps,
+		MetaTags: lo.Map(metaTags, func(item tag.Tag, index int) string {
+			return item.Name
+		}),
+		Tags: slice.Map(s.Tags, func(tag model.Tag) SubjectTag {
+			return SubjectTag{
+				Name:  tag.Name,
+				Count: tag.Count,
+			}
+		}),
+		Collection: SubjectCollectionStat{
+			OnHold:  s.OnHold,
+			Wish:    s.Wish,
+			Dropped: s.Dropped,
+			Collect: s.Collect,
+			Doing:   s.Doing,
+		},
+		TypeID: s.TypeID,
+		Series: s.Series,
+		Locked: s.Locked(),
+		NSFW:   s.NSFW,
+		Rating: Rating{
+			Rank:  s.Rating.Rank,
+			Total: s.Rating.Total,
+			Count: Count{
+				Field1:  s.Rating.Count.Field1,
+				Field2:  s.Rating.Count.Field2,
+				Field3:  s.Rating.Count.Field3,
+				Field4:  s.Rating.Count.Field4,
+				Field5:  s.Rating.Count.Field5,
+				Field6:  s.Rating.Count.Field6,
+				Field7:  s.Rating.Count.Field7,
+				Field8:  s.Rating.Count.Field8,
+				Field9:  s.Rating.Count.Field9,
+				Field10: s.Rating.Count.Field10,
+			},
+			Score: s.Rating.Score,
+		},
+	}
+}
+
 type SubjectCollectionStat struct {
 	OnHold  uint32 `json:"on_hold"`
 	Dropped uint32 `json:"dropped"`
@@ -131,11 +210,12 @@ type Rating struct {
 }
 
 type PersonRelatedSubject struct {
-	Staff     string          `json:"staff"`
-	Name      string          `json:"name"`
-	NameCn    string          `json:"name_cn"`
-	Image     string          `json:"image"`
-	SubjectID model.SubjectID `json:"id"`
+	Staff     string            `json:"staff"`
+	Name      string            `json:"name"`
+	NameCn    string            `json:"name_cn"`
+	Image     string            `json:"image"`
+	Type      model.SubjectType `json:"type"`
+	SubjectID model.SubjectID   `json:"id"`
 }
 
 type PersonRelatedCharacter struct {
@@ -143,6 +223,7 @@ type PersonRelatedCharacter struct {
 	Name          string            `json:"name"`
 	SubjectName   string            `json:"subject_name"`
 	SubjectNameCn string            `json:"subject_name_cn"`
+	SubjectType   model.SubjectType `json:"subject_type"`
 	SubjectID     model.SubjectID   `json:"subject_id"`
 	Staff         string            `json:"staff"`
 	ID            model.CharacterID `json:"id"`
@@ -150,22 +231,24 @@ type PersonRelatedCharacter struct {
 }
 
 type CharacterRelatedPerson struct {
-	Images        PersonImages    `json:"images"`
-	Name          string          `json:"name"`
-	SubjectName   string          `json:"subject_name"`
-	SubjectNameCn string          `json:"subject_name_cn"`
-	SubjectID     model.SubjectID `json:"subject_id"`
-	Staff         string          `json:"staff"`
-	ID            model.PersonID  `json:"id"`
-	Type          uint8           `json:"type" doc:"person type"`
+	Images        PersonImages      `json:"images"`
+	Name          string            `json:"name"`
+	SubjectName   string            `json:"subject_name"`
+	SubjectNameCn string            `json:"subject_name_cn"`
+	SubjectType   model.SubjectType `json:"subject_type"`
+	SubjectID     model.SubjectID   `json:"subject_id"`
+	Staff         string            `json:"staff"`
+	ID            model.PersonID    `json:"id"`
+	Type          uint8             `json:"type" doc:"person type"`
 }
 
 type CharacterRelatedSubject struct {
-	Staff  string          `json:"staff"`
-	Name   string          `json:"name"`
-	NameCn string          `json:"name_cn"`
-	Image  string          `json:"image"`
-	ID     model.SubjectID `json:"id"`
+	Staff  string            `json:"staff"`
+	Name   string            `json:"name"`
+	NameCn string            `json:"name_cn"`
+	Image  string            `json:"image"`
+	Type   model.SubjectType `json:"type"`
+	ID     model.SubjectID   `json:"id"`
 }
 
 type SubjectRelatedSubject struct {
@@ -193,6 +276,7 @@ type SubjectRelatedPerson struct {
 	Career   []string       `json:"career"`
 	Type     uint8          `json:"type"`
 	ID       model.PersonID `json:"id" doc:"person ID"`
+	Eps      string         `json:"eps" doc:"episodes participated"`
 }
 
 type Actor struct {
@@ -212,7 +296,7 @@ type IndexSubjectV0 struct {
 	Name    string            `json:"name"`
 	NameCN  string            `json:"name_cn"`
 	Comment string            `json:"comment"`
-	Infobox v0wiki            `json:"infobox"`
+	Infobox V0wiki            `json:"infobox"`
 	ID      model.SubjectID   `json:"id"`
 	TypeID  model.SubjectType `json:"type"`
 }

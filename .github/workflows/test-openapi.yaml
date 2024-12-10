@@ -18,6 +18,9 @@ on:
       - "package-lock.json"
       - ".github/workflows/test-openapi.yaml"
 
+env:
+  GOTOOLCHAIN: "local"
+
 jobs:
   test:
     runs-on: "${{ matrix.os }}"

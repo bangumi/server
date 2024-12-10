@@ -385,6 +385,63 @@ func (_c *UserRepo_GetFriends_Call) RunAndReturn(run func(context.Context, uint3
 	return _c
 }
 
+// GetFullUser provides a mock function with given fields: ctx, userID
+func (_m *UserRepo) GetFullUser(ctx context.Context, userID uint32) (user.FullUser, error) {
+	ret := _m.Called(ctx, userID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFullUser")
+	}
+
+	var r0 user.FullUser
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) (user.FullUser, error)); ok {
+		return rf(ctx, userID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) user.FullUser); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		r0 = ret.Get(0).(user.FullUser)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UserRepo_GetFullUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFullUser'
+type UserRepo_GetFullUser_Call struct {
+	*mock.Call
+}
+
+// GetFullUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uint32
+func (_e *UserRepo_Expecter) GetFullUser(ctx interface{}, userID interface{}) *UserRepo_GetFullUser_Call {
+	return &UserRepo_GetFullUser_Call{Call: _e.mock.On("GetFullUser", ctx, userID)}
+}
+
+func (_c *UserRepo_GetFullUser_Call) Run(run func(ctx context.Context, userID uint32)) *UserRepo_GetFullUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint32))
+	})
+	return _c
+}
+
+func (_c *UserRepo_GetFullUser_Call) Return(_a0 user.FullUser, _a1 error) *UserRepo_GetFullUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UserRepo_GetFullUser_Call) RunAndReturn(run func(context.Context, uint32) (user.FullUser, error)) *UserRepo_GetFullUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewUserRepo creates a new instance of UserRepo. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewUserRepo(t interface {

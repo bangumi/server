@@ -17,14 +17,16 @@ package model
 const subjectLocked = 2
 
 type Tag struct {
-	Name  string
-	Count int
+	Name       string
+	Count      uint
+	TotalCount uint
 }
 
 type Subject struct {
 	Image         string
 	Summary       string
 	Name          string
+	MetaTags      string
 	Date          string // first release date
 	NameCN        string
 	Infobox       string

@@ -19,10 +19,12 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/http/pprof"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -78,6 +80,13 @@ func New() *echo.Echo {
 		}
 	})
 
+	app.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+	app.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
+	app.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
+	app.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
+	app.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
+	app.GET("/debug/pprof/*", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
+
 	if env.Development {
 		app.Use(genFakeRequestID)
 	}
@@ -91,24 +100,26 @@ func New() *echo.Echo {
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			reqID := c.Request().Header.Get(cf.HeaderRequestID)
-			reqIP := c.RealIP()
+			ctx, cancel := context.WithTimeout(context.WithoutCancel(c.Request().Context()), time.Minute)
+			defer cancel()
 
-			c.SetRequest(c.Request().
-				WithContext(context.WithValue(context.Background(), logger.RequestKey, &logger.RequestTrace{
-					IP:    reqIP,
-					ReqID: reqID,
-				})))
+			reqID := c.Request().Header.Get(cf.HeaderRequestID)
+
+			if reqID == "" {
+				reqID = uuid.Must(uuid.NewV7()).String()
+			}
+
+			c.SetRequest(c.Request().WithContext(context.WithValue(ctx, logger.RequestKey, &logger.RequestTrace{
+				IP:    c.RealIP(),
+				ReqID: reqID,
+				Path:  c.Request().RequestURI,
+			})))
 
 			return next(c)
 		}
 	})
 
 	app.Use(recovery.New())
-
-	app.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
-
-	addProfile(app)
 
 	app.GET("/openapi", func(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "/openapi/")
