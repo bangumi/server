@@ -242,7 +242,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 
 	now := time.Now()
 
-	// DB 里没有数据
+	// RawDB 里没有数据
 	_, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.Error(t, err)
 
@@ -253,7 +253,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	// DB 里有数据
+	// RawDB 里有数据
 	_, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
