@@ -128,7 +128,7 @@ func (r mysqlRepo) DeleteSubjectCollection(
 ) error {
 	_, err := r.q.SubjectCollection.WithContext(ctx).
 		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).
-		Delete()
+		UpdateSimple(r.q.SubjectCollection.Type.Value(0))
 	return err
 }
 
