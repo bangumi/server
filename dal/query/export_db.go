@@ -18,6 +18,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func (q *Query) DB() *gorm.DB {
+func (q *Query) RawDB() *gorm.DB {
 	return q.db
 }
