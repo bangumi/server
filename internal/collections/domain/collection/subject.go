@@ -119,7 +119,7 @@ func (s *Subject) UpdateComment(comment string) error {
 		return gerr.ErrInvisibleChar
 	}
 
-	s.comment = norm.NFKC.String(comment)
+	s.comment = norm.NFC.String(comment)
 
 	return nil
 }
