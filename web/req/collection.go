@@ -70,7 +70,7 @@ func (v *SubjectEpisodeCollectionPatch) Validate() error {
 	}
 
 	if v.Comment.Set {
-		v.Comment.Value = norm.NFKC.String(v.Comment.Value)
+		v.Comment.Value = norm.NFC.String(v.Comment.Value)
 		v.Comment.Value = strings.TrimSpace(v.Comment.Value)
 		if !dam.AllPrintableChar(v.Comment.Value) {
 			return res.BadRequest("invisible character are included in comment")

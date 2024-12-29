@@ -73,7 +73,7 @@ func TestBrowse(t *testing.T) {
 	}
 	s, err := repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, 12, len(s))
+	require.Equal(t, 17, len(s))
 
 	filter = subject.BrowseFilter{
 		Type:     1,
