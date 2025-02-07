@@ -48,9 +48,6 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 		return err
 	}
 
-	ctl.log.Info("try to update collection info", zap.Uint32("subject", subjectID),
-		log.User(u.ID), zap.Reflect("episodes", episodeIDs))
-
 	/*
 		GORM v1.25.0 起修复了一个 bug，但是被当成 feature 使用了。在该版本之前，Limit 0 认为不是合法的 Limit，会被从 SQL 语句中忽略
 		see PR: go-gorm/gorm/pull/6191
