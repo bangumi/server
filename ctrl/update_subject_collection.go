@@ -25,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
 )
@@ -50,7 +49,6 @@ func (ctl Ctrl) UpdateSubjectCollection(
 	req UpdateCollectionRequest,
 	allowCreate bool,
 ) error {
-	ctl.log.Info("try to update collection", zap.Uint32("subject_id", subject.ID), log.User(u.ID))
 	met := ctl.collection.UpdateSubjectCollection
 	if allowCreate {
 		met = ctl.collection.UpdateOrCreateSubjectCollection
