@@ -36,9 +36,10 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg
-          key: go-cache-122-${{ hashFiles('**/go.sum') }}-build
+          key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-build
           restore-keys: |
-            go-cache-122-${{ hashFiles('**/go.sum') }}-
+            go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-
+            go-cache-123-${{ hashFiles('**/go.mod') }}-
 
       - run: echo "SHA=${GITHUB_REF##*/}" >> $GITHUB_ENV
         if: "${{ startsWith(github.ref, 'refs/tags/') }}"

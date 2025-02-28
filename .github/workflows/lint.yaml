@@ -43,13 +43,14 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg
-          key: go-cache-122-${{ hashFiles('**/go.sum') }}-lint
+          key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-lint
           restore-keys: |
-            go-cache-122-${{ hashFiles('**/go.sum') }}-
+            go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-
+            go-cache-123-${{ hashFiles('**/go.mod') }}-
 
       - run: go get -t ./...
 
       - name: Run linters
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.61.0
+          version: v1.64.5

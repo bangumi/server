@@ -53,9 +53,10 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg
-          key: go-cache-122-${{ hashFiles('**/go.sum') }}-test
+          key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-test
           restore-keys: |
-            go-cache-122-${{ hashFiles('**/go.sum') }}-
+            go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-
+            go-cache-123-${{ hashFiles('**/go.mod') }}-
 
       - run: go get -t ./...
 
