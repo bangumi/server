@@ -1,9 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "local>Trim21/renovate-config",
-    "local>Trim21/renovate-config:monthly"
-  ],
+  "extends": ["local>Trim21/renovate-config", "local>Trim21/renovate-config:monthly"],
   "separateMinorPatch": false,
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
@@ -34,10 +31,7 @@
     {
       "groupName": "gomod-redis",
       "matchManagers": ["gomod"],
-      "matchPackageNames": [
-        "github.com/go-redis/redismock/**",
-        "github.com/redis/go-redis/**"
-      ]
+      "matchPackageNames": ["github.com/go-redis/redismock/**", "github.com/redis/go-redis/**"]
     },
     {
       "groupName": "npm",
