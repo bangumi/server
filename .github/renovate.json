@@ -12,8 +12,8 @@
   "packageRules": [
     {
       "matchDatasources": ["docker"],
-      "matchPackagePrefixes": ["gcr.io/"],
-      "pinDigests": true
+      "pinDigests": true,
+      "matchPackageNames": ["gcr.io/**"]
     },
     {
       "matchManagers": ["docker-compose"],
@@ -31,7 +31,7 @@
     {
       "groupName": "gomod-redis",
       "matchManagers": ["gomod"],
-      "matchPackagePrefixes": ["github.com/go-redis/redismock", "github.com/redis/go-redis"]
+      "matchPackageNames": ["github.com/go-redis/redismock/**", "github.com/redis/go-redis/**"]
     },
     {
       "groupName": "npm",
