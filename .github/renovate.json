@@ -16,7 +16,7 @@
     {
       "matchDatasources": ["docker"],
       "pinDigests": true,
-      "matchPackageNames": ["gcr.io/{/,}**"]
+      "matchPackageNames": ["gcr.io/**"]
     },
     {
       "matchManagers": ["docker-compose"],
