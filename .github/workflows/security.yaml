@@ -30,22 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: "go.mod"
-          cache: false
-
-      - name: Go Build Cache (vulnerability_scan)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg
-          key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-vulnerability_scan
-          restore-keys: |
-            go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-
-            go-cache-123-${{ hashFiles('**/go.mod') }}-
+      - uses: ./.github/actions/setup-go
 
       - run: go install golang.org/x/vuln/cmd/govulncheck@latest
 
