@@ -1,6 +1,6 @@
 module github.com/bangumi/server
 
-go 1.23
+go 1.23.0
 
 toolchain go1.23.6
 
@@ -38,7 +38,7 @@ require (
 	github.com/trim21/pkg v0.0.4
 	go.uber.org/fx v1.23.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.33.0
+	golang.org/x/crypto v0.35.0
 	golang.org/x/text v0.22.0
 	google.golang.org/grpc v1.70.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
