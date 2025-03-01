@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/workflows/actions/setup-go
+      - uses: ./.github/actions/setup-go
         with:
           env: build
 

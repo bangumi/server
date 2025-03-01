@@ -36,7 +36,7 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: ./.github/workflows/actions/setup-go
+      - uses: ./.github/actions/setup-go
         with:
           env: test
 

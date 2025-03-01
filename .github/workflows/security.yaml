@@ -30,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/workflows/actions/setup-go
+      - uses: ./.github/actions/setup-go
 
       - run: go install golang.org/x/vuln/cmd/govulncheck@latest
 
