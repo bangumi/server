@@ -25,7 +25,7 @@ env:
   GOTOOLCHAIN: "local"
 
 jobs:
-  lint:
+  vulnerability-scan:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -36,13 +36,13 @@ jobs:
           go-version-file: "go.mod"
           cache: false
 
-      - name: Go Build Cache (lint)
+      - name: Go Build Cache (vulnerability_scan)
         uses: actions/cache@v4
         with:
           path: |
             ~/.cache/go-build
             ~/go/pkg
-          key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-lint
+          key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-vulnerability_scan
           restore-keys: |
             go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-
             go-cache-123-${{ hashFiles('**/go.mod') }}-
