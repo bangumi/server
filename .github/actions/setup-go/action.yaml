@@ -1,0 +1,30 @@
+inputs:
+  env:
+    description: "env"
+    required: false
+    default: "build"
+
+name: "Setup Node and run npm ci"
+description: "setup node env"
+runs:
+  using: "composite"
+  steps:
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: "go.mod"
+        cache: false
+
+    - name: Go Build Cache (build)
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg
+        key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-${{ inputs.env }}
+        restore-keys: |
+          go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-
+          go-cache-123-${{ hashFiles('**/go.mod') }}-
+
+    - run: go get ./...
+      shell: bash

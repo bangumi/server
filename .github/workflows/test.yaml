@@ -36,29 +36,14 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Go
-        uses: actions/setup-go@v5
+      - uses: ./.github/workflows/actions/setup-go
         with:
-          go-version-file: "go.mod"
-          cache: false
+          env: test
 
       - name: Install Task
         uses: arduino/setup-task@v2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: Go Build Cache (test)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg
-          key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-test
-          restore-keys: |
-            go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-
-            go-cache-123-${{ hashFiles('**/go.mod') }}-
-
-      - run: go get -t ./...
 
       - run: bash $HOME/dev-env/wait_mysql_ready.sh
 

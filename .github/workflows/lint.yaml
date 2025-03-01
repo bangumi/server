@@ -31,22 +31,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Go
-        uses: actions/setup-go@v5
+      - uses: ./.github/workflows/actions/setup-go
         with:
-          go-version-file: "go.mod"
-          cache: false
-
-      - name: Go Build Cache (lint)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg
-          key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-lint
-          restore-keys: |
-            go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-
-            go-cache-123-${{ hashFiles('**/go.mod') }}-
+          env: lint
 
       - run: go get -t ./...
 
