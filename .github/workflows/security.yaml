@@ -1,4 +1,4 @@
-name: Lint
+name: Security Vulnerability Check
 
 on:
   push:
@@ -6,21 +6,18 @@ on:
       - renovate/**
     paths:
       - "**.go"
-      - "**.go.json"
       - "go.mod"
       - "go.sum"
       - ".golangci.yaml"
-      - ".github/workflows/lint.yaml"
+      - ".github/workflows/security.yaml"
   pull_request:
     branches:
       - master
     paths:
       - "**.go"
-      - "**.go.json"
       - "go.mod"
       - "go.sum"
-      - ".golangci.yaml"
-      - ".github/workflows/lint.yaml"
+      - ".github/workflows/security.yaml"
   schedule:
     - cron: "15 3 * * 4"
 
