@@ -1,0 +1,55 @@
+name: Lint
+
+on:
+  push:
+    branches-ignore:
+      - renovate/**
+    paths:
+      - "**.go"
+      - "**.go.json"
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yaml"
+      - ".github/workflows/lint.yaml"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "**.go"
+      - "**.go.json"
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yaml"
+      - ".github/workflows/lint.yaml"
+  schedule:
+    - cron: "15 3 * * 4"
+
+env:
+  GOTOOLCHAIN: "local"
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: false
+
+      - name: Go Build Cache (lint)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg
+          key: go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-lint
+          restore-keys: |
+            go-cache-123-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-
+            go-cache-123-${{ hashFiles('**/go.mod') }}-
+
+      - run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - run: govulncheck ./...
