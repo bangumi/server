@@ -35,8 +35,6 @@ jobs:
         with:
           env: lint
 
-      - run: go get -t ./...
-
       - name: Run linters
         uses: golangci/golangci-lint-action@v6
         with:
