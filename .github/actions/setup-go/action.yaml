@@ -9,10 +9,13 @@ description: "setup golang env"
 runs:
   using: "composite"
   steps:
+    - id: parse-gomod
+      uses: Arthur1/parse-gomod-action
+
     - name: Install Go
       uses: actions/setup-go@v5
       with:
-        go-version-file: "go.mod"
+        go-version: ${{ steps.parse-gomod.outputs.toolchain-go-version }}
         cache: false
 
     - name: Go Build Cache (${{ inputs.env }})
