@@ -1,6 +1,8 @@
 module github.com/bangumi/server
 
-go 1.23.6
+go 1.23.0
+
+toolchain go1.23.6
 
 require (
 	github.com/avast/retry-go/v4 v4.6.1
