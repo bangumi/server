@@ -15,7 +15,7 @@ runs:
     - name: Install Go
       uses: actions/setup-go@v5
       with:
-        go-version: ${{ steps.parse-gomod.outputs.toolchain-go-version }}
+        go-version: ${{ steps.parse-gomod.outputs.toolchain-go-version || steps.parse-gomod.outputs.go }}
         cache: false
 
     - name: Go Build Cache (${{ inputs.env }})
