@@ -10,7 +10,7 @@ runs:
   using: "composite"
   steps:
     - id: parse-gomod
-      uses: Arthur1/parse-gomod-action
+      uses: Arthur1/parse-gomod-action@v0.1.0
 
     - name: Install Go
       uses: actions/setup-go@v5
