@@ -8,7 +8,7 @@
   "separateMinorPatch": false,
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
-  "postUpdateOptions": ["gomodTidy1.17"],
+  "postUpdateOptions": ["gomodTidy"],
   "dockerfile": {
     "fileMatch": [".*dockerfile$"],
     "enabled": true
