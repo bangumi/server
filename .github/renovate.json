@@ -21,10 +21,6 @@
       "enabled": false
     },
     {
-      "matchPackageNames": ["go"],
-      "enabled": false
-    },
-    {
       "matchManagers": ["gomod"],
       "semanticCommitType": "build"
     },
