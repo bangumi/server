@@ -44,8 +44,10 @@ jobs:
 
       - run: bash $HOME/dev-env/wait_mysql_ready.sh
 
+      - run: go install gotest.tools/gotestsum
+
       - name: Run tests
-        run: task coverage
+        run: gotestsum -- -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out ./...
         env:
           GORACE: halt_on_error=1
           MYSQL_HOST: 127.0.0.1
