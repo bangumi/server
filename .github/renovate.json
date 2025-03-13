@@ -3,12 +3,9 @@
   "extends": [
     "local>Trim21/renovate-config",
     "local>Trim21/renovate-config:go",
+    "local>Trim21/renovate-config:app",
     "local>Trim21/renovate-config:monthly"
   ],
-  "separateMinorPatch": false,
-  "separateMajorMinor": true,
-  "separateMultipleMajor": true,
-  "postUpdateOptions": ["gomodTidy"],
   "dockerfile": {
     "fileMatch": [".*dockerfile$"],
     "enabled": true
@@ -23,15 +20,6 @@
       "matchManagers": ["docker-compose"],
       "matchPackageNames": ["mysql"],
       "enabled": false
-    },
-    {
-      "matchManagers": ["gomod"],
-      "semanticCommitType": "build"
-    },
-    {
-      "groupName": "gomod-redis",
-      "matchManagers": ["gomod"],
-      "matchPackageNames": ["github.com/go-redis/redismock/**", "github.com/redis/go-redis/**"]
     },
     {
       "groupName": "npm",
