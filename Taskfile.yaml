@@ -83,14 +83,6 @@ tasks:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
 
-  coverage:
-    desc: Run tests with coverage report, used in CI.
-    cmds:
-      - go test -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out ./...
-    env:
-      TEST_MYSQL: "1"
-      TEST_REDIS: "1"
-
   mod:
     desc: "go mod tidy"
     cmds:
