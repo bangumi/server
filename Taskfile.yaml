@@ -15,8 +15,6 @@ tasks:
 
   install:
     cmds:
-      - go install google.golang.org/protobuf/cmd/protoc-gen-go
-      - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
       - echo "please install buf by yourself https://docs.buf.build/installation"
 
   build:
@@ -46,16 +44,11 @@ tasks:
 
   web:
     desc: Run Web Server
-    aliases:
-      - serve
-      - server
     cmds:
       - go run main.go --config config.yaml web
 
   consumer:
     desc: Run Kafka Consumer
-    aliases:
-      - canal
     cmds:
       - go run main.go canal --config config.yaml
 
