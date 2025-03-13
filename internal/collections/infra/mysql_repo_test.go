@@ -230,7 +230,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 		lo.Must(table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete())
 	})
 
-	err = table.WithContext(t.Context()).Create(
+	err = table.WithContext(context.Background()).Create(
 		&dao.SubjectCollection{
 			UserID: uid, SubjectID: sid + 1, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
 		},
@@ -295,12 +295,12 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.Equal(t, uint8(0), r.Rate)
 
 	// 确认不会影响到其他用户或 subject
-	r, err = table.WithContext(t.Context()).Where(table.SubjectID.Eq(sid+1), table.UserID.Eq(uid)).Take()
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid+1), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
 
-	r, err = table.WithContext(t.Context()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid+1)).Take()
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid+1)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
@@ -332,7 +332,7 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	err := table.WithContext(t.Context()).Create(
+	err := table.WithContext(context.Background()).Create(
 		&dao.SubjectCollection{
 			UserID: uid, SubjectID: sid, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
 		},
@@ -369,12 +369,12 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	require.Zero(t, r.DoneTime)
 	require.Zero(t, r.OnHoldTime)
 
-	r, err = table.WithContext(t.Context()).Where(table.SubjectID.Eq(sid+1), table.UserID.Eq(uid)).Take()
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid+1), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
 
-	r, err = table.WithContext(t.Context()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid+1)).Take()
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid+1)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
@@ -398,7 +398,7 @@ func TestMysqlRepo_UpdateSubjectCollectionType(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	err := table.WithContext(t.Context()).Create(
+	err := table.WithContext(context.Background()).Create(
 		&dao.SubjectCollection{
 			UserID: uid, SubjectID: sid, Rate: 8, Type: uint8(collection.SubjectCollectionDoing),
 		},
@@ -452,7 +452,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	repo, q := getRepo(t)
 	table := q.EpCollection
 	test.RunAndCleanup(t, func() {
-		_, err := table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Delete()
+		_, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Delete()
 		require.NoError(t, err)
 	})
 
@@ -469,7 +469,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionDone, now)
 	require.NoError(t, err)
 
-	r, err := table.WithContext(t.Context()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
+	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, now.Unix(), r.UpdatedTime)
@@ -489,7 +489,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionNone, now)
 	require.NoError(t, err)
 
-	r, err = table.WithContext(t.Context()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
+	r, err = table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	var m2 map[uint32]struct {
@@ -511,17 +511,17 @@ func TestMysqlRepo_UpdateEpisodeCollection_create_ep_status(t *testing.T) {
 	repo, q := getRepo(t)
 	table := q.EpCollection
 	test.RunAndCleanup(t, func() {
-		_, err := table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Delete()
+		_, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Delete()
 		require.NoError(t, err)
 	})
 
 	now := time.Now()
 
-	_, err := repo.UpdateEpisodeCollection(t.Context(),
+	_, err := repo.UpdateEpisodeCollection(context.Background(),
 		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionDone, now)
 	require.NoError(t, err)
 
-	r, err := table.WithContext(t.Context()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
+	r, err := table.WithContext(context.Background()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	var m map[uint32]struct {

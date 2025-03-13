@@ -260,7 +260,7 @@ linters:
     #    - staticcheck
     - stylecheck
     - tagliatelle
-    - usetesting
+    # - usetesting
     - testableexamples
     - testpackage
     - thelper
