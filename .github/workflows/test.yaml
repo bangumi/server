@@ -42,11 +42,13 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Install tf2pulumi
+      - name: Install gotestsum
         uses: jaxxstorm/action-install-gh-release@v1.10.0
         with:
           repo: gotestyourself/gotestsum
           tag: v1.12.1
+          platform: linux
+          arch: amd64
 
       - run: go get -t ./...
 
