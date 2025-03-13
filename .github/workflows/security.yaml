@@ -21,17 +21,12 @@ on:
   schedule:
     - cron: "15 3 * * 4"
 
-env:
-  GOTOOLCHAIN: "local"
-
 jobs:
   vulnerability-scan:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup-go
+      - uses: trim21/actions/setup-go@master
 
-      - run: go install golang.org/x/vuln/cmd/govulncheck@latest
-
-      - run: govulncheck ./...
+      - run: go run golang.org/x/vuln/cmd/govulncheck ./...

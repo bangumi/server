@@ -1,8 +1,8 @@
 module github.com/bangumi/server
 
-go 1.23.0
+go 1.24.1
 
-toolchain go1.23.7
+tool golang.org/x/vuln/cmd/govulncheck
 
 require (
 	github.com/avast/retry-go/v4 v4.6.1

@@ -22,18 +22,15 @@ on:
       - ".golangci.yaml"
       - ".github/workflows/lint.yaml"
 
-env:
-  GOTOOLCHAIN: "local"
-
 jobs:
   lint:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup-go
+      - uses: trim21/actions/setup-go@master
         with:
-          env: lint
+          cache-namespace: lint
 
       - name: Run linters
         uses: golangci/golangci-lint-action@v6

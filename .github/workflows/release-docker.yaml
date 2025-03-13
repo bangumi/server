@@ -10,9 +10,6 @@ on:
 permissions:
   packages: write
 
-env:
-  GOTOOLCHAIN: "local"
-
 jobs:
   docker:
     name: "docker"
@@ -24,7 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup-go
+      - uses: trim21/actions/setup-go@master
+        with:
+          cache-namespace: build
 
       - run: echo "SHA=${GITHUB_REF##*/}" >> $GITHUB_ENV
         if: "${{ startsWith(github.ref, 'refs/tags/') }}"
