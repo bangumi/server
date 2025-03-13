@@ -28,5 +28,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: trim21/actions/setup-go@master
+        with:
+          cache-namespace: sec
 
       - run: go run golang.org/x/vuln/cmd/govulncheck ./...
