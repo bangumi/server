@@ -452,7 +452,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	repo, q := getRepo(t)
 	table := q.EpCollection
 	test.RunAndCleanup(t, func() {
-		_, err := table.WithContext(t.Context()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Delete()
+		_, err := table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Delete()
 		require.NoError(t, err)
 	})
 
