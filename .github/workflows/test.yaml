@@ -42,9 +42,10 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - run: bash $HOME/dev-env/wait_mysql_ready.sh
-
       - run: go install gotest.tools/gotestsum
+      - run: go get -t ./...
+
+      - run: bash $HOME/dev-env/wait_mysql_ready.sh
 
       - name: Run tests
         run: gotestsum -- -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out ./...
