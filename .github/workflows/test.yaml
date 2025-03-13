@@ -42,12 +42,17 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
+      - run: go install gotest.tools/gotestsum
+      - run: go get -t ./...
+
       - run: bash $HOME/dev-env/wait_mysql_ready.sh
 
       - name: Run tests
-        run: task coverage
+        run: gotestsum -- -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out ./...
         env:
           GORACE: halt_on_error=1
+          TEST_MYSQL: "1"
+          TEST_REDIS: "1"
           MYSQL_HOST: 127.0.0.1
           MYSQL_PORT: "3306"
           MYSQL_USER: user

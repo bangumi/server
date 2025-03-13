@@ -15,8 +15,6 @@ tasks:
 
   install:
     cmds:
-      - go install google.golang.org/protobuf/cmd/protoc-gen-go
-      - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
       - echo "please install buf by yourself https://docs.buf.build/installation"
 
   build:
@@ -46,16 +44,11 @@ tasks:
 
   web:
     desc: Run Web Server
-    aliases:
-      - serve
-      - server
     cmds:
       - go run main.go --config config.yaml web
 
   consumer:
     desc: Run Kafka Consumer
-    aliases:
-      - canal
     cmds:
       - go run main.go canal --config config.yaml
 
@@ -86,14 +79,6 @@ tasks:
     desc: Run all tests.
     cmds:
       - go test -timeout 10s -tags test ./...
-    env:
-      TEST_MYSQL: "1"
-      TEST_REDIS: "1"
-
-  coverage:
-    desc: Run tests with coverage report, used in CI.
-    cmds:
-      - go test -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out ./...
     env:
       TEST_MYSQL: "1"
       TEST_REDIS: "1"
