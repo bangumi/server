@@ -517,7 +517,7 @@ func TestMysqlRepo_UpdateEpisodeCollection_create_ep_status(t *testing.T) {
 
 	now := time.Now()
 
-	_, err := repo.UpdateEpisodeCollection(context.Background(),
+	_, err := repo.UpdateEpisodeCollection(t.Context(),
 		uid, sid, []model.EpisodeID{1, 2}, collection.EpisodeCollectionDone, now)
 	require.NoError(t, err)
 
