@@ -34,16 +34,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup-go
+      - uses: trim21/actions/setup-go@master
         with:
-          env: build
+          cache-namespace: build
 
       - name: Install Task
         uses: arduino/setup-task@v2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-
-      - run: go get ./...
 
       - run: task build
         name: Build Binary

@@ -1,8 +1,8 @@
 module github.com/bangumi/server
 
-go 1.23.0
+go 1.24.1
 
-toolchain go1.23.7
+tool golang.org/x/vuln/cmd/govulncheck
 
 require (
 	github.com/avast/retry-go/v4 v4.6.1
@@ -100,8 +100,10 @@ require (
 	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/telemetry v0.0.0-20240522233618-39ace7a40ae7 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
+	golang.org/x/vuln v1.1.4 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
 	gorm.io/datatypes v1.2.2 // indirect
 	gorm.io/hints v1.1.2 // indirect

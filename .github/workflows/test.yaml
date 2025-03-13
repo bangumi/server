@@ -22,9 +22,6 @@ on:
       - "**.go"
       - "**.go.json"
 
-env:
-  GOTOOLCHAIN: "local"
-
 jobs:
   test:
     runs-on: ubuntu-24.04
@@ -36,9 +33,9 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: ./.github/actions/setup-go
+      - uses: trim21/actions/setup-go@master
         with:
-          env: test
+          cache-namespace: test
 
       - name: Install Task
         uses: arduino/setup-task@v2
