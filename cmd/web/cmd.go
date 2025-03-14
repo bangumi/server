@@ -19,6 +19,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/labstack/echo/v4"
+	"github.com/segmentio/kafka-go"
 	"github.com/spf13/cobra"
 	"github.com/trim21/errgo"
 	"go.uber.org/fx"
@@ -92,6 +93,15 @@ func start() error {
 			tag.NewCachedRepo, tag.NewMysqlRepo,
 
 			auth.NewService, person.NewService, search.New,
+		),
+
+		fx.Provide(
+			func(cfg config.AppConfig) *kafka.Writer {
+				logger.Info("new kafka stream broker")
+				return kafka.NewWriter(kafka.WriterConfig{
+					Brokers: []string{cfg.Canal.KafkaBroker},
+				})
+			},
 		),
 
 		ctrl.Module,
