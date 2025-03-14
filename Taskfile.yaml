@@ -13,10 +13,6 @@ tasks:
     cmds:
       - task --list
 
-  install:
-    cmds:
-      - echo "please install buf by yourself https://docs.buf.build/installation"
-
   build:
     desc: Build Web Server Binary
     sources:
@@ -91,7 +87,6 @@ tasks:
   gen:
     desc: Generate all generated GO files
     cmds:
-      - cmd: buf generate
       - task: gorm
       - task: mock
 

@@ -8,8 +8,6 @@
 
 ## Optional Requirements:
 
-- [buf](https://buf.build/) 基于 ProtoBuffer 生成 grpc 相关文件。
-- [mockery](https://github.com/vektra/mockery) 生成 mock
 - nodejs: 用于生成 openapi 文件。
 
 ## Init
@@ -32,19 +30,12 @@ task
 - `MYSQL_PASS` 默认 `password`
 - `REDIS_URI` 默认 `redis://127.0.0.1:6379/0`
 - `HTTP_PORT` 默认 `3000`
-
-#### 微服务相关
-
-- `ETCD_ADDR` etcd, 用于微服务的服务发现，留空（默认）的情况下各个微服务会使用 noop mock。example：`http://127.0.0.1:2379`
-- `ETCD_NAMESPACE` etcd 服务注册的 key 前缀。大多数情况下不需要设置。
-
-https://github.com/bangumi/service-timeline
+- `KAFKA_BROKER` kafka broker 地址。
 
 搜索功能相关的环境变量
 
 - `MEILISEARCH_URL` meilisearch 地址，默认为空。不设置的话不会初始化搜索客户端。
 - `MEILISEARCH_KEY` meilisearch key。
-- `KAFKA_BROKER` kafka broker 地址，启动 canal 需要 kafka。
 
 你也可以把配置放在 `.env` 文件中，`go-task` 会自动加载 `.env` 文件中的环境变量。
 
