@@ -1,6 +1,4 @@
 [submodule "pkg/wiki/testdata/wiki-syntax-spec"]
 	path = pkg/wiki/testdata/wiki-syntax-spec
 	url = https://github.com/bangumi/wiki-syntax-spec.git
-[submodule "proto"]
-	path = proto
-	url = https://github.com/bangumi/proto.git
+	branch = master
