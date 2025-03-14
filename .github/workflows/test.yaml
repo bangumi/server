@@ -49,6 +49,8 @@ jobs:
           tag: v1.12.1
           platform: linux
           arch: amd64
+        env:
+          GITHUB_TOKEN: "${{ github.token }}"
 
       - run: go get -t ./...
 
