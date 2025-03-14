@@ -133,9 +133,9 @@ func (m kafkaClient) ChangeEpisodeStatus(
 func (m kafkaClient) writeMessage(ctx context.Context, uid model.UserID, value timelineValue) error {
 	err := m.kafka.WriteMessages(ctx, kafka.Message{
 		Topic: timelineTopic,
-		Key:   []byte(fmt.Sprintf("%d", uid)),
+		Key:   fmt.Appendf(nil, "%d", uid),
 		Value: lo.Must(json.Marshal(value)),
 	})
 
-	return errgo.Wrap(err, "grpc")
+	return errgo.Wrap(err, "kafka")
 }
