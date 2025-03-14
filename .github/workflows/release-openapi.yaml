@@ -18,8 +18,8 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm ci
-      - run: npm run build
+      - run: yarn install --frozen-lockfile
+      - run: yarn run build
 
       - uses: actions/checkout@v4
         with:

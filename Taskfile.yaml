@@ -51,12 +51,12 @@ tasks:
   openapi-test:
     desc: Test OpenAPI Schema
     cmds:
-      - npm run test
+      - yarn run test
 
   openapi:
     desc: Build OpenAPI Schema
     cmds:
-      - npm run build
+      - yarn run build
 
   bench:
     desc: Run benchmark

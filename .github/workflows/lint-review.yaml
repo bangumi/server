@@ -20,15 +20,17 @@ jobs:
 
       - name: Install Node LTS
         uses: actions/setup-node@v4
+        with:
+          cache: yarn
 
       - name: Install Go
         uses: actions/setup-go@v5
         with:
           go-version-file: "go.mod"
 
-      - run: npm ci
+      - run: yarn install --frozen-lockfile
 
-      - run: npm run format
+      - run: yarn run format
 
       - run: gofmt -w -s .
 

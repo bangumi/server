@@ -31,5 +31,6 @@
     "delay": 2000,
     "exec": "godotenv go run main.go --config config.yaml",
     "ext": "go,json,html"
-  }
+  },
+  "packageManager": "yarn@1.22.22"
 }

@@ -6,5 +6,7 @@
 你需要 [nodejs](https://nodejs.org/) 来测试 openapi 定义：
 
 ```bash
-npm test
+yarn install --frozen-lockfile
+
+yarn run test
 ```
