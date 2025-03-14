@@ -23,9 +23,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/segmentio/kafka-go"
 	"github.com/trim21/errgo"
-	"go.uber.org/zap"
 
-	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/episode"
@@ -36,13 +34,11 @@ const timelineSourceAPI = 5
 const timelineTopic = "timeline"
 const defaultTimeout = time.Second * 5
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger, kafka *kafka.Writer) (Service, error) {
-	return kafkaClient{q: q, log: log.Named("timeline.kafkaWritter"), kafka: kafka}, nil
+func NewSrv(kafka *kafka.Writer) (Service, error) {
+	return kafkaClient{kafka: kafka}, nil
 }
 
 type kafkaClient struct {
-	q     *query.Query
-	log   *zap.Logger
 	kafka *kafka.Writer
 }
 
