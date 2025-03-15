@@ -15,8 +15,6 @@
 package web
 
 import (
-	"fmt"
-
 	"github.com/labstack/echo/v4"
 
 	"github.com/bangumi/server/config"
@@ -24,14 +22,10 @@ import (
 	"github.com/bangumi/server/web/handler/character"
 	"github.com/bangumi/server/web/handler/common"
 	"github.com/bangumi/server/web/handler/index"
-	"github.com/bangumi/server/web/handler/notification"
 	"github.com/bangumi/server/web/handler/person"
-	"github.com/bangumi/server/web/handler/pm"
 	"github.com/bangumi/server/web/handler/subject"
 	"github.com/bangumi/server/web/handler/user"
 	"github.com/bangumi/server/web/mw"
-	"github.com/bangumi/server/web/mw/origin"
-	"github.com/bangumi/server/web/mw/referer"
 	"github.com/bangumi/server/web/mw/ua"
 	"github.com/bangumi/server/web/req"
 )
@@ -47,8 +41,6 @@ func AddRouters(
 	userHandler user.User,
 	personHandler person.Person,
 	characterHandler character.Character,
-	pmHandler pm.PrivateMessage,
-	notificationHandler notification.Notification,
 	subjectHandler subject.Subject,
 	indexHandler index.Handler,
 ) {
@@ -129,29 +121,6 @@ func AddRouters(
 	v0.GET("/revisions/episodes/:id", h.GetEpisodeRevision)
 	v0.GET("/revisions/episodes", h.ListEpisodeRevision)
 	v0.Any("/*", globalNotFoundHandler)
-
-	var originMiddleware = origin.New(fmt.Sprintf("https://%s", c.WebDomain))
-	var refererMiddleware = referer.New(fmt.Sprintf("https://%s/", c.WebDomain))
-
-	var CORSBlockMiddleware []echo.MiddlewareFunc
-	if c.WebDomain != "" {
-		CORSBlockMiddleware = []echo.MiddlewareFunc{originMiddleware, refererMiddleware}
-	}
-
-	// frontend private api
-	private := app.Group("/p", append(CORSBlockMiddleware, common.MiddlewareSessionAuth)...)
-
-	// TODO migrate this to bangumi/graphql
-	private.GET("/pms/list", pmHandler.List, mw.NeedLogin)
-	private.GET("/pms/related-msgs/:id", pmHandler.ListRelated, mw.NeedLogin)
-	private.GET("/pms/counts", pmHandler.CountTypes, mw.NeedLogin)
-	private.GET("/pms/contacts/recent", pmHandler.ListRecentContact, mw.NeedLogin)
-	private.PATCH("/pms/read", pmHandler.MarkRead)
-	private.POST("/pms", pmHandler.Create)
-	private.DELETE("/pms", pmHandler.Delete, req.JSON, mw.NeedLogin)
-
-	private.GET("/notifications/count", notificationHandler.Count, mw.NeedLogin)
-	private.Any("/*", globalNotFoundHandler)
 
 	// default 404 Handler, all router should be added before this router
 	app.Any("/*", globalNotFoundHandler)

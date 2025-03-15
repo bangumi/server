@@ -21,7 +21,6 @@ import (
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gstr"
-	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/pkg/vars"
 	"github.com/bangumi/server/web/res"
 )
@@ -122,18 +121,4 @@ func ParseEpTypeOptional(s string) (*episode.Type, error) {
 	}
 
 	return nil, res.BadRequest(strconv.Quote(s) + " is not valid episode type")
-}
-
-func ParsePrivateMessageFolder(s string) (pm.FolderType, error) {
-	v := pm.FolderType(s)
-	switch v {
-	case pm.FolderTypeInbox,
-		pm.FolderTypeOutbox:
-		return v, nil
-	}
-	return v, res.BadRequest(
-		"folder must be " +
-			string(pm.FolderTypeInbox) +
-			" or " +
-			string(pm.FolderTypeOutbox))
 }

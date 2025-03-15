@@ -20,9 +20,7 @@ import (
 	"github.com/bangumi/server/web/handler/character"
 	"github.com/bangumi/server/web/handler/common"
 	"github.com/bangumi/server/web/handler/index"
-	"github.com/bangumi/server/web/handler/notification"
 	"github.com/bangumi/server/web/handler/person"
-	"github.com/bangumi/server/web/handler/pm"
 	"github.com/bangumi/server/web/handler/subject"
 	"github.com/bangumi/server/web/handler/user"
 )
@@ -36,7 +34,5 @@ var Module = fx.Module("handler",
 		subject.New,
 		character.New,
 		index.New,
-		pm.New,
-		notification.New,
 	),
 )

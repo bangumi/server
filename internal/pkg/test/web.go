@@ -34,12 +34,10 @@ import (
 	"github.com/bangumi/server/internal/index"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/notification"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
@@ -52,25 +50,23 @@ import (
 )
 
 type Mock struct {
-	SubjectRepo        subject.Repo
-	SubjectCachedRepo  subject.CachedRepo
-	PersonRepo         person.Repo
-	CharacterRepo      character.Repo
-	AuthRepo           auth.Repo
-	TagRepo            tag.Repo
-	AuthService        auth.Service
-	EpisodeRepo        episode.Repo
-	UserRepo           user.Repo
-	IndexRepo          index.Repo
-	RevisionRepo       revision.Repo
-	CollectionRepo     collections.Repo
-	TimeLineSrv        timeline.Service
-	SessionManager     session.Manager
-	Cache              cache.RedisCache
-	PrivateMessageRepo pm.Repo
-	NotificationRepo   notification.Repo
-	HTTPMock           *httpmock.MockTransport
-	Dam                *dam.Dam
+	SubjectRepo       subject.Repo
+	SubjectCachedRepo subject.CachedRepo
+	PersonRepo        person.Repo
+	CharacterRepo     character.Repo
+	AuthRepo          auth.Repo
+	TagRepo           tag.Repo
+	AuthService       auth.Service
+	EpisodeRepo       episode.Repo
+	UserRepo          user.Repo
+	IndexRepo         index.Repo
+	RevisionRepo      revision.Repo
+	CollectionRepo    collections.Repo
+	TimeLineSrv       timeline.Service
+	SessionManager    session.Manager
+	Cache             cache.RedisCache
+	HTTPMock          *httpmock.MockTransport
+	Dam               *dam.Dam
 }
 
 //nolint:funlen
@@ -106,8 +102,6 @@ func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 		MockUserRepo(m.UserRepo),
 		MockIndexRepo(m.IndexRepo),
 		MockRevisionRepo(m.RevisionRepo),
-		MockPrivateMessageRepo(m.PrivateMessageRepo),
-		MockNoticationRepo(m.NotificationRepo),
 		MockSessionManager(m.SessionManager),
 		MockTimeLineSrv(m.TimeLineSrv),
 		MockTagRepo(m.TagRepo),
@@ -159,20 +153,6 @@ func MockIndexRepo(repo index.Repo) fx.Option {
 	}
 
 	return fx.Supply(fx.Annotate(repo, fx.As(new(index.Repo))))
-}
-
-func MockPrivateMessageRepo(repo pm.Repo) fx.Option {
-	if repo == nil {
-		repo = &mocks.PrivateMessageRepo{}
-	}
-	return fx.Supply(fx.Annotate(repo, fx.As(new(pm.Repo))))
-}
-
-func MockNoticationRepo(repo notification.Repo) fx.Option {
-	if repo == nil {
-		repo = &mocks.NotificationRepo{}
-	}
-	return fx.Supply(fx.Annotate(repo, fx.As(new(notification.Repo))))
 }
 
 func MockSessionManager(repo session.Manager) fx.Option {
