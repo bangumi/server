@@ -29,10 +29,6 @@ import (
 	"github.com/bangumi/server/internal/user"
 )
 
-func getService() auth.Service {
-	return auth.NewService(nil, nil, zap.NewNop(), cache.NewNoop())
-}
-
 func TestService_GetByToken(t *testing.T) {
 	t.Parallel()
 
