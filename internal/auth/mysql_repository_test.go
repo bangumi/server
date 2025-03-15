@@ -30,19 +30,19 @@ import (
 	"github.com/bangumi/server/internal/pkg/test"
 )
 
-func getRepo(t *testing.T) (auth.Repo, *query.Query) {
+func getRepo(t *testing.T) auth.Repo {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
 	repo := auth.NewMysqlRepo(q, zap.NewNop(), sqlx.NewDb(lo.Must(q.DB().DB()), "mysql"))
 
-	return repo, q
+	return repo
 }
 
 func TestMysqlRepo_GetByToken_NotFound(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
 
-	repo, _ := getRepo(t)
+	repo := getRepo(t)
 
 	_, err := repo.GetByToken(context.Background(), "not exist token")
 	require.ErrorIs(t, err, gerr.ErrNotFound)
@@ -52,7 +52,7 @@ func TestMysqlRepo_GetByToken(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
 
-	repo, _ := getRepo(t)
+	repo := getRepo(t)
 
 	u, err := repo.GetByToken(context.Background(), "a_development_access_token")
 	require.NoError(t, err)
@@ -64,7 +64,7 @@ func TestMysqlRepo_GetByToken_case_sensitive(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
 
-	repo, _ := getRepo(t)
+	repo := getRepo(t)
 
 	_, err := repo.GetByToken(context.Background(), strings.ToUpper("a_development_access_token"))
 	require.ErrorIs(t, err, gerr.ErrNotFound)
@@ -74,7 +74,7 @@ func TestMysqlRepo_GetByToken_expired(t *testing.T) {
 	test.RequireEnv(t, "mysql")
 	t.Parallel()
 
-	repo, _ := getRepo(t)
+	repo := getRepo(t)
 
 	_, err := repo.GetByToken(context.Background(), "a_expired_token")
 	require.ErrorIs(t, err, gerr.ErrNotFound)
