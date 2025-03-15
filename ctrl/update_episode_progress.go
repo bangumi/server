@@ -90,7 +90,7 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 		return err
 	}
 
-	err = ctl.timeline.ChangeEpisodeStatus(ctx, u, s, e)
+	err = ctl.timeline.ChangeEpisodeStatus(ctx, u, s, e, t)
 
 	return errgo.Wrap(err, "timeline.ChangeEpisodeStatus")
 }

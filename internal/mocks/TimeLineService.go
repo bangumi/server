@@ -28,17 +28,17 @@ func (_m *TimeLineService) EXPECT() *TimeLineService_Expecter {
 	return &TimeLineService_Expecter{mock: &_m.Mock}
 }
 
-// ChangeEpisodeStatus provides a mock function with given fields: ctx, u, sbj, _a3
-func (_m *TimeLineService) ChangeEpisodeStatus(ctx context.Context, u auth.Auth, sbj model.Subject, _a3 episode.Episode) error {
-	ret := _m.Called(ctx, u, sbj, _a3)
+// ChangeEpisodeStatus provides a mock function with given fields: ctx, u, sbj, _a3, t
+func (_m *TimeLineService) ChangeEpisodeStatus(ctx context.Context, u auth.Auth, sbj model.Subject, _a3 episode.Episode, t collection.EpisodeCollection) error {
+	ret := _m.Called(ctx, u, sbj, _a3, t)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ChangeEpisodeStatus")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, auth.Auth, model.Subject, episode.Episode) error); ok {
-		r0 = rf(ctx, u, sbj, _a3)
+	if rf, ok := ret.Get(0).(func(context.Context, auth.Auth, model.Subject, episode.Episode, collection.EpisodeCollection) error); ok {
+		r0 = rf(ctx, u, sbj, _a3, t)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -56,13 +56,14 @@ type TimeLineService_ChangeEpisodeStatus_Call struct {
 //   - u auth.Auth
 //   - sbj model.Subject
 //   - _a3 episode.Episode
-func (_e *TimeLineService_Expecter) ChangeEpisodeStatus(ctx interface{}, u interface{}, sbj interface{}, _a3 interface{}) *TimeLineService_ChangeEpisodeStatus_Call {
-	return &TimeLineService_ChangeEpisodeStatus_Call{Call: _e.mock.On("ChangeEpisodeStatus", ctx, u, sbj, _a3)}
+//   - t collection.EpisodeCollection
+func (_e *TimeLineService_Expecter) ChangeEpisodeStatus(ctx interface{}, u interface{}, sbj interface{}, _a3 interface{}, t interface{}) *TimeLineService_ChangeEpisodeStatus_Call {
+	return &TimeLineService_ChangeEpisodeStatus_Call{Call: _e.mock.On("ChangeEpisodeStatus", ctx, u, sbj, _a3, t)}
 }
 
-func (_c *TimeLineService_ChangeEpisodeStatus_Call) Run(run func(ctx context.Context, u auth.Auth, sbj model.Subject, _a3 episode.Episode)) *TimeLineService_ChangeEpisodeStatus_Call {
+func (_c *TimeLineService_ChangeEpisodeStatus_Call) Run(run func(ctx context.Context, u auth.Auth, sbj model.Subject, _a3 episode.Episode, t collection.EpisodeCollection)) *TimeLineService_ChangeEpisodeStatus_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(auth.Auth), args[2].(model.Subject), args[3].(episode.Episode))
+		run(args[0].(context.Context), args[1].(auth.Auth), args[2].(model.Subject), args[3].(episode.Episode), args[4].(collection.EpisodeCollection))
 	})
 	return _c
 }
@@ -72,7 +73,7 @@ func (_c *TimeLineService_ChangeEpisodeStatus_Call) Return(_a0 error) *TimeLineS
 	return _c
 }
 
-func (_c *TimeLineService_ChangeEpisodeStatus_Call) RunAndReturn(run func(context.Context, auth.Auth, model.Subject, episode.Episode) error) *TimeLineService_ChangeEpisodeStatus_Call {
+func (_c *TimeLineService_ChangeEpisodeStatus_Call) RunAndReturn(run func(context.Context, auth.Auth, model.Subject, episode.Episode, collection.EpisodeCollection) error) *TimeLineService_ChangeEpisodeStatus_Call {
 	_c.Call.Return(run)
 	return _c
 }

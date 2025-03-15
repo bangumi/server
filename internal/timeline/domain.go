@@ -39,6 +39,7 @@ type Service interface {
 		u auth.Auth,
 		sbj model.Subject,
 		episode episode.Episode,
+		t collection.EpisodeCollection,
 	) error
 
 	ChangeSubjectProgress(
