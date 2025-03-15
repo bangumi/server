@@ -22,8 +22,6 @@ tasks:
       - task: CollectionRepo
       - task: TimeLineService
       - task: SearchClient
-      - task: PrivateMessageRepo
-      - task: NotificationRepo
 
   base-mock:
     cmds:
@@ -261,29 +259,3 @@ tasks:
           SRC_DIR: ./internal/search
           INTERFACE: Client
           MOCK_STRUCT: SearchClient
-
-  PrivateMessageRepo:
-    sources:
-      - internal/pm/domain.go
-      - ./internal/pkg/tools/go.mod
-    generates:
-      - internal/mocks/PrivateMessageRepo.go
-    cmds:
-      - task: base-mock
-        vars:
-          SRC_DIR: ./internal/pm
-          INTERFACE: Repo
-          MOCK_STRUCT: PrivateMessageRepo
-
-  NotificationRepo:
-    sources:
-      - internal/notification/domain.go
-      - ./internal/pkg/tools/go.mod
-    generates:
-      - internal/mocks/NotificationRepo.go
-    cmds:
-      - task: base-mock
-        vars:
-          SRC_DIR: ./internal/notification
-          INTERFACE: Repo
-          MOCK_STRUCT: NotificationRepo

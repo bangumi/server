@@ -22,7 +22,6 @@ import (
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
-	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/timeline"
 	"github.com/bangumi/server/internal/user"
@@ -38,7 +37,6 @@ func New(
 	user user.Repo,
 	tx dal.Transaction,
 	dam dam.Dam,
-	privateMessage pm.Repo,
 	log *zap.Logger,
 ) Ctrl {
 	return Ctrl{
@@ -48,13 +46,12 @@ func New(
 		tx:  tx,
 		dam: dam,
 
-		subjectCached:  subjectCached,
-		user:           user,
-		episode:        episode,
-		subject:        subject,
-		collection:     collection,
-		timeline:       timeline,
-		privateMessage: privateMessage,
+		subjectCached: subjectCached,
+		user:          user,
+		episode:       episode,
+		subject:       subject,
+		collection:    collection,
+		timeline:      timeline,
 	}
 }
 
@@ -65,11 +62,10 @@ type Ctrl struct {
 	tx  dal.Transaction
 	dam dam.Dam
 
-	subjectCached  subject.CachedRepo
-	user           user.Repo
-	episode        episode.Repo
-	subject        subject.Repo
-	collection     collections.Repo
-	timeline       timeline.Service
-	privateMessage pm.Repo
+	subjectCached subject.CachedRepo
+	user          user.Repo
+	episode       episode.Repo
+	subject       subject.Repo
+	collection    collections.Repo
+	timeline      timeline.Service
 }

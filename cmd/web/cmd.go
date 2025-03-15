@@ -32,13 +32,11 @@ import (
 	"github.com/bangumi/server/internal/collections/infra"
 	"github.com/bangumi/server/internal/episode"
 	"github.com/bangumi/server/internal/index"
-	"github.com/bangumi/server/internal/notification"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/driver"
 	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/pm"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
@@ -85,7 +83,7 @@ func start() error {
 
 			user.NewMysqlRepo,
 			index.NewMysqlRepo, auth.NewMysqlRepo, episode.NewMysqlRepo, revision.NewMysqlRepo, infra.NewMysqlRepo,
-			timeline.NewSrv, pm.NewMysqlRepo, notification.NewMysqlRepo,
+			timeline.NewSrv,
 
 			dam.New, subject.NewMysqlRepo, subject.NewCachedRepo,
 			character.NewMysqlRepo, person.NewMysqlRepo,
