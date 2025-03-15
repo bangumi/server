@@ -17,9 +17,7 @@ package auth
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"errors"
-	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -27,13 +25,9 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
-	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain/gerr"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gstr"
-	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/internal/pkg/random"
 	"github.com/bangumi/server/internal/user"
 )
 
@@ -49,23 +43,6 @@ type mysqlRepo struct {
 	q   *query.Query
 	db  *sqlx.DB
 	log *zap.Logger
-}
-
-func (m mysqlRepo) GetByEmail(ctx context.Context, email string) (UserInfo, []byte, error) {
-	u, err := m.q.Member.WithContext(ctx).Where(m.q.Member.Email.Eq(email)).Take()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return UserInfo{}, nil, gerr.ErrNotFound
-		}
-
-		return UserInfo{}, nil, errgo.Wrap(err, "gorm")
-	}
-
-	return UserInfo{
-		RegTime: time.Unix(u.Regdate, 0),
-		ID:      u.ID,
-		GroupID: u.Groupid,
-	}, u.PasswordCrypt, nil
 }
 
 func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, error) {
@@ -128,125 +105,4 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission
 	}
 
 	return p, nil
-}
-
-const defaultAccessTokenLength = 40
-
-func (m mysqlRepo) CreateAccessToken(
-	ctx context.Context, id model.UserID, name string, expiration time.Duration,
-) (string, error) {
-	token := random.Base62String(defaultAccessTokenLength)
-	var now = time.Now()
-
-	var info = TokenInfo{
-		Name:      name,
-		CreatedAt: now,
-	}
-
-	var expiredAt = now.Add(expiration)
-	if expiration < 0 {
-		expiredAt = time.Time{}
-	}
-
-	infoByte, err := json.Marshal(info)
-	if err != nil {
-		// marshal simple struct should never fail
-		m.log.Fatal("marshal simple struct should never fail",
-			zap.Error(err), zap.String("name", name), zap.Time("now", now))
-		panic("unexpected json encode error")
-	}
-
-	err = m.q.AccessToken.WithContext(ctx).Create(&dao.AccessToken{
-		Type:        TokenTypeAccessToken,
-		AccessToken: token,
-		ClientID:    "access token",
-		UserID:      strconv.FormatUint(uint64(id), 10),
-		ExpiredAt:   expiredAt,
-		Scope:       nil,
-		Info:        infoByte,
-	})
-	if err != nil {
-		return "", errgo.Wrap(err, "dal")
-	}
-
-	return token, nil
-}
-
-type TokenInfo struct {
-	CreatedAt time.Time `json:"created_at"`
-	Name      string    `json:"name"`
-}
-
-func (m mysqlRepo) ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error) {
-	records, err := m.q.AccessToken.WithContext(ctx).
-		Where(m.q.AccessToken.UserID.Eq(strconv.FormatUint(uint64(userID), 10)),
-			m.q.AccessToken.ExpiredAt.Gte(time.Now())).Find()
-	if err != nil {
-		return nil, errgo.Wrap(err, "dal")
-	}
-
-	var tokens = make([]AccessToken, len(records))
-	for i, record := range records {
-		tokens[i] = convertAccessToken(record)
-	}
-
-	return tokens, errgo.Wrap(err, "dal")
-}
-
-const defaultOauthAccessExpiration = time.Hour * 168
-
-func convertAccessToken(t *dao.AccessToken) AccessToken {
-	var createdAt time.Time
-	var name = "oauth token"
-
-	switch t.Type {
-	case TokenTypeAccessToken:
-		if len(t.Info) > 0 {
-			var info TokenInfo
-			if err := json.Unmarshal(t.Info, &info); err != nil {
-				logger.Fatal("unexpected error when trying to unmarshal json data",
-					zap.Error(err), zap.ByteString("raw", t.Info))
-			}
-			name = info.Name
-			createdAt = info.CreatedAt
-		} else {
-			name = "personal access token"
-		}
-	case TokenTypeOauthToken:
-		createdAt = t.ExpiredAt.Add(-defaultOauthAccessExpiration)
-	}
-
-	v, err := strconv.ParseUint(t.UserID, 10, 32)
-	if err != nil {
-		logger.Fatal("parsing UserID", zap.String("raw", t.UserID), zap.Error(err))
-	}
-
-	return AccessToken{
-		ExpiredAt: t.ExpiredAt,
-		CreatedAt: createdAt,
-		Name:      name,
-		UserID:    model.UserID(v),
-		ClientID:  t.ClientID,
-		ID:        t.ID,
-	}
-}
-
-func (m mysqlRepo) DeleteAccessToken(ctx context.Context, id uint32) (bool, error) {
-	info, err := m.q.AccessToken.WithContext(ctx).Where(m.q.AccessToken.ID.Eq(id)).Delete()
-
-	return info.RowsAffected > 0, errgo.Wrap(err, "dal.Delete")
-}
-
-func (m mysqlRepo) GetTokenByID(ctx context.Context, id uint32) (AccessToken, error) {
-	record, err := m.q.AccessToken.WithContext(ctx).Where(m.q.AccessToken.ID.Eq(id)).Take()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return AccessToken{}, gerr.ErrNotFound
-		}
-
-		m.log.Error("unexpected error happened", zap.Error(err))
-		return AccessToken{}, errgo.Wrap(err, "dal")
-	}
-
-	return convertAccessToken(record), errgo.Wrap(err, "dal")
 }

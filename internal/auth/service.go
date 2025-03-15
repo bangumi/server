@@ -15,19 +15,13 @@
 package auth
 
 import (
-	"context"
-	"crypto/md5" //nolint:gosec
-	"encoding/hex"
-	"errors"
+	"context" //nolint:gosec
 	"time"
 
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
-	"golang.org/x/crypto/bcrypt"
 
-	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth/internal/cachekey"
-	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/user"
 )
@@ -51,77 +45,6 @@ type service struct {
 	repo      Repo
 	user      user.Repo
 	log       *zap.Logger
-}
-
-func (s service) GetByID(ctx context.Context, userID model.UserID) (Auth, error) {
-	var cacheKey = cachekey.User(userID)
-
-	var a UserInfo
-	ok, err := s.cache.Get(ctx, cacheKey, &a)
-	if err != nil {
-		return Auth{}, errgo.Wrap(err, "cache.Get")
-	}
-
-	if !ok {
-		var u user.User
-		u, err = s.user.GetByID(ctx, userID)
-		if err != nil {
-			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
-		}
-
-		a = UserInfo{
-			RegTime: u.RegistrationTime,
-			ID:      u.ID,
-			GroupID: u.UserGroup,
-		}
-
-		_ = s.cache.Set(ctx, cacheKey, a, time.Hour)
-	}
-
-	permission, err := s.getPermission(ctx, a.GroupID)
-	if err != nil {
-		return Auth{}, err
-	}
-
-	return Auth{
-		Login:      true,
-		RegTime:    a.RegTime,
-		ID:         a.ID,
-		GroupID:    a.GroupID,
-		Permission: permission,
-	}, nil
-}
-
-func (s service) Login(ctx context.Context, email, password string) (Auth, bool, error) {
-	var a, hashedPassword, err = s.repo.GetByEmail(ctx, email)
-	if err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return Auth{}, false, nil
-		}
-
-		return Auth{}, false, errgo.Wrap(err, "repo.GetByEmail")
-	}
-
-	ok, err := s.ComparePassword(hashedPassword, password)
-	if err != nil {
-		s.log.Error("unexpected error when comparing password with bcrypt", zap.Error(err))
-		return Auth{}, false, err
-	}
-	if !ok {
-		return Auth{}, false, nil
-	}
-
-	p, err := s.getPermission(ctx, a.GroupID)
-	if err != nil {
-		return Auth{}, false, err
-	}
-
-	return Auth{
-		RegTime:    a.RegTime,
-		ID:         a.ID,
-		GroupID:    a.GroupID,
-		Permission: p,
-	}, true, nil
 }
 
 func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
@@ -156,27 +79,6 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 	}, nil
 }
 
-func (s service) ComparePassword(hashed []byte, password string) (bool, error) {
-	p := preProcessPassword(password)
-
-	if err := bcrypt.CompareHashAndPassword(hashed, p); err != nil {
-		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return false, nil
-		}
-
-		return false, errgo.Wrap(err, "bcrypt.CompareHashAndPassword")
-	}
-
-	return true, nil
-}
-
-func preProcessPassword(s string) []byte {
-	// don't know why old code base use md5 to hash password first
-	p := md5.Sum([]byte(s)) //nolint:gosec
-
-	return []byte(hex.EncodeToString(p[:]))
-}
-
 func (s service) getPermission(ctx context.Context, id user.GroupID) (Permission, error) {
 	p, ok := s.permCache.Get(ctx, id)
 
@@ -192,26 +94,4 @@ func (s service) getPermission(ctx context.Context, id user.GroupID) (Permission
 	s.permCache.Set(ctx, id, p, time.Minute)
 
 	return p, nil
-}
-
-func (s service) CreateAccessToken(
-	ctx context.Context, userID model.UserID, name string, expiration time.Duration,
-) (string, error) {
-	token, err := s.repo.CreateAccessToken(ctx, userID, name, expiration)
-	return token, errgo.Wrap(err, "repo.CreateAccessToken")
-}
-
-func (s service) ListAccessToken(ctx context.Context, userID model.UserID) ([]AccessToken, error) {
-	tokens, err := s.repo.ListAccessToken(ctx, userID)
-	return tokens, errgo.Wrap(err, "repo.ListAccessToken")
-}
-
-func (s service) DeleteAccessToken(ctx context.Context, id uint32) (bool, error) {
-	result, err := s.repo.DeleteAccessToken(ctx, id)
-	return result, errgo.Wrap(err, "repo.DeleteAccessToken")
-}
-
-func (s service) GetTokenByID(ctx context.Context, id uint32) (AccessToken, error) {
-	result, err := s.repo.GetTokenByID(ctx, id)
-	return result, errgo.Wrap(err, "repo.GetTokenByID")
 }
