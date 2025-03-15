@@ -90,7 +90,11 @@ func (ctl Ctrl) UpdateEpisodesCollection(
 		return err
 	}
 
-	err = ctl.timeline.ChangeEpisodeStatus(ctx, u, s, e)
+	if t == 0 {
+		return nil
+	}
+
+	err = ctl.timeline.ChangeEpisodeStatus(ctx, u, s, e, t)
 
 	return errgo.Wrap(err, "timeline.ChangeEpisodeStatus")
 }
@@ -125,7 +129,11 @@ func (ctl Ctrl) UpdateEpisodeCollection(
 		return err
 	}
 
-	err = ctl.timeline.ChangeEpisodeStatus(ctx, u, s, e)
+	if t == 0 {
+		return nil
+	}
+
+	err = ctl.timeline.ChangeEpisodeStatus(ctx, u, s, e, t)
 
 	return errgo.Wrap(err, "timeline.ChangeEpisodeStatus")
 }

@@ -26,8 +26,8 @@ type timelineValue struct {
 }
 
 type tlEpisode struct {
-	ID     model.EpisodeID `json:"id"`
-	Status int             `json:"status"`
+	ID     model.EpisodeID              `json:"id"`
+	Status collection.EpisodeCollection `json:"status"`
 }
 
 type tlSubjectCollect struct {

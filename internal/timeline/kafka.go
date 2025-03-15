@@ -104,6 +104,7 @@ func (m kafkaClient) ChangeEpisodeStatus(
 	u auth.Auth,
 	sbj model.Subject,
 	episode episode.Episode,
+	t collection.EpisodeCollection,
 ) error {
 	ctx, canal := context.WithTimeout(ctx, defaultTimeout)
 	defer canal()
@@ -121,7 +122,7 @@ func (m kafkaClient) ChangeEpisodeStatus(
 				},
 				Episode: tlEpisode{
 					ID:     episode.ID,
-					Status: int(episode.Sort),
+					Status: t,
 				},
 				CreatedAt: time.Now().Unix(),
 				Source:    timelineSourceAPI,
