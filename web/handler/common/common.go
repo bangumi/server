@@ -21,13 +21,11 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/web/session"
 )
 
 func New(
 	log *zap.Logger,
 	auth auth.Service,
-	session session.Manager,
 	config config.AppConfig,
 ) (Common, error) {
 	validate, trans, err := getValidator()
