@@ -21,13 +21,11 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/auth"
-	"github.com/bangumi/server/web/session"
 )
 
 func New(
 	log *zap.Logger,
 	auth auth.Service,
-	session session.Manager,
 	config config.AppConfig,
 ) (Common, error) {
 	validate, trans, err := getValidator()
@@ -38,7 +36,6 @@ func New(
 	log = log.Named("handler.Common")
 	return Common{
 		Config:               config,
-		session:              session,
 		auth:                 auth,
 		log:                  log,
 		skip1Log:             log.WithOptions(zap.AddCallerSkip(1)),
@@ -52,7 +49,6 @@ type Common struct {
 	auth                 auth.Service
 	skip1Log             *zap.Logger
 	log                  *zap.Logger
-	session              session.Manager
 	V                    *validator.Validate
 	validatorTranslation ut.Translator
 }

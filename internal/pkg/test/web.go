@@ -46,7 +46,6 @@ import (
 	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web"
 	"github.com/bangumi/server/web/handler"
-	"github.com/bangumi/server/web/session"
 )
 
 type Mock struct {
@@ -63,7 +62,6 @@ type Mock struct {
 	RevisionRepo      revision.Repo
 	CollectionRepo    collections.Repo
 	TimeLineSrv       timeline.Service
-	SessionManager    session.Manager
 	Cache             cache.RedisCache
 	HTTPMock          *httpmock.MockTransport
 	Dam               *dam.Dam
@@ -102,7 +100,6 @@ func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 		MockUserRepo(m.UserRepo),
 		MockIndexRepo(m.IndexRepo),
 		MockRevisionRepo(m.RevisionRepo),
-		MockSessionManager(m.SessionManager),
 		MockTimeLineSrv(m.TimeLineSrv),
 		MockTagRepo(m.TagRepo),
 
@@ -153,18 +150,6 @@ func MockIndexRepo(repo index.Repo) fx.Option {
 	}
 
 	return fx.Supply(fx.Annotate(repo, fx.As(new(index.Repo))))
-}
-
-func MockSessionManager(repo session.Manager) fx.Option {
-	if repo == nil {
-		mocker := &mocks.SessionManager{}
-		mocker.EXPECT().Create(mock.Anything, mock.Anything).Return("mocked random string", session.Session{}, nil)
-		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return(session.Session{}, nil)
-
-		repo = mocker
-	}
-
-	return fx.Provide(func() session.Manager { return repo })
 }
 
 func MockUserRepo(repo user.Repo) fx.Option {
