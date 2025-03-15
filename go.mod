@@ -2,10 +2,7 @@ module github.com/bangumi/server
 
 go 1.24.1
 
-tool (
-	github.com/vektra/mockery/v2
-	golang.org/x/vuln/cmd/govulncheck
-)
+tool github.com/vektra/mockery/v2
 
 require (
 	github.com/avast/retry-go/v4 v4.6.1
@@ -119,11 +116,9 @@ require (
 	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/telemetry v0.0.0-20240522233618-39ace7a40ae7 // indirect
 	golang.org/x/term v0.30.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.30.0 // indirect
-	golang.org/x/vuln v1.1.4 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gorm.io/datatypes v1.2.2 // indirect

@@ -31,4 +31,6 @@ jobs:
         with:
           cache-namespace: sec
 
-      - run: go run golang.org/x/vuln/cmd/govulncheck ./...
+      - run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - run: govulncheck ./...
