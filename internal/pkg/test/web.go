@@ -288,7 +288,7 @@ func MockTimeLineSrv(m timeline.Service) fx.Option {
 
 		mocker.EXPECT().ChangeSubjectCollection(mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		mocker.EXPECT().ChangeEpisodeStatus(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		mocker.EXPECT().ChangeEpisodeStatus(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.AnythingF).Return(nil)
 		mocker.EXPECT().ChangeSubjectProgress(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 
