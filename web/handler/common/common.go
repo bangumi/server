@@ -38,7 +38,6 @@ func New(
 	log = log.Named("handler.Common")
 	return Common{
 		Config:               config,
-		session:              session,
 		auth:                 auth,
 		log:                  log,
 		skip1Log:             log.WithOptions(zap.AddCallerSkip(1)),
@@ -52,7 +51,6 @@ type Common struct {
 	auth                 auth.Service
 	skip1Log             *zap.Logger
 	log                  *zap.Logger
-	session              session.Manager
 	V                    *validator.Validate
 	validatorTranslation ut.Translator
 }
