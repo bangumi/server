@@ -57,7 +57,7 @@ jobs:
       - run: bash $HOME/dev-env/wait_mysql_ready.sh
 
       - name: Run tests
-        run: gotestsum --hide-summary=skipped -- -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out ./...
+        run: gotestsum --format-hide-empty-pkg -- -timeout 10s -tags test -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.out ./...
         env:
           GORACE: halt_on_error=1
           TEST_MYSQL: "1"
