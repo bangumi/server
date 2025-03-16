@@ -32,7 +32,7 @@ import (
 func getRepo(t *testing.T) tag.Repo {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
-	repo, err := tag.NewMysqlRepo(q, zap.NewNop(), sqlx.NewDb(lo.Must(q.DB().DB()), "mysql"))
+	repo, err := tag.NewMysqlRepo(q, zap.NewNop(), sqlx.NewDb(lo.Must(q.RawDB().DB()), "mysql"))
 	require.NoError(t, err)
 
 	return repo

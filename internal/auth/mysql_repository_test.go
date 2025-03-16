@@ -33,7 +33,7 @@ import (
 func getRepo(t *testing.T) auth.Repo {
 	t.Helper()
 	q := query.Use(test.GetGorm(t))
-	repo := auth.NewMysqlRepo(q, zap.NewNop(), sqlx.NewDb(lo.Must(q.DB().DB()), "mysql"))
+	repo := auth.NewMysqlRepo(q, zap.NewNop(), sqlx.NewDb(lo.Must(q.RawDB().DB()), "mysql"))
 
 	return repo
 }
