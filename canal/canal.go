@@ -107,11 +107,9 @@ func Main() error {
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-		select {
-		case <-sys.HandleSignal():
-			logger.Info("receive signal, shutdown")
-			return fmt.Errorf("receive signal")
-		}
+		s := <-sys.HandleSignal()
+		logger.Info("receive signal, shutdown")
+		return fmt.Errorf("receive signal %s", s)
 	})
 
 	return wg.Wait()
