@@ -143,8 +143,4 @@ func (s *Search) EventDelete(ctx context.Context, id uint32, target SearchTarget
 	return searcher.OnDelete(ctx, id)
 }
 
-func (s *Search) Close() {
-	for _, searcher := range s.searchers {
-		searcher.Close()
-	}
-}
+func (s *Search) Close() {}

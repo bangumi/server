@@ -45,9 +45,9 @@ func (c *client) OnUpdate(ctx context.Context, id model.PersonID) error {
 
 	extracted := extract(&s)
 
-	c.queue.Push(extracted)
+	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, "id")
 
-	return nil
+	return err
 }
 
 func (c *client) OnDelete(ctx context.Context, id model.PersonID) error {

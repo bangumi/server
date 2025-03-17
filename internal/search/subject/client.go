@@ -8,7 +8,6 @@ import (
 
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/trim21/errgo"
-	"github.com/trim21/pkg/queue"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
@@ -54,23 +53,12 @@ type client struct {
 	meili meilisearch.ServiceManager
 	log   *zap.Logger
 	q     *query.Query
-
-	queue *queue.Batched[searcher.Document]
-}
-
-func (c *client) Close() {
-	if c.queue != nil {
-		c.queue.Close()
-	}
 }
 
 func (c *client) canalInit(cfg config.AppConfig) error {
 	if err := searcher.ValidateConfigs(cfg); err != nil {
 		return errgo.Wrap(err, "validate search config")
 	}
-	c.queue = searcher.NewBatchQueue(cfg, c.log, c.index)
-	searcher.RegisterQueueMetrics(idx, c.queue)
-
 	shouldCreateIndex, err := searcher.NeedFirstRun(c.meili, idx)
 	if err != nil {
 		return err

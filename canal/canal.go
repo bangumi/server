@@ -114,5 +114,5 @@ func Main() error {
 		}
 	})
 
-	wg.Wait()
+	return wg.Wait()
 }

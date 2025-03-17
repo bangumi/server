@@ -12,10 +12,8 @@ import (
 	"github.com/avast/retry-go/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
-	"github.com/trim21/pkg/queue"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
@@ -24,8 +22,6 @@ import (
 
 type Searcher interface {
 	Handle(c echo.Context) error
-
-	Close()
 
 	OnAdded(ctx context.Context, id uint32) error
 	OnUpdate(ctx context.Context, id uint32) error
@@ -138,32 +134,6 @@ func NewDedupeFunc() func([]Document) []Document {
 			return item.GetID()
 		})
 	}
-}
-
-func NewBatchQueue(cfg config.AppConfig, log *zap.Logger, index meilisearch.IndexManager) *queue.Batched[Document] {
-	return queue.NewBatchedDedupe(
-		NewSendBatch(log, index),
-		cfg.Search.SearchBatchSize,
-		cfg.Search.SearchBatchInterval,
-		NewDedupeFunc(),
-	)
-}
-
-func RegisterQueueMetrics(idx string, queue *queue.Batched[Document]) {
-	prometheus.DefaultRegisterer.MustRegister(
-		prometheus.NewGaugeFunc(
-			prometheus.GaugeOpts{
-				Namespace: "chii",
-				Name:      "meilisearch_queue_batch",
-				Help:      "meilisearch update queue batch size",
-				ConstLabels: prometheus.Labels{
-					"index": idx,
-				},
-			},
-			func() float64 {
-				return float64(queue.Len())
-			},
-		))
 }
 
 func GetAttributes(rt reflect.Type, tag string) *[]string {
