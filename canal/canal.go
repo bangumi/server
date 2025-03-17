@@ -18,11 +18,15 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/trim21/errgo"
 	"go.uber.org/fx"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal"
@@ -82,23 +86,33 @@ func Main() error {
 		return errgo.Wrap(err, "fx")
 	}
 
-	var errChan = make(chan error, 1)
-
 	// metrics http reporter
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.Handler())
 	srv := &http.Server{Addr: h.config.ListenAddr(), Handler: mux, ReadHeaderTimeout: time.Second}
-	go func() { errChan <- errgo.Wrap(srv.ListenAndServe(), "http") }()
+
+	var wg errgroup.Group
+
 	defer srv.Shutdown(context.Background()) //nolint:errcheck
+	wg.Go(func() error {
+		return errgo.Wrap(srv.ListenAndServe(), "http")
+	})
 
-	go func() { errChan <- errgo.Wrap(h.start(), "start") }()
 	defer h.Close()
+	wg.Go(func() error {
+		return errgo.Wrap(h.start(), "start")
+	})
 
-	select {
-	case err := <-errChan:
-		return err
-	case <-sys.HandleSignal():
-		logger.Info("receive signal, shutdown")
-		return nil
-	}
+	wg.Go(func() error {
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+		select {
+		case <-sys.HandleSignal():
+			logger.Info("receive signal, shutdown")
+			return fmt.Errorf("receive signal")
+		}
+	})
+
+	wg.Wait()
 }
