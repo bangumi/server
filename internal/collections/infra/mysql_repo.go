@@ -121,6 +121,30 @@ func (r mysqlRepo) UpdateOrCreateSubjectCollection(
 	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
 }
 
+func (r mysqlRepo) DeleteSubjectCollection(
+	ctx context.Context,
+	userID model.UserID,
+	subjectID model.SubjectID,
+) error {
+	err := r.q.RawDB().Exec(`
+		UPDATE chii_subject_interests set interest_type = 0,
+		                                  interest_rate = 0,
+		                                  interest_comment = 0,
+		                                  interest_has_comment = 0,
+		                                  interest_tag = '',
+		                                  interest_ep_status = 0,
+		                                  interest_vol_status = 0,
+		                                  interest_wish_dateline = 0,
+																			interest_doing_dateline = 0,
+																			interest_collect_dateline = 0,
+																			interest_on_hold_dateline = 0,
+																			interest_dropped_dateline = 0
+			where interest_uid = ? and interest_subject_id = ?
+`, userID, subjectID).Error
+
+	return err
+}
+
 //nolint:funlen
 func (r mysqlRepo) updateOrCreateSubjectCollection(
 	ctx context.Context,
@@ -308,7 +332,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 		return true
 	})
 
-	db := tx.DB().WithContext(ctx)
+	db := tx.RawDB().WithContext(ctx)
 
 	err = db.Exec(`
 			update chii_tag_neue_index as ti
@@ -554,7 +578,7 @@ func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model
 	}
 
 	return r.q.Transaction(func(tx *query.Query) error {
-		err := tx.DB().WithContext(ctx).Raw(`
+		err := tx.RawDB().WithContext(ctx).Raw(`
 			select interest_type as type, count(interest_type) as total from chii_subject_interests 
 			where interest_subject_id = ?
 			group by interest_type
@@ -603,7 +627,7 @@ func (r mysqlRepo) reCountSubjectRate(ctx context.Context, subjectID model.Subje
 		for _, rate := range []uint8{before, after} {
 			var count uint32
 			if rate != 0 {
-				err := tx.DB().WithContext(ctx).Raw(`
+				err := tx.RawDB().WithContext(ctx).Raw(`
 			select count(*) from chii_subject_interests
 			where interest_subject_id = ? and interest_private = 0 and interest_rate = ?
 		`, subjectID, rate).Scan(&count).Error
