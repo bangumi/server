@@ -44,7 +44,7 @@ func TestGet(t *testing.T) {
 
 	repo := getRepo(t)
 
-	_, err := repo.Get(context.Background(), 8)
+	_, err := repo.Get(context.Background(), 8, model.SubjectTypeAnime)
 	require.NoError(t, err)
 }
 

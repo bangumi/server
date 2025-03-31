@@ -58,7 +58,7 @@ func TestSubject_Get(t *testing.T) {
 	ep.EXPECT().Count(mock.Anything, subjectID, mock.Anything).Return(3, nil)
 
 	tagRepo := mocks.NewTagRepo(t)
-	tagRepo.EXPECT().Get(mock.Anything, mock.Anything).Return([]tag.Tag{}, nil)
+	tagRepo.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return([]tag.Tag{}, nil)
 
 	s, err := subjectHandler.New(nil, m, nil, nil, ep, tagRepo)
 	require.NoError(t, err)

@@ -1,2 +1,14 @@
 with-expecter: True
 issue-845-fix: True
+
+packages:
+  github.com/vektra/mockery/v2/pkg:
+    interfaces:
+      TypesPackage:
+      RequesterVariadic:
+        config:
+          with-expecter: False
+        configs:
+          - mockname: MockRequesterVariadicOneArgument
+            unroll-variadic: False
+          - mockname: MockRequesterVariadic

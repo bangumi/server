@@ -42,7 +42,7 @@ func TestCacheGet(t *testing.T) {
 
 	repo := getCacheRepo(t)
 
-	_, err := repo.Get(context.Background(), 8)
+	_, err := repo.Get(context.Background(), 8, model.SubjectTypeAnime)
 	require.NoError(t, err)
 }
 
