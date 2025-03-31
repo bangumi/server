@@ -208,7 +208,7 @@ func MockAuthRepo(m auth.Repo) fx.Option {
 func MockTagRepo(m tag.Repo) fx.Option {
 	if m == nil {
 		mocker := &mocks.TagRepo{}
-		mocker.EXPECT().Get(mock.Anything, mock.Anything).Return([]tag.Tag{}, nil)
+		mocker.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return([]tag.Tag{}, nil)
 		mocker.EXPECT().GetByIDs(mock.Anything, mock.Anything).Return(map[model.SubjectID][]tag.Tag{}, nil)
 
 		m = mocker
