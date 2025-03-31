@@ -22,7 +22,6 @@ import (
 	"sync/atomic"
 
 	"github.com/segmentio/kafka-go"
-	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
@@ -81,11 +80,13 @@ func (s *kafkaStream) Read(ctx context.Context, onMessage func(msg Msg) error) e
 		}
 
 		if err := onMessage(m); err != nil {
-			return errgo.Trace(err)
+			s.log.Error("failed to process kafak message", zap.Error(err))
+			continue
 		}
 
 		if err := s.k.CommitMessages(ctx, msg); err != nil {
-			return errgo.Trace(err)
+			s.log.Error("failed to commit kafak message", zap.Error(err))
+			continue
 		}
 	}
 }
