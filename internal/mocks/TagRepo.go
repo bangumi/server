@@ -22,9 +22,9 @@ func (_m *TagRepo) EXPECT() *TagRepo_Expecter {
 	return &TagRepo_Expecter{mock: &_m.Mock}
 }
 
-// Get provides a mock function with given fields: ctx, id
-func (_m *TagRepo) Get(ctx context.Context, id uint32) ([]tag.Tag, error) {
-	ret := _m.Called(ctx, id)
+// Get provides a mock function with given fields: ctx, id, typeID
+func (_m *TagRepo) Get(ctx context.Context, id uint32, typeID uint8) ([]tag.Tag, error) {
+	ret := _m.Called(ctx, id, typeID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
@@ -32,19 +32,19 @@ func (_m *TagRepo) Get(ctx context.Context, id uint32) ([]tag.Tag, error) {
 
 	var r0 []tag.Tag
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uint32) ([]tag.Tag, error)); ok {
-		return rf(ctx, id)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint8) ([]tag.Tag, error)); ok {
+		return rf(ctx, id, typeID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uint32) []tag.Tag); ok {
-		r0 = rf(ctx, id)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint8) []tag.Tag); ok {
+		r0 = rf(ctx, id, typeID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]tag.Tag)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
-		r1 = rf(ctx, id)
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, uint8) error); ok {
+		r1 = rf(ctx, id, typeID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -60,13 +60,14 @@ type TagRepo_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id uint32
-func (_e *TagRepo_Expecter) Get(ctx interface{}, id interface{}) *TagRepo_Get_Call {
-	return &TagRepo_Get_Call{Call: _e.mock.On("Get", ctx, id)}
+//   - typeID uint8
+func (_e *TagRepo_Expecter) Get(ctx interface{}, id interface{}, typeID interface{}) *TagRepo_Get_Call {
+	return &TagRepo_Get_Call{Call: _e.mock.On("Get", ctx, id, typeID)}
 }
 
-func (_c *TagRepo_Get_Call) Run(run func(ctx context.Context, id uint32)) *TagRepo_Get_Call {
+func (_c *TagRepo_Get_Call) Run(run func(ctx context.Context, id uint32, typeID uint8)) *TagRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32))
+		run(args[0].(context.Context), args[1].(uint32), args[2].(uint8))
 	})
 	return _c
 }
@@ -76,7 +77,7 @@ func (_c *TagRepo_Get_Call) Return(_a0 []tag.Tag, _a1 error) *TagRepo_Get_Call {
 	return _c
 }
 
-func (_c *TagRepo_Get_Call) RunAndReturn(run func(context.Context, uint32) ([]tag.Tag, error)) *TagRepo_Get_Call {
+func (_c *TagRepo_Get_Call) RunAndReturn(run func(context.Context, uint32, uint8) ([]tag.Tag, error)) *TagRepo_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
