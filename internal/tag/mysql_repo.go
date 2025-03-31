@@ -34,7 +34,7 @@ type mysqlRepo struct {
 	db  *sqlx.DB
 }
 
-func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
+func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID, typeID model.SubjectType) ([]Tag, error) {
 	var s []struct {
 		Tid        uint   `db:"tlt_tid"`
 		Name       string `db:"tag_name"`
@@ -44,9 +44,9 @@ func (r mysqlRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 	err := r.db.SelectContext(ctx, &s, `
 		select tlt_tid, tag_name, tag_results
 		from chii_tag_neue_list
-		inner join chii_tag_neue_index on tlt_tid = tag_id
-		where tlt_uid = 0 and tag_cat = ? and tlt_mid = ?
-		`, CatSubject, id)
+		inner join chii_tag_neue_index on tlt_tid = tag_id and tag_cat = tlt_cat and tag_type = tlt_type
+		where tlt_uid = 0 and tlt_cat = ? and tlt_mid = ? and tlt_type = ?
+		`, CatSubject, id, typeID)
 	if err != nil {
 		return nil, err
 	}

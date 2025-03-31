@@ -42,6 +42,6 @@ type Repo interface {
 }
 
 type read interface {
-	Get(ctx context.Context, id model.SubjectID) ([]Tag, error)
+	Get(ctx context.Context, id model.SubjectID, typeID model.SubjectType) ([]Tag, error)
 	GetByIDs(ctx context.Context, ids []model.SubjectID) (map[model.SubjectID][]Tag, error)
 }

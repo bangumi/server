@@ -61,7 +61,7 @@ func (h Subject) Get(c echo.Context) error {
 		return errgo.Wrap(err, "episode.Count")
 	}
 
-	metaTags, err := h.tag.Get(c.Request().Context(), s.ID)
+	metaTags, err := h.tag.Get(c.Request().Context(), s.ID, s.TypeID)
 	if err != nil {
 		return err
 	}

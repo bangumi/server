@@ -71,7 +71,7 @@ func init() {
 
 // also need to change version in [cachekey.SubjectMetaTag] if schema is changed.
 
-func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
+func (r cacheRepo) Get(ctx context.Context, id model.SubjectID, typeID model.SubjectType) ([]Tag, error) {
 	TotalCount.Add(1)
 	var key = cachekey.SubjectMetaTag(id)
 
@@ -86,7 +86,7 @@ func (r cacheRepo) Get(ctx context.Context, id model.SubjectID) ([]Tag, error) {
 		return s.Tags, nil
 	}
 
-	tags, err := r.repo.Get(ctx, id)
+	tags, err := r.repo.Get(ctx, id, typeID)
 	if err != nil {
 		return tags, err
 	}
