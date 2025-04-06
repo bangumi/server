@@ -273,11 +273,9 @@ func parseDateValOk(date string) (int, bool) {
 	}
 
 	// 2008-10-05 format
-	if !(isDigitsOnly(date[:4]) &&
-		date[4] == '-' &&
-		isDigitsOnly(date[5:7]) &&
-		date[7] == '-' &&
-		isDigitsOnly(date[8:10])) {
+	if !isDigitsOnly(date[:4]) ||
+		date[4] != '-' || !isDigitsOnly(date[5:7]) ||
+		date[7] != '-' || !isDigitsOnly(date[8:10]) {
 		return 0, false
 	}
 

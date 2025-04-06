@@ -56,7 +56,7 @@ func GetGorm(tb testing.TB) *gorm.DB {
 
 func newGorm(tb testing.TB, c config.AppConfig) (*gorm.DB, error) {
 	tb.Helper()
-	conn, err := driver.NewMysqlSqlDB(c)
+	conn, err := driver.NewMysqlDriver(c)
 	if err != nil {
 		return nil, errgo.Wrap(err, "sql.Open")
 	}

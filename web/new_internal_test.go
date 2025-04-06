@@ -59,7 +59,7 @@ func TestDefaultErrorHandler_internal(t *testing.T) {
 	app.HTTPErrorHandler = getDefaultErrorHandler()
 
 	app.GET("/", func(c echo.Context) error {
-		return errors.New("mm") //nolint:goerr113
+		return errors.New("mm")
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)

@@ -1,213 +1,21 @@
-# This file contains all available configuration options
-# with their default values.
-
-# options for analysis running
+version: "2"
 run:
-  # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 5m
-
-  # exit code when at least one issue was found, default is 1
-  issues-exit-code: 1
-
-  # include test files or not, default is true
-  tests: true
-
   modules-download-mode: readonly
-
-  # Allow multiple parallel golangci-lint instances running.
-  # If false (default) - golangci-lint acquires file lock on start.
+  issues-exit-code: 1
+  tests: true
   allow-parallel-runners: true
-
-  go: "1.23"
-
-# output configuration options
 output:
-  # colored-line-number|line-number|json|tab|checkstyle|code-climate|junit-xml|github-actions
-  # default is "colored-line-number"
   formats:
-    - format: "colored-line-number"
-
-# all available settings of specific linters
-linters-settings:
-  revive:
-    rules:
-      - name: unused-parameter
-        disabled: true
-  errcheck:
-    # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
-    # default is false: such cases aren't reported by default.
-    check-type-assertions: false
-
-    # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
-    # default is false: such cases aren't reported by default.
-    check-blank: false
-    exclude-functions:
-      - (*github.com/valyala/bytebufferpool.ByteBuffer).Write
-      - (*github.com/valyala/bytebufferpool.ByteBuffer).WriteByte
-      - (*github.com/valyala/bytebufferpool.ByteBuffer).WriteString
-
-  errorlint:
-    # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
-    errorf: true
-    # Check for plain type assertions and type switches
-    asserts: true
-    # Check for plain error comparisons
-    comparison: true
-
-  forbidigo:
-    # Forbid the following identifiers (identifiers are written using regexp):
-    forbid:
-      - ^print.*$
-      - ^fmt\.Println$
-      - ^fmt\.Print$
-
-  gofmt:
-    simplify: true
-    rewrite-rules:
-      - pattern: "interface{}"
-        replacement: "any"
-
-  funlen:
-    lines: 60
-    statements: 40
-
-  gocyclo:
-    # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 15
-
-  godot:
-    # comments to be checked: `declarations`, `toplevel`, or `all`
-    scope: declarations
-    # list of regexps for excluding particular comment lines from check
-    exclude: []
-    # example: exclude comments which contain numbers
-    # - '[0-9]+'
-    # check that each sentence starts with a capital letter
-    capital: false
-
-  gci:
-    sections:
-      - standard # Captures all standard packages if they do not match another section.
-      - default # Contains all imports that could not be matched to another section type.
-      - prefix(github.com/bangumi/server) # Groups all imports with the specified Prefix.
-
-  depguard:
-    rules:
-      main:
-        files:
-          - "$all"
-          - "!$test"
-          - "!**/internal/pkg/test/**.go"
-        deny:
-          - pkg: "github.com/sirupsen/logrus"
-            desc: 'use "app/pkg/logger"'
-          - pkg: "github.com/golang/mock"
-            desc: 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
-          - pkg: "github.com/stretchr/testify"
-            desc: "test assert package not allowed"
-      test:
-        files:
-          - "$test"
-          - "**/internal/pkg/test/**.go"
-        deny:
-          - pkg: "github.com/golang/mock"
-            desc: 'use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"'
-
-  mnd:
-    # settings:
-    # mnd:
-    # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
-    checks:
-      - argument
-      - case
-      - operation
-      - return
-      - assign
-    ignored-functions: [strconv\..*, time\..*, make, math\..*, strings\..*]
-    ignored-numbers: ["1", "2", "3", "10", "100", "1000", "10000"]
-
-  gosimple:
-    # Select the Go version to target. The default is '1.13'.
-    # https://staticcheck.io/docs/options#checks
-    checks: ["all"]
-
-  importas:
-    no-unaliased: false
-    no-extra-aliases: false
-    alias:
-      - pkg: "log"
-        alias: stdLog
-      - pkg: "gorm.io/gorm/logger"
-        alias: gormLogger
-      - pkg: "github.com/go-playground/universal-translator"
-        alias: ut
-      - pkg: "github.com/go-playground/validator/v10/translations/zh"
-        alias: zhTranslations
-
-  lll:
-    # max line length, lines longer will be reported. Default is 120.
-    # '\t' is counted as 1 character by default, and can be changed with the tab-width option
-    line-length: 120
-    # tab width in spaces. Default to 1.
-    tab-width: 2
-
-  misspell:
-    # Correct spellings using locale preferences for US or UK.
-    # Default is to use a neutral variety of English.
-    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
-    locale: US
-
-  staticcheck:
-    # Select the Go version to target. The default is '1.13'.
-    # https://staticcheck.io/docs/options#checks
-    checks: ["all"]
-
-  # stylecheck:
-  # Select the Go version to target. The default is '1.13'.
-
-  testpackage:
-    # regexp pattern to skip files
-    skip-regexp: (export|internal)_test\.go
-
-  exhaustive:
-    # check switch statements in generated files also
-    check-generated: false
-    # indicates that switch statements are to be considered exhaustive if a
-    # 'default' case is present, even if all enum members aren't listed in the
-    # switch
-    default-signifies-exhaustive: true
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-  #      - shadow
-
-  nlreturn:
-    block-size: 3
-
-  gosec:
-    excludes:
-      - G115
-
-  tagliatelle:
-    # Check the struck tag name case.
-    case:
-      # Use the struct field name to check the name of the struct tag.
-      # Default: false
-      use-field-name: false
-      rules:
-        # Any struct tag type can be used.
-        # Support string case: `camel`, `pascal`, `kebab`, `snake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`
-        json: snake
-        yaml: snake
-
+    text:
+      path: stdout
 linters:
-  disable-all: true
+  default: none
   enable:
     - asasalint
     - asciicheck
     - bidichk
     - containedctx
+    - copyloopvar
     - depguard
     - dogsled
     - durationcheck
@@ -215,13 +23,10 @@ linters:
     - errchkjson
     - errname
     - errorlint
-    #    https://github.com/golangci/golangci-lint/issues/5065
     - exhaustive
-    - copyloopvar
     - forbidigo
     - forcetypeassert
     - funlen
-    - gci
     - gocheckcompilerdirectives
     - gochecknoglobals
     - gochecknoinits
@@ -230,13 +35,10 @@ linters:
     - gocritic
     - gocyclo
     - godot
-    - gofmt
-    - mnd
     - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - grouper
     - importas
@@ -247,65 +49,206 @@ linters:
     - maintidx
     - makezero
     - misspell
-    #    - musttag
+    - mnd
     - nakedret
     - nestif
     - nilnil
     - noctx
-    #    - nosprintfhostport
     - paralleltest
     - predeclared
     - promlinter
     - reassign
-    #    - staticcheck
-    - stylecheck
+    - revive
+    - staticcheck
     - tagliatelle
-    # - usetesting
     - testableexamples
     - testpackage
     - thelper
     - tparallel
-    - typecheck
     - unconvert
     - unparam
     - unused
     - usestdlibvars
     - whitespace
-    - revive
-
-  fast: false
+  settings:
+    depguard:
+      rules:
+        main:
+          files:
+            - $all
+            - "!$test"
+            - "!**/internal/pkg/test/**.go"
+          deny:
+            - pkg: github.com/sirupsen/logrus
+              desc: use "app/pkg/logger"
+            - pkg: github.com/golang/mock
+              desc: use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"
+            - pkg: github.com/stretchr/testify
+              desc: test assert package not allowed
+        test:
+          files:
+            - $test
+            - "**/internal/pkg/test/**.go"
+          deny:
+            - pkg: github.com/golang/mock
+              desc: use "github.com/stretchr/testify/mock" and "github.com/vektra/mockery"
+    errcheck:
+      check-type-assertions: false
+      check-blank: false
+      exclude-functions:
+        - (*github.com/valyala/bytebufferpool.ByteBuffer).Write
+        - (*github.com/valyala/bytebufferpool.ByteBuffer).WriteByte
+        - (*github.com/valyala/bytebufferpool.ByteBuffer).WriteString
+    errorlint:
+      errorf: true
+      asserts: true
+      comparison: true
+    exhaustive:
+      default-signifies-exhaustive: true
+    forbidigo:
+      forbid:
+        - pattern: ^print.*$
+        - pattern: ^fmt\.Println$
+        - pattern: ^fmt\.Print$
+    funlen:
+      lines: 60
+      statements: 40
+    gocyclo:
+      min-complexity: 15
+    godot:
+      scope: declarations
+      capital: false
+    gosec:
+      excludes:
+        - G115
+    govet:
+      disable:
+        - fieldalignment
+      enable-all: true
+    importas:
+      alias:
+        - pkg: log
+          alias: stdLog
+        - pkg: gorm.io/gorm/logger
+          alias: gormLogger
+        - pkg: github.com/go-playground/universal-translator
+          alias: ut
+        - pkg: github.com/go-playground/validator/v10/translations/zh
+          alias: zhTranslations
+      no-unaliased: false
+      no-extra-aliases: false
+    lll:
+      line-length: 120
+      tab-width: 2
+    misspell:
+      locale: US
+    mnd:
+      checks:
+        - argument
+        - case
+        - operation
+        - return
+        - assign
+      ignored-numbers:
+        - "1"
+        - "2"
+        - "3"
+        - "10"
+        - "100"
+        - "1000"
+        - "10000"
+      ignored-functions:
+        - strconv\..*
+        - time\..*
+        - make
+        - math\..*
+        - strings\..*
+    nlreturn:
+      block-size: 3
+    revive:
+      rules:
+        - name: unused-parameter
+          disabled: true
+    staticcheck:
+      checks:
+        - all
+    tagliatelle:
+      case:
+        rules:
+          json: snake
+          yaml: snake
+        use-field-name: false
+    testpackage:
+      skip-regexp: (export|internal)_test\.go
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - gochecknoglobals
+          - gochecknoinits
+          - wrapcheck
+        path: cmd/.*
+      - linters:
+          - funlen
+          - gochecknoglobals
+          - gocritic
+          - godot
+          - nosnakecase
+        path: .*_test\.go
+      - linters:
+          - gochecknoglobals
+        source: var .* = pool.New
+      - linters:
+          - gochecknoglobals
+        source: var Module = fx\.Module\(
+      - linters:
+          - gochecknoglobals
+        source: var .* = reflect\.TypeOf
+      - linters:
+          - gochecknoglobals
+        source: var .* sync\.Once
+      - linters:
+          - err113
+          - errorlint
+        source: if err == redis.Nil {
+      - linters:
+          - paralleltest
+        text: Range statement for test \S+ does not use range value in test Run
+      - linters:
+          - nilerr
+        source: return false, nil
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 
 issues:
   new: false
   fix: false
-  exclude-use-default: true
-  exclude-rules:
-    - path: "cmd/.*"
-      linters: [gochecknoglobals, gochecknoinits, wrapcheck]
 
-    - path: '.*_test\.go'
-      linters: [gocritic, gochecknoglobals, godot, nosnakecase, funlen]
-
-    - source: "var .* = pool.New"
-      linters: [gochecknoglobals]
-
-    - source: 'var Module = fx\.Module\('
-      linters: [gochecknoglobals]
-
-    - source: 'var .* = reflect\.TypeOf'
-      linters: [gochecknoglobals]
-
-    - source: 'var .* sync\.Once'
-      linters: [gochecknoglobals]
-
-    - linters: [err113, errorlint]
-      source: "if err == redis.Nil {"
-
-    # https://github.com/kunwardeep/paralleltest/issues/8
-    - linters:
-        - paralleltest
-      text: "Range statement for test \\S+ does not use range value in test Run"
-
-    - linters:
-        - nilerr
-      source: "return false, nil"
+formatters:
+  enable:
+    - gci
+    - gofmt
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/bangumi/server)
+    gofmt:
+      simplify: true
+      rewrite-rules:
+        - pattern: interface{}
+          replacement: any
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

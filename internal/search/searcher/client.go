@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/samber/lo"
+	"github.com/samber/lo/mutable"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
@@ -56,12 +57,10 @@ func NeedFirstRun(meili meilisearch.ServiceManager, idx string) (bool, error) {
 
 func ValidateConfigs(cfg config.AppConfig) error {
 	if cfg.Search.SearchBatchSize <= 0 {
-		// nolint: goerr113
 		return fmt.Errorf("config.SearchBatchSize should >= 0, current %d", cfg.Search.SearchBatchSize)
 	}
 
 	if cfg.Search.SearchBatchInterval <= 0 {
-		// nolint: goerr113
 		return fmt.Errorf("config.SearchBatchInterval should >= 0, current %d", cfg.Search.SearchBatchInterval)
 	}
 
@@ -129,8 +128,8 @@ func NewSendBatch(log *zap.Logger, index meilisearch.IndexManager) func([]Docume
 
 func NewDedupeFunc() func([]Document) []Document {
 	return func(items []Document) []Document {
-		// lo.UniqBy 会保留第一次出现的元素，reverse 之后会保留新的数据
-		return lo.UniqBy(lo.Reverse(items), func(item Document) string {
+		mutable.Reverse(items)
+		return lo.UniqBy(items, func(item Document) string {
 			return item.GetID()
 		})
 	}

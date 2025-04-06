@@ -42,7 +42,6 @@ func (s *HTMLEscapedString) Scan(src any) error {
 		return nil
 	}
 
-	//nolint:goerr113
 	return fmt.Errorf("utiltype.HTMLEscapedString: unsupported input type %s", reflect.TypeOf(src).String())
 }
 

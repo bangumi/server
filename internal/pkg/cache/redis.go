@@ -96,7 +96,7 @@ func (c redisCache) MGet(ctx context.Context, keys []string, result any) error {
 	// no more ideal way to do this
 	// reflect.ValueOf(*[]T)
 	rv := reflect.ValueOf(result)
-	if !(rv.Kind() == reflect.Ptr && rv.Elem().Kind() == reflect.Slice) {
+	if rv.Kind() != reflect.Ptr || rv.Elem().Kind() != reflect.Slice {
 		panic("only allow *[]T as input")
 	}
 
