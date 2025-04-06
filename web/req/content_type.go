@@ -25,6 +25,7 @@ import (
 func JSON(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		contentType := c.Request().Header.Get(echo.HeaderContentType)
+		//nolint:staticcheck
 		if contentType == echo.MIMEApplicationJSON || contentType == echo.MIMEApplicationJSONCharsetUTF8 {
 			return next(c)
 		}

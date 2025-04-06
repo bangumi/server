@@ -92,7 +92,7 @@ func main() {
 		panic("failed to read config: " + err.Error())
 	}
 
-	conn, err := driver.NewMysqlSqlDB(c)
+	conn, err := driver.NewMysqlDriver(c)
 	if err != nil {
 		panic(err)
 	}

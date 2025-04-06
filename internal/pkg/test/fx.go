@@ -38,7 +38,7 @@ func Fx(tb testing.TB, target ...fx.Option) {
 			fx.Provide(
 				config.AppConfigReader(config.AppTypeHTTP),
 				driver.NewRueidisClient, // redis
-				driver.NewMysqlSqlDB,    // mysql
+				driver.NewMysqlDriver,   // mysql
 				func() *resty.Client {
 					httpClient := resty.New().SetJSONEscapeHTML(false)
 					httpClient.JSONUnmarshal = json.Unmarshal

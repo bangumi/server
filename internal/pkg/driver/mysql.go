@@ -31,8 +31,7 @@ import (
 
 var setLoggerOnce = sync.Once{}
 
-//nolint:stylecheck
-func NewMysqlSqlDB(c config.AppConfig) (*sql.DB, error) {
+func NewMysqlDriver(c config.AppConfig) (*sql.DB, error) {
 	setLoggerOnce.Do(func() {
 		_ = mysql.SetLogger(logger.StdAt(zap.ErrorLevel))
 	})

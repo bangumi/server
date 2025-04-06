@@ -31,7 +31,7 @@ func TestNewDB(t *testing.T) {
 	cfg, err := config.NewAppConfig()
 	require.NoError(t, err)
 
-	conn, err := driver.NewMysqlSqlDB(cfg)
+	conn, err := driver.NewMysqlDriver(cfg)
 	require.NoError(t, err)
 	db, err := dal.NewGormDB(conn, cfg)
 	require.NoError(t, err)

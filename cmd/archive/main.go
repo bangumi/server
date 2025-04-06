@@ -80,7 +80,7 @@ func start(out string) {
 	err := fx.New(
 		fx.NopLogger,
 		fx.Provide(
-			driver.NewMysqlSqlDB, dal.NewGormDB,
+			driver.NewMysqlDriver, dal.NewGormDB,
 
 			config.NewAppConfig, logger.Copy,
 
