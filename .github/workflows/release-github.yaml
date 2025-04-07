@@ -12,13 +12,13 @@ jobs:
   github:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           fetch-depth: 0
 
       - name: Generate Changelog
         id: changelog
-        uses: requarks/changelog-action@v1.10.2
+        uses: requarks/changelog-action@6d71e098526ee17bae963f058d34cd763378337f # v1.10.2
         with:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
