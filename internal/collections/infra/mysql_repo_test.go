@@ -242,7 +242,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 
 	now := time.Now()
 
-	// DB 里没有数据
+	// RawDB 里没有数据
 	_, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.Error(t, err)
 
@@ -253,7 +253,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	// DB 里有数据
+	// RawDB 里有数据
 	_, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
@@ -440,6 +440,37 @@ func TestMysqlRepo_UpdateSubjectCollectionType(t *testing.T) {
 	require.Zero(t, r.WishTime)
 	require.Zero(t, r.DoneTime)
 	require.Zero(t, r.OnHoldTime)
+}
+
+func TestMysqlRepo_DeleteSubjectCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const id model.UserID = 30000
+	const subjectID model.SubjectID = 10000
+
+	repo, q := getRepo(t)
+
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(context.Background()).SubjectCollection.
+			Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(id)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := q.WithContext(context.Background()).SubjectCollection.Create(&dao.SubjectCollection{
+		UserID:    id,
+		SubjectID: subjectID,
+		Rate:      2,
+	})
+	require.NoError(t, err)
+
+	err = repo.DeleteSubjectCollection(context.Background(), id, subjectID)
+	require.NoError(t, err)
+
+	r, err := q.WithContext(context.Background()).SubjectCollection.
+		Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(id)).Take()
+	require.ErrorIs(t, err, gorm.ErrRecordNotFound)
+	require.Nil(t, r)
 }
 
 func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
