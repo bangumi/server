@@ -54,7 +54,7 @@ func TestUser_PatchEpisodeCollectionBatch(t *testing.T) {
 		{ID: 4},
 	}, nil)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().WithQuery(mock.Anything).Return(c)
 	c.EXPECT().UpdateEpisodeCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(_ context.Context, _ model.UserID, _ model.SubjectID,
@@ -97,7 +97,7 @@ func TestUser_PutEpisodeCollection(t *testing.T) {
 	e := mocks.NewEpisodeRepo(t)
 	e.EXPECT().Get(mock.Anything, eid).Return(episode.Episode{ID: eid, SubjectID: sid}, nil)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().WithQuery(mock.Anything).Return(c)
 	c.EXPECT().GetSubjectCollection(mock.Anything, uid, sid).Return(collection.UserSubjectCollection{SubjectID: sid}, nil)
 	c.EXPECT().UpdateEpisodeCollection(mock.Anything, uid, sid, mock.Anything, mock.Anything, mock.Anything).

@@ -1,14 +1,63 @@
-with-expecter: True
-issue-845-fix: True
+all: false
+dir: "./internal/mocks/"
+
+force-file-write: true
+
+log-level: info
+pkgname: "mocks"
+recursive: false
+template: testify
+
+filename: "{{.SrcPackageName | firstUpper}}{{.InterfaceName}}.go"
+structname: "{{.SrcPackageName | firstUpper}}{{.InterfaceName}}"
 
 packages:
-  github.com/vektra/mockery/v2/pkg:
+  github.com/bangumi/server/web/session:
     interfaces:
-      TypesPackage:
-      RequesterVariadic:
-        config:
-          with-expecter: False
-        configs:
-          - mockname: MockRequesterVariadicOneArgument
-            unroll-variadic: False
-          - mockname: MockRequesterVariadic
+      Repo:
+      Manager:
+  github.com/bangumi/server/internal/pkg/cache:
+    config:
+      structname: "{{.InterfaceName}}"
+    interfaces:
+      RedisCache:
+  github.com/bangumi/server/internal/search:
+    interfaces:
+      Client:
+  github.com/bangumi/server/internal/timeline:
+    interfaces:
+      Service:
+  github.com/bangumi/server/internal/collections:
+    interfaces:
+      Repo:
+  github.com/bangumi/server/internal/person:
+    interfaces:
+      Repo:
+      Service:
+  github.com/bangumi/server/internal/episode:
+    interfaces:
+      Repo:
+  github.com/bangumi/server/internal/user:
+    interfaces:
+      Repo:
+  github.com/bangumi/server/internal/subject:
+    interfaces:
+      Repo:
+      CachedRepo:
+
+  github.com/bangumi/server/internal/auth:
+    interfaces:
+      Repo:
+      Service:
+  github.com/bangumi/server/internal/tag:
+    interfaces:
+      Repo:
+  github.com/bangumi/server/internal/character:
+    interfaces:
+      Repo:
+  github.com/bangumi/server/internal/index:
+    interfaces:
+      Repo:
+  github.com/bangumi/server/internal/revision:
+    interfaces:
+      Repo:

@@ -43,7 +43,7 @@ func TestUser_ListCollection(t *testing.T) {
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().ListSubjectCollection(mock.Anything, userID, mock.Anything, mock.Anything, mock.Anything, 10, 0).
 		Return([]collection.UserSubjectCollection{{SubjectID: subjectID, Type: 1}}, nil)
 	c.EXPECT().CountSubjectCollections(mock.Anything, userID, mock.Anything, mock.Anything, mock.Anything).
@@ -86,7 +86,7 @@ func TestUser_GetSubjectCollection(t *testing.T) {
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).
 		Return(collection.UserSubjectCollection{SubjectID: subjectID, Type: 1}, nil)
 
@@ -119,7 +119,7 @@ func TestUser_ListSubjectCollection_other_user(t *testing.T) {
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().GetSubjectCollection(mock.Anything, userID, mock.Anything).
 		Return(collection.UserSubjectCollection{SubjectID: subjectID, Private: true}, nil)
 
@@ -139,7 +139,7 @@ func TestUser_GetPersonCollection(t *testing.T) {
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().GetPersonCollection(mock.Anything, userID, mock.Anything, mock.Anything).
 		Return(collection.UserPersonCollection{UserID: userID, Category: "prsn", TargetID: personID}, nil)
 
@@ -170,7 +170,7 @@ func TestUser_ListPersonCollection(t *testing.T) {
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().ListPersonCollection(mock.Anything, userID, mock.Anything, 10, 0).
 		Return([]collection.UserPersonCollection{{UserID: userID, Category: "prsn", TargetID: personID}}, nil)
 	c.EXPECT().CountPersonCollections(mock.Anything, userID, mock.Anything).
@@ -213,7 +213,7 @@ func TestUser_GetCharacterCollection(t *testing.T) {
 
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().GetPersonCollection(mock.Anything, userID, mock.Anything, mock.Anything).
 		Return(collection.UserPersonCollection{UserID: userID, Category: "crt", TargetID: characterID}, nil)
 
@@ -244,7 +244,7 @@ func TestUser_ListCharacterCollection(t *testing.T) {
 	m := mocks.NewUserRepo(t)
 	m.EXPECT().GetByName(mock.Anything, username).Return(user.User{ID: userID, UserName: username}, nil)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().ListPersonCollection(mock.Anything, userID, mock.Anything, 10, 0).
 		Return([]collection.UserPersonCollection{{UserID: userID, Category: "crt", TargetID: characterID}}, nil)
 	c.EXPECT().CountPersonCollections(mock.Anything, userID, mock.Anything).

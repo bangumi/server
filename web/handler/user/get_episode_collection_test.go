@@ -38,7 +38,7 @@ func TestUser_GetEpisodeCollection(t *testing.T) {
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: 3}, nil)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().GetSubjectEpisodesCollection(mock.Anything, mock.Anything, mock.Anything).
 		Return(map[model.EpisodeID]collection.UserEpisodeCollection{}, nil)
 
@@ -63,7 +63,7 @@ func TestUser_GetSubjectEpisodeCollection(t *testing.T) {
 	mockAuth := mocks.NewAuthService(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: 3}, nil)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().GetSubjectEpisodesCollection(mock.Anything, mock.Anything, mock.Anything).
 		Return(map[model.EpisodeID]collection.UserEpisodeCollection{}, nil)
 
