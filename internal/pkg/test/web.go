@@ -249,7 +249,7 @@ func MockSubjectReadRepo(m subject.CachedRepo) fx.Option {
 
 func MockTimeLineSrv(m timeline.Service) fx.Option {
 	if m == nil {
-		mocker := &mocks.TimeLineService{}
+		mocker := &mocks.TimelineService{}
 
 		mocker.EXPECT().ChangeSubjectCollection(mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)

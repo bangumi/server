@@ -49,13 +49,13 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	a := mocks.NewAuthService(t)
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
-	tl := mocks.NewTimeLineService(t)
+	tl := mocks.NewTimelineService(t)
 	tl.EXPECT().
 		ChangeSubjectCollection(mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(nil)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, subject, mock.Anything, mock.Anything, mock.Anything).
 		Run(func(ctx context.Context, userID uint32,
 			subject model.Subject, at time.Time, ip string,
@@ -100,9 +100,9 @@ func TestUser_PatchToNonExistsSubjectCollection(t *testing.T) {
 	a := mocks.NewAuthService(t)
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
 
-	tl := mocks.NewTimeLineService(t)
+	tl := mocks.NewTimelineService(t)
 
-	c := mocks.NewCollectionRepo(t)
+	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().UpdateSubjectCollection(mock.Anything, uid, subject, mock.Anything, mock.Anything, mock.Anything).
 		Return(gerr.ErrSubjectNotCollected)
 
@@ -130,8 +130,8 @@ func TestUser_PatchSubjectCollection_badID(t *testing.T) {
 	a := mocks.NewAuthService(t)
 	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: 1}, nil)
 
-	tl := mocks.NewTimeLineService(t)
-	c := mocks.NewCollectionRepo(t)
+	tl := mocks.NewTimelineService(t)
+	c := mocks.NewCollectionsRepo(t)
 
 	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
 	require.NoError(t, err)
