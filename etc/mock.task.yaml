@@ -25,7 +25,7 @@ tasks:
 
   base-mock:
     cmds:
-      - 'go run github.com/vektra/mockery/v2 --dir {{.SRC_DIR}} --filename "{{.MOCK_STRUCT|default .INTERFACE}}.go" --name "{{.INTERFACE | default "Manager"}}" --structname {{.MOCK_STRUCT|default .INTERFACE}} --output ./internal/mocks --with-expecter'
+      - 'go run github.com/vektra/mockery/v3 --dir {{.SRC_DIR}} --filename "{{.MOCK_STRUCT|default .INTERFACE}}.go" --name "{{.INTERFACE | default "Manager"}}" --structname {{.MOCK_STRUCT|default .INTERFACE}} --output ./internal/mocks --with-expecter'
 
   session-repo:
     sources:

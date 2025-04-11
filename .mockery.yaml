@@ -1,14 +1,17 @@
-with-expecter: True
-issue-845-fix: True
+all: false
+dir: "./internal/mocks/"
+
+force-file-write: true
+
+log-level: info
+pkgname: "mocks"
+recursive: false
+template: testify
+
+filename: "{{.SrcPackageName | firstUpper}}{{.InterfaceName}}.go"
+structname: "{{.SrcPackageName | firstUpper}}{{.InterfaceName}}"
 
 packages:
-  github.com/vektra/mockery/v2/pkg:
+  github.com/bangumi/server/web/session:
     interfaces:
-      TypesPackage:
-      RequesterVariadic:
-        config:
-          with-expecter: False
-        configs:
-          - mockname: MockRequesterVariadicOneArgument
-            unroll-variadic: False
-          - mockname: MockRequesterVariadic
+      Repo:

@@ -92,8 +92,8 @@ tasks:
 
   mock:
     desc: Generate Mocks.
-    deps:
-      - mock:all
+    cmds:
+      - go run github.com/vektra/mockery/v3 --config ./.mockery.yaml
 
   gorm:
     desc: Run gorm-gen to generate go struct from mysql database.
