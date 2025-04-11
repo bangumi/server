@@ -25,7 +25,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14
 	github.com/meilisearch/meilisearch-go v0.31.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/prometheus/client_golang v1.21.1
+	github.com/prometheus/client_golang v1.22.0
 	github.com/redis/rueidis v1.0.57
 	github.com/samber/lo v1.49.1
 	github.com/segmentio/kafka-go v0.4.47
@@ -77,7 +77,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
