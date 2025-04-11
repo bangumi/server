@@ -2,11 +2,6 @@ version: "3"
 
 dotenv: [".env", ".envrc"]
 
-includes:
-  mock:
-    taskfile: "./etc/mock.task.yaml"
-    internal: true
-
 tasks:
   default:
     silent: true

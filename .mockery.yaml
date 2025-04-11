@@ -44,3 +44,20 @@ packages:
     interfaces:
       Repo:
       CachedRepo:
+
+  github.com/bangumi/server/internal/auth:
+    interfaces:
+      Repo:
+      Service:
+  github.com/bangumi/server/internal/tag:
+    interfaces:
+      Repo:
+  github.com/bangumi/server/internal/character:
+    interfaces:
+      Repo:
+  github.com/bangumi/server/internal/index:
+    interfaces:
+      Repo:
+  github.com/bangumi/server/internal/revision:
+    interfaces:
+      Repo:
