@@ -24,7 +24,7 @@ import (
 
 func New(
 	r revision.Repo,
-	subject subject.Repo,
+	subject subject.CachedRepo,
 	search search.Handler,
 	u user.Repo,
 	episode episode.Repo,
@@ -41,7 +41,7 @@ func New(
 type Handler struct {
 	episode episode.Repo
 	r       revision.Repo
-	subject subject.Repo
+	subject subject.CachedRepo
 	u       user.Repo
 	search  search.Handler
 }
