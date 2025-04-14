@@ -81,7 +81,7 @@ func TestSubject_Get_Redirect(t *testing.T) {
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			SubjectRepo: m,
+			SubjectCachedRepo: m,
 		},
 	)
 
@@ -105,8 +105,8 @@ func TestSubject_Get_NSFW_200(t *testing.T) {
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo:    mockAuth,
-			SubjectRepo: m,
+			AuthRepo:          mockAuth,
+			SubjectCachedRepo: m,
 		},
 	)
 
@@ -123,7 +123,7 @@ func TestSubject_Get_NSFW_404(t *testing.T) {
 		Return(model.Subject{}, gerr.ErrSubjectNotFound)
 
 	app := test.GetWebApp(t,
-		test.Mock{SubjectRepo: m},
+		test.Mock{SubjectCachedRepo: m},
 	)
 
 	resp := htest.New(t, app).Get("/v0/subjects/7")
@@ -154,7 +154,7 @@ func TestSubject_GetImage_302(t *testing.T) {
 	m.EXPECT().Get(mock.Anything, model.SubjectID(1), mock.Anything).Return(model.Subject{ID: 1, Image: "temp"}, nil)
 	m.EXPECT().Get(mock.Anything, model.SubjectID(3), mock.Anything).Return(model.Subject{ID: 1}, nil)
 
-	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
+	app := test.GetWebApp(t, test.Mock{SubjectCachedRepo: m})
 
 	for _, imageType := range []string{"small", "grid", "large", "medium", "common"} {
 		t.Run(imageType, func(t *testing.T) {
@@ -178,7 +178,7 @@ func TestSubject_GetImage_400(t *testing.T) {
 	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(model.Subject{Image: "temp"}, nil)
 
-	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
+	app := test.GetWebApp(t, test.Mock{SubjectCachedRepo: m})
 
 	htest.New(t, app).Get("/v0/subjects/1/image").ExpectCode(http.StatusBadRequest)
 }
