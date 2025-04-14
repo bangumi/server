@@ -28,6 +28,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/redis/rueidis"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/config"
@@ -37,6 +38,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/openapi"
 	"github.com/bangumi/server/web/mw/recovery"
+	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/req/cf"
 )
 
@@ -44,7 +46,7 @@ const headerProcessTime = "x-process-time-ms"
 const headerServerVersion = "x-server-version"
 
 //nolint:funlen
-func New() *echo.Echo {
+func New(r rueidis.Client) *echo.Echo {
 	app := echo.New()
 	app.HTTPErrorHandler = getDefaultErrorHandler()
 	app.HideBanner = true
@@ -61,6 +63,20 @@ func New() *echo.Echo {
 
 		return ip
 	}
+
+	if env.Development {
+		// fasthttp bug, it uses an internal global variable and causing data race here
+		app.Static("/openapi/", "./openapi/")
+		app.GET("/debug", func(c echo.Context) error {
+			return c.JSON(http.StatusOK, echo.Map{
+				"ip": c.RealIP(),
+			})
+		})
+	} else {
+		app.StaticFS("/openapi/", openapi.Static)
+	}
+
+	app.Use(req.RateLimit(r))
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -124,18 +140,6 @@ func New() *echo.Echo {
 	app.GET("/openapi", func(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "/openapi/")
 	})
-
-	if env.Development {
-		// fasthttp bug, it uses an internal global variable and causing data race here
-		app.Static("/openapi/", "./openapi/")
-		app.GET("/debug", func(c echo.Context) error {
-			return c.JSON(http.StatusOK, echo.Map{
-				"ip": c.RealIP(),
-			})
-		})
-	} else {
-		app.StaticFS("/openapi/", openapi.Static)
-	}
 
 	return app
 }
