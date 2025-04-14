@@ -81,7 +81,7 @@ func TestSubject_Get_Redirect(t *testing.T) {
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			SubjectRepo: m,
+			SubjectCachedRepo: m,
 		},
 	)
 
