@@ -2,8 +2,8 @@ name: Test(openapi)
 
 on:
   push:
-    branches-ignore:
-      - renovate/**
+    branches:
+      - master
     paths:
       - "openapi/**"
       - "package.json"

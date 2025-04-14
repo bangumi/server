@@ -2,8 +2,8 @@ name: Security Vulnerability Check
 
 on:
   push:
-    branches-ignore:
-      - renovate/**
+    branches:
+      - master
     paths:
       - "**.go"
       - "go.mod"

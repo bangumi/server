@@ -2,8 +2,8 @@ name: Build
 
 on:
   push:
-    branches-ignore:
-      - renovate/**
+    branches:
+      - master
     paths:
       - ".github/workflows/build.yaml"
       - "go.mod"

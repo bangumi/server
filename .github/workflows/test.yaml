@@ -2,8 +2,8 @@ name: Test
 
 on:
   push:
-    branches-ignore:
-      - renovate/**
+    branches:
+      - master
     paths:
       - ".github/workflows/test.yaml"
       - "go.mod"
