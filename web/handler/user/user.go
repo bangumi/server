@@ -44,7 +44,7 @@ func New(
 	character character.Repo,
 	user user.Repo,
 	ctrl ctrl.Ctrl,
-	subject subject.Repo,
+	subject subject.CachedRepo,
 	collect collections.Repo,
 	episode episode.Repo,
 	log *zap.Logger,
