@@ -2,8 +2,8 @@ name: Lint
 
 on:
   push:
-    branches-ignore:
-      - renovate/**
+    branches:
+      - master
     paths:
       - "**.go"
       - "**.go.json"
