@@ -49,22 +49,22 @@ import (
 )
 
 type Mock struct {
-	SubjectRepo       subject.Repo
-	SubjectCachedRepo subject.CachedRepo
-	PersonRepo        person.Repo
-	CharacterRepo     character.Repo
-	AuthRepo          auth.Repo
-	TagRepo           tag.Repo
-	AuthService       auth.Service
-	EpisodeRepo       episode.Repo
-	UserRepo          user.Repo
-	IndexRepo         index.Repo
-	RevisionRepo      revision.Repo
-	CollectionRepo    collections.Repo
-	TimeLineSrv       timeline.Service
-	Cache             cache.RedisCache
-	HTTPMock          *httpmock.MockTransport
-	Dam               *dam.Dam
+	SubjectRepo subject.Repo
+	// SubjectCachedRepo subject.CachedRepo
+	PersonRepo     person.Repo
+	CharacterRepo  character.Repo
+	AuthRepo       auth.Repo
+	TagRepo        tag.Repo
+	AuthService    auth.Service
+	EpisodeRepo    episode.Repo
+	UserRepo       user.Repo
+	IndexRepo      index.Repo
+	RevisionRepo   revision.Repo
+	CollectionRepo collections.Repo
+	TimeLineSrv    timeline.Service
+	Cache          cache.RedisCache
+	HTTPMock       *httpmock.MockTransport
+	Dam            *dam.Dam
 }
 
 //nolint:funlen
@@ -92,8 +92,7 @@ func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 
 		MockPersonRepo(m.PersonRepo),
 		MockCharacterRepo(m.CharacterRepo),
-		MockSubjectRepo(m.SubjectRepo),
-		MockSubjectReadRepo(m.SubjectCachedRepo),
+		MockSubjectReadRepo(m.SubjectRepo),
 		MockEpisodeRepo(m.EpisodeRepo),
 		MockAuthRepo(m.AuthRepo),
 		MockAuthService(m.AuthService),
