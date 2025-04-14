@@ -46,7 +46,7 @@ func TestSubject_GetRelatedSubjects(t *testing.T) {
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			SubjectRepo: m,
+			SubjectCachedRepo: m,
 		},
 	)
 

@@ -105,8 +105,8 @@ func TestSubject_Get_NSFW_200(t *testing.T) {
 
 	app := test.GetWebApp(t,
 		test.Mock{
-			AuthRepo:    mockAuth,
-			SubjectRepo: m,
+			AuthRepo:          mockAuth,
+			SubjectCachedRepo: m,
 		},
 	)
 
@@ -178,7 +178,7 @@ func TestSubject_GetImage_400(t *testing.T) {
 	m := mocks.NewSubjectRepo(t)
 	m.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(model.Subject{Image: "temp"}, nil)
 
-	app := test.GetWebApp(t, test.Mock{SubjectRepo: m})
+	app := test.GetWebApp(t, test.Mock{SubjectCachedRepo: m})
 
 	htest.New(t, app).Get("/v0/subjects/1/image").ExpectCode(http.StatusBadRequest)
 }
