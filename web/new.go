@@ -38,7 +38,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/openapi"
 	"github.com/bangumi/server/web/mw/recovery"
-	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/req/cf"
 )
 
@@ -76,7 +75,7 @@ func New(r rueidis.Client) *echo.Echo {
 		app.StaticFS("/openapi/", openapi.Static)
 	}
 
-	app.Use(req.RateLimit(r))
+	app.Use(mw.RateLimit(r))
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

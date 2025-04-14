@@ -16,9 +16,9 @@ if current == 1 then
   redis.call("expire", RATE_KEY, 60)
 end
 
-if current <= 60 then
+if current <= 300 then
   return 0
 end
 
-redis.call("set", LONG_BAN_KEY, 1, 'ex', 86400)
+redis.call("set", LONG_BAN_KEY, 1, 'ex', 3600)
 return 1

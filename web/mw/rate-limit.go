@@ -1,4 +1,18 @@
-package req
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>
+
+package mw
 
 import (
 	"context"
@@ -24,8 +38,8 @@ func RateLimit(r rueidis.Client) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			ip := c.RealIP()
 
-			var longBanKey = "chii-rate-limit:long:" + ip
-			var rateLimitKey = "chii-rate-limit:rate:" + ip
+			var longBanKey = "chii-rate-limit:long:2:" + ip
+			var rateLimitKey = "chii-rate-limit:rate:2:" + ip
 
 			banned, err := script.Exec(c.Request().Context(), r, []string{longBanKey, rateLimitKey}, nil).ToInt64()
 			if err != nil {
