@@ -6,11 +6,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/bangumi/server/internal/pkg/logger"
-	"github.com/bangumi/server/web/res"
 	"github.com/labstack/echo/v4"
 	"github.com/redis/rueidis"
 	"go.uber.org/zap"
+
+	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/web/res"
 )
 
 //go:embed ban.lua
