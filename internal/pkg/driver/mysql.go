@@ -52,7 +52,7 @@ func NewMysqlDriver(c config.AppConfig) (*sql.DB, error) {
 		return nil, errgo.Wrap(err, "mysql: failed to create sql connection pool")
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	if err = db.PingContext(ctx); err != nil {

@@ -28,14 +28,14 @@ type Subject struct {
 	person     person.Service
 	episode    episode.Repo
 	personRepo person.Repo
-	subject    subject.Repo
+	subject    subject.CachedRepo
 	tag        tag.CachedRepo
 	c          character.Repo
 }
 
 func New(
 	p person.Service,
-	subject subject.Repo,
+	subject subject.CachedRepo,
 	personRepo person.Repo,
 	c character.Repo,
 	episode episode.Repo,
