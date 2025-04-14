@@ -21,7 +21,14 @@ import (
 	"github.com/bangumi/server/internal/model"
 )
 
+type CachedRepo interface {
+	read
+}
 type Repo interface {
+	read
+}
+
+type read interface {
 	Get(ctx context.Context, id model.PersonID) (model.Person, error)
 	GetByIDs(ctx context.Context, ids []model.PersonID) (map[model.PersonID]model.Person, error)
 
