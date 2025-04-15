@@ -38,9 +38,9 @@ func RateLimit(cfg config.AppConfig, r rueidis.Client) echo.MiddlewareFunc {
 	script := rueidis.NewLuaScript(rateLimitLua)
 
 	args := []string{
-		fmt.Sprintf("%d", cfg.RateLimitLongTime/time.Second),
-		fmt.Sprintf("%d", cfg.RateLimitWindow/time.Second),
-		fmt.Sprintf("%d", cfg.RateLimitCount),
+		fmt.Sprintf("%d", cfg.RateLimit.LimitLongTime/time.Second),
+		fmt.Sprintf("%d", cfg.RateLimit.LimitWindow/time.Second),
+		fmt.Sprintf("%d", cfg.RateLimit.LimitCount),
 	}
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
