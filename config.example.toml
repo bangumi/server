@@ -1,0 +1,37 @@
+slow-sql-duration = "10s"
+nsfw-word = "里番|无码|18x|エロ"
+disable-words = "办假存单|办理假证|0月租手机"
+banned-domain = "lista.cc|snapmail.cc|ashotmail.com|zoutlook.com"
+s3-entry-point = ""
+s3-access-key = ""
+s3-secret-key = ""
+
+http.host = "127.0.0.1"
+http.port = 3_000
+
+redis-url = "redis://:redis-pass@127.0.0.1:6379/0"
+
+[mysql]
+host = "127.0.0.1"
+port = "3306"
+user = "user"
+password = "password"
+db = "bangumi"
+max-connection = 4
+
+[kafka]
+broker = "127.0.0.1:29092"
+topics = [
+  "debezium.bangumi.chii_subject_fields",
+  "debezium.bangumi.chii_subjects",
+  "debezium.bangumi.chii_characters",
+  "debezium.bangumi.chii_persons",
+  "debezium.bangumi.chii_members",
+]
+
+[search.meilisearch]
+url = ""
+key = ""
+
+[debug]
+gorm = true

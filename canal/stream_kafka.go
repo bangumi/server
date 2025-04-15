@@ -32,9 +32,9 @@ import (
 func newKafkaStream(cfg config.AppConfig) Stream {
 	logger.Info("new kafka stream broker")
 	k := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:     []string{cfg.Canal.KafkaBroker},
+		Brokers:     []string{cfg.Kafka.Broker},
 		GroupID:     groupID,
-		GroupTopics: cfg.Canal.Topics,
+		GroupTopics: cfg.Kafka.Topics,
 	})
 
 	var ch = make(chan Msg, 1)

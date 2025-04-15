@@ -53,7 +53,7 @@ func Main() error {
 		return errgo.Trace(err)
 	}
 
-	if len(cfg.Canal.Topics) == 0 {
+	if len(cfg.Kafka.Topics) == 0 {
 		return errNoTopic
 	}
 

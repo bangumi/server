@@ -36,12 +36,12 @@ tasks:
   web:
     desc: Run Web Server
     cmds:
-      - go run main.go --config config.yaml web
+      - go run main.go --config config.toml web
 
   consumer:
     desc: Run Kafka Consumer
     cmds:
-      - go run main.go canal --config config.yaml
+      - go run main.go canal --config config.toml
 
   openapi-test:
     desc: Test OpenAPI Schema
