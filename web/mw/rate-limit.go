@@ -18,12 +18,15 @@ import (
 	"context"
 	_ "embed"
 	"errors"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/redis/rueidis"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/web/res"
 )
@@ -31,17 +34,23 @@ import (
 //go:embed ban.lua
 var rateLimitLua string
 
-func RateLimit(r rueidis.Client) echo.MiddlewareFunc {
+func RateLimit(cfg config.AppConfig, r rueidis.Client) echo.MiddlewareFunc {
 	script := rueidis.NewLuaScript(rateLimitLua)
+
+	args := []string{
+		fmt.Sprintf("%d", cfg.RateLimit.LimitLongTime/time.Second),
+		fmt.Sprintf("%d", cfg.RateLimit.LimitWindow/time.Second),
+		fmt.Sprintf("%d", cfg.RateLimit.LimitCount),
+	}
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			ip := c.RealIP()
 
-			var longBanKey = "chii-rate-limit:long:2:" + ip
-			var rateLimitKey = "chii-rate-limit:rate:2:" + ip
+			var longBanKey = "chii-rate-limit:long:3:" + ip
+			var rateLimitKey = "chii-rate-limit:rate:3:" + ip
 
-			banned, err := script.Exec(c.Request().Context(), r, []string{longBanKey, rateLimitKey}, nil).ToInt64()
+			banned, err := script.Exec(c.Request().Context(), r, []string{longBanKey, rateLimitKey}, args).ToInt64()
 			if err != nil {
 				if errors.Is(err, context.Canceled) {
 					return err
