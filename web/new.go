@@ -46,7 +46,7 @@ const headerProcessTime = "x-process-time-ms"
 const headerServerVersion = "x-server-version"
 
 //nolint:funlen
-func New(r rueidis.Client) *echo.Echo {
+func New(r rueidis.Client, cfg config.AppConfig) *echo.Echo {
 	app := echo.New()
 	app.HTTPErrorHandler = getDefaultErrorHandler()
 	app.HideBanner = true
@@ -76,7 +76,7 @@ func New(r rueidis.Client) *echo.Echo {
 		app.StaticFS("/openapi/", openapi.Static)
 	}
 
-	app.Use(mw.RateLimit(r))
+	app.Use(mw.RateLimit(cfg, r))
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

@@ -46,6 +46,10 @@ type AppConfig struct {
 	HTTPHost  string `yaml:"http_host" env:"HTTP_HOST" env-default:"127.0.0.1"`
 	HTTPPort  int    `yaml:"http_port" env:"HTTP_PORT" env-default:"3000"`
 
+	RateLimitLongTime time.Duration `yaml:"rate-limit-long-time" env:"RATE_LIMIT_LONG_TIME" env-default:"1h"`
+	RateLimitWindow   time.Duration `yaml:"rate-limit-window" env:"RATE_LIMIT_WINDOW" env-default:"10m"`
+	RateLimitCount    uint          `yaml:"rate-limit-count" env:"RATE_LIMIT_COUNT" env-default:"3000"`
+
 	Canal struct {
 		Broker string `yaml:"broker"`
 
