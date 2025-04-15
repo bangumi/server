@@ -97,7 +97,7 @@ func start() error {
 			func(cfg config.AppConfig) *kafka.Writer {
 				logger.Info("new kafka stream broker")
 				return kafka.NewWriter(kafka.WriterConfig{
-					Brokers: []string{cfg.Canal.KafkaBroker},
+					Brokers: []string{cfg.Kafka.Broker},
 				})
 			},
 		),

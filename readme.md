@@ -53,7 +53,7 @@ MEILISEARCH_URL="http://127.0.0.1:7700/"
 
 或者使用 yaml 格式的配置文件：
 
-查看 config.example.yaml 或者 [config/config.go](https://github.com/bangumi/server/blob/master/config/config.go)
+查看 config.example.toml 或者 [config/config.go](https://github.com/bangumi/server/blob/master/config/config.go)
 
 ## 开发
 

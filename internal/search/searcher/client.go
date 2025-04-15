@@ -56,14 +56,6 @@ func NeedFirstRun(meili meilisearch.ServiceManager, idx string) (bool, error) {
 }
 
 func ValidateConfigs(cfg config.AppConfig) error {
-	if cfg.Search.SearchBatchSize <= 0 {
-		return fmt.Errorf("config.SearchBatchSize should >= 0, current %d", cfg.Search.SearchBatchSize)
-	}
-
-	if cfg.Search.SearchBatchInterval <= 0 {
-		return fmt.Errorf("config.SearchBatchInterval should >= 0, current %d", cfg.Search.SearchBatchInterval)
-	}
-
 	return nil
 }
 
