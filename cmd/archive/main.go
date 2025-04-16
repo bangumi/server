@@ -260,7 +260,7 @@ func exportSubjects(q *query.Query, w io.Writer) {
 			var metaTags = []string{}
 
 			for _, v := range strings.Split(subject.FieldMetaTags, " ") {
-				v := strings.TrimSpace(v)
+				v = strings.TrimSpace(v)
 				if v == "" {
 					continue
 				}
