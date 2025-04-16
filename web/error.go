@@ -82,19 +82,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 		}
 
 		if errors.Is(err, context.Canceled) {
-			log.Error("request timeout",
-				zap.String("message", err.Error()),
-				zap.String("request_method", c.Request().Method),
-				zap.String("request_uri", c.Request().URL.Path),
-				zap.String("request_query", c.Request().URL.RawQuery),
-				zap.String("request_id", reqID),
-			)
-
-			_ = c.JSON(http.StatusInternalServerError, res.Error{
-				Title:       "request timeout",
-				Description: "request timeout",
-				RequestID:   c.Request().Header.Get(cf.HeaderRequestID),
-			})
+			_ = c.NoContent(http.StatusNoContent)
 			return
 		}
 
