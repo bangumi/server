@@ -53,7 +53,7 @@ func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
 			return res.Forbidden("Please set a 'User-Agent'")
 		}
 
-		if strings.Contains(u, "open-ani/ani/") {
+		if strings.HasPrefix(u, "open-ani/ani/") {
 			m := aniPattern.FindStringSubmatch(u)
 
 			if len(m) < 1 {
