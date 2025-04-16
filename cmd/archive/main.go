@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/go-sql-driver/mysql"
@@ -199,6 +200,7 @@ type Subject struct {
 	Nsfw     bool              `json:"nsfw"`
 
 	Tags         []Tag    `json:"tags"`
+	MetaTags     []string `json:"meta_tags"`
 	Score        float64  `json:"score"`
 	ScoreDetails Score    `json:"score_details"`
 	Rank         uint32   `json:"rank"`
@@ -255,6 +257,17 @@ func exportSubjects(q *query.Query, w io.Writer) {
 				encodedDate = subject.Fields.Date.Format("2006-01-02")
 			}
 
+			var metaTags = []string{}
+
+			for _, v := range strings.Split(subject.FieldMetaTags, " ") {
+				v = strings.TrimSpace(v)
+				if v == "" {
+					continue
+				}
+
+				metaTags = append(metaTags, v)
+			}
+
 			encode(w, Subject{
 				ID:       subject.ID,
 				Type:     subject.TypeID,
@@ -266,6 +279,7 @@ func exportSubjects(q *query.Query, w io.Writer) {
 				Nsfw:     subject.Nsfw,
 				Rank:     subject.Fields.Rank,
 				Tags:     encodedTags,
+				MetaTags: metaTags,
 				Score:    math.Round(score*10) / 10,
 				ScoreDetails: Score{
 					Field1:  subject.Fields.Rate1,
