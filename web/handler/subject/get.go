@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
@@ -64,6 +65,13 @@ func (h Subject) Get(c echo.Context) error {
 	metaTags, err := h.tag.Get(c.Request().Context(), s.ID, s.TypeID)
 	if err != nil {
 		return err
+	}
+
+	if !s.NSFW {
+		c.Request().Header.Set(echo.HeaderCacheControl, res.CacheControlParams{
+			Public: true,
+			MaxAge: time.Hour,
+		}.String())
 	}
 
 	return c.JSON(http.StatusOK, res.ToSubjectV0(s, totalEpisode, metaTags))
