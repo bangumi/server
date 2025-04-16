@@ -25,7 +25,6 @@ import (
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/cache"
-	"github.com/bangumi/server/internal/pkg/generic"
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/random"
 )
@@ -93,7 +92,7 @@ func (m manager) Get(ctx context.Context, key string) (Session, error) {
 	}
 
 	// 缓存3天或缓存者到token失效
-	ttl := generic.Min(gtime.OneDaySec*3, s.ExpiredAt)
+	ttl := min(gtime.OneDaySec*3, s.ExpiredAt)
 
 	if err := m.cache.Set(ctx, redisKeyPrefix+key, s, gtime.Second(ttl)); err != nil {
 		m.log.Panic("failed to set cache")
