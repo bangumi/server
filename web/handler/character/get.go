@@ -55,10 +55,7 @@ func (h Character) Get(c echo.Context) error {
 	}
 
 	if !r.NSFW {
-		c.Request().Header.Set(echo.HeaderCacheControl, res.CacheControlParams{
-			Public: true,
-			MaxAge: time.Hour,
-		}.String())
+		res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 	}
 
 	return c.JSON(http.StatusOK, res.ConvertModelCharacter(r))

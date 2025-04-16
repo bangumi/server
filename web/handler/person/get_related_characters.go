@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
@@ -89,6 +90,8 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 			Staff:         res.CharacterStaffString(subjectTypeID),
 		}
 	}
+
+	res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 
 	return c.JSON(http.StatusOK, response)
 }

@@ -18,6 +18,8 @@ import (
 	"bytes"
 	"fmt"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 type CacheControlParams struct {
@@ -33,4 +35,8 @@ func (c CacheControlParams) String() string {
 	_, _ = fmt.Fprintf(buf, "max-age=%d", c.MaxAge/time.Second)
 
 	return buf.String()
+}
+
+func SetCacheControl(c echo.Context, val CacheControlParams) {
+	c.Response().Header().Set(echo.HeaderCacheControl, val.String())
 }

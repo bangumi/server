@@ -34,11 +34,6 @@ func (h Person) Get(c echo.Context) error {
 		return err
 	}
 
-	c.Request().Header.Set(echo.HeaderCacheControl, res.CacheControlParams{
-		Public: true,
-		MaxAge: time.Hour,
-	}.String())
-
 	r, err := h.person.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
@@ -47,6 +42,8 @@ func (h Person) Get(c echo.Context) error {
 
 		return errgo.Wrap(err, "failed to get person")
 	}
+
+	res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 
 	if r.Redirect != 0 {
 		return c.Redirect(http.StatusFound, "/v0/persons/"+strconv.FormatUint(uint64(r.Redirect), 10))
@@ -74,6 +71,8 @@ func (h Person) GetImage(c echo.Context) error {
 	if !ok {
 		return res.BadRequest("bad image type: " + c.QueryParam("type"))
 	}
+
+	res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 
 	if l == "" {
 		return c.Redirect(http.StatusFound, res.DefaultImageURL)
