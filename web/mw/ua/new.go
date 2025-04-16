@@ -15,7 +15,6 @@
 package ua
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -63,7 +62,6 @@ func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 
 			version := m[0]
-			fmt.Println(version)
 			s := strings.Split(version, ".")
 
 			if len(s) != 3 {
