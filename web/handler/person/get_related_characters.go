@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
@@ -30,6 +31,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
+//nolint:funlen
 func (h Person) GetRelatedCharacters(c echo.Context) error {
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
@@ -39,11 +41,13 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 	r, err := h.person.Get(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
+			res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 			return res.ErrNotFound
 		}
 		return errgo.Wrap(err, "failed to get person")
 	}
 	if r.Redirect != 0 {
+		res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 		return res.ErrNotFound
 	}
 
@@ -90,6 +94,7 @@ func (h Person) GetRelatedCharacters(c echo.Context) error {
 		}
 	}
 
+	res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 	return c.JSON(http.StatusOK, response)
 }
 

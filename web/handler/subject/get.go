@@ -68,10 +68,7 @@ func (h Subject) Get(c echo.Context) error {
 	}
 
 	if !s.NSFW {
-		c.Request().Header.Set(echo.HeaderCacheControl, res.CacheControlParams{
-			Public: true,
-			MaxAge: time.Hour,
-		}.String())
+		res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 	}
 
 	return c.JSON(http.StatusOK, res.ToSubjectV0(s, totalEpisode, metaTags))
@@ -97,6 +94,8 @@ func (h Subject) GetImage(c echo.Context) error {
 	if !ok {
 		return res.BadRequest("bad image type: " + c.QueryParam("type"))
 	}
+
+	res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 
 	if l == "" {
 		return c.Redirect(http.StatusFound, res.DefaultImageURL)

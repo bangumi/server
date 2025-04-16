@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
@@ -67,6 +68,8 @@ func (h Person) GetRelatedSubjects(c echo.Context) error {
 			Image:     res.SubjectImage(relation.Subject.Image).Large,
 		}
 	}
+
+	res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 
 	return c.JSON(http.StatusOK, response)
 }

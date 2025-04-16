@@ -17,6 +17,7 @@ package subject
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
@@ -65,6 +66,7 @@ func (h Subject) GetRelatedPersons(c echo.Context) error {
 			Eps:      rel.Eps,
 		}
 	}
+	res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 
 	return c.JSON(http.StatusOK, response)
 }

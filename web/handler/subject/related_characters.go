@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
@@ -71,6 +72,7 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 			ID:       rel.Character.ID,
 		}
 	}
+	res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour})
 
 	return c.JSON(http.StatusOK, response)
 }
