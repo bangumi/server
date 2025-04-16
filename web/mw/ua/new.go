@@ -57,11 +57,11 @@ func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
 		if strings.HasPrefix(u, "open-ani/ani/") {
 			m := aniPattern.FindStringSubmatch(u)
 
-			if len(m) < 1 {
+			if len(m) < 2 {
 				return res.Forbidden(banAnimeko)
 			}
 
-			version := m[0]
+			version := m[1]
 			s := strings.Split(version, ".")
 
 			if len(s) != 3 {
