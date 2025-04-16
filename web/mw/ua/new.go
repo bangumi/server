@@ -15,7 +15,9 @@
 package ua
 
 import (
+	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -46,7 +48,7 @@ func DisableDefaultHTTPLibrary(next echo.HandlerFunc) echo.HandlerFunc {
 
 // DisableBrokenUA disallow known broken app send infinite requests.
 func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
-	aniPattern := regexp.MustCompile(`^open-ani/ani/(?P<version>\d+.\d+.\d+) .*`)
+	aniPattern := regexp.MustCompile(`^open-ani/ani/(\d+.\d+.\d+) .*`)
 	return func(c echo.Context) error {
 		u := c.Request().UserAgent()
 		if u == "" {
@@ -61,15 +63,18 @@ func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 
 			version := m[0]
+			fmt.Println(version)
 			s := strings.Split(version, ".")
 
 			if len(s) != 3 {
 				return res.Forbidden(banAnimeko)
 			}
 
-			major, minor, patch := s[0], s[1], s[2]
+			major, _ := strconv.Atoi(s[0])
+			minor, _ := strconv.Atoi(s[1])
+			patch, _ := strconv.Atoi(s[2])
 
-			if major <= "4" && minor <= "8" && patch <= "1" {
+			if major <= 4 && minor <= 8 && patch <= 1 {
 				return res.Forbidden(banAnimeko)
 			}
 		}
