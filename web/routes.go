@@ -47,6 +47,7 @@ func AddRouters(
 	app.GET("/", indexPage())
 
 	app.Use(ua.DisableDefaultHTTPLibrary)
+	app.Use(ua.DisableBrokenUA)
 
 	v0 := app.Group("/v0", common.MiddlewareAccessTokenAuth)
 

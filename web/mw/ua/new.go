@@ -15,6 +15,8 @@
 package ua
 
 import (
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -42,6 +44,45 @@ func DisableDefaultHTTPLibrary(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
+
+// DisableBrokenUA disallow known broken app send infinite requests.
+func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
+	aniPattern := regexp.MustCompile(`^open-ani/ani/(\d+.\d+.\d+) .*`)
+	return func(c echo.Context) error {
+		u := c.Request().UserAgent()
+		if u == "" {
+			return res.Forbidden("Please set a 'User-Agent'")
+		}
+
+		if strings.HasPrefix(u, "open-ani/ani/") {
+			m := aniPattern.FindStringSubmatch(u)
+
+			if len(m) < 1 {
+				return res.Forbidden(banAnimeko)
+			}
+
+			version := m[0]
+			s := strings.Split(version, ".")
+
+			if len(s) != 3 {
+				return res.Forbidden(banAnimeko)
+			}
+
+			major, _ := strconv.Atoi(s[0])
+			minor, _ := strconv.Atoi(s[1])
+			patch, _ := strconv.Atoi(s[2])
+
+			if major <= 4 && minor <= 8 && patch <= 1 {
+				return res.Forbidden(banAnimeko)
+			}
+		}
+
+		return next(c)
+	}
+}
+
+const banAnimeko = "Animeko version 4.8.1 and earlier contain a bug that causes continuous infinite requests." +
+	"Please update to version 4.8.2 or later to resolve this issue."
 
 func isDefaultUA(u string) bool {
 	for _, s := range disabledUA {

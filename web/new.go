@@ -76,6 +76,8 @@ func New(r rueidis.Client, cfg config.AppConfig) *echo.Echo {
 		app.StaticFS("/openapi/", openapi.Static)
 	}
 
+	app.Use(recovery.New())
+
 	app.Use(mw.RateLimit(cfg, r))
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -134,8 +136,6 @@ func New(r rueidis.Client, cfg config.AppConfig) *echo.Echo {
 			return next(c)
 		}
 	})
-
-	app.Use(recovery.New())
 
 	app.GET("/openapi", func(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "/openapi/")
