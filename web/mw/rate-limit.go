@@ -47,15 +47,14 @@ func RateLimit(cfg config.AppConfig, r rueidis.Client) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			ip := c.RealIP()
 
-			var longBanKey = "chii-rate-limit:long:3:" + ip
-			var rateLimitKey = "chii-rate-limit:rate:3:" + ip
+			var longBanKey = "chii:rate-limit:long:3:" + ip
+			var rateLimitKey = "chii:rate-limit:rate:3:" + ip
 
 			banned, err := script.Exec(c.Request().Context(), r, []string{longBanKey, rateLimitKey}, args).ToInt64()
 			if err != nil {
-				if errors.Is(err, context.Canceled) {
-					return err
+				if !errors.Is(err, context.Canceled) {
+					logger.Error("failed to apply rate limit", zap.Error(err))
 				}
-				logger.Error("failed to apply rate limit", zap.Error(err))
 				return err
 			}
 
