@@ -18,6 +18,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
@@ -51,6 +52,13 @@ func (h Character) Get(c echo.Context) error {
 
 	if !auth.AllowReadCharacter(u.Auth, r) {
 		return res.ErrNotFound
+	}
+
+	if !r.NSFW {
+		c.Request().Header.Set(echo.HeaderCacheControl, res.CacheControlParams{
+			Public: true,
+			MaxAge: time.Hour,
+		}.String())
 	}
 
 	return c.JSON(http.StatusOK, res.ConvertModelCharacter(r))

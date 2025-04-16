@@ -18,6 +18,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
@@ -32,6 +33,11 @@ func (h Person) Get(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
+	c.Request().Header.Set(echo.HeaderCacheControl, res.CacheControlParams{
+		Public: true,
+		MaxAge: time.Hour,
+	}.String())
 
 	r, err := h.person.Get(c.Request().Context(), id)
 	if err != nil {
