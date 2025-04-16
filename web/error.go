@@ -82,7 +82,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 		}
 
 		if errors.Is(err, context.Canceled) {
-			c.NoContent(http.StatusNoContent)
+			_ = c.NoContent(http.StatusNoContent)
 			return
 		}
 
