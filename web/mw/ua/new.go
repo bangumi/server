@@ -72,7 +72,7 @@ func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
 			minor, _ := strconv.Atoi(s[1])
 			patch, _ := strconv.Atoi(s[2])
 
-			if major < 4 || (major == 4 && minor <= 8) || (major == 4 && minor == 8 && patch <= 1) {
+			if major < 4 || (major == 4 && minor < 8) || (major == 4 && minor == 8 && patch <= 1) {
 				return res.Forbidden(banAnimeko)
 			}
 		}
