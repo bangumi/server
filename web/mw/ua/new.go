@@ -47,7 +47,7 @@ func DisableDefaultHTTPLibrary(next echo.HandlerFunc) echo.HandlerFunc {
 
 // DisableBrokenUA disallow known broken app send infinite requests.
 func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
-	aniPattern := regexp.MustCompile(`^open-ani/ani/(\d+.\d+.\d+) .*`)
+	aniPattern := regexp.MustCompile(`^open-ani/ani/(\d+\.\d+\.\d+)\b`)
 	return func(c echo.Context) error {
 		u := c.Request().UserAgent()
 		if u == "" {
@@ -72,7 +72,7 @@ func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
 			minor, _ := strconv.Atoi(s[1])
 			patch, _ := strconv.Atoi(s[2])
 
-			if major <= 4 && minor <= 8 && patch <= 1 {
+			if major < 4 || (major == 4 && minor <= 8) || (major == 4 && minor == 8 && patch <= 1) {
 				return res.Forbidden(banAnimeko)
 			}
 		}
