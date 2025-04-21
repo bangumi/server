@@ -14,7 +14,8 @@
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.9.3",
     "js-yaml": "^4.1.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "yaml": "^2.7.1"
   },
   "devDependencies": {
     "colors": "^1.4.0",

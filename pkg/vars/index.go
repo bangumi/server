@@ -23,16 +23,18 @@ import (
 	"fmt"
 	"log"
 
+	"sigs.k8s.io/yaml"
+
 	"github.com/bangumi/server/internal/model"
 )
 
-//go:embed staff.go.json
+//go:embed common/subject_staffs.yml
 var staffRaw []byte
 
 //go:embed platform.go.json
 var platformRaw []byte
 
-//go:embed relation.go.json
+//go:embed common/subject_relations.yml
 var relationRaw []byte
 
 // StaffID ...
@@ -55,20 +57,28 @@ var (
 
 //nolint:gochecknoinits
 func init() {
-	if err := json.Unmarshal(staffRaw, &StaffMap); err != nil {
-		log.Panicln("can't unmarshal raw staff json to go type", err)
-	}
-	staffRaw = nil
-
 	if err := json.Unmarshal(platformRaw, &PlatformMap); err != nil {
-		log.Panicln("can't unmarshal raw platform json to go type", err)
+		log.Panicln("can't unmarshal raw staff json to go type", err)
 	}
 	platformRaw = nil
 
-	if err := json.Unmarshal(relationRaw, &RelationMap); err != nil {
-		log.Panicln("can't unmarshal raw relation json to go type", err)
+	var staffsYaml struct {
+		Staffs map[model.SubjectType]map[StaffID]Staff `yaml:"staffs"`
+	}
+	if err := yaml.Unmarshal(staffRaw, &staffsYaml); err != nil {
+		log.Panicln("can't unmarshal raw staff yaml to go type", err)
+	}
+	staffRaw = nil
+	StaffMap = staffsYaml.Staffs
+
+	var relationYAML struct {
+		Relations map[model.SubjectType]map[RelationID]Relation `yaml:"relations"`
+	}
+	if err := yaml.Unmarshal(relationRaw, &relationYAML); err != nil {
+		log.Panicln("can't unmarshal raw relation yaml to go type", err)
 	}
 	relationRaw = nil
+	RelationMap = relationYAML.Relations
 }
 
 type Staff struct {

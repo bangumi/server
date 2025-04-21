@@ -45,6 +45,7 @@ require (
 	gorm.io/gorm v1.25.12
 	gorm.io/plugin/dbresolver v1.5.3
 	gorm.io/plugin/soft_delete v1.2.1
+	sigs.k8s.io/yaml v1.4.0
 )
 
 require (
