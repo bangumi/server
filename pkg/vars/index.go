@@ -27,7 +27,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-//go:embed staff.go.json
+//go:embed common/subject_staffs.yml
 var staffRaw []byte
 
 //go:embed platform.go.json
@@ -56,10 +56,10 @@ var (
 
 //nolint:gochecknoinits
 func init() {
-	if err := json.Unmarshal(staffRaw, &StaffMap); err != nil {
+	if err := json.Unmarshal(platformRaw, &PlatformMap); err != nil {
 		log.Panicln("can't unmarshal raw staff json to go type", err)
 	}
-	staffRaw = nil
+	platformRaw = nil
 
 	var staffsYaml struct {
 		Staffs map[model.SubjectType]map[StaffID]Staff `yaml:"staffs"`

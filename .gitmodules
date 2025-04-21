@@ -5,3 +5,4 @@
 [submodule "pkg/vars/common"]
 	path = pkg/vars/common
 	url = https://github.com/bangumi/common
+	branch = master

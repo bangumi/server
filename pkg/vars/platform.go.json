@@ -1,169 +1,204 @@
 {
   "1": {
     "0": {
-      "alias": "misc",
       "id": 0,
       "type": "other",
       "type_cn": "其他",
-      "wiki_tpl": "Book"
+      "alias": "misc",
+      "wiki_tpl": "Book",
+      "order": 6
     },
     "1001": {
-      "alias": "comic",
-      "enable_header": true,
       "id": 1001,
       "type": "Comic",
       "type_cn": "漫画",
-      "wiki_tpl": "Manga"
+      "alias": "comic",
+      "wiki_tpl": "Manga",
+      "enable_header": true,
+      "order": 0
     },
     "1002": {
-      "alias": "novel",
-      "enable_header": true,
       "id": 1002,
       "type": "Novel",
       "type_cn": "小说",
-      "wiki_tpl": "Novel"
+      "alias": "novel",
+      "wiki_tpl": "Novel",
+      "enable_header": true,
+      "order": 1
     },
     "1003": {
-      "alias": "illustration",
-      "enable_header": true,
       "id": 1003,
       "type": "Illustration",
       "type_cn": "画集",
-      "wiki_tpl": "Book"
+      "alias": "illustration",
+      "wiki_tpl": "Book",
+      "enable_header": true,
+      "order": 2
+    },
+    "1004": {
+      "id": 1004,
+      "type": "Picture",
+      "type_cn": "绘本",
+      "alias": "picture",
+      "wiki_tpl": "Book",
+      "enable_header": true,
+      "order": 3
+    },
+    "1005": {
+      "id": 1005,
+      "type": "Photo",
+      "type_cn": "写真",
+      "alias": "photo",
+      "wiki_tpl": "PhotoBook",
+      "enable_header": true,
+      "order": 5
+    },
+    "1006": {
+      "id": 1006,
+      "type": "Official",
+      "type_cn": "公式书",
+      "alias": "official",
+      "wiki_tpl": "Book",
+      "enable_header": true,
+      "order": 4
     }
   },
   "2": {
     "0": {
-      "alias": "misc",
       "id": 0,
       "type": "other",
       "type_cn": "其他",
-      "wiki_tpl": "Anime"
+      "alias": "misc",
+      "wiki_tpl": "Anime",
+      "order": 5,
+      "sort_keys": ["上映年度"]
     },
     "1": {
-      "alias": "tv",
-      "enable_header": true,
       "id": 1,
       "type": "TV",
       "type_cn": "TV",
-      "wiki_tpl": "TVAnime"
+      "alias": "tv",
+      "enable_header": true,
+      "wiki_tpl": "TVAnime",
+      "order": 0,
+      "sort_keys": ["放送开始"]
     },
     "2": {
-      "alias": "ova",
-      "enable_header": true,
       "id": 2,
       "type": "OVA",
       "type_cn": "OVA",
-      "wiki_tpl": "OVA"
+      "alias": "ova",
+      "enable_header": true,
+      "wiki_tpl": "OVA",
+      "order": 2,
+      "sort_keys": ["发售日", "发售日期"]
     },
     "3": {
-      "alias": "movie",
-      "enable_header": true,
       "id": 3,
       "type": "movie",
       "type_cn": "剧场版",
-      "wiki_tpl": "Movie"
+      "alias": "movie",
+      "enable_header": true,
+      "wiki_tpl": "Movie",
+      "order": 3,
+      "sort_keys": ["上映年度", "上映日"]
     },
     "5": {
-      "alias": "web",
-      "enable_header": true,
       "id": 5,
       "type": "web",
       "type_cn": "WEB",
-      "wiki_tpl": "TVAnime"
-    }
-  },
-  "3": {
-    "0": {
-      "id": 0,
-      "type": "",
-      "type_cn": ""
+      "alias": "web",
+      "enable_header": true,
+      "wiki_tpl": "TVAnime",
+      "order": 1,
+      "sort_keys": ["放送开始"]
     },
-    "1": {
-      "id": 1,
-      "type": "TV",
-      "type_cn": "TV版动画"
-    },
-    "2": {
-      "id": 2,
-      "url": "ova",
-      "type": "OVA",
-      "type_cn": "OVA"
-    },
-    "3": {
-      "id": 3,
-      "url": "movie",
-      "type": "Movie",
-      "type_cn": "剧场版动画"
+    "2006": {
+      "id": 2006,
+      "type": "anime_comic",
+      "type_cn": "动态漫画",
+      "alias": "anime_comic",
+      "enable_header": true,
+      "wiki_tpl": "TVAnime",
+      "order": 4
     }
   },
   "4": {
+    "0": {
+      "id": 0,
+      "type": "other",
+      "type_cn": "其他",
+      "alias": "misc",
+      "order": 4
+    },
     "4001": {
       "id": 4001,
       "type": "games",
       "type_cn": "游戏",
       "alias": "games",
-      "enable_header": true
-    },
-    "4003": {
-      "id": 4003,
-      "type": "dlc",
-      "type_cn": "扩展包",
-      "alias": "dlc",
-      "enable_header": true
+      "enable_header": true,
+      "order": 0
     },
     "4002": {
       "id": 4002,
       "type": "software",
       "type_cn": "软件",
       "alias": "software",
-      "enable_header": true
+      "enable_header": true,
+      "order": 2
+    },
+    "4003": {
+      "id": 4003,
+      "type": "dlc",
+      "type_cn": "扩展包",
+      "alias": "dlc",
+      "enable_header": true,
+      "order": 1
     },
     "4005": {
       "id": 4005,
       "type": "tabletop",
       "type_cn": "桌游",
       "alias": "tabletop",
-      "enable_header": true
-    },
-    "0": {
-      "id": 0,
-      "type": "other",
-      "type_cn": "其他",
-      "alias": "misc"
+      "enable_header": true,
+      "order": 3
     }
   },
   "6": {
     "0": {
-      "alias": "misc",
       "id": 0,
       "type": "other",
       "type_cn": "其他",
-      "wiki_tpl": "TV"
+      "alias": "misc",
+      "wiki_tpl": "TV",
+      "order": 7
     },
     "1": {
-      "alias": "jp",
-      "enable_header": true,
       "id": 1,
       "type": "jp",
       "type_cn": "日剧",
-      "wiki_tpl": "TV"
+      "alias": "jp",
+      "enable_header": true,
+      "wiki_tpl": "TV",
+      "order": 0
     },
     "2": {
-      "alias": "en",
-      "enable_header": true,
       "id": 2,
       "type": "en",
       "type_cn": "欧美剧",
-      "wiki_tpl": "TV"
+      "alias": "en",
+      "enable_header": true,
+      "wiki_tpl": "TV",
+      "order": 1
     },
     "3": {
-      "alias": "cn",
-      "enable_header": true,
       "id": 3,
       "type": "cn",
       "type_cn": "华语剧",
-      "wiki_tpl": "TV"
+      "alias": "cn",
+      "enable_header": true,
+      "wiki_tpl": "TV",
+      "order": 2
     },
     "6001": {
       "id": 6001,
@@ -171,7 +206,8 @@
       "type_cn": "电视剧",
       "alias": "tv",
       "enable_header": true,
-      "wiki_tpl": "TV"
+      "wiki_tpl": "TV",
+      "order": 3
     },
     "6002": {
       "id": 6002,
@@ -179,7 +215,8 @@
       "type_cn": "电影",
       "alias": "movie",
       "enable_header": true,
-      "wiki_tpl": "realMovie"
+      "wiki_tpl": "realMovie",
+      "order": 4
     },
     "6003": {
       "id": 6003,
@@ -187,7 +224,8 @@
       "type_cn": "演出",
       "alias": "live",
       "enable_header": true,
-      "wiki_tpl": "TV"
+      "wiki_tpl": "TV",
+      "order": 5
     },
     "6004": {
       "id": 6004,
@@ -195,7 +233,8 @@
       "type_cn": "综艺",
       "alias": "show",
       "enable_header": true,
-      "wiki_tpl": "TV"
+      "wiki_tpl": "TV",
+      "order": 6
     }
   }
 }
