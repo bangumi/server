@@ -64,7 +64,7 @@ func init() {
 	var staffsYaml struct {
 		Staffs map[model.SubjectType]map[StaffID]Staff `yaml:"staffs"`
 	}
-	if err := json.Unmarshal(staffRaw, &staffsYaml); err != nil {
+	if err := yaml.Unmarshal(staffRaw, &staffsYaml); err != nil {
 		log.Panicln("can't unmarshal raw staff yaml to go type", err)
 	}
 	staffRaw = nil
