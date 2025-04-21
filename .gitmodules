@@ -2,3 +2,6 @@
 	path = pkg/wiki/testdata/wiki-syntax-spec
 	url = https://github.com/bangumi/wiki-syntax-spec.git
 	branch = master
+[submodule "pkg/vars/common"]
+	path = pkg/vars/common
+	url = https://github.com/bangumi/common
