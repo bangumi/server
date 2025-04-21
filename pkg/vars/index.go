@@ -23,8 +23,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/bangumi/server/internal/model"
 	"sigs.k8s.io/yaml"
+
+	"github.com/bangumi/server/internal/model"
 )
 
 //go:embed common/subject_staffs.yml
