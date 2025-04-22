@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 
+	wiki "github.com/bangumi/wiki-parser-go"
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/samber/lo"
@@ -36,7 +37,6 @@ import (
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
-	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 const defaultLimit = 10

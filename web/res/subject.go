@@ -17,6 +17,7 @@ package res
 import (
 	"time"
 
+	wiki "github.com/bangumi/wiki-parser-go"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 
@@ -28,7 +29,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/pkg/vars"
-	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 const defaultShortSummaryLength = 120

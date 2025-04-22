@@ -15,10 +15,11 @@
 package res
 
 import (
+	wiki "github.com/bangumi/wiki-parser-go"
+
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/null"
-	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 type CharacterV0 struct {
