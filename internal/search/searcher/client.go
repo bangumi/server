@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/pkg/wiki"
+	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 type Searcher interface {

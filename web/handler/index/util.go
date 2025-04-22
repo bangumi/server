@@ -21,9 +21,9 @@ import (
 	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/null"
-	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/internal/cachekey"
 	"github.com/bangumi/server/web/res"
+	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 func indexSubjectToResp(s index.Subject) res.IndexSubjectV0 {

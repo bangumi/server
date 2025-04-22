@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/tag"
 	"github.com/bangumi/server/pkg/vars"
-	"github.com/bangumi/server/pkg/wiki"
+	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 const defaultShortSummaryLength = 120

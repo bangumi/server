@@ -5,7 +5,7 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/search/searcher"
-	"github.com/bangumi/server/pkg/wiki"
+	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 type document struct {

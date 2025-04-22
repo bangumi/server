@@ -19,7 +19,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/pkg/wiki"
+	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 func TestCompat_v0wiki(t *testing.T) {

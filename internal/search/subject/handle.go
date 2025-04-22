@@ -33,10 +33,10 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/tag"
-	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
+	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 const defaultLimit = 10

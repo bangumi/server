@@ -20,7 +20,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/null"
-	"github.com/bangumi/server/pkg/wiki"
+	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 type PersonV0 struct {

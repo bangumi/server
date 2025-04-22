@@ -15,7 +15,7 @@
 package compat
 
 import (
-	"github.com/bangumi/server/pkg/wiki"
+	wiki "github.com/bangumi/wiki-parser-go"
 )
 
 func V0Wiki(s wiki.Wiki) []any {
