@@ -3,9 +3,10 @@ package character
 import (
 	"strconv"
 
+	wiki "github.com/bangumi/wiki-parser-go"
+
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/search/searcher"
-	"github.com/bangumi/server/pkg/wiki"
 )
 
 type document struct {

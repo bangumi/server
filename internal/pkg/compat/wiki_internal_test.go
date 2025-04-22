@@ -17,9 +17,8 @@ package compat
 import (
 	"testing"
 
+	wiki "github.com/bangumi/wiki-parser-go"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bangumi/server/pkg/wiki"
 )
 
 func TestCompat_v0wiki(t *testing.T) {

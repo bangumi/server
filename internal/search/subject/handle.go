@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 
+	wiki "github.com/bangumi/wiki-parser-go"
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/samber/lo"
@@ -33,7 +34,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/tag"
-	"github.com/bangumi/server/pkg/wiki"
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"

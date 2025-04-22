@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/avast/retry-go/v4"
+	wiki "github.com/bangumi/wiki-parser-go"
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/samber/lo"
@@ -18,7 +19,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
-	"github.com/bangumi/server/pkg/wiki"
 )
 
 type Searcher interface {
