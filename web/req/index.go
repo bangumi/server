@@ -23,7 +23,7 @@ type IndexBasicInfo struct {
 
 type IndexAddSubject struct {
 	SubjectID model.SubjectID `json:"subject_id"`
-	*IndexSubjectInfo
+	IndexSubjectInfo
 }
 
 type IndexSubjectInfo struct {

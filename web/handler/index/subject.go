@@ -31,6 +31,7 @@ func (h Handler) AddIndexSubject(c echo.Context) error {
 	if err := c.Echo().JSONSerializer.Deserialize(c, &reqData); err != nil {
 		return res.JSONError(c, err)
 	}
+
 	return h.addOrUpdateIndexSubject(c, reqData)
 }
 
@@ -45,7 +46,7 @@ func (h Handler) UpdateIndexSubject(c echo.Context) error {
 	}
 	return h.addOrUpdateIndexSubject(c, req.IndexAddSubject{
 		SubjectID:        subjectID,
-		IndexSubjectInfo: &reqData,
+		IndexSubjectInfo: reqData,
 	})
 }
 
