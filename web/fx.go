@@ -17,6 +17,7 @@ package web
 import (
 	"go.uber.org/fx"
 
+	"github.com/bangumi/server/graph"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/session"
@@ -27,6 +28,7 @@ var Module = fx.Module("web",
 	fx.Provide(
 		New,
 		session.NewMysqlRepo,
+		graph.NewResolver,
 		gql,
 		session.New,
 		func(c search.Client) search.Handler { return c },

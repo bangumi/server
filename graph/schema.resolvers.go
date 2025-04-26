@@ -10,7 +10,6 @@ import (
 
 	"github.com/trim21/errgo"
 
-	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/graph/model"
 )
 
@@ -31,13 +30,37 @@ func (r *queryResolver) Person(ctx context.Context, id int32) (*model.Person, er
 
 // Subject is the resolver for the subject field.
 func (r *queryResolver) Subject(ctx context.Context, id int32) (*model.Subject, error) {
-	var s dao.Subject
-	err := r.db.GetContext(ctx, &s, "select * from chii_subjects WHERE subject_id = ?", id)
+	s, err := r.q.Subject.WithContext(ctx).
+		Join(r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid), r.q.SubjectField.Redirect.Eq(0)).
+		Where(r.q.Subject.ID.Eq(uint32(id))).
+		Take()
 	if err != nil {
 		return nil, errgo.Wrap(err, "failed to get subject")
 	}
 
-	panic(fmt.Errorf("not implemented: Subject - subject"))
+	return &model.Subject{
+		Collection: &model.SubjectCollection{
+			Collect: int32(s.Done),
+			Doing:   int32(s.Doing),
+			Dropped: int32(s.Dropped),
+			OnHold:  int32(s.OnHold),
+			Wish:    int32(s.Wish),
+		},
+		Eps:         int32(s.Eps),
+		ID:          int32(s.ID),
+		Images:      nil,
+		Infobox:     s.Infobox,
+		Locked:      s.Ban != 0,
+		Name:        s.Name.String(),
+		NameCn:      s.NameCN.String(),
+		Nsfw:        s.Nsfw,
+		Relations:   nil,
+		Series:      false,
+		SeriesEntry: 0,
+		Summary:     "",
+		Type:        int32(s.TypeID),
+		Volumes:     int32(s.Volumes),
+	}, nil
 }
 
 // Query returns QueryResolver implementation.

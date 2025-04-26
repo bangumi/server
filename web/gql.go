@@ -5,17 +5,12 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/jmoiron/sqlx"
 	"github.com/vektah/gqlparser/v2/ast"
 
 	"github.com/bangumi/server/graph"
 )
 
-func gql(db *sqlx.DB) (*handler.Server, error) {
-	r, err := graph.NewResolver(db)
-	if err != nil {
-		return nil, err
-	}
+func gql(r *graph.Resolver) (*handler.Server, error) {
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: r}))
 
 	srv.AddTransport(transport.Options{})

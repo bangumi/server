@@ -15,7 +15,7 @@ type Subject struct {
 	ID            uint32                     `gorm:"column:subject_id;type:mediumint(8) unsigned;primaryKey;autoIncrement:true" json:""`
 	TypeID        uint8                      `gorm:"column:subject_type_id;type:smallint(6) unsigned;not null" json:""`
 	Name          utiltype.HTMLEscapedString `gorm:"column:subject_name;type:varchar(512);not null" json:""`
-	NameCN        utiltype.HTMLEscapedString `gorm:"column:subject_name_cn;type:varchar(512);not null" json:""`
+	NameCN        utiltype. HTMLEscapedString `gorm:"column:subject_name_cn;type:varchar(512);not null" json:""`
 	UID           string                     `gorm:"column:subject_uid;type:varchar(20);not null;comment:isbn / imdb" json:""` // isbn / imdb
 	Creator       uint32                     `gorm:"column:subject_creator;type:mediumint(8) unsigned;not null" json:""`
 	Dateline      uint32                     `gorm:"column:subject_dateline;type:int(10) unsigned;not null" json:""`
