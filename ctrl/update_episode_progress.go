@@ -166,7 +166,7 @@ func (ctl Ctrl) updateEpisodesCollectionTx(
 		epStatus := len(ec)
 
 		err = collectionTx.UpdateSubjectCollection(ctx, u.ID,
-			model.Subject{ID: subjectID, TypeID: sc.SubjectType}, time.Now(), "",
+			model.Subject{ID: subjectID, TypeID: sc.SubjectType}, at, "",
 			func(ctx context.Context, s *collection.Subject) (*collection.Subject, error) {
 				s.UpdateEps(uint32(epStatus))
 				return s, nil

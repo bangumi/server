@@ -17,7 +17,6 @@ package web
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/handler/character"
 	"github.com/bangumi/server/web/handler/common"
@@ -35,7 +34,6 @@ import (
 //nolint:funlen
 func AddRouters(
 	app *echo.Echo,
-	c config.AppConfig,
 	common common.Common,
 	h handler.Handler,
 	userHandler user.User,

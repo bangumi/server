@@ -36,7 +36,8 @@ tasks:
   web:
     desc: Run Web Server
     cmds:
-      - go run main.go --config config.toml web
+      - task: build
+      - ./dist/chii.exe --config config.toml web
 
   consumer:
     desc: Run Kafka Consumer
