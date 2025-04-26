@@ -102,6 +102,9 @@ tasks:
     cmds:
       - go run --tags gen ./cmd/gen/gorm/main.go
 
+  struct-to-go:
+    cmd: tables-to-go -v -of dao -fn-format=s -t mysql -h infra.omv.trim21.me -d bangumi -u user -p password
+
   clean:
     cmds:
       - rm -rf ./dist/
