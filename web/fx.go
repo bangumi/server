@@ -27,6 +27,7 @@ var Module = fx.Module("web",
 	fx.Provide(
 		New,
 		session.NewMysqlRepo,
+		gql,
 		session.New,
 		func(c search.Client) search.Handler { return c },
 	),

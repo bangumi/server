@@ -1,0 +1,273 @@
+type Query {
+  me: User
+  character(id: Int!): Character
+  person(id: Int!): Person
+  subject(id: Int!): Subject
+}
+
+type Avatar {
+  large: String!
+  medium: String!
+  small: String!
+}
+
+"""
+basic character info as field of other types to avoid recursive query
+"""
+type SlimCharacter {
+  collects: Int!
+  comment: Int!
+  id: Int!
+  images: Images
+  infobox: [Infobox!]
+  last_post: Int!
+  lock: Int!
+  name: String!
+  nsfw: Boolean!
+  redirect: Int!
+  role: Int!
+  summary: String!
+}
+
+type Character {
+  collects: Int!
+  comment: Int!
+  id: Int!
+  images: Images
+  infobox: [Infobox!]
+  last_post: Int!
+  lock: Int!
+  name: String!
+  nsfw: Boolean!
+  persons(limit: Int! = 10, offset: Int! = 0): [CharacterRelatedPerson!]
+  redirect: Int!
+  role: Int!
+  subjects(limit: Int! = 10, offset: Int! = 0): [CharacterRelatedSubject!]
+  summary: String!
+}
+
+type CharacterRelatedPerson {
+  person: SlimPerson!
+  subject: SlimSubject!
+  summary: String!
+}
+
+type CharacterRelatedSubject {
+  order: Int!
+  subject: SlimSubject!
+  type: Int!
+}
+
+type Episode {
+  airdate: String!
+  comment: Int!
+  description: String!
+  disc: Int!
+  duration: String!
+  id: Int!
+  last_post: Int!
+  name: String!
+  name_cn: String!
+  sort: Float!
+  type: Int!
+}
+
+type Images {
+  grid: String!
+  large: String!
+  medium: String!
+  small: String!
+}
+
+type Infobox {
+  key: String!
+  values: [InfoboxValue!]
+}
+
+type InfoboxValue {
+  k: String
+  v: String
+}
+
+"""
+basic person info as field of other types to avoid recursive query
+"""
+type SlimPerson {
+  career: [String!]!
+  collects: Int!
+  comment: Int!
+  id: Int!
+  images: Images
+  infobox: [Infobox!]
+  last_post: Int!
+  lock: Int!
+  name: String!
+  nsfw: Boolean!
+  redirect: Int!
+  summary: String!
+  type: Int!
+}
+
+type Person {
+  career: [String!]!
+  characters(limit: Int! = 10, offset: Int! = 0): [PersonRelatedCharacter!]
+  collects: Int!
+  comment: Int!
+  id: Int!
+  images: Images
+  infobox: [Infobox!]
+  last_post: Int!
+  lock: Int!
+  name: String!
+  nsfw: Boolean!
+  redirect: Int!
+  subjects(limit: Int! = 10, offset: Int! = 0): [PersonRelatedSubject!]
+  summary: String!
+  type: Int!
+}
+
+type PersonRelatedCharacter {
+  character: SlimCharacter!
+  subject: SlimSubject!
+  summary: String!
+}
+
+type PersonRelatedSubject {
+  position: Int!
+  subject: SlimSubject!
+}
+
+"""
+a subject as field of other types to avoid recursive query
+"""
+type SlimSubject {
+  airtime: SubjectAirtime!
+  eps: Int!
+  id: Int!
+  images: SubjectImages
+  infobox: [Infobox!]
+  locked: Boolean!
+  name: String!
+  name_cn: String!
+  nsfw: Boolean!
+  platform: SubjectPlatform!
+  rating: SubjectRating!
+  redirect: Int!
+  series: Boolean!
+  series_entry: Int!
+  summary: String!
+  type: Int!
+  volumes: Int!
+}
+
+type Subject {
+  airtime: SubjectAirtime!
+  characters(limit: Int! = 10, offset: Int! = 0): [SubjectRelatedCharacter!]
+  collection: SubjectCollection!
+  episodes(
+    limit: Int! = 30
+
+    """
+    超出范围时会返回空数据。可以使用负数，来获取最后几个章节。如 `-1` 会返回最后一个章节， `-2` 会返回最后两个章节
+    """
+    offset: Int! = 0
+    type: Int
+  ): [Episode!]
+  eps: Int!
+  id: Int!
+  images: SubjectImages
+  infobox: [Infobox!]
+  locked: Boolean!
+  name: String!
+  name_cn: String!
+  nsfw: Boolean!
+  persons(limit: Int! = 10, offset: Int! = 0): [SubjectRelatedPerson!]
+  platform: SubjectPlatform!
+  rating: SubjectRating!
+  redirect: Int!
+  relations(excludeTypes: [Int!], includeTypes: [Int!], limit: Int! = 30, offset: Int! = 0): [SubjectRelation!]
+  series: Boolean!
+  series_entry: Int!
+  summary: String!
+  tags(limit: Int = 0): [SubjectTag!]!
+  topics(limit: Int! = 10, offset: Int! = 0): [SubjectTopic!]
+  type: Int!
+  volumes: Int!
+}
+
+type SubjectAirtime {
+  date: String!
+  month: Int!
+  weekday: Int!
+  year: Int!
+}
+
+type SubjectCollection {
+  collect: Int!
+  doing: Int!
+  dropped: Int!
+  on_hold: Int!
+  wish: Int!
+}
+
+type SubjectImages {
+  common: String!
+  grid: String!
+  large: String!
+  medium: String!
+  small: String!
+}
+
+type SubjectPlatform {
+  alias: String
+  id: Int!
+  type: String!
+  type_cn: String
+}
+
+type SubjectRating {
+  count: [Int!]
+  rank: Int!
+  score: Float!
+  total: Int!
+}
+
+type SubjectRelatedCharacter {
+  character: SlimCharacter!
+  order: Int!
+  type: Int!
+}
+
+type SubjectRelatedPerson {
+  person: SlimPerson!
+  position: Int!
+}
+
+type SubjectRelation {
+  order: Int!
+  relation: Int!
+  subject: SlimSubject!
+}
+
+type SubjectTag {
+  count: Int!
+  name: String!
+}
+
+type SubjectTopic {
+  created_at: Int!
+  creator: User!
+  display: Int!
+  id: Int!
+  replies: Int!
+  state: Int!
+  title: String!
+  updated_at: Int!
+}
+
+type User {
+  avatar: Avatar!
+  id: Int!
+  nickname: String!
+  username: String!
+}

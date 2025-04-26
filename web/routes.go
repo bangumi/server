@@ -15,9 +15,10 @@
 package web
 
 import (
+	gqlHandler "github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/labstack/echo/v4"
 
-	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/handler/character"
 	"github.com/bangumi/server/web/handler/common"
@@ -35,9 +36,9 @@ import (
 //nolint:funlen
 func AddRouters(
 	app *echo.Echo,
-	c config.AppConfig,
 	common common.Common,
 	h handler.Handler,
+	gql *gqlHandler.Server,
 	userHandler user.User,
 	personHandler person.Person,
 	characterHandler character.Character,
@@ -50,6 +51,9 @@ func AddRouters(
 	app.Use(ua.DisableBrokenUA)
 
 	v0 := app.Group("/v0", common.MiddlewareAccessTokenAuth)
+
+	v0.GET("/graphql", echo.WrapHandler(playground.Handler("GraphQL playground", "/v0/graphql")))
+	v0.POST("/graphql", echo.WrapHandler(gql))
 
 	v0.POST("/search/subjects", h.SearchSubjects)
 	v0.POST("/search/characters", h.SearchCharacters)

@@ -82,8 +82,9 @@ tasks:
   gen:
     desc: Generate all generated GO files
     cmds:
-      - task: gorm
+      - go run github.com/99designs/gqlgen generate
       - task: mock
+      - task: gorm
 
   mock:
     desc: Generate Mocks.
