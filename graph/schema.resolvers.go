@@ -8,6 +8,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/trim21/errgo"
+
+	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/graph/model"
 )
 
@@ -28,7 +31,11 @@ func (r *queryResolver) Person(ctx context.Context, id int32) (*model.Person, er
 
 // Subject is the resolver for the subject field.
 func (r *queryResolver) Subject(ctx context.Context, id int32) (*model.Subject, error) {
-	r.db.ExecContext(ctx, "select * from chii_subject WHERE id = ?", id)
+	var s dao.Subject
+	err := r.db.GetContext(ctx, &s, "select * from chii_subjects WHERE subject_id = ?", id)
+	if err != nil {
+		return nil, errgo.Wrap(err, "failed to get subject")
+	}
 
 	panic(fmt.Errorf("not implemented: Subject - subject"))
 }
