@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"log"
 
-	"sigs.k8s.io/yaml"
+	"github.com/goccy/go-yaml"
 
 	"github.com/bangumi/server/internal/model"
 )
