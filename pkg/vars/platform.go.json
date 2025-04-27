@@ -71,7 +71,9 @@
       "alias": "misc",
       "wiki_tpl": "Anime",
       "order": 5,
-      "sort_keys": ["上映年度"]
+      "sort_keys": [
+        "上映年度"
+      ]
     },
     "1": {
       "id": 1,
@@ -81,7 +83,9 @@
       "enable_header": true,
       "wiki_tpl": "TVAnime",
       "order": 0,
-      "sort_keys": ["放送开始"]
+      "sort_keys": [
+        "放送开始"
+      ]
     },
     "2": {
       "id": 2,
@@ -91,7 +95,10 @@
       "enable_header": true,
       "wiki_tpl": "OVA",
       "order": 2,
-      "sort_keys": ["发售日", "发售日期"]
+      "sort_keys": [
+        "发售日",
+        "发售日期"
+      ]
     },
     "3": {
       "id": 3,
@@ -101,7 +108,10 @@
       "enable_header": true,
       "wiki_tpl": "Movie",
       "order": 3,
-      "sort_keys": ["上映年度", "上映日"]
+      "sort_keys": [
+        "上映年度",
+        "上映日"
+      ]
     },
     "5": {
       "id": 5,
@@ -111,7 +121,9 @@
       "enable_header": true,
       "wiki_tpl": "TVAnime",
       "order": 1,
-      "sort_keys": ["放送开始"]
+      "sort_keys": [
+        "放送开始"
+      ]
     },
     "2006": {
       "id": 2006,

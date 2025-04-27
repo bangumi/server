@@ -6,6 +6,7 @@
   "scripts": {
     "format": "prettier -w --list-different ./",
     "test": "node openapi/test.js",
+    "common": "node scripts/build-common.mjs",
     "build": "node ./openapi/build.js"
   },
   "prettier": {

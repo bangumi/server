@@ -23,18 +23,16 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/goccy/go-yaml"
-
 	"github.com/bangumi/server/internal/model"
 )
 
-//go:embed common/subject_staffs.yml
+//go:embed staffs.go.json
 var staffRaw []byte
 
 //go:embed platform.go.json
 var platformRaw []byte
 
-//go:embed common/subject_relations.yml
+//go:embed relations.go.json
 var relationRaw []byte
 
 // StaffID ...
@@ -65,8 +63,8 @@ func init() {
 	var staffsYaml struct {
 		Staffs map[model.SubjectType]map[StaffID]Staff `yaml:"staffs"`
 	}
-	if err := yaml.Unmarshal(staffRaw, &staffsYaml); err != nil {
-		log.Panicln("can't unmarshal raw staff yaml to go type", err)
+	if err := json.Unmarshal(staffRaw, &staffsYaml); err != nil {
+		log.Panicln("can't unmarshal raw staffs.go.json to go type", err)
 	}
 	staffRaw = nil
 	StaffMap = staffsYaml.Staffs
@@ -74,8 +72,8 @@ func init() {
 	var relationYAML struct {
 		Relations map[model.SubjectType]map[RelationID]Relation `yaml:"relations"`
 	}
-	if err := yaml.Unmarshal(relationRaw, &relationYAML); err != nil {
-		log.Panicln("can't unmarshal raw relation yaml to go type", err)
+	if err := json.Unmarshal(relationRaw, &relationYAML); err != nil {
+		log.Panicln("can't unmarshal raw relations.go.json to go type", err)
 	}
 	relationRaw = nil
 	RelationMap = relationYAML.Relations
