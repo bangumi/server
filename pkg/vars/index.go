@@ -61,7 +61,7 @@ func init() {
 	platformRaw = nil
 
 	var staffsYaml struct {
-		Staffs map[model.SubjectType]map[StaffID]Staff `yaml:"staffs"`
+		Staffs map[model.SubjectType]map[StaffID]Staff `json:"staffs"`
 	}
 	if err := json.Unmarshal(staffRaw, &staffsYaml); err != nil {
 		log.Panicln("can't unmarshal raw staffs.go.json to go type", err)
@@ -70,7 +70,7 @@ func init() {
 	StaffMap = staffsYaml.Staffs
 
 	var relationYAML struct {
-		Relations map[model.SubjectType]map[RelationID]Relation `yaml:"relations"`
+		Relations map[model.SubjectType]map[RelationID]Relation `json:"relations"`
 	}
 	if err := json.Unmarshal(relationRaw, &relationYAML); err != nil {
 		log.Panicln("can't unmarshal raw relations.go.json to go type", err)
