@@ -43,7 +43,7 @@ jobs:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Install gotestsum
-        uses: jaxxstorm/action-install-gh-release@4304621e8c48d66093a8a214af5d5b5bc3b3d943 # v2.0.0
+        uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
         with:
           repo: gotestyourself/gotestsum
           tag: v1.12.1
