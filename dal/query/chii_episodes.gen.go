@@ -166,11 +166,14 @@ func (e *episode) fillFieldMap() {
 
 func (e episode) clone(db *gorm.DB) episode {
 	e.episodeDo.ReplaceConnPool(db.Statement.ConnPool)
+	e.Subject.db = db.Session(&gorm.Session{Initialized: true})
+	e.Subject.db.Statement.ConnPool = db.Statement.ConnPool
 	return e
 }
 
 func (e episode) replaceDB(db *gorm.DB) episode {
 	e.episodeDo.ReplaceDB(db)
+	e.Subject.db = db.Session(&gorm.Session{})
 	return e
 }
 
@@ -211,6 +214,11 @@ func (a episodeBelongsToSubject) Model(m *dao.Episode) *episodeBelongsToSubjectT
 	return &episodeBelongsToSubjectTx{a.db.Model(m).Association(a.Name())}
 }
 
+func (a episodeBelongsToSubject) Unscoped() *episodeBelongsToSubject {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
 type episodeBelongsToSubjectTx struct{ tx *gorm.Association }
 
 func (a episodeBelongsToSubjectTx) Find() (result *dao.Subject, err error) {
@@ -247,6 +255,11 @@ func (a episodeBelongsToSubjectTx) Clear() error {
 
 func (a episodeBelongsToSubjectTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a episodeBelongsToSubjectTx) Unscoped() *episodeBelongsToSubjectTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type episodeDo struct{ gen.DO }

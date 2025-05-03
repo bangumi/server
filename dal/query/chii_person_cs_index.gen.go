@@ -140,11 +140,17 @@ func (p *personSubjects) fillFieldMap() {
 
 func (p personSubjects) clone(db *gorm.DB) personSubjects {
 	p.personSubjectsDo.ReplaceConnPool(db.Statement.ConnPool)
+	p.Subject.db = db.Session(&gorm.Session{Initialized: true})
+	p.Subject.db.Statement.ConnPool = db.Statement.ConnPool
+	p.Person.db = db.Session(&gorm.Session{Initialized: true})
+	p.Person.db.Statement.ConnPool = db.Statement.ConnPool
 	return p
 }
 
 func (p personSubjects) replaceDB(db *gorm.DB) personSubjects {
 	p.personSubjectsDo.ReplaceDB(db)
+	p.Subject.db = db.Session(&gorm.Session{})
+	p.Person.db = db.Session(&gorm.Session{})
 	return p
 }
 
@@ -185,6 +191,11 @@ func (a personSubjectsHasOneSubject) Model(m *dao.PersonSubjects) *personSubject
 	return &personSubjectsHasOneSubjectTx{a.db.Model(m).Association(a.Name())}
 }
 
+func (a personSubjectsHasOneSubject) Unscoped() *personSubjectsHasOneSubject {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
 type personSubjectsHasOneSubjectTx struct{ tx *gorm.Association }
 
 func (a personSubjectsHasOneSubjectTx) Find() (result *dao.Subject, err error) {
@@ -221,6 +232,11 @@ func (a personSubjectsHasOneSubjectTx) Clear() error {
 
 func (a personSubjectsHasOneSubjectTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a personSubjectsHasOneSubjectTx) Unscoped() *personSubjectsHasOneSubjectTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type personSubjectsHasOnePerson struct {
@@ -260,6 +276,11 @@ func (a personSubjectsHasOnePerson) Model(m *dao.PersonSubjects) *personSubjects
 	return &personSubjectsHasOnePersonTx{a.db.Model(m).Association(a.Name())}
 }
 
+func (a personSubjectsHasOnePerson) Unscoped() *personSubjectsHasOnePerson {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
 type personSubjectsHasOnePersonTx struct{ tx *gorm.Association }
 
 func (a personSubjectsHasOnePersonTx) Find() (result *dao.Person, err error) {
@@ -296,6 +317,11 @@ func (a personSubjectsHasOnePersonTx) Clear() error {
 
 func (a personSubjectsHasOnePersonTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a personSubjectsHasOnePersonTx) Unscoped() *personSubjectsHasOnePersonTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type personSubjectsDo struct{ gen.DO }

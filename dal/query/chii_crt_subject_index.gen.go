@@ -135,11 +135,17 @@ func (c *characterSubjects) fillFieldMap() {
 
 func (c characterSubjects) clone(db *gorm.DB) characterSubjects {
 	c.characterSubjectsDo.ReplaceConnPool(db.Statement.ConnPool)
+	c.Character.db = db.Session(&gorm.Session{Initialized: true})
+	c.Character.db.Statement.ConnPool = db.Statement.ConnPool
+	c.Subject.db = db.Session(&gorm.Session{Initialized: true})
+	c.Subject.db.Statement.ConnPool = db.Statement.ConnPool
 	return c
 }
 
 func (c characterSubjects) replaceDB(db *gorm.DB) characterSubjects {
 	c.characterSubjectsDo.ReplaceDB(db)
+	c.Character.db = db.Session(&gorm.Session{})
+	c.Subject.db = db.Session(&gorm.Session{})
 	return c
 }
 
@@ -180,6 +186,11 @@ func (a characterSubjectsHasOneCharacter) Model(m *dao.CharacterSubjects) *chara
 	return &characterSubjectsHasOneCharacterTx{a.db.Model(m).Association(a.Name())}
 }
 
+func (a characterSubjectsHasOneCharacter) Unscoped() *characterSubjectsHasOneCharacter {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
 type characterSubjectsHasOneCharacterTx struct{ tx *gorm.Association }
 
 func (a characterSubjectsHasOneCharacterTx) Find() (result *dao.Character, err error) {
@@ -216,6 +227,11 @@ func (a characterSubjectsHasOneCharacterTx) Clear() error {
 
 func (a characterSubjectsHasOneCharacterTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a characterSubjectsHasOneCharacterTx) Unscoped() *characterSubjectsHasOneCharacterTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type characterSubjectsHasOneSubject struct {
@@ -255,6 +271,11 @@ func (a characterSubjectsHasOneSubject) Model(m *dao.CharacterSubjects) *charact
 	return &characterSubjectsHasOneSubjectTx{a.db.Model(m).Association(a.Name())}
 }
 
+func (a characterSubjectsHasOneSubject) Unscoped() *characterSubjectsHasOneSubject {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
 type characterSubjectsHasOneSubjectTx struct{ tx *gorm.Association }
 
 func (a characterSubjectsHasOneSubjectTx) Find() (result *dao.Subject, err error) {
@@ -291,6 +312,11 @@ func (a characterSubjectsHasOneSubjectTx) Clear() error {
 
 func (a characterSubjectsHasOneSubjectTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a characterSubjectsHasOneSubjectTx) Unscoped() *characterSubjectsHasOneSubjectTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type characterSubjectsDo struct{ gen.DO }

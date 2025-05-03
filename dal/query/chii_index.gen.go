@@ -35,6 +35,7 @@ func newIndex(db *gorm.DB, opts ...gen.DOOption) index {
 	_index.SubjectCount = field.NewUint32(tableName, "idx_subject_total")
 	_index.CollectCount = field.NewUint32(tableName, "idx_collects")
 	_index.Stats = field.NewString(tableName, "idx_stats")
+	_index.Award = field.NewUint32(tableName, "idx_award")
 	_index.CreatedTime = field.NewInt32(tableName, "idx_dateline")
 	_index.UpdatedTime = field.NewUint32(tableName, "idx_lasttouch")
 	_index.CreatorID = field.NewUint32(tableName, "idx_uid")
@@ -57,6 +58,7 @@ type index struct {
 	SubjectCount field.Uint32 // 内含条目总数
 	CollectCount field.Uint32 // 收藏数
 	Stats        field.String
+	Award        field.Uint32
 	CreatedTime  field.Int32 // 创建时间
 	UpdatedTime  field.Uint32
 	CreatorID    field.Uint32 // 创建人UID
@@ -85,6 +87,7 @@ func (i *index) updateTableName(table string) *index {
 	i.SubjectCount = field.NewUint32(table, "idx_subject_total")
 	i.CollectCount = field.NewUint32(table, "idx_collects")
 	i.Stats = field.NewString(table, "idx_stats")
+	i.Award = field.NewUint32(table, "idx_award")
 	i.CreatedTime = field.NewInt32(table, "idx_dateline")
 	i.UpdatedTime = field.NewUint32(table, "idx_lasttouch")
 	i.CreatorID = field.NewUint32(table, "idx_uid")
@@ -113,7 +116,7 @@ func (i *index) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (i *index) fillFieldMap() {
-	i.fieldMap = make(map[string]field.Expr, 12)
+	i.fieldMap = make(map[string]field.Expr, 13)
 	i.fieldMap["idx_id"] = i.ID
 	i.fieldMap["idx_type"] = i.Type
 	i.fieldMap["idx_title"] = i.Title
@@ -122,6 +125,7 @@ func (i *index) fillFieldMap() {
 	i.fieldMap["idx_subject_total"] = i.SubjectCount
 	i.fieldMap["idx_collects"] = i.CollectCount
 	i.fieldMap["idx_stats"] = i.Stats
+	i.fieldMap["idx_award"] = i.Award
 	i.fieldMap["idx_dateline"] = i.CreatedTime
 	i.fieldMap["idx_lasttouch"] = i.UpdatedTime
 	i.fieldMap["idx_uid"] = i.CreatorID

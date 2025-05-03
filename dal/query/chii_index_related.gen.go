@@ -33,6 +33,7 @@ func newIndexSubject(db *gorm.DB, opts ...gen.DOOption) indexSubject {
 	_indexSubject.SubjectType = field.NewUint8(tableName, "idx_rlt_type")
 	_indexSubject.SubjectID = field.NewUint32(tableName, "idx_rlt_sid")
 	_indexSubject.Order = field.NewUint32(tableName, "idx_rlt_order")
+	_indexSubject.Award = field.NewString(tableName, "idx_rlt_award")
 	_indexSubject.Comment = field.NewString(tableName, "idx_rlt_comment")
 	_indexSubject.CreatedTime = field.NewUint32(tableName, "idx_rlt_dateline")
 	_indexSubject.Deleted = field.NewField(tableName, "idx_rlt_ban")
@@ -63,6 +64,7 @@ type indexSubject struct {
 	SubjectType field.Uint8  // 关联条目类型
 	SubjectID   field.Uint32 // 关联条目ID
 	Order       field.Uint32
+	Award       field.String
 	Comment     field.String
 	CreatedTime field.Uint32
 	Deleted     field.Field
@@ -89,6 +91,7 @@ func (i *indexSubject) updateTableName(table string) *indexSubject {
 	i.SubjectType = field.NewUint8(table, "idx_rlt_type")
 	i.SubjectID = field.NewUint32(table, "idx_rlt_sid")
 	i.Order = field.NewUint32(table, "idx_rlt_order")
+	i.Award = field.NewString(table, "idx_rlt_award")
 	i.Comment = field.NewString(table, "idx_rlt_comment")
 	i.CreatedTime = field.NewUint32(table, "idx_rlt_dateline")
 	i.Deleted = field.NewField(table, "idx_rlt_ban")
@@ -120,13 +123,14 @@ func (i *indexSubject) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (i *indexSubject) fillFieldMap() {
-	i.fieldMap = make(map[string]field.Expr, 10)
+	i.fieldMap = make(map[string]field.Expr, 11)
 	i.fieldMap["idx_rlt_id"] = i.ID
 	i.fieldMap["idx_rlt_cat"] = i.Cat
 	i.fieldMap["idx_rlt_rid"] = i.IndexID
 	i.fieldMap["idx_rlt_type"] = i.SubjectType
 	i.fieldMap["idx_rlt_sid"] = i.SubjectID
 	i.fieldMap["idx_rlt_order"] = i.Order
+	i.fieldMap["idx_rlt_award"] = i.Award
 	i.fieldMap["idx_rlt_comment"] = i.Comment
 	i.fieldMap["idx_rlt_dateline"] = i.CreatedTime
 	i.fieldMap["idx_rlt_ban"] = i.Deleted
@@ -135,11 +139,14 @@ func (i *indexSubject) fillFieldMap() {
 
 func (i indexSubject) clone(db *gorm.DB) indexSubject {
 	i.indexSubjectDo.ReplaceConnPool(db.Statement.ConnPool)
+	i.Subject.db = db.Session(&gorm.Session{Initialized: true})
+	i.Subject.db.Statement.ConnPool = db.Statement.ConnPool
 	return i
 }
 
 func (i indexSubject) replaceDB(db *gorm.DB) indexSubject {
 	i.indexSubjectDo.ReplaceDB(db)
+	i.Subject.db = db.Session(&gorm.Session{})
 	return i
 }
 
@@ -180,6 +187,11 @@ func (a indexSubjectBelongsToSubject) Model(m *dao.IndexSubject) *indexSubjectBe
 	return &indexSubjectBelongsToSubjectTx{a.db.Model(m).Association(a.Name())}
 }
 
+func (a indexSubjectBelongsToSubject) Unscoped() *indexSubjectBelongsToSubject {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
 type indexSubjectBelongsToSubjectTx struct{ tx *gorm.Association }
 
 func (a indexSubjectBelongsToSubjectTx) Find() (result *dao.Subject, err error) {
@@ -216,6 +228,11 @@ func (a indexSubjectBelongsToSubjectTx) Clear() error {
 
 func (a indexSubjectBelongsToSubjectTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a indexSubjectBelongsToSubjectTx) Unscoped() *indexSubjectBelongsToSubjectTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type indexSubjectDo struct{ gen.DO }

@@ -158,11 +158,14 @@ func (s *subjectRevision) fillFieldMap() {
 
 func (s subjectRevision) clone(db *gorm.DB) subjectRevision {
 	s.subjectRevisionDo.ReplaceConnPool(db.Statement.ConnPool)
+	s.Subject.db = db.Session(&gorm.Session{Initialized: true})
+	s.Subject.db.Statement.ConnPool = db.Statement.ConnPool
 	return s
 }
 
 func (s subjectRevision) replaceDB(db *gorm.DB) subjectRevision {
 	s.subjectRevisionDo.ReplaceDB(db)
+	s.Subject.db = db.Session(&gorm.Session{})
 	return s
 }
 
@@ -203,6 +206,11 @@ func (a subjectRevisionBelongsToSubject) Model(m *dao.SubjectRevision) *subjectR
 	return &subjectRevisionBelongsToSubjectTx{a.db.Model(m).Association(a.Name())}
 }
 
+func (a subjectRevisionBelongsToSubject) Unscoped() *subjectRevisionBelongsToSubject {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
 type subjectRevisionBelongsToSubjectTx struct{ tx *gorm.Association }
 
 func (a subjectRevisionBelongsToSubjectTx) Find() (result *dao.Subject, err error) {
@@ -239,6 +247,11 @@ func (a subjectRevisionBelongsToSubjectTx) Clear() error {
 
 func (a subjectRevisionBelongsToSubjectTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a subjectRevisionBelongsToSubjectTx) Unscoped() *subjectRevisionBelongsToSubjectTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type subjectRevisionDo struct{ gen.DO }

@@ -20,6 +20,7 @@ type Index struct {
 	SubjectCount uint32                `gorm:"column:idx_subject_total;type:mediumint(8) unsigned;not null;comment:内含条目总数" json:""` // 内含条目总数
 	CollectCount uint32                `gorm:"column:idx_collects;type:mediumint(8);not null;comment:收藏数" json:""`                  // 收藏数
 	Stats        string                `gorm:"column:idx_stats;type:mediumtext;not null" json:""`
+	Award        uint32                `gorm:"column:idx_award;type:mediumint(8) unsigned;not null" json:""`
 	CreatedTime  int32                 `gorm:"column:idx_dateline;type:int(10);not null;comment:创建时间" json:""` // 创建时间
 	UpdatedTime  uint32                `gorm:"column:idx_lasttouch;type:int(10) unsigned;not null" json:""`
 	CreatorID    uint32                `gorm:"column:idx_uid;type:mediumint(8);not null;comment:创建人UID" json:""` // 创建人UID

@@ -155,11 +155,14 @@ func (c *character) fillFieldMap() {
 
 func (c character) clone(db *gorm.DB) character {
 	c.characterDo.ReplaceConnPool(db.Statement.ConnPool)
+	c.Fields.db = db.Session(&gorm.Session{Initialized: true})
+	c.Fields.db.Statement.ConnPool = db.Statement.ConnPool
 	return c
 }
 
 func (c character) replaceDB(db *gorm.DB) character {
 	c.characterDo.ReplaceDB(db)
+	c.Fields.db = db.Session(&gorm.Session{})
 	return c
 }
 
@@ -194,6 +197,11 @@ func (a characterHasOneFields) Session(session *gorm.Session) *characterHasOneFi
 
 func (a characterHasOneFields) Model(m *dao.Character) *characterHasOneFieldsTx {
 	return &characterHasOneFieldsTx{a.db.Model(m).Association(a.Name())}
+}
+
+func (a characterHasOneFields) Unscoped() *characterHasOneFields {
+	a.db = a.db.Unscoped()
+	return &a
 }
 
 type characterHasOneFieldsTx struct{ tx *gorm.Association }
@@ -232,6 +240,11 @@ func (a characterHasOneFieldsTx) Clear() error {
 
 func (a characterHasOneFieldsTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a characterHasOneFieldsTx) Unscoped() *characterHasOneFieldsTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type characterDo struct{ gen.DO }
