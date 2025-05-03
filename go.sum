@@ -254,8 +254,8 @@ github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6Kllzaw
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasttemplate v1.2.2 h1:lxLXG0uE3Qnshl9QyaK6XJxMXlQZELvChBOCmQD0Loo=
 github.com/valyala/fasttemplate v1.2.2/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
-github.com/vektra/mockery/v3 v3.0.2 h1:U2a2PpaMDgufwtIpYxzQBBt5xcTDeOfN4obVjRckxWw=
-github.com/vektra/mockery/v3 v3.0.2/go.mod h1:UQwIbP5U84gbN/nkMyYVSW+tp7BFhaSym907rfS1HL4=
+github.com/vektra/mockery/v3 v3.2.5 h1:l65hiOW/zR7Z9XJtCS4EpOP3jhGExS2MV8INWwgcuaQ=
+github.com/vektra/mockery/v3 v3.2.5/go.mod h1:UQwIbP5U84gbN/nkMyYVSW+tp7BFhaSym907rfS1HL4=
 github.com/xdg-go/pbkdf2 v1.0.0 h1:Su7DPu48wXMwC3bs7MCNG+z4FhcyEuz5dlvchbq0B0c=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.1.2 h1:FHX5I5B4i4hKRVRBCFRxq1iQRej7WO3hhBuJf+UUySY=
