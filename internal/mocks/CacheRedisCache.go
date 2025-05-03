@@ -76,12 +76,7 @@ func (_e *RedisCache_Expecter) Del(ctx interface{}, keys ...interface{}) *RedisC
 
 func (_c *RedisCache_Del_Call) Run(run func(ctx context.Context, keys ...string)) *RedisCache_Del_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]string, len(args)-1)
-		for i, a := range args[1:] {
-			if a != nil {
-				variadicArgs[i] = a.(string)
-			}
-		}
+		variadicArgs := args[1].([]string)
 		run(args[0].(context.Context), variadicArgs...)
 	})
 	return _c

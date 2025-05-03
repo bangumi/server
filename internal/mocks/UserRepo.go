@@ -55,8 +55,8 @@ func (_mock *UserRepo) CheckIsFriendToOthers(ctx context.Context, selfID model.U
 
 	var r0 bool
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, model.UserID, []model.UserID) (bool, error)); ok {
-		return returnFunc(ctx, selfID, otherIDs)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, model.UserID, ...model.UserID) (bool, error)); ok {
+		return returnFunc(ctx, selfID, otherIDs...)
 	}
 	if returnFunc, ok := ret.Get(0).(func(context.Context, model.UserID, ...model.UserID) bool); ok {
 		r0 = returnFunc(ctx, selfID, otherIDs...)
@@ -87,12 +87,7 @@ func (_e *UserRepo_Expecter) CheckIsFriendToOthers(ctx interface{}, selfID inter
 
 func (_c *UserRepo_CheckIsFriendToOthers_Call) Run(run func(ctx context.Context, selfID model.UserID, otherIDs ...model.UserID)) *UserRepo_CheckIsFriendToOthers_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]model.UserID, len(args)-2)
-		for i, a := range args[2:] {
-			if a != nil {
-				variadicArgs[i] = a.(model.UserID)
-			}
-		}
+		variadicArgs := args[2].([]model.UserID)
 		run(args[0].(context.Context), args[1].(model.UserID), variadicArgs...)
 	})
 	return _c
