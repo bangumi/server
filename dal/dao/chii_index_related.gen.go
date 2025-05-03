@@ -18,6 +18,7 @@ type IndexSubject struct {
 	SubjectType uint8                 `gorm:"column:idx_rlt_type;type:smallint(6) unsigned;not null;comment:关联条目类型" json:""` // 关联条目类型
 	SubjectID   uint32                `gorm:"column:idx_rlt_sid;type:mediumint(8) unsigned;not null;comment:关联条目ID" json:""` // 关联条目ID
 	Order       uint32                `gorm:"column:idx_rlt_order;type:mediumint(8) unsigned;not null" json:""`
+	Award       string                `gorm:"column:idx_rlt_award;type:varchar(255);not null" json:""`
 	Comment     string                `gorm:"column:idx_rlt_comment;type:mediumtext;not null" json:""`
 	CreatedTime uint32                `gorm:"column:idx_rlt_dateline;type:int(10) unsigned;not null" json:""`
 	Deleted     soft_delete.DeletedAt `gorm:"column:idx_rlt_ban;type:tinyint(1) unsigned;not null;softDelete:flag" json:""`

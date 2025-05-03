@@ -140,11 +140,20 @@ func (c *cast) fillFieldMap() {
 
 func (c cast) clone(db *gorm.DB) cast {
 	c.castDo.ReplaceConnPool(db.Statement.ConnPool)
+	c.Character.db = db.Session(&gorm.Session{Initialized: true})
+	c.Character.db.Statement.ConnPool = db.Statement.ConnPool
+	c.Subject.db = db.Session(&gorm.Session{Initialized: true})
+	c.Subject.db.Statement.ConnPool = db.Statement.ConnPool
+	c.Person.db = db.Session(&gorm.Session{Initialized: true})
+	c.Person.db.Statement.ConnPool = db.Statement.ConnPool
 	return c
 }
 
 func (c cast) replaceDB(db *gorm.DB) cast {
 	c.castDo.ReplaceDB(db)
+	c.Character.db = db.Session(&gorm.Session{})
+	c.Subject.db = db.Session(&gorm.Session{})
+	c.Person.db = db.Session(&gorm.Session{})
 	return c
 }
 
@@ -185,6 +194,11 @@ func (a castHasOneCharacter) Model(m *dao.Cast) *castHasOneCharacterTx {
 	return &castHasOneCharacterTx{a.db.Model(m).Association(a.Name())}
 }
 
+func (a castHasOneCharacter) Unscoped() *castHasOneCharacter {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
 type castHasOneCharacterTx struct{ tx *gorm.Association }
 
 func (a castHasOneCharacterTx) Find() (result *dao.Character, err error) {
@@ -223,6 +237,11 @@ func (a castHasOneCharacterTx) Count() int64 {
 	return a.tx.Count()
 }
 
+func (a castHasOneCharacterTx) Unscoped() *castHasOneCharacterTx {
+	a.tx = a.tx.Unscoped()
+	return &a
+}
+
 type castHasOneSubject struct {
 	db *gorm.DB
 
@@ -258,6 +277,11 @@ func (a castHasOneSubject) Session(session *gorm.Session) *castHasOneSubject {
 
 func (a castHasOneSubject) Model(m *dao.Cast) *castHasOneSubjectTx {
 	return &castHasOneSubjectTx{a.db.Model(m).Association(a.Name())}
+}
+
+func (a castHasOneSubject) Unscoped() *castHasOneSubject {
+	a.db = a.db.Unscoped()
+	return &a
 }
 
 type castHasOneSubjectTx struct{ tx *gorm.Association }
@@ -298,6 +322,11 @@ func (a castHasOneSubjectTx) Count() int64 {
 	return a.tx.Count()
 }
 
+func (a castHasOneSubjectTx) Unscoped() *castHasOneSubjectTx {
+	a.tx = a.tx.Unscoped()
+	return &a
+}
+
 type castHasOnePerson struct {
 	db *gorm.DB
 
@@ -333,6 +362,11 @@ func (a castHasOnePerson) Session(session *gorm.Session) *castHasOnePerson {
 
 func (a castHasOnePerson) Model(m *dao.Cast) *castHasOnePersonTx {
 	return &castHasOnePersonTx{a.db.Model(m).Association(a.Name())}
+}
+
+func (a castHasOnePerson) Unscoped() *castHasOnePerson {
+	a.db = a.db.Unscoped()
+	return &a
 }
 
 type castHasOnePersonTx struct{ tx *gorm.Association }
@@ -371,6 +405,11 @@ func (a castHasOnePersonTx) Clear() error {
 
 func (a castHasOnePersonTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a castHasOnePersonTx) Unscoped() *castHasOnePersonTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type castDo struct{ gen.DO }

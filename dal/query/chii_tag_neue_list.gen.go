@@ -113,11 +113,14 @@ func (t *tagList) fillFieldMap() {
 
 func (t tagList) clone(db *gorm.DB) tagList {
 	t.tagListDo.ReplaceConnPool(db.Statement.ConnPool)
+	t.Tag.db = db.Session(&gorm.Session{Initialized: true})
+	t.Tag.db.Statement.ConnPool = db.Statement.ConnPool
 	return t
 }
 
 func (t tagList) replaceDB(db *gorm.DB) tagList {
 	t.tagListDo.ReplaceDB(db)
+	t.Tag.db = db.Session(&gorm.Session{})
 	return t
 }
 
@@ -152,6 +155,11 @@ func (a tagListHasOneTag) Session(session *gorm.Session) *tagListHasOneTag {
 
 func (a tagListHasOneTag) Model(m *dao.TagList) *tagListHasOneTagTx {
 	return &tagListHasOneTagTx{a.db.Model(m).Association(a.Name())}
+}
+
+func (a tagListHasOneTag) Unscoped() *tagListHasOneTag {
+	a.db = a.db.Unscoped()
+	return &a
 }
 
 type tagListHasOneTagTx struct{ tx *gorm.Association }
@@ -190,6 +198,11 @@ func (a tagListHasOneTagTx) Clear() error {
 
 func (a tagListHasOneTagTx) Count() int64 {
 	return a.tx.Count()
+}
+
+func (a tagListHasOneTagTx) Unscoped() *tagListHasOneTagTx {
+	a.tx = a.tx.Unscoped()
+	return &a
 }
 
 type tagListDo struct{ gen.DO }
