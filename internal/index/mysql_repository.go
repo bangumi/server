@@ -161,7 +161,7 @@ func (r mysqlRepo) AddOrUpdateIndexSubject(
 	ctx context.Context, id model.IndexID,
 	subjectID model.SubjectID, sort uint32, comment string,
 ) (*Subject, error) {
-	index, err := r.Get(ctx, id)
+	_, err := r.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
