@@ -80,6 +80,8 @@ func (h Character) GetImage(c echo.Context) error {
 		return res.BadRequest("bad image type: " + c.QueryParam("type"))
 	}
 
+	res.SetCacheControl(c, res.CacheControlParams{Public: true, MaxAge: time.Hour * 24})
+
 	if l == "" {
 		return c.Redirect(http.StatusFound, res.DefaultImageURL)
 	}
