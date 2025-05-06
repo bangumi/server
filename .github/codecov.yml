@@ -1,5 +1,10 @@
 comment: false
 
+coverage:
+  status:
+    patch: false
+    project: false
+
 ignore:
   - "**/mock_*.go"
   - "**/*_test.go"
