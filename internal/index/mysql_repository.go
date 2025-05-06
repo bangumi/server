@@ -19,6 +19,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 	"gorm.io/gen"
@@ -31,13 +32,14 @@ import (
 	"github.com/bangumi/server/internal/subject"
 )
 
-func NewMysqlRepo(q *query.Query, log *zap.Logger) (Repo, error) {
-	return mysqlRepo{q: q, log: log.Named("index.mysqlRepo")}, nil
+func NewMysqlRepo(q *query.Query, log *zap.Logger, db *sqlx.DB) (Repo, error) {
+	return mysqlRepo{q: q, log: log.Named("index.mysqlRepo"), db: db}, nil
 }
 
 type mysqlRepo struct {
 	q   *query.Query
 	log *zap.Logger
+	db  *sqlx.DB
 }
 
 func (r mysqlRepo) isNsfw(ctx context.Context, id model.IndexID) (bool, error) {
@@ -194,7 +196,7 @@ func (r mysqlRepo) AddOrUpdateIndexSubject(
 		// 已经存在，更新！
 		err = r.updateIndexSubject(ctx, id, subjectID, sort, comment)
 	} else {
-		err = r.addSubjectToIndex(ctx, index, &dao.IndexSubject{
+		err = r.addSubjectToIndex(ctx, &dao.IndexSubject{
 			Comment:     comment,
 			Order:       sort,
 			CreatedTime: uint32(now.Unix()),
@@ -225,43 +227,45 @@ func (r mysqlRepo) updateIndexSubject(
 	return r.WrapResult(result, err, "failed to update index subject")
 }
 
-func (r mysqlRepo) addSubjectToIndex(ctx context.Context, index model.Index, subject *dao.IndexSubject) error {
-	return r.q.Transaction(func(tx *query.Query) error {
-		err := r.q.IndexSubject.WithContext(ctx).Create(subject)
-		if err != nil {
-			return errgo.Wrap(err, "failed to create subject in index")
-		}
+func (r mysqlRepo) addSubjectToIndex(ctx context.Context, subject *dao.IndexSubject) error {
+	err := r.q.IndexSubject.WithContext(ctx).Create(subject)
+	if err != nil {
+		return errgo.Wrap(err, "failed to create subject in index")
+	}
 
-		result, err := r.q.Index.WithContext(ctx).
-			Where(r.q.Index.ID.Eq(index.ID)).
-			Updates(dao.Index{
-				UpdatedTime:  uint32(time.Now().Unix()),
-				SubjectCount: index.Total + 1,
-			})
+	return r.countSubjectTotal(ctx, subject.IndexID)
+}
 
-		return r.WrapResult(result, err, "failed to update index info")
-	})
+func (r mysqlRepo) countSubjectTotal(ctx context.Context, index model.IndexID) error {
+	_, err := r.db.ExecContext(ctx, `
+		update chii_index set
+			idx_subject_total = (
+				select count(1)
+					from chii_index_related as tl
+					where tl.idx_rlt_ban = 0 AND tl.idx_rlt_rid = ? 
+			 ),
+			idx_dateline = ?
+		where idx_id = ?
+		`, index, time.Now().Unix(), index)
+
+	return errgo.Wrap(err, "failed to update index info")
 }
 
 func (r mysqlRepo) DeleteIndexSubject(
 	ctx context.Context, id model.IndexID, subjectID model.SubjectID,
 ) error {
-	return r.q.Transaction(func(tx *query.Query) error {
-		index, err := r.Get(ctx, id)
-		if err != nil {
-			return err
-		}
-		result, err := r.q.IndexSubject.WithContext(ctx).
-			Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
-			Delete()
-		if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
-			return err
-		}
-		result, err = r.q.Index.WithContext(ctx).Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
-			SubjectCount: index.Total - 1,
-		})
-		return r.WrapResult(result, err, "failed to update index info")
-	})
+	_, err := r.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	result, err := r.q.IndexSubject.WithContext(ctx).
+		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.SubjectID.Eq(subjectID)).
+		Delete()
+	if err = r.WrapResult(result, err, "failed to delete index subject"); err != nil {
+		return err
+	}
+	return r.countSubjectTotal(ctx, id)
 }
 
 func (r mysqlRepo) GetIndexCollect(ctx context.Context, id model.IndexID, uid model.UserID) (*IndexCollect, error) {
