@@ -39,7 +39,7 @@ require (
 	go.uber.org/fx v1.23.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.14.0
-	golang.org/x/text v0.24.0
+	golang.org/x/text v0.25.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gen v0.3.27
 	gorm.io/gorm v1.26.1
