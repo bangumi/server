@@ -7,7 +7,7 @@
     "local>Trim21/renovate-config:monthly"
   ],
   "dockerfile": {
-    "fileMatch": [".*dockerfile$"],
+    "managerFilePatterns": ["**/dockerfile"],
     "enabled": true
   },
   "packageRules": [
