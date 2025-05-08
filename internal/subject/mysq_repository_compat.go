@@ -16,10 +16,10 @@ package subject
 
 import (
 	"github.com/trim21/errgo"
-	"github.com/trim21/go-phpserialize"
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
+	"github.com/bangumi/server/internal/pkg/serialize"
 )
 
 type Tag struct {
@@ -31,9 +31,9 @@ type Tag struct {
 func ParseTags(b []byte) ([]model.Tag, error) {
 	var tags []Tag
 	if len(b) != 0 {
-		err := phpserialize.Unmarshal(b, &tags)
+		err := serialize.Decode(b, &tags)
 		if err != nil {
-			return nil, errgo.Wrap(err, "ParseTags: phpserialize.Unmarshal")
+			return nil, errgo.Wrap(err, "ParseTags: serialize.Decode")
 		}
 	}
 

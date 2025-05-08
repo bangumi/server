@@ -26,7 +26,6 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
-	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen"
 	"gorm.io/gen/field"
@@ -42,6 +41,7 @@ import (
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/dam"
 	"github.com/bangumi/server/internal/pkg/gstr"
+	"github.com/bangumi/server/internal/pkg/serialize"
 	"github.com/bangumi/server/internal/subject"
 )
 
@@ -359,7 +359,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 		return -cmp.Compare(a.Count, b.Count)
 	})
 
-	newTag, err := phpserialize.Marshal(lo.Slice(phpTags, 0, 30)) //nolint:mnd
+	newTag, err := serialize.Encode(lo.Slice(phpTags, 0, 30)) //nolint:mnd
 	if err != nil {
 		return errgo.Wrap(err, "php.Marshal")
 	}
@@ -533,7 +533,7 @@ func (r mysqlRepo) GetSubjectEpisodesCollection(
 		return nil, errgo.Wrap(err, "query.EpCollection.Find")
 	}
 
-	e, err := deserializePhpEpStatus(d.Status)
+	e, err := deserializeEpStatus(d.Status)
 	if err != nil {
 		return nil, err
 	}
@@ -837,7 +837,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 		return nil, errgo.Wrap(err, "dal")
 	}
 
-	e, err := deserializePhpEpStatus(d.Status)
+	e, err := deserializeEpStatus(d.Status)
 	if err != nil {
 		r.log.Error("failed to deserialize php-serialized bytes to go data", zap.Error(err))
 		return nil, err
