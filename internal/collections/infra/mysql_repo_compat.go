@@ -25,8 +25,8 @@ import (
 )
 
 type mysqlEpCollectionItem struct {
-	EpisodeID model.EpisodeID              `php:"eid,string"`
-	Type      collection.EpisodeCollection `php:"type"`
+	EpisodeID model.EpisodeID              `php:"eid,string" json:"eid,string"`
+	Type      collection.EpisodeCollection `php:"type" json:"type"`
 }
 
 type mysqlEpCollection map[model.EpisodeID]mysqlEpCollectionItem

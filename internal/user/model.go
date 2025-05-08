@@ -54,9 +54,9 @@ func (u User) GetID() model.UserID {
 type ReceiveFilter uint8
 
 const (
-	ReceiveFilterAll ReceiveFilter = iota
-	ReceiveFilterFriends
-	ReceiveFilterNone
+	ReceiveFilterAll     ReceiveFilter = 0
+	ReceiveFilterFriends ReceiveFilter = 1
+	ReceiveFilterNone    ReceiveFilter = 2
 )
 
 type PrivacySettingsField int

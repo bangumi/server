@@ -475,7 +475,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	require.EqualValues(t, now.Unix(), r.UpdatedTime)
 
 	var m map[uint32]struct {
-		Type int `php:"type"`
+		Type int `php:"type" json:"type"`
 	}
 	require.NoError(t, serialize.Decode(r.Status, &m))
 	require.Len(t, m, 2)
