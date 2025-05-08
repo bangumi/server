@@ -55,8 +55,8 @@ type ReceiveFilter uint8
 
 const (
 	ReceiveFilterAll     ReceiveFilter = 0
-	ReceiveFilterFriends               = 1
-	ReceiveFilterNone                  = 2
+	ReceiveFilterFriends ReceiveFilter = 1
+	ReceiveFilterNone    ReceiveFilter = 2
 )
 
 type PrivacySettingsField int

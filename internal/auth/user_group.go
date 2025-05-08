@@ -16,12 +16,12 @@ package auth
 
 const (
 	UserGroupAdmin          uint8 = 1
-	UserGroupBangumiAdmin         = 2
-	UserGroupWindowAdmin          = 3
-	UserGroupQuite                = 4
-	UserGroupBanned               = 5
-	UserGroupCharacterAdmin       = 8
-	UserGroupWikiAdmin            = 9
-	UserGroupNormal               = 10
-	UserGroupWikiEditor           = 11
+	UserGroupBangumiAdmin   uint8 = 2
+	UserGroupWindowAdmin    uint8 = 3
+	UserGroupQuite          uint8 = 4
+	UserGroupBanned         uint8 = 5
+	UserGroupCharacterAdmin uint8 = 8
+	UserGroupWikiAdmin      uint8 = 9
+	UserGroupNormal         uint8 = 10
+	UserGroupWikiEditor     uint8 = 11
 )
