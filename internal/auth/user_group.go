@@ -15,15 +15,13 @@
 package auth
 
 const (
-	UserGroupAdmin uint8 = iota + 1
-	UserGroupBangumiAdmin
-	UserGroupWindowAdmin
-	UserGroupQuite
-	UserGroupBanned
-	_
-	_
-	UserGroupCharacterAdmin
-	UserGroupWikiAdmin
-	UserGroupNormal
-	UserGroupWikiEditor
+	UserGroupAdmin          uint8 = 1
+	UserGroupBangumiAdmin         = 2
+	UserGroupWindowAdmin          = 3
+	UserGroupQuite                = 4
+	UserGroupBanned               = 5
+	UserGroupCharacterAdmin       = 8
+	UserGroupWikiAdmin            = 9
+	UserGroupNormal               = 10
+	UserGroupWikiEditor           = 11
 )
