@@ -18,10 +18,10 @@ package infra
 
 import (
 	"github.com/trim21/errgo"
-	"github.com/trim21/go-phpserialize"
 
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/serialize"
 )
 
 type mysqlEpCollectionItem struct {
@@ -31,19 +31,17 @@ type mysqlEpCollectionItem struct {
 
 type mysqlEpCollection map[model.EpisodeID]mysqlEpCollectionItem
 
-func deserializePhpEpStatus(phpSerialized []byte) (mysqlEpCollection, error) {
+func deserializeEpStatus(serialized []byte) (mysqlEpCollection, error) {
 	var e map[model.EpisodeID]mysqlEpCollectionItem
-	if len(phpSerialized) != 0 {
-		if err := phpserialize.Unmarshal(phpSerialized, &e); err != nil {
-			return nil, errgo.Wrap(err, "php deserialize")
-		}
+	if err := serialize.Decode(serialized, &e); err != nil {
+		return nil, errgo.Wrap(err, "php deserialize")
 	}
 
 	return e, nil
 }
 
 func serializePhpEpStatus(data mysqlEpCollection) ([]byte, error) {
-	b, err := phpserialize.Marshal(data)
+	b, err := serialize.Encode(data)
 	return b, errgo.Wrap(err, "php serialize")
 }
 

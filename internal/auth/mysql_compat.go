@@ -16,7 +16,8 @@ package auth
 
 import (
 	"github.com/trim21/errgo"
-	"github.com/trim21/go-phpserialize"
+
+	"github.com/bangumi/server/internal/pkg/serialize"
 )
 
 func parseBool(s string) bool {
@@ -58,12 +59,12 @@ type phpPermission struct {
 	AppErase           string `php:"app_erase"`
 }
 
-func parsePhpSerializedPermission(b []byte) (Permission, error) {
+func parseSerializedPermission(b []byte) (Permission, error) {
 	var p phpPermission
 	if len(b) > 0 {
-		err := phpserialize.Unmarshal(b, &p)
+		err := serialize.Decode(b, &p)
 		if err != nil {
-			return Permission{}, errgo.Wrap(err, "parsing permission: phpserialize.Unmarshal")
+			return Permission{}, errgo.Wrap(err, "parsing permission: serialize.Decode")
 		}
 	}
 

@@ -21,7 +21,6 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
-	"github.com/trim21/go-phpserialize"
 	"go.uber.org/zap"
 	"gorm.io/gen/field"
 	"gorm.io/gorm"
@@ -33,6 +32,7 @@ import (
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/collections/infra"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/serialize"
 	"github.com/bangumi/server/internal/pkg/test"
 	subject2 "github.com/bangumi/server/internal/subject"
 )
@@ -477,7 +477,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	var m map[uint32]struct {
 		Type int `php:"type"`
 	}
-	require.NoError(t, phpserialize.Unmarshal(r.Status, &m))
+	require.NoError(t, serialize.Decode(r.Status, &m))
 	require.Len(t, m, 2)
 	require.Contains(t, m, uint32(1))
 	require.EqualValues(t, collection.EpisodeCollectionDone, m[1].Type)
@@ -495,7 +495,7 @@ func TestMysqlRepo_UpdateEpisodeCollection(t *testing.T) {
 	var m2 map[uint32]struct {
 		Type int `php:"type"`
 	}
-	require.NoError(t, phpserialize.Unmarshal(r.Status, &m2))
+	require.NoError(t, serialize.Decode(r.Status, &m2))
 	require.Len(t, m2, 0)
 }
 
@@ -527,7 +527,7 @@ func TestMysqlRepo_UpdateEpisodeCollection_create_ep_status(t *testing.T) {
 	var m map[uint32]struct {
 		Type int `php:"type"`
 	}
-	require.NoError(t, phpserialize.Unmarshal(r.Status, &m))
+	require.NoError(t, serialize.Decode(r.Status, &m))
 	require.Len(t, m, 2)
 	require.Contains(t, m, uint32(1))
 	require.EqualValues(t, collection.EpisodeCollectionDone, m[1].Type)

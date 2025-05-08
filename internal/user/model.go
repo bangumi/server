@@ -17,9 +17,8 @@ package user
 import (
 	"time"
 
-	"github.com/trim21/go-phpserialize"
-
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/serialize"
 )
 
 // FullUser is for current user or admin only.
@@ -79,7 +78,7 @@ type PrivacySettings struct {
 func (settings *PrivacySettings) Unmarshal(s []byte) {
 	rawMap := make(map[PrivacySettingsField]ReceiveFilter, 4)
 	if len(s) != 0 {
-		err := phpserialize.Unmarshal(s, &rawMap)
+		err := serialize.Decode(s, &rawMap)
 		if err != nil {
 			return
 		}

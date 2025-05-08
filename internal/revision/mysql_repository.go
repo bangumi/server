@@ -24,7 +24,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/elliotchance/phpserialize"
 	"github.com/mitchellh/mapstructure"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -34,6 +33,7 @@ import (
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/serialize"
 )
 
 type mysqlRepo struct {
@@ -237,7 +237,8 @@ func convertRevisionText(text []byte) map[string]any {
 	if err != nil {
 		return nil
 	}
-	result, err := phpserialize.UnmarshalAssociativeArray(b)
+	var result map[any]any
+	err = serialize.Decode(b, &result)
 	if err != nil {
 		return nil
 	}

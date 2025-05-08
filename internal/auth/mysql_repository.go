@@ -98,7 +98,7 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission
 		return Permission{}, errgo.Wrap(err, "dal")
 	}
 
-	p, err := parsePhpSerializedPermission(r.Perm)
+	p, err := parseSerializedPermission(r.Perm)
 	if err != nil {
 		m.log.Error("failed to decode php serialized content", zap.Error(err), zap.Uint8("user_group_id", groupID))
 		return Permission{}, nil
