@@ -8,7 +8,7 @@ import (
 )
 
 func Encode(v any) ([]byte, error) {
-	return phpserialize.Marshal(v)
+	return json.Marshal(v)
 }
 
 func Decode(data []byte, v any) error {
