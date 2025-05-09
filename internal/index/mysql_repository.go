@@ -244,7 +244,7 @@ func (r mysqlRepo) countSubjectTotal(ctx context.Context, index model.IndexID) e
 					from chii_index_related as tl
 					where tl.idx_rlt_ban = 0 AND tl.idx_rlt_rid = ? 
 			 ),
-			idx_dateline = ?
+			idx_lasttouch = ?
 		where idx_id = ?
 		`, index, time.Now().Unix(), index)
 
