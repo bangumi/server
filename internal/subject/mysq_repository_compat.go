@@ -41,6 +41,6 @@ func ParseTags(b []byte) ([]model.Tag, error) {
 		if item.Name == nil {
 			return model.Tag{}, false
 		}
-		return model.Tag{Name: *item.Name, Count: item.Count}, true
+		return model.Tag{Name: *item.Name, Count: item.Count, TotalCount: item.TotalCount}, true
 	}), nil
 }
