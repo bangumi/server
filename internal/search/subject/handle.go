@@ -12,17 +12,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>
 
-// Package search 基于 meilisearch 提供搜索功能
+// Package subject 提供 subject 相关的搜索功能
 package subject
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
-	wiki "github.com/bangumi/wiki-parser-go"
+	"github.com/bangumi/wiki-parser-go"
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/samber/lo"
@@ -64,7 +65,7 @@ type hit struct {
 	ID model.SubjectID `json:"id"`
 }
 
-type ReponseSubject struct {
+type ResponseSubject struct {
 	Date       *string                   `json:"date"`
 	Platform   *string                   `json:"platform"`
 	Images     res.SubjectImages         `json:"images"`
@@ -104,7 +105,12 @@ func (c *client) Handle(ctx echo.Context) error {
 		r.Filter.NSFW = null.Bool{Set: true, Value: false}
 	}
 
-	result, err := c.doSearch(r.Keyword, filterToMeiliFilter(r.Filter), r.Sort, q.Limit, q.Offset)
+	meiliFilter, err := filterToMeiliFilter(r.Filter)
+	if err != nil {
+		return err
+	}
+
+	result, err := c.doSearch(r.Keyword, meiliFilter, r.Sort, q.Limit, q.Offset)
 	if err != nil {
 		return errgo.Wrap(err, "search")
 	}
@@ -120,7 +126,7 @@ func (c *client) Handle(ctx echo.Context) error {
 		return errgo.Wrap(err, "subjectRepo.GetByIDs")
 	}
 
-	var data = make([]ReponseSubject, 0, len(subjects))
+	var data = make([]ResponseSubject, 0, len(subjects))
 	for _, id := range ids {
 		s, ok := subjects[id]
 		if !ok {
@@ -135,8 +141,7 @@ func (c *client) Handle(ctx echo.Context) error {
 			metaTags = append(metaTags, tag.Tag{Name: t, Count: 1})
 		}
 
-		subject := toResponseSubject(s, metaTags)
-		data = append(data, subject)
+		data = append(data, toResponseSubject(s, metaTags))
 	}
 
 	return ctx.JSON(http.StatusOK, res.Paged{
@@ -146,6 +151,8 @@ func (c *client) Handle(ctx echo.Context) error {
 		Offset: q.Offset,
 	})
 }
+
+var filterPattern = regexp.MustCompile(`^(>|<|>=|<=|=) *\d+$`)
 
 func (c *client) doSearch(
 	words string,
@@ -195,13 +202,17 @@ type meiliSearchResponse struct {
 	EstimatedTotalHits int64           `json:"estimatedTotalHits"` //nolint:tagliatelle
 }
 
-func filterToMeiliFilter(req ReqFilter) [][]string {
+func filterToMeiliFilter(req ReqFilter) ([][]string, error) {
 	var filter = make([][]string, 0, 5+len(req.Tag))
 
 	// OR
 
 	if len(req.AirDate) != 0 {
-		filter = append(filter, parseDateFilter(req.AirDate)...)
+		dateFilters, err := parseDateFilter(req.AirDate)
+		if err != nil {
+			return nil, err
+		}
+		filter = append(filter, dateFilters...)
 	}
 
 	if len(req.Type) != 0 {
@@ -214,29 +225,36 @@ func filterToMeiliFilter(req ReqFilter) [][]string {
 		filter = append(filter, []string{fmt.Sprintf("nsfw = %t", req.NSFW.Value)})
 	}
 
-	for _, tag := range req.MetaTags {
-		filter = append(filter, []string{"meta_tag = " + strconv.Quote(tag)})
+	for _, t := range req.MetaTags {
+		filter = append(filter, []string{"meta_tag = " + strconv.Quote(t)})
 	}
 
 	// AND
 
-	for _, tag := range req.Tag {
-		filter = append(filter, []string{"tag = " + strconv.Quote(tag)})
+	for _, t := range req.Tag {
+		filter = append(filter, []string{"tag = " + strconv.Quote(t)})
 	}
 
 	for _, s := range req.Rank {
-		filter = append(filter, []string{"rank" + s})
+		if !filterPattern.MatchString(s) {
+			return nil, res.BadRequest(fmt.Sprintf(`invalid rank filter: %q, should be in the format of "^(>|<|>=|<=|=) *\d+$"`, s))
+		}
+		filter = append(filter, []string{"rank " + s})
 	}
 
 	for _, s := range req.Score {
+		if !filterPattern.MatchString(s) {
+			return nil, res.BadRequest(fmt.Sprintf(`invalid score filter: %q, should be in the format of "^(>|<|>=|<=|=) *\d+$"`, s))
+		}
+
 		filter = append(filter, []string{"score " + s})
 	}
 
-	return filter
+	return filter, nil
 }
 
 // parse date filter like `<2020-01-20`, `>=2020-01-23`.
-func parseDateFilter(filters []string) [][]string {
+func parseDateFilter(filters []string) ([][]string, error) {
 	var result = make([][]string, 0, len(filters))
 
 	for _, s := range filters {
@@ -244,27 +262,37 @@ func parseDateFilter(filters []string) [][]string {
 		case strings.HasPrefix(s, ">="):
 			if v, ok := parseDateValOk(s[2:]); ok {
 				result = append(result, []string{fmt.Sprintf("date >= %d", v)})
+			} else {
+				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "YYYY-MM-DD"`, s))
 			}
 		case strings.HasPrefix(s, ">"):
 			if v, ok := parseDateValOk(s[1:]); ok {
 				result = append(result, []string{fmt.Sprintf("date > %d", v)})
+			} else {
+				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "YYYY-MM-DD"`, s))
 			}
 		case strings.HasPrefix(s, "<="):
 			if v, ok := parseDateValOk(s[2:]); ok {
 				result = append(result, []string{fmt.Sprintf("date <= %d", v)})
+			} else {
+				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "YYYY-MM-DD"`, s))
 			}
 		case strings.HasPrefix(s, "<"):
 			if v, ok := parseDateValOk(s[1:]); ok {
 				result = append(result, []string{fmt.Sprintf("date < %d", v)})
+			} else {
+				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "YYYY-MM-DD"`, s))
 			}
 		default:
 			if v, ok := parseDateValOk(s); ok {
 				result = append(result, []string{fmt.Sprintf("date = %d", v)})
+			} else {
+				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "YYYY-MM-DD"`, s))
 			}
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 func parseDateValOk(date string) (int, bool) {
@@ -309,9 +337,9 @@ func isDigitsOnly(s string) bool {
 	return true
 }
 
-func toResponseSubject(s model.Subject, metaTags []tag.Tag) ReponseSubject {
+func toResponseSubject(s model.Subject, metaTags []tag.Tag) ResponseSubject {
 	images := res.SubjectImage(s.Image)
-	return ReponseSubject{
+	return ResponseSubject{
 		ID:       s.ID,
 		Image:    images.Large,
 		Images:   images,
