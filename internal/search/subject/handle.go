@@ -152,7 +152,8 @@ func (c *client) Handle(ctx echo.Context) error {
 	})
 }
 
-var filterPattern = regexp.MustCompile(`^(>|<|>=|<=|=) *\d+$`)
+var intFilterPattern = regexp.MustCompile(`^(>|<|>=|<=|=) *\d+$`)
+var floatFilterPattern = regexp.MustCompile(`^(>|<|>=|<=|=) *\d+(?:\.\d+)?$`)
 
 func (c *client) doSearch(
 	words string,
@@ -236,15 +237,15 @@ func filterToMeiliFilter(req ReqFilter) ([][]string, error) {
 	}
 
 	for _, s := range req.Rank {
-		if !filterPattern.MatchString(s) {
+		if !intFilterPattern.MatchString(s) {
 			return nil, res.BadRequest(fmt.Sprintf(`invalid rank filter: %q, should be in the format of "^(>|<|>=|<=|=) *\d+$"`, s))
 		}
 		filter = append(filter, []string{"rank " + s})
 	}
 
 	for _, s := range req.Score {
-		if !filterPattern.MatchString(s) {
-			return nil, res.BadRequest(fmt.Sprintf(`invalid score filter: %q, should be in the format of "^(>|<|>=|<=|=) *\d+$"`, s))
+		if !floatFilterPattern.MatchString(s) {
+			return nil, res.BadRequest(fmt.Sprintf(`invalid score filter: %q, should be in the format of "^(>|<|>=|<=|=) *\d+(\.\d)?$"`, s))
 		}
 
 		filter = append(filter, []string{"score " + s})
