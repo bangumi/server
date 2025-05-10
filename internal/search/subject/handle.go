@@ -264,25 +264,25 @@ func parseDateFilter(filters []string) ([][]string, error) {
 			if v, ok := parseDateValOk(s[2:]); ok {
 				result = append(result, []string{fmt.Sprintf("date >= %d", v)})
 			} else {
-				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "YYYY-MM-DD"`, s))
+				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of ">= YYYY-MM-DD"`, s))
 			}
 		case strings.HasPrefix(s, ">"):
 			if v, ok := parseDateValOk(s[1:]); ok {
 				result = append(result, []string{fmt.Sprintf("date > %d", v)})
 			} else {
-				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "YYYY-MM-DD"`, s))
+				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "> YYYY-MM-DD"`, s))
 			}
 		case strings.HasPrefix(s, "<="):
 			if v, ok := parseDateValOk(s[2:]); ok {
 				result = append(result, []string{fmt.Sprintf("date <= %d", v)})
 			} else {
-				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "YYYY-MM-DD"`, s))
+				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "<= YYYY-MM-DD"`, s))
 			}
 		case strings.HasPrefix(s, "<"):
 			if v, ok := parseDateValOk(s[1:]); ok {
 				result = append(result, []string{fmt.Sprintf("date < %d", v)})
 			} else {
-				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "YYYY-MM-DD"`, s))
+				return nil, res.BadRequest(fmt.Sprintf(`invalid date filter: %q, date should be in the format of "< YYYY-MM-DD"`, s))
 			}
 		default:
 			if v, ok := parseDateValOk(s); ok {
