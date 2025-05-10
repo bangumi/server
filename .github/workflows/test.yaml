@@ -29,7 +29,7 @@ jobs:
       - run: git clone https://github.com/bangumi/dev-env $HOME/dev-env --branch=gh-pages
       - run: cd ~/dev-env && docker compose up -d
 
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -43,7 +43,7 @@ jobs:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Install gotestsum
-        uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
+        uses: jaxxstorm/action-install-gh-release@v2.1.0
         with:
           repo: gotestyourself/gotestsum
           tag: v1.12.1
@@ -69,7 +69,7 @@ jobs:
           MYSQL_DB: bangumi
           REDIS_URI: "redis://:redis-pass@127.0.0.1:6379/0"
 
-      - uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5
+      - uses: codecov/codecov-action@v5
         with:
           files: coverage.out
           token: ${{ secrets.CODECOV_TOKEN }} # required
