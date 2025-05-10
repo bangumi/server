@@ -152,8 +152,8 @@ func (c *client) Handle(ctx echo.Context) error {
 	})
 }
 
-var intFilterPattern = regexp.MustCompile(`^(>|<|>=|<=|=) *\d+$`)
-var floatFilterPattern = regexp.MustCompile(`^(>|<|>=|<=|=) *\d+(?:\.\d+)?$`)
+var intFilterPattern = regexp.MustCompile(`^(?:>|<|>=|<=|=) *\d+$`)
+var floatFilterPattern = regexp.MustCompile(`^(?:>|<|>=|<=|=) *\d+(?:\.\d+)?$`)
 
 func (c *client) doSearch(
 	words string,
