@@ -25,10 +25,12 @@ import (
 func Test_ReqFilterToMeiliFilter(t *testing.T) {
 	t.Parallel()
 
-	actual := filterToMeiliFilter(ReqFilter{
+	actual, err := filterToMeiliFilter(ReqFilter{
 		Tag:  []string{"a", "b"},
 		NSFW: null.Bool{Set: true, Value: false},
 	})
+
+	require.NoError(t, err)
 
 	require.Equal(t, [][]string{
 		{`nsfw = false`},
