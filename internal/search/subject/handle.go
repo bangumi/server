@@ -223,7 +223,9 @@ func filterToMeiliFilter(req ReqFilter) ([][]string, error) {
 	}
 
 	if req.NSFW.Set {
-		filter = append(filter, []string{fmt.Sprintf("nsfw = %t", req.NSFW.Value)})
+		if !req.NSFW.Value {
+			filter = append(filter, []string{fmt.Sprintf("nsfw = %t", req.NSFW.Value)})
+		}
 	}
 
 	for _, t := range req.MetaTags {
