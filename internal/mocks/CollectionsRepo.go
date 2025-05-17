@@ -204,6 +204,53 @@ func (_c *CollectionsRepo_CountSubjectCollections_Call) RunAndReturn(run func(ct
 	return _c
 }
 
+// DeleteSubjectCollection provides a mock function for the type CollectionsRepo
+func (_mock *CollectionsRepo) DeleteSubjectCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) error {
+	ret := _mock.Called(ctx, userID, subjectID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteSubjectCollection")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, model.UserID, model.SubjectID) error); ok {
+		r0 = returnFunc(ctx, userID, subjectID)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// CollectionsRepo_DeleteSubjectCollection_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteSubjectCollection'
+type CollectionsRepo_DeleteSubjectCollection_Call struct {
+	*mock.Call
+}
+
+// DeleteSubjectCollection is a helper method to define mock.On call
+//   - ctx
+//   - userID
+//   - subjectID
+func (_e *CollectionsRepo_Expecter) DeleteSubjectCollection(ctx interface{}, userID interface{}, subjectID interface{}) *CollectionsRepo_DeleteSubjectCollection_Call {
+	return &CollectionsRepo_DeleteSubjectCollection_Call{Call: _e.mock.On("DeleteSubjectCollection", ctx, userID, subjectID)}
+}
+
+func (_c *CollectionsRepo_DeleteSubjectCollection_Call) Run(run func(ctx context.Context, userID model.UserID, subjectID model.SubjectID)) *CollectionsRepo_DeleteSubjectCollection_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.SubjectID))
+	})
+	return _c
+}
+
+func (_c *CollectionsRepo_DeleteSubjectCollection_Call) Return(err error) *CollectionsRepo_DeleteSubjectCollection_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *CollectionsRepo_DeleteSubjectCollection_Call) RunAndReturn(run func(ctx context.Context, userID model.UserID, subjectID model.SubjectID) error) *CollectionsRepo_DeleteSubjectCollection_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPersonCollection provides a mock function for the type CollectionsRepo
 func (_mock *CollectionsRepo) GetPersonCollection(ctx context.Context, userID model.UserID, cat collection.PersonCollectCategory, targetID model.PersonID) (collection.UserPersonCollection, error) {
 	ret := _mock.Called(ctx, userID, cat, targetID)

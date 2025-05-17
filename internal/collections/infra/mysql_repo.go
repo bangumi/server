@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
@@ -57,6 +58,14 @@ func NewMysqlRepo(q *query.Query, log *zap.Logger) (collections.Repo, error) {
 type mysqlRepo struct {
 	q   *query.Query
 	log *zap.Logger
+}
+
+func (r mysqlRepo) DeleteSubjectCollection(ctx context.Context, userID model.UserID, subjectID model.SubjectID) error {
+	t := r.q.SubjectCollection
+
+	_, err := t.WithContext(ctx).Where(t.UserID.Eq(userID), t.SubjectID.Eq(subjectID)).
+		UpdateSimple(t.UserID.Value(0), t.SubjectID.Value(0))
+	return errgo.Wrap(err, "dal")
 }
 
 func (r mysqlRepo) getSubjectCollection(

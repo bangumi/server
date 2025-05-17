@@ -728,3 +728,34 @@ func TestMysqlRepo_ListPersonCollection(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, data, 5)
 }
+
+func TestMysqlRepo_DeleteSubjectCollection(t *testing.T) {
+	t.Parallel()
+	test.RequireEnv(t, test.EnvMysql)
+
+	const id model.UserID = 30000
+	const subjectID model.SubjectID = 10000
+
+	repo, q := getRepo(t)
+
+	test.RunAndCleanup(t, func() {
+		_, err := q.WithContext(context.Background()).SubjectCollection.
+			Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(id)).Delete()
+		require.NoError(t, err)
+	})
+
+	err := q.WithContext(t.Context()).SubjectCollection.Create(&dao.SubjectCollection{
+		UserID:    id,
+		SubjectID: subjectID,
+		Rate:      2,
+	})
+	require.NoError(t, err)
+
+	err = repo.DeleteSubjectCollection(t.Context(), id, subjectID)
+	require.NoError(t, err)
+
+	r, err := q.WithContext(t.Context()).SubjectCollection.
+		Where(q.SubjectCollection.SubjectID.Eq(subjectID), q.SubjectCollection.UserID.Eq(id)).Take()
+	require.ErrorIs(t, err, gorm.ErrRecordNotFound)
+	require.Nil(t, r)
+}

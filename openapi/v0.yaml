@@ -326,7 +326,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
 
   "/v0/subjects/{subject_id}":
     get:
@@ -357,7 +357,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/subjects/{subject_id}/image":
     get:
       tags:
@@ -397,7 +397,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/subjects/{subject_id}/persons":
     get:
       tags:
@@ -428,7 +428,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/subjects/{subject_id}/characters":
     get:
       tags:
@@ -459,7 +459,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/subjects/{subject_id}/subjects":
     get:
       tags:
@@ -490,7 +490,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/episodes":
     get:
       tags:
@@ -546,7 +546,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/episodes/{episode_id}":
     get:
       tags:
@@ -575,7 +575,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/characters/{character_id}":
     get:
       tags:
@@ -643,7 +643,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/characters/{character_id}/subjects":
     get:
       tags:
@@ -733,7 +733,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
     delete:
       tags:
         - 角色
@@ -764,7 +764,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
 
   "/v0/persons/{person_id}":
     get:
@@ -832,7 +832,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/persons/{person_id}/subjects":
     get:
       tags:
@@ -922,7 +922,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
     delete:
       tags:
         - 人物
@@ -953,7 +953,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
 
   "/v0/users/{username}":
     get:
@@ -1063,7 +1063,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
 
   "/v0/users/{username}/collections":
     get:
@@ -1115,7 +1115,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
 
   "/v0/users/{username}/collections/{subject_id}":
     get:
@@ -1147,7 +1147,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
   "/v0/users/-/collections/{subject_id}":
     post:
       tags:
@@ -1189,7 +1189,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
     patch:
       tags:
         - 收藏
@@ -1230,7 +1230,35 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - HTTPBearer: [ ]
+
+    delete:
+      tags:
+        - 收藏
+      summary: 删除用户条目收藏
+      description: |
+        删除条目收藏状态，
+        会删除当前填写的评分、tags 和吐槽，不会影响章节进度
+      operationId: deleteUserSubjectCollection
+      parameters:
+        - $ref: "#/components/parameters/path_subject_id"
+      responses:
+        "204":
+          description: Successful Response
+        "400":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorDetail"
+      security:
+        - HTTPBearer: [ ]
 
   "/v0/users/-/collections/{subject_id}/episodes":
     get:
@@ -1291,7 +1319,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
     patch:
       tags:
         - 收藏
@@ -1314,7 +1342,7 @@ paths:
                   type: array
                   items:
                     type: integer
-                  example: [1, 2, 8]
+                  example: [ 1, 2, 8 ]
                 type:
                   $ref: "#/components/schemas/EpisodeCollectionType"
       responses:
@@ -1339,7 +1367,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
 
   "/v0/users/-/collections/-/episodes/{episode_id}":
     get:
@@ -1375,7 +1403,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
     put:
       tags:
         - 收藏
@@ -1415,7 +1443,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
 
   "/v0/users/{username}/collections/-/characters":
     get:
@@ -1773,7 +1801,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
   "/v0/indices/{index_id}":
     get:
       tags:
@@ -1792,7 +1820,7 @@ paths:
         "404":
           "$ref": "#/components/responses/404"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
     put:
       tags:
         - 目录
@@ -1819,7 +1847,7 @@ paths:
         "404":
           "$ref": "#/components/responses/404"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
   "/v0/indices/{index_id}/subjects":
     get:
       tags:
@@ -1844,7 +1872,7 @@ paths:
         "404":
           "$ref": "#/components/responses/404"
       security:
-        - OptionalHTTPBearer: []
+        - OptionalHTTPBearer: [ ]
     post:
       tags:
         - 目录
@@ -1867,7 +1895,7 @@ paths:
         "404":
           "$ref": "#/components/responses/404"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
   "/v0/indices/{index_id}/subjects/{subject_id}":
     put:
       tags:
@@ -1893,7 +1921,7 @@ paths:
         "400":
           "$ref": "#/components/responses/400"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
     delete:
       tags:
         - 目录
@@ -1910,7 +1938,7 @@ paths:
         "401":
           "$ref": "#/components/responses/401"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
   "/v0/indices/{index_id}/collect":
     post:
       tags:
@@ -1930,7 +1958,7 @@ paths:
         "500":
           "$ref": "#/components/responses/500"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
     delete:
       tags:
         - 目录
@@ -1949,7 +1977,7 @@ paths:
         "500":
           "$ref": "#/components/responses/500"
       security:
-        - HTTPBearer: []
+        - HTTPBearer: [ ]
 components:
   parameters:
     path_subject_id:
@@ -2647,7 +2675,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Subject"
-          default: []
+          default: [ ]
     Paged_Character:
       title: Paged[Character]
       type: object
@@ -2669,7 +2697,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Character"
-          default: []
+          default: [ ]
     Paged_Person:
       title: Paged[Person]
       type: object
@@ -2691,7 +2719,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Person"
-          default: []
+          default: [ ]
     Paged_Episode:
       title: Paged[Episode]
       type: object
@@ -2713,7 +2741,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Episode"
-          default: []
+          default: [ ]
     Paged_IndexSubject:
       title: Paged[IndexSubject]
       type: object
@@ -2735,7 +2763,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/IndexSubject"
-          default: []
+          default: [ ]
     Paged_Revision:
       title: Paged[Revision]
       type: object
@@ -2757,7 +2785,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Revision"
-          default: []
+          default: [ ]
     Paged_UserCollection:
       title: Paged[UserCollection]
       type: object
@@ -2779,7 +2807,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/UserSubjectCollection"
-          default: []
+          default: [ ]
     Paged_UserCharacterCollection:
       title: Paged[UserCharacterCollection]
       type: object
@@ -2801,7 +2829,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/UserCharacterCollection"
-          default: []
+          default: [ ]
     Paged_UserPersonCollection:
       title: Paged[UserPersonCollection]
       type: object
@@ -2823,7 +2851,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/UserPersonCollection"
-          default: []
+          default: [ ]
     Person:
       title: Person
       required:
@@ -3068,7 +3096,7 @@ components:
           items:
             "$ref": "#/components/schemas/Person"
           description: 演员列表
-          default: []
+          default: [ ]
     RelatedPerson:
       title: RelatedPerson
       required:
