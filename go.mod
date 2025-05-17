@@ -28,7 +28,7 @@ require (
 	github.com/prometheus/client_golang v1.22.0
 	github.com/redis/rueidis v1.0.59
 	github.com/samber/lo v1.50.0
-	github.com/segmentio/kafka-go v0.4.47
+	github.com/segmentio/kafka-go v0.4.48
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
