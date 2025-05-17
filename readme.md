@@ -122,7 +122,7 @@ task lint
 
 ## License
 
-Copyright (C) 2021-2022 bangumi server contributors.
+Copyright (C) 2021-2025 bangumi server contributors.
 
 Source is licensed under the GNU AGPLv3 license that can be found in
 the [LICENSE.txt](https://github.com/bangumi/server/blob/master/LICENSE.txt) file.
