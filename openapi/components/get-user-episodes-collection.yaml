@@ -6,7 +6,7 @@ properties:
     $ref: "./episode_collection_type.yaml"
   updated_at:
     type: integer
-    description: A int64 unix timestamp, `0` as unknown or un recorded.
+    description: A int64 unix timestamp, `0` as unknown or un-recorded.
     example:
       - 0
       - 1700000000
