@@ -924,7 +924,7 @@ func updateMysqlEpisodeCollection(
 			}
 
 			v.Type = collectionType
-			v.UpdatedAt = gmap.SafeAssignMap(v.UpdatedAt, collectionType, now.Unix())
+			v.UpdatedAt = gmap.SafeAssign(v.UpdatedAt, collectionType, now.Unix())
 			updated = true
 			continue
 		}

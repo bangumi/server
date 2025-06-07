@@ -1,6 +1,6 @@
 package gmap
 
-func SafeAssignMap[K comparable, V any](m map[K]V, key K, value V) map[K]V {
+func SafeAssign[K comparable, V any](m map[K]V, key K, value V) map[K]V {
 	if m == nil {
 		return map[K]V{key: value}
 	}
