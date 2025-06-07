@@ -27,6 +27,8 @@ import (
 type mysqlEpCollectionItem struct {
 	EpisodeID model.EpisodeID              `php:"eid,string" json:"eid,string"`
 	Type      collection.EpisodeCollection `php:"type" json:"type"`
+	// unix timestamp seconds
+	UpdatedAt map[collection.EpisodeCollection]int64 `php:"updated_at" json:"updated_at"`
 }
 
 type mysqlEpCollection map[model.EpisodeID]mysqlEpCollectionItem
@@ -35,6 +37,13 @@ func deserializeEpStatus(serialized []byte) (mysqlEpCollection, error) {
 	var e map[model.EpisodeID]mysqlEpCollectionItem
 	if err := serialize.Decode(serialized, &e); err != nil {
 		return nil, errgo.Wrap(err, "php deserialize")
+	}
+
+	for _, v := range e {
+		// so we do not need to take care empty map later
+		if v.UpdatedAt == nil {
+			v.UpdatedAt = map[collection.EpisodeCollection]int64{}
+		}
 	}
 
 	return e, nil
@@ -49,8 +58,9 @@ func (c mysqlEpCollection) toModel() collection.UserSubjectEpisodesCollection {
 	var d = make(collection.UserSubjectEpisodesCollection, len(c))
 	for key, value := range c {
 		d[key] = collection.UserEpisodeCollection{
-			ID:   value.EpisodeID,
-			Type: value.Type,
+			ID:        value.EpisodeID,
+			Type:      value.Type,
+			UpdatedAt: value.UpdatedAt[value.Type],
 		}
 	}
 

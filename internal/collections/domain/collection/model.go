@@ -46,8 +46,9 @@ type UserSubjectCollection struct {
 }
 
 type UserEpisodeCollection struct {
-	ID   model.EpisodeID
-	Type EpisodeCollection
+	ID        model.EpisodeID
+	Type      EpisodeCollection
+	UpdatedAt int64
 }
 
 type UserSubjectEpisodesCollection map[model.EpisodeID]UserEpisodeCollection

@@ -897,6 +897,7 @@ func updateMysqlEpisodeCollection(
 	e mysqlEpCollection,
 	episodeIDs []model.EpisodeID,
 	collectionType collection.EpisodeCollection,
+	now time.Time,
 ) bool {
 	var updated bool
 
@@ -914,11 +915,18 @@ func updateMysqlEpisodeCollection(
 	} else {
 		for _, episodeID := range episodeIDs {
 			v, ok := e[episodeID]
-			if ok && v.Type == collectionType {
+			if ok {
+				if v.Type == collectionType {
+					continue
+				} else {
+					v.Type = collectionType
+					v.UpdatedAt[collectionType] = now.Unix()
+					updated = true
+				}
 				continue
 			}
 
-			e[episodeID] = mysqlEpCollectionItem{EpisodeID: episodeID, Type: collectionType}
+			e[episodeID] = mysqlEpCollectionItem{EpisodeID: episodeID, Type: collectionType, UpdatedAt: map[collection.EpisodeCollection]int64{collectionType: now.Unix()}}
 			updated = true
 		}
 	}

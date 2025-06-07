@@ -32,8 +32,9 @@ import (
 )
 
 type ResUserEpisodeCollection struct {
-	Episode res.Episode                  `json:"episode"`
-	Type    collection.EpisodeCollection `json:"type"`
+	Episode   res.Episode                  `json:"episode"`
+	Type      collection.EpisodeCollection `json:"type"`
+	UpdatedAt int64                        `json:"updated_at"`
 }
 
 func (h User) GetEpisodeCollection(c echo.Context) error {
@@ -56,9 +57,12 @@ func (h User) GetEpisodeCollection(c echo.Context) error {
 		return errgo.Wrap(err, "collectionRepo.GetSubjectEpisodesCollection")
 	}
 
+	ee := m[episodeID]
+
 	return c.JSON(http.StatusOK, ResUserEpisodeCollection{
-		Episode: res.ConvertModelEpisode(e),
-		Type:    m[episodeID].Type,
+		Episode:   res.ConvertModelEpisode(e),
+		Type:      ee.Type,
+		UpdatedAt: ee.UpdatedAt,
 	})
 }
 
@@ -107,9 +111,11 @@ func (h User) GetSubjectEpisodeCollection(c echo.Context) error {
 	var data []ResUserEpisodeCollection
 
 	for _, episode := range episodes {
+		e := ec[episode.ID]
 		data = append(data, ResUserEpisodeCollection{
-			Episode: res.ConvertModelEpisode(episode),
-			Type:    ec[episode.ID].Type,
+			Episode:   res.ConvertModelEpisode(episode),
+			Type:      e.Type,
+			UpdatedAt: e.UpdatedAt,
 		})
 	}
 
