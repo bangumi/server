@@ -7,7 +7,7 @@ properties:
   updated_at:
     type: integer
     description: A int64 unix timestamp, `0` as unknown or un recorded.
-    examples:
+    example:
       - 0
       - 1700000000
 required:
