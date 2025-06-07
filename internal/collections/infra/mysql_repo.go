@@ -843,7 +843,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 		return nil, err
 	}
 
-	if updated := updateMysqlEpisodeCollection(e, episodeIDs, collectionType); !updated {
+	if updated := updateMysqlEpisodeCollection(e, episodeIDs, collectionType, at); !updated {
 		return e.toModel(), nil
 	}
 
@@ -870,7 +870,7 @@ func (r mysqlRepo) createEpisodeCollection(
 	at time.Time,
 ) (collection.UserSubjectEpisodesCollection, error) {
 	var e = make(mysqlEpCollection, len(episodeIDs))
-	updateMysqlEpisodeCollection(e, episodeIDs, collectionType)
+	updateMysqlEpisodeCollection(e, episodeIDs, collectionType, at)
 
 	bytes, err := serializePhpEpStatus(e)
 	if err != nil {
