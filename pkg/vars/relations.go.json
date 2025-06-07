@@ -52,19 +52,19 @@
           "desc": "相同角色，没有关联的故事"
         },
         "8": {
-          "en": "Same setting",
+          "en": "Same Setting",
           "cn": "相同世界观",
           "jp": "",
           "desc": "发生在同一个世界观/时间线下，不同的出演角色"
         },
         "9": {
-          "en": "Alternative setting",
+          "en": "Alternative Setting",
           "cn": "不同世界观",
           "jp": "",
           "desc": "相同的主演角色，不同的世界观/时间线设定"
         },
         "10": {
-          "en": "Alternative version",
+          "en": "Alternative Version",
           "cn": "不同演绎",
           "jp": "",
           "desc": "相同设定、角色，不同的演绎方式（如EVA原作与新剧场版)"
@@ -146,7 +146,7 @@
           "desc": ""
         },
         "1010": {
-          "en": "Alternative version",
+          "en": "Version",
           "cn": "不同版本",
           "jp": "",
           "desc": ""
@@ -175,6 +175,12 @@
           "jp": "",
           "desc": "出现了被关联作品中的角色",
           "skip_vice_versa": true
+        },
+        "1015": {
+          "en": "Alternative Version",
+          "cn": "不同演绎",
+          "jp": "",
+          "desc": "相同设定、角色，不同的演绎方式"
         },
         "1099": {
           "en": "Other",
@@ -316,12 +322,24 @@
           "desc": ""
         },
         "4016": {
+          "en": "Version",
+          "cn": "不同版本",
+          "jp": "",
+          "desc": "相同故事、角色，画面、音乐或系统改进"
+        },
+        "4017": {
+          "en": "Main Version",
+          "cn": "主版本",
+          "jp": "",
+          "desc": "游戏最初发售时的版本"
+        },
+        "4018": {
           "en": "Collection",
           "cn": "合集",
           "jp": "",
           "desc": "收录本作品的合集条目"
         },
-        "4017": {
+        "4019": {
           "en": "In Collection",
           "cn": "收录作品",
           "jp": "",
@@ -388,7 +406,7 @@
         "desc": ""
       },
       "1010": {
-        "en": "Alternative version",
+        "en": "Version",
         "cn": "不同版本",
         "jp": "",
         "desc": ""
@@ -417,6 +435,12 @@
         "jp": "",
         "desc": "出现了被关联作品中的角色",
         "skip_vice_versa": true
+      },
+      "1015": {
+        "en": "Alternative Version",
+        "cn": "不同演绎",
+        "jp": "",
+        "desc": "相同设定、角色，不同的演绎方式"
       },
       "1099": {
         "en": "Other",
@@ -470,19 +494,19 @@
         "desc": "相同角色，没有关联的故事"
       },
       "8": {
-        "en": "Same setting",
+        "en": "Same Setting",
         "cn": "相同世界观",
         "jp": "",
         "desc": "发生在同一个世界观/时间线下，不同的出演角色"
       },
       "9": {
-        "en": "Alternative setting",
+        "en": "Alternative Setting",
         "cn": "不同世界观",
         "jp": "",
         "desc": "相同的主演角色，不同的世界观/时间线设定"
       },
       "10": {
-        "en": "Alternative version",
+        "en": "Alternative Version",
         "cn": "不同演绎",
         "jp": "",
         "desc": "相同设定、角色，不同的演绎方式（如EVA原作与新剧场版)"
@@ -646,12 +670,24 @@
         "desc": ""
       },
       "4016": {
+        "en": "Version",
+        "cn": "不同版本",
+        "jp": "",
+        "desc": "相同故事、角色，画面、音乐或系统改进"
+      },
+      "4017": {
+        "en": "Main Version",
+        "cn": "主版本",
+        "jp": "",
+        "desc": "游戏最初发售时的版本"
+      },
+      "4018": {
         "en": "Collection",
         "cn": "合集",
         "jp": "",
         "desc": "收录本作品的合集条目"
       },
-      "4017": {
+      "4019": {
         "en": "In Collection",
         "cn": "收录作品",
         "jp": "",
@@ -709,19 +745,19 @@
         "desc": "相同角色，没有关联的故事"
       },
       "8": {
-        "en": "Same setting",
+        "en": "Same Setting",
         "cn": "相同世界观",
         "jp": "",
         "desc": "发生在同一个世界观/时间线下，不同的出演角色"
       },
       "9": {
-        "en": "Alternative setting",
+        "en": "Alternative Setting",
         "cn": "不同世界观",
         "jp": "",
         "desc": "相同的主演角色，不同的世界观/时间线设定"
       },
       "10": {
-        "en": "Alternative version",
+        "en": "Alternative Version",
         "cn": "不同演绎",
         "jp": "",
         "desc": "相同设定、角色，不同的演绎方式（如EVA原作与新剧场版)"
