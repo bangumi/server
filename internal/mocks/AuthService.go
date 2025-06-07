@@ -70,15 +70,26 @@ type AuthService_GetByToken_Call struct {
 }
 
 // GetByToken is a helper method to define mock.On call
-//   - ctx
-//   - token
+//   - ctx context.Context
+//   - token string
 func (_e *AuthService_Expecter) GetByToken(ctx interface{}, token interface{}) *AuthService_GetByToken_Call {
 	return &AuthService_GetByToken_Call{Call: _e.mock.On("GetByToken", ctx, token)}
 }
 
 func (_c *AuthService_GetByToken_Call) Run(run func(ctx context.Context, token string)) *AuthService_GetByToken_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

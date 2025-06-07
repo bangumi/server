@@ -78,17 +78,38 @@ type SessionRepo_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//   - ctx
-//   - userID
-//   - regTime
-//   - keyGen
+//   - ctx context.Context
+//   - userID model.UserID
+//   - regTime time.Time
+//   - keyGen func() string
 func (_e *SessionRepo_Expecter) Create(ctx interface{}, userID interface{}, regTime interface{}, keyGen interface{}) *SessionRepo_Create_Call {
 	return &SessionRepo_Create_Call{Call: _e.mock.On("Create", ctx, userID, regTime, keyGen)}
 }
 
 func (_c *SessionRepo_Create_Call) Run(run func(ctx context.Context, userID model.UserID, regTime time.Time, keyGen func() string)) *SessionRepo_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID), args[2].(time.Time), args[3].(func() string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		var arg2 time.Time
+		if args[2] != nil {
+			arg2 = args[2].(time.Time)
+		}
+		var arg3 func() string
+		if args[3] != nil {
+			arg3 = args[3].(func() string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
 	})
 	return _c
 }
@@ -135,15 +156,26 @@ type SessionRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx
-//   - key
+//   - ctx context.Context
+//   - key string
 func (_e *SessionRepo_Expecter) Get(ctx interface{}, key interface{}) *SessionRepo_Get_Call {
 	return &SessionRepo_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
 func (_c *SessionRepo_Get_Call) Run(run func(ctx context.Context, key string)) *SessionRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -181,15 +213,26 @@ type SessionRepo_Revoke_Call struct {
 }
 
 // Revoke is a helper method to define mock.On call
-//   - ctx
-//   - key
+//   - ctx context.Context
+//   - key string
 func (_e *SessionRepo_Expecter) Revoke(ctx interface{}, key interface{}) *SessionRepo_Revoke_Call {
 	return &SessionRepo_Revoke_Call{Call: _e.mock.On("Revoke", ctx, key)}
 }
 
 func (_c *SessionRepo_Revoke_Call) Run(run func(ctx context.Context, key string)) *SessionRepo_Revoke_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -238,15 +281,26 @@ type SessionRepo_RevokeUser_Call struct {
 }
 
 // RevokeUser is a helper method to define mock.On call
-//   - ctx
-//   - userID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *SessionRepo_Expecter) RevokeUser(ctx interface{}, userID interface{}) *SessionRepo_RevokeUser_Call {
 	return &SessionRepo_RevokeUser_Call{Call: _e.mock.On("RevokeUser", ctx, userID)}
 }
 
 func (_c *SessionRepo_RevokeUser_Call) Run(run func(ctx context.Context, userID model.UserID)) *SessionRepo_RevokeUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

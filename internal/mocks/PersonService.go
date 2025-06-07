@@ -70,15 +70,26 @@ type PersonService_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.PersonID
 func (_e *PersonService_Expecter) Get(ctx interface{}, id interface{}) *PersonService_Get_Call {
 	return &PersonService_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
 
 func (_c *PersonService_Get_Call) Run(run func(ctx context.Context, id model.PersonID)) *PersonService_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.PersonID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.PersonID
+		if args[1] != nil {
+			arg1 = args[1].(model.PersonID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -127,15 +138,26 @@ type PersonService_GetCharacterRelated_Call struct {
 }
 
 // GetCharacterRelated is a helper method to define mock.On call
-//   - ctx
-//   - characterID
+//   - ctx context.Context
+//   - characterID model.CharacterID
 func (_e *PersonService_Expecter) GetCharacterRelated(ctx interface{}, characterID interface{}) *PersonService_GetCharacterRelated_Call {
 	return &PersonService_GetCharacterRelated_Call{Call: _e.mock.On("GetCharacterRelated", ctx, characterID)}
 }
 
 func (_c *PersonService_GetCharacterRelated_Call) Run(run func(ctx context.Context, characterID model.CharacterID)) *PersonService_GetCharacterRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.CharacterID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.CharacterID
+		if args[1] != nil {
+			arg1 = args[1].(model.CharacterID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -184,15 +206,26 @@ type PersonService_GetSubjectRelated_Call struct {
 }
 
 // GetSubjectRelated is a helper method to define mock.On call
-//   - ctx
-//   - subjectID
+//   - ctx context.Context
+//   - subjectID model.SubjectID
 func (_e *PersonService_Expecter) GetSubjectRelated(ctx interface{}, subjectID interface{}) *PersonService_GetSubjectRelated_Call {
 	return &PersonService_GetSubjectRelated_Call{Call: _e.mock.On("GetSubjectRelated", ctx, subjectID)}
 }
 
 func (_c *PersonService_GetSubjectRelated_Call) Run(run func(ctx context.Context, subjectID model.SubjectID)) *PersonService_GetSubjectRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

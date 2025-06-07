@@ -74,17 +74,38 @@ type SubjectRepo_Browse_Call struct {
 }
 
 // Browse is a helper method to define mock.On call
-//   - ctx
-//   - filter
-//   - limit
-//   - offset
+//   - ctx context.Context
+//   - filter subject.BrowseFilter
+//   - limit int
+//   - offset int
 func (_e *SubjectRepo_Expecter) Browse(ctx interface{}, filter interface{}, limit interface{}, offset interface{}) *SubjectRepo_Browse_Call {
 	return &SubjectRepo_Browse_Call{Call: _e.mock.On("Browse", ctx, filter, limit, offset)}
 }
 
 func (_c *SubjectRepo_Browse_Call) Run(run func(ctx context.Context, filter subject.BrowseFilter, limit int, offset int)) *SubjectRepo_Browse_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(subject.BrowseFilter), args[2].(int), args[3].(int))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 subject.BrowseFilter
+		if args[1] != nil {
+			arg1 = args[1].(subject.BrowseFilter)
+		}
+		var arg2 int
+		if args[2] != nil {
+			arg2 = args[2].(int)
+		}
+		var arg3 int
+		if args[3] != nil {
+			arg3 = args[3].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
 	})
 	return _c
 }
@@ -131,15 +152,26 @@ type SubjectRepo_Count_Call struct {
 }
 
 // Count is a helper method to define mock.On call
-//   - ctx
-//   - filter
+//   - ctx context.Context
+//   - filter subject.BrowseFilter
 func (_e *SubjectRepo_Expecter) Count(ctx interface{}, filter interface{}) *SubjectRepo_Count_Call {
 	return &SubjectRepo_Count_Call{Call: _e.mock.On("Count", ctx, filter)}
 }
 
 func (_c *SubjectRepo_Count_Call) Run(run func(ctx context.Context, filter subject.BrowseFilter)) *SubjectRepo_Count_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(subject.BrowseFilter))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 subject.BrowseFilter
+		if args[1] != nil {
+			arg1 = args[1].(subject.BrowseFilter)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -186,16 +218,32 @@ type SubjectRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - filter
+//   - ctx context.Context
+//   - id model.SubjectID
+//   - filter subject.Filter
 func (_e *SubjectRepo_Expecter) Get(ctx interface{}, id interface{}, filter interface{}) *SubjectRepo_Get_Call {
 	return &SubjectRepo_Get_Call{Call: _e.mock.On("Get", ctx, id, filter)}
 }
 
 func (_c *SubjectRepo_Get_Call) Run(run func(ctx context.Context, id model.SubjectID, filter subject.Filter)) *SubjectRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(subject.Filter))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		var arg2 subject.Filter
+		if args[2] != nil {
+			arg2 = args[2].(subject.Filter)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -244,16 +292,32 @@ type SubjectRepo_GetActors_Call struct {
 }
 
 // GetActors is a helper method to define mock.On call
-//   - ctx
-//   - subjectID
-//   - characterIDs
+//   - ctx context.Context
+//   - subjectID model.SubjectID
+//   - characterIDs []model.CharacterID
 func (_e *SubjectRepo_Expecter) GetActors(ctx interface{}, subjectID interface{}, characterIDs interface{}) *SubjectRepo_GetActors_Call {
 	return &SubjectRepo_GetActors_Call{Call: _e.mock.On("GetActors", ctx, subjectID, characterIDs)}
 }
 
 func (_c *SubjectRepo_GetActors_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, characterIDs []model.CharacterID)) *SubjectRepo_GetActors_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].([]model.CharacterID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		var arg2 []model.CharacterID
+		if args[2] != nil {
+			arg2 = args[2].([]model.CharacterID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -302,16 +366,32 @@ type SubjectRepo_GetByIDs_Call struct {
 }
 
 // GetByIDs is a helper method to define mock.On call
-//   - ctx
-//   - ids
-//   - filter
+//   - ctx context.Context
+//   - ids []model.SubjectID
+//   - filter subject.Filter
 func (_e *SubjectRepo_Expecter) GetByIDs(ctx interface{}, ids interface{}, filter interface{}) *SubjectRepo_GetByIDs_Call {
 	return &SubjectRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs", ctx, ids, filter)}
 }
 
 func (_c *SubjectRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids []model.SubjectID, filter subject.Filter)) *SubjectRepo_GetByIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]model.SubjectID), args[2].(subject.Filter))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].([]model.SubjectID)
+		}
+		var arg2 subject.Filter
+		if args[2] != nil {
+			arg2 = args[2].(subject.Filter)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -360,15 +440,26 @@ type SubjectRepo_GetCharacterRelated_Call struct {
 }
 
 // GetCharacterRelated is a helper method to define mock.On call
-//   - ctx
-//   - characterID
+//   - ctx context.Context
+//   - characterID model.CharacterID
 func (_e *SubjectRepo_Expecter) GetCharacterRelated(ctx interface{}, characterID interface{}) *SubjectRepo_GetCharacterRelated_Call {
 	return &SubjectRepo_GetCharacterRelated_Call{Call: _e.mock.On("GetCharacterRelated", ctx, characterID)}
 }
 
 func (_c *SubjectRepo_GetCharacterRelated_Call) Run(run func(ctx context.Context, characterID model.CharacterID)) *SubjectRepo_GetCharacterRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.CharacterID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.CharacterID
+		if args[1] != nil {
+			arg1 = args[1].(model.CharacterID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -417,15 +508,26 @@ type SubjectRepo_GetPersonRelated_Call struct {
 }
 
 // GetPersonRelated is a helper method to define mock.On call
-//   - ctx
-//   - personID
+//   - ctx context.Context
+//   - personID model.PersonID
 func (_e *SubjectRepo_Expecter) GetPersonRelated(ctx interface{}, personID interface{}) *SubjectRepo_GetPersonRelated_Call {
 	return &SubjectRepo_GetPersonRelated_Call{Call: _e.mock.On("GetPersonRelated", ctx, personID)}
 }
 
 func (_c *SubjectRepo_GetPersonRelated_Call) Run(run func(ctx context.Context, personID model.PersonID)) *SubjectRepo_GetPersonRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.PersonID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.PersonID
+		if args[1] != nil {
+			arg1 = args[1].(model.PersonID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -474,15 +576,26 @@ type SubjectRepo_GetSubjectRelated_Call struct {
 }
 
 // GetSubjectRelated is a helper method to define mock.On call
-//   - ctx
-//   - subjectID
+//   - ctx context.Context
+//   - subjectID model.SubjectID
 func (_e *SubjectRepo_Expecter) GetSubjectRelated(ctx interface{}, subjectID interface{}) *SubjectRepo_GetSubjectRelated_Call {
 	return &SubjectRepo_GetSubjectRelated_Call{Call: _e.mock.On("GetSubjectRelated", ctx, subjectID)}
 }
 
 func (_c *SubjectRepo_GetSubjectRelated_Call) Run(run func(ctx context.Context, subjectID model.SubjectID)) *SubjectRepo_GetSubjectRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

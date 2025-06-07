@@ -71,15 +71,26 @@ type PersonRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.PersonID
 func (_e *PersonRepo_Expecter) Get(ctx interface{}, id interface{}) *PersonRepo_Get_Call {
 	return &PersonRepo_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
 
 func (_c *PersonRepo_Get_Call) Run(run func(ctx context.Context, id model.PersonID)) *PersonRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.PersonID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.PersonID
+		if args[1] != nil {
+			arg1 = args[1].(model.PersonID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -128,15 +139,26 @@ type PersonRepo_GetByIDs_Call struct {
 }
 
 // GetByIDs is a helper method to define mock.On call
-//   - ctx
-//   - ids
+//   - ctx context.Context
+//   - ids []model.PersonID
 func (_e *PersonRepo_Expecter) GetByIDs(ctx interface{}, ids interface{}) *PersonRepo_GetByIDs_Call {
 	return &PersonRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs", ctx, ids)}
 }
 
 func (_c *PersonRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids []model.PersonID)) *PersonRepo_GetByIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]model.PersonID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []model.PersonID
+		if args[1] != nil {
+			arg1 = args[1].([]model.PersonID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -185,15 +207,26 @@ type PersonRepo_GetCharacterRelated_Call struct {
 }
 
 // GetCharacterRelated is a helper method to define mock.On call
-//   - ctx
-//   - subjectID
+//   - ctx context.Context
+//   - subjectID model.CharacterID
 func (_e *PersonRepo_Expecter) GetCharacterRelated(ctx interface{}, subjectID interface{}) *PersonRepo_GetCharacterRelated_Call {
 	return &PersonRepo_GetCharacterRelated_Call{Call: _e.mock.On("GetCharacterRelated", ctx, subjectID)}
 }
 
 func (_c *PersonRepo_GetCharacterRelated_Call) Run(run func(ctx context.Context, subjectID model.CharacterID)) *PersonRepo_GetCharacterRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.CharacterID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.CharacterID
+		if args[1] != nil {
+			arg1 = args[1].(model.CharacterID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -242,15 +275,26 @@ type PersonRepo_GetSubjectRelated_Call struct {
 }
 
 // GetSubjectRelated is a helper method to define mock.On call
-//   - ctx
-//   - subjectID
+//   - ctx context.Context
+//   - subjectID model.SubjectID
 func (_e *PersonRepo_Expecter) GetSubjectRelated(ctx interface{}, subjectID interface{}) *PersonRepo_GetSubjectRelated_Call {
 	return &PersonRepo_GetSubjectRelated_Call{Call: _e.mock.On("GetSubjectRelated", ctx, subjectID)}
 }
 
 func (_c *PersonRepo_GetSubjectRelated_Call) Run(run func(ctx context.Context, subjectID model.SubjectID)) *PersonRepo_GetSubjectRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

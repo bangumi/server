@@ -67,8 +67,8 @@ type RedisCache_Del_Call struct {
 }
 
 // Del is a helper method to define mock.On call
-//   - ctx
-//   - keys
+//   - ctx context.Context
+//   - keys ...string
 func (_e *RedisCache_Expecter) Del(ctx interface{}, keys ...interface{}) *RedisCache_Del_Call {
 	return &RedisCache_Del_Call{Call: _e.mock.On("Del",
 		append([]interface{}{ctx}, keys...)...)}
@@ -76,8 +76,20 @@ func (_e *RedisCache_Expecter) Del(ctx interface{}, keys ...interface{}) *RedisC
 
 func (_c *RedisCache_Del_Call) Run(run func(ctx context.Context, keys ...string)) *RedisCache_Del_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := args[1].([]string)
-		run(args[0].(context.Context), variadicArgs...)
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []string
+		var variadicArgs []string
+		if len(args) > 1 {
+			variadicArgs = args[1].([]string)
+		}
+		arg1 = variadicArgs
+		run(
+			arg0,
+			arg1...,
+		)
 	})
 	return _c
 }
@@ -124,16 +136,32 @@ type RedisCache_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx
-//   - key
-//   - value
+//   - ctx context.Context
+//   - key string
+//   - value any
 func (_e *RedisCache_Expecter) Get(ctx interface{}, key interface{}, value interface{}) *RedisCache_Get_Call {
 	return &RedisCache_Get_Call{Call: _e.mock.On("Get", ctx, key, value)}
 }
 
 func (_c *RedisCache_Get_Call) Run(run func(ctx context.Context, key string, value any)) *RedisCache_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(any))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 any
+		if args[2] != nil {
+			arg2 = args[2].(any)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -171,16 +199,32 @@ type RedisCache_MGet_Call struct {
 }
 
 // MGet is a helper method to define mock.On call
-//   - ctx
-//   - key
-//   - result
+//   - ctx context.Context
+//   - key []string
+//   - result any
 func (_e *RedisCache_Expecter) MGet(ctx interface{}, key interface{}, result interface{}) *RedisCache_MGet_Call {
 	return &RedisCache_MGet_Call{Call: _e.mock.On("MGet", ctx, key, result)}
 }
 
 func (_c *RedisCache_MGet_Call) Run(run func(ctx context.Context, key []string, result any)) *RedisCache_MGet_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]string), args[2].(any))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []string
+		if args[1] != nil {
+			arg1 = args[1].([]string)
+		}
+		var arg2 any
+		if args[2] != nil {
+			arg2 = args[2].(any)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -218,17 +262,38 @@ type RedisCache_Set_Call struct {
 }
 
 // Set is a helper method to define mock.On call
-//   - ctx
-//   - key
-//   - value
-//   - ttl
+//   - ctx context.Context
+//   - key string
+//   - value any
+//   - ttl time.Duration
 func (_e *RedisCache_Expecter) Set(ctx interface{}, key interface{}, value interface{}, ttl interface{}) *RedisCache_Set_Call {
 	return &RedisCache_Set_Call{Call: _e.mock.On("Set", ctx, key, value, ttl)}
 }
 
 func (_c *RedisCache_Set_Call) Run(run func(ctx context.Context, key string, value any, ttl time.Duration)) *RedisCache_Set_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(any), args[3].(time.Duration))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 any
+		if args[2] != nil {
+			arg2 = args[2].(any)
+		}
+		var arg3 time.Duration
+		if args[3] != nil {
+			arg3 = args[3].(time.Duration)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
 	})
 	return _c
 }
