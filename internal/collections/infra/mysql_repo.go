@@ -920,11 +920,11 @@ func updateMysqlEpisodeCollection(
 		if ok {
 			if v.Type == collectionType {
 				continue
-			} else {
-				v.Type = collectionType
-				v.UpdatedAt[collectionType] = now.Unix()
-				updated = true
 			}
+
+			v.Type = collectionType
+			v.UpdatedAt[collectionType] = now.Unix()
+			updated = true
 			continue
 		}
 
