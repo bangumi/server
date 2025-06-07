@@ -893,6 +893,14 @@ func (r mysqlRepo) createEpisodeCollection(
 	return e.toModel(), nil
 }
 
+func assignMaybeNilMap[K comparable, V any](m map[K]V, key K, value V) map[K]V {
+	if m == nil {
+		return map[K]V{key: value}
+	}
+	m[key] = value
+	return m
+}
+
 func updateMysqlEpisodeCollection(
 	e mysqlEpCollection,
 	episodeIDs []model.EpisodeID,
@@ -923,7 +931,7 @@ func updateMysqlEpisodeCollection(
 			}
 
 			v.Type = collectionType
-			v.UpdatedAt[collectionType] = now.Unix()
+			v.UpdatedAt = assignMaybeNilMap(v.UpdatedAt, collectionType, now.Unix())
 			updated = true
 			continue
 		}
