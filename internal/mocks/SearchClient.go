@@ -95,16 +95,32 @@ type SearchClient_EventAdded_Call struct {
 }
 
 // EventAdded is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - target
+//   - ctx context.Context
+//   - id uint32
+//   - target search.SearchTarget
 func (_e *SearchClient_Expecter) EventAdded(ctx interface{}, id interface{}, target interface{}) *SearchClient_EventAdded_Call {
 	return &SearchClient_EventAdded_Call{Call: _e.mock.On("EventAdded", ctx, id, target)}
 }
 
 func (_c *SearchClient_EventAdded_Call) Run(run func(ctx context.Context, id uint32, target search.SearchTarget)) *SearchClient_EventAdded_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(search.SearchTarget))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uint32
+		if args[1] != nil {
+			arg1 = args[1].(uint32)
+		}
+		var arg2 search.SearchTarget
+		if args[2] != nil {
+			arg2 = args[2].(search.SearchTarget)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -142,16 +158,32 @@ type SearchClient_EventDelete_Call struct {
 }
 
 // EventDelete is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - target
+//   - ctx context.Context
+//   - id uint32
+//   - target search.SearchTarget
 func (_e *SearchClient_Expecter) EventDelete(ctx interface{}, id interface{}, target interface{}) *SearchClient_EventDelete_Call {
 	return &SearchClient_EventDelete_Call{Call: _e.mock.On("EventDelete", ctx, id, target)}
 }
 
 func (_c *SearchClient_EventDelete_Call) Run(run func(ctx context.Context, id uint32, target search.SearchTarget)) *SearchClient_EventDelete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(search.SearchTarget))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uint32
+		if args[1] != nil {
+			arg1 = args[1].(uint32)
+		}
+		var arg2 search.SearchTarget
+		if args[2] != nil {
+			arg2 = args[2].(search.SearchTarget)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -189,16 +221,32 @@ type SearchClient_EventUpdate_Call struct {
 }
 
 // EventUpdate is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - target
+//   - ctx context.Context
+//   - id uint32
+//   - target search.SearchTarget
 func (_e *SearchClient_Expecter) EventUpdate(ctx interface{}, id interface{}, target interface{}) *SearchClient_EventUpdate_Call {
 	return &SearchClient_EventUpdate_Call{Call: _e.mock.On("EventUpdate", ctx, id, target)}
 }
 
 func (_c *SearchClient_EventUpdate_Call) Run(run func(ctx context.Context, id uint32, target search.SearchTarget)) *SearchClient_EventUpdate_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint32), args[2].(search.SearchTarget))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uint32
+		if args[1] != nil {
+			arg1 = args[1].(uint32)
+		}
+		var arg2 search.SearchTarget
+		if args[2] != nil {
+			arg2 = args[2].(search.SearchTarget)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -236,15 +284,26 @@ type SearchClient_Handle_Call struct {
 }
 
 // Handle is a helper method to define mock.On call
-//   - c
-//   - target
+//   - c echo.Context
+//   - target search.SearchTarget
 func (_e *SearchClient_Expecter) Handle(c interface{}, target interface{}) *SearchClient_Handle_Call {
 	return &SearchClient_Handle_Call{Call: _e.mock.On("Handle", c, target)}
 }
 
 func (_c *SearchClient_Handle_Call) Run(run func(c echo.Context, target search.SearchTarget)) *SearchClient_Handle_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(echo.Context), args[1].(search.SearchTarget))
+		var arg0 echo.Context
+		if args[0] != nil {
+			arg0 = args[0].(echo.Context)
+		}
+		var arg1 search.SearchTarget
+		if args[1] != nil {
+			arg1 = args[1].(search.SearchTarget)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

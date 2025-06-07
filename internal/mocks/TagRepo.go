@@ -73,16 +73,32 @@ type TagRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - typeID
+//   - ctx context.Context
+//   - id model.SubjectID
+//   - typeID model.SubjectType
 func (_e *TagRepo_Expecter) Get(ctx interface{}, id interface{}, typeID interface{}) *TagRepo_Get_Call {
 	return &TagRepo_Get_Call{Call: _e.mock.On("Get", ctx, id, typeID)}
 }
 
 func (_c *TagRepo_Get_Call) Run(run func(ctx context.Context, id model.SubjectID, typeID model.SubjectType)) *TagRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(model.SubjectType))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		var arg2 model.SubjectType
+		if args[2] != nil {
+			arg2 = args[2].(model.SubjectType)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -131,15 +147,26 @@ type TagRepo_GetByIDs_Call struct {
 }
 
 // GetByIDs is a helper method to define mock.On call
-//   - ctx
-//   - ids
+//   - ctx context.Context
+//   - ids []model.SubjectID
 func (_e *TagRepo_Expecter) GetByIDs(ctx interface{}, ids interface{}) *TagRepo_GetByIDs_Call {
 	return &TagRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs", ctx, ids)}
 }
 
 func (_c *TagRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids []model.SubjectID)) *TagRepo_GetByIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]model.SubjectID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].([]model.SubjectID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

@@ -70,15 +70,26 @@ type RevisionRepo_CountCharacterRelated_Call struct {
 }
 
 // CountCharacterRelated is a helper method to define mock.On call
-//   - ctx
-//   - characterID
+//   - ctx context.Context
+//   - characterID model.CharacterID
 func (_e *RevisionRepo_Expecter) CountCharacterRelated(ctx interface{}, characterID interface{}) *RevisionRepo_CountCharacterRelated_Call {
 	return &RevisionRepo_CountCharacterRelated_Call{Call: _e.mock.On("CountCharacterRelated", ctx, characterID)}
 }
 
 func (_c *RevisionRepo_CountCharacterRelated_Call) Run(run func(ctx context.Context, characterID model.CharacterID)) *RevisionRepo_CountCharacterRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.CharacterID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.CharacterID
+		if args[1] != nil {
+			arg1 = args[1].(model.CharacterID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -125,15 +136,26 @@ type RevisionRepo_CountEpisodeRelated_Call struct {
 }
 
 // CountEpisodeRelated is a helper method to define mock.On call
-//   - ctx
-//   - episodeID
+//   - ctx context.Context
+//   - episodeID model.EpisodeID
 func (_e *RevisionRepo_Expecter) CountEpisodeRelated(ctx interface{}, episodeID interface{}) *RevisionRepo_CountEpisodeRelated_Call {
 	return &RevisionRepo_CountEpisodeRelated_Call{Call: _e.mock.On("CountEpisodeRelated", ctx, episodeID)}
 }
 
 func (_c *RevisionRepo_CountEpisodeRelated_Call) Run(run func(ctx context.Context, episodeID model.EpisodeID)) *RevisionRepo_CountEpisodeRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.EpisodeID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.EpisodeID
+		if args[1] != nil {
+			arg1 = args[1].(model.EpisodeID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -180,15 +202,26 @@ type RevisionRepo_CountPersonRelated_Call struct {
 }
 
 // CountPersonRelated is a helper method to define mock.On call
-//   - ctx
-//   - personID
+//   - ctx context.Context
+//   - personID model.PersonID
 func (_e *RevisionRepo_Expecter) CountPersonRelated(ctx interface{}, personID interface{}) *RevisionRepo_CountPersonRelated_Call {
 	return &RevisionRepo_CountPersonRelated_Call{Call: _e.mock.On("CountPersonRelated", ctx, personID)}
 }
 
 func (_c *RevisionRepo_CountPersonRelated_Call) Run(run func(ctx context.Context, personID model.PersonID)) *RevisionRepo_CountPersonRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.PersonID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.PersonID
+		if args[1] != nil {
+			arg1 = args[1].(model.PersonID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -235,15 +268,26 @@ type RevisionRepo_CountSubjectRelated_Call struct {
 }
 
 // CountSubjectRelated is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.SubjectID
 func (_e *RevisionRepo_Expecter) CountSubjectRelated(ctx interface{}, id interface{}) *RevisionRepo_CountSubjectRelated_Call {
 	return &RevisionRepo_CountSubjectRelated_Call{Call: _e.mock.On("CountSubjectRelated", ctx, id)}
 }
 
 func (_c *RevisionRepo_CountSubjectRelated_Call) Run(run func(ctx context.Context, id model.SubjectID)) *RevisionRepo_CountSubjectRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -290,15 +334,26 @@ type RevisionRepo_GetCharacterRelated_Call struct {
 }
 
 // GetCharacterRelated is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.RevisionID
 func (_e *RevisionRepo_Expecter) GetCharacterRelated(ctx interface{}, id interface{}) *RevisionRepo_GetCharacterRelated_Call {
 	return &RevisionRepo_GetCharacterRelated_Call{Call: _e.mock.On("GetCharacterRelated", ctx, id)}
 }
 
 func (_c *RevisionRepo_GetCharacterRelated_Call) Run(run func(ctx context.Context, id model.RevisionID)) *RevisionRepo_GetCharacterRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.RevisionID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.RevisionID
+		if args[1] != nil {
+			arg1 = args[1].(model.RevisionID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -345,15 +400,26 @@ type RevisionRepo_GetEpisodeRelated_Call struct {
 }
 
 // GetEpisodeRelated is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.RevisionID
 func (_e *RevisionRepo_Expecter) GetEpisodeRelated(ctx interface{}, id interface{}) *RevisionRepo_GetEpisodeRelated_Call {
 	return &RevisionRepo_GetEpisodeRelated_Call{Call: _e.mock.On("GetEpisodeRelated", ctx, id)}
 }
 
 func (_c *RevisionRepo_GetEpisodeRelated_Call) Run(run func(ctx context.Context, id model.RevisionID)) *RevisionRepo_GetEpisodeRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.RevisionID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.RevisionID
+		if args[1] != nil {
+			arg1 = args[1].(model.RevisionID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -400,15 +466,26 @@ type RevisionRepo_GetPersonRelated_Call struct {
 }
 
 // GetPersonRelated is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.RevisionID
 func (_e *RevisionRepo_Expecter) GetPersonRelated(ctx interface{}, id interface{}) *RevisionRepo_GetPersonRelated_Call {
 	return &RevisionRepo_GetPersonRelated_Call{Call: _e.mock.On("GetPersonRelated", ctx, id)}
 }
 
 func (_c *RevisionRepo_GetPersonRelated_Call) Run(run func(ctx context.Context, id model.RevisionID)) *RevisionRepo_GetPersonRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.RevisionID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.RevisionID
+		if args[1] != nil {
+			arg1 = args[1].(model.RevisionID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -455,15 +532,26 @@ type RevisionRepo_GetSubjectRelated_Call struct {
 }
 
 // GetSubjectRelated is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.RevisionID
 func (_e *RevisionRepo_Expecter) GetSubjectRelated(ctx interface{}, id interface{}) *RevisionRepo_GetSubjectRelated_Call {
 	return &RevisionRepo_GetSubjectRelated_Call{Call: _e.mock.On("GetSubjectRelated", ctx, id)}
 }
 
 func (_c *RevisionRepo_GetSubjectRelated_Call) Run(run func(ctx context.Context, id model.RevisionID)) *RevisionRepo_GetSubjectRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.RevisionID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.RevisionID
+		if args[1] != nil {
+			arg1 = args[1].(model.RevisionID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -512,17 +600,38 @@ type RevisionRepo_ListCharacterRelated_Call struct {
 }
 
 // ListCharacterRelated is a helper method to define mock.On call
-//   - ctx
-//   - characterID
-//   - limit
-//   - offset
+//   - ctx context.Context
+//   - characterID model.CharacterID
+//   - limit int
+//   - offset int
 func (_e *RevisionRepo_Expecter) ListCharacterRelated(ctx interface{}, characterID interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListCharacterRelated_Call {
 	return &RevisionRepo_ListCharacterRelated_Call{Call: _e.mock.On("ListCharacterRelated", ctx, characterID, limit, offset)}
 }
 
 func (_c *RevisionRepo_ListCharacterRelated_Call) Run(run func(ctx context.Context, characterID model.CharacterID, limit int, offset int)) *RevisionRepo_ListCharacterRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.CharacterID), args[2].(int), args[3].(int))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.CharacterID
+		if args[1] != nil {
+			arg1 = args[1].(model.CharacterID)
+		}
+		var arg2 int
+		if args[2] != nil {
+			arg2 = args[2].(int)
+		}
+		var arg3 int
+		if args[3] != nil {
+			arg3 = args[3].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
 	})
 	return _c
 }
@@ -571,17 +680,38 @@ type RevisionRepo_ListEpisodeRelated_Call struct {
 }
 
 // ListEpisodeRelated is a helper method to define mock.On call
-//   - ctx
-//   - episodeID
-//   - limit
-//   - offset
+//   - ctx context.Context
+//   - episodeID model.EpisodeID
+//   - limit int
+//   - offset int
 func (_e *RevisionRepo_Expecter) ListEpisodeRelated(ctx interface{}, episodeID interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListEpisodeRelated_Call {
 	return &RevisionRepo_ListEpisodeRelated_Call{Call: _e.mock.On("ListEpisodeRelated", ctx, episodeID, limit, offset)}
 }
 
 func (_c *RevisionRepo_ListEpisodeRelated_Call) Run(run func(ctx context.Context, episodeID model.EpisodeID, limit int, offset int)) *RevisionRepo_ListEpisodeRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.EpisodeID), args[2].(int), args[3].(int))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.EpisodeID
+		if args[1] != nil {
+			arg1 = args[1].(model.EpisodeID)
+		}
+		var arg2 int
+		if args[2] != nil {
+			arg2 = args[2].(int)
+		}
+		var arg3 int
+		if args[3] != nil {
+			arg3 = args[3].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
 	})
 	return _c
 }
@@ -630,17 +760,38 @@ type RevisionRepo_ListPersonRelated_Call struct {
 }
 
 // ListPersonRelated is a helper method to define mock.On call
-//   - ctx
-//   - personID
-//   - limit
-//   - offset
+//   - ctx context.Context
+//   - personID model.PersonID
+//   - limit int
+//   - offset int
 func (_e *RevisionRepo_Expecter) ListPersonRelated(ctx interface{}, personID interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListPersonRelated_Call {
 	return &RevisionRepo_ListPersonRelated_Call{Call: _e.mock.On("ListPersonRelated", ctx, personID, limit, offset)}
 }
 
 func (_c *RevisionRepo_ListPersonRelated_Call) Run(run func(ctx context.Context, personID model.PersonID, limit int, offset int)) *RevisionRepo_ListPersonRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.PersonID), args[2].(int), args[3].(int))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.PersonID
+		if args[1] != nil {
+			arg1 = args[1].(model.PersonID)
+		}
+		var arg2 int
+		if args[2] != nil {
+			arg2 = args[2].(int)
+		}
+		var arg3 int
+		if args[3] != nil {
+			arg3 = args[3].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
 	})
 	return _c
 }
@@ -689,17 +840,38 @@ type RevisionRepo_ListSubjectRelated_Call struct {
 }
 
 // ListSubjectRelated is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - limit
-//   - offset
+//   - ctx context.Context
+//   - id model.SubjectID
+//   - limit int
+//   - offset int
 func (_e *RevisionRepo_Expecter) ListSubjectRelated(ctx interface{}, id interface{}, limit interface{}, offset interface{}) *RevisionRepo_ListSubjectRelated_Call {
 	return &RevisionRepo_ListSubjectRelated_Call{Call: _e.mock.On("ListSubjectRelated", ctx, id, limit, offset)}
 }
 
 func (_c *RevisionRepo_ListSubjectRelated_Call) Run(run func(ctx context.Context, id model.SubjectID, limit int, offset int)) *RevisionRepo_ListSubjectRelated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(int), args[3].(int))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		var arg2 int
+		if args[2] != nil {
+			arg2 = args[2].(int)
+		}
+		var arg3 int
+		if args[3] != nil {
+			arg3 = args[3].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
 	})
 	return _c
 }

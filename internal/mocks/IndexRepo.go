@@ -62,16 +62,32 @@ type IndexRepo_AddIndexCollect_Call struct {
 }
 
 // AddIndexCollect is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - uid
+//   - ctx context.Context
+//   - id model.IndexID
+//   - uid model.UserID
 func (_e *IndexRepo_Expecter) AddIndexCollect(ctx interface{}, id interface{}, uid interface{}) *IndexRepo_AddIndexCollect_Call {
 	return &IndexRepo_AddIndexCollect_Call{Call: _e.mock.On("AddIndexCollect", ctx, id, uid)}
 }
 
 func (_c *IndexRepo_AddIndexCollect_Call) Run(run func(ctx context.Context, id model.IndexID, uid model.UserID)) *IndexRepo_AddIndexCollect_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID), args[2].(model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		var arg2 model.UserID
+		if args[2] != nil {
+			arg2 = args[2].(model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -120,18 +136,44 @@ type IndexRepo_AddOrUpdateIndexSubject_Call struct {
 }
 
 // AddOrUpdateIndexSubject is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - subjectID
-//   - sort
-//   - comment
+//   - ctx context.Context
+//   - id model.IndexID
+//   - subjectID model.SubjectID
+//   - sort uint32
+//   - comment string
 func (_e *IndexRepo_Expecter) AddOrUpdateIndexSubject(ctx interface{}, id interface{}, subjectID interface{}, sort interface{}, comment interface{}) *IndexRepo_AddOrUpdateIndexSubject_Call {
 	return &IndexRepo_AddOrUpdateIndexSubject_Call{Call: _e.mock.On("AddOrUpdateIndexSubject", ctx, id, subjectID, sort, comment)}
 }
 
 func (_c *IndexRepo_AddOrUpdateIndexSubject_Call) Run(run func(ctx context.Context, id model.IndexID, subjectID model.SubjectID, sort uint32, comment string)) *IndexRepo_AddOrUpdateIndexSubject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID), args[2].(model.SubjectID), args[3].(uint32), args[4].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		var arg2 model.SubjectID
+		if args[2] != nil {
+			arg2 = args[2].(model.SubjectID)
+		}
+		var arg3 uint32
+		if args[3] != nil {
+			arg3 = args[3].(uint32)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
 	})
 	return _c
 }
@@ -178,16 +220,32 @@ type IndexRepo_CountSubjects_Call struct {
 }
 
 // CountSubjects is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - subjectType
+//   - ctx context.Context
+//   - id model.IndexID
+//   - subjectType model.SubjectType
 func (_e *IndexRepo_Expecter) CountSubjects(ctx interface{}, id interface{}, subjectType interface{}) *IndexRepo_CountSubjects_Call {
 	return &IndexRepo_CountSubjects_Call{Call: _e.mock.On("CountSubjects", ctx, id, subjectType)}
 }
 
 func (_c *IndexRepo_CountSubjects_Call) Run(run func(ctx context.Context, id model.IndexID, subjectType model.SubjectType)) *IndexRepo_CountSubjects_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID), args[2].(model.SubjectType))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		var arg2 model.SubjectType
+		if args[2] != nil {
+			arg2 = args[2].(model.SubjectType)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -225,15 +283,26 @@ type IndexRepo_Delete_Call struct {
 }
 
 // Delete is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.IndexID
 func (_e *IndexRepo_Expecter) Delete(ctx interface{}, id interface{}) *IndexRepo_Delete_Call {
 	return &IndexRepo_Delete_Call{Call: _e.mock.On("Delete", ctx, id)}
 }
 
 func (_c *IndexRepo_Delete_Call) Run(run func(ctx context.Context, id model.IndexID)) *IndexRepo_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -271,16 +340,32 @@ type IndexRepo_DeleteIndexCollect_Call struct {
 }
 
 // DeleteIndexCollect is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - uid
+//   - ctx context.Context
+//   - id model.IndexID
+//   - uid model.UserID
 func (_e *IndexRepo_Expecter) DeleteIndexCollect(ctx interface{}, id interface{}, uid interface{}) *IndexRepo_DeleteIndexCollect_Call {
 	return &IndexRepo_DeleteIndexCollect_Call{Call: _e.mock.On("DeleteIndexCollect", ctx, id, uid)}
 }
 
 func (_c *IndexRepo_DeleteIndexCollect_Call) Run(run func(ctx context.Context, id model.IndexID, uid model.UserID)) *IndexRepo_DeleteIndexCollect_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID), args[2].(model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		var arg2 model.UserID
+		if args[2] != nil {
+			arg2 = args[2].(model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -318,16 +403,32 @@ type IndexRepo_DeleteIndexSubject_Call struct {
 }
 
 // DeleteIndexSubject is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - subjectID
+//   - ctx context.Context
+//   - id model.IndexID
+//   - subjectID model.SubjectID
 func (_e *IndexRepo_Expecter) DeleteIndexSubject(ctx interface{}, id interface{}, subjectID interface{}) *IndexRepo_DeleteIndexSubject_Call {
 	return &IndexRepo_DeleteIndexSubject_Call{Call: _e.mock.On("DeleteIndexSubject", ctx, id, subjectID)}
 }
 
 func (_c *IndexRepo_DeleteIndexSubject_Call) Run(run func(ctx context.Context, id model.IndexID, subjectID model.SubjectID)) *IndexRepo_DeleteIndexSubject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID), args[2].(model.SubjectID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		var arg2 model.SubjectID
+		if args[2] != nil {
+			arg2 = args[2].(model.SubjectID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -374,15 +475,26 @@ type IndexRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.IndexID
 func (_e *IndexRepo_Expecter) Get(ctx interface{}, id interface{}) *IndexRepo_Get_Call {
 	return &IndexRepo_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
 
 func (_c *IndexRepo_Get_Call) Run(run func(ctx context.Context, id model.IndexID)) *IndexRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -431,16 +543,32 @@ type IndexRepo_GetIndexCollect_Call struct {
 }
 
 // GetIndexCollect is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - uid
+//   - ctx context.Context
+//   - id model.IndexID
+//   - uid model.UserID
 func (_e *IndexRepo_Expecter) GetIndexCollect(ctx interface{}, id interface{}, uid interface{}) *IndexRepo_GetIndexCollect_Call {
 	return &IndexRepo_GetIndexCollect_Call{Call: _e.mock.On("GetIndexCollect", ctx, id, uid)}
 }
 
 func (_c *IndexRepo_GetIndexCollect_Call) Run(run func(ctx context.Context, id model.IndexID, uid model.UserID)) *IndexRepo_GetIndexCollect_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID), args[2].(model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		var arg2 model.UserID
+		if args[2] != nil {
+			arg2 = args[2].(model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -489,18 +617,44 @@ type IndexRepo_ListSubjects_Call struct {
 }
 
 // ListSubjects is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - subjectType
-//   - limit
-//   - offset
+//   - ctx context.Context
+//   - id model.IndexID
+//   - subjectType model.SubjectType
+//   - limit int
+//   - offset int
 func (_e *IndexRepo_Expecter) ListSubjects(ctx interface{}, id interface{}, subjectType interface{}, limit interface{}, offset interface{}) *IndexRepo_ListSubjects_Call {
 	return &IndexRepo_ListSubjects_Call{Call: _e.mock.On("ListSubjects", ctx, id, subjectType, limit, offset)}
 }
 
 func (_c *IndexRepo_ListSubjects_Call) Run(run func(ctx context.Context, id model.IndexID, subjectType model.SubjectType, limit int, offset int)) *IndexRepo_ListSubjects_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID), args[2].(model.SubjectType), args[3].(int), args[4].(int))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		var arg2 model.SubjectType
+		if args[2] != nil {
+			arg2 = args[2].(model.SubjectType)
+		}
+		var arg3 int
+		if args[3] != nil {
+			arg3 = args[3].(int)
+		}
+		var arg4 int
+		if args[4] != nil {
+			arg4 = args[4].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
 	})
 	return _c
 }
@@ -538,15 +692,26 @@ type IndexRepo_New_Call struct {
 }
 
 // New is a helper method to define mock.On call
-//   - ctx
-//   - i
+//   - ctx context.Context
+//   - i *model.Index
 func (_e *IndexRepo_Expecter) New(ctx interface{}, i interface{}) *IndexRepo_New_Call {
 	return &IndexRepo_New_Call{Call: _e.mock.On("New", ctx, i)}
 }
 
 func (_c *IndexRepo_New_Call) Run(run func(ctx context.Context, i *model.Index)) *IndexRepo_New_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.Index))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *model.Index
+		if args[1] != nil {
+			arg1 = args[1].(*model.Index)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -584,17 +749,38 @@ type IndexRepo_Update_Call struct {
 }
 
 // Update is a helper method to define mock.On call
-//   - ctx
-//   - id
-//   - title
-//   - desc
+//   - ctx context.Context
+//   - id model.IndexID
+//   - title string
+//   - desc string
 func (_e *IndexRepo_Expecter) Update(ctx interface{}, id interface{}, title interface{}, desc interface{}) *IndexRepo_Update_Call {
 	return &IndexRepo_Update_Call{Call: _e.mock.On("Update", ctx, id, title, desc)}
 }
 
 func (_c *IndexRepo_Update_Call) Run(run func(ctx context.Context, id model.IndexID, title string, desc string)) *IndexRepo_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.IndexID), args[2].(string), args[3].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.IndexID
+		if args[1] != nil {
+			arg1 = args[1].(model.IndexID)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
 	})
 	return _c
 }

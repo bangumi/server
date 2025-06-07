@@ -77,9 +77,9 @@ type UserRepo_CheckIsFriendToOthers_Call struct {
 }
 
 // CheckIsFriendToOthers is a helper method to define mock.On call
-//   - ctx
-//   - selfID
-//   - otherIDs
+//   - ctx context.Context
+//   - selfID model.UserID
+//   - otherIDs ...model.UserID
 func (_e *UserRepo_Expecter) CheckIsFriendToOthers(ctx interface{}, selfID interface{}, otherIDs ...interface{}) *UserRepo_CheckIsFriendToOthers_Call {
 	return &UserRepo_CheckIsFriendToOthers_Call{Call: _e.mock.On("CheckIsFriendToOthers",
 		append([]interface{}{ctx, selfID}, otherIDs...)...)}
@@ -87,8 +87,25 @@ func (_e *UserRepo_Expecter) CheckIsFriendToOthers(ctx interface{}, selfID inter
 
 func (_c *UserRepo_CheckIsFriendToOthers_Call) Run(run func(ctx context.Context, selfID model.UserID, otherIDs ...model.UserID)) *UserRepo_CheckIsFriendToOthers_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := args[2].([]model.UserID)
-		run(args[0].(context.Context), args[1].(model.UserID), variadicArgs...)
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		var arg2 []model.UserID
+		var variadicArgs []model.UserID
+		if len(args) > 2 {
+			variadicArgs = args[2].([]model.UserID)
+		}
+		arg2 = variadicArgs
+		run(
+			arg0,
+			arg1,
+			arg2...,
+		)
 	})
 	return _c
 }
@@ -135,15 +152,26 @@ type UserRepo_GetByID_Call struct {
 }
 
 // GetByID is a helper method to define mock.On call
-//   - ctx
-//   - userID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *UserRepo_Expecter) GetByID(ctx interface{}, userID interface{}) *UserRepo_GetByID_Call {
 	return &UserRepo_GetByID_Call{Call: _e.mock.On("GetByID", ctx, userID)}
 }
 
 func (_c *UserRepo_GetByID_Call) Run(run func(ctx context.Context, userID model.UserID)) *UserRepo_GetByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -192,15 +220,26 @@ type UserRepo_GetByIDs_Call struct {
 }
 
 // GetByIDs is a helper method to define mock.On call
-//   - ctx
-//   - ids
+//   - ctx context.Context
+//   - ids []model.UserID
 func (_e *UserRepo_Expecter) GetByIDs(ctx interface{}, ids interface{}) *UserRepo_GetByIDs_Call {
 	return &UserRepo_GetByIDs_Call{Call: _e.mock.On("GetByIDs", ctx, ids)}
 }
 
 func (_c *UserRepo_GetByIDs_Call) Run(run func(ctx context.Context, ids []model.UserID)) *UserRepo_GetByIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []model.UserID
+		if args[1] != nil {
+			arg1 = args[1].([]model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -247,15 +286,26 @@ type UserRepo_GetByName_Call struct {
 }
 
 // GetByName is a helper method to define mock.On call
-//   - ctx
-//   - username
+//   - ctx context.Context
+//   - username string
 func (_e *UserRepo_Expecter) GetByName(ctx interface{}, username interface{}) *UserRepo_GetByName_Call {
 	return &UserRepo_GetByName_Call{Call: _e.mock.On("GetByName", ctx, username)}
 }
 
 func (_c *UserRepo_GetByName_Call) Run(run func(ctx context.Context, username string)) *UserRepo_GetByName_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -304,15 +354,26 @@ type UserRepo_GetFieldsByIDs_Call struct {
 }
 
 // GetFieldsByIDs is a helper method to define mock.On call
-//   - ctx
-//   - ids
+//   - ctx context.Context
+//   - ids []model.UserID
 func (_e *UserRepo_Expecter) GetFieldsByIDs(ctx interface{}, ids interface{}) *UserRepo_GetFieldsByIDs_Call {
 	return &UserRepo_GetFieldsByIDs_Call{Call: _e.mock.On("GetFieldsByIDs", ctx, ids)}
 }
 
 func (_c *UserRepo_GetFieldsByIDs_Call) Run(run func(ctx context.Context, ids []model.UserID)) *UserRepo_GetFieldsByIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []model.UserID
+		if args[1] != nil {
+			arg1 = args[1].([]model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -361,15 +422,26 @@ type UserRepo_GetFriends_Call struct {
 }
 
 // GetFriends is a helper method to define mock.On call
-//   - ctx
-//   - userID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *UserRepo_Expecter) GetFriends(ctx interface{}, userID interface{}) *UserRepo_GetFriends_Call {
 	return &UserRepo_GetFriends_Call{Call: _e.mock.On("GetFriends", ctx, userID)}
 }
 
 func (_c *UserRepo_GetFriends_Call) Run(run func(ctx context.Context, userID model.UserID)) *UserRepo_GetFriends_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -416,15 +488,26 @@ type UserRepo_GetFullUser_Call struct {
 }
 
 // GetFullUser is a helper method to define mock.On call
-//   - ctx
-//   - userID
+//   - ctx context.Context
+//   - userID model.UserID
 func (_e *UserRepo_Expecter) GetFullUser(ctx interface{}, userID interface{}) *UserRepo_GetFullUser_Call {
 	return &UserRepo_GetFullUser_Call{Call: _e.mock.On("GetFullUser", ctx, userID)}
 }
 
 func (_c *UserRepo_GetFullUser_Call) Run(run func(ctx context.Context, userID model.UserID)) *UserRepo_GetFullUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

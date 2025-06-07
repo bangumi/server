@@ -70,15 +70,26 @@ type AuthRepo_GetByToken_Call struct {
 }
 
 // GetByToken is a helper method to define mock.On call
-//   - ctx
-//   - token
+//   - ctx context.Context
+//   - token string
 func (_e *AuthRepo_Expecter) GetByToken(ctx interface{}, token interface{}) *AuthRepo_GetByToken_Call {
 	return &AuthRepo_GetByToken_Call{Call: _e.mock.On("GetByToken", ctx, token)}
 }
 
 func (_c *AuthRepo_GetByToken_Call) Run(run func(ctx context.Context, token string)) *AuthRepo_GetByToken_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -125,15 +136,26 @@ type AuthRepo_GetPermission_Call struct {
 }
 
 // GetPermission is a helper method to define mock.On call
-//   - ctx
-//   - groupID
+//   - ctx context.Context
+//   - groupID uint8
 func (_e *AuthRepo_Expecter) GetPermission(ctx interface{}, groupID interface{}) *AuthRepo_GetPermission_Call {
 	return &AuthRepo_GetPermission_Call{Call: _e.mock.On("GetPermission", ctx, groupID)}
 }
 
 func (_c *AuthRepo_GetPermission_Call) Run(run func(ctx context.Context, groupID uint8)) *AuthRepo_GetPermission_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint8))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uint8
+		if args[1] != nil {
+			arg1 = args[1].(uint8)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

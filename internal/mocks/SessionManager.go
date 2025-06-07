@@ -78,15 +78,26 @@ type SessionManager_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//   - ctx
-//   - a
+//   - ctx context.Context
+//   - a auth.Auth
 func (_e *SessionManager_Expecter) Create(ctx interface{}, a interface{}) *SessionManager_Create_Call {
 	return &SessionManager_Create_Call{Call: _e.mock.On("Create", ctx, a)}
 }
 
 func (_c *SessionManager_Create_Call) Run(run func(ctx context.Context, a auth.Auth)) *SessionManager_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(auth.Auth))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 auth.Auth
+		if args[1] != nil {
+			arg1 = args[1].(auth.Auth)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -133,15 +144,26 @@ type SessionManager_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx
-//   - key
+//   - ctx context.Context
+//   - key string
 func (_e *SessionManager_Expecter) Get(ctx interface{}, key interface{}) *SessionManager_Get_Call {
 	return &SessionManager_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
 func (_c *SessionManager_Get_Call) Run(run func(ctx context.Context, key string)) *SessionManager_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -179,15 +201,26 @@ type SessionManager_Revoke_Call struct {
 }
 
 // Revoke is a helper method to define mock.On call
-//   - ctx
-//   - key
+//   - ctx context.Context
+//   - key string
 func (_e *SessionManager_Expecter) Revoke(ctx interface{}, key interface{}) *SessionManager_Revoke_Call {
 	return &SessionManager_Revoke_Call{Call: _e.mock.On("Revoke", ctx, key)}
 }
 
 func (_c *SessionManager_Revoke_Call) Run(run func(ctx context.Context, key string)) *SessionManager_Revoke_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -225,15 +258,26 @@ type SessionManager_RevokeUser_Call struct {
 }
 
 // RevokeUser is a helper method to define mock.On call
-//   - ctx
-//   - id
+//   - ctx context.Context
+//   - id model.UserID
 func (_e *SessionManager_Expecter) RevokeUser(ctx interface{}, id interface{}) *SessionManager_RevokeUser_Call {
 	return &SessionManager_RevokeUser_Call{Call: _e.mock.On("RevokeUser", ctx, id)}
 }
 
 func (_c *SessionManager_RevokeUser_Call) Run(run func(ctx context.Context, id model.UserID)) *SessionManager_RevokeUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }

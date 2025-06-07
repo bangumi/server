@@ -72,16 +72,32 @@ type EpisodeRepo_Count_Call struct {
 }
 
 // Count is a helper method to define mock.On call
-//   - ctx
-//   - subjectID
-//   - filter
+//   - ctx context.Context
+//   - subjectID model.SubjectID
+//   - filter episode.Filter
 func (_e *EpisodeRepo_Expecter) Count(ctx interface{}, subjectID interface{}, filter interface{}) *EpisodeRepo_Count_Call {
 	return &EpisodeRepo_Count_Call{Call: _e.mock.On("Count", ctx, subjectID, filter)}
 }
 
 func (_c *EpisodeRepo_Count_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, filter episode.Filter)) *EpisodeRepo_Count_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(episode.Filter))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		var arg2 episode.Filter
+		if args[2] != nil {
+			arg2 = args[2].(episode.Filter)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
 	})
 	return _c
 }
@@ -128,15 +144,26 @@ type EpisodeRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - ctx
-//   - episodeID
+//   - ctx context.Context
+//   - episodeID model.EpisodeID
 func (_e *EpisodeRepo_Expecter) Get(ctx interface{}, episodeID interface{}) *EpisodeRepo_Get_Call {
 	return &EpisodeRepo_Get_Call{Call: _e.mock.On("Get", ctx, episodeID)}
 }
 
 func (_c *EpisodeRepo_Get_Call) Run(run func(ctx context.Context, episodeID model.EpisodeID)) *EpisodeRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.EpisodeID))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.EpisodeID
+		if args[1] != nil {
+			arg1 = args[1].(model.EpisodeID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
@@ -185,18 +212,44 @@ type EpisodeRepo_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//   - ctx
-//   - subjectID
-//   - filter
-//   - limit
-//   - offset
+//   - ctx context.Context
+//   - subjectID model.SubjectID
+//   - filter episode.Filter
+//   - limit int
+//   - offset int
 func (_e *EpisodeRepo_Expecter) List(ctx interface{}, subjectID interface{}, filter interface{}, limit interface{}, offset interface{}) *EpisodeRepo_List_Call {
 	return &EpisodeRepo_List_Call{Call: _e.mock.On("List", ctx, subjectID, filter, limit, offset)}
 }
 
 func (_c *EpisodeRepo_List_Call) Run(run func(ctx context.Context, subjectID model.SubjectID, filter episode.Filter, limit int, offset int)) *EpisodeRepo_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.SubjectID), args[2].(episode.Filter), args[3].(int), args[4].(int))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.SubjectID
+		if args[1] != nil {
+			arg1 = args[1].(model.SubjectID)
+		}
+		var arg2 episode.Filter
+		if args[2] != nil {
+			arg2 = args[2].(episode.Filter)
+		}
+		var arg3 int
+		if args[3] != nil {
+			arg3 = args[3].(int)
+		}
+		var arg4 int
+		if args[4] != nil {
+			arg4 = args[4].(int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
 	})
 	return _c
 }
@@ -236,14 +289,20 @@ type EpisodeRepo_WithQuery_Call struct {
 }
 
 // WithQuery is a helper method to define mock.On call
-//   - query1
+//   - query1 *query.Query
 func (_e *EpisodeRepo_Expecter) WithQuery(query1 interface{}) *EpisodeRepo_WithQuery_Call {
 	return &EpisodeRepo_WithQuery_Call{Call: _e.mock.On("WithQuery", query1)}
 }
 
 func (_c *EpisodeRepo_WithQuery_Call) Run(run func(query1 *query.Query)) *EpisodeRepo_WithQuery_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*query.Query))
+		var arg0 *query.Query
+		if args[0] != nil {
+			arg0 = args[0].(*query.Query)
+		}
+		run(
+			arg0,
+		)
 	})
 	return _c
 }

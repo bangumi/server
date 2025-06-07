@@ -64,18 +64,44 @@ type TimelineService_ChangeEpisodeStatus_Call struct {
 }
 
 // ChangeEpisodeStatus is a helper method to define mock.On call
-//   - ctx
-//   - u
-//   - sbj
-//   - episode1
-//   - t
+//   - ctx context.Context
+//   - u auth.Auth
+//   - sbj model.Subject
+//   - episode1 episode.Episode
+//   - t collection.EpisodeCollection
 func (_e *TimelineService_Expecter) ChangeEpisodeStatus(ctx interface{}, u interface{}, sbj interface{}, episode1 interface{}, t interface{}) *TimelineService_ChangeEpisodeStatus_Call {
 	return &TimelineService_ChangeEpisodeStatus_Call{Call: _e.mock.On("ChangeEpisodeStatus", ctx, u, sbj, episode1, t)}
 }
 
 func (_c *TimelineService_ChangeEpisodeStatus_Call) Run(run func(ctx context.Context, u auth.Auth, sbj model.Subject, episode1 episode.Episode, t collection.EpisodeCollection)) *TimelineService_ChangeEpisodeStatus_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(auth.Auth), args[2].(model.Subject), args[3].(episode.Episode), args[4].(collection.EpisodeCollection))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 auth.Auth
+		if args[1] != nil {
+			arg1 = args[1].(auth.Auth)
+		}
+		var arg2 model.Subject
+		if args[2] != nil {
+			arg2 = args[2].(model.Subject)
+		}
+		var arg3 episode.Episode
+		if args[3] != nil {
+			arg3 = args[3].(episode.Episode)
+		}
+		var arg4 collection.EpisodeCollection
+		if args[4] != nil {
+			arg4 = args[4].(collection.EpisodeCollection)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
 	})
 	return _c
 }
@@ -113,20 +139,56 @@ type TimelineService_ChangeSubjectCollection_Call struct {
 }
 
 // ChangeSubjectCollection is a helper method to define mock.On call
-//   - ctx
-//   - u
-//   - sbj
-//   - collect
-//   - collectID
-//   - comment
-//   - rate
+//   - ctx context.Context
+//   - u model.UserID
+//   - sbj model.Subject
+//   - collect collection.SubjectCollection
+//   - collectID uint64
+//   - comment string
+//   - rate uint8
 func (_e *TimelineService_Expecter) ChangeSubjectCollection(ctx interface{}, u interface{}, sbj interface{}, collect interface{}, collectID interface{}, comment interface{}, rate interface{}) *TimelineService_ChangeSubjectCollection_Call {
 	return &TimelineService_ChangeSubjectCollection_Call{Call: _e.mock.On("ChangeSubjectCollection", ctx, u, sbj, collect, collectID, comment, rate)}
 }
 
 func (_c *TimelineService_ChangeSubjectCollection_Call) Run(run func(ctx context.Context, u model.UserID, sbj model.Subject, collect collection.SubjectCollection, collectID uint64, comment string, rate uint8)) *TimelineService_ChangeSubjectCollection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.Subject), args[3].(collection.SubjectCollection), args[4].(uint64), args[5].(string), args[6].(uint8))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		var arg2 model.Subject
+		if args[2] != nil {
+			arg2 = args[2].(model.Subject)
+		}
+		var arg3 collection.SubjectCollection
+		if args[3] != nil {
+			arg3 = args[3].(collection.SubjectCollection)
+		}
+		var arg4 uint64
+		if args[4] != nil {
+			arg4 = args[4].(uint64)
+		}
+		var arg5 string
+		if args[5] != nil {
+			arg5 = args[5].(string)
+		}
+		var arg6 uint8
+		if args[6] != nil {
+			arg6 = args[6].(uint8)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+			arg6,
+		)
 	})
 	return _c
 }
@@ -164,18 +226,44 @@ type TimelineService_ChangeSubjectProgress_Call struct {
 }
 
 // ChangeSubjectProgress is a helper method to define mock.On call
-//   - ctx
-//   - u
-//   - sbj
-//   - epsUpdate
-//   - volsUpdate
+//   - ctx context.Context
+//   - u model.UserID
+//   - sbj model.Subject
+//   - epsUpdate uint32
+//   - volsUpdate uint32
 func (_e *TimelineService_Expecter) ChangeSubjectProgress(ctx interface{}, u interface{}, sbj interface{}, epsUpdate interface{}, volsUpdate interface{}) *TimelineService_ChangeSubjectProgress_Call {
 	return &TimelineService_ChangeSubjectProgress_Call{Call: _e.mock.On("ChangeSubjectProgress", ctx, u, sbj, epsUpdate, volsUpdate)}
 }
 
 func (_c *TimelineService_ChangeSubjectProgress_Call) Run(run func(ctx context.Context, u model.UserID, sbj model.Subject, epsUpdate uint32, volsUpdate uint32)) *TimelineService_ChangeSubjectProgress_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserID), args[2].(model.Subject), args[3].(uint32), args[4].(uint32))
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		var arg2 model.Subject
+		if args[2] != nil {
+			arg2 = args[2].(model.Subject)
+		}
+		var arg3 uint32
+		if args[3] != nil {
+			arg3 = args[3].(uint32)
+		}
+		var arg4 uint32
+		if args[4] != nil {
+			arg4 = args[4].(uint32)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
 	})
 	return _c
 }
