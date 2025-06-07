@@ -843,7 +843,7 @@ func (r mysqlRepo) UpdateEpisodeCollection(
 		return nil, err
 	}
 
-	if updated := updateMysqlEpisodeCollection(e, episodeIDs, collectionType); !updated {
+	if updated := updateMysqlEpisodeCollection(e, episodeIDs, collectionType, at); !updated {
 		return e.toModel(), nil
 	}
 
@@ -870,7 +870,7 @@ func (r mysqlRepo) createEpisodeCollection(
 	at time.Time,
 ) (collection.UserSubjectEpisodesCollection, error) {
 	var e = make(mysqlEpCollection, len(episodeIDs))
-	updateMysqlEpisodeCollection(e, episodeIDs, collectionType)
+	updateMysqlEpisodeCollection(e, episodeIDs, collectionType, at)
 
 	bytes, err := serializePhpEpStatus(e)
 	if err != nil {
@@ -897,6 +897,7 @@ func updateMysqlEpisodeCollection(
 	e mysqlEpCollection,
 	episodeIDs []model.EpisodeID,
 	collectionType collection.EpisodeCollection,
+	now time.Time,
 ) bool {
 	var updated bool
 
@@ -911,16 +912,28 @@ func updateMysqlEpisodeCollection(
 			delete(e, episodeID)
 			updated = true
 		}
-	} else {
-		for _, episodeID := range episodeIDs {
-			v, ok := e[episodeID]
-			if ok && v.Type == collectionType {
+		return updated
+	}
+
+	for _, episodeID := range episodeIDs {
+		v, ok := e[episodeID]
+		if ok {
+			if v.Type == collectionType {
 				continue
 			}
 
-			e[episodeID] = mysqlEpCollectionItem{EpisodeID: episodeID, Type: collectionType}
+			v.Type = collectionType
+			v.UpdatedAt[collectionType] = now.Unix()
 			updated = true
+			continue
 		}
+
+		e[episodeID] = mysqlEpCollectionItem{
+			EpisodeID: episodeID,
+			Type:      collectionType,
+			UpdatedAt: map[collection.EpisodeCollection]int64{collectionType: now.Unix()},
+		}
+		updated = true
 	}
 
 	return updated
