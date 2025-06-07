@@ -40,6 +40,7 @@ import (
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/dam"
+	"github.com/bangumi/server/internal/pkg/gmap"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/serialize"
 	"github.com/bangumi/server/internal/subject"
@@ -893,14 +894,6 @@ func (r mysqlRepo) createEpisodeCollection(
 	return e.toModel(), nil
 }
 
-func assignMaybeNilMap[K comparable, V any](m map[K]V, key K, value V) map[K]V {
-	if m == nil {
-		return map[K]V{key: value}
-	}
-	m[key] = value
-	return m
-}
-
 func updateMysqlEpisodeCollection(
 	e mysqlEpCollection,
 	episodeIDs []model.EpisodeID,
@@ -931,7 +924,7 @@ func updateMysqlEpisodeCollection(
 			}
 
 			v.Type = collectionType
-			v.UpdatedAt = assignMaybeNilMap(v.UpdatedAt, collectionType, now.Unix())
+			v.UpdatedAt = gmap.SafeAssignMap(v.UpdatedAt, collectionType, now.Unix())
 			updated = true
 			continue
 		}

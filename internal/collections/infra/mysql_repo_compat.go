@@ -39,13 +39,6 @@ func deserializeEpStatus(serialized []byte) (mysqlEpCollection, error) {
 		return nil, errgo.Wrap(err, "php deserialize")
 	}
 
-	for _, v := range e {
-		// so we do not need to take care empty map later
-		if v.UpdatedAt == nil {
-			v.UpdatedAt = map[collection.EpisodeCollection]int64{}
-		}
-	}
-
 	return e, nil
 }
 
