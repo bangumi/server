@@ -912,23 +912,28 @@ func updateMysqlEpisodeCollection(
 			delete(e, episodeID)
 			updated = true
 		}
-	} else {
-		for _, episodeID := range episodeIDs {
-			v, ok := e[episodeID]
-			if ok {
-				if v.Type == collectionType {
-					continue
-				} else {
-					v.Type = collectionType
-					v.UpdatedAt[collectionType] = now.Unix()
-					updated = true
-				}
-				continue
-			}
+		return updated
+	}
 
-			e[episodeID] = mysqlEpCollectionItem{EpisodeID: episodeID, Type: collectionType, UpdatedAt: map[collection.EpisodeCollection]int64{collectionType: now.Unix()}}
-			updated = true
+	for _, episodeID := range episodeIDs {
+		v, ok := e[episodeID]
+		if ok {
+			if v.Type == collectionType {
+				continue
+			} else {
+				v.Type = collectionType
+				v.UpdatedAt[collectionType] = now.Unix()
+				updated = true
+			}
+			continue
 		}
+
+		e[episodeID] = mysqlEpCollectionItem{
+			EpisodeID: episodeID,
+			Type:      collectionType,
+			UpdatedAt: map[collection.EpisodeCollection]int64{collectionType: now.Unix()},
+		}
+		updated = true
 	}
 
 	return updated
