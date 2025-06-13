@@ -1,0 +1,33 @@
+name: Release(openapi)
+
+on:
+  repository_dispatch:
+    types:
+      - ci-update-common
+
+jobs:
+  openapi:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: git pull origin master
+        working-directory: ./pkg/vars/common
+
+      - run: yarn install --frozen-lockfile
+      - run: yarn run build-common
+      - run: yarn run format
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.PAT }}
+          title: "feat: update common"
+          branch: "ci/update-common"
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
