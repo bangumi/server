@@ -1,12 +1,18 @@
-name: Release(openapi)
+name: update common defs
 
 on:
+  push:
+    branches:
+      - master
   repository_dispatch:
     types:
       - ci-update-common
 
+permissions:
+  contents: write
+
 jobs:
-  openapi:
+  update:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +23,7 @@ jobs:
         with:
           node-version: 22
 
-      - run: git pull origin master
+      - run: git reset --hard origin/master
         working-directory: ./pkg/vars/common
 
       - run: yarn install --frozen-lockfile
@@ -30,4 +36,5 @@ jobs:
           token: ${{ secrets.PAT }}
           title: "feat: update common"
           branch: "ci/update-common"
+          push-to-fork: "trim21-bot/bangumi-server"
           author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
