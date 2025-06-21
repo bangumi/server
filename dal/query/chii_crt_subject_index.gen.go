@@ -66,7 +66,7 @@ type characterSubjects struct {
 	CharacterID   field.Uint32
 	SubjectID     field.Uint32
 	SubjectTypeID field.Uint8
-	CrtType       field.Uint8  // 主角，配角
+	CrtType       field.Uint8 // 主角，配角
 	CrtOrder      field.Uint16
 	Character     characterSubjectsHasOneCharacter
 
