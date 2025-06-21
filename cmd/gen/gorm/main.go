@@ -417,6 +417,7 @@ func main() {
 
 	g.ApplyBasic(
 		g.GenerateModelAs("chii_crt_subject_index", "CharacterSubjects",
+			gen.FieldIgnore("ctr_appear_eps"),
 			gen.FieldRename("crt_id", "CharacterID"),
 			gen.FieldType("crt_id", characterIDTypeString),
 			gen.FieldType("subject_id", subjectIDTypeString),
