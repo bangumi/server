@@ -27,7 +27,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.22.0
 	github.com/redis/rueidis v1.0.62
-	github.com/samber/lo v1.50.0
+	github.com/samber/lo v1.51.0
 	github.com/segmentio/kafka-go v0.4.48
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
