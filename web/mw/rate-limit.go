@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/internal/pkg/logger"
+	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -46,9 +48,18 @@ func RateLimit(cfg config.AppConfig, r rueidis.Client) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			ip := c.RealIP()
+			u := accessor.GetFromCtx(c)
 
-			var longBanKey = "chii:rate-limit:long:3:" + ip
-			var rateLimitKey = "chii:rate-limit:rate:3:" + ip
+			var longBanKey string
+			var rateLimitKey string
+
+			if u.Login {
+				longBanKey = "chii:rate-limit:long:3:u:" + strconv.FormatUint(uint64(u.ID), 10)
+				rateLimitKey = "chii:rate-limit:rate:3:u:" + strconv.FormatUint(uint64(u.ID), 10)
+			} else {
+				longBanKey = "chii:rate-limit:long:3:ip:" + ip
+				rateLimitKey = "chii:rate-limit:rate:3:ip:" + ip
+			}
 
 			banned, err := script.Exec(c.Request().Context(), r, []string{longBanKey, rateLimitKey}, args).ToInt64()
 			if err != nil {
