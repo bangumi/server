@@ -37,6 +37,7 @@ import (
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/dam"
+	"github.com/bangumi/server/internal/pkg/driver"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/internal/revision"
 	"github.com/bangumi/server/internal/search"
@@ -106,6 +107,8 @@ func GetWebApp(tb testing.TB, m Mock) *echo.Echo {
 		// don't need a default mock for these repositories.
 		fx.Provide(func() collections.Repo { return m.CollectionRepo }),
 		fx.Provide(func() search.Handler { return search.NoopClient{} }),
+
+		fx.Provide(driver.NewRueidisClient),
 
 		fx.Invoke(web.AddRouters),
 
