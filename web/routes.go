@@ -16,6 +16,7 @@ package web
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/redis/rueidis"
 
 	"github.com/bangumi/server/web/handler"
 	"github.com/bangumi/server/web/handler/character"
@@ -35,6 +36,7 @@ import (
 func AddRouters(
 	app *echo.Echo,
 	common common.Common,
+	rueidis rueidis.Client,
 	h handler.Handler,
 	userHandler user.User,
 	personHandler person.Person,
@@ -48,6 +50,7 @@ func AddRouters(
 	app.Use(ua.DisableBrokenUA)
 
 	v0 := app.Group("/v0", common.MiddlewareAccessTokenAuth)
+	v0.Use(mw.RateLimit(common.Config, rueidis))
 
 	v0.POST("/search/subjects", h.SearchSubjects)
 	v0.POST("/search/characters", h.SearchCharacters)

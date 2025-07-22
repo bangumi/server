@@ -28,7 +28,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/redis/rueidis"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/config"
@@ -37,7 +36,6 @@ import (
 	"github.com/bangumi/server/internal/pkg/gtime"
 	"github.com/bangumi/server/internal/pkg/logger"
 	"github.com/bangumi/server/openapi"
-	"github.com/bangumi/server/web/mw"
 	"github.com/bangumi/server/web/mw/recovery"
 	"github.com/bangumi/server/web/req/cf"
 )
@@ -46,7 +44,7 @@ const headerProcessTime = "x-process-time-ms"
 const headerServerVersion = "x-server-version"
 
 //nolint:funlen
-func New(r rueidis.Client, cfg config.AppConfig) *echo.Echo {
+func New() *echo.Echo {
 	app := echo.New()
 	app.HTTPErrorHandler = getDefaultErrorHandler()
 	app.HideBanner = true
@@ -77,8 +75,6 @@ func New(r rueidis.Client, cfg config.AppConfig) *echo.Echo {
 	}
 
 	app.Use(recovery.New())
-
-	app.Use(mw.RateLimit(cfg, r))
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
