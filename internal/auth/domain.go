@@ -35,9 +35,10 @@ type Service interface {
 }
 
 type UserInfo struct {
-	RegTime time.Time
-	ID      model.UserID
-	GroupID user.GroupID
+	RegTime    time.Time
+	ID         model.UserID
+	GroupID    user.GroupID
+	Permission Permission
 }
 
 // Auth is the basic authorization represent a user.
