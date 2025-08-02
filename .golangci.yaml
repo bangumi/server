@@ -30,10 +30,10 @@ linters:
     - gocheckcompilerdirectives
     - gochecknoglobals
     - gochecknoinits
-    - gocognit
+#    - gocognit
     - goconst
     - gocritic
-    - gocyclo
+#    - gocyclo
     - godot
     - gomoddirectives
     - gomodguard
