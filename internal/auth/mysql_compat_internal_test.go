@@ -23,7 +23,7 @@ import (
 func TestUnmarshalPHP(t *testing.T) {
 	t.Parallel()
 	raw := "a:2:{s:15:\"user_wiki_apply\";s:1:\"1\";s:6:\"report\";s:1:\"1\";}"
-	p, err := ParseSerializedPermission([]byte(raw))
+	p, err := parseSerializedPermission([]byte(raw))
 	require.NoError(t, err)
 	require.True(t, p.Report)
 	require.False(t, p.ManageReport)

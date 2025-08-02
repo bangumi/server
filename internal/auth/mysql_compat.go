@@ -59,7 +59,7 @@ type phpPermission struct {
 	AppErase           string `php:"app_erase" json:"app_erase"`
 }
 
-func ParseSerializedPermission(b []byte) (Permission, error) {
+func parseSerializedPermission(b []byte) (Permission, error) {
 	var p phpPermission
 	if len(b) > 0 {
 		err := serialize.Decode(b, &p)

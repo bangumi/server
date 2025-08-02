@@ -82,7 +82,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		return UserInfo{}, errgo.Wrap(err, "gorm")
 	}
 
-	perm, err := ParseSerializedPermission([]byte(u.ACL))
+	perm, err := parseSerializedPermission([]byte(u.ACL))
 	if err != nil {
 		return UserInfo{}, errgo.Wrap(err, "parsing permission")
 	}
@@ -105,7 +105,7 @@ func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission
 		return Permission{}, errgo.Wrap(err, "dal")
 	}
 
-	p, err := ParseSerializedPermission(r.Perm)
+	p, err := parseSerializedPermission(r.Perm)
 	if err != nil {
 		m.log.Error("failed to decode php serialized content", zap.Error(err), zap.Uint8("user_group_id", groupID))
 		return Permission{}, nil
