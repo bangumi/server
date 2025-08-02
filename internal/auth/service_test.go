@@ -33,7 +33,7 @@ func TestService_GetByToken(t *testing.T) {
 	t.Parallel()
 
 	var m = mocks.NewAuthRepo(t)
-	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(auth.UserInfo{GroupID: 2}, nil)
+	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).Return(auth.UserInfo{GroupID: 2, Permission: auth.Permission{EpEdit: true}}, nil)
 	m.EXPECT().GetPermission(mock.Anything, user.GroupID(2)).Return(auth.Permission{EpEdit: true}, nil)
 
 	var u = mocks.NewUserRepo(t)
