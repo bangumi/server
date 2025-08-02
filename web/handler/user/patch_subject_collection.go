@@ -61,6 +61,8 @@ func (h User) patchSubjectCollection(
 			return res.NotFound("subject not collected")
 		case errors.Is(err, gerr.ErrSubjectNotFound):
 			return res.NotFound("subject not found")
+		case errors.Is(err, gerr.ErrBanned):
+			return res.Forbidden(err.Error())
 		}
 		return errgo.Wrap(err, "ctrl.UpdateSubjectCollection")
 	}
@@ -75,6 +77,10 @@ func (h User) updateOrCreateSubjectCollection(
 	allowCreate bool, // 如果不存在 record 是否允许创建
 ) error {
 	u := accessor.GetFromCtx(c)
+
+	if u.Permission.UserBan {
+		return gerr.ErrBanned
+	}
 
 	s, err := h.subject.Get(c.Request().Context(), subjectID, subject.Filter{NSFW: null.Bool{Set: !u.AllowNSFW()}})
 	if err != nil {

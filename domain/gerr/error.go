@@ -36,6 +36,8 @@ var ErrInvisibleChar = errors.New("input contains invisible chars")
 
 var ErrExists = errors.New("item already exists")
 
+var ErrBanned = errors.New("you are not allowed to do this")
+
 var ErrInvalidData = errors.New("invalid data")
 
 func WrapGormError(err error) error {

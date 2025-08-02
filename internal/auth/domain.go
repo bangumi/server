@@ -47,7 +47,7 @@ type Auth struct {
 	RegTime    time.Time
 	ID         model.UserID // user id
 	GroupID    user.GroupID
-	Permission Permission `json:"-"` // disable cache for this field.
+	Permission Permission
 }
 
 const nsfwThreshold = gtime.OneDay * 60
