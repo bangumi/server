@@ -15,10 +15,13 @@
 package user
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/trim21/errgo"
 
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
@@ -41,7 +44,15 @@ func (h User) PostSubjectCollection(c echo.Context) error {
 	// 与 PatchSubjectCollection 一致
 	// 但允许创建，如果不存在
 	if err := h.updateOrCreateSubjectCollection(c, subjectID, r, true); err != nil {
-		return err
+		switch {
+		case errors.Is(err, gerr.ErrSubjectNotCollected):
+			return res.NotFound("subject not collected")
+		case errors.Is(err, gerr.ErrSubjectNotFound):
+			return res.NotFound("subject not found")
+		case errors.Is(err, gerr.ErrBanned):
+			return res.Forbidden(err.Error())
+		}
+		return errgo.Wrap(err, "ctrl.UpdateSubjectCollection")
 	}
 	return c.NoContent(http.StatusAccepted)
 }

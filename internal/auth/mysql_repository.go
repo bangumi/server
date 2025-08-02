@@ -69,10 +69,11 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 	var u struct {
 		Regdate int64
 		GroupID user.GroupID
+		ACL     string
 	}
 
-	err = m.db.QueryRowContext(ctx, `select regdate, groupid from chii_members where uid = ? limit 1`, id).
-		Scan(&u.Regdate, &u.GroupID)
+	err = m.db.QueryRowContext(ctx, `select regdate, groupid, acl from chii_members where uid = ? limit 1`, id).
+		Scan(&u.Regdate, &u.GroupID, &u.ACL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return UserInfo{}, gerr.ErrNotFound
@@ -81,10 +82,16 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		return UserInfo{}, errgo.Wrap(err, "gorm")
 	}
 
+	perm, err := parseSerializedPermission([]byte(u.ACL))
+	if err != nil {
+		return UserInfo{}, errgo.Wrap(err, "parsing permission")
+	}
+
 	return UserInfo{
-		RegTime: time.Unix(u.Regdate, 0),
-		ID:      id,
-		GroupID: u.GroupID,
+		RegTime:    time.Unix(u.Regdate, 0),
+		ID:         id,
+		GroupID:    u.GroupID,
+		Permission: perm,
 	}, nil
 }
 

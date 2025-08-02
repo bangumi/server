@@ -35,9 +35,10 @@ type Service interface {
 }
 
 type UserInfo struct {
-	RegTime time.Time
-	ID      model.UserID
-	GroupID user.GroupID
+	RegTime    time.Time
+	ID         model.UserID
+	GroupID    user.GroupID
+	Permission Permission
 }
 
 // Auth is the basic authorization represent a user.
@@ -46,7 +47,7 @@ type Auth struct {
 	RegTime    time.Time
 	ID         model.UserID // user id
 	GroupID    user.GroupID
-	Permission Permission `json:"-"` // disable cache for this field.
+	Permission Permission
 }
 
 const nsfwThreshold = gtime.OneDay * 60
@@ -107,4 +108,43 @@ type Permission struct {
 	Report             bool
 	ManageApp          bool
 	AppErase           bool
+}
+
+func (p Permission) Merge(other Permission) Permission {
+	return Permission{
+		UserBan: p.UserBan || other.UserBan,
+		BanPost: p.BanPost || other.BanPost,
+
+		UserList:           p.UserList && other.UserList,
+		ManageUserGroup:    p.ManageUserGroup && other.ManageUserGroup,
+		ManageUserPhoto:    p.ManageUserPhoto && other.ManageUserPhoto,
+		ManageTopicState:   p.ManageTopicState && other.ManageTopicState,
+		ManageReport:       p.ManageReport && other.ManageReport,
+		ManageUser:         p.ManageUser && other.ManageUser,
+		UserGroup:          p.UserGroup && other.UserGroup,
+		UserWikiApply:      p.UserWikiApply && other.UserWikiApply,
+		UserWikiApprove:    p.UserWikiApprove && other.UserWikiApprove,
+		DoujinSubjectErase: p.DoujinSubjectErase && other.DoujinSubjectErase,
+		DoujinSubjectLock:  p.DoujinSubjectLock && other.DoujinSubjectLock,
+		SubjectEdit:        p.SubjectEdit && other.SubjectEdit,
+		SubjectLock:        p.SubjectLock && other.SubjectLock,
+		SubjectRefresh:     p.SubjectRefresh && other.SubjectRefresh,
+		SubjectRelated:     p.SubjectRelated && other.SubjectRelated,
+		SubjectMerge:       p.SubjectMerge && other.SubjectMerge,
+		SubjectErase:       p.SubjectErase && other.SubjectErase,
+		SubjectCoverLock:   p.SubjectCoverLock && other.SubjectCoverLock,
+		SubjectCoverErase:  p.SubjectCoverErase && other.SubjectCoverErase,
+		MonoEdit:           p.MonoEdit && other.MonoEdit,
+		MonoLock:           p.MonoLock && other.MonoLock,
+		MonoMerge:          p.MonoMerge && other.MonoMerge,
+		MonoErase:          p.MonoErase && other.MonoErase,
+		EpEdit:             p.EpEdit && other.EpEdit,
+		EpMove:             p.EpMove && other.EpMove,
+		EpMerge:            p.EpMerge && other.EpMerge,
+		EpLock:             p.EpLock && other.EpLock,
+		EpErase:            p.EpErase && other.EpErase,
+		Report:             p.Report && other.Report,
+		ManageApp:          p.ManageApp && other.ManageApp,
+		AppErase:           p.AppErase && other.AppErase,
+	}
 }

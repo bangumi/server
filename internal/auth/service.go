@@ -62,7 +62,7 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
 		}
 
-		_ = s.cache.Set(ctx, cacheKey, a, time.Hour)
+		_ = s.cache.Set(ctx, cacheKey, a, time.Minute*10)
 	}
 
 	permission, err := s.getPermission(ctx, a.GroupID)
@@ -75,7 +75,7 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 		RegTime:    a.RegTime,
 		ID:         a.ID,
 		GroupID:    a.GroupID,
-		Permission: permission,
+		Permission: permission.Merge(a.Permission),
 	}, nil
 }
 
