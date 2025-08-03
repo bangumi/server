@@ -42,7 +42,7 @@ require (
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gen v0.3.27
 	gorm.io/gorm v1.30.1
-	gorm.io/plugin/dbresolver v1.6.0
+	gorm.io/plugin/dbresolver v1.6.2
 	gorm.io/plugin/soft_delete v1.2.1
 )
 
