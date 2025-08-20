@@ -364,10 +364,6 @@ func careers(p *dao.Person) []string {
 		s = append(s, "seiyu")
 	}
 
-	if p.Writer {
-		s = append(s, "writer")
-	}
-
 	if p.Illustrator {
 		s = append(s, "illustrator")
 	}
