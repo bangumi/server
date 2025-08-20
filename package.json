@@ -13,10 +13,10 @@
     "printWidth": 120
   },
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^14.1.1",
+    "@apidevtools/json-schema-ref-parser": "^14.2.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
-    "yaml": "^2.8.0"
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
     "colors": "^1.4.0",
