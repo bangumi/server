@@ -13,7 +13,7 @@ jobs:
   openapi:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -21,7 +21,7 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn run build
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: "bangumi/api"
           path: api

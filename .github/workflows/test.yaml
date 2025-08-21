@@ -29,7 +29,7 @@ jobs:
       - run: git clone https://github.com/bangumi/dev-env $HOME/dev-env --branch=gh-pages
       - run: cd ~/dev-env && docker compose up -d
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
 
