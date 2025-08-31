@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
@@ -26,7 +27,7 @@ func (c *client) OnAdded(ctx context.Context, id model.PersonID) error {
 
 	extracted := extract(&s)
 
-	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, "id")
+	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, lo.ToPtr("id"))
 	return err
 }
 
@@ -45,7 +46,7 @@ func (c *client) OnUpdate(ctx context.Context, id model.PersonID) error {
 
 	extracted := extract(&s)
 
-	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, "id")
+	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, lo.ToPtr("id"))
 
 	return err
 }
