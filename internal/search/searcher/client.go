@@ -170,9 +170,10 @@ func InitIndex(log *zap.Logger, meili meilisearch.ServiceManager, idx string, rt
 	}
 
 	log.Info("set filterable attributes", zap.Strings("attributes", *GetAttributes(rt, "filterable")))
-	_, err = index.UpdateFilterableAttributes(lo.ToPtr(lo.Map(*GetAttributes(rt, "filterable"), func(s string, index int) any {
-		return s
-	})))
+	_, err = index.UpdateFilterableAttributes(lo.ToPtr(
+		lo.Map(*GetAttributes(rt, "filterable"), func(s string, index int) any {
+			return s
+		})))
 	if err != nil {
 		log.Fatal("failed to update search index filterable attributes", zap.Error(err))
 		return
