@@ -1,6 +1,6 @@
 module github.com/bangumi/server
 
-go 1.24.6
+go 1.24.7
 
 tool github.com/vektra/mockery/v3
 
