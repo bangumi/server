@@ -97,6 +97,7 @@ func TestMysqlRepo_CountSubjectCollections(t *testing.T) {
 			WithContext(context.Background()).
 			Create(&dao.SubjectCollection{
 				UserID:      id,
+				Type:        2,
 				SubjectID:   model.SubjectID(i + 100),
 				SubjectType: model.SubjectTypeAnime,
 				UpdatedTime: uint32(time.Now().Unix()),
