@@ -66,6 +66,7 @@ func TestMysqlRepo_GetCollection(t *testing.T) {
 		UserID:    id,
 		SubjectID: subjectID,
 		Rate:      2,
+		Type:      1,
 	})
 	require.NoError(t, err)
 
@@ -136,6 +137,7 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 			WithContext(context.Background()).
 			Create(&dao.SubjectCollection{
 				UserID:      uid,
+				Type:        2,
 				SubjectID:   model.SubjectID(100 + i),
 				SubjectType: model.SubjectTypeAnime,
 				UpdatedTime: uint32(time.Now().Unix()),

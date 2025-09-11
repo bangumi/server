@@ -568,8 +568,9 @@ func (r mysqlRepo) reCountSubjectCollection(ctx context.Context, subjectID model
 
 	return r.q.Transaction(func(tx *query.Query) error {
 		err := tx.DB().WithContext(ctx).Raw(`
-			select interest_type as type, count(interest_type) as total from chii_subject_interests 
-			where interest_subject_id = ?
+			select interest_type as type, count(interest_type) as total
+			  from chii_subject_interests
+				where interest_subject_id = ? and interest_type != 0
 			group by interest_type
 		`, subjectID).Scan(&counts).Error
 		if err != nil {
