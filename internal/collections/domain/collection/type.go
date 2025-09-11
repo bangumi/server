@@ -16,6 +16,10 @@ package collection
 
 type SubjectCollection uint8
 
+func (s SubjectCollection) IsValid() bool {
+	return s > 0 && s <= 5
+}
+
 const (
 	SubjectCollectionAll     SubjectCollection = 0 // 全部
 	SubjectCollectionWish    SubjectCollection = 1 // 想看
