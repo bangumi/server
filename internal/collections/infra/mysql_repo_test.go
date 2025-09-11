@@ -151,6 +151,7 @@ func TestMysqlRepo_ListSubjectCollection(t *testing.T) {
 			WithContext(context.Background()).
 			Create(&dao.SubjectCollection{
 				UserID:      uid,
+				Type:        2,
 				SubjectID:   200 + i,
 				SubjectType: model.SubjectTypeGame,
 				UpdatedTime: uint32(time.Now().Unix()),
