@@ -43,6 +43,12 @@ type SubjectEpisodeCollectionPatch struct {
 }
 
 func (v *SubjectEpisodeCollectionPatch) Validate() error {
+	if v.Type.Set {
+		if !v.Type.Value.IsValid() {
+			return res.BadRequest("invalid type")
+		}
+	}
+
 	if v.Rate.Set {
 		if v.Rate.Value > 10 {
 			return res.BadRequest("rate overflow")
