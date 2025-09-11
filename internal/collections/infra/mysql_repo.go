@@ -64,7 +64,10 @@ func (r mysqlRepo) getSubjectCollection(
 	ctx context.Context, user model.UserID, subject model.SubjectID,
 ) (*dao.SubjectCollection, error) {
 	s, err := r.q.SubjectCollection.WithContext(ctx).
-		Where(r.q.SubjectCollection.UserID.Eq(user), r.q.SubjectCollection.SubjectID.Eq(subject)).Take()
+		Where(
+			r.q.SubjectCollection.UserID.Eq(user),
+			r.q.SubjectCollection.SubjectID.Eq(subject),
+		).Take()
 	if err != nil {
 		return nil, gerr.WrapGormError(err)
 	}
@@ -420,7 +423,9 @@ func (r mysqlRepo) CountSubjectCollections(
 	showPrivate bool,
 ) (int64, error) {
 	q := r.q.SubjectCollection.WithContext(ctx).
-		Where(r.q.SubjectCollection.UserID.Eq(userID))
+		Where(r.q.SubjectCollection.UserID.Eq(userID),
+			r.q.SubjectCollection.Type.Neq(0),
+		)
 
 	if subjectType != model.SubjectTypeAll {
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
@@ -452,7 +457,10 @@ func (r mysqlRepo) ListSubjectCollection(
 ) ([]collection.UserSubjectCollection, error) {
 	q := r.q.SubjectCollection.WithContext(ctx).
 		Order(r.q.SubjectCollection.UpdatedTime.Desc()).
-		Where(r.q.SubjectCollection.UserID.Eq(userID)).Limit(limit).Offset(offset)
+		Where(
+			r.q.SubjectCollection.UserID.Eq(userID),
+			r.q.SubjectCollection.Type.Neq(0),
+		).Limit(limit).Offset(offset)
 
 	if subjectType != model.SubjectTypeAll {
 		q = q.Where(r.q.SubjectCollection.SubjectType.Eq(subjectType))
@@ -494,7 +502,11 @@ func (r mysqlRepo) GetSubjectCollection(
 	ctx context.Context, userID model.UserID, subjectID model.SubjectID,
 ) (collection.UserSubjectCollection, error) {
 	c, err := r.q.SubjectCollection.WithContext(ctx).
-		Where(r.q.SubjectCollection.UserID.Eq(userID), r.q.SubjectCollection.SubjectID.Eq(subjectID)).Take()
+		Where(
+			r.q.SubjectCollection.UserID.Eq(userID),
+			r.q.SubjectCollection.SubjectID.Eq(subjectID),
+			r.q.SubjectCollection.Type.Neq(0),
+		).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return collection.UserSubjectCollection{}, gerr.ErrSubjectNotCollected
