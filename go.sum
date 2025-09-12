@@ -229,8 +229,8 @@ github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOf
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/trim21/errgo v0.0.6 h1:Qz10hGY51k5u7ADRa/jqan8VaQYKx7hAqUJ6t5m42/I=
 github.com/trim21/errgo v0.0.6/go.mod h1:8uSKeZAGc+XDaPDqcgOCduVPb2Xpb1YxqxfMK1JcLlo=
-github.com/trim21/go-phpserialize v0.1.1 h1:YDDTZ10D+xqWgvnaSeud90xHRb+51VBUiQYxRTZY11k=
-github.com/trim21/go-phpserialize v0.1.1/go.mod h1:StH8iTviDvvY7dcMSNgRSzRzcuKmj2YZ/EETVRGlIws=
+github.com/trim21/go-phpserialize v0.1.2 h1:pVkA5n4IeUxpJemGmCLZXFhnZs5wL6LCqofi++zMqDU=
+github.com/trim21/go-phpserialize v0.1.2/go.mod h1:StH8iTviDvvY7dcMSNgRSzRzcuKmj2YZ/EETVRGlIws=
 github.com/trim21/htest v0.0.4 h1:dDIzKNdIClgtB158DlO+Xf0sfwNycmx3kfo/FJuY+eE=
 github.com/trim21/htest v0.0.4/go.mod h1:W+zaYAGCBqx38eMrMGvXrALnbcXR6OBtZiRiHahgo+E=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
