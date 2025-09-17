@@ -37,7 +37,7 @@ require (
 	github.com/trim21/htest v0.0.4
 	go.uber.org/fx v1.24.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/sync v0.16.0
+	golang.org/x/sync v0.17.0
 	golang.org/x/text v0.28.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gen v0.3.27
