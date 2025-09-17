@@ -31,7 +31,7 @@ require (
 	github.com/segmentio/kafka-go v0.4.48
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.10
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/trim21/errgo v0.0.6
 	github.com/trim21/go-phpserialize v0.1.2
 	github.com/trim21/htest v0.0.4
