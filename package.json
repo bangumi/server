@@ -19,6 +19,7 @@
     "yaml": "^2.8.1"
   },
   "devDependencies": {
+    "@types/json-schema": "^7.0.15",
     "colors": "^1.4.0",
     "oas-validator": "^5.0.8",
     "prettier": "^3.6.2"
