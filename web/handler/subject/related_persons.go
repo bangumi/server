@@ -19,10 +19,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/bangumi/wiki-parser-go"
 	"github.com/labstack/echo/v4"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/pkg/vars"
@@ -59,6 +61,7 @@ func (h Subject) GetRelatedPersons(c echo.Context) error {
 		response[i] = res.SubjectRelatedPerson{
 			Images:   res.PersonImage(rel.Person.Image),
 			Name:     rel.Person.Name,
+			Infobox:  compat.V0Wiki(wiki.ParseOmitError(rel.Person.Infobox).NonZero()),
 			Relation: vars.StaffMap[r.TypeID][rel.TypeID].String(),
 			Career:   rel.Person.Careers(),
 			Type:     rel.Person.Type,
