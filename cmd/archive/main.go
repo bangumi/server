@@ -480,6 +480,7 @@ type SubjectPerson struct {
 	PersonID  model.PersonID  `json:"person_id"`
 	SubjectID model.SubjectID `json:"subject_id"`
 	Position  uint16          `json:"position"`
+	AppearEps string          `json:"appear_eps"`
 }
 
 func exportSubjectPersonRelations(q *query.Query, w io.Writer) {
@@ -496,6 +497,7 @@ func exportSubjectPersonRelations(q *query.Query, w io.Writer) {
 				PersonID:  rel.PersonID,
 				SubjectID: rel.SubjectID,
 				Position:  rel.PrsnPosition,
+				AppearEps: rel.PrsnAppearEps,
 			})
 		}
 	}
