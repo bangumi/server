@@ -3,3 +3,5 @@
 .vscode/
 .idea/
 static/
+
+pkg/vars/common/
