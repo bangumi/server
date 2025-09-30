@@ -11,7 +11,8 @@ type CharacterSubjects struct {
 	CharacterID   uint32    `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey" json:""`
 	SubjectID     uint32    `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey" json:""`
 	SubjectTypeID uint8     `gorm:"column:subject_type_id;type:tinyint(4) unsigned;not null" json:""`
-	CrtType       uint8     `gorm:"column:crt_type;type:tinyint(4) unsigned;not null;comment:主角，配角" json:""` // 主角，配角
+	CrtType       uint8     `gorm:"column:crt_type;type:tinyint(4) unsigned;not null;comment:主角，配角" json:""`    // 主角，配角
+	CrtAppearEps  string    `gorm:"column:crt_appear_eps;type:mediumtext;not null;comment:可选，角色出场的的章节" json:""` // 可选，角色出场的的章节
 	CrtOrder      uint16    `gorm:"column:crt_order;type:smallint(6) unsigned;not null" json:""`
 	Character     Character `gorm:"foreignKey:crt_id;references:crt_id" json:"character"`
 	Subject       Subject   `gorm:"foreignKey:subject_id;references:subject_id" json:"subject"`
