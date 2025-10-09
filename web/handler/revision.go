@@ -285,7 +285,7 @@ func convertModelPersonRevision(r *model.PersonRevision, creatorMap map[model.Us
 		Summary: r.Summary,
 		Creator: res.Creator{
 			Username: creator.UserName,
-			Nickname: creator.UserName,
+			Nickname: creator.NickName,
 		},
 		CreatedAt: r.CreatedAt,
 		Data:      nil,
