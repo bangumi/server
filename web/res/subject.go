@@ -263,6 +263,7 @@ type SubjectRelatedSubject struct {
 type SubjectRelatedCharacter struct {
 	Images   PersonImages      `json:"images"`
 	Name     string            `json:"name"`
+	Infobox  V0wiki            `json:"infobox"`
 	Relation string            `json:"relation"`
 	Actors   []Actor           `json:"actors"`
 	Type     uint8             `json:"type"`
@@ -272,6 +273,7 @@ type SubjectRelatedCharacter struct {
 type SubjectRelatedPerson struct {
 	Images   PersonImages   `json:"images"`
 	Name     string         `json:"name" doc:"person name"`
+	Infobox  V0wiki         `json:"infobox"`
 	Relation string         `json:"relation"`
 	Career   []string       `json:"career"`
 	Type     uint8          `json:"type"`
