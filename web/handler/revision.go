@@ -340,7 +340,7 @@ func convertModelSubjectRevision(
 		Summary: r.Summary,
 		Creator: res.Creator{
 			Username: creator.UserName,
-			Nickname: creator.UserName,
+			Nickname: creator.NickName,
 		},
 		CreatedAt: r.CreatedAt,
 		Data:      data,
@@ -357,7 +357,7 @@ func convertModelCharacterRevision(
 		Summary: r.Summary,
 		Creator: res.Creator{
 			Username: creator.UserName,
-			Nickname: creator.UserName,
+			Nickname: creator.NickName,
 		},
 		CreatedAt: r.CreatedAt,
 	}
@@ -383,7 +383,7 @@ func convertModelEpisodeRevision(r *model.EpisodeRevision, creatorMap map[model.
 		Summary: r.Summary,
 		Creator: res.Creator{
 			Username: creator.UserName,
-			Nickname: creator.UserName,
+			Nickname: creator.NickName,
 		},
 		CreatedAt: r.CreatedAt,
 	}
