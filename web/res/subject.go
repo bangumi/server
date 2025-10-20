@@ -211,6 +211,7 @@ type Rating struct {
 
 type PersonRelatedSubject struct {
 	Staff     string            `json:"staff"`
+	Eps       string            `json:"eps" doc:"episodes participated"`
 	Name      string            `json:"name"`
 	NameCn    string            `json:"name_cn"`
 	Image     string            `json:"image"`

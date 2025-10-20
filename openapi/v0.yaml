@@ -3244,6 +3244,7 @@ components:
         - id
         - type
         - staff
+        - eps
         - name
         - name_cn
       type: object
@@ -3256,6 +3257,10 @@ components:
         staff:
           title: Staff
           type: string
+        eps:
+          title: Eps
+          type: string
+          description: 参与章节/曲目
         name:
           title: Name
           type: string

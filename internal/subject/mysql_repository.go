@@ -146,6 +146,7 @@ func (r mysqlRepo) GetPersonRelated(
 			SubjectID: relation.SubjectID,
 			PersonID:  relation.PersonID,
 			TypeID:    relation.PrsnPosition,
+			Eps:       relation.PrsnAppearEps,
 		})
 	}
 
