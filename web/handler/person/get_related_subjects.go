@@ -61,6 +61,7 @@ func (h Person) GetRelatedSubjects(c echo.Context) error {
 	for i, relation := range relations {
 		response[i] = res.PersonRelatedSubject{
 			SubjectID: relation.Subject.ID,
+			Eps:       relation.Eps,
 			Type:      relation.Subject.TypeID,
 			Staff:     vars.StaffMap[relation.Subject.TypeID][relation.TypeID].String(),
 			Name:      relation.Subject.Name,
@@ -104,6 +105,7 @@ func (h Person) getPersonRelated(
 			Person:  person,
 			Subject: s,
 			TypeID:  rel.TypeID,
+			Eps:     rel.Eps,
 		})
 	}
 
