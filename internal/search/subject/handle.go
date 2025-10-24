@@ -54,7 +54,7 @@ type ReqFilter struct { //nolint:musttag
 	Tag         []string            `json:"tag"`          // and
 	AirDate     []string            `json:"air_date"`     // and
 	Score       []string            `json:"rating"`       // and
-	RatingTotal []string            `json:"rating_total"` // and
+	RatingCount []string            `json:"rating_count"` // and
 	Rank        []string            `json:"rank"`         // and
 	MetaTags    []string            `json:"meta_tags"`    // and
 
@@ -256,12 +256,12 @@ func filterToMeiliFilter(req ReqFilter) ([][]string, error) {
 		filter = append(filter, []string{"score " + s})
 	}
 
-	for _, s := range req.RatingTotal {
+	for _, s := range req.RatingCount {
 		if !intFilterPattern.MatchString(s) {
 			return nil, res.BadRequest(fmt.Sprintf(
-				`invalid rating_total filter: %q, should be in the format of "^(>|<|>=|<=|=) *\d+$"`, s))
+				`invalid rating_count filter: %q, should be in the format of "^(>|<|>=|<=|=) *\d+$"`, s))
 		}
-		filter = append(filter, []string{"rating_total " + s})
+		filter = append(filter, []string{"rating_count " + s})
 	}
 
 	return filter, nil

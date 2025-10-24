@@ -36,7 +36,7 @@ type document struct {
 	Aliases     []string        `json:"aliases,omitempty" searchable:"true"`
 	Date        int             `json:"date,omitempty" filterable:"true" sortable:"true"`
 	Score       float64         `json:"score" filterable:"true" sortable:"true"`
-	RatingTotal uint32          `json:"rating_total" filterable:"true" sortable:"true"`
+	RatingCount uint32          `json:"rating_count" filterable:"true" sortable:"true"`
 	PageRank    float64         `json:"page_rank" sortable:"true"`
 	Heat        uint32          `json:"heat" sortable:"true"`
 	Rank        uint32          `json:"rank" filterable:"true" sortable:"true"`
@@ -93,7 +93,7 @@ func extract(s *model.Subject) searcher.Document {
 		Type:        s.TypeID,
 		Date:        parseDateVal(s.Date),
 		Platform:    s.PlatformID,
-		RatingTotal: s.Rating.Total,
+		RatingCount: s.Rating.Total,
 		PageRank:    float64(s.Rating.Total),
 		Rank:        s.Rating.Rank,
 		Heat:        heat(s),
