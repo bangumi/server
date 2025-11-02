@@ -710,6 +710,43 @@ func (r mysqlRepo) GetPersonCollection(
 	}, nil
 }
 
+// updatePersonCollectionCount updates the collection count for a character or person.
+// delta should be 1 for add or -1 for remove.
+func (r mysqlRepo) updatePersonCollectionCount(
+	ctx context.Context, tx *query.Query,
+	cat collection.PersonCollectCategory, targetID model.PersonID, delta int,
+) error {
+	switch cat {
+	case collection.PersonCollectCategoryCharacter:
+		var err error
+		if delta > 0 {
+			_, err = tx.Character.WithContext(ctx).Where(
+				tx.Character.ID.Eq(targetID)).UpdateSimple(tx.Character.Collects.Add(uint32(delta)))
+		} else {
+			_, err = tx.Character.WithContext(ctx).Where(
+				tx.Character.ID.Eq(targetID)).UpdateSimple(tx.Character.Collects.Sub(uint32(-delta)))
+		}
+		if err != nil {
+			r.log.Error("failed to update character collects", zap.Error(err))
+			return err
+		}
+	case collection.PersonCollectCategoryPerson:
+		var err error
+		if delta > 0 {
+			_, err = tx.Person.WithContext(ctx).Where(
+				tx.Person.ID.Eq(targetID)).UpdateSimple(tx.Person.Collects.Add(uint32(delta)))
+		} else {
+			_, err = tx.Person.WithContext(ctx).Where(
+				tx.Person.ID.Eq(targetID)).UpdateSimple(tx.Person.Collects.Sub(uint32(-delta)))
+		}
+		if err != nil {
+			r.log.Error("failed to update person collects", zap.Error(err))
+			return err
+		}
+	}
+	return nil
+}
+
 func (r mysqlRepo) AddPersonCollection(
 	ctx context.Context, userID model.UserID,
 	cat collection.PersonCollectCategory, targetID model.PersonID,
@@ -721,19 +758,8 @@ func (r mysqlRepo) AddPersonCollection(
 		CreatedTime: uint32(time.Now().Unix()),
 	}
 	err := r.q.Transaction(func(tx *query.Query) error {
-		switch cat {
-		case collection.PersonCollectCategoryCharacter:
-			if _, err := tx.Character.WithContext(ctx).Where(
-				tx.Character.ID.Eq(targetID)).UpdateSimple(tx.Character.Collects.Add(1)); err != nil {
-				r.log.Error("failed to update character collects", zap.Error(err))
-				return err
-			}
-		case collection.PersonCollectCategoryPerson:
-			if _, err := tx.Person.WithContext(ctx).Where(
-				tx.Person.ID.Eq(targetID)).UpdateSimple(tx.Person.Collects.Add(1)); err != nil {
-				r.log.Error("failed to update person collects", zap.Error(err))
-				return err
-			}
+		if err := r.updatePersonCollectionCount(ctx, tx, cat, targetID, 1); err != nil {
+			return err
 		}
 		if err := tx.PersonCollect.WithContext(ctx).Create(collect); err != nil {
 			r.log.Error("failed to create person collection record", zap.Error(err))
@@ -752,19 +778,8 @@ func (r mysqlRepo) RemovePersonCollection(
 	cat collection.PersonCollectCategory, targetID model.PersonID,
 ) error {
 	err := r.q.Transaction(func(tx *query.Query) error {
-		switch cat {
-		case collection.PersonCollectCategoryCharacter:
-			if _, err := tx.Character.WithContext(ctx).Where(
-				tx.Character.ID.Eq(targetID)).UpdateSimple(tx.Character.Collects.Sub(1)); err != nil {
-				r.log.Error("failed to update character collects", zap.Error(err))
-				return err
-			}
-		case collection.PersonCollectCategoryPerson:
-			if _, err := tx.Person.WithContext(ctx).Where(
-				tx.Person.ID.Eq(targetID)).UpdateSimple(tx.Person.Collects.Sub(1)); err != nil {
-				r.log.Error("failed to update person collects", zap.Error(err))
-				return err
-			}
+		if err := r.updatePersonCollectionCount(ctx, tx, cat, targetID, -1); err != nil {
+			return err
 		}
 		_, err := tx.PersonCollect.WithContext(ctx).Where(
 			tx.PersonCollect.UserID.Eq(userID),
