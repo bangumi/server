@@ -12,7 +12,7 @@ import (
 	"github.com/bangumi/server/internal/search/searcher"
 )
 
-func (c *client) OnAdded(ctx context.Context, id model.CharacterID) error {
+func (c *client) upsertDocument(ctx context.Context, id model.CharacterID) error {
 	s, err := c.repo.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
@@ -31,24 +31,12 @@ func (c *client) OnAdded(ctx context.Context, id model.CharacterID) error {
 	return err
 }
 
+func (c *client) OnAdded(ctx context.Context, id model.CharacterID) error {
+	return c.upsertDocument(ctx, id)
+}
+
 func (c *client) OnUpdate(ctx context.Context, id model.CharacterID) error {
-	s, err := c.repo.Get(ctx, id)
-	if err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return nil
-		}
-		return errgo.Wrap(err, "characterRepo.Get")
-	}
-
-	if s.Redirect != 0 {
-		return c.OnDelete(ctx, id)
-	}
-
-	extracted := extract(&s)
-
-	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, lo.ToPtr("id"))
-
-	return err
+	return c.upsertDocument(ctx, id)
 }
 
 func (c *client) OnDelete(ctx context.Context, id model.CharacterID) error {

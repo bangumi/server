@@ -13,7 +13,7 @@ import (
 	"github.com/bangumi/server/internal/subject"
 )
 
-func (c *client) OnAdded(ctx context.Context, id model.SubjectID) error {
+func (c *client) upsertDocument(ctx context.Context, id model.SubjectID) error {
 	s, err := c.repo.Get(ctx, id, subject.Filter{})
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
@@ -32,24 +32,12 @@ func (c *client) OnAdded(ctx context.Context, id model.SubjectID) error {
 	return err
 }
 
+func (c *client) OnAdded(ctx context.Context, id model.SubjectID) error {
+	return c.upsertDocument(ctx, id)
+}
+
 func (c *client) OnUpdate(ctx context.Context, id model.SubjectID) error {
-	s, err := c.repo.Get(ctx, id, subject.Filter{})
-	if err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return nil
-		}
-		return errgo.Wrap(err, "subjectRepo.Get")
-	}
-
-	if s.Redirect != 0 || s.Ban != 0 {
-		return c.OnDelete(ctx, id)
-	}
-
-	extracted := extract(&s)
-
-	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, lo.ToPtr("id"))
-
-	return err
+	return c.upsertDocument(ctx, id)
 }
 
 func (c *client) OnDelete(ctx context.Context, id model.SubjectID) error {
