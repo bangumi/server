@@ -150,6 +150,12 @@ func getJSONFieldName(f reflect.StructField) string {
 	return strings.Split(t, ",")[0]
 }
 
+// DeleteDocument is a helper function that deletes a document from the index by ID.
+func DeleteDocument(ctx context.Context, index meilisearch.IndexManager, id uint32) error {
+	_, err := index.DeleteDocumentWithContext(ctx, fmt.Sprintf("%d", id))
+	return errgo.Wrap(err, "search")
+}
+
 func InitIndex(log *zap.Logger, meili meilisearch.ServiceManager, idx string, rt reflect.Type, rankRule *[]string) {
 	_, err := meili.CreateIndex(&meilisearch.IndexConfig{
 		Uid:        idx,

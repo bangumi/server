@@ -16,16 +16,11 @@ package revision
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/trim21/errgo"
-	"go.uber.org/zap"
-	"gorm.io/gorm"
 
 	"github.com/bangumi/server/dal/dao"
-	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
 )
 
@@ -70,14 +65,9 @@ func (r mysqlRepo) GetEpisodeRelated(ctx context.Context, id model.RevisionID) (
 		return model.EpisodeRevision{}, wrapGORMError(err)
 	}
 
-	data, err := r.q.RevisionText.WithContext(ctx).Where(r.q.RevisionText.TextID.Eq(revision.TextID)).Take()
+	data, err := r.getRevisionText(ctx, revision.TextID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
-			return model.EpisodeRevision{}, gerr.ErrNotFound
-		}
-
-		return model.EpisodeRevision{}, errgo.Wrap(err, "dal")
+		return model.EpisodeRevision{}, err
 	}
 
 	return convertEpisodeRevisionDao(revision, data), nil

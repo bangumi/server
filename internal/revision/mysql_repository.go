@@ -87,15 +87,9 @@ func (r mysqlRepo) GetPersonRelated(ctx context.Context, id model.RevisionID) (m
 
 		return model.PersonRevision{}, errgo.Wrap(err, "dal")
 	}
-	data, err := r.q.RevisionText.WithContext(ctx).
-		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).Take()
+	data, err := r.getRevisionText(ctx, revision.TextID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
-			return model.PersonRevision{}, gerr.ErrNotFound
-		}
-
-		return model.PersonRevision{}, errgo.Wrap(err, "dal")
+		return model.PersonRevision{}, err
 	}
 	return convertPersonRevisionDao(revision, data), nil
 }
@@ -140,15 +134,9 @@ func (r mysqlRepo) GetCharacterRelated(ctx context.Context, id model.RevisionID)
 		return model.CharacterRevision{}, wrapGORMError(err)
 	}
 
-	data, err := r.q.RevisionText.WithContext(ctx).
-		Where(r.q.RevisionText.TextID.Eq(revision.TextID)).Take()
+	data, err := r.getRevisionText(ctx, revision.TextID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			r.log.Error("can't find revision text", zap.Uint32("id", revision.TextID))
-			return model.CharacterRevision{}, gerr.ErrNotFound
-		}
-
-		return model.CharacterRevision{}, errgo.Wrap(err, "dal")
+		return model.CharacterRevision{}, err
 	}
 	return convertCharacterRevisionDao(revision, data), nil
 }
@@ -158,6 +146,18 @@ func wrapGORMError(err error) error {
 		return gerr.ErrNotFound
 	}
 	return errgo.Wrap(err, "dal")
+}
+
+func (r mysqlRepo) getRevisionText(ctx context.Context, textID uint32) (*dao.RevisionText, error) {
+	data, err := r.q.RevisionText.WithContext(ctx).Where(r.q.RevisionText.TextID.Eq(textID)).Take()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			r.log.Error("can't find revision text", zap.Uint32("id", textID))
+			return nil, gerr.ErrNotFound
+		}
+		return nil, errgo.Wrap(err, "dal")
+	}
+	return data, nil
 }
 
 func (r mysqlRepo) CountSubjectRelated(ctx context.Context, id model.SubjectID) (int64, error) {

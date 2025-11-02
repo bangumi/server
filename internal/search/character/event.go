@@ -3,13 +3,13 @@ package character
 import (
 	"context"
 	"errors"
-	"strconv"
 
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/search/searcher"
 )
 
 func (c *client) OnAdded(ctx context.Context, id model.CharacterID) error {
@@ -52,7 +52,5 @@ func (c *client) OnUpdate(ctx context.Context, id model.CharacterID) error {
 }
 
 func (c *client) OnDelete(ctx context.Context, id model.CharacterID) error {
-	_, err := c.index.DeleteDocumentWithContext(ctx, strconv.FormatUint(uint64(id), 10))
-
-	return errgo.Wrap(err, "search")
+	return searcher.DeleteDocument(ctx, c.index, uint32(id))
 }
