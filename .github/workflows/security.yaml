@@ -10,20 +10,14 @@ on:
       - "go.sum"
       - ".golangci.yaml"
       - ".github/workflows/security.yaml"
-  pull_request:
-    branches:
-      - master
-    paths:
-      - "**.go"
-      - "go.mod"
-      - "go.sum"
-      - ".github/workflows/security.yaml"
   schedule:
     - cron: "15 3 * * 4"
 
 jobs:
   vulnerability-scan:
     runs-on: ubuntu-24.04
+    permissions:
+      issues: write
     steps:
       - uses: actions/checkout@v5
         with:
@@ -36,3 +30,11 @@ jobs:
       - run: go install golang.org/x/vuln/cmd/govulncheck@latest
 
       - run: govulncheck ./...
+
+      - name: Notify failed build
+        uses: jayqi/failed-build-issue-action@v1
+        if: failure()
+        with:
+          github-token: ${{ github.token }}
+          always-create-new-issue: false
+          label-name: vulncheck
