@@ -26,7 +26,7 @@ require (
 	github.com/meilisearch/meilisearch-go v0.34.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/redis/rueidis v1.0.66
+	github.com/redis/rueidis v1.0.67
 	github.com/samber/lo v1.51.0
 	github.com/segmentio/kafka-go v0.4.49
 	github.com/spf13/cobra v1.10.1
