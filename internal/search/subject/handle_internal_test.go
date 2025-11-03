@@ -26,8 +26,9 @@ func Test_ReqFilterToMeiliFilter(t *testing.T) {
 	t.Parallel()
 
 	actual, err := filterToMeiliFilter(ReqFilter{
-		Tag:  []string{"a", "b"},
-		NSFW: null.Bool{Set: true, Value: false},
+		Tag:         []string{"a", "b"},
+		RatingCount: []string{">=100"},
+		NSFW:        null.Bool{Set: true, Value: false},
 	})
 
 	require.NoError(t, err)
@@ -36,5 +37,6 @@ func Test_ReqFilterToMeiliFilter(t *testing.T) {
 		{`nsfw = false`},
 		{`tag = "a"`},
 		{`tag = "b"`},
+		{`rating_count >=100`},
 	}, actual)
 }

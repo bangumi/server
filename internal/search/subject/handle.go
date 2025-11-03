@@ -50,12 +50,13 @@ type Req struct {
 }
 
 type ReqFilter struct { //nolint:musttag
-	Type     []model.SubjectType `json:"type"`      // or
-	Tag      []string            `json:"tag"`       // and
-	AirDate  []string            `json:"air_date"`  // and
-	Score    []string            `json:"rating"`    // and
-	Rank     []string            `json:"rank"`      // and
-	MetaTags []string            `json:"meta_tags"` // and
+	Type        []model.SubjectType `json:"type"`         // or
+	Tag         []string            `json:"tag"`          // and
+	AirDate     []string            `json:"air_date"`     // and
+	Score       []string            `json:"rating"`       // and
+	RatingCount []string            `json:"rating_count"` // and
+	Rank        []string            `json:"rank"`         // and
+	MetaTags    []string            `json:"meta_tags"`    // and
 
 	// if NSFW subject is enabled
 	NSFW null.Bool `json:"nsfw"`
@@ -204,7 +205,7 @@ type meiliSearchResponse struct {
 }
 
 func filterToMeiliFilter(req ReqFilter) ([][]string, error) {
-	var filter = make([][]string, 0, 5+len(req.Tag))
+	var filter = make([][]string, 0, 6+len(req.Tag))
 
 	// OR
 
@@ -253,6 +254,14 @@ func filterToMeiliFilter(req ReqFilter) ([][]string, error) {
 		}
 
 		filter = append(filter, []string{"score " + s})
+	}
+
+	for _, s := range req.RatingCount {
+		if !intFilterPattern.MatchString(s) {
+			return nil, res.BadRequest(fmt.Sprintf(
+				`invalid rating_count filter: %q, should be in the format of "^(>|<|>=|<=|=) *\d+$"`, s))
+		}
+		filter = append(filter, []string{"rating_count " + s})
 	}
 
 	return filter, nil

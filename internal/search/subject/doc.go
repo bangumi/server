@@ -29,19 +29,20 @@ import (
 // 两种 tag 来设置是否可以被索引和排序.
 // 搜索字段因为带有排序，所以定义在 [search.searchAbleAttribute] 中.
 type document struct {
-	ID       model.SubjectID `json:"id"`
-	Tag      []string        `json:"tag,omitempty" filterable:"true"`
-	MetaTags []string        `json:"meta_tag" filterable:"true"`
-	Name     string          `json:"name" searchable:"true"`
-	Aliases  []string        `json:"aliases,omitempty" searchable:"true"`
-	Date     int             `json:"date,omitempty" filterable:"true" sortable:"true"`
-	Score    float64         `json:"score" filterable:"true" sortable:"true"`
-	PageRank float64         `json:"page_rank" sortable:"true"`
-	Heat     uint32          `json:"heat" sortable:"true"`
-	Rank     uint32          `json:"rank" filterable:"true" sortable:"true"`
-	Platform uint16          `json:"platform,omitempty"`
-	Type     uint8           `json:"type" filterable:"true"`
-	NSFW     bool            `json:"nsfw" filterable:"true"`
+	ID          model.SubjectID `json:"id"`
+	Tag         []string        `json:"tag,omitempty" filterable:"true"`
+	MetaTags    []string        `json:"meta_tag" filterable:"true"`
+	Name        string          `json:"name" searchable:"true"`
+	Aliases     []string        `json:"aliases,omitempty" searchable:"true"`
+	Date        int             `json:"date,omitempty" filterable:"true" sortable:"true"`
+	Score       float64         `json:"score" filterable:"true" sortable:"true"`
+	RatingCount uint32          `json:"rating_count" filterable:"true" sortable:"true"`
+	PageRank    float64         `json:"page_rank" sortable:"true"`
+	Heat        uint32          `json:"heat" sortable:"true"`
+	Rank        uint32          `json:"rank" filterable:"true" sortable:"true"`
+	Platform    uint16          `json:"platform,omitempty"`
+	Type        uint8           `json:"type" filterable:"true"`
+	NSFW        bool            `json:"nsfw" filterable:"true"`
 }
 
 func (d *document) GetID() string {
@@ -83,19 +84,20 @@ func extract(s *model.Subject) searcher.Document {
 	}
 
 	return &document{
-		ID:       s.ID,
-		Name:     s.Name,
-		Aliases:  extractAliases(s, w),
-		MetaTags: strings.Split(s.MetaTags, " "),
-		Tag:      tagNames,
-		NSFW:     s.NSFW,
-		Type:     s.TypeID,
-		Date:     parseDateVal(s.Date),
-		Platform: s.PlatformID,
-		PageRank: float64(s.Rating.Total),
-		Rank:     s.Rating.Rank,
-		Heat:     heat(s),
-		Score:    score,
+		ID:          s.ID,
+		Name:        s.Name,
+		Aliases:     extractAliases(s, w),
+		MetaTags:    strings.Split(s.MetaTags, " "),
+		Tag:         tagNames,
+		NSFW:        s.NSFW,
+		Type:        s.TypeID,
+		Date:        parseDateVal(s.Date),
+		Platform:    s.PlatformID,
+		RatingCount: s.Rating.Total,
+		PageRank:    float64(s.Rating.Total),
+		Rank:        s.Rating.Rank,
+		Heat:        heat(s),
+		Score:       score,
 	}
 }
 

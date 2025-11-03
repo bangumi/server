@@ -29,7 +29,7 @@ func TestIndexFilter(t *testing.T) {
 
 	rt := reflect.TypeOf(document{})
 	actual := *(searcher.GetAttributes(rt, "filterable"))
-	expected := []string{"date", "meta_tag", "score", "rank", "type", "nsfw", "tag"}
+	expected := []string{"date", "meta_tag", "rating_count", "score", "rank", "type", "nsfw", "tag"}
 
 	sort.Strings(expected)
 	sort.Strings(actual)
