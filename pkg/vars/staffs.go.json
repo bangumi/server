@@ -1954,6 +1954,493 @@
               "cn": "制作类"
             }
           ]
+        },
+        "138": {
+          "en": "Eyecatch Art",
+          "cn": "转场绘",
+          "jp": "アイキャッチ",
+          "categories": [
+            {
+              "order": 4,
+              "en": "animation",
+              "cn": "作画类"
+            },
+            {
+              "order": 11,
+              "en": "visual",
+              "cn": "视觉类"
+            }
+          ]
+        },
+        "139": {
+          "en": "Illustration",
+          "cn": "插画",
+          "jp": "イラスト",
+          "categories": [
+            {
+              "order": 4,
+              "en": "animation",
+              "cn": "作画类"
+            },
+            {
+              "order": 5,
+              "en": "design",
+              "cn": "设定类"
+            }
+          ]
+        },
+        "140": {
+          "en": "Character Animation Director",
+          "cn": "角色作画监督",
+          "jp": "キャラクター作画監督",
+          "categories": [
+            {
+              "order": 1,
+              "en": "director",
+              "cn": "导演类"
+            },
+            {
+              "order": 4,
+              "en": "animation",
+              "cn": "作画类"
+            }
+          ]
+        },
+        "141": {
+          "en": "Animation Supervisor",
+          "cn": "作画监修",
+          "jp": "作画監修",
+          "categories": [
+            {
+              "order": 1,
+              "en": "director",
+              "cn": "导演类"
+            },
+            {
+              "order": 4,
+              "en": "animation",
+              "cn": "作画类"
+            }
+          ]
+        },
+        "142": {
+          "en": "Mechanical Design Concept",
+          "cn": "机设原案",
+          "jp": "メカニカル原案",
+          "categories": [
+            {
+              "order": 5,
+              "en": "design",
+              "cn": "设定类"
+            }
+          ]
+        },
+        "143": {
+          "en": "Concept Art",
+          "cn": "概念艺术",
+          "jp": "コンセプトアート",
+          "categories": [
+            {
+              "order": 5,
+              "en": "design",
+              "cn": "设定类"
+            }
+          ]
+        },
+        "144": {
+          "en": "Visual Concept",
+          "cn": "视觉概念",
+          "jp": "ビジュアルコンセプト",
+          "categories": [
+            {
+              "order": 5,
+              "en": "design",
+              "cn": "设定类"
+            },
+            {
+              "order": 11,
+              "en": "visual",
+              "cn": "视觉类"
+            }
+          ]
+        },
+        "145": {
+          "en": "Scene Design",
+          "cn": "画面设计",
+          "jp": "画面設計",
+          "categories": [
+            {
+              "order": 5,
+              "en": "design",
+              "cn": "设定类"
+            },
+            {
+              "order": 11,
+              "en": "visual",
+              "cn": "视觉类"
+            }
+          ]
+        },
+        "146": {
+          "en": "Monster Design",
+          "cn": "怪物设计",
+          "jp": "モンスターデザイン",
+          "categories": [
+            {
+              "order": 5,
+              "en": "design",
+              "cn": "设定类"
+            }
+          ]
+        },
+        "147": {
+          "en": "Story Concept",
+          "cn": "故事概念",
+          "jp": "ストーリーコンセプト",
+          "categories": [
+            {
+              "order": 2,
+              "en": "storyboard",
+              "cn": "分镜/脚本类"
+            }
+          ]
+        },
+        "148": {
+          "en": "Scenario Coordinator",
+          "cn": "剧本协调",
+          "jp": "シナリオコーディネーター",
+          "categories": [
+            {
+              "order": 2,
+              "en": "storyboard",
+              "cn": "分镜/脚本类"
+            }
+          ]
+        },
+        "149": {
+          "en": "Script Cooperation",
+          "cn": "脚本协力",
+          "jp": "脚本協力",
+          "categories": [
+            {
+              "order": 2,
+              "en": "storyboard",
+              "cn": "分镜/脚本类"
+            },
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            }
+          ]
+        },
+        "150": {
+          "en": "Associate Series Composition",
+          "cn": "副系列构成",
+          "jp": "副シリーズ構成",
+          "categories": [
+            {
+              "order": 2,
+              "en": "storyboard",
+              "cn": "分镜/脚本类"
+            }
+          ]
+        },
+        "151": {
+          "en": "Series Composition Cooperation",
+          "cn": "构成协力",
+          "jp": "構成協力",
+          "categories": [
+            {
+              "order": 2,
+              "en": "storyboard",
+              "cn": "分镜/脚本类"
+            },
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            }
+          ]
+        },
+        "152": {
+          "en": "Recording Studio",
+          "cn": "录音工作室",
+          "jp": "録音スタジオ",
+          "categories": [
+            {
+              "order": 7,
+              "en": "music",
+              "cn": "声音类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "153": {
+          "en": "Sound Mixing",
+          "cn": "整音",
+          "jp": "整音",
+          "categories": [
+            {
+              "order": 7,
+              "en": "music",
+              "cn": "声音类"
+            }
+          ]
+        },
+        "154": {
+          "en": "Sound Production Coordinator",
+          "cn": "音响制作担当",
+          "jp": "音響制作担当",
+          "categories": [
+            {
+              "order": 7,
+              "en": "music",
+              "cn": "声音类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "155": {
+          "en": "Online Editing",
+          "cn": "在线剪辑",
+          "jp": "オンライン編集",
+          "categories": [
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "156": {
+          "en": "Offline Editing",
+          "cn": "离线剪辑",
+          "jp": "オフライン編集",
+          "categories": [
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "157": {
+          "en": "3D Animator",
+          "cn": "3D 动画师",
+          "jp": "3Dアニメーター  3Dアニメーション",
+          "categories": [
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            },
+            {
+              "order": 4,
+              "en": "animation",
+              "cn": "作画类"
+            }
+          ]
+        },
+        "158": {
+          "en": "CG Producer",
+          "cn": "CG 制作人",
+          "jp": "CGプロデューサー  CGIプロデューサー",
+          "categories": [
+            {
+              "order": 9,
+              "en": "producer",
+              "cn": "制片类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "159": {
+          "en": "Publicity Producer",
+          "cn": "宣传制片人",
+          "jp": "宣伝プロデューサー",
+          "categories": [
+            {
+              "order": 9,
+              "en": "producer",
+              "cn": "制片类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "160": {
+          "en": "Art Producer",
+          "cn": "美术制作人",
+          "jp": "美術プロデューサー",
+          "categories": [
+            {
+              "order": 9,
+              "en": "producer",
+              "cn": "制片类"
+            },
+            {
+              "order": 6,
+              "en": "art",
+              "cn": "美术类"
+            }
+          ]
+        },
+        "161": {
+          "en": "Sound Producer",
+          "cn": "音响制作人",
+          "jp": "音響プロデューサー",
+          "categories": [
+            {
+              "order": 9,
+              "en": "producer",
+              "cn": "制片类"
+            },
+            {
+              "order": 7,
+              "en": "music",
+              "cn": "声音类"
+            }
+          ]
+        },
+        "162": {
+          "en": "CG Production Coordinator",
+          "cn": "CG 制作进行",
+          "jp": "CG進行",
+          "categories": [
+            {
+              "order": 9,
+              "en": "producer",
+              "cn": "制片类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "163": {
+          "en": "Art Production Coordinator",
+          "cn": "美术制作进行",
+          "jp": "美術進行",
+          "categories": [
+            {
+              "order": 9,
+              "en": "producer",
+              "cn": "制片类"
+            },
+            {
+              "order": 6,
+              "en": "art",
+              "cn": "美术类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "164": {
+          "en": "Assistant Art Director",
+          "cn": "美术监督助理",
+          "jp": "美術監督補佐",
+          "categories": [
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            },
+            {
+              "order": 6,
+              "en": "art",
+              "cn": "美术类"
+            }
+          ]
+        },
+        "165": {
+          "en": "Assistant Color Designer",
+          "cn": "色彩设计助理",
+          "jp": "色彩設計補佐",
+          "categories": [
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            },
+            {
+              "order": 10,
+              "en": "colorist",
+              "cn": "色彩类"
+            }
+          ]
+        },
+        "166": {
+          "en": "Assistant Director of Photography",
+          "cn": "摄影监督助理",
+          "jp": "撮影監督補佐",
+          "categories": [
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "167": {
+          "en": "Assistant Production Desk",
+          "cn": "制作管理助理",
+          "jp": "制作デスク補佐",
+          "categories": [
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "168": {
+          "en": "Assistant Design Manager",
+          "cn": "设定制作助理",
+          "jp": "設定制作補佐",
+          "categories": [
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            },
+            {
+              "order": 5,
+              "en": "design",
+              "cn": "设定类"
+            }
+          ]
         }
       },
       "game": {
@@ -4513,6 +5000,493 @@
             "order": 8,
             "en": "production",
             "cn": "制作类"
+          }
+        ]
+      },
+      "138": {
+        "en": "Eyecatch Art",
+        "cn": "转场绘",
+        "jp": "アイキャッチ",
+        "categories": [
+          {
+            "order": 4,
+            "en": "animation",
+            "cn": "作画类"
+          },
+          {
+            "order": 11,
+            "en": "visual",
+            "cn": "视觉类"
+          }
+        ]
+      },
+      "139": {
+        "en": "Illustration",
+        "cn": "插画",
+        "jp": "イラスト",
+        "categories": [
+          {
+            "order": 4,
+            "en": "animation",
+            "cn": "作画类"
+          },
+          {
+            "order": 5,
+            "en": "design",
+            "cn": "设定类"
+          }
+        ]
+      },
+      "140": {
+        "en": "Character Animation Director",
+        "cn": "角色作画监督",
+        "jp": "キャラクター作画監督",
+        "categories": [
+          {
+            "order": 1,
+            "en": "director",
+            "cn": "导演类"
+          },
+          {
+            "order": 4,
+            "en": "animation",
+            "cn": "作画类"
+          }
+        ]
+      },
+      "141": {
+        "en": "Animation Supervisor",
+        "cn": "作画监修",
+        "jp": "作画監修",
+        "categories": [
+          {
+            "order": 1,
+            "en": "director",
+            "cn": "导演类"
+          },
+          {
+            "order": 4,
+            "en": "animation",
+            "cn": "作画类"
+          }
+        ]
+      },
+      "142": {
+        "en": "Mechanical Design Concept",
+        "cn": "机设原案",
+        "jp": "メカニカル原案",
+        "categories": [
+          {
+            "order": 5,
+            "en": "design",
+            "cn": "设定类"
+          }
+        ]
+      },
+      "143": {
+        "en": "Concept Art",
+        "cn": "概念艺术",
+        "jp": "コンセプトアート",
+        "categories": [
+          {
+            "order": 5,
+            "en": "design",
+            "cn": "设定类"
+          }
+        ]
+      },
+      "144": {
+        "en": "Visual Concept",
+        "cn": "视觉概念",
+        "jp": "ビジュアルコンセプト",
+        "categories": [
+          {
+            "order": 5,
+            "en": "design",
+            "cn": "设定类"
+          },
+          {
+            "order": 11,
+            "en": "visual",
+            "cn": "视觉类"
+          }
+        ]
+      },
+      "145": {
+        "en": "Scene Design",
+        "cn": "画面设计",
+        "jp": "画面設計",
+        "categories": [
+          {
+            "order": 5,
+            "en": "design",
+            "cn": "设定类"
+          },
+          {
+            "order": 11,
+            "en": "visual",
+            "cn": "视觉类"
+          }
+        ]
+      },
+      "146": {
+        "en": "Monster Design",
+        "cn": "怪物设计",
+        "jp": "モンスターデザイン",
+        "categories": [
+          {
+            "order": 5,
+            "en": "design",
+            "cn": "设定类"
+          }
+        ]
+      },
+      "147": {
+        "en": "Story Concept",
+        "cn": "故事概念",
+        "jp": "ストーリーコンセプト",
+        "categories": [
+          {
+            "order": 2,
+            "en": "storyboard",
+            "cn": "分镜/脚本类"
+          }
+        ]
+      },
+      "148": {
+        "en": "Scenario Coordinator",
+        "cn": "剧本协调",
+        "jp": "シナリオコーディネーター",
+        "categories": [
+          {
+            "order": 2,
+            "en": "storyboard",
+            "cn": "分镜/脚本类"
+          }
+        ]
+      },
+      "149": {
+        "en": "Script Cooperation",
+        "cn": "脚本协力",
+        "jp": "脚本協力",
+        "categories": [
+          {
+            "order": 2,
+            "en": "storyboard",
+            "cn": "分镜/脚本类"
+          },
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          }
+        ]
+      },
+      "150": {
+        "en": "Associate Series Composition",
+        "cn": "副系列构成",
+        "jp": "副シリーズ構成",
+        "categories": [
+          {
+            "order": 2,
+            "en": "storyboard",
+            "cn": "分镜/脚本类"
+          }
+        ]
+      },
+      "151": {
+        "en": "Series Composition Cooperation",
+        "cn": "构成协力",
+        "jp": "構成協力",
+        "categories": [
+          {
+            "order": 2,
+            "en": "storyboard",
+            "cn": "分镜/脚本类"
+          },
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          }
+        ]
+      },
+      "152": {
+        "en": "Recording Studio",
+        "cn": "录音工作室",
+        "jp": "録音スタジオ",
+        "categories": [
+          {
+            "order": 7,
+            "en": "music",
+            "cn": "声音类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "153": {
+        "en": "Sound Mixing",
+        "cn": "整音",
+        "jp": "整音",
+        "categories": [
+          {
+            "order": 7,
+            "en": "music",
+            "cn": "声音类"
+          }
+        ]
+      },
+      "154": {
+        "en": "Sound Production Coordinator",
+        "cn": "音响制作担当",
+        "jp": "音響制作担当",
+        "categories": [
+          {
+            "order": 7,
+            "en": "music",
+            "cn": "声音类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "155": {
+        "en": "Online Editing",
+        "cn": "在线剪辑",
+        "jp": "オンライン編集",
+        "categories": [
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "156": {
+        "en": "Offline Editing",
+        "cn": "离线剪辑",
+        "jp": "オフライン編集",
+        "categories": [
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "157": {
+        "en": "3D Animator",
+        "cn": "3D 动画师",
+        "jp": "3Dアニメーター  3Dアニメーション",
+        "categories": [
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          },
+          {
+            "order": 4,
+            "en": "animation",
+            "cn": "作画类"
+          }
+        ]
+      },
+      "158": {
+        "en": "CG Producer",
+        "cn": "CG 制作人",
+        "jp": "CGプロデューサー  CGIプロデューサー",
+        "categories": [
+          {
+            "order": 9,
+            "en": "producer",
+            "cn": "制片类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "159": {
+        "en": "Publicity Producer",
+        "cn": "宣传制片人",
+        "jp": "宣伝プロデューサー",
+        "categories": [
+          {
+            "order": 9,
+            "en": "producer",
+            "cn": "制片类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "160": {
+        "en": "Art Producer",
+        "cn": "美术制作人",
+        "jp": "美術プロデューサー",
+        "categories": [
+          {
+            "order": 9,
+            "en": "producer",
+            "cn": "制片类"
+          },
+          {
+            "order": 6,
+            "en": "art",
+            "cn": "美术类"
+          }
+        ]
+      },
+      "161": {
+        "en": "Sound Producer",
+        "cn": "音响制作人",
+        "jp": "音響プロデューサー",
+        "categories": [
+          {
+            "order": 9,
+            "en": "producer",
+            "cn": "制片类"
+          },
+          {
+            "order": 7,
+            "en": "music",
+            "cn": "声音类"
+          }
+        ]
+      },
+      "162": {
+        "en": "CG Production Coordinator",
+        "cn": "CG 制作进行",
+        "jp": "CG進行",
+        "categories": [
+          {
+            "order": 9,
+            "en": "producer",
+            "cn": "制片类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "163": {
+        "en": "Art Production Coordinator",
+        "cn": "美术制作进行",
+        "jp": "美術進行",
+        "categories": [
+          {
+            "order": 9,
+            "en": "producer",
+            "cn": "制片类"
+          },
+          {
+            "order": 6,
+            "en": "art",
+            "cn": "美术类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "164": {
+        "en": "Assistant Art Director",
+        "cn": "美术监督助理",
+        "jp": "美術監督補佐",
+        "categories": [
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          },
+          {
+            "order": 6,
+            "en": "art",
+            "cn": "美术类"
+          }
+        ]
+      },
+      "165": {
+        "en": "Assistant Color Designer",
+        "cn": "色彩设计助理",
+        "jp": "色彩設計補佐",
+        "categories": [
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          },
+          {
+            "order": 10,
+            "en": "colorist",
+            "cn": "色彩类"
+          }
+        ]
+      },
+      "166": {
+        "en": "Assistant Director of Photography",
+        "cn": "摄影监督助理",
+        "jp": "撮影監督補佐",
+        "categories": [
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "167": {
+        "en": "Assistant Production Desk",
+        "cn": "制作管理助理",
+        "jp": "制作デスク補佐",
+        "categories": [
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "168": {
+        "en": "Assistant Design Manager",
+        "cn": "设定制作助理",
+        "jp": "設定制作補佐",
+        "categories": [
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          },
+          {
+            "order": 5,
+            "en": "design",
+            "cn": "设定类"
           }
         ]
       }
