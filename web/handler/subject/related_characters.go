@@ -66,6 +66,7 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 		response[i] = res.SubjectRelatedCharacter{
 			Images:   res.PersonImage(rel.Character.Image),
 			Name:     rel.Character.Name,
+			Summary:  rel.Character.Summary,
 			Relation: characterStaffString(rel.TypeID),
 			Actors:   toActors(actors[rel.Character.ID]),
 			Type:     rel.Character.Type,
