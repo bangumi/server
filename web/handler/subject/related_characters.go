@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/bangumi/wiki-parser-go"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
@@ -28,6 +29,7 @@ import (
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
+	"github.com/bangumi/server/internal/pkg/compat"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
@@ -66,6 +68,7 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 		response[i] = res.SubjectRelatedCharacter{
 			Images:   res.PersonImage(rel.Character.Image),
 			Name:     rel.Character.Name,
+			Infobox:  compat.V0Wiki(wiki.ParseOmitError(rel.Character.Infobox).NonZero()),
 			Relation: characterStaffString(rel.TypeID),
 			Actors:   toActors(actors[rel.Character.ID]),
 			Type:     rel.Character.Type,

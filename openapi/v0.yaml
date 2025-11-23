@@ -3047,6 +3047,7 @@ components:
       required:
         - id
         - name
+        - infobox
         - type
         - relation
       type: object
@@ -3057,6 +3058,8 @@ components:
         name:
           title: Name
           type: string
+        infobox:
+          "$ref": "#/components/schemas/WikiV0"
         type:
           type: integer
           allOf:
@@ -3083,6 +3086,7 @@ components:
       required:
         - id
         - name
+        - infobox
         - type
         - career
         - relation
@@ -3095,6 +3099,8 @@ components:
         name:
           title: Name
           type: string
+        infobox:
+          "$ref": "#/components/schemas/WikiV0"
         type:
           type: integer
           allOf:
