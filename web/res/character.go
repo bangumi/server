@@ -46,14 +46,19 @@ var GenderMap = map[uint8]string{
 	2: "female",
 }
 
+//nolint:gochecknoglobals
+var characterStaffMap = map[uint8]string{
+	1: "主角",
+	2: "配角",
+	3: "客串",
+	4: "闲角",
+	5: "旁白",
+	6: "声库",
+}
+
 func CharacterStaffString(i uint8) string {
-	switch i {
-	case 1:
-		return "主角"
-	case 2:
-		return "配角"
-	case 3:
-		return "客串"
+	if v, ok := characterStaffMap[i]; ok {
+		return v
 	}
 
 	return ""

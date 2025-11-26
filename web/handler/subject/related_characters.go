@@ -66,7 +66,7 @@ func (h Subject) GetRelatedCharacters(c echo.Context) error {
 		response[i] = res.SubjectRelatedCharacter{
 			Images:   res.PersonImage(rel.Character.Image),
 			Name:     rel.Character.Name,
-			Relation: characterStaffString(rel.TypeID),
+			Relation: res.CharacterStaffString(rel.TypeID),
 			Actors:   toActors(actors[rel.Character.ID]),
 			Type:     rel.Character.Type,
 			ID:       rel.Character.ID,
@@ -161,17 +161,4 @@ func toActors(persons []model.Person) []res.Actor {
 	}
 
 	return actors
-}
-
-func characterStaffString(i uint8) string {
-	switch i {
-	case 1:
-		return "主角"
-	case 2:
-		return "配角"
-	case 3:
-		return "客串"
-	}
-
-	return ""
 }
