@@ -57,11 +57,7 @@ var characterStaffMap = map[uint8]string{
 }
 
 func CharacterStaffString(i uint8) string {
-	if v, ok := characterStaffMap[i]; ok {
-		return v
-	}
-
-	return ""
+    return characterStaffMap[i]
 }
 
 func ConvertModelCharacter(s model.Character) CharacterV0 {
