@@ -57,7 +57,7 @@ var characterStaffMap = map[uint8]string{
 }
 
 func CharacterStaffString(i uint8) string {
-    return characterStaffMap[i]
+	return characterStaffMap[i]
 }
 
 func ConvertModelCharacter(s model.Character) CharacterV0 {
