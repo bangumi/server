@@ -36,7 +36,7 @@ require (
 	github.com/trim21/go-phpserialize v0.1.2
 	github.com/trim21/htest v0.0.4
 	go.uber.org/fx v1.24.0
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	golang.org/x/sync v0.18.0
 	golang.org/x/text v0.31.0
 	gorm.io/driver/mysql v1.6.0
