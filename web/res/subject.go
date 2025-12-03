@@ -264,6 +264,7 @@ type SubjectRelatedSubject struct {
 type SubjectRelatedCharacter struct {
 	Images   PersonImages      `json:"images"`
 	Name     string            `json:"name"`
+	Summary  string            `json:"summary"`
 	Relation string            `json:"relation"`
 	Actors   []Actor           `json:"actors"`
 	Type     uint8             `json:"type"`
