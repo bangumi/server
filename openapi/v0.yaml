@@ -535,6 +535,13 @@ paths:
             default: 0
           name: offset
           in: query
+        - required: false
+          description: "为 true 时按 Disc > Type > Sort 倒序返回，可用于获取最后几集"
+          schema:
+            type: boolean
+            default: false
+          name: reverse
+          in: query
       responses:
         "200":
           description: Successful Response

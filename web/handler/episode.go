@@ -93,7 +93,19 @@ func (h Handler) ListEpisode(c echo.Context) error {
 		return errgo.Wrap(err, "failed to get subject")
 	}
 
-	filter := episode.Filter{Type: null.NewFromPtr(epType)}
+	reverseRaw := c.QueryParam("reverse")
+	var reverse bool
+	if reverseRaw != "" {
+		reverse, err = strconv.ParseBool(reverseRaw)
+		if err != nil {
+			return res.BadRequest("can't parse query args reverse as bool: " + strconv.Quote(reverseRaw))
+		}
+	}
+
+	filter := episode.Filter{
+		Type:    null.NewFromPtr(epType),
+		Reverse: reverse,
+	}
 
 	count, err := h.episode.Count(c.Request().Context(), subjectID, filter)
 	if err != nil {

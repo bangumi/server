@@ -26,6 +26,7 @@ import (
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/test"
+	"github.com/bangumi/server/web/req"
 	"github.com/bangumi/server/web/res"
 )
 
@@ -45,4 +46,52 @@ func TestHandler_GetEpisode(t *testing.T) {
 		ExpectCode(http.StatusOK)
 
 	require.EqualValues(t, 7, e.ID)
+}
+
+func TestHandler_ListEpisodeReverse(t *testing.T) {
+	t.Parallel()
+
+	subjectID := model.SubjectID(42)
+	episodes := []episode.Episode{{ID: 10, SubjectID: subjectID}}
+
+	m := mocks.NewEpisodeRepo(t)
+	s := mocks.NewSubjectRepo(t)
+
+	s.EXPECT().Get(mock.Anything, subjectID, mock.Anything).Return(model.Subject{ID: subjectID}, nil)
+
+	filterMatcher := mock.MatchedBy(func(f episode.Filter) bool {
+		return f.Reverse && !f.Type.Set
+	})
+
+	m.EXPECT().Count(mock.Anything, subjectID, filterMatcher).Return(int64(len(episodes)), nil)
+	m.EXPECT().List(mock.Anything, subjectID, filterMatcher, req.EpisodeDefaultLimit, 0).Return(episodes, nil)
+
+	app := test.GetWebApp(t, test.Mock{EpisodeRepo: m, SubjectRepo: s})
+
+	var resp res.PagedG[res.Episode]
+	htest.New(t, app).
+		Get("/v0/episodes?subject_id=42&reverse=1").
+		JSON(&resp).
+		ExpectCode(http.StatusOK)
+
+	require.EqualValues(t, 1, resp.Total)
+	require.Len(t, resp.Data, 1)
+	require.EqualValues(t, 10, resp.Data[0].ID)
+}
+
+func TestHandler_ListEpisodeReverseInvalid(t *testing.T) {
+	t.Parallel()
+
+	subjectID := model.SubjectID(42)
+
+	m := mocks.NewEpisodeRepo(t)
+	s := mocks.NewSubjectRepo(t)
+
+	s.EXPECT().Get(mock.Anything, subjectID, mock.Anything).Return(model.Subject{ID: subjectID}, nil)
+
+	app := test.GetWebApp(t, test.Mock{EpisodeRepo: m, SubjectRepo: s})
+
+	htest.New(t, app).
+		Get("/v0/episodes?subject_id=42&reverse=notabool").
+		ExpectCode(http.StatusBadRequest)
 }
