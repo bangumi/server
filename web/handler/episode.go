@@ -24,6 +24,7 @@ import (
 
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/episode"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
@@ -71,40 +72,9 @@ func (h Handler) ListEpisode(c echo.Context) error {
 		return err
 	}
 
-	epType, err := req.ParseEpTypeOptional(c.QueryParam("type"))
+	subjectID, filter, err := h.parseEpisodeListQuery(c, u)
 	if err != nil {
 		return err
-	}
-
-	subjectID, err := req.ParseID(c.QueryParam("subject_id"))
-	if err != nil {
-		return err
-	}
-	if subjectID == 0 {
-		return res.BadRequest("missing required query `subject_id`")
-	}
-
-	_, err = h.subject.Get(c.Request().Context(), subjectID, subject.Filter{
-		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()}})
-	if err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return res.ErrNotFound
-		}
-		return errgo.Wrap(err, "failed to get subject")
-	}
-
-	reverseRaw := c.QueryParam("reverse")
-	var reverse bool
-	if reverseRaw != "" {
-		reverse, err = strconv.ParseBool(reverseRaw)
-		if err != nil {
-			return res.BadRequest("can't parse query args reverse as bool: " + strconv.Quote(reverseRaw))
-		}
-	}
-
-	filter := episode.Filter{
-		Type:    null.NewFromPtr(epType),
-		Reverse: reverse,
 	}
 
 	count, err := h.episode.Count(c.Request().Context(), subjectID, filter)
@@ -136,4 +106,42 @@ func (h Handler) ListEpisode(c echo.Context) error {
 		Data:   slice.Map(episodes, res.ConvertModelEpisode),
 		Total:  count,
 	})
+}
+
+func (h Handler) parseEpisodeListQuery(c echo.Context, u *accessor.Accessor) (model.SubjectID, episode.Filter, error) {
+	epType, err := req.ParseEpTypeOptional(c.QueryParam("type"))
+	if err != nil {
+		return 0, episode.Filter{}, err
+	}
+
+	subjectID, err := req.ParseID(c.QueryParam("subject_id"))
+	if err != nil {
+		return 0, episode.Filter{}, err
+	}
+	if subjectID == 0 {
+		return 0, episode.Filter{}, res.BadRequest("missing required query `subject_id`")
+	}
+
+	_, err = h.subject.Get(c.Request().Context(), subjectID, subject.Filter{
+		NSFW: null.Bool{Value: false, Set: !u.AllowNSFW()}})
+	if err != nil {
+		if errors.Is(err, gerr.ErrNotFound) {
+			return 0, episode.Filter{}, res.ErrNotFound
+		}
+		return 0, episode.Filter{}, errgo.Wrap(err, "failed to get subject")
+	}
+
+	reverseRaw := c.QueryParam("reverse")
+	var reverse bool
+	if reverseRaw != "" {
+		reverse, err = strconv.ParseBool(reverseRaw)
+		if err != nil {
+			return 0, episode.Filter{}, res.BadRequest("can't parse query args reverse as bool: " + strconv.Quote(reverseRaw))
+		}
+	}
+
+	return subjectID, episode.Filter{
+		Type:    null.NewFromPtr(epType),
+		Reverse: reverse,
+	}, nil
 }
