@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/avast/retry-go/v4"
+	"github.com/avast/retry-go/v5"
 	wiki "github.com/bangumi/wiki-parser-go"
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
@@ -96,11 +96,7 @@ func GetWikiValues(f wiki.Field) []string {
 func NewSendBatch(log *zap.Logger, index meilisearch.IndexManager) func([]Document) {
 	return func(items []Document) {
 		log.Debug("send batch to meilisearch", zap.Int("len", len(items)))
-		err := retry.Do(
-			func() error {
-				_, err := index.UpdateDocuments(items, lo.ToPtr("id"))
-				return err
-			},
+		err := retry.New(
 			retry.OnRetry(func(n uint, err error) {
 				log.Warn("failed to send batch", zap.Uint("attempt", n), zap.Error(err))
 			}),
@@ -111,7 +107,10 @@ func NewSendBatch(log *zap.Logger, index meilisearch.IndexManager) func([]Docume
 				var r = &meilisearch.Error{}
 				return errors.As(err, &r)
 			}),
-		)
+		).Do(func() error {
+			_, err := index.UpdateDocuments(items, lo.ToPtr("id"))
+			return err
+		})
 		if err != nil {
 			log.Error("failed to send batch", zap.Error(err))
 		}
