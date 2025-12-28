@@ -25,7 +25,6 @@ require (
 	github.com/mattn/go-colorable v0.1.14
 	github.com/meilisearch/meilisearch-go v0.34.2
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/pingcap/log v1.1.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/rueidis v1.0.68
 	github.com/samber/lo v1.52.0
@@ -123,7 +122,6 @@ require (
 	golang.org/x/time v0.12.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/datatypes v1.2.5 // indirect
 	gorm.io/hints v1.1.2 // indirect

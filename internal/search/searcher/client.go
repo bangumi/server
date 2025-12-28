@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/avast/retry-go/v5"
+	"github.com/bangumi/server/internal/pkg/logger/log"
 	wiki "github.com/bangumi/wiki-parser-go"
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
-	"github.com/pingcap/log"
 	"github.com/samber/lo"
 	"github.com/samber/lo/mutable"
 	"github.com/trim21/errgo"
