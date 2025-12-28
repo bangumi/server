@@ -16,12 +16,14 @@ package ctrl
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
+	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
@@ -112,7 +114,11 @@ func (ctl Ctrl) mayCreateTimeline(
 ) error {
 	collect, err := ctl.collection.GetSubjectCollection(ctx, u.ID, subjectID)
 	if err != nil {
-		ctl.log.Error("failed to create associated timeline, can't get collection ID", zap.Error(err))
+		if errors.Is(err, gerr.ErrSubjectNotCollected) {
+			ctl.log.Error("failed to create associated timeline, can't get collection ID",
+				zap.Error(err), zap.Uint32("user_id", u.ID), zap.Uint32("subject_id", subjectID))
+			return nil
+		}
 		return err
 	}
 
