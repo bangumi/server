@@ -13,6 +13,7 @@ import (
 	wiki "github.com/bangumi/wiki-parser-go"
 	"github.com/labstack/echo/v4"
 	"github.com/meilisearch/meilisearch-go"
+	"github.com/pingcap/log"
 	"github.com/samber/lo"
 	"github.com/samber/lo/mutable"
 	"github.com/trim21/errgo"
@@ -93,21 +94,23 @@ func GetWikiValues(f wiki.Field) []string {
 	return s
 }
 
+var retrier = retry.New(
+	retry.OnRetry(func(n uint, err error) {
+		log.Warn("failed to send batch", zap.Uint("attempt", n), zap.Error(err))
+	}),
+	retry.DelayType(retry.BackOffDelay),
+	retry.Delay(time.Microsecond*100),
+	retry.Attempts(5), //nolint:mnd
+	retry.RetryIf(func(err error) bool {
+		var r = &meilisearch.Error{}
+		return errors.As(err, &r)
+	}),
+)
+
 func NewSendBatch(log *zap.Logger, index meilisearch.IndexManager) func([]Document) {
 	return func(items []Document) {
 		log.Debug("send batch to meilisearch", zap.Int("len", len(items)))
-		err := retry.New(
-			retry.OnRetry(func(n uint, err error) {
-				log.Warn("failed to send batch", zap.Uint("attempt", n), zap.Error(err))
-			}),
-			retry.DelayType(retry.BackOffDelay),
-			retry.Delay(time.Microsecond*100),
-			retry.Attempts(5), //nolint:mnd
-			retry.RetryIf(func(err error) bool {
-				var r = &meilisearch.Error{}
-				return errors.As(err, &r)
-			}),
-		).Do(func() error {
+		err := retrier.Do(func() error {
 			_, err := index.UpdateDocuments(items, lo.ToPtr("id"))
 			return err
 		})
