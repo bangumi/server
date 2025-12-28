@@ -141,6 +141,7 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 			SubjectID:   subject.ID,
 			SubjectType: subject.TypeID,
 			UserID:      userID,
+			Type:        uint8(collection.SubjectCollectionDoing),
 		}
 	}
 	collectionSubject, err := r.convertToSubjectCollection(obj)
