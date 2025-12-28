@@ -121,3 +121,34 @@ func TestMysqlRepo_List_Limit(t *testing.T) {
 		require.Len(t, episodes, expected[i])
 	}
 }
+
+func TestMysqlRepo_ListReverse(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	asc, err := repo.List(context.TODO(), 253, episode.Filter{}, 100, 0)
+	require.NoError(t, err)
+	require.NotEmpty(t, asc)
+
+	desc, err := repo.List(context.TODO(), 253, episode.Filter{Reverse: true}, 100, 0)
+	require.NoError(t, err)
+
+	require.Equal(t, len(asc), len(desc))
+
+	for i := range asc {
+		require.Equalf(t, asc[i], desc[len(desc)-1-i], "reverse order mismatch at index %d", i)
+	}
+
+	const limit = 5
+	require.GreaterOrEqual(t, len(asc), limit)
+
+	latest, err := repo.List(context.TODO(), 253, episode.Filter{Reverse: true}, limit, 0)
+	require.NoError(t, err)
+	require.Equal(t, limit, len(latest))
+
+	for i := 0; i < limit; i++ {
+		require.Equal(t, asc[len(asc)-1-i], latest[i])
+	}
+}
