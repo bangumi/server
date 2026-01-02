@@ -32,7 +32,7 @@ jobs:
       - run: git add .
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.PAT }}
           title: "feat: update common"
