@@ -29,7 +29,7 @@ require (
 	github.com/redis/rueidis v1.0.70
 	github.com/samber/lo v1.52.0
 	github.com/segmentio/kafka-go v0.4.49
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
 	github.com/trim21/errgo v0.0.6
