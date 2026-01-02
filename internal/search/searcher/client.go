@@ -110,7 +110,7 @@ func NewSendBatch(log *zap.Logger, index meilisearch.IndexManager) func([]Docume
 	return func(items []Document) {
 		log.Debug("send batch to meilisearch", zap.Int("len", len(items)))
 		err := retrier.Do(func() error {
-			_, err := index.UpdateDocuments(items, lo.ToPtr("id"))
+			_, err := index.UpdateDocuments(items, &meilisearch.DocumentOptions{PrimaryKey: lo.ToPtr("id")})
 			return err
 		})
 		if err != nil {

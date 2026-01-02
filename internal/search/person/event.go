@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/meilisearch/meilisearch-go"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 
@@ -27,7 +28,7 @@ func (c *client) OnAdded(ctx context.Context, id model.PersonID) error {
 
 	extracted := extract(&s)
 
-	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, lo.ToPtr("id"))
+	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, &meilisearch.DocumentOptions{PrimaryKey: lo.ToPtr("id")})
 	return err
 }
 
@@ -46,13 +47,13 @@ func (c *client) OnUpdate(ctx context.Context, id model.PersonID) error {
 
 	extracted := extract(&s)
 
-	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, lo.ToPtr("id"))
+	_, err = c.index.UpdateDocumentsWithContext(ctx, extracted, &meilisearch.DocumentOptions{PrimaryKey: lo.ToPtr("id")})
 
 	return err
 }
 
 func (c *client) OnDelete(ctx context.Context, id model.PersonID) error {
-	_, err := c.index.DeleteDocumentWithContext(ctx, strconv.FormatUint(uint64(id), 10))
+	_, err := c.index.DeleteDocumentWithContext(ctx, strconv.FormatUint(uint64(id), 10), nil)
 
 	return errgo.Wrap(err, "search")
 }
