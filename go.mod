@@ -23,7 +23,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/labstack/echo/v4 v4.15.0
 	github.com/mattn/go-colorable v0.1.14
-	github.com/meilisearch/meilisearch-go v0.34.2
+	github.com/meilisearch/meilisearch-go v0.35.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/rueidis v1.0.70
