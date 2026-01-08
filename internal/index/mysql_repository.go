@@ -24,6 +24,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gen"
 	"gorm.io/gorm"
+	"gorm.io/plugin/soft_delete"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
@@ -55,7 +56,7 @@ func (r mysqlRepo) isNsfw(ctx context.Context, id model.IndexID) (bool, error) {
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id model.IndexID) (model.Index, error) {
-	i, err := r.q.Index.WithContext(ctx).Where(r.q.Index.ID.Eq(id)).Take()
+	i, err := r.q.Index.WithContext(ctx).Unscoped().Where(r.q.Index.ID.Eq(id)).Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Index{}, gerr.ErrNotFound
@@ -84,7 +85,7 @@ func (r mysqlRepo) New(ctx context.Context, i *model.Index) error {
 }
 
 func (r mysqlRepo) Update(ctx context.Context, id model.IndexID, title string, desc string) error {
-	query := r.q.Index.WithContext(ctx)
+	query := r.q.Index.WithContext(ctx).Unscoped()
 	result, err := query.Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
 		Title: title,
 		Desc:  desc,
@@ -94,7 +95,7 @@ func (r mysqlRepo) Update(ctx context.Context, id model.IndexID, title string, d
 
 func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 	return r.q.Transaction(func(tx *query.Query) error {
-		result, err := tx.Index.WithContext(ctx).Where(tx.Index.ID.Eq(id)).Delete()
+		result, err := tx.Index.WithContext(ctx).Unscoped().Where(tx.Index.ID.Eq(id)).Delete()
 		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
 			return err
 		}
@@ -337,12 +338,18 @@ func daoToModel(index *dao.Index) *model.Index {
 		Comments:    index.ReplyCount,
 		Collects:    index.CollectCount,
 		NSFW:        false, // check nsfw outSubjectIDe of this function
+		Private:     index.Deleted != 0,
 		CreatedAt:   time.Unix(int64(index.CreatedTime), 0),
 		UpdatedAt:   time.Unix(int64(index.UpdatedTime), 0),
 	}
 }
 
 func modelToDAO(index *model.Index) *dao.Index {
+	var deleted soft_delete.DeletedAt
+	if index.Private {
+		deleted = 1
+	}
+
 	return &dao.Index{
 		ID:          index.ID,
 		Type:        0,
@@ -351,5 +358,6 @@ func modelToDAO(index *model.Index) *dao.Index {
 		CreatorID:   index.CreatorID,
 		CreatedTime: int32(index.CreatedAt.Unix()),
 		UpdatedTime: uint32(index.UpdatedAt.Unix()),
+		Deleted:     deleted,
 	}
 }

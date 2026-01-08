@@ -27,4 +27,5 @@ type Index struct {
 	Comments    uint32
 	Collects    uint32
 	NSFW        bool
+	Private     bool
 }
