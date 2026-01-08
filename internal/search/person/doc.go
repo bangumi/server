@@ -46,5 +46,6 @@ func extract(c *model.Person) searcher.Document {
 		Aliases: searcher.ExtractAliases(w),
 		Comment: c.CommentCount,
 		Collect: c.CollectCount,
+		Career:  c.Careers(),
 	}
 }

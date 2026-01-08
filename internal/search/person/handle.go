@@ -24,7 +24,7 @@ type Req struct {
 }
 
 type ReqFilter struct { //nolint:musttag
-	Careers []string `json:"meta_tags"` // and
+	Careers []string `json:"career"` // and
 }
 
 type hit struct {
