@@ -82,7 +82,7 @@ func (d Dam) CensoredWords(text string) bool {
 func AllPrintableChar(text string) bool {
 	for _, c := range text {
 		switch c {
-		case '\n', '\t':
+		case '\n', '\t', '\r':
 			continue
 		}
 
