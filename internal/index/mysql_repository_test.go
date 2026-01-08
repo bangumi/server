@@ -264,8 +264,8 @@ func TestMysqlRepo_DeleteIndex2(t *testing.T) {
 	require.Equal(t, err, gerr.ErrNotFound)
 
 	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
-	require.NoError(t, err)
-	require.Len(t, subjects, 0)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
+	require.Nil(t, subjects)
 
 	// 确保不会影响到其他目录
 	subjects, err = repo.ListSubjects(context.Background(), 15045, model.SubjectTypeAll, 20, 0)
