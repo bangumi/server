@@ -24,7 +24,6 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gen"
 	"gorm.io/gorm"
-	"gorm.io/plugin/soft_delete"
 
 	"github.com/bangumi/server/dal/dao"
 	"github.com/bangumi/server/dal/query"
@@ -338,18 +337,13 @@ func daoToModel(index *dao.Index) *model.Index {
 		Comments:    index.ReplyCount,
 		Collects:    index.CollectCount,
 		NSFW:        false, // check nsfw outSubjectIDe of this function
-		Private:     index.Deleted != 0,
+		Privacy:     model.IndexPrivacy(index.Privacy),
 		CreatedAt:   time.Unix(int64(index.CreatedTime), 0),
 		UpdatedAt:   time.Unix(int64(index.UpdatedTime), 0),
 	}
 }
 
 func modelToDAO(index *model.Index) *dao.Index {
-	var deleted soft_delete.DeletedAt
-	if index.Private {
-		deleted = 1
-	}
-
 	return &dao.Index{
 		ID:          index.ID,
 		Type:        0,
@@ -358,6 +352,6 @@ func modelToDAO(index *model.Index) *dao.Index {
 		CreatorID:   index.CreatorID,
 		CreatedTime: int32(index.CreatedAt.Unix()),
 		UpdatedTime: uint32(index.UpdatedAt.Unix()),
-		Deleted:     deleted,
+		Privacy:     uint8(index.Privacy),
 	}
 }

@@ -71,7 +71,7 @@ func TestUncollectIndex(t *testing.T) {
 func TestCollectIndex_PrivateNotOwner(t *testing.T) {
 	t.Parallel()
 	mockIndex := mocks.NewIndexRepo(t)
-	mockIndex.EXPECT().Get(mock.Anything, uint32(233)).Return(model.Index{ID: 233, CreatorID: 1, Private: true}, nil)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(233)).Return(model.Index{ID: 233, CreatorID: 1, Privacy: model.IndexPrivacyPrivate}, nil)
 	mockAuth := mocks.NewAuthRepo(t)
 	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.UserInfo{ID: 6}, nil)
 	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(auth.Permission{}, nil)

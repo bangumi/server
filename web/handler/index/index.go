@@ -33,9 +33,9 @@ import (
 )
 
 type indexCacheValue struct {
-	Index     res.Index    `json:"index"`
-	Private   bool         `json:"private"`
-	CreatorID model.UserID `json:"creator_id"`
+	Index     res.Index          `json:"index"`
+	Privacy   model.IndexPrivacy `json:"privacy"`
+	CreatorID model.UserID       `json:"creator_id"`
 }
 
 func (h Handler) GetIndex(c echo.Context) error {
@@ -75,7 +75,10 @@ func (h Handler) getIndexWithCache(ctx context.Context, user *accessor.Accessor,
 	}
 
 	if ok {
-		if cached.Private && cached.CreatorID != userID {
+		if cached.Privacy == model.IndexPrivacyDeleted {
+			return res.Index{}, false, nil
+		}
+		if cached.Privacy == model.IndexPrivacyPrivate && cached.CreatorID != userID {
 			return res.Index{}, false, nil
 		}
 		if cached.Index.NSFW && !allowNSFW {
@@ -94,7 +97,11 @@ func (h Handler) getIndexWithCache(ctx context.Context, user *accessor.Accessor,
 		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
 	}
 
-	if i.Private && i.CreatorID != userID {
+	if i.Privacy == model.IndexPrivacyDeleted {
+		return res.Index{}, false, nil
+	}
+
+	if i.Privacy == model.IndexPrivacyPrivate && i.CreatorID != userID {
 		return res.Index{}, false, nil
 	}
 
@@ -111,8 +118,8 @@ func (h Handler) getIndexWithCache(ctx context.Context, user *accessor.Accessor,
 		return res.Index{}, false, nil
 	}
 
-	if !i.Private {
-		_ = h.cache.Set(ctx, key, indexCacheValue{Index: r, Private: false, CreatorID: i.CreatorID}, time.Hour)
+	if i.Privacy == model.IndexPrivacyPublic {
+		_ = h.cache.Set(ctx, key, indexCacheValue{Index: r, Privacy: i.Privacy, CreatorID: i.CreatorID}, time.Hour)
 	}
 
 	return r, true, nil

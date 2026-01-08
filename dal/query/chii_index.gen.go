@@ -39,7 +39,7 @@ func newIndex(db *gorm.DB, opts ...gen.DOOption) index {
 	_index.CreatedTime = field.NewInt32(tableName, "idx_dateline")
 	_index.UpdatedTime = field.NewUint32(tableName, "idx_lasttouch")
 	_index.CreatorID = field.NewUint32(tableName, "idx_uid")
-	_index.Deleted = field.NewField(tableName, "idx_ban")
+	_index.Privacy = field.NewUint8(tableName, "idx_ban")
 
 	_index.fillFieldMap()
 
@@ -62,7 +62,7 @@ type index struct {
 	CreatedTime  field.Int32 // 创建时间
 	UpdatedTime  field.Uint32
 	CreatorID    field.Uint32 // 创建人UID
-	Deleted      field.Field
+	Privacy      field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -91,7 +91,7 @@ func (i *index) updateTableName(table string) *index {
 	i.CreatedTime = field.NewInt32(table, "idx_dateline")
 	i.UpdatedTime = field.NewUint32(table, "idx_lasttouch")
 	i.CreatorID = field.NewUint32(table, "idx_uid")
-	i.Deleted = field.NewField(table, "idx_ban")
+	i.Privacy = field.NewUint8(table, "idx_ban")
 
 	i.fillFieldMap()
 
@@ -129,7 +129,7 @@ func (i *index) fillFieldMap() {
 	i.fieldMap["idx_dateline"] = i.CreatedTime
 	i.fieldMap["idx_lasttouch"] = i.UpdatedTime
 	i.fieldMap["idx_uid"] = i.CreatorID
-	i.fieldMap["idx_ban"] = i.Deleted
+	i.fieldMap["idx_ban"] = i.Privacy
 }
 
 func (i index) clone(db *gorm.DB) index {

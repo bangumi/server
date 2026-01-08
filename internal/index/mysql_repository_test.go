@@ -70,7 +70,7 @@ func TestMysqlRepo_GetPrivateIndex(t *testing.T) {
 		CreatorID:   382951,
 		CreatedAt:   now,
 		UpdatedAt:   now,
-		Private:     true,
+		Privacy:     model.IndexPrivacyPrivate,
 	}
 	require.NoError(t, repo.New(ctx, idx))
 	defer func() { _ = repo.Delete(ctx, idx.ID) }()
@@ -78,7 +78,7 @@ func TestMysqlRepo_GetPrivateIndex(t *testing.T) {
 	got, err := repo.Get(ctx, idx.ID)
 	require.NoError(t, err)
 	require.Equal(t, idx.ID, got.ID)
-	require.True(t, got.Private)
+	require.Equal(t, model.IndexPrivacyPrivate, got.Privacy)
 }
 
 func TestMysqlRepo_ListSubjects(t *testing.T) {
