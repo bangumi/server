@@ -262,12 +262,8 @@ func main() {
 		gen.FieldRename("idx_collects", "CollectCount"),
 		gen.FieldRename("idx_subject_total", "SubjectCount"),
 
-		gen.FieldType("idx_ban", "soft_delete.DeletedAt"),
-		gen.FieldRename("idx_ban", "Deleted"),
-		gen.FieldGORMTag("idx_ban", func(tag field.GormTag) field.GormTag {
-			tag["softDelete"] = []string{"flag"}
-			return tag
-		}),
+		gen.FieldType("idx_ban", "uint8"),
+		gen.FieldRename("idx_ban", "Privacy"),
 	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index_collects", "IndexCollect",

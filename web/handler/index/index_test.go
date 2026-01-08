@@ -55,6 +55,59 @@ func TestHandler_GetIndex_NSFW(t *testing.T) {
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
 
+func TestHandler_GetIndex_PrivateForOwner(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewIndexRepo(t)
+	m.EXPECT().Get(mock.Anything, uint32(7)).Return(
+		model.Index{ID: 7, CreatorID: 6, Privacy: model.IndexPrivacyPrivate},
+		nil,
+	)
+
+	mAuth := mocks.NewAuthRepo(t)
+	mAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(auth.UserInfo{ID: 6, RegTime: time.Unix(1e9, 0)}, nil)
+	mAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).
+		Return(auth.Permission{}, nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: m, AuthRepo: mAuth})
+
+	resp := htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer token").
+		Get("/v0/indices/7")
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestHandler_GetIndex_PrivateForOthers(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewIndexRepo(t)
+	m.EXPECT().Get(mock.Anything, uint32(7)).Return(
+		model.Index{ID: 7, CreatorID: 6, Privacy: model.IndexPrivacyPrivate},
+		nil,
+	)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: m})
+
+	resp := htest.New(t, app).Get("/v0/indices/7")
+
+	require.Equal(t, http.StatusNotFound, resp.StatusCode)
+}
+
+func TestHandler_GetIndex_Deleted(t *testing.T) {
+	t.Parallel()
+	m := mocks.NewIndexRepo(t)
+	m.EXPECT().Get(mock.Anything, uint32(7)).Return(
+		model.Index{ID: 7, CreatorID: 6, Privacy: model.IndexPrivacyDeleted},
+		nil,
+	)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: m})
+
+	resp := htest.New(t, app).Get("/v0/indices/7")
+
+	require.Equal(t, http.StatusNotFound, resp.StatusCode)
+}
+
 func TestHandler_NewIndex_NoPermission(t *testing.T) {
 	t.Parallel()
 

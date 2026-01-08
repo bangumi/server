@@ -30,8 +30,8 @@ func (h *Handler) CollectIndex(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	uid := accessor.GetFromCtx(c).ID
-	return h.collectIndex(c, iid, uid)
+	user := accessor.GetFromCtx(c)
+	return h.collectIndex(c, iid, user)
 }
 
 func (h *Handler) UncollectIndex(c echo.Context) error {
@@ -39,50 +39,47 @@ func (h *Handler) UncollectIndex(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	uid := accessor.GetFromCtx(c).ID
-	return h.uncollectIndex(c, iid, uid)
+	user := accessor.GetFromCtx(c)
+	return h.uncollectIndex(c, iid, user)
 }
 
-func (h *Handler) collectIndex(c echo.Context, indexID uint32, uid uint32) error {
+func (h *Handler) collectIndex(c echo.Context, indexID uint32, user *accessor.Accessor) error {
 	ctx := c.Request().Context()
-	// check if the index exists
-	if _, err := h.i.Get(ctx, indexID); err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return res.NotFound("index not found")
-		}
+
+	if _, ok, err := h.getIndexWithCache(ctx, user, indexID); err != nil {
 		return res.InternalError(c, err, "get index error")
+	} else if !ok {
+		return res.NotFound("index not found")
 	}
 	// check if the user has collected the index
-	if _, err := h.i.GetIndexCollect(ctx, indexID, uid); err == nil {
+	if _, err := h.i.GetIndexCollect(ctx, indexID, user.ID); err == nil {
 		return nil // already collected
 	} else if !errors.Is(err, gerr.ErrNotFound) {
 		return res.InternalError(c, err, "get index collect error")
 	}
 	// add the collect
-	if err := h.i.AddIndexCollect(ctx, indexID, uid); err != nil {
+	if err := h.i.AddIndexCollect(ctx, indexID, user.ID); err != nil {
 		return res.InternalError(c, err, "add index collect failed")
 	}
 	return nil
 }
 
-func (h *Handler) uncollectIndex(c echo.Context, indexID uint32, uid uint32) error {
+func (h *Handler) uncollectIndex(c echo.Context, indexID uint32, user *accessor.Accessor) error {
 	ctx := c.Request().Context()
-	// check if the index exists
-	if _, err := h.i.Get(ctx, indexID); err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return res.NotFound("index not found")
-		}
+	if _, ok, err := h.getIndexWithCache(ctx, user, indexID); err != nil {
 		return res.InternalError(c, err, "get index error")
+	} else if !ok {
+		return res.NotFound("index not found")
 	}
 	// check if the user has collected the index
-	if _, err := h.i.GetIndexCollect(ctx, indexID, uid); err != nil {
+	if _, err := h.i.GetIndexCollect(ctx, indexID, user.ID); err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			return res.NotFound("index not collected")
 		}
 		return res.InternalError(c, err, "get index collect error")
 	}
 	// delete the collect
-	if err := h.i.DeleteIndexCollect(ctx, indexID, uid); err != nil {
+	if err := h.i.DeleteIndexCollect(ctx, indexID, user.ID); err != nil {
 		return res.InternalError(c, err, "delete index collect failed")
 	}
 	return nil

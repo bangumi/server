@@ -55,6 +55,58 @@ func TestMysqlRepo_Get(t *testing.T) {
 	require.False(t, i.NSFW)
 }
 
+func TestMysqlRepo_GetPrivateIndex(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	ctx := context.Background()
+	now := time.Now()
+
+	idx := &model.Index{
+		ID:          0,
+		Title:       "private index",
+		Description: "private visibility",
+		CreatorID:   382951,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+		Privacy:     model.IndexPrivacyPrivate,
+	}
+	require.NoError(t, repo.New(ctx, idx))
+	defer func() { _ = repo.Delete(ctx, idx.ID) }()
+
+	got, err := repo.Get(ctx, idx.ID)
+	require.NoError(t, err)
+	require.Equal(t, idx.ID, got.ID)
+	require.Equal(t, model.IndexPrivacyPrivate, got.Privacy)
+}
+
+func TestMysqlRepo_GetDeletedIndex(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	repo := getRepo(t)
+	ctx := context.Background()
+	now := time.Now()
+
+	idx := &model.Index{
+		ID:          0,
+		Title:       "deleted index",
+		Description: "deleted visibility",
+		CreatorID:   382951,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+		Privacy:     model.IndexPrivacyPublic,
+	}
+	require.NoError(t, repo.New(ctx, idx))
+	defer func() { _ = repo.Delete(ctx, idx.ID) }()
+
+	require.NoError(t, repo.Delete(ctx, idx.ID))
+
+	_, err := repo.Get(ctx, idx.ID)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
+}
+
 func TestMysqlRepo_ListSubjects(t *testing.T) {
 	test.RequireEnv(t, test.EnvMysql)
 	t.Parallel()
@@ -212,8 +264,8 @@ func TestMysqlRepo_DeleteIndex2(t *testing.T) {
 	require.Equal(t, err, gerr.ErrNotFound)
 
 	subjects, err = repo.ListSubjects(context.Background(), index.ID, model.SubjectTypeAll, 20, 0)
-	require.NoError(t, err)
-	require.Len(t, subjects, 0)
+	require.ErrorIs(t, err, gerr.ErrNotFound)
+	require.Nil(t, subjects)
 
 	// 确保不会影响到其他目录
 	subjects, err = repo.ListSubjects(context.Background(), 15045, model.SubjectTypeAll, 20, 0)

@@ -32,6 +32,12 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
+type indexCacheValue struct {
+	Index     res.Index          `json:"index"`
+	Privacy   model.IndexPrivacy `json:"privacy"`
+	CreatorID model.UserID       `json:"creator_id"`
+}
+
 func (h Handler) GetIndex(c echo.Context) error {
 	user := accessor.GetFromCtx(c)
 
@@ -40,53 +46,110 @@ func (h Handler) GetIndex(c echo.Context) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.Request().Context(), id)
+	resp, ok, err := h.getIndexWithCache(c.Request().Context(), user, id)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get index")
 	}
 
-	if !ok || r.NSFW && !user.AllowNSFW() {
+	if !ok {
 		return res.NotFound("index not found")
 	}
 
-	return c.JSON(http.StatusOK, r)
+	return c.JSON(http.StatusOK, resp)
 }
 
-func (h Handler) getIndexWithCache(c context.Context, id uint32) (res.Index, bool, error) {
-	var key = cachekey.Index(id)
+func (h Handler) getIndexWithCache(ctx context.Context, user *accessor.Accessor, id uint32) (res.Index, bool, error) {
+	key := cachekey.Index(id)
 
-	var r res.Index
-	ok, err := h.cache.Get(c, key, &r)
+	userID, allowNSFW := h.extractUserPrefs(user)
+
+	if cached, ok, err := h.getIndexFromCache(ctx, key, userID, allowNSFW); err != nil || ok {
+		return cached, ok, err
+	}
+
+	item, ok, err := h.buildIndexResponse(ctx, id, userID, allowNSFW)
+	if err != nil || !ok {
+		return item.Index, ok, err
+	}
+
+	if item.Privacy == model.IndexPrivacyPublic {
+		_ = h.cache.Set(ctx, key, item, time.Hour)
+	}
+
+	return item.Index, true, nil
+}
+
+func (h Handler) getIndexFromCache(
+	ctx context.Context, key string, userID model.UserID, allowNSFW bool,
+) (res.Index, bool, error) {
+	var cached indexCacheValue
+	ok, err := h.cache.Get(ctx, key, &cached)
 	if err != nil {
-		return r, ok, errgo.Wrap(err, "cache.Get")
+		return res.Index{}, ok, errgo.Wrap(err, "cache.Get")
 	}
 
-	if ok {
-		return r, ok, nil
+	if !ok {
+		return res.Index{}, false, nil
 	}
 
-	i, err := h.i.Get(c, id)
+	if !isIndexVisible(cached.Privacy, cached.CreatorID, userID) {
+		return res.Index{}, false, nil
+	}
+	if cached.Index.NSFW && !allowNSFW {
+		return res.Index{}, false, nil
+	}
+
+	return cached.Index, true, nil
+}
+
+func (h Handler) buildIndexResponse(
+	ctx context.Context, id uint32, userID model.UserID, allowNSFW bool,
+) (indexCacheValue, bool, error) {
+	i, err := h.i.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
-			return res.Index{}, false, nil
+			return indexCacheValue{}, false, nil
 		}
 
-		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
+		return indexCacheValue{}, false, errgo.Wrap(err, "Index.Get")
 	}
 
-	u, err := h.u.GetByID(c, i.CreatorID)
+	if !isIndexVisible(i.Privacy, i.CreatorID, userID) {
+		return indexCacheValue{}, false, nil
+	}
+
+	u, err := h.u.GetByID(ctx, i.CreatorID)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
 			h.log.Error("index missing creator", zap.Uint32("index_id", id), zap.Uint32("creator", i.CreatorID))
 		}
-		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
+		return indexCacheValue{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
 	}
 
-	r = res.IndexModelToResponse(&i, u)
+	r := res.IndexModelToResponse(&i, u)
+	if r.NSFW && !allowNSFW {
+		return indexCacheValue{}, false, nil
+	}
 
-	_ = h.cache.Set(c, key, r, time.Hour)
+	return indexCacheValue{Index: r, Privacy: i.Privacy, CreatorID: i.CreatorID}, true, nil
+}
 
-	return r, true, nil
+func isIndexVisible(privacy model.IndexPrivacy, creatorID, userID model.UserID) bool {
+	if privacy == model.IndexPrivacyDeleted {
+		return false
+	}
+	if privacy == model.IndexPrivacyPrivate && creatorID != userID {
+		return false
+	}
+	return true
+}
+
+func (h Handler) extractUserPrefs(user *accessor.Accessor) (model.UserID, bool) {
+	if user == nil {
+		return 0, false
+	}
+
+	return user.ID, user.AllowNSFW()
 }
 
 func (h Handler) GetIndexSubjects(c echo.Context) error {
@@ -107,12 +170,12 @@ func (h Handler) GetIndexSubjects(c echo.Context) error {
 		return err
 	}
 
-	r, ok, err := h.getIndexWithCache(c.Request().Context(), id)
+	_, ok, err := h.getIndexWithCache(c.Request().Context(), user, id)
 	if err != nil {
 		return errgo.Wrap(err, "failed to get index")
 	}
 
-	if !ok || (r.NSFW && !user.AllowNSFW()) {
+	if !ok {
 		return res.ErrNotFound
 	}
 

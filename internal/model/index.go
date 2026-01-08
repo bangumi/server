@@ -16,6 +16,14 @@ package model
 
 import "time"
 
+type IndexPrivacy uint8
+
+const (
+	IndexPrivacyPublic  IndexPrivacy = 0
+	IndexPrivacyDeleted IndexPrivacy = 1
+	IndexPrivacyPrivate IndexPrivacy = 2
+)
+
 type Index struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
@@ -27,4 +35,5 @@ type Index struct {
 	Comments    uint32
 	Collects    uint32
 	NSFW        bool
+	Privacy     IndexPrivacy
 }

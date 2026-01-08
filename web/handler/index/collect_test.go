@@ -67,3 +67,23 @@ func TestUncollectIndex(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
+
+func TestCollectIndex_PrivateNotOwner(t *testing.T) {
+	t.Parallel()
+	mockIndex := mocks.NewIndexRepo(t)
+	mockIndex.EXPECT().Get(mock.Anything, uint32(233)).Return(
+		model.Index{ID: 233, CreatorID: 1, Privacy: model.IndexPrivacyPrivate},
+		nil,
+	)
+	mockAuth := mocks.NewAuthRepo(t)
+	mockAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.UserInfo{ID: 6}, nil)
+	mockAuth.EXPECT().GetPermission(mock.Anything, mock.Anything).Return(auth.Permission{}, nil)
+
+	app := test.GetWebApp(t, test.Mock{IndexRepo: mockIndex, AuthRepo: mockAuth})
+
+	resp := htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer token").
+		Post("/v0/indices/233/collect")
+
+	require.Equal(t, http.StatusNotFound, resp.StatusCode)
+}

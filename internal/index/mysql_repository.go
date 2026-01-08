@@ -55,7 +55,12 @@ func (r mysqlRepo) isNsfw(ctx context.Context, id model.IndexID) (bool, error) {
 }
 
 func (r mysqlRepo) Get(ctx context.Context, id model.IndexID) (model.Index, error) {
-	i, err := r.q.Index.WithContext(ctx).Where(r.q.Index.ID.Eq(id)).Take()
+	i, err := r.q.Index.WithContext(ctx).
+		Where(
+			r.q.Index.ID.Eq(id),
+			r.q.Index.Privacy.Neq(uint8(model.IndexPrivacyDeleted)),
+		).
+		Take()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Index{}, gerr.ErrNotFound
@@ -85,7 +90,10 @@ func (r mysqlRepo) New(ctx context.Context, i *model.Index) error {
 
 func (r mysqlRepo) Update(ctx context.Context, id model.IndexID, title string, desc string) error {
 	query := r.q.Index.WithContext(ctx)
-	result, err := query.Where(r.q.Index.ID.Eq(id)).Updates(dao.Index{
+	result, err := query.Where(
+		r.q.Index.ID.Eq(id),
+		r.q.Index.Privacy.Neq(uint8(model.IndexPrivacyDeleted)),
+	).Updates(dao.Index{
 		Title: title,
 		Desc:  desc,
 	})
@@ -94,19 +102,19 @@ func (r mysqlRepo) Update(ctx context.Context, id model.IndexID, title string, d
 
 func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 	return r.q.Transaction(func(tx *query.Query) error {
-		result, err := tx.Index.WithContext(ctx).Where(tx.Index.ID.Eq(id)).Delete()
-		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
-			return err
-		}
-		result, err = tx.IndexSubject.WithContext(ctx).
-			Where(tx.IndexSubject.IndexID.Eq(id)).Delete()
-		return r.WrapResult(result, err, "failed to delete subjects in the index")
+		result, err := tx.Index.WithContext(ctx).
+			Where(tx.Index.ID.Eq(id)).
+			UpdateColumnSimple(tx.Index.Privacy.Value(uint8(model.IndexPrivacyDeleted)))
+		return r.WrapResult(result, err, "failed to delete index")
 	})
 }
 
 func (r mysqlRepo) CountSubjects(
 	ctx context.Context, id model.IndexID, subjectType model.SubjectType,
 ) (int64, error) {
+	if _, err := r.Get(ctx, id); err != nil {
+		return 0, err
+	}
 	q := r.q.IndexSubject.WithContext(ctx).Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.Cat.Eq(0))
 	if subjectType != 0 {
 		q = q.Where(r.q.IndexSubject.SubjectType.Eq(subjectType))
@@ -126,6 +134,9 @@ func (r mysqlRepo) ListSubjects(
 	subjectType model.SubjectType,
 	limit, offset int,
 ) ([]Subject, error) {
+	if _, err := r.Get(ctx, id); err != nil {
+		return nil, err
+	}
 	q := r.q.IndexSubject.WithContext(ctx).Joins(r.q.IndexSubject.Subject).
 		Preload(r.q.IndexSubject.Subject.Fields).
 		Where(r.q.IndexSubject.IndexID.Eq(id), r.q.IndexSubject.Cat.Eq(0)).
@@ -337,6 +348,7 @@ func daoToModel(index *dao.Index) *model.Index {
 		Comments:    index.ReplyCount,
 		Collects:    index.CollectCount,
 		NSFW:        false, // check nsfw outSubjectIDe of this function
+		Privacy:     model.IndexPrivacy(index.Privacy),
 		CreatedAt:   time.Unix(int64(index.CreatedTime), 0),
 		UpdatedAt:   time.Unix(int64(index.UpdatedTime), 0),
 	}
@@ -351,5 +363,6 @@ func modelToDAO(index *model.Index) *dao.Index {
 		CreatorID:   index.CreatorID,
 		CreatedTime: int32(index.CreatedAt.Unix()),
 		UpdatedTime: uint32(index.UpdatedAt.Unix()),
+		Privacy:     uint8(index.Privacy),
 	}
 }
