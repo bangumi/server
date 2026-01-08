@@ -64,6 +64,10 @@ func (r mysqlRepo) Get(ctx context.Context, id model.IndexID) (model.Index, erro
 		return model.Index{}, errgo.Wrap(err, "dal")
 	}
 
+	if i.Privacy == model.IndexPrivacyDeleted {
+		return model.Index{}, gerr.ErrNotFound
+	}
+
 	nsfw, err := r.isNsfw(ctx, id)
 	if err != nil {
 		return model.Index{}, err
@@ -94,10 +98,13 @@ func (r mysqlRepo) Update(ctx context.Context, id model.IndexID, title string, d
 
 func (r mysqlRepo) Delete(ctx context.Context, id model.IndexID) error {
 	return r.q.Transaction(func(tx *query.Query) error {
-		result, err := tx.Index.WithContext(ctx).Unscoped().Where(tx.Index.ID.Eq(id)).Delete()
-		if err = r.WrapResult(result, err, "failed to delete index"); err != nil {
+		result, err := tx.Index.WithContext(ctx).
+			Where(tx.Index.ID.Eq(id)).
+			UpdateColumnSimple(tx.Index.Privacy.Value(uint8(model.IndexPrivacyDeleted)))
+		if err = r.WrapResult(result, err, "failed to soft delete index"); err != nil {
 			return err
 		}
+
 		result, err = tx.IndexSubject.WithContext(ctx).
 			Where(tx.IndexSubject.IndexID.Eq(id)).Delete()
 		return r.WrapResult(result, err, "failed to delete subjects in the index")
