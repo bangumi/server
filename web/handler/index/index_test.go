@@ -58,7 +58,10 @@ func TestHandler_GetIndex_NSFW(t *testing.T) {
 func TestHandler_GetIndex_PrivateForOwner(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewIndexRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{ID: 7, CreatorID: 6, Privacy: model.IndexPrivacyPrivate}, nil)
+	m.EXPECT().Get(mock.Anything, uint32(7)).Return(
+		model.Index{ID: 7, CreatorID: 6, Privacy: model.IndexPrivacyPrivate},
+		nil,
+	)
 
 	mAuth := mocks.NewAuthRepo(t)
 	mAuth.EXPECT().GetByToken(mock.Anything, mock.Anything).
@@ -78,7 +81,10 @@ func TestHandler_GetIndex_PrivateForOwner(t *testing.T) {
 func TestHandler_GetIndex_PrivateForOthers(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewIndexRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{ID: 7, CreatorID: 6, Privacy: model.IndexPrivacyPrivate}, nil)
+	m.EXPECT().Get(mock.Anything, uint32(7)).Return(
+		model.Index{ID: 7, CreatorID: 6, Privacy: model.IndexPrivacyPrivate},
+		nil,
+	)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: m})
 
@@ -90,7 +96,10 @@ func TestHandler_GetIndex_PrivateForOthers(t *testing.T) {
 func TestHandler_GetIndex_Deleted(t *testing.T) {
 	t.Parallel()
 	m := mocks.NewIndexRepo(t)
-	m.EXPECT().Get(mock.Anything, uint32(7)).Return(model.Index{ID: 7, CreatorID: 6, Privacy: model.IndexPrivacyDeleted}, nil)
+	m.EXPECT().Get(mock.Anything, uint32(7)).Return(
+		model.Index{ID: 7, CreatorID: 6, Privacy: model.IndexPrivacyDeleted},
+		nil,
+	)
 
 	app := test.GetWebApp(t, test.Mock{IndexRepo: m})
 

@@ -20,8 +20,8 @@ type IndexPrivacy uint8
 
 const (
 	IndexPrivacyPublic  IndexPrivacy = 0
-	IndexPrivacyDeleted              = 1
-	IndexPrivacyPrivate              = 2
+	IndexPrivacyDeleted IndexPrivacy = 1
+	IndexPrivacyPrivate IndexPrivacy = 2
 )
 
 type Index struct {

@@ -61,48 +61,61 @@ func (h Handler) GetIndex(c echo.Context) error {
 func (h Handler) getIndexWithCache(ctx context.Context, user *accessor.Accessor, id uint32) (res.Index, bool, error) {
 	key := cachekey.Index(id)
 
-	var userID model.UserID
-	allowNSFW := false
-	if user != nil {
-		userID = user.ID
-		allowNSFW = user.AllowNSFW()
+	userID, allowNSFW := h.extractUserPrefs(user)
+
+	if cached, ok, err := h.getIndexFromCache(ctx, key, userID, allowNSFW); err != nil || ok {
+		return cached, ok, err
 	}
 
+	item, ok, err := h.buildIndexResponse(ctx, id, userID, allowNSFW)
+	if err != nil || !ok {
+		return item.Index, ok, err
+	}
+
+	if item.Privacy == model.IndexPrivacyPublic {
+		_ = h.cache.Set(ctx, key, item, time.Hour)
+	}
+
+	return item.Index, true, nil
+}
+
+func (h Handler) getIndexFromCache(
+	ctx context.Context, key string, userID model.UserID, allowNSFW bool,
+) (res.Index, bool, error) {
 	var cached indexCacheValue
 	ok, err := h.cache.Get(ctx, key, &cached)
 	if err != nil {
 		return res.Index{}, ok, errgo.Wrap(err, "cache.Get")
 	}
 
-	if ok {
-		if cached.Privacy == model.IndexPrivacyDeleted {
-			return res.Index{}, false, nil
-		}
-		if cached.Privacy == model.IndexPrivacyPrivate && cached.CreatorID != userID {
-			return res.Index{}, false, nil
-		}
-		if cached.Index.NSFW && !allowNSFW {
-			return res.Index{}, false, nil
-		}
-
-		return cached.Index, true, nil
+	if !ok {
+		return res.Index{}, false, nil
 	}
 
+	if !isIndexVisible(cached.Privacy, cached.CreatorID, userID) {
+		return res.Index{}, false, nil
+	}
+	if cached.Index.NSFW && !allowNSFW {
+		return res.Index{}, false, nil
+	}
+
+	return cached.Index, true, nil
+}
+
+func (h Handler) buildIndexResponse(
+	ctx context.Context, id uint32, userID model.UserID, allowNSFW bool,
+) (indexCacheValue, bool, error) {
 	i, err := h.i.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, gerr.ErrNotFound) {
-			return res.Index{}, false, nil
+			return indexCacheValue{}, false, nil
 		}
 
-		return res.Index{}, false, errgo.Wrap(err, "Index.Get")
+		return indexCacheValue{}, false, errgo.Wrap(err, "Index.Get")
 	}
 
-	if i.Privacy == model.IndexPrivacyDeleted {
-		return res.Index{}, false, nil
-	}
-
-	if i.Privacy == model.IndexPrivacyPrivate && i.CreatorID != userID {
-		return res.Index{}, false, nil
+	if !isIndexVisible(i.Privacy, i.CreatorID, userID) {
+		return indexCacheValue{}, false, nil
 	}
 
 	u, err := h.u.GetByID(ctx, i.CreatorID)
@@ -110,19 +123,33 @@ func (h Handler) getIndexWithCache(ctx context.Context, user *accessor.Accessor,
 		if errors.Is(err, gerr.ErrNotFound) {
 			h.log.Error("index missing creator", zap.Uint32("index_id", id), zap.Uint32("creator", i.CreatorID))
 		}
-		return res.Index{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
+		return indexCacheValue{}, false, errgo.Wrap(err, "failed to get creator: user.GetByID")
 	}
 
 	r := res.IndexModelToResponse(&i, u)
 	if r.NSFW && !allowNSFW {
-		return res.Index{}, false, nil
+		return indexCacheValue{}, false, nil
 	}
 
-	if i.Privacy == model.IndexPrivacyPublic {
-		_ = h.cache.Set(ctx, key, indexCacheValue{Index: r, Privacy: i.Privacy, CreatorID: i.CreatorID}, time.Hour)
+	return indexCacheValue{Index: r, Privacy: i.Privacy, CreatorID: i.CreatorID}, true, nil
+}
+
+func isIndexVisible(privacy model.IndexPrivacy, creatorID, userID model.UserID) bool {
+	if privacy == model.IndexPrivacyDeleted {
+		return false
+	}
+	if privacy == model.IndexPrivacyPrivate && creatorID != userID {
+		return false
+	}
+	return true
+}
+
+func (h Handler) extractUserPrefs(user *accessor.Accessor) (model.UserID, bool) {
+	if user == nil {
+		return 0, false
 	}
 
-	return r, true, nil
+	return user.ID, user.AllowNSFW()
 }
 
 func (h Handler) GetIndexSubjects(c echo.Context) error {
