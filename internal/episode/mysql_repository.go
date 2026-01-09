@@ -100,7 +100,13 @@ func (r mysqlRepo) List(
 		q = q.Where(r.q.Episode.Type.Eq(filter.Type.Value))
 	}
 
-	episodes, err := q.Order(r.q.Episode.Disc, r.q.Episode.Type, r.q.Episode.Sort).Limit(limit).Offset(offset).Find()
+	if filter.Reverse {
+		q = q.Order(r.q.Episode.Disc.Desc(), r.q.Episode.Type.Desc(), r.q.Episode.Sort.Desc())
+	} else {
+		q = q.Order(r.q.Episode.Disc, r.q.Episode.Type, r.q.Episode.Sort)
+	}
+
+	episodes, err := q.Limit(limit).Offset(offset).Find()
 	if err != nil {
 		return nil, errgo.Wrap(err, "dal")
 	}
