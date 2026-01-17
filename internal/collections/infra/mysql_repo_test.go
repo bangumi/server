@@ -217,6 +217,8 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	repo, q := getRepo(t)
 	table := q.SubjectCollection
 
+	var r *dao.SubjectCollection
+
 	err := q.Subject.WithContext(context.TODO()).Clauses(clause.OnConflict{DoNothing: true}).
 		Where(q.Subject.ID.Eq(sid)).Create(&dao.Subject{ID: sid})
 	require.NoError(t, err)
@@ -258,8 +260,9 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.NoError(t, err)
 
 	// DB 里有数据
-	_, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
+	r, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
+	require.EqualValues(t, now.Unix(), r.DoingTime)
 
 	// 更新
 	err = repo.UpdateOrCreateSubjectCollection(context.Background(), uid, subject, now, "",
@@ -272,7 +275,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	r, err := table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
+	r, err = table.WithContext(context.TODO()).Where(table.SubjectID.Eq(sid), table.UserID.Eq(uid)).Take()
 	require.NoError(t, err)
 
 	require.EqualValues(t, now.Unix(), r.UpdatedTime)
@@ -281,7 +284,7 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	require.Equal(t, uint8(1), r.Rate)
 	require.EqualValues(t, now.Unix(), r.DroppedTime)
 	require.Zero(t, r.WishTime)
-	require.Zero(t, r.DoingTime)
+	require.EqualValues(t, now.Unix(), r.DoingTime)
 	require.Zero(t, r.DoneTime)
 	require.Zero(t, r.OnHoldTime)
 
