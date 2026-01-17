@@ -395,7 +395,7 @@ func (r mysqlRepo) updateSubjectCollection(
 	obj.Private = uint8(s.Privacy())
 	obj.Type = uint8(s.TypeID())
 
-	if s.TypeID() != original.TypeID() {
+	if isNew || s.TypeID() != original.TypeID() {
 		err := r.updateCollectionTime(obj, s.TypeID(), at)
 		if err != nil {
 			return errgo.Trace(err)
