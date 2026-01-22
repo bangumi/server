@@ -43,5 +43,6 @@ type Repo interface {
 }
 
 type Filter struct {
-	Type null.Null[Type]
+	Type    null.Null[Type]
+	Reverse bool
 }
