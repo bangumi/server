@@ -15,7 +15,7 @@
 package mw
 
 import (
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/res"

@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"

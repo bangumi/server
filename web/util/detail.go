@@ -15,7 +15,7 @@
 package util
 
 import (
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 func DetailWithErr(c echo.Context, err error) D {
