@@ -46,7 +46,7 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@v2.1.0
         with:
           repo: gotestyourself/gotestsum
-          tag: v1.12.1
+          tag: v1.13.0
           platform: linux
           arch: amd64
         env:
