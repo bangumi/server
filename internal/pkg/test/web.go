@@ -20,7 +20,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/fx"
 

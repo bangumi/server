@@ -17,7 +17,7 @@ package req
 import (
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/web/res"
 )

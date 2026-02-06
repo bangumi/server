@@ -15,7 +15,7 @@
 package subject
 
 import (
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/episode"

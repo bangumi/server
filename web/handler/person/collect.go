@@ -17,7 +17,7 @@ package person
 import (
 	"errors"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/collections/domain/collection"

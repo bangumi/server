@@ -18,7 +18,7 @@ import (
 	"encoding/json"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/segmentio/kafka-go"
 	"github.com/spf13/cobra"
 	"github.com/trim21/errgo"

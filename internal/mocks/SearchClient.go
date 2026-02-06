@@ -8,7 +8,7 @@ import (
 	"context"
 
 	"github.com/bangumi/server/internal/search"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	mock "github.com/stretchr/testify/mock"
 )
 

@@ -17,7 +17,7 @@ package web
 import (
 	"github.com/bytedance/sonic/decoder"
 	"github.com/bytedance/sonic/encoder"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 var _ echo.JSONSerializer = jsonSerializer{}

@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 type CacheControlParams struct {
