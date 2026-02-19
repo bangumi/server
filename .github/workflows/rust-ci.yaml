@@ -1,0 +1,65 @@
+name: Rust CI
+
+on:
+  push:
+    branches:
+      - master
+  merge_group:
+  pull_request:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    runs-on: ubuntu-24.04
+    env:
+      TARGET: x86_64-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Set up Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ env.TARGET }}
+
+      - name: Check format
+        run: cargo fmt --all -- --check
+
+      - name: Run clippy
+        run: cargo clippy --workspace --all-targets --locked
+
+      - name: Run tests
+        run: cargo test --workspace --locked
+
+      - name: Build release binary
+        run: cargo build --release --locked --target $TARGET -p app
+
+  docker:
+    runs-on: ubuntu-24.04
+    needs: rust
+    env:
+      TARGET: x86_64-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Set up Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ env.TARGET }}
+
+      - name: Build release binary
+        run: cargo build --release --locked --target $TARGET -p app
+
+      - name: Build rust docker image
+        run: docker build --build-arg TARGET=$TARGET -t app-rust -f etc/Dockerfile.rust .
+
+      - name: Smoke run
+        run: docker run --rm app-rust --help

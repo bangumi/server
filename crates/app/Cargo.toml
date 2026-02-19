@@ -1,0 +1,26 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sqlx.workspace = true
+redis.workspace = true
+meilisearch-sdk.workspace = true
+opendal.workspace = true
+bangumi-wiki-parser.workspace = true
+php-serialize.workspace = true
+common = { path = "../common" }
+
+[target.'cfg(unix)'.dependencies]
+rdkafka = { workspace = true, features = ["cmake-build", "tokio", "ssl-vendored"] }
+
+[target.'cfg(not(unix))'.dependencies]
+rdkafka = { workspace = true, features = ["cmake-build", "tokio"] }
