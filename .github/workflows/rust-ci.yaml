@@ -28,6 +28,9 @@ jobs:
         with:
           target: ${{ env.TARGET }}
 
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@nextest
+
       - name: Check format
         run: cargo fmt --all -- --check
 
@@ -35,7 +38,7 @@ jobs:
         run: cargo clippy --workspace --all-targets --locked
 
       - name: Run tests
-        run: cargo test --workspace --locked
+        run: cargo nextest run --workspace --locked
 
       - name: Build release binary
         run: cargo build --release --locked --target $TARGET -p app
