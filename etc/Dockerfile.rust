@@ -1,0 +1,10 @@
+FROM gcr.io/distroless/cc-debian13:nonroot@sha256:84fcd3c223b144b0cb6edc5ecc75641819842a9679a3a58fd6294bec47532bf7
+
+ARG TARGET=x86_64-unknown-linux-gnu
+
+WORKDIR /app
+
+COPY target/${TARGET}/release/app /app/app
+
+ENTRYPOINT ["/app/app"]
+CMD ["--help"]
