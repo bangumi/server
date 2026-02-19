@@ -144,7 +144,12 @@ impl SearchDispatcher {
     Ok(Self { pool, meili })
   }
 
-  pub async fn dispatch(&self, target: &str, entity_id: u32, op: &str) -> anyhow::Result<()> {
+  pub async fn dispatch(
+    &self,
+    target: &str,
+    entity_id: u32,
+    op: &str,
+  ) -> anyhow::Result<()> {
     match op {
       OP_CREATE | OP_UPDATE | OP_SNAPSHOT => self.upsert(target, entity_id, op).await,
       OP_DELETE => self.delete(target, entity_id, op).await,
@@ -154,7 +159,12 @@ impl SearchDispatcher {
 
   async fn upsert(&self, target: &str, entity_id: u32, op: &str) -> anyhow::Result<()> {
     let Some(meili) = &self.meili else {
-      tracing::debug!(target, entity_id, op, "skip search upsert: meilisearch disabled");
+      tracing::debug!(
+        target,
+        entity_id,
+        op,
+        "skip search upsert: meilisearch disabled"
+      );
       return Ok(());
     };
 
@@ -179,8 +189,7 @@ impl SearchDispatcher {
         .await
         .context("load subject")?;
 
-        let Some(row) = row
-        else {
+        let Some(row) = row else {
           return self.delete(target, entity_id, op).await;
         };
 
@@ -320,13 +329,24 @@ impl SearchDispatcher {
       _ => return Err(anyhow!("unknown search target: {target}")),
     }
 
-    tracing::info!(target, entity_id, op, action = "event_upsert", "search event handled");
+    tracing::info!(
+      target,
+      entity_id,
+      op,
+      action = "event_upsert",
+      "search event handled"
+    );
     Ok(())
   }
 
   async fn delete(&self, target: &str, entity_id: u32, op: &str) -> anyhow::Result<()> {
     let Some(meili) = &self.meili else {
-      tracing::debug!(target, entity_id, op, "skip search delete: meilisearch disabled");
+      tracing::debug!(
+        target,
+        entity_id,
+        op,
+        "skip search delete: meilisearch disabled"
+      );
       return Ok(());
     };
 
@@ -338,16 +358,19 @@ impl SearchDispatcher {
     };
 
     meili.delete_doc(index, entity_id).await?;
-    tracing::info!(target, entity_id, op, action = "event_delete", "search event handled");
+    tracing::info!(
+      target,
+      entity_id,
+      op,
+      action = "event_delete",
+      "search event handled"
+    );
     Ok(())
   }
 }
 
 fn split_space_values(input: &str) -> Vec<String> {
-  input
-    .split(' ')
-    .map(ToOwned::to_owned)
-    .collect()
+  input.split(' ').map(ToOwned::to_owned).collect()
 }
 
 fn wiki_values(v: &FieldValue) -> Vec<String> {

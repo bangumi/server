@@ -9,7 +9,11 @@ struct PersonKey {
   prsn_id: u32,
 }
 
-pub async fn on_person(search: &SearchDispatcher, key: &[u8], op: &str) -> anyhow::Result<()> {
+pub async fn on_person(
+  search: &SearchDispatcher,
+  key: &[u8],
+  op: &str,
+) -> anyhow::Result<()> {
   let key: PersonKey = serde_json::from_slice(key).context("parse person key")?;
   on_person_change(search, key.prsn_id, op).await?;
   Ok(())
@@ -20,5 +24,7 @@ async fn on_person_change(
   person_id: u32,
   op: &str,
 ) -> anyhow::Result<()> {
-  search.dispatch(search_event::TARGET_PERSON, person_id, op).await
+  search
+    .dispatch(search_event::TARGET_PERSON, person_id, op)
+    .await
 }

@@ -14,7 +14,11 @@ struct SubjectFieldKey {
   field_sid: u32,
 }
 
-pub async fn on_subject(search: &SearchDispatcher, key: &[u8], op: &str) -> anyhow::Result<()> {
+pub async fn on_subject(
+  search: &SearchDispatcher,
+  key: &[u8],
+  op: &str,
+) -> anyhow::Result<()> {
   let key: SubjectKey = serde_json::from_slice(key).context("parse subject key")?;
   on_subject_change(search, key.subject_id, op).await?;
   Ok(())
@@ -25,7 +29,8 @@ pub async fn on_subject_field(
   key: &[u8],
   op: &str,
 ) -> anyhow::Result<()> {
-  let key: SubjectFieldKey = serde_json::from_slice(key).context("parse subject field key")?;
+  let key: SubjectFieldKey =
+    serde_json::from_slice(key).context("parse subject field key")?;
   on_subject_change(search, key.field_sid, op).await?;
   Ok(())
 }
@@ -35,5 +40,7 @@ async fn on_subject_change(
   subject_id: u32,
   op: &str,
 ) -> anyhow::Result<()> {
-  search.dispatch(search_event::TARGET_SUBJECT, subject_id, op).await
+  search
+    .dispatch(search_event::TARGET_SUBJECT, subject_id, op)
+    .await
 }

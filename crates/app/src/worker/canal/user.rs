@@ -27,7 +27,8 @@ struct RedisUserChannel {
 
 impl UserDispatcher {
   pub fn new(cfg: &AppConfig, pool: sqlx::MySqlPool) -> anyhow::Result<Self> {
-    let redis = redis::Client::open(cfg.redis_url.as_str()).context("create redis client")?;
+    let redis =
+      redis::Client::open(cfg.redis_url.as_str()).context("create redis client")?;
     let s3 = build_s3_operator(cfg)?;
     Ok(Self { pool, redis, s3 })
   }
@@ -71,14 +72,22 @@ impl UserDispatcher {
     if old_notify != new_notify {
       let notify = new_notify.unwrap_or_default() as u16;
       self.publish_notify_change(user_id, notify).await?;
-      tracing::info!(user_id, new_notify = notify, "new notify changed, published redis event");
+      tracing::info!(
+        user_id,
+        new_notify = notify,
+        "new notify changed, published redis event"
+      );
     }
 
     let old_avatar = before.get("avatar").and_then(Value::as_str);
     let new_avatar = after.get("avatar").and_then(Value::as_str);
     if old_avatar != new_avatar {
       if let (Some(s3), Some(avatar)) = (&self.s3, new_avatar) {
-        tracing::debug!(user_id, avatar, "avatar changed, clear image cache in background");
+        tracing::debug!(
+          user_id,
+          avatar,
+          "avatar changed, clear image cache in background"
+        );
         let s3 = s3.clone();
         let avatar = avatar.to_owned();
         tokio::spawn(async move {
@@ -106,14 +115,12 @@ impl UserDispatcher {
     .await
     .context("load user sessions")?;
 
-    sqlx::query(
-      r#"UPDATE chii_os_web_sessions SET expired_at = ? WHERE user_id = ?"#,
-    )
-    .bind(now)
-    .bind(user_id)
-    .execute(&self.pool)
-    .await
-    .context("revoke user sessions in mysql")?;
+    sqlx::query(r#"UPDATE chii_os_web_sessions SET expired_at = ? WHERE user_id = ?"#)
+      .bind(now)
+      .bind(user_id)
+      .execute(&self.pool)
+      .await
+      .context("revoke user sessions in mysql")?;
 
     if rows.is_empty() {
       return Ok(());
@@ -129,12 +136,19 @@ impl UserDispatcher {
     for (key,) in rows {
       cmd.arg(format!("chii:web:session:{key}"));
     }
-    let _: i64 = cmd.query_async(&mut conn).await.context("delete redis sessions")?;
+    let _: i64 = cmd
+      .query_async(&mut conn)
+      .await
+      .context("delete redis sessions")?;
 
     Ok(())
   }
 
-  async fn publish_notify_change(&self, user_id: u32, new_notify: u16) -> anyhow::Result<()> {
+  async fn publish_notify_change(
+    &self,
+    user_id: u32,
+    new_notify: u16,
+  ) -> anyhow::Result<()> {
     let message = serde_json::to_string(&RedisUserChannel {
       user_id,
       new_notify,
@@ -160,7 +174,9 @@ impl UserDispatcher {
 }
 
 fn build_s3_operator(cfg: &AppConfig) -> anyhow::Result<Option<Operator>> {
-  if cfg.s3_entry_point.is_empty() || cfg.s3_access_key.is_empty() || cfg.s3_secret_key.is_empty()
+  if cfg.s3_entry_point.is_empty()
+    || cfg.s3_access_key.is_empty()
+    || cfg.s3_secret_key.is_empty()
   {
     return Ok(None);
   }
@@ -202,31 +218,29 @@ async fn clear_image_cache(s3: Operator, avatar: String) -> anyhow::Result<()> {
   for candidate_prefix in prefix_candidates(&prefix) {
     let dir = prefix_dirname(&candidate_prefix);
 
-    let entries = match tokio::time::timeout(
-      std::time::Duration::from_secs(10),
-      s3.list(&dir),
-    )
-    .await
-    {
-      Ok(Ok(entries)) => entries,
-      Ok(Err(err)) => {
-        tracing::warn!(
-          prefix = candidate_prefix,
-          dir,
-          error = ?err,
-          "failed to list cached avatar objects by dirname"
-        );
-        continue;
-      }
-      Err(_) => {
-        tracing::warn!(
-          prefix = candidate_prefix,
-          dir,
-          "timeout while listing cached avatar objects by dirname"
-        );
-        continue;
-      }
-    };
+    let entries =
+      match tokio::time::timeout(std::time::Duration::from_secs(10), s3.list(&dir))
+        .await
+      {
+        Ok(Ok(entries)) => entries,
+        Ok(Err(err)) => {
+          tracing::warn!(
+            prefix = candidate_prefix,
+            dir,
+            error = ?err,
+            "failed to list cached avatar objects by dirname"
+          );
+          continue;
+        }
+        Err(_) => {
+          tracing::warn!(
+            prefix = candidate_prefix,
+            dir,
+            "timeout while listing cached avatar objects by dirname"
+          );
+          continue;
+        }
+      };
 
     for entry in entries {
       let path = entry.path();
@@ -285,9 +299,14 @@ mod tests {
   fn test_prefix_candidates() {
     assert_eq!(
       prefix_candidates("/pic/user/l/a.jpg"),
-      vec!["/pic/user/l/a.jpg".to_string(), "pic/user/l/a.jpg".to_string()]
+      vec![
+        "/pic/user/l/a.jpg".to_string(),
+        "pic/user/l/a.jpg".to_string()
+      ]
     );
-    assert_eq!(prefix_candidates("pic/user/l/a.jpg"), vec!["pic/user/l/a.jpg".to_string()]);
+    assert_eq!(
+      prefix_candidates("pic/user/l/a.jpg"),
+      vec!["pic/user/l/a.jpg".to_string()]
+    );
   }
-
 }

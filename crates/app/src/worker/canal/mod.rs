@@ -104,13 +104,17 @@ async fn handle_message(
   };
 
   match payload.source.table.as_str() {
-    "chii_subject_fields" => subject::on_subject_field(search, key, &payload.op).await?,
+    "chii_subject_fields" => {
+      subject::on_subject_field(search, key, &payload.op).await?
+    }
     "chii_subjects" => subject::on_subject(search, key, &payload.op).await?,
     "chii_characters" => character::on_character(search, key, &payload.op).await?,
     "chii_persons" => person::on_person(search, key, &payload.op).await?,
-    "chii_members" => user
-      .on_user(key, &payload.op, payload.before, payload.after)
-      .await?,
+    "chii_members" => {
+      user
+        .on_user(key, &payload.op, payload.before, payload.after)
+        .await?
+    }
     _ => tracing::debug!(table = %payload.source.table, "ignored table event"),
   }
 

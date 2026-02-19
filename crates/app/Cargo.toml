@@ -19,8 +19,8 @@ bangumi-wiki-parser.workspace = true
 php-serialize.workspace = true
 common = { path = "../common" }
 
-[target.'cfg(unix)'.dependencies]
-rdkafka = { workspace = true, features = ["cmake-build", "tokio", "ssl-vendored"] }
+[target.'cfg(windows)'.dependencies]
+rdkafka = { workspace = true, features = ["cmake-build"] }
 
-[target.'cfg(not(unix))'.dependencies]
-rdkafka = { workspace = true, features = ["cmake-build", "tokio"] }
+[target.'cfg(unix)'.dependencies]
+rdkafka = { workspace = true, features = ["cmake-build", "static-linking", "ssl-vendored", "curl-static", "libz-static"] }
