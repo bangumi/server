@@ -28,3 +28,36 @@ cargo run -p app -- server
 
 - `worker canal`: real Kafka consume loop with Debezium payload parsing, table-based dispatch, and commit-after-success behavior.
 - `worker timeline`: producer bootstrap and reusable timeline producer module are ready.
+
+## Server API migration status (`/v0`)
+
+Implemented in Rust (`crates/app/src/server`):
+
+- Search:
+	- `POST /v0/search/subjects`
+	- `POST /v0/search/characters`
+	- `POST /v0/search/persons`
+- Subject read APIs:
+	- `GET /v0/subjects/{subject_id}`
+	- `GET /v0/subjects/{subject_id}/image`
+	- `GET /v0/subjects/{subject_id}/subjects`
+	- `GET /v0/subjects/{subject_id}/persons`
+	- `GET /v0/subjects/{subject_id}/characters`
+- Character read/write APIs:
+	- `GET /v0/characters/{character_id}`
+	- `GET /v0/characters/{character_id}/image`
+	- `GET /v0/characters/{character_id}/subjects`
+	- `GET /v0/characters/{character_id}/persons`
+	- `POST /v0/characters/{character_id}/collect`
+	- `DELETE /v0/characters/{character_id}/collect`
+- Person read APIs:
+	- `GET /v0/persons/{person_id}`
+	- `GET /v0/persons/{person_id}/image`
+	- `GET /v0/persons/{person_id}/subjects`
+	- `GET /v0/persons/{person_id}/characters`
+
+## Behavior and test parity notes
+
+- Request-scoped auth is resolved once in middleware and injected through request extensions (`RequestAuth`).
+- OAuth token lookup no longer relies on SQL `CAST`; `user_id` is read as string and validated/parsed in Rust before member lookup.
+- Route behavior parity tests are in place (`server_smoke`, `server_real_deps`) and currently passing with `cargo test -p app`.

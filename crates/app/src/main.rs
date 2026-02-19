@@ -1,7 +1,6 @@
 use anyhow::Context;
+use app::{server, worker};
 use clap::{Parser, Subcommand};
-
-mod worker;
 
 #[derive(Debug, Parser)]
 #[command(name = "app")]
@@ -41,8 +40,5 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn run_server() -> anyhow::Result<()> {
-  tracing::info!("server subcommand placeholder is ready");
-  tokio::signal::ctrl_c().await.context("wait ctrl-c")?;
-  tracing::info!("server placeholder shutdown");
-  Ok(())
+  server::run().await.context("run server")
 }

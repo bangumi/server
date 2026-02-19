@@ -17,6 +17,10 @@ meilisearch-sdk.workspace = true
 opendal.workspace = true
 bangumi-wiki-parser.workspace = true
 php-serialize.workspace = true
+axum = "0.7"
+uuid = { version = "1", features = ["v7"] }
+utoipa = { version = "5", features = ["axum_extras"] }
+async-trait = "0.1"
 common = { path = "../common" }
 
 [target.'cfg(windows)'.dependencies]
@@ -24,3 +28,7 @@ rdkafka = { workspace = true, features = ["cmake-build"] }
 
 [target.'cfg(unix)'.dependencies]
 rdkafka = { workspace = true, features = ["cmake-build", "static-linking", "ssl-vendored", "curl-static", "libz-static"] }
+
+[dev-dependencies]
+tower = "0.5"
+mockall = "0.13"

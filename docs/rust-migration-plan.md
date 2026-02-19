@@ -34,6 +34,15 @@ Initial implementation goals:
 - Event and payload schemas are defined in Rust types for timeline/canal.
 - Golden fixtures can be added for parity tests.
 
+### M3: Server `/v0` read-path baseline
+- Search APIs for `subjects` / `characters` / `persons` are implemented in Rust.
+- Detail/image/related read APIs for `subjects` / `characters` / `persons` are implemented in Rust.
+- OpenAPI paths are generated from Rust handlers and exposed via `/openapi.json`.
+
+### M4: Server write-path baseline (in progress)
+- `POST/DELETE /v0/characters/{character_id}/collect` implemented.
+- Write-path executor pattern supports pool/transaction entry points for test rollback scenarios.
+
 ## Out of scope (for this commit)
 
 - Production traffic switching
@@ -42,7 +51,7 @@ Initial implementation goals:
 
 ## Next implementation tasks
 
-1. Implement real search/session/redis side effects in canal handlers (consume loop and commit semantics are already in place).
-2. Implement timeline publish API and payload parity tests.
-3. Add sqlx pool and first read-only repository for subject read-path.
+1. Continue migrating remaining `/v0` endpoints with same-prefix priority and keep behavior parity with Go.
+2. Expand write-path integration tests for collect/uncollect with transaction rollback assertions.
+3. Implement timeline publish API and payload parity tests.
 4. Add CI jobs to build Rust workspace and run tests.
