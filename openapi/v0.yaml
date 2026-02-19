@@ -742,13 +742,15 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:collection
     delete:
       tags:
         - 角色
       summary: Uncollect character for current user
       operationId: uncollectCharacterByCharacterIdAndUserId
-      description: 为当前用户取消收藏角色
+      description: |
+        为当前用户取消收藏角色
       parameters:
         - $ref: "#/components/parameters/path_character_id"
       responses:
@@ -773,7 +775,8 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:collection
 
   "/v0/persons/{person_id}":
     get:
@@ -931,7 +934,8 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - HTTPBearer:
+            - write:collection
     delete:
       tags:
         - 人物
@@ -962,7 +966,8 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - HTTPBearer:
+            - write:collection
 
   "/v0/users/{username}":
     get:
@@ -1198,7 +1203,8 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - HTTPBearer:
+            - write:collection
     patch:
       tags:
         - 收藏
@@ -1239,7 +1245,8 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - OptionalHTTPBearer: []
+        - HTTPBearer:
+            - write:collection
 
   "/v0/users/-/collections/{subject_id}/episodes":
     get:
@@ -1348,7 +1355,8 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:collection
 
   "/v0/users/-/collections/-/episodes/{episode_id}":
     get:
@@ -1424,7 +1432,8 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:collection
 
   "/v0/users/{username}/collections/-/characters":
     get:
@@ -1782,7 +1791,8 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ErrorDetail"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:indices
   "/v0/indices/{index_id}":
     get:
       tags:
@@ -1828,7 +1838,8 @@ paths:
         "404":
           "$ref": "#/components/responses/404"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:indices
   "/v0/indices/{index_id}/subjects":
     get:
       tags:
@@ -1876,7 +1887,8 @@ paths:
         "404":
           "$ref": "#/components/responses/404"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:indices
   "/v0/indices/{index_id}/subjects/{subject_id}":
     put:
       tags:
@@ -1902,7 +1914,8 @@ paths:
         "400":
           "$ref": "#/components/responses/400"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:indices
     delete:
       tags:
         - 目录
@@ -1919,7 +1932,8 @@ paths:
         "401":
           "$ref": "#/components/responses/401"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:indices
   "/v0/indices/{index_id}/collect":
     post:
       tags:
@@ -1939,13 +1953,15 @@ paths:
         "500":
           "$ref": "#/components/responses/500"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:collection
     delete:
       tags:
         - 目录
       summary: Uncollect index for current user
       operationId: uncollectIndexByIndexIdAndUserId
-      description: 为当前用户取消收藏一条目录
+      description: |
+        为当前用户取消收藏一条目录
       parameters:
         - $ref: "#/components/parameters/path_index_id"
       responses:
@@ -1958,7 +1974,8 @@ paths:
         "500":
           "$ref": "#/components/responses/500"
       security:
-        - HTTPBearer: []
+        - HTTPBearer:
+            - write:collection
 components:
   parameters:
     path_subject_id:
@@ -3316,9 +3333,15 @@ components:
       description: 不强制要求用户认证，但是可能看不到某些敏感内容内容（如 NSFW 或者仅用户自己可见的收藏）
       scheme: Bearer
     HTTPBearer:
-      type: http
-      description: 需要使用 access token 进行认证
-      scheme: Bearer
+      type: oauth2
+      description: OAuth2 access token（写操作会校验 scope）
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth/authorize
+          tokenUrl: /oauth/access_token
+          scopes:
+            write:collection: 修改收藏相关数据
+            write:indices: 修改目录及目录条目
   responses:
     200-no-content:
       description: Successful Response
