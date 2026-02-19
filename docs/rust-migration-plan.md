@@ -20,26 +20,31 @@ Initial implementation goals:
 ## Delivery milestones
 
 ### M0: Bootstrap
+
 - Rust workspace compiles.
 - `cargo run -p app -- worker canal` starts and exits gracefully.
 - `cargo run -p app -- worker timeline` starts and exits gracefully.
 - `cargo run -p app -- server` starts and exits gracefully.
 
 ### M1: Infra baseline
+
 - Shared config supports environment variables.
 - Kafka/MySQL clients can be initialized from config.
 - Structured logging and basic shutdown signal handling are in place.
 
 ### M2: Contract baseline
+
 - Event and payload schemas are defined in Rust types for timeline/canal.
 - Golden fixtures can be added for parity tests.
 
 ### M3: Server `/v0` read-path baseline
+
 - Search APIs for `subjects` / `characters` / `persons` are implemented in Rust.
 - Detail/image/related read APIs for `subjects` / `characters` / `persons` are implemented in Rust.
 - OpenAPI paths are generated from Rust handlers and exposed via `/openapi.json`.
 
 ### M4: Server write-path baseline (in progress)
+
 - `POST/DELETE /v0/characters/{character_id}/collect` implemented.
 - Write-path executor pattern supports pool/transaction entry points for test rollback scenarios.
 

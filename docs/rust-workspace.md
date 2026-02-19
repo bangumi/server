@@ -34,27 +34,27 @@ cargo run -p app -- server
 Implemented in Rust (`crates/app/src/server`):
 
 - Search:
-	- `POST /v0/search/subjects`
-	- `POST /v0/search/characters`
-	- `POST /v0/search/persons`
+  - `POST /v0/search/subjects`
+  - `POST /v0/search/characters`
+  - `POST /v0/search/persons`
 - Subject read APIs:
-	- `GET /v0/subjects/{subject_id}`
-	- `GET /v0/subjects/{subject_id}/image`
-	- `GET /v0/subjects/{subject_id}/subjects`
-	- `GET /v0/subjects/{subject_id}/persons`
-	- `GET /v0/subjects/{subject_id}/characters`
+  - `GET /v0/subjects/{subject_id}`
+  - `GET /v0/subjects/{subject_id}/image`
+  - `GET /v0/subjects/{subject_id}/subjects`
+  - `GET /v0/subjects/{subject_id}/persons`
+  - `GET /v0/subjects/{subject_id}/characters`
 - Character read/write APIs:
-	- `GET /v0/characters/{character_id}`
-	- `GET /v0/characters/{character_id}/image`
-	- `GET /v0/characters/{character_id}/subjects`
-	- `GET /v0/characters/{character_id}/persons`
-	- `POST /v0/characters/{character_id}/collect`
-	- `DELETE /v0/characters/{character_id}/collect`
+  - `GET /v0/characters/{character_id}`
+  - `GET /v0/characters/{character_id}/image`
+  - `GET /v0/characters/{character_id}/subjects`
+  - `GET /v0/characters/{character_id}/persons`
+  - `POST /v0/characters/{character_id}/collect`
+  - `DELETE /v0/characters/{character_id}/collect`
 - Person read APIs:
-	- `GET /v0/persons/{person_id}`
-	- `GET /v0/persons/{person_id}/image`
-	- `GET /v0/persons/{person_id}/subjects`
-	- `GET /v0/persons/{person_id}/characters`
+  - `GET /v0/persons/{person_id}`
+  - `GET /v0/persons/{person_id}/image`
+  - `GET /v0/persons/{person_id}/subjects`
+  - `GET /v0/persons/{person_id}/characters`
 
 ## Behavior and test parity notes
 
