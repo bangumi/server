@@ -76,6 +76,8 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 		ID:         a.ID,
 		GroupID:    a.GroupID,
 		Permission: permission.Merge(a.Permission),
+		Scope:      a.Scope,
+		Legacy:     a.Legacy,
 	}, nil
 }
 
