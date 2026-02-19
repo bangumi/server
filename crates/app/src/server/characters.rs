@@ -5,7 +5,7 @@ use axum::{
   response::Redirect,
   Json,
 };
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use sqlx::QueryBuilder;
 use std::collections::HashMap;
 use utoipa::ToSchema;
@@ -140,8 +140,19 @@ struct RelatedPersonRow {
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub(super) struct ImageQuery {
-  #[serde(rename = "type")]
+  #[serde(rename = "type", deserialize_with = "deserialize_image_type")]
   image_type: String,
+}
+
+fn deserialize_image_type<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+  D: Deserializer<'de>,
+{
+  let value = String::deserialize(deserializer)?;
+  match value.as_str() {
+    "small" | "grid" | "large" | "medium" => Ok(value),
+    _ => Err(serde::de::Error::custom("invalid query param `type`")),
+  }
 }
 
 #[cfg_attr(test, automock)]

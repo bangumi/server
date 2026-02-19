@@ -9,14 +9,15 @@ use utoipa::{IntoParams, ToSchema};
 use super::media::{subject_image, SubjectImages};
 use super::{
   parse_page, ApiError, ApiResult, AppState, PageInfo, PageQuery, RequestAuth,
+  SubjectCollectionType, SubjectType,
 };
 
 #[derive(Debug, Deserialize, IntoParams)]
 #[into_params(parameter_in = Query)]
 pub(super) struct UserCollectionsQuery {
-  subject_type: Option<u8>,
+  subject_type: Option<SubjectType>,
   #[serde(rename = "type")]
-  collection_type: Option<u8>,
+  collection_type: Option<SubjectCollectionType>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -122,9 +123,9 @@ pub(super) async fn list_user_collections(
   query: Query<UserCollectionsQuery>,
   page: Query<PageQuery>,
 ) -> ApiResult<UserCollectionsResponse> {
+  let subject_type = query.subject_type.map(u8::from);
+  let collection_type = query.collection_type.map(u8::from);
   let user_id = find_user_id_by_username(&state, &username).await?;
-
-  let (subject_type, collection_type) = parse_collection_filters(&query.0)?;
   let (limit, offset) = parse_page(page);
   let show_private = auth.user_id == Some(user_id);
 
@@ -194,24 +195,6 @@ async fn find_user_id_by_username(
   .await
   .map_err(|_| ApiError::internal("load user failed"))?
   .ok_or_else(|| ApiError::not_found("user doesn't exist or has been removed"))
-}
-
-fn parse_collection_filters(
-  query: &UserCollectionsQuery,
-) -> Result<(Option<u8>, Option<u8>), ApiError> {
-  if let Some(subject_type) = query.subject_type {
-    if !matches!(subject_type, 1 | 2 | 3 | 4 | 6) {
-      return Err(ApiError::bad_request("invalid query param `subject_type`"));
-    }
-  }
-
-  if let Some(collection_type) = query.collection_type {
-    if !(1..=5).contains(&collection_type) {
-      return Err(ApiError::bad_request("invalid query param `type`"));
-    }
-  }
-
-  Ok((query.subject_type, query.collection_type))
 }
 
 async fn count_subject_collections(

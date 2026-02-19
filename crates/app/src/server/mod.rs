@@ -73,6 +73,70 @@ pub(super) struct PageQuery {
   offset: Option<usize>,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(try_from = "u8", into = "u8")]
+#[repr(u8)]
+pub(super) enum SubjectType {
+  Book = 1,
+  Anime = 2,
+  Music = 3,
+  Game = 4,
+  Real = 6,
+}
+
+impl TryFrom<u8> for SubjectType {
+  type Error = &'static str;
+
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      1 => Ok(Self::Book),
+      2 => Ok(Self::Anime),
+      3 => Ok(Self::Music),
+      4 => Ok(Self::Game),
+      6 => Ok(Self::Real),
+      _ => Err("invalid subject type"),
+    }
+  }
+}
+
+impl From<SubjectType> for u8 {
+  fn from(value: SubjectType) -> Self {
+    value as u8
+  }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(try_from = "u8", into = "u8")]
+#[repr(u8)]
+pub(super) enum SubjectCollectionType {
+  Wish = 1,
+  Done = 2,
+  Doing = 3,
+  OnHold = 4,
+  Dropped = 5,
+}
+
+impl TryFrom<u8> for SubjectCollectionType {
+  type Error = &'static str;
+
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      1 => Ok(Self::Wish),
+      2 => Ok(Self::Done),
+      3 => Ok(Self::Doing),
+      4 => Ok(Self::OnHold),
+      5 => Ok(Self::Dropped),
+      _ => Err("invalid collection type"),
+    }
+  }
+}
+
+impl From<SubjectCollectionType> for u8 {
+  fn from(value: SubjectCollectionType) -> Self {
+    value as u8
+  }
+}
+
 #[derive(Debug, Serialize, utoipa::ToSchema)]
 pub(super) struct ErrorBody {
   error: String,
@@ -657,15 +721,20 @@ fn staff_map() -> &'static HashMap<u8, HashMap<u16, String>> {
   })
 }
 
-fn subject_type_string(subject_type: u8) -> &'static str {
+fn subject_type_string(subject_type: SubjectType) -> &'static str {
   match subject_type {
-    1 => "书籍",
-    2 => "动画",
-    3 => "音乐",
-    4 => "游戏",
-    6 => "三次元",
-    _ => "unknown subject type",
+    SubjectType::Book => "书籍",
+    SubjectType::Anime => "动画",
+    SubjectType::Music => "音乐",
+    SubjectType::Game => "游戏",
+    SubjectType::Real => "三次元",
   }
+}
+
+fn subject_type_string_or_unknown(subject_type: u8) -> &'static str {
+  SubjectType::try_from(subject_type)
+    .map(subject_type_string)
+    .unwrap_or("unknown subject type")
 }
 
 pub(super) fn relation_string(
@@ -673,14 +742,16 @@ pub(super) fn relation_string(
   relation_type: u16,
 ) -> String {
   if relation_type == 1 {
-    return subject_type_string(destination_subject_type).to_string();
+    return subject_type_string_or_unknown(destination_subject_type).to_string();
   }
 
   relation_map()
     .get(&destination_subject_type)
     .and_then(|m| m.get(&relation_type))
     .cloned()
-    .unwrap_or_else(|| subject_type_string(destination_subject_type).to_string())
+    .unwrap_or_else(|| {
+      subject_type_string_or_unknown(destination_subject_type).to_string()
+    })
 }
 
 pub(super) fn staff_string(subject_type: u8, staff_type: u16) -> String {

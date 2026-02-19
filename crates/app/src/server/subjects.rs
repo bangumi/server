@@ -5,7 +5,7 @@ use axum::{
   Json,
 };
 use php_serialize::from_str as parse_php_serialize;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use sqlx::QueryBuilder;
 use std::collections::HashMap;
 use utoipa::ToSchema;
@@ -21,7 +21,7 @@ use super::{
   character_staff_string, execute_search, join_filter, parse_date_filter,
   parse_float_filter, parse_integer_filter, parse_page, platform_string, quote_str,
   relation_string, search_total, staff_string, ApiError, ApiResult, AppState,
-  MySqlExecutor, PageInfo, PageQuery, RequestAuth,
+  MySqlExecutor, PageInfo, PageQuery, RequestAuth, SubjectType,
 };
 
 #[derive(Debug, Deserialize, Default, ToSchema)]
@@ -36,7 +36,7 @@ pub(super) struct SubjectReq {
 #[derive(Debug, Deserialize, Default, ToSchema)]
 pub(super) struct SubjectFilter {
   #[serde(default)]
-  r#type: Vec<u8>,
+  r#type: Vec<SubjectType>,
   #[serde(default)]
   tag: Vec<String>,
   #[serde(default)]
@@ -172,8 +172,19 @@ struct SubjectTagItem {
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub(super) struct ImageQuery {
-  #[serde(rename = "type")]
+  #[serde(rename = "type", deserialize_with = "deserialize_image_type")]
   image_type: String,
+}
+
+fn deserialize_image_type<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+  D: Deserializer<'de>,
+{
+  let value = String::deserialize(deserializer)?;
+  match value.as_str() {
+    "small" | "grid" | "large" | "medium" | "common" => Ok(value),
+    _ => Err(serde::de::Error::custom("invalid query param `type`")),
+  }
 }
 
 #[cfg_attr(test, automock)]
@@ -362,7 +373,7 @@ pub(super) async fn search_subjects(
   if !body.filter.r#type.is_empty() {
     let mut or_items = Vec::new();
     for t in &body.filter.r#type {
-      or_items.push(format!("type = {t}"));
+      or_items.push(format!("type = {}", u8::from(*t)));
     }
     filters.push(format!("({})", or_items.join(" OR ")));
   }
