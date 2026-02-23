@@ -22,5 +22,7 @@ node_modules/
 pnpm-lock.yaml
 .task/
 
+/target/
+
 config.yaml
 config.toml
