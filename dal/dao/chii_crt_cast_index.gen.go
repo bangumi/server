@@ -8,6 +8,7 @@ const TableNameCast = "chii_crt_cast_index"
 
 // Cast mapped from table <chii_crt_cast_index>
 type Cast struct {
+	RltType       uint32    `gorm:"column:rlt_type;type:mediumint(8) unsigned;not null" json:""`
 	CharacterID   uint32    `gorm:"column:crt_id;type:mediumint(9) unsigned;primaryKey" json:""`
 	PersonID      uint32    `gorm:"column:prsn_id;type:mediumint(9) unsigned;primaryKey" json:""`
 	SubjectID     uint32    `gorm:"column:subject_id;type:mediumint(9) unsigned;primaryKey" json:""`

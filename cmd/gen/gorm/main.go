@@ -441,6 +441,19 @@ func main() {
 	),
 	)
 
+	g.ApplyBasic(g.GenerateModelAs("chii_person_relations", "PersonRelation",
+		gen.FieldTrimPrefix("rlt_"),
+		gen.FieldRename("prsn_id", "PersonID"),
+		gen.FieldRename("prsn_type", "PersonType"),
+		gen.FieldRename("rlt_prsn_id", "RelatedPersonID"),
+		gen.FieldRename("rlt_prsn_type", "RelatedPersonType"),
+		gen.FieldRename("rlt_type", "RelationType"),
+		gen.FieldType("prsn_id", personIDTypeString),
+		gen.FieldType("rlt_spoiler", "bool"),
+		gen.FieldType("rlt_ended", "bool"),
+		gen.FieldType("rlt_vice_versa", "bool"),
+	))
+
 	g.ApplyBasic(g.GenerateModelAs("chii_index_related", "IndexSubject",
 		gen.FieldTrimPrefix("idx_rlt_"),
 		gen.FieldType("idx_rlt_type", "uint8"),

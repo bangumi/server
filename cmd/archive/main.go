@@ -136,6 +136,7 @@ func start(out string) {
 		{FileName: "subject-persons.jsonlines", Fn: exportSubjectPersonRelations},
 		{FileName: "subject-characters.jsonlines", Fn: exportSubjectCharacterRelations},
 		{FileName: "person-characters.jsonlines", Fn: exportPersonCharacterRelations},
+		{FileName: "person-relations.jsonlines", Fn: exportPersonRelations},
 	} {
 		w, err := z.Create(s.FileName)
 		if err != nil {
@@ -552,6 +553,37 @@ func exportPersonCharacterRelations(q *query.Query, w io.Writer) {
 				SubjectID:   rel.SubjectID,
 				CharacterID: rel.CharacterID,
 				Summary:     rel.Summary,
+			})
+		}
+	}
+}
+
+type PersonRelation struct {
+	PersonType      string         `json:"person_type"`
+	PersonID        model.PersonID `json:"person_id"`
+	RelatedPersonID model.PersonID `json:"related_person_id"`
+	RelationType    uint32         `json:"relation_type"`
+	Spoiler         bool           `json:"spoiler"`
+	Ended           bool           `json:"ended"`
+}
+
+func exportPersonRelations(q *query.Query, w io.Writer) {
+	for i := model.PersonID(0); i < maxPersonID; i += defaultStep {
+		relations, err := q.WithContext(context.Background()).PersonRelation.
+			Order(q.PersonRelation.PersonID, q.PersonRelation.PersonID).
+			Where(q.PersonRelation.PersonID.Gt(i), q.PersonRelation.PersonID.Lte(i+defaultStep)).Find()
+		if err != nil {
+			panic(err)
+		}
+
+		for _, rel := range relations {
+			encode(w, PersonRelation{
+				PersonType:      rel.PersonType,
+				PersonID:        rel.PersonID,
+				RelatedPersonID: rel.RelatedPersonID,
+				RelationType:    rel.RelationType,
+				Spoiler:         rel.Spoiler,
+				Ended:           rel.Ended,
 			})
 		}
 	}

@@ -34,6 +34,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Person:            newPerson(db, opts...),
 		PersonCollect:     newPersonCollect(db, opts...),
 		PersonField:       newPersonField(db, opts...),
+		PersonRelation:    newPersonRelation(db, opts...),
 		PersonSubjects:    newPersonSubjects(db, opts...),
 		PrivateMessage:    newPrivateMessage(db, opts...),
 		RevisionHistory:   newRevisionHistory(db, opts...),
@@ -69,6 +70,7 @@ type Query struct {
 	Person            person
 	PersonCollect     personCollect
 	PersonField       personField
+	PersonRelation    personRelation
 	PersonSubjects    personSubjects
 	PrivateMessage    privateMessage
 	RevisionHistory   revisionHistory
@@ -105,6 +107,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Person:            q.Person.clone(db),
 		PersonCollect:     q.PersonCollect.clone(db),
 		PersonField:       q.PersonField.clone(db),
+		PersonRelation:    q.PersonRelation.clone(db),
 		PersonSubjects:    q.PersonSubjects.clone(db),
 		PrivateMessage:    q.PrivateMessage.clone(db),
 		RevisionHistory:   q.RevisionHistory.clone(db),
@@ -148,6 +151,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Person:            q.Person.replaceDB(db),
 		PersonCollect:     q.PersonCollect.replaceDB(db),
 		PersonField:       q.PersonField.replaceDB(db),
+		PersonRelation:    q.PersonRelation.replaceDB(db),
 		PersonSubjects:    q.PersonSubjects.replaceDB(db),
 		PrivateMessage:    q.PrivateMessage.replaceDB(db),
 		RevisionHistory:   q.RevisionHistory.replaceDB(db),
@@ -181,6 +185,7 @@ type queryCtx struct {
 	Person            *personDo
 	PersonCollect     *personCollectDo
 	PersonField       *personFieldDo
+	PersonRelation    *personRelationDo
 	PersonSubjects    *personSubjectsDo
 	PrivateMessage    *privateMessageDo
 	RevisionHistory   *revisionHistoryDo
@@ -214,6 +219,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Person:            q.Person.WithContext(ctx),
 		PersonCollect:     q.PersonCollect.WithContext(ctx),
 		PersonField:       q.PersonField.WithContext(ctx),
+		PersonRelation:    q.PersonRelation.WithContext(ctx),
 		PersonSubjects:    q.PersonSubjects.WithContext(ctx),
 		PrivateMessage:    q.PrivateMessage.WithContext(ctx),
 		RevisionHistory:   q.RevisionHistory.WithContext(ctx),
