@@ -1,5 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "labels": ["ci:auto-merge", "dependencies"],
+  "prConcurrentLimit": 3,
   "extends": [
     "local>Trim21/renovate-config",
     "local>Trim21/renovate-config:go",
