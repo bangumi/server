@@ -21,7 +21,7 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/labstack/echo/v4 v4.15.0
+	github.com/labstack/echo/v4 v4.15.1
 	github.com/mattn/go-colorable v0.1.14
 	github.com/meilisearch/meilisearch-go v0.36.0
 	github.com/mitchellh/mapstructure v1.5.0
