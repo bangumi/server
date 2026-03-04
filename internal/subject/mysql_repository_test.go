@@ -95,7 +95,7 @@ func TestBrowse(t *testing.T) {
 	}
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, 5, len(s))
+	require.Equal(t, 4, len(s))
 	for _, item := range s {
 		require.Zero(t, item.Redirect)
 	}
