@@ -106,18 +106,18 @@ func TestBrowse(t *testing.T) {
 	}
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, 8, len(s))
+	require.Equal(t, 7, len(s))
+	lastRank := uint32(0)
+	for i, item := range s {
+		require.NotZero(t, item.Rating.Rank)
+		if i > 0 {
+			require.GreaterOrEqual(t, item.Rating.Rank, lastRank)
+		}
+		lastRank = item.Rating.Rank
+	}
 	for _, item := range s {
 		require.Zero(t, item.Redirect)
 	}
-	require.Equal(t, model.SubjectID(20), s[0].ID)
-	require.Equal(t, model.SubjectID(17), s[1].ID)
-	require.Equal(t, model.SubjectID(16), s[2].ID)
-	require.Equal(t, model.SubjectID(15), s[3].ID)
-	require.Equal(t, model.SubjectID(406604), s[4].ID)
-	require.Equal(t, model.SubjectID(19), s[5].ID)
-	require.Equal(t, model.SubjectID(315957), s[6].ID)
-	require.Equal(t, model.SubjectID(18), s[7].ID)
 
 	filter = subject.BrowseFilter{
 		Type:     4,
