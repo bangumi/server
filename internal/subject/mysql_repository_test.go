@@ -74,6 +74,9 @@ func TestBrowse(t *testing.T) {
 	s, err := repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, 30, len(s))
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 
 	filter = subject.BrowseFilter{
 		Type:     1,
@@ -82,6 +85,9 @@ func TestBrowse(t *testing.T) {
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, 2, len(s))
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 
 	filter = subject.BrowseFilter{
 		Type: 2,
@@ -89,7 +95,10 @@ func TestBrowse(t *testing.T) {
 	}
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, 5, len(s))
+	require.Equal(t, 4, len(s))
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 
 	filter = subject.BrowseFilter{
 		Type: 3,
@@ -97,15 +106,18 @@ func TestBrowse(t *testing.T) {
 	}
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
-	require.Equal(t, 8, len(s))
-	require.Equal(t, model.SubjectID(20), s[0].ID)
-	require.Equal(t, model.SubjectID(17), s[1].ID)
-	require.Equal(t, model.SubjectID(16), s[2].ID)
-	require.Equal(t, model.SubjectID(15), s[3].ID)
-	require.Equal(t, model.SubjectID(406604), s[4].ID)
-	require.Equal(t, model.SubjectID(19), s[5].ID)
-	require.Equal(t, model.SubjectID(315957), s[6].ID)
-	require.Equal(t, model.SubjectID(18), s[7].ID)
+	require.Equal(t, 7, len(s))
+	lastRank := uint32(0)
+	for i, item := range s {
+		require.NotZero(t, item.Rating.Rank)
+		if i > 0 {
+			require.GreaterOrEqual(t, item.Rating.Rank, lastRank)
+		}
+		lastRank = item.Rating.Rank
+	}
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 
 	filter = subject.BrowseFilter{
 		Type:     4,
@@ -115,6 +127,9 @@ func TestBrowse(t *testing.T) {
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, 3, len(s))
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 	require.Equal(t, model.SubjectID(7), s[0].ID)
 	require.Equal(t, model.SubjectID(6), s[1].ID)
 	require.Equal(t, model.SubjectID(13), s[2].ID)
