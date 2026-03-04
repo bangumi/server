@@ -74,6 +74,9 @@ func TestBrowse(t *testing.T) {
 	s, err := repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, 30, len(s))
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 
 	filter = subject.BrowseFilter{
 		Type:     1,
@@ -82,6 +85,9 @@ func TestBrowse(t *testing.T) {
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, 2, len(s))
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 
 	filter = subject.BrowseFilter{
 		Type: 2,
@@ -90,6 +96,9 @@ func TestBrowse(t *testing.T) {
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, 5, len(s))
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 
 	filter = subject.BrowseFilter{
 		Type: 3,
@@ -98,6 +107,9 @@ func TestBrowse(t *testing.T) {
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, 8, len(s))
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 	require.Equal(t, model.SubjectID(20), s[0].ID)
 	require.Equal(t, model.SubjectID(17), s[1].ID)
 	require.Equal(t, model.SubjectID(16), s[2].ID)
@@ -115,6 +127,9 @@ func TestBrowse(t *testing.T) {
 	s, err = repo.Browse(context.Background(), filter, 30, 0)
 	require.NoError(t, err)
 	require.Equal(t, 3, len(s))
+	for _, item := range s {
+		require.Zero(t, item.Redirect)
+	}
 	require.Equal(t, model.SubjectID(7), s[0].ID)
 	require.Equal(t, model.SubjectID(6), s[1].ID)
 	require.Equal(t, model.SubjectID(13), s[2].ID)
