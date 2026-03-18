@@ -15,6 +15,7 @@
 package recovery_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -35,7 +36,7 @@ func TestPanicMiddleware(t *testing.T) {
 		panic("errInternal")
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
 
 	app.ServeHTTP(resp, req)
