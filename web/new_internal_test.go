@@ -15,6 +15,7 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -37,7 +38,7 @@ func TestDefaultErrorHandler_resError(t *testing.T) {
 		return res.BadRequest("mm")
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
 	app.ServeHTTP(resp, req)
 	require.Equal(t, http.StatusBadRequest, resp.Code)
@@ -62,7 +63,7 @@ func TestDefaultErrorHandler_internal(t *testing.T) {
 		return errors.New("mm")
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
 	app.ServeHTTP(resp, req)
 
