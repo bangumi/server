@@ -269,42 +269,46 @@ func exportSubjects(q *query.Query, w io.Writer) {
 				metaTags = append(metaTags, v)
 			}
 
-			encode(w, Subject{
-				ID:       subject.ID,
-				Type:     subject.TypeID,
-				Name:     string(subject.Name),
-				NameCN:   string(subject.NameCN),
-				Infobox:  string(subject.Infobox),
-				Platform: subject.Platform,
-				Summary:  subject.Summary,
-				Nsfw:     subject.Nsfw,
-				Rank:     subject.Fields.Rank,
-				Tags:     encodedTags,
-				MetaTags: metaTags,
-				Score:    math.Round(score*10) / 10,
-				ScoreDetails: Score{
-					Field1:  subject.Fields.Rate1,
-					Field2:  subject.Fields.Rate2,
-					Field3:  subject.Fields.Rate3,
-					Field4:  subject.Fields.Rate4,
-					Field5:  subject.Fields.Rate5,
-					Field6:  subject.Fields.Rate6,
-					Field7:  subject.Fields.Rate7,
-					Field8:  subject.Fields.Rate8,
-					Field9:  subject.Fields.Rate9,
-					Field10: subject.Fields.Rate10,
-				},
-				Date:   encodedDate,
-				Series: subject.Series,
-				Favorite: Favorite{
-					Wish:    subject.Wish,
-					Done:    subject.Done,
-					Doing:   subject.Doing,
-					OnHold:  subject.OnHold,
-					Dropped: subject.Dropped,
-				},
-			})
+			encode(w, buildSubjectArchiveRecord(subject, encodedTags, metaTags, encodedDate, score))
 		}
+	}
+}
+
+func buildSubjectArchiveRecord(subject *dao.Subject, tags []Tag, metaTags []string, encodedDate string, score float64) Subject {
+	return Subject{
+		ID:       subject.ID,
+		Type:     subject.TypeID,
+		Name:     string(subject.Name),
+		NameCN:   string(subject.NameCN),
+		Infobox:  string(subject.Infobox),
+		Platform: subject.Platform,
+		Summary:  subject.Summary,
+		Nsfw:     subject.Nsfw,
+		Rank:     subject.Fields.Rank,
+		Tags:     tags,
+		MetaTags: metaTags,
+		Score:    math.Round(score*10) / 10,
+		ScoreDetails: Score{
+			Field1:  subject.Fields.Rate1,
+			Field2:  subject.Fields.Rate2,
+			Field3:  subject.Fields.Rate3,
+			Field4:  subject.Fields.Rate4,
+			Field5:  subject.Fields.Rate5,
+			Field6:  subject.Fields.Rate6,
+			Field7:  subject.Fields.Rate7,
+			Field8:  subject.Fields.Rate8,
+			Field9:  subject.Fields.Rate9,
+			Field10: subject.Fields.Rate10,
+		},
+		Date:   encodedDate,
+		Series: subject.Series,
+		Favorite: Favorite{
+			Wish:    subject.Wish,
+			Done:    subject.Done,
+			Doing:   subject.Doing,
+			OnHold:  subject.OnHold,
+			Dropped: subject.Dropped,
+		},
 	}
 }
 
@@ -328,17 +332,21 @@ func exportPersons(q *query.Query, w io.Writer) {
 		}
 
 		for _, p := range persons {
-			encode(w, Person{
-				ID:       p.ID,
-				Name:     p.Name,
-				Type:     p.Type,
-				Career:   careers(p),
-				Infobox:  p.Infobox,
-				Summary:  p.Summary,
-				Comments: p.Comment,
-				Collects: p.Collects,
-			})
+			encode(w, buildPersonArchiveRecord(p))
 		}
+	}
+}
+
+func buildPersonArchiveRecord(p *dao.Person) Person {
+	return Person{
+		ID:       p.ID,
+		Name:     string(p.Name),
+		Type:     p.Type,
+		Career:   careers(p),
+		Infobox:  string(p.Infobox),
+		Summary:  p.Summary,
+		Comments: p.Comment,
+		Collects: p.Collects,
 	}
 }
 
@@ -395,16 +403,20 @@ func exportCharacters(q *query.Query, w io.Writer) {
 		}
 
 		for _, c := range characters {
-			encode(w, Character{
-				ID:       c.ID,
-				Name:     c.Name,
-				Role:     c.Role,
-				Infobox:  c.Infobox,
-				Summary:  c.Summary,
-				Comments: c.Comment,
-				Collects: c.Collects,
-			})
+			encode(w, buildCharacterArchiveRecord(c))
 		}
+	}
+}
+
+func buildCharacterArchiveRecord(c *dao.Character) Character {
+	return Character{
+		ID:       c.ID,
+		Name:     string(c.Name),
+		Role:     c.Role,
+		Infobox:  string(c.Infobox),
+		Summary:  c.Summary,
+		Comments: c.Comment,
+		Collects: c.Collects,
 	}
 }
 

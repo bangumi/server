@@ -293,6 +293,8 @@ func main() {
 		DeprecatedFiled("prsn_img_anidb"),
 		DeprecatedFiled("prsn_anidb_id"),
 		gen.FieldType("prsn_id", personIDTypeString),
+		gen.FieldType("prsn_name", "utiltype.HTMLEscapedString"),
+		gen.FieldType("prsn_infobox", "utiltype.HTMLEscapedString"),
 		gen.FieldType("prsn_illustrator", "bool"),
 		gen.FieldType("prsn_writer", "bool"),
 		gen.FieldType("prsn_redirect", personIDTypeString),
@@ -307,6 +309,8 @@ func main() {
 		DeprecatedFiled("crt_img_anidb"),
 		DeprecatedFiled("crt_anidb_id"),
 		gen.FieldType("crt_id", characterIDTypeString),
+		gen.FieldType("crt_name", "utiltype.HTMLEscapedString"),
+		gen.FieldType("crt_infobox", "utiltype.HTMLEscapedString"),
 		gen.FieldType("crt_redirect", characterIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
 			GORMTag: field.GormTag{"foreignKey": []string{"crt_id"}, "polymorphic": []string{"Owner"}, "polymorphicValue": []string{"crt"}},

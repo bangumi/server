@@ -151,12 +151,12 @@ func (r mysqlRepo) GetSubjectRelationByIDs(
 func convertDao(s *dao.Character) model.Character {
 	return model.Character{
 		ID:           s.ID,
-		Name:         s.Name,
+		Name:         string(s.Name),
 		Type:         s.Role,
 		Image:        s.Img,
 		Summary:      s.Summary,
 		Locked:       s.Ban != 0,
-		Infobox:      s.Infobox,
+		Infobox:      string(s.Infobox),
 		CollectCount: s.Collects,
 		CommentCount: s.Comment,
 		NSFW:         s.Nsfw,
