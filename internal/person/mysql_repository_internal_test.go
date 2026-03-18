@@ -11,6 +11,8 @@ import (
 )
 
 func TestConvertDao_UnescapesHTMLStrings(t *testing.T) {
+	t.Parallel()
+
 	wikiValue := `[nickname|"First Hassan"] Tom & Jerry <tag> 'quote'`
 	nameValue := `Tom & Jerry <The "Best">`
 

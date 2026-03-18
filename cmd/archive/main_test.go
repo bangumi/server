@@ -1,3 +1,4 @@
+//nolint:testpackage
 package archive
 
 import (
@@ -13,6 +14,8 @@ import (
 )
 
 func TestBuildArchiveRecords_UnescapesHTMLStrings(t *testing.T) {
+	t.Parallel()
+
 	wikiValue := `[nickname|"First Hassan"] Tom & Jerry <tag> 'quote'`
 	nameValue := `Tom & Jerry <The "Best">`
 	nameCNValue := `6' 1"`

@@ -274,7 +274,13 @@ func exportSubjects(q *query.Query, w io.Writer) {
 	}
 }
 
-func buildSubjectArchiveRecord(subject *dao.Subject, tags []Tag, metaTags []string, encodedDate string, score float64) Subject {
+func buildSubjectArchiveRecord(
+	subject *dao.Subject,
+	tags []Tag,
+	metaTags []string,
+	encodedDate string,
+	score float64,
+) Subject {
 	return Subject{
 		ID:       subject.ID,
 		Type:     subject.TypeID,
