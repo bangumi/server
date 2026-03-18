@@ -20,6 +20,7 @@ pull_request_rules:
       - base=master
       - check-success=docker
       - check-success=test
+      - check-success=lint
     actions:
       merge:
         method: squash
