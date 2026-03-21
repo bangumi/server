@@ -28,9 +28,9 @@ func newCharacter(db *gorm.DB, opts ...gen.DOOption) character {
 	tableName := _character.characterDo.TableName()
 	_character.ALL = field.NewAsterisk(tableName)
 	_character.ID = field.NewUint32(tableName, "crt_id")
-	_character.Name = field.NewString(tableName, "crt_name")
+	_character.Name = field.NewField(tableName, "crt_name")
 	_character.Role = field.NewUint8(tableName, "crt_role")
-	_character.Infobox = field.NewString(tableName, "crt_infobox")
+	_character.Infobox = field.NewField(tableName, "crt_infobox")
 	_character.Summary = field.NewString(tableName, "crt_summary")
 	_character.Img = field.NewString(tableName, "crt_img")
 	_character.Comment = field.NewUint32(tableName, "crt_comment")
@@ -59,9 +59,9 @@ type character struct {
 
 	ALL      field.Asterisk
 	ID       field.Uint32
-	Name     field.String
+	Name     field.Field
 	Role     field.Uint8 // 角色，机体，组织。。
-	Infobox  field.String
+	Infobox  field.Field
 	Summary  field.String
 	Img      field.String
 	Comment  field.Uint32
@@ -92,9 +92,9 @@ func (c character) As(alias string) *character {
 func (c *character) updateTableName(table string) *character {
 	c.ALL = field.NewAsterisk(table)
 	c.ID = field.NewUint32(table, "crt_id")
-	c.Name = field.NewString(table, "crt_name")
+	c.Name = field.NewField(table, "crt_name")
 	c.Role = field.NewUint8(table, "crt_role")
-	c.Infobox = field.NewString(table, "crt_infobox")
+	c.Infobox = field.NewField(table, "crt_infobox")
 	c.Summary = field.NewString(table, "crt_summary")
 	c.Img = field.NewString(table, "crt_img")
 	c.Comment = field.NewUint32(table, "crt_comment")
