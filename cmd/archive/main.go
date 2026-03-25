@@ -553,6 +553,7 @@ type PersonCharacter struct {
 	PersonID    model.PersonID    `json:"person_id"`
 	SubjectID   model.SubjectID   `json:"subject_id"`
 	CharacterID model.CharacterID `json:"character_id"`
+	Type        uint8             `json:"type"`
 	Summary     string            `json:"summary"`
 }
 
@@ -570,6 +571,7 @@ func exportPersonCharacterRelations(q *query.Query, w io.Writer) {
 				PersonID:    rel.PersonID,
 				SubjectID:   rel.SubjectID,
 				CharacterID: rel.CharacterID,
+				Type:        rel.RltType,
 				Summary:     rel.Summary,
 			})
 		}
