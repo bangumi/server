@@ -19,7 +19,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -29,7 +29,7 @@ import (
 	"github.com/bangumi/server/web/util"
 )
 
-func globalNotFoundHandler(c echo.Context) error {
+func globalNotFoundHandler(c *echo.Context) error {
 	return c.JSON(http.StatusNotFound, res.Error{
 		Title:       "Not Found",
 		Description: "This is default response, if you see this response, please check your request",
@@ -42,7 +42,7 @@ func getDefaultErrorHandler() echo.HTTPErrorHandler {
 	var log = logger.Named("http.err").
 		WithOptions(zap.AddStacktrace(zapcore.PanicLevel), zap.WithCaller(false))
 
-	return func(err error, c echo.Context) {
+	return func(c *echo.Context, err error) {
 		reqID := c.Request().Header.Get(cf.HeaderRequestID)
 
 		{

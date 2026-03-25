@@ -18,7 +18,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
@@ -29,7 +29,7 @@ import (
 )
 
 func (h Common) MiddlewareAccessTokenAuth(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		var a = accessor.NewFromCtx(c)
 		defer a.Free()
 

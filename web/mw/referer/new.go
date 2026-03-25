@@ -17,7 +17,7 @@ package referer
 import (
 	"strings"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/web/res"
@@ -28,7 +28,7 @@ const HeaderReferer = "Referer"
 func New(referer string) echo.MiddlewareFunc {
 	if env.Production {
 		return func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
+			return func(c *echo.Context) error {
 				ref := c.Request().Header.Get(HeaderReferer)
 				if ref == "" || strings.HasPrefix(ref, referer) {
 					return next(c)
@@ -40,7 +40,7 @@ func New(referer string) echo.MiddlewareFunc {
 	}
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			return next(c)
 		}
 	}

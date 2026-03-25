@@ -17,7 +17,7 @@ package character
 import (
 	"errors"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/collections/domain/collection"
@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Character) CollectCharacter(c echo.Context) error {
+func (h Character) CollectCharacter(c *echo.Context) error {
 	cid, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func (h Character) CollectCharacter(c echo.Context) error {
 	return h.collectCharacter(c, cid, uid)
 }
 
-func (h Character) UncollectCharacter(c echo.Context) error {
+func (h Character) UncollectCharacter(c *echo.Context) error {
 	cid, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (h Character) UncollectCharacter(c echo.Context) error {
 	return h.uncollectCharacter(c, cid, uid)
 }
 
-func (h Character) collectCharacter(c echo.Context, cid uint32, uid uint32) error {
+func (h Character) collectCharacter(c *echo.Context, cid uint32, uid uint32) error {
 	ctx := c.Request().Context()
 	// check if the character exists
 	if _, err := h.character.Get(ctx, cid); err != nil {
@@ -66,7 +66,7 @@ func (h Character) collectCharacter(c echo.Context, cid uint32, uid uint32) erro
 	return nil
 }
 
-func (h Character) uncollectCharacter(c echo.Context, cid uint32, uid uint32) error {
+func (h Character) uncollectCharacter(c *echo.Context, cid uint32, uid uint32) error {
 	ctx := c.Request().Context()
 	// check if the character exists
 	if _, err := h.character.Get(ctx, cid); err != nil {

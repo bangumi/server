@@ -11,7 +11,7 @@ import (
 
 	"github.com/avast/retry-go/v5"
 	wiki "github.com/bangumi/wiki-parser-go"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/samber/lo"
 	"github.com/samber/lo/mutable"
@@ -22,7 +22,7 @@ import (
 )
 
 type Searcher interface {
-	Handle(c echo.Context) error
+	Handle(c *echo.Context) error
 
 	OnAdded(ctx context.Context, id uint32) error
 	OnUpdate(ctx context.Context, id uint32) error

@@ -17,7 +17,7 @@ package origin
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/web/res"
@@ -28,7 +28,7 @@ func New(allowed string) echo.MiddlewareFunc {
 		return dev(allowed)
 	}
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			if c.Request().Method == http.MethodGet {
 				return next(c)
 			}
@@ -48,7 +48,7 @@ func New(allowed string) echo.MiddlewareFunc {
 
 func dev(_ string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			return next(c)
 		}
 	}

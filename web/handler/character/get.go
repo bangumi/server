@@ -20,7 +20,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
@@ -30,7 +30,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Character) Get(c echo.Context) error {
+func (h Character) Get(c *echo.Context) error {
 	u := accessor.GetFromCtx(c)
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
@@ -61,7 +61,7 @@ func (h Character) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, res.ConvertModelCharacter(r))
 }
 
-func (h Character) GetImage(c echo.Context) error {
+func (h Character) GetImage(c *echo.Context) error {
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err

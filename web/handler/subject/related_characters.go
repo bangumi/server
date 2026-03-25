@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 
@@ -36,7 +36,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Subject) GetRelatedCharacters(c echo.Context) error {
+func (h Subject) GetRelatedCharacters(c *echo.Context) error {
 	u := accessor.GetFromCtx(c)
 	subjectID, err := req.ParseID(c.Param("id"))
 	if err != nil {

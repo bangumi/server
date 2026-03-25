@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
@@ -34,7 +34,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Subject) Get(c echo.Context) error {
+func (h Subject) Get(c *echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
 	id, err := req.ParseID(c.Param("id"))
@@ -74,7 +74,7 @@ func (h Subject) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, res.ToSubjectV0(s, totalEpisode, metaTags))
 }
 
-func (h Subject) GetImage(c echo.Context) error {
+func (h Subject) GetImage(c *echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
 	id, err := req.ParseID(c.Param("id"))

@@ -18,7 +18,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config/env"
@@ -37,7 +37,7 @@ func New() echo.MiddlewareFunc {
 	log := logger.Named("http.recovery")
 	// Return new handler
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) (err error) {
+		return func(c *echo.Context) (err error) {
 			defer func() {
 				if r := recover(); r != nil {
 					log.Error("recovery", zap.Any("recovery", r), logger.Ctx(c.Request().Context()))

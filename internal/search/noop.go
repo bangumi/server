@@ -18,7 +18,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 var _ Client = NoopClient{}
@@ -26,7 +26,7 @@ var _ Client = NoopClient{}
 type NoopClient struct {
 }
 
-func (n NoopClient) Handle(c echo.Context, _ SearchTarget) error {
+func (n NoopClient) Handle(c *echo.Context, _ SearchTarget) error {
 	return c.String(http.StatusOK, "search is not enable")
 }
 

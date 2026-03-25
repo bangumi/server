@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/bangumi/wiki-parser-go"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
@@ -91,7 +91,7 @@ type ResponseSubject struct {
 }
 
 //nolint:funlen
-func (c *client) Handle(ctx echo.Context) error {
+func (c *client) Handle(ctx *echo.Context) error {
 	auth := accessor.GetFromCtx(ctx)
 	q, err := req.GetPageQuerySoftLimit(ctx, defaultLimit, maxLimit)
 	if err != nil {

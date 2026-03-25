@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/web/res"
 )
@@ -31,7 +31,7 @@ const forbiddenMessage = "using HTTP request library's default User-Agent is for
 	"https://github.com/bangumi/api/blob/master/docs-raw/user%20agent.md"
 
 func DisableDefaultHTTPLibrary(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		u := c.Request().UserAgent()
 		if u == "" {
 			return res.Forbidden("Please set a 'User-Agent'")
@@ -48,7 +48,7 @@ func DisableDefaultHTTPLibrary(next echo.HandlerFunc) echo.HandlerFunc {
 // DisableBrokenUA disallow known broken app send infinite requests.
 func DisableBrokenUA(next echo.HandlerFunc) echo.HandlerFunc {
 	aniPattern := regexp.MustCompile(`^open-ani/ani/(\d+\.\d+\.\d+)\b`)
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		u := c.Request().UserAgent()
 		if u == "" {
 			return res.Forbidden("Please set a 'User-Agent'")

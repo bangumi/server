@@ -17,7 +17,7 @@ package index
 import (
 	"errors"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/web/accessor"
@@ -25,7 +25,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h *Handler) CollectIndex(c echo.Context) error {
+func (h *Handler) CollectIndex(c *echo.Context) error {
 	iid, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
@@ -34,7 +34,7 @@ func (h *Handler) CollectIndex(c echo.Context) error {
 	return h.collectIndex(c, iid, user)
 }
 
-func (h *Handler) UncollectIndex(c echo.Context) error {
+func (h *Handler) UncollectIndex(c *echo.Context) error {
 	iid, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func (h *Handler) UncollectIndex(c echo.Context) error {
 	return h.uncollectIndex(c, iid, user)
 }
 
-func (h *Handler) collectIndex(c echo.Context, indexID uint32, user *accessor.Accessor) error {
+func (h *Handler) collectIndex(c *echo.Context, indexID uint32, user *accessor.Accessor) error {
 	ctx := c.Request().Context()
 
 	if _, ok, err := h.getIndexWithCache(ctx, user, indexID); err != nil {
@@ -64,7 +64,7 @@ func (h *Handler) collectIndex(c echo.Context, indexID uint32, user *accessor.Ac
 	return nil
 }
 
-func (h *Handler) uncollectIndex(c echo.Context, indexID uint32, user *accessor.Accessor) error {
+func (h *Handler) uncollectIndex(c *echo.Context, indexID uint32, user *accessor.Accessor) error {
 	ctx := c.Request().Context()
 	if _, ok, err := h.getIndexWithCache(ctx, user, indexID); err != nil {
 		return res.InternalError(c, err, "get index error")

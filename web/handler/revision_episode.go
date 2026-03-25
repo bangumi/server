@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 
@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Handler) GetEpisodeRevision(c echo.Context) error {
+func (h Handler) GetEpisodeRevision(c *echo.Context) error {
 	id, err := gstr.ParseUint32(c.Param("id"))
 	if err != nil || id <= 0 {
 		return res.NewError(
@@ -56,7 +56,7 @@ func (h Handler) GetEpisodeRevision(c echo.Context) error {
 	return c.JSON(http.StatusOK, convertModelEpisodeRevision(&r, creatorMap))
 }
 
-func (h Handler) ListEpisodeRevision(c echo.Context) error {
+func (h Handler) ListEpisodeRevision(c *echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func (h Handler) ListEpisodeRevision(c echo.Context) error {
 	return h.listEpisodeRevision(c, episodeID, page)
 }
 
-func (h Handler) listEpisodeRevision(c echo.Context, episodeID model.EpisodeID, page req.PageQuery) error {
+func (h Handler) listEpisodeRevision(c *echo.Context, episodeID model.EpisodeID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,

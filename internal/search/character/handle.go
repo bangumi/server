@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/trim21/errgo"
 
@@ -34,7 +34,7 @@ type hit struct {
 }
 
 //nolint:funlen
-func (c *client) Handle(ctx echo.Context) error {
+func (c *client) Handle(ctx *echo.Context) error {
 	auth := accessor.GetFromCtx(ctx)
 	q, err := req.GetPageQuerySoftLimit(ctx, defaultLimit, maxLimit)
 	if err != nil {

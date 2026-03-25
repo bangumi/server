@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/redis/rueidis"
 	"go.uber.org/zap"
 
@@ -46,7 +46,7 @@ func RateLimit(cfg config.AppConfig, r rueidis.Client) echo.MiddlewareFunc {
 	}
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			ip := c.RealIP()
 			u := accessor.GetFromCtx(c)
 

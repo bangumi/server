@@ -18,7 +18,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
@@ -32,7 +32,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) ListSubjectCollection(c echo.Context) error {
+func (h User) ListSubjectCollection(c *echo.Context) error {
 	v := accessor.GetFromCtx(c)
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
@@ -69,7 +69,7 @@ func (h User) ListSubjectCollection(c echo.Context) error {
 }
 
 func (h User) listCollection(
-	c echo.Context,
+	c *echo.Context,
 	u user.User,
 	subjectType model.SubjectType,
 	collectionType collection.SubjectCollection,

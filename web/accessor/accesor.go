@@ -15,7 +15,7 @@
 package accessor
 
 import (
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -34,7 +34,7 @@ func (a *Accessor) AllowNSFW() bool {
 	return a.Login && a.Auth.AllowNSFW()
 }
 
-func (a *Accessor) fillBasicInfo(c echo.Context) {
+func (a *Accessor) fillBasicInfo(c *echo.Context) {
 	a.Login = false
 	a.RequestID = c.Request().Header.Get(cf.HeaderRequestID)
 	a.IP = c.RealIP()

@@ -17,9 +17,9 @@ package cookie
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
-func Clear(c echo.Context, key string) {
+func Clear(c *echo.Context, key string) {
 	c.SetCookie(&http.Cookie{Name: key, Value: "", SameSite: http.SameSiteLaxMode, HttpOnly: true})
 }

@@ -18,7 +18,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/ctrl"
@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) PatchSubjectCollection(c echo.Context) error {
+func (h User) PatchSubjectCollection(c *echo.Context) error {
 	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func (h User) PatchSubjectCollection(c echo.Context) error {
 }
 
 func (h User) patchSubjectCollection(
-	c echo.Context,
+	c *echo.Context,
 	subjectID model.SubjectID,
 	r req.SubjectEpisodeCollectionPatch,
 	allowCreate bool, // 如果不存在 record 是否允许创建
@@ -71,7 +71,7 @@ func (h User) patchSubjectCollection(
 }
 
 func (h User) updateOrCreateSubjectCollection(
-	c echo.Context,
+	c *echo.Context,
 	subjectID model.SubjectID,
 	r req.SubjectEpisodeCollectionPatch,
 	allowCreate bool, // 如果不存在 record 是否允许创建
