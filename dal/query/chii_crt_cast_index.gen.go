@@ -27,7 +27,7 @@ func newCast(db *gorm.DB, opts ...gen.DOOption) cast {
 
 	tableName := _cast.castDo.TableName()
 	_cast.ALL = field.NewAsterisk(tableName)
-	_cast.RltType = field.NewUint32(tableName, "rlt_type")
+	_cast.RltType = field.NewUint8(tableName, "rlt_type")
 	_cast.CharacterID = field.NewUint32(tableName, "crt_id")
 	_cast.PersonID = field.NewUint32(tableName, "prsn_id")
 	_cast.SubjectID = field.NewUint32(tableName, "subject_id")
@@ -75,7 +75,7 @@ type cast struct {
 	castDo castDo
 
 	ALL           field.Asterisk
-	RltType       field.Uint32
+	RltType       field.Uint8
 	CharacterID   field.Uint32
 	PersonID      field.Uint32
 	SubjectID     field.Uint32
@@ -102,7 +102,7 @@ func (c cast) As(alias string) *cast {
 
 func (c *cast) updateTableName(table string) *cast {
 	c.ALL = field.NewAsterisk(table)
-	c.RltType = field.NewUint32(table, "rlt_type")
+	c.RltType = field.NewUint8(table, "rlt_type")
 	c.CharacterID = field.NewUint32(table, "crt_id")
 	c.PersonID = field.NewUint32(table, "prsn_id")
 	c.SubjectID = field.NewUint32(table, "subject_id")
