@@ -404,6 +404,7 @@ func main() {
 		gen.FieldType("crt_id", characterIDTypeString),
 		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("subject_id", subjectIDTypeString),
+		gen.FieldType("rlt_type", "uint8"),
 		gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
 			GORMTag: field.GormTag{"foreignKey": []string{"crt_id"}, "references": []string{"crt_id"}},
 		}),
