@@ -30,7 +30,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) ListPersonCollection(c echo.Context) error {
+func (h User) ListPersonCollection(c *echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (h User) ListPersonCollection(c echo.Context) error {
 	return h.listPersonCollection(c, u, page)
 }
 
-func (h User) listPersonCollection(c echo.Context, u user.User, page req.PageQuery) error {
+func (h User) listPersonCollection(c *echo.Context, u user.User, page req.PageQuery) error {
 	count, err := h.collect.CountPersonCollections(c.Request().Context(), u.ID, collection.PersonCollectCategoryPerson)
 	if err != nil {
 		return errgo.Wrap(err, "failed to count user's person collections")

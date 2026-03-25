@@ -22,7 +22,7 @@ import (
 )
 
 func genFakeRequestID(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		devRequestID := "fake-ray-" + random.Base62String(10)
 		c.Request().Header.Set(cf.HeaderRequestID, devRequestID)
 		c.Set(cf.HeaderRequestID, devRequestID)

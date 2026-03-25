@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Common) ValidationError(c echo.Context, err error) error {
+func (h Common) ValidationError(c *echo.Context, err error) error {
 	return c.JSON(http.StatusBadRequest, res.Error{
 		Title:       "Bad Request",
 		Description: "can't validate request body",

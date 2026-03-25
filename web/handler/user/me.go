@@ -39,7 +39,7 @@ type CurrentUser struct {
 	TimeOffset       int8         `json:"time_offset"`
 }
 
-func (h User) GetCurrent(c echo.Context) error {
+func (h User) GetCurrent(c *echo.Context) error {
 	u := accessor.GetFromCtx(c)
 	if !u.Login || u.ID == 0 {
 		return res.Unauthorized("need Login")

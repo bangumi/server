@@ -37,11 +37,11 @@ func dev() echo.MiddlewareFunc {
 	log := logger.Copy().WithOptions(zap.AddCallerSkip(2))
 	// Return new handler
 	return func(next echo.HandlerFunc) echo.HandlerFunc { //nolint:nonamedreturns
-		return func(c echo.Context) (err error) {
+		return func(c *echo.Context) (err error) {
 			defer func() {
 				if r := recover(); r != nil {
 					c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
-					c.Response().Status = http.StatusInternalServerError
+					c.Response().WriteHeader(http.StatusInternalServerError)
 
 					_, err = fmt.Fprintf(c.Response(), _debugHTML, r, takeStacktrace(2))
 					log.Error("panic: " + fmt.Sprintln(r))

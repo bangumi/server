@@ -37,7 +37,7 @@ type ResUserEpisodeCollection struct {
 	UpdatedAt int64                        `json:"updated_at"`
 }
 
-func (h User) GetEpisodeCollection(c echo.Context) error {
+func (h User) GetEpisodeCollection(c *echo.Context) error {
 	v := accessor.GetFromCtx(c)
 	episodeID, err := req.ParseID(c.Param("episode_id"))
 	if err != nil {
@@ -67,7 +67,7 @@ func (h User) GetEpisodeCollection(c echo.Context) error {
 }
 
 // GetSubjectEpisodeCollection return episodes with user's collection info.
-func (h User) GetSubjectEpisodeCollection(c echo.Context) error {
+func (h User) GetSubjectEpisodeCollection(c *echo.Context) error {
 	v := accessor.GetFromCtx(c)
 	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {

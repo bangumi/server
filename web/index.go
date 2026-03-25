@@ -28,12 +28,12 @@ var indexPageHTML string
 
 func indexPage() echo.HandlerFunc {
 	if env.Production {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			return c.Redirect(http.StatusFound, "https://github.com/bangumi/")
 		}
 	}
 
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		return c.HTML(http.StatusOK, indexPageHTML)
 	}
 }

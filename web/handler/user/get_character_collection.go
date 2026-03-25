@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) GetCharacterCollection(c echo.Context) error {
+func (h User) GetCharacterCollection(c *echo.Context) error {
 	username := c.Param("username")
 	if username == "" {
 		return res.BadRequest("missing require parameters `username`")
@@ -42,7 +42,7 @@ func (h User) GetCharacterCollection(c echo.Context) error {
 	return h.getCharacterCollection(c, username, characterID)
 }
 
-func (h User) getCharacterCollection(c echo.Context, username string, characterID model.CharacterID) error {
+func (h User) getCharacterCollection(c *echo.Context, username string, characterID model.CharacterID) error {
 	const notFoundMessage = "character is not collected by user"
 
 	character, err := h.character.Get(c.Request().Context(), characterID)

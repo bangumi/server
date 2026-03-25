@@ -26,7 +26,7 @@ var _ Client = NoopClient{}
 type NoopClient struct {
 }
 
-func (n NoopClient) Handle(c echo.Context, _ SearchTarget) error {
+func (n NoopClient) Handle(c *echo.Context, _ SearchTarget) error {
 	return c.String(http.StatusOK, "search is not enable")
 }
 

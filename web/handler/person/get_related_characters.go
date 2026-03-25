@@ -32,7 +32,7 @@ import (
 )
 
 //nolint:funlen
-func (h Person) GetRelatedCharacters(c echo.Context) error {
+func (h Person) GetRelatedCharacters(c *echo.Context) error {
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err

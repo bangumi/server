@@ -25,7 +25,7 @@ var _ echo.JSONSerializer = jsonSerializer{}
 type jsonSerializer struct {
 }
 
-func (j jsonSerializer) Serialize(c echo.Context, i any, indent string) error {
+func (j jsonSerializer) Serialize(c *echo.Context, i any, indent string) error {
 	enc := encoder.NewStreamEncoder(c.Response())
 	if indent != "" {
 		enc.SetIndent("", indent)
@@ -33,7 +33,7 @@ func (j jsonSerializer) Serialize(c echo.Context, i any, indent string) error {
 	return enc.Encode(i)
 }
 
-func (j jsonSerializer) Deserialize(c echo.Context, i any) error {
+func (j jsonSerializer) Deserialize(c *echo.Context, i any) error {
 	dec := decoder.NewStreamDecoder(c.Request().Body)
 	dec.DisallowUnknownFields()
 	return dec.Decode(i)

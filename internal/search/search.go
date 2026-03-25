@@ -45,7 +45,7 @@ const (
 )
 
 type Client interface {
-	Handle(c echo.Context, target SearchTarget) error
+	Handle(c *echo.Context, target SearchTarget) error
 	Close()
 
 	EventAdded(ctx context.Context, id uint32, target SearchTarget) error
@@ -54,7 +54,7 @@ type Client interface {
 }
 
 type Handler interface {
-	Handle(c echo.Context, target SearchTarget) error
+	Handle(c *echo.Context, target SearchTarget) error
 }
 
 type Search struct {
@@ -111,7 +111,7 @@ func New(
 	return s, nil
 }
 
-func (s *Search) Handle(c echo.Context, target SearchTarget) error {
+func (s *Search) Handle(c *echo.Context, target SearchTarget) error {
 	searcher := s.searchers[target]
 	if searcher == nil {
 		return fmt.Errorf("searcher not found for %s", target)

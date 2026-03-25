@@ -32,7 +32,7 @@ func TestPanicMiddleware(t *testing.T) {
 
 	app.Use(recovery.New())
 
-	app.GET("/", func(c echo.Context) error {
+	app.GET("/", func(c *echo.Context) error {
 		panic("errInternal")
 	})
 

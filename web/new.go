@@ -47,8 +47,6 @@ const headerServerVersion = "x-server-version"
 func New() *echo.Echo {
 	app := echo.New()
 	app.HTTPErrorHandler = getDefaultErrorHandler()
-	app.HideBanner = true
-	app.HidePort = true
 
 	app.JSONSerializer = jsonSerializer{}
 
@@ -65,8 +63,8 @@ func New() *echo.Echo {
 	if env.Development {
 		// fasthttp bug, it uses an internal global variable and causing data race here
 		app.Static("/openapi/", "./openapi/")
-		app.GET("/debug", func(c echo.Context) error {
-			return c.JSON(http.StatusOK, echo.Map{
+		app.GET("/debug", func(c *echo.Context) error {
+			return c.JSON(http.StatusOK, map[string]any{
 				"ip": c.RealIP(),
 			})
 		})
@@ -77,18 +75,16 @@ func New() *echo.Echo {
 	app.Use(recovery.New())
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			metrics.RequestCount.Inc()
 			start := time.Now()
 			c.Response().Header().Set(headerServerVersion, config.Version)
 
-			c.Response().Before(func() {
-				sub := time.Since(start)
-				metrics.RequestHistogram.Observe(sub.Seconds())
-				c.Response().Header().Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
-			})
-
 			err := next(c)
+
+			sub := time.Since(start)
+			metrics.RequestHistogram.Observe(sub.Seconds())
+			c.Response().Header().Set(headerProcessTime, strconv.FormatInt(sub.Milliseconds(), 10))
 
 			return err
 		}
@@ -113,7 +109,7 @@ func New() *echo.Echo {
 	}))
 
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			ctx, cancel := context.WithTimeout(context.WithoutCancel(c.Request().Context()), time.Minute)
 			defer cancel()
 
@@ -133,7 +129,7 @@ func New() *echo.Echo {
 		}
 	})
 
-	app.GET("/openapi", func(c echo.Context) error {
+	app.GET("/openapi", func(c *echo.Context) error {
 		return c.Redirect(http.StatusFound, "/openapi/")
 	})
 
@@ -145,8 +141,6 @@ func New() *echo.Echo {
 func NewTestingApp() *echo.Echo {
 	app := echo.New()
 	app.HTTPErrorHandler = getDefaultErrorHandler()
-	app.HideBanner = true
-	app.HidePort = true
 
 	app.Use(genFakeRequestID)
 

@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Person) Get(c echo.Context) error {
+func (h Person) Get(c *echo.Context) error {
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func (h Person) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, res.ConvertModelPerson(r))
 }
 
-func (h Person) GetImage(c echo.Context) error {
+func (h Person) GetImage(c *echo.Context) error {
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err

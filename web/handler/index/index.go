@@ -38,7 +38,7 @@ type indexCacheValue struct {
 	CreatorID model.UserID       `json:"creator_id"`
 }
 
-func (h Handler) GetIndex(c echo.Context) error {
+func (h Handler) GetIndex(c *echo.Context) error {
 	user := accessor.GetFromCtx(c)
 
 	id, err := req.ParseID(c.Param("id"))
@@ -152,7 +152,7 @@ func (h Handler) extractUserPrefs(user *accessor.Accessor) (model.UserID, bool) 
 	return user.ID, user.AllowNSFW()
 }
 
-func (h Handler) GetIndexSubjects(c echo.Context) error {
+func (h Handler) GetIndexSubjects(c *echo.Context) error {
 	user := accessor.GetFromCtx(c)
 
 	id, err := req.ParseID(c.Param("id"))
@@ -183,7 +183,7 @@ func (h Handler) GetIndexSubjects(c echo.Context) error {
 }
 
 func (h Handler) getIndexSubjects(
-	c echo.Context, id model.IndexID, subjectType uint8, page req.PageQuery,
+	c *echo.Context, id model.IndexID, subjectType uint8, page req.PageQuery,
 ) error {
 	count, err := h.i.CountSubjects(c.Request().Context(), id, subjectType)
 	if err != nil {
@@ -221,7 +221,7 @@ func (h Handler) getIndexSubjects(
 	})
 }
 
-func (h Handler) NewIndex(c echo.Context) error {
+func (h Handler) NewIndex(c *echo.Context) error {
 	var reqData req.IndexBasicInfo
 	if err := c.Echo().JSONSerializer.Deserialize(c, &reqData); err != nil {
 		return res.JSONError(c, err)
@@ -256,7 +256,7 @@ func (h Handler) NewIndex(c echo.Context) error {
 }
 
 // 确保目录存在, 并且当前请求的用户持有权限.
-func (h Handler) ensureIndexPermission(c echo.Context, indexID uint32) (*model.Index, error) {
+func (h Handler) ensureIndexPermission(c *echo.Context, indexID uint32) (*model.Index, error) {
 	accessor := accessor.GetFromCtx(c)
 	index, err := h.i.Get(c.Request().Context(), indexID)
 	if err != nil {
@@ -271,7 +271,7 @@ func (h Handler) ensureIndexPermission(c echo.Context, indexID uint32) (*model.I
 	return &index, nil
 }
 
-func (h Handler) UpdateIndex(c echo.Context) error {
+func (h Handler) UpdateIndex(c *echo.Context) error {
 	indexID, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err

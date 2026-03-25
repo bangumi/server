@@ -32,7 +32,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Character) GetRelatedSubjects(c echo.Context) error {
+func (h Character) GetRelatedSubjects(c *echo.Context) error {
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err

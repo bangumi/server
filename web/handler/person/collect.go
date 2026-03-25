@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Person) CollectPerson(c echo.Context) error {
+func (h Person) CollectPerson(c *echo.Context) error {
 	pid, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func (h Person) CollectPerson(c echo.Context) error {
 	return h.collectPerson(c, pid, uid)
 }
 
-func (h Person) UncollectPerson(c echo.Context) error {
+func (h Person) UncollectPerson(c *echo.Context) error {
 	pid, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func (h Person) UncollectPerson(c echo.Context) error {
 	return h.uncollectPerson(c, pid, uid)
 }
 
-func (h Person) collectPerson(c echo.Context, pid uint32, uid uint32) error {
+func (h Person) collectPerson(c *echo.Context, pid uint32, uid uint32) error {
 	ctx := c.Request().Context()
 	// check if the person exists
 	if _, err := h.person.Get(ctx, pid); err != nil {
@@ -68,7 +68,7 @@ func (h Person) collectPerson(c echo.Context, pid uint32, uid uint32) error {
 	return nil
 }
 
-func (h Person) uncollectPerson(c echo.Context, pid uint32, uid uint32) error {
+func (h Person) uncollectPerson(c *echo.Context, pid uint32, uid uint32) error {
 	ctx := c.Request().Context()
 	// check if the person exists
 	if _, err := h.person.Get(ctx, pid); err != nil {

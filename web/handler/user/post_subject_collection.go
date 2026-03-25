@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) PostSubjectCollection(c echo.Context) error {
+func (h User) PostSubjectCollection(c *echo.Context) error {
 	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err

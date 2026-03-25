@@ -29,7 +29,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Subject) Browse(c echo.Context) error {
+func (h Subject) Browse(c *echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (h Subject) Browse(c echo.Context) error {
 	return c.JSON(http.StatusOK, res.Paged{Data: data, Total: count, Limit: page.Limit, Offset: page.Offset})
 }
 
-func parseBrowseQuery(c echo.Context) (*subject.BrowseFilter, error) {
+func parseBrowseQuery(c *echo.Context) (*subject.BrowseFilter, error) {
 	filter := subject.BrowseFilter{}
 	u := accessor.GetFromCtx(c)
 	filter.NSFW = null.Bool{Value: false, Set: !u.AllowNSFW()}
@@ -129,7 +129,7 @@ func parseBrowseQuery(c echo.Context) (*subject.BrowseFilter, error) {
 	return &filter, nil
 }
 
-func GetYearQuery(c echo.Context) (null.Int32, error) {
+func GetYearQuery(c *echo.Context) (null.Int32, error) {
 	yearStr := c.QueryParam("year")
 	if yearStr == "" {
 		return null.Int32{}, nil
@@ -144,7 +144,7 @@ func GetYearQuery(c echo.Context) (null.Int32, error) {
 	}
 }
 
-func GetMonthQuery(c echo.Context) (null.Int8, error) {
+func GetMonthQuery(c *echo.Context) (null.Int8, error) {
 	monthStr := c.QueryParam("month")
 	if monthStr == "" {
 		return null.Int8{}, nil

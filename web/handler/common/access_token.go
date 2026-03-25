@@ -29,7 +29,7 @@ import (
 )
 
 func (h Common) MiddlewareAccessTokenAuth(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		var a = accessor.NewFromCtx(c)
 		defer a.Free()
 

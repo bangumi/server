@@ -28,7 +28,7 @@ const HeaderReferer = "Referer"
 func New(referer string) echo.MiddlewareFunc {
 	if env.Production {
 		return func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
+			return func(c *echo.Context) error {
 				ref := c.Request().Header.Get(HeaderReferer)
 				if ref == "" || strings.HasPrefix(ref, referer) {
 					return next(c)
@@ -40,7 +40,7 @@ func New(referer string) echo.MiddlewareFunc {
 	}
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			return next(c)
 		}
 	}

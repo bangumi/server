@@ -32,7 +32,7 @@ type hit struct {
 }
 
 //nolint:funlen
-func (c *client) Handle(ctx echo.Context) error {
+func (c *client) Handle(ctx *echo.Context) error {
 	q, err := req.GetPageQuerySoftLimit(ctx, defaultLimit, maxLimit)
 	if err != nil {
 		return err

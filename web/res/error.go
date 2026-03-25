@@ -52,7 +52,7 @@ func (e HTTPError) Error() string {
 }
 
 //nolint:errorlint
-func JSONError(c echo.Context, err error) error {
+func JSONError(c *echo.Context, err error) error {
 	if ute, ok := err.(*json.UnmarshalTypeError); ok {
 		return c.JSON(http.StatusBadRequest, Error{
 			Title: "JSON Error",
@@ -75,7 +75,7 @@ func JSONError(c echo.Context, err error) error {
 	})
 }
 
-func InternalError(c echo.Context, err error, message string) error {
+func InternalError(c *echo.Context, err error, message string) error {
 	return c.JSON(http.StatusInternalServerError, Error{
 		Title:       "Internal Server Error",
 		Description: message,

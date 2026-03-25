@@ -28,7 +28,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) GetPersonCollection(c echo.Context) error {
+func (h User) GetPersonCollection(c *echo.Context) error {
 	username := c.Param("username")
 	if username == "" {
 		return res.BadRequest("missing require parameters `username`")
@@ -42,7 +42,7 @@ func (h User) GetPersonCollection(c echo.Context) error {
 	return h.getPersonCollection(c, username, personID)
 }
 
-func (h User) getPersonCollection(c echo.Context, username string, personID model.PersonID) error {
+func (h User) getPersonCollection(c *echo.Context, username string, personID model.PersonID) error {
 	const notFoundMessage = "person is not collected by user"
 
 	person, err := h.person.Get(c.Request().Context(), personID)

@@ -18,7 +18,7 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
-func DetailWithErr(c echo.Context, err error) D {
+func DetailWithErr(c *echo.Context, err error) D {
 	return D{
 		Path:        c.Request().URL.Path,
 		Error:       err.Error(),
@@ -27,7 +27,7 @@ func DetailWithErr(c echo.Context, err error) D {
 	}
 }
 
-func Detail(c echo.Context) D {
+func Detail(c *echo.Context) D {
 	return D{
 		Path:        c.Request().URL.Path,
 		Method:      c.Request().Method,

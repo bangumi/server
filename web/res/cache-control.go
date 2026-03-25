@@ -37,6 +37,6 @@ func (c CacheControlParams) String() string {
 	return buf.String()
 }
 
-func SetCacheControl(c echo.Context, val CacheControlParams) {
+func SetCacheControl(c *echo.Context, val CacheControlParams) {
 	c.Response().Header().Set(echo.HeaderCacheControl, val.String())
 }

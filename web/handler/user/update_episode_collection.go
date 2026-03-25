@@ -56,7 +56,7 @@ func (r ReqEpisodeCollectionBatch) Validate() error {
 // PatchEpisodeCollectionBatch
 //
 //	/v0/users/-/collections/:subject_id/episodes"
-func (h User) PatchEpisodeCollectionBatch(c echo.Context) error {
+func (h User) PatchEpisodeCollectionBatch(c *echo.Context) error {
 	var r ReqEpisodeCollectionBatch
 	if err := c.Echo().JSONSerializer.Deserialize(c, &r); err != nil {
 		return res.JSONError(c, err)
@@ -92,7 +92,7 @@ func (h User) PatchEpisodeCollectionBatch(c echo.Context) error {
 // PutEpisodeCollection
 //
 //	/v0/users/-/collections/-/episodes/:episode_id
-func (h User) PutEpisodeCollection(c echo.Context) error {
+func (h User) PutEpisodeCollection(c *echo.Context) error {
 	episodeID, err := req.ParseID(c.Param("episode_id"))
 	if err != nil {
 		return err

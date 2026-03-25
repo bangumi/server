@@ -32,7 +32,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Handler) GetEpisode(c echo.Context) error {
+func (h Handler) GetEpisode(c *echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
 	id, err := req.ParseID(c.Param("id"))
@@ -63,7 +63,7 @@ func (h Handler) GetEpisode(c echo.Context) error {
 	return c.JSON(http.StatusOK, res.ConvertModelEpisode(e))
 }
 
-func (h Handler) ListEpisode(c echo.Context) error {
+func (h Handler) ListEpisode(c *echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
 	page, err := req.GetPageQuery(c, req.EpisodeDefaultLimit, req.EpisodeMaxLimit)

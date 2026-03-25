@@ -208,7 +208,7 @@ func TestUser_PostSubjectCollection_bad(t *testing.T) {
 
 		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
-			BodyJSON(echo.Map{"rate": 11}).
+			BodyJSON(map[string]any{"rate": 11}).
 			Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			ExpectCode(http.StatusBadRequest)
 	})
@@ -220,7 +220,7 @@ func TestUser_PostSubjectCollection_bad(t *testing.T) {
 
 		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
-			BodyJSON(echo.Map{"type": 0}).
+			BodyJSON(map[string]any{"type": 0}).
 			Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			ExpectCode(http.StatusBadRequest)
 	})
@@ -232,7 +232,7 @@ func TestUser_PostSubjectCollection_bad(t *testing.T) {
 
 		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
-			BodyJSON(echo.Map{"tags": "vv qq"}).
+			BodyJSON(map[string]any{"tags": "vv qq"}).
 			Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			ExpectCode(http.StatusBadRequest)
 	})
@@ -244,7 +244,7 @@ func TestUser_PostSubjectCollection_bad(t *testing.T) {
 
 		htest.New(t, app).
 			Header(echo.HeaderAuthorization, "Bearer t").
-			BodyJSON(echo.Map{"comment": strings.Repeat("vv qq", 200)}).
+			BodyJSON(map[string]any{"comment": strings.Repeat("vv qq", 200)}).
 			Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 			ExpectCode(http.StatusBadRequest)
 	})

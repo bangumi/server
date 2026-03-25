@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Subject) GetRelatedPersons(c echo.Context) error {
+func (h Subject) GetRelatedPersons(c *echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
 	id, err := req.ParseID(c.Param("id"))

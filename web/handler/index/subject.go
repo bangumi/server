@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Handler) AddIndexSubject(c echo.Context) error {
+func (h Handler) AddIndexSubject(c *echo.Context) error {
 	var reqData req.IndexAddSubject
 	if err := c.Echo().JSONSerializer.Deserialize(c, &reqData); err != nil {
 		return res.JSONError(c, err)
@@ -35,7 +35,7 @@ func (h Handler) AddIndexSubject(c echo.Context) error {
 	return h.addOrUpdateIndexSubject(c, reqData)
 }
 
-func (h Handler) UpdateIndexSubject(c echo.Context) error {
+func (h Handler) UpdateIndexSubject(c *echo.Context) error {
 	var reqData req.IndexSubjectInfo
 	if err := c.Echo().JSONSerializer.Deserialize(c, &reqData); err != nil {
 		return res.JSONError(c, err)
@@ -50,7 +50,7 @@ func (h Handler) UpdateIndexSubject(c echo.Context) error {
 	})
 }
 
-func (h Handler) addOrUpdateIndexSubject(c echo.Context, payload req.IndexAddSubject) error {
+func (h Handler) addOrUpdateIndexSubject(c *echo.Context, payload req.IndexAddSubject) error {
 	if err := h.ensureValidStrings(payload.Comment); err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (h Handler) addOrUpdateIndexSubject(c echo.Context, payload req.IndexAddSub
 	return c.JSON(http.StatusOK, indexSubjectToResp(*indexSubject))
 }
 
-func (h Handler) RemoveIndexSubject(c echo.Context) error {
+func (h Handler) RemoveIndexSubject(c *echo.Context) error {
 	indexID, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err

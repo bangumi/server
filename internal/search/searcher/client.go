@@ -22,7 +22,7 @@ import (
 )
 
 type Searcher interface {
-	Handle(c echo.Context) error
+	Handle(c *echo.Context) error
 
 	OnAdded(ctx context.Context, id uint32) error
 	OnUpdate(ctx context.Context, id uint32) error
