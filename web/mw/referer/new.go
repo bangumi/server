@@ -17,7 +17,7 @@ package referer
 import (
 	"strings"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/config/env"
 	"github.com/bangumi/server/web/res"
