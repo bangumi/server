@@ -13,7 +13,7 @@
     "printWidth": 120
   },
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^15.3.4",
+    "@apidevtools/json-schema-ref-parser": "^15.3.5",
     "js-yaml": "^4.1.1",
     "lodash": "^4.17.23",
     "yaml": "^2.8.3"
