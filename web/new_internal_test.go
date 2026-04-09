@@ -15,13 +15,14 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/web/res"
@@ -33,11 +34,11 @@ func TestDefaultErrorHandler_resError(t *testing.T) {
 	app := echo.New()
 	app.HTTPErrorHandler = getDefaultErrorHandler()
 
-	app.GET("/", func(c echo.Context) error {
+	app.GET("/", func(c *echo.Context) error {
 		return res.BadRequest("mm")
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
 	app.ServeHTTP(resp, req)
 	require.Equal(t, http.StatusBadRequest, resp.Code)
@@ -58,11 +59,11 @@ func TestDefaultErrorHandler_internal(t *testing.T) {
 
 	app.HTTPErrorHandler = getDefaultErrorHandler()
 
-	app.GET("/", func(c echo.Context) error {
+	app.GET("/", func(c *echo.Context) error {
 		return errors.New("mm")
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
 	app.ServeHTTP(resp, req)
 

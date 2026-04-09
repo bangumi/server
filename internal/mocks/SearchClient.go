@@ -8,7 +8,7 @@ import (
 	"context"
 
 	"github.com/bangumi/server/internal/search"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -262,7 +262,7 @@ func (_c *SearchClient_EventUpdate_Call) RunAndReturn(run func(ctx context.Conte
 }
 
 // Handle provides a mock function for the type SearchClient
-func (_mock *SearchClient) Handle(c echo.Context, target search.SearchTarget) error {
+func (_mock *SearchClient) Handle(c *echo.Context, target search.SearchTarget) error {
 	ret := _mock.Called(c, target)
 
 	if len(ret) == 0 {
@@ -270,7 +270,7 @@ func (_mock *SearchClient) Handle(c echo.Context, target search.SearchTarget) er
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(echo.Context, search.SearchTarget) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(*echo.Context, search.SearchTarget) error); ok {
 		r0 = returnFunc(c, target)
 	} else {
 		r0 = ret.Error(0)
@@ -284,17 +284,17 @@ type SearchClient_Handle_Call struct {
 }
 
 // Handle is a helper method to define mock.On call
-//   - c echo.Context
+//   - c *echo.Context
 //   - target search.SearchTarget
 func (_e *SearchClient_Expecter) Handle(c interface{}, target interface{}) *SearchClient_Handle_Call {
 	return &SearchClient_Handle_Call{Call: _e.mock.On("Handle", c, target)}
 }
 
-func (_c *SearchClient_Handle_Call) Run(run func(c echo.Context, target search.SearchTarget)) *SearchClient_Handle_Call {
+func (_c *SearchClient_Handle_Call) Run(run func(c *echo.Context, target search.SearchTarget)) *SearchClient_Handle_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 echo.Context
+		var arg0 *echo.Context
 		if args[0] != nil {
-			arg0 = args[0].(echo.Context)
+			arg0 = args[0].(*echo.Context)
 		}
 		var arg1 search.SearchTarget
 		if args[1] != nil {
@@ -313,7 +313,7 @@ func (_c *SearchClient_Handle_Call) Return(err error) *SearchClient_Handle_Call 
 	return _c
 }
 
-func (_c *SearchClient_Handle_Call) RunAndReturn(run func(c echo.Context, target search.SearchTarget) error) *SearchClient_Handle_Call {
+func (_c *SearchClient_Handle_Call) RunAndReturn(run func(c *echo.Context, target search.SearchTarget) error) *SearchClient_Handle_Call {
 	_c.Call.Return(run)
 	return _c
 }

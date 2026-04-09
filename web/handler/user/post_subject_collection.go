@@ -18,7 +18,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
@@ -26,7 +26,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) PostSubjectCollection(c echo.Context) error {
+func (h User) PostSubjectCollection(c *echo.Context) error {
 	subjectID, err := req.ParseID(c.Param("subject_id"))
 	if err != nil {
 		return err

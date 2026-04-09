@@ -18,7 +18,7 @@ import (
 	_ "embed" //nolint:revive
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/config/env"
 )
@@ -28,12 +28,12 @@ var indexPageHTML string
 
 func indexPage() echo.HandlerFunc {
 	if env.Production {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			return c.Redirect(http.StatusFound, "https://github.com/bangumi/")
 		}
 	}
 
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		return c.HTML(http.StatusOK, indexPageHTML)
 	}
 }

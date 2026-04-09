@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/samber/lo"
 	"github.com/trim21/errgo"
 
@@ -32,7 +32,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Handler) ListPersonRevision(c echo.Context) error {
+func (h Handler) ListPersonRevision(c *echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func (h Handler) ListPersonRevision(c echo.Context) error {
 	return h.listPersonRevision(c, personID, page)
 }
 
-func (h Handler) listPersonRevision(c echo.Context, personID model.PersonID, page req.PageQuery) error {
+func (h Handler) listPersonRevision(c *echo.Context, personID model.PersonID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -91,7 +91,7 @@ func (h Handler) listPersonRevision(c echo.Context, personID model.PersonID, pag
 	return c.JSON(http.StatusOK, response)
 }
 
-func (h Handler) GetPersonRevision(c echo.Context) error {
+func (h Handler) GetPersonRevision(c *echo.Context) error {
 	id, err := gstr.ParseUint32(c.Param("id"))
 	if err != nil || id <= 0 {
 		return res.BadRequest(fmt.Sprintf("bad param id: %s", c.Param("id")))
@@ -113,7 +113,7 @@ func (h Handler) GetPersonRevision(c echo.Context) error {
 	return c.JSON(http.StatusOK, convertModelPersonRevision(&r, creatorMap))
 }
 
-func (h Handler) ListCharacterRevision(c echo.Context) error {
+func (h Handler) ListCharacterRevision(c *echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
@@ -127,7 +127,7 @@ func (h Handler) ListCharacterRevision(c echo.Context) error {
 	return h.listCharacterRevision(c, characterID, page)
 }
 
-func (h Handler) listCharacterRevision(c echo.Context, characterID model.CharacterID, page req.PageQuery) error {
+func (h Handler) listCharacterRevision(c *echo.Context, characterID model.CharacterID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -172,7 +172,7 @@ func (h Handler) listCharacterRevision(c echo.Context, characterID model.Charact
 	return c.JSON(http.StatusOK, response)
 }
 
-func (h Handler) GetCharacterRevision(c echo.Context) error {
+func (h Handler) GetCharacterRevision(c *echo.Context) error {
 	id, err := gstr.ParseUint32(c.Param("id"))
 	if err != nil || id <= 0 {
 		return res.NewError(
@@ -197,7 +197,7 @@ func (h Handler) GetCharacterRevision(c echo.Context) error {
 	return c.JSON(http.StatusOK, convertModelCharacterRevision(&r, creatorMap))
 }
 
-func (h Handler) ListSubjectRevision(c echo.Context) error {
+func (h Handler) ListSubjectRevision(c *echo.Context) error {
 	page, err := req.GetPageQuery(c, req.DefaultPageLimit, req.DefaultMaxPageLimit)
 	if err != nil {
 		return err
@@ -210,7 +210,7 @@ func (h Handler) ListSubjectRevision(c echo.Context) error {
 	return h.listSubjectRevision(c, subjectID, page)
 }
 
-func (h Handler) listSubjectRevision(c echo.Context, subjectID model.SubjectID, page req.PageQuery) error {
+func (h Handler) listSubjectRevision(c *echo.Context, subjectID model.SubjectID, page req.PageQuery) error {
 	var response = res.Paged{
 		Limit:  page.Limit,
 		Offset: page.Offset,
@@ -255,7 +255,7 @@ func (h Handler) listSubjectRevision(c echo.Context, subjectID model.SubjectID, 
 	return c.JSON(http.StatusOK, response)
 }
 
-func (h Handler) GetSubjectRevision(c echo.Context) error {
+func (h Handler) GetSubjectRevision(c *echo.Context) error {
 	id, err := gstr.ParseUint32(c.Param("id"))
 	if err != nil || id == 0 {
 		return res.BadRequest("bad param id: " + strconv.Quote(c.Param("id")))

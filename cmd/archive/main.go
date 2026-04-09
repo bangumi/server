@@ -136,6 +136,7 @@ func start(out string) {
 		{FileName: "subject-persons.jsonlines", Fn: exportSubjectPersonRelations},
 		{FileName: "subject-characters.jsonlines", Fn: exportSubjectCharacterRelations},
 		{FileName: "person-characters.jsonlines", Fn: exportPersonCharacterRelations},
+		{FileName: "person-relations.jsonlines", Fn: exportPersonRelations},
 	} {
 		w, err := z.Create(s.FileName)
 		if err != nil {
@@ -268,42 +269,52 @@ func exportSubjects(q *query.Query, w io.Writer) {
 				metaTags = append(metaTags, v)
 			}
 
-			encode(w, Subject{
-				ID:       subject.ID,
-				Type:     subject.TypeID,
-				Name:     string(subject.Name),
-				NameCN:   string(subject.NameCN),
-				Infobox:  string(subject.Infobox),
-				Platform: subject.Platform,
-				Summary:  subject.Summary,
-				Nsfw:     subject.Nsfw,
-				Rank:     subject.Fields.Rank,
-				Tags:     encodedTags,
-				MetaTags: metaTags,
-				Score:    math.Round(score*10) / 10,
-				ScoreDetails: Score{
-					Field1:  subject.Fields.Rate1,
-					Field2:  subject.Fields.Rate2,
-					Field3:  subject.Fields.Rate3,
-					Field4:  subject.Fields.Rate4,
-					Field5:  subject.Fields.Rate5,
-					Field6:  subject.Fields.Rate6,
-					Field7:  subject.Fields.Rate7,
-					Field8:  subject.Fields.Rate8,
-					Field9:  subject.Fields.Rate9,
-					Field10: subject.Fields.Rate10,
-				},
-				Date:   encodedDate,
-				Series: subject.Series,
-				Favorite: Favorite{
-					Wish:    subject.Wish,
-					Done:    subject.Done,
-					Doing:   subject.Doing,
-					OnHold:  subject.OnHold,
-					Dropped: subject.Dropped,
-				},
-			})
+			encode(w, buildSubjectArchiveRecord(subject, encodedTags, metaTags, encodedDate, score))
 		}
+	}
+}
+
+func buildSubjectArchiveRecord(
+	subject *dao.Subject,
+	tags []Tag,
+	metaTags []string,
+	encodedDate string,
+	score float64,
+) Subject {
+	return Subject{
+		ID:       subject.ID,
+		Type:     subject.TypeID,
+		Name:     string(subject.Name),
+		NameCN:   string(subject.NameCN),
+		Infobox:  string(subject.Infobox),
+		Platform: subject.Platform,
+		Summary:  subject.Summary,
+		Nsfw:     subject.Nsfw,
+		Rank:     subject.Fields.Rank,
+		Tags:     tags,
+		MetaTags: metaTags,
+		Score:    math.Round(score*10) / 10,
+		ScoreDetails: Score{
+			Field1:  subject.Fields.Rate1,
+			Field2:  subject.Fields.Rate2,
+			Field3:  subject.Fields.Rate3,
+			Field4:  subject.Fields.Rate4,
+			Field5:  subject.Fields.Rate5,
+			Field6:  subject.Fields.Rate6,
+			Field7:  subject.Fields.Rate7,
+			Field8:  subject.Fields.Rate8,
+			Field9:  subject.Fields.Rate9,
+			Field10: subject.Fields.Rate10,
+		},
+		Date:   encodedDate,
+		Series: subject.Series,
+		Favorite: Favorite{
+			Wish:    subject.Wish,
+			Done:    subject.Done,
+			Doing:   subject.Doing,
+			OnHold:  subject.OnHold,
+			Dropped: subject.Dropped,
+		},
 	}
 }
 
@@ -327,17 +338,21 @@ func exportPersons(q *query.Query, w io.Writer) {
 		}
 
 		for _, p := range persons {
-			encode(w, Person{
-				ID:       p.ID,
-				Name:     p.Name,
-				Type:     p.Type,
-				Career:   careers(p),
-				Infobox:  p.Infobox,
-				Summary:  p.Summary,
-				Comments: p.Comment,
-				Collects: p.Collects,
-			})
+			encode(w, buildPersonArchiveRecord(p))
 		}
+	}
+}
+
+func buildPersonArchiveRecord(p *dao.Person) Person {
+	return Person{
+		ID:       p.ID,
+		Name:     string(p.Name),
+		Type:     p.Type,
+		Career:   careers(p),
+		Infobox:  string(p.Infobox),
+		Summary:  p.Summary,
+		Comments: p.Comment,
+		Collects: p.Collects,
 	}
 }
 
@@ -394,16 +409,20 @@ func exportCharacters(q *query.Query, w io.Writer) {
 		}
 
 		for _, c := range characters {
-			encode(w, Character{
-				ID:       c.ID,
-				Name:     c.Name,
-				Role:     c.Role,
-				Infobox:  c.Infobox,
-				Summary:  c.Summary,
-				Comments: c.Comment,
-				Collects: c.Collects,
-			})
+			encode(w, buildCharacterArchiveRecord(c))
 		}
+	}
+}
+
+func buildCharacterArchiveRecord(c *dao.Character) Character {
+	return Character{
+		ID:       c.ID,
+		Name:     string(c.Name),
+		Role:     c.Role,
+		Infobox:  string(c.Infobox),
+		Summary:  c.Summary,
+		Comments: c.Comment,
+		Collects: c.Collects,
 	}
 }
 
@@ -534,6 +553,7 @@ type PersonCharacter struct {
 	PersonID    model.PersonID    `json:"person_id"`
 	SubjectID   model.SubjectID   `json:"subject_id"`
 	CharacterID model.CharacterID `json:"character_id"`
+	Type        uint8             `json:"type"`
 	Summary     string            `json:"summary"`
 }
 
@@ -551,7 +571,39 @@ func exportPersonCharacterRelations(q *query.Query, w io.Writer) {
 				PersonID:    rel.PersonID,
 				SubjectID:   rel.SubjectID,
 				CharacterID: rel.CharacterID,
+				Type:        rel.RltType,
 				Summary:     rel.Summary,
+			})
+		}
+	}
+}
+
+type PersonRelation struct {
+	PersonType      string         `json:"person_type"`
+	PersonID        model.PersonID `json:"person_id"`
+	RelatedPersonID model.PersonID `json:"related_person_id"`
+	RelationType    uint32         `json:"relation_type"`
+	Spoiler         bool           `json:"spoiler"`
+	Ended           bool           `json:"ended"`
+}
+
+func exportPersonRelations(q *query.Query, w io.Writer) {
+	for i := model.PersonID(0); i < maxPersonID; i += defaultStep {
+		relations, err := q.WithContext(context.Background()).PersonRelation.
+			Order(q.PersonRelation.PersonID, q.PersonRelation.PersonID).
+			Where(q.PersonRelation.PersonID.Gt(i), q.PersonRelation.PersonID.Lte(i+defaultStep)).Find()
+		if err != nil {
+			panic(err)
+		}
+
+		for _, rel := range relations {
+			encode(w, PersonRelation{
+				PersonType:      rel.PersonType,
+				PersonID:        rel.PersonID,
+				RelatedPersonID: rel.RelatedPersonID,
+				RelationType:    rel.RelationType,
+				Spoiler:         rel.Spoiler,
+				Ended:           rel.Ended,
 			})
 		}
 	}

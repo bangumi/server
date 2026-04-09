@@ -18,7 +18,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
@@ -30,7 +30,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h User) GetSubjectCollection(c echo.Context) error {
+func (h User) GetSubjectCollection(c *echo.Context) error {
 	username := c.Param("username")
 	if username == "" {
 		return res.BadRequest("missing require parameters `username`")
@@ -44,7 +44,7 @@ func (h User) GetSubjectCollection(c echo.Context) error {
 	return h.getSubjectCollection(c, username, subjectID)
 }
 
-func (h User) getSubjectCollection(c echo.Context, username string, subjectID model.SubjectID) error {
+func (h User) getSubjectCollection(c *echo.Context, username string, subjectID model.SubjectID) error {
 	const notFoundMessage = "subject is not collected by user"
 	v := accessor.GetFromCtx(c)
 

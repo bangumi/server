@@ -15,11 +15,12 @@
 package recovery_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/web/mw/recovery"
@@ -31,11 +32,11 @@ func TestPanicMiddleware(t *testing.T) {
 
 	app.Use(recovery.New())
 
-	app.GET("/", func(c echo.Context) error {
+	app.GET("/", func(c *echo.Context) error {
 		panic("errInternal")
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
 
 	app.ServeHTTP(resp, req)

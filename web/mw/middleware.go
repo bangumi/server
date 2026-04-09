@@ -15,7 +15,7 @@
 package mw
 
 import (
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/web/accessor"
 	"github.com/bangumi/server/web/res"
@@ -30,7 +30,7 @@ const (
 )
 
 func NeedLogin(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		if u := accessor.GetFromCtx(c); !u.Login {
 			return errNeedLogin
 		}

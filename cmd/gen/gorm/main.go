@@ -293,6 +293,8 @@ func main() {
 		DeprecatedFiled("prsn_img_anidb"),
 		DeprecatedFiled("prsn_anidb_id"),
 		gen.FieldType("prsn_id", personIDTypeString),
+		gen.FieldType("prsn_name", "utiltype.HTMLEscapedString"),
+		gen.FieldType("prsn_infobox", "utiltype.HTMLEscapedString"),
 		gen.FieldType("prsn_illustrator", "bool"),
 		gen.FieldType("prsn_writer", "bool"),
 		gen.FieldType("prsn_redirect", personIDTypeString),
@@ -307,6 +309,8 @@ func main() {
 		DeprecatedFiled("crt_img_anidb"),
 		DeprecatedFiled("crt_anidb_id"),
 		gen.FieldType("crt_id", characterIDTypeString),
+		gen.FieldType("crt_name", "utiltype.HTMLEscapedString"),
+		gen.FieldType("crt_infobox", "utiltype.HTMLEscapedString"),
 		gen.FieldType("crt_redirect", characterIDTypeString),
 		gen.FieldRelate(field.HasOne, "Fields", modelPersonField, &field.RelateConfig{
 			GORMTag: field.GormTag{"foreignKey": []string{"crt_id"}, "polymorphic": []string{"Owner"}, "polymorphicValue": []string{"crt"}},
@@ -400,6 +404,7 @@ func main() {
 		gen.FieldType("crt_id", characterIDTypeString),
 		gen.FieldType("prsn_id", personIDTypeString),
 		gen.FieldType("subject_id", subjectIDTypeString),
+		gen.FieldType("rlt_type", "uint8"),
 		gen.FieldRelate(field.HasOne, "Character", modelCharacter, &field.RelateConfig{
 			GORMTag: field.GormTag{"foreignKey": []string{"crt_id"}, "references": []string{"crt_id"}},
 		}),
@@ -440,6 +445,19 @@ func main() {
 		}),
 	),
 	)
+
+	g.ApplyBasic(g.GenerateModelAs("chii_person_relations", "PersonRelation",
+		gen.FieldTrimPrefix("rlt_"),
+		gen.FieldRename("prsn_id", "PersonID"),
+		gen.FieldRename("prsn_type", "PersonType"),
+		gen.FieldRename("rlt_prsn_id", "RelatedPersonID"),
+		gen.FieldRename("rlt_prsn_type", "RelatedPersonType"),
+		gen.FieldRename("rlt_type", "RelationType"),
+		gen.FieldType("prsn_id", personIDTypeString),
+		gen.FieldType("rlt_spoiler", "bool"),
+		gen.FieldType("rlt_ended", "bool"),
+		gen.FieldType("rlt_vice_versa", "bool"),
+	))
 
 	g.ApplyBasic(g.GenerateModelAs("chii_index_related", "IndexSubject",
 		gen.FieldTrimPrefix("idx_rlt_"),

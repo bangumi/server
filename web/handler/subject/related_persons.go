@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain/gerr"
@@ -31,7 +31,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Subject) GetRelatedPersons(c echo.Context) error {
+func (h Subject) GetRelatedPersons(c *echo.Context) error {
 	u := accessor.GetFromCtx(c)
 
 	id, err := req.ParseID(c.Param("id"))

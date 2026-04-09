@@ -17,7 +17,7 @@ package req
 import (
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/bangumi/server/web/res"
 )
@@ -36,7 +36,7 @@ func (q PageQuery) Check(count int64) error {
 }
 
 // GetPageQuerySoftLimit apply soft limit on query without error.
-func GetPageQuerySoftLimit(c echo.Context, defaultLimit int, maxLimit int) (PageQuery, error) {
+func GetPageQuerySoftLimit(c *echo.Context, defaultLimit int, maxLimit int) (PageQuery, error) {
 	q := PageQuery{Limit: defaultLimit}
 	var err error
 
@@ -71,7 +71,7 @@ func GetPageQuerySoftLimit(c echo.Context, defaultLimit int, maxLimit int) (Page
 	return q, nil
 }
 
-func GetPageQuery(c echo.Context, defaultLimit int, maxLimit int) (PageQuery, error) {
+func GetPageQuery(c *echo.Context, defaultLimit int, maxLimit int) (PageQuery, error) {
 	q := PageQuery{Limit: defaultLimit}
 	var err error
 

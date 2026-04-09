@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/trim21/htest"
@@ -45,7 +45,7 @@ func TestSubject_Get(t *testing.T) {
 	e := echo.New()
 
 	g := e.Group("", func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			c.Set(ctxkey.User, &accessor.Accessor{Auth: auth.Auth{Login: true, RegTime: time.Time{}, ID: 1}, Login: true})
 			return next(c)
 		}

@@ -28,9 +28,9 @@ func newPerson(db *gorm.DB, opts ...gen.DOOption) person {
 	tableName := _person.personDo.TableName()
 	_person.ALL = field.NewAsterisk(tableName)
 	_person.ID = field.NewUint32(tableName, "prsn_id")
-	_person.Name = field.NewString(tableName, "prsn_name")
+	_person.Name = field.NewField(tableName, "prsn_name")
 	_person.Type = field.NewUint8(tableName, "prsn_type")
-	_person.Infobox = field.NewString(tableName, "prsn_infobox")
+	_person.Infobox = field.NewField(tableName, "prsn_infobox")
 	_person.Producer = field.NewBool(tableName, "prsn_producer")
 	_person.Mangaka = field.NewBool(tableName, "prsn_mangaka")
 	_person.Artist = field.NewBool(tableName, "prsn_artist")
@@ -67,9 +67,9 @@ type person struct {
 
 	ALL         field.Asterisk
 	ID          field.Uint32
-	Name        field.String
+	Name        field.Field
 	Type        field.Uint8 // 个人，公司，组合
-	Infobox     field.String
+	Infobox     field.Field
 	Producer    field.Bool
 	Mangaka     field.Bool
 	Artist      field.Bool
@@ -107,9 +107,9 @@ func (p person) As(alias string) *person {
 func (p *person) updateTableName(table string) *person {
 	p.ALL = field.NewAsterisk(table)
 	p.ID = field.NewUint32(table, "prsn_id")
-	p.Name = field.NewString(table, "prsn_name")
+	p.Name = field.NewField(table, "prsn_name")
 	p.Type = field.NewUint8(table, "prsn_type")
-	p.Infobox = field.NewString(table, "prsn_infobox")
+	p.Infobox = field.NewField(table, "prsn_infobox")
 	p.Producer = field.NewBool(table, "prsn_producer")
 	p.Mangaka = field.NewBool(table, "prsn_mangaka")
 	p.Artist = field.NewBool(table, "prsn_artist")

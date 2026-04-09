@@ -233,7 +233,7 @@ func (r mysqlRepo) Count(
 	filter BrowseFilter) (int64, error) {
 	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(
 		r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid),
-	).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	).Where(r.q.Subject.TypeID.Eq(filter.Type), r.q.SubjectField.Redirect.Eq(0))
 	if filter.NSFW.Set {
 		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
 	}
@@ -270,7 +270,7 @@ func (r mysqlRepo) Browse(
 ) ([]model.Subject, error) {
 	q := r.q.Subject.WithContext(ctx).Joins(r.q.Subject.Fields).Join(
 		r.q.SubjectField, r.q.Subject.ID.EqCol(r.q.SubjectField.Sid),
-	).Where(r.q.Subject.TypeID.Eq(filter.Type))
+	).Where(r.q.Subject.TypeID.Eq(filter.Type), r.q.SubjectField.Redirect.Eq(0))
 	if filter.NSFW.Set {
 		q = q.Where(r.q.Subject.Nsfw.Is(filter.NSFW.Value))
 	}

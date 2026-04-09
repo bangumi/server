@@ -75,7 +75,7 @@ func (e *eventHandler) OnUserChange(ctx context.Context, key json.RawMessage, pa
 			}
 
 			e.log.Debug("clear user avatar cache", log.User(k.ID))
-			go e.clearImageCache(context.Background(), after.Avatar)
+			go e.clearImageCache(context.WithoutCancel(ctx), after.Avatar)
 		}
 	}
 

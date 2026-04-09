@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/domain"
@@ -32,7 +32,7 @@ import (
 	"github.com/bangumi/server/web/res"
 )
 
-func (h Character) GetRelatedSubjects(c echo.Context) error {
+func (h Character) GetRelatedSubjects(c *echo.Context) error {
 	id, err := req.ParseID(c.Param("id"))
 	if err != nil {
 		return err
