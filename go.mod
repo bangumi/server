@@ -7,8 +7,8 @@ tool github.com/vektra/mockery/v3
 require (
 	github.com/avast/retry-go/v5 v5.0.0
 	github.com/aws/aws-sdk-go-v2 v1.41.5
-	github.com/aws/aws-sdk-go-v2/credentials v1.19.13
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.98.0
+	github.com/aws/aws-sdk-go-v2/credentials v1.19.14
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.99.0
 	github.com/bangumi/wiki-parser-go v0.0.2
 	github.com/bytedance/sonic v1.15.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
