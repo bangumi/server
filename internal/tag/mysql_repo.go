@@ -73,8 +73,8 @@ func (r mysqlRepo) GetByIDs(ctx context.Context, ids []model.SubjectID) (map[mod
 	q, v, err := sqlx.In(`
 		select tlt_tid, tag_name, tag_results, tlt_mid
 		from chii_tag_neue_list
-		inner join chii_tag_neue_index on tlt_tid = tag_id
-		where tlt_uid = 0 and tag_cat = ? and tlt_mid IN (?)
+		inner join chii_tag_neue_index on tlt_tid = tag_id and tag_cat = tlt_cat and tag_type = tlt_type
+		where tlt_uid = 0 and tlt_cat = ? and tlt_mid IN (?)
 		`, CatSubject, ids)
 	if err != nil {
 		return nil, err
