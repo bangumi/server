@@ -26,7 +26,7 @@ jobs:
   lint:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
         with:
           submodules: true
 
@@ -35,6 +35,6 @@ jobs:
           cache-namespace: lint
 
       - name: Run linters
-        uses: golangci/golangci-lint-action@v9
+        uses: golangci/golangci-lint-action@v9.2.0
         with:
           version: v2.11.4
