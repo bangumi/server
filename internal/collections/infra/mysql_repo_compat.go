@@ -17,6 +17,8 @@ package infra
 // handle php serialization
 
 import (
+	"bytes"
+
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/internal/collections/domain/collection"
@@ -31,12 +33,18 @@ type mysqlEpCollectionItem struct {
 	UpdatedAt map[collection.EpisodeCollection]int64 `php:"updated_at" json:"updated_at"`
 }
 
+var emptyJSONArray = []byte("[]")
+
 type mysqlEpCollection map[model.EpisodeID]mysqlEpCollectionItem
 
 func deserializeEpStatus(serialized []byte) (mysqlEpCollection, error) {
+	if bytes.Equal(serialized, emptyJSONArray) {
+		serialized = []byte("{}")
+	}
+
 	var e map[model.EpisodeID]mysqlEpCollectionItem
 	if err := serialize.Decode(serialized, &e); err != nil {
-		return nil, errgo.Wrap(err, "php deserialize")
+		return nil, errgo.Wrap(err, "serialize.Decode:")
 	}
 
 	return e, nil
