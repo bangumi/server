@@ -33,6 +33,7 @@ type mysqlEpCollectionItem struct {
 	UpdatedAt map[collection.EpisodeCollection]int64 `php:"updated_at" json:"updated_at"`
 }
 
+// nolint: gochecknoglobals
 var emptyJSONArray = []byte("[]")
 
 type mysqlEpCollection map[model.EpisodeID]mysqlEpCollectionItem
