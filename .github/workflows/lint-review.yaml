@@ -36,4 +36,4 @@ jobs:
 
       - run: gofmt -w -s .
 
-      - uses: autofix-ci/action@v1.3.3
+      - uses: autofix-ci/action@v1.3.4
