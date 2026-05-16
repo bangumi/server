@@ -62,7 +62,7 @@ func AddRouters(
 	v0.GET("/persons/:id/image", personHandler.GetImage)
 	v0.GET("/persons/:id/subjects", personHandler.GetRelatedSubjects)
 	v0.GET("/persons/:id/characters", personHandler.GetRelatedCharacters)
-	v0.POST("/persons/:id/collect", personHandler.CollectPerson, mw.NeedLogin)
+	v0.POST("/persons/:id/collect", personHandler.CollectPerson, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteCollection))
 	// TODO: wait for soft delete
 	// v0.DELETE("/persons/:id/collect", personHandler.UncollectPerson, mw.NeedLogin)
 
@@ -70,7 +70,7 @@ func AddRouters(
 	v0.GET("/characters/:id/image", characterHandler.GetImage)
 	v0.GET("/characters/:id/subjects", characterHandler.GetRelatedSubjects)
 	v0.GET("/characters/:id/persons", characterHandler.GetRelatedPersons)
-	v0.POST("/characters/:id/collect", characterHandler.CollectCharacter, mw.NeedLogin)
+	v0.POST("/characters/:id/collect", characterHandler.CollectCharacter, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteCollection))
 	// TODO: wait for soft delete
 	// v0.DELETE("/characters/:id/collect", characterHandler.UncollectCharacter, mw.NeedLogin)
 
@@ -85,12 +85,15 @@ func AddRouters(
 	v0.GET("/users/:username/collections/:subject_id", userHandler.GetSubjectCollection)
 
 	v0.GET("/users/-/collections/-/episodes/:episode_id", userHandler.GetEpisodeCollection, mw.NeedLogin)
-	v0.PUT("/users/-/collections/-/episodes/:episode_id", userHandler.PutEpisodeCollection, req.JSON, mw.NeedLogin)
+	v0.PUT("/users/-/collections/-/episodes/:episode_id", userHandler.PutEpisodeCollection,
+		req.JSON, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteCollection))
 	v0.GET("/users/-/collections/:subject_id/episodes", userHandler.GetSubjectEpisodeCollection, mw.NeedLogin)
-	v0.PATCH("/users/-/collections/:subject_id", userHandler.PatchSubjectCollection, req.JSON, mw.NeedLogin)
-	v0.POST("/users/-/collections/:subject_id", userHandler.PostSubjectCollection, req.JSON, mw.NeedLogin)
+	v0.PATCH("/users/-/collections/:subject_id", userHandler.PatchSubjectCollection,
+		req.JSON, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteCollection))
+	v0.POST("/users/-/collections/:subject_id", userHandler.PostSubjectCollection,
+		req.JSON, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteCollection))
 	v0.PATCH("/users/-/collections/:subject_id/episodes",
-		userHandler.PatchEpisodeCollectionBatch, req.JSON, mw.NeedLogin)
+		userHandler.PatchEpisodeCollectionBatch, req.JSON, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteCollection))
 
 	v0.GET("/users/:username/collections/-/characters", userHandler.ListCharacterCollection)
 	v0.GET("/users/:username/collections/-/characters/:character_id", userHandler.GetCharacterCollection)
@@ -102,15 +105,18 @@ func AddRouters(
 		v0.GET("/indices/:id", i.GetIndex)
 		v0.GET("/indices/:id/subjects", i.GetIndexSubjects)
 		// indices
-		v0.POST("/indices", i.NewIndex, req.JSON, mw.NeedLogin)
-		v0.PUT("/indices/:id", i.UpdateIndex, req.JSON, mw.NeedLogin)
+		v0.POST("/indices", i.NewIndex, req.JSON, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteIndices))
+		v0.PUT("/indices/:id", i.UpdateIndex, req.JSON, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteIndices))
 		// indices subjects
-		v0.POST("/indices/:id/subjects", i.AddIndexSubject, req.JSON, mw.NeedLogin)
-		v0.PUT("/indices/:id/subjects/:subject_id", i.UpdateIndexSubject, req.JSON, mw.NeedLogin)
-		v0.DELETE("/indices/:id/subjects/:subject_id", i.RemoveIndexSubject, mw.NeedLogin)
+		v0.POST("/indices/:id/subjects", i.AddIndexSubject,
+			req.JSON, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteIndices))
+		v0.PUT("/indices/:id/subjects/:subject_id", i.UpdateIndexSubject,
+			req.JSON, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteIndices))
+		v0.DELETE("/indices/:id/subjects/:subject_id",
+			i.RemoveIndexSubject, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteIndices))
 		// collect
-		v0.POST("/indices/:id/collect", i.CollectIndex, mw.NeedLogin)
-		v0.DELETE("/indices/:id/collect", i.UncollectIndex, mw.NeedLogin)
+		v0.POST("/indices/:id/collect", i.CollectIndex, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteCollection))
+		v0.DELETE("/indices/:id/collect", i.UncollectIndex, mw.NeedLogin, mw.NeedScope(mw.ScopeWriteCollection))
 	}
 
 	v0.GET("/revisions/persons/:id", h.GetPersonRevision)

@@ -17,6 +17,7 @@ package auth
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -47,10 +48,11 @@ type mysqlRepo struct {
 
 func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, error) {
 	var access struct {
-		UserID string `db:"user_id"`
+		UserID string         `db:"user_id"`
+		Scope  sql.NullString `db:"scope"`
 	}
 	err := m.db.GetContext(ctx, &access,
-		`select user_id from chii_oauth_access_tokens
+		`select user_id, scope from chii_oauth_access_tokens
                where access_token = BINARY ? and expires > ? limit 1`, token, time.Now())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -87,12 +89,29 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		return UserInfo{}, errgo.Wrap(err, "parsing permission")
 	}
 
+	scope, legacy := parseTokenScope(access.Scope)
+
 	return UserInfo{
 		RegTime:    time.Unix(u.Regdate, 0),
 		ID:         id,
 		GroupID:    u.GroupID,
 		Permission: perm,
+		Scope:      scope,
+		Legacy:     legacy,
 	}, nil
+}
+
+func parseTokenScope(scope sql.NullString) (Scope, bool) {
+	if !scope.Valid || scope.String == "" {
+		return nil, true
+	}
+
+	var parsed map[string]bool
+	if err := json.Unmarshal([]byte(scope.String), &parsed); err != nil {
+		return Scope{}, false
+	}
+
+	return parsed, false
 }
 
 func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission, error) {
