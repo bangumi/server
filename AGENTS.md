@@ -41,6 +41,7 @@ fx.Provide(user.NewMysqlRepo, subject.NewMysqlRepo, auth.NewService, ...)
 ```
 
 **新增依赖时的步骤**:
+
 1. 在对应构造函数的参数中添加需要的接口/类型
 2. 如果还没有对应的 `fx.Provide`，在 `cmd/web/cmd.go` 的对应位置添加
 3. 新增接口后在 `.mockery.yaml` 添加配置，运行 `task mock` 生成 mock
@@ -93,6 +94,7 @@ func TestMysqlRepo(t *testing.T) {
 
 - 不要在测试中硬编码 `time.Sleep` 等固定等待
 - 空 slice 在 JSON 响应中不能用 `nil`（会被序列化为 `null`），用 `make([]T, 0)`
+
 ## 代码风格
 
 - 行宽上限 120 字符，每个 tab 宽 2 字符
