@@ -28,7 +28,10 @@ func TestParseTokenScope_LegacyEmptyString(t *testing.T) {
 func TestParseTokenScope_Object(t *testing.T) {
 	t.Parallel()
 
-	scope, legacy := parseTokenScope(sql.NullString{Valid: true, String: `{"write:collection":true,"write:indices":false}`})
+	scope, legacy := parseTokenScope(sql.NullString{
+		Valid:  true,
+		String: `{"write:collection":true,"write:indices":false}`,
+	})
 	require.False(t, legacy)
 	require.Equal(t, Scope{"write:collection": true, "write:indices": false}, scope)
 }
