@@ -225,6 +225,10 @@ func exportSubjects(q *query.Query, w io.Writer) {
 		}
 
 		for _, subject := range subjects {
+			if subject.Fields.Redirect != 0 {
+				continue
+			}
+
 			tags, err := subjectDto.ParseTags(subject.Fields.Tags)
 			if err != nil {
 				tags = []model.Tag{}
@@ -332,7 +336,8 @@ type Person struct {
 func exportPersons(q *query.Query, w io.Writer) {
 	for i := model.PersonID(0); i < maxPersonID; i += defaultStep {
 		persons, err := q.WithContext(context.Background()).Person.
-			Where(q.Person.ID.Gt(i), q.Person.ID.Lte(i+defaultStep)).Find()
+			Where(q.Person.ID.Gt(i), q.Person.ID.Lte(i+defaultStep),
+				q.Person.Ban.Eq(0), q.Person.Redirect.Eq(0)).Find()
 		if err != nil {
 			panic(err)
 		}
@@ -403,7 +408,8 @@ type Character struct {
 func exportCharacters(q *query.Query, w io.Writer) {
 	for i := model.CharacterID(0); i < maxCharacterID; i += defaultStep {
 		characters, err := q.WithContext(context.Background()).Character.
-			Where(q.Character.ID.Gt(i), q.Character.ID.Lte(i+defaultStep)).Find()
+			Where(q.Character.ID.Gt(i), q.Character.ID.Lte(i+defaultStep),
+				q.Character.Ban.Eq(0), q.Character.Redirect.Eq(0)).Find()
 		if err != nil {
 			panic(err)
 		}

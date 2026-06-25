@@ -1,6 +1,6 @@
 module github.com/bangumi/server
 
-go 1.26.3
+go 1.26.4
 
 tool github.com/vektra/mockery/v3
 
@@ -10,11 +10,11 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.16
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.101.0
 	github.com/bangumi/wiki-parser-go v0.0.2
-	github.com/bytedance/sonic v1.15.1
+	github.com/bytedance/sonic v1.15.2
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
-	github.com/go-playground/validator/v10 v10.30.2
+	github.com/go-playground/validator/v10 v10.30.3
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/google/uuid v1.6.0
@@ -22,7 +22,7 @@ require (
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/labstack/echo/v5 v5.1.1
-	github.com/mattn/go-colorable v0.1.14
+	github.com/mattn/go-colorable v0.1.15
 	github.com/meilisearch/meilisearch-go v0.36.2
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.23.2
