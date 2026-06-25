@@ -31,10 +31,20 @@ jobs:
 
       - run: govulncheck ./...
 
-      - name: Notify failed build
-        uses: jayqi/failed-build-issue-action@v1.2.0
+      - name: Upsert vulncheck issue
         if: failure()
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          WORKFLOW: ${{ github.workflow }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          SERVER_URL: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
         with:
-          github-token: ${{ github.token }}
-          always-create-new-issue: false
-          label-name: vulncheck
+          filename: .github/vulncheck-issue-template.md
+          update_existing: true
+          search_existing: all
