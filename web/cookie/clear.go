@@ -21,5 +21,5 @@ import (
 )
 
 func Clear(c *echo.Context, key string) {
-	c.SetCookie(&http.Cookie{Name: key, Value: "", SameSite: http.SameSiteLaxMode, HttpOnly: true})
+	c.SetCookie(&http.Cookie{Name: key, Value: "", SameSite: http.SameSiteLaxMode, HttpOnly: true, Secure: true})
 }

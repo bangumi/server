@@ -36,7 +36,7 @@ linters:
     #    - gocyclo
     - godot
     - gomoddirectives
-    - gomodguard
+    - gomodguard_v2
     - goprintffuncname
     - gosec
     - govet
@@ -118,6 +118,8 @@ linters:
     godot:
       scope: declarations
       capital: false
+    goconst:
+      ignore-tests: true
     gosec:
       excludes:
         - G115
