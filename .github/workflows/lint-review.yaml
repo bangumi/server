@@ -12,7 +12,7 @@ env:
   GOTOOLCHAIN: "local"
 
 jobs:
-  lint:
+  lint-review:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

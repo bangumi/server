@@ -22,7 +22,7 @@ env:
   GOTOOLCHAIN: "local"
 
 jobs:
-  test:
+  test-openapi:
     runs-on: "${{ matrix.os }}"
     strategy:
       matrix:

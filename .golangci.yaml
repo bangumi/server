@@ -119,7 +119,7 @@ linters:
       scope: declarations
       capital: false
     goconst:
-      ignore-strings-from-tests: true
+      ignore-tests: true
     gosec:
       excludes:
         - G115
