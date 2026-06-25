@@ -12,11 +12,11 @@ env:
   GOTOOLCHAIN: "local"
 
 jobs:
-  lint:
+  lint-review:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           submodules: true
 
