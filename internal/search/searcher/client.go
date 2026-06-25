@@ -47,7 +47,7 @@ func NeedFirstRun(meili meilisearch.ServiceManager, idx string) (bool, error) {
 		return false, errgo.Wrap(err, fmt.Sprintf("get index %s", idx))
 	}
 
-	stat, err := index.GetStats()
+	stat, err := index.GetStats(&meilisearch.StatsParams{})
 	if err != nil {
 		return false, errgo.Wrap(err, fmt.Sprintf("get index %s stats", idx))
 	}
