@@ -2,6 +2,7 @@
 title: Failed build: Security Vulnerability Check
 labels: vulncheck
 ---
+
 GitHub Actions workflow [{{ env.WORKFLOW }} #{{ env.RUN_NUMBER }}]({{ env.SERVER_URL }}/{{ env.REPOSITORY }}/actions/runs/{{ env.RUN_ID }}) failed.
 
 Event: {{ env.EVENT_NAME }}
