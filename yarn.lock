@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@apidevtools/json-schema-ref-parser@^15.3.5":
+"@apidevtools/json-schema-ref-parser@^15.4.0":
   version "15.4.0"
   resolved "https://registry.yarnpkg.com/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-15.4.0.tgz#b396b2d4204795889a7b37121f839de2d998853e"
   integrity sha512-QbMJJlMZd27fZmi7Q+twCqwABlfaO4Qdc1YvbbwkqN2lILfELnfWfw9xFFl6CeF5jAeGQpokUVhvCkhz+rvEGg==
@@ -169,7 +169,7 @@ oas-validator@^5.0.8:
     should "^13.2.1"
     yaml "^1.10.0"
 
-prettier@^3.8.3:
+prettier@^3.8.4:
   version "3.8.4"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.8.4.tgz#f334f013ac04a96676f24dabc23c1c4ae1bae411"
   integrity sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==

@@ -13,7 +13,7 @@
     "printWidth": 120
   },
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^15.3.5",
+    "@apidevtools/json-schema-ref-parser": "^15.4.0",
     "js-yaml": "^5.1.0",
     "lodash": "^4.18.1",
     "yaml": "^2.9.0"
@@ -22,7 +22,7 @@
     "@types/json-schema": "^7.0.15",
     "colors": "^1.4.0",
     "oas-validator": "^5.0.8",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.4"
   },
   "nodemonConfig": {
     "restartable": "rs",
