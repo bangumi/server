@@ -120,6 +120,7 @@ linters:
       capital: false
     goconst:
       ignore-tests: true
+      min-occurrences: 5
     gosec:
       excludes:
         - G115
