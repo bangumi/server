@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bangumi/server/internal/auth"
@@ -23,7 +23,7 @@ func TestNeedScope_NeedLogin(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := NeedScope(ScopeWriteCollection)(func(c echo.Context) error {
+	h := NeedScope(ScopeWriteCollection)(func(c *echo.Context) error {
 		return nil
 	})
 
@@ -43,7 +43,7 @@ func TestNeedScope_Insufficient(t *testing.T) {
 	a.SetAuth(auth.Auth{Scope: auth.Scope{}})
 	c.Set(ctxkey.User, a)
 
-	h := NeedScope(ScopeWriteCollection)(func(c echo.Context) error {
+	h := NeedScope(ScopeWriteCollection)(func(c *echo.Context) error {
 		return nil
 	})
 
@@ -64,7 +64,7 @@ func TestNeedScope_Match(t *testing.T) {
 	c.Set(ctxkey.User, a)
 
 	reached := false
-	h := NeedScope(ScopeWriteCollection)(func(c echo.Context) error {
+	h := NeedScope(ScopeWriteCollection)(func(c *echo.Context) error {
 		reached = true
 		return nil
 	})
@@ -87,7 +87,7 @@ func TestNeedScope_Legacy(t *testing.T) {
 	c.Set(ctxkey.User, a)
 
 	reached := false
-	h := NeedScope(ScopeWriteCollection)(func(c echo.Context) error {
+	h := NeedScope(ScopeWriteCollection)(func(c *echo.Context) error {
 		reached = true
 		return nil
 	})

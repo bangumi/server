@@ -41,7 +41,7 @@ func NeedLogin(next echo.HandlerFunc) echo.HandlerFunc {
 
 func NeedScope(scope string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			u := accessor.GetFromCtx(c)
 			if !u.Login {
 				return errNeedLogin
