@@ -39,6 +39,8 @@ type UserInfo struct {
 	ID         model.UserID
 	GroupID    user.GroupID
 	Permission Permission
+	Scope      Scope
+	Legacy     bool
 }
 
 // Auth is the basic authorization represent a user.
@@ -48,6 +50,18 @@ type Auth struct {
 	ID         model.UserID // user id
 	GroupID    user.GroupID
 	Permission Permission
+	Scope      Scope
+	Legacy     bool
+}
+
+type Scope map[string]bool
+
+func (u Auth) HasScope(s string) bool {
+	if u.Legacy || u.Scope == nil {
+		return true
+	}
+
+	return u.Scope[s]
 }
 
 const nsfwThreshold = gtime.OneDay * 60

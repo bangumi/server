@@ -47,3 +47,31 @@ func TestNotAllowNsfw(t *testing.T) {
 
 	require.False(t, u.AllowNSFW())
 }
+
+func TestAuthHasScope(t *testing.T) {
+	t.Parallel()
+
+	u := auth.Auth{
+		Scope: auth.Scope{
+			"write:collection": true,
+		},
+	}
+
+	require.True(t, u.HasScope("write:collection"))
+	require.False(t, u.HasScope("write:indices"))
+}
+
+func TestAuthHasScopeLegacy(t *testing.T) {
+	t.Parallel()
+
+	u := auth.Auth{Legacy: true}
+	require.True(t, u.HasScope("write:collection"))
+	require.True(t, u.HasScope("any:scope"))
+}
+
+func TestAuthHasScopeNilScopeCompatible(t *testing.T) {
+	t.Parallel()
+
+	u := auth.Auth{}
+	require.True(t, u.HasScope("write:collection"))
+}
