@@ -93,8 +93,9 @@ func ToSlimSubjectV0(s model.Subject) SlimSubjectV0 {
 		Date:   date,
 		Tags: slice.Map(lo.Slice(s.Tags, 0, 10), func(item model.Tag) SubjectTag {
 			return SubjectTag{
-				Name:  item.Name,
-				Count: item.Count,
+				Name:      item.Name,
+				Count:     item.Count,
+				TotalCont: item.TotalCount,
 			}
 		}),
 		ShortSummary:    gstr.Slice(s.Summary, 0, defaultShortSummaryLength),
@@ -142,8 +143,9 @@ func ToSubjectV0(s model.Subject, totalEpisode int64, metaTags []tag.Tag) Subjec
 		}),
 		Tags: slice.Map(s.Tags, func(tag model.Tag) SubjectTag {
 			return SubjectTag{
-				Name:  tag.Name,
-				Count: tag.Count,
+				Name:      tag.Name,
+				Count:     tag.Count,
+				TotalCont: tag.TotalCount,
 			}
 		}),
 		Collection: SubjectCollectionStat{
