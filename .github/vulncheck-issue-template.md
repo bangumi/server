@@ -1,5 +1,5 @@
 ---
-title: 'Failed build: Security Vulnerability Check'
+title: "Failed build: Security Vulnerability Check"
 labels: vulncheck
 ---
 
