@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@apidevtools/json-schema-ref-parser@^15.4.0":
-  version "15.4.0"
-  resolved "https://registry.yarnpkg.com/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-15.4.0.tgz#b396b2d4204795889a7b37121f839de2d998853e"
-  integrity sha512-QbMJJlMZd27fZmi7Q+twCqwABlfaO4Qdc1YvbbwkqN2lILfELnfWfw9xFFl6CeF5jAeGQpokUVhvCkhz+rvEGg==
+"@apidevtools/json-schema-ref-parser@^15.5.0":
+  version "15.5.0"
+  resolved "https://registry.yarnpkg.com/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-15.5.0.tgz#ba1f1c10a5d423ae55ac926c86543236c4a314dc"
+  integrity sha512-Ps4w0FwrDoeVK6hfYxWkVbkmxm+zN+6xoXF2ZfEhfiox0ZNbcSAiUWO6iAIvP5bc3DB270r+EaKcoT1IUyzfxw==
   dependencies:
     js-yaml "^4.2.0"
 
@@ -169,10 +169,10 @@ oas-validator@^5.0.8:
     should "^13.2.1"
     yaml "^1.10.0"
 
-prettier@^3.8.4:
-  version "3.8.4"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.8.4.tgz#f334f013ac04a96676f24dabc23c1c4ae1bae411"
-  integrity sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==
+prettier@^3.9.6:
+  version "3.9.6"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.6.tgz#b3ea5146515d40fc53f18aa63f74dfab1e10dbf6"
+  integrity sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==
 
 reftools@^1.1.9:
   version "1.1.9"
