@@ -36,9 +36,9 @@ const defaultShortSummaryLength = 120
 type V0wiki = []any
 
 type SubjectTag struct {
-	Name      string `json:"name"`
-	Count     uint   `json:"count"`
-	TotalCont uint   `json:"total_cont"`
+	Name       string `json:"name"`
+	Count      uint   `json:"count"`
+	TotalCount uint   `json:"total_count"`
 }
 
 type SubjectV0 struct {
@@ -93,9 +93,9 @@ func ToSlimSubjectV0(s model.Subject) SlimSubjectV0 {
 		Date:   date,
 		Tags: slice.Map(lo.Slice(s.Tags, 0, 10), func(item model.Tag) SubjectTag {
 			return SubjectTag{
-				Name:      item.Name,
-				Count:     item.Count,
-				TotalCont: item.TotalCount,
+				Name:       item.Name,
+				Count:      item.Count,
+				TotalCount: item.TotalCount,
 			}
 		}),
 		ShortSummary:    gstr.Slice(s.Summary, 0, defaultShortSummaryLength),
@@ -143,9 +143,9 @@ func ToSubjectV0(s model.Subject, totalEpisode int64, metaTags []tag.Tag) Subjec
 		}),
 		Tags: slice.Map(s.Tags, func(tag model.Tag) SubjectTag {
 			return SubjectTag{
-				Name:      tag.Name,
-				Count:     tag.Count,
-				TotalCont: tag.TotalCount,
+				Name:       tag.Name,
+				Count:      tag.Count,
+				TotalCount: tag.TotalCount,
 			}
 		}),
 		Collection: SubjectCollectionStat{

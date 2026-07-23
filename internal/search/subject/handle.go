@@ -378,9 +378,9 @@ func toResponseSubject(s model.Subject, metaTags []tag.Tag) ResponseSubject {
 		}),
 		Tags: slice.Map(s.Tags, func(tag model.Tag) res.SubjectTag {
 			return res.SubjectTag{
-				Name:      tag.Name,
-				Count:     tag.Count,
-				TotalCont: tag.TotalCount,
+				Name:       tag.Name,
+				Count:      tag.Count,
+				TotalCount: tag.TotalCount,
 			}
 		}),
 		Collection: res.SubjectCollectionStat{
