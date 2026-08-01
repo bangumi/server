@@ -1066,7 +1066,7 @@
         "72": {
           "en": "Assistant Director",
           "cn": "副导演",
-          "jp": "助監督 / 監督補佐",
+          "jp": "助監督 / 監督補佐 / 監督助手",
           "categories": [
             {
               "order": 1,
@@ -2441,6 +2441,244 @@
               "cn": "设定类"
             }
           ]
+        },
+        "169": {
+          "en": "Assistant Editor",
+          "cn": "剪辑助理",
+          "jp": "編集助手",
+          "categories": [
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            },
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            }
+          ]
+        },
+        "170": {
+          "en": "Publicity Cooperation",
+          "cn": "宣传协力",
+          "jp": "宣伝協力",
+          "categories": [
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            },
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            }
+          ]
+        },
+        "171": {
+          "en": "Modeling",
+          "cn": "建模/模型",
+          "jp": "モデリング モデラー CGモデラー",
+          "categories": [
+            {
+              "order": 5,
+              "en": "design",
+              "cn": "设定类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "172": {
+          "en": "Look Development",
+          "cn": "视觉开发/外观开发",
+          "jp": "ルックデヴ ルックデベロップメント",
+          "categories": [
+            {
+              "order": 5,
+              "en": "design",
+              "cn": "设定类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            },
+            {
+              "order": 11,
+              "en": "visual",
+              "cn": "视觉类"
+            }
+          ]
+        },
+        "173": {
+          "en": "Animation Director",
+          "cn": "动画导演",
+          "jp": "アニメーションディレクター",
+          "categories": [
+            {
+              "order": 1,
+              "en": "director",
+              "cn": "导演类"
+            },
+            {
+              "order": 4,
+              "en": "animation",
+              "cn": "作画类"
+            }
+          ]
+        },
+        "174": {
+          "en": "Distribution",
+          "cn": "发行",
+          "jp": "配給",
+          "categories": [
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "175": {
+          "en": "Original Work Cooperation",
+          "cn": "原作协力",
+          "jp": "原作協力 原案協力",
+          "categories": [
+            {
+              "order": 2,
+              "en": "storyboard",
+              "cn": "分镜/脚本类"
+            },
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            }
+          ]
+        },
+        "176": {
+          "en": "Production Cooperation",
+          "cn": "製作协力",
+          "jp": "製作協力",
+          "categories": [
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            },
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            }
+          ]
+        },
+        "177": {
+          "en": "Production Supervisor",
+          "cn": "製作统括",
+          "jp": "製作統括",
+          "categories": [
+            {
+              "order": 9,
+              "en": "producer",
+              "cn": "制片类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "178": {
+          "en": "Production Administration",
+          "cn": "制作事务",
+          "jp": "制作事務",
+          "categories": [
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "179": {
+          "en": "OP・ED Animation Production",
+          "cn": "OP・ED 动画制作",
+          "jp": "OP・ED アニメーション制作",
+          "categories": [
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
+        },
+        "180": {
+          "en": "Assistant 3DCG Director",
+          "cn": "3DCG 导演助理",
+          "jp": "3DCG 監督補佐",
+          "categories": [
+            {
+              "order": 1,
+              "en": "director",
+              "cn": "导演类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            },
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            }
+          ]
+        },
+        "181": {
+          "en": "Assistant CG Director",
+          "cn": "CG 导演助理",
+          "jp": "CG 監督補佐",
+          "categories": [
+            {
+              "order": 1,
+              "en": "director",
+              "cn": "导演类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            },
+            {
+              "order": 12,
+              "en": "assistant",
+              "cn": "助理类"
+            }
+          ]
+        },
+        "182": {
+          "en": "Production Producer",
+          "cn": "制作制片人",
+          "jp": "制作プロデューサー",
+          "categories": [
+            {
+              "order": 9,
+              "en": "producer",
+              "cn": "制片类"
+            },
+            {
+              "order": 8,
+              "en": "production",
+              "cn": "制作类"
+            }
+          ]
         }
       },
       "game": {
@@ -2839,6 +3077,35 @@
               "cn": "美术类"
             }
           ]
+        },
+        "1034": {
+          "en": "User Interface",
+          "cn": "UI",
+          "jp": "UI",
+          "categories": [
+            {
+              "order": 4,
+              "en": "design",
+              "cn": "设定类"
+            }
+          ]
+        },
+        "1035": {
+          "en": "Voice Director",
+          "cn": "配音导演",
+          "jp": "",
+          "categories": [
+            {
+              "order": 2,
+              "en": "director",
+              "cn": "导演类"
+            },
+            {
+              "order": 7,
+              "en": "music",
+              "cn": "声音类"
+            }
+          ]
         }
       },
       "book": {
@@ -2906,6 +3173,26 @@
           "en": "Brand",
           "cn": "图书品牌",
           "jp": "ブランド"
+        },
+        "2014": {
+          "en": "Compilation",
+          "cn": "编著",
+          "jp": "編纂 編"
+        },
+        "2015": {
+          "en": "Composition",
+          "cn": "构成",
+          "jp": "構成"
+        },
+        "2016": {
+          "en": "Supervision",
+          "cn": "监修",
+          "jp": "監修"
+        },
+        "2017": {
+          "en": "Commentary",
+          "cn": "解说",
+          "jp": "解説"
         }
       },
       "music": {
@@ -2982,7 +3269,47 @@
         "3015": {
           "en": "Vocal",
           "cn": "声乐",
+          "jp": "ボーカル"
+        },
+        "3016": {
+          "en": "Narration",
+          "cn": "念白/旁白",
+          "jp": "ナレーション"
+        },
+        "3017": {
+          "en": "Vocal Edit",
+          "cn": "人声编辑",
+          "jp": "ボーカルエディット"
+        },
+        "3018": {
+          "en": "Vocal Direction",
+          "cn": "人声指导",
+          "jp": "ボーカルディレクション"
+        },
+        "3019": {
+          "en": "Featured",
+          "cn": "客串",
           "jp": ""
+        },
+        "3020": {
+          "en": "Sound Director",
+          "cn": "音响监督",
+          "jp": "サウンドディレクション"
+        },
+        "3021": {
+          "en": "Choir",
+          "cn": "合唱",
+          "jp": ""
+        },
+        "3022": {
+          "en": "Chorus",
+          "cn": "和声",
+          "jp": "コーラス"
+        },
+        "3023": {
+          "en": "Design",
+          "cn": "设计",
+          "jp": "デザイン"
         }
       },
       "real": {
@@ -3079,7 +3406,7 @@
         "4019": {
           "en": "Present",
           "cn": "出品",
-          "jp": "配給"
+          "jp": ""
         },
         "4020": {
           "en": "ADR Director",
@@ -3095,6 +3422,116 @@
           "en": "Poster",
           "cn": "海报",
           "jp": ""
+        },
+        "4023": {
+          "en": "Planning",
+          "cn": "企划/策划",
+          "jp": "企画"
+        },
+        "4024": {
+          "en": "Assistant Director",
+          "cn": "副导演",
+          "jp": "助監督"
+        },
+        "4025": {
+          "en": "Art",
+          "cn": "美术",
+          "jp": "美術"
+        },
+        "4026": {
+          "en": "Associate Producer",
+          "cn": "联合制片人/副制片人",
+          "jp": "アソシエイトプロデューサー"
+        },
+        "4027": {
+          "en": "Action Director",
+          "cn": "动作导演/武术指导",
+          "jp": "アクション監督"
+        },
+        "4028": {
+          "en": "Stunt Coordinator",
+          "cn": "特技指导",
+          "jp": ""
+        },
+        "4029": {
+          "en": "Tokusatsu Director",
+          "cn": "特摄导演",
+          "jp": "特撮監督"
+        },
+        "4030": {
+          "en": "Special Effects",
+          "cn": "实拍特效",
+          "jp": "SFX"
+        },
+        "4031": {
+          "en": "Visual Effects",
+          "cn": "视觉特效",
+          "jp": "VFX"
+        },
+        "4032": {
+          "en": "3DCG",
+          "cn": "3DCG",
+          "jp": ""
+        },
+        "4033": {
+          "en": "Setting",
+          "cn": "设定",
+          "jp": "設定 デザインワークス"
+        },
+        "4034": {
+          "en": "Character Design",
+          "cn": "人物设计/皮套设计",
+          "jp": "キャラクターデザイン"
+        },
+        "4035": {
+          "en": "Character Modeling",
+          "cn": "造型设计",
+          "jp": "キャラクター造型製作"
+        },
+        "4036": {
+          "en": "Creature Design",
+          "cn": "生物设计",
+          "jp": "クリーチャーデザイン"
+        },
+        "4037": {
+          "en": "Monster Design",
+          "cn": "怪兽设计",
+          "jp": "怪獣デザイン"
+        },
+        "4038": {
+          "en": "Production Company",
+          "cn": "承制方/摄制",
+          "jp": "制作プロダクション"
+        },
+        "4039": {
+          "en": "Publicity",
+          "cn": "宣传",
+          "jp": "宣伝"
+        },
+        "4040": {
+          "en": "Assistance",
+          "cn": "协力",
+          "jp": "協力"
+        },
+        "4041": {
+          "en": "Special Thanks",
+          "cn": "特别鸣谢",
+          "jp": ""
+        },
+        "4042": {
+          "en": "Sound Director",
+          "cn": "音响监督",
+          "jp": ""
+        },
+        "4043": {
+          "en": "Post-Production Editor",
+          "cn": "后期",
+          "jp": ""
+        },
+        "4044": {
+          "en": "Distribution",
+          "cn": "发行",
+          "jp": "配給"
         }
       }
     }
@@ -3165,6 +3602,26 @@
         "en": "Brand",
         "cn": "图书品牌",
         "jp": "ブランド"
+      },
+      "2014": {
+        "en": "Compilation",
+        "cn": "编著",
+        "jp": "編纂 編"
+      },
+      "2015": {
+        "en": "Composition",
+        "cn": "构成",
+        "jp": "構成"
+      },
+      "2016": {
+        "en": "Supervision",
+        "cn": "监修",
+        "jp": "監修"
+      },
+      "2017": {
+        "en": "Commentary",
+        "cn": "解说",
+        "jp": "解説"
       }
     },
     "2": {
@@ -4114,7 +4571,7 @@
       "72": {
         "en": "Assistant Director",
         "cn": "副导演",
-        "jp": "助監督 / 監督補佐",
+        "jp": "助監督 / 監督補佐 / 監督助手",
         "categories": [
           {
             "order": 1,
@@ -5489,6 +5946,244 @@
             "cn": "设定类"
           }
         ]
+      },
+      "169": {
+        "en": "Assistant Editor",
+        "cn": "剪辑助理",
+        "jp": "編集助手",
+        "categories": [
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          },
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          }
+        ]
+      },
+      "170": {
+        "en": "Publicity Cooperation",
+        "cn": "宣传协力",
+        "jp": "宣伝協力",
+        "categories": [
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          },
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          }
+        ]
+      },
+      "171": {
+        "en": "Modeling",
+        "cn": "建模/模型",
+        "jp": "モデリング モデラー CGモデラー",
+        "categories": [
+          {
+            "order": 5,
+            "en": "design",
+            "cn": "设定类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "172": {
+        "en": "Look Development",
+        "cn": "视觉开发/外观开发",
+        "jp": "ルックデヴ ルックデベロップメント",
+        "categories": [
+          {
+            "order": 5,
+            "en": "design",
+            "cn": "设定类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          },
+          {
+            "order": 11,
+            "en": "visual",
+            "cn": "视觉类"
+          }
+        ]
+      },
+      "173": {
+        "en": "Animation Director",
+        "cn": "动画导演",
+        "jp": "アニメーションディレクター",
+        "categories": [
+          {
+            "order": 1,
+            "en": "director",
+            "cn": "导演类"
+          },
+          {
+            "order": 4,
+            "en": "animation",
+            "cn": "作画类"
+          }
+        ]
+      },
+      "174": {
+        "en": "Distribution",
+        "cn": "发行",
+        "jp": "配給",
+        "categories": [
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "175": {
+        "en": "Original Work Cooperation",
+        "cn": "原作协力",
+        "jp": "原作協力 原案協力",
+        "categories": [
+          {
+            "order": 2,
+            "en": "storyboard",
+            "cn": "分镜/脚本类"
+          },
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          }
+        ]
+      },
+      "176": {
+        "en": "Production Cooperation",
+        "cn": "製作协力",
+        "jp": "製作協力",
+        "categories": [
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          },
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          }
+        ]
+      },
+      "177": {
+        "en": "Production Supervisor",
+        "cn": "製作统括",
+        "jp": "製作統括",
+        "categories": [
+          {
+            "order": 9,
+            "en": "producer",
+            "cn": "制片类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "178": {
+        "en": "Production Administration",
+        "cn": "制作事务",
+        "jp": "制作事務",
+        "categories": [
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "179": {
+        "en": "OP・ED Animation Production",
+        "cn": "OP・ED 动画制作",
+        "jp": "OP・ED アニメーション制作",
+        "categories": [
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
+      },
+      "180": {
+        "en": "Assistant 3DCG Director",
+        "cn": "3DCG 导演助理",
+        "jp": "3DCG 監督補佐",
+        "categories": [
+          {
+            "order": 1,
+            "en": "director",
+            "cn": "导演类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          },
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          }
+        ]
+      },
+      "181": {
+        "en": "Assistant CG Director",
+        "cn": "CG 导演助理",
+        "jp": "CG 監督補佐",
+        "categories": [
+          {
+            "order": 1,
+            "en": "director",
+            "cn": "导演类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          },
+          {
+            "order": 12,
+            "en": "assistant",
+            "cn": "助理类"
+          }
+        ]
+      },
+      "182": {
+        "en": "Production Producer",
+        "cn": "制作制片人",
+        "jp": "制作プロデューサー",
+        "categories": [
+          {
+            "order": 9,
+            "en": "producer",
+            "cn": "制片类"
+          },
+          {
+            "order": 8,
+            "en": "production",
+            "cn": "制作类"
+          }
+        ]
       }
     },
     "3": {
@@ -5565,7 +6260,47 @@
       "3015": {
         "en": "Vocal",
         "cn": "声乐",
+        "jp": "ボーカル"
+      },
+      "3016": {
+        "en": "Narration",
+        "cn": "念白/旁白",
+        "jp": "ナレーション"
+      },
+      "3017": {
+        "en": "Vocal Edit",
+        "cn": "人声编辑",
+        "jp": "ボーカルエディット"
+      },
+      "3018": {
+        "en": "Vocal Direction",
+        "cn": "人声指导",
+        "jp": "ボーカルディレクション"
+      },
+      "3019": {
+        "en": "Featured",
+        "cn": "客串",
         "jp": ""
+      },
+      "3020": {
+        "en": "Sound Director",
+        "cn": "音响监督",
+        "jp": "サウンドディレクション"
+      },
+      "3021": {
+        "en": "Choir",
+        "cn": "合唱",
+        "jp": ""
+      },
+      "3022": {
+        "en": "Chorus",
+        "cn": "和声",
+        "jp": "コーラス"
+      },
+      "3023": {
+        "en": "Design",
+        "cn": "设计",
+        "jp": "デザイン"
       }
     },
     "4": {
@@ -5964,6 +6699,35 @@
             "cn": "美术类"
           }
         ]
+      },
+      "1034": {
+        "en": "User Interface",
+        "cn": "UI",
+        "jp": "UI",
+        "categories": [
+          {
+            "order": 4,
+            "en": "design",
+            "cn": "设定类"
+          }
+        ]
+      },
+      "1035": {
+        "en": "Voice Director",
+        "cn": "配音导演",
+        "jp": "",
+        "categories": [
+          {
+            "order": 2,
+            "en": "director",
+            "cn": "导演类"
+          },
+          {
+            "order": 7,
+            "en": "music",
+            "cn": "声音类"
+          }
+        ]
       }
     },
     "6": {
@@ -6060,7 +6824,7 @@
       "4019": {
         "en": "Present",
         "cn": "出品",
-        "jp": "配給"
+        "jp": ""
       },
       "4020": {
         "en": "ADR Director",
@@ -6076,6 +6840,147 @@
         "en": "Poster",
         "cn": "海报",
         "jp": ""
+      },
+      "4023": {
+        "en": "Planning",
+        "cn": "企划/策划",
+        "jp": "企画"
+      },
+      "4024": {
+        "en": "Assistant Director",
+        "cn": "副导演",
+        "jp": "助監督"
+      },
+      "4025": {
+        "en": "Art",
+        "cn": "美术",
+        "jp": "美術"
+      },
+      "4026": {
+        "en": "Associate Producer",
+        "cn": "联合制片人/副制片人",
+        "jp": "アソシエイトプロデューサー"
+      },
+      "4027": {
+        "en": "Action Director",
+        "cn": "动作导演/武术指导",
+        "jp": "アクション監督"
+      },
+      "4028": {
+        "en": "Stunt Coordinator",
+        "cn": "特技指导",
+        "jp": ""
+      },
+      "4029": {
+        "en": "Tokusatsu Director",
+        "cn": "特摄导演",
+        "jp": "特撮監督"
+      },
+      "4030": {
+        "en": "Special Effects",
+        "cn": "实拍特效",
+        "jp": "SFX"
+      },
+      "4031": {
+        "en": "Visual Effects",
+        "cn": "视觉特效",
+        "jp": "VFX"
+      },
+      "4032": {
+        "en": "3DCG",
+        "cn": "3DCG",
+        "jp": ""
+      },
+      "4033": {
+        "en": "Setting",
+        "cn": "设定",
+        "jp": "設定 デザインワークス"
+      },
+      "4034": {
+        "en": "Character Design",
+        "cn": "人物设计/皮套设计",
+        "jp": "キャラクターデザイン"
+      },
+      "4035": {
+        "en": "Character Modeling",
+        "cn": "造型设计",
+        "jp": "キャラクター造型製作"
+      },
+      "4036": {
+        "en": "Creature Design",
+        "cn": "生物设计",
+        "jp": "クリーチャーデザイン"
+      },
+      "4037": {
+        "en": "Monster Design",
+        "cn": "怪兽设计",
+        "jp": "怪獣デザイン"
+      },
+      "4038": {
+        "en": "Production Company",
+        "cn": "承制方/摄制",
+        "jp": "制作プロダクション"
+      },
+      "4039": {
+        "en": "Publicity",
+        "cn": "宣传",
+        "jp": "宣伝"
+      },
+      "4040": {
+        "en": "Assistance",
+        "cn": "协力",
+        "jp": "協力"
+      },
+      "4041": {
+        "en": "Special Thanks",
+        "cn": "特别鸣谢",
+        "jp": ""
+      },
+      "4042": {
+        "en": "Sound Director",
+        "cn": "音响监督",
+        "jp": ""
+      },
+      "4043": {
+        "en": "Post-Production Editor",
+        "cn": "后期",
+        "jp": ""
+      },
+      "4044": {
+        "en": "Distribution",
+        "cn": "发行",
+        "jp": "配給"
+      }
+    }
+  },
+  "presentation": {
+    "2": {
+      "groups": {
+        "source": [1, 29, 175],
+        "directors": [74, 2, 41, 49, 72, 173, 89],
+        "screenplay": [10, 150, 151, 147, 148, 3, 149],
+        "episode_direction": [4, 104, 105, 5, 91, 130, 129, 138],
+        "preproduction": [7, 8, 106, 107, 142, 16, 112, 145, 50, 19, 113, 146, 43, 115, 114, 98, 103, 143],
+        "animation": [14, 110, 15, 90, 141, 140, 70, 77, 88, 111, 109, 108, 9, 92, 20, 21, 22, 51, 27, 139],
+        "in_show": [132, 131],
+        "supervision": [18, 134, 133, 144, 137, 102, 101],
+        "postproduction": [
+          13, 165, 26, 95, 94, 93, 47, 160, 11, 164, 71, 96, 97, 25, 17, 166, 82, 136, 135, 69, 181, 86, 180, 158, 171,
+          172, 157, 75, 100, 99, 28, 169, 156, 155, 60
+        ],
+        "sound": [44, 48, 57, 45, 161, 154, 46, 117, "记录", 39, 153, 40, 152],
+        "music": [6, 116, 85, 65, 55, 32, 31, 30, 33, 118, 119, 120, 34, 73, 128, 179],
+        "animation_production": [67, 76, 123, 87, 182, 124, 37, 167, 84, 168, 125, 24, 62, 178, 56, 83, 163, 162],
+        "producers": [52, 58, 54, 59, 122, 23, 53, 121, 159, 38, 170, 64, 61, 36, 35, 127, 80, 63, 42, 177, 176, 174],
+        "cooperation": [81, 66]
+      },
+      "folded": {
+        "positions": [
+          175, 149, 104, 105, 91, 115, 110, 90, 20, 21, 22, 51, 27, 165, 26, 95, 94, 93, 164, 25, 166, 82, 181, 180,
+          171, 172, 157, 75, 100, 99, 169, 40, 55, 179, 76, 167, 168, 24, 62, 178, 56, 83, 163, 162, 23, 53, 38, 170,
+          61, 127, 176
+        ],
+        "keys": ["颜色检查", "茶水", "其他电视台", "顾问", "仕上"]
       }
     }
   }
