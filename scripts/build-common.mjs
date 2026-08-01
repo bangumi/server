@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 
 import * as yaml from "yaml";
 
-const data = yaml.parse(fs.readFileSync("pkg/vars/common/subject_platforms.yml", "utf-8"));
+const data = yaml.parse(fs.readFileSync("pkg/vars/common/subject_platforms.yml", "utf-8"), { maxAliasCount: -1 });
 
 const platforms = Object.fromEntries(Object.entries(data.platforms).filter(([key, value]) => /\d/.test(key)));
 
