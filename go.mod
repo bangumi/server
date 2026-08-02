@@ -19,7 +19,7 @@ require (
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
-	github.com/jarcoal/httpmock v1.4.1
+	github.com/jarcoal/httpmock v1.4.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/labstack/echo/v5 v5.2.1
 	github.com/mattn/go-colorable v0.1.15
