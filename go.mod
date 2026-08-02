@@ -33,7 +33,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
 	github.com/trim21/errgo v0.0.6
-	github.com/trim21/go-phpserialize v0.1.2
+	github.com/trim21/go-phpserialize v0.1.4
 	github.com/trim21/htest v0.0.4
 	go.uber.org/fx v1.24.0
 	go.uber.org/zap v1.28.0
