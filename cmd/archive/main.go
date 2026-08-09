@@ -594,12 +594,20 @@ type PersonRelation struct {
 }
 
 func exportPersonRelations(q *query.Query, w io.Writer) {
-	for i := model.PersonID(0); i < maxPersonID; i += defaultStep {
+	// chii_person_relations 是异构表（person_type 为 prsn/crt），
+	// person_id 不映射到任何单一实体表的主键，因此按本表自增主键 rlt_id 翻页，
+	// 不引用外部 ID 上界。
+	var cursor uint32
+	for {
 		relations, err := q.WithContext(context.Background()).PersonRelation.
-			Order(q.PersonRelation.PersonID, q.PersonRelation.PersonID).
-			Where(q.PersonRelation.PersonID.Gt(i), q.PersonRelation.PersonID.Lte(i+defaultStep)).Find()
+			Where(q.PersonRelation.ID.Gt(cursor)).
+			Order(q.PersonRelation.ID).
+			Limit(defaultStep).Find()
 		if err != nil {
 			panic(err)
+		}
+		if len(relations) == 0 {
+			break
 		}
 
 		for _, rel := range relations {
@@ -612,6 +620,8 @@ func exportPersonRelations(q *query.Query, w io.Writer) {
 				Ended:           rel.Ended,
 			})
 		}
+
+		cursor = relations[len(relations)-1].ID
 	}
 }
 
