@@ -26,7 +26,7 @@ require (
 	github.com/meilisearch/meilisearch-go v0.36.3
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.24.1
-	github.com/redis/rueidis v1.0.76
+	github.com/redis/rueidis v1.0.77
 	github.com/samber/lo v1.53.0
 	github.com/segmentio/kafka-go v0.4.51
 	github.com/spf13/cobra v1.10.2
@@ -110,7 +110,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
 	golang.org/x/arch v0.17.0 // indirect
 	golang.org/x/crypto v0.56.0 // indirect
