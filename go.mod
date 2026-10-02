@@ -13,7 +13,7 @@ require (
 	github.com/bytedance/sonic v1.15.4
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/go-playground/locales v0.14.2
-	github.com/go-playground/universal-translator v0.18.1
+	github.com/go-playground/universal-translator v0.18.2
 	github.com/go-playground/validator/v10 v10.30.3
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/go-sql-driver/mysql v1.10.1
