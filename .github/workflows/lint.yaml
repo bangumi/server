@@ -35,6 +35,6 @@ jobs:
           cache-namespace: lint
 
       - name: Run linters
-        uses: golangci/golangci-lint-action@v9.2.1
+        uses: golangci/golangci-lint-action@v9.3.0
         with:
-          version: v2.12.2
+          version: v2.15.0
