@@ -5,6 +5,7 @@
   "prConcurrentLimit": 3,
   "extends": [
     "local>Trim21/renovate-config",
+    "local>Trim21/renovate-config:js",
     "local>Trim21/renovate-config:go",
     "local>Trim21/renovate-config:app",
     "local>Trim21/renovate-config:monthly"
