@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 	"slices"
-	"sort"
 	"strings"
 	"time"
 
@@ -40,6 +39,7 @@ import (
 	"github.com/bangumi/server/internal/collections/domain/collection"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/dam"
+	"github.com/bangumi/server/internal/pkg/generic/slice"
 	"github.com/bangumi/server/internal/pkg/gmap"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/pkg/serialize"
@@ -60,19 +60,40 @@ type mysqlRepo struct {
 	log *zap.Logger
 }
 
-func (r mysqlRepo) getSubjectCollection(
-	ctx context.Context, user model.UserID, subject model.SubjectID,
-) (*dao.SubjectCollection, error) {
-	s, err := r.q.SubjectCollection.WithContext(ctx).
-		Where(
-			r.q.SubjectCollection.UserID.Eq(user),
-			r.q.SubjectCollection.SubjectID.Eq(subject),
-		).Take()
-	if err != nil {
-		return nil, gerr.WrapGormError(err)
+func lockSubjectCollection(
+	ctx context.Context, tx *query.Query, userID model.UserID, subject model.Subject, allowCreate bool,
+) (*dao.SubjectCollection, bool, error) {
+	if allowCreate {
+		obj := &dao.SubjectCollection{
+			SubjectID:   subject.ID,
+			SubjectType: subject.TypeID,
+			UserID:      userID,
+			Type:        uint8(collection.SubjectCollectionDoing),
+		}
+		// 键冲突时保留现有收藏。MySQL 驱动按实际变更计数，原值写回计为零行。
+		result := tx.DB().WithContext(ctx).Clauses(clause.OnConflict{
+			DoUpdates: clause.Assignments(map[string]any{"interest_id": gorm.Expr("interest_id")}),
+		}).Create(obj)
+		if result.Error != nil {
+			return nil, false, errgo.Wrap(result.Error, "ensure subject collection")
+		}
+		if result.RowsAffected == 1 {
+			return obj, true, nil
+		}
 	}
 
-	return s, nil
+	obj, err := tx.SubjectCollection.WithContext(ctx).
+		Where(tx.SubjectCollection.UserID.Eq(userID), tx.SubjectCollection.SubjectID.Eq(subject.ID)).
+		Clauses(clause.Locking{Strength: "UPDATE"}).Take()
+	if err != nil {
+		err = gerr.WrapGormError(err)
+		if errors.Is(err, gerr.ErrNotFound) {
+			return nil, false, gerr.ErrSubjectNotCollected
+		}
+		return nil, false, errgo.Wrap(err, "lock subject collection")
+	}
+
+	return obj, false, nil
 }
 
 func (r mysqlRepo) convertToSubjectCollection(s *dao.SubjectCollection) (*collection.Subject, error) {
@@ -97,14 +118,7 @@ func (r mysqlRepo) UpdateSubjectCollection(
 	ip string,
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 ) error {
-	s, err := r.getSubjectCollection(ctx, userID, subject.ID)
-	if err != nil {
-		if errors.Is(err, gerr.ErrNotFound) {
-			return gerr.ErrSubjectNotCollected
-		}
-		return err
-	}
-	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
+	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, false /* allowCreate */)
 }
 
 func (r mysqlRepo) UpdateOrCreateSubjectCollection(
@@ -115,14 +129,7 @@ func (r mysqlRepo) UpdateOrCreateSubjectCollection(
 	ip string,
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
 ) error {
-	s, err := r.getSubjectCollection(ctx, userID, subject.ID)
-	if err != nil {
-		if !errors.Is(err, gerr.ErrNotFound) {
-			return err
-		}
-		s = nil
-	}
-	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, s)
+	return r.updateOrCreateSubjectCollection(ctx, userID, subject, at, ip, update, true /* allowCreate */)
 }
 
 //nolint:funlen
@@ -133,77 +140,58 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 	at time.Time,
 	ip string,
 	update func(ctx context.Context, s *collection.Subject) (*collection.Subject, error),
-	obj *dao.SubjectCollection,
+	allowCreate bool,
 ) error {
-	created := obj == nil
-	if created {
-		obj = &dao.SubjectCollection{
-			SubjectID:   subject.ID,
-			SubjectType: subject.TypeID,
-			UserID:      userID,
-			Type:        uint8(collection.SubjectCollectionDoing),
-		}
-	}
-	collectionSubject, err := r.convertToSubjectCollection(obj)
-	if err != nil {
-		return errgo.Trace(err)
-	}
-
-	original := *collectionSubject
-
-	relatedTags := slices.Clone(original.Tags())
-	slices.Sort(relatedTags)
-
-	// Update subject collection
-	s, err := update(ctx, collectionSubject)
-	if err != nil {
-		return errgo.Trace(err)
-	}
-
-	originalCollection := *obj
-
-	if err = r.updateSubjectCollection(obj, &original, s, at, ip, created); err != nil {
-		return errgo.Trace(err)
-	}
-
-	newTags := slices.Clone(s.Tags())
-	slices.Sort(newTags)
-
-	err = r.q.Transaction(func(tx *query.Query) error {
-		sanitizedTags, txErr := r.updateUserTags(ctx, tx, userID, subject, at, s)
-		if txErr != nil {
-			return errgo.Trace(txErr)
-		}
-
-		sort.Strings(sanitizedTags)
-
-		obj.Tag = strings.Join(sanitizedTags, " ")
-
-		return errgo.Trace(r.q.SubjectCollection.WithContext(ctx).Clauses(clause.OnConflict{UpdateAll: true}).Create(obj))
-	})
-	if err != nil {
-		return err
-	}
-
-	if slices.Equal(relatedTags, newTags) {
-		relatedTags = nil
-	} else {
-		relatedTags = lo.Uniq(append(relatedTags, newTags...))
-	}
-
-	if len(relatedTags) != 0 {
-		err = r.q.Transaction(func(tx *query.Query) error {
-			return r.reCountSubjectTags(ctx, tx, subject, relatedTags)
-		})
+	var originalRate, updatedRate uint8
+	err := r.q.Transaction(func(tx *query.Query) error {
+		obj, created, err := lockSubjectCollection(ctx, tx, userID, subject, allowCreate)
 		if err != nil {
 			return errgo.Trace(err)
 		}
+		originalRate = obj.Rate
+		collectionSubject, err := r.convertToSubjectCollection(obj)
+		if err != nil {
+			return errgo.Trace(err)
+		}
+		original := *collectionSubject
+		s, err := update(ctx, collectionSubject)
+		if err != nil {
+			return errgo.Trace(err)
+		}
+		if updateErr := r.updateSubjectCollection(obj, &original, s, at, ip, created); updateErr != nil {
+			return errgo.Trace(updateErr)
+		}
+
+		var affected []uint32
+		if s.TagsSet() {
+			var tags []string
+			tags, affected, err = r.updateUserTags(ctx, tx, userID, subject, at, s.Tags())
+			if err != nil {
+				return errgo.Trace(err)
+			}
+			slices.Sort(tags)
+			obj.Tag = strings.Join(tags, " ")
+		}
+		updatedRate = obj.Rate
+		if _, writeErr := tx.SubjectCollection.WithContext(ctx).
+			Where(tx.SubjectCollection.ID.Eq(obj.ID)).Select(field.ALL).
+			Omit(tx.SubjectCollection.ID, tx.SubjectCollection.UserID, tx.SubjectCollection.SubjectID).
+			Updates(obj); writeErr != nil {
+			return errgo.Wrap(writeErr, "update subject collection")
+		}
+		if len(affected) != 0 {
+			return r.reCountSubjectTags(ctx, tx, subject.ID, affected)
+		}
+		return nil
+	})
+	if err != nil {
+		return errgo.Wrap(err, "save subject collection and tags")
 	}
 
 	r.updateSubject(ctx, subject.ID)
 
-	if obj.Rate != originalCollection.Rate {
-		if err := r.reCountSubjectRate(ctx, subject.ID, originalCollection.Rate, obj.Rate); err != nil {
+	if updatedRate != originalRate {
+		if err := r.reCountSubjectRate(ctx, subject.ID, originalRate, updatedRate); err != nil {
 			r.log.Error("failed to update collection counts", zap.Error(err), zap.Uint32("subject_id", subject.ID))
 		}
 	}
@@ -211,45 +199,99 @@ func (r mysqlRepo) updateOrCreateSubjectCollection(
 	return nil
 }
 
-//nolint:funlen
 func (r mysqlRepo) updateUserTags(ctx context.Context,
 	q *query.Query,
 	userID model.UserID, subject model.Subject,
-	at time.Time, s *collection.Subject) ([]string, error) {
-	tx := q.WithContext(ctx)
-
-	if (len(s.Tags())) == 0 {
-		_, err := tx.TagList.Where(q.TagList.UID.Eq(userID),
-			q.TagList.Mid.Eq(subject.ID),
-			q.TagList.Cat.Eq(model.TagCatSubject)).Delete()
-		return nil, errgo.Trace(err)
+	at time.Time, names []string) ([]string, []uint32, error) {
+	// 先锁条目扩展行再读取标签，读快照才能包含同一条目上一次提交的修改。
+	if _, err := q.SubjectField.WithContext(ctx).Select(q.SubjectField.Sid).
+		Where(q.SubjectField.Sid.Eq(subject.ID)).Clauses(clause.Locking{Strength: "UPDATE"}).Find(); err != nil {
+		return nil, nil, errgo.Wrap(err, "lock subject field")
 	}
 
-	tags, err := tx.TagIndex.Select().
-		Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
-			q.TagIndex.Type.Eq(subject.TypeID)).Find()
+	tags, err := r.resolveSubjectTags(ctx, q, subject.TypeID, at, names)
 	if err != nil {
-		return nil, errgo.Trace(err)
+		return nil, nil, errgo.Trace(err)
 	}
 
-	var existsTags = lo.SliceToMap(tags, func(item *dao.TagIndex) (string, bool) {
-		return strings.ToLower(item.Name), true
-	})
+	links := q.TagList.WithContext(ctx).Where(
+		q.TagList.UID.Eq(userID), q.TagList.Mid.Eq(subject.ID),
+		q.TagList.Cat.Eq(model.TagCatSubject),
+	).Session(&gorm.Session{})
+	oldLinks, err := links.Select(q.TagList.Tid).Find()
+	if err != nil {
+		return nil, nil, errgo.Wrap(err, "read collection tag links")
+	}
+	oldIDs := lo.Map(oldLinks, func(link *dao.TagList, _ int) uint32 { return link.Tid })
+	newIDs := lo.Map(tags, func(tag *dao.TagIndex, _ int) uint32 { return tag.ID })
+	slices.Sort(oldIDs)
+	slices.Sort(newIDs)
+	sanitized := slice.Map(tags, func(tag *dao.TagIndex) string { return tag.Name })
+	if slices.Equal(oldIDs, newIDs) {
+		return sanitized, nil, nil
+	}
 
-	var missingTags []string
-	for _, tag := range s.Tags() {
-		if !existsTags[strings.ToLower(tag)] {
-			missingTags = append(missingTags, tag)
+	if len(oldIDs) != 0 {
+		if _, err := links.Delete(); err != nil {
+			return nil, nil, errgo.Wrap(err, "delete collection tag links")
 		}
 	}
+	if len(newIDs) != 0 {
+		rows := lo.Map(newIDs, func(id uint32, _ int) *dao.TagList {
+			return &dao.TagList{
+				Tid:         id,
+				UID:         userID,
+				Cat:         model.TagCatSubject,
+				Type:        subject.TypeID,
+				Mid:         subject.ID,
+				CreatedTime: uint32(at.Unix()),
+			}
+		})
+		if err := q.TagList.WithContext(ctx).Create(rows...); err != nil {
+			return nil, nil, errgo.Wrap(err, "insert collection tag links")
+		}
+	}
+	return sanitized, lo.Uniq(append(oldIDs, newIDs...)), nil
+}
+
+func (r mysqlRepo) resolveSubjectTags(ctx context.Context, q *query.Query,
+	subjectType model.SubjectType, at time.Time, names []string) ([]*dao.TagIndex, error) {
+	if len(names) == 0 {
+		return nil, nil
+	}
+	names = lo.UniqBy(names, strings.ToLower)
+	tagIndex := q.TagIndex.WithContext(ctx)
+	find := func() (map[string]*dao.TagIndex, error) {
+		tags, err := tagIndex.
+			Where(q.TagIndex.Name.In(names...), q.TagIndex.Cat.Eq(model.TagCatSubject),
+				q.TagIndex.Type.Eq(subjectType)).Order(q.TagIndex.ID.Asc()).Find()
+		if err != nil {
+			return nil, err
+		}
+		byName := make(map[string]*dao.TagIndex, len(tags))
+		for _, tag := range tags {
+			key := strings.ToLower(tag.Name)
+			if byName[key] == nil {
+				byName[key] = tag
+			}
+		}
+		return byName, nil
+	}
+
+	byName, err := find()
+	if err != nil {
+		return nil, errgo.Wrap(err, "find subject tags")
+	}
+
+	missingTags := lo.Filter(names, func(name string, _ int) bool { return byName[strings.ToLower(name)] == nil })
 
 	if len(missingTags) > 0 {
 		r.log.Info("create missing tags", zap.Strings("missing_tags", missingTags))
-		err = tx.TagIndex.Create(lo.Map(missingTags, func(item string, index int) *dao.TagIndex {
+		err = tagIndex.Create(lo.Map(missingTags, func(item string, _ int) *dao.TagIndex {
 			return &dao.TagIndex{
 				Name:        item,
 				Cat:         model.TagCatSubject,
-				Type:        subject.TypeID,
+				Type:        subjectType,
 				Results:     1,
 				CreatedTime: uint32(at.Unix()),
 				UpdatedTime: uint32(at.Unix()),
@@ -257,83 +299,43 @@ func (r mysqlRepo) updateUserTags(ctx context.Context,
 		})...)
 
 		if err != nil {
-			return nil, errgo.Trace(err)
+			return nil, errgo.Wrap(err, "create subject tags")
+		}
+		byName, err = find()
+		if err != nil {
+			return nil, errgo.Wrap(err, "find subject tags after creation")
 		}
 	}
-
-	tags, err = tx.TagIndex.Select().
-		Where(q.TagIndex.Name.In(s.Tags()...), q.TagIndex.Cat.Eq(model.TagCatSubject),
-			q.TagIndex.Type.Eq(subject.TypeID)).Find()
-	if err != nil {
-		return nil, errgo.Trace(err)
+	// SQL 可能把 cafe 和 café 都查出来，这里只取请求中匹配的标签。
+	tags := slice.MapFilter(names, func(name string) (*dao.TagIndex, bool) {
+		tag := byName[strings.ToLower(name)]
+		return tag, tag != nil
+	})
+	if len(tags) != len(names) {
+		return nil, fmt.Errorf("resolve subject tags: matched %d of %d names", len(tags), len(names))
 	}
-
-	err = tx.TagList.Clauses(clause.OnConflict{DoNothing: true}).
-		Create(lo.Map(tags, func(item *dao.TagIndex, index int) *dao.TagList {
-			return &dao.TagList{
-				Tid:         item.ID,
-				UID:         s.User(),
-				Cat:         model.TagCatSubject,
-				Type:        subject.TypeID,
-				Mid:         subject.ID,
-				CreatedTime: uint32(at.Unix()),
-			}
-		})...)
-	if err != nil {
-		return nil, errgo.Trace(err)
-	}
-
-	return lo.Map(tags, func(item *dao.TagIndex, index int) string {
-		return item.Name
-	}), nil
+	return tags, nil
 }
 
-//nolint:funlen
 func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
-	s model.Subject, relatedTags []string) error {
-	tagIndexs, err := tx.WithContext(ctx).TagIndex.Select().
-		Where(
-			tx.TagIndex.Cat.Eq(model.TagCatSubject),
-			tx.TagIndex.Name.In(relatedTags...),
-			tx.TagIndex.Type.Eq(s.TypeID),
-		).Order(tx.TagIndex.ID.Asc()).Find()
-	if err != nil {
-		return err
-	}
-
-	// tag in (...) 操作不区分大小写，使用第一次出现的 tag
-	// 比如 {name="Galgame"} {name="galgame"} 在过滤后会只保留 {name="Galgame"}
-	seen := make(map[string]bool)
-	tagIndexs = lo.Filter(tagIndexs, func(item *dao.TagIndex, index int) bool {
-		n := strings.ToLower(item.Name)
-		if seen[n] {
-			return false
-		}
-		seen[n] = true
-		return true
-	})
-
+	subjectID model.SubjectID, affected []uint32) error {
 	db := tx.DB().WithContext(ctx)
 
-	err = db.Exec(`
+	err := db.Exec(`
 			update chii_tag_neue_index as ti
 				set tag_results = (
 					select count(1)
 						 from chii_tag_neue_list as tl
 						 where tl.tlt_cat = ti.tag_cat AND tl.tlt_tid = ti.tag_id and tl.tlt_type = ti.tag_type
 				 )
-			where ti.tag_cat = ? AND ti.tag_type = ? AND ti.tag_id IN ?
-	`, model.TagCatSubject, s.TypeID,
-		lo.Uniq(lo.Map(tagIndexs, func(item *dao.TagIndex, index int) uint32 {
-			return item.ID
-		})),
-	).Error
+			where ti.tag_cat = ? AND ti.tag_id IN ?
+	`, model.TagCatSubject, affected).Error
 	if err != nil {
 		return errgo.Trace(err)
 	}
 
 	tagList, err := tx.WithContext(ctx).TagList.Preload(tx.TagList.Tag).
-		Where(tx.TagList.Cat.Eq(model.TagCatSubject), tx.TagList.Mid.Eq(s.ID)).Find()
+		Where(tx.TagList.Cat.Eq(model.TagCatSubject), tx.TagList.Mid.Eq(subjectID)).Find()
 	if err != nil {
 		return errgo.Trace(err)
 	}
@@ -369,7 +371,7 @@ func (r mysqlRepo) reCountSubjectTags(ctx context.Context, tx *query.Query,
 		return errgo.Wrap(err, "php.Marshal")
 	}
 
-	_, err = tx.WithContext(ctx).SubjectField.Where(r.q.SubjectField.Sid.Eq(s.ID)).
+	_, err = tx.WithContext(ctx).SubjectField.Where(r.q.SubjectField.Sid.Eq(subjectID)).
 		UpdateSimple(r.q.SubjectField.Tags.Value(newTag))
 
 	return errgo.Wrap(err, "failed to update subject field")
@@ -388,7 +390,6 @@ func (r mysqlRepo) updateSubjectCollection(
 	obj.UpdatedTime = uint32(at.Unix())
 	obj.Comment = utiltype.HTMLEscapedString(s.Comment())
 	obj.HasComment = s.Comment() != ""
-	obj.Tag = strings.Join(s.Tags(), " ")
 	obj.EpStatus = s.Eps()
 	obj.VolStatus = s.Vols()
 	obj.Rate = s.Rate()

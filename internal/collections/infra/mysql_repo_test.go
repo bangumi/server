@@ -233,6 +233,8 @@ func TestMysqlRepo_UpdateOrCreateSubjectCollection(t *testing.T) {
 	})
 
 	test.RunAndCleanup(t, func() {
+		lo.Must(q.TagList.WithContext(context.TODO()).Where(q.TagList.UID.Eq(uid), q.TagList.Mid.Eq(sid),
+			q.TagList.Cat.Eq(model.TagCatSubject)).Delete())
 		lo.Must(table.WithContext(context.TODO()).Where(field.Or(table.SubjectID.Eq(sid), table.UserID.Eq(uid))).Delete())
 	})
 
@@ -385,6 +387,69 @@ func TestMysqlRepo_UpdateSubjectCollection(t *testing.T) {
 	require.NoError(t, err)
 
 	require.EqualValues(t, 8, r.Rate)
+}
+
+func TestMysqlRepo_ReplaceSubjectCollectionTags(t *testing.T) {
+	test.RequireEnv(t, test.EnvMysql)
+	t.Parallel()
+
+	const uid, otherUID model.UserID = 35100, 35101
+	subject := model.Subject{ID: 13100, TypeID: model.SubjectTypeMusic}
+	otherSubject := model.Subject{ID: 13101, TypeID: subject.TypeID}
+	const a, b = "test-replace-a", "test-replace-b"
+
+	repo, q := getRepo(t)
+	ctx := context.Background()
+	db := q.WithContext(ctx)
+	tagIndex := db.TagIndex.Where(q.TagIndex.Cat.Eq(model.TagCatSubject),
+		q.TagIndex.Type.Eq(subject.TypeID), q.TagIndex.Name.In(a, b)).WithContext(ctx)
+	links := db.TagList.Where(q.TagList.Cat.Eq(model.TagCatSubject), q.TagList.UID.In(uid, otherUID)).WithContext(ctx)
+	test.RunAndCleanup(t, func() {
+		lo.Must(links.Where(q.TagList.Mid.In(subject.ID, otherSubject.ID)).Delete())
+		lo.Must(tagIndex.Delete())
+		lo.Must(db.SubjectCollection.Where(q.SubjectCollection.SubjectID.In(subject.ID, otherSubject.ID),
+			q.SubjectCollection.UserID.In(uid, otherUID)).Delete())
+		lo.Must(db.SubjectField.Where(q.SubjectField.Sid.In(subject.ID, otherSubject.ID)).Delete())
+	})
+	require.NoError(t, db.SubjectField.Create(
+		&dao.SubjectField{Sid: subject.ID, Tags: []byte("")},
+		&dao.SubjectField{Sid: otherSubject.ID, Tags: []byte("")},
+	))
+
+	setTags := func(tag string) func(context.Context, *collection.Subject) (*collection.Subject, error) {
+		return func(_ context.Context, s *collection.Subject) (*collection.Subject, error) {
+			return s, s.UpdateTags([]string{tag})
+		}
+	}
+	now := time.Now()
+	require.NoError(t, repo.UpdateOrCreateSubjectCollection(ctx, otherUID, otherSubject, now, "", setTags(b)))
+	require.NoError(t, repo.UpdateOrCreateSubjectCollection(ctx, otherUID, subject, now, "", setTags(b)))
+	require.NoError(t, repo.UpdateOrCreateSubjectCollection(ctx, uid, subject, now, "", setTags(a)))
+	require.NoError(t, repo.UpdateSubjectCollection(ctx, uid, subject, now.Add(time.Second), "", setTags(b)))
+
+	collect, err := repo.GetSubjectCollection(ctx, uid, subject.ID)
+	require.NoError(t, err)
+	require.Equal(t, []string{b}, collect.Tags)
+
+	index, err := tagIndex.Find()
+	require.NoError(t, err)
+	ids := lo.SliceToMap(index, func(tag *dao.TagIndex) (uint32, string) { return tag.ID, tag.Name })
+	counts := lo.SliceToMap(index, func(tag *dao.TagIndex) (string, uint32) { return tag.Name, tag.Results })
+	require.Equal(t, map[string]uint32{a: 0, b: 3}, counts)
+
+	rows, err := links.Where(q.TagList.Mid.Eq(subject.ID)).Find()
+	require.NoError(t, err)
+	byUser := make(map[model.UserID][]string)
+	for _, row := range rows {
+		byUser[row.UID] = append(byUser[row.UID], ids[row.Tid])
+	}
+	require.Equal(t, map[model.UserID][]string{uid: {b}, otherUID: {b}}, byUser)
+
+	row, err := db.SubjectField.Where(q.SubjectField.Sid.Eq(subject.ID)).Take()
+	require.NoError(t, err)
+	tags, err := subject2.ParseTags(row.Tags)
+	require.NoError(t, err)
+	require.Equal(t, []model.Tag{{Name: b, Count: 2, TotalCount: 3}}, tags)
 }
 
 func TestMysqlRepo_UpdateSubjectCollectionType(t *testing.T) {
