@@ -19,7 +19,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -103,30 +102,15 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 }
 
 func parseTokenScope(scope sql.NullString) (Scope, bool) {
-	if !scope.Valid || scope.String == "" || scope.String == "null" {
+	if !scope.Valid || scope.String == "" {
 		return nil, true
 	}
 
-	parsed := make(Scope)
-	raw := strings.TrimSpace(scope.String)
-	if strings.HasPrefix(raw, "{") {
-		if err := json.Unmarshal([]byte(raw), &parsed); err != nil {
-			return Scope{}, false
-		}
-		return parsed, false
+	var parsed map[string]bool
+	if err := json.Unmarshal([]byte(scope.String), &parsed); err != nil {
+		return Scope{}, false
 	}
 
-	var names []string
-	if strings.HasPrefix(raw, "[") {
-		if err := json.Unmarshal([]byte(raw), &names); err != nil {
-			return Scope{}, false
-		}
-	} else {
-		names = strings.Fields(raw)
-	}
-	for _, name := range names {
-		parsed[name] = true
-	}
 	return parsed, false
 }
 
