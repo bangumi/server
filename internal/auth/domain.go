@@ -44,7 +44,7 @@ type UserInfo struct {
 	RegTime    time.Time
 	ID         model.UserID
 	GroupID    user.GroupID
-	Permission Permission
+	Permission PersonalPermission
 	Scope      Scope
 	Legacy     bool
 }
@@ -133,64 +133,97 @@ type Permission struct {
 	Report             bool
 	ManageApp          bool
 	AppErase           bool
-
-	DefinedFields []string // The explicit overrides. A nil slice denotes a plain Permission.
 }
 
-func (p Permission) Merge(other Permission) Permission {
-	if other.DefinedFields != nil {
-		if len(other.DefinedFields) == 0 {
-			return p
-		}
-		target := phpPermissionFields(&p)
-		overrides := phpPermissionFields(&other)
-		for _, name := range other.DefinedFields {
-			if field, ok := target[name]; ok {
-				*field = *overrides[name]
-			}
-		}
-		return p
+// PersonalPermission is a partial permission set read from chii_members.acl.
+// A nil field is not set and inherits the user group permission.
+type PersonalPermission struct {
+	UserList           *bool
+	ManageUserGroup    *bool
+	ManageUserPhoto    *bool
+	ManageTopicState   *bool
+	ManageReport       *bool
+	UserBan            *bool
+	ManageUser         *bool
+	UserGroup          *bool
+	UserWikiApply      *bool
+	UserWikiApprove    *bool
+	DoujinSubjectErase *bool
+	DoujinSubjectLock  *bool
+	SubjectEdit        *bool
+	SubjectLock        *bool
+	SubjectRefresh     *bool
+	SubjectRelated     *bool
+	SubjectMerge       *bool
+	SubjectErase       *bool
+	SubjectCoverLock   *bool
+	SubjectCoverErase  *bool
+	MonoEdit           *bool
+	MonoLock           *bool
+	MonoMerge          *bool
+	MonoErase          *bool
+	BanPost            *bool
+	BanPostGroup       *bool
+	BanPostGroupNSFW   *bool
+	BanSubjectInterest *bool
+	BanVisit           *bool
+	Deleted            *bool
+	EpEdit             *bool
+	EpMove             *bool
+	EpMerge            *bool
+	EpLock             *bool
+	EpErase            *bool
+	Report             *bool
+	ManageApp          *bool
+	AppErase           *bool
+}
+
+func mergeBool(group bool, personal *bool) bool {
+	if personal != nil {
+		return *personal
 	}
+	return group
+}
 
+func (p Permission) Merge(personal PersonalPermission) Permission {
 	return Permission{
-		UserBan:            p.UserBan || other.UserBan,
-		BanPost:            p.BanPost || other.BanPost,
-		BanPostGroup:       p.BanPostGroup,
-		BanPostGroupNSFW:   p.BanPostGroupNSFW,
-		BanSubjectInterest: p.BanSubjectInterest,
-		BanVisit:           p.BanVisit,
-		Deleted:            p.Deleted,
-
-		UserList:           p.UserList && other.UserList,
-		ManageUserGroup:    p.ManageUserGroup && other.ManageUserGroup,
-		ManageUserPhoto:    p.ManageUserPhoto && other.ManageUserPhoto,
-		ManageTopicState:   p.ManageTopicState && other.ManageTopicState,
-		ManageReport:       p.ManageReport && other.ManageReport,
-		ManageUser:         p.ManageUser && other.ManageUser,
-		UserGroup:          p.UserGroup && other.UserGroup,
-		UserWikiApply:      p.UserWikiApply && other.UserWikiApply,
-		UserWikiApprove:    p.UserWikiApprove && other.UserWikiApprove,
-		DoujinSubjectErase: p.DoujinSubjectErase && other.DoujinSubjectErase,
-		DoujinSubjectLock:  p.DoujinSubjectLock && other.DoujinSubjectLock,
-		SubjectEdit:        p.SubjectEdit && other.SubjectEdit,
-		SubjectLock:        p.SubjectLock && other.SubjectLock,
-		SubjectRefresh:     p.SubjectRefresh && other.SubjectRefresh,
-		SubjectRelated:     p.SubjectRelated && other.SubjectRelated,
-		SubjectMerge:       p.SubjectMerge && other.SubjectMerge,
-		SubjectErase:       p.SubjectErase && other.SubjectErase,
-		SubjectCoverLock:   p.SubjectCoverLock && other.SubjectCoverLock,
-		SubjectCoverErase:  p.SubjectCoverErase && other.SubjectCoverErase,
-		MonoEdit:           p.MonoEdit && other.MonoEdit,
-		MonoLock:           p.MonoLock && other.MonoLock,
-		MonoMerge:          p.MonoMerge && other.MonoMerge,
-		MonoErase:          p.MonoErase && other.MonoErase,
-		EpEdit:             p.EpEdit && other.EpEdit,
-		EpMove:             p.EpMove && other.EpMove,
-		EpMerge:            p.EpMerge && other.EpMerge,
-		EpLock:             p.EpLock && other.EpLock,
-		EpErase:            p.EpErase && other.EpErase,
-		Report:             p.Report && other.Report,
-		ManageApp:          p.ManageApp && other.ManageApp,
-		AppErase:           p.AppErase && other.AppErase,
+		UserList:           mergeBool(p.UserList, personal.UserList),
+		ManageUserGroup:    mergeBool(p.ManageUserGroup, personal.ManageUserGroup),
+		ManageUserPhoto:    mergeBool(p.ManageUserPhoto, personal.ManageUserPhoto),
+		ManageTopicState:   mergeBool(p.ManageTopicState, personal.ManageTopicState),
+		ManageReport:       mergeBool(p.ManageReport, personal.ManageReport),
+		UserBan:            mergeBool(p.UserBan, personal.UserBan),
+		ManageUser:         mergeBool(p.ManageUser, personal.ManageUser),
+		UserGroup:          mergeBool(p.UserGroup, personal.UserGroup),
+		UserWikiApply:      mergeBool(p.UserWikiApply, personal.UserWikiApply),
+		UserWikiApprove:    mergeBool(p.UserWikiApprove, personal.UserWikiApprove),
+		DoujinSubjectErase: mergeBool(p.DoujinSubjectErase, personal.DoujinSubjectErase),
+		DoujinSubjectLock:  mergeBool(p.DoujinSubjectLock, personal.DoujinSubjectLock),
+		SubjectEdit:        mergeBool(p.SubjectEdit, personal.SubjectEdit),
+		SubjectLock:        mergeBool(p.SubjectLock, personal.SubjectLock),
+		SubjectRefresh:     mergeBool(p.SubjectRefresh, personal.SubjectRefresh),
+		SubjectRelated:     mergeBool(p.SubjectRelated, personal.SubjectRelated),
+		SubjectMerge:       mergeBool(p.SubjectMerge, personal.SubjectMerge),
+		SubjectErase:       mergeBool(p.SubjectErase, personal.SubjectErase),
+		SubjectCoverLock:   mergeBool(p.SubjectCoverLock, personal.SubjectCoverLock),
+		SubjectCoverErase:  mergeBool(p.SubjectCoverErase, personal.SubjectCoverErase),
+		MonoEdit:           mergeBool(p.MonoEdit, personal.MonoEdit),
+		MonoLock:           mergeBool(p.MonoLock, personal.MonoLock),
+		MonoMerge:          mergeBool(p.MonoMerge, personal.MonoMerge),
+		MonoErase:          mergeBool(p.MonoErase, personal.MonoErase),
+		BanPost:            mergeBool(p.BanPost, personal.BanPost),
+		BanPostGroup:       mergeBool(p.BanPostGroup, personal.BanPostGroup),
+		BanPostGroupNSFW:   mergeBool(p.BanPostGroupNSFW, personal.BanPostGroupNSFW),
+		BanSubjectInterest: mergeBool(p.BanSubjectInterest, personal.BanSubjectInterest),
+		BanVisit:           mergeBool(p.BanVisit, personal.BanVisit),
+		Deleted:            mergeBool(p.Deleted, personal.Deleted),
+		EpEdit:             mergeBool(p.EpEdit, personal.EpEdit),
+		EpMove:             mergeBool(p.EpMove, personal.EpMove),
+		EpMerge:            mergeBool(p.EpMerge, personal.EpMerge),
+		EpLock:             mergeBool(p.EpLock, personal.EpLock),
+		EpErase:            mergeBool(p.EpErase, personal.EpErase),
+		Report:             mergeBool(p.Report, personal.Report),
+		ManageApp:          mergeBool(p.ManageApp, personal.ManageApp),
+		AppErase:           mergeBool(p.AppErase, personal.AppErase),
 	}
 }

@@ -105,122 +105,128 @@ func (v *phpPermissionValue) enabled() bool {
 	return v != nil && *v != "" && *v != "0"
 }
 
-func (p phpPermission) toPermission() Permission {
-	permission := Permission{DefinedFields: []string{}}
-	fields := phpPermissionFields(&permission)
-	for _, field := range []struct {
-		name  string
-		value *phpPermissionValue
-	}{
-		{"user_list", p.UserList},
-		{"manage_user_group", p.ManageUserGroup},
-		{"manage_user_photo", p.ManageUserPhoto},
-		{"manage_topic_state", p.ManageTopicState},
-		{"manage_report", p.ManageReport},
-		{"user_ban", p.UserBan},
-		{"manage_user", p.ManageUser},
-		{"user_group", p.UserGroup},
-		{"user_wiki_approve", p.UserWikiApprove},
-		{"user_wiki_apply", p.UserWikiApply},
-		{"doujin_subject_erase", p.DoujinSubjectErase},
-		{"doujin_subject_lock", p.DoujinSubjectLock},
-		{"subject_edit", p.SubjectEdit},
-		{"subject_lock", p.SubjectLock},
-		{"subject_refresh", p.SubjectRefresh},
-		{"subject_related", p.SubjectRelated},
-		{"subject_merge", p.SubjectMerge},
-		{"subject_erase", p.SubjectErase},
-		{"subject_cover_lock", p.SubjectCoverLock},
-		{"subject_cover_erase", p.SubjectCoverErase},
-		{"mono_edit", p.MonoEdit},
-		{"mono_lock", p.MonoLock},
-		{"mono_merge", p.MonoMerge},
-		{"mono_erase", p.MonoErase},
-		{"ban_post", p.BanPost},
-		{"ban_post_group", p.BanPostGroup},
-		{"ban_post_group_nsfw", p.BanPostGroupNSFW},
-		{"ban_subject_interest", p.BanSubjectInterest},
-		{"ban_visit", p.BanVisit},
-		{"deleted", p.Deleted},
-		{"ep_edit", p.EpEdit},
-		{"ep_move", p.EpMove},
-		{"ep_merge", p.EpMerge},
-		{"ep_lock", p.EpLock},
-		{"ep_erase", p.EpErase},
-		{"report", p.Report},
-		{"manage_app", p.ManageApp},
-		{"app_erase", p.AppErase},
-	} {
-		if field.value == nil {
-			continue
-		}
-
-		*fields[field.name] = field.value.enabled()
-		permission.DefinedFields = append(permission.DefinedFields, field.name)
+func (v *phpPermissionValue) boolPtr() *bool {
+	if v == nil {
+		return nil
 	}
-
-	return permission
+	value := v.enabled()
+	return &value
 }
 
-func parseSerializedPermission(raw []byte) (Permission, error) {
-	permission, err := decodePermission(raw)
-	permission.DefinedFields = nil
-	return permission, err
+func (p phpPermission) toPermission() Permission {
+	return Permission{
+		UserList:           p.UserList.enabled(),
+		ManageUserGroup:    p.ManageUserGroup.enabled(),
+		ManageUserPhoto:    p.ManageUserPhoto.enabled(),
+		ManageTopicState:   p.ManageTopicState.enabled(),
+		ManageReport:       p.ManageReport.enabled(),
+		UserBan:            p.UserBan.enabled(),
+		ManageUser:         p.ManageUser.enabled(),
+		UserGroup:          p.UserGroup.enabled(),
+		UserWikiApply:      p.UserWikiApply.enabled(),
+		UserWikiApprove:    p.UserWikiApprove.enabled(),
+		DoujinSubjectErase: p.DoujinSubjectErase.enabled(),
+		DoujinSubjectLock:  p.DoujinSubjectLock.enabled(),
+		SubjectEdit:        p.SubjectEdit.enabled(),
+		SubjectLock:        p.SubjectLock.enabled(),
+		SubjectRefresh:     p.SubjectRefresh.enabled(),
+		SubjectRelated:     p.SubjectRelated.enabled(),
+		SubjectMerge:       p.SubjectMerge.enabled(),
+		SubjectErase:       p.SubjectErase.enabled(),
+		SubjectCoverLock:   p.SubjectCoverLock.enabled(),
+		SubjectCoverErase:  p.SubjectCoverErase.enabled(),
+		MonoEdit:           p.MonoEdit.enabled(),
+		MonoLock:           p.MonoLock.enabled(),
+		MonoMerge:          p.MonoMerge.enabled(),
+		MonoErase:          p.MonoErase.enabled(),
+		BanPost:            p.BanPost.enabled(),
+		BanPostGroup:       p.BanPostGroup.enabled(),
+		BanPostGroupNSFW:   p.BanPostGroupNSFW.enabled(),
+		BanSubjectInterest: p.BanSubjectInterest.enabled(),
+		BanVisit:           p.BanVisit.enabled(),
+		Deleted:            p.Deleted.enabled(),
+		EpEdit:             p.EpEdit.enabled(),
+		EpMove:             p.EpMove.enabled(),
+		EpMerge:            p.EpMerge.enabled(),
+		EpLock:             p.EpLock.enabled(),
+		EpErase:            p.EpErase.enabled(),
+		Report:             p.Report.enabled(),
+		ManageApp:          p.ManageApp.enabled(),
+		AppErase:           p.AppErase.enabled(),
+	}
 }
 
-func decodePermission(raw []byte) (Permission, error) {
+func (p phpPermission) toPersonalPermission() PersonalPermission {
+	return PersonalPermission{
+		UserList:           p.UserList.boolPtr(),
+		ManageUserGroup:    p.ManageUserGroup.boolPtr(),
+		ManageUserPhoto:    p.ManageUserPhoto.boolPtr(),
+		ManageTopicState:   p.ManageTopicState.boolPtr(),
+		ManageReport:       p.ManageReport.boolPtr(),
+		UserBan:            p.UserBan.boolPtr(),
+		ManageUser:         p.ManageUser.boolPtr(),
+		UserGroup:          p.UserGroup.boolPtr(),
+		UserWikiApply:      p.UserWikiApply.boolPtr(),
+		UserWikiApprove:    p.UserWikiApprove.boolPtr(),
+		DoujinSubjectErase: p.DoujinSubjectErase.boolPtr(),
+		DoujinSubjectLock:  p.DoujinSubjectLock.boolPtr(),
+		SubjectEdit:        p.SubjectEdit.boolPtr(),
+		SubjectLock:        p.SubjectLock.boolPtr(),
+		SubjectRefresh:     p.SubjectRefresh.boolPtr(),
+		SubjectRelated:     p.SubjectRelated.boolPtr(),
+		SubjectMerge:       p.SubjectMerge.boolPtr(),
+		SubjectErase:       p.SubjectErase.boolPtr(),
+		SubjectCoverLock:   p.SubjectCoverLock.boolPtr(),
+		SubjectCoverErase:  p.SubjectCoverErase.boolPtr(),
+		MonoEdit:           p.MonoEdit.boolPtr(),
+		MonoLock:           p.MonoLock.boolPtr(),
+		MonoMerge:          p.MonoMerge.boolPtr(),
+		MonoErase:          p.MonoErase.boolPtr(),
+		BanPost:            p.BanPost.boolPtr(),
+		BanPostGroup:       p.BanPostGroup.boolPtr(),
+		BanPostGroupNSFW:   p.BanPostGroupNSFW.boolPtr(),
+		BanSubjectInterest: p.BanSubjectInterest.boolPtr(),
+		BanVisit:           p.BanVisit.boolPtr(),
+		Deleted:            p.Deleted.boolPtr(),
+		EpEdit:             p.EpEdit.boolPtr(),
+		EpMove:             p.EpMove.boolPtr(),
+		EpMerge:            p.EpMerge.boolPtr(),
+		EpLock:             p.EpLock.boolPtr(),
+		EpErase:            p.EpErase.boolPtr(),
+		Report:             p.Report.boolPtr(),
+		ManageApp:          p.ManageApp.boolPtr(),
+		AppErase:           p.AppErase.boolPtr(),
+	}
+}
+
+func decodePHP(raw []byte) (phpPermission, error) {
 	raw = bytes.TrimSpace(raw)
 	if len(raw) == 0 || bytes.Equal(raw, []byte("[]")) {
-		return Permission{DefinedFields: []string{}}, nil
+		return phpPermission{}, nil
 	}
 
 	var p phpPermission
 	if err := serialize.Decode(raw, &p); err != nil {
-		return Permission{}, errgo.Wrap(err, "parsing personal permissions: serialize.Decode")
+		return phpPermission{}, errgo.Wrap(err, "serialize.Decode")
+	}
+
+	return p, nil
+}
+
+func parseSerializedPermission(raw []byte) (Permission, error) {
+	p, err := decodePHP(raw)
+	if err != nil {
+		return Permission{}, errgo.Wrap(err, "parsing permission")
 	}
 
 	return p.toPermission(), nil
 }
 
-func phpPermissionFields(permission *Permission) map[string]*bool {
-	return map[string]*bool{
-		"user_list":            &permission.UserList,
-		"manage_user_group":    &permission.ManageUserGroup,
-		"manage_user_photo":    &permission.ManageUserPhoto,
-		"manage_topic_state":   &permission.ManageTopicState,
-		"manage_report":        &permission.ManageReport,
-		"user_ban":             &permission.UserBan,
-		"manage_user":          &permission.ManageUser,
-		"user_group":           &permission.UserGroup,
-		"user_wiki_apply":      &permission.UserWikiApply,
-		"user_wiki_approve":    &permission.UserWikiApprove,
-		"doujin_subject_erase": &permission.DoujinSubjectErase,
-		"doujin_subject_lock":  &permission.DoujinSubjectLock,
-		"subject_edit":         &permission.SubjectEdit,
-		"subject_lock":         &permission.SubjectLock,
-		"subject_refresh":      &permission.SubjectRefresh,
-		"subject_related":      &permission.SubjectRelated,
-		"subject_merge":        &permission.SubjectMerge,
-		"subject_erase":        &permission.SubjectErase,
-		"subject_cover_lock":   &permission.SubjectCoverLock,
-		"subject_cover_erase":  &permission.SubjectCoverErase,
-		"mono_edit":            &permission.MonoEdit,
-		"mono_lock":            &permission.MonoLock,
-		"mono_merge":           &permission.MonoMerge,
-		"mono_erase":           &permission.MonoErase,
-		"ban_post":             &permission.BanPost,
-		"ban_post_group":       &permission.BanPostGroup,
-		"ban_post_group_nsfw":  &permission.BanPostGroupNSFW,
-		"ban_subject_interest": &permission.BanSubjectInterest,
-		"ban_visit":            &permission.BanVisit,
-		"deleted":              &permission.Deleted,
-		"ep_edit":              &permission.EpEdit,
-		"ep_move":              &permission.EpMove,
-		"ep_merge":             &permission.EpMerge,
-		"ep_lock":              &permission.EpLock,
-		"ep_erase":             &permission.EpErase,
-		"report":               &permission.Report,
-		"manage_app":           &permission.ManageApp,
-		"app_erase":            &permission.AppErase,
+func decodePermission(raw []byte) (PersonalPermission, error) {
+	p, err := decodePHP(raw)
+	if err != nil {
+		return PersonalPermission{}, errgo.Wrap(err, "parsing personal permissions")
 	}
+
+	return p.toPersonalPermission(), nil
 }

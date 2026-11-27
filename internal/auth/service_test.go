@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
@@ -40,7 +41,7 @@ func TestService_GetByToken(t *testing.T) {
 	var m = mocks.NewAuthRepo(t)
 	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).
 		Return(auth.UserInfo{
-			GroupID: 2, Permission: auth.Permission{EpEdit: true, DefinedFields: []string{"ep_edit", "ban_post"}},
+			GroupID: 2, Permission: auth.PersonalPermission{EpEdit: lo.ToPtr(true), BanPost: lo.ToPtr(false)},
 		}, nil)
 	m.EXPECT().GetPermission(mock.Anything, user.GroupID(2)).
 		Return(auth.Permission{EpEdit: true, BanPost: true, Report: true}, nil)
@@ -60,7 +61,7 @@ func TestService_ReusesAuthCacheWithPersonalACL(t *testing.T) {
 	repo := mocks.NewAuthRepo(t)
 	repo.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).
 		Return(auth.UserInfo{
-			GroupID: 10, Permission: auth.Permission{BanVisit: true, DefinedFields: []string{"ban_visit"}},
+			GroupID: 10, Permission: auth.PersonalPermission{BanVisit: lo.ToPtr(true)},
 		}, nil).Once()
 	repo.EXPECT().GetPermission(mock.Anything, user.GroupID(10)).Return(auth.Permission{}, nil).Once()
 
@@ -80,7 +81,7 @@ func TestService_ReloadsLegacyCacheWithoutReplacingIt(t *testing.T) {
 	repo := mocks.NewAuthRepo(t)
 	repo.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).
 		Return(auth.UserInfo{
-			GroupID: 10, Permission: auth.Permission{BanVisit: true, DefinedFields: []string{"ban_visit"}},
+			GroupID: 10, Permission: auth.PersonalPermission{BanVisit: lo.ToPtr(true)},
 		}, nil).Once()
 	repo.EXPECT().GetPermission(mock.Anything, user.GroupID(10)).Return(auth.Permission{}, nil).Once()
 
@@ -104,7 +105,7 @@ func TestService_CachedEmptyACLDoesNotTriggerReload(t *testing.T) {
 		Return(auth.Permission{BanPost: true}, nil).Once()
 	cached := &authCacheStub{
 		RedisCache: cache.NewNoop(),
-		data:       []byte(`{"GroupID":10,"Permission":{"DefinedFields":[]}}`),
+		data:       []byte(`{"GroupID":10,"Permission":{},"version":1}`),
 	}
 	s := auth.NewService(repo, mocks.NewUserRepo(t), zap.NewNop(), cached)
 
