@@ -47,7 +47,8 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	var s = &collection.Subject{}
 
 	a := mocks.NewAuthService(t)
-	a.EXPECT().GetByToken(mock.Anything, mock.Anything).Return(auth.Auth{ID: uid}, nil)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(auth.Auth{ID: uid, Permission: auth.Permission{UserBan: true}}, nil)
 
 	tl := mocks.NewTimelineService(t)
 	tl.EXPECT().
@@ -89,6 +90,22 @@ func TestUser_PatchSubjectCollection(t *testing.T) {
 	require.Equal(t, "1 test_content 2", s.Comment())
 	require.EqualValues(t, []string{"qq", "vv"}, s.Tags())
 	require.EqualValues(t, 8, s.Rate())
+}
+
+func TestUser_PatchSubjectCollectionBannedGroup(t *testing.T) {
+	t.Parallel()
+
+	a := mocks.NewAuthService(t)
+	a.EXPECT().GetByToken(mock.Anything, mock.Anything).
+		Return(auth.Auth{ID: 1, GroupID: auth.UserGroupBanned}, nil)
+
+	app := test.GetWebApp(t, test.Mock{AuthService: a})
+
+	htest.New(t, app).
+		Header(echo.HeaderAuthorization, "Bearer t").
+		BodyJSON(map[string]any{"type": 2}).
+		Patch("/v0/users/-/collections/8").
+		ExpectCode(http.StatusForbidden)
 }
 
 func TestUser_PatchToNonExistsSubjectCollection(t *testing.T) {
