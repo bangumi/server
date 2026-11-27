@@ -23,6 +23,7 @@ import (
 
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/cachekey"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/user"
 )
@@ -66,32 +67,36 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 		return Auth{}, errgo.Wrap(err, "cache.Get")
 	}
 
-	if ok {
-		if entry.Revoked {
-			return Auth{}, gerr.ErrNotFound
-		}
-
-		a = entry.UserInfo
-	} else {
-		a, err = s.repo.GetByToken(ctx, token)
-		if err != nil {
-			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
-		}
-
-		_, _ = s.cache.SetNX(ctx, cacheKey, cacheEntry{UserInfo: a}, tokenCacheTTL)
+	if ok && entry.Revoked {
+		return Auth{}, gerr.ErrNotFound
 	}
 
-	permission, err := s.getPermission(ctx, a.GroupID)
+	a = entry.UserInfo
+	// A legacy cache entry has no defined fields, while a decoded empty ACL has an empty slice.
+	if !ok || a.Permission.DefinedFields == nil {
+		a, err = s.repo.GetByToken(ctx, token)
+		if err != nil {
+			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByToken")
+		}
+
+		// Legacy entries expire on their original TTL. Cache fills must not overwrite revocation markers.
+		if !ok {
+			_, _ = s.cache.SetNX(ctx, cacheKey, cacheEntry{UserInfo: a}, tokenCacheTTL)
+		}
+	}
+
+	groupPermission, err := s.getPermission(ctx, a.GroupID)
 	if err != nil {
 		return Auth{}, err
 	}
+	permission := groupPermission.Merge(a.Permission)
 
 	return Auth{
 		Login:      true,
 		RegTime:    a.RegTime,
 		ID:         a.ID,
 		GroupID:    a.GroupID,
-		Permission: permission.Merge(a.Permission),
+		Permission: permission,
 		Scope:      a.Scope,
 		Legacy:     a.Legacy,
 	}, nil
@@ -102,6 +107,21 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 func (s service) RevokeToken(ctx context.Context, token string) error {
 	err := s.cache.Set(ctx, cachekey.AuthToken(token), cacheEntry{Revoked: true}, tokenCacheTTL)
 	return errgo.Wrap(err, "cache.Set")
+}
+
+func (s service) RevokeUserTokens(ctx context.Context, userID model.UserID) error {
+	tokens, err := s.repo.GetTokensByUser(ctx, userID)
+	if err != nil {
+		return errgo.Wrap(err, "AuthRepo.GetTokensByUser")
+	}
+
+	for _, token := range tokens {
+		if err := s.RevokeToken(ctx, token); err != nil {
+			return errgo.Wrap(err, "RevokeToken")
+		}
+	}
+
+	return nil
 }
 
 func (s service) getPermission(ctx context.Context, id user.GroupID) (Permission, error) {

@@ -23,6 +23,7 @@ import (
 
 	"github.com/bangumi/server/ctrl"
 	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/null"
 	"github.com/bangumi/server/internal/subject"
@@ -78,7 +79,7 @@ func (h User) updateOrCreateSubjectCollection(
 ) error {
 	u := accessor.GetFromCtx(c)
 
-	if u.Permission.UserBan {
+	if u.GroupID == auth.UserGroupBanned {
 		return gerr.ErrBanned
 	}
 

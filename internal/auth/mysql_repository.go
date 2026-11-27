@@ -19,6 +19,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/user"
 )
@@ -84,9 +86,9 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		return UserInfo{}, errgo.Wrap(err, "gorm")
 	}
 
-	perm, err := parseSerializedPermission([]byte(u.ACL))
+	permission, err := decodePermission([]byte(u.ACL))
 	if err != nil {
-		return UserInfo{}, errgo.Wrap(err, "parsing permission")
+		return UserInfo{}, errgo.Wrap(err, "parsing personal permissions")
 	}
 
 	scope, legacy := parseTokenScope(access.Scope)
@@ -95,7 +97,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		RegTime:    time.Unix(u.Regdate, 0),
 		ID:         id,
 		GroupID:    u.GroupID,
-		Permission: perm,
+		Permission: permission,
 		Scope:      scope,
 		Legacy:     legacy,
 	}, nil
@@ -112,6 +114,18 @@ func parseTokenScope(scope sql.NullString) (Scope, bool) {
 	}
 
 	return parsed, false
+}
+
+func (m mysqlRepo) GetTokensByUser(ctx context.Context, userID model.UserID) ([]string, error) {
+	var tokens []string
+	err := m.db.SelectContext(ctx, &tokens,
+		`select access_token from chii_oauth_access_tokens where user_id = ? and expires > ?`,
+		strconv.FormatUint(uint64(userID), 10), time.Now())
+	if err != nil {
+		return nil, errgo.Wrap(err, "gorm")
+	}
+
+	return tokens, nil
 }
 
 func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission, error) {

@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/user"
@@ -38,18 +39,102 @@ func TestService_GetByToken(t *testing.T) {
 
 	var m = mocks.NewAuthRepo(t)
 	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).
-		Return(auth.UserInfo{GroupID: 2, Permission: auth.Permission{EpEdit: true}}, nil)
-	m.EXPECT().GetPermission(mock.Anything, user.GroupID(2)).Return(auth.Permission{EpEdit: true}, nil)
+		Return(auth.UserInfo{
+			GroupID: 2, Permission: auth.Permission{EpEdit: true, DefinedFields: []string{"ep_edit", "ban_post"}},
+		}, nil)
+	m.EXPECT().GetPermission(mock.Anything, user.GroupID(2)).
+		Return(auth.Permission{EpEdit: true, BanPost: true, Report: true}, nil)
 
-	var u = mocks.NewUserRepo(t)
-
-	s := auth.NewService(m, u, zap.NewNop(), cache.NewNoop())
+	s := auth.NewService(m, mocks.NewUserRepo(t), zap.NewNop(), cache.NewNoop())
 
 	a, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
 	require.NoError(t, err)
 
 	require.Equal(t, user.GroupID(2), a.GroupID)
-	require.True(t, a.Permission.EpEdit)
+	require.Equal(t, auth.Permission{EpEdit: true, Report: true}, a.Permission)
+}
+
+func TestService_ReusesAuthCacheWithPersonalACL(t *testing.T) {
+	t.Parallel()
+
+	repo := mocks.NewAuthRepo(t)
+	repo.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).
+		Return(auth.UserInfo{
+			GroupID: 10, Permission: auth.Permission{BanVisit: true, DefinedFields: []string{"ban_visit"}},
+		}, nil).Once()
+	repo.EXPECT().GetPermission(mock.Anything, user.GroupID(10)).Return(auth.Permission{}, nil).Once()
+
+	cached := &authCacheStub{RedisCache: cache.NewNoop()}
+	s := auth.NewService(repo, mocks.NewUserRepo(t), zap.NewNop(), cached)
+	for range 2 {
+		result, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
+		require.NoError(t, err)
+		require.True(t, result.Permission.BanVisit)
+	}
+	require.Equal(t, 10*time.Minute, cached.ttl)
+}
+
+func TestService_ReloadsLegacyCacheWithoutReplacingIt(t *testing.T) {
+	t.Parallel()
+
+	repo := mocks.NewAuthRepo(t)
+	repo.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).
+		Return(auth.UserInfo{
+			GroupID: 10, Permission: auth.Permission{BanVisit: true, DefinedFields: []string{"ban_visit"}},
+		}, nil).Once()
+	repo.EXPECT().GetPermission(mock.Anything, user.GroupID(10)).Return(auth.Permission{}, nil).Once()
+
+	cached := &authCacheStub{
+		RedisCache: cache.NewNoop(),
+		data:       []byte(`{"GroupID":10,"Permission":{}}`),
+	}
+	s := auth.NewService(repo, mocks.NewUserRepo(t), zap.NewNop(), cached)
+
+	result, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
+	require.NoError(t, err)
+	require.True(t, result.Permission.BanVisit)
+	require.Zero(t, cached.ttl)
+}
+
+func TestService_CachedEmptyACLDoesNotTriggerReload(t *testing.T) {
+	t.Parallel()
+
+	repo := mocks.NewAuthRepo(t)
+	repo.EXPECT().GetPermission(mock.Anything, user.GroupID(10)).
+		Return(auth.Permission{BanPost: true}, nil).Once()
+	cached := &authCacheStub{
+		RedisCache: cache.NewNoop(),
+		data:       []byte(`{"GroupID":10,"Permission":{"DefinedFields":[]}}`),
+	}
+	s := auth.NewService(repo, mocks.NewUserRepo(t), zap.NewNop(), cached)
+
+	result, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
+	require.NoError(t, err)
+	require.True(t, result.Permission.BanPost)
+	require.Zero(t, cached.ttl)
+}
+
+type authCacheStub struct {
+	cache.RedisCache
+	data []byte
+	ttl  time.Duration
+}
+
+func (c *authCacheStub) Get(_ context.Context, _ string, value any) (bool, error) {
+	if c.data == nil {
+		return false, nil
+	}
+	return true, json.Unmarshal(c.data, value)
+}
+
+func (c *authCacheStub) SetNX(_ context.Context, _ string, value any, ttl time.Duration) (bool, error) {
+	if c.data != nil {
+		return false, nil
+	}
+	c.ttl = ttl
+	var err error
+	c.data, err = json.Marshal(value)
+	return err == nil, err
 }
 
 func TestService_GetByTokenCacheMissUsesSetNX(t *testing.T) {
@@ -106,4 +191,24 @@ func TestService_RevokeToken(t *testing.T) {
 	var entry map[string]any
 	require.NoError(t, json.Unmarshal(cached, &entry))
 	require.Equal(t, true, entry["revoked"])
+}
+
+func TestService_RevokeUserTokens(t *testing.T) {
+	t.Parallel()
+
+	const (
+		userID = model.UserID(1)
+		token1 = "token-1"
+		token2 = "token-2"
+	)
+
+	repo := mocks.NewAuthRepo(t)
+	repo.EXPECT().GetTokensByUser(mock.Anything, userID).Return([]string{token1, token2}, nil)
+
+	c := mocks.NewRedisCache(t)
+	c.EXPECT().Set(mock.Anything, cachekey.AuthToken(token1), mock.Anything, 10*time.Minute).Return(nil)
+	c.EXPECT().Set(mock.Anything, cachekey.AuthToken(token2), mock.Anything, 10*time.Minute).Return(nil)
+
+	s := auth.NewService(repo, mocks.NewUserRepo(t), zap.NewNop(), c)
+	require.NoError(t, s.RevokeUserTokens(context.Background(), userID))
 }

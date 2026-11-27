@@ -71,12 +71,13 @@ func (ctl Ctrl) UpdateSubjectCollection(
 				}
 			}
 
-			if req.Private.Set {
-				if req.Private.Value {
-					s.MakePrivate()
-				} else {
-					s.MakePublic()
-				}
+			switch {
+			case u.Permission.BanSubjectInterest:
+				s.ShadowBan(true)
+			case req.Private.Set && req.Private.Value:
+				s.MakePrivate()
+			case req.Private.Set:
+				s.MakePublic()
 			}
 
 			if req.VolStatus.Set {
