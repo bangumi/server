@@ -28,12 +28,16 @@ type Repo interface {
 	// GetByToken return an authorized user by a valid access token.
 	GetByToken(ctx context.Context, token string) (UserInfo, error)
 	GetPermission(ctx context.Context, groupID uint8) (Permission, error)
+	// GetTokensByUser returns valid access tokens owned by the user.
+	GetTokensByUser(ctx context.Context, userID model.UserID) ([]string, error)
 }
 
 type Service interface {
 	GetByToken(ctx context.Context, token string) (Auth, error)
 	// RevokeToken invalidates cached authorization for a token that has been expired or deleted in database.
 	RevokeToken(ctx context.Context, token string) error
+	// RevokeUserTokens invalidates cached authorization for every valid access token owned by the user.
+	RevokeUserTokens(ctx context.Context, userID model.UserID) error
 }
 
 type UserInfo struct {

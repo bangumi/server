@@ -79,3 +79,14 @@ func TestMysqlRepo_GetByToken_expired(t *testing.T) {
 	_, err := repo.GetByToken(context.Background(), "a_expired_token")
 	require.ErrorIs(t, err, gerr.ErrNotFound)
 }
+
+func TestMysqlRepo_GetTokensByUser(t *testing.T) {
+	test.RequireEnv(t, "mysql")
+	t.Parallel()
+
+	repo := getRepo(t)
+
+	tokens, err := repo.GetTokensByUser(context.Background(), 382951)
+	require.NoError(t, err)
+	require.Contains(t, tokens, test.TreeHoleAccessToken)
+}

@@ -19,6 +19,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/bangumi/server/dal/query"
 	"github.com/bangumi/server/domain/gerr"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/gstr"
 	"github.com/bangumi/server/internal/user"
 )
@@ -112,6 +114,18 @@ func parseTokenScope(scope sql.NullString) (Scope, bool) {
 	}
 
 	return parsed, false
+}
+
+func (m mysqlRepo) GetTokensByUser(ctx context.Context, userID model.UserID) ([]string, error) {
+	var tokens []string
+	err := m.db.SelectContext(ctx, &tokens,
+		`select access_token from chii_oauth_access_tokens where user_id = ? and expires > ?`,
+		strconv.FormatUint(uint64(userID), 10), time.Now())
+	if err != nil {
+		return nil, errgo.Wrap(err, "gorm")
+	}
+
+	return tokens, nil
 }
 
 func (m mysqlRepo) GetPermission(ctx context.Context, groupID uint8) (Permission, error) {

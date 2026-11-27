@@ -31,6 +31,7 @@ import (
 
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/logger/log"
+	"github.com/bangumi/server/internal/user"
 )
 
 func (e *eventHandler) OnUserChange(ctx context.Context, key json.RawMessage, payload Payload) error {
@@ -57,6 +58,13 @@ func (e *eventHandler) OnUserChange(ctx context.Context, key json.RawMessage, pa
 			err := e.OnUserPasswordChange(ctx, k.ID)
 			if err != nil {
 				e.log.Error("failed to clear cache", zap.Error(err))
+			}
+		}
+
+		if before.ACL != after.ACL || before.GroupID != after.GroupID {
+			if err := e.auth.RevokeUserTokens(ctx, k.ID); err != nil {
+				e.log.Error("failed to revoke user tokens", log.User(k.ID), zap.Error(err))
+				return errgo.Wrap(err, "auth.RevokeUserTokens")
 			}
 		}
 
@@ -146,7 +154,9 @@ type UserKey struct {
 }
 
 type userPayload struct {
-	Password  string `json:"password_crypt"`
-	NewNotify uint16 `json:"new_notify"`
-	Avatar    string `json:"avatar"`
+	Password  string       `json:"password_crypt"`
+	NewNotify uint16       `json:"new_notify"`
+	Avatar    string       `json:"avatar"`
+	ACL       string       `json:"acl"`
+	GroupID   user.GroupID `json:"groupid"`
 }

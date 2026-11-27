@@ -23,6 +23,7 @@ import (
 
 	"github.com/bangumi/server/domain/gerr"
 	"github.com/bangumi/server/internal/cachekey"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/user"
 )
@@ -106,6 +107,21 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 func (s service) RevokeToken(ctx context.Context, token string) error {
 	err := s.cache.Set(ctx, cachekey.AuthToken(token), cacheEntry{Revoked: true}, tokenCacheTTL)
 	return errgo.Wrap(err, "cache.Set")
+}
+
+func (s service) RevokeUserTokens(ctx context.Context, userID model.UserID) error {
+	tokens, err := s.repo.GetTokensByUser(ctx, userID)
+	if err != nil {
+		return errgo.Wrap(err, "AuthRepo.GetTokensByUser")
+	}
+
+	for _, token := range tokens {
+		if err := s.RevokeToken(ctx, token); err != nil {
+			return errgo.Wrap(err, "RevokeToken")
+		}
+	}
+
+	return nil
 }
 
 func (s service) getPermission(ctx context.Context, id user.GroupID) (Permission, error) {

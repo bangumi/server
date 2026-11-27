@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/bangumi/server/internal/auth"
+	"github.com/bangumi/server/internal/model"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -17,10 +18,19 @@ func NewAuthRepo(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *AuthRepo {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &AuthRepo{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -72,7 +82,7 @@ type AuthRepo_GetByToken_Call struct {
 // GetByToken is a helper method to define mock.On call
 //   - ctx context.Context
 //   - token string
-func (_e *AuthRepo_Expecter) GetByToken(ctx interface{}, token interface{}) *AuthRepo_GetByToken_Call {
+func (_e *AuthRepo_Expecter) GetByToken(ctx any, token any) *AuthRepo_GetByToken_Call {
 	return &AuthRepo_GetByToken_Call{Call: _e.mock.On("GetByToken", ctx, token)}
 }
 
@@ -138,7 +148,7 @@ type AuthRepo_GetPermission_Call struct {
 // GetPermission is a helper method to define mock.On call
 //   - ctx context.Context
 //   - groupID uint8
-func (_e *AuthRepo_Expecter) GetPermission(ctx interface{}, groupID interface{}) *AuthRepo_GetPermission_Call {
+func (_e *AuthRepo_Expecter) GetPermission(ctx any, groupID any) *AuthRepo_GetPermission_Call {
 	return &AuthRepo_GetPermission_Call{Call: _e.mock.On("GetPermission", ctx, groupID)}
 }
 
@@ -166,6 +176,74 @@ func (_c *AuthRepo_GetPermission_Call) Return(permission auth.Permission, err er
 }
 
 func (_c *AuthRepo_GetPermission_Call) RunAndReturn(run func(ctx context.Context, groupID uint8) (auth.Permission, error)) *AuthRepo_GetPermission_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetTokensByUser provides a mock function for the type AuthRepo
+func (_mock *AuthRepo) GetTokensByUser(ctx context.Context, userID model.UserID) ([]string, error) {
+	ret := _mock.Called(ctx, userID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTokensByUser")
+	}
+
+	var r0 []string
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, model.UserID) ([]string, error)); ok {
+		return returnFunc(ctx, userID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, model.UserID) []string); ok {
+		r0 = returnFunc(ctx, userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, model.UserID) error); ok {
+		r1 = returnFunc(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// AuthRepo_GetTokensByUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTokensByUser'
+type AuthRepo_GetTokensByUser_Call struct {
+	*mock.Call
+}
+
+// GetTokensByUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID model.UserID
+func (_e *AuthRepo_Expecter) GetTokensByUser(ctx any, userID any) *AuthRepo_GetTokensByUser_Call {
+	return &AuthRepo_GetTokensByUser_Call{Call: _e.mock.On("GetTokensByUser", ctx, userID)}
+}
+
+func (_c *AuthRepo_GetTokensByUser_Call) Run(run func(ctx context.Context, userID model.UserID)) *AuthRepo_GetTokensByUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 model.UserID
+		if args[1] != nil {
+			arg1 = args[1].(model.UserID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *AuthRepo_GetTokensByUser_Call) Return(strings []string, err error) *AuthRepo_GetTokensByUser_Call {
+	_c.Call.Return(strings, err)
+	return _c
+}
+
+func (_c *AuthRepo_GetTokensByUser_Call) RunAndReturn(run func(ctx context.Context, userID model.UserID) ([]string, error)) *AuthRepo_GetTokensByUser_Call {
 	_c.Call.Return(run)
 	return _c
 }

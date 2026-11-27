@@ -28,6 +28,7 @@ import (
 	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/mocks"
+	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/test"
 	"github.com/bangumi/server/internal/user"
@@ -190,4 +191,24 @@ func TestService_RevokeToken(t *testing.T) {
 	var entry map[string]any
 	require.NoError(t, json.Unmarshal(cached, &entry))
 	require.Equal(t, true, entry["revoked"])
+}
+
+func TestService_RevokeUserTokens(t *testing.T) {
+	t.Parallel()
+
+	const (
+		userID = model.UserID(1)
+		token1 = "token-1"
+		token2 = "token-2"
+	)
+
+	repo := mocks.NewAuthRepo(t)
+	repo.EXPECT().GetTokensByUser(mock.Anything, userID).Return([]string{token1, token2}, nil)
+
+	c := mocks.NewRedisCache(t)
+	c.EXPECT().Set(mock.Anything, cachekey.AuthToken(token1), mock.Anything, 10*time.Minute).Return(nil)
+	c.EXPECT().Set(mock.Anything, cachekey.AuthToken(token2), mock.Anything, 10*time.Minute).Return(nil)
+
+	s := auth.NewService(repo, mocks.NewUserRepo(t), zap.NewNop(), c)
+	require.NoError(t, s.RevokeUserTokens(context.Background(), userID))
 }
