@@ -32,6 +32,8 @@ type Repo interface {
 
 type Service interface {
 	GetByToken(ctx context.Context, token string) (Auth, error)
+	// RevokeToken invalidates cached authorization for a token that has been expired or deleted in database.
+	RevokeToken(ctx context.Context, token string) error
 }
 
 type UserInfo struct {

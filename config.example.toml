@@ -27,6 +27,7 @@ topics = [
   "debezium.bangumi.chii_characters",
   "debezium.bangumi.chii_persons",
   "debezium.bangumi.chii_members",
+  "debezium.bangumi.chii_oauth_access_tokens",
 ]
 
 [search.meilisearch]

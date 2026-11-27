@@ -33,6 +33,10 @@ func (n noop) Set(context.Context, string, any, time.Duration) error {
 	return nil
 }
 
+func (n noop) SetNX(context.Context, string, any, time.Duration) (bool, error) {
+	return false, nil
+}
+
 func (n noop) Del(context.Context, ...string) error {
 	return nil
 }

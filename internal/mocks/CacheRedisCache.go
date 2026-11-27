@@ -17,10 +17,19 @@ func NewRedisCache(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *RedisCache {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &RedisCache{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -69,9 +78,9 @@ type RedisCache_Del_Call struct {
 // Del is a helper method to define mock.On call
 //   - ctx context.Context
 //   - keys ...string
-func (_e *RedisCache_Expecter) Del(ctx interface{}, keys ...interface{}) *RedisCache_Del_Call {
+func (_e *RedisCache_Expecter) Del(ctx any, keys ...any) *RedisCache_Del_Call {
 	return &RedisCache_Del_Call{Call: _e.mock.On("Del",
-		append([]interface{}{ctx}, keys...)...)}
+		append([]any{ctx}, keys...)...)}
 }
 
 func (_c *RedisCache_Del_Call) Run(run func(ctx context.Context, keys ...string)) *RedisCache_Del_Call {
@@ -139,7 +148,7 @@ type RedisCache_Get_Call struct {
 //   - ctx context.Context
 //   - key string
 //   - value any
-func (_e *RedisCache_Expecter) Get(ctx interface{}, key interface{}, value interface{}) *RedisCache_Get_Call {
+func (_e *RedisCache_Expecter) Get(ctx any, key any, value any) *RedisCache_Get_Call {
 	return &RedisCache_Get_Call{Call: _e.mock.On("Get", ctx, key, value)}
 }
 
@@ -202,7 +211,7 @@ type RedisCache_MGet_Call struct {
 //   - ctx context.Context
 //   - key []string
 //   - result any
-func (_e *RedisCache_Expecter) MGet(ctx interface{}, key interface{}, result interface{}) *RedisCache_MGet_Call {
+func (_e *RedisCache_Expecter) MGet(ctx any, key any, result any) *RedisCache_MGet_Call {
 	return &RedisCache_MGet_Call{Call: _e.mock.On("MGet", ctx, key, result)}
 }
 
@@ -266,7 +275,7 @@ type RedisCache_Set_Call struct {
 //   - key string
 //   - value any
 //   - ttl time.Duration
-func (_e *RedisCache_Expecter) Set(ctx interface{}, key interface{}, value interface{}, ttl interface{}) *RedisCache_Set_Call {
+func (_e *RedisCache_Expecter) Set(ctx any, key any, value any, ttl any) *RedisCache_Set_Call {
 	return &RedisCache_Set_Call{Call: _e.mock.On("Set", ctx, key, value, ttl)}
 }
 
@@ -304,6 +313,84 @@ func (_c *RedisCache_Set_Call) Return(err error) *RedisCache_Set_Call {
 }
 
 func (_c *RedisCache_Set_Call) RunAndReturn(run func(ctx context.Context, key string, value any, ttl time.Duration) error) *RedisCache_Set_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetNX provides a mock function for the type RedisCache
+func (_mock *RedisCache) SetNX(ctx context.Context, key string, value any, ttl time.Duration) (bool, error) {
+	ret := _mock.Called(ctx, key, value, ttl)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetNX")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, any, time.Duration) (bool, error)); ok {
+		return returnFunc(ctx, key, value, ttl)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, any, time.Duration) bool); ok {
+		r0 = returnFunc(ctx, key, value, ttl)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, any, time.Duration) error); ok {
+		r1 = returnFunc(ctx, key, value, ttl)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// RedisCache_SetNX_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetNX'
+type RedisCache_SetNX_Call struct {
+	*mock.Call
+}
+
+// SetNX is a helper method to define mock.On call
+//   - ctx context.Context
+//   - key string
+//   - value any
+//   - ttl time.Duration
+func (_e *RedisCache_Expecter) SetNX(ctx any, key any, value any, ttl any) *RedisCache_SetNX_Call {
+	return &RedisCache_SetNX_Call{Call: _e.mock.On("SetNX", ctx, key, value, ttl)}
+}
+
+func (_c *RedisCache_SetNX_Call) Run(run func(ctx context.Context, key string, value any, ttl time.Duration)) *RedisCache_SetNX_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 any
+		if args[2] != nil {
+			arg2 = args[2].(any)
+		}
+		var arg3 time.Duration
+		if args[3] != nil {
+			arg3 = args[3].(time.Duration)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *RedisCache_SetNX_Call) Return(b bool, err error) *RedisCache_SetNX_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *RedisCache_SetNX_Call) RunAndReturn(run func(ctx context.Context, key string, value any, ttl time.Duration) (bool, error)) *RedisCache_SetNX_Call {
 	_c.Call.Return(run)
 	return _c
 }

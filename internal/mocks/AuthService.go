@@ -17,10 +17,19 @@ func NewAuthService(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *AuthService {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &AuthService{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -72,7 +81,7 @@ type AuthService_GetByToken_Call struct {
 // GetByToken is a helper method to define mock.On call
 //   - ctx context.Context
 //   - token string
-func (_e *AuthService_Expecter) GetByToken(ctx interface{}, token interface{}) *AuthService_GetByToken_Call {
+func (_e *AuthService_Expecter) GetByToken(ctx any, token any) *AuthService_GetByToken_Call {
 	return &AuthService_GetByToken_Call{Call: _e.mock.On("GetByToken", ctx, token)}
 }
 
@@ -100,6 +109,63 @@ func (_c *AuthService_GetByToken_Call) Return(auth1 auth.Auth, err error) *AuthS
 }
 
 func (_c *AuthService_GetByToken_Call) RunAndReturn(run func(ctx context.Context, token string) (auth.Auth, error)) *AuthService_GetByToken_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RevokeToken provides a mock function for the type AuthService
+func (_mock *AuthService) RevokeToken(ctx context.Context, token string) error {
+	ret := _mock.Called(ctx, token)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RevokeToken")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = returnFunc(ctx, token)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// AuthService_RevokeToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RevokeToken'
+type AuthService_RevokeToken_Call struct {
+	*mock.Call
+}
+
+// RevokeToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - token string
+func (_e *AuthService_Expecter) RevokeToken(ctx any, token any) *AuthService_RevokeToken_Call {
+	return &AuthService_RevokeToken_Call{Call: _e.mock.On("RevokeToken", ctx, token)}
+}
+
+func (_c *AuthService_RevokeToken_Call) Run(run func(ctx context.Context, token string)) *AuthService_RevokeToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *AuthService_RevokeToken_Call) Return(err error) *AuthService_RevokeToken_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *AuthService_RevokeToken_Call) RunAndReturn(run func(ctx context.Context, token string) error) *AuthService_RevokeToken_Call {
 	_c.Call.Return(run)
 	return _c
 }
