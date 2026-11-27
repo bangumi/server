@@ -17,6 +17,7 @@ package auth
 import (
 	"testing"
 
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,21 +41,16 @@ func TestPermissionOverrides(t *testing.T) {
 	} {
 		personal, err := decodePermission([]byte(acl))
 		require.NoError(t, err)
-		require.ElementsMatch(t, []string{"ban_post", "ban_subject_interest"}, personal.DefinedFields)
+		require.Equal(t, lo.ToPtr(false), personal.BanPost)
+		require.Equal(t, lo.ToPtr(true), personal.BanSubjectInterest)
+		require.Nil(t, personal.BanVisit)
+		require.Nil(t, personal.EpEdit)
 		require.Equal(t, Permission{BanVisit: true, BanSubjectInterest: true, EpEdit: true}, group.Merge(personal))
 		require.True(t, group.BanPost)
 	}
 
 	personal, err := decodePermission([]byte("[]"))
 	require.NoError(t, err)
-	require.NotNil(t, personal.DefinedFields)
-	require.Empty(t, personal.DefinedFields)
+	require.Equal(t, PersonalPermission{}, personal)
 	require.Equal(t, group, group.Merge(personal))
-}
-
-func TestPermissionMergePlainValues(t *testing.T) {
-	t.Parallel()
-	base := Permission{UserList: true, ManageReport: true, Report: true}
-	other := Permission{UserList: true, BanPost: true}
-	require.Equal(t, Permission{UserList: true, BanPost: true}, base.Merge(other))
 }
