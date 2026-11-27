@@ -33,9 +33,12 @@ const TokenTypeAccessToken = 1
 
 const tokenCacheTTL = 10 * time.Minute
 
+const authCacheVersion = 1
+
 // cacheEntry marks a token as revoked so a concurrent cache miss can't write it back.
 type cacheEntry struct {
 	Revoked bool `json:"revoked,omitempty"`
+	Version int  `json:"version,omitempty"`
 	UserInfo
 }
 
@@ -72,8 +75,8 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 	}
 
 	a = entry.UserInfo
-	// A legacy cache entry has no defined fields, while a decoded empty ACL has an empty slice.
-	if !ok || a.Permission.DefinedFields == nil {
+	// Entries written before PersonalPermission are reloaded once.
+	if !ok || entry.Version != authCacheVersion {
 		a, err = s.repo.GetByToken(ctx, token)
 		if err != nil {
 			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByToken")
@@ -81,7 +84,7 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 
 		// Legacy entries expire on their original TTL. Cache fills must not overwrite revocation markers.
 		if !ok {
-			_, _ = s.cache.SetNX(ctx, cacheKey, cacheEntry{UserInfo: a}, tokenCacheTTL)
+			_, _ = s.cache.SetNX(ctx, cacheKey, cacheEntry{Version: authCacheVersion, UserInfo: a}, tokenCacheTTL)
 		}
 	}
 
