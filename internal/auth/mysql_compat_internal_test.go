@@ -29,3 +29,32 @@ func TestUnmarshalPHP(t *testing.T) {
 	require.False(t, p.ManageReport)
 	require.False(t, p.SubjectEdit)
 }
+
+func TestPermissionOverrides(t *testing.T) {
+	t.Parallel()
+	group := Permission{BanPost: true, BanVisit: true, EpEdit: true}
+	for _, acl := range []string{
+		`{"ban_post":false,"ban_subject_interest":true}`,
+		`{"ban_post":"0","ban_subject_interest":"1"}`,
+		`a:2:{s:8:"ban_post";s:1:"0";s:20:"ban_subject_interest";s:1:"1";}`,
+	} {
+		personal, err := decodePermission([]byte(acl))
+		require.NoError(t, err)
+		require.ElementsMatch(t, []string{"ban_post", "ban_subject_interest"}, personal.DefinedFields)
+		require.Equal(t, Permission{BanVisit: true, BanSubjectInterest: true, EpEdit: true}, group.Merge(personal))
+		require.True(t, group.BanPost)
+	}
+
+	personal, err := decodePermission([]byte("[]"))
+	require.NoError(t, err)
+	require.NotNil(t, personal.DefinedFields)
+	require.Empty(t, personal.DefinedFields)
+	require.Equal(t, group, group.Merge(personal))
+}
+
+func TestPermissionMergePlainValues(t *testing.T) {
+	t.Parallel()
+	base := Permission{UserList: true, ManageReport: true, Report: true}
+	other := Permission{UserList: true, BanPost: true}
+	require.Equal(t, Permission{UserList: true, BanPost: true}, base.Merge(other))
+}

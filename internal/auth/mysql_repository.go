@@ -85,9 +85,9 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		return UserInfo{}, errgo.Wrap(err, "gorm")
 	}
 
-	perm, err := parseSerializedPermission([]byte(u.ACL))
+	permission, err := decodePermission([]byte(u.ACL))
 	if err != nil {
-		return UserInfo{}, errgo.Wrap(err, "parsing permission")
+		return UserInfo{}, errgo.Wrap(err, "parsing personal permissions")
 	}
 
 	scope, legacy := parseTokenScope(access.Scope)
@@ -96,7 +96,7 @@ func (m mysqlRepo) GetByToken(ctx context.Context, token string) (UserInfo, erro
 		RegTime:    time.Unix(u.Regdate, 0),
 		ID:         id,
 		GroupID:    u.GroupID,
-		Permission: perm,
+		Permission: permission,
 		Scope:      scope,
 		Legacy:     legacy,
 	}, nil

@@ -114,6 +114,11 @@ type Permission struct {
 	MonoMerge          bool
 	MonoErase          bool
 	BanPost            bool
+	BanPostGroup       bool
+	BanPostGroupNSFW   bool
+	BanSubjectInterest bool
+	BanVisit           bool
+	Deleted            bool
 	EpEdit             bool
 	EpMove             bool
 	EpMerge            bool
@@ -122,12 +127,33 @@ type Permission struct {
 	Report             bool
 	ManageApp          bool
 	AppErase           bool
+
+	DefinedFields []string // The explicit overrides. A nil slice denotes a plain Permission.
 }
 
 func (p Permission) Merge(other Permission) Permission {
+	if other.DefinedFields != nil {
+		if len(other.DefinedFields) == 0 {
+			return p
+		}
+		target := phpPermissionFields(&p)
+		overrides := phpPermissionFields(&other)
+		for _, name := range other.DefinedFields {
+			if field, ok := target[name]; ok {
+				*field = *overrides[name]
+			}
+		}
+		return p
+	}
+
 	return Permission{
-		UserBan: p.UserBan || other.UserBan,
-		BanPost: p.BanPost || other.BanPost,
+		UserBan:            p.UserBan || other.UserBan,
+		BanPost:            p.BanPost || other.BanPost,
+		BanPostGroup:       p.BanPostGroup,
+		BanPostGroupNSFW:   p.BanPostGroupNSFW,
+		BanSubjectInterest: p.BanSubjectInterest,
+		BanVisit:           p.BanVisit,
+		Deleted:            p.Deleted,
 
 		UserList:           p.UserList && other.UserList,
 		ManageUserGroup:    p.ManageUserGroup && other.ManageUserGroup,

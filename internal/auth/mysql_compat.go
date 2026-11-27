@@ -15,91 +15,107 @@
 package auth
 
 import (
+	"bytes"
+	"encoding/json"
+
 	"github.com/trim21/errgo"
 
 	"github.com/bangumi/server/internal/pkg/serialize"
 )
 
-func parseBool(s string) bool {
-	return s == "1"
+func parseSerializedPermission(raw []byte) (Permission, error) {
+	permission, err := decodePermission(raw)
+	permission.DefinedFields = nil
+	return permission, err
 }
 
-type phpPermission struct {
-	UserList           string `php:"user_list" json:"user_list"`
-	ManageUserGroup    string `php:"manage_user_group" json:"manage_user_group"`
-	ManageUserPhoto    string `php:"manage_user_photo" json:"manage_user_photo"`
-	ManageTopicState   string `php:"manage_topic_state" json:"manage_topic_state"`
-	ManageReport       string `php:"manage_report" json:"manage_report"`
-	UserBan            string `php:"user_ban" json:"user_ban"`
-	ManageUser         string `php:"manage_user" json:"manage_user"`
-	UserGroup          string `php:"user_group" json:"user_group"`
-	UserWikiApprove    string `php:"user_wiki_approve" json:"user_wiki_approve"`
-	DoujinSubjectErase string `php:"doujin_subject_erase" json:"doujin_subject_erase"`
-	UserWikiApply      string `php:"user_wiki_apply" json:"user_wiki_apply"`
-	DoujinSubjectLock  string `php:"doujin_subject_lock" json:"doujin_subject_lock"`
-	SubjectEdit        string `php:"subject_edit" json:"subject_edit"`
-	SubjectLock        string `php:"subject_lock" json:"subject_lock"`
-	SubjectRefresh     string `php:"subject_refresh" json:"subject_refresh"`
-	SubjectRelated     string `php:"subject_related" json:"subject_related"`
-	SubjectMerge       string `php:"subject_merge" json:"subject_merge"`
-	SubjectErase       string `php:"subject_erase" json:"subject_erase"`
-	SubjectCoverLock   string `php:"subject_cover_lock" json:"subject_cover_lock"`
-	SubjectCoverErase  string `php:"subject_cover_erase" json:"subject_cover_erase"`
-	MonoEdit           string `php:"mono_edit" json:"mono_edit"`
-	MonoLock           string `php:"mono_lock" json:"mono_lock"`
-	MonoMerge          string `php:"mono_merge" json:"mono_merge"`
-	MonoErase          string `php:"mono_erase" json:"mono_erase"`
-	EpEdit             string `php:"ep_edit" json:"ep_edit"`
-	EpMove             string `php:"ep_move" json:"ep_move"`
-	EpMerge            string `php:"ep_merge" json:"ep_merge"`
-	EpLock             string `php:"ep_lock" json:"ep_lock"`
-	EpErase            string `php:"ep_erase" json:"ep_erase"`
-	Report             string `php:"report" json:"report"`
-	ManageApp          string `php:"manage_app" json:"manage_app"`
-	AppErase           string `php:"app_erase" json:"app_erase"`
-}
-
-func parseSerializedPermission(b []byte) (Permission, error) {
-	var p phpPermission
-	if len(b) > 0 {
-		err := serialize.Decode(b, &p)
-		if err != nil {
-			return Permission{}, errgo.Wrap(err, "parsing permission: serialize.Decode")
-		}
+func decodePermission(raw []byte) (Permission, error) {
+	permission := Permission{DefinedFields: []string{}}
+	raw = bytes.TrimSpace(raw)
+	if len(raw) == 0 || bytes.Equal(raw, []byte("[]")) {
+		return permission, nil
 	}
 
-	return Permission{
-		UserList:           parseBool(p.UserList),
-		ManageUserGroup:    parseBool(p.ManageUserGroup),
-		ManageUserPhoto:    parseBool(p.ManageUserPhoto),
-		ManageTopicState:   parseBool(p.ManageTopicState),
-		ManageReport:       parseBool(p.ManageReport),
-		UserBan:            parseBool(p.UserBan),
-		ManageUser:         parseBool(p.ManageUser),
-		UserGroup:          parseBool(p.UserGroup),
-		UserWikiApprove:    parseBool(p.UserWikiApprove),
-		UserWikiApply:      parseBool(p.UserWikiApply),
-		DoujinSubjectErase: parseBool(p.DoujinSubjectErase),
-		DoujinSubjectLock:  parseBool(p.DoujinSubjectLock),
-		SubjectEdit:        parseBool(p.SubjectEdit),
-		SubjectLock:        parseBool(p.SubjectLock),
-		SubjectRefresh:     parseBool(p.SubjectRefresh),
-		SubjectRelated:     parseBool(p.SubjectRelated),
-		SubjectMerge:       parseBool(p.SubjectMerge),
-		SubjectErase:       parseBool(p.SubjectErase),
-		SubjectCoverLock:   parseBool(p.SubjectCoverLock),
-		SubjectCoverErase:  parseBool(p.SubjectCoverErase),
-		MonoEdit:           parseBool(p.MonoEdit),
-		MonoLock:           parseBool(p.MonoLock),
-		MonoMerge:          parseBool(p.MonoMerge),
-		MonoErase:          parseBool(p.MonoErase),
-		EpEdit:             parseBool(p.EpEdit),
-		EpMove:             parseBool(p.EpMove),
-		EpMerge:            parseBool(p.EpMerge),
-		EpLock:             parseBool(p.EpLock),
-		EpErase:            parseBool(p.EpErase),
-		Report:             parseBool(p.Report),
-		ManageApp:          parseBool(p.ManageApp),
-		AppErase:           parseBool(p.AppErase),
-	}, nil
+	fields := phpPermissionFields(&permission)
+	if bytes.HasPrefix(raw, []byte("a:")) {
+		var values map[string]string
+		if err := serialize.Decode(raw, &values); err != nil {
+			return Permission{}, errgo.Wrap(err, "decoding PHP permissions")
+		}
+		for name, value := range values {
+			if field, ok := fields[name]; ok {
+				*field = value != "" && value != "0"
+				permission.DefinedFields = append(permission.DefinedFields, name)
+			}
+		}
+		return permission, nil
+	}
+
+	var values map[string]any
+	if err := json.Unmarshal(raw, &values); err != nil {
+		return Permission{}, errgo.Wrap(err, "decoding JSON permissions")
+	}
+	for name, value := range values {
+		field, ok := fields[name]
+		if !ok {
+			continue
+		}
+		switch v := value.(type) {
+		case bool:
+			*field = v
+		case string:
+			*field = v != "" && v != "0"
+		case float64:
+			*field = v != 0
+		case nil:
+			*field = false
+		default:
+			continue
+		}
+		permission.DefinedFields = append(permission.DefinedFields, name)
+	}
+	return permission, nil
+}
+
+func phpPermissionFields(permission *Permission) map[string]*bool {
+	return map[string]*bool{
+		"user_list":            &permission.UserList,
+		"manage_user_group":    &permission.ManageUserGroup,
+		"manage_user_photo":    &permission.ManageUserPhoto,
+		"manage_topic_state":   &permission.ManageTopicState,
+		"manage_report":        &permission.ManageReport,
+		"user_ban":             &permission.UserBan,
+		"manage_user":          &permission.ManageUser,
+		"user_group":           &permission.UserGroup,
+		"user_wiki_apply":      &permission.UserWikiApply,
+		"user_wiki_approve":    &permission.UserWikiApprove,
+		"doujin_subject_erase": &permission.DoujinSubjectErase,
+		"doujin_subject_lock":  &permission.DoujinSubjectLock,
+		"subject_edit":         &permission.SubjectEdit,
+		"subject_lock":         &permission.SubjectLock,
+		"subject_refresh":      &permission.SubjectRefresh,
+		"subject_related":      &permission.SubjectRelated,
+		"subject_merge":        &permission.SubjectMerge,
+		"subject_erase":        &permission.SubjectErase,
+		"subject_cover_lock":   &permission.SubjectCoverLock,
+		"subject_cover_erase":  &permission.SubjectCoverErase,
+		"mono_edit":            &permission.MonoEdit,
+		"mono_lock":            &permission.MonoLock,
+		"mono_merge":           &permission.MonoMerge,
+		"mono_erase":           &permission.MonoErase,
+		"ban_post":             &permission.BanPost,
+		"ban_post_group":       &permission.BanPostGroup,
+		"ban_post_group_nsfw":  &permission.BanPostGroupNSFW,
+		"ban_subject_interest": &permission.BanSubjectInterest,
+		"ban_visit":            &permission.BanVisit,
+		"deleted":              &permission.Deleted,
+		"ep_edit":              &permission.EpEdit,
+		"ep_move":              &permission.EpMove,
+		"ep_merge":             &permission.EpMerge,
+		"ep_lock":              &permission.EpLock,
+		"ep_erase":             &permission.EpErase,
+		"report":               &permission.Report,
+		"manage_app":           &permission.ManageApp,
+		"app_erase":            &permission.AppErase,
+	}
 }

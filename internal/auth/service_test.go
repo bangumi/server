@@ -16,7 +16,9 @@ package auth_test
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -34,16 +36,75 @@ func TestService_GetByToken(t *testing.T) {
 
 	var m = mocks.NewAuthRepo(t)
 	m.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).
-		Return(auth.UserInfo{GroupID: 2, Permission: auth.Permission{EpEdit: true}}, nil)
-	m.EXPECT().GetPermission(mock.Anything, user.GroupID(2)).Return(auth.Permission{EpEdit: true}, nil)
+		Return(auth.UserInfo{
+			GroupID: 2, Permission: auth.Permission{EpEdit: true, DefinedFields: []string{"ep_edit", "ban_post"}},
+		}, nil)
+	m.EXPECT().GetPermission(mock.Anything, user.GroupID(2)).
+		Return(auth.Permission{EpEdit: true, BanPost: true, Report: true}, nil)
 
-	var u = mocks.NewUserRepo(t)
-
-	s := auth.NewService(m, u, zap.NewNop(), cache.NewNoop())
+	s := auth.NewService(m, mocks.NewUserRepo(t), zap.NewNop(), cache.NewNoop())
 
 	a, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
 	require.NoError(t, err)
 
 	require.Equal(t, user.GroupID(2), a.GroupID)
-	require.True(t, a.Permission.EpEdit)
+	require.Equal(t, auth.Permission{EpEdit: true, Report: true}, a.Permission)
+}
+
+func TestService_ReusesAuthCacheWithPersonalACL(t *testing.T) {
+	t.Parallel()
+
+	repo := mocks.NewAuthRepo(t)
+	repo.EXPECT().GetByToken(mock.Anything, test.TreeHoleAccessToken).
+		Return(auth.UserInfo{
+			GroupID: 10, Permission: auth.Permission{BanVisit: true, DefinedFields: []string{"ban_visit"}},
+		}, nil).Once()
+	repo.EXPECT().GetPermission(mock.Anything, user.GroupID(10)).Return(auth.Permission{}, nil).Once()
+
+	cached := &authCacheStub{
+		RedisCache: cache.NewNoop(),
+		data:       []byte(`{"GroupID":10,"Permission":{}}`),
+	}
+	s := auth.NewService(repo, mocks.NewUserRepo(t), zap.NewNop(), cached)
+	for range 2 {
+		result, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
+		require.NoError(t, err)
+		require.True(t, result.Permission.BanVisit)
+	}
+	require.Equal(t, 10*time.Minute, cached.ttl)
+}
+
+func TestService_CachedEmptyACLDoesNotTriggerReload(t *testing.T) {
+	t.Parallel()
+
+	repo := mocks.NewAuthRepo(t)
+	repo.EXPECT().GetPermission(mock.Anything, user.GroupID(10)).
+		Return(auth.Permission{BanPost: true}, nil).Once()
+	cached := &authCacheStub{
+		RedisCache: cache.NewNoop(),
+		data:       []byte(`{"GroupID":10,"Permission":{"DefinedFields":[]}}`),
+	}
+	s := auth.NewService(repo, mocks.NewUserRepo(t), zap.NewNop(), cached)
+
+	result, err := s.GetByToken(context.Background(), test.TreeHoleAccessToken)
+	require.NoError(t, err)
+	require.True(t, result.Permission.BanPost)
+	require.Zero(t, cached.ttl)
+}
+
+type authCacheStub struct {
+	cache.RedisCache
+	data []byte
+	ttl  time.Duration
+}
+
+func (c *authCacheStub) Get(_ context.Context, _ string, value any) (bool, error) {
+	return true, json.Unmarshal(c.data, value)
+}
+
+func (c *authCacheStub) Set(_ context.Context, _ string, value any, ttl time.Duration) error {
+	c.ttl = ttl
+	var err error
+	c.data, err = json.Marshal(value)
+	return err
 }

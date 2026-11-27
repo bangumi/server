@@ -56,26 +56,28 @@ func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 		return Auth{}, errgo.Wrap(err, "cache.Get")
 	}
 
-	if !ok {
+	// A legacy cache entry has no defined fields, while a decoded empty ACL has an empty slice.
+	if !ok || a.Permission.DefinedFields == nil {
 		a, err = s.repo.GetByToken(ctx, token)
 		if err != nil {
-			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByID")
+			return Auth{}, errgo.Wrap(err, "AuthRepo.GetByToken")
 		}
 
 		_ = s.cache.Set(ctx, cacheKey, a, time.Minute*10)
 	}
 
-	permission, err := s.getPermission(ctx, a.GroupID)
+	groupPermission, err := s.getPermission(ctx, a.GroupID)
 	if err != nil {
 		return Auth{}, err
 	}
+	permission := groupPermission.Merge(a.Permission)
 
 	return Auth{
 		Login:      true,
 		RegTime:    a.RegTime,
 		ID:         a.ID,
 		GroupID:    a.GroupID,
-		Permission: permission.Merge(a.Permission),
+		Permission: permission,
 		Scope:      a.Scope,
 		Legacy:     a.Legacy,
 	}, nil
