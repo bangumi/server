@@ -34,6 +34,8 @@ import (
 type RedisCache interface {
 	Get(ctx context.Context, key string, value any) (bool, error)
 	Set(ctx context.Context, key string, value any, ttl time.Duration) error
+	// SetNX sets key only if it doesn't exist, returns whether the value is set.
+	SetNX(ctx context.Context, key string, value any, ttl time.Duration) (bool, error)
 	Del(ctx context.Context, keys ...string) error
 
 	// MGet result should be `*[]T`
@@ -132,6 +134,20 @@ func (c redisCache) Set(ctx context.Context, key string, value any, ttl time.Dur
 	}
 
 	return nil
+}
+
+func (c redisCache) SetNX(ctx context.Context, key string, value any, ttl time.Duration) (bool, error) {
+	err := c.ru.Do(ctx, c.ru.B().Set().Key(key).Value(rueidis.JSON(value)).Nx().Ex(ttl).Build()).Error()
+	if err != nil {
+		//nolint:errorlint
+		if err == rueidis.Nil {
+			return false, nil
+		}
+
+		return false, errgo.Wrap(err, "redis set nx")
+	}
+
+	return true, nil
 }
 
 func (c redisCache) Del(ctx context.Context, keys ...string) error {

@@ -25,6 +25,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/search"
@@ -36,6 +37,7 @@ func newEventHandler(
 	log *zap.Logger,
 	appConfig config.AppConfig,
 	session session.Manager,
+	authService auth.Service,
 	redis rueidis.Client,
 	stream Stream,
 	tag tag.Repo,
@@ -46,6 +48,7 @@ func newEventHandler(
 		redis:   redis,
 		config:  appConfig,
 		session: session,
+		auth:    authService,
 		search:  search,
 		s3:      s3,
 		stream:  stream,
@@ -58,6 +61,7 @@ type eventHandler struct {
 	closed  atomic.Bool
 	config  config.AppConfig
 	session session.Manager
+	auth    auth.Service
 	log     *zap.Logger
 	search  search.Client
 	stream  Stream
@@ -128,6 +132,8 @@ func (e *eventHandler) onMessage(key, value []byte) error {
 		err = e.OnPerson(ctx, key, p)
 	case "chii_members":
 		err = e.OnUserChange(ctx, key, p)
+	case "chii_oauth_access_tokens":
+		err = e.OnAccessToken(ctx, p)
 	}
 
 	return err
