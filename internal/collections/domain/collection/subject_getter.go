@@ -42,6 +42,10 @@ func (s *Subject) Tags() []string {
 	return s.tags
 }
 
+func (s *Subject) TagsSet() bool {
+	return s.tagsSet
+}
+
 func (s *Subject) Vols() uint32 {
 	return s.vols
 }

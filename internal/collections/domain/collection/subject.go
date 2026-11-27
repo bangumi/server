@@ -83,6 +83,7 @@ type Subject struct {
 	comment string
 	privacy CollectPrivacy
 	tags    []string
+	tagsSet bool
 	vols    uint32
 	eps     uint32
 }
@@ -125,11 +126,6 @@ func (s *Subject) UpdateComment(comment string) error {
 }
 
 func (s *Subject) UpdateTags(tags []string) error {
-	if tags == nil {
-		s.tags = nil
-		return nil
-	}
-
 	tags = slice.Map(tags, strings.TrimSpace)
 
 	if lo.ContainsBy(tags, func(item string) bool { return !dam.AllPrintableChar(item) }) {
@@ -140,7 +136,11 @@ func (s *Subject) UpdateTags(tags []string) error {
 		tags[i] = norm.NFKC.String(tag)
 	}
 
-	s.tags = lo.Uniq(tags)
+	s.tags = nil
+	if len(tags) != 0 {
+		s.tags = lo.Uniq(tags)
+	}
+	s.tagsSet = true
 
 	return nil
 }
