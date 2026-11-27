@@ -20,8 +20,6 @@ import (
 
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
-
-	"github.com/bangumi/server/internal/cachekey"
 )
 
 type accessTokenPayload struct {
@@ -43,8 +41,8 @@ func (e *eventHandler) OnAccessToken(ctx context.Context, payload Payload) error
 			return nil
 		}
 
-		if err := e.cache.Del(ctx, cachekey.AuthToken(before.AccessToken)); err != nil {
-			return errgo.Wrap(err, "cache.Del")
+		if err := e.auth.RevokeToken(ctx, before.AccessToken); err != nil {
+			return errgo.Wrap(err, "auth.RevokeToken")
 		}
 
 		return nil

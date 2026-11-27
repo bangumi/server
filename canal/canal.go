@@ -30,6 +30,7 @@ import (
 
 	"github.com/bangumi/server/config"
 	"github.com/bangumi/server/dal"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/character"
 	"github.com/bangumi/server/internal/person"
 	"github.com/bangumi/server/internal/pkg/cache"
@@ -39,6 +40,7 @@ import (
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/subject"
 	"github.com/bangumi/server/internal/tag"
+	"github.com/bangumi/server/internal/user"
 	"github.com/bangumi/server/web/session"
 )
 
@@ -69,6 +71,7 @@ func Main() error {
 			driver.NewMysqlDriver,
 			driver.NewRueidisClient, logger.Copy, cache.NewRedisCache,
 			subject.NewMysqlRepo, character.NewMysqlRepo, person.NewMysqlRepo,
+			user.NewMysqlRepo, auth.NewMysqlRepo, auth.NewService,
 			search.New, session.NewMysqlRepo, session.New,
 			driver.NewS3,
 			tag.NewCachedRepo,

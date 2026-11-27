@@ -25,8 +25,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/bangumi/server/config"
+	"github.com/bangumi/server/internal/auth"
 	"github.com/bangumi/server/internal/model"
-	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/pkg/logger/log"
 	"github.com/bangumi/server/internal/search"
 	"github.com/bangumi/server/internal/tag"
@@ -37,7 +37,7 @@ func newEventHandler(
 	log *zap.Logger,
 	appConfig config.AppConfig,
 	session session.Manager,
-	cache cache.RedisCache,
+	authService auth.Service,
 	redis rueidis.Client,
 	stream Stream,
 	tag tag.Repo,
@@ -48,7 +48,7 @@ func newEventHandler(
 		redis:   redis,
 		config:  appConfig,
 		session: session,
-		cache:   cache,
+		auth:    authService,
 		search:  search,
 		s3:      s3,
 		stream:  stream,
@@ -61,7 +61,7 @@ type eventHandler struct {
 	closed  atomic.Bool
 	config  config.AppConfig
 	session session.Manager
-	cache   cache.RedisCache
+	auth    auth.Service
 	log     *zap.Logger
 	search  search.Client
 	stream  Stream

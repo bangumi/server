@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/mocks"
 	"github.com/bangumi/server/internal/pkg/logger"
 )
@@ -36,10 +35,10 @@ func TestOnAccessTokenChange(t *testing.T) {
 		t.Run(op, func(t *testing.T) {
 			t.Parallel()
 
-			c := mocks.NewRedisCache(t)
-			c.EXPECT().Del(mock.Anything, []string{cachekey.AuthToken(token)}).Return(nil)
+			a := mocks.NewAuthService(t)
+			a.EXPECT().RevokeToken(mock.Anything, token).Return(nil)
 
-			e := eventHandler{cache: c, log: logger.Copy()}
+			e := eventHandler{auth: a, log: logger.Copy()}
 			err := e.OnAccessToken(context.Background(), Payload{
 				Op:     op,
 				Before: json.RawMessage(`{"access_token":"` + token + `"}`),
@@ -52,7 +51,7 @@ func TestOnAccessTokenChange(t *testing.T) {
 func TestOnAccessTokenCreate(t *testing.T) {
 	t.Parallel()
 
-	e := eventHandler{cache: mocks.NewRedisCache(t), log: logger.Copy()}
+	e := eventHandler{auth: mocks.NewAuthService(t), log: logger.Copy()}
 	err := e.OnAccessToken(context.Background(), Payload{Op: opCreate})
 	require.NoError(t, err)
 }
