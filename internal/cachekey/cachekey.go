@@ -58,3 +58,7 @@ func User(id model.UserID) string {
 func SubjectMetaTag(id model.SubjectID) string {
 	return "chii:v0:subject:meta-tags:" + strconv.FormatUint(uint64(id), 10)
 }
+
+func AuthToken(token string) string {
+	return config.RedisKeyPrefix + "auth:access-token:" + token
+}

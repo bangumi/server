@@ -21,7 +21,7 @@ import (
 	"github.com/trim21/errgo"
 	"go.uber.org/zap"
 
-	"github.com/bangumi/server/internal/auth/internal/cachekey"
+	"github.com/bangumi/server/internal/cachekey"
 	"github.com/bangumi/server/internal/pkg/cache"
 	"github.com/bangumi/server/internal/user"
 )
@@ -49,7 +49,7 @@ type service struct {
 
 func (s service) GetByToken(ctx context.Context, token string) (Auth, error) {
 	var a UserInfo
-	var cacheKey = cachekey.Auth(token)
+	var cacheKey = cachekey.AuthToken(token)
 
 	ok, err := s.cache.Get(ctx, cacheKey, &a)
 	if err != nil {
