@@ -36,10 +36,23 @@ func TestParseTokenScope_Object(t *testing.T) {
 	require.Equal(t, Scope{"write:collection": true, "write:indices": false}, scope)
 }
 
-func TestParseTokenScope_NonObject(t *testing.T) {
+func TestParseTokenScope_OldFormats(t *testing.T) {
 	t.Parallel()
 
-	scope, legacy := parseTokenScope(sql.NullString{Valid: true, String: `["write:collection"]`})
-	require.False(t, legacy)
-	require.Empty(t, scope)
+	for _, raw := range []string{`["write:collection"]`, "write:collection"} {
+		scope, legacy := parseTokenScope(sql.NullString{Valid: true, String: raw})
+		require.False(t, legacy)
+		require.Equal(t, Scope{"write:collection": true}, scope)
+	}
+}
+
+func TestParseTokenScope_ExplicitEmptyOrInvalid(t *testing.T) {
+	t.Parallel()
+
+	for _, raw := range []string{"{}", "[]", "[1]", `{"write:collection":"true"}`} {
+		scope, legacy := parseTokenScope(sql.NullString{Valid: true, String: raw})
+		require.False(t, legacy)
+		require.NotNil(t, scope)
+		require.Empty(t, scope)
+	}
 }
