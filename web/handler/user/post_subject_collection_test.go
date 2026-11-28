@@ -93,6 +93,7 @@ func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
 	t.Parallel()
 	const sid model.SubjectID = 8
 	const uid model.UserID = 1
+	const comment = "original comment"
 	subject := model.Subject{ID: sid, TypeID: model.SubjectTypeAll}
 
 	var s = &collection.Subject{}
@@ -102,9 +103,13 @@ func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
 
 	tl := mocks.NewTimelineService(t)
 	tl.EXPECT().
-		ChangeSubjectCollection(mock.Anything, mock.Anything, mock.Anything,
-			mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-		Return(nil)
+		ChangeSubjectCollection(mock.Anything, uid, mock.Anything,
+			collection.SubjectCollectionDoing, mock.Anything, comment, mock.Anything).
+		Return(nil).Once()
+	tl.EXPECT().
+		ChangeSubjectCollection(mock.Anything, uid, mock.Anything,
+			collection.SubjectCollectionDone, mock.Anything, comment, mock.Anything).
+		Return(nil).Once()
 
 	c := mocks.NewCollectionsRepo(t)
 	c.EXPECT().UpdateOrCreateSubjectCollection(mock.Anything, uid, subject, mock.Anything, mock.Anything, mock.Anything).
@@ -115,8 +120,10 @@ func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
 			s = lo.Must(update(context.Background(), s))
 		}).
 		Return(nil)
-	c.EXPECT().GetSubjectCollection(mock.Anything, mock.Anything, mock.Anything).
-		Return(collection.UserSubjectCollection{}, nil)
+	c.EXPECT().GetSubjectCollection(mock.Anything, uid, sid).
+		RunAndReturn(func(context.Context, model.UserID, model.SubjectID) (collection.UserSubjectCollection, error) {
+			return collection.UserSubjectCollection{Type: s.TypeID(), Comment: s.Comment()}, nil
+		})
 
 	d, err := dam.New(config.AppConfig{NsfwWord: "", DisableWords: "test_content", BannedDomain: ""})
 	require.NoError(t, err)
@@ -127,12 +134,12 @@ func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
 		Header(echo.HeaderAuthorization, "Bearer t").
 		BodyJSON(map[string]any{
 			"type":    3,
-			"comment": "1 test_content 2",
+			"comment": comment,
 		}).
 		Post(fmt.Sprintf("/v0/users/-/collections/%d", sid)).
 		ExpectCode(http.StatusAccepted)
 
-	require.Equal(t, "1 test_content 2", s.Comment())
+	require.Equal(t, comment, s.Comment())
 	require.EqualValues(t, []string(nil), s.Tags())
 	require.Equal(t, collection.SubjectCollectionDoing, s.TypeID())
 
@@ -145,7 +152,7 @@ func TestUser_PostSubjectCollectionPartialData(t *testing.T) {
 		ExpectCode(http.StatusAccepted)
 
 	require.Equal(t, collection.SubjectCollectionDone, s.TypeID())
-	require.Equal(t, "1 test_content 2", s.Comment())
+	require.Equal(t, comment, s.Comment())
 	require.EqualValues(t, []string(nil), s.Tags())
 
 	htest.New(t, app).

@@ -134,7 +134,7 @@ func (ctl Ctrl) mayCreateTimeline(
 		}
 
 		err = ctl.timeline.ChangeSubjectCollection(ctx,
-			u.ID, sj, req.Type.Value, collect.ID, req.Comment.Value, req.Rate.Value)
+			u.ID, sj, collect.Type, collect.ID, collect.Comment, collect.Rate)
 		if err != nil {
 			ctl.log.Error("failed to create associated timeline", zap.Error(err))
 			return errgo.Wrap(err, "timelineRepo.Create")
